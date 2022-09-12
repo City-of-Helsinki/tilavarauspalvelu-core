@@ -45,6 +45,7 @@ from reservation_units.tests.factories import (
     QualifierFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
+    ReservationUnitPricingFactory,
     ReservationUnitTypeFactory,
 )
 from reservations.models import STATE_CHOICES
@@ -137,6 +138,9 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
         )
         cls.reservation_unit.qualifiers.set([qualifier])
         cls.reservation_unit.payment_types.set([PaymentType.ONLINE])
+        cls.reservation_unit.pricings.add(
+            ReservationUnitPricingFactory(reservation_unit=cls.reservation_unit)
+        )
 
         cls.api_client = APIClient()
 
@@ -262,6 +266,17 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             pricingType
                             paymentTypes {
                                 code
+                            }
+                            pricings {
+                                begins
+                                pricingType
+                                priceUnit
+                                lowestPrice
+                                highestPrice
+                                taxPercentage {
+                                    value
+                                }
+                                status
                             }
                           }
                         }

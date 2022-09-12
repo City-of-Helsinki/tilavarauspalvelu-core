@@ -637,6 +637,100 @@ class ReservationUnit(models.Model):
         return ReservationUnitStateHelper.get_state(self)
 
 
+class ReservationUnitPricing(models.Model):
+
+    begins = models.DateField(
+        verbose_name=_("Date when price is activated"),
+        null=False,
+        blank=False,
+        help_text="When pricing is activated",
+    )
+
+    pricing_type = models.CharField(
+        max_length=20,
+        verbose_name=_("Pricing type"),
+        choices=PricingType.choices,
+        blank=True,
+        null=True,
+        help_text="What kind of pricing types are available with this reservation unit.",
+    )
+
+    PRICE_UNIT_PER_15_MINS = "per_15_mins"
+    PRICE_UNIT_PER_30_MINS = "per_30_mins"
+    PRICE_UNIT_PER_HOUR = "per_hour"
+    PRICE_UNIT_PER_HALF_DAY = "per_half_day"
+    PRICE_UNIT_PER_DAY = "per_day"
+    PRICE_UNIT_PER_WEEK = "per_week"
+    PRICE_UNIT_FIXED = "fixed"
+    PRICE_UNITS = (
+        (PRICE_UNIT_PER_15_MINS, _("per 15 minutes")),
+        (PRICE_UNIT_PER_30_MINS, _("per 30 minutes")),
+        (PRICE_UNIT_PER_HOUR, _("per hour")),
+        (PRICE_UNIT_PER_HALF_DAY, _("per half a day")),
+        (PRICE_UNIT_PER_DAY, _("per day")),
+        (PRICE_UNIT_PER_WEEK, _("per week")),
+        (PRICE_UNIT_FIXED, _("fixed")),
+    )
+    price_unit = models.CharField(
+        max_length=20,
+        verbose_name=_("Price unit"),
+        choices=PRICE_UNITS,
+        default=PRICE_UNIT_PER_HOUR,
+        help_text="Unit of the price",
+    )
+    lowest_price = models.DecimalField(
+        verbose_name=_("Lowest price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="Minimum price of the reservation unit",
+    )
+
+    highest_price = models.DecimalField(
+        verbose_name=_("Highest price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="Maximum price of the reservation unit",
+    )
+
+    tax_percentage = models.ForeignKey(
+        TaxPercentage,
+        verbose_name=_("Tax percentage"),
+        related_name="reservation_unit_pricings",
+        on_delete=models.PROTECT,
+        default=get_default_tax_percentage,
+        help_text="The percentage of tax included in the price",
+    )
+
+    PRICING_STATUS_PAST = "past"
+    PRICING_STATUS_ACTIVE = "active"
+    PRICING_STATUS_FUTURE = "future"
+    PRICE_STATUSES = (
+        (PRICING_STATUS_PAST, _("past")),
+        (PRICING_STATUS_ACTIVE, _("active")),
+        (PRICING_STATUS_FUTURE, _("future")),
+    )
+    status = models.CharField(
+        max_length=20,
+        verbose_name=_("Status"),
+        choices=PRICE_STATUSES,
+        help_text="Status of the pricing",
+    )
+
+    reservation_unit = models.ForeignKey(
+        ReservationUnit,
+        verbose_name=_("Reservation unit"),
+        null=True,
+        blank=False,
+        related_name="pricings",
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
+
+
 class ReservationUnitImage(models.Model):
     TYPES = (
         ("main", _("Main image")),

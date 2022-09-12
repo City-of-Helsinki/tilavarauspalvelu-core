@@ -55,6 +55,7 @@ from reservation_units.models import (
     ReservationUnitCancellationRule,
     ReservationUnitImage,
     ReservationUnitPaymentType,
+    ReservationUnitPricing,
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
 from reservation_units.models import TaxPercentage
@@ -327,6 +328,20 @@ class ReservationUnitPaymentTypeType(AuthNode, PrimaryKeyObjectType):
         connection_class = TilavarausBaseConnection
 
 
+class ReservationUnitPricingType(AuthNode, PrimaryKeyObjectType):
+    class Meta:
+        model = ReservationUnitPricing
+        fields = [
+            "begins",
+            "pricing_type",
+            "price_unit",
+            "lowest_price",
+            "highest_price",
+            "tax_percentage",
+            "status",
+        ]
+
+
 class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
@@ -370,6 +385,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         if not settings.TMP_PERMISSIONS_DISABLED
         else (AllowAny,)
     )
+    pricings = graphene.List(ReservationUnitPricingType)
 
     class Meta:
         model = ReservationUnit
@@ -439,6 +455,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_location(self, info):
         return self.get_location()
+
+    def resolve_pricings(self, info):
+        return self.pricings.all()
 
     @check_resolver_permission(SpacePermission)
     def resolve_spaces(self, info):

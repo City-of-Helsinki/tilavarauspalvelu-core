@@ -1,7 +1,10 @@
+from datetime import date
+
 from factory import SubFactory, post_generation
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 
+from reservation_units.models import PricingType
 from spaces.tests.factories import UnitFactory
 
 
@@ -107,6 +110,26 @@ class ReservationUnitFactory(DjangoModelFactory):
 class ReservationUnitImageFactory(DjangoModelFactory):
     class Meta:
         model = "reservation_units.ReservationUnitImage"
+
+
+class ReservationUnitPricingFactory(DjangoModelFactory):
+
+    begins = date(2021, 1, 1)
+    pricing_type = PricingType.PAID
+    price_unit = "per_15_mins"
+    lowest_price = 5
+    highest_price = 10
+    tax_percentage = SubFactory(TaxPercentageFactory, value=10.0)
+    status = "active"
+
+    class Meta:
+        model = "reservation_units.ReservationUnitPricing"
+
+    def reservation_unit(self, create, reservation_unit, **kwargs):
+        if not create or not reservation_unit:
+            return
+
+        self.reservation_unit = reservation_unit
 
 
 class KeywordCategoryFactory(DjangoModelFactory):

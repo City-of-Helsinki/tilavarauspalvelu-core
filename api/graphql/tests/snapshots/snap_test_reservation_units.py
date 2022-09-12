@@ -902,6 +902,19 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             'termsType': 'PRICING_TERMS'
                         },
                         'pricingType': 'PAID',
+                        'pricings': [
+                            {
+                                'begins': '2021-01-01',
+                                'highestPrice': '10.00',
+                                'lowestPrice': '5.00',
+                                'priceUnit': 'PER_15_MINS',
+                                'pricingType': 'PAID',
+                                'status': 'ACTIVE',
+                                'taxPercentage': {
+                                    'value': '10.00'
+                                }
+                            }
+                        ],
                         'publishBegins': '2021-05-03T00:00:00+00:00',
                         'publishEnds': '2021-05-10T00:00:00+00:00',
                         'purposes': [

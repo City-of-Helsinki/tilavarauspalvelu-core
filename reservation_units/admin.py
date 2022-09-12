@@ -17,6 +17,7 @@ from .models import (
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
+    ReservationUnitPricing,
     ReservationUnitType,
     TaxPercentage,
 )
@@ -35,11 +36,15 @@ class ReservationUnitImageInline(admin.TabularInline):
     model = ReservationUnitImage
 
 
+class ReservationUnitPricingInline(admin.TabularInline):
+    model = ReservationUnitPricing
+
+
 @admin.register(ReservationUnit)
 class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     model = ReservationUnit
     form = ReservationUnitAdminForm
-    inlines = [ReservationUnitImageInline]
+    inlines = [ReservationUnitImageInline, ReservationUnitPricingInline]
     readonly_fields = ["uuid"]
     search_fields = ["name", "unit__name", "pk__iexact", "unit__service_sectors__name"]
 
@@ -59,6 +64,11 @@ class ReservationUnitTypeAdmin(SortableAdminMixin, admin.ModelAdmin):
 @admin.register(ReservationUnitCancellationRule)
 class ReservationUnitCancellationRuleAdmin(admin.ModelAdmin):
     model = ReservationUnitCancellationRule
+
+
+@admin.register(ReservationUnitPricing)
+class ReservationUnitPricingAdmin(admin.ModelAdmin):
+    model = ReservationUnitPricing
 
 
 @admin.register(Period)
