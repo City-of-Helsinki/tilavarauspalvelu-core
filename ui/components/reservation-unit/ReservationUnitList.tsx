@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { sortBy } from "lodash";
 import styled from "styled-components";
-import { ApplicationEvent, OptionType } from "../../modules/types";
+import { ApplicationEvent, OptionType } from "common/types/common";
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";

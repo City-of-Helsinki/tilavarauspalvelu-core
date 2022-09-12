@@ -6,6 +6,7 @@ import { useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel, Notification } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { User } from "common/types/common";
 import Container from "../../components/common/Container";
 import {
   Query,
@@ -19,7 +20,6 @@ import { breakpoint } from "../../modules/style";
 import Head from "../../components/reservations/Head";
 import { CenterSpinner } from "../../components/common/common";
 import { getCurrentUser } from "../../modules/api";
-import { User } from "../../modules/types";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -1,5 +1,6 @@
-import { ApplicationEvent, Cell } from "../types";
-import { convertHMSToSeconds, getReadableList } from "../util";
+import { convertHMSToSeconds } from "common/src/common/util";
+import { ApplicationEvent, Cell } from "common/types/common";
+import { getReadableList } from "../util";
 
 export const getSelectedHours = (selectorData: Cell[][][]): number[] =>
   selectorData.map((n) =>

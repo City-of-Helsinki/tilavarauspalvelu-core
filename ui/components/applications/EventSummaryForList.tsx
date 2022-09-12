@@ -10,6 +10,13 @@ import { useRouter } from "next/router";
 import React, { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import {
+  ApplicationEvent,
+  Parameter,
+  RecurringReservation,
+  Reservation,
+  ReservationUnit,
+} from "common/types/common";
 import { ApiData, useApiData } from "../../hooks/useApiData";
 import {
   applicationEventCalendarFeedUrl,
@@ -17,13 +24,6 @@ import {
 } from "../../modules/api";
 import { breakpoint } from "../../modules/style";
 import { Strong } from "../../modules/style/typography";
-import {
-  ApplicationEvent,
-  Parameter,
-  RecurringReservation,
-  Reservation,
-  ReservationUnit,
-} from "../../modules/types";
 import { parseDate, formatDurationMinutes } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { HorisontalRule, SpanTwoColumns } from "../common/common";

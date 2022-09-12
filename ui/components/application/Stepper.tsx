@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { IconCheck } from "hds-react";
 import { useRouter } from "next/router";
-import { Application } from "../../modules/types";
+import { Application } from "common/types/common";
 import { fontBold } from "../../modules/style/typography";
 
 const StepContainer = styled.div<{ $disabled: boolean }>`

@@ -1,6 +1,6 @@
 import { i18n } from "next-i18next";
 import getConfig from "next/config";
-import { OptionType } from "./types";
+import { OptionType } from "common/types/common";
 
 export const weekdays = [
   "monday",

@@ -7,7 +7,7 @@ import {
   Application,
   ContactPerson,
   Organisation,
-} from "../../modules/types";
+} from "common/types/common";
 import {
   CheckboxWrapper,
   FormSubHeading,

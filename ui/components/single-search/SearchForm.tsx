@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
+import { OptionType, StringParameter } from "common/types/common";
 import { breakpoint } from "../../modules/style";
 import {
   mapOptions,
@@ -21,7 +22,6 @@ import {
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { MediumButton, truncatedText } from "../../styles/util";
-import { OptionType, StringParameter } from "../../modules/types";
 import { Query } from "../../modules/gql-types";
 import MultiSelectDropdown from "../form/MultiselectDropdown";
 import {

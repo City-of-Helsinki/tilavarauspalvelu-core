@@ -1,6 +1,7 @@
 import { formatters as getFormatters, getReservationVolume } from "common";
 import { flatten, trim, uniq } from "lodash";
 import { i18n } from "next-i18next";
+import { ReservationState, ReservationUnit } from "common/types/common";
 import {
   EquipmentType,
   ReservationsReservationStateChoices,
@@ -8,7 +9,6 @@ import {
   ReservationUnitType,
   UnitType,
 } from "./gql-types";
-import { ReservationState, ReservationUnit } from "./types";
 import { capitalize, getTranslation, localizedValue } from "./util";
 
 export const getPrice = (

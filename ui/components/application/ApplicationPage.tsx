@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { Application } from "common/types/common";
 import { breakpoint } from "../../modules/style";
-import { Application } from "../../modules/types";
 import Container from "../common/Container";
 import Head from "./Head";
 import Stepper from "./Stepper";

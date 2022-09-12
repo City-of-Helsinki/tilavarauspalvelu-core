@@ -1,8 +1,8 @@
 import { isAfter } from "date-fns";
 import camelCase from "lodash/camelCase";
+import { convertHMSToSeconds, secondsToHms } from "common/src/common/util";
+import { OptionType } from "common/types/common";
 import { ReservationType } from "./gql-types";
-import { OptionType } from "./types";
-import { convertHMSToSeconds, secondsToHms } from "./util";
 
 export const getDurationOptions = (
   minReservationDuration: number,

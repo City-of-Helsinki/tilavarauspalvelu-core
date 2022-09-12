@@ -1,4 +1,4 @@
-const formatters = (language: string) => ({
+const formatters = (language: string): Record<string, Intl.NumberFormat> => ({
   default: new Intl.NumberFormat(),
   currency: new Intl.NumberFormat(language, {
     style: "currency",

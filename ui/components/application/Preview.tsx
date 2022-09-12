@@ -6,19 +6,15 @@ import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { formatDuration } from "common/src/common/util";
 import {
   Application,
   ReservationUnit,
   Parameter,
   StringParameter,
   OptionType,
-} from "../../modules/types";
-import {
-  deepCopy,
-  formatDuration,
-  getTranslation,
-  mapOptions,
-} from "../../modules/util";
+} from "common/types/common";
+import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";

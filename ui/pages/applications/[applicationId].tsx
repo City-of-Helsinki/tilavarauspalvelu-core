@@ -11,6 +11,7 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
+import { Application, RecurringReservation } from "common/types/common";
 import {
   getApplication,
   getApplicationRound,
@@ -18,13 +19,11 @@ import {
 } from "../../modules/api";
 import { ApiData, useApiData } from "../../hooks/useApiData";
 import { breakpoint } from "../../modules/style";
-import { Application, RecurringReservation } from "../../modules/types";
 import { SubHeading } from "../../modules/style/typography";
 import { parseDate } from "../../modules/util";
 import Back from "../../components/common/Back";
 import Loader from "../../components/common/Loader";
 import { TwoColumnContainer } from "../../components/common/common";
-import ReservationsView from "../../components/applications/ReservationsView";
 import { isBrowser } from "../../modules/const";
 import { MediumButton } from "../../styles/util";
 
@@ -233,13 +232,6 @@ const Reservations = (): JSX.Element | null => {
               </Buttons>
             ) : null}
           </TwoColumnContainer>
-          {hasReservations ? (
-            <ReservationsView
-              application={application}
-              isCalendar={isCalendar}
-              reservations={reservations}
-            />
-          ) : null}
         </Loader>
       </Container>
     </OidcSecure>

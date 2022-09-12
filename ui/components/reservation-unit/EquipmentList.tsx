@@ -13,7 +13,11 @@ type Props = {
 
 const Wrapper = styled.div``;
 
-const List = styled.ul`
+const List = styled.ul<{ $showAll: boolean; $itemsToShow: number }>`
+  & > li:nth-of-type(n + ${(props) => props.$itemsToShow + 1}) {
+    display: ${(props) => (props.$showAll ? "list-item" : "none")};
+  }
+
   list-style: none;
   display: grid;
   grid-template-columns: 1fr;
@@ -44,13 +48,12 @@ const EquipmentList = ({ equipment, itemsToShow = 6 }: Props): JSX.Element => {
   const [showAll, setShowAll] = useState(false);
 
   const equipmentList = useMemo(() => {
-    const items = showAll ? equipment : equipment.slice(0, itemsToShow);
-    return getEquipmentList(items);
-  }, [equipment, showAll, itemsToShow]);
+    return getEquipmentList(equipment);
+  }, [equipment]);
 
   return (
     <Wrapper>
-      <List>
+      <List $showAll={showAll} $itemsToShow={itemsToShow}>
         {equipmentList.map((item) => (
           <EquipmentItem key={item}>{item}</EquipmentItem>
         ))}

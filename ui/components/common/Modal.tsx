@@ -22,7 +22,7 @@ const Overlay = styled.div`
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 100;
+  z-index: var(--tilavaraus-stack-order-modal);
 `;
 
 const ModalElement = styled.div`
@@ -33,7 +33,7 @@ const ModalElement = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 101;
+  z-index: calc(var(--tilavaraus-stack-order-modal) + 1);
   display: flex;
   flex-direction: column;
   max-height: 90%;

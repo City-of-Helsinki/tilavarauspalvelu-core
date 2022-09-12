@@ -1,5 +1,7 @@
 import { addDays, addMinutes, endOfWeek, set } from "date-fns";
 import { graphql, rest } from "msw";
+import { toApiDate } from "common/src/common/util";
+import { Parameter } from "common/types/common";
 import {
   OpeningTimesType,
   Query,
@@ -21,8 +23,6 @@ import {
   EquipmentCategoryType,
   ReservationUnitsReservationUnitReservationKindChoices,
 } from "../../modules/gql-types";
-import { Parameter } from "../../modules/types";
-import { toApiDate } from "../../modules/util";
 
 const equipmentCategories: EquipmentCategoryType[] = [
   {

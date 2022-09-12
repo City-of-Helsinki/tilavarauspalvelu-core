@@ -3,13 +3,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import classNames from "classnames";
-
+import { OptionType } from "common/types/common";
 import useKeyboardNavigation from "../../hooks/useDropdownKeyboardNavigation";
 import Checkbox from "./Checkbox";
 import Dropdown from "./Dropdown";
 import ScrollIntoViewWithFocus from "./ScrollIntoViewWithFocus";
 import SearchLabel from "./SearchLabel";
-import { OptionType } from "../../modules/types";
 
 const SELECT_ALL = "SELECT_ALL";
 

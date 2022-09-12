@@ -1028,6 +1028,14 @@ type EventReservationUnitType implements Node {
   pk: Int
 }
 
+type GeneralRoleType implements Node {
+  role: RoleType
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
 type KeywordCategoryType implements Node {
   nameFi: String
   nameEn: String
@@ -1170,6 +1178,7 @@ type Mutation {
   updateResource(input: ResourceUpdateMutationInput!): ResourceUpdateMutationPayload
   deleteResource(input: ResourceDeleteMutationInput!): ResourceDeleteMutationPayload
   updateUnit(input: UnitUpdateMutationInput!): UnitUpdateMutationPayload
+  updateUser(input: UserUpdateMutationInput!): UserUpdateMutationPayload
 }
 
 """An object with an ID"""
@@ -1558,6 +1567,7 @@ type Query {
     id: ID!
   ): UnitType
   unitByPk(pk: Int = null): UnitByPkType
+  currentUser: UserType
   keywordCategories(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordCategoryTypeConnection
   keywordGroups(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordGroupTypeConnection
   keywords(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordTypeConnection
@@ -1701,6 +1711,7 @@ type ReservationConfirmMutationPayload {
   """Reservee's business or association identity code"""
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
+  reserveeLanguage: String
   homeCityPk: Int
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
@@ -1769,6 +1780,7 @@ input ReservationCreateMutationInput {
   """Reservee's business or association identity code"""
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
+  reserveeLanguage: String
   homeCityPk: Int
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
@@ -1820,6 +1832,7 @@ type ReservationCreateMutationPayload {
   """Reservee's business or association identity code"""
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
+  reserveeLanguage: String
   homeCityPk: Int
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
@@ -2383,24 +2396,24 @@ input ReservationUnitCreateMutationInput {
   Possible values are ONLINE, INVOICE, ON_SITE.
   """
   paymentType: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2527,24 +2540,24 @@ type ReservationUnitCreateMutationPayload {
   Possible values are ONLINE, INVOICE, ON_SITE.
   """
   paymentType: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3019,24 +3032,24 @@ input ReservationUnitUpdateMutationInput {
   Possible values are ONLINE, INVOICE, ON_SITE.
   """
   paymentType: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3163,24 +3176,24 @@ type ReservationUnitUpdateMutationPayload {
   Possible values are ONLINE, INVOICE, ON_SITE.
   """
   paymentType: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3207,6 +3220,7 @@ input ReservationUpdateMutationInput {
   """Reservee's business or association identity code"""
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
+  reserveeLanguage: String
   homeCityPk: Int
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
@@ -3264,6 +3278,7 @@ type ReservationUpdateMutationPayload {
   """Reservee's business or association identity code"""
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
+  reserveeLanguage: String
   homeCityPk: Int
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
@@ -3490,6 +3505,23 @@ type ResourceUpdateMutationPayload {
   errors: [ErrorType]
   resource: ResourceType
   clientMutationId: String
+}
+
+type RoleType {
+  code: String
+  verboseName: String
+  verboseNameFi: String
+  verboseNameSv: String
+  verboseNameEn: String
+}
+
+type ServiceSectorRoleType implements Node {
+  role: RoleType
+  serviceSector: ServiceSectorType
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
 }
 
 type ServiceSectorType implements Node {
@@ -3821,6 +3853,25 @@ type UnitByPkType implements Node {
   serviceSectors: [ServiceSectorType]
 }
 
+type UnitGroupType implements Node {
+  name: String!
+  units: [UnitType]
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type UnitRoleType implements Node {
+  role: RoleType
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+  units: [UnitType]
+  unitGroups: [UnitGroupType]
+}
+
 type UnitType implements Node {
   tprekId: String
   nameFi: String
@@ -3872,12 +3923,12 @@ input UnitUpdateMutationInput {
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -3890,12 +3941,12 @@ type UnitUpdateMutationPayload {
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3908,6 +3959,54 @@ Create scalar that ignores normal serialization/deserialization, since
 that will be handled by the multipart request spec
 """
 scalar Upload
+
+type UserType implements Node {
+  """
+  Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella.
+  """
+  isSuperuser: Boolean!
+
+  """
+  Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.
+  """
+  username: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  uuid: UUID!
+  reservationNotification: String
+  unitRoles: [UnitRoleType]
+  serviceSectorRoles: [ServiceSectorRoleType]
+  generalRoles: [GeneralRoleType]
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+input UserUpdateMutationInput {
+  pk: Int!
+
+  """
+  When reservation notification emails are sent. Possible values are: ALL, ONLY_HANDLING_REQUIRED, NONE.
+  """
+  reservationNotification: String
+  clientMutationId: String
+}
+
+type UserUpdateMutationPayload {
+  pk: Int
+
+  """
+  When reservation notification emails are sent. Possible values are: ALL, ONLY_HANDLING_REQUIRED, NONE.
+  """
+  reservationNotification: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  user: UserType
+  clientMutationId: String
+}
 
 """
 Leverages the internal Python implementation of UUID (uuid.UUID) to provide native UUID objects

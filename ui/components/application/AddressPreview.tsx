@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Address as AddressType } from "../../modules/types";
+import { Address as AddressType } from "common/types/common";
 import { SpanTwoColumns } from "../common/common";
 import LabelValue from "../common/LabelValue";
 

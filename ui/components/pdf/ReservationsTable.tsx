@@ -5,7 +5,7 @@ import {
   Reservation,
   ReservationState,
   ReservationUnit,
-} from "../../modules/types";
+} from "common/types/common";
 import { B, FAMILY_BOLD, FAMILY_REGULAR, SIZE_SMALL } from "./Typography";
 
 const styles = StyleSheet.create({

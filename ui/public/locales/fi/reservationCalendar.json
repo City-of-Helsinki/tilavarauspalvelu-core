@@ -6,8 +6,12 @@
     "cancelledLabel": "Peruttu varaus",
     "free": "Vapaa",
     "unavailable": "Ei varattavissa",
-    "busy": "Varattu"
+    "busy": "Varattu",
+    "buffer": "Tauko",
+    "initial": "Oma varaus",
+    "timeIndicator": "Kuluva aika"
   },
+  "loginAndReserve": "Kirjaudu ja varaa",
   "loginInfo": "Sinun täytyy kirjautua sisään, jotta voit tehdä varauksen tähän tilaan.",
   "showCurrentDay": "Näytä nykyinen päivä",
   "showPrevious": "Naytä edellinen {{view}}",

@@ -9,9 +9,9 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isEqual, omit, pick, sortBy } from "lodash";
 import { NetworkStatus, useQuery } from "@apollo/client";
+import { OptionType } from "common/types/common";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/search/SearchForm";
-import { OptionType } from "../../modules/types";
 import {
   applicationRoundState,
   capitalize,

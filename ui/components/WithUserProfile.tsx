@@ -1,6 +1,6 @@
 import React from "react";
+import { UserProfile } from "common/types/common";
 import { isBrowser, authEnabled } from "../modules/const";
-import { UserProfile } from "../modules/types";
 
 function withUserProfile<TProps>(
   wrappedComponent: React.ComponentType<TProps>

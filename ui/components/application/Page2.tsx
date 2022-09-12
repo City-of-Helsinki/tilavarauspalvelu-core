@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { Application, Cell } from "../../modules/types";
+import { Application, Cell } from "common/types/common";
 import TimeSelector from "../common/TimeSelector";
 import {
   deepCopy,

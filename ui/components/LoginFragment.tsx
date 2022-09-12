@@ -1,16 +1,16 @@
 import React from "react";
-import { IconSignin } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { UserProfile } from "common/types/common";
 import { breakpoint } from "../modules/style";
 import { authEnabled, isBrowser } from "../modules/const";
-import { UserProfile } from "../modules/types";
 import RequireAuthentication from "./common/RequireAuthentication";
 import { MediumButton } from "../styles/util";
 
 type Props = {
   text?: string;
   componentIfAuthenticated?: React.ReactNode;
+  isActionDisabled?: boolean;
 };
 
 const Wrapper = styled.div`
@@ -40,6 +40,7 @@ const Wrapper = styled.div`
 const LoginFragment = ({
   text,
   componentIfAuthenticated,
+  isActionDisabled,
 }: Props): JSX.Element => {
   type InnerProps = {
     profile: UserProfile | null;
@@ -69,11 +70,12 @@ const LoginFragment = ({
         return !profile && authEnabled ? (
           <Wrapper>
             <MediumButton
-              iconLeft={<IconSignin aria-hidden="true" />}
               onClick={() => setShouldLogin(true)}
-              aria-label={t("common:loginAlt")}
+              aria-label={t("reservationCalendar:loginAndReserve")}
+              className="login-fragment__button--login"
+              disabled={isActionDisabled}
             >
-              {t("common:loginAlt")}
+              {t("reservationCalendar:loginAndReserve")}
             </MediumButton>
             {text}
           </Wrapper>

@@ -1,5 +1,6 @@
 import { get as mockGet } from "lodash";
 import { addMinutes } from "date-fns";
+import { ReservationState, ReservationUnit } from "common/types/common";
 import {
   EquipmentType,
   ReservationsReservationStateChoices,
@@ -18,7 +19,6 @@ import {
   isReservationUnitPublished,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
-import { ReservationState, ReservationUnit } from "../types";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},

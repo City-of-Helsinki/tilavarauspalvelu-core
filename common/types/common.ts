@@ -1,3 +1,18 @@
+export type CalendarBufferEvent = {
+  state: "BUFFER";
+};
+
+export type CalendarEventBuffer = {
+  start: Date;
+  end: Date;
+  event: CalendarBufferEvent;
+};
+
+export type SlotProps = {
+  className?: string;
+  style?: React.CSSProperties;
+};
+
 export type TranslationObject = {
   fi?: string;
   en?: string;
@@ -403,3 +418,9 @@ export type Promotion = {
   image: string;
   link: string;
 };
+
+export interface HMS {
+  h: number;
+  m: number;
+  s: number;
+}

@@ -9,6 +9,7 @@ import { Notification } from "hds-react";
 import { useLocalStorage } from "react-use";
 import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { OptionType } from "common/types/common";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/single-search/SearchForm";
 import { capitalize, singleSearchUrl } from "../../modules/util";
@@ -23,7 +24,6 @@ import {
 import { H1, HeroSubheading } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
-import { OptionType } from "../../modules/types";
 import KorosDefault from "../../components/common/KorosDefault";
 import ClientOnly from "../../components/ClientOnly";
 import ListWithPagination from "../../components/common/ListWithPagination";

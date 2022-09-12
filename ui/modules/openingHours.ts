@@ -1,8 +1,8 @@
 import { isWithinInterval } from "date-fns";
 import { uniq } from "lodash";
 import { i18n } from "next-i18next";
+import { toApiDate } from "common/src/common/util";
 import { PeriodType, TimeSpanType } from "./gql-types";
-import { toApiDate } from "./util";
 
 export type ActiveOpeningTime = {
   day: number;

@@ -6,6 +6,11 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import {
+  Application,
+  ApplicationRound,
+  RecurringReservation,
+} from "common/types/common";
+import {
   getApplication,
   getApplicationRound,
   getRecurringReservations,
@@ -18,11 +23,6 @@ import IconWithText from "../../components/common/IconWithText";
 import { localizedValue } from "../../modules/util";
 import ReservationList from "../../components/applications/ReservationList";
 import { isBrowser } from "../../modules/const";
-import {
-  Application,
-  ApplicationRound,
-  RecurringReservation,
-} from "../../modules/types";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -8,7 +8,9 @@
     "generate-certificate": "mkdirp certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin",
     "lint": "eslint --ext ts,tsx .",
     "start": "react-scripts start",
-    "test": "react-scripts test"
+    "test": "react-scripts test",
+    "generate-gql-types": "graphql-codegen && prettier --write 'types/gql-types.ts'",
+    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
   },
   "browserslist": {
     "production": [
@@ -24,18 +26,27 @@
   },
   "dependencies": {
     "hds-react": "^1.12.0",
+    "lodash": "^4.17.21",
+    "next-i18next": "^8.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
-    "styled-components": "^5.3.5"
+    "styled-components": "^5.3.5",
+    "date-fns": "^2.22.1",
+    "react-big-calendar": "^0.33.6"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^2.2.0",
+    "@graphql-codegen/typescript": "^2.2.2",
+    "@graphql-codegen/typescript-operations": "^2.1.5",
+    "@graphql-codegen/typescript-react-apollo": "^3.1.4",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/jest": "^26.0.23",
     "@types/react": "^17.0.11",
     "@types/react-dom": "^17.0.8",
+    "@types/react-big-calendar": "^0.33.2",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
     "eslint": "^7.29.0",

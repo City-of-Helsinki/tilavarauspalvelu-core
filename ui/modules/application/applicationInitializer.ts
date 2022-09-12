@@ -1,4 +1,4 @@
-import { Application } from "../types";
+import { Application } from "common/types/common";
 
 export const minimalApplicationForInitialSave = (
   applicationRoundId: number

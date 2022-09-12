@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { ApplicationEventSchedule } from "common/types/common";
 import { weekdays } from "../../modules/const";
-import { ApplicationEventSchedule } from "../../modules/types";
 import { fontBold, H4 } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
 

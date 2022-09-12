@@ -1,5 +1,5 @@
 import { graphql } from "msw";
-import { Promotion } from "../../modules/types";
+import { Promotion } from "common/types/common";
 
 type ReturnType = {
   promotions: Promotion[];

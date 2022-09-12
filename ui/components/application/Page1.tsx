@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
 import { sortBy, uniq } from "lodash";
 import { useRouter } from "next/router";
-import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import {
   Action,
   Application,
@@ -13,7 +12,8 @@ import {
   EditorState,
   OptionType,
   StringParameter,
-} from "../../modules/types";
+} from "common/types/common";
+import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import { participantCountOptions } from "../../modules/const";

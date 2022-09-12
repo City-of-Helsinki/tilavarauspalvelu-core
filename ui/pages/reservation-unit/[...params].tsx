@@ -24,6 +24,7 @@ import { Controller, useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
 import { camelCase, get, isFinite, omit } from "lodash";
 import { Trans, useTranslation } from "react-i18next";
+import { ReservationState } from "common/types/common";
 import apolloClient from "../../modules/apolloClient";
 import {
   fontRegular,
@@ -92,7 +93,6 @@ import {
 } from "../../modules/reservation";
 import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import KorosDefault from "../../components/common/KorosDefault";
-import { ReservationState } from "../../modules/types";
 
 type Props = {
   reservationUnit: ReservationUnitType;

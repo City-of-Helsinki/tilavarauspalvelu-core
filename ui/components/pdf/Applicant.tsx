@@ -1,5 +1,5 @@
 import React from "react";
-import { Application } from "../../modules/types";
+import { Application } from "common/types/common";
 
 type Props = { application: Application };
 

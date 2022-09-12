@@ -1,24 +1,9 @@
-import {
-  isAfter,
-  parseISO,
-  isBefore,
-  format,
-  startOfWeek as dateFnsStartOfWeek,
-  endOfWeek as dateFnsEndOfWeek,
-  parse,
-  isValid,
-} from "date-fns";
+import { isAfter, parseISO, isBefore, parse } from "date-fns";
 import { i18n, TFunction } from "next-i18next";
 import { stringify } from "query-string";
-import { isNumber, trim } from "lodash";
+import { trim } from "lodash";
 import { ApolloError } from "@apollo/client";
-import {
-  searchPrefix,
-  emptyOption,
-  applicationsPrefix,
-  singleSearchPrefix,
-  reservationsPrefix,
-} from "./const";
+import { toApiDate, toUIDate, isValidDate } from "common/src/common/util";
 import {
   ApplicationEventSchedule,
   Cell,
@@ -31,7 +16,14 @@ import {
   ReducedApplicationStatus,
   StringParameter,
   ApplicationEventSchedulePriority,
-} from "./types";
+} from "common/types/common";
+import {
+  searchPrefix,
+  emptyOption,
+  applicationsPrefix,
+  singleSearchPrefix,
+  reservationsPrefix,
+} from "./const";
 import {
   ReservationUnitImageType,
   ReservationUnitType,
@@ -67,16 +59,6 @@ export const applicationRoundState = (
 
 export const parseDate = (date: string): Date => parseISO(date);
 
-const isValidDate = (date: Date): boolean =>
-  isValid(date) && isAfter(date, new Date("1000-01-01"));
-
-export const toUIDate = (date: Date, formatStr = "d.M.yyyy"): string => {
-  if (!date || !isValidDate(date)) {
-    return "";
-  }
-  return format(date, formatStr);
-};
-
 const fromAPIDate = (date: string): Date => {
   const d = parse(date, "yyyy-MM-dd", new Date());
   return d;
@@ -93,10 +75,6 @@ export const fromUIDate = (date: string): Date => {
   return parse(date, "d.M.yyyy", new Date());
 };
 
-export const toApiDate = (date: Date, formatStr = "yyyy-MM-dd"): string => {
-  return format(date, formatStr);
-};
-
 export const apiDateToUIDate = (date: string): string => {
   return toUIDate(fromAPIDate(date));
 };
@@ -106,34 +84,6 @@ export const uiDateToApiDate = (date: string): string => {
     return date;
   }
   return toApiDate(fromUIDate(date));
-};
-
-export const formatDuration = (
-  duration: string,
-  abbreviated = true
-): string => {
-  if (!duration || isNumber(duration) || !duration?.includes(":")) {
-    return "-";
-  }
-
-  const hourKey = abbreviated ? "common:abbreviations.hour" : "common:hour";
-  const minuteKey = abbreviated
-    ? "common:abbreviations.minute"
-    : "common:minute";
-
-  const time = duration.split(":");
-  if (time.length < 3) {
-    return "-";
-  }
-
-  const hours = Number(time[0]);
-  const minutes = Number(time[1]);
-
-  return `${
-    hours
-      ? `${`${i18n.t(hourKey, { count: hours }) || "".toLocaleLowerCase()}`} `
-      : ""
-  }${minutes ? i18n.t(minuteKey, { count: minutes }) : ""}`.trim();
 };
 
 export const capitalize = (s: string): string => {
@@ -430,12 +380,6 @@ export const getReducedApplicationStatus = (
   }
 };
 
-export const startOfWeek = (d: Date): Date =>
-  dateFnsStartOfWeek(d, { weekStartsOn: 1 });
-
-export const endOfWeek = (d: Date): Date =>
-  dateFnsEndOfWeek(d, { weekStartsOn: 1 });
-
 export const formatDurationMinutes = (
   duration: number,
   abbreviated = true
@@ -464,38 +408,6 @@ export const formatDurationMinutes = (
   return p.join(" ");
 };
 
-interface HMS {
-  h?: number;
-  m?: number;
-  s?: number;
-}
-
-export const secondsToHms = (duration?: number | null): HMS => {
-  if (!duration || duration < 1) return {};
-  const h = Math.floor(duration / 3600);
-  const m = Math.floor((duration % 3600) / 60);
-  const s = Math.floor((duration % 3600) % 60);
-
-  return { h, m, s };
-};
-
-export const convertHMSToSeconds = (input: string): number | null => {
-  const result = Number(new Date(`1970-01-01T${input}Z`).getTime() / 1000);
-  return Number.isNaN(result) ? null : result;
-};
-
-export const formatSecondDuration = (
-  duration: number,
-  abbreviated = true
-): string => {
-  if (!duration || !isNumber(duration)) {
-    return "-";
-  }
-
-  const hms = secondsToHms(duration);
-  return formatDuration(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
-};
-
 export const getReadableList = (list: string[]): string => {
   if (!list || list.length === 0) return "";
 
@@ -517,12 +429,14 @@ export const printErrorMessages = (error: ApolloError): string => {
 
   return errors
     .reduce((acc, cur) => {
-      const code = i18n.t(`errors:${cur?.extensions?.error_code}`);
+      const code = cur?.extensions?.error_code
+        ? i18n.t(`errors:${cur?.extensions?.error_code}`)
+        : "";
       const message =
-        code === cur?.extensions?.error_code
+        code === cur?.extensions?.error_code || !cur?.extensions?.error_code
           ? i18n.t("errors:general_error")
-          : code;
-      return `${acc}${message}\n`; /// contains non-breaking space
+          : code || "";
+      return message ? `${acc}${message}\n` : acc; /// contains non-breaking space
     }, "")
     .trim();
 };

@@ -2,14 +2,14 @@ import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Query } from "../../modules/gql-types";
-import { CITIES } from "../../modules/queries/params";
 import {
   Application,
   Application as ApplicationType,
   FormType,
   OptionType,
-} from "../../modules/types";
+} from "common/types/common";
+import { Query } from "../../modules/gql-types";
+import { CITIES } from "../../modules/queries/params";
 import { getTranslation, mapOptions } from "../../modules/util";
 import { CenterSpinner } from "../common/common";
 import CompanyForm from "./CompanyForm";

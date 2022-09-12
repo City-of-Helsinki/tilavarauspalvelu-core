@@ -9,7 +9,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
-import ReservationUnitList from "../reservation-unit/ReservationUnitList";
 import {
   AccordionState,
   Action,
@@ -18,7 +17,8 @@ import {
   EditorState,
   LocalizationLanguages,
   OptionType,
-} from "../../modules/types";
+} from "common/types/common";
+import ReservationUnitList from "../reservation-unit/ReservationUnitList";
 import {
   apiDateToUIDate,
   apiDurationToMinutes,

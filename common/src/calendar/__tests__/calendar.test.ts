@@ -16,13 +16,13 @@ import {
   isSlotWithinReservationTime,
   isSlotWithinTimeframe,
   isStartTimeWithinInterval,
-} from "../calendar";
+} from "../util";
 import {
   ReservationType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitType,
-} from "../gql-types";
-import { ApplicationRound } from "../types";
+} from "../../../types/gql-types";
+import { ApplicationRound } from "../../../types/common";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -168,8 +168,8 @@ describe("areSlotsReservable", () => {
         [addDays(new Date().setUTCHours(hours), 7)],
         openingTimes,
         [],
-        null,
-        null,
+        undefined,
+        undefined,
         7
       )
     ).toBe(true);
@@ -179,7 +179,7 @@ describe("areSlotsReservable", () => {
         openingTimes,
         [],
         addDays(new Date(), 8),
-        null,
+        undefined,
         7
       )
     ).toBe(false);
@@ -188,7 +188,7 @@ describe("areSlotsReservable", () => {
         [addDays(new Date().setUTCHours(hours), 7)],
         openingTimes,
         [],
-        null,
+        undefined,
         addDays(new Date(), 6),
         7
       )
@@ -199,8 +199,8 @@ describe("areSlotsReservable", () => {
         [addDays(new Date().setUTCHours(hours), 7)],
         openingTimes,
         [],
-        null,
-        null,
+        undefined,
+        undefined,
         8
       )
     ).toBe(false);
@@ -381,12 +381,12 @@ describe("isStartTimeWithinInterval", () => {
 });
 
 describe("getTimeslots", () => {
-  test("returns 3 for 90min interval", () => {
+  test("returns 2 for 90min interval", () => {
     expect(
       getTimeslots(
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
       )
-    ).toBe(3);
+    ).toBe(2);
   });
 
   test("returns 2 for all rest", () => {
@@ -412,7 +412,7 @@ describe("getTimeslots", () => {
     ).toBe(2);
     expect(
       getTimeslots(
-        null as ReservationUnitsReservationUnitReservationStartIntervalChoices
+        null as unknown as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
     ).toBe(2);
   });
@@ -427,7 +427,7 @@ describe("getBufferedEventTimes", () => {
       start: new Date("2019-09-22T11:30:00+00:00"),
       end: new Date("2019-09-22T14:00:00+00:00"),
     });
-    expect(getBufferedEventTimes(start, end, null, 3600)).toEqual({
+    expect(getBufferedEventTimes(start, end, undefined, 3600)).toEqual({
       start: new Date("2019-09-22T12:00:00+00:00"),
       end: new Date("2019-09-22T14:00:00+00:00"),
     });
@@ -438,7 +438,7 @@ describe("getBufferedEventTimes", () => {
   });
 
   test("without a buffer", () => {
-    expect(getBufferedEventTimes(start, end, null, null)).toEqual({
+    expect(getBufferedEventTimes(start, end, undefined, undefined)).toEqual({
       start,
       end,
     });
@@ -471,7 +471,6 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
         bufferTimeBefore: 5400,
-        bufferTimeAfter: null,
       })
     ).toBe(true);
 
@@ -479,7 +478,6 @@ describe("doesBuffer(s)Collide", () => {
       doesBufferCollide(reservations[0], {
         start: new Date("2019-09-22T10:00:00+00:00"),
         end: new Date("2019-09-22T10:30:00+00:00"),
-        bufferTimeBefore: null,
         bufferTimeAfter: 5400,
       })
     ).toBe(false);
@@ -488,7 +486,6 @@ describe("doesBuffer(s)Collide", () => {
       doesBufferCollide(reservations[0], {
         start: new Date("2019-09-22T10:00:00+00:00"),
         end: new Date("2019-09-22T10:30:00+00:00"),
-        bufferTimeBefore: null,
         bufferTimeAfter: 5460,
       })
     ).toBe(true);
@@ -498,7 +495,6 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T14:15:00+00:00"),
         bufferTimeBefore: 3600,
-        bufferTimeAfter: null,
       })
     ).toBe(false);
 
@@ -507,7 +503,6 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T14:15:00+00:00"),
         bufferTimeBefore: 3660,
-        bufferTimeAfter: null,
       })
     ).toBe(true);
 
@@ -516,7 +511,6 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
         bufferTimeBefore: 3600,
-        bufferTimeAfter: null,
       })
     ).toBe(false);
 
@@ -584,24 +578,35 @@ describe("isReservationUnitReservable", () => {
   test("returns true for a unit that is reservable", () => {
     expect(
       isReservationUnitReservable({
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
         reservationBegins: addMinutes(new Date(), -10),
       } as ReservationUnitType)
     ).toBe(true);
 
     expect(
       isReservationUnitReservable({
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
         reservationEnds: addMinutes(new Date(), 10),
       } as ReservationUnitType)
     ).toBe(true);
 
     expect(
       isReservationUnitReservable({
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
         reservationBegins: addMinutes(new Date(), -10),
         reservationEnds: addMinutes(new Date(), 10),
       } as ReservationUnitType)
     ).toBe(true);
 
-    expect(isReservationUnitReservable({} as ReservationUnitType)).toBe(true);
+    expect(
+      isReservationUnitReservable({
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
+      } as ReservationUnitType)
+    ).toBe(true);
   });
 
   test("returns false for a unit that is not reservable", () => {
@@ -628,6 +633,8 @@ describe("isReservationUnitReservable", () => {
   test("returns correct value with buffer days", () => {
     expect(
       isReservationUnitReservable({
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
         reservationBegins: addDays(new Date(), 5),
         reservationsMaxDaysBefore: 5,
       } as ReservationUnitType)
@@ -689,8 +696,8 @@ describe("isSlotWithinReservationTime", () => {
     expect(
       isSlotWithinReservationTime(
         new Date("2019-09-22T12:00:00+00:00"),
-        null,
-        null
+        undefined,
+        undefined
       )
     ).toBe(true);
   });
@@ -700,7 +707,7 @@ describe("isSlotWithinReservationTime", () => {
       isSlotWithinReservationTime(
         new Date("2019-09-22T12:00:00+00:00"),
         new Date("2019-08-22T12:00:00+00:00"),
-        null
+        undefined
       )
     ).toBe(true);
 
@@ -708,7 +715,7 @@ describe("isSlotWithinReservationTime", () => {
       isSlotWithinReservationTime(
         new Date("2019-09-22T12:00:00+00:00"),
         new Date("2019-09-23T12:00:00+00:00"),
-        null
+        undefined
       )
     ).toBe(false);
   });
@@ -717,7 +724,7 @@ describe("isSlotWithinReservationTime", () => {
     expect(
       isSlotWithinReservationTime(
         new Date("2019-09-22T12:00:00+00:00"),
-        null,
+        undefined,
         new Date("2019-08-22T12:00:00+00:00")
       )
     ).toBe(false);
@@ -725,7 +732,7 @@ describe("isSlotWithinReservationTime", () => {
     expect(
       isSlotWithinReservationTime(
         new Date("2019-09-22T12:00:00+00:00"),
-        null,
+        undefined,
         new Date("2019-09-23T13:00:00+00:00")
       )
     ).toBe(true);

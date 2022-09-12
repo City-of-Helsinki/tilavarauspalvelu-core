@@ -16,6 +16,7 @@ import {
   TextArea,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
+import { OptionType } from "common/types/common";
 import {
   Query,
   QueryReservationCancelReasonsArgs,
@@ -47,7 +48,6 @@ import {
   TwoColumnContainer,
 } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
-import { OptionType } from "../../modules/types";
 import { emptyOption, reservationUnitPrefix } from "../../modules/const";
 import KorosDefault from "../../components/common/KorosDefault";
 import {

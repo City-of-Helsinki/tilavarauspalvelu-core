@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
 import styled from "styled-components";
-import { OptionType } from "../../modules/types";
+import { OptionType } from "common/types/common";
 import { breakpoint } from "../../modules/style";
 import { reservationUnitPath } from "../../modules/const";
 import {

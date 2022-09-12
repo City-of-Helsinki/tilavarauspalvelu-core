@@ -1,5 +1,5 @@
 import { rest } from "msw";
-import { User } from "../../modules/types";
+import { User } from "common/types/common";
 
 const currentUser = rest.get(
   "http://localhost:8000/v1/users/current/",

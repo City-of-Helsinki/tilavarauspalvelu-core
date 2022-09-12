@@ -7,7 +7,7 @@ import {
   Cell,
   ApplicationEventSchedulePriority,
   OptionType,
-} from "../../modules/types";
+} from "common/types/common";
 import TimePreview from "./TimePreview";
 import { weekdays } from "../../modules/const";
 import { breakpoint } from "../../modules/style";

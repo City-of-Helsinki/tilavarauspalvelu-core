@@ -1,12 +1,12 @@
 import i18next from "i18next";
-import { defaultDuration } from "../const";
 import {
   AccordionState,
   Action,
   Application,
   ApplicationEvent,
   EditorState,
-} from "../types";
+} from "common/types/common";
+import { defaultDuration } from "../const";
 import { deepCopy } from "../util";
 
 const applicationEvent = (

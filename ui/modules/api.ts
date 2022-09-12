@@ -1,6 +1,4 @@
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { apiBaseUrl } from "./const";
-import axiosClient from "./auth/axiosClient";
 import {
   Application,
   ApplicationRound,
@@ -10,7 +8,9 @@ import {
   RecurringReservation,
   User,
   ApplicationStatusChange,
-} from "./types";
+} from "common/types/common";
+import { apiBaseUrl } from "./const";
+import axiosClient from "./auth/axiosClient";
 import { ApiError } from "./ApiError";
 
 const applicationRoundBasePath = "application_round";

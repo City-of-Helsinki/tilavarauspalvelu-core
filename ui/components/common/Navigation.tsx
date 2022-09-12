@@ -3,11 +3,11 @@ import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation, TFunction } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { UserInfo } from "common";
+import UserInfo from "common/src/userinfo/UserInfo";
+import { UserProfile } from "common/types/common";
 import { applicationsUrl } from "../../modules/util";
 import { authEnabled, isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
-import { UserProfile } from "../../modules/types";
 import RequireAuthentication from "./RequireAuthentication";
 import { clearApiAccessToken } from "../../modules/auth/util";
 
@@ -37,7 +37,7 @@ const StyledNavigation = styled(HDSNavigation)`
 
   @media (max-width: ${breakpoint.xs}) {
     position: fixed !important;
-    z-index: 100 !important;
+    z-index: var(--tilavaraus-stack-order-navigation) !important;
   }
 `;
 

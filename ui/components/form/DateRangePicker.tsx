@@ -5,8 +5,9 @@ import { DateInput } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Language } from "../../modules/types";
-import { isValidDateString, toUIDate } from "../../modules/util";
+import { toUIDate } from "common/src/common/util";
+import { Language } from "common/types/common";
+import { isValidDateString } from "../../modules/util";
 
 const initDate = (date: Date | null): string => {
   return date ? toUIDate(date) : "";

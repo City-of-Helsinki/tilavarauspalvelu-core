@@ -1,17 +1,17 @@
 import React from "react";
 import { Text, View } from "@react-pdf/renderer";
+import {
+  Application,
+  ApplicationEvent,
+  Reservation,
+  ReservationUnit,
+} from "common/types/common";
 import { B, H1, P, SIZE_MEDIUM } from "./Typography";
 import { PDFDocument, PDFPage } from "./PDFDocument";
 import ReservationsTable from "./ReservationsTable";
 import Applicant from "./Applicant";
 import ComplaintInfo from "./ComplaintInfo";
 import DecisionMaker from "./DecisionMaker";
-import {
-  Application,
-  ApplicationEvent,
-  Reservation,
-  ReservationUnit,
-} from "../../modules/types";
 
 type Props = {
   application: Application;

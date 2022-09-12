@@ -1,4 +1,8 @@
-import { Application, ApplicationEvent, EditorState } from "../types";
+import {
+  Application,
+  ApplicationEvent,
+  EditorState,
+} from "common/types/common";
 import reducer from "./applicationReducer";
 
 jest.mock("next/config", () => () => ({

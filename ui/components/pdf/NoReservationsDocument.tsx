@@ -1,9 +1,9 @@
 import React from "react";
+import { Application } from "common/types/common";
 import { H1, P } from "./Typography";
 import { PDFDocument, PDFPage } from "./PDFDocument";
 import Applicant from "./Applicant";
 import DecisionMaker from "./DecisionMaker";
-import { Application } from "../../modules/types";
 import ComplaintInfo from "./ComplaintInfo";
 
 type Props = {

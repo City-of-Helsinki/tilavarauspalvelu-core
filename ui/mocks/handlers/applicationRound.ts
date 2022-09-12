@@ -1,5 +1,7 @@
 import { addDays, addMonths } from "date-fns";
 import { graphql, rest } from "msw";
+import { toApiDate } from "common/src/common/util";
+import { ApplicationRound } from "common/types/common";
 import {
   Query,
   ApplicationRoundTypeConnection,
@@ -8,8 +10,6 @@ import {
   ApplicationsApplicationRoundTargetGroupChoices,
   ApplicationRoundStatus,
 } from "../../modules/gql-types";
-import { ApplicationRound } from "../../modules/types";
-import { toApiDate } from "../../modules/util";
 
 const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
   "ApplicationRounds",

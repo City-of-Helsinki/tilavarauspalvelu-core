@@ -5,13 +5,9 @@ import { useLocalStorage } from "react-use";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { formatSecondDuration } from "common/src/common/util";
 import { breakpoint } from "../../modules/style";
-import {
-  formatSecondDuration,
-  getTranslation,
-  orderImages,
-  searchUrl,
-} from "../../modules/util";
+import { getTranslation, orderImages, searchUrl } from "../../modules/util";
 import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
 import Images from "./Images";

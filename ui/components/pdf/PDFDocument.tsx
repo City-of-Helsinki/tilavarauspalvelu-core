@@ -1,9 +1,9 @@
 import React from "react";
 import { Document, Page, StyleSheet, Font, View } from "@react-pdf/renderer";
+import { Application } from "common/types/common";
 import { FAMILY_BOLD, FAMILY_REGULAR, SIZE } from "./Typography";
 import PageHeader from "./PageHeader";
 import PageFooter from "./PageFooter";
-import { Application } from "../../modules/types";
 
 const styles = StyleSheet.create({
   page: {

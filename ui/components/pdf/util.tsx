@@ -1,5 +1,5 @@
 import React from "react";
-import { Application, RecurringReservation } from "../../modules/types";
+import { Application, RecurringReservation } from "common/types/common";
 import NoReservationsDocument from "./NoReservationsDocument";
 import ReservationsDocument from "./ReservationsDocument";
 

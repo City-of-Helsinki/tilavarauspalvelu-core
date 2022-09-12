@@ -1,78 +1,145 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
+import styled, { css, FlattenSimpleInterpolation } from "styled-components";
 import { breakpoint } from "../../modules/style";
+import { truncatedText } from "../../styles/util";
 
 type Props = {
   items?: LegendItem[];
+  wrapBreakpoint?: string;
 };
 
 type LegendItem = {
   title: string;
-  color: string;
+  color?: string;
+  border?: string;
+  css?: FlattenSimpleInterpolation;
 };
 
-const Wrapper = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   margin-bottom: var(--spacing-l);
   gap: var(--spacing-m);
-  flex-wrap: nowrap;
   width: 100%;
-  max-width: 300px;
+
+  @media (min-width: ${breakpoint.m}) {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
 
   @media (min-width: ${breakpoint.l}) {
     margin-top: var(--spacing-m);
   }
+
+  ${({ $wrapBreakpoint }) =>
+    $wrapBreakpoint &&
+    css`
+      @media (min-width: ${$wrapBreakpoint}) {
+        flex-direction: column;
+        position: absolute;
+        bottom: 15%;
+        left: calc(100% + var(--spacing-xl));
+        width: unset;
+        width: 200px;
+      }
+    `}
 `;
 
-const LegendItem = styled.div<{ $color: string }>`
+const LegendItem = styled.div<{
+  $color?: string;
+  $border?: string;
+  $inlineCss?: FlattenSimpleInterpolation;
+}>`
   &:before {
     content: "";
     display: block;
     background-color: ${({ $color }) => $color};
-    border: 1px solid var(--color-black-40);
-    width: 34px;
-    height: 34px;
+    ${({ $border }) =>
+      $border
+        ? `border: 2px solid ${$border}`
+        : "border: 1px solid var(--color-black-20)"};
+    width: 54px;
+    height: 40px;
     position: relative;
-    left: calc(50% - 18px);
+    ${({ $inlineCss }) => $inlineCss}
   }
 
-  display: grid;
-  align-content: center;
+  display: flex;
+  align-content: flex-start;
+  justify-content: flex-start;
   column-gap: var(--spacing-xl);
-  gap: var(--spacing-3-xs);
+  gap: var(--spacing-xs);
+  position: relative;
 `;
 
 const LegendTitle = styled.div`
   display: block;
-  white-space: nowrap;
   font-size: var(--fontsize-body-s);
+  align-self: center;
+  ${truncatedText}
 `;
 
 const defaultItems: LegendItem[] = [
+  {
+    title: "initial",
+    color: "var(--tilavaraus-event-initial-color)",
+    border: "var(--tilavaraus-event-initial-border)",
+  },
+  {
+    title: "busy",
+    color: "var(--tilavaraus-event-reservation-color)",
+    border: "var(--tilavaraus-event-reservation-border)",
+  },
+  {
+    title: "unavailable",
+    color: "var(--color-black-10)",
+    border: "transparent",
+    css: css`
+      border-left: 2px solid var(--color-black-30);
+    `,
+  },
   {
     title: "free",
     color: "var(--color-white)",
   },
   {
-    title: "unavailable",
-    color: "var(--color-black-10)",
+    title: "buffer",
+    color: "var(--color-black-5)",
+    border: "transparent",
+    css: css`
+      border-top: 4px double var(--color-black-40);
+      border-bottom: 4px double var(--color-black-40);
+      height: 20px;
+      padding: 4px 0;
+    `,
   },
   {
-    title: "busy",
-    color: "var(--color-brick-dark)",
+    title: "timeIndicator",
+    border: "transparent",
+    css: css`
+      border-top: 4px dotted #551a8b;
+      top: 20px;
+    `,
   },
 ];
 
-const Legend = ({ items = defaultItems }: Props): JSX.Element => {
+const Legend = ({
+  items = defaultItems,
+  wrapBreakpoint,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <Wrapper aria-hidden>
-      {items.map(({ title, color }) => (
-        <LegendItem key={title} $color={color}>
+    <Wrapper $wrapBreakpoint={wrapBreakpoint} aria-hidden>
+      {items.map(({ title, color, border, css: inlineCss }) => (
+        <LegendItem
+          key={title}
+          $color={color}
+          $border={border}
+          $inlineCss={inlineCss}
+        >
           <LegendTitle>{t(`reservationCalendar:legend.${title}`)}</LegendTitle>
         </LegendItem>
       ))}

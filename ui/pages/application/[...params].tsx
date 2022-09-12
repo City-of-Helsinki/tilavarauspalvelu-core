@@ -5,11 +5,11 @@ import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { saveApplication, getApplication } from "../../modules/api";
 import {
   Application as ApplicationType,
   EditorState,
-} from "../../modules/types";
+} from "common/types/common";
+import { saveApplication, getApplication } from "../../modules/api";
 import ApplicationPage from "../../components/application/ApplicationPage";
 import Page1 from "../../components/application/Page1";
 import Page2 from "../../components/application/Page2";
