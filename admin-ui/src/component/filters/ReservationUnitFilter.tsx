@@ -8,7 +8,7 @@ import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect
 
 const RESERVATION_UNITS_QUERY = gql`
   query reservationUnits {
-    reservationUnits {
+    reservationUnits(onlyWithPermission: true) {
       edges {
         node {
           nameFi

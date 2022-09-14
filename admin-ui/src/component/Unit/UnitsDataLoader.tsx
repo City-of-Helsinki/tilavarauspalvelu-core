@@ -51,6 +51,7 @@ const UNITS_QUERY = gql`
       orderBy: $orderBy
       serviceSector: $serviceSector
       nameFi: $nameFi
+      onlyWithPermission: true
     ) {
       edges {
         node {

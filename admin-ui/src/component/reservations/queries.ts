@@ -144,6 +144,7 @@ export const RESERVATIONS_QUERY = gql`
       priceGte: $priceGte
       begin: $begin
       end: $end
+      onlyWithPermission: true
     ) {
       edges {
         node {

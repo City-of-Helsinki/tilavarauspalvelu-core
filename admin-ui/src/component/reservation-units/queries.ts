@@ -30,6 +30,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       unit: $unit
       reservationUnitType: $reservationUnitType
       state: $state
+      onlyWithPermission: true
     ) {
       edges {
         node {

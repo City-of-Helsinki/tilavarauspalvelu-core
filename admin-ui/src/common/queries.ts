@@ -76,29 +76,6 @@ export const RESERVATION_UNITS_QUERY = gql`
   }
 `;
 
-export const UNITS_QUERY = gql`
-  query units {
-    units {
-      edges {
-        node {
-          nameFi
-          pk
-          reservationUnits {
-            pk
-          }
-          spaces {
-            pk
-          }
-          location {
-            longitude
-            latitude
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const DELETE_SPACE = gql`
   mutation deleteSpace($input: SpaceDeleteMutationInput!) {
     deleteSpace(input: $input) {
