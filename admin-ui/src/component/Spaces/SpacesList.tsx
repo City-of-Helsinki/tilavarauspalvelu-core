@@ -7,8 +7,7 @@ import styled from "styled-components";
 import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
 import { DataFilterConfig } from "../../common/types";
-import { IngressContainer } from "../../styles/layout";
-import { H1 } from "../../styles/typography";
+import { H1 } from "../../styles/new-typography";
 import withMainMenu from "../withMainMenu";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
@@ -21,7 +20,13 @@ import { useNotification } from "../../context/NotificationContext";
 import { spaceUrl } from "../../common/urls";
 
 const Wrapper = styled.div`
-  padding: var(--spacing-layout-xl) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-layout-2-xs);
+
+  padding: var(--spacing-layout-2-xs) 0 var(--spacing-layout-m)
+    var(--spacing-layout-m);
+  max-width: var(--container-width-l);
 `;
 
 const SearchContainer = styled.div`
@@ -199,7 +204,7 @@ const SpacesList = (): JSX.Element => {
     <>
       <BreadcrumbWrapper route={["spaces-n-settings", "spaces"]} />
       <Wrapper>
-        <IngressContainer>
+        <div>
           <H1>{t("Spaces.spaceListHeading")}</H1>
           <p>{t("Spaces.spaceListDescription")}</p>
           <SearchContainer>
@@ -225,7 +230,7 @@ const SpacesList = (): JSX.Element => {
           <SpaceCount>
             {spaces.length} {t("common.volumeUnit")}
           </SpaceCount>
-        </IngressContainer>
+        </div>
         <DataTable
           groups={[{ id: 1, data: filteredSpaces }]}
           hasGrouping={false}

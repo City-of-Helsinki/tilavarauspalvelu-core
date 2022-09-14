@@ -17,13 +17,14 @@ import { UNIT_QUERY } from "../../common/queries";
 import { parseAddress } from "../../common/util";
 import { useModal } from "../../context/ModalContext";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
-import { H1 } from "../../styles/typography";
+import { H1 } from "../../styles/new-typography";
 import { BasicLink, breakpoints } from "../../styles/util";
 import Loader from "../Loader";
 import ReservationUnitList from "./ReservationUnitList";
 import withMainMenu from "../withMainMenu";
 import ExternalLink from "./ExternalLink";
 import InfoModalContent from "./InfoModalContent";
+import { publicUrl } from "../../common/const";
 import {
   Query,
   QueryUnitByPkArgs,
@@ -191,7 +192,7 @@ const Unit = (): JSX.Element | null => {
   return (
     <Wrapper>
       <BreadcrumbWrapper
-        route={["spaces-n-settings", "/units", "route"]}
+        route={["spaces-n-settings", `${publicUrl}/units`, "route"]}
         aliases={[{ slug: "route", title: unit?.nameFi || "" }]}
       />
       <ContentContainer>
