@@ -10,22 +10,27 @@ from reservation_units.models import ReservationUnit
 class ReservationUnitStateHelper:
 
     # ARCHIVED
+    @staticmethod
     def __is_archived(reservation_unit: ReservationUnit) -> bool:
         return reservation_unit.is_archived
 
+    @staticmethod
     def __get_is_archived_query() -> Q:
         return Q(is_archived=True)
 
     # DRAFT
+    @staticmethod
     def __is_draft(reservation_unit: ReservationUnit) -> bool:
         return reservation_unit.is_draft and not reservation_unit.is_archived
 
+    @staticmethod
     def __get_is_draft_query() -> Q:
         return Q(
             is_draft=True,
             is_archived=False,
         )
 
+    @staticmethod
     # SCHEDULED_PUBLISHING
     def __is_scheduled_publishing(reservation_unit: ReservationUnit) -> bool:
         now = datetime.datetime.now(tz=get_default_timezone())
@@ -38,6 +43,7 @@ class ReservationUnitStateHelper:
             reservation_unit.publish_begins and now < reservation_unit.publish_begins
         ) or (reservation_unit.publish_ends and now >= reservation_unit.publish_ends)
 
+    @staticmethod
     def __get_is_scheduled_publishing_query() -> Q:
         now = datetime.datetime.now(tz=get_default_timezone())
         return Q(is_archived=False, is_draft=False) & (
@@ -46,6 +52,7 @@ class ReservationUnitStateHelper:
         )
 
     # SCHEDULED_RESERVATION
+    @staticmethod
     def __is_scheduled_reservation(reservation_unit: ReservationUnit) -> bool:
         now = datetime.datetime.now(tz=get_default_timezone())
         if ReservationUnitStateHelper.__is_draft(
@@ -60,6 +67,7 @@ class ReservationUnitStateHelper:
             and now >= reservation_unit.reservation_ends
         )
 
+    @staticmethod
     def __get_is_scheduled_reservation_query() -> Q:
         now = datetime.datetime.now(tz=get_default_timezone())
         return Q(reservation_begins__isnull=False, reservation_begins__gt=now) | Q(
@@ -67,6 +75,7 @@ class ReservationUnitStateHelper:
         )
 
     # PUBLISHED
+    @staticmethod
     def __get_is_published_query() -> Q:
         now = datetime.datetime.now(tz=get_default_timezone())
         return (
