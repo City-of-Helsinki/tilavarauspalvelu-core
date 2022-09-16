@@ -126,6 +126,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         if not settings.TMP_PERMISSIONS_DISABLED
         else (AllowAny,)
     )
+    created_at = graphene.String()
     user = graphene.String()
     reservation_units = graphene.List(
         "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
@@ -162,6 +163,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Reservation
         fields = [
+            "created_at",
             "state",
             "priority",
             "user",
@@ -218,6 +220,11 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         to = graphene.Field(graphene.Date)
 
     calendar_url = graphene.String()
+
+    def resolve_created_at(self, info: ResolveInfo) -> str:
+        if self is None:
+            return ""
+        return self.created_at.strftime("%Y-%m-%dT%H:%M:%S%z")
 
     @reservation_non_public_field
     def resolve_calendar_url(self, info: ResolveInfo) -> str:

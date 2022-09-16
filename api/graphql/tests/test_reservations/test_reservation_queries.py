@@ -76,6 +76,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     totalCount
                     edges {
                         node {
+                            createdAt
                             name
                             user
                             reserveeFirstName
