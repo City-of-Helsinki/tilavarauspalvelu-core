@@ -2089,6 +2089,7 @@ type ReservationType implements Node {
   numPersons: Int
   purpose: ReservationPurposeType
   cancelDetails: String
+  createdAt: String
   unitPrice: Float
   taxPercentageValue: Decimal
   price: Float
@@ -2388,11 +2389,10 @@ input ReservationUnitCreateMutationInput {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
-
-  """
-  What kind of payment types this reservation unit has. Possible values are ONLINE, INVOICE, ON_SITE
-  """
   paymentTypes: [String]
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -2402,15 +2402,12 @@ input ReservationUnitCreateMutationInput {
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2531,11 +2528,10 @@ type ReservationUnitCreateMutationPayload {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
-
-  """
-  What kind of payment types this reservation unit has. Possible values are ONLINE, INVOICE, ON_SITE
-  """
   paymentTypes: [String]
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -2545,15 +2541,12 @@ type ReservationUnitCreateMutationPayload {
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3015,11 +3008,10 @@ input ReservationUnitUpdateMutationInput {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
-
-  """
-  What kind of payment types this reservation unit has. Possible values are ONLINE, INVOICE, ON_SITE
-  """
   paymentTypes: [String]
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -3029,15 +3021,12 @@ input ReservationUnitUpdateMutationInput {
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -3158,11 +3147,10 @@ type ReservationUnitUpdateMutationPayload {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
-
-  """
-  What kind of payment types this reservation unit has. Possible values are ONLINE, INVOICE, ON_SITE
-  """
   paymentTypes: [String]
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -3172,15 +3160,12 @@ type ReservationUnitUpdateMutationPayload {
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3907,15 +3892,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -3925,15 +3910,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

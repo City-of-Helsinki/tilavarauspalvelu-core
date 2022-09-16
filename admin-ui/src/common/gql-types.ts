@@ -2305,6 +2305,7 @@ export type ReservationType = Node & {
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   calendarUrl?: Maybe<Scalars["String"]>;
   cancelDetails?: Maybe<Scalars["String"]>;
+  createdAt?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
   freeOfChargeReason?: Maybe<Scalars["String"]>;

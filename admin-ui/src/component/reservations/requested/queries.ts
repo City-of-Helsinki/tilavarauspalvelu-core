@@ -16,6 +16,7 @@ export const RESERVATION_QUERY = gql`
   query reservationByPk($pk: Int!) {
     reservationByPk(pk: $pk) {
       pk
+      createdAt
       workingMemo
       reservationUnits {
         nameFi

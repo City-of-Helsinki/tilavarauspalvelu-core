@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { get, trim } from "lodash";
 import { Accordion, Button, TextArea } from "hds-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -37,6 +37,9 @@ import BreadcrumbWrapper from "../../BreadcrumbWrapper";
 import { H1 } from "../../../styles/new-typography";
 import { HorisontalFlex, VerticalFlex } from "../../../styles/layout";
 import { publicUrl } from "../../../common/const";
+import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
+import StickyHeader from "../../StickyHeader";
+import { formatDateTime } from "../../../common/util";
 
 const Wrapper = styled.div`
   display: flex;
@@ -56,10 +59,12 @@ const Dot = styled.div`
   text-align: center;
   line-height: 1.6;
   aspect-ratio: 1;
-  margin-left: var(--spacing-xs);
   font-size: 0.6em;
   color: white;
   font-weight: 600;
+  @media (min-width: ${breakpoints.m}) {
+    flex-direction: row;
+  }
 `;
 
 const AlignVertically = styled.div`
@@ -90,13 +95,35 @@ const Summary = styled(ApplicationDatas)`
   }
 `;
 
+const NameState = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+
+  @media (min-width: ${breakpoints.m}) {
+    flex-direction: row;
+    margin-bottom: 0;
+  }
+`;
+
+const Tagline = styled.div`
+  font-size: var(--fontsize-body-xl);
+  margin-bottom: var(--spacing-xs);
+`;
+
+const DateTime = styled.div`
+  margin-bottom: var(--spacing-l);
+  font-size: var(--fontsize-body-s);
+`;
+
 const getName = (reservation: ReservationType) => {
   if (reservation.name) {
-    return trim(`${reservation.pk} ${reservation.name}`);
+    return trim(`${reservation.pk}, ${reservation.name}`);
   }
 
   return trim(
-    `${reservation.pk} ${reservation.reserveeFirstName || ""} ${
+    `${reservation.pk}, ${reservation.reserveeFirstName || ""} ${
       reservation.reserveeOrganisationName
         ? reservation.reserveeOrganisationName
         : reservation.reserveeLastName || ""
@@ -180,6 +207,8 @@ const RequestedReservation = (): JSX.Element | null => {
     setModalContent(null);
   };
 
+  const ref = useRef<HTMLHeadingElement>(null);
+
   const closeDialogAndRefetch = () => {
     closeDialog();
     refetch();
@@ -197,6 +226,91 @@ const RequestedReservation = (): JSX.Element | null => {
     (ru) => ru?.highestPrice
   );
 
+  const buttons =
+    reservation.state ===
+    ReservationsReservationStateChoices.RequiresHandling ? (
+      <>
+        <Button
+          theme="black"
+          size="small"
+          variant="secondary"
+          disabled={false}
+          onClick={(e) => {
+            e.preventDefault();
+            setModalContent(
+              <ApproveDialog
+                reservation={reservation}
+                onAccept={closeDialogAndRefetch}
+                onClose={closeDialog}
+              />,
+              true
+            );
+          }}
+        >
+          {t("RequestedReservation.approve")}
+        </Button>
+        <Button
+          size="small"
+          theme="black"
+          variant="secondary"
+          disabled={false}
+          onClick={(e) => {
+            e.preventDefault();
+            setModalContent(
+              <DenyDialog
+                reservation={reservation}
+                onReject={closeDialogAndRefetch}
+                onClose={closeDialog}
+              />,
+              true
+            );
+          }}
+        >
+          {t("RequestedReservation.reject")}
+        </Button>
+      </>
+    ) : (
+      <>
+        <Button
+          variant="secondary"
+          theme="black"
+          size="small"
+          disabled={false}
+          onClick={goBack}
+        >
+          {t("RequestedReservation.cancel")}
+        </Button>
+        <Button
+          size="small"
+          variant="secondary"
+          theme="black"
+          disabled={false}
+          onClick={(e) => {
+            e.preventDefault();
+            setModalContent(
+              <ReturnToRequiredHandlingDialog
+                reservation={reservation}
+                onAccept={closeDialogAndRefetch}
+                onClose={closeDialog}
+              />,
+              true
+            );
+          }}
+        >
+          {t("RequestedReservation.returnToHandling")}
+        </Button>
+      </>
+    );
+
+  const reservationTagline = `${reservationDateTime(
+    reservation.begin,
+    reservation.end,
+    t
+  )} ${reservationDuration(
+    reservation.begin,
+    reservation.end
+  )}t | ${reservation?.reservationUnits?.map(reservationUnitName).join(", ")}`;
+
   return (
     <>
       <BreadcrumbWrapper
@@ -209,106 +323,40 @@ const RequestedReservation = (): JSX.Element | null => {
           { slug: "requested-reservation", title: getName(reservation) },
         ]}
       />
+      <ShowWhenTargetInvisible target={ref}>
+        <StickyHeader
+          name={getName(reservation)}
+          tagline={reservationTagline}
+          buttons={buttons}
+        />
+      </ShowWhenTargetInvisible>
       <Wrapper style={{ gap: 0 }}>
-        <AlignVertically>
+        <NameState ref={ref}>
           <H1>{getName(reservation)}</H1>
           <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
             <Dot />
             {t(`RequestedReservation.state.${reservation.state}`)}
           </AlignVertically>
-        </AlignVertically>
-        <div style={{ marginBottom: "var(--spacing-m)" }}>
-          {reservationDateTime(reservation.begin, reservation.end, t)}{" "}
-          {`, ${reservationDuration(reservation.begin, reservation.end)}t`} |{" "}
-          {reservation?.reservationUnits?.map(reservationUnitName).join(", ")}
-        </div>
+        </NameState>
+        <Tagline>{reservationTagline}</Tagline>
+        <DateTime>
+          {t("RequestedReservation.createdAt")}{" "}
+          {formatDateTime(reservation.createdAt as string)}
+        </DateTime>
         <HorisontalFlex style={{ marginBottom: "var(--spacing-l)" }}>
-          {reservation.state ===
-          ReservationsReservationStateChoices.RequiresHandling ? (
-            <>
-              <Button
-                theme="black"
-                size="small"
-                variant="secondary"
-                disabled={false}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setModalContent(
-                    <ApproveDialog
-                      reservation={reservation}
-                      onAccept={closeDialogAndRefetch}
-                      onClose={closeDialog}
-                    />,
-                    true
-                  );
-                }}
-              >
-                {t("RequestedReservation.approve")}
-              </Button>
-              <Button
-                size="small"
-                theme="black"
-                variant="secondary"
-                disabled={false}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setModalContent(
-                    <DenyDialog
-                      reservation={reservation}
-                      onReject={closeDialogAndRefetch}
-                      onClose={closeDialog}
-                    />,
-                    true
-                  );
-                }}
-              >
-                {t("RequestedReservation.reject")}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="secondary"
-                theme="black"
-                size="small"
-                disabled={false}
-                onClick={goBack}
-              >
-                {t("RequestedReservation.cancel")}
-              </Button>
-              <Button
-                size="small"
-                variant="secondary"
-                theme="black"
-                disabled={false}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setModalContent(
-                    <ReturnToRequiredHandlingDialog
-                      reservation={reservation}
-                      onAccept={closeDialogAndRefetch}
-                      onClose={closeDialog}
-                    />,
-                    true
-                  );
-                }}
-              >
-                {t("RequestedReservation.returnToHandling")}
-              </Button>
-            </>
-          )}
+          {buttons}
         </HorisontalFlex>
         <Summary>
           {[
             {
               l: "reserveeType",
               v: reservation.reserveeType
-                ? (t(
+                ? t(
                     getTranslationKeyForType(
                       reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
                       reservation.reserveeIsUnregisteredAssociation
                     )
-                  ) as string)
+                  )
                 : undefined,
             },
             { l: "numPersons", v: reservation.numPersons },
@@ -320,7 +368,9 @@ const RequestedReservation = (): JSX.Element | null => {
             },
             {
               l: "purpose",
-              v: reservation.purpose ? `${reservation.purpose}` : undefined,
+              v: reservation.purpose
+                ? `${reservation.purpose.nameFi}`
+                : undefined,
             },
             { l: "description", v: reservation.description },
             {
@@ -428,14 +478,12 @@ const RequestedReservation = (): JSX.Element | null => {
             <ApplicationDatas>
               <ApplicationData
                 label={t("RequestedReservation.reserveeType")}
-                data={
-                  t(
-                    getTranslationKeyForType(
-                      reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
-                      reservation.reserveeIsUnregisteredAssociation
-                    )
-                  ) as string
-                }
+                data={t(
+                  getTranslationKeyForType(
+                    reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
+                    reservation.reserveeIsUnregisteredAssociation
+                  )
+                )}
                 wide={
                   reservation.reserveeType ===
                   ReservationsReservationReserveeTypeChoices.Individual

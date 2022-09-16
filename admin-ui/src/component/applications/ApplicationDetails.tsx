@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { orderBy, set } from "lodash";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -37,6 +37,8 @@ import TimeSelector from "./time-selector/TimeSelector";
 import { breakpoints } from "../../styles/util";
 import ScrollIntoView from "../../common/ScrollIntoView";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import ShowWhenTargetInvisible from "../ShowWhenTargetInvisible";
+import StickyHeader from "../StickyHeader";
 
 interface IRouteParams {
   applicationId: string;
@@ -208,6 +210,8 @@ function ApplicationDetails(): JSX.Element | null {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationId]);
 
+  const ref = useRef<HTMLHeadingElement>(null);
+
   if (isLoading) {
     return <Loader />;
   }
@@ -248,12 +252,20 @@ function ApplicationDetails(): JSX.Element | null {
               { slug: "application", title: customerName },
             ]}
           />
+          <ShowWhenTargetInvisible target={ref}>
+            <StickyHeader
+              name={customerName}
+              tagline={`${t("Application.id")}:${application.id}`}
+            />
+          </ShowWhenTargetInvisible>
+
           <IngressContainer>
             <StyledApplicationStatusBlock
               status={application.status}
               view={applicationRound.status}
             />
             <H2
+              ref={ref}
               style={{ margin: "1rem 0" }}
               data-testid="application-details__heading--main"
             >
