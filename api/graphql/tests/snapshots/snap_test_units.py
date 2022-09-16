@@ -45,6 +45,44 @@ snapshots['UnitsQueryTestCase::test_getting_only_with_permission_when_unit_admin
     }
 }
 
+snapshots['UnitsQueryTestCase::test_getting_own_reservations_false 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test unit'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': "I'm in a result as I should with Test unit."
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['UnitsQueryTestCase::test_getting_own_reservations_true 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Include me A'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Include me B'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['UnitsQueryTestCase::test_getting_units 1'] = {
     'data': {
         'units': {
@@ -180,6 +218,30 @@ snapshots['UnitsQueryTestCase::test_getting_units_with_published_reservation_uni
                 {
                     'node': {
                         'nameFi': 'Include me B'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['UnitsQueryTestCase::test_order_by_own_reservation_count 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': "I'm first"
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Then me'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': "I'm last."
                     }
                 }
             ]

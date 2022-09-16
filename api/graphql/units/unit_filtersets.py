@@ -1,7 +1,7 @@
 import datetime
 
 import django_filters
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils.timezone import get_default_timezone
 
 from .unit_types import Unit
@@ -25,9 +25,18 @@ class UnitsFilterSet(django_filters.FilterSet):
         method="get_published_reservation_units"
     )
 
+    own_reservations = django_filters.BooleanFilter(method="get_own_reservations")
+
     order_by = django_filters.OrderingFilter(
-        fields=("name_fi", "name_en", "name_sv", "rank")
+        fields=("name_fi", "name_en", "name_sv", "rank", "reservation_count")
     )
+
+    def filter_queryset(self, queryset):
+        queryset = queryset.annotate(
+            reservation_count=Count("reservationunit__reservation")
+        )
+
+        return super().filter_queryset(queryset)
 
     def filter_by_pk(self, qs, property, value):
         if value:
@@ -95,3 +104,16 @@ class UnitsFilterSet(django_filters.FilterSet):
             )
 
         return qs.filter(query)
+
+    def get_own_reservations(self, qs, property, value):
+        user = self.request.user
+
+        if user.is_anonymous:
+            return qs.none()
+
+        units_with_reservations = Q(reservationunit__reservation__user=user)
+
+        if value:
+            return qs.filter(units_with_reservations)
+
+        return qs.exclude(units_with_reservations)

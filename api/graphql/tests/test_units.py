@@ -16,6 +16,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from reservation_units.tests.factories import ReservationUnitFactory
+from reservations.tests.factories import ReservationFactory
 from spaces.models import Unit
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 
@@ -318,6 +319,140 @@ class UnitsQueryTestCase(UnitTestCaseBase):
             """
             query {
                 units(publishedReservationUnits: true) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_getting_own_reservations_true(self):
+        other_user = get_user_model().objects.create(
+            username="sapr",
+            first_name="Sam",
+            last_name="Sprite",
+            email="s.sprite@foo.com",
+        )
+        a_unit = UnitFactory(name="Include me A")
+        b_unit = UnitFactory(name="Include me B")
+        d_unit = UnitFactory(name="Don't you ever show me")
+
+        resu_a = ReservationUnitFactory(
+            unit=a_unit,
+        )
+        resu_b = ReservationUnitFactory(unit=b_unit)
+        resu_d = ReservationUnitFactory(unit=d_unit)
+        resu_too_d = ReservationUnitFactory(unit=d_unit)
+
+        ReservationFactory(reservation_unit=[resu_a], user=self.regular_joe)
+        ReservationFactory(reservation_unit=[resu_b], user=self.regular_joe)
+        ReservationFactory(reservation_unit=[resu_d], user=other_user)
+        ReservationFactory(reservation_unit=[resu_too_d], user=other_user)
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                units(ownReservations: true) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_getting_own_reservations_false(self):
+        other_user = get_user_model().objects.create(
+            username="sapr",
+            first_name="Sam",
+            last_name="Sprite",
+            email="s.sprite@foo.com",
+        )
+        a_unit = UnitFactory(name="Me you no see")
+        b_unit = UnitFactory(name="Me neither")
+        d_unit = UnitFactory(name="I'm in a result as I should with Test unit.")
+
+        resu_a = ReservationUnitFactory(
+            unit=a_unit,
+        )
+        resu_b = ReservationUnitFactory(unit=b_unit)
+        resu_d = ReservationUnitFactory(unit=d_unit)
+        resu_too_d = ReservationUnitFactory(unit=d_unit)
+
+        ReservationFactory(reservation_unit=[resu_a], user=self.regular_joe)
+        ReservationFactory(reservation_unit=[resu_b], user=self.regular_joe)
+        ReservationFactory(reservation_unit=[resu_d], user=other_user)
+        ReservationFactory(reservation_unit=[resu_too_d], user=other_user)
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                units(ownReservations: false) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_own_reservation_count(self):
+        other_user = get_user_model().objects.create(
+            username="sapr",
+            first_name="Sam",
+            last_name="Sprite",
+            email="s.sprite@foo.com",
+        )
+        no_unit = UnitFactory(name="Don't show me")
+        a_unit = UnitFactory(name="I'm first")
+        b_unit = UnitFactory(name="Then me")
+        l_unit = UnitFactory(name="I'm last.")
+
+        resu_a = ReservationUnitFactory(
+            unit=a_unit,
+        )
+        resu_b = ReservationUnitFactory(unit=b_unit)
+        resu_d = ReservationUnitFactory(unit=l_unit)
+        resu_too_d = ReservationUnitFactory(unit=l_unit)
+        no_resu = ReservationUnitFactory(unit=no_unit)
+
+        ReservationFactory.create_batch(
+            4, reservation_unit=[resu_a], user=self.regular_joe
+        )
+        ReservationFactory.create_batch(
+            3, reservation_unit=[resu_b], user=self.regular_joe
+        )
+        ReservationFactory(reservation_unit=[resu_d], user=self.regular_joe)
+        ReservationFactory.create_batch(
+            3, reservation_unit=[resu_too_d], user=other_user
+        )
+        ReservationFactory(reservation_unit=[no_resu], user=other_user)
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                units(ownReservations: true orderBy: "-reservationCount") {
                     edges {
                         node {
                             nameFi
