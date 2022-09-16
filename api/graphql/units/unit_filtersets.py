@@ -1,5 +1,8 @@
+import datetime
+
 import django_filters
 from django.db.models import Q
+from django.utils.timezone import get_default_timezone
 
 from .unit_types import Unit
 
@@ -16,6 +19,10 @@ class UnitsFilterSet(django_filters.FilterSet):
 
     only_with_permission = django_filters.BooleanFilter(
         method="get_only_with_permission"
+    )
+
+    published_reservation_units = django_filters.BooleanFilter(
+        method="get_published_reservation_units"
     )
 
     order_by = django_filters.OrderingFilter(
@@ -51,3 +58,40 @@ class UnitsFilterSet(django_filters.FilterSet):
                 )
             )
         ).distinct()
+
+    def get_published_reservation_units(self, qs, property, value):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        if value:
+            query = (
+                Q(reservationunit__is_archived=False)
+                & Q(reservationunit__is_draft=False)
+                & (
+                    Q(reservationunit__publish_begins__isnull=True)
+                    | Q(reservationunit__publish_begins__lte=now)
+                )
+                & (
+                    Q(reservationunit__publish_ends__isnull=True)
+                    | Q(reservationunit__publish_ends__gt=now)
+                )
+                & (
+                    Q(reservationunit__reservation_begins__isnull=True)
+                    | Q(reservationunit__reservation_begins__lte=now)
+                )
+                & (
+                    Q(reservationunit__reservation_ends__isnull=True)
+                    | Q(reservationunit__reservation_ends__gt=now)
+                )
+            )
+
+        else:
+            query = (
+                Q(reservationunit__is_archived=True)
+                | Q(reservationunit__is_draft=True)
+                | (Q(reservationunit__publish_begins__gte=now))
+                | (Q(reservationunit__publish_ends__lt=now))
+                | (Q(reservationunit__reservation_begins__lte=now))
+                | (Q(reservationunit__reservation_ends__gt=now))
+            )
+
+        return qs.filter(query)

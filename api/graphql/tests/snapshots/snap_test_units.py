@@ -167,3 +167,22 @@ snapshots['UnitsQueryTestCase::test_getting_units_sorted_by_name_desc 1'] = {
         }
     }
 }
+
+snapshots['UnitsQueryTestCase::test_getting_units_with_published_reservation_units 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Include me A'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Include me B'
+                    }
+                }
+            ]
+        }
+    }
+}

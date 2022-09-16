@@ -1,8 +1,10 @@
+import datetime
 import json
 
 import snapshottest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
+from django.utils.timezone import get_default_timezone
 from graphene_django.utils import GraphQLTestCase
 
 from permissions.models import (
@@ -13,6 +15,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
+from reservation_units.tests.factories import ReservationUnitFactory
 from spaces.models import Unit
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 
@@ -282,6 +285,39 @@ class UnitsQueryTestCase(UnitTestCaseBase):
             """
             query {
                 units(onlyWithPermission: true) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_getting_units_with_published_reservation_units(self):
+        publish_date = datetime.datetime.now(tz=get_default_timezone())
+        unpublish_date = publish_date + datetime.timedelta(days=30)
+
+        a_unit = UnitFactory.create(name="Include me A")
+        b_unit = UnitFactory.create(name="Include me B")
+        d_unit = UnitFactory.create(name="Don't you ever show me")
+
+        ReservationUnitFactory(
+            unit=a_unit,
+        )
+        ReservationUnitFactory(publish_begins=publish_date, unit=b_unit)
+        ReservationUnitFactory(is_archived=True, unit=d_unit)
+        ReservationUnitFactory(publish_begins=unpublish_date, unit=d_unit)
+
+        response = self.query(
+            """
+            query {
+                units(publishedReservationUnits: true) {
                     edges {
                         node {
                             nameFi
