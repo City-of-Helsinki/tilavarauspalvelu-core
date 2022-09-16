@@ -332,6 +332,7 @@ class ReservationUnitPricingType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = ReservationUnitPricing
         fields = [
+            "pk",
             "begins",
             "pricing_type",
             "price_unit",

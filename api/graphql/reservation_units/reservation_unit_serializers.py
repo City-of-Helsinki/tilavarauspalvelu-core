@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 from django.core import validators
 from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
@@ -21,14 +23,19 @@ from reservation_units.models import (
     EquipmentCategory,
     PricingType,
     Purpose,
+    Q,
     Qualifier,
     ReservationKind,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
     ReservationUnitPaymentType,
+    ReservationUnitPricing,
     ReservationUnitType,
     TaxPercentage,
+)
+from reservation_units.utils.reservation_unit_pricing_helper import (
+    ReservationUnitPricingHelper,
 )
 from reservations.models import ReservationMetadataSet
 from resources.models import Resource
@@ -93,6 +100,63 @@ class PurposeCreateSerializer(PrimaryKeySerializer):
 class PurposeUpdateSerializer(PrimaryKeyUpdateSerializer, PurposeCreateSerializer):
     class Meta(PurposeCreateSerializer.Meta):
         fields = ["pk"] + PurposeCreateSerializer.Meta.fields
+
+
+class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
+    pricing_type = ChoiceCharField(
+        required=True,
+        choices=PricingType.choices,
+        help_text=(
+            "What kind of pricing type this pricing has. Possible values are "
+            f"{', '.join(value.upper() for value in PricingType)}."
+        ),
+    )
+    price_unit = ChoiceCharField(
+        required=False,
+        choices=ReservationUnit.PRICE_UNITS,
+        help_text=(
+            "Unit of the price. "
+            f"Possible values are {', '.join(value[0].upper() for value in ReservationUnit.PRICE_UNITS)}."
+        ),
+    )
+
+    tax_percentage_pk = IntegerPrimaryKeyField(
+        queryset=TaxPercentage.objects.all(),
+        source="tax_percentage",
+        required=False,
+    )
+
+    status = ChoiceCharField(
+        required=True,
+        choices=ReservationUnitPricing.PRICE_STATUSES,
+        help_text=(
+            "Pricing status. "
+            f"Possible values are {', '.join(value[0].upper() for value in ReservationUnitPricing.PRICE_STATUSES)}."
+        ),
+    )
+
+    class Meta:
+        model = ReservationUnitPricing
+        fields = [
+            "begins",
+            "pricing_type",
+            "price_unit",
+            "lowest_price",
+            "highest_price",
+            "tax_percentage_pk",
+            "status",
+        ]
+
+
+class ReservationUnitPricingUpdateSerializer(
+    PrimaryKeyUpdateSerializer, ReservationUnitPricingCreateSerializer
+):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["pk"].required = False
+
+    class Meta(ReservationUnitPricingCreateSerializer.Meta):
+        fields = ["pk"] + ReservationUnitPricingCreateSerializer.Meta.fields
 
 
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySerializer):
@@ -267,6 +331,10 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
     )
 
+    pricings = ReservationUnitPricingCreateSerializer(
+        many=True, read_only=False, required=False
+    )
+
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
     class Meta(ReservationUnitSerializer.Meta):
@@ -327,6 +395,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "pricing_terms",
             "pricing_type",
             "payment_types",
+            "pricings",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
@@ -354,6 +423,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
 
     def validate(self, data):
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
+        self.validate_pricing_fields(data)
 
         if not is_draft:
             self.validate_for_publish(data)
@@ -419,16 +489,106 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
                 "minPersons can't be more than maxPersons"
             )
 
+    def validate_pricing_fields(self, data):
+        is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
+
+        ReservationUnitPricingHelper.check_pricing_required(is_draft, data)
+        ReservationUnitPricingHelper.check_pricing_dates(data)
+        ReservationUnitPricingHelper.check_pricing_counts(is_draft, data)
+
+    @staticmethod
+    def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
+        for pricing in pricings:
+            ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
+
+    def create(self, validated_data):
+        pricings = validated_data.pop("pricings", [])
+        reservation_unit = super().create(validated_data)
+        self.handle_pricings(pricings, reservation_unit)
+        return reservation_unit
+
 
 class ReservationUnitUpdateSerializer(
     PrimaryKeyUpdateSerializer, ReservationUnitCreateSerializer
 ):
+    pricings = ReservationUnitPricingUpdateSerializer(
+        many=True, read_only=False, required=True
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["unit_pk"].required = False
+        self.fields["pricings"].write_only = True
 
     class Meta(ReservationUnitCreateSerializer.Meta):
         fields = ReservationUnitCreateSerializer.Meta.fields + ["pk"]
+
+    def validate(self, data):
+        data = super().validate(data)
+        self.validate_pricing(data)
+        return data
+
+    def validate_pricing(self, data):
+        current_active_pricing = ReservationUnitPricingHelper.get_active_price(
+            self.instance
+        )
+        current_future_pricing = ReservationUnitPricingHelper.get_future_price(
+            self.instance
+        )
+
+        for pricing in data.get("pricings"):
+            if ReservationUnitPricingHelper.is_active(pricing):
+                if current_active_pricing and current_active_pricing.pk != pricing.get(
+                    "pk", 0
+                ):
+                    raise serializers.ValidationError(
+                        "ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed"
+                    )
+            elif ReservationUnitPricingHelper.is_future(pricing):
+                if current_future_pricing and current_future_pricing.pk != pricing.get(
+                    "pk", 0
+                ):
+                    raise serializers.ValidationError(
+                        "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
+                    )
+
+    @staticmethod
+    def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
+        # Delete pricings that are not in the payload
+        if not ReservationUnitPricingHelper.contains_status(
+            PricingStatus.PRICING_STATUS_ACTIVE, pricings
+        ):
+            ReservationUnitPricing.objects.filter(
+                Q(reservation_unit=reservation_unit)
+                and Q(status=PricingStatus.PRICING_STATUS_ACTIVE)
+            ).delete()
+        if not ReservationUnitPricingHelper.contains_status(
+            PricingStatus.PRICING_STATUS_FUTURE, pricings
+        ):
+            ReservationUnitPricing.objects.filter(
+                Q(reservation_unit=reservation_unit)
+                and Q(status=PricingStatus.PRICING_STATUS_FUTURE)
+            ).delete()
+
+        for pricing in pricings:
+            if "pk" in pricing:  # Update existing pricings
+                ReservationUnitPricing.objects.update_or_create(
+                    pk=pricing["pk"], defaults=pricing
+                )
+            else:  # Create new pricings
+                status = pricing.get("status")
+                ReservationUnitPricing.objects.filter(
+                    Q(reservation_unit=reservation_unit) and Q(status=status)
+                ).delete()
+                ReservationUnitPricing.objects.create(
+                    **pricing, reservation_unit=reservation_unit
+                )
+
+    def update(self, instance, validated_data):
+        pricings = validated_data.pop("pricings", [])
+        reservation_unit = super().update(instance, validated_data)
+        self.handle_pricings(pricings, instance)
+        return reservation_unit
 
 
 class ReservationUnitImageCreateSerializer(PrimaryKeySerializer):
