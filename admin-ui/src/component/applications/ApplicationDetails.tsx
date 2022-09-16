@@ -29,7 +29,7 @@ import {
   parseAgeGroups,
 } from "../../common/util";
 import ValueBox from "./ValueBox";
-import { weekdays } from "../../common/const";
+import { publicUrl, weekdays } from "../../common/const";
 import { appEventDuration, applicantName } from "./util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
 import { useNotification } from "../../context/NotificationContext";
@@ -238,8 +238,8 @@ function ApplicationDetails(): JSX.Element | null {
           <BreadcrumbWrapper
             route={[
               "recurring-reservations",
-              "/recurring-reservations/application-rounds",
-              `/recurring-reservations/application-rounds/${applicationRound.id}`,
+              `${publicUrl}/recurring-reservations/application-rounds`,
+              `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.id}`,
               `application`,
             ]}
             aliases={[

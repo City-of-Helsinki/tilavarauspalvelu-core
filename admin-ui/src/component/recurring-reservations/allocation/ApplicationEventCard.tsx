@@ -2,6 +2,7 @@ import { IconAngleDown, IconAngleUp, Link, RadioButton } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { publicUrl } from "../../../common/const";
 import {
   ApplicationEventType,
   ApplicationType,
@@ -155,8 +156,9 @@ const ApplicationEventCard = ({
       {isExpanded && (
         <Details>
           <StyledLink
-            href={`/application/${application?.pk}/details`}
+            href={`${publicUrl}/application/${application?.pk}/details`}
             external
+            openInNewTab
             openInExternalDomainAriaLabel={t("common.openToNewTab")}
           >
             {t("Allocation.openApplication")}

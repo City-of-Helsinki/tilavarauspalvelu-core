@@ -4,13 +4,14 @@ import {
   getUnRoundedReservationVolume,
 } from "common";
 
-import { differenceInMinutes, isSameDay } from "date-fns";
+import { differenceInHours, differenceInMinutes, isSameDay } from "date-fns";
 import { TFunction } from "i18next";
 import {
   AgeGroupType,
   Maybe,
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
+  ReservationUnitType,
 } from "../../../common/gql-types";
 import { formatDate, formatTime } from "../../../common/util";
 
@@ -36,6 +37,20 @@ export const reservationDateTime = (
         startTimeFormat
       )} - ${formatDate(end, endTimeFormat)} klo ${formatTime(end)}`;
 };
+
+export const reservationDuration = (start: string, end: string): string => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  return `${differenceInHours(endDate, startDate)}`;
+};
+
+export const reservationUnitName = (
+  reservationUnit: Maybe<ReservationUnitType>
+): string =>
+  reservationUnit
+    ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}`
+    : "-";
 
 export const reservationPrice = (
   reservation: ReservationType,

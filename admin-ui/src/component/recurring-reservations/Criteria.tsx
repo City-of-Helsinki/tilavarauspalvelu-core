@@ -28,6 +28,7 @@ import { formatDate, localizedValue, parseAgeGroups } from "../../common/util";
 import i18n from "../../i18n";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { useNotification } from "../../context/NotificationContext";
+import { publicUrl } from "../../common/const";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -272,8 +273,8 @@ function Criteria(): JSX.Element {
             <BreadcrumbWrapper
               route={[
                 "recurring-reservations",
-                "/recurring-reservations/application-rounds",
-                `/recurring-reservations/application-rounds/${applicationRound.id}`,
+                `${publicUrl}/recurring-reservations/application-rounds`,
+                `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.id}`,
                 "criteria",
               ]}
               aliases={[

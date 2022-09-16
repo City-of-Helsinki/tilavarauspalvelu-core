@@ -33,6 +33,9 @@ export const RESERVATION_QUERY = gql`
       purpose {
         nameFi
       }
+      homeCity {
+        nameFi
+      }
       numPersons
       reserveeType
       reserveeIsUnregisteredAssociation
