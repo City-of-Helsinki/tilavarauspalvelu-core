@@ -1,15 +1,10 @@
-import React, {
-  Fragment,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useMutation } from "@apollo/client";
 import router from "next/router";
 import { parseISO } from "date-fns";
+import { useSessionStorage } from "react-use";
 import {
   Notification,
   TextInput,
@@ -50,7 +45,6 @@ import {
   reservationsUrl,
 } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
-import { DataContext } from "../../context/DataContext";
 import {
   AgeGroupType,
   CityType,
@@ -429,12 +423,11 @@ const ReservationUnitReservation = ({
   cities,
   termsOfUse,
 }: Props): JSX.Element => {
-  const { t } = useTranslation();
-  const {
-    reservation: reservationData,
-    setReservation: setContextReservation,
-  } = useContext(DataContext);
-
+  const { t, i18n } = useTranslation();
+  const [reservationData, setPendingReservation] = useSessionStorage(
+    "pendingReservation",
+    null
+  );
   const [formStatus, setFormStatus] = useState<"pending" | "error" | "sent">(
     "pending"
   );
@@ -474,19 +467,13 @@ const ReservationUnitReservation = ({
   const hasMetadataSet = !!reservationUnit?.metadataSet?.supportedFields;
 
   useEffect(() => {
-    return () => {
-      setContextReservation(null);
-    };
-  }, [setContextReservation]);
-
-  useEffect(() => {
     if (!updateLoading) {
       if (updateError) {
         const msg = printErrorMessages(updateError);
         setErrorMsg(msg);
       } else if (updateData) {
         if (updateData.updateReservation.reservation.state === "CANCELLED") {
-          setContextReservation(null);
+          setPendingReservation(null);
           router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
         } else {
           const payload = {
@@ -523,6 +510,7 @@ const ReservationUnitReservation = ({
         });
         setFormStatus("sent");
         setStep(2);
+        setPendingReservation(null);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -554,13 +542,18 @@ const ReservationUnitReservation = ({
 
   if (
     isBrowser &&
+    step !== 2 &&
     (!reservationData?.pk || !reservationData?.begin || !reservationData?.end)
   ) {
     router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
     return null;
   }
 
-  const { pk: reservationPk, begin, end } = reservationData || {};
+  const {
+    pk: reservationPk,
+    begin,
+    end,
+  } = reservation || reservationData || {};
 
   const beginDate = t("common:dateWithWeekday", {
     date: begin && parseISO(begin),
@@ -589,6 +582,7 @@ const ReservationUnitReservation = ({
       reserveePhone: payload.reserveePhone,
       name: payload.name,
       description: payload.description,
+      reserveeLanguage: i18n.language,
     };
 
     setReservation(input);
@@ -616,9 +610,11 @@ const ReservationUnitReservation = ({
         input: {
           pk: reservationPk,
           state: "CANCELLED",
+          reserveeLanguage: i18n.language,
         },
       },
     });
+    setPendingReservation(null);
   };
 
   const onSubmitApplication1 = (payload) => {
@@ -646,6 +642,7 @@ const ReservationUnitReservation = ({
         input: {
           pk: reservationPk,
           ...input,
+          reserveeLanguage: i18n.language,
         },
       },
     });
@@ -682,7 +679,7 @@ const ReservationUnitReservation = ({
                 end={end}
                 state={formStatus === "sent" ? "complete" : "incomplete"}
                 isFree={!getPrice(reservationUnit)}
-                reservationPrice={reservationData.price}
+                reservationPrice={reservation?.price || reservationData?.price}
                 // taxPercentage={reservationUnit.taxPercentage}
               />
             </div>

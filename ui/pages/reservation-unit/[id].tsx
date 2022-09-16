@@ -37,7 +37,7 @@ import {
   isReservationUnitReservable,
   isStartTimeWithinInterval,
 } from "common/src/calendar/util";
-import { useLocalStorage } from "react-use";
+import { useLocalStorage, useSessionStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import {
@@ -493,6 +493,10 @@ const ReservationUnit = ({
 }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const [, setPendingReservation] = useSessionStorage(
+    "pendingReservation",
+    null
+  );
 
   const now = useMemo(() => new Date().toISOString(), []);
 
@@ -770,11 +774,13 @@ const ReservationUnit = ({
         const msg = printErrorMessages(createReservationError);
         setErrorMsg(msg);
       } else if (createdReservation) {
-        setReservation({
+        setPendingReservation({
           ...reservation,
           pk: createdReservation.createReservation.pk,
           price: createdReservation.createReservation.price,
         });
+        setStoredReservation(null);
+
         setIsRedirecting(true);
         router.push(`/reservation-unit/${reservationUnit.pk}/reservation`);
       }
@@ -788,6 +794,7 @@ const ReservationUnit = ({
     router,
     reservationUnit.pk,
     setReservation,
+    setPendingReservation,
   ]);
 
   const createReservation = (res: ReservationProps): void => {
@@ -797,9 +804,8 @@ const ReservationUnit = ({
       begin,
       end,
       reservationUnitPks: [reservationUnit.pk],
+      reserveeLanguage: i18n.language,
     };
-
-    setStoredReservation(input as unknown as ReservationProps);
 
     addReservation({
       variables: {
