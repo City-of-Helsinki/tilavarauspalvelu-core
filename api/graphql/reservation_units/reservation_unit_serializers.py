@@ -21,6 +21,8 @@ from api.reservation_units_api import (
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
+    PriceUnit,
+    PricingStatus,
     PricingType,
     Purpose,
     Q,
@@ -113,10 +115,10 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
     )
     price_unit = ChoiceCharField(
         required=False,
-        choices=ReservationUnit.PRICE_UNITS,
+        choices=PriceUnit.choices,
         help_text=(
             "Unit of the price. "
-            f"Possible values are {', '.join(value[0].upper() for value in ReservationUnit.PRICE_UNITS)}."
+            f"Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
         ),
     )
 
@@ -128,10 +130,10 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
 
     status = ChoiceCharField(
         required=True,
-        choices=ReservationUnitPricing.PRICE_STATUSES,
+        choices=PricingStatus.choices,
         help_text=(
             "Pricing status. "
-            f"Possible values are {', '.join(value[0].upper() for value in ReservationUnitPricing.PRICE_STATUSES)}."
+            f"Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
         ),
     )
 
@@ -259,10 +261,10 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     )
     price_unit = ChoiceCharField(
         required=False,
-        choices=ReservationUnit.PRICE_UNITS,
+        choices=PriceUnit.choices,
         help_text=(
             "Unit of the price. "
-            f"Possible values are {', '.join(value[0].upper() for value in ReservationUnit.PRICE_UNITS)}."
+            f"Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
         ),
     )
     reservation_start_interval = ChoiceCharField(
@@ -499,7 +501,9 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     @staticmethod
     def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
         for pricing in pricings:
-            ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
+            ReservationUnitPricing.objects.create(
+                **pricing, reservation_unit=reservation_unit
+            )
 
     def create(self, validated_data):
         pricings = validated_data.pop("pricings", [])

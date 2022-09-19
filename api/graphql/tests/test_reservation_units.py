@@ -33,10 +33,11 @@ from permissions.models import (
 )
 from reservation_units.models import (
     PaymentType,
+    PriceUnit,
+    PricingStatus,
     PricingType,
     ReservationKind,
     ReservationUnit,
-    ReservationUnitPricing,
     TaxPercentage,
 )
 from reservation_units.tests.factories import (
@@ -117,7 +118,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             tax_percentage=TaxPercentage.objects.get(value=24),
             lowest_price=0,
             highest_price=20,
-            price_unit=ReservationUnit.PRICE_UNIT_PER_HOUR,
+            price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
             is_draft=False,
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
             reservation_begins=datetime.datetime.now(tz=get_default_timezone()),
@@ -3251,7 +3252,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "cancellationRulePk": self.rule.pk,
             "lowestPrice": 0,
             "highestPrice": 20,
-            "priceUnit": ReservationUnit.PRICE_UNIT_PER_HOUR.upper(),
+            "priceUnit": PriceUnit.PRICE_UNIT_PER_HOUR.upper(),
             "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES.upper(),
             "taxPercentagePk": TaxPercentage.objects.get(value=24).pk,
             "publishBegins": "2021-05-03T00:00:00+00:00",
@@ -3270,11 +3271,11 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
                 {
                     "begins": datetime.date.today().strftime("%Y-%m-%d"),
                     "pricingType": PricingType.PAID,
-                    "priceUnit": ReservationUnit.PRICE_UNIT_PER_15_MINS,
+                    "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
                     "lowestPrice": 10.5,
                     "highestPrice": 18.8,
                     "taxPercentagePk": 2,
-                    "status": ReservationUnitPricing.PRICING_STATUS_ACTIVE,
+                    "status": PricingStatus.PRICING_STATUS_ACTIVE,
                 }
             ],
         }
@@ -4532,7 +4533,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
     def test_update_price_fields(self):
         expected_lowest_price = Decimal("0.00")
         expected_highest_price = Decimal("20.00")
-        expected_price_unit = ReservationUnit.PRICE_UNIT_PER_HOUR
+        expected_price_unit = PriceUnit.PRICE_UNIT_PER_HOUR
         data = self.get_valid_update_data()
         data["lowestPrice"] = float(expected_lowest_price)
         data["highestPrice"] = float(expected_highest_price)

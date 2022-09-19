@@ -155,6 +155,22 @@ class PaymentType(models.TextChoices):
     ON_SITE = "ON_SITE"
 
 
+class PriceUnit(models.TextChoices):
+    PRICE_UNIT_PER_15_MINS = "per_15_mins", _("per 15 minutes")
+    PRICE_UNIT_PER_30_MINS = "per_30_mins", _("per 30 minutes")
+    PRICE_UNIT_PER_HOUR = "per_hour", _("per hour")
+    PRICE_UNIT_PER_HALF_DAY = "per_half_day", _("per half a day")
+    PRICE_UNIT_PER_DAY = "per_day", _("per day")
+    PRICE_UNIT_PER_WEEK = "per_week", _("per week")
+    PRICE_UNIT_FIXED = "fixed", _("fixed")
+
+
+class PricingStatus(models.TextChoices):
+    PRICING_STATUS_PAST = "past", _("past")
+    PRICING_STATUS_ACTIVE = "active", _("active")
+    PRICING_STATUS_FUTURE = "future", _("future")
+
+
 class ReservationUnitPaymentType(models.Model):
     code = models.CharField(
         verbose_name=_("Code"), max_length=32, blank=False, null=False, primary_key=True
@@ -344,27 +360,11 @@ class ReservationUnit(models.Model):
         on_delete=models.PROTECT,
     )
 
-    PRICE_UNIT_PER_15_MINS = "per_15_mins"
-    PRICE_UNIT_PER_30_MINS = "per_30_mins"
-    PRICE_UNIT_PER_HOUR = "per_hour"
-    PRICE_UNIT_PER_HALF_DAY = "per_half_day"
-    PRICE_UNIT_PER_DAY = "per_day"
-    PRICE_UNIT_PER_WEEK = "per_week"
-    PRICE_UNIT_FIXED = "fixed"
-    PRICE_UNITS = (
-        (PRICE_UNIT_PER_15_MINS, _("per 15 minutes")),
-        (PRICE_UNIT_PER_30_MINS, _("per 30 minutes")),
-        (PRICE_UNIT_PER_HOUR, _("per hour")),
-        (PRICE_UNIT_PER_HALF_DAY, _("per half a day")),
-        (PRICE_UNIT_PER_DAY, _("per day")),
-        (PRICE_UNIT_PER_WEEK, _("per week")),
-        (PRICE_UNIT_FIXED, _("fixed")),
-    )
     price_unit = models.CharField(
         max_length=20,
         verbose_name=_("Price unit"),
-        choices=PRICE_UNITS,
-        default=PRICE_UNIT_PER_HOUR,
+        choices=PriceUnit.choices,
+        default=PriceUnit.PRICE_UNIT_PER_HOUR,
         help_text="Unit of the price",
     )
     lowest_price = models.DecimalField(
@@ -655,27 +655,11 @@ class ReservationUnitPricing(models.Model):
         help_text="What kind of pricing types are available with this reservation unit.",
     )
 
-    PRICE_UNIT_PER_15_MINS = "per_15_mins"
-    PRICE_UNIT_PER_30_MINS = "per_30_mins"
-    PRICE_UNIT_PER_HOUR = "per_hour"
-    PRICE_UNIT_PER_HALF_DAY = "per_half_day"
-    PRICE_UNIT_PER_DAY = "per_day"
-    PRICE_UNIT_PER_WEEK = "per_week"
-    PRICE_UNIT_FIXED = "fixed"
-    PRICE_UNITS = (
-        (PRICE_UNIT_PER_15_MINS, _("per 15 minutes")),
-        (PRICE_UNIT_PER_30_MINS, _("per 30 minutes")),
-        (PRICE_UNIT_PER_HOUR, _("per hour")),
-        (PRICE_UNIT_PER_HALF_DAY, _("per half a day")),
-        (PRICE_UNIT_PER_DAY, _("per day")),
-        (PRICE_UNIT_PER_WEEK, _("per week")),
-        (PRICE_UNIT_FIXED, _("fixed")),
-    )
     price_unit = models.CharField(
         max_length=20,
         verbose_name=_("Price unit"),
-        choices=PRICE_UNITS,
-        default=PRICE_UNIT_PER_HOUR,
+        choices=PriceUnit.choices,
+        default=PriceUnit.PRICE_UNIT_PER_HOUR,
         help_text="Unit of the price",
     )
     lowest_price = models.DecimalField(
@@ -703,18 +687,10 @@ class ReservationUnitPricing(models.Model):
         help_text="The percentage of tax included in the price",
     )
 
-    PRICING_STATUS_PAST = "past"
-    PRICING_STATUS_ACTIVE = "active"
-    PRICING_STATUS_FUTURE = "future"
-    PRICE_STATUSES = (
-        (PRICING_STATUS_PAST, _("past")),
-        (PRICING_STATUS_ACTIVE, _("active")),
-        (PRICING_STATUS_FUTURE, _("future")),
-    )
     status = models.CharField(
         max_length=20,
         verbose_name=_("Status"),
-        choices=PRICE_STATUSES,
+        choices=PricingStatus.choices,
         help_text="Status of the pricing",
     )
 

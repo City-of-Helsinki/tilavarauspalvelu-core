@@ -13,7 +13,7 @@ from applications.models import City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.hours import DEFAULT_TIMEZONE
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from reservation_units.models import PricingType, ReservationUnit
+from reservation_units.models import PriceUnit, PricingType, ReservationUnit
 from reservation_units.tests.factories import (
     ReservationUnitFactory,
     TaxPercentageFactory,
@@ -706,7 +706,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         tax_percentage = TaxPercentageFactory()
 
         self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_FIXED
+        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_FIXED
         self.reservation_unit.lowest_price = 1.0
         self.reservation_unit.highest_price = 3.0
         self.reservation_unit.tax_percentage = tax_percentage
@@ -741,7 +741,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         tax_percentage = TaxPercentageFactory()
 
         self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_FIXED
+        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_FIXED
         self.reservation_unit.lowest_price = 1.0
         self.reservation_unit.highest_price = 3.0
         self.reservation_unit.tax_percentage = tax_percentage
@@ -804,7 +804,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
             reservation_unit_type=self.reservation_unit_type,
             pricing_type=PricingType.PAID,
-            price_unit=ReservationUnit.PRICE_UNIT_FIXED,
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=2.0,
             highest_price=4.0,
             sku=self.reservation_unit.sku,

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from rest_framework import serializers
 
-from ..models import ReservationUnit, ReservationUnitPricing
+from ..models import PricingStatus, ReservationUnit, ReservationUnitPricing
 
 
 class ReservationUnitPricingHelper:
@@ -12,7 +12,7 @@ class ReservationUnitPricingHelper:
         cls, reservation_unit: ReservationUnit
     ) -> Optional[ReservationUnitPricing]:
         return reservation_unit.pricings.filter(
-            status=ReservationUnitPricing.PRICING_STATUS_ACTIVE
+            status=PricingStatus.PRICING_STATUS_ACTIVE
         ).first()
 
     @classmethod
@@ -20,16 +20,16 @@ class ReservationUnitPricingHelper:
         cls, reservation_unit: ReservationUnit
     ) -> Optional[ReservationUnitPricing]:
         return reservation_unit.pricings.filter(
-            status=ReservationUnitPricing.PRICING_STATUS_FUTURE
+            status=PricingStatus.PRICING_STATUS_FUTURE
         ).first()
 
     @classmethod
     def is_active(cls, pricing: Dict[str, Any]) -> bool:
-        return pricing.get("status") == ReservationUnitPricing.PRICING_STATUS_ACTIVE
+        return pricing.get("status") == PricingStatus.PRICING_STATUS_ACTIVE
 
     @classmethod
     def is_future(cls, pricing: Dict[str, Any]) -> bool:
-        return pricing.get("status") == ReservationUnitPricing.PRICING_STATUS_FUTURE
+        return pricing.get("status") == PricingStatus.PRICING_STATUS_FUTURE
 
     @classmethod
     def check_pricing_required(cls, is_draft: bool, data: Dict[str, Any]):
