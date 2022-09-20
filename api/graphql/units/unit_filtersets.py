@@ -1,5 +1,8 @@
+import datetime
+
 import django_filters
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.utils.timezone import get_default_timezone
 
 from .unit_types import Unit
 
@@ -18,9 +21,22 @@ class UnitsFilterSet(django_filters.FilterSet):
         method="get_only_with_permission"
     )
 
-    order_by = django_filters.OrderingFilter(
-        fields=("name_fi", "name_en", "name_sv", "rank")
+    published_reservation_units = django_filters.BooleanFilter(
+        method="get_published_reservation_units"
     )
+
+    own_reservations = django_filters.BooleanFilter(method="get_own_reservations")
+
+    order_by = django_filters.OrderingFilter(
+        fields=("name_fi", "name_en", "name_sv", "rank", "reservation_count")
+    )
+
+    def filter_queryset(self, queryset):
+        queryset = queryset.annotate(
+            reservation_count=Count("reservationunit__reservation")
+        )
+
+        return super().filter_queryset(queryset)
 
     def filter_by_pk(self, qs, property, value):
         if value:
@@ -51,3 +67,53 @@ class UnitsFilterSet(django_filters.FilterSet):
                 )
             )
         ).distinct()
+
+    def get_published_reservation_units(self, qs, property, value):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        if value:
+            query = (
+                Q(reservationunit__is_archived=False)
+                & Q(reservationunit__is_draft=False)
+                & (
+                    Q(reservationunit__publish_begins__isnull=True)
+                    | Q(reservationunit__publish_begins__lte=now)
+                )
+                & (
+                    Q(reservationunit__publish_ends__isnull=True)
+                    | Q(reservationunit__publish_ends__gt=now)
+                )
+                & (
+                    Q(reservationunit__reservation_begins__isnull=True)
+                    | Q(reservationunit__reservation_begins__lte=now)
+                )
+                & (
+                    Q(reservationunit__reservation_ends__isnull=True)
+                    | Q(reservationunit__reservation_ends__gt=now)
+                )
+            )
+
+        else:
+            query = (
+                Q(reservationunit__is_archived=True)
+                | Q(reservationunit__is_draft=True)
+                | (Q(reservationunit__publish_begins__gte=now))
+                | (Q(reservationunit__publish_ends__lt=now))
+                | (Q(reservationunit__reservation_begins__lte=now))
+                | (Q(reservationunit__reservation_ends__gt=now))
+            )
+
+        return qs.filter(query)
+
+    def get_own_reservations(self, qs, property, value):
+        user = self.request.user
+
+        if user.is_anonymous:
+            return qs.none()
+
+        units_with_reservations = Q(reservationunit__reservation__user=user)
+
+        if value:
+            return qs.filter(units_with_reservations)
+
+        return qs.exclude(units_with_reservations)
