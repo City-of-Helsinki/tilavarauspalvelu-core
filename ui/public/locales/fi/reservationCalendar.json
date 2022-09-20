@@ -69,5 +69,15 @@
   },
   "reservingStartsAt": "Varaaminen alkaa {{date}}",
   "reservationQuota": "Sinulla on jo {{count}}/{{total}} varausta tähän tilaan.",
-  "reservationQuotaFull": "Sinulla on jo {{count}} varausta tähän tilaan. Et voi tehdä uusia varauksia."
+  "reservationQuotaFull": "Sinulla on jo {{count}} varausta tähän tilaan. Et voi tehdä uusia varauksia.",
+  "quickReservation": {
+    "heading": "Katso vapaat ajat ja varaa",
+    "date": "Päivä",
+    "time": "Aika",
+    "duration": "Kesto (t:mm)",
+    "subheading": "Vapaat ajat",
+    "noTimes": "Ei vapaita aikoja",
+    "gotoCalendar": "Katso kaikki vapaat ajat",
+    "nextAvailableTime": "Näytä seuraava"
+  }
 }

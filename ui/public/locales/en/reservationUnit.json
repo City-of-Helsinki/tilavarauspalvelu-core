@@ -23,6 +23,7 @@
   "openingTimes": "Opening hours",
   "additionalInfo": "Booking details",
   "reservationFailed": "Booking creation failed",
+  "reservationNotPossible": "",
   "reservationCancellingFailed": "Booking cancellation failed",
   "reservationUpdateFailed": "Booking update failed",
   "priceFree": "Free",

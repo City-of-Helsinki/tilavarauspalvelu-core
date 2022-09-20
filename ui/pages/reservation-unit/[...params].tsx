@@ -1,4 +1,10 @@
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useMutation } from "@apollo/client";
@@ -87,6 +93,7 @@ import {
 } from "../../modules/reservation";
 import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import KorosDefault from "../../components/common/KorosDefault";
+import { DataContext } from "../../context/DataContext";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -428,6 +435,9 @@ const ReservationUnitReservation = ({
     "pendingReservation",
     null
   );
+
+  const { setReservation: setDataContext } = useContext(DataContext);
+
   const [formStatus, setFormStatus] = useState<"pending" | "error" | "sent">(
     "pending"
   );
@@ -473,6 +483,7 @@ const ReservationUnitReservation = ({
         setErrorMsg(msg);
       } else if (updateData) {
         if (updateData.updateReservation.reservation.state === "CANCELLED") {
+          setDataContext(null);
           setPendingReservation(null);
           router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
         } else {

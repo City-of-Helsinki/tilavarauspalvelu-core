@@ -462,3 +462,50 @@ export const getMaxReservation = (
   const end = addMinutes(begin, slots * 30);
   return { begin, end };
 };
+
+export const getAvailableTimes = (
+  reservationUnit: ReservationUnitByPkType,
+  date: Date
+): string[] => {
+  const { openingHours, reservationStartInterval } = reservationUnit;
+
+  const openingTimes = openingHours?.openingTimes?.find(
+    (n) => n?.date === toUIDate(date, "yyyy-MM-dd")
+  );
+
+  const { startTime, endTime } = openingTimes || {};
+
+  const intervals = getDayIntervals(
+    startTime,
+    endTime,
+    reservationStartInterval
+  );
+
+  const times: string[] = intervals.map((val) => {
+    const [startHours, startMinutes] = val.split(":").map(Number);
+
+    const start = new Date(date);
+    start.setHours(startHours, startMinutes);
+
+    return toUIDate(start, "HH:mm");
+  });
+
+  return times;
+};
+
+export const getOpenDays = (
+  reservationUnit: ReservationUnitByPkType
+): Date[] => {
+  const { openingHours } = reservationUnit;
+
+  const openDays: Date[] = [];
+
+  openingHours?.openingTimes?.forEach((openingTime) => {
+    if (openingTime && openingTime.state === "open") {
+      const date = new Date(openingTime?.date);
+      openDays.push(date);
+    }
+  });
+
+  return openDays.sort((a, b) => a.getTime() - b.getTime());
+};

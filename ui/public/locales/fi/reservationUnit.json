@@ -23,6 +23,7 @@
   "openingTimes": "Aukioloajat",
   "additionalInfo": "Varauksen tiedot",
   "reservationFailed": "Varauksen luominen epäonnistui",
+  "reservationNotPossible": "Valitettavasti valitsemasti aika ehdittiin varata. Ole hyvä ja valitse toinen aika.",
   "reservationCancellingFailed": "Varauksen peruminen epäonnistui",
   "reservationUpdateFailed": "Varauksen päivitys epäonnistui",
   "priceFree": "Maksuton",

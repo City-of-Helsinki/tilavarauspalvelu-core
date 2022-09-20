@@ -1,4 +1,4 @@
-import { addDays, addHours, addMinutes, endOfWeek, format } from "date-fns";
+import { addDays, addHours, addMinutes, format } from "date-fns";
 import {
   hzNavigationBack,
   hzNavigationFwd,
@@ -6,6 +6,15 @@ import {
   timeColumn,
 } from "model/calendar";
 import { error404Body, error404Title } from "model/error";
+import {
+  carouselButton,
+  dateSelect,
+  durationSelect,
+  nextAvailableTimeLink,
+  price,
+  submitButton,
+  timeSlots,
+} from "model/quick-reservation";
 import {
   reserveeTypeBusinessButton,
   reserveeTypeIndividualButton,
@@ -28,6 +37,7 @@ import {
   calendarWrapper,
   reservationQuotaNotification,
 } from "model/reservation-creation";
+import { ticket } from "model/reservation-list";
 import {
   addressContainer,
   description,
@@ -462,6 +472,59 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       //   });
 
       cy.checkA11y(null, null, null, true);
+    });
+  });
+
+  describe("quick reservation", () => {
+    it("should do valid action logic", () => {
+      cy.visit("/reservation-unit/902", { failOnStatusCode: false });
+
+      dateSelect().click();
+
+      price("desktop").should("not.exist");
+
+      nextAvailableTimeLink("desktop").click();
+
+      timeSlots("desktop").first().click();
+
+      price("desktop").should("contain.text", "Hinta: 80");
+      price("desktop").should("contain.text", "€");
+
+      durationSelect()
+        .click()
+        .siblings("ul")
+        .children("li:nth-of-type(2)")
+        .click();
+
+      price("desktop").should("contain.text", "Hinta: 100");
+      price("desktop").should("contain.text", "€");
+
+      durationSelect()
+        .click()
+        .siblings("ul")
+        .children("li:nth-of-type(3)")
+        .click();
+
+      price("desktop").should("contain.text", "Hinta: 120");
+      price("desktop").should("contain.text", "€");
+
+      submitButton("desktop").should("not.be.disabled");
+
+      timeSlots("desktop").first().click();
+
+      price("desktop").should("not.exist");
+
+      submitButton("desktop").should("be.disabled");
+
+      timeSlots("desktop").first().click();
+
+      submitButton("desktop").should("not.be.disabled").click();
+
+      cy.get("main#main").should("contain.text", "Uusi varaus");
+
+      ticket().should("contain.text", "Pukinmäen nuorisotalon keittiö");
+      ticket().should("contain.text", "(Kesto 1 t 30 min)");
+      ticket().should("contain.text", "Varaus 1 t 30 min");
     });
   });
 

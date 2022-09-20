@@ -11,6 +11,7 @@ import {
   toApiDate,
   toUIDate,
 } from "common/src/common/util";
+import { useLocalStorage } from "react-use";
 import {
   areSlotsReservable,
   doBuffersCollide,
@@ -130,6 +131,11 @@ const ReservationInfo = <T extends Record<string, unknown>>({
   const [duration, setDuration] = useState<OptionType | null>(
     durationOptions[0]
   );
+  const [isReserving, setIsReserving] = useState(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
+  const [_, setStoredReservation] =
+    useLocalStorage<ReservationProps>("reservation");
 
   useEffect(() => {
     if (!reservation) {
@@ -316,13 +322,17 @@ const ReservationInfo = <T extends Record<string, unknown>>({
       </PriceWrapper>
       <LoginFragment
         isActionDisabled={!isReservable}
+        actionCallback={() => {
+          setStoredReservation({ ...reservation, pk: reservationUnit.pk });
+        }}
         componentIfAuthenticated={
           isReservationUnitReservable && (
             <MediumButton
               onClick={() => {
+                setIsReserving(true);
                 createReservation(reservation);
               }}
-              disabled={!isReservable}
+              disabled={!isReservable || isReserving}
               data-test="reservation__button--submit"
             >
               {t("reservationCalendar:makeReservation")}

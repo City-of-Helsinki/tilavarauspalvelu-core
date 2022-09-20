@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
 import styled from "styled-components";
@@ -13,6 +13,7 @@ type Props = {
   cellSpacing?: number;
   wrapAround?: boolean;
   hideCenterControls?: boolean;
+  button?: ReactNode;
 };
 
 const Button = styled(MediumButton).attrs({
@@ -130,9 +131,12 @@ const Carousel = ({
   cellSpacing = 1,
   wrapAround = true,
   hideCenterControls = false,
+  button,
   ...rest
 }: Props): JSX.Element => {
   const { t } = useTranslation();
+
+  const ButtonComponent = button || VerticalButton;
 
   return (
     <StyledCarousel
@@ -140,7 +144,7 @@ const Carousel = ({
         const isDisabled =
           (!wrapAround && currentSlide === 0) || children.length < 2;
         return (
-          <VerticalButton
+          <ButtonComponent
             $disabled={isDisabled}
             $side="left"
             type="button"
@@ -148,7 +152,7 @@ const Carousel = ({
             aria-label={t("common:prev")}
           >
             <IconAngleLeft aria-label={t("common:prev")} />
-          </VerticalButton>
+          </ButtonComponent>
         );
       }}
       renderCenterRightControls={({
@@ -161,7 +165,7 @@ const Carousel = ({
           (!wrapAround && currentSlide + sts >= slideCount) ||
           children.length < 2;
         return (
-          <VerticalButton
+          <ButtonComponent
             $disabled={isDisabled}
             $side="right"
             type="button"
@@ -169,7 +173,7 @@ const Carousel = ({
             aria-label={t("common:next")}
           >
             <IconAngleRight aria-label={t("common:next")} />
-          </VerticalButton>
+          </ButtonComponent>
         );
       }}
       wrapAround={wrapAround}

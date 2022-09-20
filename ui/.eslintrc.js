@@ -37,6 +37,8 @@ module.exports = {
       },
     ],
     "no-nested-ternary": 0,
+    "no-plusplus": 0,
+    "no-script-url": 0,
     "react/destructuring-assignment": 0,
     "react/jsx-props-no-spreading": 0,
     "react/prop-types": 0,

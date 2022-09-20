@@ -11,7 +11,7 @@ import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { Button, Notification } from "hds-react";
+import { Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   addDays,
@@ -55,7 +55,6 @@ import apolloClient from "../../modules/apolloClient";
 import Map from "../../components/Map";
 import { H4 } from "../../modules/style/typography";
 import Legend from "../../components/calendar/Legend";
-import LoginFragment from "../../components/LoginFragment";
 import ReservationInfo from "../../components/calendar/ReservationInfo";
 import {
   formatDate,
@@ -96,7 +95,8 @@ import {
 import { isReservationUnitPublished } from "../../modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
 import { daysByMonths } from "../../modules/const";
-import ReservationDetails from "../../components/calendar/ReservationDetails";
+import QuickReservation from "../../components/reservation-unit/QuickReservation";
+import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -278,7 +278,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         // endDate: lastOpeningPeriodEndDate,
         from: today,
         to: lastOpeningPeriodEndDate,
-        state: ["CREATED", "CONFIRMED"],
+        state: ["created", "confirmed"],
       },
     });
 
@@ -419,7 +419,7 @@ const Subheading = styled(H4).attrs({ as: "h3" })<{ $withBorder?: boolean }>`
 `;
 
 const CalendarWrapper = styled.div`
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-layout-l);
   position: relative;
 `;
 
@@ -434,16 +434,6 @@ const StyledNotification = styled(Notification)`
   svg {
     position: relative;
     top: -3px;
-  }
-`;
-
-const SubmitButton = styled(Button).attrs({
-  variant: "primary",
-})`
-  &&& {
-    width: fit-content;
-    position: absolute;
-    bottom: var(--spacing-xs);
   }
 `;
 
@@ -501,7 +491,6 @@ const ReservationUnit = ({
   const now = useMemo(() => new Date().toISOString(), []);
 
   const { reservation, setReservation } = useContext(DataContext);
-  const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
 
   const [userReservations, setUserReservations] = useState<ReservationType[]>(
     []
@@ -513,6 +502,7 @@ const ReservationUnit = ({
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [storedReservation, setStoredReservation, removeStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
 
@@ -710,7 +700,6 @@ const ReservationUnit = ({
         { start, end } as CalendarEvent<Reservation | ReservationType>,
         true
       );
-      setStoredReservation({ ...reservation, pk: reservationUnit.pk });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservation?.begin, reservation?.end]);
@@ -779,9 +768,7 @@ const ReservationUnit = ({
           pk: createdReservation.createReservation.pk,
           price: createdReservation.createReservation.price,
         });
-        setStoredReservation(null);
 
-        setIsRedirecting(true);
         router.push(`/reservation-unit/${reservationUnit.pk}/reservation`);
       }
     }
@@ -797,38 +784,26 @@ const ReservationUnit = ({
     setPendingReservation,
   ]);
 
-  const createReservation = (res: ReservationProps): void => {
-    setErrorMsg(null);
-    const { begin, end } = res;
-    const input: ReservationCreateMutationInput = {
-      begin,
-      end,
-      reservationUnitPks: [reservationUnit.pk],
-      reserveeLanguage: i18n.language,
-    };
+  const createReservation = useCallback(
+    (res: ReservationProps): void => {
+      setErrorMsg(null);
+      const { begin, end } = res;
+      const input: ReservationCreateMutationInput = {
+        begin,
+        end,
+        reservationUnitPks: [reservationUnit.pk],
+      };
 
-    addReservation({
-      variables: {
-        input,
-      },
-    });
-  };
+      setReservation({ begin, end, pk: reservationUnit.pk, price: null });
 
-  const isReservationValid = (res: ReservationProps): boolean => {
-    const { begin, end } = res || {};
-
-    return (
-      !!begin &&
-      !!end &&
-      isReservationLongEnough(
-        new Date(begin),
-        new Date(end),
-        reservationUnit.minReservationDuration
-      ) &&
-      !createReservationLoading &&
-      !isRedirecting
-    );
-  };
+      addReservation({
+        variables: {
+          input,
+        },
+      });
+    },
+    [addReservation, reservationUnit.pk, setReservation]
+  );
 
   const ToolbarWithProps = React.memo((props: ToolbarProps) => (
     <Toolbar {...props} />
@@ -858,6 +833,28 @@ const ReservationUnit = ({
     [reservationUnit]
   );
 
+  const quickReservationComponent = useCallback(
+    (calendar, type: "mobile" | "desktop") => {
+      return (
+        <QuickReservation
+          isSlotReservable={isSlotReservable}
+          isReservationUnitReservable={!isReservationQuotaReached}
+          createReservation={(res) => createReservation(res)}
+          reservationUnit={reservationUnit}
+          scrollPosition={calendar?.current?.offsetTop - 20}
+          setErrorMsg={setErrorMsg}
+          idPrefix={type}
+        />
+      );
+    },
+    [
+      createReservation,
+      isReservationQuotaReached,
+      isSlotReservable,
+      reservationUnit,
+    ]
+  );
+
   return reservationUnit ? (
     <Wrapper>
       <Head
@@ -868,6 +865,9 @@ const ReservationUnit = ({
       <Container>
         <TwoColumnLayout>
           <Left>
+            <JustForMobile customBreakpoint={breakpoints.l}>
+              {quickReservationComponent(calendarRef, "mobile")}
+            </JustForMobile>
             <Subheading>{t("reservationUnit:description")}</Subheading>
             <Content data-testid="reservation-unit__description">
               <Sanitize html={getTranslation(reservationUnit, "description")} />
@@ -947,47 +947,6 @@ const ReservationUnit = ({
                         ? ToolbarWithProps
                         : Toolbar
                     }
-                    eventWrapperComponent={(props) => (
-                      <ReservationDetails
-                        {...props}
-                        onClose={() => {
-                          setInitialReservation(null);
-                          setReservation(null);
-                          removeStoredReservation();
-                        }}
-                        authComponent={
-                          <LoginFragment
-                            isActionDisabled={
-                              !isReservationValid({
-                                begin: props.event.start,
-                                end: props.event.end,
-                              } as ReservationProps)
-                            }
-                            componentIfAuthenticated={
-                              <SubmitButton
-                                className="ReservationDetails__submit-button"
-                                disabled={
-                                  !isReservationValid({
-                                    begin: props.event.start,
-                                    end: props.event.end,
-                                  } as ReservationProps)
-                                }
-                                onClick={() => {
-                                  createReservation({
-                                    begin: props.event.start,
-                                    end: props.event.end,
-                                  } as ReservationProps);
-                                }}
-                              >
-                                {t("reservationCalendar:makeReservation")}
-                              </SubmitButton>
-                            }
-                          />
-                        }
-                      >
-                        {props?.children}
-                      </ReservationDetails>
-                    )}
                     resizable={!isReservationQuotaReached}
                     draggable={!isReservationQuotaReached}
                     onEventDrop={handleEventChange}
@@ -1241,6 +1200,9 @@ const ReservationUnit = ({
             </Accordion>
           </Left>
           <div>
+            <JustForDesktop customBreakpoint={breakpoints.l}>
+              {quickReservationComponent(calendarRef, "desktop")}
+            </JustForDesktop>
             <Address reservationUnit={reservationUnit} />
           </div>
         </TwoColumnLayout>

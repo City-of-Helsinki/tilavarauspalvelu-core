@@ -66,5 +66,15 @@
   },
   "reservingStartsAt": "",
   "reservationQuota": "",
-  "reservationQuotaFull": ""
+  "reservationQuotaFull": "",
+  "quickReservation": {
+    "heading": "",
+    "date": "",
+    "time": "",
+    "duration": "",
+    "subheading": "",
+    "noTimes": "",
+    "gotoCalendar": "",
+    "nextAvailableTime": ""
+  }
 }

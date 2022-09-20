@@ -23,6 +23,7 @@
   "openingTimes": "Öppethållningstider",
   "additionalInfo": "Bokningsinformation",
   "reservationFailed": "Bokningen kunde inte skapas",
+  "reservationNotPossible": "",
   "reservationCancellingFailed": "Avbokning misslyckades",
   "reservationUpdateFailed": "Uppdateringen misslyckades",
   "priceFree": "Avgiftsfri",
