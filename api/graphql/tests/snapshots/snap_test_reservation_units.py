@@ -7,6 +7,45 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ReservationUnitQueryTestCase::test_admin_sees_reservations_sensitive_information 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'reservations': [
+                            {
+                                'billingAddressCity': 'city',
+                                'billingAddressStreet': 'addr',
+                                'billingAddressZip': 'zip',
+                                'billingEmail': 'email',
+                                'billingFirstName': 'Joe',
+                                'billingLastName': 'Reggie',
+                                'billingPhone': 'phone',
+                                'cancelDetails': 'cancdetails',
+                                'description': 'description',
+                                'freeOfChargeReason': 'reason',
+                                'reserveeAddressCity': 'city',
+                                'reserveeAddressStreet': 'address',
+                                'reserveeAddressZip': 'zip',
+                                'reserveeEmail': 'email@localhost',
+                                'reserveeFirstName': 'Joe',
+                                'reserveeId': 'residee',
+                                'reserveeLastName': 'Reggie',
+                                'reserveeOrganisationName': 'org name',
+                                'reserveePhone': '123435',
+                                'staffEvent': False,
+                                'user': 'joe.regularl@foo.com',
+                                'workingMemo': 'Working this memo'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filter_by_pk_multiple_values 1'] = {
     'data': {
         'reservationUnits': {
@@ -1525,6 +1564,45 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_unit_reverse_order 1'] = 
                             'nameFi': '1',
                             'nameSv': '_'
                         }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_other_reservations_does_not_show_sensitive_information 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'reservations': [
+                            {
+                                'billingAddressCity': None,
+                                'billingAddressStreet': None,
+                                'billingAddressZip': None,
+                                'billingEmail': None,
+                                'billingFirstName': None,
+                                'billingLastName': None,
+                                'billingPhone': None,
+                                'cancelDetails': None,
+                                'description': None,
+                                'freeOfChargeReason': None,
+                                'reserveeAddressCity': None,
+                                'reserveeAddressStreet': None,
+                                'reserveeAddressZip': None,
+                                'reserveeEmail': None,
+                                'reserveeFirstName': None,
+                                'reserveeId': None,
+                                'reserveeLastName': None,
+                                'reserveeOrganisationName': None,
+                                'reserveePhone': None,
+                                'staffEvent': None,
+                                'user': None,
+                                'workingMemo': None
+                            }
+                        ]
                     }
                 }
             ]
