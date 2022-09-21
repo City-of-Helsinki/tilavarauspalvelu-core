@@ -18,6 +18,7 @@ from api.graphql.applications.application_types import (
 )
 from api.graphql.reservation_units.reservation_unit_filtersets import (
     EquipmentFilterSet,
+    PurposeFilterSet,
     ReservationUnitsFilterSet,
 )
 from api.graphql.reservation_units.reservation_unit_mutations import (
@@ -457,7 +458,7 @@ class Query(graphene.ObjectType):
     keyword_groups = KeywordFilter(KeywordGroupType)
     keywords = KeywordFilter(KeywordType)
 
-    purposes = PurposeFilter(PurposeType)
+    purposes = PurposeFilter(PurposeType, filterset_class=PurposeFilterSet)
     qualifiers = QualifierFilter(QualifierType)
     reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
 

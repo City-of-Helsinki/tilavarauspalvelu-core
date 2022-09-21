@@ -669,6 +669,16 @@ class Purpose(models.Model):
         upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True
     )
 
+    rank = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("Order number"),
+        help_text=_("Order number to be used in api sorting."),
+    )
+
+    class Meta:
+        ordering = ["rank"]
+
     def __str__(self):
         return self.name
 

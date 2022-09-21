@@ -17,7 +17,49 @@ snapshots['PurposeQueryTestCase::test_getting_purposes 1'] = {
                         'nameEn': 'en',
                         'nameFi': 'fi',
                         'nameSv': 'sv',
-                        'smallUrl': None
+                        'smallUrl': None,
+                        'rank': 1
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['PurposeQueryTestCase::test_sorting_purposes_by_rank 1'] = {
+    'data': {
+        'purposes': {
+            'edges': [
+                {
+                    'node': {
+                        'nameEn': 'en',
+                        'nameFi': "I'm first",
+                        'nameSv': 'sv',
+                        'rank': 4
+                    }
+                },
+                {
+                    'node': {
+                        'nameEn': 'en',
+                        'nameFi': "I'm second",
+                        'nameSv': 'sv',
+                        'rank': 3
+                    }
+                },
+                {
+                    'node': {
+                        'nameEn': 'en',
+                        'nameFi': "I'm third",
+                        'nameSv': 'sv',
+                        'rank': 2
+                    }
+                },
+                {
+                    'node': {
+                        'nameEn': 'en',
+                        'nameFi': 'fi',
+                        'nameSv': 'sv',
+                        'rank': 1
                     }
                 }
             ]
