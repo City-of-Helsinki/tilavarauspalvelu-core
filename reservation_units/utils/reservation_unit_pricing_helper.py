@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
 from rest_framework import serializers
@@ -22,6 +22,16 @@ class ReservationUnitPricingHelper:
         return reservation_unit.pricings.filter(
             status=PricingStatus.PRICING_STATUS_FUTURE
         ).first()
+
+    @classmethod
+    def get_price_by_date(
+        cls, reservation_unit: ReservationUnit, date: datetime.date
+    ) -> Optional[ReservationUnitPricing]:
+        future_price = cls.get_future_price(reservation_unit)
+        if future_price and future_price.begins <= date:
+            return future_price
+
+        return cls.get_active_price(reservation_unit)
 
     @classmethod
     def is_active(cls, pricing: Dict[str, Any]) -> bool:
