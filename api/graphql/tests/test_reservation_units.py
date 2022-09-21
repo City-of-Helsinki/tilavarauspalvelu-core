@@ -1431,6 +1431,64 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_reservation_kind_direct(self):
+        ReservationUnitFactory(
+            reservation_kind=ReservationKind.DIRECT, name_fi="show me"
+        )
+        ReservationUnitFactory(
+            reservation_kind=ReservationKind.DIRECT_AND_SEASON,
+            name_fi="show me as well",
+        )
+        ReservationUnitFactory(
+            reservation_kind=ReservationKind.SEASON, name_fi="Don't you ever show me"
+        )
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(reservationKind: "DIRECT") {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_reservation_kind_season(self):
+        ReservationUnitFactory(
+            reservation_kind=ReservationKind.SEASON, name_fi="show me"
+        )
+        ReservationUnitFactory(
+            reservation_kind=ReservationKind.DIRECT_AND_SEASON,
+            name_fi="show me as well",
+        )
+        ReservationUnitFactory(
+            reservation_kind=ReservationKind.DIRECT, name_fi="Don't you ever show me"
+        )
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(reservationKind: "SEASON") {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_order_by_name_fi(self):
         ReservationUnitFactory(
             name="name_fi",
