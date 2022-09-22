@@ -20,6 +20,7 @@ from api.graphql.reservation_units.reservation_unit_filtersets import (
     EquipmentFilterSet,
     PurposeFilterSet,
     ReservationUnitsFilterSet,
+    ReservationUnitTypeFilterSet,
 )
 from api.graphql.reservation_units.reservation_unit_mutations import (
     EquipmentCategoryCreateMutation,
@@ -430,7 +431,9 @@ class Query(graphene.ObjectType):
         ReservationUnitCancellationRuleType
     )
 
-    reservation_unit_types = ReservationUnitTypesFilter(ReservationUnitTypeType)
+    reservation_unit_types = ReservationUnitTypesFilter(
+        ReservationUnitTypeType, filterset_class=ReservationUnitTypeFilterSet
+    )
 
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)

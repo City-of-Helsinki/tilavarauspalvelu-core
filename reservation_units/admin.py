@@ -52,7 +52,7 @@ class ReservationUnitImageAdmin(admin.ModelAdmin):
 
 
 @admin.register(ReservationUnitType)
-class ReservationUnitTypeAdmin(admin.ModelAdmin):
+class ReservationUnitTypeAdmin(SortableAdminMixin, admin.ModelAdmin):
     model = ReservationUnitType
 
 
@@ -79,6 +79,7 @@ class DayPartAdmin(admin.ModelAdmin):
 @admin.register(Purpose)
 class PurposeAdmin(SortableAdminMixin, admin.ModelAdmin):
     model = Purpose
+
 
 @admin.register(Qualifier)
 class QualifierAdmin(admin.ModelAdmin):

@@ -54,6 +54,9 @@ class ReservationUnitType(models.Model):
         help_text=_("Order number to be used in api sorting."),
     )
 
+    class Meta:
+        ordering = ["rank"]
+
     def __str__(self):
         return self.name
 
