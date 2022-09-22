@@ -10,6 +10,9 @@ from spaces.models import Unit
 
 
 class ApplicationFilterSet(filters.FilterSet):
+    pk = filters.ModelMultipleChoiceFilter(
+        field_name="pk", method="filter_by_pk", queryset=Application.objects.all()
+    )
     application_round = filters.ModelChoiceFilter(
         field_name="application_round", queryset=ApplicationRound.objects.all()
     )
@@ -71,6 +74,11 @@ class ApplicationFilterSet(filters.FilterSet):
 
         values = [v.lower() for v in value]
         return qs.filter(applicant_type__in=values)
+
+    def filter_by_pk(self, qs, property, value):
+        if not value:
+            return qs
+        return qs.filter(id__in=[event.id for event in value])
 
 
 class ApplicationEventFilterSet(filters.FilterSet):

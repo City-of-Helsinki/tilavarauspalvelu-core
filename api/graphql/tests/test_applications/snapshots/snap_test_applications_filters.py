@@ -89,6 +89,39 @@ snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_applicant 1'] = {
     }
 }
 
+snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_pk_multiple 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': "I'm also included"
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_pk_single 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationsGraphQLFiltersTestCase::test_order_by_applicant_asc 1'] = {
     'data': {
         'applications': {

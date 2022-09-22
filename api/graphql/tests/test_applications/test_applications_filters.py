@@ -334,3 +334,48 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_filter_by_pk_single(self):
+        ApplicationFactory.create_batch(5)
+        query = f"""
+            query {{
+                applications(pk: [{self.application.id}]) {{
+                    edges {{
+                        node {{
+                            additionalInformation
+                        }}
+                    }}
+                }}
+            }}
+        """
+
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_pk_multiple(self):
+        ApplicationFactory.create_batch(5)
+        app = ApplicationFactory(additional_information="I'm also included")
+        query = f"""
+                    query {{
+                        applications(pk: [{self.application.id}, {app.id}]) {{
+                            edges {{
+                                node {{
+                                    additionalInformation
+                                }}
+                            }}
+                        }}
+                    }}
+                """
+
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
