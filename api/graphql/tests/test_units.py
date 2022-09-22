@@ -203,12 +203,12 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_getting_units_filtered_by_service_sector(self):
-        target_unit_a = UnitFactory.create(name="Aaaaaa")
-        target_unit_b = UnitFactory.create(name="Bbbbbb")
+        target_unit_a = UnitFactory.create(name="Aaaaaa", rank=1)
+        target_unit_b = UnitFactory.create(name="Bbbbbb", rank=2)
         ServiceSectorFactory.create(
             pk=123, name="Test sector", units=[target_unit_a, target_unit_b]
         )
-        UnitFactory.create(name="Cccccc")
+        UnitFactory.create(name="Cccccc", rank=3)
 
         response = self.query(
             """
@@ -340,9 +340,9 @@ class UnitsQueryTestCase(UnitTestCaseBase):
             last_name="Sprite",
             email="s.sprite@foo.com",
         )
-        a_unit = UnitFactory(name="Include me A")
-        b_unit = UnitFactory(name="Include me B")
-        d_unit = UnitFactory(name="Don't you ever show me")
+        a_unit = UnitFactory(name="Include me A", rank=1)
+        b_unit = UnitFactory(name="Include me B", rank=2)
+        d_unit = UnitFactory(name="Don't you ever show me", rank=3)
 
         resu_a = ReservationUnitFactory(
             unit=a_unit,
