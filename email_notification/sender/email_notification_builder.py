@@ -2,6 +2,7 @@ import re
 
 from django.conf import settings
 from django.template import Context, Template
+from django.utils.timezone import get_default_timezone
 
 from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate
@@ -56,16 +57,22 @@ class ReservationEmailNotificationBuilder:
         return self.reservation.reservee_organisation_name
 
     def _get_begin_date(self):
-        return self.reservation.begin.strftime("%d.%m.%Y")
+        return self.reservation.begin.astimezone(get_default_timezone()).strftime(
+            "%d.%m.%Y"
+        )
 
     def _get_begin_time(self):
-        return self.reservation.begin.strftime("%H:%M")
+        return self.reservation.begin.astimezone(get_default_timezone()).strftime(
+            "%H:%M"
+        )
 
     def _get_end_date(self):
-        return self.reservation.end.strftime("%d.%m.%Y")
+        return self.reservation.end.astimezone(get_default_timezone()).strftime(
+            "%d.%m.%Y"
+        )
 
     def _get_end_time(self):
-        return self.reservation.end.strftime("%H:%M")
+        return self.reservation.end.astimezone(get_default_timezone()).strftime("%H:%M")
 
     def _get_reservation_number(self):
         return str(self.reservation.pk).zfill(10)
