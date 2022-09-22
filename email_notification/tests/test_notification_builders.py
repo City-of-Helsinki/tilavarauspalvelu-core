@@ -264,3 +264,66 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.builder._get_deny_reason()).is_equal_to(
             self.reservation.deny_reason.reason_fi
         )
+
+    def test_confirmed_instructions_renders(self):
+        content = """
+            This is the email message next one up we have confirmed_instructions.
+            {{ confirmed_instructions }}
+
+            Yours truly:
+            system.
+        """
+        compiled_content = f"""
+            This is the email message next one up we have confirmed_instructions.
+            {self.reservation_unit.reservation_confirmed_instructions}
+
+            Yours truly:
+            system.
+        """
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_pending_instructions_renders(self):
+        content = """
+            This is the email message next one up we have confirmed_instructions.
+            {{ pending_instructions }}
+
+            Yours truly:
+            system.
+        """
+        compiled_content = f"""
+            This is the email message next one up we have confirmed_instructions.
+            {self.reservation_unit.reservation_pending_instructions}
+
+            Yours truly:
+            system.
+        """
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_cancel_instructions_renders(self):
+        content = """
+            This is the email message next one up we have confirmed_instructions.
+            {{ cancelled_instructions }}
+
+            Yours truly:
+            system.
+        """
+        compiled_content = f"""
+            This is the email message next one up we have confirmed_instructions.
+            {self.reservation_unit.reservation_cancelled_instructions}
+
+            Yours truly:
+            system.
+        """
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
