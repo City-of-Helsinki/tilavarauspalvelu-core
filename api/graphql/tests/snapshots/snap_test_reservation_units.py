@@ -645,6 +645,54 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_rank 1'] = {
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_reservation_kind_direct 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'show me'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'show me as well'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_reservation_kind_season 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'show me'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'show me as well'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_reservation_state 1'] = {
     'data': {
         'reservationUnits': {

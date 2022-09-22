@@ -90,7 +90,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     )
 
     reservation_kind = django_filters.CharFilter(
-        field_name="reservation_kind", lookup_expr="iexact"
+        field_name="reservation_kind", lookup_expr="icontains"
     )
 
     state = django_filters.MultipleChoiceFilter(
