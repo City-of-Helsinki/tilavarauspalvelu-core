@@ -33,7 +33,6 @@ from permissions.api_permissions.graphene_permissions import (
     EquipmentPermission,
     PurposePermission,
     QualifierPermission,
-    ReservationPermission,
     ReservationUnitCancellationRulePermission,
     ReservationUnitHaukiUrlPermission,
     ReservationUnitPermission,
@@ -476,7 +475,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_payment_types(self, info):
         return self.payment_types.all()
 
-    @check_resolver_permission(ReservationPermission)
     def resolve_reservations(
         self,
         info: ResolveInfo,

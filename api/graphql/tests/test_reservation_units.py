@@ -2166,6 +2166,146 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_other_reservations_does_not_show_sensitive_information(self):
+        self.client.force_login(self.regular_joe)
+
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            user=self.general_admin,
+            reservee_last_name="Admin",
+            reservee_first_name="General",
+            reservee_phone="123435",
+            working_memo="I should not be visible",
+            staff_event=False,
+            reservee_email="no_visible@localhost",
+            reservee_address_street="not visbile address",
+            reservee_address_city="not visible city",
+            reservee_address_zip="don't show this zip",
+            reservee_organisation_name="don't show org name",
+            free_of_charge_reason="do not display me",
+            billing_first_name="not visible bill first",
+            billing_last_name="not visible bill last",
+            billing_address_street="not visible bill addr",
+            billing_address_city="not visible city",
+            billing_address_zip="not visible billing zip",
+            billing_phone="not visible bill phone",
+            billing_email="not visible bill email",
+            description="not visible description",
+            reservee_id="novisible",
+            cancel_details="not visible cancel_details",
+        )
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            reservations {
+                                user
+                                reserveeLastName
+                                reserveeFirstName
+                                reserveePhone
+                                workingMemo
+                                staffEvent
+                                reserveeEmail
+                                reserveeAddressStreet
+                                reserveeAddressCity
+                                reserveeAddressZip
+                                reserveeOrganisationName
+                                freeOfChargeReason
+                                billingFirstName
+                                billingLastName
+                                billingAddressStreet
+                                billingAddressCity
+                                billingAddressZip
+                                billingPhone
+                                billingEmail
+                                description
+                                reserveeId
+                                cancelDetails
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_admin_sees_reservations_sensitive_information(self):
+        self.client.force_login(self.general_admin)
+
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            user=self.regular_joe,
+            reservee_last_name="Reggie",
+            reservee_first_name="Joe",
+            reservee_phone="123435",
+            working_memo="Working this memo",
+            staff_event=False,
+            reservee_email="email@localhost",
+            reservee_address_street="address",
+            reservee_address_city="city",
+            reservee_address_zip="zip",
+            reservee_organisation_name="org name",
+            free_of_charge_reason="reason",
+            billing_first_name="Joe",
+            billing_last_name="Reggie",
+            billing_address_street="addr",
+            billing_address_city="city",
+            billing_address_zip="zip",
+            billing_phone="phone",
+            billing_email="email",
+            description="description",
+            reservee_id="residee",
+            cancel_details="cancdetails",
+        )
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            reservations {
+                                user
+                                reserveeLastName
+                                reserveeFirstName
+                                reserveePhone
+                                workingMemo
+                                staffEvent
+                                reserveeEmail
+                                reserveeAddressStreet
+                                reserveeAddressCity
+                                reserveeAddressZip
+                                reserveeOrganisationName
+                                freeOfChargeReason
+                                billingFirstName
+                                billingLastName
+                                billingAddressStreet
+                                billingAddressCity
+                                billingAddressZip
+                                billingPhone
+                                billingEmail
+                                description
+                                reserveeId
+                                cancelDetails
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
 
 class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):
     def test_filtering_by_type_fi(self):
