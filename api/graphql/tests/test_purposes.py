@@ -123,6 +123,8 @@ class PurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     nameFi
                     nameEn
                     nameSv
+                    imageUrl
+                    smallUrl
                   }
                 }
               }

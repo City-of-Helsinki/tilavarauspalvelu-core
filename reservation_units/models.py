@@ -665,6 +665,10 @@ class ReservationUnitImage(models.Model):
 class Purpose(models.Model):
     name = models.CharField(max_length=200)
 
+    image = ThumbnailerImageField(
+        upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True
+    )
+
     def __str__(self):
         return self.name
 
