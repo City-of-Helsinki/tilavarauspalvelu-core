@@ -131,11 +131,9 @@ class ReservationEmailNotificationBuilder:
     def _get_reservation_unit_instruction_field(self, name):
         instructions = []
         for res_unit in self.reservation.reservation_unit.all():
-            instructions.append(
-                f"{self._get_by_language(res_unit, 'name')}: "
-                + self._get_by_language(res_unit, name)
-            )
-        return "\n".join(instructions)
+            instructions.append(self._get_by_language(res_unit, name))
+
+        return "\n-\n".join(instructions)
 
     def _get_deny_reason(self):
         return self._get_by_language(self.reservation.deny_reason, "reason")
