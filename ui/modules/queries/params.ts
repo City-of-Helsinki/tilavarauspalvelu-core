@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const SEARCH_FORM_PARAMS_UNIT = gql`
-  query SearchFormParamsUnit {
-    units {
+  query SearchFormParamsUnit($publishedReservationUnits: Boolean) {
+    units(publishedReservationUnits: $publishedReservationUnits) {
       edges {
         node {
           pk

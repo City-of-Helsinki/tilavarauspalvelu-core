@@ -22,7 +22,7 @@ import {
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { MediumButton, truncatedText } from "../../styles/util";
-import { Query } from "../../modules/gql-types";
+import { Query, QueryUnitsArgs } from "../../modules/gql-types";
 import MultiSelectDropdown from "../form/MultiselectDropdown";
 import {
   SEARCH_FORM_PARAMS_PURPOSE,
@@ -217,7 +217,10 @@ const SearchForm = ({
   const [purposeSearchInput, setPurposeSearchInput] = useState<string>("");
   const [areFiltersVisible, setAreFiltersVisible] = useState(false);
 
-  useQuery<Query>(SEARCH_FORM_PARAMS_UNIT, {
+  useQuery<Query, QueryUnitsArgs>(SEARCH_FORM_PARAMS_UNIT, {
+    variables: {
+      publishedReservationUnits: true,
+    },
     onCompleted: (res) => {
       const units = res?.units?.edges?.map(({ node }) => ({
         id: String(node.pk),
