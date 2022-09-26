@@ -124,12 +124,26 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
         (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
 
+    image_url = graphene.String()
+    small_url = graphene.String()
+
     class Meta:
         model = Purpose
-        fields = ["pk"] + get_all_translatable_fields(model)
+        fields = ["pk", "image_url", "small_url"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+    def resolve_image_url(self, info):
+        if not self.image:
+            return None
+        return info.context.build_absolute_uri(self.image.url)
+
+    def resolve_small_url(self, info):
+        if not self.image:
+            return None
+        url = get_thumbnailer(self.image)["purpose_image"].url
+        return info.context.build_absolute_uri(url)
 
 
 class QualifierType(AuthNode, PrimaryKeyObjectType):

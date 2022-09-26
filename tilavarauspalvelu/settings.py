@@ -262,6 +262,7 @@ VERKKOKAUPPA_ORDER_API_URL = env("VERKKOKAUPPA_ORDER_API_URL")
 VERKKOKAUPPA_PAYMENT_API_URL = env("VERKKOKAUPPA_PAYMENT_API_URL")
 
 RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
+RESERVATION_UNIT_PURPOSE_IMAGES_ROOT = "reservation_unit_purpose_images"
 
 ICAL_HASH_SECRET = env("ICAL_HASH_SECRET")
 
@@ -452,6 +453,7 @@ THUMBNAIL_ALIASES = {
         "small": {"size": (250, 250), "crop": True},
         "medium": {"size": (384, 384), "crop": True},
         "large": {"size": (728, 728), "crop": True},
+        "purpose_image": {"size": (390, 245), "crop": True},
     },
 }
 
