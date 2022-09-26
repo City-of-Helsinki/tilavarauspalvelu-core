@@ -48,6 +48,7 @@ RESERVATION_STATE_EMAIL_TYPE_MAP = {
     STATE_CHOICES.CANCELLED: EmailType.RESERVATION_CANCELLED,
     STATE_CHOICES.DENIED: EmailType.RESERVATION_REJECTED,
     "APPROVED": EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
+    "NEEDS_PAYMENT": EmailType.RESERVATION_NEEDS_TO_BE_PAID,
 }
 
 
@@ -884,9 +885,14 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
     def save(self, **kwargs):
         instance = super().save(**kwargs)
         if instance.state == STATE_CHOICES.CONFIRMED:
-            send_reservation_email_task.delay(
-                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP["APPROVED"]
-            )
+            if instance.price > 0:
+                send_reservation_email_task.delay(
+                    instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP["NEEDS_PAYMENT"]
+                )
+            else:
+                send_reservation_email_task.delay(
+                    instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP["APPROVED"]
+                )
 
         if instance.state == STATE_CHOICES.CONFIRMED:
             send_staff_reservation_email_task.delay(
