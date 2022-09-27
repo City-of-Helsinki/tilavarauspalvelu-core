@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
+from ..helpers import parse_datetime
 from .exceptions import ParseOrderError
 
 
@@ -101,7 +102,7 @@ class Order:
                 order_id=UUID(json["orderId"]),
                 namespace=json["namespace"],
                 user=json["user"],
-                created_at=cls._parse_datetime(json["createdAt"]),
+                created_at=parse_datetime(json["createdAt"]),
                 items=[
                     OrderItem(
                         order_item_id=UUID(item["orderItemId"]),
@@ -134,8 +135,8 @@ class Order:
                         period_frequency=item.get("periodFrequency", None),
                         period_unit=item.get("periodUnit", None),
                         period_count=item.get("periodCount", None),
-                        start_date=cls._parse_datetime(item.get("startDate", None)),
-                        billing_start_date=cls._parse_datetime(
+                        start_date=parse_datetime(item.get("startDate", None)),
+                        billing_start_date=parse_datetime(
                             item.get("billingStartDate", None)
                         ),
                     )
@@ -159,12 +160,6 @@ class Order:
             )
         except (KeyError, ValueError) as e:
             raise ParseOrderError("Could not parse order") from e
-
-    @classmethod
-    def _parse_datetime(cls, string: Optional[str]) -> Optional[datetime]:
-        if string is None:
-            return None
-        return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%f")
 
 
 @dataclass(frozen=True)
