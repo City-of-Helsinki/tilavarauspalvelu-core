@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "reservations",
     "services",
     "reservation_units",
+    "merchants",
     "api",
     "applications",
     "opening_hours",
