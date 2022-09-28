@@ -28,6 +28,9 @@ from reservation_units.models import (
     ReservationKind,
     ReservationUnit,
 )
+from reservation_units.utils.reservation_unit_pricing_helper import (
+    ReservationUnitPricingHelper,
+)
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
@@ -516,20 +519,23 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         is_first_paid_set = False
 
         for reservation_unit in reservation_units:
+            pricing = ReservationUnitPricingHelper.get_price_by_date(
+                reservation_unit, begin.date()
+            )
             # If unit pricing type is not PAID, there is no need for calculations. Skip.
-            if reservation_unit.pricing_type != PricingType.PAID:
+            if pricing is None or pricing.pricing_type != PricingType.PAID:
                 break
 
             reservation_unit_price = Decimal(
-                max(reservation_unit.lowest_price, reservation_unit.highest_price)
+                max(pricing.lowest_price, pricing.highest_price)
             )
 
-            # Time-based calculation is needes only if price unit is not fixed.
+            # Time-based calculation is needed only if price unit is not fixed.
             # Otherwise we can just use the price defined in the reservation unit
-            if reservation_unit.price_unit != PriceUnit.PRICE_UNIT_FIXED:
+            if pricing.price_unit != PriceUnit.PRICE_UNIT_FIXED:
                 reservation_duration_in_minutes = (end - begin).seconds / 60
                 reservation_unit_price_unit_minutes = price_unit_to_minutes.get(
-                    reservation_units[0].price_unit
+                    pricing.price_unit
                 )
                 reservation_unit_price = Decimal(
                     math.ceil(
@@ -544,7 +550,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             # https://helsinkisolutionoffice.atlassian.net/browse/TILA-1765
             if not is_first_paid_set:
                 first_paid_unit_price = reservation_unit_price
-                first_paid_unit_tax_percentage = reservation_unit.tax_percentage.value
+                first_paid_unit_tax_percentage = pricing.tax_percentage.value
                 is_first_paid_set = True
 
             total_reservation_price += reservation_unit_price

@@ -13,9 +13,15 @@ from applications.models import City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.hours import DEFAULT_TIMEZONE
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from reservation_units.models import PriceUnit, PricingType, ReservationUnit
+from reservation_units.models import (
+    PriceUnit,
+    PricingStatus,
+    PricingType,
+    ReservationUnit,
+)
 from reservation_units.tests.factories import (
     ReservationUnitFactory,
+    ReservationUnitPricingFactory,
     TaxPercentageFactory,
 )
 from reservations.models import STATE_CHOICES, AgeGroup, Reservation
@@ -705,12 +711,16 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
 
         tax_percentage = TaxPercentageFactory()
 
-        self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_FIXED
-        self.reservation_unit.lowest_price = 1.0
-        self.reservation_unit.highest_price = 3.0
-        self.reservation_unit.tax_percentage = tax_percentage
-        self.reservation_unit.save()
+        ReservationUnitPricingFactory(
+            begins=datetime.date.today(),
+            pricing_type=PricingType.PAID,
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=1.0,
+            highest_price=3.0,
+            tax_percentage=tax_percentage,
+            status=PricingStatus.PRICING_STATUS_ACTIVE,
+            reservation_unit=self.reservation_unit,
+        )
 
         update_data = self.get_valid_update_data()
         update_data["begin"] = (
@@ -740,12 +750,16 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
 
         tax_percentage = TaxPercentageFactory()
 
-        self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_FIXED
-        self.reservation_unit.lowest_price = 1.0
-        self.reservation_unit.highest_price = 3.0
-        self.reservation_unit.tax_percentage = tax_percentage
-        self.reservation_unit.save()
+        ReservationUnitPricingFactory(
+            begins=datetime.date.today(),
+            pricing_type=PricingType.PAID,
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=1.0,
+            highest_price=3.0,
+            tax_percentage=tax_percentage,
+            status=PricingStatus.PRICING_STATUS_ACTIVE,
+            reservation_unit=self.reservation_unit,
+        )
 
         update_data = self.get_valid_update_data()
         update_data["begin"] = self.reservation.begin.strftime("%Y%m%dT%H%M%S%zZ")
@@ -803,12 +817,18 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             name="new_unit",
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
             reservation_unit_type=self.reservation_unit_type,
+            sku=self.reservation_unit.sku,
+        )
+
+        ReservationUnitPricingFactory(
+            begins=datetime.date.today(),
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=2.0,
             highest_price=4.0,
-            sku=self.reservation_unit.sku,
             tax_percentage=tax_percentage,
+            status=PricingStatus.PRICING_STATUS_ACTIVE,
+            reservation_unit=new_unit,
         )
 
         update_data = self.get_valid_update_data()
@@ -828,6 +848,61 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.priority).is_equal_to(update_data["priority"])
         assert_that(self.reservation.price).is_equal_to(4.0)
         assert_that(self.reservation.unit_price).is_equal_to(4.0)
+        assert_that(self.reservation.tax_percentage_value).is_equal_to(
+            tax_percentage.value
+        )
+
+    def test_update_reservation_price_calculation_when_begin_changes_to_future(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        tax_percentage = TaxPercentageFactory()
+
+        ReservationUnitPricingFactory(
+            begins=datetime.date.today(),
+            pricing_type=PricingType.PAID,
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=1.0,
+            highest_price=3.0,
+            tax_percentage=tax_percentage,
+            status=PricingStatus.PRICING_STATUS_ACTIVE,
+            reservation_unit=self.reservation_unit,
+        )
+
+        ReservationUnitPricingFactory(
+            begins=datetime.date.today() + datetime.timedelta(days=2),
+            pricing_type=PricingType.PAID,
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=4.0,
+            highest_price=6.0,
+            tax_percentage=tax_percentage,
+            status=PricingStatus.PRICING_STATUS_FUTURE,
+            reservation_unit=self.reservation_unit,
+        )
+
+        update_data = self.get_valid_update_data()
+        update_data["begin"] = (
+            self.reservation.begin + datetime.timedelta(days=2)
+        ).strftime("%Y%m%dT%H%M%S%zZ")
+        update_data["end"] = (
+            self.reservation.end + datetime.timedelta(days=2)
+        ).strftime("%Y%m%dT%H%M%S%zZ")
+        response = self.query(self.get_update_query(), input_data=update_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation).is_not_none()
+        assert_that(self.reservation.priority).is_equal_to(update_data["priority"])
+        assert_that(self.reservation.price).is_equal_to(6.0)
+        assert_that(self.reservation.unit_price).is_equal_to(6.0)
         assert_that(self.reservation.tax_percentage_value).is_equal_to(
             tax_percentage.value
         )
