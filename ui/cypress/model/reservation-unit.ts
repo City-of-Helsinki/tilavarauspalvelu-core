@@ -16,6 +16,10 @@ export function reservationInfo(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get('[data-testid="reservation-unit__reservation-info"]');
 }
 
+export function reservationNotice(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get('[data-testid="reservation-unit__reservation-notice"]');
+}
+
 export function paymentAndCancellationTerms(): Cypress.Chainable<
   JQuery<HTMLElement>
 > {

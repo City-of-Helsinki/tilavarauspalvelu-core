@@ -7,6 +7,7 @@ import {
   Query,
   PurposeType,
   ReservationUnitsReservationUnitPriceUnitChoices,
+  ReservationUnitsReservationUnitPricingTypeChoices,
 } from "../../modules/gql-types";
 
 export const reservationUnitSearchHandlers = [
@@ -28,6 +29,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 20,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "PAID" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -70,6 +73,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 20,
               priceUnit:
                 "PER_HALF_DAY" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "PAID" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -102,6 +107,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -134,6 +141,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -166,6 +175,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -198,6 +209,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -231,6 +244,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -263,6 +278,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -295,6 +312,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -327,6 +346,8 @@ export const reservationUnitSearchHandlers = [
               highestPrice: 0.0,
               priceUnit:
                 "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
+              pricingType:
+                "FREE" as ReservationUnitsReservationUnitPricingTypeChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",

@@ -1,3 +1,4 @@
+import { toUIDate } from "common/src/common/util";
 import { addDays, addHours, addMinutes, format } from "date-fns";
 import {
   hzNavigationBack,
@@ -7,12 +8,12 @@ import {
 } from "model/calendar";
 import { error404Body, error404Title } from "model/error";
 import {
-  carouselButton,
   dateSelect,
   durationSelect,
   nextAvailableTimeLink,
   price,
   submitButton,
+  timeSelect,
   timeSlots,
 } from "model/quick-reservation";
 import {
@@ -44,6 +45,7 @@ import {
   equipment,
   paymentAndCancellationTerms,
   reservationInfo,
+  reservationNotice,
   termsOfUse,
 } from "model/reservation-unit";
 import { textWithIcon } from "model/search";
@@ -155,6 +157,14 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         "Sinulla voi olla samanaikaisesti enintään yksi varaus."
       );
 
+      reservationNotice().click();
+      reservationNotice().contains(
+        `Huomioi hinnoittelumuutos ${toUIDate(addDays(new Date(), 2))} alkaen.`
+      );
+      reservationNotice().contains(
+        "Uusi hinta on 10 - 30 € / 15 min (sis. alv. 20%)."
+      );
+
       paymentAndCancellationTerms().find("> button").contains("Peruutusehdot");
       paymentAndCancellationTerms().should("contain.text", "Peruutusehdot Fi");
       paymentAndCancellationTerms().should("not.contain.text", "Maksuehgot Fi");
@@ -177,7 +187,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       reservationInfoPrice()
         .invoke("text")
         .then((text) => {
-          expect(text).to.contain("100\u00a0€");
+          expect(text).to.contain("100 - 250\u00a0€");
         });
 
       cy.checkA11y(null, null, null, true);
@@ -480,15 +490,11 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       cy.visit("/reservation-unit/902", { failOnStatusCode: false });
 
       dateSelect().click();
-
       price("desktop").should("not.exist");
 
       nextAvailableTimeLink("desktop").click();
-
       timeSlots("desktop").first().click();
-
-      price("desktop").should("contain.text", "Hinta: 80");
-      price("desktop").should("contain.text", "€");
+      price("desktop").should("contain.text", "Hinta: 40 - 120\u00a0€");
 
       durationSelect()
         .click()
@@ -496,8 +502,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .children("li:nth-of-type(2)")
         .click();
 
-      price("desktop").should("contain.text", "Hinta: 100");
-      price("desktop").should("contain.text", "€");
+      price("desktop").should("contain.text", "Hinta: 50 - 150\u00a0€");
 
       durationSelect()
         .click()
@@ -505,19 +510,27 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .children("li:nth-of-type(3)")
         .click();
 
-      price("desktop").should("contain.text", "Hinta: 120");
-      price("desktop").should("contain.text", "€");
-
+      price("desktop").should("contain.text", "Hinta: 60 - 180\u00a0€");
       submitButton("desktop").should("not.be.disabled");
 
       timeSlots("desktop").first().click();
-
       price("desktop").should("not.exist");
-
       submitButton("desktop").should("be.disabled");
 
       timeSlots("desktop").first().click();
+      price("desktop").should("exist");
+      submitButton("desktop").should("not.be.disabled");
 
+      dateSelect()
+        .clear()
+        .type(toUIDate(addDays(new Date(), 3), "dd.MM.yyyy"))
+        .blur();
+
+      price("desktop").should("not.exist");
+      submitButton("desktop").should("be.disabled");
+
+      timeSlots("desktop").first().click();
+      price("desktop").should("contain.text", "Hinta: 120 - 300\u00a0€");
       submitButton("desktop").should("not.be.disabled").click();
 
       cy.get("main#main").should("contain.text", "Uusi varaus");

@@ -2249,6 +2249,7 @@ type ReservationUnitByPkType implements Node {
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
   state: ReservationUnitState
+  pricings: [ReservationUnitPricingType]
   nextAvailableSlot: DateTime
   haukiUrl: ReservationUnitHaukiUrlType
 }
@@ -2392,24 +2393,25 @@ input ReservationUnitCreateMutationInput {
   """
   pricingType: String
   paymentTypes: [String]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
+  pricings: [ReservationUnitPricingCreateSerializerInput]
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2531,24 +2533,25 @@ type ReservationUnitCreateMutationPayload {
   """
   pricingType: String
   paymentTypes: [String]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
+  pricings: [ReservationUnitPricingType]
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2640,6 +2643,82 @@ type ReservationUnitPaymentTypeType implements Node {
   pk: Int
 }
 
+input ReservationUnitPricingCreateSerializerInput {
+  """When pricing is activated"""
+  begins: Date!
+
+  """
+  What kind of pricing type this pricing has. Possible values are PAID, FREE.
+  """
+  pricingType: String!
+
+  """
+  Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
+  """
+  priceUnit: String!
+
+  """Minimum price of the reservation unit"""
+  lowestPrice: Float
+
+  """Maximum price of the reservation unit"""
+  highestPrice: Float
+  taxPercentagePk: Int!
+
+  """Pricing status. Possible values are PAST, ACTIVE, FUTURE."""
+  status: String!
+}
+
+type ReservationUnitPricingType {
+  """When pricing is activated"""
+  begins: Date!
+
+  """What kind of pricing types are available with this reservation unit."""
+  pricingType: ReservationUnitsReservationUnitPricingPricingTypeChoices
+
+  """Unit of the price"""
+  priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices!
+
+  """Minimum price of the reservation unit"""
+  lowestPrice: Decimal!
+
+  """Maximum price of the reservation unit"""
+  highestPrice: Decimal!
+
+  """The percentage of tax included in the price"""
+  taxPercentage: TaxPercentageType!
+
+  """Status of the pricing"""
+  status: ReservationUnitsReservationUnitPricingStatusChoices!
+  pk: Int
+}
+
+input ReservationUnitPricingUpdateSerializerInput {
+  pk: Int
+
+  """When pricing is activated"""
+  begins: Date!
+
+  """
+  What kind of pricing type this pricing has. Possible values are PAID, FREE.
+  """
+  pricingType: String!
+
+  """
+  Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
+  """
+  priceUnit: String!
+
+  """Minimum price of the reservation unit"""
+  lowestPrice: Float
+
+  """Maximum price of the reservation unit"""
+  highestPrice: Float
+  taxPercentagePk: Int!
+
+  """Pricing status. Possible values are PAST, ACTIVE, FUTURE."""
+  status: String!
+}
+
 """An enumeration."""
 enum ReservationUnitsReservationUnitAuthenticationChoices {
   """Weak"""
@@ -2686,6 +2765,51 @@ enum ReservationUnitsReservationUnitPriceUnitChoices {
 
   """fixed"""
   FIXED
+}
+
+"""An enumeration."""
+enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
+  """per 15 minutes"""
+  PER_15_MINS
+
+  """per 30 minutes"""
+  PER_30_MINS
+
+  """per hour"""
+  PER_HOUR
+
+  """per half a day"""
+  PER_HALF_DAY
+
+  """per day"""
+  PER_DAY
+
+  """per week"""
+  PER_WEEK
+
+  """fixed"""
+  FIXED
+}
+
+"""An enumeration."""
+enum ReservationUnitsReservationUnitPricingPricingTypeChoices {
+  """Paid"""
+  PAID
+
+  """Free"""
+  FREE
+}
+
+"""An enumeration."""
+enum ReservationUnitsReservationUnitPricingStatusChoices {
+  """past"""
+  PAST
+
+  """voimassa"""
+  ACTIVE
+
+  """future"""
+  FUTURE
 }
 
 """An enumeration."""
@@ -2855,6 +2979,7 @@ type ReservationUnitType implements Node {
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
   state: ReservationUnitState
+  pricings: [ReservationUnitPricingType]
 }
 
 type ReservationUnitTypeConnection {
@@ -3011,24 +3136,25 @@ input ReservationUnitUpdateMutationInput {
   """
   pricingType: String
   paymentTypes: [String]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
+  pricings: [ReservationUnitPricingUpdateSerializerInput]!
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -3156,18 +3282,18 @@ type ReservationUnitUpdateMutationPayload {
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3894,6 +4020,9 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -3912,6 +4041,9 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String

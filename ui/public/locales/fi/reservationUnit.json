@@ -36,5 +36,7 @@
   "reservationInfo4": "Sinulla voi olla samanaikaisesti <2>enintään yksi varaus</2>.",
   "reservationInfo4_plural": "Sinulla voi olla samanaikaisesti <2>enintään {{count}} varausta</2>.",
   "reservationInfo1-weeks": "viikkoa",
-  "reservationInfo1-months": "kuukautta"
+  "reservationInfo1-months": "kuukautta",
+  "futurePricingNotice": "Huomioi <2>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</2>",
+  "futurePriceNoticeTax": " (sis. alv. {{tax}}%)"
 }

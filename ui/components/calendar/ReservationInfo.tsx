@@ -25,7 +25,7 @@ import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { DataContext, ReservationProps } from "../../context/DataContext";
 import { fontMedium, fontRegular } from "../../modules/style/typography";
 import { getDurationOptions } from "../../modules/reservation";
-import { getPrice } from "../../modules/reservationUnit";
+import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
 
 type Props<T> = {
@@ -312,9 +312,11 @@ const ReservationInfo = <T extends Record<string, unknown>>({
           <>
             <div>{t("reservationUnit:price")}:</div>
             <Price data-testid="reservation__price--value">
-              {getPrice(
+              {getReservationUnitPrice(
                 reservationUnit,
-                convertHMSToSeconds(`0${duration?.value}:00`) / 60
+                date,
+                convertHMSToSeconds(`0${duration?.value}:00`) / 60,
+                false
               )}
             </Price>
           </>

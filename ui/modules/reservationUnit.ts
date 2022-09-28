@@ -1,22 +1,34 @@
 import { formatters as getFormatters, getReservationVolume } from "common";
 import { flatten, trim, uniq } from "lodash";
 import { i18n } from "next-i18next";
-import { ReservationState, ReservationUnit } from "common/types/common";
+import {
+  ApplicationRound,
+  ReservationState,
+  ReservationUnit,
+} from "common/types/common";
+import { toUIDate } from "common/src/common/util";
+import { isSlotWithinReservationTime } from "common/src/calendar/util";
 import {
   EquipmentType,
   ReservationsReservationStateChoices,
   ReservationUnitByPkType,
+  ReservationUnitPricingType,
+  ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitType,
   UnitType,
 } from "./gql-types";
 import { capitalize, getTranslation, localizedValue } from "./util";
 
 export const getPrice = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType,
+  reservationUnit:
+    | ReservationUnitType
+    | ReservationUnitByPkType
+    | ReservationUnitPricingType,
   minutes?: number, // additional minutes for total price calculation
   trailingZeros = false
 ): string => {
-  const unit = reservationUnit.priceUnit as string;
+  const unit = reservationUnit.priceUnit;
+  const type = reservationUnit.pricingType;
   const volume = getReservationVolume(minutes, unit);
   const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
   const floatFormatter = trailingZeros ? "twoDecimals" : "strippedDecimal";
@@ -26,7 +38,7 @@ export const getPrice = (
 
   const formatters = getFormatters(i18n.language);
 
-  if (parseFloat(reservationUnit.highestPrice)) {
+  if (type === "PAID" && parseFloat(reservationUnit.highestPrice)) {
     if (unit === "FIXED") {
       return formatters[currencyFormatter].format(reservationUnit.highestPrice);
     }
@@ -177,4 +189,99 @@ export const getDurationRange = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType
 ): string => {
   return `${reservationUnit.minReservationDuration} - ${reservationUnit.maxReservationDuration}`;
+};
+
+export const getFuturePricing = (
+  reservationUnit: ReservationUnitByPkType,
+  applicationRounds: ApplicationRound[] = [],
+  reservationDate?: Date
+): ReservationUnitPricingType => {
+  const {
+    pricings,
+    pricingType,
+    priceUnit,
+    lowestPrice,
+    highestPrice,
+    taxPercentage,
+    reservationBegins,
+    reservationEnds,
+    openingHours,
+  } = reservationUnit;
+
+  if (!pricings || pricings.length === 0) {
+    return null;
+  }
+
+  const now = toUIDate(new Date(), "yyyy-MM-dd");
+
+  const futurePricings = pricings
+    .filter(
+      (pricing) =>
+        pricing.status ===
+        ReservationUnitsReservationUnitPricingStatusChoices.Future
+    )
+    .filter(
+      (futurePricing) =>
+        pricingType !== futurePricing.pricingType?.toString() ||
+        priceUnit !== futurePricing.priceUnit?.toString() ||
+        lowestPrice !== futurePricing.lowestPrice ||
+        highestPrice !== futurePricing.highestPrice ||
+        taxPercentage.value !== futurePricing.taxPercentage?.value
+    )
+    .filter((futurePricing) => futurePricing.begins > now)
+    .filter((futurePricing) => {
+      const start = new Date(futurePricing.begins);
+      return isSlotWithinReservationTime(
+        start,
+        reservationBegins,
+        reservationEnds
+      );
+    })
+    .filter((futurePricing) => {
+      const begins = new Date(futurePricing.begins);
+      return openingHours.openingTimePeriods.some((period) => {
+        const { startDate, endDate } = period;
+        if (!startDate || !endDate) return false;
+        const periodStart = new Date(startDate);
+        const periodEnd = new Date(endDate);
+        return begins >= periodStart && begins <= periodEnd;
+      });
+    })
+    .filter((futurePricing) => {
+      return !applicationRounds.some((applicationRound) => {
+        const { reservationPeriodBegin, reservationPeriodEnd } =
+          applicationRound;
+        if (!reservationPeriodBegin || !reservationPeriodEnd) return false;
+        const begins = new Date(futurePricing.begins);
+        const periodStart = new Date(reservationPeriodBegin);
+        const periodEnd = new Date(reservationPeriodEnd);
+        return begins >= periodStart && begins <= periodEnd;
+      });
+    })
+    .sort((a, b) => (a.begins > b.begins ? 1 : -1));
+
+  if (futurePricings.length === 0) {
+    return null;
+  }
+
+  return reservationDate
+    ? futurePricings.reverse().find((n) => {
+        return n.begins <= toUIDate(new Date(reservationDate), "yyyy-MM-dd");
+      })
+    : futurePricings[0];
+};
+
+export const getReservationUnitPrice = (
+  reservationUnit: ReservationUnitByPkType,
+  date?: Date,
+  minutes?: number,
+  trailingZeros = false
+): string => {
+  if (!reservationUnit) return null;
+
+  const pricing = date
+    ? getFuturePricing(reservationUnit, [], date) || reservationUnit
+    : reservationUnit;
+
+  return getPrice(pricing, minutes, trailingZeros);
 };

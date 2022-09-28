@@ -21,7 +21,11 @@ import {
   parseISO,
   subMinutes,
 } from "date-fns";
-import { formatSecondDuration, toApiDate } from "common/src/common/util";
+import {
+  formatSecondDuration,
+  toApiDate,
+  toUIDate,
+} from "common/src/common/util";
 import {
   areSlotsReservable,
   doBuffersCollide,
@@ -37,6 +41,7 @@ import {
   isReservationUnitReservable,
   isStartTimeWithinInterval,
 } from "common/src/calendar/util";
+import { formatters as getFormatters } from "common";
 import { useLocalStorage, useSessionStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
@@ -92,7 +97,11 @@ import {
   CREATE_RESERVATION,
   LIST_RESERVATIONS,
 } from "../../modules/queries/reservation";
-import { isReservationUnitPublished } from "../../modules/reservationUnit";
+import {
+  getFuturePricing,
+  getPrice,
+  isReservationUnitPublished,
+} from "../../modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
 import { daysByMonths } from "../../modules/const";
 import QuickReservation from "../../components/reservation-unit/QuickReservation";
@@ -855,6 +864,16 @@ const ReservationUnit = ({
     ]
   );
 
+  const futurePricing = useMemo(
+    () => getFuturePricing(reservationUnit, activeApplicationRounds),
+    [reservationUnit, activeApplicationRounds]
+  );
+
+  const formatters = useMemo(
+    () => getFormatters(i18n.language),
+    [i18n.language]
+  );
+
   return reservationUnit ? (
     <Wrapper>
       <Head
@@ -1143,8 +1162,37 @@ const ReservationUnit = ({
               </>
             )}
             {termsOfUseContent && (
-              <Accordion heading={t("reservationUnit:terms")} theme="thin">
+              <Accordion
+                heading={t("reservationUnit:terms")}
+                theme="thin"
+                data-testid="reservation-unit__reservation-notice"
+              >
                 <PaddedContent>
+                  {futurePricing && (
+                    <p style={{ marginTop: 0 }}>
+                      <Trans i18nKey="reservationUnit:futurePricingNotice">
+                        Huomioi{" "}
+                        <strong>
+                          hinnoittelumuutos{" "}
+                          {{ date: toUIDate(new Date(futurePricing.begins)) }}{" "}
+                          alkaen. Uusi hinta on{" "}
+                          {{
+                            price: getPrice(futurePricing).toLocaleLowerCase(),
+                          }}
+                        </strong>
+                      </Trans>
+                      {futurePricing.taxPercentage?.value > 0 && (
+                        <strong>
+                          {t("reservationUnit:futurePriceNoticeTax", {
+                            tax: formatters.strippedDecimal.format(
+                              futurePricing.taxPercentage.value
+                            ),
+                          })}
+                        </strong>
+                      )}
+                      .
+                    </p>
+                  )}
                   <Sanitize html={termsOfUseContent} />
                 </PaddedContent>
               </Accordion>

@@ -106,7 +106,7 @@ export const isReservationLongEnough = (
 const areOpeningTimesAvailable = <T extends Record<string, unknown>>(
   openingHours: T[],
   slotDate: Date
-) => {
+): boolean => {
   return !!openingHours?.some((oh) => {
     const startDate = oh.date;
     const startDateTime = new Date(`${startDate}T${oh.startTime}`);

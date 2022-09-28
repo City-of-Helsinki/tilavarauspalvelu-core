@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { getAvailableTimes, getOpenDays } from "common/src/calendar/util";
 import { chunkArray, toUIDate } from "common/src/common/util";
 import { Language, OptionType } from "common/types/common";
@@ -8,17 +9,18 @@ import {
   differenceInMinutes,
   isBefore,
   isSameDay,
+  isValid,
 } from "date-fns";
 import { Button, DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
 import { padStart } from "lodash";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useTranslation } from "react-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
 import { ReservationProps } from "../../context/DataContext";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { getDurationOptions } from "../../modules/reservation";
-import { getPrice } from "../../modules/reservationUnit";
+import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import { fontBold, fontMedium, H4 } from "../../modules/style/typography";
 import { formatDate } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
@@ -288,8 +290,8 @@ const QuickReservation = ({
   const price: string = useMemo(() => {
     const [hours, minutes] = duration?.value.toString().split(":").map(Number);
     const length = hours * 60 + minutes;
-    return getPrice(reservationUnit, length);
-  }, [duration?.value, reservationUnit]);
+    return getReservationUnitPrice(reservationUnit, date, length);
+  }, [duration?.value, reservationUnit, date]);
 
   const [storedReservation, setStoredReservation, removeStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
@@ -431,7 +433,10 @@ const QuickReservation = ({
           initialMonth={new Date()}
           language={i18n.language as Language}
           onChange={(val, valueAsDate) => {
-            setDate(valueAsDate);
+            if (isValid(valueAsDate) && valueAsDate.getFullYear() > 1970) {
+              setSlot(null);
+              setDate(valueAsDate);
+            }
           }}
           value={toUIDate(date)}
         />
