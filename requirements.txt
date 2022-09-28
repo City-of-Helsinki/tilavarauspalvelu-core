@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-absl-py==0.12.0
+absl-py==1.2.0
     # via ortools
 amqp==5.1.1
     # via kombu
@@ -201,11 +201,13 @@ mccabe==0.6.1
     # via flake8
 mypy-extensions==0.4.3
     # via black
+numpy==1.23.3
+    # via ortools
 oauthlib==3.1.0
     # via
     #   requests-oauthlib
     #   social-auth-core
-ortools==8.1.8487
+ortools==9.4.1874
     # via -r requirements.in
 packaging==20.9
     # via
@@ -225,7 +227,7 @@ promise==2.3
     # via graphene-django
 prompt-toolkit==3.0.23
     # via click-repl
-protobuf==3.17.0
+protobuf==4.21.6
     # via ortools
 psycopg2==2.8.6
     # via -r requirements.in
@@ -282,7 +284,7 @@ python-jose==3.2.0
     # via django-helusers
 python3-openid==3.2.0
     # via social-auth-core
-pytz==2022.1  # manual pin to 2022.1 since celery beat doesn't work with 2022.2
+pytz==2022.1
     # via
     #   celery
     #   django
@@ -310,7 +312,6 @@ sentry-sdk==0.19.5
     # via -r requirements.in
 six==1.15.0
     # via
-    #   absl-py
     #   click-repl
     #   django-jsonfield
     #   django-modeltranslation
@@ -319,7 +320,6 @@ six==1.15.0
     #   graphene-file-upload
     #   jsonschema
     #   promise
-    #   protobuf
     #   pyjwkest
     #   python-dateutil
     #   python-jose
