@@ -12,7 +12,12 @@ from api.graphql.tests.test_reservations.base import (
 from applications.models import PRIORITY_CONST, City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from reservation_units.models import PricingType, ReservationKind, ReservationUnit
+from reservation_units.models import (
+    PriceUnit,
+    PricingType,
+    ReservationKind,
+    ReservationUnit,
+)
 from reservation_units.tests.factories import (
     ReservationUnitFactory,
     TaxPercentageFactory,
@@ -1095,7 +1100,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         tax_percentage = TaxPercentageFactory()
 
         self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_FIXED
+        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_FIXED
         self.reservation_unit.lowest_price = 1.0
         self.reservation_unit.highest_price = 3.0
         self.reservation_unit.tax_percentage = tax_percentage
@@ -1127,7 +1132,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         tax_percentage = TaxPercentageFactory()
 
         self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_PER_15_MINS
+        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
         self.reservation_unit.lowest_price = 1.0
         self.reservation_unit.highest_price = 3.0
         self.reservation_unit.tax_percentage = tax_percentage
@@ -1159,7 +1164,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         tax_percentage = TaxPercentageFactory()
 
         self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_PER_15_MINS
+        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
         self.reservation_unit.lowest_price = 1.0
         self.reservation_unit.highest_price = 3.0
         self.reservation_unit.tax_percentage = tax_percentage
@@ -1224,7 +1229,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         sku = "340026__2652000155___44_10000100"
 
         self.reservation_unit.pricing_type = PricingType.PAID
-        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_PER_15_MINS
+        self.reservation_unit.price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
         self.reservation_unit.lowest_price = 1.0
         self.reservation_unit.highest_price = 3.0
         self.reservation_unit.tax_percentage = tax_percentage
@@ -1239,7 +1244,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             buffer_time_after=datetime.timedelta(minutes=30),
             sku=sku,
             pricing_type=PricingType.PAID,
-            price_unit=ReservationUnit.PRICE_UNIT_PER_15_MINS,
+            price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
             lowest_price=2.0,
             highest_price=4.0,
             tax_percentage=tax_percentage,

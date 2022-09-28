@@ -22,7 +22,12 @@ from email_notification.tasks import (
     send_staff_reservation_email_task,
 )
 from permissions.helpers import can_handle_reservation_with_units
-from reservation_units.models import PricingType, ReservationKind, ReservationUnit
+from reservation_units.models import (
+    PriceUnit,
+    PricingType,
+    ReservationKind,
+    ReservationUnit,
+)
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
@@ -496,12 +501,12 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         reservation_units: List[ReservationUnit],
     ) -> PriceCalculationResult:
         price_unit_to_minutes = {
-            ReservationUnit.PRICE_UNIT_PER_15_MINS: 15,
-            ReservationUnit.PRICE_UNIT_PER_30_MINS: 30,
-            ReservationUnit.PRICE_UNIT_PER_HOUR: 60,
-            ReservationUnit.PRICE_UNIT_PER_HALF_DAY: 720,
-            ReservationUnit.PRICE_UNIT_PER_DAY: 1440,
-            ReservationUnit.PRICE_UNIT_PER_WEEK: 10080,
+            PriceUnit.PRICE_UNIT_PER_15_MINS: 15,
+            PriceUnit.PRICE_UNIT_PER_30_MINS: 30,
+            PriceUnit.PRICE_UNIT_PER_HOUR: 60,
+            PriceUnit.PRICE_UNIT_PER_HALF_DAY: 720,
+            PriceUnit.PRICE_UNIT_PER_DAY: 1440,
+            PriceUnit.PRICE_UNIT_PER_WEEK: 10080,
         }
 
         total_reservation_price: Decimal = Decimal(0.0)
@@ -521,7 +526,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
             # Time-based calculation is needes only if price unit is not fixed.
             # Otherwise we can just use the price defined in the reservation unit
-            if reservation_unit.price_unit != ReservationUnit.PRICE_UNIT_FIXED:
+            if reservation_unit.price_unit != PriceUnit.PRICE_UNIT_FIXED:
                 reservation_duration_in_minutes = (end - begin).seconds / 60
                 reservation_unit_price_unit_minutes = price_unit_to_minutes.get(
                     reservation_units[0].price_unit
