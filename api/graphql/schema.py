@@ -18,7 +18,9 @@ from api.graphql.applications.application_types import (
 )
 from api.graphql.reservation_units.reservation_unit_filtersets import (
     EquipmentFilterSet,
+    PurposeFilterSet,
     ReservationUnitsFilterSet,
+    ReservationUnitTypeFilterSet,
 )
 from api.graphql.reservation_units.reservation_unit_mutations import (
     EquipmentCategoryCreateMutation,
@@ -429,7 +431,9 @@ class Query(graphene.ObjectType):
         ReservationUnitCancellationRuleType
     )
 
-    reservation_unit_types = ReservationUnitTypesFilter(ReservationUnitTypeType)
+    reservation_unit_types = ReservationUnitTypesFilter(
+        ReservationUnitTypeType, filterset_class=ReservationUnitTypeFilterSet
+    )
 
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)
@@ -457,7 +461,7 @@ class Query(graphene.ObjectType):
     keyword_groups = KeywordFilter(KeywordGroupType)
     keywords = KeywordFilter(KeywordType)
 
-    purposes = PurposeFilter(PurposeType)
+    purposes = PurposeFilter(PurposeType, filterset_class=PurposeFilterSet)
     qualifiers = QualifierFilter(QualifierType)
     reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
 

@@ -59,7 +59,6 @@ class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     inlines = [LocationInline]
     actions = ["update_from_tprek"]
     search_fields = ["name", "tprek_id"]
-    ordering = ["rank"]
 
     @admin.action
     def update_from_tprek(self, request, queryset):

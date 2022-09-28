@@ -111,7 +111,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 class PurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.purpose = PurposeFactory(name_fi="fi", name_en="en", name_sv="sv")
+        cls.purpose = PurposeFactory(name_fi="fi", name_en="en", name_sv="sv", rank=1)
 
     def test_getting_purposes(self):
         response = self.query(
@@ -125,6 +125,33 @@ class PurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     nameSv
                     imageUrl
                     smallUrl
+                    rank
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_sorting_purposes_by_rank(self):
+        PurposeFactory(name_fi="I'm first", name_en="en", name_sv="sv", rank=4)
+        PurposeFactory(name_fi="I'm third", name_en="en", name_sv="sv", rank=2)
+        PurposeFactory(name_fi="I'm second", name_en="en", name_sv="sv", rank=3)
+        response = self.query(
+            """
+            query {
+            purposes(orderBy:"-rank"){
+                edges{
+                  node{
+                    nameFi
+                    nameEn
+                    nameSv
+                    rank
                   }
                 }
               }
