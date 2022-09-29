@@ -97,6 +97,7 @@ snapshots['UnitsQueryTestCase::test_getting_units 1'] = {
                         'nameEn': None,
                         'nameFi': 'Test unit',
                         'nameSv': None,
+                        'paymentMerchant': None,
                         'phone': '+358 12 34567',
                         'reservationUnits': [
                         ],
@@ -225,6 +226,21 @@ snapshots['UnitsQueryTestCase::test_getting_units_with_published_reservation_uni
     }
 }
 
+snapshots['UnitsQueryTestCase::test_hide_payment_merchant_without_permissions 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test unit',
+                        'paymentMerchant': None
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['UnitsQueryTestCase::test_order_by_own_reservation_count 1'] = {
     'data': {
         'units': {
@@ -242,6 +258,23 @@ snapshots['UnitsQueryTestCase::test_order_by_own_reservation_count 1'] = {
                 {
                     'node': {
                         'nameFi': "I'm last."
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['UnitsQueryTestCase::test_show_payment_merchant 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test unit',
+                        'paymentMerchant': {
+                            'name': 'Test Merchant'
+                        }
                     }
                 }
             ]

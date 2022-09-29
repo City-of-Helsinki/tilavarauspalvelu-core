@@ -15,6 +15,7 @@ from permissions.api_permissions.graphene_permissions import (
     SpacePermission,
     UnitPermission,
 )
+from permissions.helpers import can_manage_units
 from spaces.models import Unit, UnitGroup
 
 
@@ -32,6 +33,9 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
     service_sectors = graphene.List(
         "api.graphql.application_rounds.application_round_types.ServiceSectorType"
     )
+    payment_merchant = graphene.Field(
+        "api.graphql.merchants.merchant_types.PaymentMerchantType"
+    )
 
     class Meta:
         model = Unit
@@ -41,6 +45,7 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
             "web_page",
             "email",
             "phone",
+            "payment_merchant",
         ] + get_all_translatable_fields(model)
 
         filter_fields = {
@@ -65,6 +70,11 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_service_sectors(self, info):
         return self.service_sectors.all()
+
+    def resolve_payment_merchant(self, info):
+        if can_manage_units(info.context.user, self):
+            return self.payment_merchant
+        return None
 
 
 class UnitByPkType(UnitType, OpeningHoursMixin):
