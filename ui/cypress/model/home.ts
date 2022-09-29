@@ -9,3 +9,11 @@ export function browseRecurringReservationUnitsButton(): Cypress.Chainable<
 > {
   return cy.get("#browseRecurringReservationUnits");
 }
+
+export function unitLinks(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get('[data-testid="front-page__units--unit"]');
+}
+
+export function unitLinkSearchForm(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get('[data-testid="front-page__units--more-link"]');
+}

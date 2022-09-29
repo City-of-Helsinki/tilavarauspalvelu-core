@@ -4,10 +4,6 @@
     "text": "Varaamosta voit varata julkisia tiloja ja laitteita satunnaiseen tai säännölliseen käyttöön",
     "searchPlaceholder": "Hae tiloja tai laitetta"
   },
-  "info": {
-    "heading": "Yksittäisvarauksen tekeminen",
-    "text": "Yksittäisen varauksen voit tehdä osoitteessa <0>varaamo.hel.fi</0>."
-  },
   "infoRecurring": {
     "heading": "Kausivarauksen tekeminen",
     "text": "Hae Helsingin kaupungin tiloja säännölliseen käyttöön. Voit tutustua tiloihin etukäteen ennen hakuaikaa."
@@ -17,8 +13,7 @@
     "heading": "Palvelusta",
     "body": "Varaamo on Helsingin kaupungin ylläpitämä verkkopalvelu, jonka kautta voit varata kaupungin julkisia tiloja sekä työpisteitä käyttöösi.\n\nUudistettu tilavarauspalvelu on testausvaiheessa. Uudet ominaisuudet ja toiminnallisuudet otetaan käyttöön vähitellen."
   },
-  "shortcutsHeadingMobile": "Tai valitse mitä haluat tehdä",
-  "shortcutsHeading": "Valitse mitä haluat tehdä",
+  "shortcutsHeading": "Mitä haluat tehdä?",
   "shortcuts": {
     "organizeEvent": "Järjestää tapahtuman",
     "pictureOrSound": "Kuvaa tai ääntä",
@@ -28,5 +23,6 @@
     "sauna": "Saunoa tai mökkeillä",
     "workshop": "Valmistaa esineitä, askarrella tai korjata"
   },
+  "unitsHeading": "Mistä haluat varata tilan tai laitteen?",
   "recommendations": "Suositukset"
 }

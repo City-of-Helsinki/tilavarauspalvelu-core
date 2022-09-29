@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { breakpoint } from "../../modules/style";
 import Container from "../common/Container";
@@ -126,29 +126,6 @@ const SearchGuides = (): JSX.Element => {
               {t("browseRecurringReservationsButton")}
             </Button>
           </ButtonContainer>
-        </InfoContainer>
-      </StyledImageWithCard>
-      <StyledImageWithCard
-        cardAlignment="right"
-        cardLayout="hover"
-        color="secondary"
-        src="images/guide-single.png"
-      >
-        <InfoContainer data-test-id="search-guide__single">
-          <div>
-            <Heading>{t("info.heading")}</Heading>
-            <p>
-              <Trans i18nKey="home:info.text">
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://varaamo.hel.fi/"
-                >
-                  {" "}
-                </a>
-              </Trans>
-            </p>
-          </div>
         </InfoContainer>
       </StyledImageWithCard>
     </Wrapper>

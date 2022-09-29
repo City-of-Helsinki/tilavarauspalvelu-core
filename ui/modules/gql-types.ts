@@ -1577,6 +1577,7 @@ export type QueryApplicationsArgs = {
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   status?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   user?: InputMaybe<Scalars["ID"]>;
@@ -4302,8 +4303,8 @@ export type ApplicationRoundsQueryResult = Apollo.QueryResult<
   ApplicationRoundsQueryVariables
 >;
 export const SearchFormParamsUnitDocument = gql`
-  query SearchFormParamsUnit {
-    units {
+  query SearchFormParamsUnit($publishedReservationUnits: Boolean) {
+    units(publishedReservationUnits: $publishedReservationUnits) {
       edges {
         node {
           pk
@@ -4328,6 +4329,7 @@ export const SearchFormParamsUnitDocument = gql`
  * @example
  * const { data, loading, error } = useSearchFormParamsUnitQuery({
  *   variables: {
+ *      publishedReservationUnits: // value for 'publishedReservationUnits'
  *   },
  * });
  */
@@ -5942,7 +5944,7 @@ export type ApplicationRoundsQuery = {
 };
 
 export type SearchFormParamsUnitQueryVariables = Exact<{
-  [key: string]: never;
+  publishedReservationUnits?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type SearchFormParamsUnitQuery = {

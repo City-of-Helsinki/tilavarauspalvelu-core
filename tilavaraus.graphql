@@ -1415,6 +1415,7 @@ type Query {
     status: [String] = null
     unit: [ID] = null
     user: ID = null
+    pk: [ID] = null
     applicantType: [String] = null
 
     """Järjestys"""
@@ -4029,6 +4030,9 @@ input UnitUpdateMutationInput {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
@@ -4050,6 +4054,9 @@ type UnitUpdateMutationPayload {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String

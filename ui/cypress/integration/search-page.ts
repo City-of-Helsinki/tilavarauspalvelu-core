@@ -62,7 +62,7 @@ describe("Tilavaraus ui search page (recurring)", () => {
     inputUnit().type("2");
     expect(selectOptions("#unitFilter").should("have.length", 1));
     selectClearButton("#unitFilter").click();
-    expect(selectOptions("#unitFilter").should("have.length", 3));
+    expect(selectOptions("#unitFilter").should("have.length", 9));
     inputUnitOption(1).click();
     inputUnitOption(3).click();
     inputUnitToggler().click();
