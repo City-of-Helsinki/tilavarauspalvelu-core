@@ -24,6 +24,7 @@
   --tilavaraus-event-reservation-color: #f9e9e8;
   --tilavaraus-event-reservation-border: var(--color-error);
   --tilavaraus-stack-order-modal: 200;
+  --tilavaraus-stack-order-sticky-container: 100;
   --tilavaraus-stack-order-tooltip: 100;
   --tilavaraus-stack-order-navigation: 100;
 }

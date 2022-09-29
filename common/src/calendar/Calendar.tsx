@@ -303,7 +303,6 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 
   position: relative;
-  margin-bottom: var(--spacing-l);
 
   /* stylelint-disable */
   .rbc-time-view,

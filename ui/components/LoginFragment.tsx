@@ -37,6 +37,16 @@ const Wrapper = styled.div`
   }
 `;
 
+const SubmitButton = styled(MediumButton)`
+  white-space: nowrap;
+
+  > span {
+    margin: 0 !important;
+    padding-right: var(--spacing-3-xs);
+    padding-left: var(--spacing-3-xs);
+  }
+`;
+
 const LoginFragment = ({
   text,
   componentIfAuthenticated,
@@ -70,7 +80,7 @@ const LoginFragment = ({
       render={({ profile }: InnerProps) => {
         return !profile && authEnabled ? (
           <Wrapper>
-            <MediumButton
+            <SubmitButton
               onClick={() => {
                 if (actionCallback) {
                   actionCallback();
@@ -82,7 +92,7 @@ const LoginFragment = ({
               disabled={isActionDisabled}
             >
               {t("reservationCalendar:loginAndReserve")}
-            </MediumButton>
+            </SubmitButton>
             {text}
           </Wrapper>
         ) : (

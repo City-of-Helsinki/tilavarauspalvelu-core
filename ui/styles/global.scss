@@ -100,3 +100,11 @@ strong {
   font-family: var(--font-bold);
   font-weight: 700;
 }
+
+// cookiehub overrides
+.ch2 {
+  color: hotpink;
+  .ch2-dialog {
+    min-width: 260px;
+  }
+}

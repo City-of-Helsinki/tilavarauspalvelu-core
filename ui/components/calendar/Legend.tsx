@@ -20,6 +20,7 @@ const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
   display: grid;
   grid-template-columns: 1fr 1fr;
   margin-bottom: var(--spacing-l);
+  padding-top: var(--spacing-l);
   gap: var(--spacing-m);
   width: 100%;
 
@@ -39,7 +40,7 @@ const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
       @media (min-width: ${$wrapBreakpoint}) {
         flex-direction: column;
         position: absolute;
-        bottom: 15%;
+        bottom: 90px;
         left: calc(100% + var(--spacing-xl));
         width: unset;
         width: 200px;
