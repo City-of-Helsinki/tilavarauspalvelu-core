@@ -892,6 +892,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'minPersons': 10,
                         'minReservationDuration': 600,
                         'nameFi': 'test name fi',
+                        'paymentMerchant': None,
                         'paymentTypes': [
                             {
                                 'code': 'ONLINE'
@@ -1016,6 +1017,21 @@ snapshots['ReservationUnitQueryTestCase::test_hauki_url_for_unit_manager 1'] = {
                 'url': 'https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=unit.admin%40foo.com&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03T03%3A00%3A00%2B03%3A00&hsa_valid_until=2021-05-03T03%3A30%3A00%2B03%3A00&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710&hsa_has_organization_rights=true&hsa_signature=1b61fc678411c21464160a489f22b369c6e2345c1711314dea5f447bd00a3641'
             },
             'nameFi': 'test name fi'
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_hide_payment_merchant_without_permissions 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'paymentMerchant': None
+                    }
+                }
+            ]
         }
     }
 }
@@ -1679,6 +1695,40 @@ snapshots['ReservationUnitQueryTestCase::test_should_not_return_archived_reserva
                     'node': {
                         'isArchived': False,
                         'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_show_payment_merchant_from_reservation_unit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'paymentMerchant': {
+                            'name': 'Test Merchant'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_show_payment_merchant_from_unit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'paymentMerchant': {
+                            'name': 'Test Merchant'
+                        }
                     }
                 }
             ]

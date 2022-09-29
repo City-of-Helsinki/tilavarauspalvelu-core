@@ -13,6 +13,7 @@ from graphene_permissions.permissions import AllowAny
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.duration_field import Duration
+from api.graphql.merchants.merchant_types import PaymentMerchantType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
 from api.graphql.reservations.reservation_types import (
     ReservationMetadataSetType,
@@ -41,7 +42,7 @@ from permissions.api_permissions.graphene_permissions import (
     SpacePermission,
     UnitPermission,
 )
-from permissions.helpers import can_manage_units
+from permissions.helpers import can_manage_units, can_modify_reservation_unit
 from reservation_units.enums import ReservationUnitState
 from reservation_units.models import (
     Equipment,
@@ -380,6 +381,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     metadata_set = graphene.Field(ReservationMetadataSetType)
     state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
     payment_types = graphene.List(ReservationUnitPaymentTypeType)
+    payment_merchant = graphene.Field(PaymentMerchantType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -441,6 +443,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "allow_reservations_without_opening_hours",
             "is_archived",
             "state",
+            "payment_merchant",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -543,6 +546,14 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     @check_resolver_permission(ReservationUnitCancellationRulePermission)
     def resolve_cancellation_rule(self, info: ResolveInfo):
         return self.cancellation_rule
+
+    def resolve_payment_merchant(self, info: ResolveInfo):
+        if can_modify_reservation_unit(info.context.user, self):
+            if self.payment_merchant is not None:
+                return self.payment_merchant
+            elif self.unit and self.unit.payment_merchant is not None:
+                return self.unit.payment_merchant
+        return None
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
