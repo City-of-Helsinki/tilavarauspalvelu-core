@@ -3,10 +3,7 @@ import { gql } from "@apollo/client";
 export const RESERVATIONUNIT_QUERY = gql`
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
-      lowestPrice
-      highestPrice
       state
-      priceUnit
       images {
         pk
         mediumUrl
@@ -42,7 +39,6 @@ export const RESERVATIONUNIT_QUERY = gql`
       paymentTypes {
         code
       }
-      pricingType
       pricingTerms {
         pk
       }
@@ -109,9 +105,6 @@ export const RESERVATIONUNIT_QUERY = gql`
       serviceSpecificTerms {
         pk
       }
-      taxPercentage {
-        pk
-      }
       bufferTimeBefore
       bufferTimeAfter
       reservationBegins
@@ -121,6 +114,19 @@ export const RESERVATIONUNIT_QUERY = gql`
       publishEnds
       maxReservationsPerUser
       metadataSet {
+        pk
+      }
+      pricings {
+        begins
+        pricingType
+        priceUnit
+        lowestPrice
+        highestPrice
+        taxPercentage {
+          pk
+          value
+        }
+        status
         pk
       }
     }

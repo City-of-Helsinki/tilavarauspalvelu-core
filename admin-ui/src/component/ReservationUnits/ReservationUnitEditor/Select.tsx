@@ -48,24 +48,27 @@ const Select = ({
   })(options);
 
   return (
-    <HDSSelect
-      id={id}
-      label={label}
-      placeholder={placeholder}
-      options={sortedOpts}
-      required={required}
-      onChange={(e: OptionType) => {
-        if (typeof e.value !== "undefined") {
-          onChange(e.value);
-        }
-      }}
-      disabled={options.length === 0}
-      helper={helper}
-      value={getSelectedOption(options, value)}
-      error={errorText}
-      invalid={!!errorText}
-      tooltipText={tooltipText}
-    />
+    <>
+      <div id={id} />
+      <HDSSelect
+        id={id}
+        label={label}
+        placeholder={placeholder}
+        options={sortedOpts}
+        required={required}
+        onChange={(e: OptionType) => {
+          if (typeof e.value !== "undefined") {
+            onChange(e.value);
+          }
+        }}
+        disabled={options.length === 0}
+        helper={helper}
+        value={getSelectedOption(options, value)}
+        error={errorText}
+        invalid={!!errorText}
+        tooltipText={tooltipText}
+      />
+    </>
   );
 };
 

@@ -29,9 +29,11 @@ const EnumSelect = <T,>({
   errorText,
   tooltipText,
   sort = false,
+  optionPrefix,
 }: {
   id: string;
   label: string;
+  optionPrefix?: string;
   required?: boolean;
   disabled?: boolean;
   placeholder?: string;
@@ -46,7 +48,7 @@ const EnumSelect = <T,>({
 
   const options: OptionType[] = Object.keys(type).map((key) => ({
     value: type[key],
-    label: t(`${id}.${type[key]}`),
+    label: t(`${optionPrefix || id}.${type[key]}`),
   }));
 
   return (

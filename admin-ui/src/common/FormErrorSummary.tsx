@@ -44,7 +44,7 @@ const FormErrorSummary = ({
                 {": "}
                 {t(`validation.${error.type}`, {
                   ...error.context,
-                  fieldName: t(`${fieldNamePrefix}${error.path}`),
+                  fieldName: t(`${fieldNamePrefix}${error.context?.key}`),
                 })}
               </li>
             );

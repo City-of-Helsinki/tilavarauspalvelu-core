@@ -1,11 +1,15 @@
 import i18next from "i18next";
-import { get, pick, sumBy, uniq, upperFirst } from "lodash";
+import { get, pick, sortBy, sumBy, uniq, upperFirst } from "lodash";
+import { addDays, format } from "date-fns";
 import { paymentTypes } from "common/types/common";
 import { languages } from "../../../common/const";
 import {
   Query,
   ReservationUnitImageType,
+  ReservationUnitPricingCreateSerializerInput,
+  ReservationUnitPricingUpdateSerializerInput,
   ReservationUnitsReservationUnitImageImageTypeChoices,
+  ReservationUnitsReservationUnitPricingStatusChoices,
   ResourceType,
   SpaceType,
   TermsOfUseTermsOfUseTermsTypeChoices,
@@ -90,11 +94,6 @@ const makeTermsOptions = (
     .map(optionMaker);
 
   return [...options];
-};
-
-const nullOption: OptionType = {
-  value: null,
-  label: i18next.t("common.select"),
 };
 
 export const i18nFields = (baseName: string): string[] =>
@@ -202,13 +201,31 @@ export const reducer = (state: State, action: Action): State => {
           paymentTypes: (reservationUnit.paymentTypes || []).map(
             (p) => p?.code as string
           ),
+          pricings: sortBy(
+            (reservationUnit.pricings || []).map(
+              (pricing): ReservationUnitPricingUpdateSerializerInput => ({
+                ...(pick(pricing, [
+                  "begins",
+                  "priceUnit",
+                  "pricingType",
+                  "status",
+                  "pk",
+                ]) as ReservationUnitPricingUpdateSerializerInput),
+                taxPercentagePk: pricing?.taxPercentage.pk as number,
+                highestPrice: Number(pricing?.highestPrice),
+                lowestPrice: Number(pricing?.lowestPrice),
+              })
+            ),
+            (i) =>
+              i?.status ===
+              ReservationUnitsReservationUnitPricingStatusChoices.Active
+                ? -1
+                : +1
+          ),
           pricingTermsPk: get(reservationUnit, "pricingTerms.pk"),
           reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
           cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
           cancellationRulePk: get(reservationUnit, "cancellationRule.pk"),
-          taxPercentagePk: get(reservationUnit, "taxPercentage.pk"),
-          lowestPrice: Number(reservationUnit.lowestPrice || 0),
-          highestPrice: Number(reservationUnit.highestPrice || 0),
           serviceSpecificTermsPk: get(
             reservationUnit,
             "serviceSpecificTerms.pk"
@@ -300,10 +317,10 @@ export const reducer = (state: State, action: Action): State => {
           action,
           TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms
         ),
-        taxPercentageOptions: [nullOption].concat(
-          (action.parameters.taxPercentages?.edges || []).map(
-            (v) => ({ value: v?.node?.pk, label: v?.node?.value } as OptionType)
-          )
+        taxPercentageOptions: (
+          action.parameters.taxPercentages?.edges || []
+        ).map(
+          (v) => ({ value: v?.node?.pk, label: v?.node?.value } as OptionType)
         ),
         serviceSpecificTermsOptions: makeTermsOptions(
           action,
@@ -316,13 +333,12 @@ export const reducer = (state: State, action: Action): State => {
         cancellationRuleOptions: (
           action.parameters.reservationUnitCancellationRules?.edges || []
         ).map((e) => optionMaker(e)),
-        metadataOptions: [nullOption].concat(
-          (action.parameters.metadataSets?.edges || []).map((e) =>
+        metadataOptions: (action.parameters.metadataSets?.edges || []).map(
+          (e) =>
             makeOption({
               pk: get(e, "node.pk", -1),
               nameFi: get(e, "node.name", "no-name"),
             })
-          )
         ),
       });
     }
@@ -418,9 +434,42 @@ export const reducer = (state: State, action: Action): State => {
         paymentTypes: action.paymentTypes.map((ot) => ot.value as string),
       });
     }
+    case "updatePricingType": {
+      if (state.reservationUnitEdit.pricings?.length === 0) {
+        return modifyEditorState(state, {
+          pricings: [action.pricingType],
+        });
+      }
+
+      return modifyEditorState(state, {
+        pricings: (state.reservationUnitEdit.pricings || [])
+          .map((pricingType) => {
+            if (pricingType?.status === action.pricingType.status) {
+              return action.pricingType;
+            }
+            return pricingType;
+          })
+          .concat(),
+      });
+    }
+
     case "setPurposes": {
       return modifyEditorState(state, {
         purposePks: action.purposes.map((ot) => ot.value as number),
+      });
+    }
+    case "toggleFuturePrice": {
+      const currentPricings = state.reservationUnitEdit.pricings || [];
+      const hasFuturePrice = !!currentPricings.find(
+        (p) => p?.status === "FUTURE"
+      );
+      return modifyEditorState(state, {
+        pricings: hasFuturePrice
+          ? (currentPricings || []).filter((p) => get(p, "status") !== "FUTURE")
+          : currentPricings.concat({
+              status: "FUTURE",
+              begins: format(addDays(new Date(), 30), "yyyy-MM-dd"),
+            } as ReservationUnitPricingCreateSerializerInput),
       });
     }
     case "setQualifiers": {
