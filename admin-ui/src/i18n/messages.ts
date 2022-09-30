@@ -1411,12 +1411,12 @@ const translations: ITranslations = {
     serviceSpecificTermsHelperText: ["Valitse tästä"],
     openingHours: ["Aukioloajat"],
     openingHoursHelperTextHasLink: [
-      "Varausyksikön aukioloajat määritellään HAUKI järjestelmässä. Voit siirtyä hauki järjestelmään alla näkyvällä linkillä.",
+      "Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Voit siirtyä aukiolosovellukseen alla näkyvällä linkillä.",
     ],
     openingHoursHelperTextNoLink: [
-      "Varausyksikön aukioloajat määritellään HAUKI järjestelmässä. Pääset muokkaamaan aukioloaikoja kun varausyksikkö on tallennettu.",
+      "Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Pääset muokkaamaan aukioloaikoja kun varausyksikkö on tallennettu.",
     ],
-    openingTimesExternalLink: ["Aukioloajat HAUKI järjestelmässä"],
+    openingTimesExternalLink: ["Aukioloajat aukiolosovelluksessa"],
     cancel: ["Palaa tallentamatta muutoksia"],
     archive: ["Arkistoi"],
     save: ["Tallenna tiedot"],
