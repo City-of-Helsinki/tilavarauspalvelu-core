@@ -39,5 +39,9 @@
   "reservationInfo1-weeks": "viikkoa",
   "reservationInfo1-months": "kuukautta",
   "futurePricingNotice": "Huomioi <2>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</2>",
-  "futurePriceNoticeTax": " (sis. alv. {{tax}}%)"
+  "futurePriceNoticeTax": " (sis. alv. {{tax}}%)",
+  "notifications": {
+    "notReservable": "Kohde ei ole tällä hetkellä varattavissa.",
+    "futureOpening": "Varauskalenteri aukeaa {{date}}."
+  }
 }

@@ -36,6 +36,12 @@ export function termsOfUse(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get('[data-testid="reservation-unit__terms-of-use"]');
 }
 
+export function reservationControls(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(
+    '[data-testid="reservation-unit__reservation-controls--wrapper"]'
+  );
+}
+
 export function addressContainer(
   order?: number
 ): Cypress.Chainable<JQuery<HTMLElement>> {

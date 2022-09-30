@@ -11,7 +11,7 @@ import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { Notification } from "hds-react";
+import { IconInfoCircleFill, Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   addDays,
@@ -444,11 +444,20 @@ const MapWrapper = styled.div`
 `;
 
 const StyledNotification = styled(Notification)`
+  div > div {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
   margin-bottom: var(--spacing-xl);
 
   svg {
-    position: relative;
-    top: -3px;
+    color: var(--color-info);
+    min-width: 24px;
+  }
+
+  button > svg {
+    color: inherit;
   }
 `;
 
@@ -856,15 +865,17 @@ const ReservationUnit = ({
   const quickReservationComponent = useCallback(
     (calendar, type: "mobile" | "desktop") => {
       return (
-        <QuickReservation
-          isSlotReservable={isSlotReservable}
-          isReservationUnitReservable={!isReservationQuotaReached}
-          createReservation={(res) => createReservation(res)}
-          reservationUnit={reservationUnit}
-          scrollPosition={calendar?.current?.offsetTop - 20}
-          setErrorMsg={setErrorMsg}
-          idPrefix={type}
-        />
+        !isReservationStartInFuture(reservationUnit) && (
+          <QuickReservation
+            isSlotReservable={isSlotReservable}
+            isReservationUnitReservable={!isReservationQuotaReached}
+            createReservation={(res) => createReservation(res)}
+            reservationUnit={reservationUnit}
+            scrollPosition={calendar?.current?.offsetTop - 20}
+            setErrorMsg={setErrorMsg}
+            idPrefix={type}
+          />
+        )
       );
     },
     [
@@ -934,8 +945,15 @@ const ReservationUnit = ({
               </>
             )}
             {isReservationStartInFuture(reservationUnit) && (
-              <StyledNotification type="info" label={t("common:fyiLabel")}>
+              <StyledNotification
+                type="info"
+                size="small"
+                dismissible
+                closeButtonLabelText={t("common:close")}
+              >
+                <IconInfoCircleFill aria-hidden />
                 <span data-testid="reservation-unit--notification__reservation-start">
+                  {t("reservationUnit:notifications.notReservable")}{" "}
                   {t("reservationCalendar:reservingStartsAt", {
                     date: t("common:dateTimeNoYear", {
                       date: parseISO(
@@ -946,7 +964,9 @@ const ReservationUnit = ({
                 </span>
               </StyledNotification>
             )}
-            {isReservable && (
+            {(isReservable ||
+              (!isReservable &&
+                isReservationStartInFuture(reservationUnit))) && (
               <CalendarWrapper
                 ref={calendarRef}
                 data-testid="reservation-unit__calendar--wrapper"
@@ -1024,25 +1044,29 @@ const ReservationUnit = ({
                   />
                 </div>
                 <Legend wrapBreakpoint={breakpoints.l} />
-                <CalendarFooter $cookiehubBannerHeight={cookiehubBannerHeight}>
-                  <ReservationInfo
-                    reservationUnit={reservationUnit}
-                    begin={initialReservation?.begin}
-                    end={initialReservation?.end}
-                    resetReservation={() => {
-                      setInitialReservation(null);
-                    }}
-                    isSlotReservable={(startDate, endDate) =>
-                      isSlotReservable(startDate, endDate)
-                    }
-                    setCalendarFocusDate={setFocusDate}
-                    activeApplicationRounds={activeApplicationRounds}
-                    createReservation={(res) => createReservation(res)}
-                    setErrorMsg={setErrorMsg}
-                    isReservationUnitReservable={!isReservationQuotaReached}
-                    handleEventChange={handleEventChange}
-                  />
-                </CalendarFooter>
+                {!isReservationQuotaReached &&
+                  !isReservationStartInFuture(reservationUnit) && (
+                    <CalendarFooter
+                      $cookiehubBannerHeight={cookiehubBannerHeight}
+                    >
+                      <ReservationInfo
+                        reservationUnit={reservationUnit}
+                        begin={initialReservation?.begin}
+                        end={initialReservation?.end}
+                        resetReservation={() => {
+                          setInitialReservation(null);
+                        }}
+                        isSlotReservable={(startDate, endDate) =>
+                          isSlotReservable(startDate, endDate)
+                        }
+                        setCalendarFocusDate={setFocusDate}
+                        activeApplicationRounds={activeApplicationRounds}
+                        createReservation={(res) => createReservation(res)}
+                        setErrorMsg={setErrorMsg}
+                        handleEventChange={handleEventChange}
+                      />
+                    </CalendarFooter>
+                  )}
               </CalendarWrapper>
             )}
             {isReservable && (

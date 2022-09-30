@@ -44,6 +44,7 @@ import {
   description,
   equipment,
   paymentAndCancellationTerms,
+  reservationControls,
   pricingTerms,
   reservationInfo,
   reservationNotice,
@@ -587,12 +588,16 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
   });
 
   describe("with reservation times", () => {
-    it("should display no calendar when off season", () => {
+    it("should display no calendar controls when off season", () => {
       cy.visit("/reservation-unit/900");
 
-      calendarWrapper().should("not.exist");
+      calendarWrapper().should("exist");
+      reservationControls().should("not.exist");
 
-      reservationStartNotification().should("contain", "Varaaminen alkaa");
+      reservationStartNotification().should(
+        "contain",
+        "Varauskalenteri aukeaa"
+      );
     });
   });
 

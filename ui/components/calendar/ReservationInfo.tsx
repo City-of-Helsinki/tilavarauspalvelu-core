@@ -38,7 +38,6 @@ type Props<T> = {
   activeApplicationRounds: ApplicationRound[];
   createReservation: (arg: ReservationProps) => void;
   setErrorMsg: (msg: string) => void;
-  isReservationUnitReservable: boolean;
   handleEventChange: (
     event: CalendarEvent<T>,
     skipLengthCheck?: boolean
@@ -138,7 +137,6 @@ const ReservationInfo = <T extends Record<string, unknown>>({
   activeApplicationRounds,
   createReservation,
   setErrorMsg,
-  isReservationUnitReservable,
   handleEventChange,
 }: Props<T>): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -300,7 +298,7 @@ const ReservationInfo = <T extends Record<string, unknown>>({
   );
 
   return (
-    <Wrapper>
+    <Wrapper data-testid="reservation-unit__reservation-controls--wrapper">
       <DateInput
         onChange={(val, valueAsDate) => {
           if (
@@ -367,18 +365,16 @@ const ReservationInfo = <T extends Record<string, unknown>>({
           setStoredReservation({ ...reservation, pk: reservationUnit.pk });
         }}
         componentIfAuthenticated={
-          isReservationUnitReservable && (
-            <SubmitButton
-              onClick={() => {
-                setIsReserving(true);
-                createReservation(reservation);
-              }}
-              disabled={!isReservable || isReserving}
-              data-test="reservation__button--submit"
-            >
-              {t("reservationCalendar:makeReservation")}
-            </SubmitButton>
-          )
+          <SubmitButton
+            onClick={() => {
+              setIsReserving(true);
+              createReservation(reservation);
+            }}
+            disabled={!isReservable || isReserving}
+            data-test="reservation__button--submit"
+          >
+            {t("reservationCalendar:makeReservation")}
+          </SubmitButton>
         }
       />
     </Wrapper>

@@ -39,5 +39,9 @@
   "reservationInfo1-weeks": "",
   "reservationInfo1-months": "",
   "futurePricingNotice": "",
-  "futurePriceNoticeTax": ""
+  "futurePriceNoticeTax": "",
+  "notifications": {
+    "notReservable": "",
+    "futureOpening": ""
+  }
 }

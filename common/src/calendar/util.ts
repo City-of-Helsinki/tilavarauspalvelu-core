@@ -402,7 +402,7 @@ export const getEventBuffers = (
 };
 
 export const isReservationUnitReservable = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType,
+  reservationUnit: ReservationUnitByPkType,
   now = new Date()
 ): boolean => {
   const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
@@ -414,7 +414,8 @@ export const isReservationUnitReservable = (
     now <= new Date(reservationUnit.reservationEnds);
 
   return (
-    // reservationUnit.openingHours?.openingTimes?.length > 0 &&
+    !!reservationUnit.openingHours?.openingTimes?.length &&
+    reservationUnit.openingHours?.openingTimes?.length > 0 &&
     !!reservationUnit.minReservationDuration &&
     !!reservationUnit.maxReservationDuration &&
     (isAfterReservationStart || !reservationUnit.reservationBegins) &&

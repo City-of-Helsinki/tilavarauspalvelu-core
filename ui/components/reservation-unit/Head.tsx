@@ -1,10 +1,14 @@
 import { IconClock, IconGroup, IconTicket } from "hds-react";
-import { parseISO } from "date-fns";
 import React, { useMemo } from "react";
 import { useLocalStorage } from "react-use";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import {
+  getNormalizedReservationBeginTime,
+  isReservationStartInFuture,
+} from "common/src/calendar/util";
+import { parseISO } from "date-fns";
 import { formatSecondDuration } from "common/src/common/util";
 import { breakpoint } from "../../modules/style";
 import { getTranslation, orderImages, searchUrl } from "../../modules/util";
@@ -19,6 +23,7 @@ import {
 } from "../../modules/reservationUnit";
 import { fontRegular, H1, H2 } from "../../modules/style/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
+import AltNotification from "../common/AltNotification";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -71,14 +76,6 @@ const Props = styled.div`
   @media (min-width: ${breakpoint.xl}) {
     grid-template-columns: repeat(4, 1fr);
   }
-`;
-
-const GrayBox = styled.div`
-  background-color: var(--color-black-5);
-  font-size: var(--fontsize-body-l);
-  line-height: var(--fontsize-body-l);
-  padding: var(--spacing-s);
-  display: inline-block;
 `;
 
 const ReservationUnitName = styled(H1)`
@@ -196,14 +193,25 @@ const Head = ({
                   />
                 )}
               </Props>
-              {isReservable && reservationUnit.nextAvailableSlot && (
-                <GrayBox>
-                  {`${t("reservationCalendar:nextAvailableTime")}:
-                      ${t("common:dateTimeNoYear", {
-                        date: parseISO(reservationUnit.nextAvailableSlot),
-                      })}
-                  `}
-                </GrayBox>
+              {!isReservable &&
+                !isReservationStartInFuture(reservationUnit) && (
+                  <AltNotification
+                    text={t("reservationUnit:notifications.notReservable")}
+                    type="alert"
+                  />
+                )}
+              {isReservationStartInFuture(reservationUnit) && (
+                <AltNotification
+                  data-testid="reservation-unit--notification__reservation-start"
+                  text={t("reservationUnit:notifications.futureOpening", {
+                    date: t("common:dateTimeNoYear", {
+                      date: parseISO(
+                        getNormalizedReservationBeginTime(reservationUnit)
+                      ),
+                    }),
+                  })}
+                  type="alert"
+                />
               )}
             </div>
             <Images

@@ -175,7 +175,10 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
                   <LinkButton
                     onClick={() => router.push(reservationUnitPath(unit.pk))}
                   >
-                    <IconArrowRight size="l" />
+                    <IconArrowRight
+                      size="l"
+                      aria-label={getReservationUnitName(unit)}
+                    />
                   </LinkButton>
                 </Buttons>
               </Content>

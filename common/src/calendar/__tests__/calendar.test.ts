@@ -579,13 +579,25 @@ describe("getEventBuffers", () => {
 });
 
 describe("isReservationUnitReservable", () => {
+  const openingHours = {
+    openingTimes: [
+      {
+        date: new Date().toISOString(),
+        startTime: "04:00:00+00:00",
+        endTime: "20:00:00+00:00",
+        state: "open",
+        periods: null,
+      },
+    ],
+  };
   test("returns true for a unit that is reservable", () => {
     expect(
       isReservationUnitReservable({
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
         reservationBegins: addMinutes(new Date(), -10),
-      } as ReservationUnitType)
+        openingHours,
+      } as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
@@ -593,7 +605,8 @@ describe("isReservationUnitReservable", () => {
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
         reservationEnds: addMinutes(new Date(), 10),
-      } as ReservationUnitType)
+        openingHours,
+      } as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
@@ -602,35 +615,44 @@ describe("isReservationUnitReservable", () => {
         maxReservationDuration: 3600,
         reservationBegins: addMinutes(new Date(), -10),
         reservationEnds: addMinutes(new Date(), 10),
-      } as ReservationUnitType)
+        openingHours,
+      } as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
       isReservationUnitReservable({
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-      } as ReservationUnitType)
+        openingHours,
+      } as ReservationUnitByPkType)
     ).toBe(true);
   });
 
   test("returns false for a unit that is not reservable", () => {
     expect(
       isReservationUnitReservable({
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
+      } as ReservationUnitByPkType)
+    ).toBe(false);
+
+    expect(
+      isReservationUnitReservable({
         reservationBegins: addMinutes(new Date(), 10),
-      } as ReservationUnitType)
+      } as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
         reservationEnds: addMinutes(new Date(), -10),
-      } as ReservationUnitType)
+      } as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
         reservationBegins: addMinutes(new Date(), -10),
         reservationEnds: addMinutes(new Date(), -1),
-      } as ReservationUnitType)
+      } as ReservationUnitByPkType)
     ).toBe(false);
   });
 
@@ -641,14 +663,15 @@ describe("isReservationUnitReservable", () => {
         maxReservationDuration: 3600,
         reservationBegins: addDays(new Date(), 5),
         reservationsMaxDaysBefore: 5,
-      } as ReservationUnitType)
+        openingHours,
+      } as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
       isReservationUnitReservable({
         reservationBegins: addDays(new Date(), 5),
         reservationsMaxDaysBefore: 4,
-      } as ReservationUnitType)
+      } as ReservationUnitByPkType)
     ).toBe(false);
   });
 });
