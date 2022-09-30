@@ -556,7 +556,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       state.reservationUnitEdit.reservationKind as string
     ) || false;
 
-  const requiresHandling = state.reservationUnitEdit.requireReservationHandling;
   const reservationUnitState =
     Number(state?.reservationUnitPk) > 0 ? (
       <ReservationUnitStateTag
@@ -1570,56 +1569,53 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               heading={t("ReservationUnitEditor.communication")}
             >
               <Grid>
-                {requiresHandling && (
-                  <Span12>
-                    <ExpandLink
-                      initiallyOpen={state.validationErrors != null}
-                      heading={t("ReservationUnitEditor.pendingExpandLink")}
-                    >
-                      <SlimH4>
-                        {t("ReservationUnitEditor.pendingInstructions")}
-                      </SlimH4>
-                      {languages.map((lang) => {
-                        const fieldName = `reservationPendingInstructions${upperFirst(
-                          lang
-                        )}`;
-                        return (
-                          <TextArea
-                            key={lang}
-                            id={fieldName}
-                            label={t(
-                              `ReservationUnitEditor.label.instructions${upperFirst(
-                                lang
-                              )}`
-                            )}
-                            value={get(
-                              state,
-                              `reservationUnitEdit.reservationPendingInstructions${upperFirst(
-                                lang
-                              )}`,
-                              ""
-                            )}
-                            onChange={(e) =>
-                              setValue({
-                                [fieldName]: e.target.value,
-                              })
-                            }
-                            errorText={getValidationError(fieldName)}
-                            invalid={!!getValidationError(fieldName)}
-                            tooltipText={
-                              lang === "fi"
-                                ? t(
-                                    "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi"
-                                  )
-                                : ""
-                            }
-                          />
-                        );
-                      })}
-                    </ExpandLink>
-                  </Span12>
-                )}
-
+                <Span12>
+                  <ExpandLink
+                    initiallyOpen={state.validationErrors != null}
+                    heading={t("ReservationUnitEditor.pendingExpandLink")}
+                  >
+                    <SlimH4>
+                      {t("ReservationUnitEditor.pendingInstructions")}
+                    </SlimH4>
+                    {languages.map((lang) => {
+                      const fieldName = `reservationPendingInstructions${upperFirst(
+                        lang
+                      )}`;
+                      return (
+                        <TextArea
+                          key={lang}
+                          id={fieldName}
+                          label={t(
+                            `ReservationUnitEditor.label.instructions${upperFirst(
+                              lang
+                            )}`
+                          )}
+                          value={get(
+                            state,
+                            `reservationUnitEdit.reservationPendingInstructions${upperFirst(
+                              lang
+                            )}`,
+                            ""
+                          )}
+                          onChange={(e) =>
+                            setValue({
+                              [fieldName]: e.target.value,
+                            })
+                          }
+                          errorText={getValidationError(fieldName)}
+                          invalid={!!getValidationError(fieldName)}
+                          tooltipText={
+                            lang === "fi"
+                              ? t(
+                                  "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi"
+                                )
+                              : ""
+                          }
+                        />
+                      );
+                    })}
+                  </ExpandLink>
+                </Span12>
                 <Span12>
                   <SlimH4>
                     {t("ReservationUnitEditor.confirmedInstructions")}
