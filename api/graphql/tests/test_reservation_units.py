@@ -17,6 +17,7 @@ from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from applications.tests.factories import ApplicationRoundFactory
+from merchants.tests.factories import PaymentMerchantFactory
 from opening_hours.enums import State
 from opening_hours.errors import HaukiAPIError
 from opening_hours.hours import TimeElement
@@ -96,17 +97,19 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
 
         qualifier = QualifierFactory(name="Test Qualifier")
 
+        cls.unit = UnitFactory(
+            name="test unit fi",
+            name_fi="test unit fi",
+            name_en="test unit en",
+            name_sv="test unit sv",
+        )
+
         cls.reservation_unit = ReservationUnitFactory(
             name="test name fi",
             name_fi="test name fi",
             name_en="test name en",
             name_sv="test name sv",
-            unit=UnitFactory(
-                name="test unit fi",
-                name_fi="test unit fi",
-                name_en="test unit en",
-                name_sv="test unit sv",
-            ),
+            unit=cls.unit,
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
@@ -280,6 +283,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                     value
                                 }
                                 status
+                            }
+                            paymentMerchant {
+                                name
                             }
                           }
                         }
@@ -2370,6 +2376,88 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 description
                                 reserveeId
                                 cancelDetails
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_show_payment_merchant_from_reservation_unit(self):
+        self.client.force_login(self.general_admin)
+
+        merchant = PaymentMerchantFactory.create(name="Test Merchant")
+        self.reservation_unit.payment_merchant = merchant
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            paymentMerchant {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_show_payment_merchant_from_unit(self):
+        self.client.force_login(self.general_admin)
+
+        merchant = PaymentMerchantFactory.create(name="Test Merchant")
+        self.unit.payment_merchant = merchant
+        self.unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            paymentMerchant {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_hide_payment_merchant_without_permissions(self):
+        merchant = PaymentMerchantFactory.create(name="Test Merchant")
+        self.reservation_unit.payment_merchant = merchant
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            paymentMerchant {
+                                name
                             }
                         }
                     }

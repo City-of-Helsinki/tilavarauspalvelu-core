@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 from graphene_django.utils import GraphQLTestCase
 
+from merchants.tests.factories import PaymentMerchantFactory
 from permissions.models import (
     ServiceSectorRole,
     ServiceSectorRoleChoice,
@@ -125,6 +126,9 @@ class UnitsQueryTestCase(UnitTestCaseBase):
                             }
                             serviceSectors {
                                 nameFi
+                            }
+                            paymentMerchant {
+                                name
                             }
                         }
                     }
@@ -465,4 +469,54 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
 
+        self.assertMatchSnapshot(content)
+
+    def test_show_payment_merchant(self):
+        self.client.force_login(self.unit_admin)
+
+        merchant = PaymentMerchantFactory.create(name="Test Merchant")
+        self.unit.payment_merchant = merchant
+        self.unit.save()
+
+        response = self.query(
+            """
+            query {
+                units {
+                    edges {
+                        node {
+                            nameFi
+                            paymentMerchant {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_hide_payment_merchant_without_permissions(self):
+        merchant = PaymentMerchantFactory.create(name="Test Merchant")
+        self.unit.payment_merchant = merchant
+        self.unit.save()
+
+        response = self.query(
+            """
+            query {
+                units {
+                    edges {
+                        node {
+                            nameFi
+                            paymentMerchant {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
         self.assertMatchSnapshot(content)

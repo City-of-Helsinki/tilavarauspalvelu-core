@@ -3,6 +3,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+from merchants.models import PaymentMerchant
+
 # SRID 4326 - Spatial Reference System Identifier number 4326.
 # EPSG:4326 - It's the same thing, but EPSG is the name of the authority maintaining an SRID reference.
 # WGS 84 - World Geodetic System from 1984. It's the coordinate system used in GPS.
@@ -108,6 +110,15 @@ class Unit(models.Model):
         null=True,
         verbose_name=_("Order number"),
         help_text=_("Order number to be use in api sorting."),
+    )
+
+    payment_merchant = models.ForeignKey(
+        PaymentMerchant,
+        verbose_name=_("Payment merchant"),
+        related_name="units",
+        on_delete=models.PROTECT,
+        null=True,
+        help_text="Merchant used for payments",
     )
 
     class Meta:
