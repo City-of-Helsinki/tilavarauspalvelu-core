@@ -16,6 +16,7 @@
   "termsOfUseSpaces": "Lokal specifika villkor",
   "paymentAndCancellationTerms": "",
   "cancellationTerms": "",
+  "pricingTerms": "",
   "backToSearch": "Tillbaka till resultaten",
   "reservationSuccessful": "Bokningen lyckades",
   "reservationReminderText": "Du får en påminnelse om bokningen till din e-post (<emailLink>{{user}}</emailLink>).\nDu finner de också på sidan egna bokningar i Varaamo.",

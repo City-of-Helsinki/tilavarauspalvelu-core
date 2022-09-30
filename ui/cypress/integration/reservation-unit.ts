@@ -44,6 +44,7 @@ import {
   description,
   equipment,
   paymentAndCancellationTerms,
+  pricingTerms,
   reservationInfo,
   reservationNotice,
   termsOfUse,
@@ -554,7 +555,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
   });
 
   describe("with payment terms", () => {
-    it("does display an accordion for both cancellation and payment terms", () => {
+    it("does display an accordion for both cancellation/payment and pricing terms", () => {
       cy.visit("/reservation-unit/801");
 
       paymentAndCancellationTerms()
@@ -562,6 +563,9 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .contains("Maksu- ja peruutusehdot");
       paymentAndCancellationTerms().contains("Maksuehdot Fi");
       paymentAndCancellationTerms().contains("Peruutusehdot Fi");
+
+      pricingTerms().find("> button").contains("Hinnoitteluperiaatteet");
+      pricingTerms().contains("Hinnoitteluehdot Fi");
     });
   });
 

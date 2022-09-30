@@ -16,6 +16,7 @@
   "termsOfUseSpaces": "Tilakohtaiset ehdot",
   "paymentAndCancellationTerms": "Maksu- ja peruutusehdot",
   "cancellationTerms": "Peruutusehdot",
+  "pricingTerms": "Hinnoitteluperiaatteet",
   "backToSearch": "Takaisin hakutuloksiin",
   "reservationSuccessful": "Varaus onnistui",
   "reservationReminderText": "Saat sähköpostiisi (<emailLink>{{user}}</emailLink>) muistutuksen varauksesta.\nLöydät ne myös Varaamon omat varaukset sivulta.",

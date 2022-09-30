@@ -28,6 +28,10 @@ export function paymentAndCancellationTerms(): Cypress.Chainable<
   );
 }
 
+export function pricingTerms(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get('[data-testid="reservation-unit__pricing-terms"]');
+}
+
 export function termsOfUse(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get('[data-testid="reservation-unit__terms-of-use"]');
 }

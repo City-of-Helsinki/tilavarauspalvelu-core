@@ -384,6 +384,11 @@ const selectedReservationUnitQuery = graphql.query<
       textFi: "Maksuehdot Fi",
       termsType: TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms,
     };
+    reservationUnitByPk.pricingTerms = {
+      id: "faweoipfv",
+      textFi: "Hinnoitteluehdot Fi",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms,
+    };
   }
 
   if (req.variables.pk === 900) {
