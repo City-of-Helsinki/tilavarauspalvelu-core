@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 const Content = styled(Container)`
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-layout-s) var(--spacing-m) var(--spacing-layout-m);
+  padding: var(--spacing-layout-s) var(--spacing-m) 0;
 `;
 
 const Title = styled(H1)`

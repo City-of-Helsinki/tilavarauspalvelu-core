@@ -9,6 +9,7 @@ import { fontMedium, H2 } from "../../modules/style/typography";
 
 const Wrapper = styled(Container)`
   padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
 
   @media (max-width: ${breakpoint.m}) {
     display: flex;

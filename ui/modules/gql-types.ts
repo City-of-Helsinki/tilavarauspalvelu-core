@@ -1409,10 +1409,14 @@ export type PurposeType = Node & {
   __typename?: "PurposeType";
   /** The ID of the object */
   id: Scalars["ID"];
+  imageUrl?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
+  /** Order number to be used in api sorting. */
+  rank?: Maybe<Scalars["Int"]>;
+  smallUrl?: Maybe<Scalars["String"]>;
 };
 
 export type PurposeTypeConnection = {
@@ -1682,10 +1686,8 @@ export type QueryPurposesArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
 };
 
 export type QueryQualifiersArgs = {
@@ -1754,10 +1756,8 @@ export type QueryReservationUnitTypesArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
 };
 
 export type QueryReservationUnitsArgs = {
@@ -2801,12 +2801,12 @@ export type ReservationUnitPricingCreateSerializerInput = {
   /** Minimum price of the reservation unit */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit: Scalars["String"];
+  priceUnit?: InputMaybe<Scalars["String"]>;
   /** What kind of pricing type this pricing has. Possible values are PAID, FREE. */
   pricingType: Scalars["String"];
   /** Pricing status. Possible values are PAST, ACTIVE, FUTURE. */
   status: Scalars["String"];
-  taxPercentagePk: Scalars["Int"];
+  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
 };
 
 export type ReservationUnitPricingType = {
@@ -2837,12 +2837,12 @@ export type ReservationUnitPricingUpdateSerializerInput = {
   lowestPrice?: InputMaybe<Scalars["Float"]>;
   pk?: InputMaybe<Scalars["Int"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit: Scalars["String"];
+  priceUnit?: InputMaybe<Scalars["String"]>;
   /** What kind of pricing type this pricing has. Possible values are PAID, FREE. */
   pricingType: Scalars["String"];
   /** Pricing status. Possible values are PAST, ACTIVE, FUTURE. */
   status: Scalars["String"];
-  taxPercentagePk: Scalars["Int"];
+  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
 };
 
 /** An enumeration. */
@@ -4303,8 +4303,16 @@ export type ApplicationRoundsQueryResult = Apollo.QueryResult<
   ApplicationRoundsQueryVariables
 >;
 export const SearchFormParamsUnitDocument = gql`
-  query SearchFormParamsUnit($publishedReservationUnits: Boolean) {
-    units(publishedReservationUnits: $publishedReservationUnits) {
+  query SearchFormParamsUnit(
+    $publishedReservationUnits: Boolean
+    $ownReservations: Boolean
+    $orderBy: String
+  ) {
+    units(
+      publishedReservationUnits: $publishedReservationUnits
+      ownReservations: $ownReservations
+      orderBy: $orderBy
+    ) {
       edges {
         node {
           pk
@@ -4330,6 +4338,8 @@ export const SearchFormParamsUnitDocument = gql`
  * const { data, loading, error } = useSearchFormParamsUnitQuery({
  *   variables: {
  *      publishedReservationUnits: // value for 'publishedReservationUnits'
+ *      ownReservations: // value for 'ownReservations'
+ *      orderBy: // value for 'orderBy'
  *   },
  * });
  */
@@ -4366,6 +4376,72 @@ export type SearchFormParamsUnitLazyQueryHookResult = ReturnType<
 export type SearchFormParamsUnitQueryResult = Apollo.QueryResult<
   SearchFormParamsUnitQuery,
   SearchFormParamsUnitQueryVariables
+>;
+export const ReservationUnitPurposesDocument = gql`
+  query ReservationUnitPurposes($orderBy: String) {
+    purposes(orderBy: $orderBy) {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+          smallUrl
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationUnitPurposesQuery__
+ *
+ * To run a query within a React component, call `useReservationUnitPurposesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationUnitPurposesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationUnitPurposesQuery({
+ *   variables: {
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useReservationUnitPurposesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >(ReservationUnitPurposesDocument, options);
+}
+export function useReservationUnitPurposesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >(ReservationUnitPurposesDocument, options);
+}
+export type ReservationUnitPurposesQueryHookResult = ReturnType<
+  typeof useReservationUnitPurposesQuery
+>;
+export type ReservationUnitPurposesLazyQueryHookResult = ReturnType<
+  typeof useReservationUnitPurposesLazyQuery
+>;
+export type ReservationUnitPurposesQueryResult = Apollo.QueryResult<
+  ReservationUnitPurposesQuery,
+  ReservationUnitPurposesQueryVariables
 >;
 export const SearchFormParamsPurposeDocument = gql`
   query SearchFormParamsPurpose {
@@ -5945,6 +6021,8 @@ export type ApplicationRoundsQuery = {
 
 export type SearchFormParamsUnitQueryVariables = Exact<{
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]>;
+  ownReservations?: InputMaybe<Scalars["Boolean"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type SearchFormParamsUnitQuery = {
@@ -5959,6 +6037,28 @@ export type SearchFormParamsUnitQuery = {
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
+export type ReservationUnitPurposesQueryVariables = Exact<{
+  orderBy?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type ReservationUnitPurposesQuery = {
+  __typename?: "Query";
+  purposes?: {
+    __typename?: "PurposeTypeConnection";
+    edges: Array<{
+      __typename?: "PurposeTypeEdge";
+      node?: {
+        __typename?: "PurposeType";
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        smallUrl?: string | null;
       } | null;
     } | null>;
   } | null;

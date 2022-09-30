@@ -8,6 +8,7 @@ import { singleSearchPrefix } from "../../modules/const";
 import Container from "../common/Container";
 import { fontMedium, H3 } from "../../modules/style/typography";
 import { UnitType } from "../../modules/gql-types";
+import { getTranslation } from "../../modules/util";
 
 type Props = {
   units: UnitType[];
@@ -52,6 +53,10 @@ const UnitContainer = styled.div`
 `;
 
 const UnitItem = styled.a`
+  &:hover {
+    text-decoration: underline;
+  }
+
   color: var(--color-black) !important;
   display: flex;
   align-items: center;
@@ -91,7 +96,7 @@ const Units = ({ units }: Props): JSX.Element => {
                 passHref
               >
                 <UnitItem data-testid="front-page__units--unit">
-                  {unit.nameFi}
+                  {getTranslation(unit, "name")}
                   <IconArrowRight size="l" aria-hidden />
                 </UnitItem>
               </Link>

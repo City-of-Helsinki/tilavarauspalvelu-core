@@ -23,6 +23,22 @@ export const SEARCH_FORM_PARAMS_UNIT = gql`
   }
 `;
 
+export const RESERVATION_UNIT_PURPOSES = gql`
+  query ReservationUnitPurposes($orderBy: String) {
+    purposes(orderBy: $orderBy) {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+          smallUrl
+        }
+      }
+    }
+  }
+`;
+
 export const SEARCH_FORM_PARAMS_PURPOSE = gql`
   query SearchFormParamsPurpose {
     purposes {
