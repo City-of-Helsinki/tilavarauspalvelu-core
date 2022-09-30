@@ -69,7 +69,7 @@ import {
   ArchiveButton,
   ExpandLink,
 } from "./modules/reservationUnitEditor";
-import { IProps, schema, State } from "./types";
+import { draftSchema, IProps, schema, State } from "./types";
 import { getInitialState, i18nFields, reducer } from "./reducer";
 import {
   CREATE_IMAGE,
@@ -80,7 +80,9 @@ import {
   UPDATE_IMAGE_TYPE,
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
-import FormErrorSummary from "../../../common/FormErrorSummary";
+import FormErrorSummary, {
+  validationErrorResolver,
+} from "../../../common/FormErrorSummary";
 import SortedSelect from "./SortedSelect";
 import { useModal } from "../../../context/ModalContext";
 import ArchiveDialog from "./ArchiveDialog";
@@ -534,18 +536,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return null;
   }
 
-  const getValidationError = (name: string): string | undefined => {
-    const error = state.validationErrors?.error?.details.find(
-      (errorDetail) =>
-        errorDetail.path.find((path) => path === name) ||
-        name === errorDetail.path.join(",")
-    );
-    if (!error) {
-      return undefined;
-    }
-
-    return t(`validation.${error.type}`, { ...error.context });
-  };
+  const getValidationError = validationErrorResolver(
+    state.validationErrors,
+    "ReservationUnitEditor.label."
+  );
 
   const selectedSpaces = state.spaces.filter(
     (s) => state?.reservationUnitEdit?.spacePks?.indexOf(Number(s.pk)) !== -1
@@ -1843,8 +1837,19 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             loadingText={t("ReservationUnitEditor.saving")}
             onClick={(e) => {
               e.preventDefault();
-              saveReservationUnit(false);
-              dispatch({ type: "setValidatioErrors", validationErrors: null });
+              const validationErrors = draftSchema.validate(
+                state.reservationUnitEdit
+              );
+
+              if (validationErrors.error) {
+                dispatch({ type: "setValidatioErrors", validationErrors });
+              } else {
+                saveReservationUnit(false);
+                dispatch({
+                  type: "setValidatioErrors",
+                  validationErrors: null,
+                });
+              }
             }}
           >
             {t("ReservationUnitEditor.saveAsDraft")}

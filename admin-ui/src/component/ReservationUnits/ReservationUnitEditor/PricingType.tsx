@@ -136,7 +136,7 @@ const PricingType = ({
                     setPricingTypeValue({ pricingType: typeName })
                   }
                 />
-                {index === 0 && getValidationError("pricings") && (
+                {index === 0 && getValidationError("pricings") && !hasPrice && (
                   <Error>
                     <IconAlertCircleFill />
                     <span>{getValidationError("pricings")}</span>
@@ -151,7 +151,11 @@ const PricingType = ({
             <>
               <Span3>
                 <NumberInput
-                  value={pricing.lowestPrice || 0}
+                  value={
+                    typeof pricing.lowestPrice === "number"
+                      ? pricing.lowestPrice
+                      : ""
+                  }
                   id={`pricings,${labelIndex},lowestPrice`}
                   required
                   label={t("ReservationUnitEditor.label.lowestPrice")}
@@ -160,10 +164,6 @@ const PricingType = ({
                   onChange={(e) => {
                     setPricingTypeValue({
                       lowestPrice: Number(e.target.value),
-                      highestPrice: Math.max(
-                        Number(e.target.value),
-                        pricing.highestPrice || 0
-                      ),
                     });
                   }}
                   step={1}
@@ -181,18 +181,18 @@ const PricingType = ({
               <Span3>
                 <NumberInput
                   required
-                  value={pricing.highestPrice || ""}
-                  id="highestPrice"
+                  value={
+                    typeof pricing.highestPrice === "number"
+                      ? pricing.highestPrice
+                      : ""
+                  }
+                  id={`pricings,${labelIndex},highestPrice`}
                   label={t("ReservationUnitEditor.label.highestPrice")}
                   minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
                   plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
                   onChange={(e) => {
                     setPricingTypeValue({
                       highestPrice: Number(e.target.value),
-                      lowestPrice: Math.min(
-                        Number(e.target.value),
-                        pricing.lowestPrice || 0
-                      ),
                     });
                   }}
                   step={1}
@@ -240,7 +240,7 @@ const PricingType = ({
               {type === "ACTIVE" && (
                 <Span3 id="paymentTypes">
                   <SortedSelect
-                    id="paymentTypesSelect"
+                    id="paymentTypes"
                     sort
                     multiselect
                     required
@@ -260,6 +260,8 @@ const PricingType = ({
                     tooltipText={t(
                       "ReservationUnitEditor.tooltip.paymentTypes"
                     )}
+                    error={getValidationError("paymentTypes")}
+                    invalid={!!getValidationError("paymentTypes")}
                   />
                 </Span3>
               )}

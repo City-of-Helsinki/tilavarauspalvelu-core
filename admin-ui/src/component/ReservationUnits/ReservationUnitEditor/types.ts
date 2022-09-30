@@ -119,9 +119,18 @@ const requiredForNonFree = (then: Joi.SchemaLike) =>
     then,
   });
 
+const requiredForNonFreeRU = (then: Joi.SchemaLike) =>
+  Joi.when("pricings", {
+    is: Joi.array().has(Joi.object({ pricingType: "PAID" })),
+    then,
+  });
+
 const pricing = Joi.object({
   pricingType: Joi.string().required(),
-  lowestPrice: requiredForNonFree(Joi.number().required()),
+  lowestPrice: requiredForNonFree(Joi.number().precision(2).min(0).required()),
+  highestPrice: requiredForNonFree(
+    Joi.number().precision(2).min(Joi.ref("lowestPrice")).required()
+  ),
   priceUnit: requiredForNonFree(Joi.string().required()),
   taxPercentagePk: requiredForNonFree(Joi.number().required()),
 });
@@ -154,8 +163,23 @@ export const schema = Joi.object({
   additionalInstructionsSv: Joi.string().allow("").max(10000),
   additionalInstructionsEn: Joi.string().allow("").max(10000),
   pricings: Joi.array().min(1).items(pricing),
-  paymentTypes: requiredForNonFree(Joi.array().min(1).required()),
+  paymentTypes: requiredForNonFreeRU(Joi.array().min(1).required()),
 }).options({
   allowUnknown: true,
   abortEarly: false,
+  convert: false,
+});
+
+// validation for drafts
+const draftPricing = Joi.object({
+  lowestPrice: requiredForNonFree(Joi.number().precision(2).min(0)),
+  highestPrice: requiredForNonFree(Joi.number().precision(2)),
+});
+
+export const draftSchema = Joi.object({
+  pricings: Joi.array().min(0).items(draftPricing),
+}).options({
+  allowUnknown: true,
+  abortEarly: false,
+  convert: false,
 });

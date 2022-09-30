@@ -1730,6 +1730,7 @@ const translations: ITranslations = {
       base: ["{{fieldName}} on pakollinen tieto"],
       min: ["{{fieldName}} pitää olla vähintään {{limit}}"],
       max: ["{{fieldName}} pitää olla pienempi kuin {{limit}}"],
+      precision: ["{{fieldName}} {{limit}} desimaalia sallitaan"],
     },
     array: {
       min: ["{{fieldName}} on pakollinen tieto"],

@@ -168,7 +168,6 @@ export const reducer = (state: State, action: Action): State => {
             "reservationBegins",
             "reservationEnds",
             "reservationStartInterval",
-            "surfaceArea",
             "unitPk",
             "canApplyFreeOfCharge",
             "reservationsMinDaysBefore",
@@ -232,6 +231,7 @@ export const reducer = (state: State, action: Action): State => {
           ),
           metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
           pricingType: get(reservationUnit, "pricingType") || undefined, // update api does not allow null
+          surfaceArea: Number(get(reservationUnit, "surfaceArea", 0)),
         },
         hasChanges: false,
         images: sortImages(
