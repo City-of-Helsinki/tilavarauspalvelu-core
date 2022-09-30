@@ -1,7 +1,7 @@
-import { isEqual, set } from "lodash";
+import { get, isEqual, set } from "lodash";
 import { User } from "oidc-client";
 import { getApiAccessToken, localLogout } from "../common/auth/util";
-import { CurrentUser } from "../common/types";
+import { UserType } from "../common/gql-types";
 
 export type AuthState =
   | "Unknown"
@@ -13,7 +13,7 @@ export type AuthState =
 
 export type Auth = {
   state: AuthState;
-  user?: CurrentUser;
+  user?: UserType;
   sid?: string;
   login?: () => void;
   logout?: () => void;
@@ -30,7 +30,7 @@ export type Action =
       logout: YesItsAFunction;
     }
   | { type: "error"; message: string }
-  | { type: "currentUserLoaded"; currentUser: CurrentUser };
+  | { type: "currentUserLoaded"; currentUser: UserType };
 
 export const getInitialState = (): Auth => ({
   state: "Unknown",
@@ -77,9 +77,9 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
       const { currentUser } = action;
 
       const hasSomePermissions =
-        currentUser.generalRoles.length > 0 ||
-        currentUser.serviceSectorRoles.length > 0 ||
-        currentUser.unitRoles.length > 0 ||
+        get(currentUser, "generalRoles.length") > 0 ||
+        get(currentUser, "serviceSectorRoles.length") > 0 ||
+        get(currentUser, "unitRoles.length") > 0 ||
         currentUser.isSuperuser;
 
       return {

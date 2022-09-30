@@ -18,7 +18,6 @@ import {
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
   UnitWIP,
-  CurrentUser,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -136,9 +135,6 @@ async function apiPatch<T>({ path, data }: RequestParameters): Promise<T> {
   });
 }
 
-export function getCurrentUser(): Promise<CurrentUser> {
-  return apiGet<CurrentUser>({ path: "v1/users/current" });
-}
 export function getApplicationRounds(): Promise<ApplicationRound[]> {
   return apiGet<ApplicationRound[]>({
     path: `v1/${applicationRoundsBasePath}`,

@@ -62,7 +62,7 @@ export const localLogout = (clearAll = false): void => {
   });
 };
 
-export type ApiAccessTokenAvailable = "Available" | "Error";
+export type ApiAccessTokenAvailable = "Waiting" | "Available" | "Error";
 
 export const assertApiAccessTokenIsAvailableAndFresh =
   async (): Promise<ApiAccessTokenAvailable> => {

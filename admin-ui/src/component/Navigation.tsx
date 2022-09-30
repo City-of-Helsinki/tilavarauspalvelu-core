@@ -82,7 +82,7 @@ const Navigation = (): JSX.Element => {
             {user && (
               <UserInfo
                 name={
-                  `${user.firstName} ${user.lastName}`.trim() ||
+                  `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
                   t("Navigation.noName")
                 }
                 email={user.email}
