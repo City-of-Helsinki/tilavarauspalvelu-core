@@ -46,6 +46,21 @@ snapshots['ReservationUnitQueryTestCase::test_admin_sees_reservations_sensitive_
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_by_pk_has_reservations 1'] = {
+    'data': {
+        'reservationUnitByPk': {
+            'nameFi': 'test name fi',
+            'reservations': [
+                {
+                    'begin': '2021-05-03T00:00:00+00:00',
+                    'end': '2021-05-03T01:00:00+00:00',
+                    'state': 'CREATED'
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filter_by_pk_multiple_values 1'] = {
     'data': {
         'reservationUnits': {

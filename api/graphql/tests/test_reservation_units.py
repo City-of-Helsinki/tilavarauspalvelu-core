@@ -2470,6 +2470,44 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_by_pk_has_reservations(self):
+        now = datetime.datetime.now(get_default_timezone())
+        one_hour = datetime.timedelta(hours=1)
+        matching_reservation = ReservationFactory(
+            begin=now,
+            end=now + one_hour,
+            state=STATE_CHOICES.CREATED,
+        )
+        other_reservation = ReservationFactory(
+            begin=datetime.datetime(2021, 1, 1),
+            end=datetime.datetime(2021, 1, 2),
+        )
+        self.reservation_unit.reservation_set.set(
+            [matching_reservation, other_reservation]
+        )
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnitByPk(pk: %i) {
+                    nameFi
+                    reservations(from: "2021-05-03", to: "2021-05-04") {
+                        begin
+                        end
+                        state
+                    }
+                }
+            }
+            """
+            % self.reservation_unit.id
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
 
 class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):
     def test_filtering_by_type_fi(self):
