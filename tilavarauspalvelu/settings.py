@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "reservations",
     "services",
     "reservation_units",
+    "merchants",
     "api",
     "applications",
     "opening_hours",
@@ -201,6 +202,8 @@ env = environ.Env(
     VERKKOKAUPPA_PRODUCT_API_URL=(str, None),
     VERKKOKAUPPA_ORDER_API_URL=(str, None),
     VERKKOKAUPPA_PAYMENT_API_URL=(str, None),
+    VERKKOKAUPPA_MERCHANT_API_URL=(str, None),
+    VERKKOKAUPPA_MERCHANT_NAMESPACE=(str, None),
     # Email
     EMAIL_HOST=(str, None),
     EMAIL_PORT=(str, django_default_email_port),
@@ -260,6 +263,8 @@ VERKKOKAUPPA_API_KEY = env("VERKKOKAUPPA_API_KEY")
 VERKKOKAUPPA_PRODUCT_API_URL = env("VERKKOKAUPPA_PRODUCT_API_URL")
 VERKKOKAUPPA_ORDER_API_URL = env("VERKKOKAUPPA_ORDER_API_URL")
 VERKKOKAUPPA_PAYMENT_API_URL = env("VERKKOKAUPPA_PAYMENT_API_URL")
+VERKKOKAUPPA_MERCHANT_API_URL = env("VERKKOKAUPPA_MERCHANT_API_URL")
+VERKKOKAUPPA_MERCHANT_NAMESPACE = env("VERKKOKAUPPA_MERCHANT_NAMESPACE")
 
 RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
 RESERVATION_UNIT_PURPOSE_IMAGES_ROOT = "reservation_unit_purpose_images"
