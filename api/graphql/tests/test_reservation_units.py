@@ -3,6 +3,7 @@ import json
 from decimal import Decimal
 from typing import Any, Dict
 from unittest import mock
+from uuid import UUID
 
 import snapshottest
 from assertpy import assert_that
@@ -17,7 +18,7 @@ from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from applications.tests.factories import ApplicationRoundFactory
-from merchants.tests.factories import PaymentMerchantFactory
+from merchants.tests.factories import PaymentMerchantFactory, PaymentProductFactory
 from opening_hours.enums import State
 from opening_hours.errors import HaukiAPIError
 from opening_hours.hours import TimeElement
@@ -2505,6 +2506,72 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_show_payment_product(self):
+        self.client.force_login(self.general_admin)
+
+        merchant_pk = UUID("3828ac38-3e26-4501-8556-ba2ea3442627")
+        product_pk = UUID("1018cabd-d693-41c1-8ddc-dc5c08829048")
+
+        merchant = PaymentMerchantFactory.create(pk=merchant_pk, name="Test Merchant")
+        product = PaymentProductFactory.create(pk=product_pk, merchant=merchant)
+
+        self.reservation_unit.payment_product = product
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            paymentProduct {
+                                pk
+                                merchantPk
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_hide_payment_product_without_permissions(self):
+        merchant_pk = UUID("3828ac38-3e26-4501-8556-ba2ea3442627")
+        product_pk = UUID("1018cabd-d693-41c1-8ddc-dc5c08829048")
+
+        merchant = PaymentMerchantFactory.create(pk=merchant_pk, name="Test Merchant")
+        product = PaymentProductFactory.create(pk=product_pk, merchant=merchant)
+
+        self.reservation_unit.payment_product = product
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            paymentProduct {
+                                pk
+                                merchantPk
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 

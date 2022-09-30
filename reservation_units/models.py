@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
-from merchants.models import PaymentMerchant
+from merchants.models import PaymentMerchant, PaymentProduct
 from reservation_units.enums import ReservationUnitState
 from resources.models import Resource
 from services.models import Service
@@ -550,6 +550,16 @@ class ReservationUnit(models.Model):
         blank=True,
         null=True,
         help_text="Merchant used for payments",
+    )
+
+    payment_product = models.ForeignKey(
+        PaymentProduct,
+        verbose_name=_("Payment product"),
+        related_name="reservation_units",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        help_text="Product used for payments",
     )
 
     class Meta:

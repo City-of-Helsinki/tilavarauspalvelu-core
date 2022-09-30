@@ -26,3 +26,24 @@ class PaymentMerchant(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class PaymentProduct(models.Model):
+    id = models.UUIDField(
+        verbose_name=_("Product ID"),
+        help_text=_("Value comes from the Product Experience API"),
+        primary_key=True,
+        blank=False,
+        null=False,
+    )
+    merchant = models.ForeignKey(
+        PaymentMerchant,
+        verbose_name=_("Payment merchant"),
+        related_name="products",
+        on_delete=models.PROTECT,
+        null=True,
+        help_text="Merchant used for payments",
+    )
+
+    def __str__(self) -> str:
+        return str(self.id)
