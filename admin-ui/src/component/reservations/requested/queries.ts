@@ -19,6 +19,7 @@ export const RESERVATION_QUERY = gql`
       createdAt
       workingMemo
       reservationUnits {
+        pk
         nameFi
         unit {
           nameFi
@@ -113,6 +114,42 @@ export const RESERVATION_DENY_REASONS = gql`
           pk
           reasonFi
         }
+      }
+    }
+  }
+`;
+
+export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
+  query reservationsByReservationUnit(
+    $reservationUnit: [ID]
+    $offset: Int
+    $first: Int
+    $begin: DateTime
+    $end: DateTime
+  ) {
+    reservations(
+      begin: $begin
+      end: $end
+      first: $first
+      offset: $offset
+      reservationUnit: $reservationUnit
+      state: ["DENIED", "CONFIRMED", "REQUIRES_HANDLING"]
+    ) {
+      edges {
+        node {
+          name
+          reserveeFirstName
+          reserveeLastName
+          reserveeOrganisationName
+          pk
+          begin
+          end
+          state
+          user
+        }
+      }
+      pageInfo {
+        hasNextPage
       }
     }
   }

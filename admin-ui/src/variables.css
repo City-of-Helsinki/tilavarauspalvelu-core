@@ -26,9 +26,28 @@
 
   --tilavaraus-admin-sticky-header: 700;
   --tilavaraus-admin-stack-main-menu: 500;
-  --tilavaraus-calendar-selected: #0000ff;
+  --tilavaraus-calendar-selected: var(--color-bus);
   --tilavaraus-calendar-selected-secondary: #ffe977;
   --font-regular: HelsinkiGrotesk, var(--font-default);
   --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
   --font-bold: HelsinkiGrotesk-Bold, var(--font-default);
+
+    /*
+  calendar
+  */
+  --tilavaraus-event-current-requires_handling-border-color: var(--color-bus);
+  --tilavaraus-event-current-requires_handling-background: #e5e5f9;
+
+  --tilavaraus-event-current-denied-border-color: var(--color-error);
+  --tilavaraus-event-current-denied-background: #f7e6eb;
+
+  --tilavaraus-event-current-confirmed-border-color: var(--color-success);
+  --tilavaraus-event-current-confirmed-background: #e6f2f0;
+
+  --tilavaraus-event-other-requires_handling-border-color: var(--color-bus);
+  --tilavaraus-event-other-requires_handling-background: rgba(0, 0, 191, 0.1);
+
+  --tilavaraus-event-rest-border-color: #1A1A1A;
+  --tilavaraus-event-rest-background: rgba(26, 26, 26, 0.1);
+
 }

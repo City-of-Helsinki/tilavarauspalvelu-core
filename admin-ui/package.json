@@ -48,6 +48,7 @@
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@react-pdf/renderer": "2.0.15",
     "@sentry/react": "^6.18.1",
+    "@types/react-big-calendar": "^0.38.1",
     "apollo-link-token-refresh": "^0.3.2",
     "apollo-upload-client": "17.0.0",
     "axios": "^0.21.1",

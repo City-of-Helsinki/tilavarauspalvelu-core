@@ -40,6 +40,7 @@ import { publicUrl } from "../../../common/const";
 import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
 import StickyHeader from "../../StickyHeader";
 import { formatDateTime } from "../../../common/util";
+import Calendar from "./Calendar";
 
 const Wrapper = styled.div`
   display: flex;
@@ -446,7 +447,12 @@ const RequestedReservation = (): JSX.Element | null => {
             </VerticalFlex>
           </Accordion>
           <Accordion heading={t("RequestedReservation.calendar")}>
-            TODO
+            <Calendar
+              key={reservation.state}
+              begin={reservation.begin}
+              reservationUnitPk={String(reservation?.reservationUnits?.[0]?.pk)}
+              reservation={reservation}
+            />
           </Accordion>
           <Accordion heading={t("RequestedReservation.reservationDetails")}>
             <ApplicationDatas>

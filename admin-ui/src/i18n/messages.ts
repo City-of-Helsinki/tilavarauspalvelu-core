@@ -1530,6 +1530,15 @@ const translations: ITranslations = {
       state: ["Varauksen tila"],
     },
   },
+  Calendar: {
+    legend: {
+      currentRequiresHandling: ["Varaajan toive"],
+      currentConfirmed: ["Varaajan toive (hyväksytty)"],
+      currentDenied: ["Varaajan toive (hylätty)"],
+      otherRequiedHandling: ["Muun varaajan toive"],
+      rest: ["Varattu"],
+    },
+  },
   Reservations: {
     reservationListHeading: ["Varaustoiveet"],
     noFilteredReservations: [

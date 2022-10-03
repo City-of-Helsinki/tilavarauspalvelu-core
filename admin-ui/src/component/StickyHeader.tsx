@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const Sticky = styled.div`
-  z-index: 100;
+  z-index: 101;
   position: sticky;
   top: 0px;
   width: 100%;
