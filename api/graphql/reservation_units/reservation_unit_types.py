@@ -557,8 +557,13 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
+    reservations = graphene.List(
+        ReservationType,
+        from_=graphene.Date(name="from"),
+        to=graphene.Date(),
+        state=graphene.List(graphene.String),
+    )
     next_available_slot = graphene.DateTime()
-
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
 
     class Meta:
@@ -629,3 +634,19 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
 
     def resolve_hauki_url(self, info):
         return self
+
+    def resolve_reservations(
+        self,
+        info: ResolveInfo,
+        from_: Optional[datetime.date] = None,
+        to: Optional[datetime.date] = None,
+        state: Optional[List[str]] = None,
+    ) -> QuerySet:
+        reservations = self.reservation_set.all()
+        if from_ is not None:
+            reservations = reservations.filter(begin__gte=from_)
+        if to is not None:
+            reservations = reservations.filter(end__lte=to)
+        if state is not None:
+            reservations = reservations.filter(state__in=state)
+        return reservations
