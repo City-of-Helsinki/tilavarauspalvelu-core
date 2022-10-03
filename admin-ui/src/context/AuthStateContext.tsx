@@ -1,14 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { User } from "oidc-client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 
 import {
-  ApiAccessTokenAvailable,
   assertApiAccessTokenIsAvailableAndFresh,
   clearApiAccessToken,
   localLogout,
 } from "../common/auth/util";
-import Error5xx from "../common/Error5xx";
 import { Query } from "../common/gql-types";
 
 import {
@@ -36,10 +34,8 @@ export const AuthStateContextProvider: React.FC = ({ children }) => {
     getInitialState()
   );
 
-  const [apiTokenFresh, setApiTokenFresh] =
-    useState<ApiAccessTokenAvailable>("Waiting");
-
-  const skip = apiTokenFresh === "Waiting" || apiTokenFresh === "Error";
+  const skip = authState.state !== "ApiKeyAvailable";
+  const checkApiToken = authState.state === "Authenticated";
 
   useQuery<Query>(CURRENT_USER, {
     skip,
@@ -58,26 +54,20 @@ export const AuthStateContextProvider: React.FC = ({ children }) => {
   useEffect(() => {
     const check = async () => {
       const status = await assertApiAccessTokenIsAvailableAndFresh();
-      setApiTokenFresh(status);
+      if (status === "Available") {
+        dispatch({ type: "apiTokenAvailable" });
+      }
       if (status !== "Available") {
         // token is not available and we failed to get one
         clearApiAccessToken();
         localLogout(true);
-        dispatch({ type: "error", message: "No Token Available" });
+        window.location.reload();
       }
     };
-    if (apiTokenFresh === "Waiting") {
+    if (checkApiToken) {
       check();
     }
-  }, [apiTokenFresh]);
-
-  if (apiTokenFresh === "Waiting") {
-    return null;
-  }
-
-  if (apiTokenFresh === "Error") {
-    return <Error5xx />;
-  }
+  }, [checkApiToken]);
 
   return (
     <AuthStateContext.Provider

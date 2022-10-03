@@ -1,13 +1,14 @@
 import { get, isEqual, set } from "lodash";
 import { User } from "oidc-client";
-import { getApiAccessToken, localLogout } from "../common/auth/util";
+import { localLogout } from "../common/auth/util";
 import { UserType } from "../common/gql-types";
 
 export type AuthState =
-  | "Unknown"
-  | "Authenticated"
-  | "HasPermissions"
-  | "NoPermissions"
+  | "Unknown" // initial state
+  | "Authenticated" // oidc authenticated
+  | "ApiKeyAvailable" // api key is available and valid
+  | "HasPermissions" // get user call done
+  | "NoPermissions" // get user call done
   | "NotAutenticated"
   | "Error";
 
@@ -30,6 +31,7 @@ export type Action =
       logout: YesItsAFunction;
     }
   | { type: "error"; message: string }
+  | { type: "apiTokenAvailable" }
   | { type: "currentUserLoaded"; currentUser: UserType };
 
 export const getInitialState = (): Auth => ({
@@ -41,11 +43,12 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
     case "setUser": {
       const newState = { ...state };
 
-      if (action.user === null && getApiAccessToken() === null) {
+      if (!action.user) {
         set(newState, "state", "NotAutenticated");
       }
+
       if (action.user) {
-        if (state.state === "NotAutenticated") {
+        if (state.state === "Unknown" || state.state === "NotAutenticated") {
           set(newState, "state", "Authenticated");
         }
       }
@@ -73,6 +76,15 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
     case "error": {
       return { ...state, state: "Error" };
     }
+
+    case "apiTokenAvailable": {
+      const newState = { ...state };
+      if (state.state === "Authenticated") {
+        set(newState, "state", "ApiKeyAvailable");
+      }
+      return newState;
+    }
+
     case "currentUserLoaded": {
       const { currentUser } = action;
 

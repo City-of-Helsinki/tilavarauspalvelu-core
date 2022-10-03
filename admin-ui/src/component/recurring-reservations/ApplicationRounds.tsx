@@ -109,7 +109,7 @@ function ApplicationRounds(): JSX.Element {
                 handleRounds.map((applicationRound) => (
                   <ApplicationRoundCard
                     applicationRound={applicationRound}
-                    key={applicationRound.id}
+                    key={applicationRound.pk}
                   />
                 ))
               ) : (
