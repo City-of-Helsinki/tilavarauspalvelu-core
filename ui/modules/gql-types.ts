@@ -1353,6 +1353,14 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars["String"]>;
 };
 
+export type PaymentMerchantType = Node & {
+  __typename?: "PaymentMerchantType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  name: Scalars["String"];
+  pk?: Maybe<Scalars["String"]>;
+};
+
 export type PeriodType = {
   __typename?: "PeriodType";
   descriptionEn?: Maybe<Scalars["String"]>;
@@ -2412,6 +2420,7 @@ export type ReservationUnitByPkType = Node & {
   nameSv?: Maybe<Scalars["String"]>;
   nextAvailableSlot?: Maybe<Scalars["DateTime"]>;
   openingHours?: Maybe<OpeningHoursType>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
@@ -2893,6 +2902,7 @@ export type ReservationUnitType = Node & {
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
@@ -3911,6 +3921,7 @@ export type UnitByPkType = Node & {
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   openingHours?: Maybe<OpeningHoursType>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
   phone: Scalars["String"];
   pk?: Maybe<Scalars["Int"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
@@ -3961,6 +3972,7 @@ export type UnitType = Node & {
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
   phone: Scalars["String"];
   pk?: Maybe<Scalars["Int"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
@@ -5378,6 +5390,11 @@ export const ReservationUnitDocument = gql`
         nameEn
         nameSv
       }
+      pricingTerms {
+        textFi
+        textEn
+        textSv
+      }
       maxPersons
       minReservationDuration
       maxReservationDuration
@@ -6528,6 +6545,12 @@ export type ReservationUnitQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+    } | null;
+    pricingTerms?: {
+      __typename?: "TermsOfUseType";
+      textFi?: string | null;
+      textEn?: string | null;
+      textSv?: string | null;
     } | null;
     unit?: {
       __typename?: "UnitType";

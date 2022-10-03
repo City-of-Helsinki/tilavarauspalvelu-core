@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isAfter } from "date-fns";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel, Notification } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { User } from "common/types/common";
 import Container from "../../components/common/Container";
 import {
   Query,
@@ -19,7 +18,7 @@ import { fontMedium } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
 import Head from "../../components/reservations/Head";
 import { CenterSpinner } from "../../components/common/common";
-import { getCurrentUser } from "../../modules/api";
+import { CURRENT_USER } from "../../modules/queries/user";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -74,7 +73,6 @@ const EmptyMessage = styled.div`
 `;
 
 const Reservations = (): JSX.Element => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [error, setError] = useState(false);
   const { t } = useTranslation();
 
@@ -87,52 +85,56 @@ const Reservations = (): JSX.Element => {
   const [isLoadingReservations, setIsLoadingReservations] =
     useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const user = await getCurrentUser();
-        setCurrentUser(user);
-      } catch (e) {
-        setError(true);
-      }
-    };
-
-    if (currentUser === null) {
-      fetchCurrentUser();
-    }
-  }, [currentUser]);
-
-  useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
+  const { data: userData, error: queryError } = useQuery<Query>(CURRENT_USER, {
     fetchPolicy: "no-cache",
-    variables: {
-      state: ["CONFIRMED", "REQUIRES_HANDLING"],
-      user: currentUser?.id.toString(),
-    },
-    skip: !currentUser?.id,
-    onCompleted: (data) => {
-      const reservations = data?.reservations?.edges
-        ?.map((edge) => edge?.node)
-        .reduce(
-          (acc, reservation) => {
-            if (isAfter(new Date(reservation?.begin), new Date())) {
-              acc[0].push(reservation);
-            } else {
-              acc[1].push(reservation);
-            }
-            return acc;
-          },
-          [[], []] as ReservationType[][]
-        );
-      if (reservations?.length > 0) {
-        setUpcomingReservations(reservations[0]);
-        setPastReservations(reservations[1]);
-      }
-      setIsLoadingReservations(false);
-    },
-    onError: () => {
-      setError(true);
-    },
   });
+
+  const currentUser = useMemo(() => userData?.currentUser, [userData]);
+
+  const [
+    fetchReservations,
+    { data: reservationData, error: reservationError },
+  ] = useLazyQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
+    fetchPolicy: "no-cache",
+  });
+
+  useEffect(() => {
+    if (currentUser?.pk) {
+      fetchReservations({
+        variables: {
+          state: ["CONFIRMED", "REQUIRES_HANDLING"],
+          user: currentUser?.pk.toString(),
+        },
+      });
+    }
+  }, [currentUser, fetchReservations]);
+
+  useEffect(() => {
+    const reservations = reservationData?.reservations?.edges
+      ?.map((edge) => edge?.node)
+      .reduce(
+        (acc, reservation) => {
+          if (isAfter(new Date(reservation?.begin), new Date())) {
+            acc[0].push(reservation);
+          } else {
+            acc[1].push(reservation);
+          }
+          return acc;
+        },
+        [[], []] as ReservationType[][]
+      );
+    if (reservations?.length > 0) {
+      setUpcomingReservations(reservations[0]);
+      setPastReservations(reservations[1]);
+    }
+    setIsLoadingReservations(false);
+  }, [reservationData]);
+
+  useEffect(() => {
+    if (queryError || reservationError) {
+      setError(true);
+    }
+  }, [queryError, reservationError]);
 
   return (
     <>

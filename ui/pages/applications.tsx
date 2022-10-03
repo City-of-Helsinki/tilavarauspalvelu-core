@@ -7,8 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
 import { TFunction } from "next-i18next";
-import { ReducedApplicationStatus, User } from "common/types/common";
-import { getCurrentUser } from "../modules/api";
+import { ReducedApplicationStatus } from "common/types/common";
 import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import RequireAuthentication from "../components/common/RequireAuthentication";
@@ -24,6 +23,7 @@ import {
 import { APPLICATIONS } from "../modules/queries/application";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { getReducedApplicationStatus } from "../modules/util";
+import { CURRENT_USER } from "../modules/queries/user";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
@@ -81,25 +81,16 @@ function ApplicationGroups({
 const Applications = (): JSX.Element => {
   const { t } = useTranslation();
 
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [state, setState] = useState<"loading" | "error" | "done">("loading");
   const [cancelled, setCancelled] = useState(false);
   const [cancelError, setCancelError] = useState(false);
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const user = await getCurrentUser();
-        setCurrentUser(user);
-      } catch (e) {
-        setState("error");
-      }
-    };
+  const { data: userData } = useQuery<Query>(CURRENT_USER, {
+    fetchPolicy: "no-cache",
+    onError: () => setState("error"),
+  });
 
-    if (currentUser === null) {
-      fetchCurrentUser();
-    }
-  }, [currentUser]);
+  const currentUser = useMemo(() => userData?.currentUser, [userData]);
 
   const { data: roundsData, error: roundsError } = useQuery<
     Query,
@@ -123,9 +114,9 @@ const Applications = (): JSX.Element => {
     refetch,
   } = useQuery<Query, QueryApplicationsArgs>(APPLICATIONS, {
     fetchPolicy: "no-cache",
-    skip: !currentUser?.id,
+    skip: !currentUser?.pk,
     variables: {
-      user: currentUser?.id?.toString(),
+      user: currentUser?.pk?.toString(),
       status: [
         ApplicationStatus.Draft,
         ApplicationStatus.Sent,

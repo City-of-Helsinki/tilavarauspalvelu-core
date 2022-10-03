@@ -1266,6 +1266,14 @@ type PageInfo {
   endCursor: String
 }
 
+type PaymentMerchantType implements Node {
+  name: String!
+
+  """The ID of the object"""
+  id: ID!
+  pk: String
+}
+
 type PeriodType {
   periodId: Int
   startDate: Date
@@ -2273,6 +2281,7 @@ type ReservationUnitByPkType implements Node {
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
   state: ReservationUnitState
+  paymentMerchant: PaymentMerchantType
   pricings: [ReservationUnitPricingType]
   nextAvailableSlot: DateTime
   haukiUrl: ReservationUnitHaukiUrlType
@@ -2418,21 +2427,21 @@ input ReservationUnitCreateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
@@ -2558,21 +2567,21 @@ type ReservationUnitCreateMutationPayload {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
@@ -2991,6 +3000,7 @@ type ReservationUnitType implements Node {
 
   """Is reservation unit archived."""
   isArchived: Boolean!
+  paymentMerchant: PaymentMerchantType
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -3161,21 +3171,21 @@ input ReservationUnitUpdateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
@@ -3300,21 +3310,21 @@ type ReservationUnitUpdateMutationPayload {
   """
   pricingType: String
   paymentTypes: [String]
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
@@ -3975,6 +3985,7 @@ type UnitByPkType implements Node {
   spaces: [SpaceType]
   location: LocationType
   serviceSectors: [ServiceSectorType]
+  paymentMerchant: PaymentMerchantType
 }
 
 type UnitGroupType implements Node {
@@ -4010,6 +4021,7 @@ type UnitType implements Node {
   webPage: String!
   email: String!
   phone: String!
+  paymentMerchant: PaymentMerchantType
 
   """The ID of the object"""
   id: ID!

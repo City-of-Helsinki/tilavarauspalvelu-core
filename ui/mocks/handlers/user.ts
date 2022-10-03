@@ -1,16 +1,19 @@
-import { rest } from "msw";
-import { User } from "common/types/common";
+import { graphql } from "msw";
+import { UserType } from "../../modules/gql-types";
 
-const currentUser = rest.get(
-  "http://localhost:8000/v1/users/current/",
-  (req, res, ctx) => {
-    const user: User = {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-    };
-    return res(ctx.json(user));
-  }
-);
+const currentUser = graphql.query("getCurrentUser", (req, res, ctx) => {
+  const user: UserType = {
+    id: "faopwefkope",
+    pk: 12,
+    firstName: "John",
+    lastName: "Doe",
+    username: "johndoe",
+    email: "john@doe.it",
+    isSuperuser: false,
+    unitRoles: [],
+    uuid: "12345",
+  };
+  return res(ctx.data({ currentUser: user }));
+});
 
 export const userHandlers = [currentUser];
