@@ -14,6 +14,7 @@ from reservation_units.models import (
     KeywordGroup,
     Purpose,
     Qualifier,
+    ReservationKind,
     ReservationUnit,
     ReservationUnitType,
 )
@@ -90,7 +91,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     )
 
     reservation_kind = django_filters.CharFilter(
-        field_name="reservation_kind", lookup_expr="icontains"
+        field_name="reservation_kind", method="get_reservation_kind"
     )
 
     state = django_filters.MultipleChoiceFilter(
@@ -204,6 +205,12 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         if value:
             return qs.filter(published)
         return qs.exclude(published)
+
+    def get_reservation_kind(self, qs, property, value):
+        if property.upper() == ReservationKind.DIRECT_AND_SEASON:
+            return qs.filter(reservation_kind__isnull=False)
+
+        return qs.filter(reservation_kind__icontains=value)
 
     def get_state(self, qs, property, value: List[ReservationUnitState]):
         queries = []
