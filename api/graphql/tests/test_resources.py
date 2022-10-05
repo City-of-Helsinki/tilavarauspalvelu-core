@@ -6,16 +6,32 @@ from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from graphene_django.utils import GraphQLTestCase
 
-from permissions.models import GeneralRole, GeneralRoleChoice
+from permissions.models import (
+    GeneralRole,
+    GeneralRoleChoice,
+    ServiceSectorRole,
+    ServiceSectorRoleChoice,
+    ServiceSectorRolePermission,
+    UnitRole,
+    UnitRoleChoice,
+    UnitRolePermission,
+)
 from resources.models import Resource
 from resources.tests.factories import ResourceFactory
-from spaces.tests.factories import SpaceFactory
+from spaces.tests.factories import (
+    ServiceSectorFactory,
+    SpaceFactory,
+    UnitFactory,
+    UnitGroupFactory,
+)
 
 
 class ResourceGraphQLBase(GraphQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.space = SpaceFactory(name_fi="Test space")
+        unit = UnitFactory()
+        service_sector = ServiceSectorFactory(units=[unit])
+        cls.space = SpaceFactory(name_fi="Test space", unit=unit)
         cls.resource = ResourceFactory(
             name_fi="Test resource",
             name_en="name",
@@ -33,6 +49,55 @@ class ResourceGraphQLBase(GraphQLTestCase):
             user=cls.general_admin,
             role=GeneralRoleChoice.objects.get(code="admin"),
         )
+
+        unit_role_choice = UnitRoleChoice.objects.get(code="admin")
+        UnitRolePermission.objects.create(
+            role=unit_role_choice,
+            permission="can_manage_resources",
+        )
+        cls.unit_admin = get_user_model().objects.create(
+            username="unitadmin",
+            first_name="Unit",
+            last_name="Admin",
+            email="unit.admin@foo.com",
+        )
+
+        unit_role = UnitRole.objects.create(
+            user=cls.unit_admin,
+            role=unit_role_choice,
+        )
+        unit_role.unit.add(unit)
+
+        cls.unit_group_admin = get_user_model().objects.create(
+            username="unitgroupadmin",
+            first_name="GroupUnit",
+            last_name="Admin",
+            email="unit.groupadmin@foo.com",
+        )
+        unit_group = UnitGroupFactory(units=[unit])
+        unit_group_role = UnitRole.objects.create(
+            user=cls.unit_group_admin,
+            role=unit_role_choice,
+        )
+        unit_group_role.unit_group.add(unit_group)
+
+        cls.service_sector_admin = get_user_model().objects.create(
+            username="Service",
+            first_name="SectorAdmin",
+            last_name="Admin",
+            email="service.sector@foo.com",
+        )
+        ss_role_choice = ServiceSectorRoleChoice.objects.get(code="admin")
+        ServiceSectorRolePermission.objects.create(
+            role=ss_role_choice,
+            permission="can_manage_resources",
+        )
+        ServiceSectorRole.objects.create(
+            user=cls.service_sector_admin,
+            role=ss_role_choice,
+            service_sector=service_sector,
+        )
+
         cls.regular_joe = get_user_model().objects.create(
             username="regjoe",
             first_name="joe",
@@ -141,6 +206,51 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         }
 
     def test_resource_created(self):
+        response = self.query(
+            self.get_create_query(),
+            input_data=self.get_valid_input_data(),
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("createResource").get("errors")).is_none()
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
+            1
+        )
+
+    def test_service_sector_admin_can_create_resource(self):
+        self.client.force_login(self.service_sector_admin)
+
+        response = self.query(
+            self.get_create_query(),
+            input_data=self.get_valid_input_data(),
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("createResource").get("errors")).is_none()
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
+            1
+        )
+
+    def test_unit_admin_can_create_resource(self):
+        self.client.force_login(self.unit_admin)
+
+        response = self.query(
+            self.get_create_query(),
+            input_data=self.get_valid_input_data(),
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("createResource").get("errors")).is_none()
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
+            1
+        )
+
+    def test_unit_group_admin_can_create_resource(self):
+        self.client.force_login(self.unit_group_admin)
+
         response = self.query(
             self.get_create_query(),
             input_data=self.get_valid_input_data(),

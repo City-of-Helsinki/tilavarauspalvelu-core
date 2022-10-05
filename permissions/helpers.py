@@ -442,9 +442,20 @@ def can_manage_districts(user: User):
     return is_superuser(user) or has_general_permission(user, permission)
 
 
-def can_manage_resources(user: User):
+def can_manage_resources(user: User, space=None):
     permission = "can_manage_resources"
-    return is_superuser(user) or has_general_permission(user, permission)
+    return (
+        # Is general admin
+        (is_superuser(user) or has_general_permission(user, permission))
+        or space
+        # Or has unit or service sector permissions related to the space where the resource ought to be.
+        and (
+            has_unit_permission(user, [space.unit], permission)
+            or has_service_sector_permission(
+                user, space.unit.service_sectors.all(), permission
+            )
+        )
+    )
 
 
 def can_manage_spaces(user: User):
