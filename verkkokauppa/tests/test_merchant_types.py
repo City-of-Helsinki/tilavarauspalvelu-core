@@ -44,6 +44,7 @@ class MerchantTypesBaseTestCase(TestCase):
                 "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
                 "restricted": False,
             },
+            {"key": "merchantShopId", "value": "test-shop-id", "restricted": False},
         ],
     }
 
@@ -59,6 +60,7 @@ class MerchantTypesBaseTestCase(TestCase):
         "merchantBusinessId": "123456-7",
         "merchantOrderWebhookUrl": "https://tilavaraus.dev.hel.ninja/v1/webhook/order/",
         "merchantPaymentWebhookUrl": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
+        "merchantShopId": "test-shop-id",
     }
 
 
@@ -74,6 +76,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             url="https://test.url",
             tos_url="https://test.url/tos",
             business_id="123456-7",
+            shop_id="test-shop-id",
         )
         actual = MerchantInfo.from_json(self.get_merchant_response)
         assert_that(actual).is_equal_to(expected)
@@ -93,6 +96,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             url="https://test.url",
             tos_url="https://test.url/tos",
             business_id="123456-7",
+            shop_id="test-shop-id",
         )
         actual = Merchant.from_json(self.mutation_merchant_response)
         assert_that(expected).is_equal_to(actual)
@@ -112,6 +116,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             url="",
             tos_url="",
             business_id="",
+            shop_id="",
         )
         response = self.mutation_merchant_response.copy()
         response["configurations"] = []
@@ -137,6 +142,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             url="https://test.url",
             tos_url="https://test.url/tos",
             business_id="123456-7",
+            shop_id="test-shop-id",
         )
 
         expected = {
@@ -149,6 +155,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             "merchantUrl": "https://test.url",
             "merchantTermsOfServiceUrl": "https://test.url/tos",
             "merchantBusinessId": "123456-7",
+            "merchantShopId": "test-shop-id",
         }
 
         assert_that(params.to_json()).is_equal_to(expected)
@@ -164,6 +171,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             url="https://test.url",
             tos_url="https://test.url/tos",
             business_id="123456-7",
+            shop_id="test-shop-id",
         )
 
         expected = {
@@ -176,6 +184,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             "merchantUrl": "https://test.url",
             "merchantTermsOfServiceUrl": "https://test.url/tos",
             "merchantBusinessId": "123456-7",
+            "merchantShopId": "test-shop-id",
         }
 
         assert_that(params.to_json()).is_equal_to(expected)

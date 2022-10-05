@@ -39,6 +39,7 @@ class MerchantRequestsBaseTestCase(TestCase):
         url="https://test.url",
         tos_url="https://test.url/tos",
         business_id="123456-7",
+        shop_id="test-shop-id",
     )
 
     update_merchant_params: UpdateMerchantParams = UpdateMerchantParams(
@@ -51,6 +52,7 @@ class MerchantRequestsBaseTestCase(TestCase):
         url="https://test.url",
         tos_url="https://test.url/tos",
         business_id="123456-7",
+        shop_id="test-shop-id",
     )
 
     mutation_merchant_response: Dict[str, Any] = {
@@ -82,6 +84,7 @@ class MerchantRequestsBaseTestCase(TestCase):
                 "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
                 "restricted": False,
             },
+            {"key": "merchantShopId", "value": "test-shop-id", "restricted": False},
         ],
     }
 
@@ -97,6 +100,7 @@ class MerchantRequestsBaseTestCase(TestCase):
         "merchantBusinessId": "123456-7",
         "merchantOrderWebhookUrl": "https://tilavaraus.dev.hel.ninja/v1/webhook/order/",
         "merchantPaymentWebhookUrl": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
+        "merchantShopId": "test-shop-id",
     }
 
     get_merchants_response: Dict[str, Any] = {
@@ -143,6 +147,11 @@ class MerchantRequestsBaseTestCase(TestCase):
                 {
                     "key": "merchantPaymentWebhookUrl",
                     "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
+                    "restricted": False,
+                },
+                {
+                    "key": "merchant-shop-id",
+                    "value": "test-shop-id",
                     "restricted": False,
                 },
             ],
@@ -194,6 +203,11 @@ class MerchantRequestsBaseTestCase(TestCase):
                 {
                     "key": "merchantPaymentWebhookUrl",
                     "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
+                    "restricted": False,
+                },
+                {
+                    "key": "merchantShopId",
+                    "value": "another-shop-id",
                     "restricted": False,
                 },
             ],

@@ -18,6 +18,7 @@ class MerchantInfo:
     url: str
     tos_url: str
     business_id: str
+    shop_id: str
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "MerchantInfo":
@@ -32,6 +33,7 @@ class MerchantInfo:
                 url=json.get("merchantUrl", ""),
                 tos_url=json.get("merchantTermsOfServiceUrl", ""),
                 business_id=json.get("merchantBusinessId", ""),
+                shop_id=json.get("merchantShopId", ""),
             )
         except (KeyError, ValueError) as e:
             raise ParseMerchantInfoError(f"Could not parse merchant: {e}")
@@ -52,6 +54,7 @@ class Merchant:
     url: str
     tos_url: str
     business_id: str
+    shop_id: str
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "Merchant":
@@ -75,6 +78,7 @@ class Merchant:
                 business_id=cls._parse_configuration(
                     "merchantBusinessId", configurations
                 ),
+                shop_id=cls._parse_configuration("merchantShopId", configurations),
             )
         except (KeyError, ValueError) as e:
             raise ParseMerchantError(f"Could not parse merchant: {e}")
@@ -100,6 +104,7 @@ class CreateMerchantParams:
     url: str
     tos_url: str
     business_id: str
+    shop_id: str
 
     def to_json(self) -> Dict[str, Any]:
         return {
@@ -112,6 +117,7 @@ class CreateMerchantParams:
             "merchantUrl": self.url,
             "merchantTermsOfServiceUrl": self.tos_url,
             "merchantBusinessId": self.business_id,
+            "merchantShopId": self.shop_id,
         }
 
 
@@ -126,6 +132,7 @@ class UpdateMerchantParams:
     url: str
     tos_url: str
     business_id: str
+    shop_id: str
 
     def to_json(self) -> Dict[str, Any]:
         return {
@@ -138,4 +145,5 @@ class UpdateMerchantParams:
             "merchantUrl": self.url,
             "merchantTermsOfServiceUrl": self.tos_url,
             "merchantBusinessId": self.business_id,
+            "merchantShopId": self.shop_id,
         }

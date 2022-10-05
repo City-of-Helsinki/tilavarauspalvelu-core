@@ -13,6 +13,7 @@ from verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantPar
 
 class PaymentMerchantForm(forms.ModelForm):
     # These fields are saved to / loaded from Merchant API so they are not part of the model
+    shop_id = forms.CharField(label=_("Shop ID"), max_length=256, required=True)
     business_id = forms.CharField(
         label=_("Business ID"),
         max_length=16,
@@ -38,6 +39,7 @@ class PaymentMerchantForm(forms.ModelForm):
                     f"Merchant info for {str(instance.id)} not found from Merchant API"
                 )
 
+            self.fields["shop_id"].initial = merchant_info.shop_id
             self.fields["name"].initial = merchant_info.name
             self.fields["street"].initial = merchant_info.street
             self.fields["zip"].initial = merchant_info.zip
@@ -49,7 +51,7 @@ class PaymentMerchantForm(forms.ModelForm):
             self.fields["business_id"].initial = merchant_info.business_id
 
     def save(self, commit=True):
-        if self.instance is None:
+        if self.instance is None or self.instance.id is None:
             params = CreateMerchantParams(
                 name=self.cleaned_data.get("name", ""),
                 street=self.cleaned_data.get("street", ""),
@@ -60,6 +62,7 @@ class PaymentMerchantForm(forms.ModelForm):
                 url=self.cleaned_data.get("url", ""),
                 tos_url=self.cleaned_data.get("tos_url", ""),
                 business_id=self.cleaned_data.get("business_id", ""),
+                shop_id=self.cleaned_data.get("shop_id", ""),
             )
             created_merchant = create_merchant(params)
             self.instance.id = created_merchant.id
@@ -74,6 +77,7 @@ class PaymentMerchantForm(forms.ModelForm):
                 url=self.cleaned_data.get("url", ""),
                 tos_url=self.cleaned_data.get("tos_url", ""),
                 business_id=self.cleaned_data.get("business_id", ""),
+                shop_id=self.cleaned_data.get("shop_id", ""),
             )
             update_merchant(self.instance.id, params)
 

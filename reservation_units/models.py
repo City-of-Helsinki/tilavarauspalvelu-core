@@ -547,6 +547,7 @@ class ReservationUnit(models.Model):
         verbose_name=_("Payment merchant"),
         related_name="reservation_units",
         on_delete=models.PROTECT,
+        blank=True,
         null=True,
         help_text="Merchant used for payments",
     )
