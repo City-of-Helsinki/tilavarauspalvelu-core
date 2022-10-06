@@ -9,11 +9,13 @@ from .exceptions import ParseProductError
 class CreateProductParams:
     namespace: str
     namespace_entity_id: str
+    merchant_id: str
 
     def to_json(self) -> Dict[str, Any]:
         return {
             "namespace": self.namespace,
-            "namespaceEntityId": self.namespace_entity_id,
+            "namespaceEntityId": str(self.namespace_entity_id),
+            "merchantId": str(self.merchant_id),
         }
 
 
@@ -22,6 +24,7 @@ class Product:
     product_id: UUID
     namespace: str
     namespace_entity_id: str
+    merchant_id: UUID
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "Product":
@@ -30,6 +33,7 @@ class Product:
                 product_id=UUID(json["productId"]),
                 namespace=json["namespace"],
                 namespace_entity_id=json["namespaceEntityId"],
+                merchant_id=UUID(json["merchantId"]),
             )
         except (KeyError, ValueError) as e:
             raise ParseProductError("Could not parse product") from e
