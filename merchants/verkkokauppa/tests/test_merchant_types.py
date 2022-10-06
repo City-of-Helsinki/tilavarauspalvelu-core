@@ -5,8 +5,8 @@ from uuid import UUID
 from assertpy import assert_that
 from django.test.testcases import TestCase
 
-from verkkokauppa.merchants.exceptions import ParseMerchantError
-from verkkokauppa.merchants.types import (
+from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError
+from merchants.verkkokauppa.merchants.types import (
     CreateMerchantParams,
     Merchant,
     MerchantInfo,

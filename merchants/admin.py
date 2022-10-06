@@ -3,12 +3,15 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from merchants.models import PaymentMerchant
-from verkkokauppa.merchants.requests import (
+from merchants.verkkokauppa.merchants.requests import (
     create_merchant,
     get_merchant,
     update_merchant,
 )
-from verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
+from merchants.verkkokauppa.merchants.types import (
+    CreateMerchantParams,
+    UpdateMerchantParams,
+)
 
 
 class PaymentMerchantForm(forms.ModelForm):
