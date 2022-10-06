@@ -29,7 +29,7 @@ from permissions.helpers import (
 )
 from reservation_units.models import ReservationUnit, ReservationUnitImage
 from reservations.models import RecurringReservation, Reservation
-from spaces.models import Unit
+from spaces.models import Space, Unit
 
 
 class ApplicationRoundPermission(BasePermission):
@@ -297,7 +297,9 @@ class ResourcePermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        return can_manage_resources(info.context.user)
+        space = Space.objects.filter(id=input.get("space_pk")).first()
+
+        return can_manage_resources(info.context.user, space=space)
 
 
 class ReservationPurposePermission(BasePermission):

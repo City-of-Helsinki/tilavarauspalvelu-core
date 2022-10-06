@@ -118,6 +118,10 @@ UNIT_PERMISSIONS = (
         "can_manage_spaces",
         _("Can create, edit and delete spaces in the unit"),
     ),
+    (
+        "can_manage_resources",
+        _("Can create, edit and delete resources in the given unit"),
+    ),
 )
 
 SERVICE_SECTOR_PERMISSIONS = (
@@ -151,6 +155,10 @@ SERVICE_SECTOR_PERMISSIONS = (
     (
         "can_manage_spaces",
         _("Can create, edit and delete spaces in the service sector"),
+    ),
+    (
+        "can_manage_resources",
+        _("Can create, edit and delete resources in the given service sector"),
     ),
 )
 
