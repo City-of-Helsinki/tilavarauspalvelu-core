@@ -2,7 +2,7 @@ assertpy==1.1
 black==20.8b1
 celery==5.2.7
 Django==3.2.15
-django-auditlog==1.0a1
+django-auditlog==2.1.1
 django-admin-sortable2==1.0.4 # Pin to this since the latest has dropped django 3.2 support.
 django-celery-beat==2.3.0
 django-celery-results==2.4.0
