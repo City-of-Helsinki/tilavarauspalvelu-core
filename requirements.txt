@@ -77,7 +77,6 @@ django==3.2.15
     #   django-filter
     #   django-graphql-jwt
     #   django-helusers
-    #   django-jsonfield
     #   django-modeltranslation
     #   django-mptt
     #   django-recurrence
@@ -89,7 +88,7 @@ django==3.2.15
     #   helsinki-profile-gdpr-api
 django-admin-sortable2==1.0.4
     # via -r requirements.in
-django-auditlog==1.0a1
+django-auditlog==2.1.1
     # via -r requirements.in
 django-celery-beat==2.3.0
     # via -r requirements.in
@@ -117,8 +116,6 @@ django-helusers==0.6.0
     #   helsinki-profile-gdpr-api
 django-js-asset==1.2.2
     # via django-mptt
-django-jsonfield==1.4.1
-    # via django-auditlog
 django-modeltranslation==0.17.5
     # via -r requirements.in
 django-mptt==0.11.0
@@ -272,7 +269,7 @@ pytest-factoryboy==2.1.0
     # via -r requirements.in
 python-crontab==2.6.0
     # via django-celery-beat
-python-dateutil==2.6.0
+python-dateutil==2.8.2
     # via
     #   django-auditlog
     #   django-recurrence
@@ -313,7 +310,6 @@ sentry-sdk==0.19.5
 six==1.15.0
     # via
     #   click-repl
-    #   django-jsonfield
     #   django-modeltranslation
     #   ecdsa
     #   freezegun
