@@ -15,6 +15,8 @@ import {
   ReservationWorkingMemoMutationInput,
   ReservationsReservationStateChoices,
   ReservationsReservationReserveeTypeChoices,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
+  ReservationUnitType,
 } from "../../../common/gql-types";
 import { useNotification } from "../../../context/NotificationContext";
 import { Divider } from "../../../styles/util";
@@ -22,6 +24,7 @@ import Loader from "../../Loader";
 import withMainMenu from "../../withMainMenu";
 import {
   ageGroup,
+  getReservatinUnitPricing,
   getTranslationKeyForType,
   reservationDateTime,
   reservationDuration,
@@ -223,10 +226,15 @@ const RequestedReservation = (): JSX.Element | null => {
     return null;
   }
 
-  const isNonFree = reservation?.reservationUnits?.find(
-    (ru) => ru?.highestPrice
+  const pricing = getReservatinUnitPricing(
+    reservation?.reservationUnits?.[0] as ReservationUnitType,
+    reservation.begin
   );
 
+  const isNonFree =
+    pricing?.pricingType ===
+      ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid &&
+    pricing.highestPrice >= 0;
   const buttons =
     reservation.state ===
     ReservationsReservationStateChoices.RequiresHandling ? (
@@ -363,9 +371,11 @@ const RequestedReservation = (): JSX.Element | null => {
             { l: "numPersons", v: reservation.numPersons },
             {
               l: "ageGroup",
-              v: `${ageGroup(reservation.ageGroup)} ${t(
-                "RequestedReservation.ageGroupSuffix"
-              )}`,
+              v: reservation.ageGroup
+                ? `${ageGroup(reservation.ageGroup)} ${t(
+                    "RequestedReservation.ageGroupSuffix"
+                  )}`
+                : "",
             },
             {
               l: "purpose",
@@ -386,6 +396,7 @@ const RequestedReservation = (): JSX.Element | null => {
             },
           ].map((e) => (
             <ApplicationProp
+              key={e.l}
               label={t(`RequestedReservation.${e.l}`)}
               data={e.v}
             />
@@ -464,12 +475,14 @@ const RequestedReservation = (): JSX.Element | null => {
                 label={t("RequestedReservation.numPersons")}
                 data={reservation.numPersons}
               />
-              <ApplicationData
-                label={t("RequestedReservation.ageGroup")}
-                data={`${ageGroup(reservation.ageGroup)} ${t(
-                  "RequestedReservation.ageGroupSuffix"
-                )}`}
-              />
+              {reservation.ageGroup && (
+                <ApplicationData
+                  label={t("RequestedReservation.ageGroup")}
+                  data={`${ageGroup(reservation.ageGroup)} ${t(
+                    "RequestedReservation.ageGroupSuffix"
+                  )}`}
+                />
+              )}
               <ApplicationData
                 label={t("RequestedReservation.purpose")}
                 data={reservation.purpose?.nameFi}

@@ -28,12 +28,9 @@ const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
   const { data, loading } = useQuery<Query>(UNITS_QUERY);
 
-  if (loading) {
-    return <>{t("ReservationUnitsSearch.unit")}</>;
-  }
-
   return (
     <SortedSelect
+      disabled={loading}
       sort
       label={t("ReservationUnitsSearch.unitLabel")}
       multiselect

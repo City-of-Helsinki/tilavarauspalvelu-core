@@ -4,7 +4,12 @@ import {
   getUnRoundedReservationVolume,
 } from "common";
 
-import { differenceInHours, differenceInMinutes, isSameDay } from "date-fns";
+import {
+  differenceInHours,
+  differenceInMinutes,
+  isSameDay,
+  parse,
+} from "date-fns";
 import { TFunction } from "i18next";
 import {
   AgeGroupType,
@@ -12,6 +17,9 @@ import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
   ReservationUnitType,
+  ReservationUnitPricingType,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
+  ReservationUnitsReservationUnitPricingPriceUnitChoices,
 } from "../../../common/gql-types";
 import { formatDate, formatTime } from "../../../common/util";
 
@@ -58,8 +66,36 @@ export const reservationPrice = (
 ): string => {
   return getReservationPrice(
     reservation.price as number,
-    t("RequestedReservation.noPrice")
+    t("RequestedReservation.noPrice"),
+    "fi",
+    true
   );
+};
+
+const parseDate = (date: string) => parse(date, "yyyy-MM-dd", new Date());
+
+/** returns reservation unit pricing at given date */
+export const getReservatinUnitPricing = (
+  reservationUnit: ReservationUnitType,
+  datetime: string
+): ReservationUnitPricingType | null => {
+  if (!reservationUnit.pricings || reservationUnit.pricings.length === 0) {
+    return null;
+  }
+
+  const reservationDate = new Date(datetime);
+  reservationUnit.pricings?.sort(
+    (a, b) => parseDate(a?.begins).getTime() - parseDate(b?.begins).getTime()
+  );
+
+  return (
+    (reservationUnit.pricings || []) as ReservationUnitPricingType[]
+  ).reduce((prev, current) => {
+    if (parseDate(current?.begins) < reservationDate) {
+      return current;
+    }
+    return prev;
+  }, reservationUnit.pricings[0]);
 };
 
 export const getReservationPriceDetails = (
@@ -71,19 +107,33 @@ export const getReservationPriceDetails = (
     new Date(reservation.begin)
   );
 
-  const priceUnit = reservation?.reservationUnits?.[0]?.priceUnit;
+  const pricing = getReservatinUnitPricing(
+    reservation.reservationUnits?.[0] as ReservationUnitType,
+    reservation.begin
+  );
+
+  if (pricing === null) return "???";
+
+  const { priceUnit } = pricing;
   const volume = getUnRoundedReservationVolume(
     durationMinutes,
     priceUnit as string
   );
-  const maxPrice = reservation?.reservationUnits?.[0]?.highestPrice;
+
+  const maxPrice =
+    pricing.pricingType ===
+    ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+      ? pricing.highestPrice
+      : 0;
   const formatters = getFormatters("fi");
-  return priceUnit === "FIXED"
+
+  return priceUnit ===
+    ReservationUnitsReservationUnitPricingPriceUnitChoices.Fixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"))
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
         volume: formatters.strippedDecimal.format(volume),
         units: t(`RequestedReservation.ApproveDialog.priceUnits.${priceUnit}`),
-        vatPercent: formatters.whole.format(reservation.taxPercentageValue),
+        vatPercent: formatters.whole.format(pricing.taxPercentage.value),
         unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
         unitPrice: getReservationPrice(maxPrice, ""),
         price: getReservationPrice(

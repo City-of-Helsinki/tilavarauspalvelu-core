@@ -18,12 +18,9 @@ const ReservationUnitTypeFilter = ({ onChange, value }: Props): JSX.Element => {
     {}
   );
 
-  if (loading) {
-    return <>{t("ReservationUnitsSearch.typeLabel")}</>;
-  }
-
   return (
     <SortedSelect
+      disabled={loading}
       sort
       label={t("ReservationUnitsSearch.typeLabel")}
       multiselect

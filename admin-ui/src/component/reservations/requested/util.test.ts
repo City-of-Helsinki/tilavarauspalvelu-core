@@ -1,8 +1,11 @@
 import { get } from "lodash";
-import { getReservationPriceDetails } from "./util";
+import { getReservatinUnitPricing, getReservationPriceDetails } from "./util";
 import {
   ReservationType,
-  ReservationUnitsReservationUnitPriceUnitChoices,
+  ReservationUnitPricingType,
+  ReservationUnitsReservationUnitPricingPriceUnitChoices,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
+  ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitType,
 } from "../../../common/gql-types";
 
@@ -13,8 +16,24 @@ describe("pricingDetails", () => {
       end: "2022-01-01T11:00:00Z",
       reservationUnits: [
         {
-          priceUnit: ReservationUnitsReservationUnitPriceUnitChoices.Fixed,
-          highestPrice: 120,
+          pricings: [
+            {
+              begins: "2022-01-01",
+              pricingType:
+                ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+              id: 1,
+              priceUnit:
+                ReservationUnitsReservationUnitPricingPriceUnitChoices.Fixed,
+              lowestPrice: 120,
+              highestPrice: 120,
+              taxPercentage: {
+                id: "1",
+                value: "2",
+              },
+              status:
+                ReservationUnitsReservationUnitPricingStatusChoices.Active,
+            } as ReservationUnitPricingType,
+          ],
         } as ReservationUnitType,
       ],
     } as ReservationType;
@@ -23,23 +42,87 @@ describe("pricingDetails", () => {
   });
 
   test("renders price in hours", () => {
-    const r = {
+    const reservation = {
       begin: "2022-01-01T10:00:00Z",
       end: "2022-01-01T11:30:00Z",
-      taxPercentageValue: 24,
       reservationUnits: [
         {
-          priceUnit: ReservationUnitsReservationUnitPriceUnitChoices.PerHour,
-          highestPrice: 120,
+          pricings: [
+            {
+              begins: "2021-01-01",
+              pricingType:
+                ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+              id: 1,
+              priceUnit:
+                ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
+              lowestPrice: 120,
+              highestPrice: 120,
+              taxPercentage: {
+                id: "1",
+                value: "24",
+              },
+              status:
+                ReservationUnitsReservationUnitPricingStatusChoices.Active,
+            } as ReservationUnitPricingType,
+          ],
         } as ReservationUnitType,
       ],
     } as ReservationType;
 
-    expect(getReservationPriceDetails(r, (t, a) => get(a, "price"))).toEqual(
-      "180 €"
-    );
-    expect(getReservationPriceDetails(r, (t, a) => get(a, "volume"))).toEqual(
-      "1,5"
-    );
+    expect(
+      getReservationPriceDetails(reservation, (t, a) => get(a, "price"))
+    ).toEqual("180 €");
+    expect(
+      getReservationPriceDetails(reservation, (t, a) => get(a, "volume"))
+    ).toEqual("1,5");
+  });
+});
+
+describe("getReservatinUnitPricing", () => {
+  test("returns correct pricing based on reservation date", () => {
+    const reservationUnit = {
+      pricings: [
+        {
+          begins: "2021-01-01",
+          pricingType:
+            ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+          id: 1,
+          priceUnit:
+            ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
+          lowestPrice: 120,
+          highestPrice: 120,
+          taxPercentage: {
+            id: "1",
+            value: "24",
+          },
+          status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+        } as ReservationUnitPricingType,
+        {
+          begins: "2022-01-01",
+          pricingType:
+            ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+          id: 1,
+          priceUnit:
+            ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
+          lowestPrice: 120,
+          highestPrice: 120,
+          taxPercentage: {
+            id: "1",
+            value: "24",
+          },
+          status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+        } as ReservationUnitPricingType,
+      ],
+    } as ReservationUnitType;
+
+    expect(
+      getReservatinUnitPricing(reservationUnit, "2021-02-01T00:00:01Z")
+        .pricingType
+    ).toBe(ReservationUnitsReservationUnitPricingPricingTypeChoices.Free);
+
+    expect(
+      getReservatinUnitPricing(reservationUnit, "2022-02-01T00:00:01Z")
+        .pricingType
+    ).toBe(ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid);
   });
 });
