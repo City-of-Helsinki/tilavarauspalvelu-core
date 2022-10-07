@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import {
   Query,
   QueryReservationsArgs,
+  ReservationsReservationStateChoices,
   ReservationType,
 } from "../../../common/gql-types";
 import eventStyleGetter from "./eventStyleGetter";
@@ -73,17 +74,27 @@ const Calendar = ({
       onCompleted: ({ reservations }) => {
         if (reservations) {
           setEvents(
-            (reservations?.edges || []).map((r) => ({
-              title: `${
-                r?.node?.reserveeOrganisationName ||
-                `${r?.node?.reserveeFirstName || ""} ${
-                  r?.node?.reserveeLastName || ""
-                }`
-              }`,
-              event: r?.node as ReservationType,
-              start: new Date(get(r?.node, "begin")),
-              end: new Date(get(r?.node, "end")),
-            }))
+            (reservations?.edges || [])
+              .filter(
+                (r) =>
+                  [
+                    ReservationsReservationStateChoices.Confirmed,
+                    ReservationsReservationStateChoices.RequiresHandling,
+                  ].includes(
+                    r?.node?.state as ReservationsReservationStateChoices
+                  ) || r?.node?.pk === reservation.pk
+              )
+              .map((r) => ({
+                title: `${
+                  r?.node?.reserveeOrganisationName ||
+                  `${r?.node?.reserveeFirstName || ""} ${
+                    r?.node?.reserveeLastName || ""
+                  }`
+                }`,
+                event: r?.node as ReservationType,
+                start: new Date(get(r?.node, "begin")),
+                end: new Date(get(r?.node, "end")),
+              }))
           );
 
           if (reservations.pageInfo.hasNextPage) {
