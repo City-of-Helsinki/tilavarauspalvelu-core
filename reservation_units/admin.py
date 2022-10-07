@@ -45,7 +45,7 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     model = ReservationUnit
     form = ReservationUnitAdminForm
     inlines = [ReservationUnitImageInline, ReservationUnitPricingInline]
-    readonly_fields = ["uuid"]
+    readonly_fields = ["uuid", "payment_product"]
     search_fields = ["name", "unit__name", "pk__iexact", "unit__service_sectors__name"]
 
     ordering = ["rank"]

@@ -18,7 +18,8 @@ from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from applications.tests.factories import ApplicationRoundFactory
-from merchants.tests.factories import PaymentMerchantFactory, PaymentProductFactory
+from merchants.tests.factories import PaymentMerchantFactory
+from merchants.verkkokauppa.product.types import Product
 from opening_hours.enums import State
 from opening_hours.errors import HaukiAPIError
 from opening_hours.hours import TimeElement
@@ -73,6 +74,16 @@ from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
+def mock_create_product(*args, **kwargs):
+    return Product(
+        product_id=UUID("1018cabd-d693-41c1-8ddc-dc5c08829048"),
+        namespace="tilanvaraus",
+        namespace_entity_id="foo",
+        merchant_id="bar",
+    )
+
+
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
 class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -2389,10 +2400,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_show_payment_merchant_from_reservation_unit(self):
+    @mock.patch(
+        "reservation_units.tasks.create_product", return_value=mock_create_product()
+    )
+    def test_show_payment_merchant_from_reservation_unit(self, mock_product):
+        merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.client.force_login(self.general_admin)
 
-        merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
 
@@ -2445,8 +2459,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_hide_payment_merchant_without_permissions(self):
+    @mock.patch(
+        "reservation_units.tasks.create_product", return_value=mock_create_product()
+    )
+    def test_hide_payment_merchant_without_permissions(self, mock_product):
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
+
         self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
 
@@ -2509,16 +2527,18 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_show_payment_product(self):
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    @mock.patch(
+        "reservation_units.tasks.create_product", return_value=mock_create_product()
+    )
+    def test_show_payment_product(self, mock_product):
         self.client.force_login(self.general_admin)
 
         merchant_pk = UUID("3828ac38-3e26-4501-8556-ba2ea3442627")
-        product_pk = UUID("1018cabd-d693-41c1-8ddc-dc5c08829048")
+        merchant = PaymentMerchantFactory.create(id=merchant_pk, name="Test Merchant")
+        ReservationUnitPricingFactory(reservation_unit=self.reservation_unit)
 
-        merchant = PaymentMerchantFactory.create(pk=merchant_pk, name="Test Merchant")
-        product = PaymentProductFactory.create(pk=product_pk, merchant=merchant)
-
-        self.reservation_unit.payment_product = product
+        self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
 
         response = self.query(
@@ -2543,14 +2563,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_hide_payment_product_without_permissions(self):
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    @mock.patch(
+        "reservation_units.tasks.create_product", return_value=mock_create_product()
+    )
+    def test_hide_payment_product_without_permissions(self, mock_product):
         merchant_pk = UUID("3828ac38-3e26-4501-8556-ba2ea3442627")
-        product_pk = UUID("1018cabd-d693-41c1-8ddc-dc5c08829048")
-
         merchant = PaymentMerchantFactory.create(pk=merchant_pk, name="Test Merchant")
-        product = PaymentProductFactory.create(pk=product_pk, merchant=merchant)
 
-        self.reservation_unit.payment_product = product
+        self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
 
         response = self.query(
