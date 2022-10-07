@@ -10,6 +10,7 @@ import {
   ReservationUnitPricingUpdateSerializerInput,
   ReservationUnitsReservationUnitImageImageTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
+  ReservationUnitsReservationUnitPricingTypeChoices,
   ResourceType,
   SpaceType,
   TermsOfUseTermsOfUseTermsTypeChoices,
@@ -206,13 +207,15 @@ export const reducer = (state: State, action: Action): State => {
                 ...(pick(pricing, [
                   "begins",
                   "priceUnit",
-                  "pricingType",
                   "status",
                   "pk",
                 ]) as ReservationUnitPricingUpdateSerializerInput),
                 taxPercentagePk: pricing?.taxPercentage.pk as number,
                 highestPrice: Number(pricing?.highestPrice),
                 lowestPrice: Number(pricing?.lowestPrice),
+                pricingType:
+                  pricing?.pricingType ||
+                  ReservationUnitsReservationUnitPricingTypeChoices.Free,
               })
             ),
             (i) =>
