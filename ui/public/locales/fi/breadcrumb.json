@@ -7,5 +7,6 @@
   "frontpage": "Etusivu",
   "recurring": "Kausivaraus",
   "applications": "Omat hakemukset",
-  "reservationUnit": "Varausyksikkö"
+  "reservationUnit": "Varausyksikkö",
+  "reservations": "Omat varaukset"
 }

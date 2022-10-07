@@ -138,6 +138,8 @@ export const getReservationUnitName = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType,
   language: string = i18n.language
 ): string => {
+  if (!reservationUnit) return null;
+
   const key = `name${capitalize(language)}`;
   return reservationUnit[key] || reservationUnit.nameFi;
 };

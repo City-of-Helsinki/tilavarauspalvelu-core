@@ -1,19 +1,18 @@
 import { hzNavigationBack } from "model/calendar";
 import {
-  modifyButton,
   cancelButton as detailCancelButton,
   accordionToggler,
-  returnButton,
   reservationPriceContainer,
+  reservationContent,
+  reservationInfoCard,
+  calendarLinkButton,
 } from "model/reservation-detail";
 import {
   cancelButton,
   detailButton,
-  loader,
   redoReservationButton,
   reservationCards,
   tab,
-  ticket,
   timeStrip,
 } from "model/reservation-list";
 import {
@@ -36,6 +35,7 @@ describe("Tilavaraus user reservations", () => {
     });
 
     cy.visit("/reservations");
+    cy.injectAxe();
   });
 
   afterEach(() => {
@@ -100,41 +100,117 @@ describe("Tilavaraus user reservations", () => {
     hzNavigationBack().should("exist");
   });
 
-  it("should display reservation detail view", () => {
+  it("should display reservation detail view with company reservee", () => {
+    detailButton().eq(1).click();
+
+    cy.url({ timeout: 20000 }).should("match", /\/reservations\/11$/);
+
+    detailCancelButton().should("be.disabled");
+
+    reservationContent().find("h1").should("contain", "Varaus 11");
+    reservationContent().find("h2").should("contain", "Toimistohuone 1");
+
+    cy.contains("div", "Confirmed Instructions FI").should("be.visible");
+
+    reservationContent()
+      .should("contain.text", "Yrityksen nimi: Acme Oyj")
+      .should("contain.text", "Yhteyshenkilön nimi: First name Last name")
+      .should("contain.text", "Yhteyshenkilön puhelinnumero: +358 123 4567")
+      .should("contain.text", "Yhteyshenkilön sähköposti: email@example.com");
+
+    cy.contains("div", "Payment terms FI").should("not.be.visible");
+    cy.contains("div", "Cancellation terms FI").should("not.be.visible");
+    accordionToggler("reservation__payment-and-cancellation-terms").click();
+    cy.contains("div", "Payment terms FI").should("be.visible");
+    cy.contains("div", "Cancellation terms FI").should("be.visible");
+
+    cy.contains("div", "Pricing terms FI").should("not.be.visible");
+    accordionToggler("reservation__pricing-terms").click();
+    cy.contains("div", "Pricing terms FI").should("be.visible");
+
+    cy.contains("div", "Sopparijuttuja").should("not.be.visible");
+    cy.contains("div", "Toinen rivi").should("not.be.visible");
+    accordionToggler("reservation__terms-of-use").click();
+    cy.contains("div", "Sopparijuttuja").should("be.visible");
+    cy.contains("div", "Toinen rivi").should("be.visible");
+
+    reservationInfoCard()
+      .find("h3")
+      .should("contain.text", "Reservation name / Toimistohuone 1");
+    reservationInfoCard()
+      .should("contain.text", "Varausnumero: 11")
+      .should("contain.text", "Ke 28.4.2021 klo")
+      .should("contain.text", "Kesto: Kesto 4 t")
+      .should(
+        "contain.text",
+        "Varauksen kuvaus: Reservation description - a long one with alotta text"
+      )
+      .should("contain.text", "Hinta: 42\u00a0€")
+      .should("contain.text", "Käyttötarkoitus: Liikkua tai pelata FI")
+      .should("contain.text", "Ikäryhmä: 5 - 8")
+      .should("contain.text", "Osallistujamäärä: 18");
+
+    calendarLinkButton()
+      .should("be.enabled")
+      .should("contain.text", "Tallenna kalenteriin");
+
+    cy.checkA11y(null, null, null, true);
+  });
+
+  it("should display reservation detail view with individual reservee", () => {
     detailButton().eq(0).click();
 
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/4$/);
 
-    modifyButton().should("be.disabled");
     detailCancelButton().should("be.disabled");
 
-    ticket().should("have.css", "background-color", "rgb(225, 245, 243)");
-
-    cy.get("main#main").should(
-      "contain.text",
-      "Saat sähköpostiisi (user@gmail.com) muistutuksen varauksesta."
-    );
+    reservationContent().find("h1").should("contain", "Varaus 4");
+    reservationContent().find("h2").should("contain", "Toimistohuone 1");
 
     cy.contains("div", "Confirmed Instructions FI").should("be.visible");
 
+    reservationContent()
+      .should("contain.text", "Nimi: First name Last name")
+      .should("contain.text", "Puhelin: +358 123 4567")
+      .should("contain.text", "Sähköposti: email@example.com");
+
+    cy.contains("div", "Payment terms FI").should("not.be.visible");
+    cy.contains("div", "Cancellation terms FI").should("not.be.visible");
+    accordionToggler("reservation__payment-and-cancellation-terms").click();
+    cy.contains("div", "Payment terms FI").should("be.visible");
+    cy.contains("div", "Cancellation terms FI").should("be.visible");
+
+    cy.contains("div", "Pricing terms FI").should("not.be.visible");
+    accordionToggler("reservation__pricing-terms").click();
+    cy.contains("div", "Pricing terms FI").should("be.visible");
+
     cy.contains("div", "Sopparijuttuja").should("not.be.visible");
     cy.contains("div", "Toinen rivi").should("not.be.visible");
-    accordionToggler().eq(0).click();
+    accordionToggler("reservation__terms-of-use").click();
     cy.contains("div", "Sopparijuttuja").should("be.visible");
     cy.contains("div", "Toinen rivi").should("be.visible");
 
-    cy.contains("div", "Service specific terms FI").should("not.be.visible");
-    accordionToggler().eq(1).click();
-    cy.contains("div", "Service specific terms FI").should("be.visible");
+    reservationInfoCard()
+      .find("h3")
+      .should("contain.text", "Reservation name / Toimistohuone 1");
+    reservationInfoCard()
+      .should("contain.text", "Varausnumero: 4")
+      .should("contain.text", "Ke 28.4.2021 klo")
+      .should("contain.text", "Kesto: Kesto 4 t")
+      .should(
+        "contain.text",
+        "Varauksen kuvaus: Reservation description - a long one with alotta text"
+      )
+      .should("contain.text", "Hinta: 42\u00a0€")
+      .should("contain.text", "Käyttötarkoitus: Liikkua tai pelata FI")
+      .should("contain.text", "Ikäryhmä: 5 - 8")
+      .should("contain.text", "Osallistujamäärä: 18");
 
-    reservationPriceContainer()
-      .should("contain.text", "Varaus 4 t")
-      // .should("contain.text", "(alv %)")
-      .should("contain.text", "42,00\u00a0€");
+    calendarLinkButton()
+      .should("be.enabled")
+      .should("contain.text", "Tallenna kalenteriin");
 
-    returnButton().click();
-
-    cy.url({ timeout: 20000 }).should("match", /\/reservations$/);
+    cy.checkA11y(null, null, null, true);
   });
 
   it("should do cancellation", () => {
@@ -143,7 +219,6 @@ describe("Tilavaraus user reservations", () => {
     detailCancelButton().click();
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/21\/cancel$/);
 
-    ticket().should("have.css", "background-color", "rgb(225, 245, 243)");
     cancelTitle().eq(0).should("have.text", "Toimistohuone 1");
     cancelTitle().eq(1).should("have.text", "Peruuta varaus");
     cancelCancelButton().should("be.disabled");
@@ -165,7 +240,6 @@ describe("Tilavaraus user reservations", () => {
     customReasonInput().type("A reason");
 
     cancelCancelButton().click();
-    ticket().should("have.css", "background-color", "rgb(255, 225, 225)");
     cancelTitle().eq(1).should("have.text", "Varaus on peruutettu");
 
     reservationPriceContainer()

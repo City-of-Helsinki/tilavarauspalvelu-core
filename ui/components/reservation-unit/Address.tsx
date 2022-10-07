@@ -6,12 +6,13 @@ import ExternalLink from "./ExternalLink";
 import {
   LocationType,
   ReservationUnitByPkType,
+  ReservationUnitType,
   UnitType,
 } from "../../modules/gql-types";
 import { H4 } from "../../modules/style/typography";
 
 type Props = {
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitByPkType | ReservationUnitType;
 };
 
 const Container = styled.div`

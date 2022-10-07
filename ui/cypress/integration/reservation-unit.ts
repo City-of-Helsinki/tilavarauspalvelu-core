@@ -13,7 +13,6 @@ import {
   nextAvailableTimeLink,
   price,
   submitButton,
-  timeSelect,
   timeSlots,
 } from "model/quick-reservation";
 import {
@@ -38,6 +37,7 @@ import {
   calendarWrapper,
   reservationQuotaNotification,
 } from "model/reservation-creation";
+import { reservationInfoCard } from "model/reservation-detail";
 import { ticket } from "model/reservation-list";
 import {
   addressContainer,
@@ -233,7 +233,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .invoke("attr", "href")
         .should("eq", "http://calendarUrl/42");
 
-      cy.contains("h3", "Varauksen ohjeet").should("be.visible");
+      cy.contains("h3", "Lisätietoa varauksestasi").should("be.visible");
       cy.contains("p", "Confirmed Instructions FI").should("be.visible");
 
       confirmationParagraph()
@@ -872,7 +872,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .invoke("attr", "href")
         .should("eq", "http://calendarUrl/42");
 
-      cy.contains("h3", "Varauksen ohjeet").should("be.visible");
+      cy.contains("h3", "Lisätietoa varauksestasi").should("be.visible");
       cy.contains("p", "Confirmed Instructions FI").should("be.visible");
 
       confirmationParagraph()

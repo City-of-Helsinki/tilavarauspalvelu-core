@@ -22,6 +22,11 @@ import {
   QueryCitiesArgs,
   CityTypeConnection,
   QueryReservationsArgs,
+  TermsOfUseTermsOfUseTermsTypeChoices,
+  ReservationUnitsReservationUnitImageImageTypeChoices,
+  SpaceType,
+  UnitType,
+  ReservationsReservationReserveeTypeChoices,
 } from "../../modules/gql-types";
 
 const createReservation = graphql.mutation<
@@ -263,12 +268,14 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
     const { pk } = req.variables;
     const data = {
       pk,
+      type: ReservationsReservationReserveeTypeChoices.Individual,
       id: "UmVzZXJ2YXRpb246Mg==",
       name: "Reservation name",
-      description: "Reservation description",
+      description: "Reservation description - a long one with alotta text",
       reserveeFirstName: "First name",
       reserveeLastName: "Last name",
       reserveePhone: "+358 123 4567",
+      reserveeEmail: "email@example.com",
       begin: "2021-04-28T04:23:20+00:00",
       end: "2021-04-28T08:23:20+00:00",
       calendarUrl: `http://localhost:8000/v1/reservation_calendar/${pk}/?hash=12c580bc07340b05441feb8f261786a7ceabb5423a1966c7c13241f39916233c`,
@@ -277,6 +284,12 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       bufferTimeBefore: 3600,
       bufferTimeAfter: 1800,
       price: 42.0,
+      purpose: {
+        id: "aoeirgfj",
+        nameFi: "Liikkua tai pelata FI",
+        nameEn: "Liikkua tai pelata EN",
+        nameSv: "Liikkua tai pelata SV",
+      },
       reservationUnits: [
         {
           id: "UmVzZXJ2YXRpb25Vbml0VHlwZTo5",
@@ -297,9 +310,32 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
           reservationCancelledInstructionsEn: "Cancelled Instructions EN",
           reservationCancelledInstructionsSv: "Cancelled Instructions SV",
           serviceSpecificTerms: {
+            id: "fawoifhj",
             textFi: "Service specific terms FI",
             textEn: null,
             textSv: null,
+            termsType: TermsOfUseTermsOfUseTermsTypeChoices.ServiceTerms,
+          },
+          paymentTerms: {
+            id: "fawoifhj",
+            textFi: "Payment terms FI",
+            textEn: null,
+            textSv: null,
+            termsType: TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms,
+          },
+          cancellationTerms: {
+            id: "fawoifhj",
+            textFi: "Cancellation terms FI",
+            textEn: null,
+            textSv: null,
+            termsType: TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms,
+          },
+          pricingTerms: {
+            id: "fawoifhj",
+            textFi: "Pricing terms FI",
+            textEn: null,
+            textSv: null,
+            termsType: TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms,
           },
           unit: {
             id: "VW5pdFR5cGU6NA==",
@@ -307,29 +343,64 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
             nameEn: null,
             nameSv: null,
             location: {
+              id: "r82394j",
               addressStreetFi: "Jokukatu 5",
               addressStreetEn: null,
               addressStreetSv: null,
+              addressCityFi: "Helsinki",
+              addressCityEn: null,
+              addressCitySv: null,
+              addressZip: "00100",
             },
-          },
+          } as UnitType,
           cancellationRule: null,
           spaces: [
             {
               pk: 36,
+              id: "fawpeifje",
               nameFi: "Toimistohuone 1",
               nameEn: null,
               nameSv: null,
+            } as SpaceType,
+          ],
+          images: [
+            {
+              imageUrl: "/Leikkipuisto_2_4SSB34h.jpg",
+              mediumUrl: "https://via.placeholder.com/384x384",
+              smallUrl: "/Leikkipuisto_2_4SSB34h.jpg.250x250_q85_crop.jpg",
+              imageType:
+                ReservationUnitsReservationUnitImageImageTypeChoices.Other,
+            },
+            {
+              imageUrl: "/Musiikki_2.jpg",
+              mediumUrl: "https://via.placeholder.com/384x384",
+              smallUrl: "/Musiikki_2.jpg.250x250_q85_crop.jpg",
+              imageType:
+                ReservationUnitsReservationUnitImageImageTypeChoices.Main,
             },
           ],
-        },
+        } as ReservationUnitType,
       ],
-    };
+      ageGroup: {
+        id: "famwieopfm",
+        pk: 1,
+        minimum: 5,
+        maximum: 8,
+      },
+      numPersons: 18,
+    } as ReservationType;
+
+    if (pk === 11) {
+      data.type = ReservationsReservationReserveeTypeChoices.Business;
+      data.reserveeOrganisationName = "Acme Oyj";
+    }
 
     if (pk === 21) {
       data.begin = addDays(new Date(), 10).toISOString();
       data.end = addHours(addDays(new Date(), 10), 2).toISOString();
       data.reservationUnits[0].cancellationRule = {
-        canBeCancelled: 10,
+        id: "fr8ejifod",
+        canBeCancelledTimeBefore: 10,
         needsHandling: false,
       };
     }
@@ -443,21 +514,15 @@ const reservationData = [
           location: null,
           images: [
             {
-              imageUrl:
-                "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Leikkipuisto_2_4SSB34h.jpg",
-              mediumUrl:
-                "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Leikkipuisto_2_4SSB34h.jpg.384x384_q85_crop.jpg",
-              smallUrl:
-                "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Leikkipuisto_2_4SSB34h.jpg.250x250_q85_crop.jpg",
+              imageUrl: "/Leikkipuisto_2_4SSB34h.jpg",
+              mediumUrl: "/Leikkipuisto_2_4SSB34h.jpg.384x384_q85_crop.jpg",
+              smallUrl: "/Leikkipuisto_2_4SSB34h.jpg.250x250_q85_crop.jpg",
               imageType: "OTHER",
             },
             {
-              imageUrl:
-                "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Musiikki_2.jpg",
-              mediumUrl:
-                "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Musiikki_2.jpg.384x384_q85_crop.jpg",
-              smallUrl:
-                "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Musiikki_2.jpg.250x250_q85_crop.jpg",
+              imageUrl: "/Musiikki_2.jpg",
+              mediumUrl: "/Musiikki_2.jpg.384x384_q85_crop.jpg",
+              smallUrl: "/Musiikki_2.jpg.250x250_q85_crop.jpg",
               imageType: "MAIN",
             },
           ],

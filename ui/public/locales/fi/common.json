@@ -85,6 +85,8 @@
   },
   "location": "Sijainti",
   "phone": "Puhelin",
+  "email": "Sähköposti",
+  "name": "Nimi",
   "thanksForUsingVaraamo": "Kiitos Varaamon käytöstä!",
   "sendFeedback": "Lähetä palvelusta palautetta.",
   "gotoFrontpage": "Palaa etusivulle",

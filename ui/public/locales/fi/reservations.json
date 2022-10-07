@@ -1,4 +1,6 @@
 {
+  "reservationName": "Varaus {{id}}",
+  "reservationNumber": "Varausnumero",
   "subHeading": "Hallinnoi omia varauksiasi",
   "back": "Takaisin Omat hakemukset",
   "info": "Hakemukselle on myönnetty seuraavat vuorot",
@@ -32,9 +34,25 @@
   "reservationCancelledBody": "Varauksesi on nyt peruutettu. Voit tarkistaa maksu- ja peruutusehdot kohteen esittelystä. Ole tarvittaessa yhteydessä meihin. Yhteystiedot löydät varausvahvistuksesta.",
   "reservationCancellationFailed": "Varauksen peruuttaminen epäonnistui",
   "makeNewReservation": "Tee uusi varaus samaan tilaan",
-  "reservationInfo": "Varauksen ohjeet",
+  "reservationInfo": "Lisätietoa varauksestasi",
   "gotoReservations": "Siirry omiin varauksiin",
   "reservationDuration": "Varaus {{duration}}",
   "noUpcomingReservations": "Ei tulevia varauksia",
-  "noPastReservations": "Ei menneitä varauksia"
+  "noPastReservations": "Ei menneitä varauksia",
+  "status": {
+    "cancelled": "Peruutettu",
+    "confirmed": "Hyväksytty",
+    "denied": "Hylätty",
+    "requiresHandling": "Käsittelyssä",
+    "created": "Luotu"
+  },
+  "purpose": "Käyttötarkoitus",
+  "ageGroup": "Ikäryhmä",
+  "numPersons": "Osallistujamäärä",
+  "organisationName": "Yrityksen nimi",
+  "reserveeId": "Y-tunnus",
+  "contactName": "Yhteyshenkilön nimi",
+  "contactPhone": "Yhteyshenkilön puhelinnumero",
+  "contactEmail": "Yhteyshenkilön sähköposti",
+  "saveToCalendar": "Tallenna kalenteriin"
 }

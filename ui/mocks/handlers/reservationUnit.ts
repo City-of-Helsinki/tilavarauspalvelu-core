@@ -97,30 +97,21 @@ const selectedReservationUnitQuery = graphql.query<
     reservationEnds: addDays(new Date(), 10),
     images: [
       {
-        imageUrl:
-          "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg",
-        mediumUrl:
-          "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg.384x384_q85_crop.jpg",
-        smallUrl:
-          "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg.250x250_q85_crop.jpg",
+        imageUrl: "https://via.placeholder.com/1024x768",
+        mediumUrl: "https://via.placeholder.com/384x384",
+        smallUrl: "https://via.placeholder.com/250x250",
         imageType: "MAIN",
       },
       {
-        imageUrl:
-          "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg",
-        mediumUrl:
-          "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg.384x384_q85_crop.jpg",
-        smallUrl:
-          "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg.250x250_q85_crop.jpg",
+        imageUrl: "https://via.placeholder.com/1024x768",
+        mediumUrl: "https://via.placeholder.com/384x384",
+        smallUrl: "https://via.placeholder.com/250x250",
         imageType: "OTHER",
       },
       {
-        imageUrl:
-          "http://localhost:8000/media/reservation_unit_images/575479-L.jpg",
-        mediumUrl:
-          "http://localhost:8000/media/reservation_unit_images/575479-L.jpg.384x384_q85_crop.jpg",
-        smallUrl:
-          "http://localhost:8000/media/reservation_unit_images/575479-L.jpg.250x250_q85_crop.jpg",
+        imageUrl: "https://via.placeholder.com/1024x768",
+        mediumUrl: "https://via.placeholder.com/384x384",
+        smallUrl: "https://via.placeholder.com/250x250",
         imageType: "OTHER",
       },
     ] as ReservationUnitImageType[],
@@ -713,24 +704,18 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
           "PAID" as ReservationUnitsReservationUnitPricingTypeChoices,
         images: [
           {
-            imageUrl:
-              "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg",
-            smallUrl:
-              "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg.250x250_q85_crop.jpg",
+            imageUrl: "https://via.placeholder.com/1024x768",
+            smallUrl: "https://via.placeholder.com/250x250",
             imageType: "MAIN",
           },
           {
-            imageUrl:
-              "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg",
-            smallUrl:
-              "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg.250x250_q85_crop.jpg",
+            imageUrl: "https://via.placeholder.com/1024x768",
+            smallUrl: "https://via.placeholder.com/250x250",
             imageType: "OTHER",
           },
           {
-            imageUrl:
-              "http://localhost:8000/media/reservation_unit_images/575479-L.jpg",
-            smallUrl:
-              "http://localhost:8000/media/reservation_unit_images/575479-L.jpg.250x250_q85_crop.jpg",
+            imageUrl: "https://via.placeholder.com/1024x768",
+            smallUrl: "https://via.placeholder.com/250x250",
             imageType: "OTHER",
           },
         ] as ReservationUnitImageType[],

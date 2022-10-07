@@ -85,6 +85,8 @@
   },
   "location": "Läge",
   "phone": "Telefon",
+  "email": "E-post",
+  "name": "Namn",
   "thanksForUsingVaraamo": "Tack för att du använder Varaamo!",
   "sendFeedback": "Skicka feedback om tjänsten.",
   "gotoFrontpage": "Tillbaka till hemsidan",

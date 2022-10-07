@@ -189,14 +189,35 @@ export const GET_RESERVATION = gql`
           textEn
           textSv
         }
+        cancellationTerms {
+          textFi
+          textEn
+          textSv
+        }
+        paymentTerms {
+          textFi
+          textEn
+          textSv
+        }
+        pricingTerms {
+          textFi
+          textEn
+          textSv
+        }
         unit {
           nameFi
           nameEn
           nameSv
           location {
+            latitude
+            longitude
             addressStreetFi
             addressStreetEn
             addressStreetSv
+            addressZip
+            addressCityFi
+            addressCityEn
+            addressCitySv
           }
         }
         cancellationRule {
@@ -212,6 +233,13 @@ export const GET_RESERVATION = gql`
         metadataSet {
           supportedFields
           requiredFields
+        }
+        images {
+          imageUrl
+          largeUrl
+          mediumUrl
+          smallUrl
+          imageType
         }
       }
       purpose {

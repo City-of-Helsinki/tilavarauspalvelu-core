@@ -7,5 +7,6 @@
   "frontpage": "Home",
   "recurring": "Seasonal booking",
   "applications": "My applications",
-  "reservationUnit": "Reservation unit"
+  "reservationUnit": "Reservation unit",
+  "reservations": "My bookings"
 }

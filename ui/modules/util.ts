@@ -28,6 +28,7 @@ import {
   ReservationUnitImageType,
   ReservationUnitType,
   ApplicationStatus,
+  ReservationUnitByPkType,
 } from "./gql-types";
 
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -299,7 +300,7 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
 );
 
 export const getMainImage = (
-  ru: ReservationUnit | ReservationUnitType
+  ru: ReservationUnit | ReservationUnitType | ReservationUnitByPkType
 ): Image | ReservationUnitImageType | null => {
   if (!ru.images || ru.images.length === 0) {
     return null;

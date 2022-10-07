@@ -7,5 +7,6 @@
   "frontpage": "Hemsidan",
   "recurring": "Säsongbokning",
   "applications": "Mina bokningar",
-  "reservationUnit": "Bokningsenhet"
+  "reservationUnit": "Bokningsenhet",
+  "reservations": "Mina bokningar"
 }

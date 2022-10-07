@@ -60,7 +60,7 @@ import apolloClient from "../../modules/apolloClient";
 import Map from "../../components/Map";
 import { H4 } from "../../modules/style/typography";
 import Legend from "../../components/calendar/Legend";
-import ReservationInfo from "../../components/calendar/ReservationInfo";
+import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
 import {
   formatDate,
   getTranslation,
@@ -378,10 +378,6 @@ const Left = styled.div`
 `;
 
 const Content = styled.div`
-  /* & > p {
-    margin: 0;
-  } */
-
   font-size: var(--fontsize-body-l);
   line-height: var(--lineheight-l);
   white-space: pre-wrap;
@@ -1049,7 +1045,7 @@ const ReservationUnit = ({
                     <CalendarFooter
                       $cookiehubBannerHeight={cookiehubBannerHeight}
                     >
-                      <ReservationInfo
+                      <ReservationCalendarControls
                         reservationUnit={reservationUnit}
                         begin={initialReservation?.begin}
                         end={initialReservation?.end}

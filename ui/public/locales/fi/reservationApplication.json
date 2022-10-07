@@ -2,7 +2,6 @@
   "title": "Uusi varausanomus",
   "titleSent": "Varausanomus jätetty",
   "applicationInfo": "Anomuksen tiedot",
-  "applicationSummary": "Anomuksen yhteenveto",
   "summaryIngress": "Anomuksesi on nyt käsiteltävänä. Tästä löydät yhteenvedon anomuksestasi.",
   "reserveeTypePrefix": "Luon hakemuksen",
   "reserveeTypes": {

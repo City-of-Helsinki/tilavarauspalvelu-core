@@ -1,49 +1,45 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
-import { get, isFinite } from "lodash";
-import { Accordion, IconArrowLeft, IconCrossCircle, IconPen } from "hds-react";
+import { isFinite } from "lodash";
+import { IconCalendar, IconCross, Notification } from "hds-react";
 import { useQuery } from "@apollo/client";
-import { Trans, useTranslation } from "react-i18next";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import {
   Query,
+  QueryReservationByPkArgs,
   QueryTermsOfUseArgs,
+  ReservationsReservationReserveeTypeChoices,
   ReservationType,
   TermsOfUseType,
 } from "../../modules/gql-types";
 import apolloClient from "../../modules/apolloClient";
 import { GET_RESERVATION } from "../../modules/queries/reservation";
 import {
-  fontRegular,
-  H1,
-  H2,
-  H3,
-  Strong,
-} from "../../modules/style/typography";
-import { NarrowCenteredContainer } from "../../modules/style/layout";
+  JustForDesktop,
+  JustForMobile,
+  NarrowCenteredContainer,
+} from "../../modules/style/layout";
 import { breakpoint } from "../../modules/style";
-import Ticket from "../../components/reservation/Ticket";
 import { getTranslation, reservationsUrl } from "../../modules/util";
-import {
-  CenterSpinner,
-  TwoColumnContainer,
-} from "../../components/common/common";
+import { CenterSpinner } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
 import Sanitize from "../../components/common/Sanitize";
-import {
-  canUserCancelReservation,
-  getReservationApplicationFields,
-  ReserveeType,
-} from "../../modules/reservation";
+import { AccordionWithState as Accordion } from "../../components/common/Accordion";
+import { canUserCancelReservation } from "../../modules/reservation";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
-import KorosDefault from "../../components/common/KorosDefault";
 import {
   getReservationUnitInstructionsKey,
   getReservationUnitName,
-  getUnitName,
 } from "../../modules/reservationUnit";
+import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
+import ReservationStatus from "../../components/reservation/ReservationStatus";
+import Address from "../../components/reservation-unit/Address";
+import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
+import { H1, H4 } from "../../modules/style/typography";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -71,7 +67,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         ...(await serverSideTranslations(locale)),
-        overrideBackgroundColor: "var(--tilavaraus-gray)",
+        overrideBackgroundColor: "var(--tilavaraus-white)",
         termsOfUse: {
           genericTerms,
         },
@@ -89,12 +85,15 @@ const Spinner = styled(CenterSpinner)`
   margin: var(--spacing-layout-xl) auto;
 `;
 
-const Head = styled.div`
-  padding: var(--spacing-layout-m) 0 0;
+const StyledBreadcrumbWrapper = styled(BreadcrumbWrapper)`
+  padding: 0;
+`;
+
+const Wrapper = styled.div`
   background-color: var(--color-white);
 `;
 
-const HeadWrapper = styled(NarrowCenteredContainer)`
+const Container = styled(NarrowCenteredContainer)`
   padding: 0 var(--spacing-m) var(--spacing-layout-m);
 
   @media (min-width: ${breakpoint.m}) {
@@ -104,14 +103,19 @@ const HeadWrapper = styled(NarrowCenteredContainer)`
 `;
 
 const Heading = styled(H1)`
-  font-size: 1.75rem;
-  font-family: var(--font-bold);
-  font-weight: 700;
+  margin-top: 0;
   margin-bottom: var(--spacing-m);
 `;
 
-const HeadColumns = styled(TwoColumnContainer)`
+const SubHeading = styled(H4).attrs({ as: "h2" })`
   margin-top: 0;
+  margin-bottom: var(--spacing-m);
+`;
+
+const Columns = styled.div`
+  grid-template-columns: 1fr;
+  display: grid;
+  align-items: flex-start;
   gap: var(--spacing-m);
 
   @media (min-width: ${breakpoint.m}) {
@@ -119,14 +123,15 @@ const HeadColumns = styled(TwoColumnContainer)`
       order: 2;
     }
 
-    gap: var(--spacing-layout-xl);
+    margin-top: var(--spacing-xl);
+    grid-template-columns: 1fr 378px;
   }
 `;
 
 const Actions = styled.div`
   display: flex;
-  flex-direction: column;
   gap: var(--spacing-m);
+  margin: var(--spacing-s) 0 var(--spacing-xl);
 
   @media (min-width: ${breakpoint.s}) {
     button {
@@ -135,30 +140,21 @@ const Actions = styled.div`
   }
 `;
 
-const StyledKoros = styled(KorosDefault)`
-  margin-top: var(--spacing-layout-xl);
-`;
-
-const BodyContainer = styled(NarrowCenteredContainer)`
-  background-color: var(-color-gray);
-  padding-bottom: var(--spacing-layout-l);
-  ${fontRegular};
-
-  a {
-    color: var(--color-bus);
-  }
+const SecondaryActions = styled.div`
+  margin-top: var(--spacing-l);
+  display: flex;
+  gap: var(--spacing-m);
 
   @media (min-width: ${breakpoint.m}) {
-    max-width: 791px;
-    padding-right: 219px;
+    justify-content: flex-end;
   }
 `;
 
-const ContentHeading = styled(H2)`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
-  font-weight: 700;
+const Content = styled.div`
+  font-size: var(--fontsize-body-l);
 `;
+
+const ParagraphHeading = styled(H4).attrs({ as: "h3" })``;
 
 const Paragraph = styled.p`
   white-space: pre-line;
@@ -173,7 +169,7 @@ const ParagraphAlt = styled(Paragraph)`
   margin-bottom: 0;
 `;
 
-const TermContainer = styled.div`
+const ContentContainer = styled.div`
   margin-bottom: var(--spacing-xl);
   white-space: pre-line;
 
@@ -182,40 +178,37 @@ const TermContainer = styled.div`
   }
 `;
 
-const AccordionContainer = styled.div`
-  @media (min-width: ${breakpoint.m}) {
-    width: 70%;
-  }
-
+const AccordionContent = styled.div`
+  font-size: var(--fontsize-body-l);
   line-height: var(--lineheight-l);
-
-  ${TermContainer} {
-    margin-bottom: 0;
-  }
-
-  button {
-    margin-bottom: var(--spacing-xs);
-  }
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: var(--spacing-s);
+  padding-top: var(--spacing-m);
 `;
 
-const ActionContainer = styled.div`
-  margin-top: var(--spacing-2-xl);
+const Terms = styled.div`
+  margin-bottom: var(--spacing-xl);
 `;
 
 const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const [reservation, setReservation] = useState<ReservationType>();
-
-  useQuery(GET_RESERVATION, {
+  const {
+    data: reservationData,
+    loading,
+    error,
+  } = useQuery<Query, QueryReservationByPkArgs>(GET_RESERVATION, {
     fetchPolicy: "no-cache",
     variables: {
       pk: id,
     },
-    onCompleted: (data) => {
-      setReservation(data.reservationByPk);
-    },
   });
+
+  const reservation: ReservationType = useMemo(
+    () => reservationData?.reservationByPk,
+    [reservationData]
+  );
 
   const reservationUnit = reservation?.reservationUnits[0];
 
@@ -226,268 +219,243 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
 
   const isReservationCancelled = reservation?.state === "CANCELLED";
   const isBeingHandled = reservation?.state === "REQUIRES_HANDLING";
-  const ticketState = useMemo(() => {
-    if (isBeingHandled) {
-      return "incomplete";
-    }
 
-    return isReservationCancelled ? "error" : "complete";
-  }, [isBeingHandled, isReservationCancelled]);
+  const paymentTermsContent = useMemo(
+    () => getTranslation(reservationUnit?.paymentTerms, "text"),
+    [reservationUnit]
+  );
 
-  if (!reservation) {
-    return <Spinner />;
+  const cancellationTermsContent = useMemo(
+    () => getTranslation(reservationUnit?.cancellationTerms, "text"),
+    [reservationUnit]
+  );
+
+  const pricingTermsContent = useMemo(
+    () => getTranslation(reservationUnit?.pricingTerms, "text"),
+    [reservationUnit]
+  );
+
+  const serviceSpecificTermsContent = useMemo(
+    () => getTranslation(reservationUnit?.serviceSpecificTerms, "text"),
+    [reservationUnit]
+  );
+
+  const bylineContent = useMemo(() => {
+    return (
+      reservation && (
+        <>
+          <ReservationInfoCard
+            reservation={reservation}
+            reservationUnit={reservationUnit}
+          />
+          <SecondaryActions>
+            <Link href={reservation.calendarUrl} passHref>
+              <MediumButton
+                variant="secondary"
+                iconRight={<IconCalendar aria-hidden />}
+                disabled={!reservation.calendarUrl}
+                data-testid="reservation__button--calendar-link"
+              >
+                {t("reservations:saveToCalendar")}
+              </MediumButton>
+            </Link>
+          </SecondaryActions>
+        </>
+      )
+    );
+  }, [reservation, reservationUnit, t]);
+
+  if (error) {
+    return (
+      <Notification
+        type="error"
+        label={t("common:error")}
+        position="top-center"
+        autoClose={false}
+        displayAutoCloseProgress={false}
+      >
+        {t("common:dataError")}
+      </Notification>
+    );
   }
 
-  const optionValues = {
-    purpose: getTranslation(reservation.purpose, "name"),
-    ageGroup: `${reservation.ageGroup?.minimum} - ${reservation.ageGroup?.maximum}`,
-    homeCity: reservation.homeCity?.name,
-  };
-
-  const headingSlug = isReservationCancelled
-    ? "reservations:reservationCancelledTitle"
-    : isBeingHandled
-    ? "reservationApplication:applicationInfo"
-    : "reservationCalendar:reservationInfo";
-  const subHeadingSlug = isBeingHandled
-    ? "reservationApplication:applicationSummary"
-    : "reservationCalendar:reservationSummary";
-
-  const reserveeType =
-    reservation.reserveeType && reservation.reserveeType.toLowerCase();
-
-  return (
-    <>
-      <Head>
-        <HeadWrapper>
-          <HeadColumns>
-            <Ticket
-              state={ticketState}
-              title={getReservationUnitName(reservationUnit)}
-              subtitle={getUnitName(reservationUnit.unit)}
-              begin={reservation.begin}
-              end={reservation.end}
-              isFree={!reservation.price}
-              reservationPrice={reservation.price}
-            />
-            <div>
-              <Heading>{t(headingSlug)}</Heading>
-              <Actions>
-                <MediumButton
-                  variant="secondary"
-                  iconLeft={<IconPen />}
-                  onClick={() => {}}
-                  disabled
-                  data-testid="reservation-detail__button--edit"
-                >
-                  {t(
-                    `reservations:modify${
-                      isBeingHandled ? "Application" : "Reservation"
-                    }`
-                  )}
-                </MediumButton>
-                <MediumButton
-                  variant="secondary"
-                  iconLeft={<IconCrossCircle />}
-                  onClick={() =>
-                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
-                  }
-                  disabled={
-                    !canUserCancelReservation(reservation) ||
-                    isReservationCancelled ||
-                    isBeingHandled
-                  }
-                  data-testid="reservation-detail__button--cancel"
-                >
-                  {t(
-                    `reservations:cancel${
-                      isBeingHandled ? "Application" : "Reservation"
-                    }`
-                  )}
-                </MediumButton>
-              </Actions>
-            </div>
-          </HeadColumns>
-        </HeadWrapper>
-        <StyledKoros from="white" to="var(--tilavaraus-gray)" />
-      </Head>
-      <BodyContainer>
-        <ContentHeading>{t(subHeadingSlug)}</ContentHeading>
-        {isBeingHandled ? (
-          <Paragraph>{t("reservationApplication:summaryIngress")}</Paragraph>
-        ) : (
-          <>
-            <Paragraph>
-              <Trans
-                i18nKey="reservationUnit:reservationReminderText"
-                t={t}
-                values={{ user: reservation?.user }}
-                components={{
-                  emailLink: (
-                    <a href={`mailto:${reservation?.user}`}>
-                      {reservation?.user}
-                    </a>
-                  ),
-                }}
-              />
-            </Paragraph>
-            <Paragraph>
-              <Trans
-                i18nKey="reservationUnit:loadReservationCalendar"
-                t={t}
-                components={{
-                  calendarLink: (
-                    <a
-                      href={reservation?.calendarUrl}
-                      data-test="reservation__confirmation--calendar-url"
-                    >
-                      {" "}
-                    </a>
-                  ),
-                }}
-              />
-            </Paragraph>
-            <Paragraph>
-              {t("common:thanksForUsingVaraamo")}
-              <br />
-              <a
-                href={t(`footer:Navigation.feedback.href`)}
-                target="_blank"
-                rel="noopener noreferrer"
+  return loading || !reservation ? (
+    <Spinner />
+  ) : (
+    <Wrapper>
+      <Container>
+        <StyledBreadcrumbWrapper
+          route={[
+            "",
+            "/reservations",
+            t("reservations:reservationName", { id: reservation.pk }),
+          ]}
+        />
+        <Columns>
+          <div>
+            <JustForDesktop>{bylineContent}</JustForDesktop>
+          </div>
+          <div data-testid="reservation__content">
+            <Heading>
+              {t("reservations:reservationName", { id: reservation.pk })}
+            </Heading>
+            <SubHeading>{getReservationUnitName(reservationUnit)}</SubHeading>
+            <ReservationStatus state={reservation.state} />
+            <JustForMobile>{bylineContent}</JustForMobile>
+            <Actions>
+              <MediumButton
+                variant="secondary"
+                iconRight={<IconCross />}
+                onClick={() =>
+                  router.push(`${reservationsUrl}${reservation.pk}/cancel`)
+                }
+                disabled={
+                  !canUserCancelReservation(reservation) ||
+                  isReservationCancelled ||
+                  isBeingHandled
+                }
+                data-testid="reservation-detail__button--cancel"
               >
-                {t("common:sendFeedback")}
-              </a>
-            </Paragraph>
-          </>
-        )}
-        {getTranslation(reservationUnit, instructionsKey) && (
-          <TermContainer>
-            <H3>{t("reservations:reservationInfo")}</H3>
-            <Paragraph>
-              {getTranslation(reservationUnit, instructionsKey)}
-            </Paragraph>
-          </TermContainer>
-        )}
-        <H3>{t("reservationUnit:additionalInfo")}</H3>
-        <TermContainer>
-          {reservation.reservationUnits[0]?.metadataSet?.supportedFields &&
-          reserveeType ? (
-            <>
-              {getReservationApplicationFields(
-                reservation.reservationUnits[0].metadataSet?.supportedFields,
-                reserveeType as ReserveeType,
-                true
-              )
-                .filter(
-                  (key) =>
-                    !["", undefined, false, 0, null].includes(
-                      get(reservation, key)
-                    )
-                )
-                .map((key) => {
-                  const rawValue = get(reservation, key);
-                  const value = get(optionValues, key)
-                    ? get(optionValues, key)
-                    : typeof rawValue === "boolean"
-                    ? t(`common:${String(rawValue)}`)
-                    : rawValue;
-                  return (
-                    <ParagraphAlt key={`summary_${key}`}>
-                      <div>
-                        <Strong>
-                          {t(
-                            `reservationApplication:label.${reserveeType}.${key}`
-                          )}
-                        </Strong>
-                      </div>
-                      <div>{value}</div>
-                    </ParagraphAlt>
-                  );
-                })}
-            </>
-          ) : (
-            <>
-              <ParagraphAlt>
-                <div>
-                  <Strong>{t("reservationCalendar:label.reserveeName")}</Strong>
-                </div>
-                <div>
-                  {`${reservation.reserveeFirstName || ""} ${
-                    reservation.reserveeLastName || ""
-                  }`.trim()}
-                </div>
-              </ParagraphAlt>
-              <ParagraphAlt>
-                <div>
-                  <Strong>{t("common:phone")}</Strong>
-                  <div>{reservation.reserveePhone}</div>
-                </div>
-              </ParagraphAlt>
-              <ParagraphAlt style={{ gridColumn: "1 / -1" }}>
-                <div>
-                  <Strong>{t("reservationCalendar:label.name")}</Strong>
-                </div>
-                <div>{reservation.name}</div>
-              </ParagraphAlt>
-              <ParagraphAlt>
-                <div>
-                  <Strong>{t("reservationCalendar:label.description")}</Strong>
-                </div>
-                <div>{reservation.description}</div>
-              </ParagraphAlt>
-            </>
-          )}
-        </TermContainer>
-        {getTranslation(reservationUnit, "termsOfUse") && (
-          <AccordionContainer>
-            <TermContainer>
-              <Accordion
-                initiallyOpen={false}
-                heading={t("reservationCalendar:heading.termsOfUse")}
-              >
-                <Sanitize
-                  html={getTranslation(termsOfUse?.genericTerms, "text")}
-                />
-              </Accordion>
-            </TermContainer>
-          </AccordionContainer>
-        )}
-        {getTranslation(reservationUnit.serviceSpecificTerms, "text") && (
-          <AccordionContainer>
-            <TermContainer>
-              <Accordion
-                initiallyOpen={false}
-                heading={t("reservationCalendar:heading.resourceTerms")}
-              >
-                <p>
-                  <Sanitize
-                    html={getTranslation(reservationUnit, "termsOfUse")}
-                  />
-                </p>
-                <p>
-                  <Sanitize
-                    html={getTranslation(
-                      reservationUnit.serviceSpecificTerms,
-                      "text"
+                {t(
+                  `reservations:cancel${
+                    isBeingHandled ? "Application" : "Reservation"
+                  }`
+                )}
+              </MediumButton>
+            </Actions>
+            <Content>
+              {getTranslation(reservationUnit, instructionsKey) && (
+                <ContentContainer>
+                  <ParagraphHeading>
+                    {t("reservations:reservationInfo")}
+                  </ParagraphHeading>
+                  <Paragraph>
+                    {getTranslation(reservationUnit, instructionsKey)}
+                  </Paragraph>
+                </ContentContainer>
+              )}
+              <ParagraphHeading>
+                {t("reservationCalendar:reserverInfo")}
+              </ParagraphHeading>
+              <ContentContainer>
+                {[
+                  ReservationsReservationReserveeTypeChoices.Business.toString(),
+                  ReservationsReservationReserveeTypeChoices.Nonprofit.toString(),
+                ].includes(reservation.type) ? (
+                  <>
+                    {reservation.reserveeOrganisationName && (
+                      <ParagraphAlt>
+                        {t("reservations:organisationName")}:{" "}
+                        {reservation.reserveeOrganisationName}
+                      </ParagraphAlt>
                     )}
-                  />
-                </p>
-              </Accordion>
-            </TermContainer>
-          </AccordionContainer>
-        )}
-        <ActionContainer>
-          <MediumButton
-            variant="secondary"
-            onClick={() => router.push(reservationsUrl)}
-            iconLeft={<IconArrowLeft />}
-            data-testid="reservation-detail__button--return"
-          >
-            {t("common:prev")}
-          </MediumButton>
-        </ActionContainer>
-      </BodyContainer>
-    </>
+                    {reservation.reserveeId && (
+                      <ParagraphAlt>
+                        {t("reservations:reserveeId")}: {reservation.reserveeId}
+                      </ParagraphAlt>
+                    )}
+                    {reservation.reserveeId && (
+                      <ParagraphAlt>
+                        {t("reservations:reserveeId")}: {reservation.reserveeId}
+                      </ParagraphAlt>
+                    )}
+                    <ParagraphAlt>
+                      {t("reservations:contactName")}:{" "}
+                      {`${reservation.reserveeFirstName || ""} ${
+                        reservation.reserveeLastName || ""
+                      }`.trim()}
+                    </ParagraphAlt>
+                    {reservation.reserveePhone && (
+                      <ParagraphAlt>
+                        {t("reservations:contactPhone")}:{" "}
+                        {reservation.reserveePhone}
+                      </ParagraphAlt>
+                    )}
+                    {reservation.reserveeEmail && (
+                      <ParagraphAlt>
+                        {t("reservations:contactEmail")}:{" "}
+                        {reservation.reserveeEmail}
+                      </ParagraphAlt>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <ParagraphAlt>
+                      {t("common:name")}:{" "}
+                      {`${reservation.reserveeFirstName || ""} ${
+                        reservation.reserveeLastName || ""
+                      }`.trim()}
+                    </ParagraphAlt>
+                    {reservation.reserveePhone && (
+                      <ParagraphAlt>
+                        {t("common:phone")}: {reservation.reserveePhone}
+                      </ParagraphAlt>
+                    )}
+                    {reservation.reserveeEmail && (
+                      <ParagraphAlt>
+                        {t("common:email")}: {reservation.reserveeEmail}
+                      </ParagraphAlt>
+                    )}
+                  </>
+                )}
+              </ContentContainer>
+              <Terms>
+                {(paymentTermsContent || cancellationTermsContent) && (
+                  <Accordion
+                    heading={t(
+                      `reservationUnit:${
+                        paymentTermsContent
+                          ? "paymentAndCancellationTerms"
+                          : "cancellationTerms"
+                      }`
+                    )}
+                    theme="thin"
+                    data-testid="reservation__payment-and-cancellation-terms"
+                  >
+                    {paymentTermsContent && (
+                      <AccordionContent>
+                        <Sanitize html={paymentTermsContent} />
+                      </AccordionContent>
+                    )}
+                    <AccordionContent>
+                      <Sanitize html={cancellationTermsContent} />
+                    </AccordionContent>
+                  </Accordion>
+                )}
+                {pricingTermsContent && (
+                  <Accordion
+                    heading={t("reservationUnit:pricingTerms")}
+                    theme="thin"
+                    data-testid="reservation__pricing-terms"
+                  >
+                    <AccordionContent>
+                      <Sanitize html={pricingTermsContent} />
+                    </AccordionContent>
+                  </Accordion>
+                )}
+                <Accordion
+                  heading={t("reservationUnit:termsOfUse")}
+                  theme="thin"
+                  data-testid="reservation__terms-of-use"
+                >
+                  {serviceSpecificTermsContent && (
+                    <AccordionContent>
+                      <Sanitize html={serviceSpecificTermsContent} />
+                    </AccordionContent>
+                  )}
+                  <AccordionContent>
+                    <Sanitize
+                      html={getTranslation(termsOfUse.genericTerms, "text")}
+                    />
+                  </AccordionContent>
+                </Accordion>
+              </Terms>
+              <Address reservationUnit={reservationUnit} />
+            </Content>
+          </div>
+        </Columns>
+      </Container>
+    </Wrapper>
   );
 };
 

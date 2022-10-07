@@ -15,15 +15,19 @@ type Alias = {
 type Props = {
   route: string[];
   aliases?: Alias[];
+  className?: string;
 };
 
 const Wrapper = styled.div`
   display: block;
   background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-black-20);
 `;
 
-const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
+const BreadcrumbWrapper = ({
+  route,
+  aliases,
+  className,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoint.m})`, false);
 
@@ -43,6 +47,7 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
         linkComponent={Link}
         routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
         isMobile={isMobile}
+        className={className}
       />
     </Wrapper>
   );

@@ -127,7 +127,7 @@ const SubmitButton = styled(MediumButton)`
   }
 `;
 
-const ReservationInfo = <T extends Record<string, unknown>>({
+const ReservationCalendarControls = <T extends Record<string, unknown>>({
   reservationUnit,
   begin,
   end,
@@ -381,4 +381,4 @@ const ReservationInfo = <T extends Record<string, unknown>>({
   );
 };
 
-export default ReservationInfo;
+export default ReservationCalendarControls;

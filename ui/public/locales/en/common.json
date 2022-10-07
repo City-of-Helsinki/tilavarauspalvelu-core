@@ -85,6 +85,8 @@
   },
   "location": "Location",
   "phone": "Telephone",
+  "email": "Email",
+  "name": "Name",
   "thanksForUsingVaraamo": "Thank you for using Varaamo!",
   "sendFeedback": "Send feedback about the service.",
   "gotoFrontpage": "Return to front page",

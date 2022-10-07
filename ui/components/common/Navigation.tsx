@@ -35,9 +35,21 @@ const StyledNavigation = styled(HDSNavigation)`
     cursor: pointer;
   }
 
+  #languageSelector-menu {
+    right: 0;
+    left: unset;
+  }
+
   @media (max-width: ${breakpoint.xs}) {
     position: fixed !important;
     z-index: var(--tilavaraus-stack-order-navigation) !important;
+  }
+
+  @media (max-width: ${breakpoint.m}) {
+    .navigation__language-selector--button {
+      position: absolute;
+      right: var(--spacing-layout-l);
+    }
   }
 `;
 
