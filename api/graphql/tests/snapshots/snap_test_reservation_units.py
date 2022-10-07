@@ -1051,6 +1051,21 @@ snapshots['ReservationUnitQueryTestCase::test_hide_payment_merchant_without_perm
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_hide_payment_product_without_permissions 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'paymentProduct': None
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_order_by_max_persons 1'] = {
     'data': {
         'reservationUnits': {
@@ -1743,6 +1758,24 @@ snapshots['ReservationUnitQueryTestCase::test_show_payment_merchant_from_unit 1'
                         'nameFi': 'test name fi',
                         'paymentMerchant': {
                             'name': 'Test Merchant'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_show_payment_product 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'paymentProduct': {
+                            'merchantPk': '3828ac38-3e26-4501-8556-ba2ea3442627',
+                            'pk': '1018cabd-d693-41c1-8ddc-dc5c08829048'
                         }
                     }
                 }

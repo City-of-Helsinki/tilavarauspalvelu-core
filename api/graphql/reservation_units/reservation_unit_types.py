@@ -13,7 +13,7 @@ from graphene_permissions.permissions import AllowAny
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.duration_field import Duration
-from api.graphql.merchants.merchant_types import PaymentMerchantType
+from api.graphql.merchants.merchant_types import PaymentMerchantType, PaymentProductType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
 from api.graphql.reservations.reservation_types import (
     ReservationMetadataSetType,
@@ -382,6 +382,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
     payment_types = graphene.List(ReservationUnitPaymentTypeType)
     payment_merchant = graphene.Field(PaymentMerchantType)
+    payment_product = graphene.Field(PaymentProductType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -444,6 +445,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "is_archived",
             "state",
             "payment_merchant",
+            "payment_product",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -553,6 +555,11 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
                 return self.payment_merchant
             elif self.unit and self.unit.payment_merchant is not None:
                 return self.unit.payment_merchant
+        return None
+
+    def resolve_payment_product(self, info: ResolveInfo):
+        if can_modify_reservation_unit(info.context.user, self):
+            return self.payment_product
         return None
 
 
