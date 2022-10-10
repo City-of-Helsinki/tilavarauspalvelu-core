@@ -1411,12 +1411,13 @@ const translations: ITranslations = {
     serviceSpecificTermsHelperText: ["Valitse tästä"],
     openingHours: ["Aukioloajat"],
     openingHoursHelperTextHasLink: [
-      "Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Voit siirtyä aukiolosovellukseen alla näkyvällä linkillä.",
+      'Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Huom. Käytä aukioloaikatyyppeinä ainoastaan "varattavissa" ja "suljettu".',
     ],
     openingHoursHelperTextNoLink: [
       "Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Pääset muokkaamaan aukioloaikoja kun varausyksikkö on tallennettu.",
     ],
-    openingTimesExternalLink: ["Aukioloajat aukiolosovelluksessa"],
+    openingTimesExternalLink: ["Siirry aukioloaikasovellukseen"],
+    previewCalendarLink: ["Siirry varaamon kalenterinäkymään"],
     cancel: ["Palaa tallentamatta muutoksia"],
     archive: ["Arkistoi"],
     save: ["Tallenna tiedot"],

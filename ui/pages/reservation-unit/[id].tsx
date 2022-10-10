@@ -967,7 +967,7 @@ const ReservationUnit = ({
                 ref={calendarRef}
                 data-testid="reservation-unit__calendar--wrapper"
               >
-                <Subheading>
+                <Subheading id="calendar">
                   {t("reservations:reservationCalendar", {
                     title: getTranslation(reservationUnit, "name"),
                   })}

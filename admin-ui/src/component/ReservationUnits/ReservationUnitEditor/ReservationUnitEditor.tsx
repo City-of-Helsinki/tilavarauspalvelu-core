@@ -1,10 +1,11 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
   Accordion,
+  Button,
   Checkbox,
   IconAlertCircleFill,
   IconArrowLeft,
-  Link,
+  IconLinkExternal,
   Notification,
   NumberInput,
   RadioButton,
@@ -1743,15 +1744,44 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   <p>
                     {t("ReservationUnitEditor.openingHoursHelperTextHasLink")}
                   </p>
-                  <Link
-                    href={state.reservationUnit?.haukiUrl?.url}
-                    external
-                    openInNewTab
-                    size="M"
-                    style={{ display: "block", width: "fit-content" }}
+                  <HorisontalFlex
+                    style={{
+                      fontSize: "var(--fontsize-body-s)",
+                    }}
                   >
-                    {t("ReservationUnitEditor.openingTimesExternalLink")}
-                  </Link>
+                    <Button
+                      theme="black"
+                      variant="secondary"
+                      size="small"
+                      iconRight={<IconLinkExternal />}
+                      onClick={() => {
+                        if (state.reservationUnit?.haukiUrl?.url) {
+                          window.open(
+                            state.reservationUnit?.haukiUrl?.url,
+                            "_blank"
+                          );
+                        }
+                      }}
+                    >
+                      {t("ReservationUnitEditor.openingTimesExternalLink")}
+                    </Button>
+                    <Button
+                      theme="black"
+                      variant="secondary"
+                      size="small"
+                      iconRight={<IconLinkExternal />}
+                      onClick={() => {
+                        if (state.reservationUnit?.haukiUrl?.url) {
+                          window.open(
+                            `${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}#calendar`,
+                            "_blank"
+                          );
+                        }
+                      }}
+                    >
+                      {t("ReservationUnitEditor.previewCalendarLink")}
+                    </Button>
+                  </HorisontalFlex>
                 </>
               ) : (
                 <p>{t("ReservationUnitEditor.openingHoursHelperTextNoLink")}</p>
