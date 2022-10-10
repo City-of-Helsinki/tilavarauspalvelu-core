@@ -4,7 +4,7 @@ import { memoize, truncate } from "lodash";
 import { ReservationType } from "../../common/gql-types";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 import { reservationUrl } from "../../common/urls";
-import { reservationDateTime } from "./requested/util";
+import { getReserveeName, reservationDateTime } from "./requested/util";
 
 export type Sort = {
   field: string;
@@ -24,15 +24,12 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
   },
   {
-    headerName: t("Reservations.headings.name"),
-    key: "name",
+    headerName: t("Reservations.headings.reserveeName"),
+    key: "reservee_name",
     isSortable: true,
-    transform: ({ name, pk }: ReservationType) => (
-      <TableLink href={reservationUrl(pk as number)}>
-        {truncate((name as string) || "-", {
-          length: 22,
-          omission: "...",
-        })}
+    transform: (reservation: ReservationType) => (
+      <TableLink href={reservationUrl(reservation.pk as number)}>
+        {getReserveeName(reservation, 22) || t("RequestedReservation.noName")}
       </TableLink>
     ),
   },

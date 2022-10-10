@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { get, trim } from "lodash";
 import { Accordion, Button, TextArea } from "hds-react";
 import React, { useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { TFunction, useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
@@ -25,6 +25,7 @@ import withMainMenu from "../../withMainMenu";
 import {
   ageGroup,
   getReservatinUnitPricing,
+  getReserveeName,
   getTranslationKeyForType,
   reservationDateTime,
   reservationDuration,
@@ -121,18 +122,15 @@ const DateTime = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
-const getName = (reservation: ReservationType) => {
+const getName = (reservation: ReservationType, t: TFunction) => {
   if (reservation.name) {
     return trim(`${reservation.pk}, ${reservation.name}`);
   }
 
   return trim(
-    `${reservation.pk}, ${reservation.reserveeFirstName || ""} ${
-      reservation.reserveeOrganisationName
-        ? reservation.reserveeOrganisationName
-        : reservation.reserveeLastName || ""
-    }
-    `
+    `${reservation.pk}, ${
+      getReserveeName(reservation) || t("RequestedReservation.noName")
+    }`.trim()
   );
 };
 
@@ -329,19 +327,19 @@ const RequestedReservation = (): JSX.Element | null => {
           "requested-reservation",
         ]}
         aliases={[
-          { slug: "requested-reservation", title: getName(reservation) },
+          { slug: "requested-reservation", title: getName(reservation, t) },
         ]}
       />
       <ShowWhenTargetInvisible target={ref}>
         <StickyHeader
-          name={getName(reservation)}
+          name={getName(reservation, t)}
           tagline={reservationTagline}
           buttons={buttons}
         />
       </ShowWhenTargetInvisible>
       <Wrapper style={{ gap: 0 }}>
         <NameState ref={ref}>
-          <H1>{getName(reservation)}</H1>
+          <H1>{getName(reservation, t)}</H1>
           <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
             <Dot />
             {t(`RequestedReservation.state.${reservation.state}`)}

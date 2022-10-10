@@ -11,6 +11,7 @@ import {
   parse,
 } from "date-fns";
 import { TFunction } from "i18next";
+import { trim, truncate } from "lodash";
 import {
   AgeGroupType,
   Maybe,
@@ -163,3 +164,18 @@ export const getTranslationKeyForType = (
       }`;
   }
 };
+
+export const getReserveeName = (
+  reservation: ReservationType,
+  length = 50
+): string =>
+  truncate(
+    reservation.reserveeOrganisationName
+      ? reservation.reserveeOrganisationName
+      : trim(
+          `${reservation.reserveeFirstName || ""} ${
+            reservation.reserveeLastName || ""
+          }`
+        ),
+    { length, omission: "…" }
+  );

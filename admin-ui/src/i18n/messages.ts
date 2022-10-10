@@ -202,7 +202,7 @@ const translations: ITranslations = {
     spaces: ["Tilat"],
     resources: ["Resurssit"],
     reservations: ["Varaukset"],
-    requested: ["Varaustoiveet"],
+    "requested-reservations": ["Varaustoiveet"],
     "all-reservations": ["Kaikki varaukset"],
     units: ["Toimipisteet"],
   },
@@ -1553,7 +1553,7 @@ const translations: ITranslations = {
     ],
     headings: {
       id: ["id"],
-      name: ["Varauksen nimi"],
+      reserveeName: ["Varaajan nimi"],
       reservationUnit: ["Varausyksikkö"],
       unit: ["Toimipiste"],
       datetime: ["Aika"],
@@ -1683,6 +1683,7 @@ const translations: ITranslations = {
       returned: ["Varaus palautettu käsiteltäväksi"],
       errorSaving: ["Palauttaminen ei onnistunut"],
     },
+    noName: ["-"],
   },
   Allocation: {
     allocationTitle: ["Vuorojen jako"],
