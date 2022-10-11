@@ -564,7 +564,10 @@ class ReservationUnit(models.Model):
     )
 
     class Meta:
-        ordering = ("id",)
+        ordering = (
+            "rank",
+            "id",
+        )
 
     def __str__(self):
         return "{}, {}".format(self.name, getattr(self.unit, "name", ""))
