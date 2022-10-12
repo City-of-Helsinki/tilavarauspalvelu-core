@@ -1,5 +1,5 @@
 import React from "react";
-import { ApolloError, gql, useQuery } from "@apollo/client";
+import { ApolloError, useQuery } from "@apollo/client";
 
 import { Query, QueryUnitsArgs, UnitType } from "../../common/gql-types";
 import { FilterArguments } from "./Filters";
@@ -9,6 +9,7 @@ import UnitsTable from "./UnitsTable";
 import { LIST_PAGE_SIZE } from "../../common/const";
 import { More } from "../lists/More";
 import { combineResults } from "../../common/util";
+import { UNITS_QUERY } from "./queries";
 
 export type Sort = {
   field: string;
@@ -36,39 +37,6 @@ const updateQuery = (
 
   return combineResults(previousResult, fetchMoreResult, "units");
 };
-
-const UNITS_QUERY = gql`
-  query units(
-    $first: Int
-    $offset: Int
-    $orderBy: String
-    $serviceSector: Float
-    $nameFi: String
-  ) {
-    units(
-      first: $first
-      offset: $offset
-      orderBy: $orderBy
-      serviceSector: $serviceSector
-      nameFi: $nameFi
-      onlyWithPermission: true
-    ) {
-      edges {
-        node {
-          nameFi
-          pk
-          serviceSectors {
-            nameFi
-          }
-          reservationUnits {
-            pk
-          }
-        }
-      }
-      totalCount
-    }
-  }
-`;
 
 const UnitsDataLoader = ({
   filters,

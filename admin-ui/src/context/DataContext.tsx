@@ -7,11 +7,13 @@ import { useAuthState } from "./AuthStateContext";
 
 export type DataContextProps = {
   handlingCount: number;
+  hasOwnUnits: boolean;
   updateHandlingCount: () => void;
 };
 
 export const DataContext = React.createContext<DataContextProps>({
   handlingCount: 0,
+  hasOwnUnits: false,
   updateHandlingCount: () => undefined,
 });
 
@@ -19,6 +21,7 @@ export const useData = (): DataContextProps => useContext(DataContext);
 
 export const DataContextProvider: React.FC = ({ children }) => {
   const [handlingCount, setHandlingCount] = React.useState(0);
+  const [hasOwnUnits, setHasOwnUnits] = React.useState(false);
 
   const { authState } = useAuthState();
 
@@ -28,8 +31,9 @@ export const DataContextProvider: React.FC = ({ children }) => {
     {
       skip: authState.state !== "HasPermissions",
       fetchPolicy: "no-cache",
-      onCompleted: ({ reservations }) => {
+      onCompleted: ({ reservations, units }) => {
         setHandlingCount(reservations?.edges?.length || 0);
+        setHasOwnUnits((units?.totalCount as number) > 0);
       },
     }
   );
@@ -49,6 +53,7 @@ export const DataContextProvider: React.FC = ({ children }) => {
     <DataContext.Provider
       value={{
         handlingCount,
+        hasOwnUnits,
         updateHandlingCount: refetch,
       }}
     >

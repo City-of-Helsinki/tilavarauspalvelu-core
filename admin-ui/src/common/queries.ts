@@ -176,13 +176,17 @@ export const DELETE_RESOURCE = gql`
 `;
 
 export const HANDLING_COUNT_QUERY = gql`
-  query handlingCount {
+  query dataQueries {
     reservations(state: "REQUIRES_HANDLING") {
       edges {
         node {
           pk
         }
       }
+    }
+
+    units(onlyWithPermission: true) {
+      totalCount
     }
   }
 `;

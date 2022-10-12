@@ -205,6 +205,7 @@ const translations: ITranslations = {
     "requested-reservations": ["Varaustoiveet"],
     "all-reservations": ["Kaikki varaukset"],
     units: ["Toimipisteet"],
+    "my-units": ["Omat toimipisteet"],
   },
 
   ArchiveReservationUnitDialog: {
@@ -231,6 +232,8 @@ const translations: ITranslations = {
     welcome: ["Tervetuloa"],
   },
   MainMenu: {
+    home: ["Etusivu"],
+    myUnits: ["Omat toimipisteet"],
     reservations: ["Varaukset"],
     requestedReservations: ["Varaustoiveet"],
     allReservations: ["Kaikki varaukset"],
@@ -268,6 +271,12 @@ const translations: ITranslations = {
     expandMenu: ['Laajenna valikko "{{title}}"', 'Expand menu "{{title}}"'],
     shrinkMenu: ['Pienennä valikko "{{title}}"', 'Shrink menu "{{title}}"'],
     noName: ["Ei nimeä"],
+  },
+  MyUnits: {
+    heading: ["Omat toimipisteet"],
+    description: [
+      "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeudet.",
+    ],
   },
   Application: {
     id: ["Hakemnustunnus"],
