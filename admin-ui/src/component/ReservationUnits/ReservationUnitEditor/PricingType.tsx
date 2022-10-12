@@ -109,7 +109,7 @@ const PricingType = ({
                     setPricingTypeValue({
                       begins: format(
                         parse(e, "dd.MM.yyyy", new Date()),
-                        "yyyy-MM-yyyy"
+                        "yyyy-MM-dd"
                       ),
                     })
                   }
