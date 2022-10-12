@@ -19,6 +19,7 @@ import graphql
 import sentry_sdk
 from django.conf.global_settings import DEFAULT_FROM_EMAIL as django_default_from_email
 from django.conf.global_settings import EMAIL_PORT as django_default_email_port
+from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -215,6 +216,8 @@ env = environ.Env(
     # GDPR API
     GDPR_API_QUERY_SCOPE=(str, ""),
     GDPR_API_DELETE_SCOPE=(str, ""),
+    # Logging
+    ENABLE_SQL_LOGGING=(bool, False),
 )
 
 environ.Env.read_env()
@@ -525,3 +528,17 @@ GRAPH_MODELS = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+ENABLE_SQL_LOGGING = env("ENABLE_SQL_LOGGING")
+
+if ENABLE_SQL_LOGGING:
+    LOGGING = DEFAULT_LOGGING
+    LOGGING["loggers"].update(
+        {
+            "django.db.backends": {
+                "handlers": ["django.server"],
+                "level": "DEBUG",
+                "propagate": True,
+            },
+        }
+    )
