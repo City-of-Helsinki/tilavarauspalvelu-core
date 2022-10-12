@@ -5,11 +5,11 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import styled from "styled-components";
 import { parseISO } from "date-fns";
+import { breakpoints } from "common/src/common/style";
+import { fontMedium, H4 } from "common/src/common/typography";
 import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
-import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
-import { fontMedium, H4 } from "../../modules/style/typography";
 import { ApplicationRoundType } from "../../modules/gql-types";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 
@@ -29,7 +29,7 @@ const StyledCard = styled(Card)`
     padding: var(--spacing-s);
     margin-bottom: var(--spacing-m);
 
-    @media (min-width: ${breakpoint.s}) {
+    @media (min-width: ${breakpoints.s}) {
       grid-template-columns: 1fr auto;
     }
   }
@@ -49,7 +49,7 @@ const Name = styled(H4).attrs({ as: "h3" })`
 
 const ReservationPeriod = styled.div`
   margin-top: var(--spacing-xs);
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     margin-top: 0;
   }
 `;
@@ -62,7 +62,7 @@ const CardButton = styled(MediumButton)`
   width: 100%;
   align-self: flex-end;
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     justify-self: right;
     width: max-content;
   }

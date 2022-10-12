@@ -8,10 +8,10 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { fontBold, H6 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { getMainImage } from "../../modules/util";
-import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
-import { fontBold, H6 } from "../../modules/style/typography";
 import { ReservationUnitType } from "../../modules/gql-types";
 import { getReservationUnitName } from "../../modules/reservationUnit";
 
@@ -39,7 +39,7 @@ const CardButtonContainer = styled.div`
   align-items: center;
   position: relative;
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     grid-template-columns: 1fr;
   }
 `;
@@ -50,7 +50,7 @@ const CardContainer = styled.div`
   align-items: flex-start;
   grid-template-columns: 1fr;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-template-columns: 163px 6fr 2fr;
     gap: var(--spacing-xs);
   }
@@ -59,7 +59,7 @@ const CardContainer = styled.div`
 const PaddedCell = styled.div`
   padding: var(--spacing-m) 0;
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
@@ -76,7 +76,7 @@ const ImageCell = styled.div<{ $src: string }>`
   height: 150px;
   background-size: cover;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     height: 100%;
   }
 `;
@@ -87,7 +87,7 @@ const Name = styled.div`
   line-height: var(--lineheight-xl);
   margin-bottom: var(--spacing-xs);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     margin-bottom: 0;
   }
 `;
@@ -114,7 +114,7 @@ const ArrowContainer = styled.div`
   right: var(--spacing-m);
   bottom: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     position: static;
     flex-direction: column;
     gap: var(--spacing-s);

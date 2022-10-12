@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button } from "hds-react";
-import { breakpoints } from "../styles/util";
+import { breakpoints } from "common/src/common/style";
 
 interface IProps {
   buttons: Button[];

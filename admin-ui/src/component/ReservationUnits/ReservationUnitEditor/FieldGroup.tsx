@@ -1,7 +1,7 @@
+import { Strong } from "common/src/common/typography";
 import { Tooltip } from "hds-react";
 import React from "react";
 import { HorisontalFlex } from "../../../styles/layout";
-import { Strong } from "../../../styles/util";
 
 export type Props = {
   heading: string;

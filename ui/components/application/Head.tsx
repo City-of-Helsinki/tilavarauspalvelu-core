@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { H1 } from "../../modules/style/typography";
+import { H1 } from "common/src/common/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import KorosDefault from "../common/KorosDefault";
 

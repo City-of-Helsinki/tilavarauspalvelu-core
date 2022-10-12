@@ -2,7 +2,7 @@ import { Table, TableProps } from "hds-react";
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { breakpoints } from "../../styles/util";
+import { breakpoints } from "common/src/common/style";
 
 type TableWrapperProps = {
   $headingBackground?: string;

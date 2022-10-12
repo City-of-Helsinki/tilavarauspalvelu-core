@@ -6,14 +6,12 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
-
+import { H1, Strong } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { DataFilterConfig } from "../../common/types";
-import { H1 } from "../../styles/new-typography";
 import withMainMenu from "../withMainMenu";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
-
-import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
 import { RESOURCES_QUERY } from "../../common/queries";
 import { Query, ResourceType } from "../../common/gql-types";

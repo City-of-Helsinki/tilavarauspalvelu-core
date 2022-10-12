@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
 import { Reservation } from "common/types/common";
-import { Strong } from "../../modules/style/typography";
+import { Strong } from "common/src/common/typography";
 import { parseDate } from "../../modules/util";
 
 type Props = {

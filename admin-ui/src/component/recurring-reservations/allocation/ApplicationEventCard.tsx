@@ -2,6 +2,7 @@ import { IconAngleDown, IconAngleUp, Link, RadioButton } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { Strong, Strongish } from "common/src/common/typography";
 import { publicUrl } from "../../../common/const";
 import {
   ApplicationEventType,
@@ -10,7 +11,6 @@ import {
 } from "../../../common/gql-types";
 import { AllocationApplicationEventCardType } from "../../../common/types";
 import { parseDuration } from "../../../common/util";
-import { FontBold, FontMedium } from "../../../styles/typography";
 import { ageGroup } from "../../reservations/requested/util";
 import {
   getApplicantName,
@@ -87,7 +87,7 @@ const StyledLink = styled(Link).attrs({
   },
 })`
   && {
-    ${FontMedium};
+    ${Strongish};
     border: 0;
     text-decoration: none;
   }
@@ -103,7 +103,7 @@ const DetailRow = styled.div`
     }
 
     &:nth-of-type(2) {
-      ${FontBold}
+      ${Strong}
     }
   }
 `;

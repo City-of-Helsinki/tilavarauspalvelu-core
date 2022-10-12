@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 
 interface Props {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ const styles = `
   max-width: 75rem;
   margin: 0 auto;
   padding: 0 var(--spacing-m) var(--spacing-m) var(--spacing-m);
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
   }
 
@@ -36,7 +36,7 @@ const Container = ({ main = false, ...rest }: Props): JSX.Element => {
 export const CenteredContainer = styled(Container)`
   margin: 0 auto;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 590px;
   }
 `;

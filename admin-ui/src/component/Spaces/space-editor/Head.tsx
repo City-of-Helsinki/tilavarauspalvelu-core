@@ -3,10 +3,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import { UnitType } from "../../../common/gql-types";
 import { parseAddress } from "../../../common/util";
 import { ContentContainer, IngressContainer } from "../../../styles/layout";
-import { breakpoints } from "../../../styles/util";
 import LinkPrev from "../../LinkPrev";
 
 interface IProps {

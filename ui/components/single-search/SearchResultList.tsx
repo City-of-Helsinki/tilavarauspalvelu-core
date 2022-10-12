@@ -7,10 +7,10 @@ import {
   LoadingSpinner,
 } from "hds-react";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import Container from "../common/Container";
 import ReservationUnitCard from "./ReservationUnitCard";
 import { PageInfo, ReservationUnitType } from "../../modules/gql-types";
-import { breakpoint } from "../../modules/style";
 
 interface Props {
   reservationUnits: ReservationUnitType[] | null;
@@ -26,7 +26,7 @@ const Wrapper = styled.div`
 `;
 
 const TopWrapper = styled.div`
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     display: flex;
     justify-content: space-between;
     align-items: center;

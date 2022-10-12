@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { H1, H2 } from "common/src/common/typography";
 import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
 import { MainMenuWrapper } from "../withMainMenu";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import HeroImage from "../../images/hero-user@1x.jpg";
-import { H1, H2 } from "../../styles/typography";
+
 import { WideContainer, IngressContainer } from "../../styles/layout";
 
 import Loader from "../Loader";

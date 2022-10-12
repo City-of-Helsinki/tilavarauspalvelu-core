@@ -1,8 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
-import { H1, HeroSubheading } from "../../modules/style/typography";
+import { H1 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
+import { HeroSubheading } from "../../modules/style/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import KorosDefault from "../common/KorosDefault";
 
@@ -16,7 +17,7 @@ const Container = styled.div`
 const Content = styled.div`
   padding: var(--spacing-s) var(--spacing-m) var(--spacing-xl);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: var(--container-width-xl);
     padding: var(--spacing-m);
     margin: 0 auto;

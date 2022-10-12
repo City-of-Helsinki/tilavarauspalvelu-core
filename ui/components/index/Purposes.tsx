@@ -1,13 +1,13 @@
-import { breakpoints } from "common/src/common/style";
 import { IconAngleDown, IconAngleUp, IconArrowRight } from "hds-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
+import { fontMedium, H3 } from "common/src/common/typography";
 import { singleSearchPrefix } from "../../modules/const";
 import { PurposeType } from "../../modules/gql-types";
-import { fontMedium, H3 } from "../../modules/style/typography";
 import { getTranslation } from "../../modules/util";
 import Container from "../common/Container";
 import ReservationUnitSearch from "./ReservationUnitSearch";

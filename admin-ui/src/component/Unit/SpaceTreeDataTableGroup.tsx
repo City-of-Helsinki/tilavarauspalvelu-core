@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import { get } from "lodash";
 import { useHistory } from "react-router-dom";
-import { breakpoints } from "../../styles/util";
+import { breakpoints } from "common/src/common/style";
 import { SpaceType } from "../../common/gql-types";
 import { CellConfig, Row, Column, Cell } from "../DataTable";
 

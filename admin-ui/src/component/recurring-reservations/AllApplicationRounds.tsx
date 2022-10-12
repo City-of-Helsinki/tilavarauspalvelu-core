@@ -4,6 +4,7 @@ import { groupBy, orderBy } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { H1 } from "common/src/common/typography";
 import {
   ApplicationRoundType,
   Query,
@@ -13,7 +14,6 @@ import { applicationRoundUrl } from "../../common/urls";
 import { formatDate } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
 import { Container, Content, VerticalFlexNoGap } from "../../styles/layout";
-import { H1 } from "../../styles/new-typography";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";

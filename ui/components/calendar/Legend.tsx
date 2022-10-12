@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css, FlattenSimpleInterpolation } from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import { truncatedText } from "../../styles/util";
 
 type Props = {
@@ -24,13 +24,13 @@ const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
   gap: var(--spacing-m);
   width: 100%;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     margin-top: var(--spacing-m);
   }
 

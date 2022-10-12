@@ -4,7 +4,7 @@ import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import styled from "styled-components";
-import { breakpoints } from "../../styles/util";
+import { breakpoints } from "common/src/common/style";
 import { OptionType } from "../../common/types";
 import UnitFilter from "../filters/UnitFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";

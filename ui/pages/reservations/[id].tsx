@@ -8,6 +8,8 @@ import { IconCalendar, IconCross, Notification } from "hds-react";
 import { useQuery } from "@apollo/client";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { H1, H4 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import {
   Query,
   QueryReservationByPkArgs,
@@ -23,7 +25,6 @@ import {
   JustForMobile,
   NarrowCenteredContainer,
 } from "../../modules/style/layout";
-import { breakpoint } from "../../modules/style";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { CenterSpinner } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
@@ -39,7 +40,6 @@ import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 import ReservationStatus from "../../components/reservation/ReservationStatus";
 import Address from "../../components/reservation-unit/Address";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
-import { H1, H4 } from "../../modules/style/typography";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -96,7 +96,7 @@ const Wrapper = styled.div`
 const Container = styled(NarrowCenteredContainer)`
   padding: 0 var(--spacing-m) var(--spacing-layout-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 1000px;
     margin-bottom: var(--spacing-layout-l);
   }
@@ -118,7 +118,7 @@ const Columns = styled.div`
   align-items: flex-start;
   gap: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     & > div:nth-of-type(1) {
       order: 2;
     }
@@ -133,7 +133,7 @@ const Actions = styled.div`
   gap: var(--spacing-m);
   margin: var(--spacing-s) 0 var(--spacing-xl);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     button {
       max-width: 300px;
     }
@@ -145,7 +145,7 @@ const SecondaryActions = styled.div`
   display: flex;
   gap: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     justify-content: flex-end;
   }
 `;

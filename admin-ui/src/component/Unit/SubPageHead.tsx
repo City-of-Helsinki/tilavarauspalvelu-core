@@ -1,11 +1,11 @@
 import { IconLocation } from "hds-react";
 import React from "react";
+import { H1 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { UnitByPkType } from "../../common/gql-types";
 import { parseAddress } from "../../common/util";
 import { Container, ContentContainer } from "../../styles/layout";
-import { H1 } from "../../styles/typography";
 import LinkPrev from "../LinkPrev";
 
 interface IProps {

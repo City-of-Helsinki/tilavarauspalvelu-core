@@ -4,7 +4,7 @@ import React, { ReactElement, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { parseTimeframeLength } from "common/src/calendar/util";
-import { fontMedium } from "../../modules/style/typography";
+import { fontMedium } from "common/src/common/typography";
 import { formatDate } from "../../modules/util";
 
 type EventEvent = {

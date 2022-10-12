@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link } from "hds-react";
+import { H1 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { debounce } from "lodash";
 import { VerticalFlex } from "../../styles/layout";
 import withMainMenu from "../withMainMenu";
-import { H1 } from "../../styles/new-typography";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Filters, { emptyFilterState, FilterArguments } from "./Filters";
 import UnitsDataLoader from "./UnitsDataLoader";

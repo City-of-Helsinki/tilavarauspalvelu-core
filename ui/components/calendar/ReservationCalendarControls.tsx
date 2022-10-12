@@ -19,11 +19,11 @@ import {
   getDayIntervals,
 } from "common/src/calendar/util";
 import { ApplicationRound, Language, OptionType } from "common/types/common";
-import { breakpoint } from "../../modules/style";
+import { fontMedium, fontRegular } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { DataContext, ReservationProps } from "../../context/DataContext";
-import { fontMedium, fontRegular } from "../../modules/style/typography";
 import { getDurationOptions } from "../../modules/reservation";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
@@ -66,7 +66,7 @@ const Wrapper = styled.div`
     ${fontMedium};
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     > *:nth-child(5) {
       grid-column: 3/3;
     }
@@ -76,7 +76,7 @@ const Wrapper = styled.div`
     justify-content: space-between;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     > *:nth-child(5) {
       grid-column: unset;
     }

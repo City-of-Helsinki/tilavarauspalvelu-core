@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/client";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { Strong } from "common/src/common/typography";
 import {
   ApplicationEventScheduleType,
   ApplicationEventType,
@@ -15,7 +16,6 @@ import { parseDuration } from "../../../common/util";
 import { useAllocationContext } from "../../../context/AllocationContext";
 import { useNotification } from "../../../context/NotificationContext";
 import { SmallRoundButton } from "../../../styles/buttons";
-import { FontBold } from "../../../styles/typography";
 import {
   ApplicationEventScheduleResultStatuses,
   getApplicantName,
@@ -49,7 +49,7 @@ const Wrapper = styled.div`
 `;
 
 const ApplicationEventName = styled.div`
-  ${FontBold}
+  ${Strong}
   font-size: var(--fontsize-body-m);
 `;
 
@@ -68,7 +68,7 @@ const DetailRow = styled.div`
     }
 
     &:nth-of-type(2) {
-      ${FontBold}
+      ${Strong}
     }
   }
 `;

@@ -1,12 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import { ApplicationRoundStatus } from "../../common/types";
 import {
   applicationRoundApplications,
   applicationRoundUrl,
 } from "../../common/urls";
-import { BasicLink, breakpoints } from "../../styles/util";
+import { BasicLink } from "../../styles/util";
 
 interface IProps {
   applicationRoundId: number;

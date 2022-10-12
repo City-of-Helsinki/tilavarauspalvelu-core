@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { H1, H3 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { ApplicationRound } from "../../common/types";
 import { formatDate } from "../../common/util";
-import { H1, H3 } from "../../styles/typography";
-import { breakpoints } from "../../styles/util";
 
 interface IProps {
   activeStage: number;

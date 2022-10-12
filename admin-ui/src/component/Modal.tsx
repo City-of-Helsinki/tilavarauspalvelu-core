@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { Button, IconCross } from "hds-react";
 import { useTranslation } from "react-i18next";
+import { breakpoints } from "common/src/common/style";
 import { useModal } from "../context/ModalContext";
-import { breakpoints, Seranwrap } from "../styles/util";
+import { Seranwrap } from "../styles/util";
 
 interface IProps {
   children: React.ReactNode;

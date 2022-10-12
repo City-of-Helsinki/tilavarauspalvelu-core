@@ -1,14 +1,13 @@
-// eslint-disable-next-line import/no-unresolved
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { H2 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import Footer from "../component/Footer";
 import KorosHeading, { Heading } from "../component/KorosHeading";
 import { useAuthState } from "../context/AuthStateContext";
 import HeroImage from "../images/hero-user@1x.jpg";
-import { H2 } from "../styles/typography";
-import { breakpoints } from "../styles/util";
 
 const Wrapper = styled.div``;
 

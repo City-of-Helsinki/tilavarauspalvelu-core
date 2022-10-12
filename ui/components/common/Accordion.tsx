@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import styled from "styled-components";
-import { H4 } from "../../modules/style/typography";
+import { H4 } from "common/src/common/typography";
 
 type Theme = "default" | "thin";
 

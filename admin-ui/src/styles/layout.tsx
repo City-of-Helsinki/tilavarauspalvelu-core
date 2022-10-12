@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { breakpoints } from "./util";
+import { breakpoints } from "common/src/common/style";
 
 export const ContentContainer = styled.div`
   padding: var(--spacing-m);

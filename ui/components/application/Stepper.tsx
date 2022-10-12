@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { IconCheck } from "hds-react";
 import { useRouter } from "next/router";
 import { Application } from "common/types/common";
-import { fontBold } from "../../modules/style/typography";
+import { fontBold } from "common/src/common/typography";
 
 const StepContainer = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) =>

@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FormType } from "common/types/common";
-import { fontRegular } from "../../modules/style/typography";
+import { fontRegular } from "common/src/common/typography";
 
 type Props = {
   activeForm: FormType;

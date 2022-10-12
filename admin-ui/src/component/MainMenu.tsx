@@ -3,7 +3,7 @@ import { IconAngleDown, IconAngleUp } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { NavLink, RouteProps } from "react-router-dom";
 import styled from "styled-components";
-import { breakpoints } from "../styles/util";
+import { breakpoints } from "common/src/common/style";
 import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
 import { ReactComponent as IconIndividualReservation } from "../images/icon_individual-reservation.svg";
 import { ReactComponent as IconPremises } from "../images/icon_premises.svg";

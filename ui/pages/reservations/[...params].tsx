@@ -17,6 +17,8 @@ import {
 } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { OptionType } from "common/types/common";
+import { breakpoints } from "common/src/common/style";
+import { fontMedium, fontRegular, H1, H3 } from "common/src/common/typography";
 import {
   Query,
   QueryReservationCancelReasonsArgs,
@@ -29,14 +31,7 @@ import {
   GET_RESERVATION,
   GET_RESERVATION_CANCEL_REASONS,
 } from "../../modules/queries/reservation";
-import {
-  fontMedium,
-  fontRegular,
-  H1,
-  H3,
-} from "../../modules/style/typography";
 import { NarrowCenteredContainer } from "../../modules/style/layout";
-import { breakpoint } from "../../modules/style";
 import Ticket from "../../components/reservation/Ticket";
 import {
   getSelectedOption,
@@ -93,7 +88,7 @@ const Head = styled.div`
 const HeadWrapper = styled(NarrowCenteredContainer)`
   padding: 0 var(--spacing-m) var(--spacing-layout-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 1000px;
     margin-bottom: var(--spacing-layout-l);
   }
@@ -103,7 +98,7 @@ const HeadColumns = styled(TwoColumnContainer)`
   margin-top: 0;
   gap: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     & > div:nth-of-type(1) {
       order: 2;
     }
@@ -134,7 +129,7 @@ const Actions = styled.div`
   gap: var(--spacing-m);
   margin-top: var(--spacing-xl);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     flex-direction: row;
 
     button {
@@ -144,7 +139,7 @@ const Actions = styled.div`
 `;
 
 const StyledKoros = styled(KorosDefault)`
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-layout-xl);
   }
 `;
@@ -164,7 +159,7 @@ const BodyContainer = styled(NarrowCenteredContainer)`
     color: var(--color-bus);
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 50%;
     padding-right: 50%;
   }
@@ -185,7 +180,7 @@ const ButtonContainer = styled.div`
   flex-direction: column;
   gap: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
     justify-content: space-between;
   }

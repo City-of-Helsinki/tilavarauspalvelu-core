@@ -18,6 +18,8 @@ import {
   LocalizationLanguages,
   OptionType,
 } from "common/types/common";
+import { fontRegular, H5 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import ReservationUnitList from "../reservation-unit/ReservationUnitList";
 import {
   apiDateToUIDate,
@@ -27,7 +29,6 @@ import {
   formatDate,
   uiDateToApiDate,
 } from "../../modules/util";
-import { breakpoint } from "../../modules/style";
 import { CheckboxWrapper } from "../common/common";
 import ApplicationEventSummary from "./ApplicationEventSummary";
 import ControlledSelect from "../common/ControlledSelect";
@@ -36,7 +37,6 @@ import { getDurationOptions } from "../../modules/const";
 import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
-import { fontRegular, H5 } from "../../modules/style/typography";
 import {
   ApplicationRoundType,
   ReservationUnitType,
@@ -84,7 +84,7 @@ const TwoColumnContainer = styled.div`
     ${fontRegular};
   }
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     grid-template-columns: 1fr;
   }
 `;
@@ -101,7 +101,7 @@ const PeriodContainer = styled.div`
     ${fontRegular};
   }
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     grid-template-columns: 1fr;
   }
 `;
@@ -112,7 +112,7 @@ const ActionContainer = styled.div`
   margin-top: var(--spacing-layout-l);
   gap: var(--spacing-l);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
     justify-content: space-between;
     gap: var(--spacing-l);
@@ -122,7 +122,7 @@ const ActionContainer = styled.div`
 const Button = styled(MediumButton)`
   width: 100%;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     width: 250px;
   }
 `;

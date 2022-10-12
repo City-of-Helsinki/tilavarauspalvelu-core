@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconLocation } from "hds-react";
+import { H2, Strong } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import {
   getApplicationRound,
   getReservations,
@@ -15,10 +17,9 @@ import {
   ReservationUnit,
 } from "../../common/types";
 import { ContentContainer, NarrowContainer } from "../../styles/layout";
-import { H2 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
-import { BasicLink, breakpoints, Divider, Strong } from "../../styles/util";
+import { BasicLink, Divider } from "../../styles/util";
 import { formatDate, localizedValue } from "../../common/util";
 import { weekdays } from "../../common/const";
 import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";

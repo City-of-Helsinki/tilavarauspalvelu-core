@@ -4,7 +4,7 @@ import React from "react";
 import { Trans, useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
 import { ApplicationEvent } from "common/types/common";
-import { H5 } from "../../modules/style/typography";
+import { H5 } from "common/src/common/typography";
 import { apiDurationToMinutes, fromUIDate } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 

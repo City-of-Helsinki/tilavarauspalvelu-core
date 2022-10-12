@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { Button } from "hds-react";
 import styled from "styled-components";
-import { breakpoints } from "../styles/util";
+import { breakpoints } from "common/src/common/style";
 
 interface IProps {
   children: ReactNode;

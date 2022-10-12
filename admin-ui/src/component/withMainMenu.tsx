@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { breakpoints } from "../styles/util";
+import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
 
 const Wrapper = styled.div`

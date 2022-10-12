@@ -7,10 +7,10 @@ import { AxiosError } from "axios";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
+import { H1, H3 } from "common/src/common/typography";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import LinkPrev from "../LinkPrev";
 import withMainMenu from "../withMainMenu";
-import { H1, H3 } from "../../styles/typography";
 import { getApplicationRound, getApplications } from "../../common/api";
 import {
   Application as ApplicationType,

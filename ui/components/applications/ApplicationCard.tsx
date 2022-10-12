@@ -4,12 +4,12 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { Card as HdsCard, Tag as HdsTag } from "hds-react";
 import { parseISO } from "date-fns";
+import { breakpoints } from "common/src/common/style";
 import {
   isActive,
   applicationUrl,
   getReducedApplicationStatus,
 } from "../../modules/util";
-import { breakpoint } from "../../modules/style";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
 import { cancelApplication } from "../../modules/api";
@@ -29,7 +29,7 @@ const Card = styled(HdsCard).attrs({
   grid-template-columns: 1fr;
   display: block;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: var(--spacing-m);
@@ -65,12 +65,12 @@ const Buttons = styled.div`
   flex-direction: column-reverse;
   gap: var(--spacing-xs);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     flex-direction: row;
     gap: var(--spacing-s);
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     align-items: flex-end;
     justify-content: flex-end;
   }
@@ -90,7 +90,7 @@ const RoundName = styled.div`
   font-family: var(--font-bold);
   margin-bottom: 0;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     font-size: var(--fontsize-heading-m);
   }
 `;
@@ -101,7 +101,7 @@ const Modified = styled.div`
   color: var(--color-black-70);
   margin-top: var(--spacing-l);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     margin-top: var(--spacing-xl);
   }
 `;
@@ -109,7 +109,7 @@ const Modified = styled.div`
 const StyledButton = styled(MediumButton)`
   white-space: nowrap;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     width: 100%;
   }
 `;

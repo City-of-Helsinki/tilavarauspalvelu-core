@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { LoadingSpinner, Notification as HDSNotification } from "hds-react";
-import { breakpoint } from "../../modules/style";
-import { H5 } from "../../modules/style/typography";
+import { breakpoints } from "common/src/common/style";
+import { H5 } from "common/src/common/typography";
 
 export const TwoColumnContainer = styled.div`
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     grid-template-columns: 1fr;
   }
 
@@ -21,7 +21,7 @@ export const SpanTwoColumns = styled.span`
   grid-column-start: 1;
   grid-column-end: 3;
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     grid-column-start: 1;
     grid-column-end: 2;
   }
@@ -30,7 +30,7 @@ export const SpanTwoColumns = styled.span`
 export const FormSubHeading = styled(H5)`
   margin: var(--spacing-m) 0 0 0;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-column-start: 1;
     grid-column-end: 3;
   }
@@ -50,7 +50,7 @@ export const ButtonContainer = styled.div`
   gap: var(--spacing-m);
   border-top: 1px solid var(--color-black-60);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
   }
 `;
@@ -73,7 +73,7 @@ export const CheckboxWrapper = styled.div<{ $break?: boolean }>`
   margin-top: 2.5em;
   margin-bottom: auto;
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     margin-top: 0;
   }
 `;

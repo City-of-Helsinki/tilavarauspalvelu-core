@@ -15,9 +15,10 @@ import trim from "lodash/trim";
 import uniq from "lodash/uniq";
 import uniqBy from "lodash/uniqBy";
 import { TFunction } from "i18next";
+import { H1, H3 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
-import { H1, H3 } from "../../styles/typography";
-import { BasicLink, breakpoints, InlineRowLink } from "../../styles/util";
+import { BasicLink, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import withMainMenu from "../withMainMenu";
 import {

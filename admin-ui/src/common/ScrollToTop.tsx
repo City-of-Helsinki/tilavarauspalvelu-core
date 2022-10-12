@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import { Button, IconAngleUp } from "hds-react";
 import { useDebounce, useWindowSize } from "react-use";
-import { breakpoints } from "../styles/util";
+import { breakpoints } from "common/src/common/style";
 
 const Btn = styled(Button).attrs({
   style: {

@@ -4,9 +4,10 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { UserInfo } from "common";
+import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
 import { useAuthState } from "../context/AuthStateContext";
-import { breakpoints, StyledHDSNavigation } from "../styles/util";
+import { StyledHDSNavigation } from "../styles/util";
 
 const MobileNavigation = styled.div`
   @media (min-width: ${breakpoints.m}) {

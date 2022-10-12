@@ -2,12 +2,13 @@ import { IconCheck, IconCross } from "hds-react";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
+import { Strongish } from "common/src/common/typography";
 import { ALLOCATION_CALENDAR_TIMES, weekdays } from "../../../common/const";
 import {
   ApplicationEventScheduleType,
   ApplicationEventType,
 } from "../../../common/gql-types";
-import { FontMedium } from "../../../styles/typography";
+
 import {
   applicationEventSchedulesToCells,
   getSlotApplicationEventCount,
@@ -53,7 +54,7 @@ const Slot = styled.div<{
   $isAccepted?: boolean;
   $isDeclined?: boolean;
 }>`
-  ${FontMedium};
+  ${Strongish};
   font-size: var(--fontsize-body-m);
   display: flex;
   justify-content: center;

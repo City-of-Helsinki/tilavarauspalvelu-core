@@ -7,6 +7,8 @@ import uniqBy from "lodash/uniqBy";
 import trim from "lodash/trim";
 import get from "lodash/get";
 import { TFunction } from "i18next";
+import { H1 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import {
   getAllocationResults,
   getApplication,
@@ -19,8 +21,7 @@ import {
   DataFilterConfig,
 } from "../../common/types";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
-import { H1 } from "../../styles/typography";
-import { BasicLink, breakpoints, InlineRowLink } from "../../styles/util";
+import { BasicLink, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import ApplicantApplicationsStatusBlock from "./ApplicantApplicationsStatusBlock";

@@ -1,8 +1,8 @@
 import { Link } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import { H1 } from "../styles/new-typography";
-import { breakpoints } from "../styles/util";
+import { H1 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { publicUrl } from "./const";
 
 const Wrapper = styled.div`

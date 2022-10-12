@@ -2,8 +2,8 @@ import { get } from "lodash";
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import { Table, TableProps } from "../../common/hds-fork/table/Table";
-import { breakpoints } from "../../styles/util";
 
 type TableWrapperProps = {
   $headingBackground?: string;

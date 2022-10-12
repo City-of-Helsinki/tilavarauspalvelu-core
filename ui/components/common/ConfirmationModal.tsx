@@ -8,7 +8,7 @@ import React, {
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import { MediumButton } from "../../styles/util";
 
 type Props = {
@@ -37,7 +37,7 @@ const StyledDialog = styled(Dialog)`
       margin: 0;
     }
 
-    @media (min-width: ${breakpoint.s}) {
+    @media (min-width: ${breakpoints.s}) {
       flex-direction: row;
       justify-content: flex-end;
     }
@@ -53,7 +53,7 @@ const StyledDialog = styled(Dialog)`
     line-height: 2rem;
     margin-bottom: var(--spacing-m);
 
-    @media (min-width: ${breakpoint.s}) {
+    @media (min-width: ${breakpoints.s}) {
       font-size: 2rem;
     }
   }

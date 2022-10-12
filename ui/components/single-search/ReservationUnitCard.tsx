@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import NextImage from "next/image";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { H5, Strongish } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import {
   getAddressAlt,
   getMainImage,
@@ -14,7 +15,7 @@ import {
 import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel, truncatedText } from "../../styles/util";
 import { ReservationUnitType } from "../../modules/gql-types";
-import { H5, Strongish } from "../../modules/style/typography";
+
 import {
   getPrice,
   getReservationUnitName,
@@ -31,7 +32,7 @@ const Container = styled.div`
   background-color: var(--color-white);
   margin-top: var(--spacing-s);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     display: grid;
     grid-template-columns: 226px auto;
   }
@@ -41,7 +42,7 @@ const MainContent = styled.div`
   display: grid;
   margin: var(--spacing-s);
 
-  @media (min-width: ${breakpoint.s}) and (max-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.s}) and (max-width: ${breakpoints.m}) {
     margin-bottom: 0;
   }
 `;
@@ -52,7 +53,7 @@ const Name = styled(H5).attrs({ as: "h2" })`
   margin: 0 0 var(--spacing-2-xs);
   line-height: var(--lineheight-m);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     ${truncatedText};
   }
 `;
@@ -63,7 +64,7 @@ const Description = styled.span`
   flex-grow: 1;
   height: 40px;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     height: unset;
   }
 `;
@@ -77,7 +78,7 @@ const Bottom = styled.span`
     }
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: var(--spacing-l);
@@ -87,7 +88,7 @@ const Bottom = styled.span`
 const Props = styled.div`
   display: block;
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     display: flex;
     gap: var(--spacing-l);
   }
@@ -101,7 +102,7 @@ const Actions = styled.div`
     white-space: nowrap;
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -115,16 +116,16 @@ const Image = styled.img`
   object-fit: cover;
   max-width: 100%;
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     max-height: 250px;
     height: 100%;
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-height: 182px;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     max-height: 150px;
   }
 `;

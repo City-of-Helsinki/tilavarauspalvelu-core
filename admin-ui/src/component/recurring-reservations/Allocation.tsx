@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button, IconArrowRedo } from "hds-react";
+import { Strong } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { getApplicationRound, triggerAllocation } from "../../common/api";
 import {
   ApplicationRound as ApplicationRoundType,
@@ -13,7 +15,7 @@ import {
   WideContainer,
 } from "../../styles/layout";
 import { ContentHeading } from "../../styles/typography";
-import { breakpoints, NotificationBox, Strong } from "../../styles/util";
+import { NotificationBox } from "../../styles/util";
 import StatusRecommendation from "../applications/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";

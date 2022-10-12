@@ -3,7 +3,7 @@ import { camelCase, startCase } from "lodash";
 import React, { ChangeEvent, MutableRefObject } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import Checkbox from "./Checkbox";
 import DateRangePicker from "./DateRangePicker";
 
@@ -35,7 +35,7 @@ const Wrapper = styled.div`
   z-index: 1;
   min-width: fit-content;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     position: absolute;
     top: 100%;
     left: 0;

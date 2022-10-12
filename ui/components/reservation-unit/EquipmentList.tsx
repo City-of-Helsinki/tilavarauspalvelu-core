@@ -2,9 +2,9 @@ import { Button, IconAngleDown, IconAngleUp } from "hds-react";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import { EquipmentType } from "../../modules/gql-types";
 import { getEquipmentList } from "../../modules/reservationUnit";
-import { breakpoint } from "../../modules/style";
 
 type Props = {
   equipment: EquipmentType[];
@@ -24,7 +24,7 @@ const List = styled.ul<{ $showAll: boolean; $itemsToShow: number }>`
   gap: var(--spacing-2-xs) var(--spacing-m);
   padding: 0;
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     grid-template-columns: 1fr 1fr;
     row-gap: var(--spacing-s);
   }
@@ -33,7 +33,7 @@ const List = styled.ul<{ $showAll: boolean; $itemsToShow: number }>`
 const EquipmentItem = styled.li`
   font-size: var(--fontsize-body-m);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     font-size: var(--fontsize-body-l);
   }
 `;

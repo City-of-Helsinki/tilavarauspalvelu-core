@@ -1,26 +1,6 @@
 import styled, { css } from "styled-components";
-import { breakpoints } from "./util";
-
-export const H1 = styled.h1`
-  font-size: var(--fontsize-heading-l);
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
-  line-height: var(--lineheight-m);
-`;
-
-export const H2 = styled.h2`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
-  line-height: var(--lineheight-m);
-`;
-
-export const H3 = styled.h3`
-  font-size: var(--fontsize-heading-xs);
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
-  line-height: var(--lineheight-l);
-`;
+import { H1 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 
 export const truncatedText = css`
   white-space: nowrap;
@@ -44,14 +24,4 @@ export const RequiredLabel = css`
     font-family: var(--tilavaraus-admin-font-bold);
     font-weight: 700;
   }
-`;
-
-export const FontBold = css`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: 700;
-`;
-
-export const FontMedium = css`
-  font-family: var(--tilavaraus-admin-font-medium);
-  font-weight: 500;
 `;

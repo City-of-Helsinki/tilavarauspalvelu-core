@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Application } from "common/types/common";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import Container from "../common/Container";
 import Head from "./Head";
 import Stepper from "./Stepper";
@@ -25,7 +25,7 @@ const InnerContainer = styled.div`
   grid-template-columns: 18em 1fr;
   margin-top: var(--spacing-l);
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoints.l}) {
     grid-template-columns: 1fr;
     gap: 0;
   }
@@ -34,7 +34,7 @@ const InnerContainer = styled.div`
 const Main = styled.div`
   margin-top: var(--spacing-s);
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     width: calc (100vw - 3 * var(--spacing-xs));
   }
 `;

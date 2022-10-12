@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
-import { breakpoints } from "../../../styles/util";
+import { breakpoints } from "common/src/common/style";
 import { weekdays } from "../../../common/const";
 import {
   ApplicationEvent,

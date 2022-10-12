@@ -2,8 +2,8 @@ import React, { ReactNode } from "react";
 import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "react-i18next";
-import { breakpoint } from "../modules/style";
 import { MediumButton } from "../styles/util";
 
 type Props = {
@@ -73,7 +73,7 @@ const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
     }
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     width: 100% !important;
     height: fit-content !important;
     margin: 0 !important;
@@ -96,7 +96,7 @@ const VerticalButton = styled(Button)<{
     opacity: 0.5;
   `};
 
-  @media (min-width: calc(${breakpoint.xl} + 130px)) {
+  @media (min-width: calc(${breakpoints.xl} + 130px)) {
     &:hover {
       opacity: 0.5;
     }

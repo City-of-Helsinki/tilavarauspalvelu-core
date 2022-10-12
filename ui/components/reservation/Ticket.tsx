@@ -10,9 +10,9 @@ import styled from "styled-components";
 import { IconCalendar } from "hds-react";
 import { isFinite } from "lodash";
 import { i18n } from "next-i18next";
-import { H1, H2, fontMedium, Strongish } from "../../modules/style/typography";
+import { fontMedium, H1, H2, Strongish } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { capitalize, formatDurationMinutes } from "../../modules/util";
-import { breakpoint } from "../../modules/style";
 import {
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitPriceUnitChoices,
@@ -52,7 +52,7 @@ const PunchHole = styled.div<{ $bgColor: string }>`
   z-index: 1;
   background-color: ${({ $bgColor }) => $bgColor};
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     width: 22px;
     height: 40px;
     top: -30px;
@@ -80,7 +80,7 @@ const Wrapper = styled.div<{ $state: TicketState }>`
     border-radius: 0 0 10px 10px;
     border-top: 2px dashed var(--color-white);
 
-    @media (min-width: ${breakpoint.m}) {
+    @media (min-width: ${breakpoints.m}) {
       width: 60px;
       height: 100%;
       top: 0;
@@ -111,7 +111,7 @@ const Wrapper = styled.div<{ $state: TicketState }>`
   position: relative;
   width: 100%;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin: 0;
     width: calc(100% - 60px);
     height: calc(100% + 40px);
@@ -145,7 +145,7 @@ const Price = styled.div<{ $isFree: boolean }>`
   margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-s);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin-top: ${({ $isFree }) =>
       $isFree ? "var(--spacing-layout-xl)" : "var(--spacing-3-xl)"};
   }

@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button, LoadingSpinner } from "hds-react";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import Container from "./Container";
 import { PageInfo } from "../../modules/gql-types";
 import { CenterSpinner } from "./common";
@@ -21,7 +21,7 @@ export type Props = {
 };
 
 const TopWrapper = styled.div`
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -32,7 +32,7 @@ const HitCount = styled.div`
   font-size: var(--fontsize-body-l);
   margin-bottom: var(--spacing-s);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     margin-bottom: 0;
   }
 `;

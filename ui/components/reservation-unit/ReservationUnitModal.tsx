@@ -14,7 +14,8 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
-import { breakpoint } from "../../modules/style";
+import { fontMedium } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { reservationUnitPath } from "../../modules/const";
 import {
   getAddressAlt,
@@ -23,7 +24,7 @@ import {
 } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel } from "../../styles/util";
-import { fontMedium } from "../../modules/style/typography";
+
 import {
   ApplicationRoundType,
   Query,
@@ -44,7 +45,7 @@ const Container = styled.div`
   gap: var(--spacing-m);
   align-items: start;
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoints.l}) {
     grid-template-areas:
       "image name"
       "image a"
@@ -52,7 +53,7 @@ const Container = styled.div`
     grid-template-columns: 180px auto;
   }
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     grid-template-areas:
       "image"
       "name"
@@ -104,7 +105,7 @@ const Props = styled.span`
     margin-right: var(--spacing-layout-m);
   }
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     flex-direction: column;
     align-items: flex-start;
 
@@ -215,7 +216,7 @@ const MainContainer = styled.div`
   width: 48em;
   height: 40em;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     margin: 0;
     padding: var(--spacing-xs);
     width: calc(100% - 2 * var(--spacing-xs));
@@ -234,7 +235,7 @@ const Text = styled.span`
 `;
 
 const Filters = styled.div`
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     grid-template-columns: 1fr;
     margin-left: 0;
   }

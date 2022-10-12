@@ -4,8 +4,9 @@ import { i18n, useTranslation } from "next-i18next";
 import { parseISO } from "date-fns";
 import router from "next/router";
 import styled, { css } from "styled-components";
+import { fontMedium } from "common/src/common/typography";
 import { getReservationPrice } from "common";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import {
   getMainImage,
   getTranslation,
@@ -16,7 +17,6 @@ import { MediumButton, truncatedText } from "../../styles/util";
 import { ReservationType } from "../../modules/gql-types";
 import { reservationUnitPrefix } from "../../modules/const";
 import { canUserCancelReservation } from "../../modules/reservation";
-import { fontMedium } from "../../modules/style/typography";
 import {
   getReservationUnitName,
   getUnitName,
@@ -34,12 +34,12 @@ const Container = styled.div`
   margin-top: var(--spacing-s);
   position: relative;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     display: grid;
     grid-template-columns: 300px 1fr;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     display: grid;
     grid-template-columns: 300px auto;
 
@@ -54,23 +54,23 @@ const MainContent = styled.div`
   flex-direction: column;
   margin: var(--spacing-xs);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     margin: var(--spacing-s);
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     justify-content: space-between;
     flex-direction: column;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     white-space: pre;
     flex-direction: row;
   }
 `;
 
 const Details = styled.div`
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     width: 10px;
     white-space: pre;
   }
@@ -131,13 +131,13 @@ const Actions = styled.div`
     ${truncatedText};
   }
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     flex-direction: row;
     padding-bottom: var(--spacing-m);
     gap: var(--spacing-m);
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     align-self: flex-end;
     justify-self: flex-end;
     padding: 0;
@@ -147,7 +147,7 @@ const Actions = styled.div`
     }
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     margin-top: 120px;
 
     button {
@@ -162,17 +162,17 @@ const Image = styled.img`
   width: 100%;
   height: 60vw;
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     height: 100%;
     max-height: 200px;
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 300px;
     max-height: unset;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     max-height: 240px;
   }
 `;
@@ -203,7 +203,7 @@ const TimeStrip = styled.div<{ $type: CardType }>`
   text-align: center;
   ${truncatedText};
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     position: relative;
     max-width: fit-content;
   }

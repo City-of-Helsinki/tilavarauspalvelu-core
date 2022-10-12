@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { H4 } from "common/src/common/typography";
 import { getTranslation } from "../../modules/util";
 import ExternalLink from "./ExternalLink";
 import {
@@ -9,7 +10,6 @@ import {
   ReservationUnitType,
   UnitType,
 } from "../../modules/gql-types";
-import { H4 } from "../../modules/style/typography";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | ReservationUnitType;

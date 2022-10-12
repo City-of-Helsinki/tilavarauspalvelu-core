@@ -7,20 +7,13 @@ import {
 } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { breakpoints } from "common/src/common/style";
 import {
   ApplicationEventStatus,
   ApplicationStatus,
   NormalizedApplicationRoundStatus,
 } from "../common/types";
 import { getApplicationStatusColor } from "../component/applications/util";
-
-export const breakpoints = {
-  xs: "320px",
-  s: "576px",
-  m: "768px",
-  l: "992px",
-  xl: "1248px",
-};
 
 export const getGridFraction = (space: number, columns = 12): number => {
   const fraction = (space / columns) * 100;
@@ -166,11 +159,6 @@ export const SelectionCheckbox = styled(Checkbox).attrs({
     "--label-padding": "0",
   } as React.CSSProperties,
 })``;
-
-export const Strong = styled.span`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: 700;
-`;
 
 export const Divider = styled.hr`
   background-color: var(--color-silver);

@@ -2,7 +2,7 @@ import { debounce } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { H1 } from "../../styles/new-typography";
+import { H1 } from "common/src/common/typography";
 import withMainMenu from "../withMainMenu";
 import Filters, { FilterArguments, emptyState } from "./Filters";
 import ReservationUnitsDataReader, { Sort } from "./ReservationsDataLoader";

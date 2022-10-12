@@ -4,7 +4,7 @@ import { useMedia } from "react-use";
 import { Breadcrumb } from "common";
 import { useTranslation } from "react-i18next";
 import { trim } from "lodash";
-import { breakpoints } from "../styles/util";
+import { breakpoints } from "common/src/common/style";
 import { publicUrl } from "../common/const";
 
 type Alias = {

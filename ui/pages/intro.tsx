@@ -7,8 +7,8 @@ import { useQuery } from "@apollo/client";
 import { GetStaticProps } from "next";
 import styled from "styled-components";
 import { Application, OptionType } from "common/types/common";
+import { breakpoints } from "common/src/common/style";
 import { saveApplication } from "../modules/api";
-import { breakpoint } from "../modules/style";
 import { applicationRoundState, deepCopy } from "../modules/util";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
 import { MediumButton } from "../styles/util";
@@ -40,7 +40,7 @@ const Container = styled.div`
     display: none;
   }
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoints.l}) {
     grid-template-columns: 1fr;
   }
 `;

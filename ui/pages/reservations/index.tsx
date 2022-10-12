@@ -6,6 +6,8 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel, Notification } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { fontMedium } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import Container from "../../components/common/Container";
 import {
   Query,
@@ -14,8 +16,6 @@ import {
 } from "../../modules/gql-types";
 import { LIST_RESERVATIONS } from "../../modules/queries/reservation";
 import ReservationCard from "../../components/reservation/ReservationCard";
-import { fontMedium } from "../../modules/style/typography";
-import { breakpoint } from "../../modules/style";
 import Head from "../../components/reservations/Head";
 import { CenterSpinner } from "../../components/common/common";
 import { CURRENT_USER } from "../../modules/queries/user";
@@ -58,7 +58,7 @@ const StyledTab = styled(Tab)`
   span {
     padding: 0 var(--spacing-xs) !important;
 
-    @media (min-width: ${breakpoint.s}) {
+    @media (min-width: ${breakpoints.s}) {
       padding: 0 var(--spacing-xl) !important;
     }
   }

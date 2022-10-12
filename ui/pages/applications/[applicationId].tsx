@@ -12,13 +12,13 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import { Application, RecurringReservation } from "common/types/common";
+import { breakpoints } from "common/src/common/style";
 import {
   getApplication,
   getApplicationRound,
   getRecurringReservations,
 } from "../../modules/api";
 import { ApiData, useApiData } from "../../hooks/useApiData";
-import { breakpoint } from "../../modules/style";
 import { SubHeading } from "../../modules/style/typography";
 import { parseDate } from "../../modules/util";
 import Back from "../../components/common/Back";
@@ -41,7 +41,7 @@ const Container = styled.div`
   margin: 0 auto var(--spacing-2-xl) auto;
   height: 100%;
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     padding: var(--spacing-s);
   }
 `;
@@ -50,7 +50,7 @@ const RoundName = styled.div`
   font-size: var(--fontsize-heading-xl);
   font-family: var(--font-bold);
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     font-size: var(--fontsize-heading-l);
   }
 `;
@@ -76,14 +76,14 @@ const Modified = styled.div`
 const Buttons = styled.div`
   justify-self: end;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     width: 100%;
   }
 `;
 const ToggleButton = styled(MediumButton)`
   margin-top: var(--spacing-m);
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     width: 100%;
   }
 `;

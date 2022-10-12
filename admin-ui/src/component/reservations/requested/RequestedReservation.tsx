@@ -6,6 +6,7 @@ import { TFunction, useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
+import { H1 } from "common/src/common/typography";
 import {
   Maybe,
   Mutation,
@@ -38,7 +39,6 @@ import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
 import { RESERVATION_QUERY, UPDATE_WORKING_MEMO } from "./queries";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
-import { H1 } from "../../../styles/new-typography";
 import { HorisontalFlex, VerticalFlex } from "../../../styles/layout";
 import { publicUrl } from "../../../common/const";
 import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";

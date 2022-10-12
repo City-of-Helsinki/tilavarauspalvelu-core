@@ -10,7 +10,8 @@ import {
 } from "common/src/calendar/util";
 import { parseISO } from "date-fns";
 import { formatSecondDuration } from "common/src/common/util";
-import { breakpoint } from "../../modules/style";
+import { fontRegular, H1, H2 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { getTranslation, orderImages, searchUrl } from "../../modules/util";
 import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
@@ -21,7 +22,6 @@ import {
   getReservationUnitName,
   getUnitName,
 } from "../../modules/reservationUnit";
-import { fontRegular, H1, H2 } from "../../modules/style/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import AltNotification from "../common/AltNotification";
 
@@ -41,7 +41,7 @@ const RightContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-template-columns: auto 465px;
     gap: var(--spacing-layout-2-xl);
   }
@@ -69,11 +69,11 @@ const Props = styled.div`
   gap: var(--spacing-m) var(--spacing-s);
   margin-bottom: var(--spacing-layout-m);
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (min-width: ${breakpoint.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     grid-template-columns: repeat(4, 1fr);
   }
 `;

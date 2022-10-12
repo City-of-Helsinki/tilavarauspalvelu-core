@@ -3,10 +3,10 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import Container from "./Container";
 import { MediumButton } from "../../styles/util";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import { breakpoint } from "../../modules/style";
 
 type Props = {
   count: number;
@@ -19,7 +19,7 @@ const BackgroundContainer = styled.div`
   bottom: 0;
   width: 100%;
   z-index: 20;
-  min-width: ${breakpoint.xs};
+  min-width: ${breakpoints.xs};
 `;
 
 const CountWrapper = styled.div`
@@ -27,7 +27,7 @@ const CountWrapper = styled.div`
   width: 20px;
   height: 18px;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     width: 100px;
   }
 `;
@@ -56,7 +56,7 @@ const InnerContainer = styled.div`
   color: var(--color-white);
   padding-left: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     gap: var(--spacing-l);
   }
 `;
@@ -66,7 +66,7 @@ const Left = styled.div`
   align-items: center;
   gap: var(--spacing-xs);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     gap: var(--spacing-3-xl);
   }
 `;

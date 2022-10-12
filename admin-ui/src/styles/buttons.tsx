@@ -1,6 +1,6 @@
 import { Button } from "hds-react";
 import styled from "styled-components";
-import { FontMedium } from "./typography";
+import { Strongish } from "common/src/common/typography";
 
 export const SmallRoundButton = styled(Button).attrs({
   size: "small",
@@ -11,5 +11,5 @@ export const SmallRoundButton = styled(Button).attrs({
 
   --min-size: var(--spacing-m);
   border-radius: 4px;
-  ${FontMedium};
+  ${Strongish};
 `;

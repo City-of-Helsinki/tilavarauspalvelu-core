@@ -26,16 +26,16 @@ import { GetServerSideProps } from "next";
 import { camelCase, get, isFinite, omit } from "lodash";
 import { Trans, useTranslation } from "react-i18next";
 import { ReservationState } from "common/types/common";
-import apolloClient from "../../modules/apolloClient";
 import {
-  fontRegular,
   fontMedium,
+  fontRegular,
   H1,
   H2,
   H3,
   Strong,
-} from "../../modules/style/typography";
-import { breakpoint } from "../../modules/style";
+} from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
+import apolloClient from "../../modules/apolloClient";
 import {
   CheckboxWrapper,
   TwoColumnContainer,
@@ -262,7 +262,7 @@ const Head = styled.div`
 const HeadWrapper = styled(NarrowCenteredContainer)`
   padding: 0 var(--spacing-m) var(--spacing-xl) var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 1000px;
   }
 `;
@@ -271,7 +271,7 @@ const HeadColumns = styled(TwoColumnContainer)`
   margin-top: 0;
   gap: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     & > div:nth-of-type(1) {
       order: 2;
     }
@@ -307,7 +307,7 @@ const BodyContainer = styled(NarrowCenteredContainer)`
     color: var(--color-bus);
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 791px;
     padding-right: 219px;
   }
@@ -342,13 +342,13 @@ const OneColumnContainer = styled(TwoColumnContainer)`
   grid-template-columns: 1fr;
   margin-bottom: var(--spacing-3-xl);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     width: 48.638%;
   }
 `;
 
 const AccordionContainer = styled.div`
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     width: 70%;
   }
 
@@ -373,12 +373,12 @@ const ActionContainer = styled.div`
   button {
     margin-bottom: var(--spacing-m);
 
-    @media (min-width: ${breakpoint.m}) {
+    @media (min-width: ${breakpoints.m}) {
       width: 18rem;
     }
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     & > button:first-of-type {
       order: 1;
     }

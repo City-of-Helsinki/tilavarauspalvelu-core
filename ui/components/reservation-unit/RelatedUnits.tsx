@@ -6,8 +6,8 @@ import router from "next/router";
 import Link from "next/link";
 import styled from "styled-components";
 import { useMedia } from "react-use";
+import { breakpoints } from "common/src/common/style";
 import { reservationUnitPath } from "../../modules/const";
-import { breakpoint } from "../../modules/style";
 import { getMainImage, getTranslation } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import Carousel from "../Carousel";
@@ -26,7 +26,7 @@ type PropsType = {
 const Wrapper = styled.div`
   margin: 0 var(--spacing-s);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin: 0;
   }
 `;
@@ -99,8 +99,8 @@ const LinkButton = styled(SupplementaryButton)`
 
 const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
   const { t } = useTranslation();
-  const isMobile = useMedia(`(max-width: ${breakpoint.m})`, false);
-  const isWideMobile = useMedia(`(max-width: ${breakpoint.l})`, false);
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
+  const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
 
   if (units.length === 0) {
     return null;

@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import { IconAngleRight, IconArrowRight } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
+import { fontMedium, H3 } from "common/src/common/typography";
 import { singleSearchPrefix } from "../../modules/const";
 import Container from "../common/Container";
-import { fontMedium, H3 } from "../../modules/style/typography";
 import { UnitType } from "../../modules/gql-types";
 import { getTranslation } from "../../modules/util";
 

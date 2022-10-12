@@ -2,8 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
+import { H2 } from "common/src/common/typography";
 import Dialog from "../Dialog";
-import { H2 } from "../../styles/typography";
 
 interface IProps {
   callback?: () => void;

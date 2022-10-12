@@ -13,7 +13,7 @@ exports[`renders correctly 1`] = `
       class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 ihJQrt keghAK"
+        class="typography__H1-sc-1mzxtf7-3 Ticket__Title-sc-1svriai-3 gbNdsS keghAK"
         data-test="reservation__title"
       >
         Ticket title
@@ -27,7 +27,7 @@ exports[`renders correctly 1`] = `
         >
           <div>
             <span
-              class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+              class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
             >
               reservations:reservationDuration
             </span>
@@ -39,14 +39,14 @@ exports[`renders correctly 1`] = `
         >
           <div>
             <span
-              class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+              class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
             >
               prices:total
             </span>
           </div>
           <div>
             <span
-              class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+              class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
             >
               prices:priceFree
             </span>
@@ -74,7 +74,7 @@ exports[`renders correctly 2`] = `
       class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 ihJQrt keghAK"
+        class="typography__H1-sc-1mzxtf7-3 Ticket__Title-sc-1svriai-3 gbNdsS keghAK"
         data-test="reservation__title"
       >
         Ticket title
@@ -88,7 +88,7 @@ exports[`renders correctly 2`] = `
         >
           <div>
             <span
-              class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+              class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
             >
               reservations:reservationDuration
             </span>
@@ -100,14 +100,14 @@ exports[`renders correctly 2`] = `
         >
           <div>
             <span
-              class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+              class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
             >
               prices:total
             </span>
           </div>
           <div>
             <span
-              class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+              class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
             >
               prices:priceFree
             </span>
@@ -135,7 +135,7 @@ exports[`renders correctly 3`] = `
       class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 ihJQrt keghAK"
+        class="typography__H1-sc-1mzxtf7-3 Ticket__Title-sc-1svriai-3 gbNdsS keghAK"
         data-test="reservation__title"
       >
         Ticket title
@@ -145,7 +145,7 @@ exports[`renders correctly 3`] = `
         data-testid="reservation__price--container"
       >
         <span
-          class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+          class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
         >
           reservationUnit:priceFree
         </span>
@@ -171,13 +171,13 @@ exports[`renders correctly 4`] = `
       class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 ihJQrt keghAK"
+        class="typography__H1-sc-1mzxtf7-3 Ticket__Title-sc-1svriai-3 gbNdsS keghAK"
         data-test="reservation__title"
       >
         Backgstage huone
       </h1>
       <h2
-        class="typography__H2-sc-1yt5fo8-5 Ticket__Subtitle-sc-1svriai-4 cxlsOL ePyLiG"
+        class="typography__H2-sc-1mzxtf7-4 Ticket__Subtitle-sc-1svriai-4 iAyuOa ePyLiG"
       >
         Arabianrannan nuorisotalo
       </h2>
@@ -218,7 +218,7 @@ exports[`renders correctly 4`] = `
         data-testid="reservation__price--container"
       >
         <span
-          class="typography__Strongish-sc-1yt5fo8-1 gjTyhP"
+          class="typography__Strongish-sc-1mzxtf7-0 fDITwk"
         >
           reservationUnit:priceFree
         </span>

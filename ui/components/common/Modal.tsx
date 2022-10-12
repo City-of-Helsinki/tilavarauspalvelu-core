@@ -2,8 +2,8 @@ import FocusTrap from "focus-trap-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { breakpoints } from "common/src/common/style";
 import { isBrowser } from "../../modules/const";
-import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 
 type Props = {
@@ -39,7 +39,7 @@ const ModalElement = styled.div`
   max-height: 90%;
   overflow-y: auto;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     height: 100%;
     width: 100%;
     padding: 0;
@@ -61,7 +61,7 @@ const ButtonContainer = styled.div`
     min-width: 9rem;
   }
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     width: calc(100% - 2 * var(--spacing-layout-xs));
     padding: var(--spacing-layout-xs);
     grid-template-columns: 1fr;

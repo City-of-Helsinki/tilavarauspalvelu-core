@@ -10,14 +10,14 @@ import {
   ApplicationRound,
   RecurringReservation,
 } from "common/types/common";
+import { Strong } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import {
   getApplication,
   getApplicationRound,
   getRecurringReservations,
 } from "../../modules/api";
 import Back from "../../components/common/Back";
-import { breakpoint } from "../../modules/style";
-import { Strong } from "../../modules/style/typography";
 import { CenterSpinner, HorisontalRule } from "../../components/common/common";
 import IconWithText from "../../components/common/IconWithText";
 import { localizedValue } from "../../modules/util";
@@ -43,7 +43,7 @@ const Container = styled.div`
   margin: 0 auto var(--spacing-2-xl) auto;
   height: 100%;
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     padding: var(--spacing-s);
   }
 `;

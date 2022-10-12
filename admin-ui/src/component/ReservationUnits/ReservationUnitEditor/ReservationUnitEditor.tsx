@@ -69,6 +69,7 @@ import {
   Error,
   ArchiveButton,
   ExpandLink,
+  SlimH4,
 } from "./modules/reservationUnitEditor";
 import { draftSchema, IProps, schema, State } from "./types";
 import { getInitialState, i18nFields, reducer } from "./reducer";
@@ -89,7 +90,6 @@ import { useModal } from "../../../context/ModalContext";
 import ArchiveDialog from "./ArchiveDialog";
 import ReservationUnitStateTag from "./ReservationUnitStateTag";
 import DiscardChangesDialog from "./DiscardChangesDialog";
-import { SlimH4 } from "../../../styles/new-typography";
 import FieldGroup from "./FieldGroup";
 import PricingType from "./PricingType";
 

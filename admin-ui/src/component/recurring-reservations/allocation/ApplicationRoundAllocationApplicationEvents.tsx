@@ -2,12 +2,12 @@ import { sortBy } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { H5 } from "common/src/common/typography";
 import {
   ApplicationEventType,
   ApplicationType,
   ReservationUnitType,
 } from "../../../common/gql-types";
-import { H5 } from "../../../styles/new-typography";
 import Accordion from "../../Accordion";
 import { getApplicationEventScheduleResultStatuses } from "../modules/applicationRoundAllocation";
 import AllocationCalendar from "./AllocationCalendar";

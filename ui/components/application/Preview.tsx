@@ -14,6 +14,8 @@ import {
   StringParameter,
   OptionType,
 } from "common/types/common";
+import { fontRegular } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
@@ -25,10 +27,8 @@ import {
   TwoColumnContainer,
 } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
-import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { Query, TermsOfUseType } from "../../modules/gql-types";
-import { fontRegular } from "../../modules/style/typography";
 import { CITIES, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import { getOldReservationUnitName } from "../../modules/reservationUnit";
 
@@ -99,7 +99,7 @@ const Terms = styled.div`
   padding: var(--spacing-s);
   border: 1px solid var(--color-black-90);
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     height: auto;
     background-color: transparent;
     padding: 0;

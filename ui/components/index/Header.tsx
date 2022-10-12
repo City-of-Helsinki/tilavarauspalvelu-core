@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { fontRegular, H1 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import Container from "../common/Container";
-import { fontRegular, H1 } from "../../modules/style/typography";
 
 interface HeadProps {
   heading: string;
@@ -25,7 +25,7 @@ const Title = styled(H1)`
   ${fontRegular}
   margin-bottom: 0;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-l);
   }
 `;

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import { applicationsUrl } from "../../modules/util";
 import Container from "../common/Container";
 import Head from "./Head";
@@ -12,7 +12,7 @@ const Paragraph = styled.p`
   white-space: pre-wrap;
   margin-bottom: var(--spacing-xl);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: 60%;
   }
 `;

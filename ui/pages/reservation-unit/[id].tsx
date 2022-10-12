@@ -50,6 +50,7 @@ import {
   PendingReservation,
   Reservation,
 } from "common/types/common";
+import { H4 } from "common/src/common/typography";
 import Container from "../../components/common/Container";
 import Head from "../../components/reservation-unit/Head";
 import Address from "../../components/reservation-unit/Address";
@@ -58,7 +59,6 @@ import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
 import apolloClient from "../../modules/apolloClient";
 import Map from "../../components/Map";
-import { H4 } from "../../modules/style/typography";
 import Legend from "../../components/calendar/Legend";
 import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
 import {

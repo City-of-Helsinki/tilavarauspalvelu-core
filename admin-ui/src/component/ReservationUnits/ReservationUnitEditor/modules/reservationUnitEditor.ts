@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Accordion, Button } from "hds-react";
+import { H4 } from "common/src/common/typography";
 import { Grid, Span4 as DefaultSpan4 } from "../../../../styles/layout";
 
 export const EditorGrid = styled(Grid)`
@@ -93,4 +94,8 @@ export const Error = styled.div`
     flex-shrink: 0;
   }
   white-space: nowrap;
+`;
+
+export const SlimH4 = styled(H4)`
+  margin: 0;
 `;

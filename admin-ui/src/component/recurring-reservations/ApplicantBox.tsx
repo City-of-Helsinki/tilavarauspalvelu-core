@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { H2 } from "common/src/common/typography";
 import { Application as ApplicationType } from "../../common/types";
-import { H2 } from "../../styles/typography";
 import { BasicLink, StatusDot } from "../../styles/util";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import { applicationDetailsUrl } from "../../common/urls";

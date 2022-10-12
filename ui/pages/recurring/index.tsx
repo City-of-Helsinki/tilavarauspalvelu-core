@@ -4,8 +4,9 @@ import { GetServerSideProps } from "next";
 import { sortBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H1, H3, HeroSubheading } from "../../modules/style/typography";
-import { breakpoint } from "../../modules/style";
+import { H1, H3 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
+import { HeroSubheading } from "../../modules/style/typography";
 import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
 import { applicationRoundState } from "../../modules/util";
 import KorosDefault from "../../components/common/KorosDefault";
@@ -56,7 +57,7 @@ const HeadWrapper = styled.div`
 const Head = styled.div`
   padding: var(--spacing-m) var(--spacing-m) var(--spacing-xl);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: var(--container-width-xl);
     padding: var(--spacing-m);
     margin: 0 auto;
@@ -72,7 +73,7 @@ const Content = styled.div`
   padding: 0 var(--spacing-m) var(--spacing-xl);
   background-color: var(--color-white);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-width: var(--container-width-xl);
     margin: 0 auto;
     padding-bottom: var(--spacing-layout-xl);

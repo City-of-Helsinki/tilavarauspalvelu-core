@@ -2,7 +2,8 @@ import React, { CSSProperties, ReactNode, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { IconCross } from "hds-react";
-import { breakpoints, Seranwrap } from "../styles/util";
+import { breakpoints } from "common/src/common/style";
+import { Seranwrap } from "../styles/util";
 
 interface IProps {
   children: ReactNode;

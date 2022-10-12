@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 
 interface Props {
   isOpen: boolean;
@@ -19,7 +19,7 @@ const Wrapper = styled.div`
     box-sizing: border-box;
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     position: absolute;
     top: 100%;
     left: 0;
@@ -29,7 +29,7 @@ const Wrapper = styled.div`
 `;
 
 const Menu = styled.div`
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     max-height: 18.35rem;
     overflow: auto;
   }

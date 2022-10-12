@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { useMedia } from "react-use";
 import Breadcrumb from "common/src/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
+import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { trim } from "lodash";
-import { breakpoint } from "../../modules/style";
 
 type Alias = {
   slug: string;
@@ -29,7 +29,7 @@ const BreadcrumbWrapper = ({
   className,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const isMobile = useMedia(`(max-width: ${breakpoint.m})`, false);
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
   const routes =
     route

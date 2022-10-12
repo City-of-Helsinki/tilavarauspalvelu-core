@@ -1,5 +1,6 @@
 import { getReservationPrice } from "common";
 import { breakpoints } from "common/src/common/style";
+import { H4 } from "common/src/common/typography";
 import { differenceInMinutes, parseISO } from "date-fns";
 import { trim } from "lodash";
 import React from "react";
@@ -10,7 +11,6 @@ import {
   ReservationUnitByPkType,
   ReservationUnitType,
 } from "../../modules/gql-types";
-import { H4 } from "../../modules/style/typography";
 import {
   capitalize,
   formatDurationMinutes,

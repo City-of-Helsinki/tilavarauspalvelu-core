@@ -3,8 +3,8 @@ import { NumberInput, TextInput } from "hds-react";
 import { get, upperFirst } from "lodash";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { breakpoints } from "common/src/common/style";
 import { languages } from "../../../common/const";
-import { breakpoints } from "../../../styles/util";
 import {
   SpaceCreateMutationInput,
   SpaceUpdateMutationInput,

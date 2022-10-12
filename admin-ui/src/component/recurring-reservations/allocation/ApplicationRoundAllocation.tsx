@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import { H1, Strongish } from "common/src/common/typography";
 import { getApplicationRound } from "../../../common/api";
 import {
   ApplicationType,
@@ -17,13 +18,11 @@ import {
 } from "../../../common/gql-types";
 import { ApplicationRound, OptionType } from "../../../common/types";
 import { useNotification } from "../../../context/NotificationContext";
-import { H1 } from "../../../styles/new-typography";
 import Loader from "../../Loader";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
 import { getFilteredApplicationEvents } from "../modules/applicationRoundAllocation";
 import ApplicationRoundAllocationApplicationEvents from "./ApplicationRoundAllocationApplicationEvents";
 import LinkPrev from "../../LinkPrev";
-import { FontMedium } from "../../../styles/typography";
 import { useAllocationContext } from "../../../context/AllocationContext";
 
 type Props = {
@@ -56,12 +55,12 @@ const Filters = styled.div`
   border-bottom: 1px solid var(--color-black-30);
 
   label {
-    ${FontMedium};
+    ${Strongish};
   }
 `;
 
 const ReservationUnits = styled(Tabs.TabList)`
-  ${FontMedium};
+  ${Strongish};
 `;
 
 const Tab = styled(Tabs.Tab)`

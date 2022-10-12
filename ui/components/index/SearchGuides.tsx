@@ -3,15 +3,15 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
-import { breakpoint } from "../../modules/style";
+import { fontMedium, H2 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import Container from "../common/Container";
-import { fontMedium, H2 } from "../../modules/style/typography";
 
 const Wrapper = styled(Container)`
   padding-top: var(--spacing-xl);
   padding-bottom: var(--spacing-xl);
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     display: flex;
     flex-direction: column;
     gap: 46px;
@@ -47,7 +47,7 @@ const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
       }
     }
 
-    @media (max-width: ${breakpoint.m}) {
+    @media (max-width: ${breakpoints.m}) {
       display: contents;
       padding-bottom: 200px;
 
@@ -67,7 +67,7 @@ const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
       }
     }
 
-    @media (max-width: ${breakpoint.s}) {
+    @media (max-width: ${breakpoints.s}) {
       > div:nth-of-type(1) {
         max-height: 160px;
       }
@@ -86,7 +86,7 @@ const InfoContainer = styled.div`
     text-decoration: underline;
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-s);
     margin-bottom: var(--spacing-m);
   }
@@ -95,7 +95,7 @@ const InfoContainer = styled.div`
 const ButtonContainer = styled.div`
   margin-top: var(--spacing-xs);
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     display: flex;
     flex-direction: column;
   }

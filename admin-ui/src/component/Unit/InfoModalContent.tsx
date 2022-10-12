@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { H1, H2 } from "../../styles/typography";
+import { H1, H2 } from "common/src/common/typography";
 
 const Content = styled.div`
   line-height: 26px;

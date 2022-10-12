@@ -10,6 +10,7 @@ import {
   Address,
   OptionType,
 } from "common/types/common";
+import { breakpoints } from "common/src/common/style";
 import {
   CheckboxWrapper,
   TwoColumnContainer,
@@ -20,10 +21,9 @@ import BillingAddress from "./BillingAddress";
 import Buttons from "./Buttons";
 import { deepCopy, applicationErrorText } from "../../modules/util";
 import ControlledSelect from "../common/ControlledSelect";
-import { breakpoint } from "../../modules/style";
 
 export const Placeholder = styled.span`
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     display: none;
   }
 `;

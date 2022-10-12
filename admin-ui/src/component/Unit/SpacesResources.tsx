@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
+import { breakpoints } from "common/src/common/style";
 import { useModal } from "../../context/ModalContext";
 import {
   ContentContainer,
@@ -23,7 +24,6 @@ import SpacesTable from "./SpacesTable";
 import SubPageHead from "./SubPageHead";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
-import { breakpoints } from "../../styles/util";
 import NewResourceModal from "../Resources/resource-editor/NewResourceModal";
 import { UNIT_QUERY } from "../../common/queries";
 import {

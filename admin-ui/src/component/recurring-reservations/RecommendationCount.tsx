@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { H3 } from "../../styles/typography";
+import { H3 } from "common/src/common/typography";
 
 interface IProps {
   recommendationCount: number;

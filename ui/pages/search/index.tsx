@@ -10,6 +10,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isEqual, omit, pick, sortBy } from "lodash";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import { OptionType } from "common/types/common";
+import { H1 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/search/SearchForm";
 import {
@@ -19,7 +21,7 @@ import {
 } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
 import ClientOnly from "../../components/ClientOnly";
-import { H1, HeroSubheading } from "../../modules/style/typography";
+import { HeroSubheading } from "../../modules/style/typography";
 import KorosDefault from "../../components/common/KorosDefault";
 import {
   ApplicationRoundType,
@@ -32,7 +34,6 @@ import {
 } from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
-import { breakpoint } from "../../modules/style";
 import apolloClient from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
@@ -85,7 +86,7 @@ const Wrapper = styled.div`
 const HeadContainer = styled.div`
   background-color: white;
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     padding-top: 0;
   }
 `;

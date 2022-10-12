@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { UserProfile } from "common/types/common";
-import { breakpoint } from "../modules/style";
+import { breakpoints } from "common/src/common/style";
 import { authEnabled, isBrowser } from "../modules/const";
 import RequireAuthentication from "./common/RequireAuthentication";
 import { MediumButton } from "../styles/util";
@@ -25,7 +25,7 @@ const Wrapper = styled.div`
     width: 100%;
   }
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     flex-direction: row;
     justify-content: flex-start;
     text-align: left;

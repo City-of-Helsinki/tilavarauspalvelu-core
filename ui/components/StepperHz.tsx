@@ -1,7 +1,7 @@
 import { IconCheck, IconCross } from "hds-react";
 import React, { ReactNode } from "react";
 import styled from "styled-components";
-import { fontMedium } from "../modules/style/typography";
+import { fontMedium } from "common/src/common/typography";
 
 type Step = {
   label: string;

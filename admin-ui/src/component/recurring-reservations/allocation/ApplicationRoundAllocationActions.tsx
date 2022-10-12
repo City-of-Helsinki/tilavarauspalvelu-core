@@ -1,6 +1,7 @@
 import { IconCross, Select } from "hds-react";
 import React, { useCallback, useMemo } from "react";
 import { TFunction, useTranslation } from "react-i18next";
+import { Strong, Strongish } from "common/src/common/typography";
 import styled from "styled-components";
 import { ALLOCATION_CALENDAR_TIMES } from "../../../common/const";
 import {
@@ -17,7 +18,6 @@ import {
   getTimeSlotOptions,
 } from "../modules/applicationRoundAllocation";
 import ApplicationEventScheduleCard from "./ApplicationEventScheduleCard";
-import { FontBold, FontMedium } from "../../../styles/typography";
 
 type Props = {
   applications: ApplicationType[];
@@ -55,7 +55,7 @@ const TimeAccordion = styled(Accordion)`
     margin-bottom: 0;
 
     h2 {
-      ${FontMedium};
+      ${Strongish};
       font-size: var(--fontsize-body-m);
       display: inline-block;
       color: var(--color-bus);
@@ -84,7 +84,7 @@ const TimeSelectWrapper = styled.div`
   }
 
   label {
-    ${FontMedium};
+    ${Strongish};
     margin-bottom: 0;
   }
 `;
@@ -92,13 +92,13 @@ const TimeSelectWrapper = styled.div`
 const TimeLabel = styled.div`
   background-color: var(--color-black-5);
   padding: var(--spacing-3-xs) var(--spacing-xs);
-  ${FontMedium};
+  ${Strongish};
   font-size: var(--fontsize-body-m);
   display: inline-block;
 `;
 
 const Heading = styled.div`
-  ${FontBold};
+  ${Strong};
   font-size: var(--fontsize-body-m);
   margin: var(--spacing-xs) 0 var(--spacing-s);
   padding-bottom: 0;

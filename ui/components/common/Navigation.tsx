@@ -5,9 +5,9 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import UserInfo from "common/src/userinfo/UserInfo";
 import { UserProfile } from "common/types/common";
+import { breakpoints } from "common/src/common/style";
 import { applicationsUrl } from "../../modules/util";
 import { authEnabled, isBrowser } from "../../modules/const";
-import { breakpoint } from "../../modules/style";
 import RequireAuthentication from "./RequireAuthentication";
 import { clearApiAccessToken } from "../../modules/auth/util";
 
@@ -27,7 +27,7 @@ const StyledNavigation = styled(HDSNavigation)`
   --header-divider-color: var(--color-black-20);
 
   color: var(--tilavaraus-header-color);
-  min-width: ${breakpoint.xs};
+  min-width: ${breakpoints.xs};
 
   .btn-logout {
     display: flex;
@@ -40,12 +40,12 @@ const StyledNavigation = styled(HDSNavigation)`
     left: unset;
   }
 
-  @media (max-width: ${breakpoint.xs}) {
+  @media (max-width: ${breakpoints.xs}) {
     position: fixed !important;
     z-index: var(--tilavaraus-stack-order-navigation) !important;
   }
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoints.m}) {
     .navigation__language-selector--button {
       position: absolute;
       right: var(--spacing-layout-l);
@@ -64,7 +64,7 @@ const NaviItem = styled(HDSNavigation.Item)<{ $hidden: boolean }>`
 `;
 
 const PreContent = styled.div`
-  @media (max-width: ${breakpoint.xs}) {
+  @media (max-width: ${breakpoints.xs}) {
     margin-top: var(--spacing-layout-l);
   }
 `;

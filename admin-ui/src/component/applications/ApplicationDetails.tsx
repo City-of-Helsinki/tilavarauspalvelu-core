@@ -6,6 +6,8 @@ import { useParams } from "react-router-dom";
 import { Card, Table } from "hds-react";
 import isEqual from "lodash/isEqual";
 import omit from "lodash/omit";
+import { H2, H4, H5, Strong } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import Accordion from "../Accordion";
 import {
   getApplication,
@@ -20,7 +22,6 @@ import {
   Parameter,
 } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
-import { H2, H4, H5 } from "../../styles/new-typography";
 import withMainMenu from "../withMainMenu";
 import {
   formatNumber,
@@ -34,7 +35,6 @@ import { appEventDuration, applicantName } from "./util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
 import { useNotification } from "../../context/NotificationContext";
 import TimeSelector from "./time-selector/TimeSelector";
-import { breakpoints } from "../../styles/util";
 import ScrollIntoView from "../../common/ScrollIntoView";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import ShowWhenTargetInvisible from "../ShowWhenTargetInvisible";
@@ -409,7 +409,7 @@ function ApplicationDetails(): JSX.Element | null {
 
                                 return (
                                   <EventSchedule key={day}>
-                                    <strong>{t(`calendar.${day}`)}</strong>
+                                    <Strong>{t(`calendar.${day}`)}</Strong>
                                     {schedulesTxt ? `,${schedulesTxt}` : ""}
                                   </EventSchedule>
                                 );
@@ -429,7 +429,7 @@ function ApplicationDetails(): JSX.Element | null {
 
                                 return (
                                   <EventSchedule key={day}>
-                                    <strong>{t(`calendar.${day}`)}</strong>
+                                    <Strong>{t(`calendar.${day}`)}</Strong>
                                     {schedulesTxt ? `,${schedulesTxt}` : ""}
                                   </EventSchedule>
                                 );

@@ -7,7 +7,8 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import Joi from "joi";
-
+import { H1 } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import {
   Query,
   QuerySpaceByPkArgs,
@@ -19,12 +20,10 @@ import {
 
 import { schema } from "./util";
 import { useNotification } from "../../../context/NotificationContext";
-import { breakpoints } from "../../../styles/util";
 import { SPACE_QUERY, UPDATE_SPACE } from "./queries";
 import Loader from "../../Loader";
 import Head from "./Head";
 import { ContentContainer, IngressContainer } from "../../../styles/layout";
-import { H1 } from "../../../styles/typography";
 import FormErrorSummary from "../../../common/FormErrorSummary";
 import SpaceHierarchy from "./SpaceHierarchy";
 import ParentSelector from "./ParentSelector";

@@ -8,16 +8,16 @@ import {
   ApplicationEventSchedulePriority,
   OptionType,
 } from "common/types/common";
+import { fontRegular } from "common/src/common/typography";
+import { breakpoints } from "common/src/common/style";
 import TimePreview from "./TimePreview";
 import { weekdays } from "../../modules/const";
-import { breakpoint } from "../../modules/style";
 import {
   arrowDown,
   arrowUp,
   MediumButton,
   SupplementaryButton,
 } from "../../styles/util";
-import { fontRegular } from "../../modules/style/typography";
 
 type Props = {
   index: number;
@@ -190,7 +190,7 @@ const CalendarContainer = styled.div`
   width: 90vw;
   user-select: none;
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     overflow-x: auto;
     width: 100%;
   }
@@ -200,7 +200,7 @@ const LegendContainer = styled.div`
   display: block;
   margin-top: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     & > div {
       display: flex;
       justify-content: space-between;
@@ -217,7 +217,7 @@ const Legend = styled.div`
   margin-right: 3em;
   margin-bottom: var(--spacing-xs);
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin-bottom: 0;
   }
 `;
@@ -258,7 +258,7 @@ const LegendBox = styled.div<{ type: string }>`
   height: 37px;
   position: relative;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     margin-right: var(spacing-xs);
   }
 `;

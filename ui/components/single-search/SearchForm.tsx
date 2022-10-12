@@ -14,7 +14,7 @@ import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import { OptionType, StringParameter } from "common/types/common";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import {
   mapOptions,
   getSelectedOption,
@@ -104,11 +104,11 @@ const Filters = styled.div<{ $areFiltersVisible: boolean }>`
     margin-right: 0;
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-template-columns: 1fr 1fr;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-template-columns: 1fr 1fr 1fr;
   }
 `;
@@ -168,15 +168,15 @@ const ResetButton = styled(StyledTag).attrs({
 })``;
 
 const StyledMultiSelectDropdown = styled(MultiSelectDropdown)`
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-column: 2/4;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-column: 2/3;
   }
 
-  @media (min-width: ${breakpoint.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     grid-column: 2/4;
   }
 `;
@@ -184,7 +184,7 @@ const StyledMultiSelectDropdown = styled(MultiSelectDropdown)`
 const SubmitButton = styled(MediumButton)`
   width: 100%;
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     width: auto;
     white-space: nowrap;
   }

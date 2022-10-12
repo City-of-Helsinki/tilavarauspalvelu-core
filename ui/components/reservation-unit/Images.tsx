@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
-import { breakpoint } from "../../modules/style";
+import { breakpoints } from "common/src/common/style";
 import Carousel from "../Carousel";
 import { pixel } from "../../styles/util";
 import { ReservationUnitImageType } from "../../modules/gql-types";
@@ -17,15 +17,15 @@ const StyledCarousel = styled(Carousel)`
   max-width: 100%;
   margin: 0;
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoints.s}) {
     max-width: 400px;
   }
 
-  @media (min-width: ${breakpoint.m}) {
+  @media (min-width: ${breakpoints.m}) {
     margin-right: var(--spacing-l) !important;
   }
 
-  @media (min-width: ${breakpoint.l}) {
+  @media (min-width: ${breakpoints.l}) {
     max-width: unset;
   }
 `;
@@ -35,7 +35,7 @@ const CarouselImage = styled.img`
   height: 300px;
   object-fit: cover;
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoints.l}) {
     width: 100%;
     height: 200px;
   }
@@ -50,7 +50,7 @@ const ThumbnailImage = styled.img`
   width: 122px;
   height: 122px;
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoints.l}) {
     max-width: 100%;
     height: auto;
   }
@@ -59,7 +59,7 @@ const ThumbnailImage = styled.img`
 const ModalContent = styled.div`
   max-width: 578px;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     margin: 0.5em;
   }
 `;
@@ -81,7 +81,7 @@ const ModalImages = styled.div`
     margin-right: 1em;
   }
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     margin-top: 0.25em;
   }
 `;

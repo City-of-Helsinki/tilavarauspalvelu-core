@@ -2,8 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
 import { useTranslation } from "next-i18next";
+import { breakpoints } from "common/src/common/style";
 import Container from "./Container";
-import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 
 type MessageType = {
@@ -23,7 +23,7 @@ const Message = styled.div`
 const Content = styled.div`
   margin-top: var(--spacing-s);
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoints.s}) {
     margin-top: var(--spacing-l);
   }
 `;
