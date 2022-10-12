@@ -1,9 +1,9 @@
 from datetime import date
 
-from .models import PricingStatus, ReservationUnitPricing
-
 
 def update_reservation_unit_pricings(today: date) -> int:
+    from .models import PricingStatus, ReservationUnitPricing
+
     future_pricings = ReservationUnitPricing.objects.filter(
         status=PricingStatus.PRICING_STATUS_FUTURE, begins=today
     )
