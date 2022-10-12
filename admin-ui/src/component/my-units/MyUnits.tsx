@@ -1,10 +1,10 @@
 import { useQuery } from "@apollo/client";
+import { H1 } from "common/src/common/typography";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Query, QueryUnitsArgs, UnitType } from "../../common/gql-types";
 import { useNotification } from "../../context/NotificationContext";
-import { H1 } from "../../styles/new-typography";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
 import { UNITS_QUERY } from "../Unit/queries";
