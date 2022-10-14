@@ -29,6 +29,8 @@ class User(AbstractUser):
         help_text="When user wants to receive reservation notification emails.",
     )
 
+    date_of_birth = models.DateField(verbose_name=_("Date of birth"), null=True)
+
     def get_display_name(self):
         return "{0} {1}".format(self.first_name, self.last_name).strip()
 

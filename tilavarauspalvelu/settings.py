@@ -17,6 +17,7 @@ import subprocess  # nosec
 import environ
 import graphql
 import sentry_sdk
+from corsheaders.defaults import default_headers
 from django.conf.global_settings import DEFAULT_FROM_EMAIL as django_default_from_email
 from django.conf.global_settings import EMAIL_PORT as django_default_email_port
 from django.utils.log import DEFAULT_LOGGING
@@ -217,6 +218,9 @@ env = environ.Env(
     # GDPR API
     GDPR_API_QUERY_SCOPE=(str, ""),
     GDPR_API_DELETE_SCOPE=(str, ""),
+    # Open City Profile
+    OPEN_CITY_PROFILE_GRAPHQL_API=(str, "https://profile-api.test.hel.ninja/graphql/"),
+    OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES=(list, ["substantial", "high"]),
     # Logging
     ENABLE_SQL_LOGGING=(bool, False),
 )
@@ -289,6 +293,9 @@ MULTI_PROXY_HEADERS = env("MULTI_PROXY_HEADERS")
 # Configure cors
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-authorization",  # for passing Open City Profile API token from frontend
+]
 
 AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
 
@@ -386,6 +393,8 @@ SESSION_COOKIE_SECURE = True
 OIDC_API_TOKEN_AUTH = {
     "AUDIENCE": env("TUNNISTAMO_JWT_AUDIENCE"),
     "ISSUER": env("TUNNISTAMO_JWT_ISSUER"),
+    # Use a custom resolve user for fetching date of birth.
+    "USER_RESOLVER": "users.utils.birthday_resolver.resolve_user",
 }
 
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
@@ -532,6 +541,9 @@ GRAPH_MODELS = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
+OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES = env("OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES")
 
 ENABLE_SQL_LOGGING = env("ENABLE_SQL_LOGGING")
 
