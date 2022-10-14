@@ -18,8 +18,9 @@ logger = getLogger(__name__)
 @app.task(name="update_reservation_unit_pricings")
 def _update_reservation_unit_pricings() -> None:
     today = date.today()
+
     logger.info(f"Updating reservation unit pricing with date {today}")
-    num_updated = update_reservation_unit_pricings()
+    num_updated = update_reservation_unit_pricings(today)
     logger.info(f"Updated {num_updated} reservation units with date {today}")
 
 
