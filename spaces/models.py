@@ -118,6 +118,7 @@ class Unit(models.Model):
         related_name="units",
         on_delete=models.PROTECT,
         null=True,
+        blank=True,
         help_text="Merchant used for payments",
     )
 
