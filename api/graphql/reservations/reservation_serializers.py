@@ -640,6 +640,17 @@ class ReservationUpdateSerializer(
         for reservation_unit in reservation_units:
             self.check_metadata_fields(data, reservation_unit)
 
+        # If the reservation as applying_for_free_of_charge True then we require free_of_charge_reason.
+        if data.get(
+            "applying_for_free_of_charge", self.instance.applying_for_free_of_charge
+        ) and not data.get(
+            "free_of_charge_reason", self.instance.free_of_charge_reason
+        ):
+            raise ValidationErrorWithCode(
+                "Free of charge reason is mandatory when applying for free of charge.",
+                ValidationErrorCodes.REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE,
+            )
+
         return data
 
     @property

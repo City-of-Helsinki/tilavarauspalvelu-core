@@ -956,3 +956,23 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.tax_percentage_value).is_equal_to(
             tax_percentage.value
         )
+
+    def test_require_free_of_charge_reason_if_applying_for_free_of_charge(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        data = self.get_valid_update_data()
+        data["applyingForFreeOfCharge"] = True
+
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Free of charge reason is mandatory when applying for free of charge."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE"
+        )

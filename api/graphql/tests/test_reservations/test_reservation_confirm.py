@@ -137,6 +137,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         self.reservation.applying_for_free_of_charge = True
+        self.reservation.free_of_charge_reason = (
+            "Reasonable reasoning for the reason that we question."
+        )
         self.reservation.save()
 
         self.client.force_login(self.regular_joe)
