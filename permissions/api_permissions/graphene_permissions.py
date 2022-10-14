@@ -26,6 +26,7 @@ from permissions.helpers import (
     can_modify_reservation,
     can_read_application,
     can_view_recurring_reservation,
+    can_view_users,
 )
 from reservation_units.models import ReservationUnit, ReservationUnitImage
 from reservations.models import RecurringReservation, Reservation
@@ -562,11 +563,15 @@ class ServiceSectorPermission(BasePermission):
 class UserPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
-        return True
+        user = info.context.user
+
+        if user is None:
+            return False
+        return can_view_users(user)
 
     @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:
-        return True
+        return False
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:

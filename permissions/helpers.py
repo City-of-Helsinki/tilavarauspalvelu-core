@@ -12,6 +12,9 @@ from spaces.models import ServiceSector, Unit, UnitGroup
 
 
 def is_superuser(user: User) -> bool:
+    if user.is_anonymous:
+        return False
+
     return user.is_superuser
 
 
