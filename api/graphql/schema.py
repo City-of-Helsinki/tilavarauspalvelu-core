@@ -473,7 +473,6 @@ class Query(graphene.ObjectType):
     cities = CityFilter(CityType)
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
 
-    @check_resolver_permission(UserPermission)
     def resolve_current_user(self, info, **kwargs):
         return get_object_or_404(User, pk=info.context.user.pk)
 
