@@ -9,6 +9,7 @@ from easy_thumbnails.fields import ThumbnailerImageField
 
 from merchants.models import PaymentMerchant, PaymentProduct
 from reservation_units.enums import ReservationUnitState
+from reservation_units.tasks import refresh_reservation_unit_product_mapping
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
@@ -656,6 +657,11 @@ class ReservationUnit(models.Model):
         )
 
         return ReservationUnitStateHelper.get_state(self)
+
+    def save(self, *args, **kwargs) -> None:
+        super(ReservationUnit, self).save(*args, **kwargs)
+        if settings.UPDATE_PRODUCT_MAPPING:
+            refresh_reservation_unit_product_mapping.delay(self.pk)
 
 
 class ReservationUnitPricing(models.Model):

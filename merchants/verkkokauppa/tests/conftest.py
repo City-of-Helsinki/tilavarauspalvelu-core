@@ -26,17 +26,19 @@ def setup_audit_log(settings):
 @fixture
 def create_product_params() -> CreateProductParams:
     return CreateProductParams(
-        "test-namespace",
-        "test-namespace-entity-id",
+        namespace="test-namespace",
+        namespace_entity_id="test-namespace-entity-id",
+        merchant_id="be4154c7-9f66-4625-998b-18abac4ecae7",
     )
 
 
 @fixture
-def create_product_response() -> Dict[str, str]:
+def response() -> Dict[str, str]:
     return {
         "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
         "namespace": "test-namespace",
         "namespaceEntityId": "test-namespace-entity-id",
+        "merchantId": "be4154c7-9f66-4625-998b-18abac4ecae7",
     }
 
 
