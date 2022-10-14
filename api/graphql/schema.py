@@ -455,7 +455,9 @@ class Query(graphene.ObjectType):
     units = UnitsFilter(UnitType, filterset_class=UnitsFilterSet)
     unit = relay.Node.Field(UnitType)
     unit_by_pk = Field(UnitByPkType, pk=graphene.Int())
+
     current_user = Field(UserType)
+    user = Field(UserType, pk=graphene.Int())
 
     keyword_categories = KeywordFilter(KeywordCategoryType)
     keyword_groups = KeywordFilter(KeywordGroupType)
@@ -474,6 +476,11 @@ class Query(graphene.ObjectType):
     @check_resolver_permission(UserPermission)
     def resolve_current_user(self, info, **kwargs):
         return get_object_or_404(User, pk=info.context.user.pk)
+
+    @check_resolver_permission(UserPermission, raise_permission_error=True)
+    def resolve_user(self, info, **kwargs):
+        pk = kwargs.get("pk")
+        return get_object_or_404(User, pk=pk)
 
     @check_resolver_permission(ReservationPermission)
     def resolve_reservation_by_pk(self, info, **kwargs):

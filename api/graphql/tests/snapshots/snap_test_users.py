@@ -118,3 +118,82 @@ snapshots['UserQueryTestCase::test_show_unit_roles 1'] = {
         }
     }
 }
+
+snapshots['UsersQueryTestCase::test_general_admin_can_read_other 1'] = {
+    'data': {
+        'user': {
+            'email': 'non-staff.admin@foo.com',
+            'firstName': 'Non-Staff',
+            'isSuperuser': False,
+            'lastName': 'Admin',
+            'reservationNotification': None,
+            'username': 'non_staff_admin'
+        }
+    }
+}
+
+snapshots['UsersQueryTestCase::test_regular_user_cant_read_other 1'] = {
+    'data': {
+        'user': None
+    },
+    'errors': [
+        {
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'No permissions to this operation.',
+            'path': [
+                'user'
+            ]
+        }
+    ]
+}
+
+snapshots['UsersQueryTestCase::test_regular_user_cant_read_self 1'] = {
+    'data': {
+        'user': None
+    },
+    'errors': [
+        {
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'No permissions to this operation.',
+            'path': [
+                'user'
+            ]
+        }
+    ]
+}
+
+snapshots['UsersQueryTestCase::test_service_sector_admin_can_read_other 1'] = {
+    'data': {
+        'user': {
+            'email': 'non-staff.admin@foo.com',
+            'firstName': 'Non-Staff',
+            'isSuperuser': False,
+            'lastName': 'Admin',
+            'reservationNotification': None,
+            'username': 'non_staff_admin'
+        }
+    }
+}
+
+snapshots['UsersQueryTestCase::test_unit_admin_can_read_other 1'] = {
+    'data': {
+        'user': {
+            'email': 'non-staff.admin@foo.com',
+            'firstName': 'Non-Staff',
+            'isSuperuser': False,
+            'lastName': 'Admin',
+            'reservationNotification': None,
+            'username': 'non_staff_admin'
+        }
+    }
+}
