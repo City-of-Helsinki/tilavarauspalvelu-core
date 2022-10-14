@@ -79,8 +79,8 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.builder._get_end_date()).is_equal_to("01.03.2022")
 
     def test_get_reservation_number(self):
-        resno = str(self.reservation.id).zfill(10)
-        assert_that(self.builder._get_reservation_number()).is_equal_to(f"{resno}")
+        resno = self.reservation.id
+        assert_that(self.builder._get_reservation_number()).is_equal_to(resno)
 
     def test_get_unit_location(self):
         location_str = f"{self.location.address_street} {self.location.address_zip} {self.location.address_city}"
@@ -214,7 +214,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         """
         compiled_content = f"""
             Should contain Dance time! and 09.02.2022 and 10:00 and 09.02.2022
-            and 12:00 and of course the {str(self.reservation.id).zfill(10)}
+            and 12:00 and of course the {self.reservation.id}
             Yours truly:
             system.
         """
@@ -226,36 +226,36 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     def test_padding_does_not_matter_in_curly_brackets(self):
         EmailTemplate.objects.all().delete()
-        content_with_padding = "I have {{ reservation_number }} padding"
-        compiled_content_with_padding = (
-            f"I have {str(self.reservation.id).zfill(10)} padding"
+        content_with_space_inside_braces = "I have {{ reservation_number }} padding"
+        compiled_content_with_space_inside_braces = (
+            f"I have {self.reservation.id} padding"
         )
         template = EmailTemplateFactory(
             type=EmailType.RESERVATION_MODIFIED,
-            content=content_with_padding,
+            content=content_with_space_inside_braces,
             subject="subject",
         )
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        actual_compiled_content_with_padding = builder.get_content()
-        assert_that(actual_compiled_content_with_padding).is_equal_to(
-            compiled_content_with_padding
+        actual_compiled_content_with_space_in_brackets = builder.get_content()
+        assert_that(actual_compiled_content_with_space_in_brackets).is_equal_to(
+            compiled_content_with_space_inside_braces
         )
 
-        content_without_padding = "I have {{reservation_number}} padding"
-        compiled_content_without_padding = (
-            f"I have {str(self.reservation.id).zfill(10)} padding"
+        content_without_space_in_brackets = "I have {{reservation_number}} padding"
+        compiled_content_without_space_in_brackets = (
+            f"I have {self.reservation.id} padding"
         )
-        template.content = content_without_padding
+        template.content = content_without_space_in_brackets
         template.save()
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        actual_compiled_content_without_padding = builder.get_content()
-        assert_that(actual_compiled_content_without_padding).is_equal_to(
-            compiled_content_without_padding
+        actual_compiled_content_without_space_in_brackets = builder.get_content()
+        assert_that(actual_compiled_content_without_space_in_brackets).is_equal_to(
+            compiled_content_without_space_in_brackets
         )
 
         # Assert actually does not matter
-        assert_that(actual_compiled_content_without_padding).is_equal_to(
-            actual_compiled_content_with_padding
+        assert_that(actual_compiled_content_without_space_in_brackets).is_equal_to(
+            actual_compiled_content_with_space_in_brackets
         )
 
     def test_language_defaults_to_fi_when_content_not_translated(self):

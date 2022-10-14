@@ -75,7 +75,7 @@ class ReservationEmailNotificationBuilder:
         return self.reservation.end.astimezone(get_default_timezone()).strftime("%H:%M")
 
     def _get_reservation_number(self):
-        return str(self.reservation.pk).zfill(10)
+        return self.reservation.id
 
     def _get_unit_location(self):
         res_unit = self.reservation.reservation_unit.filter(unit__isnull=False).first()
