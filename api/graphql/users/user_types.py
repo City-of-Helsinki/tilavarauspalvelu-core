@@ -11,8 +11,10 @@ from api.graphql.permissions.permission_types import (
     UnitRoleType,
 )
 from permissions.api_permissions.graphene_permissions import UserPermission
+from permissions.helpers import can_view_users
 from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from users.models import User
+from users.tasks import save_personal_info_view_log
 
 
 class UserType(AuthNode, PrimaryKeyObjectType):
@@ -39,6 +41,7 @@ class UserType(AuthNode, PrimaryKeyObjectType):
             "general_roles",
             "service_sector_roles",
             "unit_roles",
+            "date_of_birth",
         ]
         filter_fields = ()
         interfaces = (graphene.relay.Node,)
@@ -57,3 +60,12 @@ class UserType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_unit_roles(self, info: graphene.ResolveInfo):
         return UnitRole.objects.filter(user__pk=self.pk)
+
+    def resolve_date_of_birth(self, info: graphene.ResolveInfo):
+        if settings.TMP_PERMISSIONS_DISABLED or can_view_users(info.context.user):
+            save_personal_info_view_log.delay(
+                self.pk, info.context.user.id, "User.date_of_birth"
+            )
+            return self.date_of_birth
+
+        return None
