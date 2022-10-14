@@ -70,6 +70,7 @@ from spaces.tests.factories import (
 from terms_of_use.models import TermsOfUse
 from terms_of_use.tests.factories import TermsOfUseFactory
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
+from users.models import PersonalInfoViewLog
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -2262,7 +2263,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_other_reservations_does_not_show_sensitive_information(self):
         self.client.force_login(self.regular_joe)
-
+        self.general_admin.date_of_birth = datetime.date(2020, 1, 1)
+        self.general_admin.save()
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
             user=self.general_admin,
@@ -2318,6 +2320,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 description
                                 reserveeId
                                 cancelDetails
+                                reserveeDateOfBirth
                             }
                         }
                     }
@@ -2330,9 +2333,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_admin_sees_reservations_sensitive_information(self):
         self.client.force_login(self.general_admin)
-
+        self.regular_joe.date_of_birth = datetime.date(2020, 1, 1)
+        self.regular_joe.save()
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
             user=self.regular_joe,
@@ -2388,6 +2393,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 description
                                 reserveeId
                                 cancelDetails
+                                reserveeDateOfBirth
                             }
                         }
                     }
@@ -2399,6 +2405,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(self.content_is_empty(content)).is_false()
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+        assert_that(PersonalInfoViewLog.objects.all().count()).is_equal_to(1)
 
     @mock.patch(
         "reservation_units.tasks.create_product", return_value=mock_create_product()

@@ -1,10 +1,13 @@
+import datetime
 import json
 
 import snapshottest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
-from graphene_django.utils import GraphQLTestCase
+from django.test import override_settings
+from django.utils.timezone import get_default_timezone
 
+from api.graphql.tests.base import GrapheneTestCaseBase
 from permissions.models import (
     GeneralRole,
     GeneralRoleChoice,
@@ -14,12 +17,13 @@ from permissions.models import (
     UnitRoleChoice,
 )
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
-from users.models import ReservationNotification, User
+from users.models import PersonalInfoViewLog, ReservationNotification, User
 
 
-class UserTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
+class UserTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.super_user = get_user_model().objects.create(
             username="super_admin",
             first_name="Super",
@@ -293,3 +297,99 @@ class UpdateUserTestCase(UserTestCaseBase):
 
         updated_user = User.objects.get(pk=self.super_user.pk)
         assert_that(updated_user.reservation_notification).is_equal_to("none")
+
+
+class UsersQueryTestCase(UserTestCaseBase):
+    def get_query(self, user):
+        return (
+            """
+            query {
+                user(pk: %i) {
+                    username
+                    firstName
+                    lastName
+                    email
+                    isSuperuser
+                    reservationNotification
+                }
+            }
+            """
+            % user.id
+        )
+
+    def test_general_admin_can_read_other(self):
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_query(self.non_staff_user))
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_service_sector_admin_can_read_other(self):
+        service_sector_admin = self.create_service_sector_admin()
+        self.client.force_login(service_sector_admin)
+        response = self.query(self.get_query(self.non_staff_user))
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_unit_admin_can_read_other(self):
+        unit_admin = self.create_unit_admin()
+        self.client.force_login(unit_admin)
+        response = self.query(self.get_query(self.non_staff_user))
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_regular_user_cant_read_other(self):
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_query(self.non_staff_user))
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_regular_user_cant_read_self(self):
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_query(self.regular_joe))
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_date_of_birth_read_is_logged(self):
+        assert_that(PersonalInfoViewLog.objects.count()).is_zero()
+        query = (
+            """
+                query {
+                    user(pk: %i) {
+                        username
+                        firstName
+                        lastName
+                        email
+                        isSuperuser
+                        reservationNotification
+                        dateOfBirth
+                    }
+                }
+        """
+            % self.regular_joe.id
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(query)
+
+        assert_that(response.status_code).is_equal_to(200)
+        assert_that(PersonalInfoViewLog.objects.count()).is_equal_to(1)
+
+        view_log = PersonalInfoViewLog.objects.first()
+        assert_that(view_log.user).is_equal_to(self.regular_joe)
+        assert_that(view_log.viewer_user).is_equal_to(self.general_admin)
+        assert_that(view_log.viewer_username).is_equal_to(self.general_admin.username)
+        assert_that(view_log.access_time).is_close_to(
+            datetime.datetime.now(tz=get_default_timezone()),
+            datetime.timedelta(seconds=5),
+        )
+        assert_that(view_log.field).is_equal_to("User.date_of_birth")

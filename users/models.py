@@ -39,3 +39,23 @@ class User(AbstractUser):
             return settings.LANGUAGES[0][0]
         else:
             return self.preferred_language
+
+
+class PersonalInfoViewLog(models.Model):
+    field = models.CharField(max_length=255, null=False, blank=False, editable=False)
+    user = models.ForeignKey(
+        User,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="personal_info_view_logs",
+        editable=False,
+    )
+    viewer_username = models.CharField(max_length=255)
+    viewer_user = models.ForeignKey(
+        User,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="as_viewer_personal_info_view_logs",
+        editable=False,
+    )
+    access_time = models.DateTimeField(auto_now=True, editable=False)

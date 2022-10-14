@@ -18,6 +18,14 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_by_pk 1'] = {
     }
 }
 
+snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_pk_does_not_reveal_date_of_birth 1'] = {
+    'data': {
+        'reservationByPk': {
+            'reserveeDateOfBirth': None
+        }
+    }
+}
+
 snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_pk_does_not_reveal_reservee_name 1'] = {
     'data': {
         'reservationByPk': {
@@ -25,6 +33,14 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_
             'reserveeFirstName': None,
             'reserveeLastName': None,
             'reserveePhone': None
+        }
+    }
+}
+
+snapshots['ReservationByPkTestCase::test_getting_reservation_reservee_date_of_birth_is_logged 1'] = {
+    'data': {
+        'reservationByPk': {
+            'reserveeDateOfBirth': '2020-01-01'
         }
     }
 }
@@ -1267,6 +1283,38 @@ snapshots['ReservationQueryTestCase::test_reservation_total_count 1'] = {
                 {
                     'node': {
                         'state': 'CREATED'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_not_shown_to_reg_user 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'reserveeDateOfBirth': None,
+                        'user': None
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_shown_to_admin_and_logged 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'reserveeDateOfBirth': '2020-01-01',
+                        'user': 'joe.regularl@foo.com'
                     }
                 }
             ],
