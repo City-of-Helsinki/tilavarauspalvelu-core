@@ -657,6 +657,16 @@ class ReservationUpdateSerializer(
         for required_field in required_fields:
             internal_field_name = required_field.field_name
             existing_value = getattr(self.instance, internal_field_name, None)
+
+            # If the reservee_is_unregistered_association is True it's not mandatory to give reservee_id
+            # even if in metadataset says so.
+            unregistered_field_name = "reservee_is_unregistered_association"
+            if internal_field_name == "reservee_id" and data.get(
+                unregistered_field_name,
+                getattr(self.instance, unregistered_field_name, None),
+            ):
+                continue
+
             if not data.get(internal_field_name, existing_value):
                 raise ValidationErrorWithCode(
                     f"Value for required field {to_camel_case(internal_field_name)} is missing.",
