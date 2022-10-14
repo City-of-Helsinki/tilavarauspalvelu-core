@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.contrib.gis.db.models import PointField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from merchants.models import PaymentMerchant
+from reservation_units.tasks import refresh_reservation_unit_product_mapping
 
 # SRID 4326 - Spatial Reference System Identifier number 4326.
 # EPSG:4326 - It's the same thing, but EPSG is the name of the authority maintaining an SRID reference.
@@ -135,6 +137,24 @@ class Unit(models.Model):
     @property
     def hauki_resource_data_source_id(self):
         return "tprek"
+
+    def save(self, *args, **kwargs):
+        old_values = Unit.objects.filter(pk=self.pk).first()
+        result = super(Unit, self).save(*args, **kwargs)
+
+        # When merchant changes, update reservation_units that are using
+        # the merchant information from the Unit. This will update their
+        # product mapping.
+        if settings.UPDATE_PRODUCT_MAPPING and (
+            old_values is None or old_values.payment_merchant != self.payment_merchant
+        ):
+            reservation_units = self.reservationunit_set.filter(
+                payment_merchant__isnull=True
+            ).all()
+            for runit in reservation_units:
+                refresh_reservation_unit_product_mapping.delay(runit.pk)
+
+        return result
 
 
 class RealEstate(models.Model):

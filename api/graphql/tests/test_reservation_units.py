@@ -2431,7 +2431,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_show_payment_merchant_from_unit(self):
+    @mock.patch(
+        "reservation_units.tasks.create_product", return_value=mock_create_product()
+    )
+    def test_show_payment_merchant_from_unit(self, mock_create_product):
         self.client.force_login(self.general_admin)
 
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
