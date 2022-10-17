@@ -3,9 +3,11 @@ import json
 
 import freezegun
 from assertpy import assert_that
+from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
+from permissions.models import GeneralRole, GeneralRoleChoice, GeneralRolePermission
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import ReservationFactory
 
@@ -44,6 +46,44 @@ class ReservationWorkingMemoWriteTestCase(ReservationTestCaseBase):
 
     def test_working_memo_saves_when_admin(self):
         self.client.force_login(self.general_admin)
+        input_data = self.get_valid_update_data()
+
+        response = self.query(self.get_update_memo_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+
+        confirm_data = content.get("data").get("updateReservationWorkingMemo")
+        assert_that(confirm_data.get("errors")).is_none()
+        assert_that(confirm_data.get("workingMemo")).is_equal_to(
+            input_data["workingMemo"]
+        )
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.working_memo).is_equal_to(
+            input_data["workingMemo"]
+        )
+
+    def test_working_memo_saves_with_comment_permission(self):
+        commenter = get_user_model().objects.create(
+            username="commenter",
+            first_name="Comm",
+            last_name="Enter",
+            email="commenter@foo.com",
+        )
+
+        comment_role_choice = GeneralRoleChoice.objects.create(
+            code="can_comment_reservations"
+        )
+
+        GeneralRolePermission.objects.create(
+            role=comment_role_choice, permission="can_comment_reservations"
+        )
+        GeneralRole.objects.create(
+            user=commenter,
+            role=comment_role_choice,
+        )
+
+        self.client.force_login(commenter)
         input_data = self.get_valid_update_data()
 
         response = self.query(self.get_update_memo_query(), input_data=input_data)

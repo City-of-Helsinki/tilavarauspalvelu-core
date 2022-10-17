@@ -340,6 +340,12 @@ def can_handle_reservation(user: User, reservation: Reservation) -> bool:
     )
 
 
+def can_comment_reservation(user: User, reservation: Reservation) -> bool:
+    return has_general_permission(
+        user, "can_comment_reservations"
+    ) or can_handle_reservation(user, reservation)
+
+
 def can_handle_reservation_with_units(
     user: User, reservation_unit_ids: List[int]
 ) -> bool:

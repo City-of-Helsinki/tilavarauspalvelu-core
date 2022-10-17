@@ -56,7 +56,7 @@ GENERAL_PERMISSIONS = (
     ),
     (
         "can_view_reservations",
-        _("Can create, edit and delete equipment in the whole system"),
+        _("Can view reservations in the whole system"),
     ),
     (
         "can_manage_reservations",
@@ -86,6 +86,10 @@ GENERAL_PERMISSIONS = (
     (
         "can_view_users",
         _("Can view users in the whole system"),
+    ),
+    (
+        "can_comment_reservations",
+        _("Can comment reservations in the whole system"),
     ),
 )
 

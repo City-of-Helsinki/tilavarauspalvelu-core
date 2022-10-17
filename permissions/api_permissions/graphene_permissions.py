@@ -6,6 +6,7 @@ from graphene_permissions.permissions import BasePermission
 
 from applications.models import Application, ApplicationEvent, ApplicationEventSchedule
 from permissions.helpers import (
+    can_comment_reservation,
     can_create_reservation,
     can_handle_application,
     can_handle_reservation,
@@ -350,6 +351,16 @@ class ReservationHandlingPermission(BasePermission):
         if pk:
             reservation = get_object_or_404(Reservation, pk=pk)
             return can_handle_reservation(info.context.user, reservation)
+        return False
+
+
+class ReservationCommentPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk")
+        if pk:
+            reservation = get_object_or_404(Reservation, pk=pk)
+            return can_comment_reservation(info.context.user, reservation)
         return False
 
 

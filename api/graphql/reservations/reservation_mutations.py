@@ -17,6 +17,7 @@ from api.graphql.reservations.reservation_serializers import (
 )
 from api.graphql.reservations.reservation_types import ReservationType
 from permissions.api_permissions.graphene_permissions import (
+    ReservationCommentPermission,
     ReservationHandlingPermission,
     ReservationPermission,
 )
@@ -122,7 +123,7 @@ class ReservationRequiresHandlingMutation(AuthSerializerMutation, SerializerMuta
 
 class ReservationWorkingMemoMutation(AuthSerializerMutation, SerializerMutation):
     permission_classes = (
-        (ReservationHandlingPermission,)
+        (ReservationCommentPermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
         else (AllowAny,)
     )
