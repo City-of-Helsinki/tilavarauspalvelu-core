@@ -14,7 +14,7 @@ class SendReservationEmailNotificationTestCase(ReservationEmailBaseTestCase):
         send_reservation_email_notification(
             EmailType.RESERVATION_CONFIRMED, self.reservation
         )
-        should_be_body = f"This is the { str(self.reservation.id).zfill(10) } content"
+        should_be_body = f"This is the {self.reservation.id } content"
         should_be_subject = f"Los subjectos { self.reservation.name }"
 
         assert_that(len(mail.outbox)).is_equal_to(1)
@@ -32,7 +32,7 @@ class SendReservationEmailNotificationTestCase(ReservationEmailBaseTestCase):
         send_reservation_email_notification(
             EmailType.RESERVATION_CONFIRMED, self.reservation, recipients
         )
-        should_be_body = f"This is the { str(self.reservation.id).zfill(10) } content"
+        should_be_body = f"This is the { self.reservation.id } content"
         should_be_subject = f"Los subjectos { self.reservation.name }"
 
         assert_that(len(mail.outbox)).is_equal_to(1)
@@ -67,9 +67,7 @@ class SendReservationEmailNotificationTestCase(ReservationEmailBaseTestCase):
         send_reservation_email_notification(
             EmailType.RESERVATION_CONFIRMED, self.reservation
         )
-        should_be_body = (
-            f"This is the {str(self.reservation.id).zfill(10)} content in english"
-        )
+        should_be_body = f"This is the {self.reservation.id} content in english"
         should_be_subject = f"Los subjectos inglesa {self.reservation.name}"
 
         assert_that(len(mail.outbox)).is_equal_to(1)
