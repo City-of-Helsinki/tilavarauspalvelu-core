@@ -2298,7 +2298,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                     edges {
                         node {
                             reservations {
-                                user
+                                user { email dateOfBirth }
                                 reserveeLastName
                                 reserveeFirstName
                                 reserveePhone
@@ -2320,7 +2320,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 description
                                 reserveeId
                                 cancelDetails
-                                reserveeDateOfBirth
                             }
                         }
                     }
@@ -2371,7 +2370,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                     edges {
                         node {
                             reservations {
-                                user
                                 reserveeLastName
                                 reserveeFirstName
                                 reserveePhone
@@ -2393,7 +2391,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 description
                                 reserveeId
                                 cancelDetails
-                                reserveeDateOfBirth
+                                user { dateOfBirth }
                             }
                         }
                     }

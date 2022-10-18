@@ -80,7 +80,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             createdAt
                             name
-                            user
+                            user { email }
                             reserveeFirstName
                             reserveeLastName
                             reserveePhone
@@ -165,7 +165,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             state
                             priority
-                            user
+                            user { email }
                             begin
                             end
                             bufferTimeBefore
@@ -450,7 +450,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     totalCount
                     edges {
                         node {
-                            user
+                            user { email }
                         }
                     }
                 }
@@ -475,8 +475,9 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     totalCount
                     edges {
                         node {
-                            user
-                            reserveeDateOfBirth
+                            user {
+                                dateOfBirth
+                            }
                         }
                     }
                 }
@@ -513,8 +514,9 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     totalCount
                     edges {
                         node {
-                            user
-                            reserveeDateOfBirth
+                            user {
+                                dateOfBirth
+                            }
                         }
                     }
                 }
@@ -1220,7 +1222,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         query = f"""
             {{
                 reservationByPk(pk: {self.reservation.pk}) {{
-                    reserveeDateOfBirth
+                    user {{ dateOfBirth }}
                 }}
             }}
         """
@@ -1241,7 +1243,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         query = f"""
             {{
                 reservationByPk(pk: {self.reservation.pk}) {{
-                    reserveeDateOfBirth
+                    user {{ dateOfBirth }}
                 }}
             }}
         """

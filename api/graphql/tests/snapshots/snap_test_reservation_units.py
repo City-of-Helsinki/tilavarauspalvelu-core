@@ -28,7 +28,6 @@ snapshots['ReservationUnitQueryTestCase::test_admin_sees_reservations_sensitive_
                                 'reserveeAddressCity': 'city',
                                 'reserveeAddressStreet': 'address',
                                 'reserveeAddressZip': 'zip',
-                                'reserveeDateOfBirth': '2020-01-01',
                                 'reserveeEmail': 'email@localhost',
                                 'reserveeFirstName': 'Joe',
                                 'reserveeId': 'residee',
@@ -36,7 +35,9 @@ snapshots['ReservationUnitQueryTestCase::test_admin_sees_reservations_sensitive_
                                 'reserveeOrganisationName': 'org name',
                                 'reserveePhone': '123435',
                                 'staffEvent': False,
-                                'user': 'joe.regularl@foo.com',
+                                'user': {
+                                    'dateOfBirth': '2020-01-01'
+                                },
                                 'workingMemo': 'Working this memo'
                             }
                         ]
@@ -1700,7 +1701,6 @@ snapshots['ReservationUnitQueryTestCase::test_other_reservations_does_not_show_s
                                 'reserveeAddressCity': None,
                                 'reserveeAddressStreet': None,
                                 'reserveeAddressZip': None,
-                                'reserveeDateOfBirth': None,
                                 'reserveeEmail': None,
                                 'reserveeFirstName': None,
                                 'reserveeId': None,
