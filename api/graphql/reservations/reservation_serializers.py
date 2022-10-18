@@ -640,6 +640,17 @@ class ReservationUpdateSerializer(
         for reservation_unit in reservation_units:
             self.check_metadata_fields(data, reservation_unit)
 
+        # If the reservation as applying_for_free_of_charge True then we require free_of_charge_reason.
+        if data.get(
+            "applying_for_free_of_charge", self.instance.applying_for_free_of_charge
+        ) and not data.get(
+            "free_of_charge_reason", self.instance.free_of_charge_reason
+        ):
+            raise ValidationErrorWithCode(
+                "Free of charge reason is mandatory when applying for free of charge.",
+                ValidationErrorCodes.REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE,
+            )
+
         return data
 
     @property
@@ -657,6 +668,16 @@ class ReservationUpdateSerializer(
         for required_field in required_fields:
             internal_field_name = required_field.field_name
             existing_value = getattr(self.instance, internal_field_name, None)
+
+            # If the reservee_is_unregistered_association is True it's not mandatory to give reservee_id
+            # even if in metadataset says so.
+            unregistered_field_name = "reservee_is_unregistered_association"
+            if internal_field_name == "reservee_id" and data.get(
+                unregistered_field_name,
+                getattr(self.instance, unregistered_field_name, None),
+            ):
+                continue
+
             if not data.get(internal_field_name, existing_value):
                 raise ValidationErrorWithCode(
                     f"Value for required field {to_camel_case(internal_field_name)} is missing.",

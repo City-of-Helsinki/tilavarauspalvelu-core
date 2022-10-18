@@ -24,7 +24,12 @@ from reservation_units.tests.factories import (
     ReservationUnitPricingFactory,
     TaxPercentageFactory,
 )
-from reservations.models import STATE_CHOICES, AgeGroup, Reservation
+from reservations.models import (
+    STATE_CHOICES,
+    AgeGroup,
+    Reservation,
+    ReservationMetadataField,
+)
 from reservations.tests.factories import ReservationFactory
 
 
@@ -558,6 +563,51 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.home_city).is_equal_to(home_city)
         assert_that(self.reservation.age_group).is_equal_to(age_group)
 
+    def test_update_succeeds_when_missing_reservee_id_but_is_unregistered_org(
+        self, mock_periods, mock_opening_hours
+    ):
+        metadata_set = self._create_metadata_set()
+        reservee_id_field = ReservationMetadataField.objects.get(
+            field_name="reservee_id"
+        )
+        metadata_set.required_fields.add(reservee_id_field)
+        metadata_set.supported_fields.add(reservee_id_field)
+        self.reservation_unit.metadata_set = metadata_set
+        self.reservation_unit.save(update_fields=["metadata_set"])
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        home_city = City.objects.create(name="Helsinki")
+        age_group = AgeGroup.objects.create(minimum=18, maximum=30)
+        input_data = self.get_valid_update_data()
+        input_data["reserveeFirstName"] = "John"
+        input_data["reserveeLastName"] = "Doe"
+        input_data["reserveePhone"] = "+358123456789"
+        input_data["homeCityPk"] = home_city.pk
+        input_data["ageGroupPk"] = age_group.pk
+        input_data["reserveeIsUnregisteredAssociation"] = True
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.reservee_first_name).is_equal_to(
+            input_data["reserveeFirstName"]
+        )
+        assert_that(self.reservation.reservee_last_name).is_equal_to(
+            input_data["reserveeLastName"]
+        )
+        assert_that(self.reservation.reservee_phone).is_equal_to(
+            input_data["reserveePhone"]
+        )
+        assert_that(self.reservation.home_city).is_equal_to(home_city)
+        assert_that(self.reservation.age_group).is_equal_to(age_group)
+
     def test_update_fails_when_some_required_fields_are_missing(
         self, mock_periods, mock_opening_hours
     ):
@@ -905,4 +955,24 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.unit_price).is_equal_to(6.0)
         assert_that(self.reservation.tax_percentage_value).is_equal_to(
             tax_percentage.value
+        )
+
+    def test_require_free_of_charge_reason_if_applying_for_free_of_charge(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        data = self.get_valid_update_data()
+        data["applyingForFreeOfCharge"] = True
+
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Free of charge reason is mandatory when applying for free of charge."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE"
         )
