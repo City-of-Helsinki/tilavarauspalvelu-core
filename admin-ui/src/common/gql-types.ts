@@ -1350,6 +1350,22 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars["String"]>;
 };
 
+export type PaymentMerchantType = Node & {
+  __typename?: "PaymentMerchantType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  name: Scalars["String"];
+  pk?: Maybe<Scalars["String"]>;
+};
+
+export type PaymentProductType = Node & {
+  __typename?: "PaymentProductType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  merchantPk?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["String"]>;
+};
+
 export type PeriodType = {
   __typename?: "PeriodType";
   descriptionEn?: Maybe<Scalars["String"]>;
@@ -1406,10 +1422,14 @@ export type PurposeType = Node & {
   __typename?: "PurposeType";
   /** The ID of the object */
   id: Scalars["ID"];
+  imageUrl?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
+  /** Order number to be used in api sorting. */
+  rank?: Maybe<Scalars["Int"]>;
+  smallUrl?: Maybe<Scalars["String"]>;
 };
 
 export type PurposeTypeConnection = {
@@ -1520,6 +1540,7 @@ export type Query = {
   unit?: Maybe<UnitType>;
   unitByPk?: Maybe<UnitByPkType>;
   units?: Maybe<UnitTypeConnection>;
+  user?: Maybe<UserType>;
 };
 
 export type QueryAgeGroupsArgs = {
@@ -1574,6 +1595,7 @@ export type QueryApplicationsArgs = {
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   status?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   user?: InputMaybe<Scalars["ID"]>;
@@ -1678,10 +1700,8 @@ export type QueryPurposesArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
 };
 
 export type QueryQualifiersArgs = {
@@ -1750,10 +1770,8 @@ export type QueryReservationUnitTypesArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
 };
 
 export type QueryReservationUnitsArgs = {
@@ -1910,8 +1928,14 @@ export type QueryUnitsArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
+  ownReservations?: InputMaybe<Scalars["Boolean"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  publishedReservationUnits?: InputMaybe<Scalars["Boolean"]>;
   serviceSector?: InputMaybe<Scalars["Float"]>;
+};
+
+export type QueryUserArgs = {
+  pk?: InputMaybe<Scalars["Int"]>;
 };
 
 export type RealEstateType = Node & {
@@ -2338,7 +2362,7 @@ export type ReservationType = Node & {
   taxPercentageValue?: Maybe<Scalars["Decimal"]>;
   type?: Maybe<Scalars["String"]>;
   unitPrice?: Maybe<Scalars["Float"]>;
-  user?: Maybe<Scalars["String"]>;
+  user?: Maybe<UserType>;
   /** Working memo for staff users. */
   workingMemo?: Maybe<Scalars["String"]>;
 };
@@ -2403,6 +2427,8 @@ export type ReservationUnitByPkType = Node & {
   nameSv?: Maybe<Scalars["String"]>;
   nextAvailableSlot?: Maybe<Scalars["DateTime"]>;
   openingHours?: Maybe<OpeningHoursType>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
+  paymentProduct?: Maybe<PaymentProductType>;
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
@@ -2771,12 +2797,12 @@ export type ReservationUnitPricingCreateSerializerInput = {
   /** Minimum price of the reservation unit */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit: Scalars["String"];
+  priceUnit?: InputMaybe<Scalars["String"]>;
   /** What kind of pricing type this pricing has. Possible values are PAID, FREE. */
   pricingType: Scalars["String"];
   /** Pricing status. Possible values are PAST, ACTIVE, FUTURE. */
   status: Scalars["String"];
-  taxPercentagePk: Scalars["Int"];
+  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
 };
 
 export type ReservationUnitPricingType = {
@@ -2807,12 +2833,12 @@ export type ReservationUnitPricingUpdateSerializerInput = {
   lowestPrice?: InputMaybe<Scalars["Float"]>;
   pk?: InputMaybe<Scalars["Int"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit: Scalars["String"];
+  priceUnit?: InputMaybe<Scalars["String"]>;
   /** What kind of pricing type this pricing has. Possible values are PAID, FREE. */
   pricingType: Scalars["String"];
   /** Pricing status. Possible values are PAST, ACTIVE, FUTURE. */
   status: Scalars["String"];
-  taxPercentagePk: Scalars["Int"];
+  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
 };
 
 /** An enumeration. */
@@ -2863,6 +2889,8 @@ export type ReservationUnitType = Node & {
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
+  paymentProduct?: Maybe<PaymentProductType>;
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
@@ -3830,6 +3858,7 @@ export type UnitByPkType = Node & {
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   openingHours?: Maybe<OpeningHoursType>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
   phone: Scalars["String"];
   pk?: Maybe<Scalars["Int"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
@@ -3880,6 +3909,7 @@ export type UnitType = Node & {
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
+  paymentMerchant?: Maybe<PaymentMerchantType>;
   phone: Scalars["String"];
   pk?: Maybe<Scalars["Int"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
@@ -3952,6 +3982,7 @@ export type UnitUpdateMutationPayload = {
 
 export type UserType = Node & {
   __typename?: "UserType";
+  dateOfBirth?: Maybe<Scalars["Date"]>;
   email: Scalars["String"];
   firstName: Scalars["String"];
   generalRoles?: Maybe<Array<Maybe<GeneralRoleType>>>;

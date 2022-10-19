@@ -1361,6 +1361,14 @@ export type PaymentMerchantType = Node & {
   pk?: Maybe<Scalars["String"]>;
 };
 
+export type PaymentProductType = Node & {
+  __typename?: "PaymentProductType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  merchantPk?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["String"]>;
+};
+
 export type PeriodType = {
   __typename?: "PeriodType";
   descriptionEn?: Maybe<Scalars["String"]>;
@@ -1535,6 +1543,7 @@ export type Query = {
   unit?: Maybe<UnitType>;
   unitByPk?: Maybe<UnitByPkType>;
   units?: Maybe<UnitTypeConnection>;
+  user?: Maybe<UserType>;
 };
 
 export type QueryAgeGroupsArgs = {
@@ -1926,6 +1935,10 @@ export type QueryUnitsArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]>;
   serviceSector?: InputMaybe<Scalars["Float"]>;
+};
+
+export type QueryUserArgs = {
+  pk?: InputMaybe<Scalars["Int"]>;
 };
 
 export type RealEstateType = Node & {
@@ -2355,7 +2368,7 @@ export type ReservationType = Node & {
   taxPercentageValue?: Maybe<Scalars["Decimal"]>;
   type?: Maybe<Scalars["String"]>;
   unitPrice?: Maybe<Scalars["Float"]>;
-  user?: Maybe<Scalars["String"]>;
+  user?: Maybe<UserType>;
   /** Working memo for staff users. */
   workingMemo?: Maybe<Scalars["String"]>;
 };
@@ -2421,6 +2434,7 @@ export type ReservationUnitByPkType = Node & {
   nextAvailableSlot?: Maybe<Scalars["DateTime"]>;
   openingHours?: Maybe<OpeningHoursType>;
   paymentMerchant?: Maybe<PaymentMerchantType>;
+  paymentProduct?: Maybe<PaymentProductType>;
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
@@ -2903,6 +2917,7 @@ export type ReservationUnitType = Node & {
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   paymentMerchant?: Maybe<PaymentMerchantType>;
+  paymentProduct?: Maybe<PaymentProductType>;
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
@@ -4045,6 +4060,7 @@ export type UnitUpdateMutationPayload = {
 
 export type UserType = Node & {
   __typename?: "UserType";
+  dateOfBirth?: Maybe<Scalars["Date"]>;
   email: Scalars["String"];
   firstName: Scalars["String"];
   generalRoles?: Maybe<Array<Maybe<GeneralRoleType>>>;
@@ -4757,7 +4773,9 @@ export const UpdateReservationDocument = gql`
         pk
         calendarUrl
         state
-        user
+        user {
+          email
+        }
         name
         description
         purpose {
@@ -5085,7 +5103,9 @@ export const ReservationByPkDocument = gql`
       begin
       end
       calendarUrl
-      user
+      user {
+        email
+      }
       state
       reservationUnits {
         pk
@@ -5109,14 +5129,35 @@ export const ReservationByPkDocument = gql`
           textEn
           textSv
         }
+        cancellationTerms {
+          textFi
+          textEn
+          textSv
+        }
+        paymentTerms {
+          textFi
+          textEn
+          textSv
+        }
+        pricingTerms {
+          textFi
+          textEn
+          textSv
+        }
         unit {
           nameFi
           nameEn
           nameSv
           location {
+            latitude
+            longitude
             addressStreetFi
             addressStreetEn
             addressStreetSv
+            addressZip
+            addressCityFi
+            addressCityEn
+            addressCitySv
           }
         }
         cancellationRule {
@@ -5132,6 +5173,13 @@ export const ReservationByPkDocument = gql`
         metadataSet {
           supportedFields
           requiredFields
+        }
+        images {
+          imageUrl
+          largeUrl
+          mediumUrl
+          smallUrl
+          imageType
         }
       }
       purpose {
@@ -5962,6 +6010,65 @@ export type ReservationUnitTypesQueryResult = Apollo.QueryResult<
   ReservationUnitTypesQuery,
   ReservationUnitTypesQueryVariables
 >;
+export const GetCurrentUserDocument = gql`
+  query getCurrentUser {
+    currentUser {
+      pk
+      firstName
+      lastName
+    }
+  }
+`;
+
+/**
+ * __useGetCurrentUserQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCurrentUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCurrentUserQuery,
+    GetCurrentUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(
+    GetCurrentUserDocument,
+    options
+  );
+}
+export function useGetCurrentUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCurrentUserQuery,
+    GetCurrentUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(
+    GetCurrentUserDocument,
+    options
+  );
+}
+export type GetCurrentUserQueryHookResult = ReturnType<
+  typeof useGetCurrentUserQuery
+>;
+export type GetCurrentUserLazyQueryHookResult = ReturnType<
+  typeof useGetCurrentUserLazyQuery
+>;
+export type GetCurrentUserQueryResult = Apollo.QueryResult<
+  GetCurrentUserQuery,
+  GetCurrentUserQueryVariables
+>;
 export type ApplicationsQueryVariables = Exact<{
   user?: InputMaybe<Scalars["ID"]>;
   status?: InputMaybe<
@@ -6189,7 +6296,6 @@ export type UpdateReservationMutation = {
       pk?: number | null;
       calendarUrl?: string | null;
       state: ReservationsReservationStateChoices;
-      user?: string | null;
       name?: string | null;
       description?: string | null;
       numPersons?: number | null;
@@ -6212,6 +6318,7 @@ export type UpdateReservationMutation = {
       billingAddressZip?: string | null;
       applyingForFreeOfCharge: boolean;
       freeOfChargeReason?: string | null;
+      user?: { __typename?: "UserType"; email: string } | null;
       purpose?: {
         __typename?: "ReservationPurposeType";
         pk?: number | null;
@@ -6348,8 +6455,8 @@ export type ReservationByPkQuery = {
     begin: any;
     end: any;
     calendarUrl?: string | null;
-    user?: string | null;
     state: ReservationsReservationStateChoices;
+    user?: { __typename?: "UserType"; email: string } | null;
     reservationUnits?: Array<{
       __typename?: "ReservationUnitType";
       pk?: number | null;
@@ -6374,6 +6481,24 @@ export type ReservationByPkQuery = {
         textEn?: string | null;
         textSv?: string | null;
       } | null;
+      cancellationTerms?: {
+        __typename?: "TermsOfUseType";
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      paymentTerms?: {
+        __typename?: "TermsOfUseType";
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      pricingTerms?: {
+        __typename?: "TermsOfUseType";
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
       unit?: {
         __typename?: "UnitType";
         nameFi?: string | null;
@@ -6381,9 +6506,15 @@ export type ReservationByPkQuery = {
         nameSv?: string | null;
         location?: {
           __typename?: "LocationType";
+          latitude?: string | null;
+          longitude?: string | null;
           addressStreetFi?: string | null;
           addressStreetEn?: string | null;
           addressStreetSv?: string | null;
+          addressZip: string;
+          addressCityFi?: string | null;
+          addressCityEn?: string | null;
+          addressCitySv?: string | null;
         } | null;
       } | null;
       cancellationRule?: {
@@ -6403,6 +6534,14 @@ export type ReservationByPkQuery = {
         supportedFields?: Array<string | null> | null;
         requiredFields?: Array<string | null> | null;
       } | null;
+      images?: Array<{
+        __typename?: "ReservationUnitImageType";
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
+      } | null> | null;
     } | null> | null;
     purpose?: {
       __typename?: "ReservationPurposeType";
@@ -6820,5 +6959,17 @@ export type ReservationUnitTypesQuery = {
         nameSv?: string | null;
       } | null;
     } | null>;
+  } | null;
+};
+
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetCurrentUserQuery = {
+  __typename?: "Query";
+  currentUser?: {
+    __typename?: "UserType";
+    pk?: number | null;
+    firstName: string;
+    lastName: string;
   } | null;
 };

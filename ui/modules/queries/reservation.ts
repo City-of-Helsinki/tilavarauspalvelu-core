@@ -20,7 +20,9 @@ export const UPDATE_RESERVATION = gql`
         pk
         calendarUrl
         state
-        user
+        user {
+          email
+        }
         name
         description
         purpose {
@@ -165,7 +167,9 @@ export const GET_RESERVATION = gql`
       begin
       end
       calendarUrl
-      user
+      user {
+        email
+      }
       state
       reservationUnits {
         pk

@@ -585,7 +585,7 @@ const RequestedReservation = (): JSX.Element | null => {
             <ApplicationDatas>
               <ApplicationData
                 label={t("RequestedReservation.user")}
-                data={reservation.user}
+                data={reservation?.user?.email}
               />
             </ApplicationDatas>
           </Accordion>

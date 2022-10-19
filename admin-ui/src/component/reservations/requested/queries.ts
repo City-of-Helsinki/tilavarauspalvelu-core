@@ -58,7 +58,9 @@ export const RESERVATION_QUERY = gql`
       begin
       end
       calendarUrl
-      user
+      user {
+        email
+      }
       state
       reserveeOrganisationName
       reserveeEmail
@@ -144,6 +146,9 @@ export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
     ) {
       edges {
         node {
+          user {
+            email
+          }
           name
           reserveeFirstName
           reserveeLastName
@@ -152,7 +157,6 @@ export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
           begin
           end
           state
-          user
         }
       }
       pageInfo {

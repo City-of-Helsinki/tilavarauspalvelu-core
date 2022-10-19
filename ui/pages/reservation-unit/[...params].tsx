@@ -142,7 +142,7 @@ type Reservation = {
   reserveeLastName?: string;
   reserveePhone?: string;
   name?: string;
-  user?: string;
+  user?: { email: string };
   description?: string;
   calendarUrl?: string;
   state?: string;
@@ -1227,8 +1227,8 @@ const ReservationUnitReservation = ({
                   values={{ user: reservation?.user }}
                   components={{
                     emailLink: (
-                      <a href={`mailto:${reservation?.user}`}>
-                        {reservation?.user}
+                      <a href={`mailto:${reservation?.user.email}`}>
+                        {reservation?.user.email}
                       </a>
                     ),
                   }}
