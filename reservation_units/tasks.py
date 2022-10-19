@@ -45,7 +45,7 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
 
     if ReservationUnitPaymentHelper.requires_product_mapping_update(reservation_unit):
         params = CreateProductParams(
-            namespace=settings.VERKKOKAUPPA_MERCHANT_NAMESPACE,
+            namespace=settings.VERKKOKAUPPA_NAMESPACE,
             namespace_entity_id=reservation_unit.pk,
             merchant_id=payment_merchant.id,
         )

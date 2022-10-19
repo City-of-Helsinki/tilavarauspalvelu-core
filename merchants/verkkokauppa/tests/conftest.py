@@ -20,7 +20,7 @@ def setup_audit_log(settings):
     settings.VERKKOKAUPPA_ORDER_API_URL = "http://test-order:1234"
     settings.VERKKOKAUPPA_PAYMENT_API_URL = "http://test-payment:1234"
     settings.VERKKOKAUPPA_MERCHANT_API_URL = "http://test-merchant:1234"
-    settings.VERKKOKAUPPA_MERCHANT_NAMESPACE = "tilanvaraus"
+    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
 
 
 @fixture

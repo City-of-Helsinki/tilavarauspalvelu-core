@@ -223,7 +223,7 @@ class CreateMerchantRequestTestCase(MerchantRequestsBaseTestCase):
             url=(
                 settings.VERKKOKAUPPA_MERCHANT_API_URL
                 + "/create/merchant/"
-                + settings.VERKKOKAUPPA_MERCHANT_NAMESPACE
+                + settings.VERKKOKAUPPA_NAMESPACE
             ),
             json=self.create_merchant_params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -269,7 +269,7 @@ class UpdateMerchantRequestTestCase(MerchantRequestsBaseTestCase):
             url=(
                 settings.VERKKOKAUPPA_MERCHANT_API_URL
                 + "/update/merchant/"
-                + settings.VERKKOKAUPPA_MERCHANT_NAMESPACE
+                + settings.VERKKOKAUPPA_NAMESPACE
                 + "/7107df38-5985-39c9-8c83-ffe18bff24f5"
             ),
             json=self.update_merchant_params.to_json(),
@@ -329,7 +329,7 @@ class GetMerchantsRequestTestCase(MerchantRequestsBaseTestCase):
             url=(
                 settings.VERKKOKAUPPA_MERCHANT_API_URL
                 + "/list/merchants/"
-                + settings.VERKKOKAUPPA_MERCHANT_NAMESPACE
+                + settings.VERKKOKAUPPA_NAMESPACE
             ),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,

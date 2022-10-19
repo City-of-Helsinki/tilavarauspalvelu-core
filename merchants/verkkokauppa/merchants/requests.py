@@ -21,7 +21,7 @@ from .types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantP
 def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
     try:
         response = post(
-            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/create/merchant/{settings.VERKKOKAUPPA_MERCHANT_NAMESPACE}",
+            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}",
             json=params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
@@ -40,7 +40,7 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
             url=(
                 settings.VERKKOKAUPPA_MERCHANT_API_URL
                 + "/update/merchant/"
-                + f"{settings.VERKKOKAUPPA_MERCHANT_NAMESPACE}/{str(id)}"
+                + f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"
             ),
             json=params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -62,7 +62,7 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
 def get_merchants(get=_get) -> List[Merchant]:
     try:
         response = get(
-            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/list/merchants/{settings.VERKKOKAUPPA_MERCHANT_NAMESPACE}",
+            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}",
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
@@ -81,7 +81,7 @@ def get_merchants(get=_get) -> List[Merchant]:
 def get_merchant(id: UUID, get=_get) -> Optional[MerchantInfo]:
     try:
         response = get(
-            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{settings.VERKKOKAUPPA_MERCHANT_NAMESPACE}/{str(id)}",
+            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
