@@ -57,7 +57,7 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-coverage==6.0b1
+coverage[toml]==6.0b1
     # via pytest-cov
 cryptography==3.4.7
     # via social-auth-core
@@ -261,11 +261,11 @@ pytest==6.1.2
     #   pytest-cov
     #   pytest-django
     #   pytest-factoryboy
-pytest-cov==2.10.1
+pytest-cov==4.0.0
     # via -r requirements.in
-pytest-django==4.1.0
+pytest-django==4.5.2
     # via -r requirements.in
-pytest-factoryboy==2.1.0
+pytest-factoryboy==2.5.0
     # via -r requirements.in
 python-crontab==2.6.0
     # via django-celery-beat
@@ -340,10 +340,14 @@ toml==0.10.2
     #   black
     #   pep517
     #   pytest
+tomli==2.0.1
+    # via coverage
 typed-ast==1.4.3
     # via black
 typing-extensions==3.10.0.0
-    # via black
+    # via
+    #   black
+    #   pytest-factoryboy
 tzdata==2022.2
     # via django-celery-beat
 uritemplate==3.0.1

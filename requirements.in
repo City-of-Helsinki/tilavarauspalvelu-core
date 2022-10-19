@@ -32,9 +32,9 @@ isort==5.6.4
 ortools==9.4.1874
 psycopg2==2.8.6
 pydot==1.4.2
-pytest-cov==2.10.1
-pytest-django==4.1.0
-pytest-factoryboy==2.1.0
+pytest-cov
+pytest-django
+pytest-factoryboy
 sentry-sdk==0.19.5
 snapshottest
 social-auth-app-django==5.0.0
