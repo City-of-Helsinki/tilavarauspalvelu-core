@@ -59,7 +59,7 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
         )
 
     # Remove product mapping if merchant is removed
-    if reservation_unit.payment_product is not None and payment_merchant is None:
+    if reservation_unit.payment_product and not payment_merchant:
         ReservationUnit.objects.filter(pk=reservation_unit_pk).update(
-            payment_product=payment_product
+            payment_product=None
         )

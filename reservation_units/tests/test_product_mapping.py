@@ -57,3 +57,16 @@ class ReservationUnitProductMappingTestCase(TestCase):
 
         self.runit.refresh_from_db()
         assert_that(self.runit.payment_product).is_none()
+
+    def test_mapping_is_removed_if_merchant_is_removed(self, mock_product):
+        self.runit.payment_merchant = self.payment_merchant
+        self.runit.save()
+
+        self.runit.refresh_from_db()
+        assert_that(self.runit.payment_product).is_not_none()
+
+        self.runit.payment_merchant = None
+        self.runit.save()
+
+        self.runit.refresh_from_db()
+        assert_that(self.runit.payment_product).is_none()
