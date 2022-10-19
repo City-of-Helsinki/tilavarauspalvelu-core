@@ -43,6 +43,14 @@ class State(Enum):
             cls.ENTER_ONLY,
         ]
 
+    @classmethod
+    def reservable_states(cls):
+        return [
+            cls.WITH_RESERVATION,
+            cls.OPEN_AND_RESERVABLE,
+            cls.WITH_KEY_AND_RESERVATION,
+        ]
+
 
 class Weekday(Enum):
     MONDAY = 1
