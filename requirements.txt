@@ -231,7 +231,7 @@ protobuf==4.21.6
     # via ortools
 psycopg2==2.8.6
     # via -r requirements.in
-py==1.10.0
+py==1.11.0
     # via pytest
 pyasn1==0.4.8
     # via
