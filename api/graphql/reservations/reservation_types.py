@@ -36,7 +36,6 @@ from reservations.models import (
     ReservationMetadataSet,
     ReservationPurpose,
 )
-from users.tasks import save_personal_info_view_log
 
 
 class AgeGroupType(AuthNode, PrimaryKeyObjectType):
@@ -128,7 +127,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         else (AllowAny,)
     )
     created_at = graphene.String()
-    user = graphene.String()
+    user = graphene.Field("api.graphql.users.user_types.UserType")
     reservation_units = graphene.List(
         "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
     )
@@ -160,7 +159,6 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     buffer_time_after = Duration()
     staff_event = graphene.Boolean()
     type = graphene.String()
-    reservee_date_of_birth = graphene.Date()
 
     class Meta:
         model = Reservation
@@ -208,7 +206,6 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "cancel_details",
             "staff_event",
             "type",
-            "reservee_date_of_birth",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -243,7 +240,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     def resolve_user(self, info: ResolveInfo) -> [str]:
         if not self.user:
             return None
-        return self.user.email
+        return self.user
 
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_units(self, info: ResolveInfo):
@@ -348,13 +345,6 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_cancel_details(self, info: ResolveInfo) -> Optional[str]:
         return self.cancel_details
-
-    @reservation_non_public_field
-    def resolve_reservee_date_of_birth(self, info: ResolveInfo) -> Optional[str]:
-        save_personal_info_view_log.delay(
-            self.user.pk, info.context.user.id, "User.date_of_birth"
-        )
-        return self.user.date_of_birth
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):

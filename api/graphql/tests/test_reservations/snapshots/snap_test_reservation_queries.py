@@ -21,7 +21,7 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_by_pk 1'] = {
 snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_pk_does_not_reveal_date_of_birth 1'] = {
     'data': {
         'reservationByPk': {
-            'reserveeDateOfBirth': None
+            'user': None
         }
     }
 }
@@ -40,7 +40,9 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_
 snapshots['ReservationByPkTestCase::test_getting_reservation_reservee_date_of_birth_is_logged 1'] = {
     'data': {
         'reservationByPk': {
-            'reserveeDateOfBirth': '2020-01-01'
+            'user': {
+                'dateOfBirth': '2020-01-01'
+            }
         }
     }
 }
@@ -509,7 +511,9 @@ snapshots['ReservationQueryTestCase::test_filter_by_user 1'] = {
             'edges': [
                 {
                     'node': {
-                        'user': 'joe.regularl@foo.com'
+                        'user': {
+                            'email': 'joe.regularl@foo.com'
+                        }
                     }
                 }
             ],
@@ -547,7 +551,9 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'reserveeLastName': 'Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
-                        'user': 'joe.regularl@foo.com'
+                        'user': {
+                            'email': 'joe.regularl@foo.com'
+                        }
                     }
                 }
             ],
@@ -585,7 +591,9 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeLastName': 'Hidden',
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
-                        'user': 'amin.general@foo.com'
+                        'user': {
+                            'email': 'amin.general@foo.com'
+                        }
                     }
                 },
                 {
@@ -613,7 +621,9 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeLastName': 'Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
-                        'user': 'joe.regularl@foo.com'
+                        'user': {
+                            'email': 'joe.regularl@foo.com'
+                        }
                     }
                 }
             ],
@@ -651,7 +661,9 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'reserveeLastName': 'Hidden',
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
-                        'user': 'amin.general@foo.com'
+                        'user': {
+                            'email': 'amin.general@foo.com'
+                        }
                     }
                 },
                 {
@@ -679,7 +691,9 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'reserveeLastName': 'Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
-                        'user': 'joe.regularl@foo.com'
+                        'user': {
+                            'email': 'joe.regularl@foo.com'
+                        }
                     }
                 }
             ],
@@ -819,7 +833,9 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'reserveeLastName': 'Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
-                        'user': 'joe.regularl@foo.com'
+                        'user': {
+                            'email': 'joe.regularl@foo.com'
+                        }
                     }
                 }
             ],
@@ -1268,7 +1284,9 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         'taxPercentageValue': '24.00',
                         'type': None,
                         'unitPrice': 10.0,
-                        'user': 'joe.regularl@foo.com'
+                        'user': {
+                            'email': 'joe.regularl@foo.com'
+                        }
                     }
                 }
             ]
@@ -1297,7 +1315,6 @@ snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_not_shown_to
             'edges': [
                 {
                     'node': {
-                        'reserveeDateOfBirth': None,
                         'user': None
                     }
                 }
@@ -1313,8 +1330,9 @@ snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_shown_to_adm
             'edges': [
                 {
                     'node': {
-                        'reserveeDateOfBirth': '2020-01-01',
-                        'user': 'joe.regularl@foo.com'
+                        'user': {
+                            'dateOfBirth': '2020-01-01'
+                        }
                     }
                 }
             ],
