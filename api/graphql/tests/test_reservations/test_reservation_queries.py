@@ -1117,6 +1117,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             name="other unit",
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
             reservation_unit_type=self.reservation_unit_type,
+            rank=0,
         )
 
         not_visible_unit = ReservationUnitFactory(
@@ -1125,6 +1126,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             name="not visible unit",
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
             reservation_unit_type=self.reservation_unit_type,
+            rank=1,
         )
 
         ReservationFactory(
