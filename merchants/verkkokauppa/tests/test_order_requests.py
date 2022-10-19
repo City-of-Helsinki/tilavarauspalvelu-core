@@ -74,8 +74,11 @@ def test_get_order_makes_valid_request(get_order_response):
     get = mock_get(get_order_response)
     get_order(order_id, user, get)
     get.assert_called_with(
-        url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, str(order_id)),
-        headers={"api-key": settings.VERKKOKAUPPA_API_KEY, "user": user},
+        url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"admin/{order_id}"),
+        headers={
+            "api-key": settings.VERKKOKAUPPA_API_KEY,
+            "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+        },
         timeout=REQUEST_TIMEOUT_SECONDS,
     )
 
@@ -112,3 +115,14 @@ def test_get_order_raises_exception_on_timeout(get_order_response):
             get_order_response["user"],
             Mock(side_effect=Timeout()),
         )
+
+
+def test_get_order_raises_exception_on_404(get_order_response):
+    get = mock_get(get_order_response, status_code=404)
+    with raises(GetOrderError) as e:
+        get_order(
+            UUID(get_order_response["orderId"]),
+            get_order_response["user"],
+            get,
+        )
+    assert_that(str(e.value)).is_equal_to("Order not found: None")

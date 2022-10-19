@@ -31,11 +31,16 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
 def get_order(order_id: UUID, user: str, get=_get) -> Order:
     try:
         response = get(
-            url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, str(order_id)),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY, "user": user},
+            url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"admin/{order_id}"),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+            },
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
         json = response.json()
+        if response.status_code == 404:
+            raise GetOrderError(f"Order not found: {json.get('errors')}")
         if response.status_code != 200:
             raise GetOrderError(f"Order retrieval failed: {json.get('errors')}")
         return Order.from_json(json)
