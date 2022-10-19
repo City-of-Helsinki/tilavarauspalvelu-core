@@ -14,6 +14,8 @@ class State(Enum):
     ENTER_ONLY = "enter_only"
     EXIT_ONLY = "exit_only"
     WEATHER_PERMITTING = "weather_permitting"
+    NOT_IN_USER = "not_in_use"
+    MAINTENANCE = "maintenance"
 
     class Labels:
         OPEN = pgettext_lazy("State", "Open")
@@ -27,6 +29,8 @@ class State(Enum):
         ENTER_ONLY = pgettext_lazy("State", "Enter only")
         EXIT_ONLY = pgettext_lazy("State", "Exit only")
         WEATHER_PERMITTING = pgettext_lazy("State", "Weather permitting")
+        NOT_IN_USE = pgettext_lazy("State", "Not in use")
+        MAINTENANCE = pgettext_lazy("State", "Maintenance")
 
     @classmethod
     def open_states(cls):
