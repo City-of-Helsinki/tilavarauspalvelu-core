@@ -28,6 +28,8 @@ billiard==3.6.4.0
     # via celery
 black==20.8b1
     # via -r requirements.in
+build==0.8.0
+    # via pip-tools
 cachetools==4.2.2
     # via django-helusers
 celery==5.2.7
@@ -208,15 +210,16 @@ ortools==9.4.1874
     # via -r requirements.in
 packaging==20.9
     # via
+    #   build
     #   deprecation
     #   pytest
 pathspec==0.8.1
     # via black
 pep517==0.10.0
-    # via pip-tools
+    # via build
 pillow==9.0.1
     # via easy-thumbnails
-pip-tools==6.6.0
+pip-tools==6.9.0
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest
@@ -341,7 +344,9 @@ toml==0.10.2
     #   pep517
     #   pytest
 tomli==2.0.1
-    # via coverage
+    # via
+    #   build
+    #   coverage
 typed-ast==1.4.3
     # via black
 typing-extensions==3.10.0.0
