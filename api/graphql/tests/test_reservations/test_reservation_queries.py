@@ -496,6 +496,76 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(view_log.field).is_equal_to("User.date_of_birth")
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_reservee_date_of_birth_is_shown_to_unit_admin(self):
+        unit_admin = self.create_unit_admin(unit=self.unit)
+        self.client.force_login(unit_admin)
+        self.regular_joe.date_of_birth = datetime.date(2020, 1, 1)
+        self.regular_joe.save()
+
+        response = self.query(
+            """
+            query {
+                reservations(user: %s) {
+                    totalCount
+                    edges {
+                        node {
+                            user {
+                                dateOfBirth
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % self.regular_joe.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        view_log = PersonalInfoViewLog.objects.first()
+        assert_that(view_log.user).is_equal_to(self.regular_joe)
+        assert_that(view_log.viewer_user).is_equal_to(unit_admin)
+        assert_that(view_log.viewer_username).is_equal_to(unit_admin.username)
+        assert_that(view_log.field).is_equal_to("User.date_of_birth")
+
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_reservee_date_of_birth_is_shown_to_service_sector_admin(self):
+        service_sector_admin = self.create_service_sector_admin(
+            service_sector=self.service_sector
+        )
+        self.client.force_login(service_sector_admin)
+        self.regular_joe.date_of_birth = datetime.date(2020, 1, 1)
+        self.regular_joe.save()
+
+        response = self.query(
+            """
+            query {
+                reservations(user: %s) {
+                    totalCount
+                    edges {
+                        node {
+                            user {
+                                dateOfBirth
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % self.regular_joe.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        view_log = PersonalInfoViewLog.objects.first()
+        assert_that(view_log.user).is_equal_to(self.regular_joe)
+        assert_that(view_log.viewer_user).is_equal_to(service_sector_admin)
+        assert_that(view_log.viewer_username).is_equal_to(service_sector_admin.username)
+        assert_that(view_log.field).is_equal_to("User.date_of_birth")
+
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_reservee_date_of_birth_is_not_shown_to_reg_user(self):
         other_user = get_user_model().objects.create(
             username="theotherguy",
