@@ -12,6 +12,7 @@ from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
 from api.graphql.translate_fields import get_all_translatable_fields
+from api.graphql.users.user_types import UserType
 from applications.models import (
     Address,
     Application,
@@ -35,6 +36,7 @@ from permissions.api_permissions.graphene_permissions import (
     CityPermission,
     OrganisationPermission,
 )
+from permissions.helpers import can_validate_unit_applications
 from spaces.models import Space
 from utils.query_performance import QueryPerformanceOptimizerMixin
 
@@ -300,6 +302,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
     applicant_email = graphene.String()
 
     home_city = graphene.Field(CityType)
+    applicant_user = graphene.Field(UserType)
 
     class Meta:
         model = Application
@@ -333,6 +336,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
             "applicantName": ("select", "user"),
             "applicantEmail": ("select", "user"),
             "aggregatedData": ("prefetch", "aggregated_data"),
+            "applicantUser": ("select", "user"),
             "applicationEvents": (
                 "prefetch",
                 {
@@ -438,6 +442,15 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
             return None
 
         return self.user.email
+
+    def resolve_applicant_user(self, info: graphene.ResolveInfo):
+        if not self.user:
+            return None
+
+        if can_validate_unit_applications(info.context.user, self.units):
+            return self.user
+
+        return None
 
     @check_resolver_permission(OrganisationPermission)
     def resolve_organisation(self, info: graphene.ResolveInfo):

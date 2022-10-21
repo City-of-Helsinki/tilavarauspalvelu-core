@@ -2,6 +2,9 @@ import json
 
 import freezegun
 from assertpy import assert_that
+from django.test import override_settings
+
+from users.models import PersonalInfoViewLog
 
 from .base import ApplicationTestCaseBase
 
@@ -454,3 +457,80 @@ class ApplicationsGraphQLTestCase(ApplicationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_application_applicant_user_does_not_render_to_regular_user(self):
+        response = self.query(
+            """
+            query {
+                applications {
+                    edges {
+                        node {
+                            applicantUser { firstName }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content["data"]["applications"]["edges"][0]["node"]["applicantUser"]
+        ).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_application_applicant_user_does_render_to_application_validator_user(self):
+        unit_admin = self.create_unit_admin()
+        self.client.force_login(unit_admin)
+        response = self.query(
+            """
+            query {
+                applications {
+                    edges {
+                        node {
+                            applicantUser { firstName }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content["data"]["applications"]["edges"][0]["node"]["applicantUser"]
+        ).is_not_none()
+        self.assertMatchSnapshot(content)
+
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_application_applicant_user_logs_date_of_birth_view(self):
+        unit_admin = self.create_unit_admin()
+        self.client.force_login(unit_admin)
+        assert_that(PersonalInfoViewLog.objects.count()).is_zero()
+        response = self.query(
+            """
+            query {
+                applications {
+                    edges {
+                        node {
+                            applicantUser { dateOfBirth }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        assert_that(PersonalInfoViewLog.objects.count()).is_equal_to(1)
