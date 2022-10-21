@@ -1113,6 +1113,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_multiple_reservation_unit(self):
+        self.maxDiff = None  # TODO: Remove when flakines is fixed
         other_unit = ReservationUnitFactory(
             spaces=[self.space],
             unit=self.unit,
