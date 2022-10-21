@@ -54,8 +54,10 @@ class ReservationUnitReservationScheduler:
         self.end_time = self.start_time + datetime.timedelta(
             hours=self.reservation_duration
         )
-        is_reservation_unit_closed = not self.opening_hours_client.is_resource_open(
-            str(self.reservation_unit.uuid), self.start_time, self.end_time
+        is_reservation_unit_closed = (
+            not self.opening_hours_client.is_resource_open_for_reservations(
+                str(self.reservation_unit.uuid), self.start_time, self.end_time
+            )
         )
         open_application_round = self.get_conflicting_open_application_round(
             self.start_time.date(), self.end_time.date()
@@ -95,8 +97,10 @@ class ReservationUnitReservationScheduler:
             open_application_round = self.get_conflicting_open_application_round(
                 self.start_time.date(), self.end_time.date()
             )
-            is_reservation_unit_closed = not self.opening_hours_client.is_resource_open(
-                str(self.reservation_unit.uuid), self.start_time, self.end_time
+            is_reservation_unit_closed = (
+                not self.opening_hours_client.is_resource_open_for_reservations(
+                    str(self.reservation_unit.uuid), self.start_time, self.end_time
+                )
             )
 
             if self.reservation_date_end < self.start_time.date():
@@ -170,7 +174,7 @@ class ReservationUnitReservationScheduler:
     def is_reservation_unit_open(
         self, start: datetime.datetime, end: datetime.datetime
     ):
-        return self.opening_hours_client.is_resource_open(
+        return self.opening_hours_client.is_resource_open_for_reservations(
             str(self.reservation_unit.uuid), start, end
         )
 

@@ -6,12 +6,9 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from opening_hours.decorators import datetime_args_to_default_timezone
-from opening_hours.hours import (
-    Period,
-    TimeElement,
-    get_opening_hours,
-    get_periods_for_resource,
-)
+from opening_hours.hours import Period
+from opening_hours.hours import State as ResourceState
+from opening_hours.hours import TimeElement, get_opening_hours, get_periods_for_resource
 
 TIMEZONE = get_default_timezone()
 
@@ -21,6 +18,7 @@ class OpeningHours:
     end_time: datetime.datetime
     resource_state: str
     periods: List[int]
+    end_time_on_next_day: bool
 
     def __init__(
         self,
@@ -28,11 +26,13 @@ class OpeningHours:
         end_time: datetime.datetime,
         resource_state: str,
         periods: List[int],
+        end_time_on_next_day: bool,
     ):
         self.start_time = start_time
         self.end_time = end_time
         self.resource_state = resource_state
         self.periods = periods
+        self.end_time_on_next_day = end_time_on_next_day
 
     @classmethod
     def get_opening_hours_class_from_time_element(
@@ -43,13 +43,16 @@ class OpeningHours:
             type(pytz.UTC), pytz.tzinfo.DstTzInfo, pytz.tzinfo.StaticTzInfo
         ],
     ):
+        start = time_element.start_time or datetime.time(0)
+        end = time_element.end_time or datetime.time(23, 59)
+
         start_time = timezone.localize(
             datetime.datetime(
                 date.year,
                 date.month,
                 date.day,
-                time_element.start_time.hour,
-                time_element.end_time.minute,
+                start.hour,
+                start.minute,
             )
         )
         if time_element.end_time_on_next_day:
@@ -59,8 +62,8 @@ class OpeningHours:
                 date.year,
                 date.month,
                 date.day,
-                time_element.end_time.hour,
-                time_element.end_time.minute,
+                end.hour,
+                end.minute,
             )
         )
         return OpeningHours(
@@ -68,6 +71,7 @@ class OpeningHours:
             end_time=end_time.astimezone(TIMEZONE),
             resource_state=time_element.resource_state,
             periods=time_element.periods,
+            end_time_on_next_day=time_element.end_time_on_next_day,
         )
 
 
@@ -164,12 +168,21 @@ class OpeningHoursClient:
         return self.periods.get(resource)
 
     @datetime_args_to_default_timezone
-    def is_resource_open(
+    def is_resource_open_for_reservations(
         self, resource: str, start_time: datetime.datetime, end_time: datetime.datetime
     ) -> bool:
         times = self.get_opening_hours_for_resource(resource, start_time.date())
-        for time in times:
-            if time.start_time <= start_time and time.end_time >= end_time:
+        for time in [
+            time
+            for time in times
+            if ResourceState(time.resource_state) in ResourceState.reservable_states()
+        ]:
+            open_full_day = not time.start_time and not time.end_time
+            if (
+                open_full_day
+                or time.start_time <= start_time
+                and (time.end_time >= end_time or time.end_time_on_next_day)
+            ):
                 return True
         return False
 

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.test.testcases import TestCase
 from django.utils.timezone import get_default_timezone
 
+from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 from reservation_units.tests.factories import ReservationUnitFactory
@@ -39,6 +40,7 @@ class OpeningHoursClientTestCase(TestCase):
                         start_time=datetime.time(hour=10),
                         end_time=datetime.time(hour=22),
                         end_time_on_next_day=False,
+                        resource_state=State.OPEN_AND_RESERVABLE.value,
                     ),
                 ],
             },
@@ -52,6 +54,7 @@ class OpeningHoursClientTestCase(TestCase):
                         start_time=datetime.time(hour=10),
                         end_time=datetime.time(hour=22),
                         end_time_on_next_day=False,
+                        resource_state=State.OPEN_AND_RESERVABLE.value,
                     ),
                 ],
             },
@@ -108,7 +111,9 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
         )
-        is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
         assert_that(is_open).is_true()
 
     def test_is_resource_open_is_false(self, mock):
@@ -122,7 +127,9 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00"
         )
-        is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
         assert_that(is_open).is_false()
 
     def test_is_resource_open_respects_timezone_is_true(self, mock):
@@ -137,8 +144,207 @@ class OpeningHoursClientTestCase(TestCase):
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00+04:00"
         )
 
-        is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
         assert_that(is_open).is_true()
+
+    def test_is_resource_open_is_true_when_start_end_null(self, mock):
+        dates = self.get_mocked_opening_hours()
+        dates[0]["times"] = [
+            TimeElement(
+                start_time=None,
+                end_time=None,
+                end_time_on_next_day=False,
+                resource_state=State.OPEN_AND_RESERVABLE.value,
+            )
+        ]
+        dates[1]["times"] = [
+            TimeElement(
+                start_time=None,
+                end_time=None,
+                end_time_on_next_day=False,
+                resource_state=State.OPEN_AND_RESERVABLE.value,
+            )
+        ]
+
+        mock.return_value = dates
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
+        )
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
+        assert_that(is_open).is_true()
+
+    def test_is_resource_open_is_false_when_no_times_in_reservable_states(self, mock):
+        dates = self.get_mocked_opening_hours()
+        dates[0]["times"] = [
+            TimeElement(
+                start_time=None,
+                end_time=None,
+                end_time_on_next_day=False,
+                resource_state=State.CLOSED.value,
+            )
+        ]
+        dates[1]["times"] = [
+            TimeElement(
+                start_time=None,
+                end_time=None,
+                end_time_on_next_day=False,
+                resource_state=State.OPEN_AND_RESERVABLE.value,
+            )
+        ]
+
+        mock.return_value = dates
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
+        )
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
+        assert_that(is_open).is_false()
+
+    def test_is_resource_open_is_true_when_end_time_on_next_day(self, mock):
+        dates = self.get_mocked_opening_hours()
+        dates[0]["times"] = [
+            TimeElement(
+                start_time=datetime.time(hour=10),
+                end_time=datetime.time(hour=6),
+                end_time_on_next_day=True,
+                resource_state=State.WITH_RESERVATION.value,
+            )
+        ]
+        mock.return_value = dates
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
+        )
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
+        assert_that(is_open).is_true()
+
+    def test_is_resource_open_is_true_when_multiple_times_in_one_date_first_match(
+        self, mock
+    ):
+        dates = self.get_mocked_opening_hours()
+        dates[0]["times"] = [
+            TimeElement(
+                start_time=datetime.time(hour=10),
+                end_time=datetime.time(hour=12),
+                end_time_on_next_day=False,
+                resource_state=State.WITH_RESERVATION.value,
+            ),
+            TimeElement(
+                start_time=datetime.time(hour=15),
+                end_time=datetime.time(hour=18),
+                end_time_on_next_day=False,
+                resource_state=State.WITH_RESERVATION.value,
+            ),
+        ]
+        mock.return_value = dates
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
+        )
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
+        assert_that(is_open).is_true()
+
+    def test_is_resource_open_is_true_when_multiple_times_in_one_date_second_match(
+        self, mock
+    ):
+        dates = self.get_mocked_opening_hours()
+        dates[0]["times"] = [
+            TimeElement(
+                start_time=datetime.time(hour=10),
+                end_time=datetime.time(hour=12),
+                end_time_on_next_day=False,
+                resource_state=State.WITH_RESERVATION.value,
+            ),
+            TimeElement(
+                start_time=datetime.time(hour=15),
+                end_time=datetime.time(hour=18),
+                end_time_on_next_day=False,
+                resource_state=State.WITH_RESERVATION.value,
+            ),
+        ]
+        mock.return_value = dates
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T15:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T16:00"
+        )
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
+        assert_that(is_open).is_true()
+
+    def test_is_resource_open_is_false_when_multiple_times_in_one_date_no_match(
+        self, mock
+    ):
+        dates = self.get_mocked_opening_hours()
+        dates[0]["times"] = [
+            TimeElement(
+                start_time=datetime.time(hour=10),
+                end_time=datetime.time(hour=12),
+                end_time_on_next_day=False,
+                resource_state=State.WITH_RESERVATION.value,
+            ),
+            TimeElement(
+                start_time=datetime.time(hour=15),
+                end_time=datetime.time(hour=18),
+                end_time_on_next_day=False,
+                resource_state=State.WITH_RESERVATION.value,
+            ),
+        ]
+        mock.return_value = dates
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T13:00"
+        )
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
+        assert_that(is_open).is_false()
 
     def test_is_resource_open_respects_timezone_is_false(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
@@ -152,7 +358,9 @@ class OpeningHoursClientTestCase(TestCase):
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T07:00+02:00"
         )
 
-        is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
+        is_open = client.is_resource_open_for_reservations(
+            str(self.reservation_unit.uuid), begin, end
+        )
         assert_that(is_open).is_false()
 
     def test_next_opening_times_returns_date_and_times(self, mock):
