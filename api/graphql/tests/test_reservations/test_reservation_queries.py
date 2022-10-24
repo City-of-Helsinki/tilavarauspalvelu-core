@@ -1133,7 +1133,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         )
 
         ReservationFactory(
-            name="Test reservation",
+            name="test reservation",
             reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
             reservee_first_name="First",
             reservee_last_name="Name",
@@ -1141,7 +1141,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         )
 
         ReservationFactory(
-            name="Hidden reservation",
+            name="hidden reservation",
             reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
             reservee_first_name="First",
             reservee_last_name="Name",
@@ -1152,7 +1152,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         response = self.query(
             """
             query {
-                reservations(reservationUnit: [%s, %s], orderBy:"unitNameFi") {
+                reservations(reservationUnit: [%s, %s], orderBy:"name") {
                     totalCount
                     edges {
                         node {

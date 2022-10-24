@@ -79,7 +79,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_multiple_reservation_unit 1'
                 },
                 {
                     'node': {
-                        'name': 'Test reservation',
+                        'name': 'test reservation',
                         'reservationUnits': [
                             {
                                 'nameFi': 'other unit'
