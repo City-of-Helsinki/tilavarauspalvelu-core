@@ -527,20 +527,27 @@ const ReservationUnit = ({
     useLocalStorage<ReservationProps>("reservation");
 
   const calendarRef = useRef(null);
+  const hash = router.asPath.split("#")[1];
 
   useEffect(() => {
-    if (storedReservation?.pk === reservationUnit.pk) {
-      setFocusDate(new Date(storedReservation.begin));
+    const scrollToCalendar = () =>
       window.scroll({
         top: calendarRef.current.offsetTop - 20,
         left: 0,
         behavior: "smooth",
       });
+
+    if (storedReservation?.pk === reservationUnit.pk) {
+      setFocusDate(new Date(storedReservation.begin));
+      scrollToCalendar();
       setReservation(storedReservation);
       removeStoredReservation();
+    } else if (hash === "calendar" && reservation) {
+      scrollToCalendar();
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [reservation]);
 
   useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
     fetchPolicy: "no-cache",
@@ -967,7 +974,7 @@ const ReservationUnit = ({
                 ref={calendarRef}
                 data-testid="reservation-unit__calendar--wrapper"
               >
-                <Subheading id="calendar">
+                <Subheading>
                   {t("reservations:reservationCalendar", {
                     title: getTranslation(reservationUnit, "name"),
                   })}
