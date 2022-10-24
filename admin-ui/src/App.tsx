@@ -34,7 +34,7 @@ import PrivateRoutes from "./common/PrivateRoutes";
 import { prefixes } from "./common/urls";
 import ExternalScripts from "./common/ExternalScripts";
 import ApplicationRoundAllocation from "./component/recurring-reservations/allocation/ApplicationRoundAllocation";
-import MyUnits from "./component/my-units/MyUnits";
+import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
 
 function App(): JSX.Element {
   return (
@@ -146,7 +146,7 @@ function App(): JSX.Element {
             />
             <Route path="/unit/:unitPk" component={Unit} exact />
             <Route path="/reservations/:id" component={Reservations} />
-            <Route path="/my-units" component={MyUnits} exact />
+            <Route path="/my-units" component={MyUnitsRouter} />
           </PrivateRoutes>
         </Switch>
         <ExternalScripts />

@@ -38,3 +38,10 @@ export const resourceUrl = (resourceId: number, unitId: number): string =>
   `/unit/${unitId}/resource/edit/${resourceId}`;
 
 export const unitUrl = (unitId: number): string => `/unit/${unitId}`;
+
+export const myUnitUrl = (unitId: number): string => `/my-units/${unitId}`;
+
+export const myReservationUnitUrl = (
+  unitId: number,
+  reservationUnitId: number
+): string => `${myUnitUrl(unitId)}/${reservationUnitId}`;

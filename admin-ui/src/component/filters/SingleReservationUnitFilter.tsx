@@ -1,0 +1,49 @@
+import React from "react";
+import { useQuery } from "@apollo/client";
+import { useTranslation } from "react-i18next";
+
+import { Query, QueryReservationUnitsArgs } from "../../common/gql-types";
+import { OptionType } from "../../common/types";
+import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
+import { RESERVATION_UNITS_QUERY } from "./queries";
+
+type Props = {
+  onChange: (reservationUnits: OptionType) => void;
+  value?: OptionType;
+  unitPk?: string;
+};
+
+const SingleReservationUnitFilter = ({
+  onChange,
+  value,
+  unitPk,
+}: Props): JSX.Element => {
+  const { t } = useTranslation();
+  const { data, loading } = useQuery<Query, QueryReservationUnitsArgs>(
+    RESERVATION_UNITS_QUERY,
+    { variables: { unit: [unitPk as string] } }
+  );
+
+  const options = (data?.reservationUnits?.edges || [])
+    .map((e) => e?.node)
+    .map((reservationUnit) => ({
+      label: reservationUnit?.nameFi as string,
+      value: String(reservationUnit?.pk as number),
+    }));
+  const valueOption = options.find((o) => o.value === value?.value);
+
+  return (
+    <SortedSelect
+      disabled={loading}
+      sort
+      label={t("ReservationUnitsFilter.label")}
+      placeholder={t("common.choose")}
+      options={options}
+      value={valueOption}
+      onChange={onChange}
+      id="reservation-unit"
+    />
+  );
+};
+
+export default SingleReservationUnitFilter;

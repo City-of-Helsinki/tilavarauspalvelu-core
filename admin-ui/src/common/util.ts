@@ -17,9 +17,12 @@ import {
 } from "./types";
 import { ApplicationEventScheduleType, LocationType, Query } from "./gql-types";
 
+export const DATE_FORMAT = "d.M.yyyy";
+export const DATE_FORMAT_SHORT = "d.M";
+
 export const formatDate = (
   date: string | null,
-  outputFormat = "d.M.yyyy"
+  outputFormat = DATE_FORMAT
 ): string | null => {
   return date ? format(parseISO(date), outputFormat) : null;
 };

@@ -12,3 +12,16 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
     }
   }
 `;
+
+export const RESERVATION_UNITS_QUERY = gql`
+  query reservationUnits($unit: [ID]) {
+    reservationUnits(onlyWithPermission: true, unit: $unit) {
+      edges {
+        node {
+          nameFi
+          pk
+        }
+      }
+    }
+  }
+`;

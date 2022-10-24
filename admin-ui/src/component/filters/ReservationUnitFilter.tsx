@@ -1,23 +1,11 @@
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 
 import { Query } from "../../common/gql-types";
 import { OptionType } from "../../common/types";
 import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
-
-const RESERVATION_UNITS_QUERY = gql`
-  query reservationUnits {
-    reservationUnits(onlyWithPermission: true) {
-      edges {
-        node {
-          nameFi
-          pk
-        }
-      }
-    }
-  }
-`;
+import { RESERVATION_UNITS_QUERY } from "./queries";
 
 type Props = {
   onChange: (reservationUnits: OptionType[]) => void;

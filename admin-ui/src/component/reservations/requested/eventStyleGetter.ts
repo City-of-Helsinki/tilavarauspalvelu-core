@@ -4,8 +4,58 @@ import {
   ReservationType,
 } from "../../../common/gql-types";
 
+const CURRENT = (state: string) => {
+  const lcState = state.toLowerCase();
+  return {
+    style: {
+      backgroundColor: `var(--tilavaraus-event-current-${lcState}-background)`,
+      color: `var(--tilavaraus-event-current-${lcState}-color)`,
+      border: `2px dashed var(--tilavaraus-event-current-${lcState}-border-color)`,
+    },
+  };
+};
+
+const UNCONFIRMED = {
+  style: {
+    border: `2px solid var(--tilavaraus-event-other-requires_handling-border-color)`,
+    backgroundColor: `var(--tilavaraus-event-other-requires_handling-background)`,
+    color: `black`,
+  },
+};
+
+const REST = {
+  style: {
+    border: `2px solid var(--tilavaraus-event-rest-border-color)`,
+    background: `var(--tilavaraus-event-rest-background)`,
+    color: `black`,
+  },
+};
+
+export const legend = [
+  {
+    label: "Calendar.legend.currentRequiresHandling",
+    style: CURRENT(ReservationsReservationStateChoices.RequiresHandling).style,
+  },
+  {
+    label: "Calendar.legend.currentConfirmed",
+    style: CURRENT(ReservationsReservationStateChoices.Confirmed).style,
+  },
+  {
+    label: "Calendar.legend.currentDenied",
+    style: CURRENT(ReservationsReservationStateChoices.Denied).style,
+  },
+  {
+    label: "Calendar.legend.otherRequiedHandling",
+    style: UNCONFIRMED.style,
+  },
+  {
+    label: "Calendar.legend.rest",
+    style: REST.style,
+  },
+];
+
 const eventStyleGetter =
-  (currentReservation: ReservationType) =>
+  (currentReservation?: ReservationType) =>
   ({
     event,
   }: CalendarEvent<ReservationType>): {
@@ -13,6 +63,7 @@ const eventStyleGetter =
     className?: string;
   } => {
     const style = {
+      cursor: "pointer",
       borderRadius: "0px",
       opacity: "0.8",
       color: "var(--color-white)",
@@ -22,22 +73,13 @@ const eventStyleGetter =
       fontSize: "var(--fontsize-body-s)",
     } as Record<string, string>;
 
-    const state = event?.state.toLowerCase() as string;
-
-    if (currentReservation.pk === event?.pk) {
-      // current reservation
-      style.backgroundColor = `var(--tilavaraus-event-current-${state}-background)`;
-      style.color = `var(--tilavaraus-event-current-${state}-color)`;
-      style.border = `2px dashed var(--tilavaraus-event-current-${state}-border-color)`;
-      style.class = "current";
+    if (currentReservation?.pk === event?.pk) {
+      Object.assign(style, CURRENT(event?.state as string).style);
+      style.cursor = "default";
     } else if (event?.state !== ReservationsReservationStateChoices.Confirmed) {
-      style.border = `2px solid var(--tilavaraus-event-other-requires_handling-border-color)`;
-      style.backgroundColor = `var(--tilavaraus-event-other-requires_handling-background)`;
-      style.color = `black`;
+      Object.assign(style, UNCONFIRMED.style);
     } else {
-      style.border = `2px solid var(--tilavaraus-event-rest-border-color)`;
-      style.background = `var(--tilavaraus-event-rest-background)`;
-      style.color = `black`;
+      Object.assign(style, REST.style);
     }
     return {
       style,

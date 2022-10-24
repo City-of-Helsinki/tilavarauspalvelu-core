@@ -5,23 +5,22 @@ import { get } from "lodash";
 import { endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { reservationUrl } from "../../common/urls";
 import {
   Query,
   QueryReservationsArgs,
-  ReservationsReservationStateChoices,
   ReservationType,
-} from "../../../common/gql-types";
+} from "../../common/gql-types";
+import { combineResults } from "../../common/util";
+import { useNotification } from "../../context/NotificationContext";
+import Legend from "../reservations/requested/Legend";
+import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import { RESERVATIONS_BY_RESERVATIONUNIT } from "./queries";
-import { useNotification } from "../../../context/NotificationContext";
-import Legend from "./Legend";
-import { reservationUrl } from "../../../common/urls";
-import { combineResults } from "../../../common/util";
 
 type Props = {
   begin: string;
-  reservationUnitPk: string;
-  reservation: ReservationType;
+  intersectingReservationUnits: number[];
+  reservationUnitPk: number;
 };
 
 const Legends = styled.div`
@@ -51,7 +50,7 @@ const updateQuery = (
 const Calendar = ({
   begin,
   reservationUnitPk,
-  reservation,
+  intersectingReservationUnits,
 }: Props): JSX.Element => {
   const [events, setEvents] = useState([] as CalendarEvent<ReservationType>[]);
   const [hasMore, setHasMore] = useState(false);
@@ -60,41 +59,31 @@ const Calendar = ({
   const { t } = useTranslation();
 
   const { fetchMore } = useQuery<Query, QueryReservationsArgs>(
-    RESERVATIONS_BY_RESERVATIONUNIT,
+    RESERVATIONS_BY_RESERVATIONUNITS,
 
     {
       fetchPolicy: "network-only",
       variables: {
         offset: 0,
         first: 100,
-        reservationUnit: [reservationUnitPk],
+        reservationUnit: intersectingReservationUnits.map(String),
         begin: startOfISOWeek(new Date(begin)),
         end: endOfISOWeek(new Date(begin)),
       },
       onCompleted: ({ reservations }) => {
         if (reservations) {
           setEvents(
-            (reservations?.edges || [])
-              .filter(
-                (r) =>
-                  [
-                    ReservationsReservationStateChoices.Confirmed,
-                    ReservationsReservationStateChoices.RequiresHandling,
-                  ].includes(
-                    r?.node?.state as ReservationsReservationStateChoices
-                  ) || r?.node?.pk === reservation.pk
-              )
-              .map((r) => ({
-                title: `${
-                  r?.node?.reserveeOrganisationName ||
-                  `${r?.node?.reserveeFirstName || ""} ${
-                    r?.node?.reserveeLastName || ""
-                  }`
-                }`,
-                event: r?.node as ReservationType,
-                start: new Date(get(r?.node, "begin")),
-                end: new Date(get(r?.node, "end")),
-              }))
+            (reservations?.edges || []).map((r) => ({
+              title: `${
+                r?.node?.reserveeOrganisationName ||
+                `${r?.node?.reserveeFirstName || ""} ${
+                  r?.node?.reserveeLastName || ""
+                }`
+              }`,
+              event: r?.node as ReservationType,
+              start: new Date(get(r?.node, "begin")),
+              end: new Date(get(r?.node, "end")),
+            }))
           );
 
           if (reservations.pageInfo.hasNextPage) {
@@ -125,18 +114,16 @@ const Calendar = ({
       <CommonCalendar
         events={events}
         begin={startOfISOWeek(new Date(begin))}
-        eventStyleGetter={eventStyleGetter(reservation)}
+        eventStyleGetter={eventStyleGetter(reservationUnitPk)}
         onSelectEvent={(e) => {
-          if (e.event?.pk !== reservation.pk) {
-            window.open(reservationUrl(e.event?.pk as number), "_blank");
-          }
+          window.open(reservationUrl(e.event?.pk as number), "_blank");
         }}
       />
       <Legends>
         {legend.map((l) => (
           <Legend key={l.label} style={l.style} label={t(l.label)} />
         ))}
-      </Legends>{" "}
+      </Legends>
     </Container>
   );
 };

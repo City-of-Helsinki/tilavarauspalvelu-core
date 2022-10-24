@@ -75,6 +75,7 @@ const translations: ITranslations = {
     allResults: ["Kaikki {{totalCount}} tulosta näytetty"],
   },
   common: {
+    week: ["Viikko"],
     showMore: ["Näytä lisää"],
     clearAllSelections: ["Tyhjennä valinnat"],
     clear: ["Tyhjennä"],
@@ -277,6 +278,13 @@ const translations: ITranslations = {
     description: [
       "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeudet.",
     ],
+    Calendar: {
+      legend: {
+        confirmed: ["Varattu"],
+        unconfirmed: ["Varaustoive"],
+        intersecting: ["Osana toista varausyksikköä"],
+      },
+    },
   },
   Application: {
     id: ["Hakemnustunnus"],

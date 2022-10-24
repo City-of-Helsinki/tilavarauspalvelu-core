@@ -2,9 +2,8 @@ import React from "react";
 import styled from "styled-components";
 
 type Props = {
-  color: string;
-  border: string;
   label: string;
+  style: React.CSSProperties;
 };
 
 const Container = styled.div`
@@ -20,10 +19,10 @@ const Box = styled.div`
   min-width: 3em;
 `;
 
-const Legend = ({ label, color, border }: Props): JSX.Element => {
+const Legend = ({ label, style }: Props): JSX.Element => {
   return (
     <Container>
-      <Box style={{ background: color, border }} />
+      <Box style={style} />
       {label}
     </Container>
   );
