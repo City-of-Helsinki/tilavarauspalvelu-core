@@ -1656,6 +1656,10 @@ const translations: ITranslations = {
     savedWorkingMemo: ["Kommentti tallennettu"],
     errorSavingWorkingMemo: ["Kommentin tallennus ei onnistunut"],
     user: ["Varauksen tekijä"],
+    email: ["Sähköposti"],
+    birthDate: ["Syntymäaika"],
+    hideBirthDate: ["Piilota"],
+    showBirthDate: ["Näytä"],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],

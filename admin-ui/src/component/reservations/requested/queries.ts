@@ -12,6 +12,16 @@ export const UPDATE_WORKING_MEMO = gql`
   }
 `;
 
+export const GET_BIRTHDATE_BY_RESERVATION_PK = gql`
+  query reservationUserBirthDate($pk: Int) {
+    reservationByPk(pk: $pk) {
+      user {
+        dateOfBirth
+      }
+    }
+  }
+`;
+
 export const RESERVATION_QUERY = gql`
   query reservationByPk($pk: Int!) {
     reservationByPk(pk: $pk) {
@@ -59,7 +69,10 @@ export const RESERVATION_QUERY = gql`
       end
       calendarUrl
       user {
+        firstName
+        lastName
         email
+        pk
       }
       state
       reserveeOrganisationName

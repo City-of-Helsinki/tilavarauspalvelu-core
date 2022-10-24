@@ -45,6 +45,7 @@ import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
 import StickyHeader from "../../StickyHeader";
 import { formatDateTime } from "../../../common/util";
 import Calendar from "./Calendar";
+import UserBirthDate from "./UserBirthDate";
 
 const Wrapper = styled.div`
   display: flex;
@@ -153,7 +154,7 @@ const ApplicationData = ({
   wide,
 }: {
   label: string;
-  data?: Maybe<string> | number;
+  data?: Maybe<string> | number | JSX.Element;
   wide?: boolean;
 }) =>
   data ? (
@@ -585,7 +586,27 @@ const RequestedReservation = (): JSX.Element | null => {
             <ApplicationDatas>
               <ApplicationData
                 label={t("RequestedReservation.user")}
+                data={
+                  trim(
+                    `${reservation?.user?.firstName || ""} ${
+                      reservation?.user?.lastName || ""
+                    }`
+                  ) || t("RequestedReservation.noName")
+                }
+              />
+              <ApplicationData
+                label={t("RequestedReservation.email")}
                 data={reservation?.user?.email}
+              />
+              <ApplicationData
+                label={t("RequestedReservation.birthDate")}
+                data={
+                  <UserBirthDate
+                    reservationPk={reservation.pk as number}
+                    showLabel={t("RequestedReservation.showBirthDate")}
+                    hideLabel={t("RequestedReservation.hideBirthDate")}
+                  />
+                }
               />
             </ApplicationDatas>
           </Accordion>
