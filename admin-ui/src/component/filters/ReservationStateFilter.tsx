@@ -10,23 +10,22 @@ type Props = {
   value: OptionType[];
 };
 
-const ReservationUnitStates = Object.values(
-  ReservationsReservationStateChoices
-);
+const ReservationStates = [
+  ReservationsReservationStateChoices.Confirmed,
+  ReservationsReservationStateChoices.RequiresHandling,
+  ReservationsReservationStateChoices.Denied,
+  ReservationsReservationStateChoices.Cancelled,
+];
 
-const ReservationUnitStateFilter = ({
-  onChange,
-  value,
-}: Props): JSX.Element => {
+const ReservationStateFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   return (
     <SortedSelect
-      sort
       label={t("ReservationStateFilter.label")}
       multiselect
       placeholder={t("common.filter")}
-      options={ReservationUnitStates.map((s) => ({
+      options={ReservationStates.map((s) => ({
         value: s,
         label: t(`RequestedReservation.state.${s}`),
       }))}
@@ -37,4 +36,4 @@ const ReservationUnitStateFilter = ({
   );
 };
 
-export default ReservationUnitStateFilter;
+export default ReservationStateFilter;
