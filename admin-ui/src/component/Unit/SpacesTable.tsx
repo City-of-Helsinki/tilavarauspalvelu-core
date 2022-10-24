@@ -226,7 +226,7 @@ const SpacesTable = ({
                         onAccept: () => {
                           deleteSpace(space.pk as number)
                             .then((d) => {
-                              if (!d.errors) {
+                              if (d.data?.deleteSpace.deleted) {
                                 onDelete();
                               } else {
                                 onDataError("SpaceTable.removeFailed");
