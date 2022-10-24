@@ -40,6 +40,7 @@ const multivaluedFields = [
 
 type Props = {
   onSearch: (args: FilterArguments) => void;
+  initialFiltering?: Partial<FilterArguments>;
 };
 
 const Wrapper = styled.div`
@@ -102,11 +103,13 @@ const MyTextInput = ({
   />
 );
 
-const Filters = ({ onSearch }: Props): JSX.Element => {
+const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
   const { t } = useTranslation();
+  const initialEmptyState = { ...emptyState, ...initialFiltering };
+
   const [state, dispatch] = useReducer(
-    getReducer<FilterArguments>(emptyState),
-    emptyState
+    getReducer<FilterArguments>(initialEmptyState),
+    initialEmptyState
   );
   const [more, setMore] = useState(false);
 
