@@ -1340,3 +1340,37 @@ snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_shown_to_adm
         }
     }
 }
+
+snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_shown_to_service_sector_admin 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'user': {
+                            'dateOfBirth': '2020-01-01'
+                        }
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_shown_to_unit_admin 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'user': {
+                            'dateOfBirth': '2020-01-01'
+                        }
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}

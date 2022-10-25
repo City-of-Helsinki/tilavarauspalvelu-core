@@ -55,6 +55,10 @@ class GrapheneTestCaseBase(GraphQLTestCase):
             role=ServiceSectorRoleChoice.objects.get(code="admin"),
             permission="can_handle_applications",
         )
+        ServiceSectorRolePermission.objects.create(
+            role=ServiceSectorRoleChoice.objects.get(code="admin"),
+            permission="can_view_reservations",
+        )
 
         return service_sector_admin
 

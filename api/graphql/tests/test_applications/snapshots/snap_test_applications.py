@@ -56,6 +56,52 @@ snapshots['ApplicationsGraphQLTestCase::test_application_applicant_no_value 1'] 
     }
 }
 
+snapshots['ApplicationsGraphQLTestCase::test_application_applicant_user_does_not_render_to_regular_user 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'applicantUser': None
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLTestCase::test_application_applicant_user_does_render_to_application_validator_user 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'applicantUser': {
+                            'firstName': 'joe'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLTestCase::test_application_applicant_user_logs_date_of_birth_view 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'applicantUser': {
+                            'dateOfBirth': None
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationsGraphQLTestCase::test_application_application_events_ability_group_fields 1'] = {
     'data': {
         'applications': {

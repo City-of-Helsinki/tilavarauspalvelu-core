@@ -17,7 +17,12 @@ from reservation_units.tests.factories import (
 )
 from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from reservations.tests.factories import ReservationPurposeFactory
-from spaces.tests.factories import SpaceFactory, UnitFactory, UnitGroupFactory
+from spaces.tests.factories import (
+    ServiceSectorFactory,
+    SpaceFactory,
+    UnitFactory,
+    UnitGroupFactory,
+)
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -28,6 +33,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         super().setUpTestData()
         cls.space = SpaceFactory()
         cls.unit = UnitFactory(name="unit")
+        cls.service_sector = ServiceSectorFactory(units=[cls.unit])
         cls.reservation_unit_type = ReservationUnitTypeFactory(
             name="reservation_unit_type"
         )
