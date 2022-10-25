@@ -1,3 +1,4 @@
+import { breakpoints } from "common/src/common/style";
 import React from "react";
 import styled from "styled-components";
 
@@ -26,6 +27,10 @@ const StickyContent = styled.div`
   button {
     border-color: var(--color-white) !important;
     color: var(--color-white) !important;
+  }
+  @media (max-width: ${breakpoints.s}) {
+    padding: var(--spacing-xs) var(--spacing-s);
+    flex-direction: column;
   }
 `;
 

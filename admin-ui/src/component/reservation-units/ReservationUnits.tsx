@@ -2,22 +2,12 @@ import { debounce } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
-import styled from "styled-components";
 import withMainMenu from "../withMainMenu";
 import Filters, { FilterArguments, emptyState } from "./Filters";
 import ReservationUnitsDataReader, { Sort } from "./ReservationUnitsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "../lists/components";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-layout-2-xs);
-
-  padding: var(--spacing-layout-2-xs) 0 var(--spacing-layout-m)
-    var(--spacing-layout-m);
-  max-width: var(--container-width-l);
-`;
+import { Container } from "../../styles/layout";
 
 const ReservationUnits = (): JSX.Element => {
   const [search, setSearch] = useState<FilterArguments>(emptyState);
@@ -36,7 +26,7 @@ const ReservationUnits = (): JSX.Element => {
   return (
     <>
       <BreadcrumbWrapper route={["spaces-n-settings", "reservation-units"]} />
-      <Wrapper>
+      <Container>
         <div>
           <H1>{t("ReservationUnits.reservationUnitListHeading")}</H1>
           <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
@@ -49,7 +39,7 @@ const ReservationUnits = (): JSX.Element => {
           sort={sort}
           sortChanged={onSortChanged}
         />
-      </Wrapper>
+      </Container>
     </>
   );
 };

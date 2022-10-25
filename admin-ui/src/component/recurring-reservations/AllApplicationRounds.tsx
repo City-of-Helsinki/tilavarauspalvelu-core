@@ -13,7 +13,7 @@ import {
 import { applicationRoundUrl } from "../../common/urls";
 import { formatDate } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
-import { Container, Content, VerticalFlexNoGap } from "../../styles/layout";
+import { Container, VerticalFlexNoGap } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
@@ -22,11 +22,6 @@ import { getApplicationRoundStatus } from "./ApplicationRoundStatusTag";
 import { TableLink, CustomTable } from "./components";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 import { truncate } from "./util";
-
-const StyledContainer = styled(Container)`
-  padding: var(--spacing-l) 0 var(--spacing-layout-xl);
-  background: var(--gray-light);
-`;
 
 const AccordionContainer = styled.div`
   display: flex;
@@ -115,128 +110,124 @@ function AllApplicationRounds(): JSX.Element | null {
         route={["recurring-reservations", "application-rounds"]}
       />
 
-      <StyledContainer>
-        <Content>
-          <VerticalFlexNoGap>
-            <StyledH1>{t("MainMenu.applicationRounds")}</StyledH1>
-            <RoundsAccordion
-              initiallyOpen
-              hideIfEmpty
-              name={t("ApplicationRound.groupLabel.handling")}
-              rounds={
+      <Container>
+        <VerticalFlexNoGap>
+          <StyledH1>{t("MainMenu.applicationRounds")}</StyledH1>
+          <RoundsAccordion
+            initiallyOpen
+            hideIfEmpty
+            name={t("ApplicationRound.groupLabel.handling")}
+            rounds={
+              orderBy(
+                applicationRounds.g1,
+                ["status", "applicationPeriodEnd"],
+                ["asc", "asc"]
+              ) || []
+            }
+          />
+          <RoundsAccordion
+            name={t("ApplicationRound.groupLabel.notSent")}
+            rounds={applicationRounds.g2 || []}
+            hideIfEmpty
+            initiallyOpen
+          />
+          <RoundsAccordion
+            name={t("ApplicationRound.groupLabel.open")}
+            rounds={
+              orderBy(
+                applicationRounds.g3,
+                ["applicationPeriodEnd", "asc"],
+                []
+              ) || []
+            }
+            hideIfEmpty
+            initiallyOpen
+          />
+          <RoundsAccordion
+            name={t("ApplicationRound.groupLabel.opening")}
+            rounds={
+              orderBy(
+                applicationRounds.g4,
+                ["applicationPeriodBegin"],
+                ["asc"]
+              ) || []
+            }
+            emptyContent={
+              <div>
+                <div>{t("ApplicationRound.noUpcoming")}</div>
+              </div>
+            }
+          />
+          <Accordion heading={t("ApplicationRound.groupLabel.previousRounds")}>
+            <CustomTable
+              ariaLabelSortButtonAscending="Sorted in ascending order"
+              ariaLabelSortButtonDescending="Sorted in descending order"
+              ariaLabelSortButtonUnset="Not sorted"
+              initialSortingColumnKey="applicantSort"
+              initialSortingOrder="asc"
+              cols={[
+                {
+                  isSortable: true,
+                  headerName: t("ApplicationRound.headings.name"),
+                  transform: (applicationRound: ApplicationRoundType) => (
+                    <TableLink
+                      to={applicationRoundUrl(Number(applicationRound.pk))}
+                    >
+                      <span title={applicationRound.nameFi as string}>
+                        {truncate(applicationRound.nameFi as string, 20)}
+                      </span>
+                    </TableLink>
+                  ),
+                  key: "nameFi",
+                },
+                {
+                  headerName: t("ApplicationRound.headings.service"),
+                  transform: (applicationRound: ApplicationRoundType) =>
+                    applicationRound.serviceSector?.nameFi as string,
+                  key: "serviceSectorName",
+                },
+                {
+                  isSortable: true,
+                  headerName: t(
+                    "ApplicationRound.headings.reservationUnitCount"
+                  ),
+                  transform: (applicationRound: ApplicationRoundType) =>
+                    String(applicationRound.applicationsCount),
+                  key: "applicationsCount",
+                },
+                {
+                  isSortable: true,
+                  headerName: t("ApplicationRound.headings.applicationCount"),
+                  transform: (applicationRound: ApplicationRoundType) =>
+                    String(applicationRound.reservationUnitCount),
+                  key: "reservationUnitCount",
+                },
+                {
+                  isSortable: true,
+                  headerName: t("ApplicationRound.headings.sent"),
+                  transform: (applicationRound: ApplicationRoundType) =>
+                    formatDate(applicationRound.statusTimestamp) || "-",
+                  key: "statusTimestampSort",
+                },
+              ]}
+              indexKey="pk"
+              rows={
                 orderBy(
-                  applicationRounds.g1,
-                  ["status", "applicationPeriodEnd"],
-                  ["asc", "asc"]
-                ) || []
+                  applicationRounds.g5,
+                  ["statusTimestamp"],
+                  ["desc"]
+                ).map((a) => ({
+                  ...a,
+                  statusTimestampSort: new Date(
+                    a.statusTimestamp || ""
+                  ).getTime(),
+                })) || []
               }
+              variant="light"
             />
-            <RoundsAccordion
-              name={t("ApplicationRound.groupLabel.notSent")}
-              rounds={applicationRounds.g2 || []}
-              hideIfEmpty
-              initiallyOpen
-            />
-            <RoundsAccordion
-              name={t("ApplicationRound.groupLabel.open")}
-              rounds={
-                orderBy(
-                  applicationRounds.g3,
-                  ["applicationPeriodEnd", "asc"],
-                  []
-                ) || []
-              }
-              hideIfEmpty
-              initiallyOpen
-            />
-            <RoundsAccordion
-              name={t("ApplicationRound.groupLabel.opening")}
-              rounds={
-                orderBy(
-                  applicationRounds.g4,
-                  ["applicationPeriodBegin"],
-                  ["asc"]
-                ) || []
-              }
-              emptyContent={
-                <div>
-                  <div>{t("ApplicationRound.noUpcoming")}</div>
-                </div>
-              }
-            />
-            <Accordion
-              heading={t("ApplicationRound.groupLabel.previousRounds")}
-            >
-              <CustomTable
-                ariaLabelSortButtonAscending="Sorted in ascending order"
-                ariaLabelSortButtonDescending="Sorted in descending order"
-                ariaLabelSortButtonUnset="Not sorted"
-                initialSortingColumnKey="applicantSort"
-                initialSortingOrder="asc"
-                cols={[
-                  {
-                    isSortable: true,
-                    headerName: t("ApplicationRound.headings.name"),
-                    transform: (applicationRound: ApplicationRoundType) => (
-                      <TableLink
-                        to={applicationRoundUrl(Number(applicationRound.pk))}
-                      >
-                        <span title={applicationRound.nameFi as string}>
-                          {truncate(applicationRound.nameFi as string, 20)}
-                        </span>
-                      </TableLink>
-                    ),
-                    key: "nameFi",
-                  },
-                  {
-                    headerName: t("ApplicationRound.headings.service"),
-                    transform: (applicationRound: ApplicationRoundType) =>
-                      applicationRound.serviceSector?.nameFi as string,
-                    key: "serviceSectorName",
-                  },
-                  {
-                    isSortable: true,
-                    headerName: t(
-                      "ApplicationRound.headings.reservationUnitCount"
-                    ),
-                    transform: (applicationRound: ApplicationRoundType) =>
-                      String(applicationRound.applicationsCount),
-                    key: "applicationsCount",
-                  },
-                  {
-                    isSortable: true,
-                    headerName: t("ApplicationRound.headings.applicationCount"),
-                    transform: (applicationRound: ApplicationRoundType) =>
-                      String(applicationRound.reservationUnitCount),
-                    key: "reservationUnitCount",
-                  },
-                  {
-                    isSortable: true,
-                    headerName: t("ApplicationRound.headings.sent"),
-                    transform: (applicationRound: ApplicationRoundType) =>
-                      formatDate(applicationRound.statusTimestamp) || "-",
-                    key: "statusTimestampSort",
-                  },
-                ]}
-                indexKey="pk"
-                rows={
-                  orderBy(
-                    applicationRounds.g5,
-                    ["statusTimestamp"],
-                    ["desc"]
-                  ).map((a) => ({
-                    ...a,
-                    statusTimestampSort: new Date(
-                      a.statusTimestamp || ""
-                    ).getTime(),
-                  })) || []
-                }
-                variant="light"
-              />
-            </Accordion>
-          </VerticalFlexNoGap>
-        </Content>
-      </StyledContainer>
+          </Accordion>
+        </VerticalFlexNoGap>
+      </Container>
     </>
   );
 }

@@ -18,16 +18,7 @@ import { Query, ResourceType } from "../../common/gql-types";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { useNotification } from "../../context/NotificationContext";
 import { resourceUrl } from "../../common/urls";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-layout-2-xs);
-
-  padding: var(--spacing-layout-2-xs) 0 var(--spacing-layout-m)
-    var(--spacing-layout-m);
-  max-width: var(--container-width-l);
-`;
+import { Container } from "../../styles/layout";
 
 const SearchContainer = styled.div`
   display: grid;
@@ -205,7 +196,7 @@ const ResourcesList = (): JSX.Element => {
   return (
     <>
       <BreadcrumbWrapper route={["spaces-n-settings", "resources"]} />
-      <Wrapper>
+      <Container>
         <div>
           <H1>{t("Resources.resourceListHeading")}</H1>
           <p>{t("Resources.resourceListDescription")}</p>
@@ -240,7 +231,7 @@ const ResourcesList = (): JSX.Element => {
           cellConfig={cellConfig}
           filterConfig={filterConfig}
         />
-      </Wrapper>
+      </Container>
     </>
   );
 };

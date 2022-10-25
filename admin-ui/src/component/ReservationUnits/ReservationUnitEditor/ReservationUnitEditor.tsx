@@ -14,13 +14,14 @@ import {
   TextInput,
   Tooltip,
 } from "hds-react";
+import { H1, Strong } from "common/src/common/typography";
 import { get, isNull, omitBy, pick, sumBy, upperFirst } from "lodash";
 import i18next from "i18next";
 import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 
-import { languages, previewUrlPrefix } from "../../../common/const";
+import { languages, previewUrlPrefix, publicUrl } from "../../../common/const";
 import Select from "./Select";
 import {
   Query,
@@ -40,7 +41,7 @@ import {
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
 import {
-  ContentContainer,
+  Container,
   DenseVerticalFlex,
   Grid,
   HorisontalFlex,
@@ -51,7 +52,6 @@ import {
 
 import { ButtonsStripe, WhiteButton } from "../../../styles/util";
 import Loader from "../../Loader";
-import SubPageHead from "../../Unit/SubPageHead";
 import { MainMenuWrapper } from "../../withMainMenu";
 import RichTextInput from "../../RichTextInput";
 import { useNotification } from "../../../context/NotificationContext";
@@ -61,8 +61,6 @@ import ImageEditor from "./ImageEditor";
 import DateTimeInput from "./DateTimeInput";
 import {
   ButtonsContainer,
-  Editor,
-  EditorGrid,
   Preview,
   Wrapper,
   Span4,
@@ -92,6 +90,8 @@ import ReservationUnitStateTag from "./ReservationUnitStateTag";
 import DiscardChangesDialog from "./DiscardChangesDialog";
 import FieldGroup from "./FieldGroup";
 import PricingType from "./PricingType";
+import BreadcrumbWrapper from "../../BreadcrumbWrapper";
+import { parseAddress } from "../../../common/util";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -567,16 +567,45 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   return (
     <Wrapper key={JSON.stringify(state.validationErrors)}>
       <MainMenuWrapper>
-        <ContentContainer>
+        <BreadcrumbWrapper
+          route={[
+            "spaces-n-settings",
+            `${publicUrl}/reservation-units`,
+            "reservation-unit",
+          ]}
+          aliases={[
+            {
+              slug: "reservation-unit",
+              title: state.reservationUnitEdit.nameFi || "-",
+            },
+          ]}
+        />
+        <Container>
           {state.unit ? (
-            <SubPageHead
-              unit={state.unit}
-              title={
-                state.reservationUnitEdit.nameFi ||
-                t("ReservationUnitEditor.defaultHeading")
-              }
-              state={reservationUnitState}
-            />
+            <>
+              <DenseVerticalFlex>
+                <HorisontalFlex style={{ justifyContent: "space-between" }}>
+                  <H1>
+                    {state.reservationUnitEdit.nameFi ||
+                      t("ReservationUnitEditor.defaultHeading")}
+                  </H1>
+                  <span>{reservationUnitState}</span>
+                </HorisontalFlex>
+                <div
+                  style={{
+                    lineHeight: "24px",
+                    fontSize: "var(--fontsize-heading-s)",
+                  }}
+                >
+                  <div>
+                    <Strong>{state.unit.nameFi}</Strong>
+                  </div>
+                  {state.unit.location ? (
+                    <span>{parseAddress(state.unit.location)}</span>
+                  ) : null}
+                </div>
+              </DenseVerticalFlex>
+            </>
           ) : null}
           <FormErrorSummary
             fieldNamePrefix="ReservationUnitEditor.label."
@@ -590,12 +619,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             ]}
           />
 
-          <Editor key={JSON.stringify(state.validationErrors)}>
+          <div key={JSON.stringify(state.validationErrors)}>
             <Accordion
               initiallyOpen
               heading={t("ReservationUnitEditor.basicInformation")}
             >
-              <EditorGrid>
+              <Grid>
                 <Span12>
                   <FieldGroup
                     id="reservationKind"
@@ -785,13 +814,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     tooltipText={t("ReservationUnitEditor.tooltip.minPersons")}
                   />
                 </Span4>
-              </EditorGrid>
+              </Grid>
             </Accordion>
             <Accordion
               initiallyOpen={state.validationErrors != null}
               heading={t("ReservationUnitEditor.typesProperties")}
             >
-              <EditorGrid>
+              <Grid>
                 <Span6>
                   <Select
                     sort
@@ -924,14 +953,14 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     }
                   />
                 </Span12>
-              </EditorGrid>
+              </Grid>
             </Accordion>
             {onlyForDirect && (
               <Accordion
                 initiallyOpen={state.validationErrors != null}
                 heading={t("ReservationUnitEditor.settings")}
               >
-                <EditorGrid>
+                <Grid>
                   <Span12>
                     <FieldGroup
                       heading={t("ReservationUnitEditor.publishingSettings")}
@@ -1398,14 +1427,14 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       />
                     </FieldGroup>
                   </Span12>
-                </EditorGrid>
+                </Grid>
               </Accordion>
             )}
             <Accordion
               initiallyOpen={state.validationErrors != null}
               heading={t("ReservationUnitEditor.label.pricings")}
             >
-              <EditorGrid>
+              <Grid>
                 <Span12>
                   <FieldGroup
                     id="pricings"
@@ -1498,14 +1527,14 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     )}
                   </Span12>
                 </Span12>
-              </EditorGrid>
+              </Grid>
             </Accordion>
             {onlyForDirect && (
               <Accordion
                 initiallyOpen={state.validationErrors != null}
                 heading={t("ReservationUnitEditor.termsInstructions")}
               >
-                <EditorGrid>
+                <Grid>
                   {["serviceSpecific", "payment", "cancellation"].map(
                     (name) => {
                       const options = get(state, `${name}TermsOptions`);
@@ -1567,7 +1596,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       </Span12>
                     );
                   })}
-                </EditorGrid>
+                </Grid>
               </Accordion>
             )}
             <Accordion
@@ -1821,8 +1850,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             >
               {t("ReservationUnitEditor.archive")}
             </ArchiveButton>
-          </Editor>
-        </ContentContainer>
+          </div>
+        </Container>
       </MainMenuWrapper>
       <ButtonsStripe>
         <WhiteButton

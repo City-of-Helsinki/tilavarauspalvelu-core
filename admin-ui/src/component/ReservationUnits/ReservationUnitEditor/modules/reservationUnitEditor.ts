@@ -1,12 +1,7 @@
 import styled from "styled-components";
 import { Accordion, Button } from "hds-react";
 import { H4 } from "common/src/common/typography";
-import { Grid, Span4 as DefaultSpan4 } from "../../../../styles/layout";
-
-export const EditorGrid = styled(Grid)`
-  margin-top: var(--spacing-s);
-  padding-bottom: var(--spacing-m);
-`;
+import { Span4 as DefaultSpan4 } from "../../../../styles/layout";
 
 export const Span4 = styled(DefaultSpan4)`
   label {
@@ -16,11 +11,6 @@ export const Span4 = styled(DefaultSpan4)`
 
 export const Wrapper = styled.div`
   padding-bottom: 6em;
-`;
-
-export const Editor = styled.div`
-  margin: 0 var(--spacing-layout-xs);
-  max-width: var(--container-width-l);
 `;
 
 export const ButtonsContainer = styled.div`

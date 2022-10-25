@@ -181,19 +181,21 @@ const ApproveDialog = ({
       variant="primary"
       id="info-dialog"
       aria-labelledby="modal-header"
-      aria-describedby="modal-description"
       isOpen={isOpen}
       focusAfterCloseRef={undefined}
     >
-      <Dialog.Header
-        id="modal-header"
-        title={t("RequestedReservation.ApproveDialog.title")}
-      />
-      <DialogContent
-        reservation={reservation}
-        onAccept={onAccept}
-        onClose={onClose}
-      />
+      <VerticalFlex>
+        <Dialog.Header
+          id="modal-header"
+          title={t("RequestedReservation.ApproveDialog.title")}
+        />
+
+        <DialogContent
+          reservation={reservation}
+          onAccept={onAccept}
+          onClose={onClose}
+        />
+      </VerticalFlex>
     </Dialog>
   );
 };

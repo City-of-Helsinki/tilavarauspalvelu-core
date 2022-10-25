@@ -5,21 +5,12 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Query, QueryUnitsArgs, UnitType } from "../../common/gql-types";
 import { useNotification } from "../../context/NotificationContext";
+import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
 import { UNITS_QUERY } from "../Unit/queries";
 import withMainMenu from "../withMainMenu";
 import MyUnitCard from "./MyUnitCard";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-layout-2-xs);
-
-  padding: var(--spacing-layout-2-xs) 0 var(--spacing-layout-m)
-    var(--spacing-layout-m);
-  max-width: var(--container-width-l);
-`;
 
 const Grid = styled.div`
   display: grid;
@@ -49,7 +40,7 @@ const MyUnits = () => {
   return (
     <>
       <BreadcrumbWrapper route={["my-units"]} />
-      <Wrapper>
+      <Container>
         <div>
           <H1>{t("MyUnits.heading")}</H1>
           <p>{t("MyUnits.description")}</p>
@@ -59,7 +50,7 @@ const MyUnits = () => {
             <MyUnitCard unit={unit?.node as UnitType} />
           ))}
         </Grid>
-      </Wrapper>
+      </Container>
     </>
   );
 };

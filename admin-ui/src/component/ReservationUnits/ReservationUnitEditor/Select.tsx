@@ -51,7 +51,7 @@ const Select = ({
 
   return (
     <>
-      <div id={id} />
+      <div id={id} style={{ display: "none" }} />
       <HDSSelect
         id={id}
         clearable={clearable}

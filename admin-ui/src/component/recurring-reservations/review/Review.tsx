@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { H2 } from "common/src/common/typography";
 import { ApplicationRound as RestApplicationRoundType } from "../../../common/types";
 import { applicationRoundUrl } from "../../../common/urls";
-import { Container, Content, VerticalFlex } from "../../../styles/layout";
+import { Container, VerticalFlex } from "../../../styles/layout";
 import StatusRecommendation from "../../applications/StatusRecommendation";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
 import { ApplicationRoundType } from "../../../common/gql-types";
@@ -73,89 +73,87 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
         aliases={[{ slug: "application-round", title: applicationRound.name }]}
       />
       <Container>
-        <Content>
-          <Header>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingBottom: "var(--spacing-m)",
-              }}
-            >
-              <ApplicationRoundStatusTag
-                applicationRound={
-                  applicationRound as unknown as ApplicationRoundType
-                }
-              />
-              <div>
-                <NaviItem
-                  to={`${applicationRoundUrl(applicationRound.id)}/criteria`}
-                >
-                  {t("ApplicationRound.roundCriteria")}
-                </NaviItem>
-              </div>
-            </div>
-
-            <StyledH2>{applicationRound.name}</StyledH2>
-            <TimeframeStatus
-              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+        <Header>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingBottom: "var(--spacing-m)",
+            }}
+          >
+            <ApplicationRoundStatusTag
+              applicationRound={
+                applicationRound as unknown as ApplicationRoundType
+              }
             />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "end",
-              }}
-            >
-              <RecommendationValue>
-                <StatusRecommendation
-                  status="in_review"
-                  applicationRound={applicationRound}
-                />
-              </RecommendationValue>
-              <Button
-                onClick={() => window.open(`${window.location}/allocation`)}
+            <div>
+              <NaviItem
+                to={`${applicationRoundUrl(applicationRound.id)}/criteria`}
               >
-                {t("ApplicationRound.allocate")}
-              </Button>
+                {t("ApplicationRound.roundCriteria")}
+              </NaviItem>
             </div>
-          </Header>
-          <Tabs>
-            <Tabs.TabList>
-              <Tabs.Tab>{t("ApplicationRound.applications")}</Tabs.Tab>
-              <Tabs.Tab>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
-            </Tabs.TabList>
-            <Tabs.TabPanel>
-              <TabContent>
-                <VerticalFlex>
-                  <Filters onSearch={debouncedSearch} />
-                  <ApplicationDataLoader
-                    applicationRound={applicationRound}
-                    key={JSON.stringify({ ...search, ...sort })}
-                    filters={search}
-                    sort={sort}
-                    sortChanged={onSortChanged}
-                  />
-                </VerticalFlex>
-              </TabContent>
-            </Tabs.TabPanel>
-            <Tabs.TabPanel>
-              <TabContent>
-                <VerticalFlex>
-                  <Filters onSearch={debouncedSearch} />
-                  <ApplicationEventDataLoader
-                    applicationRound={applicationRound}
-                    key={JSON.stringify({ ...search, ...sort })}
-                    filters={search}
-                    sort={sort}
-                    sortChanged={onSortChanged}
-                  />
-                </VerticalFlex>
-              </TabContent>
-            </Tabs.TabPanel>
-          </Tabs>
-        </Content>
+          </div>
+
+          <StyledH2>{applicationRound.name}</StyledH2>
+          <TimeframeStatus
+            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+          />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "end",
+            }}
+          >
+            <RecommendationValue>
+              <StatusRecommendation
+                status="in_review"
+                applicationRound={applicationRound}
+              />
+            </RecommendationValue>
+            <Button
+              onClick={() => window.open(`${window.location}/allocation`)}
+            >
+              {t("ApplicationRound.allocate")}
+            </Button>
+          </div>
+        </Header>
+        <Tabs>
+          <Tabs.TabList>
+            <Tabs.Tab>{t("ApplicationRound.applications")}</Tabs.Tab>
+            <Tabs.Tab>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
+          </Tabs.TabList>
+          <Tabs.TabPanel>
+            <TabContent>
+              <VerticalFlex>
+                <Filters onSearch={debouncedSearch} />
+                <ApplicationDataLoader
+                  applicationRound={applicationRound}
+                  key={JSON.stringify({ ...search, ...sort })}
+                  filters={search}
+                  sort={sort}
+                  sortChanged={onSortChanged}
+                />
+              </VerticalFlex>
+            </TabContent>
+          </Tabs.TabPanel>
+          <Tabs.TabPanel>
+            <TabContent>
+              <VerticalFlex>
+                <Filters onSearch={debouncedSearch} />
+                <ApplicationEventDataLoader
+                  applicationRound={applicationRound}
+                  key={JSON.stringify({ ...search, ...sort })}
+                  filters={search}
+                  sort={sort}
+                  sortChanged={onSortChanged}
+                />
+              </VerticalFlex>
+            </TabContent>
+          </Tabs.TabPanel>
+        </Tabs>
       </Container>
     </>
   );

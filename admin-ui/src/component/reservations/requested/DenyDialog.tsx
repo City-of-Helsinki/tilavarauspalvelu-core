@@ -16,7 +16,7 @@ import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import Select from "../../ReservationUnits/ReservationUnitEditor/Select";
 import { OptionType } from "../../../common/types";
-import { SparseVerticalFlex } from "../../../styles/layout";
+import { VerticalFlex } from "../../../styles/layout";
 import { CustomDialogHeader } from "../../CustomDialogHeader";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -74,8 +74,7 @@ const DialogContent = ({
   return (
     <>
       <Dialog.Content>
-        <p id="modal-description" className="text-body" />
-        <SparseVerticalFlex>
+        <VerticalFlex>
           <Select
             required
             id="denyReason"
@@ -95,13 +94,12 @@ const DialogContent = ({
               "RequestedReservation.DenyDialog.handlingDetailsHelper"
             )}
           />
-        </SparseVerticalFlex>
+        </VerticalFlex>
       </Dialog.Content>
       <ActionButtons>
         <Button variant="secondary" onClick={onClose} theme="black">
           {t("common.prev")}
         </Button>
-
         <Button
           disabled={!denyReasonPk}
           onClick={async () => {
@@ -148,19 +146,20 @@ const DenyDialog = ({
       variant="danger"
       id="info-dialog"
       aria-labelledby="modal-header"
-      aria-describedby="modal-description"
       isOpen={isOpen}
     >
-      <CustomDialogHeader
-        id="modal-header"
-        title={t("RequestedReservation.DenyDialog.title")}
-        close={onClose}
-      />
-      <DialogContent
-        reservation={reservation}
-        onReject={onReject}
-        onClose={onClose}
-      />
+      <VerticalFlex>
+        <CustomDialogHeader
+          id="modal-header"
+          title={t("RequestedReservation.DenyDialog.title")}
+          close={onClose}
+        />
+        <DialogContent
+          reservation={reservation}
+          onReject={onReject}
+          onClose={onClose}
+        />
+      </VerticalFlex>
     </Dialog>
   );
 };

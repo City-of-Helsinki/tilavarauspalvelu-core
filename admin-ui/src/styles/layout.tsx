@@ -143,7 +143,17 @@ export const VerticalFlexNoGap = styled.div`
 VerticalFlexNoGap.displayName = "VerticalFlexNoGap";
 
 export const Container = styled.div`
-  max-width: var(--container-width-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-layout-2-xs);
+
+  max-width: var(--container-width-l);
+
+  margin: var(--spacing-layout-2-xs) var(--spacing-layout-m);
+
+  @media (max-width: ${breakpoints.m}) {
+    margin: var(--spacing-layout-2-xs);
+  }
 `;
 
 Container.displayName = "Container";

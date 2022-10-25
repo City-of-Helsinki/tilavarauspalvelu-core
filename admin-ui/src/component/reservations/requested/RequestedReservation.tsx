@@ -20,7 +20,6 @@ import {
   ReservationUnitType,
 } from "../../../common/gql-types";
 import { useNotification } from "../../../context/NotificationContext";
-import { Divider } from "../../../styles/util";
 import Loader from "../../Loader";
 import withMainMenu from "../../withMainMenu";
 import {
@@ -39,23 +38,17 @@ import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
 import { RESERVATION_QUERY, UPDATE_WORKING_MEMO } from "./queries";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
-import { HorisontalFlex, VerticalFlex } from "../../../styles/layout";
+import {
+  Container,
+  HorisontalFlex,
+  VerticalFlex,
+} from "../../../styles/layout";
 import { publicUrl } from "../../../common/const";
 import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
 import StickyHeader from "../../StickyHeader";
 import { formatDateTime } from "../../../common/util";
 import Calendar from "./Calendar";
 import UserBirthDate from "./UserBirthDate";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-layout-2-xs);
-
-  padding: var(--spacing-layout-2-xs) 0 var(--spacing-layout-m)
-    var(--spacing-layout-m);
-  max-width: var(--container-width-l);
-`;
 
 const Dot = styled.div`
   display: inline-block;
@@ -119,7 +112,7 @@ const Tagline = styled.div`
 `;
 
 const DateTime = styled.div`
-  margin-bottom: var(--spacing-l);
+  margin-bottom: var(--spacing-s);
   font-size: var(--fontsize-body-s);
 `;
 
@@ -328,6 +321,7 @@ const RequestedReservation = (): JSX.Element | null => {
           "requested-reservation",
         ]}
         aliases={[
+          { slug: "requested", title: t("breadcrumb.requested-reservations") },
           { slug: "requested-reservation", title: getName(reservation, t) },
         ]}
       />
@@ -338,20 +332,22 @@ const RequestedReservation = (): JSX.Element | null => {
           buttons={buttons}
         />
       </ShowWhenTargetInvisible>
-      <Wrapper style={{ gap: 0 }}>
-        <NameState ref={ref}>
-          <H1>{getName(reservation, t)}</H1>
-          <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
-            <Dot />
-            {t(`RequestedReservation.state.${reservation.state}`)}
-          </AlignVertically>
-        </NameState>
-        <Tagline>{reservationTagline}</Tagline>
-        <DateTime>
-          {t("RequestedReservation.createdAt")}{" "}
-          {formatDateTime(reservation.createdAt as string)}
-        </DateTime>
-        <HorisontalFlex style={{ marginBottom: "var(--spacing-l)" }}>
+      <Container>
+        <div>
+          <NameState ref={ref}>
+            <H1>{getName(reservation, t)}</H1>
+            <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
+              <Dot />
+              {t(`RequestedReservation.state.${reservation.state}`)}
+            </AlignVertically>
+          </NameState>
+          <Tagline>{reservationTagline}</Tagline>
+          <DateTime>
+            {t("RequestedReservation.createdAt")}{" "}
+            {formatDateTime(reservation.createdAt as string)}
+          </DateTime>
+        </div>
+        <HorisontalFlex style={{ marginBottom: "var(--spacing-s)" }}>
           {buttons}
         </HorisontalFlex>
         <Summary>
@@ -611,8 +607,7 @@ const RequestedReservation = (): JSX.Element | null => {
             </ApplicationDatas>
           </Accordion>
         </div>
-        <Divider />
-      </Wrapper>
+      </Container>
     </>
   );
 };

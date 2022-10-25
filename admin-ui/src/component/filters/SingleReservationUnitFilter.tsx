@@ -34,10 +34,11 @@ const SingleReservationUnitFilter = ({
 
   return (
     <SortedSelect
+      style={{ zIndex: "101" }}
       disabled={loading}
       sort
       label={t("ReservationUnitsFilter.label")}
-      placeholder={t("common.choose")}
+      placeholder={t("common.select")}
       options={options}
       value={valueOption}
       onChange={onChange}

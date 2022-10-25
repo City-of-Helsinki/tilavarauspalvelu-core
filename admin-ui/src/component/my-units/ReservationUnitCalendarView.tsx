@@ -2,7 +2,6 @@ import { useQuery } from "@apollo/client";
 import { H1 } from "common/src/common/typography";
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import styled from "styled-components";
 import { addDays, subDays } from "date-fns";
 import { intersection } from "lodash";
 import {
@@ -18,21 +17,11 @@ import withMainMenu from "../withMainMenu";
 import { UNIT_QUERY } from "./queries";
 import { parseAddress } from "../../common/util";
 import SingleReservationUnitFilter from "../filters/SingleReservationUnitFilter";
-import { EditorGrid } from "../ReservationUnits/ReservationUnitEditor/modules/reservationUnitEditor";
-import { HorisontalFlex, Span4 } from "../../styles/layout";
+import { Container, Grid, HorisontalFlex, Span4 } from "../../styles/layout";
 import ReservationUnitCalendar from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
 import { myReservationUnitUrl } from "../../common/urls";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-layout-2-xs);
-
-  padding: var(--spacing-layout-2-xs) 0 var(--spacing-layout-m)
-    var(--spacing-layout-m);
-  max-width: var(--container-width-l);
-`;
+import { publicUrl } from "../../common/const";
 
 type Params = {
   unitId: string;
@@ -86,15 +75,15 @@ const ReservationUnitCalendarView = () => {
   return (
     <>
       <BreadcrumbWrapper
-        route={["my-units", "unit"]}
+        route={[`${publicUrl}/my-units`, "unit"]}
         aliases={[{ slug: "unit", title: unit?.node?.nameFi as string }]}
       />
-      <Wrapper>
+      <Container>
         <div>
           <H1>{unit?.node?.nameFi}</H1>
           <p>{parseAddress(unit?.node?.location as LocationType)}</p>
         </div>
-        <EditorGrid>
+        <Grid>
           <Span4>
             <SingleReservationUnitFilter
               unitPk={unitId}
@@ -104,7 +93,7 @@ const ReservationUnitCalendarView = () => {
               }}
             />
           </Span4>
-        </EditorGrid>
+        </Grid>
         {reservationUnitId && (
           <>
             <HorisontalFlex style={{ justifyContent: "center" }}>
@@ -129,7 +118,7 @@ const ReservationUnitCalendarView = () => {
             />
           </>
         )}
-      </Wrapper>
+      </Container>
     </>
   );
 };
