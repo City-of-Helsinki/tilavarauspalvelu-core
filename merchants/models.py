@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -47,3 +50,116 @@ class PaymentProduct(models.Model):
 
     def __str__(self) -> str:
         return str(self.id)
+
+
+class PaymentType(models.TextChoices):
+    ON_SITE = "ON_SITE", _("On site")
+    ONLINE = "ONLINE", _("Online")
+    INVOICE = "INVOICE", _("Invoice")
+
+
+class PaymentStatus(models.TextChoices):
+    DRAFT = "DRAFT", _("Draft")
+    EXPIRED = "EXPIRED", _("Expired")
+    CANCELLED = "CANCELLED", _("Cancelled")
+    PAID = "PAID", _("Paid")
+    PAID_MANUALLY = "PAID_MANUALLY", _("Paid manually")
+    REFUNDED = "REFUNDED", _("Refunded")
+
+
+class Language(models.TextChoices):
+    FI = "fi", _("Finnish")
+    SV = "sv", _("Swedish")
+    EN = "en", _("English")
+
+
+class PaymentOrder(models.Model):
+    order_id = models.UUIDField(
+        verbose_name=_("Order ID"),
+        help_text=_("eCommerce order ID"),
+        blank=True,
+        null=True,
+    )
+    payment_id = models.CharField(
+        verbose_name=_("Payment ID"),
+        help_text=_("eCommerce payment ID"),
+        blank=True,
+        null=True,
+        max_length=128,
+    )
+    payment_type = models.CharField(
+        verbose_name=_("Payment type"),
+        blank=False,
+        null=False,
+        max_length=128,
+        choices=PaymentType.choices,
+    )
+    status = models.CharField(
+        verbose_name=_("Payment status"),
+        blank=False,
+        null=False,
+        max_length=128,
+        choices=PaymentStatus.choices,
+    )
+    price_net = models.DecimalField(
+        verbose_name=_("Net amount"),
+        max_digits=10,
+        decimal_places=2,
+    )
+
+    price_vat = models.DecimalField(
+        verbose_name=_("VAT amount"),
+        max_digits=10,
+        decimal_places=2,
+    )
+
+    price_total = models.DecimalField(
+        verbose_name=_("Total amount"),
+        max_digits=10,
+        decimal_places=2,
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name=_("Created at"), null=False, auto_now_add=True
+    )
+
+    processed_at = models.DateTimeField(
+        verbose_name=_("Processed at"), null=True, blank=True
+    )
+
+    language = models.CharField(
+        verbose_name=_("Language"),
+        blank=False,
+        null=False,
+        max_length=8,
+        choices=Language.choices,
+    )
+
+    def clean(self):
+        validation_errors = {}
+
+        failsafe_price_net = self.price_net or Decimal("0.0")
+        failsafe_price_vat = self.price_vat or Decimal("0.0")
+
+        if self.price_net is not None and self.price_net < 0.01:
+            validation_errors.setdefault("price_net", []).append(
+                _("Must be greater than 0.01")
+            )
+        if self.price_vat is not None and self.price_vat < 0:
+            validation_errors.setdefault("price_vat", []).append(
+                _("Must be greater than 0")
+            )
+        if (
+            self.price_total is not None
+            and self.price_total != failsafe_price_net + failsafe_price_vat
+        ):
+            validation_errors.setdefault("price_total", []).append(
+                _("Must be the sum of net and vat amounts")
+            )
+
+        if validation_errors:
+            raise ValidationError(validation_errors)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)

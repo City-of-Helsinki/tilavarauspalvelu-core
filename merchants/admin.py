@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from merchants.models import PaymentMerchant
+from merchants.models import PaymentMerchant, PaymentOrder
 from merchants.verkkokauppa.merchants.requests import (
     create_merchant,
     get_merchant,
@@ -92,3 +92,8 @@ class PaymentMerchantAdmin(admin.ModelAdmin):
     form = PaymentMerchantForm
     model = PaymentMerchant
     readonly_fields = ["id"]
+
+
+@admin.register(PaymentOrder)
+class PaymentOrderAdmin(admin.ModelAdmin):
+    model = PaymentOrder
