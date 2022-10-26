@@ -52,7 +52,7 @@ describe("Tilavaraus user reservations", () => {
         if ([0, 1, 2, 4].includes($i)) {
           expect($el).to.contain("Tulossa");
         } else {
-          expect($el).to.contain("Varaus käsiteltävänä");
+          expect($el).to.contain("Varaus käsittelyssä");
         }
       });
 
@@ -82,7 +82,7 @@ describe("Tilavaraus user reservations", () => {
     reservationCards()
       .eq(3)
       .find('[data-testid="reservation__card--time"]')
-      .should("contain.text", "Varaus käsiteltävänä");
+      .should("contain.text", "Varaus käsittelyssä");
 
     tab(2).click();
 
@@ -140,7 +140,7 @@ describe("Tilavaraus user reservations", () => {
     reservationInfoCard()
       .should("contain.text", "Varausnumero: 11")
       .should("contain.text", "Ke 28.4.2021 klo")
-      .should("contain.text", "Kesto: Kesto 4 t")
+      .should("contain.text", "Kesto: 4 t")
       .should(
         "contain.text",
         "Varauksen kuvaus: Reservation description - a long one with alotta text"
@@ -196,7 +196,7 @@ describe("Tilavaraus user reservations", () => {
     reservationInfoCard()
       .should("contain.text", "Varausnumero: 4")
       .should("contain.text", "Ke 28.4.2021 klo")
-      .should("contain.text", "Kesto: Kesto 4 t")
+      .should("contain.text", "Kesto: 4 t")
       .should(
         "contain.text",
         "Varauksen kuvaus: Reservation description - a long one with alotta text"

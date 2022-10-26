@@ -12,12 +12,16 @@
     }
   },
   "label": {
-    "nonprofit": {
+    "common": {
       "name": "",
       "description": "",
       "purpose": "",
       "numPersons": "",
       "ageGroup": "",
+      "applyingForFreeOfCharge": "",
+      "freeOfChargeReason": ""
+    },
+    "nonprofit": {
       "reserveeFirstName": "",
       "reserveeLastName": "",
       "reserveeAddressStreet": "",
@@ -29,8 +33,6 @@
       "reserveeId": "",
       "reserveeIsUnregisteredAssociation": "",
       "homeCity": "",
-      "applyingForFreeOfCharge": "",
-      "freeOfChargeReason": "",
       "showBillingAddress": "",
       "billingFirstName": "",
       "billingLastName": "",
@@ -41,11 +43,6 @@
       "billingAddressCity": ""
     },
     "individual": {
-      "name": "",
-      "description": "",
-      "purpose": "",
-      "numPersons": "",
-      "ageGroup": "",
       "reserveeFirstName": "",
       "reserveeLastName": "",
       "reserveeAddressStreet": "",
@@ -53,8 +50,6 @@
       "reserveeAddressCity": "",
       "reserveeEmail": "",
       "reserveePhone": "",
-      "applyingForFreeOfCharge": "",
-      "freeOfChargeReason": "",
       "showBillingAddress": "",
       "billingFirstName": "",
       "billingLastName": "",
@@ -65,11 +60,6 @@
       "billingAddressCity": ""
     },
     "business": {
-      "name": "",
-      "description": "",
-      "purpose": "",
-      "numPersons": "",
-      "ageGroup": "",
       "reserveeFirstName": "",
       "reserveeLastName": "",
       "reserveeAddressStreet": "",
@@ -80,8 +70,6 @@
       "reserveeOrganisationName": "",
       "reserveeId": "",
       "homeCity": "",
-      "applyingForFreeOfCharge": "",
-      "freeOfChargeReason": "",
       "showBillingAddress": "",
       "billingFirstName": "",
       "billingLastName": "",
@@ -90,6 +78,11 @@
       "billingAddressStreet": "",
       "billingAddressZip": "",
       "billingAddressCity": ""
+    },
+    "headings": {
+      "companyInfo": "",
+      "nonprofitInfo": "",
+      "contactInfo": ""
     }
   },
   "processLabels": {

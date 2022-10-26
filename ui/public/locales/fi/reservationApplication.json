@@ -6,31 +6,33 @@
   "reserveeTypePrefix": "Luon hakemuksen",
   "reserveeTypes": {
     "labels": {
-      "nonprofit": "yhdistyksen, järjestön, ryhmän tai yhteisön puolesta",
+      "nonprofit": "järjestön, ryhmän tai yhteisön puolesta",
       "business": "yrityksen puolesta",
       "individual": "yksityishenkilönä"
     }
   },
   "label": {
-    "nonprofit": {
+    "common": {
       "name": "Varauksen nimi (julkinen)",
       "description": "Varauksen kuvaus",
       "purpose": "Varauksen käyttötarkoitus",
       "numPersons": "Osallistujamäärä",
       "ageGroup": "Ikäryhmä",
-      "reserveeFirstName": "Varaajan etunimi",
-      "reserveeLastName": "Varaajan sukunimi",
+      "applyingForFreeOfCharge": "Haen maksutonta varausta",
+      "freeOfChargeReason": "Perusteet maksuttomaan varaukseen"
+    },
+    "nonprofit": {
+      "reserveeFirstName": "Yhteyshenkilön etunimi",
+      "reserveeLastName": "Yhteyshenkilön sukunimi",
       "reserveeAddressStreet": "Katuosoite",
       "reserveeAddressZip": "Postinumero",
       "reserveeAddressCity": "Postitoimipaikka",
-      "reserveeEmail": "Sähköpostiosoite",
-      "reserveePhone": "Puhelinnumero",
-      "reserveeOrganisationName": "Yhdistyksen virallinen nimi",
+      "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
+      "reserveePhone": "Yhteyshenkilön puhelinnumero",
+      "reserveeOrganisationName": "Virallinen nimi",
       "reserveeId": "Y-tunnus",
       "reserveeIsUnregisteredAssociation": "Yhdistystä ei ole rekisteröity",
-      "homeCity": "Kotikunta",
-      "applyingForFreeOfCharge": "Haen maksutonta varausta",
-      "freeOfChargeReason": "Perusteet maksuttomaan varaukseen",
+      "homeCity": "Kotipaikka",
       "showBillingAddress": "Erillinen laskutusosoite",
       "billingFirstName": "Varaajan etunimi",
       "billingLastName": "Varaajan sukunimi",
@@ -41,20 +43,13 @@
       "billingAddressCity": "Postitoimipaikka"
     },
     "individual": {
-      "name": "Varauksen nimi (julkinen)",
-      "description": "Varauksen kuvaus",
-      "purpose": "Varauksen käyttötarkoitus",
-      "numPersons": "Osallistujamäärä",
-      "ageGroup": "Ikäryhmä",
-      "reserveeFirstName": "Varaajan etunimi",
-      "reserveeLastName": "Varaajan sukunimi",
+      "reserveeFirstName": "Etunimi",
+      "reserveeLastName": "Sukunimi",
       "reserveeAddressStreet": "Katuosoite",
       "reserveeAddressZip": "Postinumero",
       "reserveeAddressCity": "Postitoimipaikka",
       "reserveeEmail": "Sähköpostiosoite",
       "reserveePhone": "Puhelinnumero",
-      "applyingForFreeOfCharge": "Haen maksutonta varausta",
-      "freeOfChargeReason": "Perusteet maksuttomaan varaukseen",
       "showBillingAddress": "Erillinen laskutusosoite",
       "billingFirstName": "Varaajan etunimi",
       "billingLastName": "Varaajan sukunimi",
@@ -65,23 +60,16 @@
       "billingAddressCity": "Postitoimipaikka"
     },
     "business": {
-      "name": "Varauksen nimi (julkinen)",
-      "description": "Varauksen kuvaus",
-      "purpose": "Varauksen käyttötarkoitus",
-      "numPersons": "Osallistujamäärä",
-      "ageGroup": "Ikäryhmä",
-      "reserveeFirstName": "Varaajan etunimi",
-      "reserveeLastName": "Varaajan sukunimi",
+      "reserveeFirstName": "Yhteyshenkilön etunimi",
+      "reserveeLastName": "Yhteyshenkilön sukunimi",
       "reserveeAddressStreet": "Katuosoite",
       "reserveeAddressZip": "Postinumero",
       "reserveeAddressCity": "Postitoimipaikka",
-      "reserveeEmail": "Sähköpostiosoite",
-      "reserveePhone": "Puhelinnumero",
-      "reserveeOrganisationName": "Yrityksen virallinen nimi",
+      "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
+      "reserveePhone": "Yhteyshenkilön puhelinnumero",
+      "reserveeOrganisationName": "Virallinen nimi",
       "reserveeId": "Y-tunnus",
-      "homeCity": "Kotikunta",
-      "applyingForFreeOfCharge": "Haen maksutonta varausta",
-      "freeOfChargeReason": "Perusteet maksuttomaan varaukseen",
+      "homeCity": "Kotipaikka",
       "showBillingAddress": "Erillinen laskutusosoite",
       "billingFirstName": "Varaajan etunimi",
       "billingLastName": "Varaajan sukunimi",
@@ -90,12 +78,17 @@
       "billingAddressStreet": "Katuosoite",
       "billingAddressZip": "Postinumero",
       "billingAddressCity": "Postitoimipaikka"
+    },
+    "headings": {
+      "companyInfo": "Yrityksen tiedot",
+      "nonprofitInfo": "Yhdistyksen tiedot",
+      "contactInfo": "Yhteyshenkilön tiedot"
     }
   },
   "processLabels": {
-    "handlingRequired": "Varaus käsiteltävänä"
+    "handlingRequired": "Varaus käsittelyssä"
   },
   "errors": {
-    "noFormType": "Täytä ensin lomake"
+    "noFormType": "Valitse hakijan tyyppi"
   }
 }

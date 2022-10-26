@@ -597,6 +597,9 @@ describe("isReservationUnitReservable", () => {
         maxReservationDuration: 3600,
         reservationBegins: addMinutes(new Date(), -10),
         openingHours,
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(true);
 
@@ -606,6 +609,9 @@ describe("isReservationUnitReservable", () => {
         maxReservationDuration: 3600,
         reservationEnds: addMinutes(new Date(), 10),
         openingHours,
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(true);
 
@@ -616,6 +622,9 @@ describe("isReservationUnitReservable", () => {
         reservationBegins: addMinutes(new Date(), -10),
         reservationEnds: addMinutes(new Date(), 10),
         openingHours,
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(true);
 
@@ -624,6 +633,9 @@ describe("isReservationUnitReservable", () => {
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
         openingHours,
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(true);
   });
@@ -633,18 +645,27 @@ describe("isReservationUnitReservable", () => {
       isReservationUnitReservable({
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
         reservationBegins: addMinutes(new Date(), 10),
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
         reservationEnds: addMinutes(new Date(), -10),
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(false);
 
@@ -652,6 +673,9 @@ describe("isReservationUnitReservable", () => {
       isReservationUnitReservable({
         reservationBegins: addMinutes(new Date(), -10),
         reservationEnds: addMinutes(new Date(), -1),
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(false);
   });
@@ -664,6 +688,9 @@ describe("isReservationUnitReservable", () => {
         reservationBegins: addDays(new Date(), 5),
         reservationsMaxDaysBefore: 5,
         openingHours,
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(true);
 
@@ -671,6 +698,9 @@ describe("isReservationUnitReservable", () => {
       isReservationUnitReservable({
         reservationBegins: addDays(new Date(), 5),
         reservationsMaxDaysBefore: 4,
+        metadataSet: {
+          supportedFields: ["name"],
+        },
       } as ReservationUnitByPkType)
     ).toBe(false);
   });

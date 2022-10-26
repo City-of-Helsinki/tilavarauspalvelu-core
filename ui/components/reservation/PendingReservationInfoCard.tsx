@@ -1,11 +1,10 @@
 import { getReservationPrice } from "common";
 import { breakpoints } from "common/src/common/style";
-import { H4 } from "common/src/common/typography";
 import { differenceInMinutes, parseISO } from "date-fns";
-import { trim } from "lodash";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { H4, Strong } from "common/src/common/typography";
 import {
   ReservationType,
   ReservationUnitByPkType,
@@ -24,7 +23,7 @@ type Props = {
 };
 
 const Wrapper = styled.div`
-  background-color: var(--color-silver-light);
+  background-color: var(--color-gold-light);
 `;
 
 const MainImage = styled.img`
@@ -51,7 +50,7 @@ const Value = styled.div`
   margin-bottom: var(--spacing-s);
 `;
 
-const ReservationInfoCard = ({
+const PendingReservationInfoCard = ({
   reservation,
   reservationUnit,
 }: Props): JSX.Element => {
@@ -77,28 +76,13 @@ const ReservationInfoCard = ({
 
   const duration = differenceInMinutes(new Date(end), new Date(begin));
 
-  const timeString = trim(
-    `${beginDate} ${beginTime} - ${
-      endDate !== beginDate ? endDate : ""
-    }${endTime}`,
-    " - "
-  );
+  const timeString = `${beginDate} ${beginTime} - ${
+    endDate !== beginDate ? endDate : ""
+  }${endTime}`;
 
   const mainImage = getMainImage(reservationUnit);
 
-  const heading = trim(
-    `${reservation.name} / ${getTranslation(reservationUnit, "name")}`,
-    " / "
-  );
-
-  const ageGroup = trim(
-    `${reservation.ageGroup?.minimum || ""} - ${
-      reservation.ageGroup?.maximum || ""
-    }`,
-    " - "
-  );
-
-  const purpose = getTranslation(reservation.purpose, "name");
+  const heading = getTranslation(reservationUnit, "name");
 
   return (
     <Wrapper>
@@ -110,39 +94,26 @@ const ReservationInfoCard = ({
       )}
       <Content data-testid="reservation__reservation-info-card__content">
         <Heading>{heading}</Heading>
+        <Value>{getTranslation(reservationUnit, "name")}</Value>
         <Value>
-          {t("reservations:reservationNumber")}: {reservation.pk}
-        </Value>
-        <Value>{capitalize(timeString)}</Value>
-        <Value>
-          {t("reservationCalendar:duration")}: {formatDurationMinutes(duration)}
+          {getTranslation(reservationUnit?.unit?.location, "addressStreet")}
         </Value>
         <Value>
-          {t("reservationCalendar:label.description")}:{" "}
-          {reservation.description}
+          <Strong>{capitalize(timeString)}</Strong>
+        </Value>
+        <Value>
+          {t("reservationCalendar:duration")}:{" "}
+          <Strong>{formatDurationMinutes(duration)}</Strong>
         </Value>
         <Value>
           {t("reservationUnit:price")}:{" "}
-          {getReservationPrice(reservation.price, t("prices:priceFree"))}
+          <Strong>
+            {getReservationPrice(reservation.price, t("prices:priceFree"))}
+          </Strong>
         </Value>
-        {purpose && (
-          <Value>
-            {t("reservations:purpose")}: {purpose}
-          </Value>
-        )}
-        {ageGroup && (
-          <Value>
-            {t("reservations:ageGroup")}: {ageGroup}
-          </Value>
-        )}
-        {reservation.numPersons > 0 && (
-          <Value>
-            {t("reservations:numPersons")}: {reservation.numPersons}
-          </Value>
-        )}
       </Content>
     </Wrapper>
   );
 };
 
-export default ReservationInfoCard;
+export default PendingReservationInfoCard;

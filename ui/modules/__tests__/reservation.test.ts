@@ -1,5 +1,8 @@
 import { get as mockGet } from "lodash";
-import { ReservationType } from "../gql-types";
+import {
+  ReservationsReservationReserveeTypeChoices,
+  ReservationType,
+} from "../gql-types";
 import {
   canUserCancelReservation,
   getDurationOptions,
@@ -159,40 +162,59 @@ describe("canUseCancelReservation", () => {
 
 describe("getReservationApplicationFields", () => {
   test("with emrty input", () => {
-    expect(getReservationApplicationFields([], "individual")).toEqual([]);
+    expect(
+      getReservationApplicationFields(
+        [],
+        ReservationsReservationReserveeTypeChoices.Individual
+      )
+    ).toEqual([]);
   });
 
   const fields = ["reservee_id", "reservee_organisation_name", "name"];
 
   test("with individual input", () => {
-    expect(getReservationApplicationFields(fields, "individual")).toEqual([
-      "name",
-    ]);
+    expect(
+      getReservationApplicationFields(
+        fields,
+        ReservationsReservationReserveeTypeChoices.Individual
+      )
+    ).toEqual([]);
+  });
+
+  test("with common input", () => {
+    expect(getReservationApplicationFields(fields, "common")).toEqual(["name"]);
   });
 
   test("with business input", () => {
-    expect(getReservationApplicationFields(fields, "business")).toEqual([
-      "name",
-      "reservee_organisation_name",
-      "reservee_id",
-    ]);
+    expect(
+      getReservationApplicationFields(
+        fields,
+        ReservationsReservationReserveeTypeChoices.Business
+      )
+    ).toEqual(["reservee_organisation_name", "reservee_id"]);
   });
 
   test("with nonprofit input, camelCased", () => {
-    expect(getReservationApplicationFields(fields, "nonprofit", true)).toEqual([
-      "name",
-      "reserveeOrganisationName",
-      "reserveeId",
-    ]);
+    expect(
+      getReservationApplicationFields(
+        fields,
+        ReservationsReservationReserveeTypeChoices.Nonprofit,
+        true
+      )
+    ).toEqual(["reserveeOrganisationName", "reserveeId"]);
   });
 });
 
 describe("getReservationApplcationMutationValues", () => {
   test("with empty input", () => {
     expect(
-      getReservationApplicationMutationValues({}, [], "individual")
+      getReservationApplicationMutationValues(
+        {},
+        [],
+        ReservationsReservationReserveeTypeChoices.Individual
+      )
     ).toEqual({
-      reserveeType: "individual",
+      reserveeType: ReservationsReservationReserveeTypeChoices.Individual,
     });
   });
 
@@ -206,12 +228,12 @@ describe("getReservationApplcationMutationValues", () => {
       getReservationApplicationMutationValues(
         payload,
         ["name", "reservee_id", "reservee_first_name"],
-        "individual"
+        ReservationsReservationReserveeTypeChoices.Individual
       )
     ).toEqual({
       name: "Nimi",
       reserveeFirstName: "Etunimi",
-      reserveeType: "individual",
+      reserveeType: ReservationsReservationReserveeTypeChoices.Individual,
     });
   });
 });

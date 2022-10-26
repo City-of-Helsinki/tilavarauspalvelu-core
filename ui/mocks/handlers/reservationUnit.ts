@@ -363,6 +363,22 @@ const selectedReservationUnitQuery = graphql.query<
       textFi: "Peruutusehdot Fi",
       termsType: TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms,
     },
+    metadataSet: {
+      id: "f4089wfjeakrf",
+      name: "Initial",
+      supportedFields: [
+        "reservee_first_name",
+        "reservee_last_name",
+        "description",
+        "name",
+      ],
+      requiredFields: [
+        "reservee_first_name",
+        "reservee_last_name",
+        "description",
+        "name",
+      ],
+    },
   };
 
   if (req.variables.pk === 800) {
@@ -418,13 +434,6 @@ const selectedReservationUnitQuery = graphql.query<
         "reservee_address_street",
         "reservee_address_city",
         "reservee_address_zip",
-        "billing_first_name",
-        "billing_last_name",
-        "billing_phone",
-        "billing_email",
-        "billing_address_street",
-        "billing_address_city",
-        "billing_address_zip",
         "home_city",
         "age_group",
         "applying_for_free_of_charge",

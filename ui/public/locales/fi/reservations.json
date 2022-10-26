@@ -34,7 +34,7 @@
   "reservationCancelledBody": "Varauksesi on nyt peruutettu. Voit tarkistaa maksu- ja peruutusehdot kohteen esittelystä. Ole tarvittaessa yhteydessä meihin. Yhteystiedot löydät varausvahvistuksesta.",
   "reservationCancellationFailed": "Varauksen peruuttaminen epäonnistui",
   "makeNewReservation": "Tee uusi varaus samaan tilaan",
-  "reservationInfo": "Lisätietoa varauksestasi",
+  "reservationInfo": "Tietoa varauksestasi",
   "gotoReservations": "Siirry omiin varauksiin",
   "reservationDuration": "Varaus {{duration}}",
   "noUpcomingReservations": "Ei tulevia varauksia",
@@ -54,5 +54,14 @@
   "contactName": "Yhteyshenkilön nimi",
   "contactPhone": "Yhteyshenkilön puhelinnumero",
   "contactEmail": "Yhteyshenkilön sähköposti",
-  "saveToCalendar": "Tallenna kalenteriin"
+  "saveToCalendar": "Tallenna kalenteriin",
+  "reservationInfoBoxHeading": "Huomioi varatessa",
+  "reservationInfoBoxContent": "<p>Varmista tarvittaessa yhteysaluksen liikennöinti ennen varauksen tekoa.</p><p>Huomaathan, että vahvistetun varauksen ajankohdan tai keston muuttaminen ei ole mahdollista. Peruutukset peruutusehtojemme mukaisesti.</p><p>Jos teet varauksen samalla päivälle, ilmoitathan siitä aina myös puhelimitse henkilökunnalle.</p>",
+  "steps": {
+    "1": "Varaustiedot",
+    "2": "Tarkistus",
+    "3": "Maksutapa",
+    "4": "Maksun yhteenveto",
+    "5": "Maksu"
+  }
 }

@@ -16,7 +16,6 @@
   "showView": "",
   "initialReservation": "",
   "makeReservation": "",
-  "newReservation": "",
   "reserverInfo": "",
   "reservationInfo": "",
   "notification": {
@@ -37,7 +36,9 @@
   },
   "heading": {
     "termsOfUse": "",
-    "resourceTerms": ""
+    "resourceTerms": "",
+    "newReservation": "",
+    "pendingReservation": ""
   },
   "saveReservation": "",
   "selectedTime": "",

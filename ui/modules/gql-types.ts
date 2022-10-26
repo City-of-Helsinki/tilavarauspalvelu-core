@@ -616,6 +616,7 @@ export type ApplicationType = Node & {
   applicantName?: Maybe<Scalars["String"]>;
   applicantPk?: Maybe<Scalars["Int"]>;
   applicantType?: Maybe<ApplicationsApplicationApplicantTypeChoices>;
+  applicantUser?: Maybe<UserType>;
   applicationEvents?: Maybe<Array<Maybe<ApplicationEventType>>>;
   applicationRound: ApplicationRoundType;
   billingAddress?: Maybe<AddressType>;
@@ -5181,6 +5182,26 @@ export const ReservationByPkDocument = gql`
           smallUrl
           imageType
         }
+        lowestPrice
+        highestPrice
+        priceUnit
+        pricingType
+        taxPercentage {
+          value
+        }
+        pricings {
+          begins
+          priceUnit
+          pricingType
+          lowestPrice
+          highestPrice
+          taxPercentage {
+            value
+          }
+          status
+        }
+        minPersons
+        maxPersons
       }
       purpose {
         pk
@@ -6475,6 +6496,12 @@ export type ReservationByPkQuery = {
       termsOfUseFi?: string | null;
       termsOfUseEn?: string | null;
       termsOfUseSv?: string | null;
+      lowestPrice: any;
+      highestPrice: any;
+      priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
+      pricingType?: ReservationUnitsReservationUnitPricingTypeChoices | null;
+      minPersons?: number | null;
+      maxPersons?: number | null;
       serviceSpecificTerms?: {
         __typename?: "TermsOfUseType";
         textFi?: string | null;
@@ -6541,6 +6568,17 @@ export type ReservationByPkQuery = {
         mediumUrl?: string | null;
         smallUrl?: string | null;
         imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
+      } | null> | null;
+      taxPercentage?: { __typename?: "TaxPercentageType"; value: any } | null;
+      pricings?: Array<{
+        __typename?: "ReservationUnitPricingType";
+        begins: any;
+        priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices;
+        pricingType?: ReservationUnitsReservationUnitPricingPricingTypeChoices | null;
+        lowestPrice: any;
+        highestPrice: any;
+        status: ReservationUnitsReservationUnitPricingStatusChoices;
+        taxPercentage: { __typename?: "TaxPercentageType"; value: any };
       } | null> | null;
     } | null> | null;
     purpose?: {

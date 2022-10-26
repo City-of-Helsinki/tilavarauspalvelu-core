@@ -2,7 +2,10 @@ import { isAfter } from "date-fns";
 import camelCase from "lodash/camelCase";
 import { convertHMSToSeconds, secondsToHms } from "common/src/common/util";
 import { OptionType } from "common/types/common";
-import { ReservationType } from "./gql-types";
+import {
+  ReservationsReservationReserveeTypeChoices,
+  ReservationType,
+} from "./gql-types";
 
 export const getDurationOptions = (
   minReservationDuration: number,
@@ -63,11 +66,6 @@ export type ReserveeType = "individual" | "nonprofit" | "business";
 
 const reservationApplicationFields = {
   individual: [
-    "name",
-    "description",
-    "purpose",
-    "num_persons",
-    "age_group",
     "reservee_first_name",
     "reservee_last_name",
     "reservee_address_street",
@@ -75,8 +73,6 @@ const reservationApplicationFields = {
     "reservee_address_city",
     "reservee_email",
     "reservee_phone",
-    "applying_for_free_of_charge",
-    "free_of_charge_reason",
     "billing_first_name",
     "billing_last_name",
     "billing_phone",
@@ -86,11 +82,10 @@ const reservationApplicationFields = {
     "billing_address_city",
   ],
   nonprofit: [
-    "name",
-    "description",
-    "purpose",
-    "num_persons",
-    "age_group",
+    "reservee_organisation_name",
+    "home_city",
+    "reservee_is_unregistered_association",
+    "reservee_id",
     "reservee_first_name",
     "reservee_last_name",
     "reservee_address_street",
@@ -98,12 +93,6 @@ const reservationApplicationFields = {
     "reservee_address_city",
     "reservee_email",
     "reservee_phone",
-    "reservee_organisation_name",
-    "reservee_id",
-    "reservee_is_unregistered_association",
-    "home_city",
-    "applying_for_free_of_charge",
-    "free_of_charge_reason",
     "billing_first_name",
     "billing_last_name",
     "billing_phone",
@@ -113,11 +102,9 @@ const reservationApplicationFields = {
     "billing_address_city",
   ],
   business: [
-    "name",
-    "description",
-    "purpose",
-    "num_persons",
-    "age_group",
+    "reservee_organisation_name",
+    "home_city",
+    "reservee_id",
     "reservee_first_name",
     "reservee_last_name",
     "reservee_address_street",
@@ -125,11 +112,6 @@ const reservationApplicationFields = {
     "reservee_address_city",
     "reservee_email",
     "reservee_phone",
-    "reservee_organisation_name",
-    "reservee_id",
-    "home_city",
-    "applying_for_free_of_charge",
-    "free_of_charge_reason",
     "billing_first_name",
     "billing_last_name",
     "billing_phone",
@@ -138,19 +120,29 @@ const reservationApplicationFields = {
     "billing_address_zip",
     "billing_address_city",
   ],
-  common: ["reservee_type"],
+  common: [
+    "reservee_type",
+    "name",
+    "purpose",
+    "num_persons",
+    "age_group",
+    "description",
+    "applying_for_free_of_charge",
+    "free_of_charge_reason",
+  ],
 };
 
 export const getReservationApplicationFields = (
   supportedFields: string[],
-  reserveeType: ReserveeType,
+  reserveeType: ReservationsReservationReserveeTypeChoices | "common",
   camelCaseOutput = false
 ): string[] => {
-  if (supportedFields.length === 0 || !reserveeType) return [];
+  if (!supportedFields || supportedFields?.length === 0 || !reserveeType)
+    return [];
 
-  const fields = reservationApplicationFields[reserveeType].filter((field) =>
-    supportedFields.includes(field)
-  );
+  const fields = reservationApplicationFields[
+    reserveeType.toLocaleLowerCase()
+  ].filter((field) => supportedFields.includes(field));
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fields.length; i++) {
@@ -166,7 +158,7 @@ export const getReservationApplicationFields = (
 export const getReservationApplicationMutationValues = (
   payload: Record<string, string | number | boolean>,
   supportedFields: string[],
-  reserveeType: ReserveeType
+  reserveeType: ReservationsReservationReserveeTypeChoices
 ): Record<string, string | number | boolean> => {
   const result = { reserveeType };
   const intValues = ["numPersons"];
@@ -180,12 +172,19 @@ export const getReservationApplicationMutationValues = (
     reserveeType
   ).map(camelCase);
 
-  fields.forEach((field: string) => {
+  const commonFields = getReservationApplicationFields(
+    supportedFields,
+    "common"
+  ).map(camelCase);
+
+  [...fields, ...commonFields].forEach((field: string) => {
     const key = changes.find((c) => c.field === field)?.mutationField || field;
     result[key as string] = intValues.includes(field)
       ? Number(payload[field])
       : payload[field];
   });
+
+  result.reserveeType = reserveeType;
 
   return result;
 };

@@ -25,7 +25,8 @@ export const getPrice = (
     | ReservationUnitByPkType
     | ReservationUnitPricingType,
   minutes?: number, // additional minutes for total price calculation
-  trailingZeros = false
+  trailingZeros = false,
+  asInt = false
 ): string => {
   const unit = reservationUnit.priceUnit;
   const type = reservationUnit.pricingType;
@@ -58,7 +59,7 @@ export const getPrice = (
     return trim(`${price} / ${unitStr}`, " / ");
   }
 
-  return i18n.t("prices:priceFree");
+  return asInt ? "0" : i18n.t("prices:priceFree");
 };
 
 export const isReservationUnitPublished = (
@@ -277,7 +278,8 @@ export const getReservationUnitPrice = (
   reservationUnit: ReservationUnitByPkType,
   date?: Date,
   minutes?: number,
-  trailingZeros = false
+  trailingZeros = false,
+  asInt = false
 ): string => {
   if (!reservationUnit) return null;
 
@@ -285,5 +287,5 @@ export const getReservationUnitPrice = (
     ? getFuturePricing(reservationUnit, [], date) || reservationUnit
     : reservationUnit;
 
-  return getPrice(pricing, minutes, trailingZeros);
+  return getPrice(pricing, minutes, trailingZeros, asInt);
 };

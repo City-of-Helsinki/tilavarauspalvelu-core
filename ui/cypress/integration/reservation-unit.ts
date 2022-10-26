@@ -8,6 +8,10 @@ import {
 } from "model/calendar";
 import { error404Body, error404Title } from "model/error";
 import {
+  errorNotificationBody,
+  errorNotificationTitle,
+} from "model/notification";
+import {
   dateSelect,
   durationSelect,
   nextAvailableTimeLink,
@@ -27,7 +31,7 @@ import {
   reservationTitle,
   updateButton,
   cancelButton,
-  calendarUrlLink,
+  calendarUrlButton,
   reservationInfoPrice,
   dateSelector,
   reservationEvent,
@@ -36,6 +40,7 @@ import {
   reservationStartNotification,
   calendarWrapper,
   reservationQuotaNotification,
+  reserveeTypeSelector,
 } from "model/reservation-creation";
 import { reservationInfoCard } from "model/reservation-detail";
 import { ticket } from "model/reservation-list";
@@ -196,26 +201,28 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
       reservationSubmitButton().click();
 
-      const form1 = [
+      const form1Top = [
+        { label: "name", value: "Varaus" },
+        { label: "description", value: "Kuvaus", type: "textarea" },
+      ];
+
+      const form1Bottom = [
         { label: "reserveeFirstName", value: "Etunimi" },
         { label: "reserveeLastName", value: "Sukunimi" },
-        { label: "reserveePhone", value: "+3581234567" },
-        { label: "name", value: "Varaus" },
-        { label: "description", value: "Kuvaus" },
       ];
 
       const form2 = [{ label: "spaceTerms" }, { label: "resourceTerms" }];
 
       updateButton().click();
-      form1.forEach((field) => {
+      form1Top.forEach((field) => {
         cy.get(`#${field.label}-error`).should("exist");
       });
 
-      form1.forEach((field) => {
-        formField(field.label).type(field.value);
+      form1Top.forEach((field) => {
+        formField(field.label, field.type).type(field.value);
       });
 
-      form1.forEach((field) => {
+      form1Top.forEach((field) => {
         cy.get(`#${field.label}-error`).should("not.exist");
       });
 
@@ -223,88 +230,51 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
       updateButton().click();
 
-      form2.forEach((field) => {
+      errorNotificationTitle().should(
+        "contain.text",
+        "Varauksen päivitys epäonnistui"
+      );
+      errorNotificationBody().should("contain.text", "Valitse hakijan tyyppi");
+
+      reserveeTypeSelector(1).click();
+
+      form1Bottom.forEach((field) => {
         formField(field.label).click();
       });
 
       updateButton().click();
+      form1Bottom.forEach((field) => {
+        cy.get(`#${field.label}-error`).should("exist");
+      });
 
-      calendarUrlLink()
-        .invoke("attr", "href")
-        .should("eq", "http://calendarUrl/42");
+      form1Bottom.forEach((field) => {
+        formField(field.label).type(field.value);
+      });
 
-      cy.contains("h3", "Lisätietoa varauksestasi").should("be.visible");
+      form1Bottom.forEach((field) => {
+        cy.get(`#${field.label}-error`).should("not.exist");
+      });
+
+      updateButton().click();
+
+      form2.forEach((field) => {
+        const input = formField(field.label);
+        input.should("exist");
+        input.click();
+      });
+
+      form2.forEach((field) => {
+        cy.get(`#${field.label}-error`).should("not.exist");
+      });
+
+      updateButton().click();
+
+      cy.contains("h4", "Tietoa varauksestasi").should("be.visible");
       cy.contains("p", "Confirmed Instructions FI").should("be.visible");
 
-      confirmationParagraph()
-        .eq(0)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varauksen nimi (julkinen)")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", form1[3].value);
+      cy.contains("button", "Palaa Varaamon etusivulle");
 
-      confirmationParagraph()
-        .eq(1)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varaaja")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", `${form1[0].value} ${form1[1].value}`);
-
-      confirmationParagraph()
-        .eq(2)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varauksen kuvaus")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", form1[4].value);
-
-      confirmationParagraph()
-        .eq(3)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varauksen ajankohta")
-        .parent()
-        .find("span")
-        .eq(1)
-        .invoke("text")
-        .then((text) => {
-          reservationConfirmationTimeRange().should("contain.text", text);
-        });
-
-      confirmationParagraph()
-        .eq(4)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Tila")
-        .parent()
-        .find("span")
-        .eq(1)
-        .invoke("text")
-        .then((text) => {
-          reservationTitle().should("have.text", text);
-        });
-
-      confirmationParagraph()
-        .eq(5)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Puhelin")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", form1[2].value);
-
-      cy.contains("button", "Siirry omiin varauksiin").click();
-
-      cy.url().should("contain", "/reservations");
+      calendarUrlButton().should("exist");
 
       cy.checkA11y(null, null, null, true);
     });
@@ -535,11 +505,13 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       price("desktop").should("contain.text", "Hinta: 120 - 300\u00a0€");
       submitButton("desktop").should("not.be.disabled").click();
 
-      cy.get("main#main").should("contain.text", "Uusi varaus");
+      cy.get("main#main").should("contain.text", "Täytä varauksen tiedot");
 
-      ticket().should("contain.text", "Pukinmäen nuorisotalon keittiö");
-      ticket().should("contain.text", "(Kesto 1 t 30 min)");
-      ticket().should("contain.text", "Varaus 1 t 30 min");
+      reservationInfoCard().should(
+        "contain.text",
+        "Pukinmäen nuorisotalon keittiö"
+      );
+      reservationInfoCard().should("contain.text", "1 t 30 min");
     });
   });
 
@@ -684,10 +656,18 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
       reservationSubmitButton().click();
 
-      reserveeTypeNonprofitButton().click({ force: true });
+      ["freeOfChargeReason"].forEach((field) => {
+        cy.get(`#${field}`).should("not.be.visible");
+      });
+      // reserveeTypeNonprofitButton().click({ force: true });
+      reserveeTypeSelector(1).click();
 
       cy.get("#applyingForFreeOfCharge").click();
-      cy.get("#showBillingAddress").click();
+      ["freeOfChargeReason"].forEach((field) => {
+        cy.get(`#${field}`).should("exist");
+      });
+
+      reserveeTypeSelector(0).click();
       [
         "name",
         "description",
@@ -701,51 +681,14 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         "reserveeAddressCity",
         "reserveeEmail",
         "reserveePhone",
-        "reserveeOrganisationName",
-        "reserveeId",
-        "reserveeIsUnregisteredAssociation",
-        "homeCity-toggle-button",
         "applyingForFreeOfCharge",
         "freeOfChargeReason",
-        "billingFirstName",
-        "billingLastName",
-        "billingPhone",
-        "billingEmail",
-        "billingAddressStreet",
-        "billingAddressZip",
-        "billingAddressCity",
       ].forEach((field) => {
         cy.get(`#${field}`).should("exist");
       });
 
-      reserveeTypeIndividualButton().click({ force: true });
-      [
-        "name",
-        "description",
-        "purpose-toggle-button",
-        "numPersons",
-        "ageGroup-toggle-button",
-        "reserveeFirstName",
-        "reserveeLastName",
-        "reserveeAddressStreet",
-        "reserveeAddressZip",
-        "reserveeAddressCity",
-        "reserveeEmail",
-        "reserveePhone",
-        "applyingForFreeOfCharge",
-        "freeOfChargeReason",
-        "billingFirstName",
-        "billingLastName",
-        "billingPhone",
-        "billingEmail",
-        "billingAddressStreet",
-        "billingAddressZip",
-        "billingAddressCity",
-      ].forEach((field) => {
-        cy.get(`#${field}`).should("exist");
-      });
+      reserveeTypeSelector(2).click();
 
-      reserveeTypeBusinessButton().click({ force: true });
       [
         "name",
         "description",
@@ -761,23 +704,13 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         "reserveePhone",
         "applyingForFreeOfCharge",
         "freeOfChargeReason",
-        "billingFirstName",
-        "billingLastName",
-        "billingPhone",
-        "billingEmail",
-        "billingAddressStreet",
-        "billingAddressZip",
-        "billingAddressCity",
       ].forEach((field) => {
         cy.get(`#${field}`).should("exist");
       });
 
       cy.get('button[type="submit"]').click();
 
-      [
-        cy.get("#reserveeFirstName-error"),
-        cy.get("#billingLastName-error"),
-      ].forEach((error) =>
+      [cy.get("#reserveeFirstName-error")].forEach((error) =>
         error.should("contain.text", "Kenttä on pakollinen")
       );
 
@@ -788,19 +721,19 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       );
 
       cy.get("#reserveeFirstName").type("Forename");
-      cy.get("#billingLastName").type("Surname (billing)");
       cy.get("#reserveeEmail").type("@bar.baz");
 
       cy.checkA11y(null, null, null, true);
 
       cy.get('button[type="submit"]').click();
 
-      cy.get("main#main").should("contain.text", "Varauksen yhteenveto");
-      cy.get("main#main").should("contain.text", "Varaajan etunimi");
-      cy.get("main#main").should("contain.text", "Sähköpostiosoite");
+      cy.get("main#main").should("contain.text", "Tarkista varauksen tiedot");
+      cy.get("main#main").should("contain.text", "Yhteyshenkilön etunimi");
+      cy.get("main#main").should(
+        "contain.text",
+        "Yhteyshenkilön sähköpostiosoite"
+      );
       cy.get("main#main").should("contain.text", "Haen maksutonta varausta");
-      cy.get("main#main").should("contain.text", "Erillinen laskutusosoite");
-      cy.get("main#main").should("contain.text", "Varaajan sukunimi");
 
       [{ label: "spaceTerms" }, { label: "resourceTerms" }].forEach((field) => {
         formField(field.label).click();
@@ -808,144 +741,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
       cy.get('button[type="submit"]').click();
 
-      cy.get("main#main").should("contain.text", "Varaus onnistui");
-
-      cy.get("main#main").should("contain.text", "Varauksen tiedot");
-      cy.get("main#main").should("contain.text", "Varaajan etunimi");
-      cy.get("main#main").should("contain.text", "Sähköpostiosoite");
-      cy.get("main#main").should("contain.text", "Haen maksutonta varausta");
-      cy.get("main#main").should("contain.text", "Erillinen laskutusosoite");
-      cy.get("main#main").should("contain.text", "Varaajan sukunimi");
-    });
-  });
-
-  describe("with required application", () => {
-    Cypress.config("defaultCommandTimeout", 20000);
-    beforeEach(() => {
-      cy.visit("/reservation-unit/904");
-      cy.injectAxe();
-    });
-
-    it("can do reservation", () => {
-      drawReservation();
-
-      reservationSubmitButton().click();
-
-      cy.get("main#main").should("contain.text", "Uusi varausanomus");
-
-      const form1 = [
-        { label: "reserveeFirstName", value: "Etunimi" },
-        { label: "reserveeLastName", value: "Sukunimi" },
-        { label: "reserveePhone", value: "+3581234567" },
-        { label: "name", value: "Varaus" },
-        { label: "description", value: "Kuvaus" },
-      ];
-
-      const form2 = [{ label: "spaceTerms" }, { label: "resourceTerms" }];
-
-      updateButton().click();
-      form1.forEach((field) => {
-        cy.get(`#${field.label}-error`).should("exist");
-      });
-
-      form1.forEach((field) => {
-        formField(field.label).type(field.value);
-      });
-
-      form1.forEach((field) => {
-        cy.get(`#${field.label}-error`).should("not.exist");
-      });
-
-      cy.checkA11y(null, null, null, true);
-
-      updateButton().click();
-
-      form2.forEach((field) => {
-        formField(field.label).click();
-      });
-
-      updateButton().click();
-
-      cy.get("main#main").should("contain.text", "Varausanomus jätetty");
-
-      calendarUrlLink()
-        .invoke("attr", "href")
-        .should("eq", "http://calendarUrl/42");
-
-      cy.contains("h3", "Lisätietoa varauksestasi").should("be.visible");
-      cy.contains("p", "Confirmed Instructions FI").should("be.visible");
-
-      confirmationParagraph()
-        .eq(0)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varauksen nimi (julkinen)")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", form1[3].value);
-
-      confirmationParagraph()
-        .eq(1)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varaaja")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", `${form1[0].value} ${form1[1].value}`);
-
-      confirmationParagraph()
-        .eq(2)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varauksen kuvaus")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", form1[4].value);
-
-      confirmationParagraph()
-        .eq(3)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Varauksen ajankohta")
-        .parent()
-        .find("span")
-        .eq(1)
-        .invoke("text")
-        .then((text) => {
-          reservationConfirmationTimeRange().should("contain.text", text);
-        });
-
-      confirmationParagraph()
-        .eq(4)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Tila")
-        .parent()
-        .find("span")
-        .eq(1)
-        .invoke("text")
-        .then((text) => {
-          reservationTitle().should("have.text", text);
-        });
-
-      confirmationParagraph()
-        .eq(5)
-        .find("span")
-        .eq(0)
-        .should("have.text", "Puhelin")
-        .parent()
-        .find("span")
-        .eq(1)
-        .should("have.text", form1[2].value);
-
-      cy.contains("button", "Siirry omiin varauksiin").click();
-
-      cy.url().should("contain", "/reservations");
-
-      cy.checkA11y(null, null, null, true);
+      cy.get("main#main").should("contain.text", "Varaus tehty");
     });
   });
 

@@ -56,6 +56,7 @@ const StyledNavigation = styled(HDSNavigation)`
 const NaviItem = styled(HDSNavigation.Item)<{ $hidden: boolean }>`
   --item-active-color: var(--color-bus);
   ${({ $hidden }) => $hidden && `display: none !important;`}
+  white-space: nowrap;
 
   span {
     font-family: var(--font-medium);
@@ -105,8 +106,17 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
 
   const menuItems: MenuItem[] = [
     {
+      title: "reservationUnitSearch",
+      path: "/search/single",
+    },
+    {
       title: "spaceReservation",
       path: "/recurring",
+    },
+    {
+      title: "reservations",
+      path: "/reservations",
+      condition: !!profile,
     },
     {
       title: "applications",

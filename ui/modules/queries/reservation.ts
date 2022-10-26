@@ -245,6 +245,26 @@ export const GET_RESERVATION = gql`
           smallUrl
           imageType
         }
+        lowestPrice
+        highestPrice
+        priceUnit
+        pricingType
+        taxPercentage {
+          value
+        }
+        pricings {
+          begins
+          priceUnit
+          pricingType
+          lowestPrice
+          highestPrice
+          taxPercentage {
+            value
+          }
+          status
+        }
+        minPersons
+        maxPersons
       }
       purpose {
         pk

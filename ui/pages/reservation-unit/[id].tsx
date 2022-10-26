@@ -868,7 +868,8 @@ const ReservationUnit = ({
   const quickReservationComponent = useCallback(
     (calendar, type: "mobile" | "desktop") => {
       return (
-        !isReservationStartInFuture(reservationUnit) && (
+        !isReservationStartInFuture(reservationUnit) &&
+        isReservable && (
           <QuickReservation
             isSlotReservable={isSlotReservable}
             isReservationUnitReservable={!isReservationQuotaReached}
@@ -886,6 +887,7 @@ const ReservationUnit = ({
       isReservationQuotaReached,
       isSlotReservable,
       reservationUnit,
+      isReservable,
     ]
   );
 

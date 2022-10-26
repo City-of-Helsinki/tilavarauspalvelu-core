@@ -414,6 +414,7 @@ export const isReservationUnitReservable = (
     now <= new Date(reservationUnit.reservationEnds);
 
   return (
+    !!reservationUnit.metadataSet?.supportedFields?.length &&
     !!reservationUnit.openingHours?.openingTimes?.length &&
     reservationUnit.openingHours?.openingTimes?.length > 0 &&
     !!reservationUnit.minReservationDuration &&

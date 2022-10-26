@@ -1,7 +1,8 @@
 export function formField(
-  name: string
+  name: string,
+  type = "input"
 ): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get(`input[name="${name}"]`);
+  return cy.get(`${type}[name="${name}"]`);
 }
 
 export function updateButton(): Cypress.Chainable<JQuery<HTMLElement>> {
@@ -32,8 +33,10 @@ export function reservationTitle(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get('[data-test="reservation__title"]');
 }
 
-export function calendarUrlLink(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get('[data-test="reservation__confirmation--calendar-url"]');
+export function calendarUrlButton(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(
+    '[data-testid="reservation__confirmation--button__calendar-url"]'
+  );
 }
 
 export function dateSelector(): Cypress.Chainable<JQuery<HTMLElement>> {
@@ -90,4 +93,12 @@ export function reservationQuotaNotification(): Cypress.Chainable<
 
 export function calendarWrapper(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get('[data-testid="reservation-unit__calendar--wrapper"]');
+}
+
+export function reserveeTypeSelector(
+  order: number
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy
+    .get('[data-testid="reservation__checkbox--reservee-type"] > button')
+    .eq(order);
 }

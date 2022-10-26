@@ -19,7 +19,6 @@
   "showView": "Näytä {{view}}näkymä",
   "initialReservation": "Alustava varaus",
   "makeReservation": "Varaa",
-  "newReservation": "Uusi varaus",
   "reserverInfo": "Varaajan tiedot",
   "reservationInfo": "Varauksen tiedot",
   "notification": {
@@ -40,7 +39,9 @@
   },
   "heading": {
     "termsOfUse": "Sopimusehdot",
-    "resourceTerms": "Tilakohtaiset ehdot"
+    "resourceTerms": "Tilakohtaiset ehdot",
+    "newReservation": "Täytä varauksen tiedot",
+    "pendingReservation": "Tarkista varauksen tiedot"
   },
   "saveReservation": "Tallenna varaus",
   "selectedTime": "Valittu aika",
