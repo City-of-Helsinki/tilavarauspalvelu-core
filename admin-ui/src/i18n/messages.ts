@@ -329,6 +329,7 @@ const translations: ITranslations = {
       ageGroup: ["Ikäluokka"],
       recommendations: ["Ehdotukset"],
       additionalInformation: ["Lisätiedot (yksityishenkilö)"],
+      userBirthDate: ["Syntymäaika"],
     },
     statuses: {
       draft: ["Luonnos"],

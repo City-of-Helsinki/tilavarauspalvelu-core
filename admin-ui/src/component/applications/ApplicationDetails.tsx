@@ -39,6 +39,7 @@ import ScrollIntoView from "../../common/ScrollIntoView";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import ShowWhenTargetInvisible from "../ShowWhenTargetInvisible";
 import StickyHeader from "../StickyHeader";
+import ApplicationUserBirthDate from "./ApplicationUserBirthDate";
 
 interface IRouteParams {
   applicationId: string;
@@ -471,6 +472,16 @@ function ApplicationDetails(): JSX.Element | null {
               <ValueBox
                 label={t("Application.headings.additionalInformation")}
                 value={application.additionalInformation}
+              />
+              <ValueBox
+                label={t("Application.headings.userBirthDate")}
+                value={
+                  <ApplicationUserBirthDate
+                    applicationPk={application.id}
+                    showLabel={t("RequestedReservation.showBirthDate")}
+                    hideLabel={t("RequestedReservation.hideBirthDate")}
+                  />
+                }
               />
             </EventProps>
             <H4>{t("Application.contactPersonInformation")}</H4>

@@ -17,7 +17,7 @@ const Wrapper = styled.div``;
 
 interface IValueBoxProps {
   label: string;
-  value: string | undefined | null;
+  value: string | undefined | null | JSX.Element;
   style?: React.CSSProperties;
 }
 

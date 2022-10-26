@@ -613,6 +613,7 @@ export type ApplicationType = Node & {
   applicantName?: Maybe<Scalars["String"]>;
   applicantPk?: Maybe<Scalars["Int"]>;
   applicantType?: Maybe<ApplicationsApplicationApplicantTypeChoices>;
+  applicantUser?: Maybe<UserType>;
   applicationEvents?: Maybe<Array<Maybe<ApplicationEventType>>>;
   applicationRound: ApplicationRoundType;
   billingAddress?: Maybe<AddressType>;
