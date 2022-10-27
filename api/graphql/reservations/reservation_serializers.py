@@ -22,6 +22,7 @@ from email_notification.tasks import (
 )
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.models import (
+    PaymentType,
     PriceUnit,
     PricingType,
     ReservationKind,
@@ -740,6 +741,15 @@ class ReservationUpdateSerializer(
 
 
 class ReservationConfirmSerializer(ReservationUpdateSerializer):
+    payment_type = ChoiceCharField(
+        choices=PaymentType.choices,
+        required=False,
+        help_text=(
+            "Type of the payment. "
+            f"Possible values are {', '.join(value[0].upper() for value in PaymentType.choices)}."
+        ),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # All fields should be read-only, except for the lookup
@@ -747,25 +757,86 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         for field in self.fields:
             self.fields[field].read_only = True
         self.fields["pk"].read_only = False
+        self.fields["payment_type"].read_only = False
+
+    class Meta(ReservationUpdateSerializer.Meta):
+        fields = ["payment_type"] + ReservationUpdateSerializer.Meta.fields
+
+    def _requires_handling(self):
+        return (
+            self.instance.reservation_unit.filter(
+                require_reservation_handling=True
+            ).exists()
+            or self.instance.applying_for_free_of_charge
+        )
+
+    def _get_default_payment_type(self):
+        reservation_unit = self.instance.reservation_unit.first()
+        payment_types = reservation_unit.payment_types
+
+        if payment_types.count() == 0:
+            raise ValidationErrorWithCode(
+                "Reservation unit does not have payment types defined. At least one payment type must be defined.",
+                ValidationErrorCodes.INVALID_PAYMENT_TYPE,
+            )
+
+        # Rules to pick the default, defined in TILA-1974:
+        # 1. If only one payment type is defined, use that
+        # 2. If only INVOICE and ON_SITE are defined, use INVOICE
+        # 3. Otherwise use ONLINE
+
+        if payment_types.count() == 1:
+            return payment_types.first().code
+        elif (
+            payment_types.filter(
+                code__in=[PaymentType.INVOICE, PaymentType.ON_SITE]
+            ).count()
+            == payment_types.count()
+        ):
+            return PaymentType.INVOICE
+        else:
+            return PaymentType.ONLINE
+
+    def validate(self, data):
+        data = super().validate(data)
+
+        if self.instance.reservation_unit.count() > 1:
+            raise ValidationErrorWithCode(
+                "Reservations with multiple reservation units are not supported.",
+                ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS,
+            )
+
+        if not self._requires_handling():
+            payment_type = data.get("payment_type", "").upper()
+            reservation_unit = self.instance.reservation_unit.first()
+            if not payment_type:
+                data["payment_type"] = self._get_default_payment_type()
+            elif not reservation_unit.payment_types.filter(code=payment_type).exists():
+                allowed_values = list(
+                    map(lambda x: x.code, reservation_unit.payment_types.all())
+                )
+                raise ValidationErrorWithCode(
+                    f"Reservation unit does not support {payment_type} payment type. "
+                    f"Allowed values: {', '.join(allowed_values)}",
+                    ValidationErrorCodes.INVALID_PAYMENT_TYPE,
+                )
+        return data
 
     @property
     def validated_data(self):
         validated_data = super().validated_data
 
-        reservation_unit_requires_handling = self.instance.reservation_unit.filter(
-            require_reservation_handling=True
-        ).exists()
-
-        if (
-            reservation_unit_requires_handling
-            or self.instance.applying_for_free_of_charge
-        ):
+        if self._requires_handling():
             validated_data["state"] = STATE_CHOICES.REQUIRES_HANDLING
         else:
             validated_data["state"] = STATE_CHOICES.CONFIRMED
+
         return validated_data
 
     def save(self, **kwargs):
+        # TODO: Store payment_type and use it later for creating order
+        self.fields.pop("payment_type")
+
         instance = super().save(**kwargs)
 
         if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
@@ -788,6 +859,9 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
                 [ReservationNotification.ALL],
             )
+
+        # TODO: Store local order
+        # TODO: Call verkkokauppa order API
         return instance
 
 
