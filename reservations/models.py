@@ -393,7 +393,7 @@ class Reservation(models.Model):
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="The price of this particular reservation",
+        help_text="The unit price of this particular reservation",
     )
     tax_percentage_value = models.DecimalField(
         verbose_name=_("Tax percentage value"),
@@ -407,7 +407,14 @@ class Reservation(models.Model):
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="The price of this particular reservation",
+        help_text="The price of this particular reservation including VAT",
+    )
+    price_net = models.DecimalField(
+        verbose_name=_("Price"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="The price of this particular reservation excluding VAT",
     )
 
     handled_at = models.DateTimeField(
