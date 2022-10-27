@@ -25,6 +25,11 @@ snapshots['UserQueryTestCase::test_show_general_roles 1'] = {
         'currentUser': {
             'generalRoles': [
                 {
+                    'permissions': [
+                        {
+                            'permission': 'can_do_stuff'
+                        }
+                    ],
                     'role': {
                         'code': 'general_role',
                         'verboseName': ''
@@ -74,6 +79,11 @@ snapshots['UserQueryTestCase::test_show_service_sector_roles 1'] = {
         'currentUser': {
             'serviceSectorRoles': [
                 {
+                    'permissions': [
+                        {
+                            'permission': 'can_do_service_sector_things'
+                        }
+                    ],
                     'role': {
                         'code': 'TEST_SERVICE_SECTOR_ROLE',
                         'verboseName': 'Test Service Sector Role'
@@ -93,6 +103,11 @@ snapshots['UserQueryTestCase::test_show_unit_roles 1'] = {
         'currentUser': {
             'unitRoles': [
                 {
+                    'permissions': [
+                        {
+                            'permission': 'can_do_unit_things'
+                        }
+                    ],
                     'role': {
                         'code': 'TEST_UNIT_ROLE',
                         'verboseName': 'Test Unit Role'
@@ -196,4 +211,24 @@ snapshots['UsersQueryTestCase::test_unit_admin_can_read_other 1'] = {
             'username': 'non_staff_admin'
         }
     }
+}
+
+snapshots['UsersQueryTestCase::test_unit_admin_cant_read_permissions 1'] = {
+    'data': {
+        'user': None
+    },
+    'errors': [
+        {
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'No permissions to this operation.',
+            'path': [
+                'user'
+            ]
+        }
+    ]
 }

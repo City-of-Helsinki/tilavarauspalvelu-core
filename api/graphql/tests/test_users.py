@@ -11,10 +11,13 @@ from api.graphql.tests.base import GrapheneTestCaseBase
 from permissions.models import (
     GeneralRole,
     GeneralRoleChoice,
+    GeneralRolePermission,
     ServiceSectorRole,
     ServiceSectorRoleChoice,
+    ServiceSectorRolePermission,
     UnitRole,
     UnitRoleChoice,
+    UnitRolePermission,
 )
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 from users.models import PersonalInfoViewLog, ReservationNotification, User
@@ -54,6 +57,9 @@ class UserTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
         GeneralRole.objects.create(role=general_role_choice, user=cls.staff_user)
+        GeneralRolePermission.objects.create(
+            role=general_role_choice, permission="can_do_stuff"
+        )
         GeneralRole.objects.create(role=general_role_choice, user=cls.non_staff_user)
 
 
@@ -110,6 +116,9 @@ class UserQueryTestCase(UserTestCaseBase):
                             code
                             verboseName
                         }
+                        permissions {
+                            permission
+                        }
                     }
                 }
             }
@@ -132,6 +141,9 @@ class UserQueryTestCase(UserTestCaseBase):
             service_sector=service_sector,
             role=service_sector_role,
         )
+        ServiceSectorRolePermission.objects.create(
+            role=service_sector_role, permission="can_do_service_sector_things"
+        )
 
         self.client.force_login(self.staff_user)
         response = self.query(
@@ -146,6 +158,9 @@ class UserQueryTestCase(UserTestCaseBase):
                         }
                         serviceSector {
                             nameFi
+                        }
+                        permissions {
+                            permission
                         }
                     }
                 }
@@ -162,6 +177,9 @@ class UserQueryTestCase(UserTestCaseBase):
         unit_group = UnitGroupFactory(name="Test Unit Group", units=[unit])
         unit_role = UnitRoleChoice.objects.create(
             code="TEST_UNIT_ROLE", verbose_name="Test Unit Role"
+        )
+        UnitRolePermission.objects.create(
+            role=unit_role, permission="can_do_unit_things"
         )
 
         role = UnitRole.objects.create(user=self.staff_user, role=unit_role)
@@ -187,6 +205,9 @@ class UserQueryTestCase(UserTestCaseBase):
                             units {
                                 nameFi
                             }
+                        }
+                        permissions {
+                            permission
                         }
                     }
                 }
@@ -342,6 +363,31 @@ class UsersQueryTestCase(UserTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
+
+    def test_unit_admin_cant_read_permissions(self):
+        unit_admin = self.create_unit_admin()
+        UnitRolePermission.objects.filter(permission="can_view_users").delete()
+        self.client.force_login(unit_admin)
+
+        query = (
+            """
+            query {
+                user(pk: %i) {
+                    unitRoles { permissions { permission } }
+                    serviceSectorRoles { permissions { permission } }
+                    generalRoles { permissions { permission } }
+                }
+            }
+            """
+            % self.non_staff_user.id
+        )
+
+        response = self.query(query)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+        assert_that(content["errors"]).is_not_none()
 
     def test_regular_user_cant_read_other(self):
         self.client.force_login(self.regular_joe)
