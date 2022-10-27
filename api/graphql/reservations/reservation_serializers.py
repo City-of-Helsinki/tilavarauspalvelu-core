@@ -809,6 +809,13 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         if not self._requires_handling():
             payment_type = data.get("payment_type", "").upper()
             reservation_unit = self.instance.reservation_unit.first()
+
+            if not reservation_unit.payment_product:
+                raise ValidationErrorWithCode(
+                    "Reservation unit is missing payment product",
+                    ValidationErrorCodes.MISSING_PAYMENT_PRODUCT,
+                )
+
             if not payment_type:
                 data["payment_type"] = self._get_default_payment_type()
             elif not reservation_unit.payment_types.filter(code=payment_type).exists():

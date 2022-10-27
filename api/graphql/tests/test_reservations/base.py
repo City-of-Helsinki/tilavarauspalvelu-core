@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
+from merchants.tests.factories import PaymentMerchantFactory, PaymentProductFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
@@ -37,12 +38,16 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.reservation_unit_type = ReservationUnitTypeFactory(
             name="reservation_unit_type"
         )
+        cls.payment_merchant = PaymentMerchantFactory()
+        cls.payment_product = PaymentProductFactory(merchant=cls.payment_merchant)
         cls.reservation_unit = ReservationUnitFactory(
             spaces=[cls.space],
             unit=cls.unit,
             name="resunit",
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
             reservation_unit_type=cls.reservation_unit_type,
+            payment_merchant=cls.payment_merchant,
+            payment_product=cls.payment_product,
         )
         cls.purpose = ReservationPurposeFactory(name="purpose")
 
