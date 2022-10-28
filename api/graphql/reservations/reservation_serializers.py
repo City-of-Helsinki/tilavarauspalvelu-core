@@ -868,7 +868,16 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 )
             else:
                 # TODO: Call verkkokauppa order API
-                print("Create order and call API")
+                PaymentOrder.objects.create(
+                    payment_type=payment_type,
+                    status=PaymentStatus.DRAFT,
+                    language=self.instance.reservee_language or Language.FI,
+                    price_net=self._get_price_net(),
+                    price_vat=self._get_price_vat(),
+                    price_total=self.instance.price,
+                    reservation=self.instance,
+                    reservation_user_uuid=self.instance.user.uuid,
+                )
 
         instance = super().save(**kwargs)
 

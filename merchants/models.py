@@ -143,6 +143,11 @@ class PaymentOrder(models.Model):
         max_length=8,
         choices=Language.choices,
     )
+    reservation_user_uuid = models.UUIDField(
+        verbose_name=_("Reservation user UUID"),
+        blank=True,
+        null=True,
+    )
 
     def clean(self):
         validation_errors = {}

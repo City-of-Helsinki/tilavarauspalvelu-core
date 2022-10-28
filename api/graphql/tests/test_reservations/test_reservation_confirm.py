@@ -1,5 +1,6 @@
 import datetime
 import json
+from decimal import Decimal
 from unittest.mock import patch
 
 import freezegun
@@ -37,6 +38,8 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CREATED,
             user=self.regular_joe,
             reservee_email="email@reservee",
+            price=Decimal("12.4"),
+            tax_percentage_value=Decimal("24.0"),
         )
         EmailTemplateFactory(
             type=EmailType.RESERVATION_CONFIRMED, content="", subject="confirmed"
