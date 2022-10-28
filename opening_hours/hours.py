@@ -144,14 +144,17 @@ def get_opening_hours(
                 "times": [],
             }
             for time_data_in in opening_hours["times"]:
+                start_time = time_data_in.pop("start_time")
+                end_time = time_data_in.pop("end_time")
+
                 day_data_out["times"].append(
                     TimeElement(
-                        start_time=datetime.time.fromisoformat(
-                            time_data_in.pop("start_time")
-                        ),
-                        end_time=datetime.time.fromisoformat(
-                            time_data_in.pop("end_time")
-                        ),
+                        start_time=datetime.time.fromisoformat(start_time)
+                        if start_time
+                        else None,
+                        end_time=datetime.time.fromisoformat(end_time)
+                        if end_time
+                        else None,
                         **time_data_in,
                     )
                 )
