@@ -863,7 +863,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     language=self.instance.reservee_language or Language.FI,
                     price_net=self._get_price_net(),
                     price_vat=self._get_price_vat(),
-                    price_total=self.instance.price,  # TODO: Add reference to reservation
+                    price_total=self.instance.price,
+                    reservation=self.instance,
                 )
             else:
                 # TODO: Call verkkokauppa order API

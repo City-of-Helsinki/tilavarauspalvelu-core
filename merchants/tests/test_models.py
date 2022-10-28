@@ -7,12 +7,15 @@ from django.test.testcases import TestCase
 from pytest import raises
 
 from merchants.models import PaymentOrder
+from reservations.tests.factories import ReservationFactory
 
 
 class PaymentOrderTestCase(TestCase):
     @classmethod
     def setUp(cls):
+        cls.reservation = ReservationFactory()
         cls.valid_args = {
+            "reservation": cls.reservation,
             "order_id": uuid4(),
             "payment_id": "test_payment_id",
             "payment_type": "ON_SITE",

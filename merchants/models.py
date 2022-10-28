@@ -74,6 +74,15 @@ class Language(models.TextChoices):
 
 
 class PaymentOrder(models.Model):
+    reservation = models.ForeignKey(
+        "reservations.Reservation",
+        verbose_name=_("Reservation"),
+        related_name="payment_order",
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="Reservation this order is based on",
+    )
+
     order_id = models.UUIDField(
         verbose_name=_("Order ID"),
         help_text=_("eCommerce order ID"),
