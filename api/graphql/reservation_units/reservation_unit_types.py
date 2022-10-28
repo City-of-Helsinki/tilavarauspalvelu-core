@@ -338,7 +338,9 @@ class ReservationUnitPricingType(AuthNode, PrimaryKeyObjectType):
             "pricing_type",
             "price_unit",
             "lowest_price",
+            "lowest_price_net",
             "highest_price",
+            "highest_price_net",
             "tax_percentage",
             "status",
         ]

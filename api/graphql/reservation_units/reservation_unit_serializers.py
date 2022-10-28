@@ -144,7 +144,9 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
             "pricing_type",
             "price_unit",
             "lowest_price",
+            "lowest_price_net",
             "highest_price",
+            "highest_price_net",
             "tax_percentage_pk",
             "status",
         ]
@@ -425,7 +427,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
 
     def validate(self, data):
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
-        self.validate_pricing_fields(data)
+        data = self.validate_pricing_fields(data)
 
         if not is_draft:
             self.validate_for_publish(data)
@@ -497,6 +499,9 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         ReservationUnitPricingHelper.check_pricing_required(is_draft, data)
         ReservationUnitPricingHelper.check_pricing_dates(data)
         ReservationUnitPricingHelper.check_pricing_counts(is_draft, data)
+        data["pricings"] = ReservationUnitPricingHelper.calculate_vat_prices(data)
+
+        return data
 
     @staticmethod
     def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
@@ -532,7 +537,7 @@ class ReservationUnitUpdateSerializer(
         self.validate_pricing(data)
         return data
 
-    def validate_pricing(self, data):
+    def validate_pricing(self, data) -> Dict[str, Any]:
         current_active_pricing = ReservationUnitPricingHelper.get_active_price(
             self.instance
         )
@@ -555,6 +560,9 @@ class ReservationUnitUpdateSerializer(
                     raise serializers.ValidationError(
                         "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
                     )
+
+        data = ReservationUnitPricingHelper.calculate_vat_prices(data)
+        return data
 
     @staticmethod
     def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):

@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
 from rest_framework import serializers
@@ -93,6 +94,37 @@ class ReservationUnitPricingHelper:
             raise serializers.ValidationError(
                 "only ACTIVE and FUTURE pricings can be mutated"
             )
+
+    @classmethod
+    def calculate_vat_prices(cls, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculates vat prices from net prices and returns a dict of pricing data."""
+        pricings = data.get("pricings", [])
+
+        for pricing in pricings:
+            highest_price_net = pricing.get("highest_price_net", 0)
+            lowest_price_net = pricing.get("lowest_price_net", 0)
+
+            if highest_price_net < lowest_price_net:
+                raise serializers.ValidationError(
+                    "Highest price cannot be less than lowest price."
+                )
+
+            tax_percentage = pricing.get("tax_percentage")
+
+            if not tax_percentage or tax_percentage.value == 0:
+                pricing["highest_price"] = highest_price_net
+                pricing["lowest_price"] = lowest_price_net
+            else:
+                pricing["highest_price"] = round(
+                    Decimal(highest_price_net * (1 + tax_percentage.decimal)),
+                    2,
+                )
+                pricing["lowest_price"] = round(
+                    Decimal(lowest_price_net * (1 + tax_percentage.decimal)),
+                    2,
+                )
+
+        return pricings
 
     @classmethod
     def contains_status(
