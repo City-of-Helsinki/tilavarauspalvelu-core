@@ -20,6 +20,7 @@ from email_notification.tasks import (
     send_reservation_email_task,
     send_staff_reservation_email_task,
 )
+from merchants.models import Language, PaymentOrder, PaymentStatus
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.models import (
     PaymentType,
@@ -840,9 +841,33 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         return validated_data
 
+    # TODO: Remove when separated prices are in reservation
+    def _get_price_net(self) -> Decimal:
+        price_total = self.instance.price
+        tax_percentage = self.instance.tax_percentage_value
+        return price_total / (1 + tax_percentage / 100)
+
+    def _get_price_vat(self) -> Decimal:
+        return self.instance.price - self._get_price_net()
+
     def save(self, **kwargs):
-        # TODO: Store payment_type and use it later for creating order
         self.fields.pop("payment_type")
+        state = self.validated_data["state"]
+
+        if state == STATE_CHOICES.CONFIRMED:
+            payment_type = self.validated_data["payment_type"].upper()
+            if payment_type == PaymentType.ON_SITE:
+                PaymentOrder.objects.create(
+                    payment_type=payment_type,
+                    status=PaymentStatus.PAID_MANUALLY,
+                    language=self.instance.reservee_language or Language.FI,
+                    price_net=self._get_price_net(),
+                    price_vat=self._get_price_vat(),
+                    price_total=self.instance.price,  # TODO: Add reference to reservation
+                )
+            else:
+                # TODO: Call verkkokauppa order API
+                print("Create order and call API")
 
         instance = super().save(**kwargs)
 
@@ -867,8 +892,6 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 [ReservationNotification.ALL],
             )
 
-        # TODO: Store local order
-        # TODO: Call verkkokauppa order API
         return instance
 
 
