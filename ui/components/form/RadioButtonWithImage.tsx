@@ -71,7 +71,10 @@ const RadioButtonWithImage = ({
 }: Props): JSX.Element => {
   return (
     <Wrapper
-      onClick={() => onClick()}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
       tabIndex={0}
       onKeyDown={(e) => {
         if ([" ", "Enter"].includes(e.key)) {
