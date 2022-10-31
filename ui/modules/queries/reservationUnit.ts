@@ -103,20 +103,20 @@ export const RESERVATION_UNIT = gql`
         nameEn
         nameSv
       }
-      # openingHours(openingTimes: false, periods: true) {
-      #   openingTimePeriods {
-      #     periodId
-      #     startDate
-      #     endDate
-      #     resourceState
-      #     timeSpans {
-      #       startTime
-      #       endTime
-      #       resourceState
-      #       weekdays
-      #     }
-      #   }
-      # }
+      openingHours(openingTimes: false, periods: true) {
+        openingTimePeriods {
+          periodId
+          startDate
+          endDate
+          resourceState
+          timeSpans {
+            startTime
+            endTime
+            resourceState
+            weekdays
+          }
+        }
+      }
       requireReservationHandling
       metadataSet {
         id
@@ -283,27 +283,27 @@ export const RELATED_RESERVATION_UNITS = gql`
 export const OPENING_HOURS = gql`
   query ReservationUnitOpeningHours(
     $pk: Int
-    # $startDate: Date
-    # $endDate: Date
+    $startDate: Date
+    $endDate: Date
     $from: Date
     $to: Date
     $state: [String]
   ) {
     reservationUnitByPk(pk: $pk) {
-      # openingHours(
-      #   openingTimes: true
-      #   periods: false
-      #   startDate: $startDate
-      #   endDate: $endDate
-      # ) {
-      #   openingTimes {
-      #     date
-      #     startTime
-      #     endTime
-      #     state
-      #     periods
-      #   }
-      # }
+      openingHours(
+        openingTimes: true
+        periods: false
+        startDate: $startDate
+        endDate: $endDate
+      ) {
+        openingTimes {
+          date
+          startTime
+          endTime
+          state
+          periods
+        }
+      }
       reservations(state: $state, from: $from, to: $to) {
         pk
         state

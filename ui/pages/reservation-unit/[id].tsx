@@ -283,8 +283,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       fetchPolicy: "no-cache",
       variables: {
         pk: id,
-        // startDate: today,
-        // endDate: lastOpeningPeriodEndDate,
+        startDate: today,
+        endDate: lastOpeningPeriodEndDate,
         from: today,
         to: lastOpeningPeriodEndDate,
         state: ["created", "confirmed"],
@@ -331,10 +331,12 @@ export const getServerSideProps: GetServerSideProps = async ({
           openingHours: {
             openingTimes: allowReservationsWithoutOpeningHours
               ? openingTimes
-              : [],
+              : additionalData.reservationUnitByPk?.openingHours
+                  ?.openingTimes || [],
             openingTimePeriods: allowReservationsWithoutOpeningHours
               ? openingTimePeriods
-              : [],
+              : reservationUnitData?.reservationUnitByPk?.openingHours
+                  ?.openingTimePeriods || [],
           },
           reservations:
             additionalData?.reservationUnitByPk?.reservations?.filter(

@@ -78,6 +78,10 @@ const Props = styled.div`
   }
 `;
 
+const StyledAltNotification = styled(AltNotification)`
+  margin-bottom: var(--spacing-m);
+`;
+
 const ReservationUnitName = styled(H1)`
   margin-top: 0;
 `;
@@ -195,13 +199,13 @@ const Head = ({
               </Props>
               {!isReservable &&
                 !isReservationStartInFuture(reservationUnit) && (
-                  <AltNotification
+                  <StyledAltNotification
                     text={t("reservationUnit:notifications.notReservable")}
                     type="alert"
                   />
                 )}
               {isReservationStartInFuture(reservationUnit) && (
-                <AltNotification
+                <StyledAltNotification
                   data-testid="reservation-unit--notification__reservation-start"
                   text={t("reservationUnit:notifications.futureOpening", {
                     date: t("common:dateTimeNoYear", {
