@@ -250,11 +250,13 @@ export const isStartTimeWithinInterval = (
   const { startTime: dayStartTime, endTime: dayEndTime } =
     openingTimes?.find((n) => n.date === toApiDate(start)) || {};
 
-  const [startHours, startMinutes] = dayStartTime.split(":").map(Number);
+  const [startHours, startMinutes] = dayStartTime?.split(":").map(Number) || [
+    0, 0,
+  ];
   const startTime = new Date();
   startTime.setUTCHours(startHours, startMinutes, 0);
 
-  const [endHours, endMinutes] = dayEndTime.split(":").map(Number);
+  const [endHours, endMinutes] = dayEndTime?.split(":").map(Number) || [0, 0];
   const endTime = new Date();
   endTime.setUTCHours(endHours, endMinutes, 0);
 

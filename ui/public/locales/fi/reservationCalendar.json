@@ -11,6 +11,7 @@
     "initial": "Oma varaus",
     "timeIndicator": "Kuluva aika"
   },
+  "selectTime": "Valitse aika",
   "loginAndReserve": "Kirjaudu ja varaa",
   "loginInfo": "Sinun täytyy kirjautua sisään, jotta voit tehdä varauksen tähän tilaan.",
   "showCurrentDay": "Näytä nykyinen päivä",

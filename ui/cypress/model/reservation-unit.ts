@@ -50,3 +50,11 @@ export function addressContainer(
   );
   return order ? element.eq(order) : element;
 }
+
+export function reservationControlsToggleButton(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get(
+    "[data-testid='reservation-unit__reservation-controls--toggle-button']"
+  );
+}

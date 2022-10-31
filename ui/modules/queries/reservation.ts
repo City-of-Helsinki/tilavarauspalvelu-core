@@ -102,6 +102,7 @@ export const LIST_RESERVATIONS = gql`
     $end: DateTime
     $state: [String]
     $user: ID
+    $reservationUnit: [ID]
   ) {
     reservations(
       before: $before
@@ -112,6 +113,7 @@ export const LIST_RESERVATIONS = gql`
       end: $end
       state: $state
       user: $user
+      reservationUnit: $reservationUnit
     ) {
       edges {
         node {

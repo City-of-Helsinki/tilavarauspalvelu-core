@@ -1,9 +1,21 @@
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { differenceInSeconds, format, isValid, subMinutes } from "date-fns";
-import { Button, DateInput, Select } from "hds-react";
-import { trimStart } from "lodash";
+import {
+  differenceInSeconds,
+  format,
+  isValid,
+  parseISO,
+  subMinutes,
+} from "date-fns";
+import {
+  Button,
+  DateInput,
+  IconAngleDown,
+  IconAngleUp,
+  Select,
+} from "hds-react";
+import { trim, trimStart } from "lodash";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   convertHMSToSeconds,
@@ -19,7 +31,11 @@ import {
   getDayIntervals,
 } from "common/src/calendar/util";
 import { ApplicationRound, Language, OptionType } from "common/types/common";
-import { fontMedium, fontRegular } from "common/src/common/typography";
+import {
+  fontBold,
+  fontMedium,
+  fontRegular,
+} from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
@@ -45,17 +61,66 @@ type Props<T> = {
 };
 
 const Wrapper = styled.div`
+  border-top: 1px solid var(--color-black-50);
+`;
+
+const TogglerTop = styled.div``;
+
+const TogglerBottom = styled.div`
+  display: flex;
+  align-self: flex-end;
+  justify-content: flex-end;
+  min-width: 177px;
+  padding-bottom: var(--spacing-xs);
+
+  button {
+    width: 100%;
+    max-width: 177px;
+  }
+`;
+
+const ToggleControls = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+  width: 100%;
+  padding: var(--spacing-3-xs) var(--spacing-3-xs) 0;
+  box-sizing: border-box;
+`;
+
+const ToggleButton = styled.button`
+  background: var(--color-white);
+  border: 0;
+  cursor: pointer;
+`;
+
+const TogglerLabel = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xs) 0;
+`;
+
+const TogglerDate = styled.div`
+  text-transform: capitalize;
+  line-height: var(--lineheight-l);
+  ${fontBold}
+`;
+
+const TogglerPrice = styled.div`
+  line-height: var(--lineheight-l);
+`;
+
+const Content = styled.div`
   display: grid;
   gap: var(--spacing-xs);
   align-items: flex-end;
   padding-top: var(--spacing-s);
   padding-bottom: var(--spacing-s);
   grid-template-columns: repeat(2, 1fr);
-  border-top: 1px solid var(--color-black-50);
 
   button {
     width: 100% !important;
-    order: unset !important;
   }
 
   h3 {
@@ -76,7 +141,7 @@ const Wrapper = styled.div`
     justify-content: space-between;
   }
 
-  @media (min-width: ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.xl}) {
     > *:nth-child(5) {
       grid-column: unset;
     }
@@ -89,11 +154,24 @@ const StyledSelect = styled(Select)`
   & > div:nth-of-type(2) {
     line-height: var(--lineheight-l);
   }
+
+  ul {
+    transform: unset;
+    bottom: 54px;
+    left: -2px;
+    border-top: var(--border-width) solid var(--dropdown-border-color-focus);
+    border-bottom: var(--divider-width) solid var(--menu-divider-color);
+  }
 `;
 
 const PriceWrapper = styled.div`
   ${fontMedium};
   align-self: flex-end;
+  order: 2;
+
+  @media (min-width: ${breakpoints.m}) {
+    order: unset;
+  }
 `;
 
 const Label = styled.div`
@@ -107,14 +185,29 @@ const Price = styled.div`
   padding-bottom: var(--spacing-3-xs);
 `;
 
-const ResetButton = styled(Button).attrs({ variant: "secondary" })`
+const ResetButton = styled(Button).attrs({
+  variant: "secondary",
+  style: {
+    "--border-color": "var(--color-black)",
+    "--color": "var(--color-black)",
+  },
+})`
   white-space: nowrap;
+  order: 1;
 
   > span {
     margin: 0 !important;
     padding-right: var(--spacing-3-xs);
     padding-left: var(--spacing-3-xs);
   }
+
+  @media (min-width: ${breakpoints.m}) {
+    order: unset;
+  }
+`;
+
+const SubmitButtonWrapper = styled.div`
+  order: 3;
 `;
 
 const SubmitButton = styled(MediumButton)`
@@ -124,6 +217,10 @@ const SubmitButton = styled(MediumButton)`
     margin: 0 !important;
     padding-right: var(--spacing-3-xs);
     padding-left: var(--spacing-3-xs);
+  }
+
+  @media (min-width: ${breakpoints.m}) {
+    order: unset;
   }
 `;
 
@@ -160,6 +257,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     durationOptions[0]
   );
   const [isReserving, setIsReserving] = useState(false);
+  const [areControlsVisible, setAreControlsVisible] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
   const [_, setStoredReservation] =
@@ -297,68 +395,38 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     [duration, reservation, isSlotReservable]
   );
 
-  return (
-    <Wrapper data-testid="reservation-unit__reservation-controls--wrapper">
-      <DateInput
-        onChange={(val, valueAsDate) => {
-          if (
-            !val ||
-            !isValid(valueAsDate) ||
-            toApiDate(valueAsDate) < toApiDate(new Date())
-          ) {
-            resetReservation();
-          } else {
-            setDate(valueAsDate);
-            setCalendarFocusDate(valueAsDate);
-          }
-        }}
-        value={toUIDate(date)}
-        id="reservation__input--date"
-        initialMonth={new Date()}
-        label={`${t("reservationCalendar:startDate")} *`}
-        language={i18n.language as Language}
-      />
-      <StyledSelect
-        key={`startTime-${startTime}`}
-        id="reservation__input--start-time"
-        label={`${t("reservationCalendar:startTime")} *`}
-        onChange={(val: OptionType) => setStartTime(val.value as string)}
-        options={startingTimesOptions}
-        value={startingTimesOptions.find((n) => n.value === startTime)}
-      />
-      <StyledSelect
-        id="reservation__input--duration"
-        label={`${t("reservationCalendar:duration")} *`}
-        onChange={(val: OptionType) => {
-          setDuration(val);
-        }}
-        options={durationOptions}
-        value={duration}
-      />
-      <PriceWrapper>
-        {isReservable && (
-          <>
-            <Label>{t("reservationUnit:price")}:</Label>
-            <Price data-testid="reservation__price--value">
-              {getReservationUnitPrice(
-                reservationUnit,
-                date,
-                convertHMSToSeconds(`0${duration?.value}:00`) / 60,
-                false
-              )}
-            </Price>
-          </>
-        )}
-      </PriceWrapper>
-      <ResetButton
-        onClick={() => {
-          setStartTime(null);
-          resetReservation();
-          setReservation(null);
-        }}
-      >
-        {t("searchForm:resetForm")}
-      </ResetButton>
+  const beginDate = t("common:dateWithWeekday", {
+    date: begin && parseISO(begin),
+  });
+
+  const beginTime = t("common:time", {
+    date: begin && parseISO(begin),
+  });
+
+  const endDate = t("common:dateWithWeekday", {
+    date: end && parseISO(end),
+  });
+
+  const endTime = t("common:time", {
+    date: end && parseISO(end),
+  });
+
+  const togglerLabel = trim(
+    `${beginDate} ${beginTime}-${
+      endDate !== beginDate ? endDate : ""
+    }${endTime}`,
+    "-"
+  );
+
+  const price = getReservationUnitPrice(
+    reservationUnit,
+    date,
+    convertHMSToSeconds(`0${duration?.value}:00`) / 60,
+    false
+  );
+
+  const submitButton = (
+    <SubmitButtonWrapper>
       <LoginFragment
         isActionDisabled={!isReservable}
         actionCallback={() => {
@@ -377,6 +445,101 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           </SubmitButton>
         }
       />
+    </SubmitButtonWrapper>
+  );
+
+  return (
+    <Wrapper data-testid="reservation-unit__reservation-controls--wrapper">
+      <TogglerTop>
+        <ToggleControls>
+          {isReservable ? (
+            areControlsVisible ? (
+              <div />
+            ) : (
+              <TogglerLabel>
+                <TogglerDate>{togglerLabel}</TogglerDate>
+                <TogglerPrice>
+                  {t("reservationUnit:price")}: {price}
+                </TogglerPrice>
+              </TogglerLabel>
+            )
+          ) : (
+            <TogglerLabel>{t("reservationCalendar:selectTime")}</TogglerLabel>
+          )}
+          <ToggleButton
+            onClick={() => setAreControlsVisible(!areControlsVisible)}
+            data-testid="reservation-unit__reservation-controls--toggle-button"
+          >
+            {areControlsVisible ? (
+              <IconAngleDown aria-hidden size="m" />
+            ) : (
+              <IconAngleUp aria-hidden size="m" />
+            )}
+          </ToggleButton>
+        </ToggleControls>
+      </TogglerTop>
+      <TogglerBottom>
+        {isReservable && !areControlsVisible && submitButton}
+      </TogglerBottom>
+      {areControlsVisible && (
+        <Content>
+          <DateInput
+            onChange={(val, valueAsDate) => {
+              if (
+                !val ||
+                !isValid(valueAsDate) ||
+                toApiDate(valueAsDate) < toApiDate(new Date())
+              ) {
+                resetReservation();
+              } else {
+                setDate(valueAsDate);
+                setCalendarFocusDate(valueAsDate);
+              }
+            }}
+            value={toUIDate(date)}
+            id="reservation__input--date"
+            initialMonth={new Date()}
+            label={t("reservationCalendar:startDate")}
+            language={i18n.language as Language}
+          />
+          <StyledSelect
+            key={`startTime-${startTime}`}
+            id="reservation__input--start-time"
+            label={t("reservationCalendar:startTime")}
+            onChange={(val: OptionType) => setStartTime(val.value as string)}
+            options={startingTimesOptions}
+            value={startingTimesOptions.find((n) => n.value === startTime)}
+          />
+          <StyledSelect
+            id="reservation__input--duration"
+            label={t("reservationCalendar:duration")}
+            onChange={(val: OptionType) => {
+              setDuration(val);
+            }}
+            options={durationOptions}
+            value={duration}
+          />
+          <PriceWrapper>
+            {isReservable && (
+              <>
+                <Label>{t("reservationUnit:price")}:</Label>
+                <Price data-testid="reservation__price--value">{price}</Price>
+              </>
+            )}
+          </PriceWrapper>
+          <ResetButton
+            onClick={() => {
+              setStartTime(null);
+              resetReservation();
+              setReservation(null);
+            }}
+            disabled={!startTime}
+          >
+            {t("searchForm:resetForm")}
+          </ResetButton>
+          {submitButton}
+        </Content>
+      )}
     </Wrapper>
   );
 };

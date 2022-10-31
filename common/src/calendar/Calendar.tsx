@@ -62,6 +62,7 @@ type Props<T> = {
   resizableAccessor?: (event: CalendarEvent<T>) => boolean;
   toolbarComponent?: React.ReactNode;
   eventWrapperComponent?: React.ReactNode;
+  dateCellWrapperComponent?: React.ReactNode;
   showToolbar?: boolean;
   reservable?: boolean;
   draggable?: boolean;
@@ -421,6 +422,7 @@ const Calendar = <T extends Record<string, unknown>>({
   onSelecting,
   toolbarComponent,
   eventWrapperComponent,
+  dateCellWrapperComponent,
   onNavigate = () => {},
   onView = () => {},
   onSelectEvent = () => {},
@@ -464,6 +466,7 @@ const Calendar = <T extends Record<string, unknown>>({
       components={{
         toolbar: toolbarComponent,
         eventWrapper: eventWrapperComponent,
+        dateCellWrapper: dateCellWrapperComponent,
       }}
       onSelecting={onSelecting}
       onSelectSlot={onSelectSlot}

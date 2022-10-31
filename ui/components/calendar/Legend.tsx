@@ -21,17 +21,23 @@ const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
   grid-template-columns: 1fr 1fr;
   margin-bottom: var(--spacing-l);
   padding-top: var(--spacing-l);
-  gap: var(--spacing-m);
   width: 100%;
+  gap: var(--spacing-s) var(--spacing-xs);
+
+  @media (min-width: ${breakpoints.s}) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 
   @media (min-width: ${breakpoints.m}) {
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
+    gap: var(--spacing-m);
   }
 
   @media (min-width: ${breakpoints.l}) {
     margin-top: var(--spacing-m);
+    gap: var(--spacing-m);
   }
 
   ${({ $wrapBreakpoint }) =>
@@ -40,7 +46,7 @@ const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
       @media (min-width: ${$wrapBreakpoint}) {
         flex-direction: column;
         position: absolute;
-        bottom: 90px;
+        top: 440px;
         left: calc(100% + var(--spacing-xl));
         width: unset;
         width: 200px;
@@ -61,10 +67,15 @@ const LegendItem = styled.div<{
       $border
         ? `border: 2px solid ${$border}`
         : "border: 1px solid var(--color-black-20)"};
-    width: 54px;
-    height: 40px;
+    width: 30px;
+    height: 32px;
     position: relative;
     ${({ $inlineCss }) => $inlineCss}
+
+    @media (min-width: ${breakpoints.l}) {
+      width: 54px;
+      height: 40px;
+    }
   }
 
   display: flex;
@@ -112,8 +123,12 @@ const defaultItems: LegendItem[] = [
     css: css`
       border-top: 4px double var(--color-black-40);
       border-bottom: 4px double var(--color-black-40);
-      height: 20px;
+      height: 18px;
       padding: 4px 0;
+
+      @media (min-width: ${breakpoints.l}) {
+        height: 34px !important;
+      }
     `,
   },
   {

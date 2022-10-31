@@ -54,6 +54,7 @@ import {
   reservationInfo,
   reservationNotice,
   termsOfUse,
+  reservationControlsToggleButton,
 } from "model/reservation-unit";
 import { textWithIcon } from "model/search";
 
@@ -99,7 +100,7 @@ const drawReservation = (): void => {
       .trigger("mousemove", 0, 400, { force: true });
     cy.get(".rbc-time-slot").eq(6).trigger("mouseup", { force: true });
   });
-  reservationSubmitButton().should("be.disabled");
+  reservationSubmitButton().should("not.exist");
 
   timeColumn(1).within(() => {
     cy.get(".rbc-time-slot")
@@ -108,6 +109,10 @@ const drawReservation = (): void => {
       .trigger("mousemove", 0, 40, { force: true });
     cy.get(".rbc-time-slot").eq(16).trigger("mouseup", { force: true });
   });
+
+  durationSelectorToggle().should("not.exist");
+
+  reservationControlsToggleButton().click();
 
   durationSelectorToggle()
     .click()
@@ -299,6 +304,11 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
     it("can do the reservation with form inputs", () => {
       const today = format(new Date(), "d.M.yyyy");
+
+      dateSelector().should("not.exist");
+
+      reservationControlsToggleButton().click();
+
       dateSelector()
         .invoke("val")
         .then((value) => {
