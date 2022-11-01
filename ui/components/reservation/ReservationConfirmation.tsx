@@ -71,7 +71,7 @@ const ReservationConfirmation = ({
               requiresHandling ? "Handling" : ""
             }`}
             t={t}
-            values={{ user: reservation?.user }}
+            values={{ user: reservation?.user.email }}
             components={{
               link: <a href={reservationsUrl}> </a>,
             }}
