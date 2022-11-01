@@ -16,7 +16,7 @@ export const BirthDate = ({
   hideLabel,
   showLabel,
 }: Props): JSX.Element => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(!!user);
 
   return (
     <HorisontalFlex style={{ gap: "var(--spacing-2-xs)" }}>
