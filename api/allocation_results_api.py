@@ -1,8 +1,7 @@
-from django.conf import settings
 from django.db.models import Count, Prefetch
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, permissions, serializers, viewsets
+from rest_framework import mixins, serializers, viewsets
 
 from api.applications_api.serializers import ApplicationEventSerializer
 from api.common_filters import ModelInFilter
@@ -159,11 +158,7 @@ class AllocationResultViewSet(
     serializer_class = ApplicationEventScheduleResultSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AllocationResultsFilter
-    permission_classes = (
-        [AllocationResultsPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [AllocationResultsPermission]
     queryset = (
         ApplicationEventScheduleResult.objects.all()
         .select_related(

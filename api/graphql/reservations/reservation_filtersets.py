@@ -2,8 +2,6 @@ import operator
 from functools import reduce
 
 import django_filters
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db.models import Case, CharField, F, Q
 from django.db.models import Value as V
 from django.db.models import When
@@ -16,7 +14,7 @@ from permissions.helpers import (
 )
 from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.models import STATE_CHOICES, Reservation, User
-from spaces.models import ServiceSector, Unit
+from spaces.models import Unit
 
 
 class ReservationFilterSet(django_filters.FilterSet):
@@ -132,15 +130,7 @@ class ReservationFilterSet(django_filters.FilterSet):
         user = self.request.user
         viewable_units = get_units_where_can_view_reservations(user)
         viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
-        if settings.TMP_PERMISSIONS_DISABLED:
-            viewable_units = Unit.objects.all()
-            viewable_service_sectors = ServiceSector.objects.all()
-            user = (
-                get_user_model().objects.get(username="admin")
-                if settings.TMP_PERMISSIONS_DISABLED
-                else user
-            )
-        elif user.is_anonymous:
+        if user.is_anonymous:
             return qs.none()
         return qs.filter(
             Q(reservation_unit__unit__in=viewable_units)

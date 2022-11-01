@@ -1,9 +1,8 @@
 import threading
 
-from django.conf import settings
 from django.db.models import Prefetch
 from django.utils.datetime_safe import datetime
-from rest_framework import permissions, serializers, viewsets
+from rest_framework import serializers, viewsets
 from rest_framework.exceptions import ValidationError
 
 from allocation.allocation_runner import start_allocation
@@ -93,8 +92,4 @@ class AllocationRequestViewSet(viewsets.ModelViewSet):
         )
     )
     serializer_class = AllocationRequestSerializer
-    permission_classes = (
-        [AllocationRequestPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [AllocationRequestPermission]

@@ -1,8 +1,6 @@
 import graphene
-from django.conf import settings
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.resources.resource_serializers import (
@@ -17,9 +15,7 @@ from resources.models import Resource
 class ResourceCreateMutation(AuthSerializerMutation, SerializerMutation):
     resource = graphene.Field(ResourceType)
 
-    permission_classes = (
-        (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (ResourcePermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -30,9 +26,7 @@ class ResourceCreateMutation(AuthSerializerMutation, SerializerMutation):
 class ResourceUpdateMutation(AuthSerializerMutation, SerializerMutation):
     resource = graphene.Field(ResourceType)
 
-    permission_classes = (
-        (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (ResourcePermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -41,9 +35,7 @@ class ResourceUpdateMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ResourceDeleteMutation(AuthDeleteMutation, ClientIDMutation):
-    permission_classes = (
-        (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (ResourcePermission,)
     model = Resource
 
     @classmethod

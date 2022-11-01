@@ -1,10 +1,8 @@
 import graphene
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.applications.application_decline_serializers import (
     ApplicationDeclineSerializer,
@@ -45,11 +43,7 @@ from permissions.api_permissions.graphene_permissions import (
 class ApplicationCreateMutation(AuthSerializerMutation, SerializerMutation):
     application = graphene.Field(ApplicationType)
 
-    permission_classes = (
-        (ApplicationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationPermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -60,11 +54,7 @@ class ApplicationCreateMutation(AuthSerializerMutation, SerializerMutation):
 class ApplicationUpdateMutation(AuthSerializerMutation, SerializerMutation):
     application = graphene.Field(ApplicationType)
 
-    permission_classes = (
-        (ApplicationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationPermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -75,11 +65,7 @@ class ApplicationUpdateMutation(AuthSerializerMutation, SerializerMutation):
 class ApplicationEventCreateMutation(AuthSerializerMutation, SerializerMutation):
     application_event = graphene.Field(ApplicationEventType)
 
-    permission_classes = (
-        (ApplicationEventPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationEventPermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -90,11 +76,7 @@ class ApplicationEventCreateMutation(AuthSerializerMutation, SerializerMutation)
 class ApplicationEventUpdateMutation(AuthSerializerMutation, SerializerMutation):
     application_event = graphene.Field(ApplicationEventType)
 
-    permission_classes = (
-        (ApplicationEventPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationEventPermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -103,11 +85,7 @@ class ApplicationEventUpdateMutation(AuthSerializerMutation, SerializerMutation)
 
 
 class ApplicationEventDeleteMutation(AuthDeleteMutation, ClientIDMutation):
-    permission_classes = (
-        (ApplicationEventPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationEventPermission,)
     model = ApplicationEvent
 
     @classmethod
@@ -126,11 +104,7 @@ class ApplicationEventScheduleResultCreateMutation(
         ApplicationEventScheduleResultType
     )
 
-    permission_classes = (
-        (ApplicationEventScheduleResultPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationEventScheduleResultPermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -145,11 +119,7 @@ class ApplicationEventScheduleResultUpdateMutation(
         ApplicationEventScheduleResultType
     )
 
-    permission_classes = (
-        (ApplicationEventScheduleResultPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationEventScheduleResultPermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -158,11 +128,7 @@ class ApplicationEventScheduleResultUpdateMutation(
 
 
 class ApplicationDeclineMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ApplicationDeclinePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationDeclinePermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -170,11 +136,7 @@ class ApplicationDeclineMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ApplicationEventDeclineMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ApplicationEventDeclinePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationEventDeclinePermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -182,11 +144,7 @@ class ApplicationEventDeclineMutation(AuthSerializerMutation, SerializerMutation
 
 
 class ApplicationEventFlagMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ApplicationEventSetFlagPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationEventSetFlagPermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -194,11 +152,7 @@ class ApplicationEventFlagMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ApplicationFlagMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ApplicationSetFlagPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationSetFlagPermission,)
 
     class Meta:
         lookup_field = "pk"

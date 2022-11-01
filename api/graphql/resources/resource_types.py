@@ -1,7 +1,5 @@
 import graphene
-from django.conf import settings
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
@@ -17,9 +15,7 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
     buffer_time_before = Duration()
     buffer_time_after = Duration()
 
-    permission_classes = (
-        (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (ResourcePermission,)
 
     class Meta:
         model = Resource

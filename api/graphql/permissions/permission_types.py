@@ -1,7 +1,5 @@
 import graphene
-from django.conf import settings
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 from rest_framework.exceptions import PermissionDenied
 
 from api.graphql.base_connection import TilavarausBaseConnection
@@ -65,11 +63,7 @@ class UnitRolePermissionType(graphene.ObjectType):
 
 
 class GeneralRoleType(AuthNode, PrimaryKeyObjectType, IncludePermissionsMixin):
-    permission_classes = (
-        (GeneralRolePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (GeneralRolePermission,)
 
     role = graphene.Field(RoleType)
     permissions = graphene.List(GeneralRolePermissionType)
@@ -85,11 +79,7 @@ class GeneralRoleType(AuthNode, PrimaryKeyObjectType, IncludePermissionsMixin):
 
 
 class ServiceSectorRoleType(AuthNode, PrimaryKeyObjectType, IncludePermissionsMixin):
-    permission_classes = (
-        (ServiceSectorRolePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ServiceSectorRolePermission,)
 
     role = graphene.Field(RoleType)
     service_sector = graphene.Field(ServiceSectorType)
@@ -107,9 +97,7 @@ class ServiceSectorRoleType(AuthNode, PrimaryKeyObjectType, IncludePermissionsMi
 
 
 class UnitRoleType(AuthNode, PrimaryKeyObjectType, IncludePermissionsMixin):
-    permission_classes = (
-        (UnitRolePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (UnitRolePermission,)
 
     role = graphene.Field(RoleType)
     units = graphene.List(UnitType)

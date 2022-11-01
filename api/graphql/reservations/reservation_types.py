@@ -1,10 +1,9 @@
 from typing import Optional
 
 import graphene
-from django.conf import settings
 from graphene import ResolveInfo
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny, AllowAuthenticated
+from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.reverse import reverse
 
 from api.graphql.base_connection import TilavarausBaseConnection
@@ -39,9 +38,7 @@ from reservations.models import (
 
 
 class AgeGroupType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AgeGroupPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AgeGroupPermission,)
 
     class Meta:
         model = AgeGroup
@@ -51,11 +48,7 @@ class AgeGroupType(AuthNode, PrimaryKeyObjectType):
 
 
 class AbilityGroupType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AbilityGroupPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (AbilityGroupPermission,)
 
     class Meta:
         model = AbilityGroup
@@ -63,11 +56,7 @@ class AbilityGroupType(AuthNode, PrimaryKeyObjectType):
 
 
 class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (RecurringReservationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (RecurringReservationPermission,)
 
     user = graphene.String()
     application_pk = graphene.Int()
@@ -107,11 +96,7 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationPurposeType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ReservationPurposePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPurposePermission,)
 
     class Meta:
         model = ReservationPurpose
@@ -121,11 +106,7 @@ class ReservationPurposeType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ReservationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPermission,)
     created_at = graphene.String()
     user = graphene.Field("api.graphql.users.user_types.UserType")
     reservation_units = graphene.List(
@@ -259,26 +240,17 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         return self.reservee_phone
 
     def resolve_working_memo(self, info: ResolveInfo) -> Optional[str]:
-        if (
-            can_handle_reservation(info.context.user, self)
-            or settings.TMP_PERMISSIONS_DISABLED
-        ):
+        if can_handle_reservation(info.context.user, self):
             return self.working_memo
         return None
 
     def resolve_staff_event(self, info: ResolveInfo) -> Optional[bool]:
-        if (
-            can_handle_reservation(info.context.user, self)
-            or settings.TMP_PERMISSIONS_DISABLED
-        ):
+        if can_handle_reservation(info.context.user, self):
             return self.staff_event
         return None
 
     def resolve_type(self, info: ResolveInfo) -> Optional[str]:
-        if (
-            can_handle_reservation(info.context.user, self)
-            or settings.TMP_PERMISSIONS_DISABLED
-        ):
+        if can_handle_reservation(info.context.user, self):
             return self.type
         return None
 
@@ -348,9 +320,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AllowAuthenticated,)
 
     class Meta:
         model = ReservationCancelReason
@@ -360,9 +330,7 @@ class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationDenyReasonType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AllowAuthenticated,)
 
     class Meta:
         model = ReservationDenyReason
@@ -372,9 +340,7 @@ class ReservationDenyReasonType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationMetadataSetType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AllowAuthenticated,)
 
     supported_fields = graphene.List(graphene.String)
     required_fields = graphene.List(graphene.String)

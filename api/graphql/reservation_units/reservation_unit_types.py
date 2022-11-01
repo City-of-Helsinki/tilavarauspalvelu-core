@@ -2,13 +2,11 @@ import datetime
 from typing import List, Optional
 
 import graphene
-from django.conf import settings
 from django.db.models import Q, QuerySet, Sum
 from easy_thumbnails.files import get_thumbnailer
 from graphene import ResolveInfo
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
@@ -122,9 +120,7 @@ class KeywordCategoryType(AuthNode, PrimaryKeyObjectType):
 
 
 class PurposeType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (PurposePermission,)
 
     image_url = graphene.String()
     small_url = graphene.String()
@@ -151,9 +147,7 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
 
 
 class QualifierType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (QualifierPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (QualifierPermission,)
 
     class Meta:
         model = Qualifier
@@ -167,11 +161,7 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
 
     url = graphene.String()
 
-    permission_classes = (
-        (ReservationUnitHaukiUrlPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitHaukiUrlPermission,)
 
     class Meta:
         model = ReservationUnit
@@ -179,9 +169,7 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         connection_class = TilavarausBaseConnection
 
     def resolve_url(self, info):
-        if settings.TMP_PERMISSIONS_DISABLED or can_manage_units(
-            info.context.user, self.unit
-        ):
+        if can_manage_units(info.context.user, self.unit):
             return generate_hauki_link(
                 self.uuid,
                 getattr(info.context.user, "email", ""),
@@ -236,11 +224,7 @@ class ReservationUnitImageType(PrimaryKeyObjectType):
 
 
 class ReservationUnitCancellationRuleType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ReservationUnitCancellationRulePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitCancellationRulePermission,)
 
     class Meta:
         model = ReservationUnitCancellationRule
@@ -270,11 +254,7 @@ class ReservationUnitTypeType(PrimaryKeyObjectType):
 
 
 class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (EquipmentCategoryPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (EquipmentCategoryPermission,)
 
     class Meta:
         model = EquipmentCategory
@@ -291,9 +271,7 @@ class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
 
 
 class EquipmentType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (EquipmentPermission,)
     category = graphene.Field(EquipmentCategoryType)
 
     class Meta:
@@ -384,11 +362,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     payment_merchant = graphene.Field(PaymentMerchantType)
     payment_product = graphene.Field(PaymentProductType)
 
-    permission_classes = (
-        (ReservationUnitPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitPermission,)
     pricings = graphene.List(ReservationUnitPricingType)
 
     class Meta:

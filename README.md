@@ -142,9 +142,6 @@ In debug mode basic and session authentication are also enabled.
 For unknown reason separate user objects are created for JWT and Django Admin authentications. This is not intended and will probably be fixed at some point.
 
 
-For development purposes requirement to authenticate can be turned off by setting
-environment variable TMP_PERMISSIONS_DISABLED to True.
-
 ![Data model visualization](tilavarauspalvelu_visualized.svg)
 
 ## Deployed application settings & static files

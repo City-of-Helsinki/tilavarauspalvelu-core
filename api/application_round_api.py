@@ -1,8 +1,7 @@
 import logging
 
-from django.conf import settings
 from django.db.models import Case, Exists, OuterRef, Prefetch, Subquery, Sum, When
-from rest_framework import permissions, serializers, viewsets
+from rest_framework import serializers, viewsets
 
 from applications.models import (
     Application,
@@ -346,11 +345,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
 class ApplicationRoundViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationRoundSerializer
-    permission_classes = (
-        [ApplicationRoundPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ApplicationRoundPermission]
     queryset = (
         ApplicationRound.objects.all()
         .annotate(

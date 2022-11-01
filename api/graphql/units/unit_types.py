@@ -1,7 +1,5 @@
 import graphene
-from django.conf import settings
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
@@ -20,9 +18,7 @@ from spaces.models import Unit, UnitGroup
 
 
 class UnitType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (UnitPermission,)
 
     # avoid circulars and use path.
     reservation_units = graphene.List(
@@ -78,9 +74,7 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
 
 
 class UnitByPkType(UnitType, OpeningHoursMixin):
-    permission_classes = (
-        (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (UnitPermission,)
     hauki_origin_id = "tprek"
 
     class Meta:
@@ -98,9 +92,7 @@ class UnitByPkType(UnitType, OpeningHoursMixin):
 
 
 class UnitGroupType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (UnitPermission,)
 
     units = graphene.List(UnitType)
 
