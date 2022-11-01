@@ -16,6 +16,7 @@ import { useNotification } from "../../context/NotificationContext";
 import Legend from "../reservations/requested/Legend";
 import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
+import { publicUrl } from "../../common/const";
 
 type Props = {
   begin: string;
@@ -116,7 +117,10 @@ const Calendar = ({
         begin={startOfISOWeek(new Date(begin))}
         eventStyleGetter={eventStyleGetter(reservationUnitPk)}
         onSelectEvent={(e) => {
-          window.open(reservationUrl(e.event?.pk as number), "_blank");
+          window.open(
+            publicUrl + reservationUrl(e.event?.pk as number),
+            "_blank"
+          );
         }}
       />
       <Legends>
