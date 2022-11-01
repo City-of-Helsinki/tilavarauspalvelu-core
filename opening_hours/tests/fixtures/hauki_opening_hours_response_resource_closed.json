@@ -1,0 +1,51 @@
+{
+	"count": 1,
+	"next": null,
+	"previous": null,
+	"results": [
+		{
+			"resource": {
+				"id": 1234,
+				"name": {
+					"fi": "Test resource",
+					"sv": null,
+					"en": null
+				},
+				"timezone": "Europe/Helsinki",
+				"origins": [
+					{
+						"data_source": {
+							"id": "tvp",
+							"name": {
+								"fi": "Tilavarauspalvelu",
+								"sv": null,
+								"en": null
+							}
+						},
+						"origin_id": "proper-uuid"
+					}
+				]
+			},
+			"opening_hours": [
+				{
+					"date": "2022-12-12",
+					"times": [
+						{
+							"name": "",
+							"description": "",
+							"start_time": null,
+							"end_time": null,
+							"end_time_on_next_day": false,
+							"resource_state": "closed",
+							"full_day": false,
+							"periods": [
+								1234,
+								1234
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

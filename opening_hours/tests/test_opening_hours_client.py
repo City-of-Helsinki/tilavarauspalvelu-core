@@ -84,6 +84,48 @@ class OpeningHoursClientTestCase(TestCase):
         )
         assert_that(len(times)).is_greater_than(0)
 
+    def test_opening_hours_start_end_null_works(self, mock):
+        resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
+        data = [
+            {
+                "timezone": DEFAULT_TIMEZONE,
+                "resource_id": resource_id,
+                "origin_id": str(self.reservation_unit.uuid),
+                "date": DATES[0],
+                "times": [
+                    TimeElement(
+                        start_time=None,
+                        end_time=None,
+                        end_time_on_next_day=False,
+                        resource_state=State.CLOSED.value,
+                    ),
+                ],
+            },
+            {
+                "timezone": DEFAULT_TIMEZONE,
+                "resource_id": resource_id,
+                "origin_id": str(self.reservation_unit.uuid),
+                "date": DATES[1],
+                "times": [
+                    TimeElement(
+                        start_time=None,
+                        end_time=None,
+                        end_time_on_next_day=False,
+                        resource_state=State.CLOSED.value,
+                    ),
+                ],
+            },
+        ]
+        mock.return_value = data
+        resources = [str(self.reservation_unit.uuid)]
+        client = OpeningHoursClient(resources, DATES[0], DATES[1])
+
+        assert_that(client).is_not_none()
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
+        )
+        assert_that(times).is_not_empty()
+
     def test_refresh_opening_hours(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
         client = OpeningHoursClient(
