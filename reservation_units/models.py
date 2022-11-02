@@ -1,5 +1,6 @@
 import datetime
 import uuid as uuid
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -134,6 +135,10 @@ class TaxPercentage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.value}%"
+
+    @property
+    def decimal(self):
+        return self.value / Decimal("100")
 
 
 def get_default_tax_percentage() -> int:
