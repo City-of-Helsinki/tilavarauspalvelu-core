@@ -148,6 +148,18 @@ class PaymentOrder(models.Model):
         blank=True,
         null=True,
     )
+    checkout_url = models.CharField(
+        verbose_name=_("Checkout URL"),
+        blank=True,
+        null=True,
+        max_length=512,
+    )
+    receipt_url = models.CharField(
+        verbose_name=_("Receipt URL"),
+        blank=True,
+        null=True,
+        max_length=512,
+    )
 
     def clean(self):
         validation_errors = {}

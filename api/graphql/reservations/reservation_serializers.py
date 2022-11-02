@@ -6,6 +6,7 @@ from typing import List, Optional
 from django.utils.timezone import get_default_timezone
 from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
+from sentry_sdk import capture_message
 
 from api.graphql.base_serializers import (
     PrimaryKeySerializer,
@@ -21,6 +22,14 @@ from email_notification.tasks import (
     send_staff_reservation_email_task,
 )
 from merchants.models import Language, PaymentOrder, PaymentStatus
+from merchants.verkkokauppa.order.exceptions import CreateOrderError
+from merchants.verkkokauppa.order.requests import create_order
+from merchants.verkkokauppa.order.types import (
+    CreateOrderParams,
+    OrderCustomer,
+    OrderItemMetaParams,
+    OrderItemParams,
+)
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.models import (
     PaymentType,
@@ -850,6 +859,63 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     def _get_price_vat(self) -> Decimal:
         return self.instance.price - self._get_price_net()
 
+    def _create_verkkokauppa_order(self):
+        runit = self.instance.reservation_unit.first()
+        quantity = 1  # Currently this is always 1
+        items = [
+            OrderItemParams(
+                product_id=runit.payment_product.id,
+                product_name=runit.name_fi,  # TODO: Add language support
+                quantity=1,
+                unit="pcs",
+                row_price_net=quantity * self._get_price_net(),
+                row_price_vat=quantity * self._get_price_vat(),
+                row_price_total=quantity * self._get_price_net()
+                + quantity * self._get_price_vat(),
+                price_net=self._get_price_net(),
+                price_vat=self._get_price_vat(),
+                price_gross=self._get_price_net() + self._get_price_vat(),
+                vat_percentage=runit.tax_percentage.value,
+                meta=[
+                    OrderItemMetaParams(
+                        key="reservationPeriod",
+                        value="Ti 1.11.2022 09:00-10:00",  # TODO: Format
+                        label="Varausaika",
+                        visible_in_checkout=True,
+                        ordinal=1,
+                    )
+                ],
+            )
+        ]
+        order_params = CreateOrderParams(
+            namespace=settings.VERKKOKAUPPA_NAMESPACE,
+            user=self.instance.user.uuid,
+            language=self.instance.reservee_language or "fi",
+            items=items,
+            price_net=sum(item.row_price_net for item in items),
+            price_vat=sum(item.row_price_vat for item in items),
+            price_total=sum(item.row_price_total for item in items),
+            customer=OrderCustomer(
+                first_name="First",
+                last_name="Name",
+                email="asdasd@asdasd.fi",
+                phone="+358 50 565 8148",  # TODO: Must be validated
+            ),
+        )
+
+        try:
+            payment_order = create_order(order_params)
+        except (CreateOrderError) as e:
+            capture_message(
+                f"Call to Verkkokauppa Order Experience API failed: {e}",
+                level="error",
+            )
+            raise ValidationErrorWithCode(
+                "Upstream service call failed. Unable to confirm the reservation.",
+                ValidationErrorCodes.UPSTREAM_CALL_FAILED,
+            )
+        return payment_order
+
     def save(self, **kwargs):
         self.fields.pop("payment_type")
         state = self.validated_data["state"]
@@ -867,7 +933,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     reservation=self.instance,
                 )
             else:
-                # TODO: Call verkkokauppa order API
+                payment_order = self._create_verkkokauppa_order()
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
                     status=PaymentStatus.DRAFT,
@@ -877,6 +943,9 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     price_total=self.instance.price,
                     reservation=self.instance,
                     reservation_user_uuid=self.instance.user.uuid,
+                    order_id=payment_order.order_id,
+                    checkout_url=payment_order.checkout_url,
+                    receipt_url=payment_order.receipt_url,
                 )
 
         instance = super().save(**kwargs)

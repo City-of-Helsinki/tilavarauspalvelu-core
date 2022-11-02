@@ -23,6 +23,10 @@ class OrderTypesTestCase(TestCase):
     create_order_params: CreateOrderParams = CreateOrderParams(
         namespace="test-namespace",
         user="test-user",
+        language="fi",
+        price_net=Decimal("100.0"),
+        price_vat=Decimal("24.0"),
+        price_total=Decimal("124.0"),
         items=[
             OrderItemParams(
                 product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
@@ -111,6 +115,7 @@ class OrderTypesTestCase(TestCase):
         "type": "order",
         "subscriptionId": None,
         "checkoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
+        "receiptUrl": "http://localhost:1234/c1c55d55-4ef6-4a4c-8195-4f5022ad8ed8",
         "priceNet": "100",
         "priceVat": "24",
         "priceTotal": "124",
@@ -122,6 +127,10 @@ class OrderTypesTestCase(TestCase):
             {
                 "namespace": "test-namespace",
                 "user": "test-user",
+                "language": "fi",
+                "priceNet": "100.0",
+                "priceVat": "24.0",
+                "priceTotal": "124.0",
                 "items": [
                     {
                         "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
@@ -212,6 +221,7 @@ class OrderTypesTestCase(TestCase):
                 price_vat=Decimal("24"),
                 price_total=Decimal("124"),
                 checkout_url="http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
+                receipt_url="http://localhost:1234/c1c55d55-4ef6-4a4c-8195-4f5022ad8ed8",
                 customer=OrderCustomer(
                     first_name="John",
                     last_name="Doe",

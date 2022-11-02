@@ -2,6 +2,7 @@ import datetime
 import json
 from decimal import Decimal
 from unittest.mock import patch
+from uuid import uuid4
 
 import freezegun
 from assertpy import assert_that
@@ -14,10 +15,35 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
+from merchants.verkkokauppa.order.types import Order, OrderCustomer, OrderType
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from permissions.models import UnitRole
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import ReservationFactory
+
+
+def create_verkkokauppa_order() -> Order:
+    return Order(
+        order_id=uuid4(),
+        namespace="tilanvaraus",
+        user=str(uuid4()),
+        created_at=datetime.datetime.now(),
+        items=[],
+        price_net=Decimal("100.0"),
+        price_vat=Decimal("24.0"),
+        price_total=Decimal("124.0"),
+        checkout_url="https://checkout.url",
+        receipt_url="http://receipt.url",
+        customer=OrderCustomer(
+            first_name="Liu",
+            last_name="Kang",
+            email="liu.kang@earthrealm.com",
+            phone="+358 50 123 4567",
+        ),
+        status="created",
+        subscription_id=uuid4(),
+        type="order",
+    )
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
@@ -82,7 +108,11 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_confirm_reservation_changes_state(self, mock_periods, mock_opening_hours):
+    @patch("api.graphql.reservations.reservation_serializers.create_order")
+    def test_confirm_reservation_changes_state(
+        self, mock_create_order, mock_periods, mock_opening_hours
+    ):
+        mock_create_order.return_value = create_verkkokauppa_order()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
@@ -202,9 +232,11 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
 
+    @patch("api.graphql.reservations.reservation_serializers.create_order")
     def test_confirm_reservation_updates_confirmed_at(
-        self, mock_periods, mock_opening_hours
+        self, mock_create_order, mock_periods, mock_opening_hours
     ):
+        mock_create_order.return_value = create_verkkokauppa_order()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
