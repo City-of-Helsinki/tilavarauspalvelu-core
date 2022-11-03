@@ -1,5 +1,6 @@
 import datetime
 import json
+from decimal import Decimal
 from unittest.mock import patch
 
 import freezegun
@@ -1093,6 +1094,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.price).is_equal_to(
             0.0
         )  # Free units should always be 0 €
+        assert_that(reservation.price_net).is_zero()
         assert_that(reservation.unit_price).is_equal_to(0.0)
         assert_that(reservation.tax_percentage_value).is_equal_to(0.0)
 
@@ -1107,6 +1109,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=1.0,
             highest_price=3.0,
+            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -1130,6 +1133,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             3.0
         )  # With fixed price unit, time is ignored
         assert_that(reservation.unit_price).is_equal_to(3.0)
+        assert_that(reservation.price_net).is_close_to(
+            Decimal("3") / (1 + tax_percentage.decimal), 6
+        )
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
     def test_create_price_calculation_with_time_based_price_reservation_unit(
@@ -1142,7 +1148,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
             lowest_price=1.0,
+            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
             highest_price=3.0,
+            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -1166,7 +1174,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             3.0 * 4
         )  # 1h reservation = 4 x 15 min = 4 x 3 €
         assert_that(reservation.unit_price).is_equal_to(
-            3.0 * 4
+            3.0
         )  # 1h reservation = 4 x 15 min = 4 x 3 €
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
@@ -1178,7 +1186,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
             lowest_price=1.0,
+            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
             highest_price=3.0,
+            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -1208,8 +1218,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             3.0 * 4
         )  # 46 min reservation = 4 x 15 min = 4 x 3 €
         assert_that(reservation.unit_price).is_equal_to(
-            3.0 * 4
-        )  # 46 min reservation = 4 x 15 min = 4 x 3 €
+            3.0
+        )  # Unit price is the price of the reservation unit.
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
     @patch(
@@ -1250,7 +1260,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
             lowest_price=1.0,
+            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
             highest_price=3.0,
+            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -1270,7 +1282,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
             lowest_price=2.0,
+            lowest_price_net=Decimal("2") / (1 + tax_percentage.decimal),
             highest_price=4.0,
+            highest_price_net=Decimal("4") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=second_unit,
@@ -1295,8 +1309,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             3.0 * 4 + 4.0 * 4
         )  # 1h reservation = 4 x 15 min from both units
         assert_that(reservation.unit_price).is_equal_to(
-            3.0 * 4
-        )  # 1 h reservation = 4 x 15 min from the first unit
+            3.0
+        )  # 3€ from from the first unit
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
     def test_create_price_calculation_with_future_pricing(
@@ -1313,6 +1327,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=1.0,
             highest_price=3.0,
+            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
+            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -1322,8 +1338,10 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             begins=datetime.date.today() + datetime.timedelta(days=2),
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
-            lowest_price=4.0,
-            highest_price=6.0,
+            lowest_price=Decimal("4"),
+            highest_price=Decimal("6"),
+            lowest_price_net=Decimal("4") / (1 + tax_percentage.decimal),
+            highest_price_net=Decimal("6") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_FUTURE,
             reservation_unit=self.reservation_unit,
@@ -1350,5 +1368,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.price).is_equal_to(
             6.0
         )  # With fixed price unit, time is ignored
+        assert_that(reservation.price_net).is_close_to(
+            6 / (1 + tax_percentage.decimal), 6
+        )
         assert_that(reservation.unit_price).is_equal_to(6.0)
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)

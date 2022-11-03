@@ -1,5 +1,6 @@
 import datetime
 import uuid as uuid
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -134,6 +135,10 @@ class TaxPercentage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.value}%"
+
+    @property
+    def decimal(self):
+        return self.value / Decimal("100")
 
 
 def get_default_tax_percentage() -> int:
@@ -697,7 +702,15 @@ class ReservationUnitPricing(models.Model):
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="Minimum price of the reservation unit",
+        help_text="Minimum price of the reservation unit including VAT",
+    )
+
+    lowest_price_net = models.DecimalField(
+        verbose_name=_("Lowest net price"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="Minimum price of the reservation unit excluding VAT",
     )
 
     highest_price = models.DecimalField(
@@ -705,7 +718,15 @@ class ReservationUnitPricing(models.Model):
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="Maximum price of the reservation unit",
+        help_text="Maximum price of the reservation unit including VAT",
+    )
+
+    highest_price_net = models.DecimalField(
+        verbose_name=_("Highest net price"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="Maximum price of the reservation unit excluding VAT",
     )
 
     tax_percentage = models.ForeignKey(

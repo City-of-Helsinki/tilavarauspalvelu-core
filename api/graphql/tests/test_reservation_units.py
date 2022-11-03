@@ -3236,6 +3236,7 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
         cls.pricing_term = TermsOfUseFactory(
             name="Test pricing terms", terms_type=TermsOfUse.TERMS_TYPE_PRICING
         )
+        cls.tax_percentage = TaxPercentage.objects.get(value=24)
 
     def setUp(self):
         self.client.force_login(self.general_admin)
@@ -3495,8 +3496,14 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
                     "pricingType": PricingType.PAID,
                     "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
                     "lowestPrice": 10.5,
+                    "lowestPriceNet": round(
+                        float(Decimal("10.5") / (1 + self.tax_percentage.decimal)), 6
+                    ),
                     "highestPrice": 18.8,
-                    "taxPercentagePk": 2,
+                    "highestPriceNet": round(
+                        float(Decimal("18.8") / (1 + self.tax_percentage.decimal)), 6
+                    ),
+                    "taxPercentagePk": self.tax_percentage.id,
                     "status": PricingStatus.PRICING_STATUS_ACTIVE,
                 }
             ],
@@ -5335,9 +5342,11 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(pricing.begins).is_equal_to(datetime.date.today())
         assert_that(pricing.pricing_type).is_equal_to(PricingType.FREE)
         assert_that(pricing.status).is_equal_to(PricingStatus.PRICING_STATUS_ACTIVE)
-        assert_that(pricing.lowest_price).is_equal_to(0.0)
-        assert_that(pricing.highest_price).is_equal_to(0.0)
-        assert_that(pricing.tax_percentage.value).is_equal_to(0.0)
+        assert_that(pricing.lowest_price).is_zero()
+        assert_that(pricing.highest_price).is_zero()
+        assert_that(pricing.lowest_price_net).is_zero()
+        assert_that(pricing.highest_price_net).is_zero()
+        assert_that(pricing.tax_percentage.value).is_zero()
 
     def test_active_pricing_can_be_created_on_update(self):
         create_data = self.get_valid_data(True)

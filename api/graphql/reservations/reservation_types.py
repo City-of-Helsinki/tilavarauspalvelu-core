@@ -202,6 +202,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "unit_price",
             "tax_percentage_value",
             "price",
+            "price_net",
             "working_memo",
             "cancel_details",
             "staff_event",

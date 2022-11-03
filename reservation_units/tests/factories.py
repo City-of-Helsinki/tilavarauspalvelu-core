@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 
 from factory import SubFactory, post_generation
 from factory.django import DjangoModelFactory
@@ -40,7 +41,7 @@ class TaxPercentageFactory(DjangoModelFactory):
     class Meta:
         model = "reservation_units.TaxPercentage"
 
-    value = FuzzyChoice(choices=(10.0, 14.0, 24.0))
+    value = FuzzyChoice(choices=(Decimal("10.0"), Decimal("14.0"), Decimal("24.0")))
 
 
 class QualifierFactory(DjangoModelFactory):

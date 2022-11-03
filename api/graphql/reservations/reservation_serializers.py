@@ -61,14 +61,20 @@ RESERVATION_STATE_EMAIL_TYPE_MAP = {
 
 
 class PriceCalculationResult:
-    reservation_price: Decimal = Decimal(0)
-    unit_price: Decimal = Decimal(0)
-    tax_percentage: Decimal = Decimal(0)
+    reservation_price: Decimal = Decimal("0")
+    reservation_price_net: Decimal = Decimal("0")
+    unit_price: Decimal = Decimal("0")
+    tax_percentage: Decimal = Decimal("0")
 
     def __init__(
-        self, reservation_price: Decimal, unit_price: Decimal, tax_percentage: Decimal
+        self,
+        reservation_price: Decimal,
+        reservation_price_net: Decimal,
+        unit_price: Decimal,
+        tax_percentage: Decimal,
     ) -> None:
         self.reservation_price = reservation_price
+        self.reservation_price_net = reservation_price_net
         self.unit_price = unit_price
         self.tax_percentage = tax_percentage
 
@@ -155,6 +161,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "unit_price",
             "tax_percentage_value",
             "price",
+            "price_net",
             "staff_event",
             "type",
         ]
@@ -167,6 +174,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         self.fields["unit_price"].read_only = True
         self.fields["tax_percentage_value"].read_only = True
         self.fields["price"].read_only = True
+        self.fields["price_net"].read_only = True
 
         # Form/metadata fields should be optional by default
         self.fields["reservee_type"].required = False
@@ -256,6 +264,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             data["price"] = price_calculation_result.reservation_price
             data["unit_price"] = price_calculation_result.unit_price
             data["tax_percentage_value"] = price_calculation_result.tax_percentage
+            data["price_net"] = price_calculation_result.reservation_price_net
 
         staff_event = data.get("staff_event", None)
         reservation_type = data.get("type", None)
@@ -512,10 +521,11 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             PriceUnit.PRICE_UNIT_PER_WEEK: 10080,
         }
 
-        total_reservation_price: Decimal = Decimal(0.0)
+        total_reservation_price: Decimal = Decimal("0")
+        total_reservation_price_net: Decimal = Decimal("0")
 
-        first_paid_unit_price: Decimal = 0.0
-        first_paid_unit_tax_percentage: Decimal = 0.0
+        first_paid_unit_price: Decimal = Decimal("0")
+        first_paid_unit_tax_percentage: Decimal = Decimal("0")
         is_first_paid_set = False
 
         for reservation_unit in reservation_units:
@@ -526,37 +536,50 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             if pricing is None or pricing.pricing_type != PricingType.PAID:
                 break
 
-            reservation_unit_price = Decimal(
-                max(pricing.lowest_price, pricing.highest_price)
+            max_price = max(pricing.lowest_price, pricing.highest_price)
+            reservation_unit_price = unit_price = max_price
+
+            # Use same equivalent net price that with vat price.
+            # This is merely a cautionary check since this should be highest_price_net.
+            reservation_unit_price_net = (
+                pricing.highest_price_net
+                if max_price == pricing.highest_price
+                else pricing.lowest_price_net
             )
 
             # Time-based calculation is needed only if price unit is not fixed.
-            # Otherwise we can just use the price defined in the reservation unit
+            # Otherwise, we can just use the price defined in the reservation unit
             if pricing.price_unit != PriceUnit.PRICE_UNIT_FIXED:
-                reservation_duration_in_minutes = (end - begin).seconds / 60
+                reservation_duration_in_minutes = (end - begin).seconds / Decimal("60")
                 reservation_unit_price_unit_minutes = price_unit_to_minutes.get(
                     pricing.price_unit
                 )
-                reservation_unit_price = Decimal(
+                reservation_unit_price_net = Decimal(
                     math.ceil(
                         reservation_duration_in_minutes
                         / reservation_unit_price_unit_minutes
                     )
-                    * reservation_unit_price
+                    * reservation_unit_price_net
+                )
+
+                reservation_unit_price = reservation_unit_price_net * (
+                    1 + pricing.tax_percentage.decimal
                 )
 
             # It was agreed in TILA-1765 that when multiple units are given,
             # unit price and tax percentage are fetched from the FIRST unit.
             # https://helsinkisolutionoffice.atlassian.net/browse/TILA-1765
             if not is_first_paid_set:
-                first_paid_unit_price = reservation_unit_price
+                first_paid_unit_price = unit_price
                 first_paid_unit_tax_percentage = pricing.tax_percentage.value
                 is_first_paid_set = True
 
             total_reservation_price += reservation_unit_price
+            total_reservation_price_net += reservation_unit_price_net
 
         return PriceCalculationResult(
             total_reservation_price,
+            total_reservation_price_net,
             first_paid_unit_price,
             first_paid_unit_tax_percentage,
         )
