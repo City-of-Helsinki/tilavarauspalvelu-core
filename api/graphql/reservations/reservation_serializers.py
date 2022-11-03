@@ -6,7 +6,6 @@ from typing import List, Optional
 from django.utils.timezone import get_default_timezone
 from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
-from sentry_sdk import capture_message
 
 from api.graphql.base_serializers import (
     PrimaryKeySerializer,
@@ -22,14 +21,7 @@ from email_notification.tasks import (
     send_staff_reservation_email_task,
 )
 from merchants.models import Language, PaymentOrder, PaymentStatus
-from merchants.verkkokauppa.order.exceptions import CreateOrderError
-from merchants.verkkokauppa.order.requests import create_order
-from merchants.verkkokauppa.order.types import (
-    CreateOrderParams,
-    OrderCustomer,
-    OrderItemMetaParams,
-    OrderItemParams,
-)
+from merchants.verkkokauppa.helpers import create_verkkokauppa_order
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.models import (
     PaymentType,
@@ -55,6 +47,7 @@ from reservations.models import (
     ReservationType,
 )
 from users.models import ReservationNotification
+from utils.decimal_utils import round_decimal
 
 from ..application_errors import ValidationErrorCodes, ValidationErrorWithCode
 
@@ -850,97 +843,36 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         return validated_data
 
-    # TODO: Remove when separated prices are in reservation
-    def _get_price_net(self) -> Decimal:
-        price_total = self.instance.price
-        tax_percentage = self.instance.tax_percentage_value
-        return price_total / (1 + tax_percentage / 100)
-
-    def _get_price_vat(self) -> Decimal:
-        return self.instance.price - self._get_price_net()
-
-    def _create_verkkokauppa_order(self):
-        runit = self.instance.reservation_unit.first()
-        quantity = 1  # Currently this is always 1
-        items = [
-            OrderItemParams(
-                product_id=runit.payment_product.id,
-                product_name=runit.name_fi,  # TODO: Add language support
-                quantity=1,
-                unit="pcs",
-                row_price_net=quantity * self._get_price_net(),
-                row_price_vat=quantity * self._get_price_vat(),
-                row_price_total=quantity * self._get_price_net()
-                + quantity * self._get_price_vat(),
-                price_net=self._get_price_net(),
-                price_vat=self._get_price_vat(),
-                price_gross=self._get_price_net() + self._get_price_vat(),
-                vat_percentage=runit.tax_percentage.value,
-                meta=[
-                    OrderItemMetaParams(
-                        key="reservationPeriod",
-                        value="Ti 1.11.2022 09:00-10:00",  # TODO: Format
-                        label="Varausaika",
-                        visible_in_checkout=True,
-                        ordinal=1,
-                    )
-                ],
-            )
-        ]
-        order_params = CreateOrderParams(
-            namespace=settings.VERKKOKAUPPA_NAMESPACE,
-            user=self.instance.user.uuid,
-            language=self.instance.reservee_language or "fi",
-            items=items,
-            price_net=sum(item.row_price_net for item in items),
-            price_vat=sum(item.row_price_vat for item in items),
-            price_total=sum(item.row_price_total for item in items),
-            customer=OrderCustomer(
-                first_name="First",
-                last_name="Name",
-                email="asdasd@asdasd.fi",
-                phone="+358 50 565 8148",  # TODO: Must be validated
-            ),
-        )
-
-        try:
-            payment_order = create_order(order_params)
-        except (CreateOrderError) as e:
-            capture_message(
-                f"Call to Verkkokauppa Order Experience API failed: {e}",
-                level="error",
-            )
-            raise ValidationErrorWithCode(
-                "Upstream service call failed. Unable to confirm the reservation.",
-                ValidationErrorCodes.UPSTREAM_CALL_FAILED,
-            )
-        return payment_order
-
     def save(self, **kwargs):
         self.fields.pop("payment_type")
         state = self.validated_data["state"]
-
         if state == STATE_CHOICES.CONFIRMED:
             payment_type = self.validated_data["payment_type"].upper()
+            price_net = round_decimal(self.instance.price_net, 2)
+            price_vat = round_decimal(
+                self.instance.price_net * (self.instance.tax_percentage_value / 100), 2
+            )
+            price_total = round_decimal(self.instance.price, 2)
+
             if payment_type == PaymentType.ON_SITE:
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
                     status=PaymentStatus.PAID_MANUALLY,
                     language=self.instance.reservee_language or Language.FI,
-                    price_net=self._get_price_net(),
-                    price_vat=self._get_price_vat(),
-                    price_total=self.instance.price,
+                    price_net=price_net,
+                    price_vat=price_vat,
+                    price_total=price_total,
                     reservation=self.instance,
                 )
             else:
-                payment_order = self._create_verkkokauppa_order()
+                payment_order = create_verkkokauppa_order(self.instance)
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
                     status=PaymentStatus.DRAFT,
                     language=self.instance.reservee_language or Language.FI,
-                    price_net=self._get_price_net(),
-                    price_vat=self._get_price_vat(),
-                    price_total=self.instance.price,
+                    price_net=price_net,
+                    price_vat=price_vat,
+                    price_total=price_total,
                     reservation=self.instance,
                     reservation_user_uuid=self.instance.user.uuid,
                     order_id=payment_order.order_id,

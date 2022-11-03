@@ -15,7 +15,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
-from merchants.verkkokauppa.order.types import Order, OrderCustomer, OrderType
+from merchants.verkkokauppa.order.types import Order, OrderCustomer
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from permissions.models import UnitRole
 from reservations.models import STATE_CHOICES, AgeGroup
@@ -64,6 +64,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CREATED,
             user=self.regular_joe,
             reservee_email="email@reservee",
+            price_net=Decimal("10.0"),
             price=Decimal("12.4"),
             tax_percentage_value=Decimal("24.0"),
         )
@@ -108,7 +109,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    @patch("api.graphql.reservations.reservation_serializers.create_order")
+    @patch("merchants.verkkokauppa.helpers.create_order")
     def test_confirm_reservation_changes_state(
         self, mock_create_order, mock_periods, mock_opening_hours
     ):
@@ -232,7 +233,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
 
-    @patch("api.graphql.reservations.reservation_serializers.create_order")
+    @patch("merchants.verkkokauppa.helpers.create_order")
     def test_confirm_reservation_updates_confirmed_at(
         self, mock_create_order, mock_periods, mock_opening_hours
     ):
@@ -247,10 +248,11 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             datetime.datetime(2021, 10, 12, 12).astimezone(get_default_timezone())
         )
 
-    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    @patch("merchants.verkkokauppa.helpers.create_order")
     def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(
-        self, mock_periods, mock_opening_hours
+        self, mock_create_order, mock_periods, mock_opening_hours
     ):
+        mock_create_order.return_value = create_verkkokauppa_order()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.metadata_set = self._create_metadata_set()
         self.reservation_unit.save(update_fields=["metadata_set"])

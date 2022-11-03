@@ -4,7 +4,6 @@ from decimal import Decimal
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
-from ..helpers import parse_datetime
 from .exceptions import ParseOrderError
 
 
@@ -98,6 +97,8 @@ class Order:
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "Order":
+        from ..helpers import parse_datetime
+
         try:
             return Order(
                 order_id=UUID(json["orderId"]),
@@ -196,7 +197,7 @@ class CreateOrderParams:
                     "meta": [
                         {
                             "key": meta.key,
-                            "value": meta.value,
+                            "value": str(meta.value),
                             "label": meta.label,
                             "visibleInCheckout": meta.visible_in_checkout,
                             "ordinal": meta.ordinal,
