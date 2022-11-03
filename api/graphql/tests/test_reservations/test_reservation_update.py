@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from applications.models import City
+from applications.models import CUSTOMER_TYPES, City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.hours import DEFAULT_TIMEZONE
 from opening_hours.tests.test_get_periods import get_mocked_periods
@@ -606,6 +606,84 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             input_data["reserveePhone"]
         )
         assert_that(self.reservation.home_city).is_equal_to(home_city)
+        assert_that(self.reservation.age_group).is_equal_to(age_group)
+
+    def test_update_succeeds_when_missing_home_city_for_individual(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        metadata_set = self._create_metadata_set()
+        self.reservation_unit.metadata_set = metadata_set
+        self.reservation_unit.save(update_fields=["metadata_set"])
+
+        age_group = AgeGroup.objects.create(minimum=18, maximum=30)
+        input_data = self.get_valid_update_data()
+        input_data["reserveeFirstName"] = "John"
+        input_data["reserveeLastName"] = "Doe"
+        input_data["reserveePhone"] = "+358123456789"
+        input_data["ageGroupPk"] = age_group.pk
+        input_data["reserveeType"] = CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.reservee_first_name).is_equal_to(
+            input_data["reserveeFirstName"]
+        )
+        assert_that(self.reservation.reservee_last_name).is_equal_to(
+            input_data["reserveeLastName"]
+        )
+        assert_that(self.reservation.reservee_phone).is_equal_to(
+            input_data["reserveePhone"]
+        )
+        assert_that(self.reservation.age_group).is_equal_to(age_group)
+
+    def test_update_succeeds_when_missing_reservee_organisation_name_for_individual(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        metadata_set = self._create_metadata_set()
+        reservee_organisation_name_field = ReservationMetadataField.objects.get(
+            field_name="reservee_organisation_name"
+        )
+        metadata_set.required_fields.add(reservee_organisation_name_field)
+        metadata_set.supported_fields.add(reservee_organisation_name_field)
+        self.reservation_unit.metadata_set = metadata_set
+        self.reservation_unit.save(update_fields=["metadata_set"])
+
+        age_group = AgeGroup.objects.create(minimum=18, maximum=30)
+        input_data = self.get_valid_update_data()
+        input_data["reserveeFirstName"] = "John"
+        input_data["reserveeLastName"] = "Doe"
+        input_data["reserveePhone"] = "+358123456789"
+        input_data["ageGroupPk"] = age_group.pk
+        input_data["reserveeType"] = CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.reservee_first_name).is_equal_to(
+            input_data["reserveeFirstName"]
+        )
+        assert_that(self.reservation.reservee_last_name).is_equal_to(
+            input_data["reserveeLastName"]
+        )
+        assert_that(self.reservation.reservee_phone).is_equal_to(
+            input_data["reserveePhone"]
+        )
         assert_that(self.reservation.age_group).is_equal_to(age_group)
 
     def test_update_fails_when_some_required_fields_are_missing(
