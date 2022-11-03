@@ -1,10 +1,8 @@
 import graphene
-from django.conf import settings
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.spaces.space_serializers import (
@@ -20,9 +18,7 @@ from spaces.models import Space
 class SpaceCreateMutation(AuthSerializerMutation, SerializerMutation):
     space = graphene.Field(SpaceType)
 
-    permission_classes = (
-        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (SpacePermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -33,9 +29,7 @@ class SpaceCreateMutation(AuthSerializerMutation, SerializerMutation):
 class SpaceUpdateMutation(AuthSerializerMutation, SerializerMutation):
     space = graphene.Field(SpaceType)
 
-    permission_classes = (
-        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (SpacePermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -44,9 +38,7 @@ class SpaceUpdateMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class SpaceDeleteMutation(AuthDeleteMutation, ClientIDMutation):
-    permission_classes = (
-        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (SpacePermission,)
     model = Space
 
     @classmethod

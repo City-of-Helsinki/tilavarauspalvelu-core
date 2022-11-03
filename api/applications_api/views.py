@@ -1,10 +1,9 @@
 from datetime import datetime
 
 from dateutil.parser import parse
-from django.conf import settings
 from django.db.models import Count, Prefetch, Q
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import mixins, viewsets
 
 from api.applications_api.filters import (
     ApplicationEventWeeklyAmountReductionFilter,
@@ -42,17 +41,10 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ApplicationFilter
-    permission_classes = (
-        [ApplicationPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ApplicationPermission]
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
-        if settings.TMP_PERMISSIONS_DISABLED:
-            return queryset
 
         # Filtering queries formation
         user = self.request.user
@@ -142,11 +134,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
 class ApplicationEventViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationEventSerializer
-    permission_classes = (
-        [ApplicationEventPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ApplicationEventPermission]
     queryset = ApplicationEvent.objects.all()
 
     def get_serializer_context(self):
@@ -203,9 +191,6 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
             )
         )
 
-        if settings.TMP_PERMISSIONS_DISABLED:
-            return queryset
-
         user = self.request.user
 
         return queryset.filter(
@@ -220,11 +205,7 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
 
 class ApplicationStatusViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationStatusSerializer
-    permission_classes = (
-        [ApplicationStatusPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ApplicationStatusPermission]
     queryset = ApplicationStatus.objects.all()
 
     def get_serializer(self, *args, **kwargs):
@@ -236,11 +217,7 @@ class ApplicationStatusViewSet(viewsets.ModelViewSet):
 
 class ApplicationEventStatusViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationEventStatusSerializer
-    permission_classes = (
-        [ApplicationEventStatusPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ApplicationEventStatusPermission]
     queryset = ApplicationEventStatus.objects.all()
 
     def get_serializer(self, *args, **kwargs):
@@ -265,8 +242,4 @@ class ApplicationEventWeeklyAmountReductionViewSet(
     filter_backends = [DjangoFilterBackend]
     filterset_class = ApplicationEventWeeklyAmountReductionFilter
 
-    permission_classes = (
-        [ApplicationEventWeeklyAmountReductionPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ApplicationEventWeeklyAmountReductionPermission]

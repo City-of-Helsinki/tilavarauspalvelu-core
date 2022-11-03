@@ -1,9 +1,8 @@
 import graphene
-from django.conf import settings
 from django.db.models import Count
 from graphene_django import DjangoListField
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny, AllowAuthenticated
+from graphene_permissions.permissions import AllowAuthenticated
 
 from api.graphql.application_rounds.application_round_types import (
     ApplicationRoundBasketType,
@@ -42,9 +41,7 @@ from utils.query_performance import QueryPerformanceOptimizerMixin
 
 
 class CityType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (CityPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (CityPermission,)
 
     class Meta:
         model = City
@@ -55,9 +52,7 @@ class CityType(AuthNode, PrimaryKeyObjectType):
 
 
 class AddressType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AddressPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AddressPermission,)
 
     class Meta:
         model = Address
@@ -68,9 +63,7 @@ class AddressType(AuthNode, PrimaryKeyObjectType):
 
 
 class PersonType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
-    )
+    permission_classes = (AllowAuthenticated,)
 
     class Meta:
         model = Person
@@ -81,11 +74,7 @@ class PersonType(AuthNode, PrimaryKeyObjectType):
 
 
 class OrganisationType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (OrganisationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [AllowAny]
-    )
+    permission_classes = (OrganisationPermission,)
 
     address = graphene.Field(AddressType)
 
@@ -115,9 +104,7 @@ class ApplicationEventAggregatedDataType(graphene.ObjectType):
 
 
 class ApplicationEventScheduleResultType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
-    )
+    permission_classes = (AllowAuthenticated,)
     allocated_reservation_unit = graphene.Field(ReservationUnitType)
     basket = graphene.Field(ApplicationRoundBasketType)
     allocated_day = graphene.Int()
@@ -144,9 +131,7 @@ class ApplicationEventScheduleResultType(AuthNode, PrimaryKeyObjectType):
 
 
 class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
-    )
+    permission_classes = (AllowAuthenticated,)
     day = graphene.Int()
     priority = graphene.Int()
     application_event_schedule_result = graphene.Field(
@@ -174,9 +159,7 @@ class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
 
 
 class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
-    )
+    permission_classes = (AllowAuthenticated,)
 
     reservation_unit = graphene.Field(ReservationUnitType)
 
@@ -196,9 +179,7 @@ class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
 
 class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
-    )
+    permission_classes = (AllowAuthenticated,)
 
     application_event_schedules = graphene.List(ApplicationEventScheduleType)
 
@@ -274,11 +255,7 @@ class ApplicationAggregatedDataType(graphene.ObjectType):
 
 
 class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ApplicationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [AllowAny]
-    )
+    permission_classes = (ApplicationPermission,)
 
     contact_person = graphene.Field(PersonType)
 

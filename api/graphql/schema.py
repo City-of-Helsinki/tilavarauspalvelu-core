@@ -1,10 +1,9 @@
 import django_filters
 import graphene
-from django.conf import settings
 from django.db.models import Q
 from graphene import Field, relay
 from graphene_permissions.mixins import AuthFilter
-from graphene_permissions.permissions import AllowAny, AllowAuthenticated
+from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.applications.application_filtersets import (
@@ -143,19 +142,11 @@ class AllowAuthenticatedFilter(AuthFilter):
 
 
 class ApplicationRoundFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (ApplicationRoundPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [AllowAny]
-    )
+    permission_classes = (ApplicationRoundPermission,)
 
 
 class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (ApplicationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [AllowAny]
-    )
+    permission_classes = (ApplicationPermission,)
 
     @classmethod
     def resolve_queryset(
@@ -164,9 +155,6 @@ class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
         queryset = super().resolve_queryset(
             connection, iterable, info, args, filtering_args, filterset_class
         )
-
-        if settings.TMP_PERMISSIONS_DISABLED:
-            return queryset
 
         # Filtering queries formation
         user = info.context.user
@@ -194,11 +182,7 @@ class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
 
 
 class ApplicationEventsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (ApplicationEventPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [AllowAny]
-    )
+    permission_classes = (ApplicationEventPermission,)
 
     @classmethod
     def resolve_queryset(
@@ -207,9 +191,6 @@ class ApplicationEventsFilter(AuthFilter, django_filters.FilterSet):
         queryset = super().resolve_queryset(
             connection, iterable, info, args, filtering_args, filterset_class
         )
-
-        if settings.TMP_PERMISSIONS_DISABLED:
-            return queryset
 
         # Filtering queries formation
         user = info.context.user
@@ -235,11 +216,7 @@ class ApplicationEventsFilter(AuthFilter, django_filters.FilterSet):
 
 
 class ReservationsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (ReservationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPermission,)
 
     @classmethod
     def resolve_queryset(
@@ -255,11 +232,7 @@ class ReservationsFilter(AuthFilter, django_filters.FilterSet):
 
 
 class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (ReservationUnitPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitPermission,)
 
     @classmethod
     def resolve_queryset(
@@ -273,133 +246,79 @@ class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
 
 
 class ReservationUnitTypesFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (ReservationUnitPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitPermission,)
 
 
 class ResourcesFilter(AuthFilter):
-    permission_classes = (
-        (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (ResourcePermission,)
 
 
 class SpacesFilter(AuthFilter):
-    permission_classes = (
-        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (SpacePermission,)
 
 
 class UnitsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (UnitPermission,)
 
 
 class KeywordFilter(AuthFilter):
-    permission_classes = (
-        (KeywordPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (KeywordPermission,)
 
 
 class EquipmentFilter(AuthFilter):
-    permission_classes = (
-        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (EquipmentPermission,)
 
 
 class EquipmentCategoryFilter(AuthFilter):
-    permission_classes = (
-        (EquipmentCategoryPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (EquipmentCategoryPermission,)
 
 
 class PurposeFilter(AuthFilter):
-    permission_classes = (
-        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (PurposePermission,)
 
 
 class QualifierFilter(AuthFilter):
-    permission_classes = (
-        (QualifierPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (QualifierPermission,)
 
 
 class ReservationPurposeFilter(AuthFilter):
-    permission_classes = (
-        (ReservationPurposePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPurposePermission,)
 
 
 class ReservationCancelReasonFilter(AuthFilter):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AllowAuthenticated,)
 
 
 class ReservationDenyReasonFilter(AuthFilter):
-    permission_classes = (
-        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AllowAuthenticated,)
 
 
 class ReservationUnitCancellationRulesFilter(AuthFilter):
-    permission_classes = (
-        (ReservationUnitCancellationRulePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitCancellationRulePermission,)
 
 
 class TermsOfUseFilter(AuthFilter):
-    permission_classes = (
-        (TermsOfUsePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (TermsOfUsePermission,)
 
 
 class TaxPercentageFilter(AuthFilter):
-    permission_classes = (
-        (TaxPercentagePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (TaxPercentagePermission,)
 
 
 class AgeGroupFilter(AuthFilter):
-    permission_classes = (
-        (AgeGroupPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (AgeGroupPermission,)
 
 
 class CityFilter(AuthFilter):
-    permission_classes = (
-        (CityPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (CityPermission,)
 
 
 class ReservationMetadataSetFilter(AuthFilter):
-    permission_classes = (
-        (ReservationMetadataSetPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationMetadataSetPermission,)
 
 
 class ServiceSectorFilter(AuthFilter):
-    permission_classes = (
-        (ServiceSectorPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ServiceSectorPermission,)
 
 
 class Query(graphene.ObjectType):

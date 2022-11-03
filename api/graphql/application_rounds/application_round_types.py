@@ -1,8 +1,6 @@
 import graphene
-from django.conf import settings
 from django.db.models import Sum
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
@@ -29,11 +27,7 @@ class ApplicationRoundAggregatedDataType(graphene.ObjectType):
 
 
 class ApplicationRoundBasketType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ApplicationRoundPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationRoundPermission,)
 
     purpose_ids = graphene.List(graphene.Int)
     age_group_ids = graphene.List(graphene.Int)
@@ -66,11 +60,7 @@ class ApplicationRoundBasketType(AuthNode, PrimaryKeyObjectType):
 
 
 class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ApplicationRoundPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ApplicationRoundPermission,)
 
     service_sector = graphene.Field(ServiceSectorType)
     status = graphene.Field(

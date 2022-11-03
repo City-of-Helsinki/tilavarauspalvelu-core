@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, serializers, viewsets
@@ -117,29 +116,17 @@ class GeneralRoleSerializer(BaseRoleSerializer):
 
 class UnitRoleViewSet(viewsets.ModelViewSet):
     serializer_class = UnitRoleSerializer
-    permission_classes = (
-        [permissions.IsAuthenticated & UnitRolePermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [permissions.IsAuthenticated & UnitRolePermission]
     queryset = UnitRole.objects.all()
 
 
 class ServiceSectorRoleViewSet(viewsets.ModelViewSet):
     serializer_class = ServiceSectorRoleSerializer
-    permission_classes = (
-        [permissions.IsAuthenticated & ServiceSectorRolePermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [permissions.IsAuthenticated & ServiceSectorRolePermission]
     queryset = ServiceSectorRole.objects.all()
 
 
 class GeneralRoleViewSet(viewsets.ModelViewSet):
     serializer_class = GeneralRoleSerializer
-    permission_classes = (
-        [permissions.IsAuthenticated & GeneralRolePermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [permissions.IsAuthenticated & GeneralRolePermission]
     queryset = GeneralRole.objects.all()

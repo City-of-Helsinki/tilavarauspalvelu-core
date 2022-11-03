@@ -169,7 +169,6 @@ env = environ.Env(
     RESOURCE_DEFAULT_TIMEZONE=(str, "Europe/Helsinki"),
     CORS_ALLOWED_ORIGINS=(list, []),
     AUDIT_LOGGING_ENABLED=(bool, False),
-    TMP_PERMISSIONS_DISABLED=(bool, False),
     TUNNISTAMO_JWT_AUDIENCE=(str, "https://api.hel.fi/auth/tilavarausapidev"),
     TUNNISTAMO_JWT_ISSUER=(str, "https://tunnistamo.test.hel.ninja/openid"),
     TUNNISTAMO_ADMIN_KEY=(str, "tilavaraus-django-admin-dev"),
@@ -229,7 +228,6 @@ environ.Env.read_env()
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 DEBUG = env("DEBUG")
-TMP_PERMISSIONS_DISABLED = env("TMP_PERMISSIONS_DISABLED")
 
 # Database configuration
 DATABASES = {"default": env.db()}
@@ -515,8 +513,6 @@ if os.path.exists(local_settings_path):
         code = compile(fp.read(), local_settings_path, "exec")
     exec(code, globals(), locals())  # nosec
 
-if TMP_PERMISSIONS_DISABLED and not DEBUG:
-    logging.error("Running with permissions disabled in production environment.")
 
 if not all(
     [

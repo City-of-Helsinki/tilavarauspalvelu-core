@@ -1,8 +1,6 @@
 import graphene
-from django.conf import settings
 from graphene import ResolveInfo
 from graphene_django.rest_framework.mutation import SerializerMutation
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_mutations import AuthSerializerMutation
 from api.graphql.reservations.reservation_serializers import (
@@ -27,11 +25,7 @@ from reservations.models import Reservation
 class ReservationCreateMutation(AuthSerializerMutation, SerializerMutation):
     reservation = graphene.Field(ReservationType)
 
-    permission_classes = (
-        (ReservationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -45,11 +39,7 @@ class ReservationCreateMutation(AuthSerializerMutation, SerializerMutation):
 class ReservationUpdateMutation(AuthSerializerMutation, SerializerMutation):
     reservation = graphene.Field(ReservationType)
 
-    permission_classes = (
-        (ReservationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -62,11 +52,7 @@ class ReservationUpdateMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ReservationConfirmMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ReservationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -74,11 +60,7 @@ class ReservationConfirmMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ReservationCancellationMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ReservationPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationPermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -86,11 +68,7 @@ class ReservationCancellationMutation(AuthSerializerMutation, SerializerMutation
 
 
 class ReservationDenyMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ReservationHandlingPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationHandlingPermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -98,11 +76,7 @@ class ReservationDenyMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ReservationApproveMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ReservationHandlingPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationHandlingPermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -110,11 +84,7 @@ class ReservationApproveMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ReservationRequiresHandlingMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ReservationHandlingPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationHandlingPermission,)
 
     class Meta:
         lookup_field = "pk"
@@ -122,11 +92,7 @@ class ReservationRequiresHandlingMutation(AuthSerializerMutation, SerializerMuta
 
 
 class ReservationWorkingMemoMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (
-        (ReservationCommentPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationCommentPermission,)
 
     class Meta:
         lookup_field = "pk"

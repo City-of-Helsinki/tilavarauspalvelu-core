@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Prefetch, Q
 from django.utils.timezone import localtime
@@ -6,7 +5,7 @@ from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters as drf_filters
-from rest_framework import permissions, serializers, viewsets
+from rest_framework import serializers, viewsets
 
 from applications.models import Application, ApplicationEvent
 from permissions.api_permissions.drf_permissions import (
@@ -73,11 +72,7 @@ class AgeGroupSerializer(serializers.ModelSerializer):
 class AgeGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AgeGroupSerializer
     queryset = AgeGroup.objects.all()
-    permission_classes = (
-        [AgeGroupPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [AgeGroupPermission]
 
 
 class AbilityGroupSerializer(serializers.ModelSerializer):
@@ -98,11 +93,7 @@ class AbilityGroupSerializer(serializers.ModelSerializer):
 class AbilityGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AbilityGroupSerializer
     queryset = AbilityGroup.objects.all()
-    permission_classes = (
-        [AbilityGroupPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [AbilityGroupPermission]
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -223,11 +214,7 @@ class ReservationFilter(filters.FilterSet):
 
 class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
-    permission_classes = (
-        [ReservationPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ReservationPermission]
 
     filter_backends = [
         drf_filters.OrderingFilter,
@@ -279,9 +266,6 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
-        if settings.TMP_PERMISSIONS_DISABLED:
-            return queryset
 
         user = self.request.user
         return queryset.filter(
@@ -419,11 +403,7 @@ class RecurringReservationFilter(filters.FilterSet):
 
 class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecurringReservationSerializer
-    permission_classes = (
-        [RecurringReservationPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [RecurringReservationPermission]
     queryset = (
         RecurringReservation.objects.all()
         .select_related(
@@ -487,8 +467,6 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if settings.TMP_PERMISSIONS_DISABLED:
-            return queryset
         user = self.request.user
 
         can_view_units_reservations = Q(

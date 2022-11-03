@@ -10,7 +10,7 @@ from django.http import FileResponse, Http404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from icalendar import Calendar, Event
-from rest_framework import mixins, permissions, serializers, viewsets
+from rest_framework import mixins, serializers, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.reverse import reverse
@@ -100,11 +100,7 @@ class ReservationUnitCalendarUrlViewSet(
 ):
     serializer_class = ReservationUnitCalendarUrlSerializer
     queryset = ReservationUnit.objects.all().prefetch_related("unit")
-    permission_classes = (
-        [ReservationUnitCalendarUrlPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
+    permission_classes = [ReservationUnitCalendarUrlPermission]
 
 
 class ReservationUnitIcalViewset(ViewSet):

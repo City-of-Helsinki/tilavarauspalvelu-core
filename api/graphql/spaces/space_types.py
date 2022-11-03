@@ -1,7 +1,5 @@
 import graphene
-from django.conf import settings
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
@@ -49,9 +47,7 @@ class BuildingType(PrimaryKeyObjectType):
 
 class SpaceType(AuthNode, PrimaryKeyObjectType):
 
-    permission_classes = (
-        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (SpacePermission,)
     children = graphene.List(lambda: SpaceType)
     resources = graphene.List("api.graphql.resources.resource_types.ResourceType")
     surface_area = graphene.Float()

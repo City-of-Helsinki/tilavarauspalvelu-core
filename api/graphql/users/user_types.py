@@ -1,7 +1,5 @@
 import graphene
-from django.conf import settings
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
@@ -17,9 +15,7 @@ from users.tasks import save_personal_info_view_log
 
 
 class UserType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (UserPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (UserPermission,)
 
     reservation_notification = graphene.String()
     general_roles = graphene.List(GeneralRoleType)

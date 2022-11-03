@@ -1,7 +1,5 @@
 import graphene
-from django.conf import settings
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
@@ -13,11 +11,7 @@ from terms_of_use.models import TermsOfUse
 class TermsOfUseType(AuthNode, PrimaryKeyObjectType):
     pk = graphene.String()
 
-    permission_classes = (
-        (TermsOfUsePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (TermsOfUsePermission,)
 
     class Meta:
         model = TermsOfUse

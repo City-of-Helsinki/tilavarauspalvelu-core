@@ -1,6 +1,5 @@
 from typing import Optional
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
@@ -100,7 +99,7 @@ class UserViewSet(
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
-        if settings.TMP_PERMISSIONS_DISABLED or can_view_users(user):
+        if can_view_users(user):
             return queryset
         user = self.request.user
 

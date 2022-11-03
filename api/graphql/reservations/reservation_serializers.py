@@ -3,7 +3,6 @@ import math
 from decimal import Decimal
 from typing import List, Optional
 
-from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
@@ -252,7 +251,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "buffer_time_after", reservation_units
         )
         user = self.context.get("request").user
-        if settings.TMP_PERMISSIONS_DISABLED and user.is_anonymous:
+        if user.is_anonymous:
             user = None
 
         data["user"] = user
@@ -587,10 +586,8 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
     def check_staff_event(
         self, user, reservation_unit_ids: List[int], staff_event: Optional[bool]
     ):
-        if (
-            settings.TMP_PERMISSIONS_DISABLED
-            or staff_event is None
-            or can_handle_reservation_with_units(user, reservation_unit_ids)
+        if staff_event is None or can_handle_reservation_with_units(
+            user, reservation_unit_ids
         ):
             return
 
@@ -602,10 +599,8 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
     def check_reservation_type(
         self, user, reservation_unit_ids: List[int], reservation_type: Optional[str]
     ):
-        if (
-            settings.TMP_PERMISSIONS_DISABLED
-            or reservation_type is None
-            or can_handle_reservation_with_units(user, reservation_unit_ids)
+        if reservation_type is None or can_handle_reservation_with_units(
+            user, reservation_unit_ids
         ):
             return
 

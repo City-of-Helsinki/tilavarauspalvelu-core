@@ -7,7 +7,6 @@ from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_django.types import ErrorType
 from graphene_file_upload.scalars import Upload
-from graphene_permissions.permissions import AllowAny
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
@@ -53,9 +52,7 @@ logger = logging.getLogger(__name__)
 class EquipmentCreateMutation(AuthSerializerMutation, SerializerMutation):
     equipment = graphene.Field(EquipmentType)
 
-    permission_classes = (
-        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (EquipmentPermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -65,9 +62,7 @@ class EquipmentCreateMutation(AuthSerializerMutation, SerializerMutation):
 class EquipmentUpdateMutation(AuthSerializerMutation, SerializerMutation):
     equipment = graphene.Field(EquipmentType)
 
-    permission_classes = (
-        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (EquipmentPermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -76,9 +71,7 @@ class EquipmentUpdateMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class EquipmentDeleteMutation(AuthDeleteMutation, ClientIDMutation):
-    permission_classes = (
-        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (EquipmentPermission,)
     model = Equipment
 
     @classmethod
@@ -89,11 +82,7 @@ class EquipmentDeleteMutation(AuthDeleteMutation, ClientIDMutation):
 class EquipmentCategoryCreateMutation(AuthSerializerMutation, SerializerMutation):
     equipment_category = graphene.Field(EquipmentCategoryType)
 
-    permission_classes = (
-        (EquipmentCategoryPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (EquipmentCategoryPermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -103,11 +92,7 @@ class EquipmentCategoryCreateMutation(AuthSerializerMutation, SerializerMutation
 class EquipmentCategoryUpdateMutation(AuthSerializerMutation, SerializerMutation):
     equipment_category = graphene.Field(EquipmentCategoryType)
 
-    permission_classes = (
-        (EquipmentCategoryPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (EquipmentCategoryPermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -116,11 +101,7 @@ class EquipmentCategoryUpdateMutation(AuthSerializerMutation, SerializerMutation
 
 
 class EquipmentCategoryDeleteMutation(AuthDeleteMutation, ClientIDMutation):
-    permission_classes = (
-        (EquipmentCategoryPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (EquipmentCategoryPermission,)
     model = EquipmentCategory
 
     @classmethod
@@ -131,9 +112,7 @@ class EquipmentCategoryDeleteMutation(AuthDeleteMutation, ClientIDMutation):
 class PurposeCreateMutation(AuthSerializerMutation, SerializerMutation):
     purpose = graphene.Field(PurposeType)
 
-    permission_classes = (
-        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (PurposePermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -149,9 +128,7 @@ class PurposeCreateMutation(AuthSerializerMutation, SerializerMutation):
 class PurposeUpdateMutation(AuthSerializerMutation, SerializerMutation):
     purpose = graphene.Field(PurposeType)
 
-    permission_classes = (
-        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
+    permission_classes = (PurposePermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -196,11 +173,7 @@ class ReservationUnitCreateMutation(
 ):
     reservation_unit = graphene.Field(ReservationUnitType)
 
-    permission_classes = (
-        (ReservationUnitPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitPermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -213,11 +186,7 @@ class ReservationUnitUpdateMutation(
 ):
     reservation_unit = graphene.Field(ReservationUnitType)
 
-    permission_classes = (
-        (ReservationUnitPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitPermission,)
 
     def remove_personal_data_and_logs_on_archive(input):
         """When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
@@ -266,11 +235,7 @@ class ReservationUnitImageCreateMutation(AuthSerializerMutation, SerializerMutat
     class Input:
         image = Upload()
 
-    permission_classes = (
-        (ReservationUnitImagePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitImagePermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -285,11 +250,7 @@ class ReservationUnitImageCreateMutation(AuthSerializerMutation, SerializerMutat
 class ReservationUnitImageUpdateMutation(AuthSerializerMutation, SerializerMutation):
     reservation_unit_image = graphene.Field(ReservationUnitImageType)
 
-    permission_classes = (
-        (ReservationUnitImagePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitImagePermission,)
 
     class Meta:
         model_operations = ["update"]
@@ -298,11 +259,7 @@ class ReservationUnitImageUpdateMutation(AuthSerializerMutation, SerializerMutat
 
 
 class ReservationUnitImageDeleteMutation(AuthDeleteMutation, ClientIDMutation):
-    permission_classes = (
-        (ReservationUnitImagePermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
+    permission_classes = (ReservationUnitImagePermission,)
     model = ReservationUnitImage
 
     @classmethod
