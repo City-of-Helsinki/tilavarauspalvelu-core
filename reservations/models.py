@@ -416,7 +416,20 @@ class Reservation(models.Model):
         default=0,
         help_text="The price of this particular reservation excluding VAT",
     )
-
+    non_subsidised_price = models.DecimalField(
+        verbose_name=_("Non subsidised price"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="The non subsidised price of this reservation excluding VAT",
+    )
+    non_subsidised_price_net = models.DecimalField(
+        verbose_name=_("Non subsidised net price"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="The non subsidised price of this reservation excluding VAT",
+    )
     handled_at = models.DateTimeField(
         verbose_name=_("Handled at"),
         null=True,
