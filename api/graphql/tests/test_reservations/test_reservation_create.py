@@ -1091,12 +1091,16 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.price).is_equal_to(
-            0.0
-        )  # Free units should always be 0 €
+        assert_that(reservation.price).is_zero()  # Free units should always be 0 €
+        assert_that(reservation.non_subsidised_price).is_equal_to(
+            reservation.price
+        )  # Non subsidised price should copy of price
         assert_that(reservation.price_net).is_zero()
-        assert_that(reservation.unit_price).is_equal_to(0.0)
-        assert_that(reservation.tax_percentage_value).is_equal_to(0.0)
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(
+            reservation.price_net
+        )
+        assert_that(reservation.unit_price).is_zero()
+        assert_that(reservation.tax_percentage_value).is_zero()
 
     def test_create_price_calculation_with_fixed_price_reservation_unit(
         self, mock_periods, mock_opening_hours
@@ -1132,9 +1136,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.price).is_equal_to(
             3.0
         )  # With fixed price unit, time is ignored
+        assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 3)
         assert_that(reservation.unit_price).is_equal_to(3.0)
         assert_that(reservation.price_net).is_close_to(
             Decimal("3") / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(
+            reservation.price_net
         )
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
@@ -1173,6 +1181,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.price).is_equal_to(
             3.0 * 4
         )  # 1h reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 3)
+        assert_that(reservation.price_net).is_close_to(
+            (Decimal("3") * 4) / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(
+            reservation.price_net
+        )
         assert_that(reservation.unit_price).is_equal_to(
             3.0
         )  # 1h reservation = 4 x 15 min = 4 x 3 €
@@ -1217,6 +1232,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.price).is_equal_to(
             3.0 * 4
         )  # 46 min reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 3)
+        assert_that(reservation.price_net).is_close_to(
+            Decimal(3.0 * 4) / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(
+            reservation.price_net
+        )
         assert_that(reservation.unit_price).is_equal_to(
             3.0
         )  # Unit price is the price of the reservation unit.
@@ -1308,10 +1330,17 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.price).is_equal_to(
             3.0 * 4 + 4.0 * 4
         )  # 1h reservation = 4 x 15 min from both units
+        assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 6)
         assert_that(reservation.unit_price).is_equal_to(
             3.0
         )  # 3€ from from the first unit
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
+        assert_that(reservation.price_net).is_close_to(
+            reservation.price / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(
+            reservation.price_net
+        )
 
     def test_create_price_calculation_with_future_pricing(
         self, mock_periods, mock_opening_hours
@@ -1368,8 +1397,56 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.price).is_equal_to(
             6.0
         )  # With fixed price unit, time is ignored
+        assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 6)
         assert_that(reservation.price_net).is_close_to(
             6 / (1 + tax_percentage.decimal), 6
         )
         assert_that(reservation.unit_price).is_equal_to(6.0)
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
+        assert_that(reservation.price_net).is_close_to(
+            reservation.price / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(
+            reservation.price_net
+        )
+
+    def test_reservation_subsidised_price_is_equal_to_price(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        tax_percentage = TaxPercentageFactory()
+        ReservationUnitPricingFactory(
+            begins=datetime.date.today(),
+            pricing_type=PricingType.PAID,
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=1.0,
+            highest_price=3.0,
+            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
+            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
+            tax_percentage=tax_percentage,
+            status=PricingStatus.PRICING_STATUS_ACTIVE,
+            reservation_unit=self.reservation_unit,
+        )
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.price).is_equal_to(Decimal("3"))
+        assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 6)
+        assert_that(reservation.price_net).is_close_to(
+            Decimal("3") / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(
+            reservation.price_net
+        )

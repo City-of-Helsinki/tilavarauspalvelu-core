@@ -64,6 +64,8 @@ class PriceCalculationResult:
     reservation_price_net: Decimal = Decimal("0")
     unit_price: Decimal = Decimal("0")
     tax_percentage: Decimal = Decimal("0")
+    non_subsidised_price: Decimal = Decimal("0")
+    non_subsidised_price_net: Decimal = Decimal("0")
 
     def __init__(
         self,
@@ -71,11 +73,15 @@ class PriceCalculationResult:
         reservation_price_net: Decimal,
         unit_price: Decimal,
         tax_percentage: Decimal,
+        non_subsidised_price: Decimal,
+        non_subsidised_price_net: Decimal,
     ) -> None:
         self.reservation_price = reservation_price
         self.reservation_price_net = reservation_price_net
         self.unit_price = unit_price
         self.tax_percentage = tax_percentage
+        self.non_subsidised_price = non_subsidised_price
+        self.non_subsidised_price_net = non_subsidised_price_net
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
@@ -161,6 +167,8 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "tax_percentage_value",
             "price",
             "price_net",
+            "non_subsidised_price",
+            "non_subsidised_price_net",
             "staff_event",
             "type",
         ]
@@ -174,6 +182,8 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         self.fields["tax_percentage_value"].read_only = True
         self.fields["price"].read_only = True
         self.fields["price_net"].read_only = True
+        self.fields["non_subsidised_price"].read_only = True
+        self.fields["non_subsidised_price_net"].read_only = True
 
         # Form/metadata fields should be optional by default
         self.fields["reservee_type"].required = False
@@ -264,6 +274,10 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             data["unit_price"] = price_calculation_result.unit_price
             data["tax_percentage_value"] = price_calculation_result.tax_percentage
             data["price_net"] = price_calculation_result.reservation_price_net
+            data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
+            data[
+                "non_subsidised_price_net"
+            ] = price_calculation_result.non_subsidised_price_net
 
         staff_event = data.get("staff_event", None)
         reservation_type = data.get("type", None)
@@ -576,11 +590,16 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             total_reservation_price += reservation_unit_price
             total_reservation_price_net += reservation_unit_price_net
 
+        non_subsidised_price = total_reservation_price
+        non_subsidised_price_net = total_reservation_price_net
+
         return PriceCalculationResult(
             total_reservation_price,
             total_reservation_price_net,
             first_paid_unit_price,
             first_paid_unit_tax_percentage,
+            non_subsidised_price,
+            non_subsidised_price_net,
         )
 
     def check_staff_event(
