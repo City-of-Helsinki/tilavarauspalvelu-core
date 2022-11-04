@@ -1,3 +1,4 @@
+import decimal
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
@@ -115,14 +116,12 @@ class ReservationUnitPricingHelper:
                 pricing["highest_price"] = highest_price_net
                 pricing["lowest_price"] = lowest_price_net
             else:
-                pricing["highest_price"] = round(
-                    Decimal(highest_price_net * (1 + tax_percentage.decimal)),
-                    2,
-                )
-                pricing["lowest_price"] = round(
-                    Decimal(lowest_price_net * (1 + tax_percentage.decimal)),
-                    2,
-                )
+                pricing["highest_price"] = Decimal(
+                    highest_price_net * (1 + tax_percentage.decimal)
+                ).quantize(Decimal("1.00"), rounding=decimal.ROUND_HALF_UP)
+                pricing["lowest_price"] = Decimal(
+                    lowest_price_net * (1 + tax_percentage.decimal)
+                ).quantize(Decimal("1.00"), rounding=decimal.ROUND_HALF_UP)
 
         return pricings
 

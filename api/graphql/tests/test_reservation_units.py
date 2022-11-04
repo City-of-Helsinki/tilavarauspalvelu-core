@@ -3584,9 +3584,11 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(pricing.pricing_type).is_equal_to(pricing_data["pricingType"])
         assert_that(pricing.price_unit).is_equal_to(pricing_data["priceUnit"])
-        assert_that(pricing.lowest_price).is_close_to(pricing_data["lowestPrice"], 0.01)
+        assert_that(pricing.lowest_price).is_close_to(
+            pricing_data["lowestPrice"], 0.001
+        )
         assert_that(pricing.highest_price).is_close_to(
-            pricing_data["highestPrice"], 0.01
+            pricing_data["highestPrice"], 0.001
         )
         assert_that(pricing.tax_percentage).is_equal_to(tax_percentage)
         assert_that(pricing.status).is_equal_to(pricing_data["status"])
