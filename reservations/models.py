@@ -410,7 +410,7 @@ class Reservation(models.Model):
         help_text="The price of this particular reservation including VAT",
     )
     price_net = models.DecimalField(
-        verbose_name=_("Price"),
+        verbose_name=_("Price net"),
         max_digits=20,
         decimal_places=6,
         default=0,
