@@ -67,3 +67,74 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
     }
   }
 `;
+
+export const RESERVATION_UNITS_BY_UNIT = gql`
+  query reservationUnitsByUnit($unit: [ID], $offset: Int, $first: Int) {
+    reservationUnits(
+      first: $first
+      offset: $offset
+      unit: $unit
+      orderBy: "nameFi"
+    ) {
+      edges {
+        node {
+          pk
+          nameFi
+          spaces {
+            pk
+          }
+          reservationUnitType {
+            pk
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+      }
+    }
+  }
+`;
+
+export const RESERVATIONS_BY_UNIT = gql`
+  query reservationsByUnit(
+    $unit: [ID]
+    $offset: Int
+    $first: Int
+    $begin: DateTime
+    $end: DateTime
+  ) {
+    reservations(
+      begin: $begin
+      end: $end
+      first: $first
+      offset: $offset
+      unit: $unit
+    ) {
+      edges {
+        node {
+          user {
+            firstName
+            lastName
+            email
+          }
+          workingMemo
+          name
+          reserveeFirstName
+          reserveeLastName
+          reserveeOrganisationName
+          reservationUnits {
+            pk
+            nameFi
+          }
+          pk
+          begin
+          end
+          state
+        }
+      }
+      pageInfo {
+        hasNextPage
+      }
+    }
+  }
+`;

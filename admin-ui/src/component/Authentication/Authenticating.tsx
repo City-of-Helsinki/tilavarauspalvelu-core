@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { LoadingSpinner } from "hds-react";
 import { BrowserRouter } from "react-router-dom";
 import EmptyContent from "../EmptyContent";
 import PageWrapper from "../PageWrapper";
+import Loader from "../Loader";
 
 interface IProps {
   noNavigation?: boolean;
@@ -23,14 +23,14 @@ function Authenticating({ noNavigation }: IProps): JSX.Element {
       {noNavigation ? (
         <EmptyContent>
           <Wrapper>
-            <LoadingSpinner />
+            <Loader />
           </Wrapper>
         </EmptyContent>
       ) : (
         <PageWrapper>
           <EmptyContent>
             <Wrapper>
-              <LoadingSpinner />
+              <Loader />
             </Wrapper>
           </EmptyContent>
         </PageWrapper>

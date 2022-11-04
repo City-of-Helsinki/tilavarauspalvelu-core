@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { LoadingSpinner } from "hds-react";
 import { Query, QueryReservationByPkArgs } from "../../common/gql-types";
 import { BirthDate } from "../BirthDate";
 import { GET_BIRTHDATE_BY_APPLICATION_PK } from "./queries";
+import Loader from "../Loader";
 
 type Props = {
   applicationPk?: number;
@@ -30,7 +30,7 @@ const ApplicationUserBirthDate = ({
   );
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   return (

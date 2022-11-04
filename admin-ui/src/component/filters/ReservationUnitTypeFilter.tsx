@@ -9,9 +9,14 @@ import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";
 type Props = {
   onChange: (reservationUnitType: OptionType[]) => void;
   value: OptionType[];
+  style?: React.CSSProperties;
 };
 
-const ReservationUnitTypeFilter = ({ onChange, value }: Props): JSX.Element => {
+const ReservationUnitTypeFilter = ({
+  onChange,
+  value,
+  style,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
   const { data, loading } = useQuery<Query, QueryReservationUnitTypesArgs>(
     RESERVATION_UNIT_TYPES_QUERY,
@@ -20,6 +25,7 @@ const ReservationUnitTypeFilter = ({ onChange, value }: Props): JSX.Element => {
 
   return (
     <SortedSelect
+      style={style}
       disabled={loading}
       sort
       label={t("ReservationUnitsSearch.typeLabel")}

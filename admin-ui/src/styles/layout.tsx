@@ -147,7 +147,7 @@ export const Container = styled.div`
   flex-direction: column;
   gap: var(--spacing-layout-2-xs);
 
-  max-width: var(--container-width-l);
+  max-width: var(--container-width-xl);
 
   margin: var(--spacing-layout-2-xs) var(--spacing-layout-m);
 

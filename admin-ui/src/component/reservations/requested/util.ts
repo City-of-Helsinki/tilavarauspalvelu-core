@@ -176,6 +176,12 @@ export const getReserveeName = (
           `${reservation.reserveeFirstName || ""} ${
             reservation.reserveeLastName || ""
           }`
-        ),
+        ) ||
+          trim(
+            `${reservation.user?.firstName || ""} ${
+              reservation.user?.lastName || ""
+            }`
+          ),
+
     { length, omission: "…" }
   );

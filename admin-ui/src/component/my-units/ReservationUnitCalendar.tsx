@@ -48,7 +48,7 @@ const updateQuery = (
   return combineResults(previousResult, fetchMoreResult, "reservations");
 };
 
-const Calendar = ({
+const ReservationUnitCalendar = ({
   begin,
   reservationUnitPk,
   intersectingReservationUnits,
@@ -93,7 +93,7 @@ const Calendar = ({
         }
       },
       onError: () => {
-        notifyError("Varauksia ei voitu hakea");
+        notifyError(t("errors.errorFetchingData"));
       },
     }
   );
@@ -132,4 +132,4 @@ const Calendar = ({
   );
 };
 
-export default Calendar;
+export default ReservationUnitCalendar;
