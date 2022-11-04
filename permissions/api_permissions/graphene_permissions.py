@@ -440,14 +440,20 @@ class SpacePermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        unit = None
+
+        space_id = input.get("pk")
         unit_id = input.get("unit_pk")
-        if unit_id:
-            try:
-                unit = Unit.objects.get(id=unit_id)
-            except Unit.DoesNotExist:
-                pass
-            else:
-                return can_manage_units_spaces(info.context.user, unit)
+        operation = getattr(info.operation, "name", None)
+
+        if getattr(operation, "value", None) == "createSpace" and unit_id:
+            unit = Unit.objects.filter(id=unit_id).first()
+        elif space_id:
+            unit = Unit.objects.filter(spaces=space_id).first()
+
+        if unit:
+            return can_manage_units_spaces(info.context.user, unit)
+
         return can_manage_spaces(info.context.user)
 
 
