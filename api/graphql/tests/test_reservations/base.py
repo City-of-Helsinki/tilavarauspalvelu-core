@@ -11,7 +11,7 @@ from merchants.tests.factories import PaymentMerchantFactory, PaymentProductFact
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
-from reservation_units.models import ReservationUnit
+from reservation_units.models import PaymentType, ReservationUnit
 from reservation_units.tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
@@ -49,6 +49,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             payment_merchant=cls.payment_merchant,
             payment_product=cls.payment_product,
         )
+        cls.reservation_unit.payment_types.set([PaymentType.ON_SITE])
         cls.purpose = ReservationPurposeFactory(name="purpose")
 
         # Setup for reservation notification tests
