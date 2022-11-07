@@ -41,6 +41,3 @@ class PaymentOrderFactory(DjangoModelFactory):
     payment_type = PaymentType.INVOICE
     status = PaymentStatus.DRAFT
     language = Language.FI
-    customer_first_name = "First"
-    customer_last_name = "Last"
-    customer_email = "first.last@example.com"

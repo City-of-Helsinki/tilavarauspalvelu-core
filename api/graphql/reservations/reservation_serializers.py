@@ -803,6 +803,12 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     def validate(self, data):
         data = super().validate(data)
 
+        if self.instance.payment_order.exists():
+            raise ValidationErrorWithCode(
+                "Reservation cannot be changed anymore because it is attached to a payment order",
+                ValidationErrorCodes.CHANGES_NOT_ALLOWED,
+            )
+
         if self.instance.reservation_unit.count() > 1:
             raise ValidationErrorWithCode(
                 "Reservations with multiple reservation units are not supported.",

@@ -16,6 +16,7 @@ from applications.models import City
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
 from merchants.models import PaymentOrder, PaymentStatus, PaymentType
+from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.test.factories import OrderFactory
 from merchants.verkkokauppa.order.types import Order, OrderCustomer
 from opening_hours.tests.test_get_periods import get_mocked_periods
@@ -471,3 +472,19 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ONLINE)
+
+    def test_confirm_reservation_error_when_order_exists(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        PaymentOrderFactory(reservation=self.reservation)
+
+        input_data = self.get_valid_confirm_data()
+        response = self.query(self.get_confirm_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation cannot be changed anymore because it is attached to a payment order"
+        )
