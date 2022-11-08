@@ -54,6 +54,7 @@ def create_verkkokauppa_order() -> Order:
 @patch(
     "opening_hours.hours.get_periods_for_resource", return_value=get_mocked_periods()
 )
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationConfirmTestCase(ReservationTestCaseBase):
     def setUp(self):
         super().setUp()
@@ -120,7 +121,12 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         mock_create_order.return_value = create_verkkokauppa_order()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
+
+        self.reservation_unit.payment_types.add("ON_SITE")
+
         input_data = self.get_valid_confirm_data()
+        input_data["paymentType"] = PaymentType.ON_SITE
+
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         response = self.query(self.get_confirm_query(), input_data=input_data)
         content = json.loads(response.content)
@@ -384,7 +390,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
         assert_that(confirm_data.get("state")).is_equal_to(
-            STATE_CHOICES.CONFIRMED.upper()
+            STATE_CHOICES.WAITING_FOR_PAYMENT.upper()
         )
 
         assert_that(mock_create_vk_order.called).is_true()
@@ -393,6 +399,11 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(local_order.order_id).is_equal_to(mock_vk_order.order_id)
         assert_that(local_order.checkout_url).is_equal_to(mock_vk_order.checkout_url)
         assert_that(local_order.receipt_url).is_equal_to(mock_vk_order.receipt_url)
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(
+            STATE_CHOICES.WAITING_FOR_PAYMENT
+        )
 
     def test_confirm_reservation_does_not_allow_unsupported_payment_type(
         self, mock_periods, mock_opening_hours

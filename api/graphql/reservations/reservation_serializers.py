@@ -851,6 +851,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
     def save(self, **kwargs):
         self.fields.pop("payment_type")
+        instance = super().save(**kwargs)
+
         state = self.validated_data["state"]
         if state == STATE_CHOICES.CONFIRMED:
             payment_type = self.validated_data["payment_type"].upper()
@@ -885,8 +887,10 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     checkout_url=payment_order.checkout_url,
                     receipt_url=payment_order.receipt_url,
                 )
-
-        instance = super().save(**kwargs)
+                Reservation.objects.filter(pk=self.instance.pk).update(
+                    state=STATE_CHOICES.WAITING_FOR_PAYMENT
+                )
+                self.instance.refresh_from_db()
 
         if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
             send_reservation_email_task.delay(
