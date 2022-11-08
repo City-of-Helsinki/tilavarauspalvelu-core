@@ -2,7 +2,6 @@ import { hzNavigationBack } from "model/calendar";
 import {
   cancelButton as detailCancelButton,
   accordionToggler,
-  reservationPriceContainer,
   reservationContent,
   reservationInfoCard,
   calendarLinkButton,
@@ -21,7 +20,6 @@ import {
   backButton,
   reasonSelect,
   customReasonInput,
-  reReserveButton,
   secondBackButton,
 } from "model/reservation-cancel";
 
@@ -105,7 +103,7 @@ describe("Tilavaraus user reservations", () => {
 
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/11$/);
 
-    detailCancelButton().should("be.disabled");
+    detailCancelButton().should("not.exist");
 
     reservationContent().find("h1").should("contain", "Varaus 11");
     reservationContent().find("h2").should("contain", "Toimistohuone 1");
@@ -162,7 +160,7 @@ describe("Tilavaraus user reservations", () => {
 
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/4$/);
 
-    detailCancelButton().should("be.disabled");
+    detailCancelButton().should("not.exist");
 
     reservationContent().find("h1").should("contain", "Varaus 4");
     reservationContent().find("h2").should("contain", "Toimistohuone 1");
@@ -219,8 +217,7 @@ describe("Tilavaraus user reservations", () => {
     detailCancelButton().click();
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/21\/cancel$/);
 
-    cancelTitle().eq(0).should("have.text", "Toimistohuone 1");
-    cancelTitle().eq(1).should("have.text", "Peruuta varaus");
+    cancelTitle().should("have.text", "Peru varaus");
     cancelCancelButton().should("be.disabled");
 
     backButton().click();
@@ -240,16 +237,13 @@ describe("Tilavaraus user reservations", () => {
     customReasonInput().type("A reason");
 
     cancelCancelButton().click();
-    cancelTitle().eq(1).should("have.text", "Varaus on peruutettu");
+    cancelTitle().should("have.text", "Varaus on peruttu!");
 
-    reservationPriceContainer()
-      .should("contain.text", "Varaus 2 t")
+    reservationInfoCard()
+      .should("contain.text", "Kesto: 2 t")
       // .should("contain.text", "(alv %)")
-      .should("contain.text", "42,00\u00a0€");
+      .should("contain.text", "Hinta: 42\u00a0€");
 
     secondBackButton().should("exist");
-    reReserveButton().click();
-
-    cy.url({ timeout: 20000 }).should("match", /\/reservation-unit\/9$/);
   });
 });

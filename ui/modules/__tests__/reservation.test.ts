@@ -1,4 +1,5 @@
 import { get as mockGet } from "lodash";
+import { addMinutes } from "date-fns";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
@@ -8,6 +9,8 @@ import {
   getDurationOptions,
   getReservationApplicationFields,
   getReservationApplicationMutationValues,
+  getReservationCancellationReason,
+  isReservationInThePast,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
 
@@ -95,7 +98,7 @@ describe("canUseCancelReservation", () => {
 
   test("that does not need handling", () => {
     const reservation = {
-      begin: new Date().toISOString(),
+      begin: addMinutes(new Date(), 10).toISOString(),
       reservationUnits: [
         {
           cancellationRule: {
@@ -235,5 +238,128 @@ describe("getReservationApplcationMutationValues", () => {
       reserveeFirstName: "Etunimi",
       reserveeType: ReservationsReservationReserveeTypeChoices.Individual,
     });
+  });
+});
+
+describe("isReservationInThePast", () => {
+  test("with valid data", () => {
+    expect(
+      isReservationInThePast({
+        begin: new Date(),
+      } as ReservationType)
+    ).toBe(true);
+
+    expect(
+      isReservationInThePast({
+        begin: addMinutes(new Date(), 10),
+      } as ReservationType)
+    ).toBe(false);
+
+    expect(
+      isReservationInThePast({
+        begin: addMinutes(new Date(), -10),
+      } as ReservationType)
+    ).toBe(true);
+  });
+
+  test("with invalid data", () => {
+    expect(isReservationInThePast({} as ReservationType)).toBe(null);
+  });
+});
+
+describe("getReservationCancellationReason", () => {
+  const reservation = {
+    begin: addMinutes(new Date(), 60).toISOString(),
+    reservationUnits: [
+      {
+        cancellationRule: {
+          id: "fr8ejifod",
+          canBeCancelledTimeBefore: 10,
+          needsHandling: false,
+        },
+      },
+    ],
+  };
+
+  test("with no reservation unit", () => {
+    expect(
+      getReservationCancellationReason({
+        ...reservation,
+        reservationUnits: [],
+      } as ReservationType)
+    ).toBe(null);
+  });
+
+  test("with no cancellation rule", () => {
+    const reservationUnit = {
+      ...reservation.reservationUnits[0],
+      cancellationRule: null,
+    };
+
+    expect(
+      getReservationCancellationReason({
+        ...reservation,
+        reservationUnits: [reservationUnit],
+      } as ReservationType)
+    ).toBe("NO_CANCELLATION_RULE");
+  });
+
+  test("with required handling", () => {
+    const reservationUnit = {
+      ...reservation.reservationUnits[0],
+    };
+    reservationUnit.cancellationRule = {
+      ...reservationUnit.cancellationRule,
+      needsHandling: true,
+    };
+
+    expect(
+      getReservationCancellationReason({
+        ...reservation,
+        reservationUnits: [reservationUnit],
+      } as ReservationType)
+    ).toBe("REQUIRES_HANDLING");
+  });
+
+  test("with cancellation period", () => {
+    expect(
+      getReservationCancellationReason({
+        ...reservation,
+      } as ReservationType)
+    ).toBe(null);
+  });
+
+  test("with cancellation period and long enough buffer", () => {
+    const reservationUnit = {
+      ...reservation.reservationUnits[0],
+    };
+    reservationUnit.cancellationRule = {
+      ...reservationUnit.cancellationRule,
+      canBeCancelledTimeBefore: 3500,
+    };
+
+    expect(
+      getReservationCancellationReason({
+        ...reservation,
+        reservationUnits: [reservationUnit],
+      } as ReservationType)
+    ).toBe(null);
+  });
+
+  test("with cancellation period and too short buffer", () => {
+    const reservationUnit = {
+      ...reservation.reservationUnits[0],
+    };
+    reservationUnit.cancellationRule = {
+      ...reservationUnit.cancellationRule,
+      canBeCancelledTimeBefore: 3600,
+    };
+
+    expect(
+      getReservationCancellationReason({
+        ...reservation,
+        reservationUnits: [reservationUnit],
+      } as ReservationType)
+    ).toBe("BUFFER");
   });
 });

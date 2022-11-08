@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
@@ -7,10 +7,10 @@ import router from "next/router";
 import { isFinite } from "lodash";
 import { Controller, useForm } from "react-hook-form";
 import {
-  IconArrowLeft,
-  IconCheck,
-  IconCrossCircle,
-  IconPlusCircle,
+  IconAngleDown,
+  IconAngleUp,
+  IconArrowRight,
+  IconSignout,
   Notification,
   Select,
   TextArea,
@@ -18,7 +18,9 @@ import {
 import { useTranslation } from "react-i18next";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
-import { fontMedium, fontRegular, H1, H3 } from "common/src/common/typography";
+import NotificationBox from "common/src/common/NotificationBox";
+import { fontMedium, H1 } from "common/src/common/typography";
+import Sanitize from "../../components/common/Sanitize";
 import {
   Query,
   QueryReservationCancelReasonsArgs,
@@ -31,27 +33,27 @@ import {
   GET_RESERVATION,
   GET_RESERVATION_CANCEL_REASONS,
 } from "../../modules/queries/reservation";
-import { NarrowCenteredContainer } from "../../modules/style/layout";
-import Ticket from "../../components/reservation/Ticket";
+import {
+  JustForDesktop,
+  JustForMobile,
+  NarrowCenteredContainer,
+} from "../../modules/style/layout";
 import {
   getSelectedOption,
   getTranslation,
   reservationsUrl,
 } from "../../modules/util";
-import {
-  CenterSpinner,
-  TwoColumnContainer,
-} from "../../components/common/common";
+import { CenterSpinner } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
-import { emptyOption, reservationUnitPrefix } from "../../modules/const";
-import KorosDefault from "../../components/common/KorosDefault";
-import {
-  getReservationUnitName,
-  getUnitName,
-} from "../../modules/reservationUnit";
+import { authEnabled, emptyOption, isBrowser } from "../../modules/const";
+import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
+import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
+import { Paragraph } from "../../components/reservation/styles";
+import { clearApiAccessToken } from "../../modules/auth/util";
 
 type Props = {
   id: number;
+  logout?: () => void;
 };
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -65,7 +67,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         ...(await serverSideTranslations(locale)),
-        overrideBackgroundColor: "var(--tilavaraus-gray)",
         id,
       },
     };
@@ -80,12 +81,11 @@ const Spinner = styled(CenterSpinner)`
   margin: var(--spacing-layout-xl) auto;
 `;
 
-const Head = styled.div`
-  padding: var(--spacing-layout-m) 0 0;
+const Wrapper = styled.div`
   background-color: var(--color-white);
 `;
 
-const HeadWrapper = styled(NarrowCenteredContainer)`
+const Container = styled(NarrowCenteredContainer)`
   padding: 0 var(--spacing-m) var(--spacing-layout-m);
 
   @media (min-width: ${breakpoints.m}) {
@@ -94,33 +94,17 @@ const HeadWrapper = styled(NarrowCenteredContainer)`
   }
 `;
 
-const HeadColumns = styled(TwoColumnContainer)`
-  margin-top: 0;
-  gap: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    & > div:nth-of-type(1) {
-      order: 2;
-    }
-
-    gap: var(--spacing-layout-xl);
-  }
-`;
-
 const Heading = styled.div`
+  font-size: var(--fontsize-body-l);
   svg {
     color: var(--color-success);
   }
+`;
 
-  h1 {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    font-size: 1.75rem;
-    font-family: var(--font-bold);
-    font-weight: 700;
-    margin-bottom: var(--spacing-m);
-  }
+const TermsToggleButton = styled(MediumButton)`
+  font-size: var(--fontsize-body-m);
+  ${fontMedium};
+  margin-bottom: var(--spacing-s);
 `;
 
 const Actions = styled.div`
@@ -128,6 +112,7 @@ const Actions = styled.div`
   flex-direction: column;
   gap: var(--spacing-m);
   margin-top: var(--spacing-xl);
+  justify-content: flex-end;
 
   @media (min-width: ${breakpoints.s}) {
     flex-direction: row;
@@ -138,34 +123,38 @@ const Actions = styled.div`
   }
 `;
 
-const StyledKoros = styled(KorosDefault)`
-  @media (min-width: ${breakpoints.m}) {
-    margin-top: var(--spacing-layout-xl);
+const Content = styled.div`
+  font-size: var(--fontsize-body-l);
+`;
+
+const ContentContainer = styled.div`
+  margin-bottom: var(--spacing-xl);
+  white-space: pre-line;
+
+  div[role="heading"] {
+    font-size: var(--fontsize-heading-s);
   }
 `;
 
-const Body = styled.div`
-  margin: 0 auto;
-  padding: var(--spacing-layout-m) var(--spacing-m);
-  max-width: 1000px;
-`;
-
-const BodyContainer = styled(NarrowCenteredContainer)`
-  background-color: var(--color-gray);
-  padding: 0 0 var(--spacing-layout-m) 0;
-  ${fontRegular}
-
-  a {
-    color: var(--color-bus);
-  }
+const Columns = styled.div`
+  grid-template-columns: 1fr;
+  display: grid;
+  align-items: flex-start;
+  gap: var(--spacing-l);
 
   @media (min-width: ${breakpoints.m}) {
-    max-width: 50%;
-    padding-right: 50%;
+    & > div:nth-of-type(1) {
+      order: 2;
+    }
+
+    margin-top: var(--spacing-xl);
+    grid-template-columns: 1fr 378px;
   }
 `;
 
 const Form = styled.form`
+  margin-top: var(--spacing-m);
+
   label {
     ${fontMedium};
   }
@@ -179,20 +168,17 @@ const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
-    justify-content: space-between;
-  }
+  align-items: flex-start;
 `;
 
-const ReservationCancellation = ({ id }: Props): JSX.Element => {
+const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
   const [reservation, setReservation] = useState<ReservationType>();
   const [reasons, setReasons] = useState<OptionType[]>([]);
+  const [areTermsVisible, setAreTermsVisible] = useState(false);
 
   useQuery(GET_RESERVATION, {
     fetchPolicy: "no-cache",
@@ -243,6 +229,25 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     register({ name: "description" });
   }, [register]);
 
+  const bylineContent = useMemo(() => {
+    const reservationUnit = reservation?.reservationUnits[0];
+    return (
+      reservation && (
+        <>
+          <ReservationInfoCard
+            reservation={reservation}
+            reservationUnit={reservationUnit}
+          />
+        </>
+      )
+    );
+  }, [reservation]);
+
+  const instructionsKey = useMemo(
+    () => getReservationUnitInstructionsKey(reservation?.state),
+    [reservation?.state]
+  );
+
   if (!reservation) {
     return <Spinner />;
   }
@@ -266,115 +271,157 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
   };
 
   return (
-    <>
-      <Head>
-        <HeadWrapper>
-          <HeadColumns>
-            <Ticket
-              state={formState === "unsent" ? "complete" : "error"}
-              title={getReservationUnitName(reservationUnit)}
-              subtitle={getUnitName(reservationUnit.unit)}
-              begin={reservation.begin}
-              end={reservation.end}
-              isFree={!reservation.price}
-              reservationPrice={reservation.price}
-            />
+    <Wrapper>
+      <Container>
+        <Columns>
+          <div>
+            <JustForDesktop>{bylineContent}</JustForDesktop>
+          </div>
+          <div>
             <Heading>
               {formState === "unsent" ? (
                 <>
                   <H1>{t("reservations:cancelReservation")}</H1>
+                  <JustForMobile>{bylineContent}</JustForMobile>
                   <p>{t("reservations:cancelReservationBody")}</p>
                 </>
               ) : (
                 <>
-                  <H1>
-                    <IconCheck size="l" />
-                    {t("reservations:reservationCancelledTitle")}
-                  </H1>
-                  <p>{t("reservations:reservationCancelledBody")}</p>
+                  <H1>{t("reservations:reservationCancelledTitle")}</H1>
+                  <JustForMobile>{bylineContent}</JustForMobile>
+                  <p>
+                    {t("reservations:reservationCancelledBody", {
+                      user: reservation?.user?.email,
+                    })}
+                  </p>
                 </>
               )}
             </Heading>
-          </HeadColumns>
-        </HeadWrapper>
-        <StyledKoros from="white" to="var(--tilavaraus-gray)" />
-      </Head>
-      {formState === "unsent" ? (
-        <Body>
-          <BodyContainer>
-            <H3>{t("reservations:cancelInfo")}</H3>
-            <p>{t("reservations:cancelInfoBody")}</p>
-            <Form onSubmit={handleSubmit(onSubmit)}>
-              <Controller
-                as={
-                  <StyledSelect
-                    id="reservation__button--cancel-reason"
-                    label={`${t("reservations:cancelReason")}`}
-                    onChange={(val: OptionType) => {
-                      setValue("reason", val.value);
-                    }}
-                    options={[emptyOption(t("common:select")), ...reasons]}
-                    placeholder={t("common:select")}
-                    value={getSelectedOption(getValues("reason"), reasons)}
-                    required
-                  />
-                }
-                name="reason"
-                control={control}
-              />
-              <TextArea
-                id="reservation__button--cancel-description"
-                name="description"
-                label={t("reservations:cancelDescription")}
-                placeholder={t("reservations:cancelDescriptionPlaceholder")}
-                onChange={(e) => setValue("description", e.target.value)}
-              />
-              <Actions>
-                <MediumButton
-                  variant="secondary"
-                  onClick={() => router.push(reservationsUrl)}
-                  iconLeft={<IconArrowLeft />}
-                  data-testid="reservation-cancel__button--back"
-                >
-                  {t("common:prev")}
-                </MediumButton>
-                <MediumButton
-                  variant="primary"
-                  type="submit"
-                  iconLeft={<IconCrossCircle />}
-                  disabled={!watch("reason")?.value}
-                  data-testid="reservation-cancel__button--cancel"
-                >
-                  {t("reservations:cancelReservation")}
-                </MediumButton>
-              </Actions>
-            </Form>
-          </BodyContainer>
-        </Body>
-      ) : (
-        <Body>
-          <ButtonContainer>
-            <MediumButton
-              variant="primary"
-              iconLeft={<IconArrowLeft />}
-              onClick={() => router.push("/")}
-              data-testid="reservation-cancel__button--back-front"
-            >
-              {t("common:gotoFrontpage")}
-            </MediumButton>
-            <MediumButton
-              variant="secondary"
-              iconLeft={<IconPlusCircle />}
-              onClick={() =>
-                router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`)
-              }
-              data-testid="reservation-cancel__button--rereserve"
-            >
-              {t("reservations:makeNewReservation")}
-            </MediumButton>
-          </ButtonContainer>
-        </Body>
-      )}
+            <Content>
+              <ContentContainer>
+                {formState === "unsent" ? (
+                  <>
+                    <p>{t("reservations:cancelInfoBody")}</p>
+                    <TermsToggleButton
+                      variant="supplementary"
+                      size="small"
+                      onClick={() => setAreTermsVisible(!areTermsVisible)}
+                      iconRight={
+                        areTermsVisible ? (
+                          <IconAngleUp aria-hidden />
+                        ) : (
+                          <IconAngleDown aria-hidden />
+                        )
+                      }
+                    >
+                      {t(
+                        `reservations:${
+                          areTermsVisible ? "hide" : "show"
+                        }CancellationTerms`
+                      )}
+                    </TermsToggleButton>
+                    {areTermsVisible && (
+                      <NotificationBox
+                        heading={t("reservationUnit:cancellationTerms")}
+                        body={
+                          <Sanitize
+                            html={getTranslation(
+                              reservationUnit.cancellationTerms,
+                              "text"
+                            )}
+                          />
+                        }
+                      />
+                    )}
+                    <Form onSubmit={handleSubmit(onSubmit)}>
+                      <Controller
+                        as={
+                          <StyledSelect
+                            id="reservation__button--cancel-reason"
+                            label={`${t("reservations:cancelReason")}`}
+                            onChange={(val: OptionType) => {
+                              setValue("reason", val.value);
+                            }}
+                            options={[
+                              emptyOption(t("common:select")),
+                              ...reasons,
+                            ]}
+                            placeholder={t("common:select")}
+                            value={getSelectedOption(
+                              getValues("reason"),
+                              reasons
+                            )}
+                            required
+                          />
+                        }
+                        name="reason"
+                        control={control}
+                      />
+                      <TextArea
+                        id="reservation__button--cancel-description"
+                        name="description"
+                        label={t("reservations:cancelDescription")}
+                        placeholder={t(
+                          "reservations:cancelDescriptionPlaceholder"
+                        )}
+                        onChange={(e) =>
+                          setValue("description", e.target.value)
+                        }
+                        maxLength={200}
+                      />
+                      <Actions>
+                        <MediumButton
+                          variant="secondary"
+                          onClick={() => router.push(reservationsUrl)}
+                          data-testid="reservation-cancel__button--back"
+                        >
+                          {t("common:prev")}
+                        </MediumButton>
+                        <MediumButton
+                          variant="primary"
+                          type="submit"
+                          disabled={!watch("reason")?.value}
+                          data-testid="reservation-cancel__button--cancel"
+                        >
+                          {t("reservations:cancelReservation")}
+                        </MediumButton>
+                      </Actions>
+                    </Form>
+                  </>
+                ) : (
+                  <>
+                    {getTranslation(reservationUnit, instructionsKey) && (
+                      <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
+                        {getTranslation(reservationUnit, instructionsKey)}
+                      </Paragraph>
+                    )}
+                    <ButtonContainer>
+                      <MediumButton
+                        variant="supplementary"
+                        iconRight={<IconArrowRight aria-hidden />}
+                        onClick={() => router.push("/")}
+                        data-testid="reservation-cancel__button--back-front"
+                      >
+                        {t("common:gotoFrontpage")}
+                      </MediumButton>
+                      {logout && (
+                        <MediumButton
+                          variant="supplementary"
+                          iconRight={<IconSignout aria-hidden />}
+                          onClick={() => logout()}
+                          data-testid="reservation-cancel__button--logout"
+                        >
+                          {t("common:logout")}
+                        </MediumButton>
+                      )}
+                    </ButtonContainer>
+                  </>
+                )}
+              </ContentContainer>
+            </Content>
+          </div>
+        </Columns>
+      </Container>
       {errorMsg && (
         <Notification
           type="error"
@@ -389,8 +436,32 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
           {errorMsg}
         </Notification>
       )}
-    </>
+    </Wrapper>
   );
 };
 
-export default ReservationCancellation;
+const ReservationCancellationWithProfileAndLogout = (
+  props: Props
+): JSX.Element => {
+  if (!isBrowser || !authEnabled) {
+    return <ReservationCancellation {...props} />;
+  }
+
+  const WithOidc = require("../../components/common/WithOidc").default;
+
+  return (
+    <WithOidc
+      render={(oidcProps: { logout: (() => void) | undefined }) => (
+        <ReservationCancellation
+          {...props}
+          logout={() => {
+            clearApiAccessToken();
+            oidcProps.logout();
+          }}
+        />
+      )}
+    />
+  );
+};
+
+export default ReservationCancellationWithProfileAndLogout;

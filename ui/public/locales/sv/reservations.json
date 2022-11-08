@@ -25,8 +25,11 @@
   "modifyReservation": "",
   "modifyApplication": "",
   "backToReservations": "",
+  "showCancellationTerms": "",
+  "hideCancellationTerms": "",
   "cancelInfo": "",
   "cancelInfoBody": "",
+  "reasonOther": "",
   "cancelReason": "",
   "cancelDescription": "",
   "cancelDescriptionPlaceholder": "",
@@ -62,5 +65,9 @@
     "3": "",
     "4": "",
     "5": ""
+  },
+  "cancellationReasons": {
+    "termsAreBinding": "",
+    "buffer": ""
   }
 }

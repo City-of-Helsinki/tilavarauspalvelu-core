@@ -395,6 +395,16 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       data.reserveeOrganisationName = "Acme Oyj";
     }
 
+    if (pk === 20) {
+      data.begin = addDays(new Date(), 1).toISOString();
+      data.end = addHours(addDays(new Date(), 1), 2).toISOString();
+      data.reservationUnits[0].cancellationRule = {
+        id: "fawkpofk3490",
+        canBeCancelledTimeBefore: 90000,
+        needsHandling: false,
+      };
+    }
+
     if (pk === 21) {
       data.begin = addDays(new Date(), 10).toISOString();
       data.end = addHours(addDays(new Date(), 10), 2).toISOString();

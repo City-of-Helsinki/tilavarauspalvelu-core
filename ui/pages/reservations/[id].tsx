@@ -30,7 +30,10 @@ import { CenterSpinner } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
 import Sanitize from "../../components/common/Sanitize";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
-import { canUserCancelReservation } from "../../modules/reservation";
+import {
+  canUserCancelReservation,
+  getReservationCancellationReason,
+} from "../../modules/reservation";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
 import {
   getReservationUnitInstructionsKey,
@@ -116,7 +119,7 @@ const Columns = styled.div`
   grid-template-columns: 1fr;
   display: grid;
   align-items: flex-start;
-  gap: var(--spacing-m);
+  gap: var(--spacing-l);
 
   @media (min-width: ${breakpoints.m}) {
     & > div:nth-of-type(1) {
@@ -138,6 +141,11 @@ const Actions = styled.div`
       max-width: 300px;
     }
   }
+`;
+
+const CancellationText = styled.div`
+  color: var(--color-black-70);
+  line-height: var(--lineheight-l);
 `;
 
 const SecondaryActions = styled.div`
@@ -265,6 +273,19 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     );
   }, [reservation, reservationUnit, t]);
 
+  const cancellationReason = useMemo(() => {
+    const reason = reservation && getReservationCancellationReason(reservation);
+    switch (reason) {
+      case "NO_CANCELLATION_RULE":
+      case "REQUIRES_HANDLING":
+        return "termsAreBinding";
+      case "BUFFER":
+        return "buffer";
+      default:
+        return null;
+    }
+  }, [reservation]);
+
   if (error) {
     return (
       <Notification
@@ -303,25 +324,37 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
             <ReservationStatus state={reservation.state} />
             <JustForMobile>{bylineContent}</JustForMobile>
             <Actions>
-              <MediumButton
-                variant="secondary"
-                iconRight={<IconCross />}
-                onClick={() =>
-                  router.push(`${reservationsUrl}${reservation.pk}/cancel`)
-                }
-                disabled={
-                  !canUserCancelReservation(reservation) ||
-                  isReservationCancelled ||
-                  isBeingHandled
-                }
-                data-testid="reservation-detail__button--cancel"
-              >
-                {t(
-                  `reservations:cancel${
-                    isBeingHandled ? "Application" : "Reservation"
-                  }`
-                )}
-              </MediumButton>
+              {canUserCancelReservation(reservation) &&
+              !isReservationCancelled &&
+              !isBeingHandled ? (
+                <MediumButton
+                  variant="secondary"
+                  iconRight={<IconCross />}
+                  onClick={() =>
+                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
+                  }
+                  disabled={
+                    !canUserCancelReservation(reservation) ||
+                    isReservationCancelled ||
+                    isBeingHandled
+                  }
+                  data-testid="reservation-detail__button--cancel"
+                >
+                  {t(
+                    `reservations:cancel${
+                      isBeingHandled ? "Application" : "Reservation"
+                    }`
+                  )}
+                </MediumButton>
+              ) : (
+                cancellationReason && (
+                  <CancellationText>
+                    {t(
+                      `reservations:cancellationReasons:${cancellationReason}`
+                    )}
+                  </CancellationText>
+                )
+              )}
             </Actions>
             <Content>
               {getTranslation(reservationUnit, instructionsKey) && (

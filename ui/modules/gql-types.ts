@@ -978,10 +978,16 @@ export type EventReservationUnitType = Node & {
   reservationUnit?: Maybe<ReservationUnitType>;
 };
 
+export type GeneralRolePermissionType = {
+  __typename?: "GeneralRolePermissionType";
+  permission?: Maybe<Scalars["String"]>;
+};
+
 export type GeneralRoleType = Node & {
   __typename?: "GeneralRoleType";
   /** The ID of the object */
   id: Scalars["ID"];
+  permissions?: Maybe<Array<Maybe<GeneralRolePermissionType>>>;
   pk?: Maybe<Scalars["Int"]>;
   role?: Maybe<RoleType>;
 };
@@ -3651,10 +3657,16 @@ export type RoleType = {
   verboseNameSv?: Maybe<Scalars["String"]>;
 };
 
+export type ServiceSectorRolePermissionType = {
+  __typename?: "ServiceSectorRolePermissionType";
+  permission?: Maybe<Scalars["String"]>;
+};
+
 export type ServiceSectorRoleType = Node & {
   __typename?: "ServiceSectorRoleType";
   /** The ID of the object */
   id: Scalars["ID"];
+  permissions?: Maybe<Array<Maybe<ServiceSectorRolePermissionType>>>;
   pk?: Maybe<Scalars["Int"]>;
   role?: Maybe<RoleType>;
   serviceSector?: Maybe<ServiceSectorType>;
@@ -3966,10 +3978,16 @@ export type UnitGroupType = Node & {
   units?: Maybe<Array<Maybe<UnitType>>>;
 };
 
+export type UnitRolePermissionType = {
+  __typename?: "UnitRolePermissionType";
+  permission?: Maybe<Scalars["String"]>;
+};
+
 export type UnitRoleType = Node & {
   __typename?: "UnitRoleType";
   /** The ID of the object */
   id: Scalars["ID"];
+  permissions?: Maybe<Array<Maybe<UnitRolePermissionType>>>;
   pk?: Maybe<Scalars["Int"]>;
   role?: Maybe<RoleType>;
   unitGroups?: Maybe<Array<Maybe<UnitGroupType>>>;
@@ -4982,6 +5000,7 @@ export const ListReservationsDocument = gql`
     $end: DateTime
     $state: [String]
     $user: ID
+    $reservationUnit: [ID]
   ) {
     reservations(
       before: $before
@@ -4992,6 +5011,7 @@ export const ListReservationsDocument = gql`
       end: $end
       state: $state
       user: $user
+      reservationUnit: $reservationUnit
     ) {
       edges {
         node {
@@ -5054,6 +5074,7 @@ export const ListReservationsDocument = gql`
  *      end: // value for 'end'
  *      state: // value for 'state'
  *      user: // value for 'user'
+ *      reservationUnit: // value for 'reservationUnit'
  *   },
  * });
  */
@@ -5496,6 +5517,20 @@ export const ReservationUnitDocument = gql`
         nameEn
         nameSv
       }
+      openingHours(openingTimes: false, periods: true) {
+        openingTimePeriods {
+          periodId
+          startDate
+          endDate
+          resourceState
+          timeSpans {
+            startTime
+            endTime
+            resourceState
+            weekdays
+          }
+        }
+      }
       requireReservationHandling
       metadataSet {
         id
@@ -5827,11 +5862,27 @@ export type RelatedReservationUnitsQueryResult = Apollo.QueryResult<
 export const ReservationUnitOpeningHoursDocument = gql`
   query ReservationUnitOpeningHours(
     $pk: Int
+    $startDate: Date
+    $endDate: Date
     $from: Date
     $to: Date
     $state: [String]
   ) {
     reservationUnitByPk(pk: $pk) {
+      openingHours(
+        openingTimes: true
+        periods: false
+        startDate: $startDate
+        endDate: $endDate
+      ) {
+        openingTimes {
+          date
+          startTime
+          endTime
+          state
+          periods
+        }
+      }
       reservations(state: $state, from: $from, to: $to) {
         pk
         state
@@ -5860,6 +5911,8 @@ export const ReservationUnitOpeningHoursDocument = gql`
  * const { data, loading, error } = useReservationUnitOpeningHoursQuery({
  *   variables: {
  *      pk: // value for 'pk'
+ *      startDate: // value for 'startDate'
+ *      endDate: // value for 'endDate'
  *      from: // value for 'from'
  *      to: // value for 'to'
  *      state: // value for 'state'
@@ -6405,6 +6458,9 @@ export type ListReservationsQueryVariables = Exact<{
     Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>
   >;
   user?: InputMaybe<Scalars["ID"]>;
+  reservationUnit?: InputMaybe<
+    Array<InputMaybe<Scalars["ID"]>> | InputMaybe<Scalars["ID"]>
+  >;
 }>;
 
 export type ListReservationsQuery = {
@@ -6757,6 +6813,23 @@ export type ReservationUnitQuery = {
       nameEn?: string | null;
       nameSv?: string | null;
     } | null> | null;
+    openingHours?: {
+      __typename?: "OpeningHoursType";
+      openingTimePeriods?: Array<{
+        __typename?: "PeriodType";
+        periodId?: number | null;
+        startDate?: any | null;
+        endDate?: any | null;
+        resourceState?: string | null;
+        timeSpans?: Array<{
+          __typename?: "TimeSpanType";
+          startTime?: any | null;
+          endTime?: any | null;
+          resourceState?: string | null;
+          weekdays?: Array<number | null> | null;
+        } | null> | null;
+      } | null> | null;
+    } | null;
     metadataSet?: {
       __typename?: "ReservationMetadataSetType";
       id: string;
@@ -6928,6 +7001,8 @@ export type RelatedReservationUnitsQuery = {
 
 export type ReservationUnitOpeningHoursQueryVariables = Exact<{
   pk?: InputMaybe<Scalars["Int"]>;
+  startDate?: InputMaybe<Scalars["Date"]>;
+  endDate?: InputMaybe<Scalars["Date"]>;
   from?: InputMaybe<Scalars["Date"]>;
   to?: InputMaybe<Scalars["Date"]>;
   state?: InputMaybe<
@@ -6939,6 +7014,17 @@ export type ReservationUnitOpeningHoursQuery = {
   __typename?: "Query";
   reservationUnitByPk?: {
     __typename?: "ReservationUnitByPkType";
+    openingHours?: {
+      __typename?: "OpeningHoursType";
+      openingTimes?: Array<{
+        __typename?: "OpeningTimesType";
+        date?: any | null;
+        startTime?: any | null;
+        endTime?: any | null;
+        state?: string | null;
+        periods?: Array<number | null> | null;
+      } | null> | null;
+    } | null;
     reservations?: Array<{
       __typename?: "ReservationType";
       pk?: number | null;

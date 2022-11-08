@@ -39,6 +39,15 @@ export const getDurationOptions = (
   return timeOptions;
 };
 
+export const isReservationInThePast = (
+  reservation: ReservationType
+): boolean => {
+  if (!reservation?.begin) return null;
+
+  const now = new Date().setSeconds(0, 0);
+  return !isAfter(new Date(reservation.begin).setSeconds(0, 0), now);
+};
+
 export const isReservationWithinCancellationPeriod = (
   reservation: ReservationType
 ): boolean => {
@@ -48,7 +57,7 @@ export const isReservationWithinCancellationPeriod = (
   if (reservationUnit?.cancellationRule?.canBeCancelledTimeBefore)
     now += reservationUnit.cancellationRule.canBeCancelledTimeBefore;
 
-  return isAfter(now, begin);
+  return now > begin;
 };
 
 export const canUserCancelReservation = (
@@ -187,4 +196,37 @@ export const getReservationApplicationMutationValues = (
   result.reserveeType = reserveeType;
 
   return result;
+};
+
+export type ReservationCancellationReason =
+  | "PAST"
+  | "NO_CANCELLATION_RULE"
+  | "REQUIRES_HANDLING"
+  | "BUFFER";
+
+export const getReservationCancellationReason = (
+  reservation: ReservationType
+): ReservationCancellationReason | null => {
+  const reservationUnit = reservation.reservationUnits?.[0];
+
+  if (!reservationUnit) return null;
+
+  if (isReservationInThePast(reservation)) return "PAST";
+
+  if (!reservationUnit.cancellationRule) {
+    return "NO_CANCELLATION_RULE";
+  }
+
+  if (reservationUnit.cancellationRule?.needsHandling) {
+    return "REQUIRES_HANDLING";
+  }
+
+  if (
+    reservationUnit.cancellationRule?.canBeCancelledTimeBefore &&
+    isReservationWithinCancellationPeriod(reservation)
+  ) {
+    return "BUFFER";
+  }
+
+  return null;
 };

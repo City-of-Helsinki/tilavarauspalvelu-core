@@ -1029,12 +1029,17 @@ type EventReservationUnitType implements Node {
   pk: Int
 }
 
+type GeneralRolePermissionType {
+  permission: String
+}
+
 type GeneralRoleType implements Node {
   role: RoleType
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  permissions: [GeneralRolePermissionType]
 }
 
 type KeywordCategoryType implements Node {
@@ -2437,24 +2442,24 @@ input ReservationUnitCreateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2577,24 +2582,24 @@ type ReservationUnitCreateMutationPayload {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3182,24 +3187,24 @@ input ReservationUnitUpdateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3321,24 +3326,24 @@ type ReservationUnitUpdateMutationPayload {
   """
   pricingType: String
   paymentTypes: [String]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3660,6 +3665,10 @@ type RoleType {
   verboseNameEn: String
 }
 
+type ServiceSectorRolePermissionType {
+  permission: String
+}
+
 type ServiceSectorRoleType implements Node {
   role: RoleType
   serviceSector: ServiceSectorType
@@ -3667,6 +3676,7 @@ type ServiceSectorRoleType implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+  permissions: [ServiceSectorRolePermissionType]
 }
 
 type ServiceSectorType implements Node {
@@ -4008,6 +4018,10 @@ type UnitGroupType implements Node {
   pk: Int
 }
 
+type UnitRolePermissionType {
+  permission: String
+}
+
 type UnitRoleType implements Node {
   role: RoleType
 
@@ -4016,6 +4030,7 @@ type UnitRoleType implements Node {
   pk: Int
   units: [UnitType]
   unitGroups: [UnitGroupType]
+  permissions: [UnitRolePermissionType]
 }
 
 type UnitType implements Node {
@@ -4067,18 +4082,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -4088,18 +4100,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
