@@ -104,6 +104,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             cancelDetails
                             begin
                             end
+                            orderUuid
+                            orderStatus
                         }
                     }
                 }
@@ -212,6 +214,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             bufferTimeAfter
                             staffEvent
                             type
+                            orderUuid
+                            orderStatus
                         }
                     }
                 }
@@ -1324,6 +1328,34 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             }
             """
             % (self.reservation_unit.pk, other_unit.pk)
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_uuid_field(self):
+        self.client.force_login(self.general_admin)
+        PaymentOrderFactory(
+            reservation=self.reservation,
+            order_id="626c0cf7-3628-4ff5-aa9c-1b4e70dedc89",
+            status=PaymentStatus.PAID,
+        )
+
+        response = self.query(
+            """
+            query {
+                reservations {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            orderUuid
+                            orderStatus
+                        }
+                    }
+                }
+            }
+            """
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

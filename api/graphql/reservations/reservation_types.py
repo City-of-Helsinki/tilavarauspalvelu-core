@@ -140,6 +140,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     buffer_time_after = Duration()
     staff_event = graphene.Boolean()
     type = graphene.String()
+    order_uuid = graphene.String()
+    order_status = graphene.String()
 
     class Meta:
         model = Reservation
@@ -188,6 +190,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "cancel_details",
             "staff_event",
             "type",
+            "order_uuid",
+            "order_status",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -318,6 +322,18 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_cancel_details(self, info: ResolveInfo) -> Optional[str]:
         return self.cancel_details
+
+    @reservation_non_public_field
+    def resolve_order_uuid(self, info: ResolveInfo) -> Optional[str]:
+        payment_order = self.payment_order.first()
+        return (
+            payment_order.order_id if payment_order and payment_order.order_id else None
+        )
+
+    @reservation_non_public_field
+    def resolve_order_status(self, info: ResolveInfo) -> Optional[str]:
+        payment_order = self.payment_order.first()
+        return payment_order.status if payment_order else None
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
