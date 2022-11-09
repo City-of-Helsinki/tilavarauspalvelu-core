@@ -1,5 +1,6 @@
 import datetime
 import json
+from decimal import Decimal
 from unittest.mock import patch
 
 import freezegun
@@ -55,6 +56,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             unit_price=10,
             tax_percentage_value=24,
             price=10,
+            price_net=Decimal(10) / (Decimal("1.24")),
         )
 
     def get_update_query(self):
@@ -871,6 +873,11 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.price).is_equal_to(10)
         assert_that(self.reservation.unit_price).is_equal_to(10)
         assert_that(self.reservation.tax_percentage_value).is_equal_to(24)
+        assert_that(self.reservation.price_net).is_close_to(
+            self.reservation.price
+            / (1 + self.reservation.tax_percentage_value / Decimal("100")),
+            6,
+        )
 
     def test_update_reservation_price_calculation_when_begin_changes(
         self, mock_periods, mock_opening_hours
@@ -886,6 +893,8 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=1.0,
             highest_price=3.0,
+            highest_price_net=Decimal(3) / (1 + tax_percentage.decimal),
+            lowest_price_net=Decimal(1) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -910,6 +919,15 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.tax_percentage_value).is_equal_to(
             tax_percentage.value
         )
+        assert_that(self.reservation.price_net).is_close_to(
+            self.reservation.price / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(self.reservation.non_subsidised_price).is_close_to(
+            self.reservation.price, 6
+        )
+        assert_that(self.reservation.non_subsidised_price_net).is_equal_to(
+            self.reservation.price_net
+        )
 
     def test_update_reservation_price_calculation_when_end_changes(
         self, mock_periods, mock_opening_hours
@@ -925,6 +943,8 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=1.0,
             highest_price=3.0,
+            highest_price_net=Decimal(3) / (1 + tax_percentage.decimal),
+            lowest_price_net=Decimal(1) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -948,6 +968,15 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.unit_price).is_equal_to(3.0)
         assert_that(self.reservation.tax_percentage_value).is_equal_to(
             tax_percentage.value
+        )
+        assert_that(self.reservation.price_net).is_close_to(
+            self.reservation.price / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(self.reservation.non_subsidised_price).is_close_to(
+            self.reservation.price, 6
+        )
+        assert_that(self.reservation.non_subsidised_price_net).is_equal_to(
+            self.reservation.price_net
         )
 
     @patch(
@@ -995,6 +1024,8 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=2.0,
             highest_price=4.0,
+            highest_price_net=Decimal(4) / (1 + tax_percentage.decimal),
+            lowest_price_net=Decimal(2) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=new_unit,
@@ -1019,6 +1050,15 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.unit_price).is_equal_to(4.0)
         assert_that(self.reservation.tax_percentage_value).is_equal_to(
             tax_percentage.value
+        )
+        assert_that(self.reservation.price_net).is_close_to(
+            self.reservation.price / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(self.reservation.non_subsidised_price).is_close_to(
+            self.reservation.price, 6
+        )
+        assert_that(self.reservation.non_subsidised_price_net).is_equal_to(
+            self.reservation.price_net
         )
 
     def test_update_reservation_price_calculation_when_begin_changes_to_future(
@@ -1049,6 +1089,8 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=4.0,
             highest_price=6.0,
+            highest_price_net=Decimal(6) / (1 + tax_percentage.decimal),
+            lowest_price_net=Decimal(4) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_FUTURE,
             reservation_unit=self.reservation_unit,
@@ -1074,6 +1116,15 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.unit_price).is_equal_to(6.0)
         assert_that(self.reservation.tax_percentage_value).is_equal_to(
             tax_percentage.value
+        )
+        assert_that(self.reservation.price_net).is_close_to(
+            self.reservation.price / (1 + tax_percentage.decimal), 6
+        )
+        assert_that(self.reservation.non_subsidised_price).is_close_to(
+            self.reservation.price, 6
+        )
+        assert_that(self.reservation.non_subsidised_price_net).is_equal_to(
+            self.reservation.price_net
         )
 
     def test_require_free_of_charge_reason_if_applying_for_free_of_charge(
