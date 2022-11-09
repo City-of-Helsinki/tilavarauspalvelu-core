@@ -682,7 +682,11 @@ class ReservationUpdateSerializer(
 
     def check_metadata_fields(self, data, reservation_unit) -> None:
         # Even marked in the metadata set to be mandatory, yet these never should be for private person.
-        non_mandatory_fields_for_person = ["reservee_organisation_name", "home_city"]
+        non_mandatory_fields_for_person = [
+            "reservee_organisation_name",
+            "home_city",
+            "reservee_id",
+        ]
 
         metadata_set = reservation_unit.metadata_set
         required_fields = metadata_set.required_fields.all() if metadata_set else []
