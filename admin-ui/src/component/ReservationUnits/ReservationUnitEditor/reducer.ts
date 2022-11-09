@@ -141,6 +141,12 @@ const modifyEditorState = (
   hasChanges: true,
 });
 
+const calculateNetPrice = (crossPrice: number, taxPercentage: number): number =>
+  crossPrice / (1 + taxPercentage / 100);
+
+const calculatePrice = (netPrice: number, taxPercentage: number): number =>
+  Number((netPrice * (1 + taxPercentage / 100)).toFixed(2));
+
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "dataLoaded": {
@@ -213,6 +219,8 @@ export const reducer = (state: State, action: Action): State => {
                 taxPercentagePk: pricing?.taxPercentage.pk as number,
                 highestPrice: Number(pricing?.highestPrice),
                 lowestPrice: Number(pricing?.lowestPrice),
+                highestPriceNet: Number(pricing?.highestPriceNet),
+                lowestPriceNet: Number(pricing?.lowestPriceNet),
                 pricingType:
                   pricing?.pricingType ||
                   ReservationUnitsReservationUnitPricingTypeChoices.Free,
@@ -438,9 +446,58 @@ export const reducer = (state: State, action: Action): State => {
       });
     }
     case "updatePricingType": {
+      const newPricingType = { ...action.pricingType };
+
+      if (action.changeField) {
+        const currentTaxPercentage = Number(
+          state.taxPercentageOptions.find(
+            (v) => v.value === action.pricingType.taxPercentagePk
+          )?.label
+        );
+
+        switch (action.changeField) {
+          case "highestPrice":
+            newPricingType.highestPriceNet = calculateNetPrice(
+              action.pricingType.highestPrice as number,
+              currentTaxPercentage
+            );
+            break;
+          case "highestPriceNet":
+            newPricingType.highestPrice = calculatePrice(
+              action.pricingType.highestPriceNet as number,
+              currentTaxPercentage
+            );
+            break;
+
+          case "lowestPrice":
+            newPricingType.lowestPriceNet = calculateNetPrice(
+              action.pricingType.lowestPrice as number,
+              currentTaxPercentage
+            );
+            break;
+          case "lowestPriceNet":
+            newPricingType.lowestPrice = calculatePrice(
+              action.pricingType.lowestPriceNet as number,
+              currentTaxPercentage
+            );
+            break;
+          case "taxPercentagePk":
+            newPricingType.lowestPriceNet = calculateNetPrice(
+              action.pricingType.lowestPrice as number,
+              currentTaxPercentage
+            );
+            newPricingType.highestPriceNet = calculateNetPrice(
+              action.pricingType.highestPrice as number,
+              currentTaxPercentage
+            );
+            break;
+          default:
+        }
+      }
+
       if (state.reservationUnitEdit.pricings?.length === 0) {
         return modifyEditorState(state, {
-          pricings: [action.pricingType],
+          pricings: [newPricingType],
         });
       }
 
@@ -448,7 +505,7 @@ export const reducer = (state: State, action: Action): State => {
         pricings: (state.reservationUnitEdit.pricings || [])
           .map((pricingType) => {
             if (pricingType?.status === action.pricingType.status) {
-              return action.pricingType;
+              return newPricingType;
             }
             return pricingType;
           })

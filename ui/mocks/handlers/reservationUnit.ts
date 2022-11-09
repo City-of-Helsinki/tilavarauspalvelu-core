@@ -123,7 +123,9 @@ const selectedReservationUnitQuery = graphql.query<
       {
         begins: toUIDate(addDays(new Date(), 2), "yyyy-MM-dd"),
         lowestPrice: 10,
+        lowestPriceNet: 10 / 1.24,
         highestPrice: 30,
+        highestPriceNet: 30 / 1.24,
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
         pricingType:
@@ -137,7 +139,9 @@ const selectedReservationUnitQuery = graphql.query<
       {
         begins: toUIDate(addDays(new Date(), 3), "yyyy-MM-dd"),
         lowestPrice: 20,
+        lowestPriceNet: 20 / 1.24,
         highestPrice: 50,
+        highestPriceNet: 50 / 1.24,
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
         pricingType:

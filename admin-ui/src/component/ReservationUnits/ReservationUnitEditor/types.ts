@@ -45,6 +45,12 @@ export type Action =
   | {
       type: "updatePricingType";
       pricingType: ReservationUnitPricingUpdateSerializerInput;
+      changeField?:
+        | "lowestPriceNet"
+        | "lowestPrice"
+        | "highestPriceNet"
+        | "highestPrice"
+        | "taxPercentagePk";
     }
   | { type: "setPurposes"; purposes: OptionType[] }
   | { type: "setQualifiers"; qualifiers: OptionType[] }
@@ -173,7 +179,9 @@ export const schema = Joi.object({
 // validation for drafts
 const draftPricing = Joi.object({
   lowestPrice: requiredForNonFree(Joi.number().precision(2).min(0)),
-  highestPrice: requiredForNonFree(Joi.number().precision(2)),
+  highestPrice: requiredForNonFree(
+    Joi.number().precision(2).min(Joi.ref("lowestPrice")).required()
+  ),
 });
 
 export const draftSchema = Joi.object({

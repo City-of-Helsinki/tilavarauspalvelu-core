@@ -121,7 +121,9 @@ export const RESERVATIONUNIT_QUERY = gql`
         pricingType
         priceUnit
         lowestPrice
+        lowestPriceNet
         highestPrice
+        highestPriceNet
         taxPercentage {
           pk
           value

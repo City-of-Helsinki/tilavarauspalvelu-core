@@ -9,7 +9,13 @@ import {
   NumberInput,
   RadioButton,
 } from "hds-react";
-import { Grid, Span3, Span4, VerticalFlex } from "../../../styles/layout";
+import {
+  Grid,
+  Span3,
+  Span4,
+  Span6,
+  VerticalFlex,
+} from "../../../styles/layout";
 import { Error } from "./modules/reservationUnitEditor";
 import EnumSelect from "./EnumSelect";
 import Select from "./Select";
@@ -79,15 +85,23 @@ const PricingType = ({
   }
 
   const setPricingTypeValue = (
-    value: Partial<ReservationUnitPricingCreateSerializerInput>
-  ) =>
+    value: Partial<ReservationUnitPricingCreateSerializerInput>,
+    changeField?:
+      | "lowestPriceNet"
+      | "lowestPrice"
+      | "highestPriceNet"
+      | "highestPrice"
+      | "taxPercentagePk"
+  ) => {
     dispatch({
       type: "updatePricingType",
       pricingType: {
         ...(pricing as ReservationUnitPricingCreateSerializerInput),
         ...value,
       },
+      changeField,
     });
+  };
 
   return (
     <>
@@ -149,6 +163,76 @@ const PricingType = ({
         <Grid>
           {pricing.pricingType === "PAID" && (
             <>
+              <Span6>
+                <EnumSelect
+                  optionPrefix="priceUnit"
+                  placeholder={t("common.select")}
+                  id={`pricings,${labelIndex},priceUnit`}
+                  required
+                  value={pricing.priceUnit as string}
+                  label={t("ReservationUnitEditor.label.priceUnit")}
+                  type={ReservationUnitsReservationUnitPriceUnitChoices}
+                  onChange={(priceUnit) => setPricingTypeValue({ priceUnit })}
+                  tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
+                  errorText={getValidationError(
+                    `pricings,${labelIndex},priceUnit`
+                  )}
+                />
+              </Span6>
+              <Span6>
+                <Select
+                  placeholder={t("common.select")}
+                  required
+                  id={`pricings,${labelIndex},taxPercentagePk`}
+                  label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
+                  options={state.taxPercentageOptions}
+                  onChange={(selectedVat) => {
+                    setPricingTypeValue(
+                      {
+                        taxPercentagePk: selectedVat as number,
+                      },
+                      "taxPercentagePk"
+                    );
+                  }}
+                  value={get(pricingType, "taxPercentagePk") as number}
+                  errorText={getValidationError(
+                    `pricings,${labelIndex},taxPercentagePk`
+                  )}
+                />
+              </Span6>
+
+              <Span3>
+                <NumberInput
+                  value={
+                    typeof pricing.lowestPriceNet === "number"
+                      ? pricing.lowestPriceNet
+                      : ""
+                  }
+                  id={`pricings,${labelIndex},lowestPriceNet`}
+                  required
+                  label={t("ReservationUnitEditor.label.lowestPriceNet")}
+                  minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+                  plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+                  onChange={(e) => {
+                    setPricingTypeValue(
+                      {
+                        lowestPriceNet: Number(e.target.value),
+                      },
+                      "lowestPriceNet"
+                    );
+                  }}
+                  step={1}
+                  min={0}
+                  errorText={getValidationError(
+                    `pricings,${labelIndex},lowestPrice`
+                  )}
+                  invalid={
+                    !!getValidationError(
+                      `pricings,${labelIndex},lowestPriceNet`
+                    )
+                  }
+                />
+              </Span3>
               <Span3>
                 <NumberInput
                   value={
@@ -162,12 +246,14 @@ const PricingType = ({
                   minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
                   plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
                   onChange={(e) => {
-                    setPricingTypeValue({
-                      lowestPrice: Number(e.target.value),
-                    });
+                    setPricingTypeValue(
+                      {
+                        lowestPrice: Number(e.target.value),
+                      },
+                      "lowestPrice"
+                    );
                   }}
                   step={1}
-                  type="number"
                   min={0}
                   errorText={getValidationError(
                     `pricings,${labelIndex},lowestPrice`
@@ -176,6 +262,32 @@ const PricingType = ({
                     !!getValidationError(`pricings,${labelIndex},lowestPrice`)
                   }
                   tooltipText={t("ReservationUnitEditor.tooltip.lowestPrice")}
+                />
+              </Span3>
+              <Span3>
+                <NumberInput
+                  required
+                  value={
+                    typeof pricing.highestPriceNet === "number"
+                      ? pricing.highestPriceNet
+                      : ""
+                  }
+                  id={`pricings,${labelIndex},highestPriceNet`}
+                  label={t("ReservationUnitEditor.label.highestPriceNet")}
+                  minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+                  plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+                  onChange={(e) => {
+                    setPricingTypeValue(
+                      {
+                        highestPriceNet: Number(e.target.value),
+                      },
+                      "highestPriceNet"
+                    );
+                  }}
+                  step={1}
+                  min={0}
+                  errorText={getValidationError("highestPriceNet")}
+                  invalid={!!getValidationError("highestPriceNet")}
                 />
               </Span3>
               <Span3>
@@ -191,50 +303,18 @@ const PricingType = ({
                   minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
                   plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
                   onChange={(e) => {
-                    setPricingTypeValue({
-                      highestPrice: Number(e.target.value),
-                    });
+                    setPricingTypeValue(
+                      {
+                        highestPrice: Number(e.target.value),
+                      },
+                      "highestPrice"
+                    );
                   }}
                   step={1}
-                  type="number"
                   min={0}
                   errorText={getValidationError("highestPrice")}
                   invalid={!!getValidationError("highestPrice")}
                   tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
-                />
-              </Span3>
-              <Span3>
-                <EnumSelect
-                  optionPrefix="priceUnit"
-                  placeholder={t("common.select")}
-                  id={`pricings,${labelIndex},priceUnit`}
-                  required
-                  value={pricing.priceUnit as string}
-                  label={t("ReservationUnitEditor.label.priceUnit")}
-                  type={ReservationUnitsReservationUnitPriceUnitChoices}
-                  onChange={(priceUnit) => setPricingTypeValue({ priceUnit })}
-                  tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
-                  errorText={getValidationError(
-                    `pricings,${labelIndex},priceUnit`
-                  )}
-                />
-              </Span3>
-              <Span3>
-                <Select
-                  placeholder={t("common.select")}
-                  required
-                  id={`pricings,${labelIndex},taxPercentagePk`}
-                  label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
-                  options={state.taxPercentageOptions}
-                  onChange={(selectedVat) => {
-                    setPricingTypeValue({
-                      taxPercentagePk: selectedVat as number,
-                    });
-                  }}
-                  value={get(pricingType, "taxPercentagePk") as number}
-                  errorText={getValidationError(
-                    `pricings,${labelIndex},taxPercentagePk`
-                  )}
                 />
               </Span3>
               {type === "ACTIVE" && (

@@ -1975,7 +1975,7 @@ export type ReservationApproveMutationInput = {
   /** Additional information for approval. */
   handlingDetails?: InputMaybe<Scalars["String"]>;
   pk?: InputMaybe<Scalars["Int"]>;
-  /** The price of this particular reservation */
+  /** The price of this particular reservation including VAT */
   price: Scalars["Float"];
 };
 
@@ -1989,7 +1989,7 @@ export type ReservationApproveMutationPayload = {
   /** Additional information for approval. */
   handlingDetails?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
-  /** The price of this particular reservation */
+  /** The price of this particular reservation including VAT */
   price?: Maybe<Scalars["Float"]>;
   state?: Maybe<State>;
 };
@@ -2074,8 +2074,10 @@ export type ReservationConfirmMutationPayload = {
   name?: Maybe<Scalars["String"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
-  /** The price of this particular reservation */
+  /** The price of this particular reservation including VAT */
   price?: Maybe<Scalars["Float"]>;
+  /** The price of this particular reservation excluding VAT */
+  priceNet?: Maybe<Scalars["Float"]>;
   priority?: Maybe<Scalars["Int"]>;
   purposePk?: Maybe<Scalars["Int"]>;
   reserveeAddressCity?: Maybe<Scalars["String"]>;
@@ -2103,7 +2105,7 @@ export type ReservationConfirmMutationPayload = {
   taxPercentageValue?: Maybe<Scalars["Float"]>;
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
   type?: Maybe<Scalars["String"]>;
-  /** The price of this particular reservation */
+  /** The unit price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
 };
 
@@ -2175,8 +2177,10 @@ export type ReservationCreateMutationPayload = {
   name?: Maybe<Scalars["String"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
-  /** The price of this particular reservation */
+  /** The price of this particular reservation including VAT */
   price?: Maybe<Scalars["Float"]>;
+  /** The price of this particular reservation excluding VAT */
+  priceNet?: Maybe<Scalars["Float"]>;
   priority?: Maybe<Scalars["Int"]>;
   purposePk?: Maybe<Scalars["Int"]>;
   reservation?: Maybe<ReservationType>;
@@ -2202,7 +2206,7 @@ export type ReservationCreateMutationPayload = {
   taxPercentageValue?: Maybe<Scalars["Float"]>;
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
   type?: Maybe<Scalars["String"]>;
-  /** The price of this particular reservation */
+  /** The unit price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
 };
 
@@ -2354,6 +2358,8 @@ export type ReservationType = Node & {
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   price?: Maybe<Scalars["Float"]>;
+  /** The price of this particular reservation excluding VAT */
+  priceNet: Scalars["Decimal"];
   priority: ReservationsReservationPriorityChoices;
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
@@ -2826,10 +2832,14 @@ export type ReservationUnitPaymentTypeType = Node & {
 export type ReservationUnitPricingCreateSerializerInput = {
   /** When pricing is activated */
   begins: Scalars["Date"];
-  /** Maximum price of the reservation unit */
+  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Float"]>;
-  /** Minimum price of the reservation unit */
+  /** Maximum price of the reservation unit excluding VAT */
+  highestPriceNet?: InputMaybe<Scalars["Float"]>;
+  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
+  /** Minimum price of the reservation unit excluding VAT */
+  lowestPriceNet?: InputMaybe<Scalars["Float"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
   priceUnit?: InputMaybe<Scalars["String"]>;
   /** What kind of pricing type this pricing has. Possible values are PAID, FREE. */
@@ -2843,10 +2853,14 @@ export type ReservationUnitPricingType = {
   __typename?: "ReservationUnitPricingType";
   /** When pricing is activated */
   begins: Scalars["Date"];
-  /** Maximum price of the reservation unit */
+  /** Maximum price of the reservation unit including VAT */
   highestPrice: Scalars["Decimal"];
-  /** Minimum price of the reservation unit */
+  /** Maximum price of the reservation unit excluding VAT */
+  highestPriceNet: Scalars["Decimal"];
+  /** Minimum price of the reservation unit including VAT */
   lowestPrice: Scalars["Decimal"];
+  /** Minimum price of the reservation unit excluding VAT */
+  lowestPriceNet: Scalars["Decimal"];
   pk?: Maybe<Scalars["Int"]>;
   /** Unit of the price */
   priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices;
@@ -2861,10 +2875,14 @@ export type ReservationUnitPricingType = {
 export type ReservationUnitPricingUpdateSerializerInput = {
   /** When pricing is activated */
   begins: Scalars["Date"];
-  /** Maximum price of the reservation unit */
+  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Float"]>;
-  /** Minimum price of the reservation unit */
+  /** Maximum price of the reservation unit excluding VAT */
+  highestPriceNet?: InputMaybe<Scalars["Float"]>;
+  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
+  /** Minimum price of the reservation unit excluding VAT */
+  lowestPriceNet?: InputMaybe<Scalars["Float"]>;
   pk?: InputMaybe<Scalars["Int"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
   priceUnit?: InputMaybe<Scalars["String"]>;
@@ -3417,8 +3435,10 @@ export type ReservationUpdateMutationPayload = {
   name?: Maybe<Scalars["String"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
-  /** The price of this particular reservation */
+  /** The price of this particular reservation including VAT */
   price?: Maybe<Scalars["Float"]>;
+  /** The price of this particular reservation excluding VAT */
+  priceNet?: Maybe<Scalars["Float"]>;
   priority?: Maybe<Scalars["Int"]>;
   purposePk?: Maybe<Scalars["Int"]>;
   reservation?: Maybe<ReservationType>;
@@ -3447,7 +3467,7 @@ export type ReservationUpdateMutationPayload = {
   taxPercentageValue?: Maybe<Scalars["Float"]>;
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
   type?: Maybe<Scalars["String"]>;
-  /** The price of this particular reservation */
+  /** The unit price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
 };
 
