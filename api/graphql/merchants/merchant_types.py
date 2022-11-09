@@ -3,7 +3,8 @@ from graphene_permissions.mixins import AuthNode
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
-from merchants.models import PaymentMerchant, PaymentProduct
+from merchants.models import PaymentMerchant, PaymentOrder, PaymentProduct
+from permissions.api_permissions.graphene_permissions import PaymentOrderPermission
 
 
 class PaymentMerchantType(AuthNode, PrimaryKeyObjectType):
@@ -33,3 +34,32 @@ class PaymentProductType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_merchant_pk(self, info) -> str:
         return self.merchant.pk
+
+
+class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (PaymentOrderPermission,)
+
+    order_id = graphene.String()
+    status = graphene.String()
+    payment_type = graphene.String()
+    processed_at = graphene.DateTime()
+    checkout_url = graphene.String()
+    receipt_url = graphene.String()
+    reservation_pk = graphene.String()
+
+    class Meta:
+        model = PaymentOrder
+        fields = [
+            "order_id",
+            "status",
+            "payment_type",
+            "processed_at",
+            "checkout_url",
+            "receipt_url",
+            "reservation_pk",
+        ]
+        interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
+
+    def resolve_reservation_pk(self, info) -> str:
+        return self.reservation.pk

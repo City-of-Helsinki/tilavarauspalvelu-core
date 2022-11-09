@@ -577,6 +577,16 @@ class ServiceSectorPermission(BasePermission):
         return False
 
 
+class PaymentOrderPermission(BasePermission):
+    @classmethod
+    def has_permission(self, info: ResolveInfo) -> bool:
+        return info.context.user.is_authenticated
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
+
+
 class UserPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
