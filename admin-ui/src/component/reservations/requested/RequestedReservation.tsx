@@ -49,6 +49,7 @@ import StickyHeader from "../../StickyHeader";
 import { formatDateTime } from "../../../common/util";
 import Calendar from "./Calendar";
 import ReservationUserBirthDate from "./ReservationUserBirthDate";
+import VisibleIfPermission from "./VisibleIfPermission";
 
 const Dot = styled.div`
   display: inline-block;
@@ -230,7 +231,10 @@ const RequestedReservation = (): JSX.Element | null => {
   const buttons =
     reservation.state ===
     ReservationsReservationStateChoices.RequiresHandling ? (
-      <>
+      <VisibleIfPermission
+        permissionName="can_manage_reservations"
+        unitPk={reservation?.reservationUnits?.[0]?.unit?.pk as number}
+      >
         <Button
           theme="black"
           size="small"
@@ -269,7 +273,7 @@ const RequestedReservation = (): JSX.Element | null => {
         >
           {t("RequestedReservation.reject")}
         </Button>
-      </>
+      </VisibleIfPermission>
     ) : (
       <>
         <Button
@@ -281,25 +285,30 @@ const RequestedReservation = (): JSX.Element | null => {
         >
           {t("RequestedReservation.cancel")}
         </Button>
-        <Button
-          size="small"
-          variant="secondary"
-          theme="black"
-          disabled={false}
-          onClick={(e) => {
-            e.preventDefault();
-            setModalContent(
-              <ReturnToRequiredHandlingDialog
-                reservation={reservation}
-                onAccept={closeDialogAndRefetch}
-                onClose={closeDialog}
-              />,
-              true
-            );
-          }}
+        <VisibleIfPermission
+          permissionName="can_manage_reservations"
+          unitPk={reservation?.reservationUnits?.[0]?.unit?.pk as number}
         >
-          {t("RequestedReservation.returnToHandling")}
-        </Button>
+          <Button
+            size="small"
+            variant="secondary"
+            theme="black"
+            disabled={false}
+            onClick={(e) => {
+              e.preventDefault();
+              setModalContent(
+                <ReturnToRequiredHandlingDialog
+                  reservation={reservation}
+                  onAccept={closeDialogAndRefetch}
+                  onClose={closeDialog}
+                />,
+                true
+              );
+            }}
+          >
+            {t("RequestedReservation.returnToHandling")}
+          </Button>
+        </VisibleIfPermission>
       </>
     );
 
@@ -403,53 +412,59 @@ const RequestedReservation = (): JSX.Element | null => {
             initiallyOpen={get(reservation, "workingMemo.length") > 0}
           >
             <VerticalFlex>
-              <TextArea
-                label={t("RequestedReservation.workingMemoLabel")}
-                id="workingMemo"
-                helperText={t("RequestedReservation.workingMemoHelperText")}
-                value={workingMemo}
-                onChange={(e) => setWorkingMemo(e.target.value)}
-              />
-              <HorisontalFlex style={{ justifyContent: "flex-end" }}>
-                <Button
-                  size="small"
-                  variant="secondary"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setWorkingMemo(reservation.workingMemo || "");
-                  }}
-                >
-                  {t("common.cancel")}
-                </Button>
-                <Button
-                  size="small"
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    try {
-                      const res = await updateMemo({
-                        pk: reservation.pk,
-                        workingMemo,
-                      });
-                      if (!res.errors) {
-                        refetch();
-                        notifySuccess(
-                          t("RequestedReservation.savedWorkingMemo")
-                        );
-                      } else {
+              <VisibleIfPermission
+                permissionName="can_comment_reservations"
+                unitPk={reservation?.reservationUnits?.[0]?.unit?.pk as number}
+                otherwise={<span>{workingMemo || ""}</span>}
+              >
+                <TextArea
+                  label={t("RequestedReservation.workingMemoLabel")}
+                  id="workingMemo"
+                  helperText={t("RequestedReservation.workingMemoHelperText")}
+                  value={workingMemo}
+                  onChange={(e) => setWorkingMemo(e.target.value)}
+                />
+                <HorisontalFlex style={{ justifyContent: "flex-end" }}>
+                  <Button
+                    size="small"
+                    variant="secondary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setWorkingMemo(reservation.workingMemo || "");
+                    }}
+                  >
+                    {t("common.cancel")}
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      try {
+                        const res = await updateMemo({
+                          pk: reservation.pk,
+                          workingMemo,
+                        });
+                        if (!res.errors) {
+                          refetch();
+                          notifySuccess(
+                            t("RequestedReservation.savedWorkingMemo")
+                          );
+                        } else {
+                          notifyError(
+                            t("RequestedReservation.errorSavingWorkingMemo")
+                          );
+                        }
+                      } catch (ex) {
                         notifyError(
                           t("RequestedReservation.errorSavingWorkingMemo")
                         );
                       }
-                    } catch (ex) {
-                      notifyError(
-                        t("RequestedReservation.errorSavingWorkingMemo")
-                      );
-                    }
-                  }}
-                >
-                  {t("RequestedReservation.save")}
-                </Button>
-              </HorisontalFlex>
+                    }}
+                  >
+                    {t("RequestedReservation.save")}
+                  </Button>
+                </HorisontalFlex>
+              </VisibleIfPermission>
             </VerticalFlex>
           </Accordion>
           <Accordion heading={t("RequestedReservation.calendar")}>

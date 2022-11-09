@@ -2,6 +2,7 @@ import { get, isEqual, set } from "lodash";
 import { User } from "oidc-client";
 import { localLogout } from "../common/auth/util";
 import { UserType } from "../common/gql-types";
+import permissionHelper from "./permissionHelper";
 
 export type AuthState =
   | "Unknown" // initial state
@@ -18,6 +19,11 @@ export type Auth = {
   sid?: string;
   login?: () => void;
   logout?: () => void;
+  hasPermission: (
+    permissionName: string,
+    unitPk: number,
+    serviceSectorPk?: number
+  ) => boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -36,6 +42,7 @@ export type Action =
 
 export const getInitialState = (): Auth => ({
   state: "Unknown",
+  hasPermission: () => false,
 });
 
 export const authStateReducer = (state: Auth, action: Action): Auth => {
@@ -96,6 +103,7 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
 
       return {
         ...state,
+        hasPermission: permissionHelper(currentUser),
         user: currentUser,
         state: hasSomePermissions ? "HasPermissions" : "NoPermissions",
       };

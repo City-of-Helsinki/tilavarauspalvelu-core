@@ -32,6 +32,7 @@ export const RESERVATION_QUERY = gql`
         pk
         nameFi
         unit {
+          pk
           nameFi
         }
         pricings {
