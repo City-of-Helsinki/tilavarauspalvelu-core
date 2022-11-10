@@ -275,7 +275,7 @@ export const getFuturePricing = (
 };
 
 export const getReservationUnitPrice = (
-  reservationUnit: ReservationUnitByPkType,
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType,
   date?: Date,
   minutes?: number,
   trailingZeros = false,
@@ -284,7 +284,8 @@ export const getReservationUnitPrice = (
   if (!reservationUnit) return null;
 
   const pricing = date
-    ? getFuturePricing(reservationUnit, [], date) || reservationUnit
+    ? getFuturePricing(reservationUnit as ReservationUnitByPkType, [], date) ||
+      reservationUnit
     : reservationUnit;
 
   return getPrice(pricing, minutes, trailingZeros, asInt);

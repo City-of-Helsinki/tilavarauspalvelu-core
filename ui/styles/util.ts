@@ -12,6 +12,13 @@ export const pixel =
 
 export const MediumButton = styled(Button)``;
 
+export const BlackButton = styled(Button).attrs({
+  style: {
+    "--color-button-primary": "var(--color-black-90)",
+    "--color-bus": "var(--color-black-90)",
+  },
+})``;
+
 export const SupplementaryButton = styled(Button).attrs({
   style: {} as CSSProperties,
 })`

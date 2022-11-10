@@ -16,6 +16,7 @@ import {
   getMainImage,
   getTranslation,
 } from "../../modules/util";
+import { getReservationUnitPrice } from "../../modules/reservationUnit";
 
 type Props = {
   reservation: ReservationType;
@@ -84,6 +85,11 @@ const PendingReservationInfoCard = ({
 
   const heading = getTranslation(reservationUnit, "name");
 
+  const price =
+    reservation.state === "REQUIRES_HANDLING"
+      ? getReservationUnitPrice(reservationUnit)
+      : getReservationPrice(reservation.price, t("prices:priceFree"));
+
   return (
     <Wrapper>
       {mainImage?.mediumUrl && (
@@ -106,10 +112,7 @@ const PendingReservationInfoCard = ({
           <Strong>{formatDurationMinutes(duration)}</Strong>
         </Value>
         <Value>
-          {t("reservationUnit:price")}:{" "}
-          <Strong>
-            {getReservationPrice(reservation.price, t("prices:priceFree"))}
-          </Strong>
+          {t("reservationUnit:price")}: <Strong>{price}</Strong>
         </Value>
       </Content>
     </Wrapper>

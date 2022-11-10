@@ -43,7 +43,6 @@ import {
   reserveeTypeSelector,
 } from "model/reservation-creation";
 import { reservationInfoCard } from "model/reservation-detail";
-import { ticket } from "model/reservation-list";
 import {
   addressContainer,
   description,

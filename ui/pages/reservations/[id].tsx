@@ -27,7 +27,7 @@ import {
 } from "../../modules/style/layout";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { CenterSpinner } from "../../components/common/common";
-import { MediumButton } from "../../styles/util";
+import { BlackButton } from "../../styles/util";
 import Sanitize from "../../components/common/Sanitize";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
 import {
@@ -258,14 +258,14 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
           />
           <SecondaryActions>
             <Link href={reservation.calendarUrl} passHref>
-              <MediumButton
+              <BlackButton
                 variant="secondary"
                 iconRight={<IconCalendar aria-hidden />}
                 disabled={!reservation.calendarUrl}
                 data-testid="reservation__button--calendar-link"
               >
                 {t("reservations:saveToCalendar")}
-              </MediumButton>
+              </BlackButton>
             </Link>
           </SecondaryActions>
         </>
@@ -327,7 +327,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
               {canUserCancelReservation(reservation) &&
               !isReservationCancelled &&
               !isBeingHandled ? (
-                <MediumButton
+                <BlackButton
                   variant="secondary"
                   iconRight={<IconCross />}
                   onClick={() =>
@@ -345,7 +345,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
                       isBeingHandled ? "Application" : "Reservation"
                     }`
                   )}
-                </MediumButton>
+                </BlackButton>
               ) : (
                 cancellationReason && (
                   <CancellationText>

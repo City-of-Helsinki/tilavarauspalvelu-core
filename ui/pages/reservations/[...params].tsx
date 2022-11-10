@@ -38,13 +38,9 @@ import {
   JustForMobile,
   NarrowCenteredContainer,
 } from "../../modules/style/layout";
-import {
-  getSelectedOption,
-  getTranslation,
-  reservationsUrl,
-} from "../../modules/util";
+import { getSelectedOption, getTranslation } from "../../modules/util";
 import { CenterSpinner } from "../../components/common/common";
-import { MediumButton } from "../../styles/util";
+import { BlackButton, MediumButton } from "../../styles/util";
 import { authEnabled, emptyOption, isBrowser } from "../../modules/const";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
@@ -370,13 +366,13 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                         maxLength={200}
                       />
                       <Actions>
-                        <MediumButton
+                        <BlackButton
                           variant="secondary"
-                          onClick={() => router.push(reservationsUrl)}
+                          onClick={() => router.back()}
                           data-testid="reservation-cancel__button--back"
                         >
                           {t("common:prev")}
-                        </MediumButton>
+                        </BlackButton>
                         <MediumButton
                           variant="primary"
                           type="submit"

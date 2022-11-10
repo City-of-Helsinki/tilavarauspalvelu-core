@@ -20,6 +20,7 @@
   "redoReservation": "",
   "upcomingReservations": "",
   "pastReservations": "",
+  "cancelledReservations": "",
   "upcomingSlug": "",
   "pastSlug": "",
   "modifyReservation": "",
@@ -42,6 +43,7 @@
   "reservationDuration": "",
   "noUpcomingReservations": "",
   "noPastReservations": "",
+  "noCancelledReservations": "",
   "status": {
     "cancelled": "",
     "confirmed": "",

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Navigation as HDSNavigation } from "hds-react";
+import { IconSignout, Navigation as HDSNavigation } from "hds-react";
 import { useTranslation, TFunction } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -53,6 +53,23 @@ const StyledNavigation = styled(HDSNavigation)`
   }
 `;
 
+const UserMenu = styled(HDSNavigation.User)<{
+  $active?: boolean;
+}>`
+  ${({ $active }) =>
+    $active &&
+    `
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: -20px;
+        width: 100%;
+        border-bottom: 3px solid var(--color-bus);
+        z-index: -1;
+    }
+  `}
+`;
+
 const NaviItem = styled(HDSNavigation.Item)<{ $hidden: boolean }>`
   --item-active-color: var(--color-bus);
   ${({ $hidden }) => $hidden && `display: none !important;`}
@@ -62,6 +79,50 @@ const NaviItem = styled(HDSNavigation.Item)<{ $hidden: boolean }>`
     font-family: var(--font-medium);
     font-weight: 500;
   }
+`;
+
+const UserNaviItem = styled(HDSNavigation.Item)<{
+  $hidden: boolean;
+  $divider?: boolean;
+  icon?: Element;
+}>`
+  & > span {
+    margin: 0 !important;
+  }
+
+  cursor: pointer;
+  display: flex;
+  padding: var(--spacing-xs) 0;
+  color: var(--color-black);
+
+  ${({ $hidden }) => $hidden && `display: none !important;`}
+  ${({ $divider }) =>
+    $divider &&
+    `
+    position: relative;
+    margin-top: var(--spacing-xs) !important;
+
+    &:after {
+      content: "";
+      border-top: 1px solid var(--color-black-20);
+      position: absolute;
+      width: 100%;
+      top: 0;
+
+      @media (min-width: ${breakpoints.m}) {
+        width: 80%;
+
+      }
+    }
+    `}
+  ${({ icon }) =>
+    icon &&
+    `
+    & > span:first-of-type {
+      order: 2;
+      padding-left: var(--spacing-xs);
+    }
+  `}
 `;
 
 const PreContent = styled.div`
@@ -113,16 +174,6 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
       title: "spaceReservation",
       path: "/recurring",
     },
-    {
-      title: "reservations",
-      path: "/reservations",
-      condition: !!profile,
-    },
-    {
-      title: "applications",
-      path: applicationsUrl,
-      condition: !!profile,
-    },
   ];
 
   return (
@@ -147,20 +198,36 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
           ))}
         </HDSNavigation.Row>
         <HDSNavigation.Actions>
-          <HDSNavigation.User
+          <UserMenu
             userName={getUserName(profile, t)}
             authenticated={Boolean(profile)}
             label={t("common:login")}
             onSignIn={() => setShouldLogin(true)}
+            $active={
+              router.pathname === "/reservations" ||
+              router.pathname === "/applications"
+            }
           >
             {profile && (
               <UserInfo name={getUserName(profile, t)} email={profile.email} />
             )}
-            <HDSNavigation.Item
+            <UserNaviItem
+              $hidden={!profile}
+              label={t("navigation:Item.reservations")}
+              onClick={() => router.push("/reservations")}
+            />
+            <UserNaviItem
+              $hidden={!profile}
+              label={t("navigation:Item.applications")}
+              onClick={() => router.push(applicationsUrl)}
+            />
+            <UserNaviItem
+              $divider={!!profile}
               label={t("common:logout")}
               onClick={() => logout && logout()}
+              icon={<IconSignout aria-hidden />}
             />
-          </HDSNavigation.User>
+          </UserMenu>
           <HDSNavigation.LanguageSelector
             label={formatSelectedValue(i18n.language)}
             className="navigation__language-selector--button"

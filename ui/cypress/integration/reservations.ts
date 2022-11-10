@@ -12,7 +12,7 @@ import {
   redoReservationButton,
   reservationCards,
   tab,
-  timeStrip,
+  statusTag,
 } from "model/reservation-list";
 import {
   title as cancelTitle,
@@ -44,25 +44,25 @@ describe("Tilavaraus user reservations", () => {
 
   it("should list proper items with correct button states and link to reservation unit", () => {
     reservationCards().should("have.length", 5);
-    timeStrip()
+    statusTag("desktop")
       .should("have.length", 5)
       .each(($el, $i) => {
         if ([0, 1, 2, 4].includes($i)) {
-          expect($el).to.contain("Tulossa");
+          expect($el).to.contain("Hyväksytty");
         } else {
-          expect($el).to.contain("Varaus käsittelyssä");
+          expect($el).to.contain("Käsiteltävänä");
         }
       });
 
     tab(1)
       .invoke("text")
       .then((text) => {
-        expect(text).to.eq("Tulevat varaukset (5)");
+        expect(text).to.eq("Tulevat");
       });
     tab(2)
       .invoke("text")
       .then((text) => {
-        expect(text).to.eq("Menneet varaukset (2)");
+        expect(text).to.eq("Menneet");
       });
 
     cancelButton().should("exist");
@@ -79,23 +79,17 @@ describe("Tilavaraus user reservations", () => {
 
     reservationCards()
       .eq(3)
-      .find('[data-testid="reservation__card--time"]')
-      .should("contain.text", "Varaus käsittelyssä");
+      .find('[data-testid="reservation__card--status-desktop"]')
+      .should("contain.text", "Käsiteltävänä");
 
     tab(2).click();
 
     reservationCards().should("have.length", 2);
-    timeStrip()
+    statusTag("desktop")
       .should("have.length", 2)
       .each(($el) => {
-        expect($el).to.contain("Mennyt");
+        expect($el).to.contain("Hyväksytty");
       });
-
-    redoReservationButton().eq(0).click();
-
-    cy.url({ timeout: 20000 }).should("match", /\/reservation-unit\/1$/);
-
-    hzNavigationBack().should("exist");
   });
 
   it("should display reservation detail view with company reservee", () => {
@@ -221,7 +215,9 @@ describe("Tilavaraus user reservations", () => {
     cancelCancelButton().should("be.disabled");
 
     backButton().click();
-    cy.url({ timeout: 20000 }).should("match", /\/reservations$/);
+    cy.url({ timeout: 20000 }).should("match", /\/reservations\/21$/);
+
+    cy.visit("/reservations");
 
     detailButton().eq(4).click();
     detailCancelButton().click();

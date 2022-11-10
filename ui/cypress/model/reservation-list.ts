@@ -28,8 +28,10 @@ export function timeStrip(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("[data-testid='reservation__card--time']");
 }
 
-export function ticket(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("[data-testid='reservation__ticket--container']");
+export function statusTag(
+  type: string
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`[data-testid='reservation__card--status-${type}']`);
 }
 
 export function loader(): Cypress.Chainable<JQuery<HTMLElement>> {

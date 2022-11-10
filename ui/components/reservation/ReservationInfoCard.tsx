@@ -11,6 +11,7 @@ import {
   ReservationUnitByPkType,
   ReservationUnitType,
 } from "../../modules/gql-types";
+import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import {
   capitalize,
   formatDurationMinutes,
@@ -100,6 +101,11 @@ const ReservationInfoCard = ({
 
   const purpose = getTranslation(reservation.purpose, "name");
 
+  const price =
+    reservation.state === "REQUIRES_HANDLING"
+      ? getReservationUnitPrice(reservationUnit)
+      : getReservationPrice(reservation.price, t("prices:priceFree"));
+
   return (
     <Wrapper>
       {mainImage?.mediumUrl && (
@@ -122,8 +128,7 @@ const ReservationInfoCard = ({
           {reservation.description}
         </Value>
         <Value>
-          {t("reservationUnit:price")}:{" "}
-          {getReservationPrice(reservation.price, t("prices:priceFree"))}
+          {t("reservationUnit:price")}: {price}
         </Value>
         {purpose && (
           <Value>
