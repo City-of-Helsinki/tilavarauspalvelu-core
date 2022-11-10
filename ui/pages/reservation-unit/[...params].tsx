@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useMutation, useQuery } from "@apollo/client";
 import router from "next/router";
-import { useSessionStorage } from "react-use";
+import { useLocalStorage, useSessionStorage } from "react-use";
 import { Notification, Stepper } from "hds-react";
 import { useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
@@ -58,7 +58,7 @@ import {
   getReservationApplicationMutationValues,
 } from "../../modules/reservation";
 import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
-import { DataContext } from "../../context/DataContext";
+import { DataContext, ReservationProps } from "../../context/DataContext";
 import PendingReservationInfoCard from "../../components/reservation/PendingReservationInfoCard";
 import Container from "../../components/common/Container";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
@@ -241,6 +241,9 @@ const ReservationUnitReservation = ({
 
   const { setReservation: setDataContext } = useContext(DataContext);
 
+  const [storedReservation, , removeStoredReservation] =
+    useLocalStorage<ReservationProps>("reservation");
+
   const [formStatus, setFormStatus] = useState<"pending" | "error" | "sent">(
     "pending"
   );
@@ -259,6 +262,10 @@ const ReservationUnitReservation = ({
   >(GET_RESERVATION, {
     variables: { pk: reservationData?.pk },
   });
+
+  useEffect(() => {
+    if (storedReservation) removeStoredReservation();
+  }, [storedReservation, removeStoredReservation]);
 
   useEffect(() => {
     const data = fetchedReservationData?.reservationByPk;

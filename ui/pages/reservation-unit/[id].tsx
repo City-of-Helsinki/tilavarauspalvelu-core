@@ -534,8 +534,7 @@ const ReservationUnit = ({
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [storedReservation, setStoredReservation, removeStoredReservation] =
+  const [storedReservation, , removeStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
 
   const calendarRef = useRef(null);
