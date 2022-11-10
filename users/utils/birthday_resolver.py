@@ -72,8 +72,13 @@ class UserBirthdayReader:
 
     def __get_token(self):
         token = self.request.headers.get("X-Authorization", b"")
+
         if isinstance(token, str):
             token = token.encode(HTTP_HEADER_ENCODING)
+
+        if token and not token.startswith(b"Bearer"):
+            token = b"Bearer " + token
+
         return token
 
     def get_user_birthday(self) -> [datetime.date, None]:
