@@ -1,4 +1,5 @@
 import datetime
+from json import JSONDecodeError
 
 import requests
 from django.conf import settings
@@ -144,6 +145,20 @@ class UserBirthdayReader:
             headers={"Authorization": token},
         )
 
-        data = response.json()
+        status = response.status_code
+        if status >= 400 and status < 500:
+            try:
+                data = response.json()
+            except JSONDecodeError:
+                raise BirthDayReaderError(
+                    "Got %s status code from profile and could not json decode the data"
+                    % response.status_code
+                )
+        elif status >= 500:
+            raise BirthDayReaderError(
+                "Got internal server error while querying profile data"
+            )
+        else:
+            data = response.json()
 
         return data
