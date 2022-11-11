@@ -10,6 +10,7 @@ import {
   IconAngleDown,
   IconAngleUp,
   IconArrowRight,
+  IconCross,
   IconSignout,
   Notification,
   Select,
@@ -108,7 +109,7 @@ const Actions = styled.div`
   flex-direction: column;
   gap: var(--spacing-m);
   margin-top: var(--spacing-xl);
-  justify-content: flex-end;
+  justify-content: space-between;
 
   @media (min-width: ${breakpoints.s}) {
     flex-direction: row;
@@ -368,10 +369,11 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                       <Actions>
                         <BlackButton
                           variant="secondary"
+                          iconLeft={<IconCross aria-hidden />}
                           onClick={() => router.back()}
                           data-testid="reservation-cancel__button--back"
                         >
-                          {t("common:prev")}
+                          {t("reservations:cancelReservationCancellation")}
                         </BlackButton>
                         <MediumButton
                           variant="primary"

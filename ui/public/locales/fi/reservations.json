@@ -15,6 +15,7 @@
   "errorGeneratingPDF": "PDF Dokumenttia ei pystytty luomaan",
   "reservationCalendar": "Varaa {{title}}",
   "cancelReservation": "Peru varaus",
+  "cancelReservationCancellation": "Keskeytä peruminen",
   "cancelReservationAbbreviated": "Peru",
   "cancelApplication": "Peru anomus",
   "cancelReservationBody": "Olet peruuttamassa tekemääsi varausta.",
