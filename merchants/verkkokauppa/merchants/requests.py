@@ -1,5 +1,6 @@
 from json import JSONDecodeError
 from typing import List, Optional
+from urllib.parse import urljoin
 from uuid import UUID
 
 from django.conf import settings
@@ -8,6 +9,7 @@ from requests import get as _get
 from requests import post as _post
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
+from ..exceptions import VerkkokauppaConfigurationError
 from .exceptions import (
     CreateMerchantError,
     GetMerchantError,
@@ -18,10 +20,22 @@ from .exceptions import (
 from .types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
 
 
+def _get_base_url():
+    if not settings.VERKKOKAUPPA_MERCHANT_API_URL or not settings.VERKKOKAUPPA_API_KEY:
+        raise VerkkokauppaConfigurationError()
+
+    if settings.VERKKOKAUPPA_MERCHANT_API_URL.endswith("/"):
+        return settings.VERKKOKAUPPA_MERCHANT_API_URL
+
+    return f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/"
+
+
 def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
     try:
         response = post(
-            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}",
+            url=urljoin(
+                _get_base_url(), f"create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}"
+            ),
             json=params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
@@ -37,10 +51,9 @@ def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
 def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merchant:
     try:
         response = post(
-            url=(
-                settings.VERKKOKAUPPA_MERCHANT_API_URL
-                + "/update/merchant/"
-                + f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"
+            url=urljoin(
+                _get_base_url(),
+                f"/update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
             ),
             json=params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -62,7 +75,9 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
 def get_merchants(get=_get) -> List[Merchant]:
     try:
         response = get(
-            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}",
+            url=urljoin(
+                _get_base_url(), f"/list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}"
+            ),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
@@ -81,7 +96,9 @@ def get_merchants(get=_get) -> List[Merchant]:
 def get_merchant(id: UUID, get=_get) -> Optional[MerchantInfo]:
     try:
         response = get(
-            url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
+            url=urljoin(
+                _get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"
+            ),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )

@@ -9,14 +9,25 @@ from requests import post as _post
 from sentry_sdk import capture_message
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
+from ..exceptions import VerkkokauppaConfigurationError
 from .exceptions import CreateOrderError, GetOrderError, ParseOrderError
 from .types import CreateOrderParams, Order
+
+
+def _get_base_url():
+    if not settings.VERKKOKAUPPA_ORDER_API_URL or not settings.VERKKOKAUPPA_API_KEY:
+        raise VerkkokauppaConfigurationError()
+
+    if settings.VERKKOKAUPPA_ORDER_API_URL.endswith("/"):
+        return settings.VERKKOKAUPPA_ORDER_API_URL
+
+    return f"{settings.VERKKOKAUPPA_ORDER_API_URL}/"
 
 
 def create_order(params: CreateOrderParams, post=_post) -> Order:
     try:
         response = post(
-            url=settings.VERKKOKAUPPA_ORDER_API_URL + "/",
+            url=_get_base_url(),
             json=params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
@@ -42,7 +53,7 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
 def get_order(order_id: UUID, user: str, get=_get) -> Order:
     try:
         response = get(
-            url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"admin/{order_id}"),
+            url=urljoin(_get_base_url(), f"admin/{order_id}"),
             headers={
                 "api-key": settings.VERKKOKAUPPA_API_KEY,
                 "namespace": settings.VERKKOKAUPPA_NAMESPACE,
