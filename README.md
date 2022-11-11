@@ -30,13 +30,31 @@ Then you can run docker image with
 
 Workflow with requirements is as follows.
 
-requirements.txt is not edited manually, but is generated with pip-compile.
+Requirements are defined in two files. `requirements.txt` contains the production requirements that are needed to run the app. `requirements_dev.txt` contains requirements needed in development.
 
-requirements.txt contains fully tested, pinned versions of the requirements. requirements.in contains the primary, requirements of the project without their dependencies.
+`requirements*.txt` files are not edited manually, but are generated with `pip-compile` (part of the `pip-tools` package). Note, that on the first line of `requirements_dev.in` there is the following line: `-c requirements.txt`. This constrains the development requirements to packages already selected for production.
 
-In production, deployments should always use requirements.txt and the versions pinned therein. In development, new virtualenvs and development environments should also be initialised using requirements.txt. pip-sync will synchronize the active virtualenv to match exactly the packages in requirements.txt.
+To generate `.txt` files:
+```
+pip-compile requirements.in
+pip-compile requirements_dev.in
+```
 
-In development and testing, to update a package update it in requirements.in and use the command pip-compile.
+`requirements.txt` contains fully tested, pinned versions of the requirements. `requirements.in` contains the primary, requirements of the project without their dependencies. Same applies to `requirements_dev` files.
+
+In production, deployments should always use `requirements.txt` and the versions pinned therein. In development, new virtualenvs and development environments should be initialised using both `requirements.txt` and `requirements_dev.txt`.pip-sync will synchronize the active virtualenv to match exactly the packages in requirements.txt.
+
+In production:
+```
+pip-sync requirements.txt
+```
+
+In development:
+```
+pip-sync requirements.txt requirements_dev.txt
+```
+
+In development and testing, to update a package update it in `requirements.in` (or in `requirements_dev.in`) and use the command `pip-compile`.
 
 To remove a dependency, remove it from requirements.in, run pip-compile and then pip-sync. If everything works as expected, commit the changes.
 
