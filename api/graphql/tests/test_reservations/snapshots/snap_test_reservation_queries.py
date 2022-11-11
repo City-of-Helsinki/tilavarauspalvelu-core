@@ -170,7 +170,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name 1'] = 
                         'name': 'movies',
                         'reservationUnits': [
                             {
-                                'nameFi': 'Koirankoppi'
+                                'nameFi': 'koirankoppi'
                             }
                         ]
                     }
@@ -190,7 +190,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name 2'] = 
                         'name': 'movies',
                         'reservationUnits': [
                             {
-                                'nameEn': 'Doghouse'
+                                'nameEn': 'doghouse'
                             }
                         ]
                     }
@@ -210,7 +210,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name 3'] = 
                         'name': 'movies',
                         'reservationUnits': [
                             {
-                                'nameSv': 'Hundkoja'
+                                'nameSv': 'hundkoja'
                             }
                         ]
                     }
@@ -230,7 +230,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multip
                         'name': 'movies',
                         'reservationUnits': [
                             {
-                                'nameFi': 'Koirankoppi'
+                                'nameFi': 'koirankoppi'
                             }
                         ]
                     }
@@ -240,7 +240,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multip
                         'name': 'second test',
                         'reservationUnits': [
                             {
-                                'nameFi': 'Norsutarha'
+                                'nameFi': 'norsutarha'
                             }
                         ]
                     }
@@ -260,7 +260,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multip
                         'name': 'movies',
                         'reservationUnits': [
                             {
-                                'nameEn': 'Doghouse'
+                                'nameEn': 'doghouse'
                             }
                         ]
                     }
@@ -270,7 +270,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multip
                         'name': 'second test',
                         'reservationUnits': [
                             {
-                                'nameEn': 'Elephant park'
+                                'nameEn': 'elephant park'
                             }
                         ]
                     }
@@ -290,7 +290,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multip
                         'name': 'movies',
                         'reservationUnits': [
                             {
-                                'nameSv': 'Hundkoja'
+                                'nameSv': 'hundkoja'
                             }
                         ]
                     }
@@ -300,7 +300,7 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multip
                         'name': 'second test',
                         'reservationUnits': [
                             {
-                                'nameSv': 'Elefantparken'
+                                'nameSv': 'elefantparken'
                             }
                         ]
                     }
