@@ -702,6 +702,42 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_payment_status_multiple_values 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Show me too',
+                        'state': 'CANCELLED'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'Show me',
+                        'state': 'REQUIRES_HANDLING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_payment_status_single_value 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Show me',
+                        'state': 'REQUIRES_HANDLING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_requested 1'] = {
     'data': {
         'reservations': {
