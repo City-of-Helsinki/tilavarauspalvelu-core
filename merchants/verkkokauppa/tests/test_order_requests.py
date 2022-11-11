@@ -27,6 +27,10 @@ class OrderRequestsTestCaseBase(TestCase):
     create_order_params: CreateOrderParams = CreateOrderParams(
         namespace="test-namespace",
         user="test-user",
+        language="fi",
+        price_net=Decimal("100.0"),
+        price_vat=Decimal("24.0"),
+        price_total=Decimal("124.0"),
         items=[
             OrderItemParams(
                 product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
@@ -115,6 +119,7 @@ class OrderRequestsTestCaseBase(TestCase):
         "type": "order",
         "subscriptionId": None,
         "checkoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
+        "receiptUrl": "http://localhost:12344/c1c55d55-4ef6-4a4c-8195-4f5022ad8ed8",
         "priceNet": "100",
         "priceVat": "24",
         "priceTotal": "124",
@@ -169,6 +174,7 @@ class OrderRequestsTestCaseBase(TestCase):
         "type": "order",
         "subscriptionId": None,
         "checkoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
+        "receiptUrl": "http://localhost:12344/c1c55d55-4ef6-4a4c-8195-4f5022ad8ed8",
         "priceNet": "100",
         "priceVat": "24",
         "priceTotal": "124",
@@ -186,7 +192,7 @@ class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
         post = mock_post(self.create_order_response)
         create_order(self.create_order_params, post)
         post.assert_called_with(
-            url=settings.VERKKOKAUPPA_ORDER_API_URL,
+            url=settings.VERKKOKAUPPA_ORDER_API_URL + "/",
             json=self.create_order_params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
@@ -221,8 +227,17 @@ class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
         with raises(CreateOrderError):
             create_order(self.create_order_params, Mock(side_effect=Timeout()))
 
-    def test_create_order_raises_exception_if_status_code_is_not_201(self):
+    def test_create_order_raises_exception_if_status_is_500(self):
         post = mock_post(self.create_order_response, status_code=500)
+        with raises(CreateOrderError) as ex:
+            create_order(self.create_order_params, post)
+
+        assert_that(str(ex.value)).is_equal_to(
+            "Order creation failed: problem with upstream service"
+        )
+
+    def test_create_order_raises_exception_if_status_code_is_not_201(self):
+        post = mock_post(self.create_order_response, status_code=400)
         with raises(CreateOrderError):
             create_order(self.create_order_params, post)
 

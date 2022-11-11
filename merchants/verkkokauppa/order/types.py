@@ -4,7 +4,6 @@ from decimal import Decimal
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
-from ..helpers import parse_datetime
 from .exceptions import ParseOrderError
 
 
@@ -90,6 +89,7 @@ class Order:
     price_vat: Optional[Decimal]
     price_total: Optional[Decimal]
     checkout_url: Optional[str]
+    receipt_url: Optional[str]
     customer: Optional[OrderCustomer]
     status: Optional[str]
     subscription_id: Optional[UUID]
@@ -97,6 +97,8 @@ class Order:
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "Order":
+        from ..helpers import parse_datetime
+
         try:
             return Order(
                 order_id=UUID(json["orderId"]),
@@ -146,6 +148,7 @@ class Order:
                 price_vat=Decimal(json["priceVat"]),
                 price_total=Decimal(json["priceTotal"]),
                 checkout_url=json["checkoutUrl"],
+                receipt_url=json["receiptUrl"],
                 customer=OrderCustomer(
                     first_name=json["customer"]["firstName"],
                     last_name=json["customer"]["lastName"],
@@ -165,14 +168,19 @@ class Order:
 @dataclass(frozen=True)
 class CreateOrderParams:
     namespace: str
-    user: str
+    user: UUID
+    language: str
     items: List[OrderItemParams]
     customer: OrderCustomer
+    price_net: Decimal
+    price_vat: Decimal
+    price_total: Decimal
 
     def to_json(self) -> Dict[str, Any]:
         return {
             "namespace": self.namespace,
-            "user": self.user,
+            "user": str(self.user),
+            "language": self.language,
             "items": [
                 {
                     "productId": str(item.product_id),
@@ -189,7 +197,7 @@ class CreateOrderParams:
                     "meta": [
                         {
                             "key": meta.key,
-                            "value": meta.value,
+                            "value": str(meta.value),
                             "label": meta.label,
                             "visibleInCheckout": meta.visible_in_checkout,
                             "ordinal": meta.ordinal,
@@ -199,6 +207,9 @@ class CreateOrderParams:
                 }
                 for item in self.items
             ],
+            "priceNet": str(self.price_net),
+            "priceVat": str(self.price_vat),
+            "priceTotal": str(self.price_total),
             "customer": {
                 "firstName": self.customer.first_name,
                 "lastName": self.customer.last_name,

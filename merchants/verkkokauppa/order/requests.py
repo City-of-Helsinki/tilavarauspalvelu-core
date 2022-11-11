@@ -6,32 +6,54 @@ from django.conf import settings
 from requests import RequestException
 from requests import get as _get
 from requests import post as _post
+from sentry_sdk import capture_message
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
+from ..exceptions import VerkkokauppaConfigurationError
 from .exceptions import CreateOrderError, GetOrderError, ParseOrderError
 from .types import CreateOrderParams, Order
+
+
+def _get_base_url():
+    if not settings.VERKKOKAUPPA_ORDER_API_URL or not settings.VERKKOKAUPPA_API_KEY:
+        raise VerkkokauppaConfigurationError()
+
+    if settings.VERKKOKAUPPA_ORDER_API_URL.endswith("/"):
+        return settings.VERKKOKAUPPA_ORDER_API_URL
+
+    return f"{settings.VERKKOKAUPPA_ORDER_API_URL}/"
 
 
 def create_order(params: CreateOrderParams, post=_post) -> Order:
     try:
         response = post(
-            url=settings.VERKKOKAUPPA_ORDER_API_URL,
+            url=_get_base_url(),
             json=params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
+        if response.status_code >= 500:
+            capture_message(
+                f"Call to Order Experience API failed with status {response.status_code}. "
+                + f"Response body: {response.text}",
+                level="error",
+            )
+            raise CreateOrderError(
+                "Order creation failed: problem with upstream service"
+            )
+
         json = response.json()
         if response.status_code != 201:
             raise CreateOrderError(f"Order creation failed: {json.get('errors')}")
         return Order.from_json(json)
     except (RequestException, JSONDecodeError, ParseOrderError) as e:
-        raise CreateOrderError("Order creation failed") from e
+        raise CreateOrderError(f"Order creation failed: {e}")
 
 
 def get_order(order_id: UUID, user: str, get=_get) -> Order:
     try:
         response = get(
-            url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"admin/{order_id}"),
+            url=urljoin(_get_base_url(), f"admin/{order_id}"),
             headers={
                 "api-key": settings.VERKKOKAUPPA_API_KEY,
                 "namespace": settings.VERKKOKAUPPA_NAMESPACE,
@@ -45,4 +67,4 @@ def get_order(order_id: UUID, user: str, get=_get) -> Order:
             raise GetOrderError(f"Order retrieval failed: {json.get('errors')}")
         return Order.from_json(json)
     except (RequestException, JSONDecodeError, ParseOrderError) as e:
-        raise GetOrderError("Order retrieval failed") from e
+        raise GetOrderError(f"Order retrieval failed: {e}")

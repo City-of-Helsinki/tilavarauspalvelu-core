@@ -1,5 +1,6 @@
 from json import JSONDecodeError
 from typing import Optional
+from urllib.parse import urljoin
 from uuid import UUID
 
 from django.conf import settings
@@ -8,14 +9,25 @@ from requests import get as _get
 from requests import post as _post
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
+from ..exceptions import VerkkokauppaConfigurationError
 from .exceptions import CreateProductError, GetProductMappingError, ParseProductError
 from .types import CreateProductParams, Product
+
+
+def _get_base_url():
+    if not settings.VERKKOKAUPPA_PRODUCT_API_URL or not settings.VERKKOKAUPPA_API_KEY:
+        raise VerkkokauppaConfigurationError()
+
+    if settings.VERKKOKAUPPA_PRODUCT_API_URL.endswith("/"):
+        return settings.VERKKOKAUPPA_PRODUCT_API_URL
+
+    return f"{settings.VERKKOKAUPPA_PRODUCT_API_URL}/"
 
 
 def create_product(params: CreateProductParams, post=_post) -> Product:
     try:
         response = post(
-            url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/",
+            url=_get_base_url(),
             json=params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
@@ -31,7 +43,7 @@ def create_product(params: CreateProductParams, post=_post) -> Product:
 def get_product_mapping(product_id: UUID, get=_get) -> Optional[Product]:
     try:
         response = get(
-            url=(settings.VERKKOKAUPPA_PRODUCT_API_URL + f"/{str(product_id)}/mapping"),
+            url=urljoin(_get_base_url(), f"/{str(product_id)}/mapping"),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )

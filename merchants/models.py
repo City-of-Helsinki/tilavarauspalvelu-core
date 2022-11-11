@@ -74,6 +74,15 @@ class Language(models.TextChoices):
 
 
 class PaymentOrder(models.Model):
+    reservation = models.ForeignKey(
+        "reservations.Reservation",
+        verbose_name=_("Reservation"),
+        related_name="payment_order",
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="Reservation this order is based on",
+    )
+
     order_id = models.UUIDField(
         verbose_name=_("Order ID"),
         help_text=_("eCommerce order ID"),
@@ -133,6 +142,23 @@ class PaymentOrder(models.Model):
         null=False,
         max_length=8,
         choices=Language.choices,
+    )
+    reservation_user_uuid = models.UUIDField(
+        verbose_name=_("Reservation user UUID"),
+        blank=True,
+        null=True,
+    )
+    checkout_url = models.CharField(
+        verbose_name=_("Checkout URL"),
+        blank=True,
+        null=True,
+        max_length=512,
+    )
+    receipt_url = models.CharField(
+        verbose_name=_("Receipt URL"),
+        blank=True,
+        null=True,
+        max_length=512,
     )
 
     def clean(self):
