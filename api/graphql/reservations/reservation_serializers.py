@@ -1062,16 +1062,12 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
         self.fields["state"].read_only = True
         self.fields["handled_at"].read_only = True
         self.fields["price"].required = True
+        self.fields["price_net"].required = True
+        self.fields["handling_details"].required = True
 
     class Meta:
         model = Reservation
-        fields = [
-            "pk",
-            "state",
-            "handling_details",
-            "handled_at",
-            "price",
-        ]
+        fields = ["pk", "state", "handling_details", "handled_at", "price", "price_net"]
 
     @property
     def validated_data(self):
@@ -1088,6 +1084,7 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
                 f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be approved.",
                 ValidationErrorCodes.APPROVING_NOT_ALLOWED,
             )
+
         data = super().validate(data)
 
         return data

@@ -71,6 +71,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             "pk": self.reservation.pk,
             "handlingDetails": "You're welcome.",
             "price": 10.59,  # This floating point number will float somewhere 10.58999...
+            "priceNet": 8.61,
         }
 
     @override_settings(
@@ -98,6 +99,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.price).is_equal_to(
             Decimal("10.59")
         )  # Float does not cause abnormality.
+        assert_that(self.reservation.price_net).is_equal_to(Decimal("8.61"))
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("needs payment")
         assert_that(mail.outbox[1].subject).is_equal_to("staff reservation made")
@@ -112,6 +114,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
 
         input_data = self.get_valid_approve_data()
         input_data["price"] = 0.0
+        input_data["priceNet"] = 0.0
 
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
@@ -128,6 +131,9 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.handling_details).is_equal_to("You're welcome.")
         assert_that(self.reservation.handled_at).is_not_none()
         assert_that(self.reservation.price).is_equal_to(
+            Decimal("0.0")
+        )  # Float does not cause abnormality.
+        assert_that(self.reservation.price_net).is_equal_to(
             Decimal("0.0")
         )  # Float does not cause abnormality.
         assert_that(len(mail.outbox)).is_equal_to(2)
@@ -180,6 +186,30 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()
 
+    def test_approving_fails_when_price_net_missing(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_approve_data()
+        input_data.pop("priceNet")
+        response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.handling_details).is_empty()
+
+    def test_approving_fails_when_handling_details_missing(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_approve_data()
+        input_data.pop("handlingDetails")
+        response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.handling_details).is_empty()
+
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
         SEND_RESERVATION_NOTIFICATION_EMAILS=False,
@@ -224,6 +254,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.price).is_equal_to(
             Decimal("10.59")
         )  # Float does not cause abnormality.
+        assert_that(self.reservation.price_net).is_equal_to(Decimal("8.61"))
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("needs payment")
         assert_that(mail.outbox[1].subject).is_equal_to("staff reservation made")
