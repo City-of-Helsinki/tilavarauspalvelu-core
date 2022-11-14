@@ -73,6 +73,7 @@ django==3.2.16
     # via
     #   -r requirements.in
     #   django-admin-sortable2
+    #   django-auditlog
     #   django-celery-beat
     #   django-cors-headers
     #   django-extra-fields
@@ -90,7 +91,7 @@ django==3.2.16
     #   helsinki-profile-gdpr-api
 django-admin-sortable2==1.0.4
     # via -r requirements.in
-django-auditlog==2.1.1
+django-auditlog==2.2.0
     # via -r requirements.in
 django-celery-beat==2.3.0
     # via -r requirements.in
