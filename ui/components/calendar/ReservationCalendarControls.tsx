@@ -501,6 +501,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
             initialMonth={new Date()}
             label={t("reservationCalendar:startDate")}
             language={i18n.language as Language}
+            minDate={new Date()}
           />
           <StyledSelect
             key={`startTime-${startTime}`}
