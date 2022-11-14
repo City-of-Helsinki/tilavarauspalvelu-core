@@ -11,10 +11,12 @@ type Props = {
 };
 
 const ReservationStates = [
+  ReservationsReservationStateChoices.Created,
   ReservationsReservationStateChoices.Confirmed,
   ReservationsReservationStateChoices.RequiresHandling,
   ReservationsReservationStateChoices.Denied,
   ReservationsReservationStateChoices.Cancelled,
+  ReservationsReservationStateChoices.WaitingForPayment,
 ];
 
 const ReservationStateFilter = ({ onChange, value }: Props): JSX.Element => {
