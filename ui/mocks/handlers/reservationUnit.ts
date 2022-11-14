@@ -176,7 +176,7 @@ const selectedReservationUnitQuery = graphql.query<
     reservationCancelledInstructionsSv: "Cancelled Instructions SV",
 
     reservationStartInterval:
-      "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices,
+      "INTERVAL_60_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices,
     serviceSpecificTerms: {
       id: "VGVybXNPZlVzZVR5cGU6Mw==",
       termsType: "SERVICE_TERMS" as TermsOfUseTermsOfUseTermsTypeChoices,

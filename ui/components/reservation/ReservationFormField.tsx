@@ -120,6 +120,15 @@ const ReservationFormField = ({
 
   const required = metadataSet.requiredFields.map(camelCase).includes(field);
 
+  const isReserveeIdRequired =
+    field === "reserveeId" &&
+    watch("reserveeIsUnregisteredAssociation") !== undefined
+      ? watch("reserveeIsUnregisteredAssociation") !== true
+      : required;
+
+  const isFreeOfChargeReasonRequired =
+    field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
+
   return Object.keys(options).includes(field) ? (
     <Controller
       as={
@@ -174,7 +183,7 @@ const ReservationFormField = ({
             id={field}
             onChange={(e) => props.onChange(e.target.checked)}
             checked={props.value}
-            defaultChecked={get(reservation, field)}
+            defaultChecked={watch("reserveeIsUnregisteredAssociation")}
             label={`${t(
               `reservationApplication:label.${normalizedReserveeType}.${field}`
             )}${required ? " * " : ""}`}
@@ -208,10 +217,10 @@ const ReservationFormField = ({
     <StyledTextArea
       label={`${t(
         `reservationApplication:label.${normalizedReserveeType}.${field}`
-      )}${required ? " * " : ""}`}
+      )}${isFreeOfChargeReasonRequired ? " * " : ""}`}
       id={field}
       name={field}
-      ref={register({ required })}
+      ref={register({ required: isFreeOfChargeReasonRequired })}
       key={field}
       defaultValue={get(reservation, field) || ""}
       errorText={get(errors, field) && t("forms:requiredField")}
@@ -278,6 +287,29 @@ const ReservationFormField = ({
       }
       $break={isBreakingColumn}
       $height="119px"
+    />
+  ) : field === "reserveeId" ? (
+    <StyledTextInput
+      label={`${t(
+        `reservationApplication:label.${normalizedReserveeType}.${field}`
+      )}${isReserveeIdRequired ? " * " : ""}`}
+      id={field}
+      name={field}
+      ref={register({
+        required: isReserveeIdRequired,
+      })}
+      key={field}
+      type="text"
+      defaultValue={get(reservation, field)}
+      errorText={get(errors, field) && t("forms:requiredField")}
+      invalid={!!get(errors, field)}
+      $isWide={isWideRow}
+      $hidden={
+        watch("reserveeIsUnregisteredAssociation") === undefined
+          ? get(reservation, "reserveeIsUnregisteredAssociation") === true
+          : watch("reserveeIsUnregisteredAssociation") === true
+      }
+      $break={isBreakingColumn}
     />
   ) : (
     <StyledTextInput

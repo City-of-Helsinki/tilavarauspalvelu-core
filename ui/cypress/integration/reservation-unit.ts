@@ -92,6 +92,8 @@ const reservationEnds = format(addDays(new Date(), 10), "d.M.yyyy");
 const drawReservation = (): void => {
   hzNavigationFwd().click();
 
+  reservationSubmitButton().should("not.exist");
+
   timeColumn(0).within(() => {
     cy.get(".rbc-time-slot")
       .eq(18)
@@ -99,7 +101,7 @@ const drawReservation = (): void => {
       .trigger("mousemove", 0, 400, { force: true });
     cy.get(".rbc-time-slot").eq(6).trigger("mouseup", { force: true });
   });
-  reservationSubmitButton().should("not.exist");
+  reservationSubmitButton().should("exist");
 
   timeColumn(1).within(() => {
     cy.get(".rbc-time-slot")
@@ -112,6 +114,8 @@ const drawReservation = (): void => {
   durationSelectorToggle().should("not.exist");
 
   reservationControlsToggleButton().click();
+
+  durationSelectorToggle().should("exist");
 
   durationSelectorToggle()
     .click()
@@ -671,10 +675,14 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       // reserveeTypeNonprofitButton().click({ force: true });
       reserveeTypeSelector(1).click();
 
+      ["freeOfChargeReason"].forEach((field) => {
+        cy.get(`#${field}`).should("not.be.visible");
+      });
       cy.get("#applyingForFreeOfCharge").click();
       ["freeOfChargeReason"].forEach((field) => {
-        cy.get(`#${field}`).should("exist");
+        cy.get(`#${field}`).should("be.visible");
       });
+      cy.get("#freeOfChargeReason").type("Reason");
 
       reserveeTypeSelector(0).click();
       [
