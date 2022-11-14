@@ -1,20 +1,48 @@
 import axios from "axios";
 import {
   apiScope,
+  profileApiScope,
   isBrowser,
   apiTokenUrl,
   oidcClientId,
   oidcUrl,
 } from "../const";
 
-export const getApiAccessToken = (): string | null =>
-  isBrowser && sessionStorage.getItem(`oidc.apiToken.${apiScope}`);
+export const getApiAccessTokens = (): [string | null, string | null] => {
+  if (!isBrowser) {
+    return [null, null];
+  }
+  return [
+    sessionStorage.getItem(`oidc.apiToken.${apiScope}`),
+    sessionStorage.getItem(`oidc.apiToken.${profileApiScope}`),
+  ];
+};
 
-const setApiAccessToken = (accessToken: string): void =>
-  isBrowser && sessionStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
+const setApiAccessTokens = (
+  accessToken: string,
+  profileApiAccessToken: string
+): void => {
+  if (!isBrowser) {
+    return;
+  }
+  if (accessToken) {
+    sessionStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
+  }
+  if (profileApiAccessToken) {
+    sessionStorage.setItem(
+      `oidc.apiToken.${profileApiScope}`,
+      profileApiAccessToken
+    );
+  }
+};
 
-export const clearApiAccessToken = (): void =>
-  isBrowser && sessionStorage.removeItem(`oidc.apiToken.${apiScope}`);
+export const clearApiAccessToken = (): void => {
+  if (!isBrowser) {
+    return;
+  }
+  sessionStorage.removeItem(`oidc.apiToken.${apiScope}`);
+  sessionStorage.removeItem(`oidc.apiToken.${profileApiScope}`);
+};
 
 export const getAccessToken = (): string | null => {
   const key = `oidc.user:${oidcUrl}:${oidcClientId}`;
@@ -31,11 +59,11 @@ export const getAccessToken = (): string | null => {
   return undefined;
 };
 
-export const updateApiAccessToken = async (
+export const updateApiAccessTokens = async (
   accessToken: string | undefined
-): Promise<string> => {
+): Promise<[string, string]> => {
   if (!accessToken) {
-    throw new Error("Api access token not available. Cannot update");
+    throw new Error("Access token not available. Cannot update");
   }
   if (!apiScope) {
     throw new Error("Application configuration error, illegal api scope.");
@@ -53,7 +81,8 @@ export const updateApiAccessToken = async (
   const { data } = response;
 
   const apiAccessToken = data[apiScope];
-  setApiAccessToken(apiAccessToken);
+  const profileApiAccessToken = data[profileApiScope];
+  setApiAccessTokens(apiAccessToken, profileApiAccessToken);
 
-  return apiAccessToken;
+  return [apiAccessToken, profileApiAccessToken];
 };

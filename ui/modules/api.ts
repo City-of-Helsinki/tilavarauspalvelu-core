@@ -2,26 +2,18 @@ import { AxiosRequestConfig, AxiosResponse } from "axios";
 import {
   Application,
   ApplicationRound,
-  ReservationUnit,
   Parameter,
-  Reservation,
   RecurringReservation,
-  User,
-  ApplicationStatusChange,
 } from "common/types/common";
 import { apiBaseUrl } from "./const";
 import axiosClient from "./auth/axiosClient";
 import { ApiError } from "./ApiError";
 
 const applicationRoundBasePath = "application_round";
-const reservationUnitsBasePath = "reservation_unit";
-const reservationBasePath = "reservation";
 const recurringReservationBasePath = "recurring_reservation";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
-const applicationEventStatusBasePath = "application_event_status";
 const applicationEventFeedBasePath = "application_event_calendar";
-const userBasePath = "users";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -136,21 +128,6 @@ export interface ReservationUnitsParameters {
   after?: string;
 }
 
-export function getReservationUnits(
-  params: QueryParameters
-): Promise<ReservationUnit[]> {
-  return apiGet<ReservationUnit[]>({
-    parameters: params,
-    path: `v1/${reservationUnitsBasePath}`,
-  });
-}
-
-export function getReservations(): Promise<Reservation[]> {
-  return apiGet<Reservation[]>({
-    path: `v1/${reservationBasePath}`,
-  });
-}
-
 export function getRecurringReservations(
   applicationId: number
 ): Promise<RecurringReservation[]> {
@@ -160,38 +137,8 @@ export function getRecurringReservations(
   });
 }
 
-export async function getDecisionMaker(
-  applicationEventId: number
-): Promise<User | null> {
-  const statusChanges = await apiGet<ApplicationStatusChange[]>({
-    path: `v1/${applicationEventStatusBasePath}`,
-    parameters: { application: applicationEventId },
-  });
-
-  const decisionStatusChange = statusChanges
-    .filter(
-      (sc) =>
-        sc.applicationId === applicationEventId && sc.status === "review_done"
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
-    .find(() => true);
-
-  return apiGet<User>({
-    path: `v1/${userBasePath}/${decisionStatusChange?.userId}`,
-  });
-}
-
 interface IDParameter {
   id: number;
-}
-
-export function getReservationUnit(id: number): Promise<ReservationUnit> {
-  return apiGet<ReservationUnit>({
-    path: `v1/${reservationUnitsBasePath}/${id}`,
-  });
 }
 
 export function getParameters(

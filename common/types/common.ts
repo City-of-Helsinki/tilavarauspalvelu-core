@@ -93,19 +93,6 @@ export type Resource = {
   bufferTimeAfter: string;
 };
 
-export type ApplicationStatusChange = {
-  status: ApplicationStatus;
-  userId: number;
-  applicationId: number;
-  timestamp: string;
-};
-
-export type User = {
-  id: number;
-  firstName: string;
-  lastName: string;
-};
-
 export type Service = {
   id: number;
   name: TranslationObject;

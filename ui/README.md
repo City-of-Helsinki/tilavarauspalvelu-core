@@ -113,19 +113,20 @@ You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Ca
 
 ## Configurable environment variables
 
-| Name                             | Description                                                   |
-| -------------------------------- | ------------------------------------------------------------- |
-| NEXT_PUBLIC_TILAVARAUS_API_URL   | tilavaraus-core base url                                      |
-| NEXT_PUBLIC_SENTRY_DSN           | Sentry dsn                                                    |
-| NEXT_PUBLIC_SENTRY_ENVIRONMENT   | Sentry environment, for example 'test', 'prod'                |
-| NEXT_PUBLIC_OIDC_CLIENT_ID       | Oidc client id                                                |
-| NEXT_PUBLIC_OIDC_URL             | https://tunnistamo.test.hel.ninja/openid                      |
-| NEXT_PUBLIC_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
-| NEXT_PUBLIC_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
-| NEXT_PUBLIC_MAPBOX_TOKEN         | token tor mapbox service                                      |
-| NEXT_PUBLIC_MOCK_REQUESTS        | 'true' enables network level request mocking                  |
-| NEXT_PUBLIC_COOKIEHUB_ENABLED    | 'true' enables cookiehub consent module                       |
-| NEXT_PUBLIC_MATOMO_ENABLED       | 'true' enables matomo tracking                                |
-| NEXT_PUBLIC_HOTJAR_ENABLED       | 'true' enables hotjar tracking                                |
-| NEXT_PUBLIC_API_TOKEN_URL        | https://tunnistamo.test.hel.ninja/api-tokens/                 |
-| SENTRY_AUTH_TOKEN                | auth token for sentry cli                                     |
+| Name                             | Description                                                                                     |
+| -------------------------------- | ----------------------------------------------------------------------------------------------- |
+| NEXT_PUBLIC_TILAVARAUS_API_URL   | tilavaraus-core base url                                                                        |
+| NEXT_PUBLIC_SENTRY_DSN           | Sentry dsn                                                                                      |
+| NEXT_PUBLIC_SENTRY_ENVIRONMENT   | Sentry environment, for example 'test', 'prod'                                                  |
+| NEXT_PUBLIC_OIDC_CLIENT_ID       | Oidc client id                                                                                  |
+| NEXT_PUBLIC_OIDC_URL             | https://tunnistamo.test.hel.ninja/openid                                                        |
+| NEXT_PUBLIC_OIDC_SCOPE           | openid profile https://api.hel.fi/auth/helsinkiprofile https://api.hel.fi/auth/tilavarausapidev |
+| NEXT_PUBLIC_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                                                        |
+| NEXT_PUBLIC_PROFILE_API_SCOPE    | https://api.hel.fi/auth/helsinkiprofile                                                         |
+| NEXT_PUBLIC_MAPBOX_TOKEN         | token tor mapbox service                                                                        |
+| NEXT_PUBLIC_MOCK_REQUESTS        | 'true' enables network level request mocking                                                    |
+| NEXT_PUBLIC_COOKIEHUB_ENABLED    | 'true' enables cookiehub consent module                                                         |
+| NEXT_PUBLIC_MATOMO_ENABLED       | 'true' enables matomo tracking                                                                  |
+| NEXT_PUBLIC_HOTJAR_ENABLED       | 'true' enables hotjar tracking                                                                  |
+| NEXT_PUBLIC_API_TOKEN_URL        | https://tunnistamo.test.hel.ninja/api-tokens/                                                   |
+| SENTRY_AUTH_TOKEN                | auth token for sentry cli                                                                       |

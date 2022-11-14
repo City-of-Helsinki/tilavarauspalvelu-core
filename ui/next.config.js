@@ -22,6 +22,7 @@ const moduleExports = {
     apiTokenUrl: process.env.NEXT_PUBLIC_API_TOKEN_URL,
     oidcScope: process.env.NEXT_PUBLIC_OIDC_SCOPE,
     apiScope: process.env.NEXT_PUBLIC_TILAVARAUS_API_SCOPE,
+    profileApiScope: process.env.NEXT_PUBLIC_PROFILE_API_SCOPE,
     mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
     mockRequests: process.env.NEXT_PUBLIC_MOCK_REQUESTS === "true",
   },

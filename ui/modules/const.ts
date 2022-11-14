@@ -104,6 +104,8 @@ export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";
 
+export const PROFILE_TOKEN_HEADER = "X-Authorization";
+
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 export const {
@@ -116,6 +118,7 @@ export const {
   oidcUrl,
   oidcScope,
   apiScope,
+  profileApiScope,
   mapboxToken,
   apiTokenUrl,
   mockRequests,
