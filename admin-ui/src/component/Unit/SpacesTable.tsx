@@ -20,6 +20,7 @@ import {
 } from "../../common/gql-types";
 import { DataGroup } from "../../common/types";
 import SpaceTreeDataTableGroup from "./SpaceTreeDataTableGroup";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   spaces: SpaceType[];
@@ -137,6 +138,8 @@ const SpacesTable = ({
     { input: SpaceDeleteMutationInput }
   >(DELETE_SPACE);
 
+  const { notifyError } = useNotification();
+
   const deleteSpace = (
     pk: number
   ): Promise<FetchResult<{ deleteSpace: SpaceDeleteMutationPayload }>> =>
@@ -214,6 +217,17 @@ const SpacesTable = ({
                   {
                     name: t("SpaceTable.menuRemoveSpace"),
                     onClick: () => {
+                      if (
+                        space &&
+                        space.resources &&
+                        space?.resources?.length > 0
+                      ) {
+                        notifyError(
+                          t("SpaceTable.removeConflictTitle"),
+                          t("SpaceTable.removeConflictMessage")
+                        );
+                        return;
+                      }
                       modal.current?.open({
                         id: "confirmation-modal",
                         open: true,

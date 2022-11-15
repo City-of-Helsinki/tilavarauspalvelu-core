@@ -1008,6 +1008,10 @@ const translations: ITranslations = {
     menuAddSubSpace: ["Lisää alitiloja"],
     menuEditSpace: ["Muokkaa tilatietoja"],
     menuRemoveSpace: ["Poista tila"],
+    removeConflictTitle: ["Tilaa ei voi poistaa"],
+    removeConflictMessage: [
+      "Et voi poistaa tilaa. Siirrä tai poista ensin resurssi",
+    ],
     removeConfirmationTitle: ["Haluatko varmasti poistaa tilan {{name}}?"],
     removeConfirmationMessage: [
       "Tila poistetaan kaikista varausyksiköistä, joihin se on liitetty. Et voi perua toimintoa.",
