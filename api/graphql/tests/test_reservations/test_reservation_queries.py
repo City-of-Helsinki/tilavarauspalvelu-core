@@ -9,6 +9,8 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import CUSTOMER_TYPES, City
+from merchants.models import PaymentStatus
+from merchants.tests.factories import PaymentOrderFactory
 from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import (
     ReservationUnitFactory,
@@ -276,6 +278,90 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             """
             query {
                 reservations(state: ["REQUIRES_HANDLING", "CANCELLED"]) {
+                    edges {
+                        node {
+                            state
+                            name
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_payment_status_single_value(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        metadata = ReservationMetadataSetFactory()
+        res_unit = ReservationUnitFactory(metadata_set=metadata)
+        res = ReservationFactory(
+            state=STATE_CHOICES.REQUIRES_HANDLING,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="Show me",
+        )
+        PaymentOrderFactory(reservation=res)
+        response = self.query(
+            """
+            query {
+                reservations(paymentStatus: "DRAFT") {
+                    edges {
+                        node {
+                            state
+                            name
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_payment_status_multiple_values(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        metadata = ReservationMetadataSetFactory()
+        res_unit = ReservationUnitFactory(metadata_set=metadata)
+        res = ReservationFactory(
+            state=STATE_CHOICES.REQUIRES_HANDLING,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="Show me",
+            begin=datetime.datetime.now(tz=get_default_timezone())
+            + datetime.timedelta(days=2),
+        )
+        PaymentOrderFactory(reservation=res, status=PaymentStatus.PAID)
+        res_too = ReservationFactory(
+            state=STATE_CHOICES.CANCELLED,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="Show me too",
+            begin=datetime.datetime.now(tz=get_default_timezone())
+            + datetime.timedelta(days=1),
+        )
+        PaymentOrderFactory(reservation=res_too, status=PaymentStatus.REFUNDED)
+
+        ReservationFactory(
+            state=STATE_CHOICES.WAITING_FOR_PAYMENT,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="I shouldn't be visible in snapshots. PANIC!",
+            begin=datetime.datetime.now(tz=get_default_timezone())
+            + datetime.timedelta(days=1),
+        )
+        PaymentOrderFactory(reservation=res_too, status=PaymentStatus.EXPIRED)
+
+        response = self.query(
+            """
+            query {
+                reservations(paymentStatus: ["PAID", "REFUNDED"]) {
                     edges {
                         node {
                             state
