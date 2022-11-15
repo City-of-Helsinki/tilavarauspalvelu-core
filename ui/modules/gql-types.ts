@@ -2046,6 +2046,8 @@ export type ReservationCancellationMutationPayload = {
 
 export type ReservationConfirmMutationInput = {
   clientMutationId?: InputMaybe<Scalars["String"]>;
+  /** Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE. */
+  paymentType?: InputMaybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -2072,7 +2074,13 @@ export type ReservationConfirmMutationPayload = {
   freeOfChargeReason?: Maybe<Scalars["String"]>;
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
+  /** The non subsidised price of this reservation excluding VAT */
+  nonSubsidisedPrice?: Maybe<Scalars["Float"]>;
+  /** The non subsidised price of this reservation excluding VAT */
+  nonSubsidisedPriceNet?: Maybe<Scalars["Float"]>;
   numPersons?: Maybe<Scalars["Int"]>;
+  /** Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE. */
+  paymentType?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
   price?: Maybe<Scalars["Float"]>;
@@ -2098,7 +2106,7 @@ export type ReservationConfirmMutationPayload = {
   staffEvent?: Maybe<Scalars["Boolean"]>;
   /**
    * String value for ReservationType's ReservationState enum. Possible values are
-   * CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
+   * CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
    */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
@@ -2175,6 +2183,10 @@ export type ReservationCreateMutationPayload = {
   freeOfChargeReason?: Maybe<Scalars["String"]>;
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
+  /** The non subsidised price of this reservation excluding VAT */
+  nonSubsidisedPrice?: Maybe<Scalars["Float"]>;
+  /** The non subsidised price of this reservation excluding VAT */
+  nonSubsidisedPriceNet?: Maybe<Scalars["Float"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
@@ -3403,7 +3415,7 @@ export type ReservationUpdateMutationInput = {
   staffEvent?: InputMaybe<Scalars["Boolean"]>;
   /**
    * String value for ReservationType's ReservationState enum. Possible values are
-   * CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
+   * CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
    */
   state?: InputMaybe<Scalars["String"]>;
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
@@ -3433,6 +3445,10 @@ export type ReservationUpdateMutationPayload = {
   freeOfChargeReason?: Maybe<Scalars["String"]>;
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
+  /** The non subsidised price of this reservation excluding VAT */
+  nonSubsidisedPrice?: Maybe<Scalars["Float"]>;
+  /** The non subsidised price of this reservation excluding VAT */
+  nonSubsidisedPriceNet?: Maybe<Scalars["Float"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
@@ -3460,7 +3476,7 @@ export type ReservationUpdateMutationPayload = {
   staffEvent?: Maybe<Scalars["Boolean"]>;
   /**
    * String value for ReservationType's ReservationState enum. Possible values are
-   * CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
+   * CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
    */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
@@ -3522,6 +3538,8 @@ export enum ReservationsReservationStateChoices {
   Denied = "DENIED",
   /** requires_handling */
   RequiresHandling = "REQUIRES_HANDLING",
+  /** waiting_for_payment */
+  WaitingForPayment = "WAITING_FOR_PAYMENT",
 }
 
 export type ResourceCreateMutationInput = {
@@ -4208,6 +4226,8 @@ export enum State {
   Denied = "DENIED",
   /** requires_handling */
   RequiresHandling = "REQUIRES_HANDLING",
+  /** waiting_for_payment */
+  WaitingForPayment = "WAITING_FOR_PAYMENT",
 }
 
 export const ApplicationsDocument = gql`
@@ -5021,6 +5041,7 @@ export const ListReservationsDocument = gql`
     $state: [String]
     $user: ID
     $reservationUnit: [ID]
+    $orderBy: String
   ) {
     reservations(
       before: $before
@@ -5032,6 +5053,7 @@ export const ListReservationsDocument = gql`
       state: $state
       user: $user
       reservationUnit: $reservationUnit
+      orderBy: $orderBy
     ) {
       edges {
         node {
@@ -5095,6 +5117,7 @@ export const ListReservationsDocument = gql`
  *      state: // value for 'state'
  *      user: // value for 'user'
  *      reservationUnit: // value for 'reservationUnit'
+ *      orderBy: // value for 'orderBy'
  *   },
  * });
  */
@@ -6481,6 +6504,7 @@ export type ListReservationsQueryVariables = Exact<{
   reservationUnit?: InputMaybe<
     Array<InputMaybe<Scalars["ID"]>> | InputMaybe<Scalars["ID"]>
   >;
+  orderBy?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type ListReservationsQuery = {

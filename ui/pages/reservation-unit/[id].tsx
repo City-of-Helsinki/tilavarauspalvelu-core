@@ -119,6 +119,13 @@ type WeekOptions = "day" | "week" | "month";
 
 type ReservationStateWithInitial = string;
 
+const allowedReservationStates: ReservationsReservationStateChoices[] = [
+  ReservationsReservationStateChoices.Created,
+  ReservationsReservationStateChoices.Confirmed,
+  ReservationsReservationStateChoices.RequiresHandling,
+  ReservationsReservationStateChoices.WaitingForPayment,
+];
+
 const openingTimePeriods = [
   {
     periodId: 38600,
@@ -288,7 +295,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         endDate: lastOpeningPeriodEndDate,
         from: today,
         to: lastOpeningPeriodEndDate,
-        state: ["created", "confirmed"],
+        state: allowedReservationStates,
       },
     });
 
@@ -567,16 +574,12 @@ const ReservationUnit = ({
       variables: {
         begin: now,
         reservationUnit: [reservationUnit?.pk?.toString()],
+        state: allowedReservationStates,
       },
     }
   );
 
   useEffect(() => {
-    const allowedReservationStates = [
-      ReservationsReservationStateChoices.Created,
-      ReservationsReservationStateChoices.Confirmed,
-      ReservationsReservationStateChoices.RequiresHandling,
-    ];
     const reservations = userReservationsData?.reservations?.edges
       ?.map(({ node }) => node)
       .filter((n) => allowedReservationStates.includes(n.state));
