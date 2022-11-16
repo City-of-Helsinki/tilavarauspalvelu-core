@@ -854,7 +854,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         instance = super().save(**kwargs)
 
         state = self.validated_data["state"]
-        if state == STATE_CHOICES.CONFIRMED:
+        if state == STATE_CHOICES.CONFIRMED and self.instance.price_net > 0:
             payment_type = self.validated_data["payment_type"].upper()
             price_net = round_decimal(self.instance.price_net, 2)
             price_vat = round_decimal(
