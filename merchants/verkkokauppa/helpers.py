@@ -5,7 +5,7 @@ from typing import Optional
 from django.conf import settings
 from sentry_sdk import capture_message
 
-from api.graphql.application_errors import ValidationErrorCodes, ValidationErrorWithCode
+from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from applications.models import CUSTOMER_TYPES
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.order.requests import create_order

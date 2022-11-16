@@ -49,7 +49,7 @@ from reservations.models import (
 from users.models import ReservationNotification
 from utils.decimal_utils import round_decimal
 
-from ..application_errors import ValidationErrorCodes, ValidationErrorWithCode
+from ..validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
