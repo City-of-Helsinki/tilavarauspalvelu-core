@@ -690,17 +690,17 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(PersonalInfoViewLog.objects.count()).is_equal_to(0)
 
     def test_filter_by_reservation_unit_name(self):
-        self.reservation_unit.name_fi = "Koirankoppi"
-        self.reservation_unit.name_en = "Doghouse"
-        self.reservation_unit.name_sv = "Hundkoja"
+        self.reservation_unit.name_fi = "koirankoppi"
+        self.reservation_unit.name_en = "doghouse"
+        self.reservation_unit.name_sv = "hundkoja"
         self.reservation_unit.save()
 
         self.client.force_login(self.general_admin)
 
         test_cases = [
-            ("reservationUnitNameFi", "Koi", "nameFi"),
-            ("reservationUnitNameEn", "Dog", "nameEn"),
-            ("reservationUnitNameSv", "Hun", "nameSv"),
+            ("reservationUnitNameFi", "koi", "nameFi"),
+            ("reservationUnitNameEn", "dog", "nameEn"),
+            ("reservationUnitNameSv", "hun", "nameSv"),
         ]
         for filter_name, filter_value, field_name in test_cases:
             response = self.query(
@@ -726,13 +726,13 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             self.assertMatchSnapshot(content)
 
     def test_filter_by_reservation_unit_name_multiple_values(self):
-        self.reservation_unit.name_fi = "Koirankoppi"
-        self.reservation_unit.name_en = "Doghouse"
-        self.reservation_unit.name_sv = "Hundkoja"
+        self.reservation_unit.name_fi = "koirankoppi"
+        self.reservation_unit.name_en = "doghouse"
+        self.reservation_unit.name_sv = "hundkoja"
         self.reservation_unit.save()
 
         reservation_unit = ReservationUnitFactory(
-            name_fi="Norsutarha", name_en="Elephant park", name_sv="Elefantparken"
+            name_fi="norsutarha", name_en="elephant park", name_sv="elefantparken"
         )
         ReservationFactory(
             name="second test",
@@ -743,9 +743,9 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
 
         test_cases = [
-            ("reservationUnitNameFi", "Koi, Nors", "nameFi"),
-            ("reservationUnitNameEn", "Dog, Elep", "nameEn"),
-            ("reservationUnitNameSv", "Hun, Elef", "nameSv"),
+            ("reservationUnitNameFi", "koi, nors", "nameFi"),
+            ("reservationUnitNameEn", "dog, elep", "nameEn"),
+            ("reservationUnitNameSv", "hun, elef", "nameSv"),
         ]
         for filter_name, filter_value, field_name in test_cases:
             response = self.query(
