@@ -479,6 +479,12 @@ class Reservation(models.Model):
         help_text="Type of reservation",
     )
 
+    def _requires_handling(self):
+        return (
+            self.reservation_unit.filter(require_reservation_handling=True).exists()
+            or self.applying_for_free_of_charge
+        )
+
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
