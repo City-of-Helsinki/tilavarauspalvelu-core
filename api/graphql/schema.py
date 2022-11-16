@@ -15,6 +15,7 @@ from api.graphql.applications.application_types import (
     ApplicationType,
     CityType,
 )
+from api.graphql.merchants.merchant_types import PaymentOrderType
 from api.graphql.reservation_units.reservation_unit_filtersets import (
     EquipmentFilterSet,
     PurposeFilterSet,
@@ -87,6 +88,7 @@ from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
 from api.graphql.users.user_mutations import UserUpdateMutation
 from api.graphql.users.user_types import UserType
+from merchants.models import PaymentOrder
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
 )
@@ -99,6 +101,7 @@ from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
     KeywordPermission,
+    PaymentOrderPermission,
     PurposePermission,
     QualifierPermission,
     ReservationMetadataSetPermission,
@@ -114,7 +117,10 @@ from permissions.api_permissions.graphene_permissions import (
     UnitPermission,
     UserPermission,
 )
-from permissions.helpers import get_service_sectors_where_can_view_applications
+from permissions.helpers import (
+    can_handle_reservation,
+    get_service_sectors_where_can_view_applications,
+)
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.models import Reservation
 from resources.models import Resource
@@ -321,6 +327,10 @@ class ServiceSectorFilter(AuthFilter):
     permission_classes = (ServiceSectorPermission,)
 
 
+class PaymentOrderFilter(AuthFilter):
+    permission_classes = (PaymentOrderPermission,)
+
+
 class Query(graphene.ObjectType):
     applications = ApplicationsFilter(
         ApplicationType, filterset_class=ApplicationFilterSet
@@ -392,6 +402,8 @@ class Query(graphene.ObjectType):
     cities = CityFilter(CityType)
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
 
+    order = Field(PaymentOrderType, order_id=graphene.String())
+
     def resolve_current_user(self, info, **kwargs):
         return get_object_or_404(User, pk=info.context.user.pk)
 
@@ -434,6 +446,17 @@ class Query(graphene.ObjectType):
     def resolve_equipment_category_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(EquipmentCategory, pk=pk)
+
+    @check_resolver_permission(PaymentOrderPermission)
+    def resolve_order(self, info, **kwargs):
+        order_id = kwargs.get("order_id")
+        order = get_object_or_404(PaymentOrder, order_id=order_id)
+        if (
+            can_handle_reservation(info.context.user, order.reservation)
+            or order.reservation.user_id == info.context.user.id
+        ):
+            return order
+        return None
 
 
 class Mutation(graphene.ObjectType):

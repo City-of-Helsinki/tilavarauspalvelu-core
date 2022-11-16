@@ -542,6 +542,8 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
                         'name': 'movies',
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -582,6 +584,8 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'Only admins can see me.',
                         'name': 'admin movies',
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'reserveeAddressCity': 'Nowhere',
                         'reserveeAddressStreet': 'Mystery street 2',
                         'reserveeAddressZip': '00100',
@@ -612,6 +616,8 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
                         'name': 'movies',
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -652,6 +658,8 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'Only admins can see me.',
                         'name': 'admin movies',
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'reserveeAddressCity': 'Nowhere',
                         'reserveeAddressStreet': 'Mystery street 2',
                         'reserveeAddressZip': '00100',
@@ -682,6 +690,8 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
                         'name': 'movies',
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -832,6 +842,8 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': None,
                         'name': 'admin movies',
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'reserveeAddressCity': None,
                         'reserveeAddressStreet': None,
                         'reserveeAddressZip': None,
@@ -860,6 +872,8 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
                         'name': 'movies',
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -1250,6 +1264,23 @@ snapshots['ReservationQueryTestCase::test_order_by_unit_name 3'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_order_uuid_field 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'orderStatus': 'PAID',
+                        'orderUuid': '626c0cf7-3628-4ff5-aa9c-1b4e70dedc89'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_regular_user_cant_read_working_memo 1'] = {
     'data': {
         'reservations': {
@@ -1293,6 +1324,8 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         },
                         'name': 'movies',
                         'numPersons': None,
+                        'orderStatus': None,
+                        'orderUuid': None,
                         'price': 10.0,
                         'priority': 'A_100',
                         'purpose': {
