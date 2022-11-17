@@ -396,7 +396,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(mock_create_vk_order.called).is_true()
         local_order = PaymentOrder.objects.first()
         assert_that(local_order).is_not_none()
-        assert_that(local_order.order_id).is_equal_to(mock_vk_order.order_id)
+        assert_that(local_order.remote_id).is_equal_to(mock_vk_order.order_id)
         assert_that(local_order.checkout_url).is_equal_to(mock_vk_order.checkout_url)
         assert_that(local_order.receipt_url).is_equal_to(mock_vk_order.receipt_url)
 

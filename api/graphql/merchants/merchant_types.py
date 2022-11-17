@@ -64,7 +64,7 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
         connection_class = TilavarausBaseConnection
 
     def resolve_order_uuid(self, info) -> Optional[str]:
-        return self.order_id
+        return self.remote_id
 
     def resolve_reservation_pk(self, info) -> str:
         return self.reservation.pk

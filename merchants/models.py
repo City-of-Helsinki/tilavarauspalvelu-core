@@ -83,8 +83,8 @@ class PaymentOrder(models.Model):
         help_text="Reservation this order is based on",
     )
 
-    order_id = models.UUIDField(
-        verbose_name=_("Order ID"),
+    remote_id = models.UUIDField(
+        verbose_name=_("Remote order ID"),
         help_text=_("eCommerce order ID"),
         blank=True,
         null=True,

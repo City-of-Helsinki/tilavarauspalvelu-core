@@ -326,9 +326,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_order_uuid(self, info: ResolveInfo) -> Optional[str]:
         payment_order = self.payment_order.first()
-        return (
-            payment_order.order_id if payment_order and payment_order.order_id else None
-        )
+        uuid = getattr(payment_order, "remote_id", None)
+        return uuid
 
     @reservation_non_public_field
     def resolve_order_status(self, info: ResolveInfo) -> Optional[str]:
