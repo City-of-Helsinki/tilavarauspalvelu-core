@@ -15,7 +15,7 @@ def get_staff_notification_recipients(
     Get users with unit roles and notifications enabled, collect the ones that can manage relevant units,
     have matching notification setting are not the reservation creator
     """
-    notification_recipients: List[User] = []
+    notification_recipients: List[str] = []
     reservation_units = reservation.reservation_unit.all()
     units = Unit.objects.filter(reservationunit__in=reservation_units)
 
