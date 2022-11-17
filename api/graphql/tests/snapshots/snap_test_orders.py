@@ -17,7 +17,7 @@ snapshots['OrderQueryTestCase::test_returns_order_when_user_can_handle_reservati
     'data': {
         'order': {
             'checkoutUrl': None,
-            'orderId': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
             'paymentType': 'INVOICE',
             'receiptUrl': None,
             'reservationPk': '1',
@@ -30,7 +30,7 @@ snapshots['OrderQueryTestCase::test_returns_order_when_user_owns_reservation 1']
     'data': {
         'order': {
             'checkoutUrl': None,
-            'orderId': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
             'paymentType': 'INVOICE',
             'receiptUrl': None,
             'reservationPk': '1',

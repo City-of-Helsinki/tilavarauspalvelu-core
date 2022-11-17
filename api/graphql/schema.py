@@ -402,7 +402,7 @@ class Query(graphene.ObjectType):
     cities = CityFilter(CityType)
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
 
-    order = Field(PaymentOrderType, order_id=graphene.String())
+    order = Field(PaymentOrderType, order_uuid=graphene.String())
 
     def resolve_current_user(self, info, **kwargs):
         return get_object_or_404(User, pk=info.context.user.pk)
@@ -449,7 +449,7 @@ class Query(graphene.ObjectType):
 
     @check_resolver_permission(PaymentOrderPermission)
     def resolve_order(self, info, **kwargs):
-        order_id = kwargs.get("order_id")
+        order_id = kwargs.get("order_uuid")
         order = get_object_or_404(PaymentOrder, order_id=order_id)
         if (
             can_handle_reservation(info.context.user, order.reservation)

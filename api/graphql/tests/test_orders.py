@@ -29,15 +29,15 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
 
     @classmethod
-    def get_order_query(cls, order_id: Optional[str] = None) -> str:
-        if not order_id:
-            order_id = cls.order.order_id
+    def get_order_query(cls, order_uuid: Optional[str] = None) -> str:
+        if not order_uuid:
+            order_uuid = cls.order.order_id
 
         return (
             """
             query {
-                order(orderId: "%s") {
-                    orderId
+                order(orderUuid: "%s") {
+                    orderUuid
                     status
                     paymentType
                     receiptUrl
@@ -46,7 +46,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 }
             }
             """
-            % order_id
+            % order_uuid
         )
 
     def test_returns_none_when_not_authenticated(self):
