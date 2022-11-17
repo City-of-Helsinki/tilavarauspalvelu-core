@@ -518,3 +518,46 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
         local_order = PaymentOrder.objects.first()
         assert_that(local_order).is_none()
+
+    @patch("api.graphql.reservations.reservation_serializers.create_verkkokauppa_order")
+    def test_confirm_reservation_return_order_data(
+        self, mock_create_vk_order, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        mock_order = OrderFactory()
+        mock_create_vk_order.return_value = mock_order
+
+        self.client.force_login(self.regular_joe)
+
+        self.reservation_unit.payment_types.add(PaymentType.INVOICE)
+
+        input_data = self.get_valid_confirm_data()
+        query = """
+            mutation confirmReservation($input: ReservationConfirmMutationInput!) {
+                confirmReservation(input: $input) {
+                    state
+                    errors {
+                        field
+                        messages
+                    }
+                    order {
+                        orderUuid
+                        receiptUrl
+                        checkoutUrl
+                    }
+                }
+            }
+        """
+        response = self.query(query, input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("confirmReservation")).is_not_none()
+        assert_that(
+            content.get("data").get("confirmReservation").get("order")
+        ).is_not_none()
+
+        order_data = content.get("data").get("confirmReservation").get("order")
+        assert_that(order_data.get("orderUuid")).is_equal_to(str(mock_order.order_id))
+        assert_that(order_data.get("receiptUrl")).is_equal_to(mock_order.receipt_url)
+        assert_that(order_data.get("checkoutUrl")).is_equal_to(mock_order.checkout_url)
