@@ -144,42 +144,6 @@
 <text text-anchor="start" x="13862.5" y="-1429.5" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="13893.5" y="-1429.5" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
 </g>
-<g id="clust23" class="cluster">
-<title>cluster_email_notification</title>
-<path fill="none" stroke="#698b22" d="M13434,-3534.5C13434,-3534.5 13626,-3534.5 13626,-3534.5 13632,-3534.5 13638,-3540.5 13638,-3546.5 13638,-3546.5 13638,-3766.5 13638,-3766.5 13638,-3772.5 13632,-3778.5 13626,-3778.5 13626,-3778.5 13434,-3778.5 13434,-3778.5 13428,-3778.5 13422,-3772.5 13422,-3766.5 13422,-3766.5 13422,-3546.5 13422,-3546.5 13422,-3540.5 13428,-3534.5 13434,-3534.5"/>
-<text text-anchor="start" x="13434" y="-3763" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13457" y="-3763" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13488" y="-3763" font-family="Roboto" font-weight="bold" font-size="10.00">email_notification</text>
-<text text-anchor="start" x="13572" y="-3763" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13603" y="-3763" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-</g>
-<g id="clust24" class="cluster">
-<title>cluster_django_celery_beat</title>
-<path fill="none" stroke="#698b22" d="M13658,-3241.5C13658,-3241.5 14395,-3241.5 14395,-3241.5 14401,-3241.5 14407,-3247.5 14407,-3253.5 14407,-3253.5 14407,-3844.5 14407,-3844.5 14407,-3850.5 14401,-3856.5 14395,-3856.5 14395,-3856.5 13658,-3856.5 13658,-3856.5 13652,-3856.5 13646,-3850.5 13646,-3844.5 13646,-3844.5 13646,-3253.5 13646,-3253.5 13646,-3247.5 13652,-3241.5 13658,-3241.5"/>
-<text text-anchor="start" x="13927" y="-3841" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13950" y="-3841" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13981" y="-3841" font-family="Roboto" font-weight="bold" font-size="10.00">django_celery_beat</text>
-<text text-anchor="start" x="14072" y="-3841" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="14103" y="-3841" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-</g>
-<g id="clust16" class="cluster">
-<title>cluster_django_contrib_gis</title>
-<path fill="none" stroke="#698b22" d="M12068,-3560.5C12068,-3560.5 12466,-3560.5 12466,-3560.5 12472,-3560.5 12478,-3566.5 12478,-3572.5 12478,-3572.5 12478,-3740.5 12478,-3740.5 12478,-3746.5 12472,-3752.5 12466,-3752.5 12466,-3752.5 12068,-3752.5 12068,-3752.5 12062,-3752.5 12056,-3746.5 12056,-3740.5 12056,-3740.5 12056,-3572.5 12056,-3572.5 12056,-3566.5 12062,-3560.5 12068,-3560.5"/>
-<text text-anchor="start" x="12170" y="-3737" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12193" y="-3737" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12224" y="-3737" font-family="Roboto" font-weight="bold" font-size="10.00">django.contrib.gis</text>
-<text text-anchor="start" x="12310" y="-3737" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12341" y="-3737" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-</g>
-<g id="clust21" class="cluster">
-<title>cluster_django_celery_results</title>
-<path fill="none" stroke="#698b22" d="M12782,-3508.5C12782,-3508.5 13402,-3508.5 13402,-3508.5 13408,-3508.5 13414,-3514.5 13414,-3520.5 13414,-3520.5 13414,-3792.5 13414,-3792.5 13414,-3798.5 13408,-3804.5 13402,-3804.5 13402,-3804.5 12782,-3804.5 12782,-3804.5 12776,-3804.5 12770,-3798.5 12770,-3792.5 12770,-3792.5 12770,-3520.5 12770,-3520.5 12770,-3514.5 12776,-3508.5 12782,-3508.5"/>
-<text text-anchor="start" x="12986.5" y="-3789" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13009.5" y="-3789" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13040.5" y="-3789" font-family="Roboto" font-weight="bold" font-size="10.00">django_celery_results</text>
-<text text-anchor="start" x="13143.5" y="-3789" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="13174.5" y="-3789" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-</g>
 <g id="clust2" class="cluster">
 <title>cluster_django_contrib_admin</title>
 <path fill="none" stroke="#698b22" d="M863,-1227C863,-1227 1091,-1227 1091,-1227 1097,-1227 1103,-1233 1103,-1239 1103,-1239 1103,-1420 1103,-1420 1103,-1426 1097,-1432 1091,-1432 1091,-1432 863,-1432 863,-1432 857,-1432 851,-1426 851,-1420 851,-1420 851,-1239 851,-1239 851,-1233 857,-1227 863,-1227"/>
@@ -224,6 +188,42 @@
 <text text-anchor="start" x="10151" y="-3405" font-family="Roboto" font-weight="bold" font-size="10.00">reservation_units</text>
 <text text-anchor="start" x="10232" y="-3405" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="10263" y="-3405" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+</g>
+<g id="clust16" class="cluster">
+<title>cluster_django_contrib_gis</title>
+<path fill="none" stroke="#698b22" d="M12068,-3560.5C12068,-3560.5 12466,-3560.5 12466,-3560.5 12472,-3560.5 12478,-3566.5 12478,-3572.5 12478,-3572.5 12478,-3740.5 12478,-3740.5 12478,-3746.5 12472,-3752.5 12466,-3752.5 12466,-3752.5 12068,-3752.5 12068,-3752.5 12062,-3752.5 12056,-3746.5 12056,-3740.5 12056,-3740.5 12056,-3572.5 12056,-3572.5 12056,-3566.5 12062,-3560.5 12068,-3560.5"/>
+<text text-anchor="start" x="12170" y="-3737" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12193" y="-3737" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12224" y="-3737" font-family="Roboto" font-weight="bold" font-size="10.00">django.contrib.gis</text>
+<text text-anchor="start" x="12310" y="-3737" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12341" y="-3737" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+</g>
+<g id="clust21" class="cluster">
+<title>cluster_django_celery_results</title>
+<path fill="none" stroke="#698b22" d="M12782,-3508.5C12782,-3508.5 13402,-3508.5 13402,-3508.5 13408,-3508.5 13414,-3514.5 13414,-3520.5 13414,-3520.5 13414,-3792.5 13414,-3792.5 13414,-3798.5 13408,-3804.5 13402,-3804.5 13402,-3804.5 12782,-3804.5 12782,-3804.5 12776,-3804.5 12770,-3798.5 12770,-3792.5 12770,-3792.5 12770,-3520.5 12770,-3520.5 12770,-3514.5 12776,-3508.5 12782,-3508.5"/>
+<text text-anchor="start" x="12986.5" y="-3789" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13009.5" y="-3789" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13040.5" y="-3789" font-family="Roboto" font-weight="bold" font-size="10.00">django_celery_results</text>
+<text text-anchor="start" x="13143.5" y="-3789" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13174.5" y="-3789" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+</g>
+<g id="clust23" class="cluster">
+<title>cluster_email_notification</title>
+<path fill="none" stroke="#698b22" d="M13434,-3534.5C13434,-3534.5 13626,-3534.5 13626,-3534.5 13632,-3534.5 13638,-3540.5 13638,-3546.5 13638,-3546.5 13638,-3766.5 13638,-3766.5 13638,-3772.5 13632,-3778.5 13626,-3778.5 13626,-3778.5 13434,-3778.5 13434,-3778.5 13428,-3778.5 13422,-3772.5 13422,-3766.5 13422,-3766.5 13422,-3546.5 13422,-3546.5 13422,-3540.5 13428,-3534.5 13434,-3534.5"/>
+<text text-anchor="start" x="13434" y="-3763" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13457" y="-3763" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13488" y="-3763" font-family="Roboto" font-weight="bold" font-size="10.00">email_notification</text>
+<text text-anchor="start" x="13572" y="-3763" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13603" y="-3763" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+</g>
+<g id="clust24" class="cluster">
+<title>cluster_django_celery_beat</title>
+<path fill="none" stroke="#698b22" d="M13658,-3241.5C13658,-3241.5 14395,-3241.5 14395,-3241.5 14401,-3241.5 14407,-3247.5 14407,-3253.5 14407,-3253.5 14407,-3844.5 14407,-3844.5 14407,-3850.5 14401,-3856.5 14395,-3856.5 14395,-3856.5 13658,-3856.5 13658,-3856.5 13652,-3856.5 13646,-3850.5 13646,-3844.5 13646,-3844.5 13646,-3253.5 13646,-3253.5 13646,-3247.5 13652,-3241.5 13658,-3241.5"/>
+<text text-anchor="start" x="13927" y="-3841" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13950" y="-3841" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="13981" y="-3841" font-family="Roboto" font-weight="bold" font-size="10.00">django_celery_beat</text>
+<text text-anchor="start" x="14072" y="-3841" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="14103" y="-3841" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
 </g>
 <!-- helusers_models_ADGroup -->
 <g id="node1" class="node">
@@ -4313,53 +4313,53 @@
 <text text-anchor="start" x="12834" y="-1330.1" font-family="Roboto" font-size="8.00">CharField</text>
 <text text-anchor="start" x="12870" y="-1330.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">order_id</text>
-<text text-anchor="start" x="12753" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">payment_id</text>
+<text text-anchor="start" x="12764" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12834" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">UUIDField</text>
-<text text-anchor="start" x="12872" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12834" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">CharField</text>
+<text text-anchor="start" x="12870" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1304.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">payment_id</text>
-<text text-anchor="start" x="12764" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1304.1" font-family="Roboto" font-size="8.00">payment_type</text>
+<text text-anchor="start" x="12773" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12834" y="-1304.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">CharField</text>
+<text text-anchor="start" x="12834" y="-1304.1" font-family="Roboto" font-size="8.00">CharField</text>
 <text text-anchor="start" x="12870" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1291.1" font-family="Roboto" font-size="8.00">payment_type</text>
-<text text-anchor="start" x="12773" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1291.1" font-family="Roboto" font-size="8.00">price_net</text>
+<text text-anchor="start" x="12756" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12834" y="-1291.1" font-family="Roboto" font-size="8.00">CharField</text>
-<text text-anchor="start" x="12870" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12834" y="-1291.1" font-family="Roboto" font-size="8.00">DecimalField</text>
+<text text-anchor="start" x="12880" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1278.1" font-family="Roboto" font-size="8.00">price_net</text>
-<text text-anchor="start" x="12756" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1278.1" font-family="Roboto" font-size="8.00">price_total</text>
+<text text-anchor="start" x="12759" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12834" y="-1278.1" font-family="Roboto" font-size="8.00">DecimalField</text>
 <text text-anchor="start" x="12880" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1265.1" font-family="Roboto" font-size="8.00">price_total</text>
-<text text-anchor="start" x="12759" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1265.1" font-family="Roboto" font-size="8.00">price_vat</text>
+<text text-anchor="start" x="12755" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12834" y="-1265.1" font-family="Roboto" font-size="8.00">DecimalField</text>
 <text text-anchor="start" x="12880" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1252.1" font-family="Roboto" font-size="8.00">price_vat</text>
-<text text-anchor="start" x="12755" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1252.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">processed_at</text>
+<text text-anchor="start" x="12771" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12834" y="-1252.1" font-family="Roboto" font-size="8.00">DecimalField</text>
-<text text-anchor="start" x="12880" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12834" y="-1252.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DateTimeField</text>
+<text text-anchor="start" x="12886" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1239.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">processed_at</text>
-<text text-anchor="start" x="12771" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1239.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">receipt_url</text>
+<text text-anchor="start" x="12760" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12834" y="-1239.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DateTimeField</text>
-<text text-anchor="start" x="12886" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12834" y="-1239.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">CharField</text>
+<text text-anchor="start" x="12870" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12722" y="-1226.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">receipt_url</text>
-<text text-anchor="start" x="12760" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12722" y="-1226.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">remote_id</text>
+<text text-anchor="start" x="12759" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12820" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="12834" y="-1226.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">CharField</text>
-<text text-anchor="start" x="12870" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="12834" y="-1226.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">UUIDField</text>
+<text text-anchor="start" x="12872" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12708" y="-1213.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="12722" y="-1213.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">reservation_user_uuid</text>
 <text text-anchor="start" x="12802" y="-1213.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
@@ -4842,9 +4842,9 @@
 <!-- applications_models_ApplicationRoundStatus&#45;&gt;applications_models_ApplicationRound -->
 <g id="edge86" class="edge">
 <title>applications_models_ApplicationRoundStatus&#45;&gt;applications_models_ApplicationRound</title>
-<path fill="none" stroke="black" d="M7546.39,-1922.55C7550.21,-1826.35 7572.5,-1628.57 7687,-1521.5 7712.35,-1497.79 7734.58,-1523.43 7763,-1503.5 7788.49,-1485.62 7810.28,-1461.05 7828.36,-1435.25"/>
-<ellipse fill="black" stroke="black" cx="7546.24" cy="-1926.7" rx="4" ry="4"/>
-<text text-anchor="middle" x="7834.5" y="-1492.6" font-family="Roboto" font-size="8.00"> application_round (statuses)</text>
+<path fill="none" stroke="black" d="M7549.57,-1922.83C7558.72,-1827.49 7591.09,-1631.57 7705,-1521.5 7724.41,-1502.74 7741.45,-1519.75 7763,-1503.5 7787.45,-1485.07 7808.68,-1460.67 7826.52,-1435.25"/>
+<ellipse fill="black" stroke="black" cx="7549.19" cy="-1926.92" rx="4" ry="4"/>
+<text text-anchor="middle" x="7833.5" y="-1492.6" font-family="Roboto" font-size="8.00"> application_round (statuses)</text>
 </g>
 <!-- applications_models_ApplicationRoundStatus&#45;&gt;users_models_User -->
 <g id="edge87" class="edge">
@@ -4923,113 +4923,113 @@
 <!-- applications_models_ApplicationRoundAggregateData&#45;&gt;applications_models_ApplicationRound -->
 <g id="edge91" class="edge">
 <title>applications_models_ApplicationRoundAggregateData&#45;&gt;applications_models_ApplicationRound</title>
-<path fill="none" stroke="black" d="M7082.47,-3023.17C7094.45,-3006.11 7106.81,-2986.61 7116,-2967.5 7213.81,-2764.13 7106.14,-2643.73 7263,-2481.5 7280.29,-2463.62 7292.57,-2471.87 7316,-2463.5 7326.73,-2459.67 7328.85,-2456.84 7340,-2454.5 7375.28,-2447.08 7638.43,-2461.92 7664,-2436.5 7808.45,-2292.86 7579.23,-1668.75 7720,-1521.5 7746.1,-1494.2 7863.4,-1531.27 7889,-1503.5 7899.27,-1492.36 7903.12,-1465.58 7903.74,-1435.12"/>
+<path fill="none" stroke="black" d="M7082.47,-3023.17C7094.45,-3006.11 7106.81,-2986.61 7116,-2967.5 7213.81,-2764.13 7106.14,-2643.73 7263,-2481.5 7280.29,-2463.62 7292.57,-2471.87 7316,-2463.5 7326.73,-2459.67 7328.85,-2456.84 7340,-2454.5 7375.28,-2447.08 7638.19,-2461.67 7664,-2436.5 7810.05,-2294.08 7596.51,-1668.46 7738,-1521.5 7784.88,-1472.81 7843.5,-1553.48 7889,-1503.5 7899.2,-1492.3 7903.03,-1465.5 7903.64,-1435.04"/>
 <ellipse fill="black" stroke="black" cx="7080.05" cy="-3026.56" rx="4" ry="4"/>
 <text text-anchor="middle" x="7408" y="-2457.1" font-family="Roboto" font-size="8.00"> application_round (aggregated_data)</text>
 </g>
 <!-- applications_models_ApplicationRoundBasket -->
 <g id="node63" class="node">
 <title>applications_models_ApplicationRoundBasket</title>
-<polygon fill="white" stroke="none" points="7737,-1896 7737,-2062 8027,-2062 8027,-1896 7737,-1896"/>
-<polygon fill="#1b563f" stroke="none" points="7738,-2040 7738,-2061 8026,-2061 8026,-2040 7738,-2040"/>
-<text text-anchor="start" x="7798" y="-2049" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7812" y="-2049" font-family="Roboto" font-weight="bold" font-size="10.00" fill="white"> &#160;&#160;&#160;&#160;&#160;ApplicationRoundBasket &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-2032.6" font-family="Roboto" font-weight="bold" font-size="8.00">id</text>
-<text text-anchor="start" x="7762" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-2032.6" font-family="Roboto" font-weight="bold" font-size="8.00">AutoField</text>
-<text text-anchor="start" x="7960" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-2019.6" font-family="Roboto" font-weight="bold" font-size="8.00">application_round</text>
-<text text-anchor="start" x="7827" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-2019.6" font-family="Roboto" font-weight="bold" font-size="8.00">ForeignKey (id)</text>
-<text text-anchor="start" x="7982" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-2006.6" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">home_city</text>
-<text text-anchor="start" x="7795" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-2006.6" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">ForeignKey (id)</text>
-<text text-anchor="start" x="7982" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1993.6" font-family="Roboto" font-size="8.00">allocation_percentage</text>
-<text text-anchor="start" x="7833" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1993.6" font-family="Roboto" font-size="8.00">PositiveSmallIntegerField</text>
-<text text-anchor="start" x="8010" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1980.6" font-family="Roboto" font-size="8.00">customer_type</text>
-<text text-anchor="start" x="7807" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1980.6" font-family="Roboto" font-size="8.00">ArrayField</text>
-<text text-anchor="start" x="7957" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1967.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1967.6" font-family="Roboto" font-size="8.00">must_be_main_purpose_of_applicant</text>
-<text text-anchor="start" x="7888" y="-1967.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<polygon fill="white" stroke="none" points="7755,-1896 7755,-2062 8045,-2062 8045,-1896 7755,-1896"/>
+<polygon fill="#1b563f" stroke="none" points="7756,-2040 7756,-2061 8044,-2061 8044,-2040 7756,-2040"/>
+<text text-anchor="start" x="7816" y="-2049" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7830" y="-2049" font-family="Roboto" font-weight="bold" font-size="10.00" fill="white"> &#160;&#160;&#160;&#160;&#160;ApplicationRoundBasket &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-2032.6" font-family="Roboto" font-weight="bold" font-size="8.00">id</text>
+<text text-anchor="start" x="7780" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-2032.6" font-family="Roboto" font-weight="bold" font-size="8.00">AutoField</text>
+<text text-anchor="start" x="7978" y="-2032.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-2019.6" font-family="Roboto" font-weight="bold" font-size="8.00">application_round</text>
+<text text-anchor="start" x="7845" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-2019.6" font-family="Roboto" font-weight="bold" font-size="8.00">ForeignKey (id)</text>
+<text text-anchor="start" x="8000" y="-2019.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-2006.6" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">home_city</text>
+<text text-anchor="start" x="7813" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-2006.6" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">ForeignKey (id)</text>
+<text text-anchor="start" x="8000" y="-2006.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1993.6" font-family="Roboto" font-size="8.00">allocation_percentage</text>
+<text text-anchor="start" x="7851" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1993.6" font-family="Roboto" font-size="8.00">PositiveSmallIntegerField</text>
+<text text-anchor="start" x="8028" y="-1993.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1980.6" font-family="Roboto" font-size="8.00">customer_type</text>
+<text text-anchor="start" x="7825" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1980.6" font-family="Roboto" font-size="8.00">ArrayField</text>
+<text text-anchor="start" x="7975" y="-1980.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1967.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1967.6" font-family="Roboto" font-size="8.00">must_be_main_purpose_of_applicant</text>
 <text text-anchor="start" x="7906" y="-1967.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1967.6" font-family="Roboto" font-size="8.00">BooleanField</text>
-<text text-anchor="start" x="7967" y="-1967.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1954.6" font-family="Roboto" font-size="8.00">name</text>
-<text text-anchor="start" x="7775" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1954.6" font-family="Roboto" font-size="8.00">CharField</text>
-<text text-anchor="start" x="7956" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1941.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_en</text>
-<text text-anchor="start" x="7788" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1941.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
-<text text-anchor="start" x="7994" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1928.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_fi</text>
-<text text-anchor="start" x="7783" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1928.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
-<text text-anchor="start" x="7994" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1915.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_sv</text>
-<text text-anchor="start" x="7787" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1915.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
-<text text-anchor="start" x="7994" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7740" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7754" y="-1902.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">order_number</text>
-<text text-anchor="start" x="7806" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7906" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="7920" y="-1902.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">PositiveSmallIntegerField</text>
-<text text-anchor="start" x="8010" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<polygon fill="none" stroke="black" points="7737,-1896 7737,-2062 8027,-2062 8027,-1896 7737,-1896"/>
+<text text-anchor="start" x="7924" y="-1967.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1967.6" font-family="Roboto" font-size="8.00">BooleanField</text>
+<text text-anchor="start" x="7985" y="-1967.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1954.6" font-family="Roboto" font-size="8.00">name</text>
+<text text-anchor="start" x="7793" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1954.6" font-family="Roboto" font-size="8.00">CharField</text>
+<text text-anchor="start" x="7974" y="-1954.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1941.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_en</text>
+<text text-anchor="start" x="7806" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1941.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
+<text text-anchor="start" x="8012" y="-1941.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1928.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_fi</text>
+<text text-anchor="start" x="7801" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1928.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
+<text text-anchor="start" x="8012" y="-1928.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1915.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_sv</text>
+<text text-anchor="start" x="7805" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1915.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
+<text text-anchor="start" x="8012" y="-1915.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7758" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7772" y="-1902.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">order_number</text>
+<text text-anchor="start" x="7824" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7924" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="7938" y="-1902.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">PositiveSmallIntegerField</text>
+<text text-anchor="start" x="8028" y="-1902.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<polygon fill="none" stroke="black" points="7755,-1896 7755,-2062 8045,-2062 8045,-1896 7755,-1896"/>
 </g>
 <!-- applications_models_ApplicationRoundBasket&#45;&gt;reservations_models_AgeGroup -->
 <g id="edge96" class="edge">
 <title>applications_models_ApplicationRoundBasket&#45;&gt;reservations_models_AgeGroup</title>
-<path fill="none" stroke="black" d="M7884.87,-1883.54C7893.77,-1776.21 7926.23,-1605.14 8040,-1521.5 8093.2,-1482.39 8588.02,-1550.89 8634,-1503.5 8639.57,-1497.76 8639.56,-1491.25 8634,-1485.5 8624.96,-1476.15 8412.17,-1482.1 8400,-1477.5 8199.06,-1401.45 8228.88,-1243.53 8027,-1170 7872.35,-1113.67 2250.82,-1186.31 2102,-1116 2066.13,-1099.05 2038.29,-1062.89 2020.65,-1034.14"/>
-<ellipse fill="black" stroke="black" cx="7884.54" cy="-1887.81" rx="4" ry="4"/>
+<path fill="none" stroke="black" d="M7902.89,-1883.56C7911.8,-1776.25 7944.27,-1605.19 8058,-1521.5 8109.57,-1483.55 8589.44,-1549.48 8634,-1503.5 8639.57,-1497.76 8639.56,-1491.25 8634,-1485.5 8624.96,-1476.15 8412.17,-1482.1 8400,-1477.5 8199.06,-1401.45 8228.88,-1243.53 8027,-1170 7872.35,-1113.67 2250.82,-1186.31 2102,-1116 2066.13,-1099.05 2038.29,-1062.89 2020.65,-1034.14"/>
+<ellipse fill="black" stroke="black" cx="7902.55" cy="-1887.83" rx="4" ry="4"/>
 <ellipse fill="black" stroke="black" cx="2018.44" cy="-1030.44" rx="4" ry="4"/>
 <text text-anchor="middle" x="8468" y="-1300.6" font-family="Roboto" font-size="8.00"> age_groups (applicationroundbasket)</text>
 </g>
 <!-- applications_models_ApplicationRoundBasket&#45;&gt;reservations_models_ReservationPurpose -->
 <g id="edge95" class="edge">
 <title>applications_models_ApplicationRoundBasket&#45;&gt;reservations_models_ReservationPurpose</title>
-<path fill="none" stroke="black" d="M7867.06,-1883.81C7844.25,-1775.2 7789.37,-1601.39 7664,-1521.5 7619.47,-1493.12 5814.92,-1513.17 5763,-1503.5 5740.6,-1499.33 5737.41,-1489.59 5715,-1485.5 5692.57,-1481.4 2451.93,-1488.57 2432,-1477.5 2386.52,-1452.25 2357.48,-1399.26 2340.9,-1358.35"/>
-<ellipse fill="black" stroke="black" cx="7867.9" cy="-1887.92" rx="4" ry="4"/>
+<path fill="none" stroke="black" d="M7881.38,-1883.55C7854.33,-1774.69 7792.62,-1600.63 7664,-1521.5 7619.02,-1493.83 5814.92,-1513.17 5763,-1503.5 5740.6,-1499.33 5737.41,-1489.59 5715,-1485.5 5692.57,-1481.4 2451.93,-1488.57 2432,-1477.5 2386.52,-1452.25 2357.48,-1399.26 2340.9,-1358.35"/>
+<ellipse fill="black" stroke="black" cx="7882.39" cy="-1887.71" rx="4" ry="4"/>
 <ellipse fill="black" stroke="black" cx="2339.42" cy="-1354.58" rx="4" ry="4"/>
 <text text-anchor="middle" x="5826" y="-1492.6" font-family="Roboto" font-size="8.00"> purposes (applicationroundbasket)</text>
 </g>
 <!-- applications_models_ApplicationRoundBasket&#45;&gt;applications_models_ApplicationRound -->
 <g id="edge93" class="edge">
 <title>applications_models_ApplicationRoundBasket&#45;&gt;applications_models_ApplicationRound</title>
-<path fill="none" stroke="black" d="M7886.59,-1883.51C7890.96,-1784.38 7896.76,-1624.02 7896,-1485.5 7895.91,-1469.23 7895.78,-1452.14 7895.62,-1435.21"/>
-<ellipse fill="black" stroke="black" cx="7886.4" cy="-1887.73" rx="4" ry="4"/>
+<path fill="none" stroke="black" d="M7899.31,-1883.49C7898.57,-1784.34 7897.32,-1623.97 7896,-1485.5 7895.84,-1469.23 7895.67,-1452.14 7895.49,-1435.21"/>
+<ellipse fill="black" stroke="black" cx="7899.34" cy="-1887.7" rx="4" ry="4"/>
 <text text-anchor="middle" x="7980.5" y="-1492.6" font-family="Roboto" font-size="8.00"> application_round (application_round_baskets)</text>
 </g>
 <!-- applications_models_ApplicationRoundBasket&#45;&gt;applications_models_City -->
 <g id="edge94" class="edge">
 <title>applications_models_ApplicationRoundBasket&#45;&gt;applications_models_City</title>
-<path fill="none" stroke="black" d="M7865.25,-1884.03C7840.87,-1777.29 7784.64,-1606.9 7664,-1521.5 7633.35,-1499.81 7521.1,-1531.43 7496,-1503.5 7461.79,-1465.42 7525.24,-1492.82 7548,-1477.5 7592.67,-1447.44 7621.09,-1391.16 7636.73,-1350.74"/>
-<ellipse fill="black" stroke="black" cx="7866.14" cy="-1888.02" rx="4" ry="4"/>
+<path fill="none" stroke="black" d="M7879.51,-1883.82C7850.89,-1776.88 7787.9,-1606.3 7664,-1521.5 7633.02,-1500.29 7521.1,-1531.43 7496,-1503.5 7461.79,-1465.42 7525.24,-1492.82 7548,-1477.5 7592.67,-1447.44 7621.09,-1391.16 7636.73,-1350.74"/>
+<ellipse fill="black" stroke="black" cx="7880.57" cy="-1887.86" rx="4" ry="4"/>
 <text text-anchor="middle" x="7560.5" y="-1492.6" font-family="Roboto" font-size="8.00"> home_city (applicationroundbasket)</text>
 </g>
 <!-- applications_models_ApplicationStatus -->
@@ -5081,7 +5081,7 @@
 <!-- applications_models_ApplicationStatus&#45;&gt;users_models_User -->
 <g id="edge98" class="edge">
 <title>applications_models_ApplicationStatus&#45;&gt;users_models_User</title>
-<path fill="none" stroke="black" d="M7459.13,-2672.55C7571.62,-2613.96 7768.42,-2520.83 7950,-2481.5 7978.96,-2475.23 8462.41,-2484.8 8483,-2463.5 8485.78,-2460.62 8485.34,-2457.74 8483,-2454.5 8468.21,-2433.98 8444.69,-2456.34 8429,-2436.5 8302.35,-2276.38 8497.1,-1659.87 8347,-1521.5 8324.44,-1500.7 6168.65,-1504.99 6138,-1503.5 6047.97,-1499.13 6026.04,-1489.62 5936,-1485.5 5925.17,-1485 2823.11,-1484.69 2815,-1477.5 2711.95,-1386.16 2879.74,-1261.69 2777,-1170 2737.37,-1134.63 915.89,-1167.21 865,-1152 850.83,-1147.76 850.25,-1140.59 837,-1134 747.19,-1089.32 639.58,-1051.02 561.16,-1025.66"/>
+<path fill="none" stroke="black" d="M7459.13,-2672.55C7571.62,-2613.96 7768.42,-2520.83 7950,-2481.5 7978.96,-2475.23 8462.41,-2484.8 8483,-2463.5 8485.78,-2460.62 8485.34,-2457.74 8483,-2454.5 8468.21,-2433.98 8444.85,-2456.21 8429,-2436.5 8300.85,-2277.17 8483.45,-1658.87 8332,-1521.5 8309.43,-1501.03 6168.44,-1504.98 6138,-1503.5 6047.97,-1499.13 6026.04,-1489.62 5936,-1485.5 5925.17,-1485 2823.11,-1484.69 2815,-1477.5 2711.95,-1386.16 2879.74,-1261.69 2777,-1170 2737.37,-1134.63 915.89,-1167.21 865,-1152 850.83,-1147.76 850.25,-1140.59 837,-1134 747.19,-1089.32 639.58,-1051.02 561.16,-1025.66"/>
 <ellipse fill="black" stroke="black" cx="7455.39" cy="-2674.5" rx="4" ry="4"/>
 <text text-anchor="middle" x="6180.5" y="-1492.6" font-family="Roboto" font-size="8.00"> user (applicationstatus)</text>
 </g>
@@ -5255,7 +5255,7 @@
 <!-- applications_models_ApplicationEvent&#45;&gt;reservations_models_ReservationPurpose -->
 <g id="edge113" class="edge">
 <title>applications_models_ApplicationEvent&#45;&gt;reservations_models_ReservationPurpose</title>
-<path fill="none" stroke="black" d="M8182.71,-2675.82C8356.81,-2603.81 8666.75,-2474.5 8674,-2463.5 8715.49,-2400.6 8395.64,-2482.55 8336,-2436.5 7998.13,-2175.61 8387.61,-1774.79 8044,-1521.5 8020.47,-1504.15 5967.78,-1508.65 5939,-1503.5 5915.75,-1499.34 5912.26,-1489.59 5889,-1485.5 5865.29,-1481.33 2443.82,-1489.58 2423,-1477.5 2376.29,-1450.4 2349.48,-1392.33 2335.6,-1350.72"/>
+<path fill="none" stroke="black" d="M8182.71,-2675.82C8356.81,-2603.81 8666.75,-2474.5 8674,-2463.5 8715.49,-2400.6 8395.22,-2483.09 8336,-2436.5 8002.35,-2174.04 8401.44,-1776.43 8062,-1521.5 8038.42,-1503.79 5968.03,-1508.69 5939,-1503.5 5915.75,-1499.34 5912.26,-1489.59 5889,-1485.5 5865.29,-1481.33 2443.82,-1489.58 2423,-1477.5 2376.29,-1450.4 2349.48,-1392.33 2335.6,-1350.72"/>
 <ellipse fill="black" stroke="black" cx="8178.99" cy="-2677.35" rx="4" ry="4"/>
 <text text-anchor="middle" x="8384.5" y="-1977.1" font-family="Roboto" font-size="8.00"> purpose (applicationevent)</text>
 </g>
@@ -5537,7 +5537,7 @@
 <!-- applications_models_ApplicationEventScheduleResult&#45;&gt;applications_models_ApplicationRoundBasket -->
 <g id="edge123" class="edge">
 <title>applications_models_ApplicationEventScheduleResult&#45;&gt;applications_models_ApplicationRoundBasket</title>
-<path fill="none" stroke="black" d="M7437.41,-3229.86C7428.17,-3218.22 7420,-3205.68 7414,-3192.5 7379.08,-3115.85 7403.11,-3087.67 7400,-3003.5 7399.7,-2995.51 7395.1,-2991.82 7400,-2985.5 7419.68,-2960.11 7449.95,-2992.6 7470,-2967.5 7505.6,-2922.95 7445.81,-2495.93 7485,-2454.5 7517.49,-2420.15 7658.94,-2464.55 7697,-2436.5 7815.74,-2348.97 7858.46,-2172.13 7873.69,-2066.08"/>
+<path fill="none" stroke="black" d="M7437.41,-3229.86C7428.17,-3218.22 7420,-3205.68 7414,-3192.5 7379.08,-3115.85 7403.11,-3087.67 7400,-3003.5 7399.7,-2995.51 7395.1,-2991.82 7400,-2985.5 7419.68,-2960.11 7449.95,-2992.6 7470,-2967.5 7505.6,-2922.95 7445.67,-2495.8 7485,-2454.5 7520.35,-2417.37 7673.63,-2466.78 7715,-2436.5 7834.03,-2349.36 7876.64,-2172.39 7891.78,-2066.21"/>
 <ellipse fill="black" stroke="black" cx="7440.1" cy="-3233.14" rx="4" ry="4"/>
 <text text-anchor="middle" x="7471" y="-2992.6" font-family="Roboto" font-size="8.00"> basket (applicationeventscheduleresult)</text>
 </g>
@@ -5713,9 +5713,9 @@
 <!-- allocation_models_AllocationRequest&#45;&gt;applications_models_ApplicationRoundBasket -->
 <g id="edge131" class="edge">
 <title>allocation_models_AllocationRequest&#45;&gt;applications_models_ApplicationRoundBasket</title>
-<path fill="none" stroke="black" d="M8720.44,-2663.35C8672.87,-2598.56 8587.49,-2498.8 8486,-2454.5 8410.76,-2421.66 8186.03,-2480.95 8117,-2436.5 7990.33,-2354.94 7928.48,-2182.08 7901.08,-2074.04"/>
-<ellipse fill="black" stroke="black" cx="8722.85" cy="-2666.67" rx="4" ry="4"/>
-<ellipse fill="black" stroke="black" cx="7900.06" cy="-2069.93" rx="4" ry="4"/>
+<path fill="none" stroke="black" d="M8720.39,-2663.46C8672.79,-2598.76 8587.37,-2499.08 8486,-2454.5 8418.57,-2424.84 8217.5,-2475.5 8155,-2436.5 8024.83,-2355.28 7955.39,-2182.31 7923.23,-2074.16"/>
+<ellipse fill="black" stroke="black" cx="8722.81" cy="-2666.76" rx="4" ry="4"/>
+<ellipse fill="black" stroke="black" cx="7922.01" cy="-2070" rx="4" ry="4"/>
 <text text-anchor="middle" x="8587" y="-2457.1" font-family="Roboto" font-size="8.00"> application_round_baskets (allocationrequest)</text>
 </g>
 <!-- allocation_models_AllocationRequest&#45;&gt;users_models_User -->

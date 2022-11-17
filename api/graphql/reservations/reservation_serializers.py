@@ -883,7 +883,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     price_total=price_total,
                     reservation=self.instance,
                     reservation_user_uuid=self.instance.user.uuid,
-                    order_id=payment_order.order_id,
+                    remote_id=payment_order.order_id,
                     checkout_url=payment_order.checkout_url,
                     receipt_url=payment_order.receipt_url,
                 )

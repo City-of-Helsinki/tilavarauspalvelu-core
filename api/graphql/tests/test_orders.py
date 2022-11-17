@@ -25,19 +25,20 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             user=cls.regular_joe,
         )
         cls.order = PaymentOrderFactory.create(
-            reservation=cls.reservation, order_id="b3fef99e-6c18-422e-943d-cf00702af53e"
+            reservation=cls.reservation,
+            remote_id="b3fef99e-6c18-422e-943d-cf00702af53e",
         )
 
     @classmethod
-    def get_order_query(cls, order_id: Optional[str] = None) -> str:
-        if not order_id:
-            order_id = cls.order.order_id
+    def get_order_query(cls, order_uuid: Optional[str] = None) -> str:
+        if not order_uuid:
+            order_uuid = cls.order.remote_id
 
         return (
             """
             query {
-                order(orderId: "%s") {
-                    orderId
+                order(orderUuid: "%s") {
+                    orderUuid
                     status
                     paymentType
                     receiptUrl
@@ -46,7 +47,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 }
             }
             """
-            % order_id
+            % order_uuid
         )
 
     def test_returns_none_when_not_authenticated(self):

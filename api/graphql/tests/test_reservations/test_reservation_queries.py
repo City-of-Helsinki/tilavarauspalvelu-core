@@ -1337,7 +1337,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         PaymentOrderFactory(
             reservation=self.reservation,
-            order_id="626c0cf7-3628-4ff5-aa9c-1b4e70dedc89",
+            remote_id="626c0cf7-3628-4ff5-aa9c-1b4e70dedc89",
             status=PaymentStatus.PAID,
         )
 

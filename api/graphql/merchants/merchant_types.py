@@ -1,3 +1,5 @@
+from typing import Optional
+
 import graphene
 from graphene_permissions.mixins import AuthNode
 
@@ -39,7 +41,7 @@ class PaymentProductType(AuthNode, PrimaryKeyObjectType):
 class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (PaymentOrderPermission,)
 
-    order_id = graphene.String()
+    order_uuid = graphene.String()
     status = graphene.String()
     payment_type = graphene.String()
     processed_at = graphene.DateTime()
@@ -50,7 +52,7 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = PaymentOrder
         fields = [
-            "order_id",
+            "order_uuid",
             "status",
             "payment_type",
             "processed_at",
@@ -60,6 +62,9 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
         ]
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+    def resolve_order_uuid(self, info) -> Optional[str]:
+        return self.remote_id
 
     def resolve_reservation_pk(self, info) -> str:
         return self.reservation.pk

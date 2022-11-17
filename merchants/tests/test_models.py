@@ -23,7 +23,7 @@ class PaymentOrderTestCase(TestCase):
         cls.reservation = ReservationFactory(user=cls.user)
         cls.valid_args = {
             "reservation": cls.reservation,
-            "order_id": uuid4(),
+            "remote_id": uuid4(),
             "payment_id": "test_payment_id",
             "payment_type": "ON_SITE",
             "status": "DRAFT",
