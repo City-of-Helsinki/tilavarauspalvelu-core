@@ -120,17 +120,13 @@ class ReservationUnitPricingFactory(DjangoModelFactory):
     price_unit = "per_15_mins"
     lowest_price = 5
     highest_price = 10
+    lowest_price_net = Decimal("5") / Decimal("1.10")
+    highest_price_net = Decimal("10") / Decimal("1.10")
     tax_percentage = SubFactory(TaxPercentageFactory, value=10.0)
     status = "active"
 
     class Meta:
         model = "reservation_units.ReservationUnitPricing"
-
-    def reservation_unit(self, create, reservation_unit, **kwargs):
-        if not create or not reservation_unit:
-            return
-
-        self.reservation_unit = reservation_unit
 
 
 class KeywordCategoryFactory(DjangoModelFactory):

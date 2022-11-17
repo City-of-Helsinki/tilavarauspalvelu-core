@@ -11,6 +11,7 @@ from api.graphql.reservations.reservation_serializers import (
     ReservationCreateSerializer,
     ReservationDenySerializer,
     ReservationRequiresHandlingSerializer,
+    ReservationUnitAdjustTimeSerializer,
     ReservationUpdateSerializer,
     ReservationWorkingMemoSerializer,
 )
@@ -104,3 +105,12 @@ class ReservationWorkingMemoMutation(AuthSerializerMutation, SerializerMutation)
     class Meta:
         lookup_field = "pk"
         serializer_class = ReservationWorkingMemoSerializer
+
+
+class ReservationAdjustTimeMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (ReservationPermission,)
+
+    class Meta:
+        model_operations = ["update"]
+        lookup_field = "pk"
+        serializer_class = ReservationUnitAdjustTimeSerializer
