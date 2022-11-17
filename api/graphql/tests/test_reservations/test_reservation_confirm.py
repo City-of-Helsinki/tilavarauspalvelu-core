@@ -499,3 +499,22 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation cannot be changed anymore because it is attached to a payment order"
         )
+
+    def test_confirm_order_not_created_when_price_is_zero(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        self.reservation.price = Decimal(0)
+        self.reservation.price_net = Decimal(0)
+        self.reservation.save()
+
+        input_data = self.get_valid_confirm_data()
+        response = self.query(self.get_confirm_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        local_order = PaymentOrder.objects.first()
+        assert_that(local_order).is_none()
