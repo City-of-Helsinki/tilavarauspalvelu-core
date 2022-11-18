@@ -5477,13 +5477,6 @@ export const ReservationUnitDocument = gql`
       descriptionFi
       descriptionEn
       descriptionSv
-      lowestPrice
-      highestPrice
-      priceUnit
-      pricingType
-      taxPercentage {
-        value
-      }
       termsOfUseFi
       termsOfUseEn
       termsOfUseSv
@@ -5701,10 +5694,6 @@ export const SearchReservationUnitsDocument = gql`
           nameFi
           nameEn
           nameSv
-          lowestPrice
-          highestPrice
-          priceUnit
-          pricingType
           nameFi
           reservationBegins
           reservationEnds
@@ -5730,6 +5719,17 @@ export const SearchReservationUnitsDocument = gql`
             imageType
             smallUrl
             mediumUrl
+          }
+          pricings {
+            begins
+            priceUnit
+            pricingType
+            lowestPrice
+            highestPrice
+            taxPercentage {
+              value
+            }
+            status
           }
         }
       }
@@ -5844,6 +5844,17 @@ export const RelatedReservationUnitsDocument = gql`
           publishBegins
           publishEnds
           isDraft
+          pricings {
+            begins
+            priceUnit
+            pricingType
+            lowestPrice
+            highestPrice
+            taxPercentage {
+              value
+            }
+            status
+          }
         }
       }
     }
@@ -6758,10 +6769,6 @@ export type ReservationUnitQuery = {
     descriptionFi?: string | null;
     descriptionEn?: string | null;
     descriptionSv?: string | null;
-    lowestPrice: any;
-    highestPrice: any;
-    priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
-    pricingType?: ReservationUnitsReservationUnitPricingTypeChoices | null;
     termsOfUseFi?: string | null;
     termsOfUseEn?: string | null;
     termsOfUseSv?: string | null;
@@ -6798,7 +6805,6 @@ export type ReservationUnitQuery = {
       smallUrl?: string | null;
       imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
     } | null> | null;
-    taxPercentage?: { __typename?: "TaxPercentageType"; value: any } | null;
     serviceSpecificTerms?: {
       __typename?: "TermsOfUseType";
       textFi?: string | null;
@@ -6947,10 +6953,6 @@ export type SearchReservationUnitsQuery = {
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
-        lowestPrice: any;
-        highestPrice: any;
-        priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
-        pricingType?: ReservationUnitsReservationUnitPricingTypeChoices | null;
         reservationBegins?: any | null;
         reservationEnds?: any | null;
         maxPersons?: number | null;
@@ -6979,6 +6981,16 @@ export type SearchReservationUnitsQuery = {
           imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
           smallUrl?: string | null;
           mediumUrl?: string | null;
+        } | null> | null;
+        pricings?: Array<{
+          __typename?: "ReservationUnitPricingType";
+          begins: any;
+          priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices;
+          pricingType?: ReservationUnitsReservationUnitPricingPricingTypeChoices | null;
+          lowestPrice: any;
+          highestPrice: any;
+          status: ReservationUnitsReservationUnitPricingStatusChoices;
+          taxPercentage: { __typename?: "TaxPercentageType"; value: any };
         } | null> | null;
       } | null;
     } | null>;
@@ -7038,6 +7050,16 @@ export type RelatedReservationUnitsQuery = {
           nameEn?: string | null;
           nameSv?: string | null;
         } | null;
+        pricings?: Array<{
+          __typename?: "ReservationUnitPricingType";
+          begins: any;
+          priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices;
+          pricingType?: ReservationUnitsReservationUnitPricingPricingTypeChoices | null;
+          lowestPrice: any;
+          highestPrice: any;
+          status: ReservationUnitsReservationUnitPricingStatusChoices;
+          taxPercentage: { __typename?: "TaxPercentageType"; value: any };
+        } | null> | null;
       } | null;
     } | null>;
   } | null;

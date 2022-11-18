@@ -161,6 +161,10 @@ const StyledSelect = styled(Select)`
     left: -2px;
     border-top: var(--border-width) solid var(--dropdown-border-color-focus);
     border-bottom: var(--divider-width) solid var(--menu-divider-color);
+
+    li {
+      white-space: nowrap;
+    }
   }
 `;
 

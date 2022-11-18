@@ -22,6 +22,7 @@ import IconWithText from "../common/IconWithText";
 import Images from "./Images";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import {
+  getActivePricing,
   getPrice,
   getReservationUnitName,
   getUnitName,
@@ -136,7 +137,8 @@ const Head = ({
   //   getDayOpeningTimes(openingTime, index)
   // );
 
-  const unitPrice = getPrice(reservationUnit);
+  const pricing = getActivePricing(reservationUnit);
+  const unitPrice = getPrice(pricing);
 
   const reservationUnitName = getReservationUnitName(reservationUnit);
 

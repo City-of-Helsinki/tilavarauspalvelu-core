@@ -13,6 +13,7 @@ import IconWithText from "../common/IconWithText";
 import Carousel from "../Carousel";
 import { ReservationUnitType } from "../../modules/gql-types";
 import {
+  getActivePricing,
   getPrice,
   getReservationUnitName,
   getUnitName,
@@ -115,7 +116,8 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
         cellSpacing={24}
       >
         {units.map((unit) => {
-          const unitPrice = getPrice(unit);
+          const pricing = getActivePricing(unit);
+          const unitPrice = getPrice(pricing);
           const reservationUnitTypeName = getTranslation(
             unit.reservationUnitType,
             "name"

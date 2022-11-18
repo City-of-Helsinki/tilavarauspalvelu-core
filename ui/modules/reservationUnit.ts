@@ -19,49 +19,6 @@ import {
 } from "./gql-types";
 import { capitalize, getTranslation, localizedValue } from "./util";
 
-export const getPrice = (
-  reservationUnit:
-    | ReservationUnitType
-    | ReservationUnitByPkType
-    | ReservationUnitPricingType,
-  minutes?: number, // additional minutes for total price calculation
-  trailingZeros = false,
-  asInt = false
-): string => {
-  const unit = reservationUnit.priceUnit;
-  const type = reservationUnit.pricingType;
-  const volume = getReservationVolume(minutes, unit);
-  const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  const floatFormatter = trailingZeros ? "twoDecimals" : "strippedDecimal";
-
-  const unitStr =
-    unit === "FIXED" || minutes ? "" : i18n.t(`prices:priceUnits.${unit}`);
-
-  const formatters = getFormatters(i18n.language);
-
-  if (type === "PAID" && parseFloat(reservationUnit.highestPrice)) {
-    if (unit === "FIXED") {
-      return formatters[currencyFormatter].format(reservationUnit.highestPrice);
-    }
-
-    const lowestPrice = parseFloat(reservationUnit.lowestPrice)
-      ? formatters[floatFormatter].format(reservationUnit.lowestPrice * volume)
-      : 0;
-    const highestPrice = formatters[currencyFormatter].format(
-      reservationUnit.highestPrice * volume
-    );
-    const price =
-      reservationUnit.lowestPrice === reservationUnit.highestPrice
-        ? formatters[currencyFormatter].format(
-            reservationUnit.lowestPrice * volume
-          )
-        : `${lowestPrice} - ${highestPrice}`;
-    return trim(`${price} / ${unitStr}`, " / ");
-  }
-
-  return asInt ? "0" : i18n.t("prices:priceFree");
-};
-
 export const isReservationUnitPublished = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType
 ): boolean => {
@@ -194,22 +151,25 @@ export const getDurationRange = (
   return `${reservationUnit.minReservationDuration} - ${reservationUnit.maxReservationDuration}`;
 };
 
+export const getActivePricing = (
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+): ReservationUnitPricingType => {
+  const { pricings } = reservationUnit;
+
+  if (!pricings || pricings.length === 0) {
+    return null;
+  }
+
+  return pricings.find((pricing) => pricing.status === "ACTIVE");
+};
+
 export const getFuturePricing = (
   reservationUnit: ReservationUnitByPkType,
   applicationRounds: ApplicationRound[] = [],
   reservationDate?: Date
 ): ReservationUnitPricingType => {
-  const {
-    pricings,
-    pricingType,
-    priceUnit,
-    lowestPrice,
-    highestPrice,
-    taxPercentage,
-    reservationBegins,
-    reservationEnds,
-    openingHours,
-  } = reservationUnit;
+  const { pricings, reservationBegins, reservationEnds, openingHours } =
+    reservationUnit;
 
   if (!pricings || pricings.length === 0) {
     return null;
@@ -222,14 +182,6 @@ export const getFuturePricing = (
       (pricing) =>
         pricing.status ===
         ReservationUnitsReservationUnitPricingStatusChoices.Future
-    )
-    .filter(
-      (futurePricing) =>
-        pricingType !== futurePricing.pricingType?.toString() ||
-        priceUnit !== futurePricing.priceUnit?.toString() ||
-        lowestPrice !== futurePricing.lowestPrice ||
-        highestPrice !== futurePricing.highestPrice ||
-        taxPercentage.value !== futurePricing.taxPercentage?.value
     )
     .filter((futurePricing) => futurePricing.begins > now)
     .filter((futurePricing) => {
@@ -274,19 +226,60 @@ export const getFuturePricing = (
     : futurePricings[0];
 };
 
+export const getPrice = (
+  pricing: ReservationUnitPricingType,
+  minutes?: number, // additional minutes for total price calculation
+  trailingZeros = false,
+  asInt = false
+): string => {
+  const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
+  const floatFormatter = trailingZeros ? "twoDecimals" : "strippedDecimal";
+
+  const formatters = getFormatters(i18n.language);
+
+  if (pricing?.pricingType === "PAID" && parseFloat(pricing.highestPrice)) {
+    const volume = getReservationVolume(minutes, pricing.priceUnit);
+    const unitStr =
+      pricing.priceUnit === "FIXED" || minutes
+        ? ""
+        : i18n.t(`prices:priceUnits.${pricing.priceUnit}`);
+
+    if (pricing.priceUnit === "FIXED") {
+      return formatters[currencyFormatter].format(pricing.highestPrice);
+    }
+
+    const lowestPrice = parseFloat(pricing.lowestPrice)
+      ? formatters[floatFormatter].format(pricing.lowestPrice * volume)
+      : 0;
+    const highestPrice = formatters[currencyFormatter].format(
+      pricing.highestPrice * volume
+    );
+    const price =
+      pricing.lowestPrice === pricing.highestPrice
+        ? formatters[currencyFormatter].format(pricing.lowestPrice * volume)
+        : `${lowestPrice} - ${highestPrice}`;
+    return trim(`${price} / ${unitStr}`, " / ");
+  }
+
+  return asInt ? "0" : i18n.t("prices:priceFree");
+};
+
 export const getReservationUnitPrice = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType,
-  date?: Date,
+  pricingDate?: Date,
   minutes?: number,
   trailingZeros = false,
   asInt = false
 ): string => {
   if (!reservationUnit) return null;
 
-  const pricing = date
-    ? getFuturePricing(reservationUnit as ReservationUnitByPkType, [], date) ||
-      reservationUnit
-    : reservationUnit;
+  const pricing: ReservationUnitPricingType = pricingDate
+    ? getFuturePricing(
+        reservationUnit as ReservationUnitByPkType,
+        [],
+        pricingDate
+      ) || getActivePricing(reservationUnit as ReservationUnitByPkType)
+    : getActivePricing(reservationUnit as ReservationUnitByPkType);
 
   return getPrice(pricing, minutes, trailingZeros, asInt);
 };

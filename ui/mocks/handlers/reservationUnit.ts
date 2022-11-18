@@ -14,7 +14,6 @@ import {
   ReservationUnitImageType,
   ReservationUnitTypeConnection,
   TermsOfUseTermsOfUseTermsTypeChoices,
-  ReservationUnitsReservationUnitPriceUnitChoices,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   QueryTermsOfUseArgs,
   TermsOfUseTypeConnection,
@@ -27,7 +26,7 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   QueryPurposesArgs,
   PurposeTypeConnection,
-  ReservationUnitsReservationUnitPricingTypeChoices,
+  ReservationUnitType,
 } from "../../modules/gql-types";
 
 const equipmentCategories: EquipmentCategoryType[] = [
@@ -79,7 +78,7 @@ const selectedReservationUnitQuery = graphql.query<
   Query,
   QueryReservationUnitByPkArgs
 >("ReservationUnit", async (req, res, ctx) => {
-  const reservationUnitByPk: ReservationUnitByPkType = {
+  const reservationUnitByPk = {
     resources: [],
     services: [],
     uuid: "8e5275aa-8625-4458-88b4-d5b1b2df6619",
@@ -115,10 +114,6 @@ const selectedReservationUnitQuery = graphql.query<
         imageType: "OTHER",
       },
     ] as ReservationUnitImageType[],
-    lowestPrice: 20,
-    highestPrice: 20,
-    priceUnit: "PER_15_MINS" as ReservationUnitsReservationUnitPriceUnitChoices,
-    pricingType: ReservationUnitsReservationUnitPricingTypeChoices.Paid,
     pricings: [
       {
         begins: toUIDate(addDays(new Date(), 2), "yyyy-MM-dd"),
@@ -135,6 +130,22 @@ const selectedReservationUnitQuery = graphql.query<
           value: 20,
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      },
+      {
+        begins: toUIDate(new Date(), "yyyy-MM-dd"),
+        lowestPrice: 20,
+        lowestPriceNet: 20 / 1.24,
+        highestPrice: 20,
+        highestPriceNet: 20 / 1.24,
+        priceUnit:
+          ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+        taxPercentage: {
+          id: "goier1",
+          value: 20,
+        },
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
       {
         begins: toUIDate(addDays(new Date(), 3), "yyyy-MM-dd"),
@@ -383,7 +394,7 @@ const selectedReservationUnitQuery = graphql.query<
         "name",
       ],
     },
-  };
+  } as ReservationUnitByPkType;
 
   if (req.variables.pk === 800) {
     reservationUnitByPk.equipment = [];
@@ -421,8 +432,6 @@ const selectedReservationUnitQuery = graphql.query<
 
   if (req.variables.pk === 903) {
     reservationUnitByPk.pk = 903;
-    reservationUnitByPk.lowestPrice = 0;
-    reservationUnitByPk.highestPrice = 0;
     reservationUnitByPk.metadataSet = {
       id: "UmVzZXJ2YXRpb25NZXRhZGF0YVNldFR5cGU6MQ==",
       name: "Test",
@@ -631,12 +640,24 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         authentication:
           ReservationUnitsReservationUnitAuthenticationChoices.Weak,
         images: [],
-        lowestPrice: 12.34,
-        highestPrice: 20,
-        priceUnit:
-          "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
-        pricingType:
-          "PAID" as ReservationUnitsReservationUnitPricingTypeChoices,
+        pricings: [
+          {
+            begins: toUIDate(new Date(), "yyyy-MM-dd"),
+            lowestPrice: 12.34,
+            lowestPriceNet: 12.34 / 1.2,
+            highestPrice: 20,
+            highestPriceNet: 20 / 1.2,
+            priceUnit:
+              ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
+            pricingType:
+              ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+            taxPercentage: {
+              id: "goier1",
+              value: 20,
+            },
+            status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+          },
+        ],
         unit: {
           id: "VW5pdFR5cGU6Nw==",
           pk: 7,
@@ -695,7 +716,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
         isArchived: false,
-      },
+      } as ReservationUnitType,
       cursor: "YXJyYXljb25uZWN0aW9uOjA=",
     },
     {
@@ -709,12 +730,24 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         nameSv: "Pukinmäen nuorisotalon sali Sv",
         authentication:
           ReservationUnitsReservationUnitAuthenticationChoices.Weak,
-        lowestPrice: 3.34,
-        highestPrice: 30,
-        priceUnit:
-          "PER_WEEK" as ReservationUnitsReservationUnitPriceUnitChoices,
-        pricingType:
-          "PAID" as ReservationUnitsReservationUnitPricingTypeChoices,
+        pricings: [
+          {
+            begins: toUIDate(new Date(), "yyyy-MM-dd"),
+            lowestPrice: 3.34,
+            lowestPriceNet: 3.34 / 1.2,
+            highestPrice: 30,
+            highestPriceNet: 30 / 1.2,
+            priceUnit:
+              ReservationUnitsReservationUnitPricingPriceUnitChoices.PerWeek,
+            pricingType:
+              ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+            taxPercentage: {
+              id: "goier1",
+              value: 24,
+            },
+            status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+          },
+        ],
         images: [
           {
             imageUrl: "https://via.placeholder.com/1024x768",
@@ -790,7 +823,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
         isArchived: false,
-      },
+      } as ReservationUnitType,
       cursor: "YXJyYXljb25uZWN0aW9uOjE=",
     },
   ],

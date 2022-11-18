@@ -20,13 +20,6 @@ export const RESERVATION_UNIT = gql`
       descriptionFi
       descriptionEn
       descriptionSv
-      lowestPrice
-      highestPrice
-      priceUnit
-      pricingType
-      taxPercentage {
-        value
-      }
       termsOfUseFi
       termsOfUseEn
       termsOfUseSv
@@ -194,10 +187,6 @@ export const RESERVATION_UNITS = gql`
           nameFi
           nameEn
           nameSv
-          lowestPrice
-          highestPrice
-          priceUnit
-          pricingType
           nameFi
           reservationBegins
           reservationEnds
@@ -223,6 +212,17 @@ export const RESERVATION_UNITS = gql`
             imageType
             smallUrl
             mediumUrl
+          }
+          pricings {
+            begins
+            priceUnit
+            pricingType
+            lowestPrice
+            highestPrice
+            taxPercentage {
+              value
+            }
+            status
           }
         }
       }
@@ -274,6 +274,17 @@ export const RELATED_RESERVATION_UNITS = gql`
           publishBegins
           publishEnds
           isDraft
+          pricings {
+            begins
+            priceUnit
+            pricingType
+            lowestPrice
+            highestPrice
+            taxPercentage {
+              value
+            }
+            status
+          }
         }
       }
     }

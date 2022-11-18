@@ -17,6 +17,7 @@ import { MediumButton, pixel, truncatedText } from "../../styles/util";
 import { ReservationUnitType } from "../../modules/gql-types";
 
 import {
+  getActivePricing,
   getPrice,
   getReservationUnitName,
   getUnitName,
@@ -158,7 +159,10 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
 
   const unitName = getUnitName(reservationUnit.unit);
 
-  const unitPrice = useMemo(() => getPrice(reservationUnit), [reservationUnit]);
+  const unitPrice = useMemo(() => {
+    const pricing = getActivePricing(reservationUnit);
+    return getPrice(pricing);
+  }, [reservationUnit]);
 
   const reservationUnitTypeName = getTranslation(
     reservationUnit.reservationUnitType,

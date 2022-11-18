@@ -10,6 +10,7 @@ import {
   EquipmentType,
   ReservationsReservationStateChoices,
   ReservationUnitByPkType,
+  ReservationUnitPricingType,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
@@ -47,100 +48,89 @@ jest.mock("next-i18next", () => ({
 
 describe("getPrice", () => {
   test("price range", () => {
-    const reservationUnit = {
+    const pricing = {
       lowestPrice: 10,
       highestPrice: 50.5,
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
-    };
+    } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(reservationUnit as ReservationUnitByPkType)).toBe(
-      "10 - 50,5 € / 15 min"
-    );
+    expect(getPrice(pricing)).toBe("10 - 50,5 € / 15 min");
   });
 
   test("price range with no min", () => {
-    const reservationUnit = {
+    const pricing = {
       lowestPrice: 0.0,
       highestPrice: 50.5,
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
-    };
+    } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(reservationUnit as ReservationUnitByPkType)).toBe(
-      "0 - 50,5 € / 15 min"
-    );
+    expect(getPrice(pricing)).toBe("0 - 50,5 € / 15 min");
   });
 
   test("fixed price", () => {
-    const reservationUnit = {
+    const pricing = {
       lowestPrice: 50,
       highestPrice: 50,
       priceUnit: "FIXED",
       pricingType: "PAID",
-    };
+    } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(reservationUnit as ReservationUnitByPkType)).toBe("50 €");
+    expect(getPrice(pricing)).toBe("50 €");
   });
 
   test("fixed price with decimals", () => {
-    const reservationUnit = {
+    const pricing = {
       lowestPrice: 50,
       highestPrice: 50,
       priceUnit: "FIXED",
       pricingType: "PAID",
-    };
+    } as unknown as ReservationUnitPricingType;
 
-    expect(
-      getPrice(reservationUnit as ReservationUnitByPkType, undefined, true)
-    ).toBe("50,00 €");
+    expect(getPrice(pricing, undefined, true)).toBe("50,00 €");
   });
 
   test("no price", () => {
-    const reservationUnit = {
+    const pricing = {
       priceUnit: "FIXED",
-    };
+    } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(reservationUnit as ReservationUnitByPkType)).toBe(
-      "Maksuton"
-    );
+    expect(getPrice(pricing)).toBe("Maksuton");
+    expect(getPrice({} as ReservationUnitPricingType)).toBe("Maksuton");
   });
 
   test("free", () => {
-    const reservationUnit = {
+    const pricing = {
       priceUnit: "FIXED",
       pricingType: "FREE",
-    };
+    } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(reservationUnit as ReservationUnitByPkType)).toBe(
-      "Maksuton"
-    );
+    expect(getPrice(pricing)).toBe("Maksuton");
   });
 
   test("total price with minutes", () => {
-    const reservationUnit = {
+    const pricing = {
       lowestPrice: 0.0,
       highestPrice: 50.5,
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
-    };
+      status: "ACTIVE",
+    } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(reservationUnit as ReservationUnitByPkType, 180)).toBe(
-      "0 - 606 €"
-    );
+    expect(getPrice(pricing, 180)).toBe("0 - 606 €");
   });
 
   test("total price with minutes and decimals", () => {
-    const reservationUnit = {
+    const pricing = {
       lowestPrice: 0.0,
       highestPrice: 50.5,
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
-    };
+      status: "ACTIVE",
+    } as unknown as ReservationUnitPricingType;
 
-    expect(
-      getPrice(reservationUnit as ReservationUnitByPkType, 180, true)
-    ).toBe("0 - 606,00 €");
+    expect(getPrice(pricing, 180, true)).toBe("0 - 606,00 €");
   });
 });
 
@@ -700,13 +690,6 @@ describe("getReservationUnitInstructionsKey", () => {
 
 describe("getFuturePricing", () => {
   const reservationUnit: ReservationUnitByPkType = {
-    pricingType: "PAID",
-    priceUnit: "PER_HOUR",
-    lowestPrice: 0,
-    highestPrice: 10,
-    taxPercentage: {
-      value: 24,
-    },
     openingHours: {
       openingTimePeriods: [
         {
@@ -766,32 +749,25 @@ describe("getFuturePricing", () => {
 
   it("should sort items correctly", () => {
     const data = cloneDeep(reservationUnit);
-    expect(getFuturePricing(data)).toEqual(null);
-
-    data.pricings[2].taxPercentage.value = 22;
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
-    data.pricings[2].taxPercentage.value = 24;
-    data.pricings[1].lowestPrice = 5;
+    data.pricings[1].begins = toUIDate(addDays(new Date(), 3), "yyyy-MM-dd");
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+
+    data.pricings[2].begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
+    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
   });
 
   it("should return null if no future pricing", () => {
     const data = cloneDeep(reservationUnit);
 
-    expect(getFuturePricing(data)).toEqual(null);
+    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
-    data.pricings[0].highestPrice = 20;
-    expect(getFuturePricing(data)).toEqual(data.pricings[0]);
     data.pricings[0].status =
-      ReservationUnitsReservationUnitPricingStatusChoices.Active;
-    expect(getFuturePricing(data)).toEqual(null);
-
-    data.pricings[1].pricingType =
-      ReservationUnitsReservationUnitPricingPricingTypeChoices.Free;
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
-
+      ReservationUnitsReservationUnitPricingStatusChoices.Past;
     data.pricings[1].status =
+      ReservationUnitsReservationUnitPricingStatusChoices.Active;
+    data.pricings[2].status =
       ReservationUnitsReservationUnitPricingStatusChoices.Past;
     expect(getFuturePricing(data)).toEqual(null);
 
@@ -801,8 +777,7 @@ describe("getFuturePricing", () => {
   it("with reservation begin time", () => {
     const data = cloneDeep(reservationUnit);
 
-    data.pricings[1].lowestPrice = 5;
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
     data.reservationBegins = addDays(new Date(), 19).toISOString();
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
@@ -814,35 +789,33 @@ describe("getFuturePricing", () => {
   it("with reservation end time", () => {
     const data = cloneDeep(reservationUnit);
 
-    data.pricings[1].highestPrice = 5;
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
-    data.reservationEnds = addDays(new Date(), 19).toISOString();
+    data.reservationEnds = addDays(new Date(), 1).toISOString();
     expect(getFuturePricing(data)).toEqual(null);
 
-    data.reservationEnds = addDays(new Date(), 20).toISOString();
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+    data.reservationEnds = addDays(new Date(), 5).toISOString();
+    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
   });
 
   it("with both reservation times", () => {
     const data = cloneDeep(reservationUnit);
 
-    data.pricings[1].taxPercentage.value = 5;
+    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
+
+    data.reservationBegins = addDays(new Date(), 15).toISOString();
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
-    data.reservationBegins = addDays(new Date(), 1).toISOString();
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
-
-    data.reservationEnds = addDays(new Date(), 20).toISOString();
+    data.reservationEnds = addDays(new Date(), 30).toISOString();
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
   });
 
   it("with opening time periods", () => {
     const data = cloneDeep(reservationUnit);
 
-    expect(getFuturePricing(data)).toEqual(null);
+    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
-    data.pricings[1].lowestPrice = 5;
+    data.pricings[1].begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
     data.openingHours.openingTimePeriods = [];
@@ -868,13 +841,12 @@ describe("getFuturePricing", () => {
     const data = cloneDeep(reservationUnit);
     const applicationRounds = [{} as ApplicationRound];
 
-    data.pricings[1].lowestPrice = 5;
-    expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[1]);
+    expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
 
     applicationRounds[0] = {
       reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
     } as ApplicationRound;
-    expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[1]);
+    expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
 
     applicationRounds[0] = {
       reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
@@ -893,10 +865,6 @@ describe("getFuturePricing", () => {
     const data = cloneDeep(reservationUnit);
     let date = addDays(new Date(), 15);
 
-    data.pricings[0].lowestPrice = 5;
-    data.pricings[1].lowestPrice = 5;
-    data.pricings[2].lowestPrice = 5;
-
     expect(getFuturePricing(data, [], date)).toEqual(data.pricings[0]);
 
     date = addDays(new Date(), 5);
@@ -909,13 +877,6 @@ describe("getFuturePricing", () => {
 
 describe("getReservationUnitPrice", () => {
   const reservationUnit: ReservationUnitByPkType = {
-    pricingType: "PAID",
-    priceUnit: "PER_HOUR",
-    lowestPrice: 0,
-    highestPrice: 10,
-    taxPercentage: {
-      value: 24,
-    },
     openingHours: {
       openingTimePeriods: [
         {
@@ -970,16 +931,19 @@ describe("getReservationUnitPrice", () => {
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
+      {
+        pk: 4,
+        pricingType: "PAID",
+        priceUnit: "PER_HOUR",
+        lowestPrice: 0,
+        highestPrice: 10,
+        taxPercentage: {
+          value: 24,
+        },
+        status: "ACTIVE",
+      },
     ],
   } as ReservationUnitByPkType;
-
-  it("returns reservation units data if no pricing is found", () => {
-    const data = cloneDeep(reservationUnit);
-
-    expect(getReservationUnitPrice(data, new Date())).toEqual(
-      "0 - 10 € / tunti"
-    );
-  });
 
   it("returns future data based on date lookup", () => {
     const data = cloneDeep(reservationUnit);

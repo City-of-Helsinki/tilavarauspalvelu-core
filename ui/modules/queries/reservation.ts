@@ -249,13 +249,6 @@ export const GET_RESERVATION = gql`
           smallUrl
           imageType
         }
-        lowestPrice
-        highestPrice
-        priceUnit
-        pricingType
-        taxPercentage {
-          value
-        }
         pricings {
           begins
           priceUnit
