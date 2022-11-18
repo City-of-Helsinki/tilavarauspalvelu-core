@@ -53,6 +53,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
 )
 from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
 from api.graphql.reservations.reservation_mutations import (
+    ReservationAdjustTimeMutation,
     ReservationApproveMutation,
     ReservationCancellationMutation,
     ReservationConfirmMutation,
@@ -486,6 +487,7 @@ class Mutation(graphene.ObjectType):
     approve_reservation = ReservationApproveMutation.Field()
     require_handling_for_reservation = ReservationRequiresHandlingMutation.Field()
     update_reservation_working_memo = ReservationWorkingMemoMutation.Field()
+    adjust_reservation_time = ReservationAdjustTimeMutation.Field()
 
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()

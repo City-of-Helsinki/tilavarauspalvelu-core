@@ -20,7 +20,6 @@ from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.test.factories import OrderFactory
 from merchants.verkkokauppa.order.types import Order, OrderCustomer
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from permissions.models import UnitRole
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import ReservationFactory
 
@@ -89,9 +88,6 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             content="",
             subject="staff requires handling",
         )
-
-        UnitRole
-        self.general_admin
 
     def get_confirm_query(self):
         return """
