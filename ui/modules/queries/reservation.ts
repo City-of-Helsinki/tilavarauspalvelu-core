@@ -84,6 +84,12 @@ export const CONFIRM_RESERVATION = gql`
     confirmReservation(input: $input) {
       pk
       state
+      order {
+        id
+        pk
+        checkoutUrl
+        receiptUrl
+      }
       errors {
         field
         messages
@@ -175,6 +181,8 @@ export const GET_RESERVATION = gql`
         email
       }
       state
+      price
+      priceNet
       reservationUnits {
         pk
         nameFi

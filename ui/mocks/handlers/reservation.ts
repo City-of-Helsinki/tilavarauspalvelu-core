@@ -33,11 +33,20 @@ const createReservation = graphql.mutation<
   { createReservation: ReservationCreateMutationPayload },
   { input: ReservationCreateMutationInput }
 >("createReservation", (req, res, ctx) => {
+  const getPrice = (pk: number): number => {
+    switch (pk) {
+      case 903:
+        return 42.0;
+      default:
+        return 0;
+    }
+  };
+
   return res(
     ctx.data({
       createReservation: {
         pk: 42,
-        price: 42.0,
+        price: getPrice(req.variables?.input?.reservationUnitPks[0]),
         errors: null,
       },
     })
@@ -105,6 +114,13 @@ const confirmReservation = graphql.mutation<
       confirmReservation: {
         pk: input.pk,
         state: ReservationsReservationStateChoices.Confirmed,
+        order: {
+          pk: 1234,
+          id: "vmearo094r",
+          checkoutUrl: "https://www.google.com/00-11-22-33",
+          receiptUrl:
+            "https://www.google.com/receiptUrl/00-11-22-33/receipt?user=1234-abcd-9876",
+        },
       },
     })
   );
@@ -413,6 +429,10 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
         canBeCancelledTimeBefore: 10,
         needsHandling: false,
       };
+    }
+
+    if (pk === 42) {
+      data.price = 0;
     }
 
     return res(

@@ -128,13 +128,13 @@ const drawReservation = (): void => {
 };
 
 describe("Tilavaraus ui reservation unit page (single)", () => {
-  describe("with basic data", () => {
-    Cypress.config("defaultCommandTimeout", 20000);
-
+  describe("renders with basic data", () => {
     beforeEach(() => {
       cy.visit("/reservation-unit/1");
       cy.injectAxe();
     });
+
+    Cypress.config("defaultCommandTimeout", 20000);
 
     it("contains default elements", () => {
       cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
@@ -191,100 +191,12 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       );
       termsOfUse().should("contain.text", "Sopparijuttuja");
     });
+  });
 
-    it("allows making a reservation", () => {
-      calendarWrapper().should("exist");
-
-      reservationQuotaNotification().should("not.exist");
-
-      drawReservation();
-
-      reservationInfoPrice()
-        .invoke("text")
-        .then((text) => {
-          expect(text).to.contain("100 - 250\u00a0€");
-        });
-
-      cy.checkA11y(null, null, null, true);
-
-      reservationSubmitButton().click();
-
-      const form1Top = [
-        { label: "name", value: "Varaus" },
-        { label: "description", value: "Kuvaus", type: "textarea" },
-      ];
-
-      const form1Bottom = [
-        { label: "reserveeFirstName", value: "Etunimi" },
-        { label: "reserveeLastName", value: "Sukunimi" },
-      ];
-
-      const form2 = [{ label: "spaceTerms" }, { label: "resourceTerms" }];
-
-      updateButton().click();
-      form1Top.forEach((field) => {
-        cy.get(`#${field.label}-error`).should("exist");
-      });
-
-      form1Top.forEach((field) => {
-        formField(field.label, field.type).type(field.value);
-      });
-
-      form1Top.forEach((field) => {
-        cy.get(`#${field.label}-error`).should("not.exist");
-      });
-
-      cy.checkA11y(null, null, null, true);
-
-      updateButton().click();
-
-      errorNotificationTitle().should(
-        "contain.text",
-        "Varauksen päivitys epäonnistui"
-      );
-      errorNotificationBody().should("contain.text", "Valitse hakijan tyyppi");
-
-      reserveeTypeSelector(1).click();
-
-      form1Bottom.forEach((field) => {
-        formField(field.label).click();
-      });
-
-      updateButton().click();
-      form1Bottom.forEach((field) => {
-        cy.get(`#${field.label}-error`).should("exist");
-      });
-
-      form1Bottom.forEach((field) => {
-        formField(field.label).type(field.value);
-      });
-
-      form1Bottom.forEach((field) => {
-        cy.get(`#${field.label}-error`).should("not.exist");
-      });
-
-      updateButton().click();
-
-      form2.forEach((field) => {
-        const input = formField(field.label);
-        input.should("exist");
-        input.click();
-      });
-
-      form2.forEach((field) => {
-        cy.get(`#${field.label}-error`).should("not.exist");
-      });
-
-      updateButton().click();
-
-      cy.contains("h4", "Tietoa varauksestasi").should("be.visible");
-      cy.contains("p", "Confirmed Instructions FI").should("be.visible");
-
-      cy.contains("button", "Palaa Varaamon etusivulle");
-
-      calendarUrlButton().should("exist");
-
-      cy.checkA11y(null, null, null, true);
+  describe("reservation", () => {
+    beforeEach(() => {
+      cy.visit("/reservation-unit/2");
+      cy.injectAxe();
     });
 
     it("can cancel reservation process", () => {
@@ -758,7 +670,10 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
       cy.get('button[type="submit"]').click();
 
-      cy.get("main#main").should("contain.text", "Varaus tehty");
+      cy.url().should(
+        "contain",
+        "https://www.google.com/00-11-22-33/paymentmethod?user=1234-abcd-9876&lang=fi"
+      );
     });
   });
 

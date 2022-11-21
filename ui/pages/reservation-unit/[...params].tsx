@@ -66,7 +66,7 @@ import { Subheading } from "../../components/reservation/styles";
 import ReservationConfirmation from "../../components/reservation/ReservationConfirmation";
 import Step0 from "../../components/reservation/Step0";
 import Step1 from "../../components/reservation/Step1";
-import { Inputs, Reservation } from "../../modules/types";
+import { Inputs, Reservation, ReservationStep } from "../../modules/types";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -331,21 +331,57 @@ const ReservationUnitReservation = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateData, updateLoading, updateError]);
 
+  const steps: ReservationStep[] = useMemo(() => {
+    const price = getReservationUnitPrice(
+      reservationUnit as unknown as ReservationUnitByPkType,
+      new Date(reservation?.begin),
+      null,
+      false,
+      true
+    );
+
+    const stepLength = price === "0" ? 2 : 5;
+
+    return Array.from(Array(stepLength)).map((n, i) => {
+      const state = i === step ? 0 : i < step ? 1 : 2;
+
+      return {
+        label: `${i + 1}. ${t(`reservations:steps.${i + 1}`)}`,
+        state,
+      };
+    });
+  }, [step, reservationUnit, reservation, t]);
+
   useEffect(() => {
     if (!confirmLoading) {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
 
       if (confirmError) {
-        const msg = printErrorMessages(updateError);
+        const msg = printErrorMessages(confirmError);
         setErrorMsg(msg);
       } else if (confirmData) {
-        setReservation({
-          ...reservation,
-          state: "CONFIRMED",
-        });
-        setFormStatus("sent");
-        setStep(2);
-        setPendingReservation(null);
+        if (steps?.length > 2) {
+          const { checkoutUrl, receiptUrl } =
+            confirmData.confirmReservation?.order;
+          const userId = new URL(receiptUrl)?.searchParams?.get("user");
+
+          if (checkoutUrl && receiptUrl && userId) {
+            router.push(
+              `${confirmData.confirmReservation?.order?.checkoutUrl}/paymentmethod?user=${userId}&lang=${i18n.language}`
+            );
+          } else {
+            const msg = printErrorMessages(confirmError);
+            setErrorMsg(msg);
+          }
+        } else {
+          setReservation({
+            ...reservation,
+            state: "CONFIRMED",
+          });
+          setFormStatus("sent");
+          setStep(2);
+          setPendingReservation(null);
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -380,27 +416,6 @@ const ReservationUnitReservation = ({
     }
     return t("reservationCalendar:heading.pendingReservation");
   }, [step, formStatus, t]);
-
-  const steps = useMemo(() => {
-    const price = getReservationUnitPrice(
-      reservationUnit as unknown as ReservationUnitByPkType,
-      new Date(reservation?.begin),
-      null,
-      false,
-      true
-    );
-
-    const stepLength = price === "0" ? 2 : 5;
-
-    return Array.from(Array(stepLength)).map((n, i) => {
-      const state = i === step ? 0 : i < step ? 1 : 2;
-
-      return {
-        label: `${i + 1}. ${t(`reservations:steps.${i + 1}`)}`,
-        state,
-      };
-    });
-  }, [step, reservationUnit, reservation, t]);
 
   const generalFields = useMemo(() => {
     return getReservationApplicationFields(

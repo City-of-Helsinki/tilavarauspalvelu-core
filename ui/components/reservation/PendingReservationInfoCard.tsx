@@ -87,7 +87,7 @@ const PendingReservationInfoCard = ({
 
   const price =
     reservation.state === "REQUIRES_HANDLING"
-      ? getReservationUnitPrice(reservationUnit)
+      ? getReservationUnitPrice(reservationUnit, begin)
       : getReservationPrice(reservation.price, t("prices:priceFree"));
 
   return (

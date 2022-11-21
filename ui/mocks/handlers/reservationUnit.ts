@@ -163,6 +163,12 @@ const selectedReservationUnitQuery = graphql.query<
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
+      {
+        begins: toUIDate(addDays(new Date(), 5), "yyyy-MM-dd"),
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      },
     ],
     descriptionFi:
       "<p>Sali sijaitsee nuorisotalon toisessa kerroksessa. Tilaan mahtuu 60 henkil&ouml;&auml;..</p> Fi",
@@ -395,6 +401,20 @@ const selectedReservationUnitQuery = graphql.query<
       ],
     },
   } as ReservationUnitByPkType;
+
+  if (req.variables.pk === 2) {
+    const pricings = reservationUnitByPk.pricings.map((pricing) => {
+      return pricing.status ===
+        ReservationUnitsReservationUnitPricingStatusChoices.Active
+        ? {
+            ...pricing,
+            pricingType:
+              ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+          }
+        : pricing;
+    });
+    reservationUnitByPk.pricings = pricings;
+  }
 
   if (req.variables.pk === 800) {
     reservationUnitByPk.equipment = [];
