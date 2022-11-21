@@ -577,7 +577,6 @@ class Reservation(models.Model):
                 "begin": self.begin,
                 "end": self.end,
                 "duration_minutes": (self.end - self.begin).total_seconds() / 60,
-                "staff_event": self.staff_event,
                 "reservation_type": self.type,
                 "state": self.state,
                 "cancel_reason": self.cancel_reason,
@@ -774,13 +773,6 @@ class ReservationStatistic(models.Model):
 
     duration_minutes = models.IntegerField(
         null=False, verbose_name=_("Reservation duration in minutes")
-    )
-
-    staff_event = models.BooleanField(
-        verbose_name=_("Reservation is internal"),
-        null=True,
-        default=False,
-        help_text="Indicates if reservation is internal or created by staff",
     )
 
     reservation_type = models.CharField(
