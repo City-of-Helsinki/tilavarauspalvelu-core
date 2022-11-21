@@ -2484,3 +2484,48 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(self.content_is_empty(content)).is_false()
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_include_reservations_with_same_components(self):
+        now = datetime.datetime.now(get_default_timezone())
+        one_hour = datetime.timedelta(hours=1)
+        ReservationFactory(
+            begin=now,
+            end=now + one_hour,
+            state=STATE_CHOICES.CREATED,
+            reservation_unit=[self.reservation_unit],
+        )
+
+        res_unit = ReservationUnitFactory(
+            name_fi="conflicting reservation unit with same space",
+            spaces=[self.small_space],
+        )
+
+        ReservationFactory(
+            begin=datetime.datetime(2021, 1, 1),
+            end=datetime.datetime(2021, 1, 2),
+            reservation_unit=[res_unit],
+        )
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            reservations(from: "2021-05-03", to: "2021-05-04", includeWithSameComponents: true) {
+                                begin
+                                end
+                                state
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)

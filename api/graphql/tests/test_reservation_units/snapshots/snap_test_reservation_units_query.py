@@ -1068,6 +1068,39 @@ snapshots['ReservationUnitQueryTestCase::test_hide_payment_product_without_permi
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_include_reservations_with_same_components 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservations': [
+                            {
+                                'begin': '2021-05-03T00:00:00+00:00',
+                                'end': '2021-05-03T01:00:00+00:00',
+                                'state': 'CREATED'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'conflicting reservation unit with same space',
+                        'reservations': [
+                            {
+                                'begin': '2021-05-03T00:00:00+00:00',
+                                'end': '2021-05-03T01:00:00+00:00',
+                                'state': 'CREATED'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_order_by_max_persons 1'] = {
     'data': {
         'reservationUnits': {
