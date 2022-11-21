@@ -55,7 +55,9 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
         large_space = SpaceFactory(
             max_persons=100, name="Large space", surface_area=100
         )
-        small_space = SpaceFactory(max_persons=10, name="Small space", surface_area=50)
+        cls.small_space = SpaceFactory(
+            max_persons=10, name="Small space", surface_area=50
+        )
         rule = ReservationUnitCancellationRuleFactory(
             name_fi="fi", name_en="en", name_sv="sv"
         )
@@ -77,7 +79,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             unit=cls.unit,
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
-            spaces=[large_space, small_space],
+            spaces=[large_space, cls.small_space],
             services=[service],
             cancellation_rule=rule,
             reservation_confirmed_instructions_fi="Hyväksytyn varauksen lisäohjeita",

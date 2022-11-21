@@ -61,6 +61,7 @@ from reservation_units.models import TaxPercentage
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
+from reservations.models import Reservation
 
 
 def get_payment_type_codes() -> List[str]:
@@ -324,7 +325,42 @@ class ReservationUnitPricingType(AuthNode, PrimaryKeyObjectType):
         ]
 
 
-class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
+class ReservationUnitWithReservationsMixin:
+    reservations = graphene.List(
+        ReservationType,
+        from_=graphene.Date(name="from"),
+        to=graphene.Date(),
+        state=graphene.List(graphene.String),
+        include_with_same_components=graphene.Boolean(),
+    )
+
+    def resolve_reservations(
+        self,
+        info: ResolveInfo,
+        from_: Optional[datetime.date] = None,
+        to: Optional[datetime.date] = None,
+        state: Optional[List[str]] = None,
+        include_with_same_components: Optional[bool] = None,
+    ) -> QuerySet:
+        if include_with_same_components:
+            reservations = Reservation.objects.with_same_components(self, from_, to)
+        else:
+            reservations = self.reservation_set.all()
+
+            if from_ is not None:
+                reservations = reservations.filter(begin__gte=from_)
+            if to is not None:
+                reservations = reservations.filter(end__lte=to)
+
+        if state is not None:
+            reservations = reservations.filter(state__in=state)
+
+        return reservations
+
+
+class ReservationUnitType(
+    AuthNode, PrimaryKeyObjectType, ReservationUnitWithReservationsMixin
+):
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
     services = graphene.List(ServiceType)
@@ -340,12 +376,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     max_reservation_duration = Duration()
     min_reservation_duration = Duration()
     keyword_groups = graphene.List(KeywordGroupType)
-    reservations = graphene.List(
-        ReservationType,
-        from_=graphene.Date(name="from"),
-        to=graphene.Date(),
-        state=graphene.List(graphene.String),
-    )
     application_rounds = graphene.List(
         "api.graphql.application_rounds.application_round_types.ApplicationRoundType",
         active=graphene.Boolean(),
@@ -492,22 +522,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_payment_types(self, info):
         return self.payment_types.all()
 
-    def resolve_reservations(
-        self,
-        info: ResolveInfo,
-        from_: Optional[datetime.date] = None,
-        to: Optional[datetime.date] = None,
-        state: Optional[List[str]] = None,
-    ) -> QuerySet:
-        reservations = self.reservation_set.all()
-        if from_ is not None:
-            reservations = reservations.filter(begin__gte=from_)
-        if to is not None:
-            reservations = reservations.filter(end__lte=to)
-        if state is not None:
-            reservations = reservations.filter(state__in=state)
-        return reservations
-
     def resolve_application_rounds(
         self, info: ResolveInfo, active: Optional[bool] = None
     ) -> QuerySet:
@@ -539,13 +553,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         return None
 
 
-class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
-    reservations = graphene.List(
-        ReservationType,
-        from_=graphene.Date(name="from"),
-        to=graphene.Date(),
-        state=graphene.List(graphene.String),
-    )
+class ReservationUnitByPkType(
+    ReservationUnitType, OpeningHoursMixin, ReservationUnitWithReservationsMixin
+):
     next_available_slot = graphene.DateTime()
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
 
@@ -617,19 +627,3 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
 
     def resolve_hauki_url(self, info):
         return self
-
-    def resolve_reservations(
-        self,
-        info: ResolveInfo,
-        from_: Optional[datetime.date] = None,
-        to: Optional[datetime.date] = None,
-        state: Optional[List[str]] = None,
-    ) -> QuerySet:
-        reservations = self.reservation_set.all()
-        if from_ is not None:
-            reservations = reservations.filter(begin__gte=from_)
-        if to is not None:
-            reservations = reservations.filter(end__lte=to)
-        if state is not None:
-            reservations = reservations.filter(state__in=state)
-        return reservations
