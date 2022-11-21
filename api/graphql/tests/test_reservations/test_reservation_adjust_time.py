@@ -244,7 +244,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
     def test_reservation_is_already_handled_fails(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation.handled_at = datetime.datetime.now()
+        self.reservation.handled_at = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         self.reservation.save()
 
         self.client.force_login(self.regular_joe)
