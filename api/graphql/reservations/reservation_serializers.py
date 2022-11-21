@@ -1105,7 +1105,7 @@ class ReservationWorkingMemoSerializer(PrimaryKeySerializer):
         self.fields["pk"].help_text = "Primary key of the reservation"
 
 
-class ReservationUnitAdjustTimeSerializer(
+class ReservationAdjustTimeSerializer(
     PrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin
 ):
     class Meta:
