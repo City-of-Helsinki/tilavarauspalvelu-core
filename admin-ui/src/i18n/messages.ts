@@ -1565,7 +1565,18 @@ const translations: ITranslations = {
       applicant: ["Tilan käyttäjä"],
       name: ["Varauksen nimi"],
       price: ["Hinta"],
+      paymentStatus: ["Maksutila"],
       state: ["Varauksen tila"],
+    },
+  },
+  Payment: {
+    status: {
+      DRAFT: ["Odottaa"],
+      EXPIRED: ["Rauennut"],
+      CANCELLED: ["Peruutettu"],
+      PAID: ["Maksettu"],
+      PAID_MANUALLY: ["Paikan päällä"],
+      REFUNDED: ["Hyvitetty"],
     },
   },
   Calendar: {
@@ -1595,6 +1606,7 @@ const translations: ITranslations = {
       reservationUnit: ["Varausyksikkö"],
       unit: ["Toimipiste"],
       datetime: ["Aika"],
+      paymentStatus: ["Maksutila"],
       state: ["Käsittelytila"],
     },
   },
@@ -1606,6 +1618,7 @@ const translations: ITranslations = {
     maxPrice: ["Hinta enintään"],
     begin: ["Alkaen"],
     end: ["Asti"],
+    paymentStatus: ["Maksutila"],
     filters: {
       minPriceTag: ["Hinta vähintään: {{value}}"],
       maxPriceTag: ["Hinta enintään: {{value}}"],

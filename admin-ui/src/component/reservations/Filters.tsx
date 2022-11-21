@@ -17,12 +17,14 @@ import Tags, { Action, getReducer, toTags } from "../lists/Tags";
 import UnitFilter from "../filters/UnitFilter";
 import ReservationUnitFilter from "../filters/ReservationUnitFilter";
 import ReservationStateFilter from "../filters/ReservationStateFilter";
+import PaymentStatusFilter from "./PaymentStatusFilter";
 
 export type FilterArguments = {
   reservationUnitType: OptionType[];
   unit: OptionType[];
   reservationUnit: OptionType[];
   reservationState: OptionType[];
+  paymentStatuses: OptionType[];
   textSearch: string;
   begin: string;
   end: string;
@@ -36,6 +38,7 @@ const multivaluedFields = [
   "reservationUnitType",
   "reservationUnitStates",
   "reservationState",
+  "paymentStatuses",
 ];
 
 type Props = {
@@ -65,6 +68,7 @@ export const emptyState: FilterArguments = {
   reservationUnitType: [],
   unit: [],
   reservationUnit: [],
+  paymentStatuses: [],
   reservationState: [],
   textSearch: "",
   begin: "",
@@ -157,6 +161,14 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
               id="textSearch"
               dispatch={dispatch}
               value={state.textSearch || ""}
+            />
+          </Span3>
+          <Span3>
+            <PaymentStatusFilter
+              onChange={(paymentStatuses) =>
+                dispatch({ type: "set", value: { paymentStatuses } })
+              }
+              value={state.paymentStatuses || []}
             />
           </Span3>
         </Grid>

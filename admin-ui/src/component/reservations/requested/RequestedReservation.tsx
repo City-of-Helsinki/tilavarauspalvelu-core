@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { get, trim } from "lodash";
-import { Accordion, Button, TextArea } from "hds-react";
+import { Accordion, Button, Tag, TextArea } from "hds-react";
 import React, { useRef, useState } from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
@@ -345,10 +345,23 @@ const RequestedReservation = (): JSX.Element | null => {
         <div>
           <NameState ref={ref}>
             <H1>{getName(reservation, t)}</H1>
-            <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
-              <Dot />
-              {t(`RequestedReservation.state.${reservation.state}`)}
-            </AlignVertically>
+
+            <HorisontalFlex>
+              <AlignVertically>
+                {reservation.orderStatus && (
+                  <Tag
+                    theme={{ "--tag-background": "var(--color-engel-light)" }}
+                    id="orderStatus"
+                  >
+                    {t(`Payment.status.${reservation.orderStatus}`)}
+                  </Tag>
+                )}
+              </AlignVertically>
+              <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
+                <Dot />
+                {t(`RequestedReservation.state.${reservation.state}`)}
+              </AlignVertically>
+            </HorisontalFlex>
           </NameState>
           <Tagline>{reservationTagline}</Tagline>
           <DateTime>
@@ -576,7 +589,11 @@ const RequestedReservation = (): JSX.Element | null => {
                 />
                 <ApplicationData
                   label={t("RequestedReservation.paymentState")}
-                  data="-"
+                  data={
+                    reservation.orderStatus === null
+                      ? "-"
+                      : t(`Payment.status.${reservation.orderStatus}`)
+                  }
                 />
                 <ApplicationData
                   label={t("RequestedReservation.applyingForFreeOfCharge")}

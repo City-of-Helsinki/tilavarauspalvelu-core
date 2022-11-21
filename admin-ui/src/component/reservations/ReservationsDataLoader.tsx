@@ -61,7 +61,10 @@ const mapFilterParams = (
     end: parseDate(params.end),
     priceGte: params.minPrice !== "" ? Number(params.minPrice) : undefined,
     priceLte: params.maxPrice !== "" ? Number(params.maxPrice) : undefined,
-  };
+    paymentStatus: params.paymentStatuses?.map(
+      (status) => status.value as string
+    ),
+  } as QueryReservationsArgs;
 };
 
 const updateQuery = (

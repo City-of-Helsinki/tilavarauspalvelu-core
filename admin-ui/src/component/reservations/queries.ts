@@ -73,6 +73,7 @@ export const RESERVATIONS_QUERY = gql`
     $begin: DateTime
     $end: DateTime
     $reservationUnit: [ID]
+    $paymentStatus: [String]
   ) {
     reservations(
       first: $first
@@ -83,6 +84,7 @@ export const RESERVATIONS_QUERY = gql`
       reservationUnit: $reservationUnit
       reservationUnitType: $reservationUnitType
       state: $state
+      paymentStatus: $paymentStatus
       textSearch: $textSearch
       priceLte: $priceLte
       priceGte: $priceGte
@@ -108,6 +110,7 @@ export const RESERVATIONS_QUERY = gql`
           reserveeEmail
           name
           price
+          orderStatus
         }
       }
       pageInfo {

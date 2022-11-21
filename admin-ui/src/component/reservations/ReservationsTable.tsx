@@ -61,6 +61,14 @@ const getColConfig = (t: TFunction) => [
       reservationDateTime(begin, end, t),
   },
   {
+    headerName: t("Reservations.headings.paymentStatus"),
+    key: "paymentStatus",
+    isSortable: false,
+    transform: ({ orderStatus }: ReservationType) =>
+      orderStatus === null ? "-" : t(`Payment.status.${orderStatus}`),
+  },
+
+  {
     headerName: t("Reservations.headings.state"),
     key: "state",
     isSortable: true,

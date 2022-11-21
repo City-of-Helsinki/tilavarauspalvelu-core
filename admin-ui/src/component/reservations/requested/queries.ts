@@ -47,6 +47,7 @@ export const RESERVATION_QUERY = gql`
           status
         }
       }
+      orderStatus
       ageGroup {
         minimum
         maximum
