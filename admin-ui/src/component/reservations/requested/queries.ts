@@ -58,6 +58,7 @@ export const RESERVATION_QUERY = gql`
         nameFi
       }
       price
+      taxPercentageValue
       numPersons
       reserveeType
       reserveeIsUnregisteredAssociation

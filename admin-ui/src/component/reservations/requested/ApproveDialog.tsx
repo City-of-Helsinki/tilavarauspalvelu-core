@@ -96,7 +96,7 @@ const DialogContent = ({
               <div style={{ width: "14em" }}>
                 <NumberInput
                   type="number"
-                  value={Number(price)}
+                  value={price ? Number(price) : ""}
                   required
                   min={0}
                   minusStepButtonAriaLabel={t("common:subtract")}
@@ -136,6 +136,12 @@ const DialogContent = ({
               const res = await approveReservation({
                 pk: reservation.pk,
                 price: parseNumber(price),
+                priceNet: Number(
+                  (
+                    Number(price) /
+                    ((1 + reservation.taxPercentageValue) / 100)
+                  ).toFixed(2)
+                ),
                 handlingDetails,
               });
 

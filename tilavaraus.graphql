@@ -1164,6 +1164,7 @@ type Mutation {
   approveReservation(input: ReservationApproveMutationInput!): ReservationApproveMutationPayload
   requireHandlingForReservation(input: ReservationRequiresHandlingMutationInput!): ReservationRequiresHandlingMutationPayload
   updateReservationWorkingMemo(input: ReservationWorkingMemoMutationInput!): ReservationWorkingMemoMutationPayload
+  adjustReservationTime(input: ReservationAdjustTimeMutationInput!): ReservationAdjustTimeMutationPayload
   createReservationUnit(input: ReservationUnitCreateMutationInput!): ReservationUnitCreateMutationPayload
   updateReservationUnit(input: ReservationUnitUpdateMutationInput!): ReservationUnitUpdateMutationPayload
   createReservationUnitImage(input: ReservationUnitImageCreateMutationInput!): ReservationUnitImageCreateMutationPayload
@@ -1278,6 +1279,20 @@ type PaymentMerchantType implements Node {
   """The ID of the object"""
   id: ID!
   pk: String
+}
+
+type PaymentOrderType implements Node {
+  paymentType: String
+  status: String
+  processedAt: DateTime
+  checkoutUrl: String
+  receiptUrl: String
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+  orderUuid: String
+  reservationPk: String
 }
 
 type PaymentProductType implements Node {
@@ -1489,6 +1504,11 @@ type Query {
     reservationUnitType: [ID] = null
     textSearch: String = null
 
+    """
+    PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
+    """
+    paymentStatus: [String] = null
+
     """Järjestys"""
     orderBy: String = null
   ): ReservationTypeConnection
@@ -1629,6 +1649,7 @@ type Query {
   ageGroups(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): AgeGroupTypeConnection
   cities(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): CityTypeConnection
   metadataSets(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ReservationMetadataSetTypeConnection
+  order(orderUuid: String = null): PaymentOrderType
 }
 
 type RealEstateType implements Node {
@@ -1652,14 +1673,36 @@ type RecurringReservationType {
   applicationEventPk: Int
 }
 
+input ReservationAdjustTimeMutationInput {
+  pk: Int!
+  begin: DateTime!
+  end: DateTime!
+  state: state
+  clientMutationId: String
+}
+
+type ReservationAdjustTimeMutationPayload {
+  pk: Int
+  begin: DateTime
+  end: DateTime
+  state: state
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
 input ReservationApproveMutationInput {
   pk: Int
 
   """Additional information for approval."""
-  handlingDetails: String
+  handlingDetails: String!
 
   """The price of this particular reservation including VAT"""
   price: Float!
+
+  """The price of this particular reservation excluding VAT"""
+  priceNet: Float!
   clientMutationId: String
 }
 
@@ -1675,6 +1718,9 @@ type ReservationApproveMutationPayload {
 
   """The price of this particular reservation including VAT"""
   price: Float
+
+  """The price of this particular reservation excluding VAT"""
+  priceNet: Float
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1822,6 +1868,7 @@ type ReservationConfirmMutationPayload {
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
+  order: PaymentOrderType
   clientMutationId: String
 }
 
@@ -2179,6 +2226,8 @@ type ReservationType implements Node {
   id: ID!
   pk: Int
   reservationUnits: [ReservationUnitType]
+  orderUuid: String
+  orderStatus: String
   calendarUrl: String
 }
 
@@ -2470,24 +2519,24 @@ input ReservationUnitCreateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2610,24 +2659,24 @@ type ReservationUnitCreateMutationPayload {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3233,24 +3282,24 @@ input ReservationUnitUpdateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3372,24 +3421,24 @@ type ReservationUnitUpdateMutationPayload {
   """
   pricingType: String
   paymentTypes: [String]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4140,15 +4189,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -4158,15 +4207,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

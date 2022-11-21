@@ -1093,6 +1093,7 @@ export type LocationType = Node & {
 
 export type Mutation = {
   __typename?: "Mutation";
+  adjustReservationTime?: Maybe<ReservationAdjustTimeMutationPayload>;
   approveReservation?: Maybe<ReservationApproveMutationPayload>;
   cancelReservation?: Maybe<ReservationCancellationMutationPayload>;
   confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
@@ -1133,6 +1134,10 @@ export type Mutation = {
   updateSpace?: Maybe<SpaceUpdateMutationPayload>;
   updateUnit?: Maybe<UnitUpdateMutationPayload>;
   updateUser?: Maybe<UserUpdateMutationPayload>;
+};
+
+export type MutationAdjustReservationTimeArgs = {
+  input: ReservationAdjustTimeMutationInput;
 };
 
 export type MutationApproveReservationArgs = {
@@ -1365,6 +1370,20 @@ export type PaymentMerchantType = Node & {
   pk?: Maybe<Scalars["String"]>;
 };
 
+export type PaymentOrderType = Node & {
+  __typename?: "PaymentOrderType";
+  checkoutUrl?: Maybe<Scalars["String"]>;
+  /** The ID of the object */
+  id: Scalars["ID"];
+  orderUuid?: Maybe<Scalars["String"]>;
+  paymentType?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  processedAt?: Maybe<Scalars["DateTime"]>;
+  receiptUrl?: Maybe<Scalars["String"]>;
+  reservationPk?: Maybe<Scalars["String"]>;
+  status?: Maybe<Scalars["String"]>;
+};
+
 export type PaymentProductType = Node & {
   __typename?: "PaymentProductType";
   /** The ID of the object */
@@ -1523,6 +1542,7 @@ export type Query = {
   keywordGroups?: Maybe<KeywordGroupTypeConnection>;
   keywords?: Maybe<KeywordTypeConnection>;
   metadataSets?: Maybe<ReservationMetadataSetTypeConnection>;
+  order?: Maybe<PaymentOrderType>;
   purposes?: Maybe<PurposeTypeConnection>;
   qualifiers?: Maybe<QualifierTypeConnection>;
   reservationByPk?: Maybe<ReservationType>;
@@ -1702,6 +1722,10 @@ export type QueryMetadataSetsArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
 };
 
+export type QueryOrderArgs = {
+  orderUuid?: InputMaybe<Scalars["String"]>;
+};
+
 export type QueryPurposesArgs = {
   after?: InputMaybe<Scalars["String"]>;
   before?: InputMaybe<Scalars["String"]>;
@@ -1826,6 +1850,7 @@ export type QueryReservationsArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
+  paymentStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   priceGte?: InputMaybe<Scalars["Float"]>;
   priceLte?: InputMaybe<Scalars["Float"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
@@ -1967,13 +1992,34 @@ export type RecurringReservationType = {
   user?: Maybe<Scalars["String"]>;
 };
 
+export type ReservationAdjustTimeMutationInput = {
+  begin: Scalars["DateTime"];
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  end: Scalars["DateTime"];
+  pk: Scalars["Int"];
+  state?: InputMaybe<State>;
+};
+
+export type ReservationAdjustTimeMutationPayload = {
+  __typename?: "ReservationAdjustTimeMutationPayload";
+  begin?: Maybe<Scalars["DateTime"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  end?: Maybe<Scalars["DateTime"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]>;
+  state?: Maybe<State>;
+};
+
 export type ReservationApproveMutationInput = {
   clientMutationId?: InputMaybe<Scalars["String"]>;
   /** Additional information for approval. */
-  handlingDetails?: InputMaybe<Scalars["String"]>;
+  handlingDetails: Scalars["String"];
   pk?: InputMaybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
   price: Scalars["Float"];
+  /** The price of this particular reservation excluding VAT */
+  priceNet: Scalars["Float"];
 };
 
 export type ReservationApproveMutationPayload = {
@@ -1988,6 +2034,8 @@ export type ReservationApproveMutationPayload = {
   pk?: Maybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
   price?: Maybe<Scalars["Float"]>;
+  /** The price of this particular reservation excluding VAT */
+  priceNet?: Maybe<Scalars["Float"]>;
   state?: Maybe<State>;
 };
 
@@ -2076,6 +2124,7 @@ export type ReservationConfirmMutationPayload = {
   /** The non subsidised price of this reservation excluding VAT */
   nonSubsidisedPriceNet?: Maybe<Scalars["Float"]>;
   numPersons?: Maybe<Scalars["Int"]>;
+  order?: Maybe<PaymentOrderType>;
   /** Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE. */
   paymentType?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
@@ -2362,6 +2411,8 @@ export type ReservationType = Node & {
   id: Scalars["ID"];
   name?: Maybe<Scalars["String"]>;
   numPersons?: Maybe<Scalars["Int"]>;
+  orderStatus?: Maybe<Scalars["String"]>;
+  orderUuid?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   price?: Maybe<Scalars["Float"]>;
   /** The price of this particular reservation excluding VAT */
