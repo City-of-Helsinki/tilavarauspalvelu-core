@@ -91,6 +91,10 @@ GENERAL_PERMISSIONS = (
         "can_comment_reservations",
         _("Can comment reservations in the whole system"),
     ),
+    (
+        "can_create_staff_reservations",
+        _("Can create staff reservations in the whole system"),
+    ),
 )
 
 
@@ -125,6 +129,10 @@ UNIT_PERMISSIONS = (
     (
         "can_manage_resources",
         _("Can create, edit and delete resources in the given unit"),
+    ),
+    (
+        "can_create_staff_reservations",
+        _("Can create staff reservations in the given unit"),
     ),
 )
 
@@ -163,6 +171,10 @@ SERVICE_SECTOR_PERMISSIONS = (
     (
         "can_manage_resources",
         _("Can create, edit and delete resources in the given service sector"),
+    ),
+    (
+        "can_create_staff_reservations",
+        _("Can create staff reservations in the given service sector"),
     ),
 )
 
