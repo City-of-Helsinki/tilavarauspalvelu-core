@@ -28,6 +28,7 @@ RESERVEE_LANGUAGE_CHOICES = settings.LANGUAGES + (("", ""),)
 class ReservationType(models.TextChoices):
     NORMAL = "normal"
     BLOCKED = "blocked"
+    STAFF = "staff"
 
 
 class AgeGroup(models.Model):
@@ -470,13 +471,6 @@ class Reservation(models.Model):
         blank=True,
         default="",
         help_text="Working memo for staff users.",
-    )
-
-    staff_event = models.BooleanField(
-        verbose_name=_("Reservation is internal"),
-        null=True,
-        default=False,
-        help_text="Indicates if reservation is internal or created by staff",
     )
 
     type = models.CharField(
