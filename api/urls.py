@@ -3,6 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_file_upload.django import FileUploadGraphQLView
 from rest_framework import routers
 
+from api.webhook_api.views import WebhookPaymentViewSet
+
 from .allocation_api import AllocationRequestViewSet
 from .allocation_results_api import AllocationResultViewSet
 from .application_round_api import ApplicationRoundViewSet
@@ -122,8 +124,7 @@ router.register(
     "equipment",
 )
 router.register(r"parameters/city", CityViewSet, "city")
-
-
+router.register(r"webhook/payment", WebhookPaymentViewSet, "payment")
 urlpatterns = [
     path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
     path(
