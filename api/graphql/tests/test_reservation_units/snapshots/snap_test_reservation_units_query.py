@@ -1068,6 +1068,39 @@ snapshots['ReservationUnitQueryTestCase::test_hide_payment_product_without_permi
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_include_reservations_with_same_components 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservations': [
+                            {
+                                'begin': '2021-05-03T00:00:00+00:00',
+                                'end': '2021-05-03T01:00:00+00:00',
+                                'state': 'CREATED'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'conflicting reservation unit with same space',
+                        'reservations': [
+                            {
+                                'begin': '2021-05-03T00:00:00+00:00',
+                                'end': '2021-05-03T01:00:00+00:00',
+                                'state': 'CREATED'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_order_by_max_persons 1'] = {
     'data': {
         'reservationUnits': {
@@ -1839,315 +1872,6 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_reservatio
                     'node': {
                         'nameFi': 'This should be scheduled reservation',
                         'state': 'SCHEDULED_RESERVATION'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_archived_returns_nothing 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_draft 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'I am a draft!',
-                        'state': 'DRAFT'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_mixed 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'I am a draft!',
-                        'state': 'DRAFT'
-                    }
-                },
-                {
-                    'node': {
-                        'nameFi': 'I am scheduled for publishing!',
-                        'state': 'SCHEDULED_PUBLISHING'
-                    }
-                },
-                {
-                    'node': {
-                        'nameFi': 'I am also scheduled for publishing!',
-                        'state': 'SCHEDULED_PUBLISHING'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_published 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': "Yey! I'm published!",
-                        'state': 'PUBLISHED'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_publishing 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'I am scheduled for publishing!',
-                        'state': 'SCHEDULED_PUBLISHING'
-                    }
-                },
-                {
-                    'node': {
-                        'nameFi': 'I am also scheduled for publishing!',
-                        'state': 'SCHEDULED_PUBLISHING'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_reservation 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'state': 'SCHEDULED_RESERVATION'
-                    }
-                },
-                {
-                    'node': {
-                        'nameFi': 'I am scheduled for reservation!',
-                        'state': 'SCHEDULED_RESERVATION'
-                    }
-                },
-                {
-                    'node': {
-                        'nameFi': 'I am also scheduled for reservation!',
-                        'state': 'SCHEDULED_RESERVATION'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_description_en 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'descriptionEn': 'Lorem ipsum en',
-                        'nameFi': 'test name fi'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_description_fi 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'descriptionFi': 'Lorem ipsum fi',
-                        'nameFi': 'test name fi'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_description_sv 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'descriptionSv': 'Lorem ipsum sv',
-                        'nameFi': 'test name fi'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_name_en 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameEn': 'test name en'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_name_fi 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_name_sv 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameSv': 'test name sv'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_space_name_en 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'spaces': [
-                            {
-                                'nameEn': 'space name en'
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_space_name_fi 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'spaces': [
-                            {
-                                'nameFi': 'space name fi'
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_space_name_sv 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'spaces': [
-                            {
-                                'nameSv': 'space name sv'
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_en 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'reservationUnitType': {
-                            'nameEn': 'test type en'
-                        }
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_fi 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'reservationUnitType': {
-                            'nameFi': 'test type fi'
-                        }
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_sv 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'reservationUnitType': {
-                            'nameSv': 'test type sv'
-                        }
                     }
                 }
             ]

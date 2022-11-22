@@ -186,6 +186,15 @@ class ReservationQuerySet(models.QuerySet):
             - timedelta(minutes=older_than_minutes),
         )
 
+    def with_same_components(self, reservation_unit, begin, end):
+        if begin and end:
+            return self.filter(
+                reservation_unit__in=reservation_unit.reservation_units_with_same_components,
+                end__lte=end,
+                begin__gte=begin,
+            ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+        return self.none()
+
 
 class Reservation(models.Model):
     objects = ReservationQuerySet.as_manager()
