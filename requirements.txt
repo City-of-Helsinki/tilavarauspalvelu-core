@@ -126,7 +126,7 @@ drf-oidc-auth==0.10.0
     # via
     #   -r requirements.in
     #   helsinki-profile-gdpr-api
-drf-spectacular==0.13.0
+drf-spectacular==0.24.2
     # via -r requirements.in
 easy-thumbnails==2.7.1
     # via -r requirements.in

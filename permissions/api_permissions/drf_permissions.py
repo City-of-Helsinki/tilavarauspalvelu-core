@@ -469,3 +469,14 @@ class UserPermission(permissions.BasePermission):
         return (
             request.user.is_authenticated and request.method in permissions.SAFE_METHODS
         )
+
+
+class WebhookPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, reservation_unit):
+        return True
+
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            return True
+
+        return False

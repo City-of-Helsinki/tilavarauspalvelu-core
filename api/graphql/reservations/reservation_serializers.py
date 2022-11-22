@@ -15,11 +15,6 @@ from api.graphql.choice_char_field import ChoiceCharField
 from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
-from email_notification.models import EmailType
-from email_notification.tasks import (
-    send_reservation_email_task,
-    send_staff_reservation_email_task,
-)
 from merchants.models import Language, PaymentOrder, PaymentStatus
 from merchants.verkkokauppa.helpers import create_verkkokauppa_order
 from permissions.helpers import can_handle_reservation_with_units
@@ -36,6 +31,14 @@ from reservation_units.utils.reservation_unit_pricing_helper import (
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
+from reservations.email_utils import (
+    send_approve_email,
+    send_cancellation_email,
+    send_confirmation_email,
+    send_deny_email,
+    send_requires_handling_email,
+    send_reservation_modified_email,
+)
 from reservations.models import (
     RESERVEE_LANGUAGE_CHOICES,
     STATE_CHOICES,
@@ -46,22 +49,11 @@ from reservations.models import (
     ReservationPurpose,
     ReservationType,
 )
-from users.models import ReservationNotification
 from utils.decimal_utils import round_decimal
 
 from ..validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 
 DEFAULT_TIMEZONE = get_default_timezone()
-
-RESERVATION_STATE_EMAIL_TYPE_MAP = {
-    STATE_CHOICES.CONFIRMED: EmailType.RESERVATION_CONFIRMED,
-    STATE_CHOICES.REQUIRES_HANDLING: EmailType.HANDLING_REQUIRED_RESERVATION,
-    STATE_CHOICES.CANCELLED: EmailType.RESERVATION_CANCELLED,
-    STATE_CHOICES.DENIED: EmailType.RESERVATION_REJECTED,
-    "APPROVED": EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
-    "NEEDS_PAYMENT": EmailType.RESERVATION_NEEDS_TO_BE_PAID,
-    "MODIFIED": EmailType.RESERVATION_MODIFIED,
-}
 
 
 class PriceCalculationResult:
@@ -892,27 +884,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 )
                 self.instance.refresh_from_db()
 
-        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
-            send_reservation_email_task.delay(
-                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
-            )
-
-        if instance.state == STATE_CHOICES.REQUIRES_HANDLING:
-            send_staff_reservation_email_task.delay(
-                instance.id,
-                EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
-                [
-                    ReservationNotification.ALL,
-                    ReservationNotification.ONLY_HANDLING_REQUIRED,
-                ],
-            )
-        elif instance.state == STATE_CHOICES.CONFIRMED:
-            send_staff_reservation_email_task.delay(
-                instance.id,
-                EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
-                [ReservationNotification.ALL],
-            )
-
+        send_confirmation_email(instance)
         return instance
 
 
@@ -986,10 +958,7 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
-            send_reservation_email_task.delay(
-                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
-            )
+        send_cancellation_email(instance)
         return instance
 
 
@@ -1043,10 +1012,7 @@ class ReservationDenySerializer(PrimaryKeySerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
-            send_reservation_email_task.delay(
-                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
-            )
+        send_deny_email(instance)
         return instance
 
 
@@ -1091,23 +1057,7 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        if instance.state == STATE_CHOICES.CONFIRMED:
-            if instance.price > 0:
-                send_reservation_email_task.delay(
-                    instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP["NEEDS_PAYMENT"]
-                )
-            else:
-                send_reservation_email_task.delay(
-                    instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP["APPROVED"]
-                )
-
-        if instance.state == STATE_CHOICES.CONFIRMED:
-            send_staff_reservation_email_task.delay(
-                instance.id,
-                EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
-                [ReservationNotification.ALL],
-            )
-
+        send_approve_email(instance)
         return instance
 
 
@@ -1141,21 +1091,7 @@ class ReservationRequiresHandlingSerializer(PrimaryKeySerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
-            send_reservation_email_task.delay(
-                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
-            )
-
-        if instance.state == STATE_CHOICES.REQUIRES_HANDLING:
-            send_staff_reservation_email_task.delay(
-                instance.id,
-                EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
-                [
-                    ReservationNotification.ALL,
-                    ReservationNotification.ONLY_HANDLING_REQUIRED,
-                ],
-            )
-
+        send_requires_handling_email(instance)
         return instance
 
 
@@ -1187,18 +1123,7 @@ class ReservationUnitAdjustTimeSerializer(
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        send_reservation_email_task.delay(instance.id, EmailType.RESERVATION_MODIFIED)
-
-        if instance.state == STATE_CHOICES.REQUIRES_HANDLING:
-            send_staff_reservation_email_task.delay(
-                instance.id,
-                EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
-                [
-                    ReservationNotification.ALL,
-                    ReservationNotification.ONLY_HANDLING_REQUIRED,
-                ],
-            )
-
+        send_reservation_modified_email(instance)
         return instance
 
     def validate(self, data):
