@@ -1,8 +1,10 @@
 import graphene
-from graphene import ResolveInfo
+from django.core.exceptions import ValidationError
+from graphene import ClientIDMutation, ResolveInfo
 from graphene_django.rest_framework.mutation import SerializerMutation
+from rest_framework.generics import get_object_or_404
 
-from api.graphql.base_mutations import AuthSerializerMutation
+from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.merchants.merchant_types import PaymentOrderType
 from api.graphql.reservations.reservation_serializers import (
     ReservationApproveSerializer,
@@ -22,6 +24,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationHandlingPermission,
     ReservationPermission,
 )
+from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import Reservation
 
 
@@ -114,3 +117,21 @@ class ReservationAdjustTimeMutation(AuthSerializerMutation, SerializerMutation):
         model_operations = ["update"]
         lookup_field = "pk"
         serializer_class = ReservationUnitAdjustTimeSerializer
+
+
+class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
+    permission_classes = (ReservationPermission,)
+    model = Reservation
+
+    @classmethod
+    def validate(self, root, info, **input):
+        reservation = get_object_or_404(Reservation, pk=input.get("pk", None))
+        if reservation.state not in (
+            ReservationState.CREATED,
+            ReservationState.WAITING_FOR_PAYMENT,
+        ):
+            raise ValidationError(
+                "Reservation which is not in created or waiting_for_payment state cannot be deleted."
+            )
+
+        return None
