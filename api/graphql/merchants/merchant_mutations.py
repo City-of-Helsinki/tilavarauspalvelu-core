@@ -7,6 +7,7 @@ from sentry_sdk import capture_message
 from merchants.models import PaymentOrder, PaymentStatus
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
+from permissions.api_permissions.graphene_permissions import OrderRefreshPermission
 from reservations.email_utils import send_confirmation_email
 from reservations.models import STATE_CHOICES
 
@@ -14,6 +15,8 @@ from ..validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 
 
 class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
+    permission_classes = (OrderRefreshPermission,)
+
     class Input:
         order_uuid = graphene.UUID(required=True)
 
@@ -22,8 +25,12 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        remote_id = input.get("order_uuid")
+        if not cls.has_permission(root, info, input):
+            raise ValidationErrorWithCode(
+                "No permission to refresh the order", ValidationErrorCodes.NO_PERMISSION
+            )
 
+        remote_id = input.get("order_uuid")
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:
             raise ValidationErrorWithCode(

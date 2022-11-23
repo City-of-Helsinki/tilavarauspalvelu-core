@@ -5,6 +5,7 @@ from graphene import ResolveInfo
 from graphene_permissions.permissions import BasePermission
 
 from applications.models import Application, ApplicationEvent, ApplicationEventSchedule
+from merchants.models import PaymentOrder
 from permissions.helpers import (
     can_comment_reservation,
     can_create_reservation,
@@ -26,6 +27,7 @@ from permissions.helpers import (
     can_modify_application,
     can_modify_reservation,
     can_read_application,
+    can_refresh_order,
     can_view_recurring_reservation,
     can_view_users,
 )
@@ -655,3 +657,14 @@ class UnitRolePermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return False
+
+
+class OrderRefreshPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root, info, input):
+        remote_id = input.get("order_uuid")
+        payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
+        if not payment_order:
+            return False
+
+        return can_refresh_order(info.context.user, payment_order)

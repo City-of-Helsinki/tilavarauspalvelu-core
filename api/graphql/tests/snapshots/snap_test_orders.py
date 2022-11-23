@@ -94,7 +94,7 @@ snapshots['RefreshOrderMutationTestCase::test_payment_order_not_found_returns_er
     'errors': [
         {
             'extensions': {
-                'error_code': 'NOT_FOUND',
+                'error_code': 'NO_PERMISSION',
                 'field': 'nonFieldError'
             },
             'locations': [
@@ -103,12 +103,21 @@ snapshots['RefreshOrderMutationTestCase::test_payment_order_not_found_returns_er
                     'line': 3
                 }
             ],
-            'message': 'Order not found',
+            'message': 'No permission to refresh the order',
             'path': [
                 'refreshOrder'
             ]
         }
     ]
+}
+
+snapshots['RefreshOrderMutationTestCase::test_reservation_managers_can_call 1'] = {
+    'data': {
+        'refreshOrder': {
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'status': 'DRAFT'
+        }
+    }
 }
 
 snapshots['RefreshOrderMutationTestCase::test_status_authorized_cause_no_changes 1'] = {
@@ -154,4 +163,52 @@ snapshots['RefreshOrderMutationTestCase::test_status_payment_cancelled_cause_can
             'status': 'CANCELLED'
         }
     }
+}
+
+snapshots['RefreshOrderMutationTestCase::test_unauthenticated_call_returns_an_error 1'] = {
+    'data': {
+        'refreshOrder': None
+    },
+    'errors': [
+        {
+            'extensions': {
+                'error_code': 'NO_PERMISSION',
+                'field': 'nonFieldError'
+            },
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'No permission to refresh the order',
+            'path': [
+                'refreshOrder'
+            ]
+        }
+    ]
+}
+
+snapshots['RefreshOrderMutationTestCase::test_unauthorized_call_returns_an_error 1'] = {
+    'data': {
+        'refreshOrder': None
+    },
+    'errors': [
+        {
+            'extensions': {
+                'error_code': 'NO_PERMISSION',
+                'field': 'nonFieldError'
+            },
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'No permission to refresh the order',
+            'path': [
+                'refreshOrder'
+            ]
+        }
+    ]
 }
