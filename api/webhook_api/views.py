@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from sentry_sdk import capture_message
 
 from merchants.models import PaymentOrder, PaymentStatus
+from merchants.verkkokauppa.order.exceptions import GetOrderError
+from merchants.verkkokauppa.order.requests import get_order
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
 from permissions.api_permissions.drf_permissions import WebhookPermission
@@ -119,6 +121,90 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
             return Response(data=e.to_json(), status=e.status_code)
         except GetPaymentError as e:
             capture_message(f"Checking order payment failed: {str(e)}", level="error")
+            return Response(
+                data={"status": 500, "message": "Problem with upstream service"},
+                status=500,
+            )
+
+
+class WebhookOrderViewSet(viewsets.ViewSet):
+    permission_classes = [WebhookPermission]
+
+    def validate_request(self, request):
+        required_field = ["orderId", "namespace", "type", "timestamp"]
+        for field in required_field:
+            if field not in request.data:
+                raise WebhookError(
+                    message=f"Required field missing: {field}", status_code=400
+                )
+
+        namespace = request.data.get("namespace", None)
+        type = request.data.get("type", None)
+
+        if namespace != settings.VERKKOKAUPPA_NAMESPACE:
+            raise WebhookError(message="Invalid namespace", status_code=400)
+
+        if type != "ORDER_CANCELLED":
+            raise WebhookError(message="Unsupported type", status_code=501)
+
+    @extend_schema(
+        request=inline_serializer(
+            name="WebhookOrderPayload",
+            fields={
+                "orderId": serializers.UUIDField(),
+                "namespace": serializers.CharField(),
+                "type": serializers.ChoiceField(
+                    choices=[("ORDER_CANCELLED", "ORDER_CANCELLED")]
+                ),
+                "timestamp": serializers.DateTimeField(),
+            },
+        ),
+        responses={
+            200: OpenApiResponse(description="OK"),
+            400: OpenApiResponse(description="Invalid payload, namespace or type"),
+            404: OpenApiResponse(description="Order not found"),
+            500: OpenApiResponse(
+                description="Internal server error or problem with upstream service"
+            ),
+            501: OpenApiResponse(description="Unsupported type"),
+        },
+    )
+    def create(self, request):
+        try:
+            self.validate_request(request)
+
+            remote_id = request.data.get("orderId", "")
+            payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
+            if not payment_order:
+                raise WebhookError(message="Order not found", status_code=404)
+
+            # Order is already in a state where no updates are needed
+            if payment_order.status != PaymentStatus.DRAFT:
+                return Response(status=200)
+
+            # Check order status from the API
+            order = get_order(remote_id, payment_order.reservation.user.id)
+            order_status = getattr(order, "status", "payment_not_found")
+
+            if order_status != "cancelled":
+                capture_message(
+                    f"Received order cancellation webhook for order {remote_id} "
+                    f"that is not in cancelled state: {order_status}",
+                    level="warning",
+                )
+                raise WebhookError(message="Invalid order state", status_code=400)
+
+            payment_order.status = PaymentStatus.CANCELLED
+            payment_order.processed_at = datetime.now().astimezone(
+                get_default_timezone()
+            )
+            payment_order.save()
+
+            return Response(status=200)
+        except WebhookError as e:
+            return Response(data=e.to_json(), status=e.status_code)
+        except GetOrderError as e:
+            capture_message(f"Checking order failed: {str(e)}", level="error")
             return Response(
                 data={"status": 500, "message": "Problem with upstream service"},
                 status=500,
