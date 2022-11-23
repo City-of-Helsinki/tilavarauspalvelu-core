@@ -216,7 +216,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
-        assert_that(error).is_equal_to("CANCELLATION_NOT_ALLOWED")
+        assert_that(error).is_equal_to("CANCELLATION_TIME_PAST")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)

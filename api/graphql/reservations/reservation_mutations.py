@@ -7,13 +7,13 @@ from rest_framework.generics import get_object_or_404
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.merchants.merchant_types import PaymentOrderType
 from api.graphql.reservations.reservation_serializers import (
+    ReservationAdjustTimeSerializer,
     ReservationApproveSerializer,
     ReservationCancellationSerializer,
     ReservationConfirmSerializer,
     ReservationCreateSerializer,
     ReservationDenySerializer,
     ReservationRequiresHandlingSerializer,
-    ReservationUnitAdjustTimeSerializer,
     ReservationUpdateSerializer,
     ReservationWorkingMemoSerializer,
 )
@@ -116,7 +116,7 @@ class ReservationAdjustTimeMutation(AuthSerializerMutation, SerializerMutation):
     class Meta:
         model_operations = ["update"]
         lookup_field = "pk"
-        serializer_class = ReservationUnitAdjustTimeSerializer
+        serializer_class = ReservationAdjustTimeSerializer
 
 
 class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):

@@ -1089,7 +1089,7 @@ class ReservationWorkingMemoSerializer(PrimaryKeySerializer):
         self.fields["pk"].help_text = "Primary key of the reservation"
 
 
-class ReservationUnitAdjustTimeSerializer(
+class ReservationAdjustTimeSerializer(
     PrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin
 ):
     class Meta:
@@ -1186,7 +1186,7 @@ class ReservationUnitAdjustTimeSerializer(
         if must_be_cancelled_before < now:
             raise ValidationErrorWithCode(
                 "Reservation time cannot be changed because the cancellation period has expired.",
-                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
+                ValidationErrorCodes.CANCELLATION_TIME_PAST,
             )
         if cancel_rule.needs_handling:
             raise ValidationErrorWithCode(
