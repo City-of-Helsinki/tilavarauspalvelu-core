@@ -47,7 +47,7 @@ def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
             return None
 
         if response.status_code != 200:
-            raise GetPaymentError(f"Payment creation failed: {json.get('errors')}")
+            raise GetPaymentError(f"Payment retrieval failed: {json.get('errors')}")
         return Payment.from_json(json)
     except (RequestException, JSONDecodeError, ParsePaymentError) as e:
         raise GetPaymentError("Payment retrieval failed") from e
