@@ -91,7 +91,6 @@ class ReservationStatisticsCreateTestCase(TestCase):
         assert_that(stat.begin).is_equal_to(self.reservation.begin)
         assert_that(stat.end).is_equal_to(self.reservation.end)
         assert_that(stat.duration_minutes).is_equal_to(120)
-        assert_that(stat.staff_event).is_equal_to(self.reservation.staff_event)
         assert_that(stat.reservation_type).is_equal_to(self.reservation.type)
         assert_that(stat.state).is_equal_to(self.reservation.state)
         assert_that(stat.cancel_reason).is_equal_to(self.reservation.cancel_reason)

@@ -34,7 +34,6 @@ snapshots['ReservationUnitQueryTestCase::test_admin_sees_reservations_sensitive_
                                 'reserveeLastName': 'Reggie',
                                 'reserveeOrganisationName': 'org name',
                                 'reserveePhone': '123435',
-                                'staffEvent': False,
                                 'user': {
                                     'dateOfBirth': '2020-01-01'
                                 },
@@ -1740,7 +1739,6 @@ snapshots['ReservationUnitQueryTestCase::test_other_reservations_does_not_show_s
                                 'reserveeLastName': None,
                                 'reserveeOrganisationName': None,
                                 'reserveePhone': None,
-                                'staffEvent': None,
                                 'user': None,
                                 'workingMemo': None
                             }

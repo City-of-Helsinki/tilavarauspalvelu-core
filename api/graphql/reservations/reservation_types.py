@@ -35,6 +35,7 @@ from reservations.models import (
     ReservationMetadataSet,
     ReservationPurpose,
 )
+from reservations.models import ReservationType as ReservationTypeField
 
 
 class AgeGroupType(AuthNode, PrimaryKeyObjectType):
@@ -138,7 +139,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     age_group = graphene.Field(AgeGroupType)
     buffer_time_before = Duration()
     buffer_time_after = Duration()
-    staff_event = graphene.Boolean()
+    staff_event = graphene.Boolean(deprecation_reason="Please refer to type.")
     type = graphene.String()
     order_uuid = graphene.String()
     order_status = graphene.String()
@@ -251,7 +252,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_staff_event(self, info: ResolveInfo) -> Optional[bool]:
         if can_handle_reservation(info.context.user, self):
-            return self.staff_event
+            return self.type == ReservationTypeField.STAFF
         return None
 
     def resolve_type(self, info: ResolveInfo) -> Optional[str]:

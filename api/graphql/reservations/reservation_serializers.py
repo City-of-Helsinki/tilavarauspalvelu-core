@@ -447,7 +447,6 @@ class ReservationCreateSerializer(
             "price_net",
             "non_subsidised_price",
             "non_subsidised_price_net",
-            "staff_event",
             "type",
         ]
 
@@ -557,10 +556,8 @@ class ReservationCreateSerializer(
                 "non_subsidised_price_net"
             ] = price_calculation_result.non_subsidised_price_net
 
-        staff_event = data.get("staff_event", None)
         reservation_type = data.get("type", None)
         reservation_unit_ids = list(map(lambda x: x.pk, reservation_units))
-        self.check_staff_event(user, reservation_unit_ids, staff_event)
         self.check_reservation_type(user, reservation_unit_ids, reservation_type)
 
         return data
@@ -605,19 +602,6 @@ class ReservationCreateSerializer(
                 "since its reservation kind is SEASON.",
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
-
-    def check_staff_event(
-        self, user, reservation_unit_ids: List[int], staff_event: Optional[bool]
-    ):
-        if staff_event is None or can_handle_reservation_with_units(
-            user, reservation_unit_ids
-        ):
-            return
-
-        raise ValidationErrorWithCode(
-            "You don't have permissions to set staff_event",
-            ValidationErrorCodes.NO_PERMISSION,
-        )
 
     def check_reservation_type(
         self, user, reservation_unit_ids: List[int], reservation_type: Optional[str]

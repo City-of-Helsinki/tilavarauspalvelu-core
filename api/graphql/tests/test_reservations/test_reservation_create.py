@@ -25,7 +25,7 @@ from reservation_units.tests.factories import (
     ReservationUnitPricingFactory,
     TaxPercentageFactory,
 )
-from reservations.models import STATE_CHOICES, AgeGroup, Reservation
+from reservations.models import STATE_CHOICES, AgeGroup, Reservation, ReservationType
 from reservations.tests.factories import ReservationFactory
 
 
@@ -998,13 +998,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "RESERVATION_UNIT_TYPE_IS_SEASON"
         )
 
-    def test_creating_reservation_with_staff_event_succeed(
+    def test_creating_reservation_type_to_staff_succeed(
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_input_data()
-        input_data["staffEvent"] = True
+        input_data["type"] = ReservationType.STAFF
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -1017,25 +1017,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.staff_event).is_equal_to(True)
-
-    def test_creating_fails_when_staff_event_is_provided_without_permissions(
-        self, mock_periods, mock_opening_hours
-    ):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.client.force_login(self.regular_joe)
-        input_data = self.get_valid_input_data()
-        input_data["staffEvent"] = True
-        response = self.query(self.get_create_query(), input_data=input_data)
-        content = json.loads(response.content)
-
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to(
-            "You don't have permissions to set staff_event"
-        )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "NO_PERMISSION"
-        )
+        assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
 
     def test_creating_reservation_with_type_succeed(
         self, mock_periods, mock_opening_hours
