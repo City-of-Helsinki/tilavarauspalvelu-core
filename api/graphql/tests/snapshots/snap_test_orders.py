@@ -38,3 +38,120 @@ snapshots['OrderQueryTestCase::test_returns_order_when_user_owns_reservation 1']
         }
     }
 }
+
+snapshots['RefreshOrderMutationTestCase::test_get_payment_exceptions_are_logged 1'] = {
+    'data': {
+        'refreshOrder': None
+    },
+    'errors': [
+        {
+            'extensions': {
+                'error_code': 'EXTERNAL_SERVICE_ERROR',
+                'field': 'nonFieldError'
+            },
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'Unable to check order payment: problem with external service',
+            'path': [
+                'refreshOrder'
+            ]
+        }
+    ]
+}
+
+snapshots['RefreshOrderMutationTestCase::test_payment_not_found_returns_error_with_no_changes 1'] = {
+    'data': {
+        'refreshOrder': None
+    },
+    'errors': [
+        {
+            'extensions': {
+                'error_code': 'NOT_FOUND',
+                'field': 'nonFieldError'
+            },
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'Unable to check order payment',
+            'path': [
+                'refreshOrder'
+            ]
+        }
+    ]
+}
+
+snapshots['RefreshOrderMutationTestCase::test_payment_order_not_found_returns_error 1'] = {
+    'data': {
+        'refreshOrder': None
+    },
+    'errors': [
+        {
+            'extensions': {
+                'error_code': 'NOT_FOUND',
+                'field': 'nonFieldError'
+            },
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
+            ],
+            'message': 'Order not found',
+            'path': [
+                'refreshOrder'
+            ]
+        }
+    ]
+}
+
+snapshots['RefreshOrderMutationTestCase::test_status_authorized_cause_no_changes 1'] = {
+    'data': {
+        'refreshOrder': {
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'status': 'DRAFT'
+        }
+    }
+}
+
+snapshots['RefreshOrderMutationTestCase::test_status_created_cause_no_changes 1'] = {
+    'data': {
+        'refreshOrder': {
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'status': 'DRAFT'
+        }
+    }
+}
+
+snapshots['RefreshOrderMutationTestCase::test_status_paid_online_cause_paid_marking_and_no_notification 1'] = {
+    'data': {
+        'refreshOrder': {
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'status': 'PAID'
+        }
+    }
+}
+
+snapshots['RefreshOrderMutationTestCase::test_status_paid_online_sends_notification_if_reservation_waiting_for_payment 1'] = {
+    'data': {
+        'refreshOrder': {
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'status': 'PAID'
+        }
+    }
+}
+
+snapshots['RefreshOrderMutationTestCase::test_status_payment_cancelled_cause_cancellation 1'] = {
+    'data': {
+        'refreshOrder': {
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'status': 'CANCELLED'
+        }
+    }
+}
