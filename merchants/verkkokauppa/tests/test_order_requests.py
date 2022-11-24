@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict
+from unittest import mock
 from unittest.mock import Mock
 from urllib.parse import urljoin
 from uuid import UUID
@@ -13,8 +14,8 @@ from pytest import raises
 from requests import Timeout
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
-from ..order.exceptions import CreateOrderError, GetOrderError
-from ..order.requests import create_order, get_order
+from ..order.exceptions import CancelOrderError, CreateOrderError, GetOrderError
+from ..order.requests import cancel_order, create_order, get_order
 from ..order.types import (
     CreateOrderParams,
     Order,
@@ -189,6 +190,83 @@ class OrderRequestsTestCaseBase(TestCase):
         "errors": [{"code": "order-not-found", "message": "Order not found"}]
     }
 
+    cancel_order_response: Dict[str, Any] = {
+        "order": {
+            "orderId": "f8477bab-26c6-38de-a74b-692e729bae05",
+            "namespace": "tilanvaraus",
+            "user": "657d6cfc-f048-11ec-b6f9-0ed952b261b2",
+            "createdAt": "2022-11-24T05:30:18.715",
+            "items": [
+                {
+                    "merchantId": "13373e6d-85e6-4796-b1f1-caf6b67fd933",
+                    "orderItemId": "d975d859-d128-4b83-bb46-cad22efcf5f1",
+                    "orderId": "f8477bab-26c6-38de-a74b-692e729bae05",
+                    "productId": "d23b7c02-58a3-3333-bdee-ba238d50185b",
+                    "productName": "Studiohuone 1 + soittimet",
+                    "productLabel": None,
+                    "productDescription": None,
+                    "unit": "pcs",
+                    "quantity": 1,
+                    "rowPriceNet": "100.000000",
+                    "rowPriceVat": "24.00000000",
+                    "rowPriceTotal": "124.00000000",
+                    "vatPercentage": "24.00",
+                    "priceNet": "100.000000",
+                    "priceVat": "24.00000000",
+                    "priceGross": "124.00000000",
+                    "originalPriceNet": None,
+                    "originalPriceVat": None,
+                    "originalPriceGross": None,
+                    "periodFrequency": None,
+                    "periodUnit": None,
+                    "periodCount": None,
+                    "startDate": None,
+                    "billingStartDate": None,
+                    "meta": [
+                        {
+                            "orderItemMetaId": "3d28a712-870e-41a4-ae8d-32c04f906b0f",
+                            "orderItemId": "d975d859-d128-4b83-bb46-cad22efcf5f1",
+                            "orderId": "f8477bab-26c6-38de-a74b-692e729bae05",
+                            "key": "namespaceProductId",
+                            "value": "3bc5b647-8821-412b-89ce-2f9e88dc7d45",
+                            "label": None,
+                            "visibleInCheckout": "false",
+                            "ordinal": "0",
+                        },
+                        {
+                            "orderItemMetaId": "4cf984dd-65b3-4686-80c7-4fc364b41517",
+                            "orderItemId": "d975d859-d128-4b83-bb46-cad22efcf5f1",
+                            "orderId": "f8477bab-26c6-38de-a74b-692e729bae05",
+                            "key": "reservationPeriod",
+                            "value": "To 24.11.2022 05:27-05:27",
+                            "label": "Varausaika",
+                            "visibleInCheckout": "true",
+                            "ordinal": "1",
+                        },
+                    ],
+                }
+            ],
+            "customer": {
+                "firstName": "First",
+                "lastName": "Name",
+                "email": "asdasd@asdasd.fi",
+                "phone": "",
+            },
+            "status": "cancelled",
+            "type": "order",
+            "subscriptionId": None,
+            "invoice": None,
+            "checkoutUrl": "https://localhost:1234/f8477bab-26c6-38de-a74b-692e729bae05",
+            "receiptUrl": "https://localhost:1234/f8477bab-26c6-38de-a74b-692e729bae05/receiptUrl",
+            "loggedInCheckoutUrl": "https://localhost:1234/profile/f8477bab-26c6-38de-a74b-692e729bae05",
+            "updateCardUrl": "https://localhost:1234/f8477bab-26c6-38de-a74b-692e729bae05/update-card",
+            "priceNet": "100",
+            "priceVat": "24",
+            "priceTotal": "124",
+        },
+        "cancelUrl": "https://tilavaraus.test.hel.ninja/payment/failure?orderId=f8477bab-26c6-38de-a74b-692e729bae05",
+    }
+
 
 class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
     def test_create_order_makes_valid_request(self):
@@ -303,3 +381,48 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
         assert_that(str(e.value)).is_equal_to(
             "Order not found: [{'code': 'order-not-found', 'message': 'Order not found'}]"
         )
+
+
+class CancelOrderRequestsTestCase(OrderRequestsTestCaseBase):
+    def test_cancel_order_makes_valid_request(self):
+        order_id = UUID(self.cancel_order_response["order"]["orderId"])
+        user = self.cancel_order_response["order"]["user"]
+        post = mock_post(self.cancel_order_response, status_code=200)
+        cancel_order(order_id, user, post)
+        post.assert_called_with(
+            url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"{order_id}/cancel"),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "user": user,
+            },
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+
+    def test_cancel_order_returns_order(self):
+        order_id = UUID(self.cancel_order_response["order"]["orderId"])
+        user = self.cancel_order_response["order"]["user"]
+        post = mock_post(self.cancel_order_response, status_code=200)
+        order = cancel_order(order_id, user, post)
+        expected = Order.from_json(self.cancel_order_response["order"])
+        assert_that(order).is_equal_to(expected)
+
+    def test_cancel_order_returns_none_if_order_is_not_found(self):
+        order_id = UUID(self.cancel_order_response["order"]["orderId"])
+        user = self.cancel_order_response["order"]["user"]
+        post = mock_post({}, status_code=404)
+        order = cancel_order(order_id, user, post)
+        assert_that(order).is_none()
+
+    @mock.patch("merchants.verkkokauppa.order.requests.capture_message")
+    def test_cancel_order_raises_exception_on_500_status(self, mock_capture):
+        order_id = UUID(self.cancel_order_response["order"]["orderId"])
+        user = self.cancel_order_response["order"]["user"]
+        post = mock_post({}, status_code=500)
+
+        with raises(CancelOrderError) as ex:
+            cancel_order(order_id, user, post)
+
+        assert_that(str(ex.value)).is_equal_to(
+            "Order cancellation failed: problem with upstream service"
+        )
+        assert_that(mock_capture.called).is_true()

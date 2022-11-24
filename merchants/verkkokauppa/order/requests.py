@@ -1,4 +1,5 @@
 from json import JSONDecodeError
+from typing import Optional
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -10,7 +11,12 @@ from sentry_sdk import capture_message
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
 from ..exceptions import VerkkokauppaConfigurationError
-from .exceptions import CreateOrderError, GetOrderError, ParseOrderError
+from .exceptions import (
+    CancelOrderError,
+    CreateOrderError,
+    GetOrderError,
+    ParseOrderError,
+)
 from .types import CreateOrderParams, Order
 
 
@@ -68,3 +74,33 @@ def get_order(order_id: UUID, user: str, get=_get) -> Order:
         return Order.from_json(json)
     except (RequestException, JSONDecodeError, ParseOrderError) as e:
         raise GetOrderError(f"Order retrieval failed: {e}")
+
+
+def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Optional[Order]:
+    try:
+        response = post(
+            url=urljoin(_get_base_url(), f"{str(order_id)}/cancel"),
+            headers={"api-key": settings.VERKKOKAUPPA_API_KEY, "user": str(user_uuid)},
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+        if response.status_code >= 500:
+            capture_message(
+                f"Call to Order Experience API cancel endpoint failed with status {response.status_code}. "
+                + f"Response body: {response.text}",
+                level="error",
+            )
+            raise CancelOrderError(
+                "Order cancellation failed: problem with upstream service"
+            )
+        if response.status_code == 404:
+            return None
+
+        json = response.json()
+        if response.status_code != 200:
+            json = response.json()
+            raise CancelOrderError(f"Order cancellation failed: {json.get('errors')}")
+
+        return Order.from_json(json["order"])
+
+    except (RequestException, JSONDecodeError, ParseOrderError) as e:
+        raise CancelOrderError(f"Order cancellation failed: {e}")
