@@ -32,6 +32,8 @@ import {
   ReservationByPkQueryVariables,
   ReservationConfirmMutationInput,
   ReservationConfirmMutationPayload,
+  ReservationDeleteMutationInput,
+  ReservationDeleteMutationPayload,
   ReservationPurposeType,
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
@@ -47,6 +49,7 @@ import {
 } from "../../modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
+  DELETE_RESERVATION,
   GET_CITIES,
   GET_RESERVATION,
   UPDATE_RESERVATION,
@@ -269,6 +272,7 @@ const ReservationUnitReservation = ({
     ReservationByPkQueryVariables
   >(GET_RESERVATION, {
     variables: { pk: reservationData?.pk },
+    skip: !reservationData?.pk,
   });
 
   useEffect(() => {
@@ -288,7 +292,22 @@ const ReservationUnitReservation = ({
       };
       setReservation(res);
     }
-  }, [fetchedReservationData?.reservationByPk, reservationUnit?.pk]);
+  }, [
+    fetchedReservationData?.reservationByPk,
+    reservationUnit?.pk,
+    setDataContext,
+    setPendingReservation,
+  ]);
+
+  const [
+    deleteReservation,
+    { data: deleteData, loading: deleteLoading, error: deleteError },
+  ] = useMutation<
+    { deleteReservation: ReservationDeleteMutationPayload },
+    { input: ReservationDeleteMutationInput }
+  >(DELETE_RESERVATION, {
+    errorPolicy: "all",
+  });
 
   const [
     updateReservation,
@@ -307,6 +326,28 @@ const ReservationUnitReservation = ({
     { confirmReservation: ReservationConfirmMutationPayload },
     { input: ReservationConfirmMutationInput }
   >(CONFIRM_RESERVATION);
+
+  useEffect(() => {
+    if (!deleteLoading) {
+      if (deleteError) {
+        setDataContext(null);
+        setPendingReservation(null);
+        router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+      } else if (deleteData) {
+        setDataContext(null);
+        setPendingReservation(null);
+        router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+      }
+    }
+  }, [
+    deleteLoading,
+    deleteError,
+    deleteData,
+    reservationUnit.pk,
+    setDataContext,
+    setPendingReservation,
+    t,
+  ]);
 
   useEffect(() => {
     if (!updateLoading) {
@@ -482,15 +523,6 @@ const ReservationUnitReservation = ({
     ]
   );
 
-  if (
-    isBrowser &&
-    step !== 2 &&
-    (!reservationData?.pk || !reservationData?.begin || !reservationData?.end)
-  ) {
-    router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
-    return null;
-  }
-
   const onSubmitOpen2 = () => {
     confirmReservation({
       variables: {
@@ -502,12 +534,10 @@ const ReservationUnitReservation = ({
   };
 
   const cancelReservation = () => {
-    updateReservation({
+    deleteReservation({
       variables: {
         input: {
           pk: reservationPk,
-          state: "CANCELLED",
-          reserveeLanguage: i18n.language,
         },
       },
     });
@@ -530,10 +560,12 @@ const ReservationUnitReservation = ({
           </div>
         ) : (
           <div>
-            <PendingReservationInfoCard
-              reservation={reservation || reservationData}
-              reservationUnit={reservationUnit}
-            />
+            {reservation && (
+              <PendingReservationInfoCard
+                reservation={reservation || reservationData}
+                reservationUnit={reservationUnit}
+              />
+            )}
             <PinkBox $isHiddenOnMobile={step > 0}>
               <Subheading>
                 {t("reservations:reservationInfoBoxHeading")}

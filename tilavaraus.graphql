@@ -1161,6 +1161,7 @@ type Mutation {
   confirmReservation(input: ReservationConfirmMutationInput!): ReservationConfirmMutationPayload
   cancelReservation(input: ReservationCancellationMutationInput!): ReservationCancellationMutationPayload
   denyReservation(input: ReservationDenyMutationInput!): ReservationDenyMutationPayload
+  deleteReservation(input: ReservationDeleteMutationInput!): ReservationDeleteMutationPayload
   approveReservation(input: ReservationApproveMutationInput!): ReservationApproveMutationPayload
   requireHandlingForReservation(input: ReservationRequiresHandlingMutationInput!): ReservationRequiresHandlingMutationPayload
   updateReservationWorkingMemo(input: ReservationWorkingMemoMutationInput!): ReservationWorkingMemoMutationPayload
@@ -1858,11 +1859,8 @@ type ReservationConfirmMutationPayload {
   """The non subsidised price of this reservation excluding VAT"""
   nonSubsidisedPriceNet: Float
 
-  """Indicates if reservation is internal or created by staff"""
-  staffEvent: Boolean
-
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
   """
   type: String
 
@@ -1913,11 +1911,8 @@ input ReservationCreateMutationInput {
   reservationUnitPks: [Int]!
   purposePk: Int
 
-  """Indicates if reservation is internal or created by staff"""
-  staffEvent: Boolean
-
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
   """
   type: String
   clientMutationId: String
@@ -1986,17 +1981,25 @@ type ReservationCreateMutationPayload {
   """The non subsidised price of this reservation excluding VAT"""
   nonSubsidisedPriceNet: Float
 
-  """Indicates if reservation is internal or created by staff"""
-  staffEvent: Boolean
-
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
   """
   type: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
   reservation: ReservationType
+  clientMutationId: String
+}
+
+input ReservationDeleteMutationInput {
+  pk: Int!
+  clientMutationId: String
+}
+
+type ReservationDeleteMutationPayload {
+  deleted: Boolean
+  errors: String
   clientMutationId: String
 }
 
@@ -2219,13 +2222,13 @@ type ReservationType implements Node {
 
   """Working memo for staff users."""
   workingMemo: String
-  staffEvent: Boolean
   type: String
 
   """The ID of the object"""
   id: ID!
   pk: Int
   reservationUnits: [ReservationUnitType]
+  staffEvent: Boolean @deprecated(reason: "Please refer to type.")
   orderUuid: String
   orderStatus: String
   calendarUrl: String
@@ -2363,6 +2366,7 @@ type ReservationUnitByPkType implements Node {
 
   """The ID of the object"""
   id: ID!
+  reservations(from: Date = null, to: Date = null, state: [String] = null, includeWithSameComponents: Boolean = null): [ReservationType]
   openingHours(openingTimes: Boolean = null, periods: Boolean = null, startDate: Date = null, endDate: Date = null): OpeningHoursType
   pk: Int
   qualifiers: [QualifierType]
@@ -2370,7 +2374,6 @@ type ReservationUnitByPkType implements Node {
   equipment: [EquipmentType]
   unit: UnitType
   keywordGroups: [KeywordGroupType]
-  reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
   state: ReservationUnitState
   paymentMerchant: PaymentMerchantType
   paymentProduct: PaymentProductType
@@ -2519,24 +2522,24 @@ input ReservationUnitCreateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2659,24 +2662,24 @@ type ReservationUnitCreateMutationPayload {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3117,12 +3120,12 @@ type ReservationUnitType implements Node {
 
   """The ID of the object"""
   id: ID!
+  reservations(from: Date = null, to: Date = null, state: [String] = null, includeWithSameComponents: Boolean = null): [ReservationType]
   pk: Int
   location: LocationType
   equipment: [EquipmentType]
   unit: UnitType
   keywordGroups: [KeywordGroupType]
-  reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
   state: ReservationUnitState
   pricings: [ReservationUnitPricingType]
 }
@@ -3282,24 +3285,24 @@ input ReservationUnitUpdateMutationInput {
   pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3421,24 +3424,24 @@ type ReservationUnitUpdateMutationPayload {
   """
   pricingType: String
   paymentTypes: [String]
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3494,11 +3497,8 @@ input ReservationUpdateMutationInput {
   reservationUnitPks: [Int]
   purposePk: Int
 
-  """Indicates if reservation is internal or created by staff"""
-  staffEvent: Boolean
-
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
   """
   type: String
   clientMutationId: String
@@ -3570,11 +3570,8 @@ type ReservationUpdateMutationPayload {
   """The non subsidised price of this reservation excluding VAT"""
   nonSubsidisedPriceNet: Float
 
-  """Indicates if reservation is internal or created by staff"""
-  staffEvent: Boolean
-
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
   """
   type: String
 
@@ -4189,15 +4186,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -4207,15 +4204,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

@@ -27,6 +27,8 @@ import {
   SpaceType,
   UnitType,
   ReservationsReservationReserveeTypeChoices,
+  ReservationDeleteMutationPayload,
+  ReservationDeleteMutationInput,
 } from "../../modules/gql-types";
 
 const createReservation = graphql.mutation<
@@ -139,6 +141,19 @@ const cancelReservation = graphql.mutation<
         cancelDetails: input.cancelDetails,
         state: "CANCELLED",
       } as ReservationCancellationMutationPayload,
+    })
+  );
+});
+
+const deleteReservation = graphql.mutation<
+  { deleteReservation: ReservationDeleteMutationPayload },
+  { input: ReservationDeleteMutationInput }
+>("deleteReservation", (req, res, ctx) => {
+  return res(
+    ctx.data({
+      deleteReservation: {
+        deleted: true,
+      },
     })
   );
 });
@@ -1226,6 +1241,7 @@ export const reservationHandlers = [
   reservationByPk,
   confirmReservation,
   cancelReservation,
+  deleteReservation,
   listReservations,
   reservationCancelReasons,
   reservationPurposes,

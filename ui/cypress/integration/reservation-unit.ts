@@ -200,7 +200,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       cy.injectAxe();
     });
 
-    it("can cancel reservation process", () => {
+    it.only("can cancel reservation process", () => {
       drawReservation();
 
       cy.checkA11y(null, null, null, true);

@@ -57,7 +57,7 @@ const PendingReservationInfoCard = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const { begin, end } = reservation;
+  const { begin, end } = reservation || {};
 
   const beginDate = t("common:dateWithWeekday", {
     date: begin && parseISO(begin),
@@ -86,7 +86,7 @@ const PendingReservationInfoCard = ({
   const heading = getTranslation(reservationUnit, "name");
 
   const price =
-    reservation.state === "REQUIRES_HANDLING"
+    reservation?.state === "REQUIRES_HANDLING"
       ? getReservationUnitPrice(reservationUnit, begin)
       : getReservationPrice(reservation.price, t("prices:priceFree"));
 

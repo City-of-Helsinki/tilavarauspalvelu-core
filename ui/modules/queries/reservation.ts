@@ -63,6 +63,15 @@ export const UPDATE_RESERVATION = gql`
   }
 `;
 
+export const DELETE_RESERVATION = gql`
+  mutation deleteReservation($input: ReservationDeleteMutationInput!) {
+    deleteReservation(input: $input) {
+      deleted
+      errors
+    }
+  }
+`;
+
 export const CANCEL_RESERVATION = gql`
   mutation cancelReservation($input: ReservationCancellationMutationInput!) {
     cancelReservation(input: $input) {
