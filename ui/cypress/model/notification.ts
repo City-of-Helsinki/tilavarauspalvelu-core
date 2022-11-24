@@ -13,3 +13,9 @@ export function errorNotificationBody(): Cypress.Chainable<
 > {
   return errorNotification().find("> div > div:last-of-type");
 }
+
+export function errorNotificationCloseButton(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return errorNotification().find("button");
+}

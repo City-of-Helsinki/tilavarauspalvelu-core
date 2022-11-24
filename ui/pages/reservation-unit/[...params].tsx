@@ -105,7 +105,10 @@ export const getServerSideProps: GetServerSideProps = async ({
         termsType: "generic_terms",
       },
     });
-    const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
+    const genericTerms =
+      genericTermsData.termsOfUse?.edges
+        ?.map((n) => n.node)
+        .find((n) => ["generic1"].includes(n.pk)) || {};
 
     if (reservationUnitData?.reservationUnitByPk) {
       if (reservationUnitData.reservationUnitByPk?.metadataSet) {
@@ -196,7 +199,7 @@ const Title = styled(H2).attrs({ as: "h1" })`
   }
 `;
 
-const PinkBox = styled.div`
+const PinkBox = styled.div<{ $isHiddenOnMobile: boolean }>`
   margin-top: var(--spacing-m);
   padding: 1px var(--spacing-m) var(--spacing-m);
   background-color: var(--color-suomenlinna-light);
@@ -211,6 +214,11 @@ const PinkBox = styled.div`
 
   ${Subheading} {
     margin-top: var(--spacing-m);
+  }
+
+  @media (max-width: ${breakpoints.m}) {
+    display: ${({ $isHiddenOnMobile }) =>
+      $isHiddenOnMobile ? "none" : "block"};
   }
 `;
 
@@ -526,11 +534,11 @@ const ReservationUnitReservation = ({
               reservation={reservation || reservationData}
               reservationUnit={reservationUnit}
             />
-            <PinkBox>
+            <PinkBox $isHiddenOnMobile={step > 0}>
               <Subheading>
                 {t("reservations:reservationInfoBoxHeading")}
               </Subheading>
-              <Sanitize html={t("reservations:reservationInfoBoxContent")} />
+              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
             </PinkBox>
           </div>
         )}
@@ -580,9 +588,8 @@ const ReservationUnitReservation = ({
                   options={options}
                   reserveeType={reserveeType}
                   setStep={setStep}
-                  register={register}
-                  errors={errors}
                   termsOfUse={termsOfUse}
+                  setErrorMsg={setErrorMsg}
                 />
               )}
             </>
@@ -601,7 +608,7 @@ const ReservationUnitReservation = ({
           label={t("reservationUnit:reservationUpdateFailed")}
           position="top-center"
           autoClose
-          autoCloseDuration={2000}
+          autoCloseDuration={4000}
           displayAutoCloseProgress={false}
           onClose={() => setErrorMsg(null)}
           dismissible

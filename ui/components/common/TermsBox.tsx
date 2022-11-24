@@ -3,7 +3,6 @@ import { H6 } from "common/src/common/typography";
 import { Checkbox, IconLinkExternal } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import Sanitize from "./Sanitize";
 
 type Link = {
   href: string;
@@ -11,8 +10,9 @@ type Link = {
 };
 
 export type Props = {
+  id: string;
   heading: string;
-  body?: string;
+  body?: string | JSX.Element;
   links?: Link[];
   acceptLabel?: string;
   accepted?: boolean;
@@ -64,10 +64,14 @@ const Links = styled.ul`
 const Link = styled.li``;
 
 const Anchor = styled.a`
-  color: var(--color-black);
+  color: var(--color-black) !important;
   text-decoration: underline;
   display: flex;
   gap: var(--spacing-2-xs);
+
+  svg {
+    min-width: var(--spacing-m);
+  }
 `;
 
 const Actions = styled.div`
@@ -81,9 +85,14 @@ const Divider = styled.hr`
 
 const StyledCheckbox = styled(Checkbox)`
   --lineheight-m: var(--lineheight-l);
+
+  label {
+    user-select: none;
+  }
 `;
 
 const TermsBox = ({
+  id,
   heading,
   body,
   links,
@@ -93,11 +102,12 @@ const TermsBox = ({
   ...rest
 }: Props): JSX.Element => {
   const canAccept = Boolean(acceptLabel) && Boolean(setAccepted);
+
   return (
     <Wrapper {...rest}>
       <Content>
         <Heading>{heading}</Heading>
-        <Sanitize html={body} />
+        <p>{body}</p>
         {links?.length > 0 && (
           <Links>
             {links.map((link) => (
@@ -119,7 +129,7 @@ const TermsBox = ({
         <Actions>
           <Divider />
           <StyledCheckbox
-            id="terms-accepted"
+            id={`${id}-terms-accepted`}
             data-testid="terms-box__checkbox--accept-terms"
             label={acceptLabel}
             checked={accepted}

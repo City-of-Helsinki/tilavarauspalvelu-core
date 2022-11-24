@@ -33,14 +33,20 @@
     "reserveeLastName": "Varaajan sukunimi",
     "name": "Varauksen nimi (julkinen)",
     "description": "Varauksen kuvaus",
-    "termsSpace": "Olen lukenut ja hyväksynyt varauksen sopimusehdot",
-    "termsResource": "Olen lukenut ja hyväksynyt varauksen resurssikohtaiset ehdot",
+    "termsGeneral": "Olen lukenut ja hyväksyn kaupungin yleiset ehdot",
+    "termsGeneralSpecific": "Olen lukenut ja hyväksyn sopimusehdot ja kaupungin yleiset ehdot",
+    "termsCancellation": "Olen lukenut ja hyväksyn peruutusehdot",
+    "termsPayment": "Olen lukenut ja hyväksyn maksuehdot",
+    "termsCancellationPayment": "Olen lukenut ja hyväksyn peruutus- ja maksuehdot",
     "reservationDate": "Varauksen ajankohta",
     "reservationSpace": "Tila"
   },
   "heading": {
+    "generalTerms": "Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot",
     "termsOfUse": "Sopimusehdot",
-    "resourceTerms": "Tilakohtaiset ehdot",
+    "cancellationPaymentTerms": "Peruutus- ja maksuehdot",
+    "cancellationTerms": "Peruutusehdot",
+    "paymentTerms": "Maksuehdot",
     "newReservation": "Täytä varauksen tiedot",
     "pendingReservation": "Tarkista varauksen tiedot"
   },
@@ -67,7 +73,8 @@
   "errors": {
     "bufferCollision": "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika.",
     "collision": "Valittu aika on varattu. Valitse toinen aika.",
-    "unavailable": "Valittu aika ei ole varattavissa. Valitse toinen aloitusaika tai kesto."
+    "unavailable": "Valittu aika ei ole varattavissa. Valitse toinen aloitusaika tai kesto.",
+    "termsNotAccepted": "Hyväksy ehdot jatkaaksesi."
   },
   "reservingStartsAt": "Varauskalenteri aukeaa {{date}}.",
   "reservationQuota": "Sinulla on jo {{count}}/{{total}} varausta tähän tilaan.",

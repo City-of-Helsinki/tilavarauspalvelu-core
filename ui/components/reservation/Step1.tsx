@@ -1,19 +1,12 @@
-import { breakpoints } from "common/src/common/style";
 import { OptionType } from "common/types/common";
 import { get } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DeepMap, FieldError } from "react-hook-form";
 import styled from "styled-components";
-import { Checkbox, IconArrowLeft, IconArrowRight } from "hds-react";
-import { Inputs, Reservation } from "../../modules/types";
-import {
-  applicationErrorText,
-  capitalize,
-  getTranslation,
-} from "../../modules/util";
+import { IconArrowLeft, IconArrowRight } from "hds-react";
+import { Reservation } from "../../modules/types";
+import { capitalize, getTranslation } from "../../modules/util";
 import { ActionContainer, Subheading, TwoColumnContainer } from "./styles";
-import { AccordionWithState as Accordion } from "../common/Accordion";
 import Sanitize from "../common/Sanitize";
 import {
   ReservationsReservationReserveeTypeChoices,
@@ -21,6 +14,7 @@ import {
   TermsOfUseType,
 } from "../../modules/gql-types";
 import { MediumButton } from "../../styles/util";
+import TermsBox from "../common/TermsBox";
 
 type Props = {
   reservation: Reservation;
@@ -31,10 +25,8 @@ type Props = {
   options: Record<string, OptionType[]>;
   reserveeType: ReservationsReservationReserveeTypeChoices;
   setStep: React.Dispatch<React.SetStateAction<number>>;
-  errors: DeepMap<Inputs, FieldError>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register: any;
   termsOfUse: Record<string, TermsOfUseType>;
+  setErrorMsg: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const ParagraphAlt = styled.div<{ $isWide?: boolean }>`
@@ -56,23 +48,6 @@ const PreviewValue = styled.span`
   font-size: var(--fontsize-body-l);
 `;
 
-const AccordionContainer = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    width: 70%;
-  }
-
-  line-height: var(--lineheight-l);
-  white-space: pre-line;
-
-  button {
-    margin-bottom: var(--spacing-xs);
-  }
-`;
-
-const TermContainer = styled.div`
-  margin-bottom: var(--spacing-xl);
-`;
-
 const Step1 = ({
   reservation,
   reservationUnit,
@@ -82,9 +57,8 @@ const Step1 = ({
   options,
   reserveeType,
   setStep,
-  errors,
-  register,
   termsOfUse,
+  setErrorMsg,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -96,7 +70,11 @@ const Step1 = ({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        handleSubmit();
+        if (!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted) {
+          setErrorMsg(t("reservationCalendar:errors.termsNotAccepted"));
+        } else {
+          handleSubmit();
+        }
       }}
     >
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
@@ -174,55 +152,71 @@ const Step1 = ({
             })}
         </>
       </TwoColumnContainer>
-      <AccordionContainer>
-        <TermContainer>
-          <Accordion open heading={t("reservationCalendar:heading.termsOfUse")}>
-            <Sanitize html={getTranslation(termsOfUse.genericTerms, "text")} />
-          </Accordion>
-          <Checkbox
-            id="spaceTerms"
-            name="spaceTerms"
-            checked={areTermsSpaceAccepted}
-            onChange={(e) => setAreTermsSpaceAccepted(e.target.checked)}
-            label={`${t("reservationCalendar:label.termsSpace")} *`}
-            ref={register({ required: true })}
-            errorText={
-              !!errors.spaceTerms && applicationErrorText(t, "requiredField")
-            }
-          />
-        </TermContainer>
-        <TermContainer>
-          <Accordion
-            open
-            heading={t("reservationCalendar:heading.resourceTerms")}
-          >
-            <p>
-              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
-            </p>
-            <p>
-              <Sanitize
-                html={getTranslation(
-                  reservationUnit.serviceSpecificTerms,
-                  "text"
-                )}
-              />
-            </p>
-          </Accordion>
-          <Checkbox
-            id="resourceTerms"
-            name="resourceTerms"
-            checked={areServiceSpecificTermsAccepted}
-            onChange={(e) =>
-              setAreServiceSpecificTermsAccepted(e.target.checked)
-            }
-            label={`${t("reservationCalendar:label.termsResource")} *`}
-            ref={register({ required: true })}
-            errorText={
-              !!errors.resourceTerms && applicationErrorText(t, "requiredField")
-            }
-          />
-        </TermContainer>
-      </AccordionContainer>
+      <TermsBox
+        id="generic-and-service-specific-terms"
+        heading={t("reservationCalendar:heading.termsOfUse")}
+        body={
+          <>
+            <Sanitize
+              html={getTranslation(
+                reservationUnit.serviceSpecificTerms,
+                "text"
+              )}
+            />
+          </>
+        }
+        links={
+          termsOfUse.genericTerms && [
+            {
+              href: "/terms/general",
+              text: t("reservationCalendar:heading.generalTerms"),
+            },
+          ]
+        }
+        acceptLabel={t(
+          `reservationCalendar:label.${
+            reservationUnit.serviceSpecificTerms
+              ? "termsGeneralSpecific"
+              : "termsGeneral"
+          }`
+        )}
+        accepted={areTermsSpaceAccepted}
+        setAccepted={setAreTermsSpaceAccepted}
+      />
+      <TermsBox
+        id="cancellation-and-payment-terms"
+        heading={t(
+          `reservationCalendar:heading.${
+            reservationUnit.cancellationTerms && reservationUnit.paymentTerms
+              ? "cancellationPaymentTerms"
+              : reservationUnit.cancellationTerms
+              ? "cancellationTerms"
+              : "paymentTerms"
+          }`
+        )}
+        body={
+          <>
+            <Sanitize
+              html={getTranslation(reservationUnit.cancellationTerms, "text")}
+            />
+            <br />
+            <Sanitize
+              html={getTranslation(reservationUnit.paymentTerms, "text")}
+            />
+          </>
+        }
+        acceptLabel={t(
+          `reservationCalendar:label.${
+            reservationUnit.cancellationTerms && reservationUnit.paymentTerms
+              ? "termsCancellationPayment"
+              : reservationUnit.cancellationTerms
+              ? "termsCancellation"
+              : "termsPayment"
+          }`
+        )}
+        accepted={areServiceSpecificTermsAccepted}
+        setAccepted={setAreServiceSpecificTermsAccepted}
+      />
       <ActionContainer>
         <MediumButton
           variant="primary"
