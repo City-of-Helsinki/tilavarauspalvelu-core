@@ -6,6 +6,7 @@ from django.db.models import Q, QuerySet
 from django.utils import timezone
 
 from applications.models import Application, ApplicationRound
+from merchants.models import PaymentOrder
 from reservation_units.models import ReservationUnit
 from reservations.models import RecurringReservation, Reservation
 from spaces.models import ServiceSector, Unit, UnitGroup
@@ -489,4 +490,16 @@ def can_view_users(user: User):
         or has_general_permission(user, permission)
         or has_unit_permission(user, Unit.objects.all(), permission)
         or has_service_sector_permission(user, ServiceSector.objects.all(), permission)
+    )
+
+
+def can_refresh_order(user: User, payment_order: PaymentOrder) -> bool:
+    if not user.is_authenticated:
+        return False
+
+    permission = "can_manage_reservations"
+    return (
+        is_superuser(user)
+        or has_general_permission(user, permission)
+        or user.uuid == payment_order.reservation_user_uuid
     )

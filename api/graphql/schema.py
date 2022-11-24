@@ -15,6 +15,7 @@ from api.graphql.applications.application_types import (
     ApplicationType,
     CityType,
 )
+from api.graphql.merchants.merchant_mutations import RefreshOrderMutation
 from api.graphql.merchants.merchant_types import PaymentOrderType
 from api.graphql.reservation_units.reservation_unit_filtersets import (
     EquipmentFilterSet,
@@ -520,6 +521,8 @@ class Mutation(graphene.ObjectType):
     update_unit = UnitUpdateMutation.Field()
 
     update_user = UserUpdateMutation.Field()
+
+    refresh_order = RefreshOrderMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
