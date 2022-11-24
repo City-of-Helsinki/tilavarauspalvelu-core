@@ -14,6 +14,7 @@ from api.graphql.reservations.reservation_serializers import (
     ReservationCreateSerializer,
     ReservationDenySerializer,
     ReservationRequiresHandlingSerializer,
+    ReservationStaffCreateSerializer,
     ReservationUpdateSerializer,
     ReservationWorkingMemoSerializer,
 )
@@ -23,6 +24,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationCommentPermission,
     ReservationHandlingPermission,
     ReservationPermission,
+    ReservationStaffCreatePermission,
 )
 from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import Reservation
@@ -135,3 +137,18 @@ class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
             )
 
         return None
+
+
+class ReservationStaffCreateMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (ReservationStaffCreatePermission,)
+    model = Reservation
+
+    reservation = graphene.Field(ReservationType)
+
+    class Meta:
+        model_operations = ["create"]
+        serializer_class = ReservationStaffCreateSerializer
+
+    def resolve_reservation(self, info: ResolveInfo):
+        reservation = Reservation.objects.filter(pk=self.pk).first()
+        return reservation
