@@ -503,3 +503,17 @@ def can_refresh_order(user: User, payment_order: PaymentOrder) -> bool:
         or has_general_permission(user, permission)
         or user.uuid == payment_order.reservation_user_uuid
     )
+
+
+def can_create_staff_reservation(user: User, reservation_unit):
+    permission = "can_create_staff_reservations"
+
+    units = [r.unit_id for r in reservation_unit]
+    service_sectors = ServiceSector.objects.filter(units__in=units)
+
+    return (
+        is_superuser(user)
+        or has_unit_permission(user, units, permission)
+        or has_general_permission(user, permission)
+        or has_service_sector_permission(user, service_sectors, permission)
+    )

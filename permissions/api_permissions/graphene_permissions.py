@@ -9,6 +9,7 @@ from merchants.models import PaymentOrder
 from permissions.helpers import (
     can_comment_reservation,
     can_create_reservation,
+    can_create_staff_reservation,
     can_handle_application,
     can_handle_reservation,
     can_manage_ability_groups,
@@ -364,6 +365,14 @@ class ReservationCommentPermission(BasePermission):
             reservation = get_object_or_404(Reservation, pk=pk)
             return can_comment_reservation(info.context.user, reservation)
         return False
+
+
+class ReservationStaffCreatePermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        reservation_unit_ids = input.get("reservation_unit_pks", [])
+        reservation_units = ReservationUnit.objects.filter(id__in=reservation_unit_ids)
+        return can_create_staff_reservation(info.context.user, reservation_units)
 
 
 class RecurringReservationPermission(BasePermission):
