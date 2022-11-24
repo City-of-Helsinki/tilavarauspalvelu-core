@@ -175,12 +175,14 @@ class CreateOrderParams:
     price_net: Decimal
     price_vat: Decimal
     price_total: Decimal
+    last_valid_purchase_datetime: datetime
 
     def to_json(self) -> Dict[str, Any]:
         return {
             "namespace": self.namespace,
             "user": str(self.user),
             "language": self.language,
+            "lastValidPurchaseDateTime": self.last_valid_purchase_datetime.isoformat(),
             "items": [
                 {
                     "productId": str(item.product_id),

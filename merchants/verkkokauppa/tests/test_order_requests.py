@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict
 from unittest.mock import Mock
@@ -7,6 +8,7 @@ from uuid import UUID
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
+from django.utils.timezone import utc
 from pytest import raises
 from requests import Timeout
 
@@ -31,6 +33,7 @@ class OrderRequestsTestCaseBase(TestCase):
         price_net=Decimal("100.0"),
         price_vat=Decimal("24.0"),
         price_total=Decimal("124.0"),
+        last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=utc),
         items=[
             OrderItemParams(
                 product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),

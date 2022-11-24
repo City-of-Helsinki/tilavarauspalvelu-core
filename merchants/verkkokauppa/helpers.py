@@ -1,8 +1,9 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 from sentry_sdk import capture_message
 
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -107,6 +108,8 @@ def create_verkkokauppa_order(reservation: Reservation):
             if reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
             else "",
         ),
+        last_valid_purchase_datetime=datetime.now(tz=get_default_timezone())
+        + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES),
     )
 
     try:
