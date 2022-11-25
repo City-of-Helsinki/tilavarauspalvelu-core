@@ -5,6 +5,7 @@ from uuid import UUID
 
 from assertpy import assert_that
 from django.test.testcases import TestCase
+from django.utils.timezone import utc
 from pytest import raises
 
 from ..order.exceptions import ParseOrderError
@@ -27,6 +28,7 @@ class OrderTypesTestCase(TestCase):
         price_net=Decimal("100.0"),
         price_vat=Decimal("24.0"),
         price_total=Decimal("124.0"),
+        last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=utc),
         items=[
             OrderItemParams(
                 product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
@@ -128,6 +130,7 @@ class OrderTypesTestCase(TestCase):
                 "namespace": "test-namespace",
                 "user": "test-user",
                 "language": "fi",
+                "lastValidPurchaseDateTime": "2022-11-24T12:00:00+00:00",
                 "priceNet": "100.0",
                 "priceVat": "24.0",
                 "priceTotal": "124.0",

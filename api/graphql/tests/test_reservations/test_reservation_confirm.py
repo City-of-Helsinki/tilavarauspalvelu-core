@@ -2,7 +2,6 @@ import datetime
 import json
 from decimal import Decimal
 from unittest.mock import patch
-from uuid import uuid4
 
 import freezegun
 from assertpy import assert_that
@@ -18,34 +17,9 @@ from email_notification.tests.factories import EmailTemplateFactory
 from merchants.models import PaymentOrder, PaymentStatus, PaymentType
 from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.test.factories import OrderFactory
-from merchants.verkkokauppa.order.types import Order, OrderCustomer
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import ReservationFactory
-
-
-def create_verkkokauppa_order() -> Order:
-    return Order(
-        order_id=uuid4(),
-        namespace="tilanvaraus",
-        user=str(uuid4()),
-        created_at=datetime.datetime.now(),
-        items=[],
-        price_net=Decimal("100.0"),
-        price_vat=Decimal("24.0"),
-        price_total=Decimal("124.0"),
-        checkout_url="https://checkout.url",
-        receipt_url="http://receipt.url",
-        customer=OrderCustomer(
-            first_name="Liu",
-            last_name="Kang",
-            email="liu.kang@earthrealm.com",
-            phone="+358 50 123 4567",
-        ),
-        status="created",
-        subscription_id=uuid4(),
-        type="order",
-    )
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
@@ -114,7 +88,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
     def test_confirm_reservation_changes_state(
         self, mock_create_order, mock_periods, mock_opening_hours
     ):
-        mock_create_order.return_value = create_verkkokauppa_order()
+        mock_create_order.return_value = OrderFactory.create()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
 
@@ -243,7 +217,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
     def test_confirm_reservation_updates_confirmed_at(
         self, mock_create_order, mock_periods, mock_opening_hours
     ):
-        mock_create_order.return_value = create_verkkokauppa_order()
+        mock_create_order.return_value = OrderFactory.create()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
@@ -258,7 +232,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
     def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(
         self, mock_create_order, mock_periods, mock_opening_hours
     ):
-        mock_create_order.return_value = create_verkkokauppa_order()
+        mock_create_order.return_value = OrderFactory.create()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.metadata_set = self._create_metadata_set()
         self.reservation_unit.save(update_fields=["metadata_set"])
