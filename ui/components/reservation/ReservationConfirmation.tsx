@@ -8,7 +8,7 @@ import { H2 } from "common/src/common/typography";
 import {
   ReservationsReservationStateChoices,
   ReservationUnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { Reservation } from "../../modules/types";
 import { getTranslation, reservationsUrl } from "../../modules/util";

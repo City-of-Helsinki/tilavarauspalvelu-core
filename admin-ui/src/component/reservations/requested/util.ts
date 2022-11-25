@@ -21,7 +21,7 @@ import {
   ReservationUnitPricingType,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import { formatDate, formatTime } from "../../../common/util";
 
 export const reservationDateTime = (

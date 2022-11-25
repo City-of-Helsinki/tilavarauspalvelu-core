@@ -4,15 +4,15 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
-import { Reservation } from "../../modules/types";
-import { capitalize, getTranslation } from "../../modules/util";
-import { ActionContainer, Subheading, TwoColumnContainer } from "./styles";
-import Sanitize from "../common/Sanitize";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationUnitType,
   TermsOfUseType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
+import { Reservation } from "../../modules/types";
+import { capitalize, getTranslation } from "../../modules/util";
+import { ActionContainer, Subheading, TwoColumnContainer } from "./styles";
+import Sanitize from "../common/Sanitize";
 import { MediumButton } from "../../styles/util";
 import TermsBox from "../common/TermsBox";
 

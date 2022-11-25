@@ -9,7 +9,7 @@ import {
   ReservationType,
   ReservationUnitByPkType,
   ReservationUnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 import {
   capitalize,
   formatDurationMinutes,

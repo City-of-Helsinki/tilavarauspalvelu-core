@@ -1,7 +1,7 @@
 import { get, isEqual, set } from "lodash";
 import { User } from "oidc-client";
+import { UserType } from "common/types/gql-types";
 import { localLogout } from "../common/auth/util";
-import { UserType } from "../common/gql-types";
 import permissionHelper from "./permissionHelper";
 
 export type AuthState =

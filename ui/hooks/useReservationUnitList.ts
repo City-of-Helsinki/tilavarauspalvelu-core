@@ -2,7 +2,7 @@ import { useSessionStorage } from "react-use";
 import {
   ReservationUnitByPkType,
   ReservationUnitType,
-} from "../modules/gql-types";
+} from "common/types/gql-types";
 
 export type ReservationUnitList = {
   reservationUnits: ReservationUnitType[] | ReservationUnitByPkType[];

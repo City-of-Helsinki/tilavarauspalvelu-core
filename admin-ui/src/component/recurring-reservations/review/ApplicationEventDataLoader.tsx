@@ -1,5 +1,10 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
+import {
+  ApplicationEventType,
+  Query,
+  QueryApplicationEventsArgs,
+} from "common/types/gql-types";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
 import { useNotification } from "../../../context/NotificationContext";
@@ -7,12 +12,6 @@ import Loader from "../../Loader";
 import { More } from "../../lists/More";
 import { LIST_PAGE_SIZE } from "../../../common/const";
 import { combineResults } from "../../../common/util";
-import {
-  ApplicationEventType,
-  Query,
-  QueryApplicationEventsArgs,
-} from "../../../common/gql-types";
-
 import { appEventMapper } from "../util";
 import { ApplicationRound } from "../../../common/types";
 import ApplicationEventsTable from "./ApplicationEventsTable";

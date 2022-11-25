@@ -1,5 +1,5 @@
 import { i18n } from "next-i18next";
-import { ApplicationRoundType } from "./gql-types";
+import { ApplicationRoundType } from "common/types/gql-types";
 import { capitalize } from "./util";
 
 export const getApplicationRoundName = (

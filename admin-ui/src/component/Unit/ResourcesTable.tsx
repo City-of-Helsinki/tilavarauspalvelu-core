@@ -4,17 +4,16 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useHistory } from "react-router-dom";
-import DataTable, { CellConfig } from "../DataTable";
-import PopupMenu from "./PopupMenu";
-import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
-import { DELETE_RESOURCE } from "../../common/queries";
-
 import {
   ResourceDeleteMutationInput,
   ResourceDeleteMutationPayload,
   ResourceType,
   UnitByPkType,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
+import DataTable, { CellConfig } from "../DataTable";
+import PopupMenu from "./PopupMenu";
+import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
+import { DELETE_RESOURCE } from "../../common/queries";
 import { resourceUrl } from "../../common/urls";
 
 interface IProps {

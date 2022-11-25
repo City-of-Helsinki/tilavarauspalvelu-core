@@ -1,4 +1,4 @@
-import { UserType } from "../common/gql-types";
+import { UserType } from "common/types/gql-types";
 
 const hasUnitPermission = (
   permissionName: string,

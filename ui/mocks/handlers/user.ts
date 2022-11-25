@@ -1,5 +1,5 @@
 import { graphql } from "msw";
-import { UserType } from "../../modules/gql-types";
+import { UserType } from "common/types/gql-types";
 
 const currentUser = graphql.query("getCurrentUser", (req, res, ctx) => {
   const user: UserType = {

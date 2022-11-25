@@ -10,7 +10,7 @@ import {
   ReservationType,
   ReservationUnitByPkType,
   ReservationUnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import {
   capitalize,

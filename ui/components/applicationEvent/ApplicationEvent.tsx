@@ -18,6 +18,10 @@ import {
   LocalizationLanguages,
   OptionType,
 } from "common/types/common";
+import {
+  ApplicationRoundType,
+  ReservationUnitType,
+} from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import ReservationUnitList from "../reservation-unit/ReservationUnitList";
@@ -37,10 +41,6 @@ import { getDurationOptions } from "../../modules/const";
 import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
-import {
-  ApplicationRoundType,
-  ReservationUnitType,
-} from "../../modules/gql-types";
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];

@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Query, QueryReservationUnitTypesArgs } from "../../common/gql-types";
+import { Query, QueryReservationUnitTypesArgs } from "common/types/gql-types";
 import { OptionType } from "../../common/types";
 import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
 import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";

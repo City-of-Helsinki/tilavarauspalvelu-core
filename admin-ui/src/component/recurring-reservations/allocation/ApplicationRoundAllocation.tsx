@@ -7,7 +7,6 @@ import { uniqBy } from "lodash";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, Strongish } from "common/src/common/typography";
-import { getApplicationRound } from "../../../common/api";
 import {
   ApplicationType,
   QueryApplicationsArgs,
@@ -15,7 +14,8 @@ import {
   ApplicationEventType,
   ReservationUnitType,
   ApplicationStatus,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+import { getApplicationRound } from "../../../common/api";
 import { ApplicationRound, OptionType } from "../../../common/types";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";

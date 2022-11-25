@@ -10,7 +10,7 @@ import {
   ResourceType,
   SpaceType,
   UnitByPkType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import { OptionType } from "../../../common/types";
 
 export interface IProps {

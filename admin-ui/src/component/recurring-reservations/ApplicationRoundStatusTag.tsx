@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   ApplicationRoundStatus,
   ApplicationRoundType,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
 
 interface IProps {
   applicationRound: ApplicationRoundType;

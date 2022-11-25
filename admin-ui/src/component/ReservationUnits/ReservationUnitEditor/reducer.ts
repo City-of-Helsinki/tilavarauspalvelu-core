@@ -2,7 +2,6 @@ import i18next from "i18next";
 import { get, pick, sortBy, sumBy, uniq, upperFirst } from "lodash";
 import { addDays, format } from "date-fns";
 import { paymentTypes } from "common/types/common";
-import { languages } from "../../../common/const";
 import {
   Query,
   ReservationUnitImageType,
@@ -14,7 +13,8 @@ import {
   ResourceType,
   SpaceType,
   TermsOfUseTermsOfUseTermsTypeChoices,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+import { languages } from "../../../common/const";
 import { OptionType } from "../../../common/types";
 import {
   Action,

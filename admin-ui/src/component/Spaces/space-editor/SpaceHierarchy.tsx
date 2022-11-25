@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { SpaceType } from "../../../common/gql-types";
+import { SpaceType } from "common/types/gql-types";
 
 type Props = {
   space: SpaceType;

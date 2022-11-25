@@ -8,6 +8,7 @@ import { GetStaticProps } from "next";
 import styled from "styled-components";
 import { Application, OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
+import { Query, QueryApplicationRoundsArgs } from "common/types/gql-types";
 import { saveApplication } from "../modules/api";
 import { applicationRoundState, deepCopy } from "../modules/util";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
@@ -15,7 +16,6 @@ import { MediumButton } from "../styles/util";
 import RequireAuthentication from "../components/common/RequireAuthentication";
 import Head from "../components/application/Head";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
-import { Query, QueryApplicationRoundsArgs } from "../modules/gql-types";
 import { CenterSpinner } from "../components/common/common";
 import { getApplicationRoundName } from "../modules/applicationRound";
 

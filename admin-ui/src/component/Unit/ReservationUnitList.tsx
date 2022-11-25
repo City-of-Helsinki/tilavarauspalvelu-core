@@ -3,15 +3,13 @@ import { uniq, uniqBy } from "lodash";
 import React, { useMemo, useState } from "react";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
-
+import { ReservationUnitType } from "common/types/gql-types";
 import { DataFilterConfig, DataFilterOption } from "../../common/types";
-
 import { filterData } from "../../common/util";
 import FilterContainer, { FilterBtn } from "../FilterContainer";
 import FilterControls from "../FilterControls";
 import ReservationUnitCard from "./ReservationUnitCard";
 import { ContentContainer } from "../../styles/layout";
-import { ReservationUnitType } from "../../common/gql-types";
 
 interface IProps {
   reservationUnits: ReservationUnitType[];

@@ -4,11 +4,11 @@ import { get, upperFirst } from "lodash";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "common/src/common/style";
-import { languages } from "../../../common/const";
 import {
   SpaceCreateMutationInput,
   SpaceUpdateMutationInput,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+import { languages } from "../../../common/const";
 
 const EditorColumns = styled.div`
   display: grid;

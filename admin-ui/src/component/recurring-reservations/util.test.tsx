@@ -1,7 +1,7 @@
 import {
   ApplicationType,
   EventReservationUnitType,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
 import { ApplicationRound } from "../../common/types";
 import { appMapper } from "./util";
 

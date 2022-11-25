@@ -13,7 +13,7 @@ import {
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
   UnitByPkType,
-} from "../../../../common/gql-types";
+} from "common/types/gql-types";
 import { CustomDialogHeader } from "../../../CustomDialogHeader";
 import {
   Action,

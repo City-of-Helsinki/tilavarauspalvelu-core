@@ -16,8 +16,7 @@ import {
   SpaceUpdateMutationInput,
   SpaceUpdateMutationPayload,
   UnitType,
-} from "../../../common/gql-types";
-
+} from "common/types/gql-types";
 import { schema } from "./util";
 import { useNotification } from "../../../context/NotificationContext";
 import { SPACE_QUERY, UPDATE_SPACE } from "./queries";

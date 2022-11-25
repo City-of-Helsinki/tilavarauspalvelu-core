@@ -17,9 +17,6 @@ import { isFinite, omit } from "lodash";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
-import apolloClient from "../../modules/apolloClient";
-import { isBrowser, reservationUnitPrefix } from "../../modules/const";
-import { getTranslation, printErrorMessages } from "../../modules/util";
 import {
   AgeGroupType,
   CityType,
@@ -42,7 +39,10 @@ import {
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
   TermsOfUseType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
+import apolloClient from "../../modules/apolloClient";
+import { isBrowser, reservationUnitPrefix } from "../../modules/const";
+import { getTranslation, printErrorMessages } from "../../modules/util";
 import {
   RESERVATION_UNIT,
   TERMS_OF_USE,

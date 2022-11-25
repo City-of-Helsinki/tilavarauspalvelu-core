@@ -16,6 +16,7 @@ import {
 } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { Query, TermsOfUseType } from "common/types/gql-types";
 import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
@@ -28,7 +29,6 @@ import {
 } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { MediumButton } from "../../styles/util";
-import { Query, TermsOfUseType } from "../../modules/gql-types";
 import { CITIES, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import { getOldReservationUnitName } from "../../modules/reservationUnit";
 

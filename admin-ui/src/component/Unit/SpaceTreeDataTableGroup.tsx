@@ -4,7 +4,7 @@ import { IconAngleDown, IconAngleUp } from "hds-react";
 import { get } from "lodash";
 import { useHistory } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";
-import { SpaceType } from "../../common/gql-types";
+import { SpaceType } from "common/types/gql-types";
 import { CellConfig, Row, Column, Cell } from "../DataTable";
 
 interface IProps {

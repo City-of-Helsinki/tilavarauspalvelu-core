@@ -2,14 +2,14 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
-import { getTranslation } from "../../modules/util";
-import ExternalLink from "./ExternalLink";
 import {
   LocationType,
   ReservationUnitByPkType,
   ReservationUnitType,
   UnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
+import { getTranslation } from "../../modules/util";
+import ExternalLink from "./ExternalLink";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | ReservationUnitType;

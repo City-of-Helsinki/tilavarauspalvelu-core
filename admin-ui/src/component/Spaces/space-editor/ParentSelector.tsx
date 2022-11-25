@@ -7,7 +7,7 @@ import {
   Query,
   QueryUnitByPkArgs,
   SpaceType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import { SPACE_HIERARCHY_QUERY } from "./queries";
 import { spacesAsHierarchy } from "./util";
 

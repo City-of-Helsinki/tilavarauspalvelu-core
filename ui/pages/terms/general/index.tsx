@@ -3,15 +3,15 @@ import { useTranslation } from "react-i18next";
 import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import apolloClient from "../../../modules/apolloClient";
-import Sanitize from "../../../components/common/Sanitize";
-import { getTranslation } from "../../../modules/util";
-import { TERMS_OF_USE } from "../../../modules/queries/reservationUnit";
 import {
   QueryTermsOfUseArgs,
   TermsOfUseType,
   Query,
-} from "../../../modules/gql-types";
+} from "common/types/gql-types";
+import apolloClient from "../../../modules/apolloClient";
+import Sanitize from "../../../components/common/Sanitize";
+import { getTranslation } from "../../../modules/util";
+import { TERMS_OF_USE } from "../../../modules/queries/reservationUnit";
 import Container from "../../../components/common/Container";
 
 type Props = {

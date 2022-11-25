@@ -10,7 +10,7 @@ import {
   ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 
 export const reservationUnitSearchHandlers = [
   graphql.query<

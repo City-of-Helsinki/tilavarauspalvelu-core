@@ -5,12 +5,12 @@ import { get } from "lodash";
 import { endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { reservationUrl } from "../../common/urls";
 import {
   Query,
   QueryReservationsArgs,
   ReservationType,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
+import { reservationUrl } from "../../common/urls";
 import { combineResults } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
 import Legend from "../reservations/requested/Legend";

@@ -3,7 +3,7 @@ import { addMinutes } from "date-fns";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
-} from "../gql-types";
+} from "common/types/gql-types";
 import {
   canUserCancelReservation,
   getDurationOptions,

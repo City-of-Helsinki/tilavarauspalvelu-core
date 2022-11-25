@@ -6,7 +6,7 @@ import {
   SpaceCreateMutationPayload,
   SpaceType,
   UnitByPkType,
-} from "../../../../common/gql-types";
+} from "common/types/gql-types";
 import { CREATE_SPACE } from "../queries";
 import {
   Action,

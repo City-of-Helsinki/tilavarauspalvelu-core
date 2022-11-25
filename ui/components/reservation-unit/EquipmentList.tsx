@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { EquipmentType } from "../../modules/gql-types";
+import { EquipmentType } from "common/types/gql-types";
 import { getEquipmentList } from "../../modules/reservationUnit";
 
 type Props = {

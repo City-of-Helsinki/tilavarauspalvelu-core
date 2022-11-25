@@ -6,7 +6,7 @@ import {
   Mutation,
   ReservationRequiresHandlingMutationInput,
   ReservationType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import { useModal } from "../../../context/ModalContext";
 import { REQUIRE_HANDLING_RESERVATION } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";

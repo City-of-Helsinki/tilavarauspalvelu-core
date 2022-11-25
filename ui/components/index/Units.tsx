@@ -5,9 +5,9 @@ import { IconAngleRight, IconArrowRight } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { fontMedium, H3 } from "common/src/common/typography";
+import { UnitType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import Container from "../common/Container";
-import { UnitType } from "../../modules/gql-types";
 import { getTranslation } from "../../modules/util";
 
 type Props = {

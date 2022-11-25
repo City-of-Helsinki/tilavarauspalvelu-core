@@ -1,7 +1,7 @@
 import React from "react";
 import { Tag } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitState } from "../../../common/gql-types";
+import { ReservationUnitState } from "common/types/gql-types";
 
 interface IProps {
   state: ReservationUnitState;

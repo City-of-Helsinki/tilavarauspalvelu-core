@@ -7,11 +7,11 @@ import Link from "next/link";
 import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
+import { ReservationUnitType } from "common/types/gql-types";
 import { reservationUnitPath } from "../../modules/const";
 import { getMainImage, getTranslation } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import Carousel from "../Carousel";
-import { ReservationUnitType } from "../../modules/gql-types";
 import {
   getActivePricing,
   getPrice,

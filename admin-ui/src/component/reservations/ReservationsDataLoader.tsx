@@ -6,8 +6,7 @@ import {
   Query,
   QueryReservationsArgs,
   ReservationType,
-} from "../../common/gql-types";
-
+} from "common/types/gql-types";
 import { LIST_PAGE_SIZE } from "../../common/const";
 import { combineResults } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";

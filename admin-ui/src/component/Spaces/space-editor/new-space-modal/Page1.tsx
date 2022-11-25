@@ -7,7 +7,7 @@ import {
   NumberInput,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { UnitByPkType } from "../../../../common/gql-types";
+import { UnitByPkType } from "common/types/gql-types";
 import { CustomDialogHeader } from "../../../CustomDialogHeader";
 import ParentSelector from "../ParentSelector";
 import {

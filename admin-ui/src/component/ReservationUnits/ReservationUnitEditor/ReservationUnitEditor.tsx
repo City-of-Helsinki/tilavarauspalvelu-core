@@ -20,9 +20,6 @@ import i18next from "i18next";
 import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
-
-import { languages, previewUrlPrefix, publicUrl } from "../../../common/const";
-import Select from "./Select";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -37,7 +34,10 @@ import {
   ReservationUnitsReservationUnitAuthenticationChoices,
   ReservationUnitByPkType,
   ReservationUnitState,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+
+import { languages, previewUrlPrefix, publicUrl } from "../../../common/const";
+import Select from "./Select";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
 import {

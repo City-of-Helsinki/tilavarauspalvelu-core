@@ -39,9 +39,9 @@ yarn generate-certificate
 yarn dev
 ```
 
-### Generate new gql types
+### When GQL api changes and you need to update the Typescript types
 
-When GQL api changes and you need to update the Typescript types
+go to common module and run
 
 ```
 yarn generate-gql-types
@@ -68,11 +68,11 @@ docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 
 ### Graphql workflow
 
-When server has new api changes -> update schema & generate new types by running: `yarn update-schema generate-gql-types`
-
-When a query is modified and you need new mock data types run: `generate-gql-types`, see [mocks/handlers/singleSearch.ts](mocks/handlers/singleSearch.ts) for example on how to use type safe mock test data.
+When server has new api changes -> update schema & generate new types by running: `yarn update-schema generate-gql-types` in common module.
 
 - Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
+
+When a query is modified and you need new mock data types run: `generate-gql-types`, see [mocks/handlers/singleSearch.ts](mocks/handlers/singleSearch.ts) for example on how to use type safe mock test data.
 
 ## Available Scripts
 

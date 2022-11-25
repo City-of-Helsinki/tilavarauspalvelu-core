@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { ReservationType } from "../../common/gql-types";
+import { ReservationType } from "common/types/gql-types";
 import { reservationUrl } from "../../common/urls";
 import { formatTime } from "../../common/util";
 import { DenseVerticalFlex } from "../../styles/layout";

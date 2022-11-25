@@ -3,18 +3,18 @@ import styled from "styled-components";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
-import Header from "../components/index/Header";
-import SearchGuides from "../components/index/SearchGuides";
-import Purposes from "../components/index/Purposes";
-import Units from "../components/index/Units";
-import apolloClient from "../modules/apolloClient";
 import {
   PurposeType,
   Query,
   QueryPurposesArgs,
   QueryUnitsArgs,
   UnitType,
-} from "../modules/gql-types";
+} from "common/types/gql-types";
+import Header from "../components/index/Header";
+import SearchGuides from "../components/index/SearchGuides";
+import Purposes from "../components/index/Purposes";
+import Units from "../components/index/Units";
+import apolloClient from "../modules/apolloClient";
 import {
   RESERVATION_UNIT_PURPOSES,
   SEARCH_FORM_PARAMS_UNIT,

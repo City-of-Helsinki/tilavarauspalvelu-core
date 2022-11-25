@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { Query, QueryReservationByPkArgs } from "../../../common/gql-types";
+import { Query, QueryReservationByPkArgs } from "common/types/gql-types";
 import { GET_BIRTHDATE_BY_RESERVATION_PK } from "./queries";
 import { BirthDate } from "../../BirthDate";
 import Loader from "../../Loader";

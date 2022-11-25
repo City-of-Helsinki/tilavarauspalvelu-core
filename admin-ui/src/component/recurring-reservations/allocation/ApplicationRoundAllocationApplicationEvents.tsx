@@ -7,7 +7,7 @@ import {
   ApplicationEventType,
   ApplicationType,
   ReservationUnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import Accordion from "../../Accordion";
 import { getApplicationEventScheduleResultStatuses } from "../modules/applicationRoundAllocation";
 import AllocationCalendar from "./AllocationCalendar";

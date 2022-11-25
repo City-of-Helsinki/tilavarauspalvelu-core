@@ -9,7 +9,7 @@ import { fontMedium, fontRegular } from "common/src/common/typography";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationUnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 import { Inputs, Reservation } from "../../modules/types";
 import { MediumButton } from "../../styles/util";
 import RadioButtonWithImage from "../form/RadioButtonWithImage";

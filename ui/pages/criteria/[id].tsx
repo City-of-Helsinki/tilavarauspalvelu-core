@@ -3,16 +3,16 @@ import { useTranslation } from "react-i18next";
 import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {
+  ApplicationRoundType,
+  Query,
+  QueryApplicationRoundsArgs,
+} from "common/types/gql-types";
 import Container from "../../components/common/Container";
 import apolloClient from "../../modules/apolloClient";
 import Sanitize from "../../components/common/Sanitize";
 import KorosDefault from "../../components/common/KorosDefault";
 import { getTranslation } from "../../modules/util";
-import {
-  ApplicationRoundType,
-  Query,
-  QueryApplicationRoundsArgs,
-} from "../../modules/gql-types";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 import { getApplicationRoundName } from "../../modules/applicationRound";

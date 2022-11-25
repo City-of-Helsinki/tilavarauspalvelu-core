@@ -4,8 +4,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { Query, QueryUnitByPkArgs, UnitByPkType } from "../../common/gql-types";
-
+import { Query, QueryUnitByPkArgs, UnitByPkType } from "common/types/gql-types";
 import { UNIT_QUERY } from "../../common/queries";
 import { ContentContainer } from "../../styles/layout";
 import Loader from "../Loader";

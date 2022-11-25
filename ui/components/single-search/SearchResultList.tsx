@@ -8,9 +8,9 @@ import {
 } from "hds-react";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
+import { PageInfo, ReservationUnitType } from "common/types/gql-types";
 import Container from "../common/Container";
 import ReservationUnitCard from "./ReservationUnitCard";
-import { PageInfo, ReservationUnitType } from "../../modules/gql-types";
 
 interface Props {
   reservationUnits: ReservationUnitType[] | null;

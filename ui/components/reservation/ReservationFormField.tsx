@@ -7,7 +7,7 @@ import { Control, Controller, DeepMap, FieldError } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium } from "common/src/common/typography";
-import { ReservationMetadataSetType } from "../../modules/gql-types";
+import { ReservationMetadataSetType } from "common/types/gql-types";
 import { Inputs, Reservation } from "../../modules/types";
 import { CheckboxWrapper } from "../common/common";
 

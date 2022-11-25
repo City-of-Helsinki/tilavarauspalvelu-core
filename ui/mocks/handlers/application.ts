@@ -6,7 +6,7 @@ import {
   OrganisationType,
   Query,
   QueryApplicationsArgs,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 
 const applications = graphql.query<Query, QueryApplicationsArgs>(
   "Applications",

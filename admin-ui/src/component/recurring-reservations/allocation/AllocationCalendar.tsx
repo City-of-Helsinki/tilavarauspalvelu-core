@@ -3,12 +3,11 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import { Strongish } from "common/src/common/typography";
-import { ALLOCATION_CALENDAR_TIMES, weekdays } from "../../../common/const";
 import {
   ApplicationEventScheduleType,
   ApplicationEventType,
-} from "../../../common/gql-types";
-
+} from "common/types/gql-types";
+import { ALLOCATION_CALENDAR_TIMES, weekdays } from "../../../common/const";
 import {
   applicationEventSchedulesToCells,
   getSlotApplicationEventCount,

@@ -10,7 +10,7 @@ import {
   QueryReservationsArgs,
   ReservationsReservationStateChoices,
   ReservationType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { RESERVATIONS_BY_RESERVATIONUNIT } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";

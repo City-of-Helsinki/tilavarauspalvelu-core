@@ -27,7 +27,7 @@ import {
   QueryPurposesArgs,
   PurposeTypeConnection,
   ReservationUnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 
 const equipmentCategories: EquipmentCategoryType[] = [
   {

@@ -5,8 +5,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { get, pick, upperFirst } from "lodash";
 import { useHistory } from "react-router-dom";
-import { UNIT_WITH_SPACES_AND_RESOURCES } from "../../../common/queries";
-import { languages } from "../../../common/const";
 import {
   Mutation,
   Query,
@@ -15,8 +13,9 @@ import {
   SpaceType,
   UnitByPkType,
   ResourceType,
-} from "../../../common/gql-types";
-
+} from "common/types/gql-types";
+import { UNIT_WITH_SPACES_AND_RESOURCES } from "../../../common/queries";
+import { languages } from "../../../common/const";
 import Loader from "../../Loader";
 import { ContentContainer, IngressContainer } from "../../../styles/layout";
 import SubPageHead from "../../Unit/SubPageHead";

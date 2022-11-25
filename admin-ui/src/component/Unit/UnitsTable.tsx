@@ -1,7 +1,7 @@
 import React from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import { memoize } from "lodash";
-import { UnitType } from "../../common/gql-types";
+import { UnitType } from "common/types/gql-types";
 
 import { unitUrl } from "../../common/urls";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";

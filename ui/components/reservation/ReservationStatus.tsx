@@ -2,7 +2,7 @@ import { camelCase } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { ReservationsReservationStateChoices } from "../../modules/gql-types";
+import { ReservationsReservationStateChoices } from "common/types/gql-types";
 
 type Props = {
   state: ReservationsReservationStateChoices;

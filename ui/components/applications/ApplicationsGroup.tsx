@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { H3 } from "common/src/common/typography";
-import { ApplicationRoundType, ApplicationType } from "../../modules/gql-types";
+import { ApplicationRoundType, ApplicationType } from "common/types/gql-types";
 import ApplicationCard from "./ApplicationCard";
 
 const GroupName = styled(H3).attrs({ as: "h2" })`

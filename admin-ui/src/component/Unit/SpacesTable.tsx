@@ -5,19 +5,18 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useHistory } from "react-router-dom";
+import {
+  SpaceDeleteMutationInput,
+  SpaceDeleteMutationPayload,
+  SpaceType,
+  UnitByPkType,
+} from "common/types/gql-types";
 import { DELETE_SPACE } from "../../common/queries";
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
-
-import {
-  SpaceDeleteMutationInput,
-  SpaceDeleteMutationPayload,
-  SpaceType,
-  UnitByPkType,
-} from "../../common/gql-types";
 import { DataGroup } from "../../common/types";
 import SpaceTreeDataTableGroup from "./SpaceTreeDataTableGroup";
 import { useNotification } from "../../context/NotificationContext";

@@ -10,11 +10,11 @@ import {
 import { useTranslation } from "react-i18next";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { BasicLink } from "../../styles/util";
 import {
   ReservationUnitsReservationUnitImageImageTypeChoices,
   ReservationUnitType,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
+import { BasicLink } from "../../styles/util";
 import { ReactComponent as IconDraft } from "../../images/icon_draft.svg";
 
 interface IProps {

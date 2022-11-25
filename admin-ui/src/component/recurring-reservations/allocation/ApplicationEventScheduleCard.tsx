@@ -11,7 +11,7 @@ import {
   MutationCreateApplicationEventScheduleResultArgs,
   MutationUpdateApplicationEventScheduleResultArgs,
   ReservationUnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import { parseDuration } from "../../../common/util";
 import { useAllocationContext } from "../../../context/AllocationContext";
 import { useNotification } from "../../../context/NotificationContext";

@@ -9,7 +9,7 @@ import {
   ApplicationRoundType,
   Query,
   QueryApplicationRoundsArgs,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
 import { applicationRoundUrl } from "../../common/urls";
 import { formatDate } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";

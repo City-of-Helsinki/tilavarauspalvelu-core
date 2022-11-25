@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { Card as HdsCard, Tag as HdsTag } from "hds-react";
 import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
+import { ApplicationRoundType, ApplicationType } from "common/types/gql-types";
 import {
   isActive,
   applicationUrl,
@@ -14,7 +15,6 @@ import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
 import { cancelApplication } from "../../modules/api";
 import { MediumButton } from "../../styles/util";
-import { ApplicationRoundType, ApplicationType } from "../../modules/gql-types";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 
 const Card = styled(HdsCard).attrs({

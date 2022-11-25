@@ -2,7 +2,7 @@ import { H2 } from "common/src/common/typography";
 import { IconArrowRight } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import { UnitType } from "../../common/gql-types";
+import { UnitType } from "common/types/gql-types";
 import { myUnitUrl } from "../../common/urls";
 import { BasicLink } from "../../styles/util";
 

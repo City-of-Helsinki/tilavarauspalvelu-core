@@ -1,5 +1,4 @@
 import { get } from "lodash";
-import { getReservatinUnitPricing, getReservationPriceDetails } from "./util";
 import {
   ReservationType,
   ReservationUnitPricingType,
@@ -7,7 +6,8 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+import { getReservatinUnitPricing, getReservationPriceDetails } from "./util";
 
 describe("pricingDetails", () => {
   test("renders fixed price", () => {
@@ -25,7 +25,9 @@ describe("pricingDetails", () => {
               priceUnit:
                 ReservationUnitsReservationUnitPricingPriceUnitChoices.Fixed,
               lowestPrice: 120,
+              lowestPriceNet: 120 / 1.24,
               highestPrice: 120,
+              highestPriceNet: 120 / 1.24,
               taxPercentage: {
                 id: "1",
                 value: "2",
@@ -56,7 +58,9 @@ describe("pricingDetails", () => {
               priceUnit:
                 ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
               lowestPrice: 120,
+              lowestPriceNet: 120 / 1.24,
               highestPrice: 120,
+              highestPriceNet: 120 / 1.24,
               taxPercentage: {
                 id: "1",
                 value: "24",
@@ -90,7 +94,9 @@ describe("getReservatinUnitPricing", () => {
           priceUnit:
             ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
           lowestPrice: 120,
+          lowestPriceNet: 120 / 1.24,
           highestPrice: 120,
+          highestPriceNet: 120 / 1.24,
           taxPercentage: {
             id: "1",
             value: "24",
@@ -105,7 +111,9 @@ describe("getReservatinUnitPricing", () => {
           priceUnit:
             ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
           lowestPrice: 120,
+          lowestPriceNet: 120 / 1.24,
           highestPrice: 120,
+          highestPriceNet: 120 / 1.24,
           taxPercentage: {
             id: "1",
             value: "24",
@@ -117,12 +125,12 @@ describe("getReservatinUnitPricing", () => {
 
     expect(
       getReservatinUnitPricing(reservationUnit, "2021-02-01T00:00:01Z")
-        .pricingType
+        ?.pricingType
     ).toBe(ReservationUnitsReservationUnitPricingPricingTypeChoices.Free);
 
     expect(
       getReservatinUnitPricing(reservationUnit, "2022-02-01T00:00:01Z")
-        .pricingType
+        ?.pricingType
     ).toBe(ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid);
   });
 });

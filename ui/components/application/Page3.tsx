@@ -8,7 +8,7 @@ import {
   FormType,
   OptionType,
 } from "common/types/common";
-import { Query } from "../../modules/gql-types";
+import { Query } from "common/types/gql-types";
 import { CITIES } from "../../modules/queries/params";
 import { getTranslation, mapOptions } from "../../modules/util";
 import { CenterSpinner } from "../common/common";

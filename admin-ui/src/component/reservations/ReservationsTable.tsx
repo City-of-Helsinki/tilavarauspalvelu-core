@@ -1,7 +1,7 @@
 import React from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import { memoize, truncate } from "lodash";
-import { ReservationType } from "../../common/gql-types";
+import { ReservationType } from "common/types/gql-types";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 import { reservationUrl } from "../../common/urls";
 import { getReserveeName, reservationDateTime } from "./requested/util";

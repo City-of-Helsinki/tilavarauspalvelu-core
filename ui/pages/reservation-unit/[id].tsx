@@ -52,6 +52,23 @@ import {
   Reservation,
 } from "common/types/common";
 import { H4 } from "common/src/common/typography";
+import {
+  Query,
+  QueryReservationsArgs,
+  QueryReservationUnitByPkArgs,
+  QueryReservationUnitsArgs,
+  QueryTermsOfUseArgs,
+  ReservationCreateMutationInput,
+  ReservationCreateMutationPayload,
+  ReservationsReservationStateChoices,
+  ReservationType,
+  ReservationUnitByPkType,
+  ReservationUnitByPkTypeOpeningHoursArgs,
+  ReservationUnitByPkTypeReservationsArgs,
+  ReservationUnitType,
+  ReservationUnitTypeEdge,
+  TermsOfUseType,
+} from "common/types/gql-types";
 import Container from "../../components/common/Container";
 import Head from "../../components/reservation-unit/Head";
 import Address from "../../components/reservation-unit/Address";
@@ -69,23 +86,6 @@ import {
   printErrorMessages,
 } from "../../modules/util";
 import Toolbar, { ToolbarProps } from "../../components/calendar/Toolbar";
-import {
-  Query,
-  QueryReservationsArgs,
-  QueryReservationUnitByPkArgs,
-  QueryReservationUnitsArgs,
-  QueryTermsOfUseArgs,
-  ReservationCreateMutationInput,
-  ReservationCreateMutationPayload,
-  ReservationsReservationStateChoices,
-  ReservationType,
-  ReservationUnitByPkType,
-  ReservationUnitByPkTypeOpeningHoursArgs,
-  ReservationUnitByPkTypeReservationsArgs,
-  ReservationUnitType,
-  ReservationUnitTypeEdge,
-  TermsOfUseType,
-} from "../../modules/gql-types";
 import {
   OPENING_HOURS,
   RELATED_RESERVATION_UNITS,

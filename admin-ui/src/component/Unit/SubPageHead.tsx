@@ -3,7 +3,7 @@ import React from "react";
 import { H1 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { UnitByPkType } from "../../common/gql-types";
+import { UnitByPkType } from "common/types/gql-types";
 import { parseAddress } from "../../common/util";
 import { Container, ContentContainer } from "../../styles/layout";
 import LinkPrev from "../LinkPrev";

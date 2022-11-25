@@ -8,10 +8,6 @@ import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
 import { TFunction } from "next-i18next";
 import { ReducedApplicationStatus } from "common/types/common";
-import Head from "../components/applications/Head";
-import ApplicationsGroup from "../components/applications/ApplicationsGroup";
-import RequireAuthentication from "../components/common/RequireAuthentication";
-import { CenterSpinner } from "../components/common/common";
 import {
   ApplicationRoundType,
   ApplicationType,
@@ -19,7 +15,11 @@ import {
   Query,
   QueryApplicationRoundsArgs,
   QueryApplicationsArgs,
-} from "../modules/gql-types";
+} from "common/types/gql-types";
+import Head from "../components/applications/Head";
+import ApplicationsGroup from "../components/applications/ApplicationsGroup";
+import RequireAuthentication from "../components/common/RequireAuthentication";
+import { CenterSpinner } from "../components/common/common";
 import { APPLICATIONS } from "../modules/queries/application";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { getReducedApplicationStatus } from "../modules/util";

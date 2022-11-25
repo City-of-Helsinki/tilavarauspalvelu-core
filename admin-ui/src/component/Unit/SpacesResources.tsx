@@ -10,6 +10,14 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
+import {
+  Query,
+  QueryUnitByPkArgs,
+  ResourceType,
+  SpaceType,
+  UnitByPkType,
+  UnitType,
+} from "common/types/gql-types";
 import { useModal } from "../../context/ModalContext";
 import {
   ContentContainer,
@@ -26,14 +34,6 @@ import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import NewResourceModal from "../Resources/resource-editor/NewResourceModal";
 import { UNIT_QUERY } from "../../common/queries";
-import {
-  Query,
-  QueryUnitByPkArgs,
-  ResourceType,
-  SpaceType,
-  UnitByPkType,
-  UnitType,
-} from "../../common/gql-types";
 
 interface IProps {
   unitPk: string;

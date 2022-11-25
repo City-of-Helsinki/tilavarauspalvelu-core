@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button as HDSButton, FileInput } from "hds-react";
-import { ReservationUnitsReservationUnitImageImageTypeChoices } from "../../../common/gql-types";
+import { ReservationUnitsReservationUnitImageImageTypeChoices } from "common/types/gql-types";
 import { Image } from "./types";
 
 const Wrapper = styled.div`

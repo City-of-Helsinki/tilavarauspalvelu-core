@@ -35,13 +35,15 @@ yarn start
 
 ### When GQL api changes and you need to update the Typescript types
 
+Go to common module and run
+
 ```
 yarn generate-gql-types
 ```
 
 ### Access with browser
 
-UI is at https://local-tilavaraus.hel.fi:3000/
+UI is at https://local-tilavaraus.hel.fi:3000/kasittely
 Backend is at http://127.0.0.1:8000/v1/
 
 The UI development server exposes the proxied backend at http://127.0.0.1:3000/api/ which the UI uses.
@@ -62,7 +64,7 @@ docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 
 ### Graphql workflow
 
-When server has new api changes -> update schema & generate new types by running: `yarn update-schema generate-gql-types`
+When server has new api changes -> update schema & generate new types by running: `yarn update-schema generate-gql-types` in common module.
 
 - Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
 

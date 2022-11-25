@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ReservationsReservationStateChoices } from "../../common/gql-types";
+import { ReservationsReservationStateChoices } from "common/types/gql-types";
 
 import { OptionType } from "../../common/types";
 import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";

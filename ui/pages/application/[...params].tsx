@@ -9,6 +9,15 @@ import {
   Application as ApplicationType,
   EditorState,
 } from "common/types/common";
+import {
+  ApplicationRoundType,
+  Query,
+  QueryApplicationRoundsArgs,
+  QueryTermsOfUseArgs,
+  ReservationUnitType,
+  TermsOfUseType,
+  TermsOfUseTypeEdge,
+} from "common/types/gql-types";
 import { saveApplication, getApplication } from "../../modules/api";
 import ApplicationPage from "../../components/application/ApplicationPage";
 import Page1 from "../../components/application/Page1";
@@ -26,15 +35,6 @@ import {
   uiDateToApiDate,
 } from "../../modules/util";
 import RequireAuthentication from "../../components/common/RequireAuthentication";
-import {
-  ApplicationRoundType,
-  Query,
-  QueryApplicationRoundsArgs,
-  QueryTermsOfUseArgs,
-  ReservationUnitType,
-  TermsOfUseType,
-  TermsOfUseTypeEdge,
-} from "../../modules/gql-types";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
 import apolloClient from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";

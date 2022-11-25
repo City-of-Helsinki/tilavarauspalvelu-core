@@ -5,7 +5,7 @@ import {
   ApplicationsApplicationApplicantTypeChoices,
   ApplicationType,
   ReservationUnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import {
   ApplicationEventSchedulePriority,
   OptionType,

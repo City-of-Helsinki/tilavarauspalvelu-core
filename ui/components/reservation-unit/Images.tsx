@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
 import { breakpoints } from "common/src/common/style";
+import { ReservationUnitImageType } from "common/types/gql-types";
 import Carousel from "../Carousel";
 import { pixel } from "../../styles/util";
-import { ReservationUnitImageType } from "../../modules/gql-types";
 
 const Modal = dynamic(() => import("../common/Modal"));
 type Props = {

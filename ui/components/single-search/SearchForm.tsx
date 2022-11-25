@@ -15,6 +15,7 @@ import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import { OptionType, StringParameter } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
+import { Query, QueryUnitsArgs } from "common/types/gql-types";
 import {
   mapOptions,
   getSelectedOption,
@@ -22,7 +23,6 @@ import {
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { MediumButton, truncatedText } from "../../styles/util";
-import { Query, QueryUnitsArgs } from "../../modules/gql-types";
 import MultiSelectDropdown from "../form/MultiselectDropdown";
 import {
   SEARCH_FORM_PARAMS_PURPOSE,

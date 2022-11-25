@@ -3,12 +3,12 @@ import React, { useCallback, useMemo } from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import { Strong, Strongish } from "common/src/common/typography";
 import styled from "styled-components";
-import { ALLOCATION_CALENDAR_TIMES } from "../../../common/const";
 import {
   ApplicationEventType,
   ApplicationType,
   ReservationUnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+import { ALLOCATION_CALENDAR_TIMES } from "../../../common/const";
 import { OptionType } from "../../../common/types";
 import Accordion from "../../Accordion";
 import {

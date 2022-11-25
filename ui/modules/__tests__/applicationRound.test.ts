@@ -1,5 +1,5 @@
+import { ApplicationRoundType } from "common/types/gql-types";
 import { getApplicationRoundName } from "../applicationRound";
-import { ApplicationRoundType } from "../gql-types";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},

@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 
 import React, { useContext, useEffect } from "react";
-import { Query, QueryReservationsArgs } from "../common/gql-types";
+import { Query, QueryReservationsArgs } from "common/types/gql-types";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 import { useAuthState } from "./AuthStateContext";
 

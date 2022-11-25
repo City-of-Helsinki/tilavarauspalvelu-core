@@ -5,14 +5,12 @@
   "scripts": {
     "build": "react-app-rewired build",
     "eject": "react-scripts eject",
-    "generate-gql-types": "graphql-codegen && prettier --write 'src/common/gql-types.ts'",
     "lint": "eslint --ext ts,tsx src",
     "lint:css": "stylelint './src/**/*.tsx'",
     "start": "HOST=local-tilavaraus.hel.fi HTTPS=true SSL_CRT_FILE=../common/certificates/local-tilavaraus.crt SSL_KEY_FILE=../common/certificates/local-tilavaraus.key react-app-rewired start",
     "test": "react-app-rewired test",
     "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
-    "ts-check": "tsc --noEmit --project tsconfig.json",
-    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
+    "ts-check": "tsc --noEmit --project tsconfig.json"
   },
   "husky": {
     "hooks": {

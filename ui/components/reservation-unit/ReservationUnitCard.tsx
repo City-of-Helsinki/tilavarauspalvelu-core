@@ -10,9 +10,9 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontBold, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { ReservationUnitType } from "common/types/gql-types";
 import { getMainImage } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
-import { ReservationUnitType } from "../../modules/gql-types";
 import { getReservationUnitName } from "../../modules/reservationUnit";
 
 type Props = {

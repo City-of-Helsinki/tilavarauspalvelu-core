@@ -9,7 +9,7 @@ import {
   QueryReservationDenyReasonsArgs,
   ReservationDenyMutationInput,
   ReservationType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import { useModal } from "../../../context/ModalContext";
 import { DENY_RESERVATION, RESERVATION_DENY_REASONS } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";

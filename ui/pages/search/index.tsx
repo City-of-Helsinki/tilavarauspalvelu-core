@@ -12,6 +12,15 @@ import { NetworkStatus, useQuery } from "@apollo/client";
 import { OptionType } from "common/types/common";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import {
+  ApplicationRoundType,
+  PageInfo,
+  Query,
+  QueryApplicationRoundsArgs,
+  QueryReservationUnitsArgs,
+  ReservationUnitsReservationUnitReservationKindChoices,
+  ReservationUnitType,
+} from "common/types/gql-types";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/search/SearchForm";
 import {
@@ -23,15 +32,6 @@ import { isBrowser } from "../../modules/const";
 import ClientOnly from "../../components/ClientOnly";
 import { HeroSubheading } from "../../modules/style/typography";
 import KorosDefault from "../../components/common/KorosDefault";
-import {
-  ApplicationRoundType,
-  PageInfo,
-  Query,
-  QueryApplicationRoundsArgs,
-  QueryReservationUnitsArgs,
-  ReservationUnitsReservationUnitReservationKindChoices,
-  ReservationUnitType,
-} from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
 import apolloClient from "../../modules/apolloClient";

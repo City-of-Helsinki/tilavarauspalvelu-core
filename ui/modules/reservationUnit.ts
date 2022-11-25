@@ -16,7 +16,7 @@ import {
   ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitType,
   UnitType,
-} from "./gql-types";
+} from "common/types/gql-types";
 import { capitalize, getTranslation, localizedValue } from "./util";
 
 export const isReservationUnitPublished = (

@@ -9,7 +9,7 @@ import {
   ReservationUnitType,
   ApplicationsApplicationRoundTargetGroupChoices,
   ApplicationRoundStatus,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 
 const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
   "ApplicationRounds",

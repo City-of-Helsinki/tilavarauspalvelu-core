@@ -5,14 +5,14 @@ import styled from "styled-components";
 import { useMutation } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
-import { parseAddress } from "../../../common/util";
-import { CustomDialogHeader } from "../../CustomDialogHeader";
-import { languages } from "../../../common/const";
 import {
   Mutation,
   ResourceCreateMutationInput,
   UnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+import { parseAddress } from "../../../common/util";
+import { CustomDialogHeader } from "../../CustomDialogHeader";
+import { languages } from "../../../common/const";
 import { CREATE_RESOURCE } from "./queries";
 import ParentSelector from "../../Spaces/space-editor/ParentSelector";
 import { useNotification } from "../../../context/NotificationContext";

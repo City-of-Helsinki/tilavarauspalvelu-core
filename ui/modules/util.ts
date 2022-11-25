@@ -18,18 +18,18 @@ import {
   ApplicationEventSchedulePriority,
 } from "common/types/common";
 import {
+  ReservationUnitImageType,
+  ReservationUnitType,
+  ApplicationStatus,
+  ReservationUnitByPkType,
+} from "common/types/gql-types";
+import {
   searchPrefix,
   emptyOption,
   applicationsPrefix,
   singleSearchPrefix,
   reservationsPrefix,
 } from "./const";
-import {
-  ReservationUnitImageType,
-  ReservationUnitType,
-  ApplicationStatus,
-  ReservationUnitByPkType,
-} from "./gql-types";
 
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date().getTime();

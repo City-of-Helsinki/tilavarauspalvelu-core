@@ -4,6 +4,11 @@ import trim from "lodash/trim";
 import upperFirst from "lodash/upperFirst";
 import { groupBy, set, get } from "lodash";
 import {
+  ApplicationEventScheduleType,
+  LocationType,
+  Query,
+} from "common/types/gql-types";
+import {
   AllocationResult,
   ApplicationEventSchedule,
   ApplicationEventStatus,
@@ -15,7 +20,6 @@ import {
   NormalizedApplicationRoundStatus,
   TranslationObject,
 } from "./types";
-import { ApplicationEventScheduleType, LocationType, Query } from "./gql-types";
 
 export const DATE_FORMAT = "d.M.yyyy";
 export const DATE_FORMAT_SHORT = "d.M";

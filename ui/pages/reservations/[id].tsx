@@ -17,7 +17,7 @@ import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
   TermsOfUseType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
 import apolloClient from "../../modules/apolloClient";
 import { GET_RESERVATION } from "../../modules/queries/reservation";
 import {

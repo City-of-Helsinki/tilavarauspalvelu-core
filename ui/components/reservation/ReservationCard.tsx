@@ -8,6 +8,10 @@ import { getReservationPrice } from "common";
 import { camelCase, trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
 import {
+  ReservationsReservationStateChoices,
+  ReservationType,
+} from "common/types/gql-types";
+import {
   capitalize,
   getMainImage,
   getTranslation,
@@ -15,10 +19,6 @@ import {
 } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import { BlackButton, truncatedText } from "../../styles/util";
-import {
-  ReservationsReservationStateChoices,
-  ReservationType,
-} from "../../modules/gql-types";
 import { canUserCancelReservation } from "../../modules/reservation";
 import {
   getReservationUnitName,

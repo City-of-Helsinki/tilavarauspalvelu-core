@@ -10,6 +10,10 @@ import {
   RadioButton,
 } from "hds-react";
 import {
+  ReservationUnitPricingCreateSerializerInput,
+  ReservationUnitsReservationUnitPriceUnitChoices,
+} from "common/types/gql-types";
+import {
   Grid,
   Span3,
   Span4,
@@ -22,10 +26,6 @@ import Select from "./Select";
 import SortedSelect from "./SortedSelect";
 
 import { Action, State } from "./types";
-import {
-  ReservationUnitPricingCreateSerializerInput,
-  ReservationUnitsReservationUnitPriceUnitChoices,
-} from "../../../common/gql-types";
 import { OptionType } from "../../../common/types";
 
 type Props = {

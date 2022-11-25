@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitByPkType } from "../../../common/gql-types";
+import { ReservationUnitByPkType } from "common/types/gql-types";
 import GenericDialog from "./GenericDialog";
 
 const ArchiveDialog = ({

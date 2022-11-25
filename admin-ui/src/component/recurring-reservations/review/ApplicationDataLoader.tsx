@@ -1,6 +1,11 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
+import {
+  ApplicationType,
+  Query,
+  QueryApplicationsArgs,
+} from "common/types/gql-types";
 import { APPLICATIONS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
 import { useNotification } from "../../../context/NotificationContext";
@@ -9,12 +14,6 @@ import ApplicationsTable from "./ApplicationsTable";
 import { More } from "../../lists/More";
 import { LIST_PAGE_SIZE } from "../../../common/const";
 import { combineResults } from "../../../common/util";
-import {
-  ApplicationType,
-  Query,
-  QueryApplicationsArgs,
-} from "../../../common/gql-types";
-
 import { appMapper } from "../util";
 import { ApplicationRound } from "../../../common/types";
 

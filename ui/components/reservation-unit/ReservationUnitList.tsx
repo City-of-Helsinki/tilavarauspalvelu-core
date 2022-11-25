@@ -5,17 +5,17 @@ import { useTranslation } from "react-i18next";
 import { sortBy } from "lodash";
 import styled from "styled-components";
 import { ApplicationEvent, OptionType } from "common/types/common";
-import Modal from "../common/Modal";
-import ReservationUnitModal from "./ReservationUnitModal";
-import ReservationUnitCard from "./ReservationUnitCard";
-import { MediumButton } from "../../styles/util";
 import {
   ApplicationRoundType,
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitByPkType,
   ReservationUnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
+import Modal from "../common/Modal";
+import ReservationUnitModal from "./ReservationUnitModal";
+import ReservationUnitCard from "./ReservationUnitCard";
+import { MediumButton } from "../../styles/util";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import apolloClient from "../../modules/apolloClient";
 import { CenterSpinner } from "../common/common";

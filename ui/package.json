@@ -11,9 +11,7 @@
     "test:browser": "CYPRESS_BASE_URL=https://local-tilavaraus.hel.fi:3000 TZ=Europe/Helsinki ./node_modules/.bin/cypress open",
     "lint": "eslint --ext ts,tsx .",
     "lint:css": "stylelint '**/*.tsx'",
-    "ts-check": "tsc --noEmit --project tsconfig.json",
-    "generate-gql-types": "graphql-codegen && prettier --write 'modules/gql-types.ts'",
-    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
+    "ts-check": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
     "@apollo/client": "^3.4.13",

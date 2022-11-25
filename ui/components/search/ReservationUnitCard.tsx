@@ -6,6 +6,7 @@ import NextImage from "next/image";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H5, Strongish } from "common/src/common/typography";
+import { ReservationUnitType } from "common/types/gql-types";
 import {
   getAddressAlt,
   getMainImage,
@@ -13,7 +14,6 @@ import {
 } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel, truncatedText } from "../../styles/util";
-import { ReservationUnitType } from "../../modules/gql-types";
 import { reservationUnitPrefix } from "../../modules/const";
 import {
   getReservationUnitName,

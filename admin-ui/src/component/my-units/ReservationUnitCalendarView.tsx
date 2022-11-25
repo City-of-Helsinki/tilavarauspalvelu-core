@@ -7,7 +7,7 @@ import {
   Query,
   QueryUnitsArgs,
   ReservationUnitType,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
 import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";
 import { UNIT_QUERY } from "./queries";

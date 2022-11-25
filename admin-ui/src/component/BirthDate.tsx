@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UserType } from "../common/gql-types";
+import { UserType } from "common/types/gql-types";
 import { formatDate } from "../common/util";
 import { HorisontalFlex } from "../styles/layout";
 

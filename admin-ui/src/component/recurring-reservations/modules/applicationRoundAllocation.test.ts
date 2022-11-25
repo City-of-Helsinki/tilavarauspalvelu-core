@@ -2,7 +2,7 @@ import {
   ApplicationEventScheduleResultType,
   ApplicationEventScheduleType,
   ApplicationEventType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import {
   getApplicationEventScheduleResultStatuses,
   getEarliestScheduleStart,

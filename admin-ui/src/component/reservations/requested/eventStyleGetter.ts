@@ -2,7 +2,7 @@ import { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   ReservationsReservationStateChoices,
   ReservationType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 
 const CURRENT = (state: string) => {
   const lcState = state.toLowerCase();

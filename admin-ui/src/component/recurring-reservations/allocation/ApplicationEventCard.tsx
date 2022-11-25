@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Strong, Strongish } from "common/src/common/typography";
-import { publicUrl } from "../../../common/const";
 import {
   ApplicationEventType,
   ApplicationType,
   ReservationUnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
+import { publicUrl } from "../../../common/const";
 import { AllocationApplicationEventCardType } from "../../../common/types";
 import { parseDuration } from "../../../common/util";
 import { ageGroup } from "../../reservations/requested/util";

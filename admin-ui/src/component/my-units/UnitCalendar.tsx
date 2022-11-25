@@ -4,7 +4,7 @@ import { differenceInMinutes } from "date-fns";
 import React, { Fragment } from "react";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
-import { ReservationType } from "../../common/gql-types";
+import { ReservationType } from "common/types/gql-types";
 import { CELL_BORDER } from "./const";
 import ReservationPopupContent from "./ReservationPopupContent";
 import resourceEventStyleGetter from "./resourceEventStyleGetter";

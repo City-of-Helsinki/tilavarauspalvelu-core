@@ -11,17 +11,17 @@ import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { OptionType } from "common/types/common";
 import { H1 } from "common/src/common/typography";
-import Container from "../../components/common/Container";
-import SearchForm from "../../components/single-search/SearchForm";
-import { capitalize, singleSearchUrl } from "../../modules/util";
-import { isBrowser } from "../../modules/const";
 import {
   PageInfo,
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitsReservationUnitReservationKindChoices,
   ReservationUnitType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
+import Container from "../../components/common/Container";
+import SearchForm from "../../components/single-search/SearchForm";
+import { capitalize, singleSearchUrl } from "../../modules/util";
+import { isBrowser } from "../../modules/const";
 import { HeroSubheading } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";

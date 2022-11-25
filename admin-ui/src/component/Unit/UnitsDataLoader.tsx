@@ -1,7 +1,6 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-
-import { Query, QueryUnitsArgs, UnitType } from "../../common/gql-types";
+import { Query, QueryUnitsArgs, UnitType } from "common/types/gql-types";
 import { FilterArguments } from "./Filters";
 import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";

@@ -15,6 +15,12 @@ import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import {
+  Query,
+  QueryUnitByPkArgs,
+  ReservationUnitType,
+  UnitByPkType,
+} from "common/types/gql-types";
 import { UNIT_QUERY } from "../../common/queries";
 import { parseAddress } from "../../common/util";
 import { useModal } from "../../context/ModalContext";
@@ -26,12 +32,6 @@ import withMainMenu from "../withMainMenu";
 import ExternalLink from "./ExternalLink";
 import InfoModalContent from "./InfoModalContent";
 import { publicUrl } from "../../common/const";
-import {
-  Query,
-  QueryUnitByPkArgs,
-  ReservationUnitType,
-  UnitByPkType,
-} from "../../common/gql-types";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { useNotification } from "../../context/NotificationContext";
 

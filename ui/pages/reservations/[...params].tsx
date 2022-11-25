@@ -21,14 +21,14 @@ import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H1 } from "common/src/common/typography";
-import Sanitize from "../../components/common/Sanitize";
 import {
   Query,
   QueryReservationCancelReasonsArgs,
   ReservationCancellationMutationInput,
   ReservationCancellationMutationPayload,
   ReservationType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
+import Sanitize from "../../components/common/Sanitize";
 import {
   CANCEL_RESERVATION,
   GET_RESERVATION,

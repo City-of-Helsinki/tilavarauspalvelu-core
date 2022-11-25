@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { SpaceType } from "../../../common/gql-types";
+import { SpaceType } from "common/types/gql-types";
 
 const recurse = (
   parent: SpaceType,

@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { ApplicationRoundType } from "../../common/gql-types";
+import { ApplicationRoundType } from "common/types/gql-types";
 import { applicationRoundUrl } from "../../common/urls";
 import ApplicationRoundStatusTag from "./ApplicationRoundStatusTag";
 import ReservationPeriod from "./ReservationPeriod";

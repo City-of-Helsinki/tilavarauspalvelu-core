@@ -37,8 +37,8 @@ import {
   fontRegular,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { ReservationUnitByPkType } from "common/types/gql-types";
 import { MediumButton } from "../../styles/util";
-import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { DataContext, ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";

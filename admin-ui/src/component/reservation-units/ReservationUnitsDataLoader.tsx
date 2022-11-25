@@ -1,12 +1,10 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-
 import {
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitType,
-} from "../../common/gql-types";
-
+} from "common/types/gql-types";
 import { SEARCH_RESERVATION_UNITS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
 import { useNotification } from "../../context/NotificationContext";

@@ -3,7 +3,7 @@ import {
   UnitRoleType,
   UnitType,
   UserType,
-} from "../common/gql-types";
+} from "common/types/gql-types";
 import permissionHelper from "./permissionHelper";
 
 test("permissionHelper returns true when named unit permission is set", () => {

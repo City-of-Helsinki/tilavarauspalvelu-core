@@ -4,7 +4,7 @@ import {
   ApplicationEventType,
   ApplicationType,
   ReservationUnitType,
-} from "../../../common/gql-types";
+} from "common/types/gql-types";
 import { AllocationApplicationEventCardType } from "../../../common/types";
 import ApplicationEventCard from "./ApplicationEventCard";
 

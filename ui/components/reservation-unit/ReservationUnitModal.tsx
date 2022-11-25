@@ -16,6 +16,12 @@ import styled from "styled-components";
 import { OptionType } from "common/types/common";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import {
+  ApplicationRoundType,
+  Query,
+  QueryReservationUnitsArgs,
+  ReservationUnitType,
+} from "common/types/gql-types";
 import { reservationUnitPath } from "../../modules/const";
 import {
   getAddressAlt,
@@ -24,13 +30,6 @@ import {
 } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel } from "../../styles/util";
-
-import {
-  ApplicationRoundType,
-  Query,
-  QueryReservationUnitsArgs,
-  ReservationUnitType,
-} from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 import {

@@ -8,12 +8,12 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import Container from "../../components/common/Container";
 import {
   Query,
   QueryReservationsArgs,
   ReservationType,
-} from "../../modules/gql-types";
+} from "common/types/gql-types";
+import Container from "../../components/common/Container";
 import { LIST_RESERVATIONS } from "../../modules/queries/reservation";
 import ReservationCard from "../../components/reservation/ReservationCard";
 import Head from "../../components/reservations/Head";

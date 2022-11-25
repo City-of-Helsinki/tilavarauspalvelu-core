@@ -7,10 +7,10 @@ import styled from "styled-components";
 import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import { fontMedium, H4 } from "common/src/common/typography";
+import { ApplicationRoundType } from "common/types/gql-types";
 import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
-import { ApplicationRoundType } from "../../modules/gql-types";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 
 interface Props {

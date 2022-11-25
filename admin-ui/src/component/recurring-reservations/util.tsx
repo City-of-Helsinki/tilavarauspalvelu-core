@@ -5,11 +5,15 @@ import { TFunction } from "react-i18next";
 import { formatters as getFormatters } from "common";
 import { parse } from "date-fns";
 import {
+  ApplicationEventType,
+  ApplicationType,
+  UnitType,
+} from "common/types/gql-types";
+import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   ApplicationStatus,
 } from "../../common/types";
-
 import {
   appEventHours,
   applicantName,
@@ -18,11 +22,6 @@ import {
 } from "../applications/util";
 import StatusCell from "../StatusCell";
 import { formatNumber } from "../../common/util";
-import {
-  ApplicationEventType,
-  ApplicationType,
-  UnitType,
-} from "../../common/gql-types";
 
 export type ApplicationView = {
   id: number;

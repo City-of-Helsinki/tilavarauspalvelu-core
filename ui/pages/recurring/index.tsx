@@ -6,16 +6,16 @@ import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import {
+  ApplicationRoundType,
+  Query,
+  QueryApplicationRoundsArgs,
+} from "common/types/gql-types";
 import { HeroSubheading } from "../../modules/style/typography";
 import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
 import { applicationRoundState } from "../../modules/util";
 import KorosDefault from "../../components/common/KorosDefault";
 import apolloClient from "../../modules/apolloClient";
-import {
-  ApplicationRoundType,
-  Query,
-  QueryApplicationRoundsArgs,
-} from "../../modules/gql-types";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 

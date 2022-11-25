@@ -3,23 +3,21 @@ import { ApolloError, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { H1, H2 } from "common/src/common/typography";
-import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
-import { MainMenuWrapper } from "../withMainMenu";
-import ApplicationRoundCard from "./ApplicationRoundCard";
-import HeroImage from "../../images/hero-user@1x.jpg";
-
-import { WideContainer, IngressContainer } from "../../styles/layout";
-
-import Loader from "../Loader";
-import { NotificationBox } from "../../styles/util";
-import { useNotification } from "../../context/NotificationContext";
-import { useAuthState } from "../../context/AuthStateContext";
 import {
   ApplicationRoundStatus,
   ApplicationRoundType,
   Query,
   QueryApplicationRoundsArgs,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
+import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
+import { MainMenuWrapper } from "../withMainMenu";
+import ApplicationRoundCard from "./ApplicationRoundCard";
+import HeroImage from "../../images/hero-user@1x.jpg";
+import { WideContainer, IngressContainer } from "../../styles/layout";
+import Loader from "../Loader";
+import { NotificationBox } from "../../styles/util";
+import { useNotification } from "../../context/NotificationContext";
+import { useAuthState } from "../../context/AuthStateContext";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 
 const Wrapper = styled.div``;

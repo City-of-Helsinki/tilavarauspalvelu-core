@@ -1,13 +1,13 @@
 import { useQuery } from "@apollo/client";
 import { User } from "oidc-client";
 import React, { useContext, useEffect } from "react";
+import { Query } from "common/types/gql-types";
 
 import {
   assertApiAccessTokenIsAvailableAndFresh,
   clearApiAccessToken,
   localLogout,
 } from "../common/auth/util";
-import { Query } from "../common/gql-types";
 
 import {
   Auth,

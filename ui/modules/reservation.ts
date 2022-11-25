@@ -5,7 +5,7 @@ import { OptionType } from "common/types/common";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
-} from "./gql-types";
+} from "common/types/gql-types";
 
 export const getDurationOptions = (
   minReservationDuration: number,

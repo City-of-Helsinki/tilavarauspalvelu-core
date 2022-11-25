@@ -11,7 +11,7 @@ import {
   QueryReservationUnitsArgs,
   ReservationType,
   ReservationUnitType,
-} from "../../common/gql-types";
+} from "common/types/gql-types";
 import { combineResults } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
 import Legend from "../reservations/requested/Legend";

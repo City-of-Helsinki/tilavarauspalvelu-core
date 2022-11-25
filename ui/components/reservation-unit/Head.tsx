@@ -12,6 +12,7 @@ import { parseISO } from "date-fns";
 import { formatSecondDuration } from "common/src/common/util";
 import { fontRegular, H1, H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { ReservationUnitByPkType } from "common/types/gql-types";
 import {
   getTranslation,
   orderImages,
@@ -20,7 +21,6 @@ import {
 import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
 import Images from "./Images";
-import { ReservationUnitByPkType } from "../../modules/gql-types";
 import {
   getActivePricing,
   getPrice,

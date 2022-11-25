@@ -13,17 +13,17 @@ import {
   OptionType,
   StringParameter,
 } from "common/types/common";
+import {
+  Query,
+  ApplicationRoundType,
+  ReservationUnitType,
+} from "common/types/gql-types";
 import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import { participantCountOptions } from "../../modules/const";
 import { ButtonContainer, CenterSpinner } from "../common/common";
 import { MediumButton } from "../../styles/util";
-import {
-  Query,
-  ApplicationRoundType,
-  ReservationUnitType,
-} from "../../modules/gql-types";
 import {
   RESERVATION_PURPOSES,
   SEARCH_FORM_PARAMS_UNIT,
