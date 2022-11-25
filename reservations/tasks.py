@@ -3,7 +3,7 @@ from tilavarauspalvelu.celery import app
 from .pruning import prune_reservation_statistics, prune_reservations
 
 # The pruning task will be run periodically at every PRUNE_INTERVAL_SECONDS
-PRUNE_INTERVAL_SECONDS = 60 * 10
+PRUNE_INTERVAL_SECONDS = 60 * 5
 
 # Reservations older than PRUNE_OLDER_THAN_MINUTES will be deleted when the task is run
 PRUNE_OLDER_THAN_MINUTES = 20
