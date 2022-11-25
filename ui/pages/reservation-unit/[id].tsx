@@ -107,6 +107,7 @@ import EquipmentList from "../../components/reservation-unit/EquipmentList";
 import { daysByMonths } from "../../modules/const";
 import QuickReservation from "../../components/reservation-unit/QuickReservation";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
+import { CURRENT_USER } from "../../modules/queries/user";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -296,6 +297,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         from: today,
         to: lastOpeningPeriodEndDate,
         state: allowedReservationStates,
+        includeWithSameComponents: true,
       },
     });
 
@@ -567,12 +569,20 @@ const ReservationUnit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservation]);
 
+  const { data: userData } = useQuery<Query>(CURRENT_USER, {
+    fetchPolicy: "no-cache",
+  });
+
+  const currentUser = useMemo(() => userData?.currentUser, [userData]);
+
   const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
     LIST_RESERVATIONS,
     {
       fetchPolicy: "no-cache",
+      skip: !currentUser,
       variables: {
         begin: now,
+        user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString()],
         state: allowedReservationStates,
       },

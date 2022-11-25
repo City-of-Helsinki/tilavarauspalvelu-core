@@ -299,6 +299,7 @@ export const OPENING_HOURS = gql`
     $from: Date
     $to: Date
     $state: [String]
+    $includeWithSameComponents: Boolean
   ) {
     reservationUnitByPk(pk: $pk) {
       openingHours(
@@ -315,7 +316,12 @@ export const OPENING_HOURS = gql`
           periods
         }
       }
-      reservations(state: $state, from: $from, to: $to) {
+      reservations(
+        state: $state
+        from: $from
+        to: $to
+        includeWithSameComponents: $includeWithSameComponents
+      ) {
         pk
         state
         priority
