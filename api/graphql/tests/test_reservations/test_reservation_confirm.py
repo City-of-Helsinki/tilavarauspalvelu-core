@@ -274,7 +274,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             "homeCity"
         )
 
-    @patch("api.graphql.reservations.reservation_serializers.create_verkkokauppa_order")
+    @patch(
+        "api.graphql.reservations.reservation_serializers.confirm_serializers.create_verkkokauppa_order"
+    )
     def test_confirm_reservation_does_not_create_order_when_handling_is_required(
         self, mock_create_vk_order, mock_periods, mock_opening_hours
     ):
@@ -299,7 +301,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(PaymentOrder.objects.all().count()).is_equal_to(0)
         assert_that(mock_create_vk_order.called).is_false()
 
-    @patch("api.graphql.reservations.reservation_serializers.create_verkkokauppa_order")
+    @patch(
+        "api.graphql.reservations.reservation_serializers.confirm_serializers.create_verkkokauppa_order"
+    )
     def test_confirm_reservation_creates_local_order_when_payment_type_is_on_site(
         self, mock_create_vk_order, mock_periods, mock_opening_hours
     ):
@@ -336,7 +340,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         )
         assert_that(local_order.reservation).is_equal_to(self.reservation)
 
-    @patch("api.graphql.reservations.reservation_serializers.create_verkkokauppa_order")
+    @patch(
+        "api.graphql.reservations.reservation_serializers.confirm_serializers.create_verkkokauppa_order"
+    )
     def test_confirm_reservation_calls_api_when_payment_type_is_not_on_site(
         self, mock_create_vk_order, mock_periods, mock_opening_hours
     ):
@@ -412,7 +418,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ON_SITE)
 
-    @patch("api.graphql.reservations.reservation_serializers.create_verkkokauppa_order")
+    @patch(
+        "api.graphql.reservations.reservation_serializers.confirm_serializers.create_verkkokauppa_order"
+    )
     def test_confirm_reservation_without_payment_type_use_invoice(
         self, mock_create_vk_order, mock_periods, mock_opening_hours
     ):
@@ -433,7 +441,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.INVOICE)
 
-    @patch("api.graphql.reservations.reservation_serializers.create_verkkokauppa_order")
+    @patch(
+        "api.graphql.reservations.reservation_serializers.confirm_serializers.create_verkkokauppa_order"
+    )
     def test_confirm_reservation_without_payment_type_use_online(
         self, mock_create_vk_order, mock_periods, mock_opening_hours
     ):
@@ -489,7 +499,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         local_order = PaymentOrder.objects.first()
         assert_that(local_order).is_none()
 
-    @patch("api.graphql.reservations.reservation_serializers.create_verkkokauppa_order")
+    @patch(
+        "api.graphql.reservations.reservation_serializers.confirm_serializers.create_verkkokauppa_order"
+    )
     def test_confirm_reservation_return_order_data(
         self, mock_create_vk_order, mock_periods, mock_opening_hours
     ):
