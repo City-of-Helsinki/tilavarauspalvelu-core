@@ -15,6 +15,7 @@ from applications.models import (
     ApplicationRound,
     City,
 )
+from merchants.models import OrderStatus
 from reservation_units.models import ReservationUnit
 from tilavarauspalvelu import settings
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
@@ -196,6 +197,15 @@ class ReservationQuerySet(models.QuerySet):
                 begin__gte=begin,
             ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
         return self.none()
+
+    def with_inactive_payments(self, older_than_minutes: int):
+        return self.filter(
+            state=STATE_CHOICES.WAITING_FOR_PAYMENT,
+            payment_order__remote_id__isnull=False,
+            payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
+            payment_order__created_at__lte=datetime.now(tz=get_current_timezone())
+            - timedelta(minutes=older_than_minutes),
+        )
 
 
 class Reservation(models.Model):
