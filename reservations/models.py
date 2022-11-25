@@ -174,6 +174,7 @@ class ReservationQuerySet(models.QuerySet):
                 STATE_CHOICES.CREATED,
                 STATE_CHOICES.CONFIRMED,
                 STATE_CHOICES.WAITING_FOR_PAYMENT,
+                STATE_CHOICES.REQUIRES_HANDLING,
             )
         )
 
