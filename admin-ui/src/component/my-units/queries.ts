@@ -125,6 +125,8 @@ export const RESERVATIONS_BY_UNIT = gql`
           reservationUnits {
             pk
             nameFi
+            bufferTimeBefore
+            bufferTimeAfter
           }
           pk
           begin

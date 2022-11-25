@@ -6678,6 +6678,10 @@ export type ReservationByPkQuery = {
       termsOfUseFi?: string | null;
       termsOfUseEn?: string | null;
       termsOfUseSv?: string | null;
+      lowestPrice: any;
+      highestPrice: any;
+      priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
+      pricingType?: ReservationUnitsReservationUnitPricingTypeChoices | null;
       minPersons?: number | null;
       maxPersons?: number | null;
       serviceSpecificTerms?: {
@@ -6747,6 +6751,7 @@ export type ReservationByPkQuery = {
         smallUrl?: string | null;
         imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
       } | null> | null;
+      taxPercentage?: { __typename?: "TaxPercentageType"; value: any } | null;
       pricings?: Array<{
         __typename?: "ReservationUnitPricingType";
         begins: any;

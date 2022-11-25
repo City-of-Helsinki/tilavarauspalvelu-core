@@ -35,11 +35,21 @@ const INTERSECTING_RESERVATION_UNIT = {
   } as React.CSSProperties,
 };
 
-const PAUSE = {
+export const PRE_PAUSE = {
   style: {
+    borderTop: "2px solid var(--color-black-40)",
+    borderBottom: "2px solid var(--color-black-40)",
+    borderLeft: "1px solid var(--color-black-40)",
+    backgroundColor: "var(--color-black-10)",
+  },
+};
+
+export const POST_PAUSE = {
+  style: {
+    borderTop: "2px solid var(--color-black-40)",
+    borderBottom: "2px solid var(--color-black-40)",
     borderRight: "1px solid var(--color-black-40)",
     backgroundColor: "var(--color-black-10)",
-    color: "black",
   },
 };
 
@@ -66,7 +76,7 @@ export const legend = [
   },
   {
     label: "MyUnits.UnitCalendar.legend.pause",
-    style: PAUSE.style,
+    style: POST_PAUSE.style,
   },
   {
     label: "MyUnits.UnitCalendar.legend.closed",

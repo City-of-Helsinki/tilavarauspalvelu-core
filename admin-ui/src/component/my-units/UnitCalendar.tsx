@@ -1,19 +1,31 @@
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { breakpoints } from "common/src/common/style";
 import { differenceInMinutes } from "date-fns";
-import React, { Fragment } from "react";
+import React, { CSSProperties, Fragment } from "react";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
+import { TFunction, useTranslation } from "react-i18next";
 import { CELL_BORDER } from "./const";
 import ReservationPopupContent from "./ReservationPopupContent";
-import resourceEventStyleGetter from "./resourceEventStyleGetter";
+import resourceEventStyleGetter, {
+  POST_PAUSE,
+  PRE_PAUSE,
+} from "./resourceEventStyleGetter";
 
 export type Resource = {
   title: string;
   pk: number;
   url: string;
   events: CalendarEvent<ReservationType>[];
+};
+
+const zIndex = "101";
+
+const TemplateProps: CSSProperties = {
+  zIndex,
+  height: "41px",
+  position: "absolute",
 };
 
 type EventStyleGetter = ({ event }: CalendarEvent<ReservationType>) => {
@@ -90,16 +102,70 @@ const Cells = ({ cols }: { cols: number }) => (
   </CellContent>
 );
 
+const getPreBuffer = (
+  event: CalendarEvent<ReservationType>,
+  hourPercent: number,
+  left: string,
+  t: TFunction
+): JSX.Element | null => {
+  const buffer = event.event?.reservationUnits?.[0]?.bufferTimeBefore;
+
+  if (buffer) {
+    const width = `${(hourPercent * buffer) / 3600}%`;
+    return (
+      <div
+        style={{
+          ...PRE_PAUSE.style,
+          ...TemplateProps,
+          left: `calc(${left} - ${width})`,
+          width,
+        }}
+        title={t("MyUnits.UnitCalendar.legend.pause")}
+      />
+    );
+  }
+  return null;
+};
+
+const getPostBuffer = (
+  event: CalendarEvent<ReservationType>,
+  hourPercent: number,
+  right: string,
+  t: TFunction
+): JSX.Element | null => {
+  const buffer = event.event?.reservationUnits?.[0]?.bufferTimeAfter;
+
+  if (buffer) {
+    const width = `calc(${(hourPercent * buffer) / 3600}% - 1px)`;
+    return (
+      <div
+        style={{
+          ...POST_PAUSE.style,
+          ...TemplateProps,
+          left: right,
+          width,
+        }}
+        title={t("MyUnits.UnitCalendar.legend.pause")}
+      />
+    );
+  }
+  return null;
+};
+
 const Events = ({
+  currentReservationUnit,
   firstHour,
   events,
   eventStyleGetter,
   numHours,
+  t,
 }: {
+  currentReservationUnit: number;
   firstHour: number;
   events: CalendarEvent<ReservationType>[];
   eventStyleGetter: EventStyleGetter;
   numHours: number;
+  t: TFunction;
 }) => (
   <div
     style={{
@@ -125,14 +191,24 @@ const Events = ({
 
       const durationMinutes = differenceInMinutes(endDate, startDate);
 
-      return (
+      let preBuffer = null;
+      let postBuffer = null;
+      if (currentReservationUnit === e.event?.reservationUnits?.[0]?.pk) {
+        preBuffer = getPreBuffer(e, hourPercent, left, t);
+
+        const right = `calc(${left} + ${durationMinutes / 60} * ${
+          100 / numHours
+        }% + 1px)`;
+        postBuffer = getPostBuffer(e, hourPercent, right, t);
+      }
+
+      return [
+        preBuffer,
         <div
           key={String(e.event?.pk)}
           style={{
-            zIndex: "1000",
-            height: "41px",
-            position: "absolute",
             left,
+            ...TemplateProps,
             width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
           }}
         >
@@ -164,13 +240,15 @@ const Events = ({
               />
             </Popup>
           </div>
-        </div>
-      );
+        </div>,
+        postBuffer,
+      ];
     })}
   </div>
 );
 
 const ResourceCalendar = ({ resources }: Props): JSX.Element => {
+  const { t } = useTranslation();
   // todo find out min and max opening hour of every reservationunit
   const [beginHour, endHour] = [8, 24];
   const numHours = endHour - beginHour;
@@ -203,10 +281,12 @@ const ResourceCalendar = ({ resources }: Props): JSX.Element => {
               <RowCalendarArea>
                 <Cells cols={numHours * 2} />
                 <Events
+                  currentReservationUnit={row.pk}
                   firstHour={beginHour}
                   numHours={numHours}
                   events={row.events}
                   eventStyleGetter={resourceEventStyleGetter(row.pk)}
+                  t={t}
                 />
               </RowCalendarArea>
             </Row>
