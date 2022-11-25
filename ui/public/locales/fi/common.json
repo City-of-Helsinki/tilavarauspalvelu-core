@@ -100,5 +100,6 @@
   "duration": "Kesto {{duration}}",
   "fyiLabel": "Tiedoksi",
   "add": "Lisää",
-  "subtract": "Vähennä"
+  "subtract": "Vähennä",
+  "inclTax": "sis. alv {{taxPercentage}}%"
 }

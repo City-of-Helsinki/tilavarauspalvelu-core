@@ -3,8 +3,9 @@ import { IconArrowRight, IconCalendar, IconSignout } from "hds-react";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import Link from "next/link";
 import styled from "styled-components";
-import { H2 } from "common/src/common/typography";
+import { fontMedium, H2 } from "common/src/common/typography";
 import {
   ReservationsReservationStateChoices,
   ReservationUnitType,
@@ -12,7 +13,7 @@ import {
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { Reservation } from "../../modules/types";
 import { getTranslation, reservationsUrl } from "../../modules/util";
-import { MediumButton } from "../../styles/util";
+import { BlackButton } from "../../styles/util";
 import { Paragraph, Subheading } from "./styles";
 
 type Props = {
@@ -35,6 +36,15 @@ const ActionContainer2 = styled.div`
   gap: var(--spacing-m);
   flex-direction: column;
   align-items: flex-start;
+`;
+
+const Anchor = styled.a`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2-xs);
+  text-decoration: underline;
+  color: var(--color-black) !important;
+  ${fontMedium}
 `;
 
 const ReservationConfirmation = ({
@@ -78,14 +88,14 @@ const ReservationConfirmation = ({
           />
         </Paragraph>
         <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
-          <MediumButton
+          <BlackButton
             data-testid="reservation__confirmation--button__calendar-url"
             onClick={() => router.push(reservation.calendarUrl)}
             variant="secondary"
             iconRight={<IconCalendar aria-hidden />}
           >
             {t("reservations:saveToCalendar")}
-          </MediumButton>
+          </BlackButton>
         </ActionContainer1>
         {getTranslation(reservationUnit, instructionsKey) && (
           <>
@@ -100,20 +110,17 @@ const ReservationConfirmation = ({
             marginTop: "var(--spacing-3-xl)",
           }}
         >
-          <MediumButton
-            variant="supplementary"
-            onClick={() => router.push("/")}
-            iconRight={<IconArrowRight aria-hidden />}
-          >
-            {t("common:gotoFrontpage")}
-          </MediumButton>{" "}
-          <MediumButton
-            variant="supplementary"
-            onClick={() => router.push(reservationsUrl)}
-            iconRight={<IconSignout aria-hidden />}
-          >
-            {t("common:logout")}
-          </MediumButton>
+          <Link href="/" passHref>
+            <Anchor>
+              {t("common:gotoFrontpage")}
+              <IconArrowRight aria-hidden size="m" />
+            </Anchor>
+          </Link>{" "}
+          <Link href={reservationsUrl} passHref>
+            <Anchor>
+              {t("common:logout")} <IconSignout size="m" aria-hidden />
+            </Anchor>
+          </Link>
         </ActionContainer2>
       </div>
     </Wrapper>

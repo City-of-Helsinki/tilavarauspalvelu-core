@@ -255,6 +255,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
           <ReservationInfoCard
             reservation={reservation}
             reservationUnit={reservationUnit}
+            type="complete"
           />
           <SecondaryActions>
             <Link href={reservation.calendarUrl} passHref>
@@ -413,12 +414,15 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
                   </>
                 ) : (
                   <>
-                    <ParagraphAlt>
-                      {t("common:name")}:{" "}
-                      {`${reservation.reserveeFirstName || ""} ${
-                        reservation.reserveeLastName || ""
-                      }`.trim()}
-                    </ParagraphAlt>
+                    {(reservation.reserveeFirstName ||
+                      reservation.reserveeLastName) && (
+                      <ParagraphAlt>
+                        {t("common:name")}:{" "}
+                        {`${reservation.reserveeFirstName || ""} ${
+                          reservation.reserveeLastName || ""
+                        }`.trim()}
+                      </ParagraphAlt>
+                    )}
                     {reservation.reserveePhone && (
                       <ParagraphAlt>
                         {t("common:phone")}: {reservation.reserveePhone}

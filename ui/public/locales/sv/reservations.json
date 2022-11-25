@@ -72,5 +72,6 @@
   "cancellationReasons": {
     "termsAreBinding": "",
     "buffer": ""
-  }
+  },
+  "makeReservation": ""
 }

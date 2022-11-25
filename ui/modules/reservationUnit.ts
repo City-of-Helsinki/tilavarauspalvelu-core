@@ -168,8 +168,7 @@ export const getFuturePricing = (
   applicationRounds: ApplicationRound[] = [],
   reservationDate?: Date
 ): ReservationUnitPricingType => {
-  const { pricings, reservationBegins, reservationEnds, openingHours } =
-    reservationUnit;
+  const { pricings, reservationBegins, reservationEnds } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
     return null;
@@ -192,16 +191,17 @@ export const getFuturePricing = (
         reservationEnds
       );
     })
-    .filter((futurePricing) => {
-      const begins = new Date(futurePricing.begins);
-      return openingHours.openingTimePeriods.some((period) => {
-        const { startDate, endDate } = period;
-        if (!startDate || !endDate) return false;
-        const periodStart = new Date(startDate);
-        const periodEnd = new Date(endDate);
-        return begins >= periodStart && begins <= periodEnd;
-      });
-    })
+    // TODO: find out should opening hours be checked here
+    // .filter((futurePricing) => {
+    //   const begins = new Date(futurePricing.begins);
+    //   return openingHours.openingTimePeriods.some((period) => {
+    //     const { startDate, endDate } = period;
+    //     if (!startDate || !endDate) return false;
+    //     const periodStart = new Date(startDate);
+    //     const periodEnd = new Date(endDate);
+    //     return begins >= periodStart && begins <= periodEnd;
+    //   });
+    // })
     .filter((futurePricing) => {
       return !applicationRounds.some((applicationRound) => {
         const { reservationPeriodBegin, reservationPeriodEnd } =

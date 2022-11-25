@@ -119,37 +119,41 @@ const Step0 = ({
         handleSubmit();
       }}
     >
-      <Subheading
-        style={{
-          margin: "var(--spacing-layout-m) 0 var(--spacing-xs)",
-        }}
-      >
-        {t("reservationCalendar:reservationInfo")}
-      </Subheading>
-      <TwoColumnContainer>
-        {generalFields.map((field) => {
-          return (
-            <ReservationFormField
-              key={`key-${field}`}
-              field={field}
-              options={options}
-              register={register}
-              errors={errors}
-              metadataSet={reservationUnit.metadataSet}
-              watch={watch}
-              control={control}
-              reserveeType="common"
-              reservation={reservation}
-              params={{
-                numPersons: {
-                  min: reservationUnit.minPersons || 0,
-                  max: reservationUnit.maxPersons,
-                },
-              }}
-            />
-          );
-        })}
-      </TwoColumnContainer>
+      {generalFields?.length > 0 && (
+        <>
+          <Subheading
+            style={{
+              margin: "var(--spacing-layout-m) 0 var(--spacing-xs)",
+            }}
+          >
+            {t("reservationCalendar:reservationInfo")}
+          </Subheading>
+          <TwoColumnContainer>
+            {generalFields.map((field) => {
+              return (
+                <ReservationFormField
+                  key={`key-${field}`}
+                  field={field}
+                  options={options}
+                  register={register}
+                  errors={errors}
+                  metadataSet={reservationUnit.metadataSet}
+                  watch={watch}
+                  control={control}
+                  reserveeType="common"
+                  reservation={reservation}
+                  params={{
+                    numPersons: {
+                      min: reservationUnit.minPersons || 0,
+                      max: reservationUnit.maxPersons,
+                    },
+                  }}
+                />
+              );
+            })}
+          </TwoColumnContainer>
+        </>
+      )}
       <Subheading
         style={{
           margin: "var(--spacing-layout-m) 0 var(--spacing-xs)",
@@ -157,26 +161,32 @@ const Step0 = ({
       >
         {t("reservationCalendar:reserverInfo")}
       </Subheading>
-      <p>{t("reservationApplication:reserveeTypePrefix")}</p>
-      <ReserveeTypeContainer data-testid="reservation__checkbox--reservee-type">
-        {reserveeOptions.map(({ id, icon }) => (
-          <RadioButtonWithImage
-            key={id}
-            id={id}
-            label={t(
-              `reservationApplication:reserveeTypes.labels.${id.toLocaleLowerCase()}`
-            )}
-            onClick={() => {
-              setReserveeType(id);
-            }}
-            icon={icon}
-            checked={reserveeType === id}
-          />
-        ))}
-      </ReserveeTypeContainer>
+      {reservationUnit?.metadataSet?.supportedFields.includes(
+        "reservee_type"
+      ) && (
+        <>
+          <p>{t("reservationApplication:reserveeTypePrefix")}</p>
+          <ReserveeTypeContainer data-testid="reservation__checkbox--reservee-type">
+            {reserveeOptions.map(({ id, icon }) => (
+              <RadioButtonWithImage
+                key={id}
+                id={id}
+                label={t(
+                  `reservationApplication:reserveeTypes.labels.${id.toLocaleLowerCase()}`
+                )}
+                onClick={() => {
+                  setReserveeType(id);
+                }}
+                icon={icon}
+                checked={reserveeType === id}
+              />
+            ))}
+          </ReserveeTypeContainer>
+        </>
+      )}
       <TwoColumnContainer
         style={{
-          margin: "var(--spacing-layout-m) 0 var(--spacing-layout-xl)",
+          margin: "var(--spacing-layout-m) 0 var(--spacing-layout-m)",
         }}
       >
         {reservationApplicationFields.map((field, index) => {

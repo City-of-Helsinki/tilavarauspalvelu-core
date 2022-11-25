@@ -42,6 +42,7 @@ export type Reservation = {
   calendarUrl?: string;
   state?: string;
   price?: number;
+  taxPercentageValue?: number;
   spaceTerms?: boolean;
   resourceTerms?: boolean;
   purpose?: number;

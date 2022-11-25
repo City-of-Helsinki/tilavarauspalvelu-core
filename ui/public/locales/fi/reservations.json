@@ -36,7 +36,7 @@
   "cancelReason": "Perumisen syy",
   "cancelDescription": "Perumisen kuvaus",
   "cancelDescriptionPlaceholder": "Kuvaile tähän miksi perut varauksen.",
-  "reservationCancelledTitle": "Varaus on peruttu!",
+  "reservationCancelledTitle": "Varaus peruttu!",
   "reservationCancelledBody": "Saat sähköpostiisi ({{user}}) varausvahvistuksen hetken kuluttua.",
   "reservationCancellationFailed": "Varauksen peruuttaminen epäonnistui",
   "makeNewReservation": "Tee uusi varaus samaan tilaan",
@@ -74,5 +74,6 @@
   "cancellationReasons": {
     "termsAreBinding": "Maksu- ja peruutusehtojemme mukaisesti varaus on sitova. Tätä varausta ei voi perua.",
     "buffer": "Varauksen peruminen tai muuttaminen ei ole mahdollista, koska varauksen peruutusaika on umpeutunut."
-  }
+  },
+  "makeReservation": "Tee varaus"
 }

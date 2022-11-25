@@ -810,32 +810,32 @@ describe("getFuturePricing", () => {
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
   });
 
-  it("with opening time periods", () => {
-    const data = cloneDeep(reservationUnit);
+  // it("with opening time periods", () => {
+  //   const data = cloneDeep(reservationUnit);
 
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
+  //   expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
-    data.pricings[1].begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+  //   data.pricings[1].begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
+  //   expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
-    data.openingHours.openingTimePeriods = [];
-    expect(getFuturePricing(data)).toEqual(null);
+  //   data.openingHours.openingTimePeriods = [];
+  //   expect(getFuturePricing(data)).toEqual(null);
 
-    data.openingHours.openingTimePeriods.push({
-      startDate: addDays(new Date(), 1),
-      endDate: addDays(new Date(), 20),
-    });
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+  //   data.openingHours.openingTimePeriods.push({
+  //     startDate: addDays(new Date(), 1),
+  //     endDate: addDays(new Date(), 20),
+  //   });
+  //   expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
-    data.openingHours.openingTimePeriods[0].startDate = null;
-    expect(getFuturePricing(data)).toEqual(null);
+  //   data.openingHours.openingTimePeriods[0].startDate = null;
+  //   expect(getFuturePricing(data)).toEqual(null);
 
-    data.openingHours.openingTimePeriods[0].startDate = new Date();
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+  //   data.openingHours.openingTimePeriods[0].startDate = new Date();
+  //   expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
-    data.openingHours.openingTimePeriods[0].endDate = null;
-    expect(getFuturePricing(data)).toEqual(null);
-  });
+  //   data.openingHours.openingTimePeriods[0].endDate = null;
+  //   expect(getFuturePricing(data)).toEqual(null);
+  // });
 
   it("handles active application rounds", () => {
     const data = cloneDeep(reservationUnit);

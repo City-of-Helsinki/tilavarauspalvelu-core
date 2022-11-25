@@ -62,7 +62,6 @@ import {
 } from "../../modules/reservation";
 import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import { DataContext, ReservationProps } from "../../context/DataContext";
-import PendingReservationInfoCard from "../../components/reservation/PendingReservationInfoCard";
 import Container from "../../components/common/Container";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import { Subheading } from "../../components/reservation/styles";
@@ -97,6 +96,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     >({
       query: RESERVATION_UNIT,
       variables: { pk: id },
+      fetchPolicy: "no-cache",
     });
 
     const { data: genericTermsData } = await apolloClient.query<
@@ -475,16 +475,27 @@ const ReservationUnitReservation = ({
   }, [reservationUnit?.metadataSet?.supportedFields]);
 
   const reservationApplicationFields = useMemo(() => {
+    const type = reservationUnit.metadataSet?.supportedFields?.includes(
+      "reservee_type"
+    )
+      ? reserveeType
+      : ReservationsReservationReserveeTypeChoices.Individual;
+
     return getReservationApplicationFields(
       reservationUnit.metadataSet?.supportedFields,
-      reserveeType,
+      type,
       true
     );
   }, [reservationUnit?.metadataSet?.supportedFields, reserveeType]);
 
   const onSubmitApplication1 = useCallback(
     (payload): void => {
-      if (!reserveeType) {
+      if (
+        reservationUnit?.metadataSet?.supportedFields.includes(
+          "reservee_type"
+        ) &&
+        !reserveeType
+      ) {
         setErrorMsg(t("reservationApplication:errors.noFormType"));
         return;
       }
@@ -500,7 +511,9 @@ const ReservationUnitReservation = ({
       const input = getReservationApplicationMutationValues(
         normalizedPayload,
         reservationUnit.metadataSet?.supportedFields,
-        reserveeType
+        reservationUnit?.metadataSet?.supportedFields.includes("reservee_type")
+          ? reserveeType
+          : ReservationsReservationReserveeTypeChoices.Individual
       );
 
       updateReservation({
@@ -556,14 +569,16 @@ const ReservationUnitReservation = ({
             <ReservationInfoCard
               reservation={reservation as unknown as ReservationType}
               reservationUnit={reservationUnit}
+              type="confirmed"
             />
           </div>
         ) : (
           <div>
             {reservation && (
-              <PendingReservationInfoCard
+              <ReservationInfoCard
                 reservation={reservation || reservationData}
                 reservationUnit={reservationUnit}
+                type="pending"
               />
             )}
             <PinkBox $isHiddenOnMobile={step > 0}>
@@ -619,6 +634,7 @@ const ReservationUnitReservation = ({
                   reservationApplicationFields={reservationApplicationFields}
                   options={options}
                   reserveeType={reserveeType}
+                  steps={steps}
                   setStep={setStep}
                   termsOfUse={termsOfUse}
                   setErrorMsg={setErrorMsg}

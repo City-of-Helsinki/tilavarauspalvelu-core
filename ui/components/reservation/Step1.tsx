@@ -9,7 +9,7 @@ import {
   ReservationUnitType,
   TermsOfUseType,
 } from "common/types/gql-types";
-import { Reservation } from "../../modules/types";
+import { Reservation, ReservationStep } from "../../modules/types";
 import { capitalize, getTranslation } from "../../modules/util";
 import { ActionContainer, Subheading, TwoColumnContainer } from "./styles";
 import Sanitize from "../common/Sanitize";
@@ -24,6 +24,7 @@ type Props = {
   reservationApplicationFields: string[];
   options: Record<string, OptionType[]>;
   reserveeType: ReservationsReservationReserveeTypeChoices;
+  steps: ReservationStep[];
   setStep: React.Dispatch<React.SetStateAction<number>>;
   termsOfUse: Record<string, TermsOfUseType>;
   setErrorMsg: React.Dispatch<React.SetStateAction<string>>;
@@ -56,6 +57,7 @@ const Step1 = ({
   reservationApplicationFields,
   options,
   reserveeType,
+  steps,
   setStep,
   termsOfUse,
   setErrorMsg,
@@ -77,55 +79,64 @@ const Step1 = ({
         }
       }}
     >
-      <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
-      <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
+      {generalFields?.length > 0 && (
         <>
-          {generalFields
-            .filter(
-              (key) =>
-                !["", undefined, false, 0, null].includes(get(reservation, key))
-            )
-            .map((key) => {
-              const rawValue = get(reservation, key);
-              const value = get(options, key)
-                ? get(options, key).find((option) => option.value === rawValue)
-                    ?.label
-                : typeof rawValue === "boolean"
-                ? t(`common:${String(rawValue)}`)
-                : rawValue;
-              return (
-                <ParagraphAlt
-                  key={`summary_${key}`}
-                  $isWide={[
-                    "name",
-                    "description",
-                    "freeOfChargeReason",
-                  ].includes(key)}
-                >
-                  <PreviewLabel>
-                    {t(`reservationApplication:label.common.${key}`)}
-                  </PreviewLabel>
-                  <PreviewValue>{value}</PreviewValue>
-                </ParagraphAlt>
-              );
-            })}
+          <Subheading>{t("reservationCalendar:reservationInfo")} </Subheading>
+          <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
+            <>
+              {generalFields
+                .filter(
+                  (key) =>
+                    !["", undefined, false, 0, null].includes(
+                      get(reservation, key)
+                    )
+                )
+                .map((key) => {
+                  const rawValue = get(reservation, key);
+                  const value = get(options, key)
+                    ? get(options, key).find(
+                        (option) => option.value === rawValue
+                      )?.label
+                    : typeof rawValue === "boolean"
+                    ? t(`common:${String(rawValue)}`)
+                    : rawValue;
+                  return (
+                    <ParagraphAlt
+                      key={`summary_${key}`}
+                      $isWide={[
+                        "name",
+                        "description",
+                        "freeOfChargeReason",
+                      ].includes(key)}
+                    >
+                      <PreviewLabel>
+                        {t(`reservationApplication:label.common.${key}`)}
+                      </PreviewLabel>
+                      <PreviewValue>{value}</PreviewValue>
+                    </ParagraphAlt>
+                  );
+                })}
+            </>
+          </TwoColumnContainer>
         </>
-      </TwoColumnContainer>
+      )}
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
       <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
         <>
-          <ParagraphAlt $isWide>
-            <PreviewLabel>
-              {t("reservationApplication:reserveeTypePrefix")}
-            </PreviewLabel>
-            <PreviewValue>
-              {capitalize(
-                t(
-                  `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`
-                )
-              )}
-            </PreviewValue>
-          </ParagraphAlt>
+          {reservationApplicationFields.includes("reserveeType") && (
+            <ParagraphAlt $isWide>
+              <PreviewLabel>
+                {t("reservationApplication:reserveeTypePrefix")}
+              </PreviewLabel>
+              <PreviewValue>
+                {capitalize(
+                  t(
+                    `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`
+                  )
+                )}
+              </PreviewValue>
+            </ParagraphAlt>
+          )}
           {reservationApplicationFields
             .filter(
               (key) =>
@@ -143,7 +154,9 @@ const Step1 = ({
                 <ParagraphAlt key={`summary_${key}`}>
                   <PreviewLabel>
                     {t(
-                      `reservationApplication:label.${reserveeType.toLocaleLowerCase()}.${key}`
+                      `reservationApplication:label.${
+                        reserveeType?.toLocaleLowerCase() || "individual"
+                      }.${key}`
                     )}
                   </PreviewLabel>
                   <PreviewValue>{value}</PreviewValue>
@@ -224,7 +237,11 @@ const Step1 = ({
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
         >
-          {t("reservationCalendar:nextStep")}
+          {t(
+            `reservationCalendar:${
+              steps.length > 2 ? "nextStep" : "makeReservation"
+            }`
+          )}
         </MediumButton>
         <MediumButton
           variant="secondary"
@@ -232,7 +249,7 @@ const Step1 = ({
           onClick={() => setStep(0)}
           data-test="reservation__button--cancel"
         >
-          {t("common:cancel")}
+          {t("common:prev")}
         </MediumButton>
       </ActionContainer>
     </form>

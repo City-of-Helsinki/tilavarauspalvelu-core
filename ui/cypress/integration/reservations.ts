@@ -126,13 +126,11 @@ describe("Tilavaraus user reservations", () => {
     cy.contains("div", "Sopparijuttuja").should("be.visible");
     cy.contains("div", "Toinen rivi").should("be.visible");
 
-    reservationInfoCard()
-      .find("h3")
-      .should("contain.text", "Reservation name / Toimistohuone 1");
+    reservationInfoCard().find("h3").should("contain.text", "Toimistohuone 1");
     reservationInfoCard()
       .should("contain.text", "Varausnumero: 11")
       .should("contain.text", "Ke 28.4.2021 klo")
-      .should("contain.text", "Kesto: 4 t")
+      .should("contain.text", ", 4 t")
       .should(
         "contain.text",
         "Varauksen kuvaus: Reservation description - a long one with alotta text"
@@ -182,13 +180,11 @@ describe("Tilavaraus user reservations", () => {
     cy.contains("div", "Sopparijuttuja").should("be.visible");
     cy.contains("div", "Toinen rivi").should("be.visible");
 
-    reservationInfoCard()
-      .find("h3")
-      .should("contain.text", "Reservation name / Toimistohuone 1");
+    reservationInfoCard().find("h3").should("contain.text", "Toimistohuone 1");
     reservationInfoCard()
       .should("contain.text", "Varausnumero: 4")
       .should("contain.text", "Ke 28.4.2021 klo")
-      .should("contain.text", "Kesto: 4 t")
+      .should("contain.text", ", 4 t")
       .should(
         "contain.text",
         "Varauksen kuvaus: Reservation description - a long one with alotta text"
@@ -233,10 +229,10 @@ describe("Tilavaraus user reservations", () => {
     customReasonInput().type("A reason");
 
     cancelCancelButton().click();
-    cancelTitle().should("have.text", "Varaus on peruttu!");
+    cancelTitle().should("have.text", "Varaus peruttu!");
 
     reservationInfoCard()
-      .should("contain.text", "Kesto: 2 t")
+      .should("contain.text", ", 2 t")
       // .should("contain.text", "(alv %)")
       .should("contain.text", "Hinta: 42\u00a0€");
 

@@ -19,7 +19,7 @@ export function cancelButton(): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 export function secondBackButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("button[data-testid='reservation-cancel__button--back-front']");
+  return cy.get("a[data-testid='reservation-cancel__button--back-front']");
 }
 
 export function reReserveButton(): Cypress.Chainable<JQuery<HTMLElement>> {

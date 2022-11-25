@@ -100,5 +100,6 @@
   "duration": "Varaktighet {{duration}}",
   "fyiLabel": "Till kännedom",
   "add": "addera",
-  "subtract": "subtrahera"
+  "subtract": "subtrahera",
+  "inclTax": ""
 }

@@ -16,6 +16,7 @@ import {
   Select,
   TextArea,
 } from "hds-react";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
@@ -166,6 +167,18 @@ const ButtonContainer = styled.div`
   flex-direction: column;
   gap: var(--spacing-m);
   align-items: flex-start;
+  font-size: var(--fontsize-body-m);
+  margin-top: var(--spacing-layout-m);
+`;
+
+const Anchor = styled.a`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2-xs);
+  text-decoration: underline;
+  color: var(--color-black) !important;
+  ${fontMedium}
+  cursor: pointer;
 `;
 
 const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
@@ -234,6 +247,7 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
           <ReservationInfoCard
             reservation={reservation}
             reservationUnit={reservationUnit}
+            type="confirmed"
           />
         </>
       )
@@ -394,23 +408,20 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                       </Paragraph>
                     )}
                     <ButtonContainer>
-                      <MediumButton
-                        variant="supplementary"
-                        iconRight={<IconArrowRight aria-hidden />}
-                        onClick={() => router.push("/")}
-                        data-testid="reservation-cancel__button--back-front"
-                      >
-                        {t("common:gotoFrontpage")}
-                      </MediumButton>
+                      <Link href="/" passHref>
+                        <Anchor data-testid="reservation-cancel__button--back-front">
+                          {t("common:gotoFrontpage")}
+                          <IconArrowRight size="m" aria-hidden />
+                        </Anchor>
+                      </Link>
                       {logout && (
-                        <MediumButton
-                          variant="supplementary"
-                          iconRight={<IconSignout aria-hidden />}
+                        <Anchor
                           onClick={() => logout()}
                           data-testid="reservation-cancel__button--logout"
                         >
                           {t("common:logout")}
-                        </MediumButton>
+                          <IconSignout size="m" aria-hidden />
+                        </Anchor>
                       )}
                     </ButtonContainer>
                   </>
