@@ -2375,7 +2375,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_by_pk_has_reservations(self):
-        now = datetime.datetime.now(get_default_timezone())
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -2383,8 +2383,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             state=STATE_CHOICES.CREATED,
         )
         other_reservation = ReservationFactory(
-            begin=datetime.datetime(2021, 1, 1),
-            end=datetime.datetime(2021, 1, 2),
+            begin=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2021, 1, 2, tzinfo=DEFAULT_TIMEZONE),
         )
         self.reservation_unit.reservation_set.set(
             [matching_reservation, other_reservation]

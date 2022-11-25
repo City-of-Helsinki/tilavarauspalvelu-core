@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.urls import reverse
+from django.utils.timezone import get_default_timezone
 from helusers.settings import api_token_auth_settings
 from jose import jwt
 from rest_framework.test import APITestCase
@@ -65,7 +66,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
         keys = {"keys": [rsa_key.public_key_jwk]}
 
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(tz=get_default_timezone())
         expire = now + datetime.timedelta(days=14)
 
         jwt_data = {

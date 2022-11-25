@@ -2,6 +2,7 @@ import threading
 
 from django.db.models import Prefetch
 from django.utils.datetime_safe import datetime
+from django.utils.timezone import get_default_timezone
 from rest_framework import serializers, viewsets
 from rest_framework.exceptions import ValidationError
 
@@ -49,7 +50,7 @@ class AllocationRequestSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        validated_data["start_date"] = datetime.now()
+        validated_data["start_date"] = datetime.now(tz=get_default_timezone())
 
         application_round_id = validated_data["application_round_id"]
 

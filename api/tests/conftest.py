@@ -5,6 +5,7 @@ import recurrence
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
 
 from allocation.models import AllocationRequest
@@ -37,6 +38,8 @@ from reservations.models import AbilityGroup, AgeGroup, Reservation, Reservation
 from resources.models import Resource
 from spaces.models import District, Location, ServiceSector, Space, Unit, UnitGroup
 from users.models import ReservationNotification
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @pytest.fixture(autouse=True)
@@ -221,7 +224,7 @@ def application_round(reservation_unit, purpose, service_sector) -> ApplicationR
 def allocation_request_in_progress(application_round) -> AllocationRequest:
     return AllocationRequest.objects.create(
         application_round=application_round,
-        start_date=datetime.datetime.now(),
+        start_date=datetime.datetime.now(tz=get_default_timezone()),
         end_date=None,
         completed=False,
     )
@@ -524,8 +527,8 @@ def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> Application
         application_event=application_event,
         recurrence=recurrence.Recurrence(
             include_dtstart=False,
-            dtstart=timezone.datetime(2021, 1, 4, 0, 0, 0),
-            dtend=timezone.datetime(2021, 12, 28, 0, 0, 0),
+            dtstart=timezone.datetime(2021, 1, 4, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+            dtend=timezone.datetime(2021, 12, 28, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
             rrules=[
                 recurrence.Rule(
                     recurrence.WEEKLY, byday=[recurrence.MONDAY, recurrence.TUESDAY]

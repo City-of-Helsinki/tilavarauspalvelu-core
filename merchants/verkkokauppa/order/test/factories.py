@@ -3,6 +3,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 import factory
+from django.utils.timezone import get_default_timezone
 
 from ..types import Order, OrderCustomer
 
@@ -24,7 +25,7 @@ class OrderFactory(factory.Factory):
     order_id = uuid4()
     namespace = "tilavaraus"
     user = str(uuid4())
-    created_at = datetime.now()
+    created_at = datetime.now(tz=get_default_timezone())
     items = []
     price_net = Decimal("10.0")
     price_vat = Decimal("2.4")

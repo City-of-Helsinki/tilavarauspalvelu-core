@@ -1,4 +1,5 @@
 from django.utils.datetime_safe import datetime
+from django.utils.timezone import get_default_timezone
 
 from allocation.allocation_data_builder import AllocationDataBuilder
 from allocation.allocation_solver import AllocationSolver
@@ -27,13 +28,13 @@ def start_allocation(allocation_request: AllocationRequest):
         # Safeguard so we don't lock allocation on unexpected exceptions even though this shouldn't throw anything
         allocation_request.application_round.allocating = False
         allocation_request.application_round.save()
-        allocation_request.end_date = datetime.now()
+        allocation_request.end_date = datetime.now(tz=get_default_timezone())
         allocation_request.completed = False
         allocation_request.save()
         raise
 
     allocation_request.application_round.allocating = False
     allocation_request.application_round.save()
-    allocation_request.end_date = datetime.now()
+    allocation_request.end_date = datetime.now(tz=get_default_timezone())
     allocation_request.completed = True
     allocation_request.save()

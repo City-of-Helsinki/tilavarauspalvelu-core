@@ -4,7 +4,6 @@ from decimal import Decimal
 from unittest.mock import patch
 
 import freezegun
-import pytz
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
@@ -339,7 +338,9 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_update_data()
         today = datetime.date.today()
-        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        begin = datetime.datetime(
+            today.year, today.month, today.day, 21, 0, tzinfo=get_default_timezone()
+        )
         end = begin + datetime.timedelta(hours=2)
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
         input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
@@ -365,10 +366,16 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_update_data()
         today = datetime.date.today()
-        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        begin = datetime.datetime(
+            today.year,
+            today.month,
+            today.day,
+            21,
+            0,
+        ).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(hours=2)
-        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
-        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%S%z")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%S%z")
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
@@ -384,8 +391,8 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(reservation_id).is_greater_than_or_equal_to(1)
         saved_reservation = Reservation.objects.get(pk=reservation_id)
         assert_that(saved_reservation).is_not_none()
-        assert_that(saved_reservation.begin).is_equal_to(pytz.utc.localize(begin))
-        assert_that(saved_reservation.end).is_equal_to(pytz.utc.localize(end))
+        assert_that(saved_reservation.begin).is_equal_to(begin)
+        assert_that(saved_reservation.end).is_equal_to(end)
 
     def test_update_fails_when_reservation_unit_in_open_application_round(
         self, mock_periods, mock_opening_hours
@@ -464,8 +471,9 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         )
         res = ReservationFactory(
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime.now(),
-            end=datetime.datetime.now() + datetime.timedelta(hours=2),
+            begin=datetime.datetime.now(tz=get_default_timezone()),
+            end=datetime.datetime.now(tz=get_default_timezone())
+            + datetime.timedelta(hours=2),
             state=STATE_CHOICES.CREATED,
             user=citizen,
         )

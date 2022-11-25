@@ -60,7 +60,7 @@ class ApplicationRoundAggregateDataTestCase(TestCase):
         )
         res_start = datetime.datetime.combine(
             cls.application_round.reservation_period_begin, datetime.time(12)
-        )
+        ).astimezone(tz=get_default_timezone())
         cls.reservation_1 = ReservationFactory(
             begin=res_start,
             end=res_start + datetime.timedelta(hours=2),

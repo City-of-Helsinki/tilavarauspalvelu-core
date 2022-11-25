@@ -5,12 +5,15 @@ import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.utils import timezone
+from django.utils.timezone import get_default_timezone
 
 from allocation.allocation_data_builder import AllocationDataBuilder
 from allocation.allocation_models import ALLOCATION_PRECISION
 from allocation.tests.conftest import get_default_end, get_default_start
 from applications.models import ApplicationStatus
 from opening_hours.hours import TimeElement
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 def every_second_day(p_start, p_end):
@@ -140,9 +143,9 @@ def test_should_map_application_events(
     ).get_allocation_data()
 
     dates = []
-    start = datetime.datetime(2020, 1, 6, 10, 0)
+    start = datetime.datetime(2020, 1, 6, 10, 0, tzinfo=DEFAULT_TIMEZONE)
     delta = datetime.timedelta(days=7)
-    while start <= datetime.datetime(2020, 2, 24, 10, 0):
+    while start <= datetime.datetime(2020, 2, 24, 10, 0, tzinfo=DEFAULT_TIMEZONE):
         dates.append(start)
         start += delta
 

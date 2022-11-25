@@ -5,6 +5,7 @@ from assertpy import assert_that
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test.testcases import TestCase
+from django.utils.timezone import get_default_timezone
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
@@ -14,6 +15,8 @@ from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import ReservationFactory
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 def get_mocked_opening_hours():
@@ -51,8 +54,8 @@ class ReservationUnitCapacityTestCase(TestCase):
         cls.reservation_unit = ReservationUnitFactory()
         cls.reservation = ReservationFactory(
             reservation_unit=[cls.reservation_unit],
-            begin=datetime.datetime(2020, 5, 5, 12),
-            end=datetime.datetime(2020, 5, 5, 14),
+            begin=datetime.datetime(2020, 5, 5, 12, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2020, 5, 5, 14, tzinfo=DEFAULT_TIMEZONE),
             state=STATE_CHOICES.CONFIRMED,
         )
 
@@ -109,8 +112,8 @@ class ReservationUnitCapacityTestCase(TestCase):
         mock.return_value = get_mocked_opening_hours()
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime(2022, 5, 5, 12),
-            end=datetime.datetime(2022, 5, 5, 14),
+            begin=datetime.datetime(2022, 5, 5, 12, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2022, 5, 5, 14, tzinfo=DEFAULT_TIMEZONE),
             state=STATE_CHOICES.CONFIRMED,
         )
         response = self.api_client.get(
