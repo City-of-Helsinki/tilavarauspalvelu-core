@@ -234,7 +234,7 @@ describe("application", () => {
 
     nextButton().click();
 
-    notificationTitle().should(
+    cy.get("[data-testid='application__page2--notification-error'").should(
       "contain.text",
       "Lisää kaikille kausivarauksille vähintään yksi aika"
     );
@@ -270,12 +270,14 @@ describe("application", () => {
     );
     minDurationNotification().should("not.exist");
 
-    notificationTitle().should(
+    cy.get("[data-testid='application__page2--notification-success']").should(
       "contain.text",
       "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
     );
 
-    successNotification().find("button").click();
+    cy.get("[data-testid='application__page2--notification-success']")
+      .find("button")
+      .click();
 
     nextButton().click();
 
