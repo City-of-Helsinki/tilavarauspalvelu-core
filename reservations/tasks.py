@@ -1,3 +1,4 @@
+from merchants.pruning import update_expired_orders
 from tilavarauspalvelu.celery import app
 
 from .pruning import (
@@ -21,6 +22,11 @@ REMOVE_STATS_OLDER_THAN_YEARS = 5
 def _prune_reservations() -> None:
     prune_inactive_reservations(PRUNE_OLDER_THAN_MINUTES)
     prune_reservation_with_inactive_payments(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
+
+
+@app.task(name="update_expired_orders")
+def update_expired_orders_task(older_than_minutes=PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES):
+    update_expired_orders(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
 
 
 @app.on_after_finalize.connect
