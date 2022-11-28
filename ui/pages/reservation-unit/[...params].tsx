@@ -574,13 +574,11 @@ const ReservationUnitReservation = ({
           </div>
         ) : (
           <div>
-            {reservation && (
-              <ReservationInfoCard
-                reservation={reservation || reservationData}
-                reservationUnit={reservationUnit}
-                type="pending"
-              />
-            )}
+            <ReservationInfoCard
+              reservation={reservation || reservationData}
+              reservationUnit={reservationUnit}
+              type="pending"
+            />
             <PinkBox $isHiddenOnMobile={step > 0}>
               <Subheading>
                 {t("reservations:reservationInfoBoxHeading")}

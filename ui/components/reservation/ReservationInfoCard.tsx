@@ -72,7 +72,7 @@ const ReservationInfoCard = ({
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const { begin, end, taxPercentageValue } = reservation;
+  const { begin, end, taxPercentageValue } = reservation || {};
 
   const beginDate = t("common:dateWithWeekday", {
     date: begin && parseISO(begin),
@@ -102,18 +102,23 @@ const ReservationInfoCard = ({
   const mainImage = getMainImage(reservationUnit);
 
   const ageGroup = trim(
-    `${reservation.ageGroup?.minimum || ""} - ${
-      reservation.ageGroup?.maximum || ""
+    `${reservation?.ageGroup?.minimum || ""} - ${
+      reservation?.ageGroup?.maximum || ""
     }`,
     " - "
   );
 
-  const purpose = getTranslation(reservation.purpose, "name");
+  const purpose = getTranslation(reservation?.purpose, "name");
 
-  const price =
-    reservation.state === "REQUIRES_HANDLING"
-      ? getReservationUnitPrice(reservationUnit)
-      : getReservationPrice(reservation.price, t("prices:priceFree"));
+  const price: string =
+    reservation?.state === "REQUIRES_HANDLING"
+      ? getReservationUnitPrice(reservationUnit, begin)
+      : getReservationPrice(reservation?.price, t("prices:priceFree"));
+
+  const shouldDisaplyTaxPercentage: boolean =
+    reservation?.state === "REQUIRES_HANDLING"
+      ? getReservationUnitPrice(reservationUnit, begin, 0, false, true) !== "0"
+      : reservation?.price > 0;
 
   const formatters = useMemo(
     () => getFormatters(i18n.language),
@@ -132,7 +137,7 @@ const ReservationInfoCard = ({
         <Heading>{getTranslation(reservationUnit, "name")}</Heading>
         {["confirmed", "complete"].includes(type) && (
           <Subheading>
-            {t("reservations:reservationNumber")}: {reservation.pk}
+            {t("reservations:reservationNumber")}: {reservation?.pk}
           </Subheading>
         )}
         <Subheading>{getTranslation(reservationUnit.unit, "name")}</Subheading>
@@ -141,18 +146,19 @@ const ReservationInfoCard = ({
             {capitalize(timeString)}, {formatDurationMinutes(duration)}
           </Strong>
         </Value>
-        {reservation.description && ["confirmed", "complete"].includes(type) && (
+        {reservation?.description && ["confirmed", "complete"].includes(type) && (
           <Value>
             {t("reservationCalendar:label.description")}:{" "}
-            {reservation.description}
+            {reservation?.description}
           </Value>
         )}
         <Value>
           {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
           {taxPercentageValue &&
+            shouldDisaplyTaxPercentage &&
             `(${t("common:inclTax", {
               taxPercentage: formatters.strippedDecimal.format(
-                reservation.taxPercentageValue
+                reservation?.taxPercentageValue
               ),
             })})`}
         </Value>
@@ -166,9 +172,9 @@ const ReservationInfoCard = ({
             {t("reservations:ageGroup")}: {ageGroup}
           </Value>
         )}
-        {reservation.numPersons > 0 && ["complete"].includes(type) && (
+        {reservation?.numPersons > 0 && ["complete"].includes(type) && (
           <Value>
-            {t("reservations:numPersons")}: {reservation.numPersons}
+            {t("reservations:numPersons")}: {reservation?.numPersons}
           </Value>
         )}
       </Content>
