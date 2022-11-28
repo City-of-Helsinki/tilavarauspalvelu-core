@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Dict, List, Union
 
 from django.utils import timezone
@@ -22,7 +21,6 @@ from applications.models import (
     EventReservationUnit,
     Organisation,
     Person,
-    Recurrence,
 )
 from applications.utils.reservation_creation import (
     create_reservations_from_allocation_results,
@@ -170,28 +168,6 @@ class ApplicationEventScheduleSerializer(serializers.ModelSerializer):
                 ),
             },
         }
-
-
-class DateAwareRecurrenceReadSerializer(serializers.ModelSerializer):
-
-    recurrence = serializers.SerializerMethodField()
-
-    def get_recurrence(self, instance):
-        return instance.recurrence.between(self.get_start_date(), self.get_end_date())
-
-    def get_start_date(self) -> datetime:
-        if "start" in self.context and self.context["start"] is not None:
-            return self.context["start"]
-        return MINIMUM_TIME
-
-    def get_end_date(self) -> datetime:
-        if "end" in self.context and self.context["end"] is not None:
-            return self.context["end"]
-        return MAXIMUM_TIME
-
-    class Meta:
-        model = Recurrence
-        fields = ["id", "priority", "recurrence"]
 
 
 class EventReservationUnitSerializer(serializers.ModelSerializer):

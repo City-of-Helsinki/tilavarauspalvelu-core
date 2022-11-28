@@ -21,14 +21,6 @@ from .models import (
 )
 
 
-class CityInline(admin.TabularInline):
-    model = City
-
-
-class ApplicationEventInline(admin.TabularInline):
-    model = ApplicationEvent
-
-
 class ApplicationStatusInline(admin.TabularInline):
     model = ApplicationStatus
 

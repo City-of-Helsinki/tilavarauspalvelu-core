@@ -1,5 +1,3 @@
-from rest_framework import mixins, viewsets
-
 from api.base import TranslatedModelSerializer
 from services.models import Service
 
@@ -28,10 +26,3 @@ class ServiceSerializer(TranslatedModelSerializer):
                 "help_text": "Buffer time required after reservation if this service is used.",
             },
         }
-
-
-class ServiceViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
-    serializer_class = ServiceSerializer
-    queryset = Service.objects.all()
