@@ -113,7 +113,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const [showAll, setShowAll] = React.useState(false);
-  const isMobile = useMedia(`(max-width: ${mobileBreakpoint})`);
+  const isMobile = useMedia(`(max-width: ${mobileBreakpoint})`, false);
 
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 

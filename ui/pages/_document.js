@@ -6,12 +6,6 @@ import { getCriticalHdsRules, hdsStyles } from "hds-react";
 export default class MyDocument extends Document {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static async getInitialProps(ctx) {
-    const initialProps = await Document.getInitialProps(ctx);
-    const hdsCriticalRules = await getCriticalHdsRules(
-      initialProps.html,
-      hdsStyles
-    );
-
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
 
@@ -23,6 +17,12 @@ export default class MyDocument extends Document {
             // eslint-disable-next-line react/jsx-filename-extension
             sheet.collectStyles(<App {...props} />),
         });
+
+      const initialProps = await Document.getInitialProps(ctx);
+      const hdsCriticalRules = await getCriticalHdsRules(
+        initialProps.html,
+        hdsStyles
+      );
 
       return {
         ...initialProps,
