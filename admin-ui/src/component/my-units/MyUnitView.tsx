@@ -61,14 +61,14 @@ const MyUnitView = () => {
         </div>
         <Tabs>
           <Tabs.TabList>
-            <Tabs.Tab>{t("MyUnits.Calendar.tab")}</Tabs.Tab>
             <Tabs.Tab>{t("MyUnits.UnitCalendar.tab")}</Tabs.Tab>
+            <Tabs.Tab>{t("MyUnits.Calendar.tab")}</Tabs.Tab>
           </Tabs.TabList>
           <TabPanel>
-            <ReservationUnitCalendarView />
+            <UnitReservationsView />
           </TabPanel>
           <TabPanel>
-            <UnitReservationsView />
+            <ReservationUnitCalendarView />
           </TabPanel>
         </Tabs>
       </Container>
