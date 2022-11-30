@@ -86,6 +86,7 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     order_by = django_filters.OrderingFilter(
         fields=(
+            "created_at",
             "state",
             "begin",
             "end",
