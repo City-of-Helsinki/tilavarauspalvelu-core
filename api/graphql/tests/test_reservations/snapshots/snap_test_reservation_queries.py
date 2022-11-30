@@ -894,6 +894,46 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
     }
 }
 
+snapshots['ReservationQueryTestCase::test_order_by_created_at 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'createdAt': '2021-10-12T09:00:00+0000',
+                        'name': 'this should be 1st'
+                    }
+                },
+                {
+                    'node': {
+                        'createdAt': '2021-10-12T10:00:00+0000',
+                        'name': 'this should be 2nd'
+                    }
+                },
+                {
+                    'node': {
+                        'createdAt': '2021-10-12T11:00:00+0000',
+                        'name': 'this should be 3rd'
+                    }
+                },
+                {
+                    'node': {
+                        'createdAt': '2021-10-12T12:00:00+0000',
+                        'name': 'movies'
+                    }
+                },
+                {
+                    'node': {
+                        'createdAt': '2021-10-12T22:00:00+0000',
+                        'name': 'this should be last'
+                    }
+                }
+            ],
+            'totalCount': 5
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_order_by_reservation_unit_name 1'] = {
     'data': {
         'reservations': {

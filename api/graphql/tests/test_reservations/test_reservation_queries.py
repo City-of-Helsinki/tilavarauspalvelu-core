@@ -1216,6 +1216,42 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             assert_that(content.get("errors")).is_none()
             self.assertMatchSnapshot(content)
 
+    @freezegun.freeze_time("2021-10-12T12:00:00Z")
+    def test_order_by_created_at(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+        ReservationFactory(
+            name="this should be 1st", created_at=now + datetime.timedelta(hours=-3)
+        )
+        ReservationFactory(
+            name="this should be 2nd", created_at=now + datetime.timedelta(hours=-2)
+        )
+        ReservationFactory(
+            name="this should be 3rd", created_at=now + datetime.timedelta(hours=-1)
+        )
+        ReservationFactory(
+            name="this should be last", created_at=now + datetime.timedelta(hours=10)
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(orderBy:"createdAt") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            createdAt
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_getting_reservation_with_fields_requiring_special_permissions(self):
         self.client.force_login(self.general_admin)
         response = self.query(
