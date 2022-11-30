@@ -47,7 +47,7 @@ const MyUnits = () => {
         </div>
         <Grid>
           {data?.units?.edges.map((unit) => (
-            <MyUnitCard unit={unit?.node as UnitType} />
+            <MyUnitCard unit={unit?.node as UnitType} key={unit?.node?.pk} />
           ))}
         </Grid>
       </Container>
