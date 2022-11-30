@@ -75,5 +75,10 @@
     "termsAreBinding": "Maksu- ja peruutusehtojemme mukaisesti varaus on sitova. Tätä varausta ei voi perua.",
     "buffer": "Varauksen peruminen tai muuttaminen ei ole mahdollista, koska varauksen peruutusaika on umpeutunut."
   },
-  "makeReservation": "Tee varaus"
+  "makeReservation": "Tee varaus",
+  "orderStatus": {
+    "DRAFT": "Odottaa maksua",
+    "PAID": "Maksettu",
+    "PAID_MANUALLY": "Paikan päällä"
+  }
 }

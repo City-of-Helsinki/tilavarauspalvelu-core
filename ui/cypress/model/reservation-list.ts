@@ -34,6 +34,12 @@ export function statusTag(
   return cy.get(`[data-testid='reservation__card--status-${type}']`);
 }
 
+export function orderStatusTag(
+  type: string
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`[data-testid='reservation__card--order-status-${type}']`);
+}
+
 export function loader(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("[data-testid='loading-spinner']");
 }

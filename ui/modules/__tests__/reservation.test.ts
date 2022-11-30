@@ -7,6 +7,7 @@ import {
 import {
   canUserCancelReservation,
   getDurationOptions,
+  getNormalizedReservationOrderStatus,
   getReservationApplicationFields,
   getReservationApplicationMutationValues,
   getReservationCancellationReason,
@@ -361,5 +362,37 @@ describe("getReservationCancellationReason", () => {
         reservationUnits: [reservationUnit],
       } as ReservationType)
     ).toBe("BUFFER");
+  });
+});
+
+describe("getNormalizedReservationOrderStatus", () => {
+  test("return correct value", () => {
+    expect(
+      getNormalizedReservationOrderStatus({
+        orderStatus: "DRAFT",
+      } as ReservationType)
+    ).toBe("DRAFT");
+
+    expect(
+      getNormalizedReservationOrderStatus({
+        orderStatus: "PAID",
+      } as ReservationType)
+    ).toBe("PAID");
+
+    expect(
+      getNormalizedReservationOrderStatus({
+        orderStatus: "PAID_MANUALLY",
+      } as ReservationType)
+    ).toBe("PAID_MANUALLY");
+
+    expect(
+      getNormalizedReservationOrderStatus({
+        orderStatus: "SOMETHING_ELSE",
+      } as ReservationType)
+    ).toBe(null);
+
+    expect(getNormalizedReservationOrderStatus({} as ReservationType)).toBe(
+      null
+    );
   });
 });

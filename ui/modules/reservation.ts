@@ -230,3 +230,17 @@ export const getReservationCancellationReason = (
 
   return null;
 };
+
+export const getNormalizedReservationOrderStatus = (
+  reservation: ReservationType
+): string | null => {
+  const orderStatuses = ["DRAFT", "PAID", "PAID_MANUALLY"];
+
+  if (!reservation) return null;
+
+  if (orderStatuses.includes(reservation.orderStatus)) {
+    return reservation.orderStatus;
+  }
+
+  return null;
+};

@@ -74,5 +74,10 @@
     "termsAreBinding": "",
     "buffer": ""
   },
-  "makeReservation": ""
+  "makeReservation": "",
+  "orderStatus": {
+    "DRAFT": "",
+    "PAID": "",
+    "PAID_MANUALLY": ""
+  }
 }

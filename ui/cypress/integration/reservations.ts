@@ -13,6 +13,7 @@ import {
   reservationCards,
   tab,
   statusTag,
+  orderStatusTag,
 } from "model/reservation-list";
 import {
   title as cancelTitle,
@@ -44,6 +45,7 @@ describe("Tilavaraus user reservations", () => {
 
   it("should list proper items with correct button states and link to reservation unit", () => {
     reservationCards().should("have.length", 5);
+
     statusTag("desktop")
       .should("have.length", 5)
       .each(($el, $i) => {
@@ -51,6 +53,18 @@ describe("Tilavaraus user reservations", () => {
           expect($el).to.contain("Hyväksytty");
         } else {
           expect($el).to.contain("Käsiteltävänä");
+        }
+      });
+
+    orderStatusTag("desktop")
+      .should("have.length", 3)
+      .each(($el, $i) => {
+        if ($i === 0) {
+          expect($el).to.contain("Maksettu");
+        } else if ($i === 1) {
+          expect($el).to.contain("Odottaa maksua");
+        } else if ($i === 2) {
+          expect($el).to.contain("Paikan päällä");
         }
       });
 
@@ -101,6 +115,8 @@ describe("Tilavaraus user reservations", () => {
 
     reservationContent().find("h1").should("contain", "Varaus 11");
     reservationContent().find("h2").should("contain", "Toimistohuone 1");
+
+    orderStatusTag("desktop").should("contain", "Maksettu");
 
     cy.contains("div", "Confirmed Instructions FI").should("be.visible");
 
@@ -157,6 +173,8 @@ describe("Tilavaraus user reservations", () => {
     reservationContent().find("h1").should("contain", "Varaus 4");
     reservationContent().find("h2").should("contain", "Toimistohuone 1");
 
+    orderStatusTag("desktop").should("contain", "Odottaa maksua");
+
     cy.contains("div", "Confirmed Instructions FI").should("be.visible");
 
     reservationContent()
@@ -209,6 +227,8 @@ describe("Tilavaraus user reservations", () => {
 
     cancelTitle().should("have.text", "Peru varaus");
     cancelCancelButton().should("be.disabled");
+
+    orderStatusTag("desktop").should("not.exist");
 
     backButton().click();
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/21$/);

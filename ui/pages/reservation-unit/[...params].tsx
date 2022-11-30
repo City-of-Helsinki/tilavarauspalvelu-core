@@ -26,7 +26,7 @@ import {
   QueryReservationPurposesArgs,
   QueryReservationUnitByPkArgs,
   QueryTermsOfUseArgs,
-  ReservationByPkQueryVariables,
+  QueryReservationByPkArgs,
   ReservationConfirmMutationInput,
   ReservationConfirmMutationPayload,
   ReservationDeleteMutationInput,
@@ -269,7 +269,7 @@ const ReservationUnitReservation = ({
 
   const { data: fetchedReservationData } = useQuery<
     Query,
-    ReservationByPkQueryVariables
+    QueryReservationByPkArgs
   >(GET_RESERVATION, {
     variables: { pk: reservationData?.pk },
     skip: !reservationData?.pk,
