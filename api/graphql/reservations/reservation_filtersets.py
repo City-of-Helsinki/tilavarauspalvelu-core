@@ -70,7 +70,7 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
-    payment_status = django_filters.MultipleChoiceFilter(
+    order_status = django_filters.MultipleChoiceFilter(
         field_name="payment_order__status",
         lookup_expr="iexact",
         choices=tuple(

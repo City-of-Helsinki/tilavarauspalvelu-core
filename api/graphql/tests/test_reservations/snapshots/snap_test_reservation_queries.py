@@ -712,7 +712,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
     }
 }
 
-snapshots['ReservationQueryTestCase::test_filter_payment_status_multiple_values 1'] = {
+snapshots['ReservationQueryTestCase::test_filter_order_status_multiple_values 1'] = {
     'data': {
         'reservations': {
             'edges': [
@@ -733,7 +733,7 @@ snapshots['ReservationQueryTestCase::test_filter_payment_status_multiple_values 
     }
 }
 
-snapshots['ReservationQueryTestCase::test_filter_payment_status_single_value 1'] = {
+snapshots['ReservationQueryTestCase::test_filter_order_status_single_value 1'] = {
     'data': {
         'reservations': {
             'edges': [

@@ -296,7 +296,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_filter_payment_status_single_value(self):
+    def test_filter_order_status_single_value(self):
         self.maxDiff = None
         self.client.force_login(self.general_admin)
         metadata = ReservationMetadataSetFactory()
@@ -311,7 +311,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         response = self.query(
             """
             query {
-                reservations(paymentStatus: "DRAFT") {
+                reservations(orderStatus: "DRAFT") {
                     edges {
                         node {
                             state
@@ -327,7 +327,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_filter_payment_status_multiple_values(self):
+    def test_filter_order_status_multiple_values(self):
         self.maxDiff = None
         self.client.force_login(self.general_admin)
         metadata = ReservationMetadataSetFactory()
@@ -364,7 +364,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         response = self.query(
             """
             query {
-                reservations(paymentStatus: ["PAID", "REFUNDED"]) {
+                reservations(orderStatus: ["PAID", "REFUNDED"]) {
                     edges {
                         node {
                             state
