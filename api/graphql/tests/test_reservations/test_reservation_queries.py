@@ -1252,6 +1252,45 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_order_by_order_status(self):
+        res1 = ReservationFactory(name="this should be 1st")
+        PaymentOrderFactory(status=PaymentStatus.CANCELLED, reservation=res1)
+
+        res2 = ReservationFactory(name="this should be 2nd")
+        PaymentOrderFactory(status=PaymentStatus.DRAFT, reservation=res2)
+
+        res3 = ReservationFactory(name="this should be 3rd")
+        PaymentOrderFactory(status=PaymentStatus.EXPIRED, reservation=res3)
+
+        res4 = ReservationFactory(name="this should be 4th")
+        PaymentOrderFactory(status=PaymentStatus.PAID, reservation=res4)
+
+        res5 = ReservationFactory(name="this should be 5th")
+        PaymentOrderFactory(status=PaymentStatus.PAID_MANUALLY, reservation=res5)
+
+        res6 = ReservationFactory(name="this should be 6th")
+        PaymentOrderFactory(status=PaymentStatus.REFUNDED, reservation=res6)
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(orderBy:"orderStatus") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            orderStatus
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_getting_reservation_with_fields_requiring_special_permissions(self):
         self.client.force_login(self.general_admin)
         response = self.query(

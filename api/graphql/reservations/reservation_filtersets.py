@@ -100,6 +100,7 @@ class ReservationFilterSet(django_filters.FilterSet):
             ("reservation_unit__unit__name_en", "unit_name_en"),
             ("reservation_unit__unit__name_sv", "unit_name_sv"),
             "reservee_name",
+            ("payment_order__status", "order_status"),
         )
     )
 

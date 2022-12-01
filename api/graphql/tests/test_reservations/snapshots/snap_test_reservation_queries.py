@@ -966,6 +966,58 @@ snapshots['ReservationQueryTestCase::test_order_by_created_at 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_order_by_order_status 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'orderStatus': 'CANCELLED'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'orderStatus': 'DRAFT'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'orderStatus': 'EXPIRED'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 4th',
+                        'orderStatus': 'PAID'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 5th',
+                        'orderStatus': 'PAID_MANUALLY'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 6th',
+                        'orderStatus': 'REFUNDED'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'orderStatus': None
+                    }
+                }
+            ],
+            'totalCount': 7
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_order_by_reservation_unit_name 1'] = {
     'data': {
         'reservations': {
