@@ -1606,6 +1606,7 @@ const translations: ITranslations = {
       reservationUnit: ["Varausyksikkö"],
       unit: ["Toimipiste"],
       datetime: ["Aika"],
+      createdAt: ["Tehty"],
       paymentStatus: ["Maksutila"],
       state: ["Käsittelytila"],
     },

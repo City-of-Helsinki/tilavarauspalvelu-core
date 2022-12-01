@@ -111,6 +111,7 @@ export const RESERVATIONS_QUERY = gql`
           name
           price
           orderStatus
+          createdAt
         }
       }
       pageInfo {
