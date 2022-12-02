@@ -143,6 +143,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     type = graphene.String()
     order_uuid = graphene.String()
     order_status = graphene.String()
+    handled_at = graphene.DateTime()
 
     class Meta:
         model = Reservation
@@ -193,6 +194,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "type",
             "order_uuid",
             "order_status",
+            "handled_at",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -258,6 +260,11 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     def resolve_type(self, info: ResolveInfo) -> Optional[str]:
         if can_handle_reservation(info.context.user, self):
             return self.type
+        return None
+
+    def resolve_handled_at(self, info: ResolveInfo) -> Optional[str]:
+        if can_handle_reservation(info.context.user, self):
+            return self.handled_at
         return None
 
     @reservation_non_public_field

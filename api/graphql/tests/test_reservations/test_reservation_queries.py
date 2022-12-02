@@ -1396,6 +1396,62 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_handled_at_not_visible_without_permissions(self):
+        other_user = get_user_model().objects.create(
+            username="other",
+            first_name="Other",
+            last_name="User",
+            email="other.user@foo.com",
+        )
+
+        self.reservation.handled_at = datetime.datetime.now()
+        self.reservation.save()
+
+        self.client.force_login(other_user)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            handledAt
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_handled_at_visible_with_permissions(self):
+        self.client.force_login(self.general_admin)
+
+        self.reservation.handled_at = datetime.datetime.now()
+        self.reservation.save()
+
+        response = self.query(
+            """
+            query {
+                reservations {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            handledAt
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationByPkTestCase(ReservationTestCaseBase):
