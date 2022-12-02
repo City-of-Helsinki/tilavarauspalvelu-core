@@ -10,6 +10,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import Error, models
 from django.db.models import OuterRef, QuerySet, Subquery
 from django.utils.text import format_lazy
+from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
 from rest_framework.exceptions import ValidationError
@@ -31,6 +32,8 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
+DEFAULT_TIMEZONE = get_default_timezone()
+
 DAY_CHOICES = (
     (0, "Monday"),
     (1, "Tuesday"),
@@ -48,7 +51,7 @@ def year_not_in_future(year: Optional[int]):
     if year is None:
         return
 
-    current_date = datetime.datetime.now()
+    current_date = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
     if current_date.year < year:
         msg = _("is after current year")
@@ -1280,6 +1283,7 @@ class ApplicationEventSchedule(models.Model):
                 hour=self.end.hour,
                 minute=self.end.minute,
                 second=0,
+                tzinfo=DEFAULT_TIMEZONE,
             ),
         )
         pattern = recurrence.Recurrence(
@@ -1290,6 +1294,7 @@ class ApplicationEventSchedule(models.Model):
                 hour=self.begin.hour,
                 minute=self.begin.minute,
                 second=0,
+                tzinfo=DEFAULT_TIMEZONE,
             ),
             rrules=[
                 myrule,
@@ -1384,6 +1389,7 @@ class ApplicationEventScheduleResult(models.Model):
                 hour=self.allocated_end.hour,
                 minute=self.allocated_end.minute,
                 second=0,
+                tzinfo=get_default_timezone(),
             ),
         )
         pattern = recurrence.Recurrence(
@@ -1394,6 +1400,7 @@ class ApplicationEventScheduleResult(models.Model):
                 hour=self.allocated_begin.hour,
                 minute=self.allocated_begin.minute,
                 second=0,
+                tzinfo=DEFAULT_TIMEZONE,
             ),
             rrules=[
                 myrule,

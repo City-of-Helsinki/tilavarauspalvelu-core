@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import freezegun
 from assertpy import assert_that
+from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import (
     DEFAULT_TIMEZONE,
@@ -419,7 +420,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_input_data()
         today = datetime.date.today()
-        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        begin = datetime.datetime(
+            today.year, today.month, today.day, 21, 0, tzinfo=get_default_timezone()
+        )
         end = begin + datetime.timedelta(hours=2)
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
         input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
@@ -446,7 +449,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_input_data()
         today = datetime.date.today()
-        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        begin = datetime.datetime(
+            today.year, today.month, today.day, 21, 0, tzinfo=get_default_timezone()
+        )
         end = begin + datetime.timedelta(hours=2)
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
         input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
@@ -728,7 +733,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         opening_hours_data[0]["date"] = datetime.date(2022, 6, 15)
         mock_opening_hours.return_value = opening_hours_data
 
-        res_start = datetime.datetime(2022, 6, 15, 15, 0)
+        res_start = datetime.datetime(2022, 6, 15, 15, 0, tzinfo=get_default_timezone())
         valid_data = self.get_valid_input_data()
         valid_data["begin"] = res_start.strftime("%Y%m%dT%H%M%SZ")
         valid_data["end"] = (res_start + datetime.timedelta(hours=1)).strftime(
@@ -931,7 +936,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     def test_create_succeed_when_reservation_is_done_less_than_one_full_day_before(
         self, mock_periods, mock_opening_hours
     ):
-        reservation_begin = datetime.datetime(2021, 10, 13, 0, 0, 0)
+        reservation_begin = datetime.datetime(
+            2021, 10, 13, 0, 0, 0, tzinfo=get_default_timezone()
+        )
         reservation_end = reservation_begin + datetime.timedelta(hours=1)
 
         mock_opening_hours.return_value = self.get_mocked_opening_hours(

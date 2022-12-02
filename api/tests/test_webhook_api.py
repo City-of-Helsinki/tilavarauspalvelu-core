@@ -8,6 +8,7 @@ from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
 
 from merchants.models import PaymentStatus
@@ -49,14 +50,14 @@ class WebhookAPITestCaseBase(TestCase):
             description=None,
             additional_info='{"payment_method": creditcards}',
             token=uuid4(),
-            timestamp=datetime.now(),
+            timestamp=datetime.now(tz=get_default_timezone()),
             payment_method_label="Visa",
         )
         self.verkkokauppa_order = Order(
             order_id=uuid4(),
             namespace="tilanvaraus",
             user=self.user,
-            created_at=datetime.now(),
+            created_at=datetime.now(tz=get_default_timezone()),
             items=[],
             price_net=Decimal("100"),
             price_vat=Decimal("24"),

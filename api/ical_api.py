@@ -7,6 +7,7 @@ from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.http import FileResponse, Http404
+from django.utils.timezone import get_default_timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from icalendar import Calendar, Event
@@ -225,7 +226,7 @@ def export_reservation_events(reservation: Reservation, site_name: str, cal: Cal
     ical_event.add("summary", reservation.get_ical_summary())
     ical_event.add("dtstart", reservation.begin)
     ical_event.add("dtend", reservation.end)
-    ical_event.add("dtstamp", datetime.datetime.now())
+    ical_event.add("dtstamp", datetime.datetime.now(tz=get_default_timezone()))
     ical_event.add("description", reservation.get_ical_description())
     ical_event.add("location", reservation.get_location_string())
     ical_event["uid"] = f"{reservation.pk}.event.events.{site_name}"
@@ -245,7 +246,7 @@ def export(
         ical_event.add("summary", application_event.name)
         ical_event.add("dtstart", reservation.begin)
         ical_event.add("dtend", reservation.end)
-        ical_event.add("dtstamp", datetime.datetime.now())
+        ical_event.add("dtstamp", datetime.datetime.now(tz=get_default_timezone()))
         ical_event.add("description", reservation.get_ical_description())
         ical_event.add("location", reservation.get_location_string())
         ical_event["uid"] = "%s.event.events.%s" % (reservation.id, site_name)

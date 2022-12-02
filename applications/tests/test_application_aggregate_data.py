@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from assertpy import assert_that
+from django.utils.timezone import get_default_timezone
 
 from applications.models import (
     ApplicationAggregateData,
@@ -10,6 +11,8 @@ from applications.models import (
 )
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import RecurringReservationFactory, ReservationFactory
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @pytest.mark.django_db
@@ -202,8 +205,8 @@ def test_aggregate_data_creates_data_per_application_reservations_duration_total
     )
     ReservationFactory(
         state=STATE_CHOICES.CREATED,
-        begin=datetime.datetime(2021, 5, 1, 12, 0),
-        end=datetime.datetime(2021, 5, 1, 14, 0),
+        begin=datetime.datetime(2021, 5, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2021, 5, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
         recurring_reservation=recurring,
     )
 
@@ -214,8 +217,8 @@ def test_aggregate_data_creates_data_per_application_reservations_duration_total
     )
     ReservationFactory(
         state=STATE_CHOICES.CREATED,
-        begin=datetime.datetime(2021, 6, 1, 15, 0),
-        end=datetime.datetime(2021, 6, 1, 18, 0),
+        begin=datetime.datetime(2021, 6, 1, 15, 0, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2021, 6, 1, 18, 0, tzinfo=DEFAULT_TIMEZONE),
         recurring_reservation=recurring,
     )
 
@@ -247,8 +250,8 @@ def test_aggregate_data_creates_data_per_application_created_reservations_total(
     )
     ReservationFactory(
         state=STATE_CHOICES.CREATED,
-        begin=datetime.datetime(2021, 5, 1, 12, 0),
-        end=datetime.datetime(2021, 5, 1, 14, 0),
+        begin=datetime.datetime(2021, 5, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2021, 5, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
         recurring_reservation=recurring,
     )
 
@@ -258,8 +261,8 @@ def test_aggregate_data_creates_data_per_application_created_reservations_total(
     )
     ReservationFactory(
         state=STATE_CHOICES.CREATED,
-        begin=datetime.datetime(2021, 6, 1, 15, 0),
-        end=datetime.datetime(2021, 6, 1, 18, 0),
+        begin=datetime.datetime(2021, 6, 1, 15, 0, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2021, 6, 1, 18, 0, tzinfo=DEFAULT_TIMEZONE),
         recurring_reservation=recurring,
     )
 

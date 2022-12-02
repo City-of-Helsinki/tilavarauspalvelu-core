@@ -24,7 +24,7 @@ def test_allocation_request_create(
         format="json",
     )
 
-    assert_that(response).has_status_code == 201
+    assert_that(response.status_code).is_equal_to(201)
     assert_that(response.data["application_round_id"]).is_equal_to(application_round.id)
     assert_that(response.data["completed"]).is_false()
 
