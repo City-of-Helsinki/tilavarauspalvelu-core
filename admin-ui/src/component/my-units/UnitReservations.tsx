@@ -100,6 +100,7 @@ const merge = (
       return {
         title: reservationUnit.nameFi as string,
         pk: reservationUnit.pk as number,
+        isDraft: reservationUnit.isDraft,
         events: reservations
           .filter(
             (reservation) =>
