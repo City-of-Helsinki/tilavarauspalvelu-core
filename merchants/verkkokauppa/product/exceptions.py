@@ -15,3 +15,11 @@ class GetProductMappingError(ProductError):
 
 class ParseProductError(ProductError):
     pass
+
+
+class ParseAccountingError(ProductError):
+    pass
+
+
+class CreateOrUpdateAccountingError(ProductError):
+    pass

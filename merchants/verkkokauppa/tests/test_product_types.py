@@ -4,8 +4,13 @@ from assertpy import assert_that
 from django.test.testcases import TestCase
 from pytest import raises
 
-from ..product.exceptions import ParseProductError
-from ..product.types import CreateProductParams, Product
+from ..product.exceptions import ParseAccountingError, ParseProductError
+from ..product.types import (
+    Accounting,
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+    Product,
+)
 
 
 class ProductTypesTestCase(TestCase):
@@ -55,5 +60,65 @@ class ProductTypesTestCase(TestCase):
                     "productId": "invalid-product-id",
                     "namespace": "some-namespace",
                     "namespaceEntityId": "some-entity-id",
+                }
+            )
+
+    def test_create_or_update_accounting_params_to_json(self):
+        params = CreateOrUpdateAccountingParams(
+            vat_code="vat-code",
+            internal_order="internal-order",
+            profit_center="profit-center",
+            project="project",
+            operation_area="operation-area",
+            company_code="company-code",
+            main_ledger_account="main-ledger-account",
+        )
+        json = params.to_json()
+        expected = {
+            "vatCode": params.vat_code,
+            "internalOrder": params.internal_order,
+            "profitCenter": params.profit_center,
+            "project": params.project,
+            "operationArea": params.operation_area,
+            "companyCode": params.company_code,
+            "mainLedgerAccount": params.main_ledger_account,
+        }
+        assert_that(json).is_equal_to(expected)
+
+    def test_accounting_from_json(self):
+        json = {
+            "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
+            "vatCode": "vat-code",
+            "internalOrder": "internal-order",
+            "profitCenter": "profit-center",
+            "project": "project",
+            "operationArea": "operation-area",
+            "companyCode": "CODE",
+            "mainLedgerAccount": "main-ledger-account",
+        }
+        accounting = Accounting.from_json(json)
+        expected = Accounting(
+            product_id=json["productId"],
+            vat_code=json["vatCode"],
+            internal_order=json["internalOrder"],
+            profit_center=json["profitCenter"],
+            project=json["project"],
+            operation_area=json["operationArea"],
+            company_code=json["companyCode"],
+            main_ledger_account=json["mainLedgerAccount"],
+        )
+        assert_that(accounting).is_equal_to(expected)
+
+    def test_accounting_from_json_raises_exception_if_key_is_missing(self):
+        with raises(ParseAccountingError):
+            Accounting.from_json(
+                {
+                    "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
+                    "vatCode": "vat-code",
+                    "internalOrder": "internal-order",
+                    "profitCenter": "profit-center",
+                    "project": "project",
+                    "operationArea": "operation-area",
+                    "companyCode": "CODE",
                 }
             )
