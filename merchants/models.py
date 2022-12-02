@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from merchants.validators import is_numeric, validate_accounting_project
+
 
 class PaymentMerchant(models.Model):
     """
@@ -189,3 +191,68 @@ class PaymentOrder(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
+
+
+class PaymentAccounting(models.Model):
+    """
+    Custom validation comes from requirements in SAP
+    """
+
+    name = models.CharField(
+        verbose_name=_("Accounting name"), blank=False, null=False, max_length=128
+    )
+
+    company_code = models.CharField(
+        verbose_name=_("Company code"),
+        blank=False,
+        null=False,
+        max_length=4,
+        validators=[is_numeric],
+    )
+
+    main_ledger_account = models.CharField(
+        verbose_name=_("Main ledger account"),
+        blank=False,
+        null=False,
+        max_length=6,
+        validators=[is_numeric],
+    )
+
+    vat_code = models.CharField(
+        verbose_name=_("VAT code"), blank=False, null=False, max_length=2
+    )
+
+    internal_order = models.CharField(
+        verbose_name=_("Internal order"),
+        blank=True,
+        null=True,
+        max_length=10,
+        validators=[is_numeric],
+    )
+
+    profit_center = models.CharField(
+        verbose_name=_("Profit center"),
+        blank=True,
+        null=True,
+        max_length=7,
+        validators=[is_numeric],
+    )
+
+    project = models.CharField(
+        verbose_name=_("Project"),
+        blank=True,
+        null=True,
+        max_length=16,
+        validators=[validate_accounting_project, is_numeric],
+    )
+
+    operation_area = models.CharField(
+        verbose_name=_("Operation area"),
+        blank=True,
+        null=True,
+        max_length=6,
+        validators=[is_numeric],
+    )
+
+    def __str__(self) -> str:
+        return self.name

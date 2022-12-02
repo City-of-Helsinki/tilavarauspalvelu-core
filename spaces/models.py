@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
-from merchants.models import PaymentMerchant
+from merchants.models import PaymentAccounting, PaymentMerchant
 from reservation_units.tasks import refresh_reservation_unit_product_mapping
 
 # SRID 4326 - Spatial Reference System Identifier number 4326.
@@ -122,6 +122,16 @@ class Unit(models.Model):
         null=True,
         blank=True,
         help_text="Merchant used for payments",
+    )
+
+    payment_accounting = models.ForeignKey(
+        PaymentAccounting,
+        verbose_name=_("Payment accounting"),
+        related_name="units",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        help_text="Payment accounting information",
     )
 
     class Meta:
