@@ -94,6 +94,26 @@ const RowCalendarArea = styled.div`
   position: relative;
 `;
 
+const EventContent = styled.div`
+  height: 100%;
+  width: 100%;
+  position: relative;
+
+  p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: var(--spacing-xs);
+
+    margin: 0;
+    position: absolute;
+    z-index: 5;
+    width: calc(100% - var(--spacing-xs) * 2);
+    height: calc(100% - var(--spacing-xs) * 2);
+    pointer-events: none;
+  }
+`;
+
 const Cells = ({ cols }: { cols: number }) => (
   <CellContent $numCols={cols}>
     {Array.from(Array(cols).keys()).map((i) => (
@@ -212,14 +232,8 @@ const Events = ({
             width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
           }}
         >
-          <div
-            style={{
-              height: "100%",
-              width: "100%",
-              ...eventStyleGetter(e).style,
-            }}
-            title={e.title}
-          >
+          <EventContent style={{ ...eventStyleGetter(e).style }}>
+            <p>{e.title}</p>
             <Popup
               position={["right center", "left center"]}
               trigger={() => (
@@ -239,7 +253,7 @@ const Events = ({
                 reservation={e.event as ReservationType}
               />
             </Popup>
-          </div>
+          </EventContent>
         </div>,
         postBuffer,
       ];
