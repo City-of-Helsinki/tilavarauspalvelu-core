@@ -68,6 +68,8 @@ pluggy==1.0.0
     # via pytest
 pydot==1.4.2
     # via -r requirements_dev.in
+pygraphviz==1.10
+    # via -r requirements_dev.in
 pyparsing==2.4.7
     # via
     #   -c requirements.txt

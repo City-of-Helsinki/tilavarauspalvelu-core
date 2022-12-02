@@ -28,7 +28,7 @@ jobs:
       - name: psycopg2 and graphviz prerequisites
         run: |
           sudo apt update
-          sudo apt install libpq-dev gdal-bin graphviz -y
+          sudo apt install libpq-dev gdal-bin graphviz graphviz-dev -y
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
