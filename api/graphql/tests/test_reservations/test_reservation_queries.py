@@ -9,7 +9,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import CUSTOMER_TYPES, City
-from merchants.models import PaymentStatus
+from merchants.models import OrderStatus
 from merchants.tests.factories import PaymentOrderFactory
 from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import (
@@ -340,7 +340,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             begin=datetime.datetime.now(tz=get_default_timezone())
             + datetime.timedelta(days=2),
         )
-        PaymentOrderFactory(reservation=res, status=PaymentStatus.PAID)
+        PaymentOrderFactory(reservation=res, status=OrderStatus.PAID)
         res_too = ReservationFactory(
             state=STATE_CHOICES.CANCELLED,
             reservation_unit=[res_unit],
@@ -349,7 +349,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             begin=datetime.datetime.now(tz=get_default_timezone())
             + datetime.timedelta(days=1),
         )
-        PaymentOrderFactory(reservation=res_too, status=PaymentStatus.REFUNDED)
+        PaymentOrderFactory(reservation=res_too, status=OrderStatus.REFUNDED)
 
         ReservationFactory(
             state=STATE_CHOICES.WAITING_FOR_PAYMENT,
@@ -359,7 +359,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             begin=datetime.datetime.now(tz=get_default_timezone())
             + datetime.timedelta(days=1),
         )
-        PaymentOrderFactory(reservation=res_too, status=PaymentStatus.EXPIRED)
+        PaymentOrderFactory(reservation=res_too, status=OrderStatus.EXPIRED)
 
         response = self.query(
             """
@@ -1254,22 +1254,22 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     def test_order_by_order_status(self):
         res1 = ReservationFactory(name="this should be 1st")
-        PaymentOrderFactory(status=PaymentStatus.CANCELLED, reservation=res1)
+        PaymentOrderFactory(status=OrderStatus.CANCELLED, reservation=res1)
 
         res2 = ReservationFactory(name="this should be 2nd")
-        PaymentOrderFactory(status=PaymentStatus.DRAFT, reservation=res2)
+        PaymentOrderFactory(status=OrderStatus.DRAFT, reservation=res2)
 
         res3 = ReservationFactory(name="this should be 3rd")
-        PaymentOrderFactory(status=PaymentStatus.EXPIRED, reservation=res3)
+        PaymentOrderFactory(status=OrderStatus.EXPIRED, reservation=res3)
 
         res4 = ReservationFactory(name="this should be 4th")
-        PaymentOrderFactory(status=PaymentStatus.PAID, reservation=res4)
+        PaymentOrderFactory(status=OrderStatus.PAID, reservation=res4)
 
         res5 = ReservationFactory(name="this should be 5th")
-        PaymentOrderFactory(status=PaymentStatus.PAID_MANUALLY, reservation=res5)
+        PaymentOrderFactory(status=OrderStatus.PAID_MANUALLY, reservation=res5)
 
         res6 = ReservationFactory(name="this should be 6th")
-        PaymentOrderFactory(status=PaymentStatus.REFUNDED, reservation=res6)
+        PaymentOrderFactory(status=OrderStatus.REFUNDED, reservation=res6)
 
         self.client.force_login(self.general_admin)
         response = self.query(
@@ -1412,7 +1412,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         PaymentOrderFactory(
             reservation=self.reservation,
             remote_id="626c0cf7-3628-4ff5-aa9c-1b4e70dedc89",
-            status=PaymentStatus.PAID,
+            status=OrderStatus.PAID,
         )
 
         response = self.query(

@@ -14,7 +14,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
-from merchants.models import PaymentOrder, PaymentStatus, PaymentType
+from merchants.models import OrderStatus, PaymentOrder, PaymentType
 from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.test.factories import OrderFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
@@ -331,7 +331,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(mock_create_vk_order.called).is_false()
         assert_that(local_order).is_not_none()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ON_SITE)
-        assert_that(local_order.status).is_equal_to(PaymentStatus.PAID_MANUALLY)
+        assert_that(local_order.status).is_equal_to(OrderStatus.PAID_MANUALLY)
         assert_that(local_order.created_at.strftime("%Y%m%d%H%:M:%S")).is_equal_to(
             datetime.datetime.now().strftime("%Y%m%d%H%:M:%S")
         )

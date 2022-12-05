@@ -58,7 +58,7 @@ class PaymentType(models.TextChoices):
     INVOICE = "INVOICE", _("Invoice")
 
 
-class PaymentStatus(models.TextChoices):
+class OrderStatus(models.TextChoices):
     DRAFT = "DRAFT", _("Draft")
     EXPIRED = "EXPIRED", _("Expired")
     CANCELLED = "CANCELLED", _("Cancelled")
@@ -108,7 +108,7 @@ class PaymentOrder(models.Model):
         blank=False,
         null=False,
         max_length=128,
-        choices=PaymentStatus.choices,
+        choices=OrderStatus.choices,
     )
     price_net = models.DecimalField(
         verbose_name=_("Net amount"),

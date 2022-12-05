@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from merchants.models import PaymentStatus
+from merchants.models import OrderStatus
 from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.order.test.factories import OrderFactory
@@ -122,7 +122,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         self.reservation.save()
 
         payment_order = PaymentOrderFactory.create(
-            remote_id=uuid4(), reservation=self.reservation, status=PaymentStatus.DRAFT
+            remote_id=uuid4(), reservation=self.reservation, status=OrderStatus.DRAFT
         )
 
         self.client.force_login(self.regular_joe)
@@ -137,7 +137,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert_that(mock_cancel_order.called).is_true()
 
         payment_order.refresh_from_db()
-        assert_that(payment_order.status).is_equal_to(PaymentStatus.CANCELLED)
+        assert_that(payment_order.status).is_equal_to(OrderStatus.CANCELLED)
 
     @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
     def test_do_not_mark_order_cancelled_if_webshop_call_fails(self, mock_cancel_order):
@@ -147,7 +147,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         self.reservation.save()
 
         payment_order = PaymentOrderFactory.create(
-            remote_id=uuid4(), reservation=self.reservation, status=PaymentStatus.DRAFT
+            remote_id=uuid4(), reservation=self.reservation, status=OrderStatus.DRAFT
         )
 
         self.client.force_login(self.regular_joe)
@@ -162,7 +162,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert_that(mock_cancel_order.called).is_true()
 
         payment_order.refresh_from_db()
-        assert_that(payment_order.status).is_equal_to(PaymentStatus.DRAFT)
+        assert_that(payment_order.status).is_equal_to(OrderStatus.DRAFT)
 
     @mock.patch("api.graphql.reservations.reservation_mutations.capture_message")
     @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")

@@ -21,7 +21,7 @@ from api.graphql.reservations.reservation_serializers import (
 )
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from merchants.models import PaymentOrder, PaymentStatus
+from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.order.requests import cancel_order
 from permissions.api_permissions.graphene_permissions import (
@@ -148,7 +148,7 @@ class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
                 )
 
                 if webshop_order and webshop_order.status == "cancelled":
-                    payment_order.status = PaymentStatus.CANCELLED
+                    payment_order.status = OrderStatus.CANCELLED
                     payment_order.save()
             except CancelOrderError as err:
                 capture_message(

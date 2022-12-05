@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from merchants.models import PaymentOrder, PaymentStatus
+from merchants.models import OrderStatus, PaymentOrder
 from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.test.factories import PaymentFactory
@@ -99,7 +99,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.payment_order = PaymentOrderFactory.create(
             reservation=cls.reservation,
             remote_id="b3fef99e-6c18-422e-943d-cf00702af53e",
-            status=PaymentStatus.DRAFT,
+            status=OrderStatus.DRAFT,
             reservation_user_uuid=cls.regular_joe.uuid,
         )
 
@@ -205,7 +205,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self.assertMatchSnapshot(content)
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(PaymentStatus.CANCELLED)
+        assert_that(order.status).is_equal_to(OrderStatus.CANCELLED)
 
     @mock.patch("api.graphql.merchants.merchant_mutations.send_confirmation_email")
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
@@ -229,7 +229,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(mock_send_email.called).is_false()
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(PaymentStatus.PAID)
+        assert_that(order.status).is_equal_to(OrderStatus.PAID)
 
     @mock.patch("api.graphql.merchants.merchant_mutations.send_confirmation_email")
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
@@ -256,7 +256,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(mock_send_email.called).is_true()
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(PaymentStatus.PAID)
+        assert_that(order.status).is_equal_to(OrderStatus.PAID)
 
     @mock.patch("api.graphql.merchants.merchant_mutations.capture_message")
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")

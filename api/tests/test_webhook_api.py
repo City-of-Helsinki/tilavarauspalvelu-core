@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
 
-from merchants.models import PaymentStatus
+from merchants.models import OrderStatus
 from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.order.types import Order
@@ -34,7 +34,7 @@ class WebhookAPITestCaseBase(TestCase):
             state=STATE_CHOICES.WAITING_FOR_PAYMENT, user=self.user
         )
         self.payment_order = PaymentOrderFactory.create(
-            reservation=self.reservation, status=PaymentStatus.DRAFT
+            reservation=self.reservation, status=OrderStatus.DRAFT
         )
         self.verkkokauppa_payment = Payment(
             payment_id=uuid4(),
@@ -98,7 +98,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.data).is_none()
 
         self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.status).is_equal_to(PaymentStatus.PAID)
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
         assert_that(self.payment_order.payment_id).is_equal_to(
             str(self.verkkokauppa_payment.payment_id)
         )
@@ -108,7 +108,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         assert_that(mock_send_confirmation_email.called).is_true()
 
     def test_returns_200_without_body_on_order_already_paid(self, mock_get_payment):
-        self.payment_order.status = PaymentStatus.PAID
+        self.payment_order.status = OrderStatus.PAID
         self.payment_order.save()
 
         response = self.client.post(
@@ -236,10 +236,10 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.data).is_none()
 
         self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.status).is_equal_to(PaymentStatus.CANCELLED)
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.CANCELLED)
 
     def test_returns_200_without_body_on_order_is_already_handled(self, mock_get_order):
-        self.payment_order.status = PaymentStatus.PAID_MANUALLY
+        self.payment_order.status = OrderStatus.PAID_MANUALLY
         self.payment_order.save()
 
         response = self.client.post(
@@ -251,7 +251,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.data).is_none()
 
         self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.status).is_equal_to(PaymentStatus.PAID_MANUALLY)
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID_MANUALLY)
 
     def test_returns_400_with_error_on_invalid_payload(self, mock_get_payment):
         data = self.get_valid_data()
