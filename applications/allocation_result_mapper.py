@@ -1,5 +1,4 @@
-import logging
-
+import tilavarauspalvelu.utils.logging as logging
 from allocation.allocation_solver import AllocatedEvent
 from applications.models import (
     ApplicationEventSchedule,

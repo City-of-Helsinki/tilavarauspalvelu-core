@@ -1,8 +1,7 @@
-import logging
-
 from django.db.models import Case, Exists, OuterRef, Prefetch, Subquery, Sum, When
 from rest_framework import serializers, viewsets
 
+import tilavarauspalvelu.utils.logging as logging
 from applications.models import (
     Application,
     ApplicationEventAggregateData,

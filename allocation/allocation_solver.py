@@ -1,9 +1,9 @@
 import datetime
-import logging
 from typing import Dict, Tuple
 
 from ortools.sat.python import cp_model
 
+import tilavarauspalvelu.utils.logging as logging
 from allocation.allocation_models import (
     ALLOCATION_PRECISION,
     AllocatedEvent,

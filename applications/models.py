@@ -1,5 +1,4 @@
 import datetime
-import logging
 import math
 import uuid
 from typing import Dict, List, Optional, TypeVar
@@ -16,6 +15,7 @@ from recurrence.fields import RecurrenceField
 from rest_framework.exceptions import ValidationError
 from sentry_sdk import capture_message
 
+import tilavarauspalvelu.utils.logging as logging
 from applications.base_models import ContactInformation
 from applications.utils.aggregate_data import (
     ApplicationAggregateDataCreator,

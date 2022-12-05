@@ -1,9 +1,8 @@
-import logging
-
 import requests
 from django.conf import settings
 from kombu.utils import json
 
+import tilavarauspalvelu.utils.logging as logging
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
 
 REQUESTS_TIMEOUT = 15
