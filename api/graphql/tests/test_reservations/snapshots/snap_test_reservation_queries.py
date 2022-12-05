@@ -822,6 +822,38 @@ snapshots['ReservationQueryTestCase::test_getting_reservation_with_fields_requir
     }
 }
 
+snapshots['ReservationQueryTestCase::test_handled_at_not_visible_without_permissions 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'handledAt': None,
+                        'name': 'movies'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_handled_at_visible_with_permissions 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'handledAt': '2021-10-12T09:00:00+00:00',
+                        'name': 'movies'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 1'] = {
     'data': {
         'reservations': {
