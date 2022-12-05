@@ -15,3 +15,7 @@ class ParseOrderError(OrderError):
 
 class GetOrderError(OrderError):
     pass
+
+
+class CancelOrderError(OrderError):
+    pass

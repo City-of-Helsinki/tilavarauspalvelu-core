@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from graphene import ClientIDMutation, ResolveInfo
 from graphene_django.rest_framework.mutation import SerializerMutation
 from rest_framework.generics import get_object_or_404
+from sentry_sdk import capture_message
 
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.merchants.merchant_types import PaymentOrderType
@@ -19,7 +20,10 @@ from api.graphql.reservations.reservation_serializers import (
     ReservationWorkingMemoSerializer,
 )
 from api.graphql.reservations.reservation_types import ReservationType
-from merchants.models import PaymentOrder
+from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from merchants.models import PaymentOrder, PaymentStatus
+from merchants.verkkokauppa.order.exceptions import CancelOrderError
+from merchants.verkkokauppa.order.requests import cancel_order
 from permissions.api_permissions.graphene_permissions import (
     ReservationCommentPermission,
     ReservationHandlingPermission,
@@ -135,6 +139,25 @@ class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
             raise ValidationError(
                 "Reservation which is not in created or waiting_for_payment state cannot be deleted."
             )
+
+        payment_order: PaymentOrder = reservation.payment_order.first()
+        if payment_order and payment_order.remote_id:
+            try:
+                webshop_order = cancel_order(
+                    payment_order.remote_id, payment_order.reservation_user_uuid
+                )
+
+                if webshop_order and webshop_order.status == "cancelled":
+                    payment_order.status = PaymentStatus.CANCELLED
+                    payment_order.save()
+            except CancelOrderError as err:
+                capture_message(
+                    f"Failed to cancel order {payment_order.remote_id}: {err}"
+                )
+                raise ValidationErrorWithCode(
+                    "Unable to cancel the order: problem with external service",
+                    ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,
+                )
 
         return None
 
