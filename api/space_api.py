@@ -90,8 +90,3 @@ class DistrictViewSet(
 ):
     serializer_class = DistrictSerializer
     queryset = District.objects.all().select_related("parent")
-
-
-class SpaceViewSet(viewsets.ModelViewSet):
-    serializer_class = SpaceSerializer
-    queryset = Space.objects.all().select_related("parent", "building")

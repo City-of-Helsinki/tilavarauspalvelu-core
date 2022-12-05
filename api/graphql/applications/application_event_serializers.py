@@ -5,7 +5,6 @@ from rest_framework import serializers
 from api.applications_api.serializers import (
     ApplicationEventScheduleSerializer,
     ApplicationEventSerializer,
-    ApplicationEventStatusSerializer,
 )
 from api.graphql.base_serializers import (
     PrimaryKeySerializer,
@@ -151,19 +150,6 @@ class ApplicationEventUpdateSerializer(
 
         event.set_status(status, request_user)
         return instance
-
-
-class ApplicationEventStatusCreateSerializer(
-    ApplicationEventStatusSerializer, PrimaryKeySerializer
-):
-    class Meta:
-        model = ApplicationEventStatus
-        fields = [
-            "status",
-            "application_event_id",
-            "user_id",
-            "timestamp",
-        ]
 
 
 class ApplicationEventScheduleResultCreateSerializer(PrimaryKeySerializer):

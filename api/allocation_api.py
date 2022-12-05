@@ -17,14 +17,6 @@ from applications.models import (
 from permissions.api_permissions.drf_permissions import AllocationRequestPermission
 
 
-class AllocationInProcessException(Exception):
-    pass
-
-
-class UnsuitableStatusForAllocationException(Exception):
-    pass
-
-
 class AllocationRequestSerializer(serializers.ModelSerializer):
     start_date = serializers.DateTimeField(read_only=True)
     end_date = serializers.DateTimeField(read_only=True)

@@ -331,10 +331,6 @@ class ServiceSectorFilter(AuthFilter):
     permission_classes = (ServiceSectorPermission,)
 
 
-class PaymentOrderFilter(AuthFilter):
-    permission_classes = (PaymentOrderPermission,)
-
-
 class Query(graphene.ObjectType):
     applications = ApplicationsFilter(
         ApplicationType, filterset_class=ApplicationFilterSet
