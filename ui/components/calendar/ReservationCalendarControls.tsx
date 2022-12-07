@@ -351,8 +351,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           [startDate, subMinutes(endDate, 1)],
           reservationUnit.openingHours?.openingTimes,
           activeApplicationRounds,
-          reservationUnit.reservationBegins,
-          reservationUnit.reservationEnds,
+          new Date(reservationUnit.reservationBegins),
+          new Date(reservationUnit.reservationEnds),
           reservationUnit.reservationsMinDaysBefore
         )
       ) {

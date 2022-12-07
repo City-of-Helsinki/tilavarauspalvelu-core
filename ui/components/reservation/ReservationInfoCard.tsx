@@ -112,12 +112,18 @@ const ReservationInfoCard = ({
 
   const price: string =
     reservation?.state === "REQUIRES_HANDLING"
-      ? getReservationUnitPrice(reservationUnit, begin)
+      ? getReservationUnitPrice(reservationUnit, new Date(begin))
       : getReservationPrice(reservation?.price, t("prices:priceFree"));
 
   const shouldDisaplyTaxPercentage: boolean =
     reservation?.state === "REQUIRES_HANDLING"
-      ? getReservationUnitPrice(reservationUnit, begin, 0, false, true) !== "0"
+      ? getReservationUnitPrice(
+          reservationUnit,
+          new Date(begin),
+          0,
+          false,
+          true
+        ) !== "0"
       : reservation?.price > 0;
 
   const formatters = useMemo(

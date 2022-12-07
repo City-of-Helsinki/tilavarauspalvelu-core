@@ -250,19 +250,19 @@ describe("isReservationInThePast", () => {
     expect(
       isReservationInThePast({
         begin: new Date(),
-      } as ReservationType)
+      } as unknown as ReservationType)
     ).toBe(true);
 
     expect(
       isReservationInThePast({
         begin: addMinutes(new Date(), 10),
-      } as ReservationType)
+      } as unknown as ReservationType)
     ).toBe(false);
 
     expect(
       isReservationInThePast({
         begin: addMinutes(new Date(), -10),
-      } as ReservationType)
+      } as unknown as ReservationType)
     ).toBe(true);
   });
 

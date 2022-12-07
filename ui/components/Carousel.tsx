@@ -41,7 +41,10 @@ const Button = styled(MediumButton).attrs({
   }
 `;
 
-const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
+const StyledCarousel = styled(NukaCarousel)<{
+  $showCenterControls: boolean;
+  children: React.ReactNode;
+}>`
   width: calc(100% + var(--spacing-xs) * 2) !important;
   height: fit-content !important;
   margin-right: calc(var(--spacing-xs) * -1);

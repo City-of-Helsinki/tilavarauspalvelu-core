@@ -3,6 +3,7 @@ import * as React from "react";
 import TermsBox, { Props } from "../TermsBox";
 
 const defaultProps = {
+  id: "testing",
   heading:
     "A heading with somewhat long text that might wrap to multiple lines",
   body: `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat nisi sunt est magna id voluptate. Ullamco elit do tempor et dolore. Sit dolore laborum excepteur laborum qui eiusmod. Nisi proident officia labore sunt sit labore. Non aute ut exercitation elit sint. Aute irure reprehenderit reprehenderit amet sunt velit irure voluptate.`,

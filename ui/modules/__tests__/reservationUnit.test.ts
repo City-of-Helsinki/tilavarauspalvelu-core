@@ -141,19 +141,19 @@ describe("isReservationPublished", () => {
     expect(
       isReservationUnitPublished({
         publishBegins: addMinutes(new Date(), -1),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
         publishBegins: addMinutes(new Date(), 1),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         publishBegins: new Date(),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(true);
   });
 
@@ -161,19 +161,19 @@ describe("isReservationPublished", () => {
     expect(
       isReservationUnitPublished({
         publishEnds: addMinutes(new Date(), -1),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         publishEnds: addMinutes(new Date(), 1),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
         publishEnds: new Date(),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(true);
   });
 
@@ -182,35 +182,35 @@ describe("isReservationPublished", () => {
       isReservationUnitPublished({
         publishBegins: new Date(),
         publishEnds: new Date(),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
         publishBegins: addMinutes(new Date(), -1),
         publishEnds: new Date(),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
         publishBegins: addMinutes(new Date(), 1),
         publishEnds: new Date(),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         publishBegins: new Date(),
         publishEnds: addMinutes(new Date(), -1),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         publishBegins: new Date(),
         publishEnds: addMinutes(new Date(), 1),
-      } as ReservationUnitByPkType)
+      } as unknown as ReservationUnitByPkType)
     ).toBe(true);
   });
 });
@@ -690,16 +690,19 @@ describe("getReservationUnitInstructionsKey", () => {
 
 describe("getFuturePricing", () => {
   const reservationUnit: ReservationUnitByPkType = {
+    id: "testing",
     openingHours: {
       openingTimePeriods: [
         {
           startDate: new Date(),
           endDate: addDays(new Date(), 300),
+          id: "testing",
         },
       ],
     },
     pricings: [
       {
+        id: "1",
         pk: 1,
         begins: toUIDate(addDays(new Date(), 10), "yyyy-MM-dd"),
         pricingType:
@@ -715,6 +718,7 @@ describe("getFuturePricing", () => {
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
+        id: "2",
         pk: 2,
         begins: toUIDate(addDays(new Date(), 20), "yyyy-MM-dd"),
         pricingType:
@@ -730,6 +734,7 @@ describe("getFuturePricing", () => {
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
+        id: "3",
         pk: 3,
         begins: toUIDate(addDays(new Date(), 5), "yyyy-MM-dd"),
         pricingType:
@@ -745,7 +750,7 @@ describe("getFuturePricing", () => {
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
     ],
-  } as ReservationUnitByPkType;
+  } as unknown as ReservationUnitByPkType;
 
   it("should sort items correctly", () => {
     const data = cloneDeep(reservationUnit);
@@ -877,11 +882,12 @@ describe("getFuturePricing", () => {
 
 describe("getReservationUnitPrice", () => {
   const reservationUnit: ReservationUnitByPkType = {
+    id: "testing",
     openingHours: {
       openingTimePeriods: [
         {
-          startDate: new Date(),
-          endDate: addDays(new Date(), 300),
+          startDate: new Date().toISOString(),
+          endDate: addDays(new Date(), 300).toISOString(),
         },
       ],
     },
@@ -894,7 +900,9 @@ describe("getReservationUnitPrice", () => {
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         lowestPrice: 10,
+        lowestPriceNet: 10,
         highestPrice: 20,
+        highestPriceNet: 20,
         taxPercentage: {
           id: "1",
           value: 24,
@@ -909,7 +917,9 @@ describe("getReservationUnitPrice", () => {
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         lowestPrice: 20,
+        lowestPriceNet: 20,
         highestPrice: 30,
+        highestPriceNet: 30,
         taxPercentage: {
           id: "1",
           value: 24,
@@ -924,7 +934,9 @@ describe("getReservationUnitPrice", () => {
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         lowestPrice: 40,
+        lowestPriceNet: 40,
         highestPrice: 50,
+        highestPriceNet: 50,
         taxPercentage: {
           id: "1",
           value: 24,
@@ -933,17 +945,23 @@ describe("getReservationUnitPrice", () => {
       },
       {
         pk: 4,
-        pricingType: "PAID",
-        priceUnit: "PER_HOUR",
+        begins: toUIDate(addDays(new Date(), 5), "yyyy-MM-dd"),
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+        priceUnit:
+          ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         lowestPrice: 0,
+        lowestPriceNet: 0,
         highestPrice: 10,
+        highestPriceNet: 10,
         taxPercentage: {
+          id: "1",
           value: 24,
         },
-        status: "ACTIVE",
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
     ],
-  } as ReservationUnitByPkType;
+  } as unknown as ReservationUnitByPkType;
 
   it("returns future data based on date lookup", () => {
     const data = cloneDeep(reservationUnit);

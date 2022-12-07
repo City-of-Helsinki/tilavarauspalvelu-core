@@ -505,8 +505,8 @@ const ReservationUnit = ({
       getSlotPropGetter(
         reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds,
-        reservationUnit.reservationBegins,
-        reservationUnit.reservationEnds,
+        new Date(reservationUnit.reservationBegins),
+        new Date(reservationUnit.reservationEnds),
         reservationUnit.reservationsMinDaysBefore
       ),
     [
@@ -670,8 +670,8 @@ const ReservationUnit = ({
         begin: initialReservation?.begin,
         end: initialReservation?.end,
         state: "INITIAL",
-        bufferTimeBefore: reservationUnit.bufferTimeBefore,
-        bufferTimeAfter: reservationUnit.bufferTimeAfter,
+        bufferTimeBefore: reservationUnit.bufferTimeBefore.toString(),
+        bufferTimeAfter: reservationUnit.bufferTimeAfter.toString(),
       } as PendingReservation,
     ]);
   }, [calendarEvents, initialReservation, reservationUnit]);
