@@ -10,9 +10,17 @@ from pytest import raises
 from requests import Timeout
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
-from ..product.exceptions import CreateProductError, GetProductMappingError
-from ..product.requests import create_product, get_product_mapping
-from ..product.types import CreateProductParams, Product
+from ..product.exceptions import (
+    CreateOrUpdateAccountingError,
+    CreateProductError,
+    GetProductMappingError,
+)
+from ..product.requests import (
+    create_or_update_accounting,
+    create_product,
+    get_product_mapping,
+)
+from ..product.types import CreateOrUpdateAccountingParams, CreateProductParams, Product
 from ..tests.mocks import mock_get, mock_post
 
 
@@ -23,6 +31,18 @@ class ProductRequestsTestCaseBase(TestCase):
             namespace="test-namespace",
             namespace_entity_id="test-namespace-entity-id",
             merchant_id="be4154c7-9f66-4625-998b-18abac4ecae7",
+        )
+
+    @classmethod
+    def create_or_update_account_params(cls) -> CreateOrUpdateAccountingParams:
+        return CreateOrUpdateAccountingParams(
+            vat_code="AB",
+            internal_order="1234567890",
+            profit_center="1111111",
+            project="2222222",
+            operation_area="333333",
+            company_code="4444",
+            main_ledger_account="555555",
         )
 
     @classmethod
@@ -41,6 +61,19 @@ class ProductRequestsTestCaseBase(TestCase):
             "namespace": "test-namespace",
             "namespaceEntityId": "test-namespace-entity-id",
             "merchantId": "5fdb7904-1a82-4a3b-9480-cd02cce37999",
+        }
+
+    @classmethod
+    def create_or_update_accounting_response(cls) -> Dict[str, str]:
+        return {
+            "productId": "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
+            "vatCode": "AB",
+            "internalOrder": "1234567890",
+            "profitCenter": "1111111",
+            "project": "2222222",
+            "operationArea": "333333",
+            "companyCode": "4444",
+            "mainLedgerAccount": "555555",
         }
 
 
@@ -142,3 +175,45 @@ class GetProductMappingTestCase(ProductRequestsTestCaseBase):
         get = mock_get(response)
         with raises(GetProductMappingError):
             get_product_mapping(self.product_id, get)
+
+
+class CreateOrUpdateAccountingTestCase(ProductRequestsTestCaseBase):
+    def test_create_or_update_account_makes_valid_request(self):
+        params = self.create_or_update_account_params()
+        post = mock_post(params.to_json())
+        with suppress(Exception):
+            create_or_update_accounting(
+                "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post
+            )
+        post.assert_called_with(
+            url=settings.VERKKOKAUPPA_PRODUCT_API_URL
+            + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/accounting",
+            json=params.to_json(),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+            },
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+
+    def test_create_or_update_accounting_raises_exception_if_status_code_is_not_201(
+        self,
+    ):
+        response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
+        params = self.create_or_update_account_params()
+        post = mock_post(response, status_code=500)
+        with raises(CreateOrUpdateAccountingError) as e:
+            create_or_update_accounting(
+                "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post
+            )
+
+        assert_that(str(e.value)).contains("mock-error")
+
+    def test_create_or_update_accounting_raises_exception_on_timeout(self):
+        params = self.create_or_update_account_params()
+        with raises(CreateOrUpdateAccountingError):
+            create_or_update_accounting(
+                "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
+                params,
+                Mock(side_effect=Timeout()),
+            )

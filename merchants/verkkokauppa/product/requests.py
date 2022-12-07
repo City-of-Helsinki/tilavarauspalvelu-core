@@ -10,8 +10,19 @@ from requests import post as _post
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
 from ..exceptions import VerkkokauppaConfigurationError
-from .exceptions import CreateProductError, GetProductMappingError, ParseProductError
-from .types import CreateProductParams, Product
+from .exceptions import (
+    CreateOrUpdateAccountingError,
+    CreateProductError,
+    GetProductMappingError,
+    ParseAccountingError,
+    ParseProductError,
+)
+from .types import (
+    Accounting,
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+    Product,
+)
 
 
 def _get_base_url():
@@ -57,3 +68,38 @@ def get_product_mapping(product_id: UUID, get=_get) -> Optional[Product]:
         return Product.from_json(json)
     except (RequestException, JSONDecodeError, ParseProductError) as e:
         raise GetProductMappingError(f"Fetching product mapping failed: {e}")
+
+
+def create_or_update_accounting(
+    product_id: UUID, params: CreateOrUpdateAccountingParams, post=_post
+) -> Optional[Accounting]:
+    """
+    Be aware that this endpoint allows creating accouting data for products that
+    do not exist. This is intentional, since in some uses cases there is a need
+    to create accounting information before product information.
+
+    It is up to us to make sure that the product does exists.
+    Otherwise payments will fail.
+    """
+    try:
+        response = post(
+            url=urljoin(_get_base_url(), f"/{product_id}/accounting"),
+            json=params.to_json(),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+            },
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+        json = response.json()
+        if response.status_code == 201:
+            return Accounting.from_json(json)
+
+        raise CreateOrUpdateAccountingError(
+            f"Creating or updating accounting failed: {json.get('errors')}"
+        )
+
+    except (RequestException, JSONDecodeError, ParseAccountingError) as e:
+        raise CreateOrUpdateAccountingError(
+            f"Creating or updating accounting failed: {e}"
+        )
