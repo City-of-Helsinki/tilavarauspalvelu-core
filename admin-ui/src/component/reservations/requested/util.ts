@@ -85,8 +85,11 @@ export const getReservatinUnitPricing = (
   }
 
   const reservationDate = new Date(datetime);
-  reservationUnit.pricings?.sort(
-    (a, b) => parseDate(a?.begins).getTime() - parseDate(b?.begins).getTime()
+
+  reservationUnit.pricings.sort((a, b) =>
+    a?.begins && b?.begins
+      ? parseDate(a.begins).getTime() - parseDate(b.begins).getTime()
+      : 1
   );
 
   return (

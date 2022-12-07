@@ -206,7 +206,7 @@ function AllApplicationRounds(): JSX.Element | null {
                   isSortable: true,
                   headerName: t("ApplicationRound.headings.sent"),
                   transform: (applicationRound: ApplicationRoundType) =>
-                    formatDate(applicationRound.statusTimestamp) || "-",
+                    formatDate(applicationRound.statusTimestamp || null) || "-",
                   key: "statusTimestampSort",
                 },
               ]}

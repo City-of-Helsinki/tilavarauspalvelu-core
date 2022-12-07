@@ -30,7 +30,7 @@ describe("pricingDetails", () => {
               highestPriceNet: 120 / 1.24,
               taxPercentage: {
                 id: "1",
-                value: "2",
+                value: 2,
               },
               status:
                 ReservationUnitsReservationUnitPricingStatusChoices.Active,
@@ -63,7 +63,7 @@ describe("pricingDetails", () => {
               highestPriceNet: 120 / 1.24,
               taxPercentage: {
                 id: "1",
-                value: "24",
+                value: 24,
               },
               status:
                 ReservationUnitsReservationUnitPricingStatusChoices.Active,
@@ -99,7 +99,7 @@ describe("getReservatinUnitPricing", () => {
           highestPriceNet: 120 / 1.24,
           taxPercentage: {
             id: "1",
-            value: "24",
+            value: 24,
           },
           status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
         } as ReservationUnitPricingType,
@@ -116,7 +116,7 @@ describe("getReservatinUnitPricing", () => {
           highestPriceNet: 120 / 1.24,
           taxPercentage: {
             id: "1",
-            value: "24",
+            value: 24,
           },
           status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
         } as ReservationUnitPricingType,

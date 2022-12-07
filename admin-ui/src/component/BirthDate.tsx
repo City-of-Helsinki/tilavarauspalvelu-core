@@ -21,7 +21,7 @@ export const BirthDate = ({
   return (
     <HorisontalFlex style={{ gap: "var(--spacing-2-xs)" }}>
       {visible ? (
-        <span>{formatDate(user?.dateOfBirth) || "-"}</span>
+        <span>{user?.dateOfBirth ? formatDate(user.dateOfBirth) : "-"}</span>
       ) : (
         <span>XX.XX.XXXX</span>
       )}

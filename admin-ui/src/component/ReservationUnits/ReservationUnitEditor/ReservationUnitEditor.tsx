@@ -994,7 +994,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             noMargin
                           >
                             <DateTimeInput
-                              value={state.reservationUnitEdit.publishBegins}
+                              value={
+                                state.reservationUnitEdit.publishBegins ||
+                                undefined
+                              }
                               setValue={(v) =>
                                 setValue({
                                   publishBegins: v,
@@ -1014,7 +1017,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             noMargin
                           >
                             <DateTimeInput
-                              value={state.reservationUnitEdit.publishEnds}
+                              value={
+                                state.reservationUnitEdit.publishEnds ||
+                                undefined
+                              }
                               setValue={(v) =>
                                 setValue({
                                   publishEnds: v,
@@ -1059,7 +1065,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           noIndent
                         >
                           <DateTimeInput
-                            value={state.reservationUnitEdit.reservationBegins}
+                            value={
+                              state.reservationUnitEdit.reservationBegins ||
+                              undefined
+                            }
                             setValue={(v) =>
                               setValue({
                                 reservationBegins: v,
@@ -1077,7 +1086,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           noIndent
                         >
                           <DateTimeInput
-                            value={state.reservationUnitEdit.reservationEnds}
+                            value={
+                              state.reservationUnitEdit.reservationEnds ||
+                              undefined
+                            }
                             setValue={(v) =>
                               setValue({
                                 reservationEnds: v,

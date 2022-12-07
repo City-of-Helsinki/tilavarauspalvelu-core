@@ -19,13 +19,12 @@ export const dateTime = (date: string, time: string): string => {
   return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date()).toISOString();
 };
 
+type Props = { value?: string; setValue: (value: string) => void };
+
 const DateTimeInput = ({
-  value,
+  value = new Date().toISOString(),
   setValue,
-}: {
-  value: string;
-  setValue: (value: string) => void;
-}): JSX.Element => {
+}: Props): JSX.Element => {
   const { t } = useTranslation();
   return (
     <div
@@ -40,7 +39,7 @@ const DateTimeInput = ({
         disableConfirmation
         label={t("common.date")}
         id="publishBegins.date"
-        value={valueForDateInput(value)}
+        value={value && valueForDateInput(value)}
         onChange={(v) => {
           setValue(dateTime(v, valueForTimeInput(value)));
         }}
@@ -50,7 +49,7 @@ const DateTimeInput = ({
         label={t("common.time")}
         hoursLabel="hours"
         minutesLabel="minutes"
-        value={valueForTimeInput(value)}
+        value={value && valueForTimeInput(value)}
         onChange={(e) => {
           if (e.target.value.length !== 5) {
             return;
