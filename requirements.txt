@@ -128,7 +128,7 @@ drf-oidc-auth==0.10.0
     #   helsinki-profile-gdpr-api
 drf-spectacular==0.24.2
     # via -r requirements.in
-easy-thumbnails==2.7.1
+easy-thumbnails==2.8.3
     # via -r requirements.in
 ecdsa==0.14.1
     # via python-jose
