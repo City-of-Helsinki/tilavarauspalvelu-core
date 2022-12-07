@@ -1,5 +1,3 @@
-import logging
-
 import graphene
 from auditlog.models import LogEntry
 from django.conf import settings
@@ -9,6 +7,7 @@ from graphene_django.types import ErrorType
 from graphene_file_upload.scalars import Upload
 from rest_framework.generics import get_object_or_404
 
+import tilavarauspalvelu.utils.logging as logging
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.reservation_units.reservation_unit_serializers import (
     EquipmentCategoryCreateSerializer,

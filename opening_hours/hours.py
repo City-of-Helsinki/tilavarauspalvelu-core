@@ -1,5 +1,4 @@
 import datetime
-import logging
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
 
@@ -7,6 +6,7 @@ import pytz
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
+import tilavarauspalvelu.utils.logging as logging
 from opening_hours.enums import State
 from opening_hours.errors import HaukiConfigurationError
 from opening_hours.hauki_request import make_hauki_get_request

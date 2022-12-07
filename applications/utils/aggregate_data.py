@@ -1,4 +1,3 @@
-import logging
 import sys
 from threading import Thread
 
@@ -7,6 +6,7 @@ from django.conf import settings
 from django.db import Error
 from django.db.models import DurationField, ExpressionWrapper, F
 
+import tilavarauspalvelu.utils.logging as logging
 from applications.utils.aggregate_tasks import (
     _celery_application_event_schedule_result_aggregate_data_create,
 )

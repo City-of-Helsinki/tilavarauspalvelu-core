@@ -1,9 +1,9 @@
 import datetime
-import logging
 
 from django.db import Error
 from django.utils.timezone import get_default_timezone
 
+import tilavarauspalvelu.utils.logging as logging
 from applications.utils.aggregate_data import (
     ApplicationAggregateDataCreator,
     ApplicationRoundAggregateDataCreator,

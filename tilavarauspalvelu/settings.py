@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import logging
 import os
 import subprocess  # nosec
 
@@ -24,8 +23,7 @@ from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
-logger = logging.getLogger("settings")
-
+from tilavarauspalvelu.utils.logging import getLogger
 
 # This is a temporary fix for graphene_permissions to avoid ImportError when importing ResolveInfo
 # This can be removed when graphene_permissions is updated to import ResolveInfo from the correct package.
@@ -223,9 +221,21 @@ env = environ.Env(
     OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES=(list, ["substantial", "high"]),
     # Logging
     ENABLE_SQL_LOGGING=(bool, False),
+    APP_LOGGING_LEVEL=(str, "WARNING"),
 )
 
 environ.Env.read_env()
+
+APP_LOGGING_LEVEL = env("APP_LOGGING_LEVEL")
+
+LOGGING = DEFAULT_LOGGING
+LOGGING["loggers"]["tilavaraus"] = {
+    "handlers": ["django.server"],
+    "level": APP_LOGGING_LEVEL,
+    "propagate": True,
+}
+
+logger = getLogger("settings")
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 DEBUG = env("DEBUG")
@@ -525,7 +535,7 @@ if not all(
         SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT,
     ]
 ):
-    logging.error(
+    logger.error(
         "Some of Tunnistamo environment variables are not set. Authentication may not work properly!"
     )
 
