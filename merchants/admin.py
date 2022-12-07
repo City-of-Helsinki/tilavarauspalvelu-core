@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from merchants.models import PaymentMerchant, PaymentOrder
+from merchants.models import PaymentAccounting, PaymentMerchant, PaymentOrder
 from merchants.verkkokauppa.merchants.requests import (
     create_merchant,
     get_merchant,
@@ -97,3 +97,8 @@ class PaymentMerchantAdmin(admin.ModelAdmin):
 @admin.register(PaymentOrder)
 class PaymentOrderAdmin(admin.ModelAdmin):
     model = PaymentOrder
+
+
+@admin.register(PaymentAccounting)
+class PaymentAccountingAdmin(admin.ModelAdmin):
+    model = PaymentAccounting

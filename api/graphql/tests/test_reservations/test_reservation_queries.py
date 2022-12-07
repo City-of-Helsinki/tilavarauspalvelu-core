@@ -884,12 +884,12 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_reservation_unit_type(self):
-        reservation_unit_type = ReservationUnitTypeFactory(name="Another type")
+        reservation_unit_type = ReservationUnitTypeFactory(name="another type")
         reservation_unit = ReservationUnitFactory(
-            name="Another resunit", reservation_unit_type=reservation_unit_type
+            name="another resunit", reservation_unit_type=reservation_unit_type
         )
         ReservationFactory(
-            name="Another reservation",
+            name="another reservation",
             reservation_unit=[reservation_unit],
             price=50,
         )
