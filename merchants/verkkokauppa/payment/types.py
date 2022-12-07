@@ -1,10 +1,24 @@
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 from typing import Any, Dict, Optional
 from uuid import UUID
 
 from ..payment.exceptions import ParsePaymentError
+
+
+class PaymentStatus(Enum):
+    """
+    Source:
+    https://github.com/City-of-Helsinki/verkkokauppa-core/blob/master/
+    paymentapi/src/main/java/fi/hel/verkkokauppa/payment/model/PaymentStatus.java
+    """
+
+    CREATED = "created"
+    PAID_ONLINE = "payment_paid_online"
+    CANCELLED = "payment_cancelled"
+    AUTHORIZED = "authorized"
 
 
 @dataclass(frozen=True)
