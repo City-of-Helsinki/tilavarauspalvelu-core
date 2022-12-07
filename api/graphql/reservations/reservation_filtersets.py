@@ -8,7 +8,7 @@ from django.db.models import When
 from django.db.models.functions import Concat
 
 from applications.models import CUSTOMER_TYPES
-from merchants.models import PaymentStatus
+from merchants.models import OrderStatus
 from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
@@ -70,7 +70,7 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
-    payment_status = django_filters.MultipleChoiceFilter(
+    order_status = django_filters.MultipleChoiceFilter(
         field_name="payment_order__status",
         lookup_expr="iexact",
         choices=tuple(
@@ -78,10 +78,10 @@ class ReservationFilterSet(django_filters.FilterSet):
                 key,
                 value,
             )
-            for key, value in PaymentStatus.choices
+            for key, value in OrderStatus.choices
         ),
         label="PaymentOrder's statuses; %s"
-        % ", ".join([k for k, v in PaymentStatus.choices]),
+        % ", ".join([k for k, v in OrderStatus.choices]),
     )
 
     order_by = django_filters.OrderingFilter(
@@ -100,6 +100,7 @@ class ReservationFilterSet(django_filters.FilterSet):
             ("reservation_unit__unit__name_en", "unit_name_en"),
             ("reservation_unit__unit__name_sv", "unit_name_sv"),
             "reservee_name",
+            ("payment_order__status", "order_status"),
         )
     )
 

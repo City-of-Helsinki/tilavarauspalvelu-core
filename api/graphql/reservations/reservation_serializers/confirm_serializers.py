@@ -3,7 +3,7 @@ from api.graphql.reservations.reservation_serializers.update_serializers import 
     ReservationUpdateSerializer,
 )
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from merchants.models import Language, PaymentOrder, PaymentStatus
+from merchants.models import Language, OrderStatus, PaymentOrder
 from merchants.verkkokauppa.helpers import create_verkkokauppa_order
 from reservation_units.models import PaymentType
 from reservations.email_utils import send_confirmation_email
@@ -125,7 +125,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             if payment_type == PaymentType.ON_SITE:
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
-                    status=PaymentStatus.PAID_MANUALLY,
+                    status=OrderStatus.PAID_MANUALLY,
                     language=self.instance.reservee_language or Language.FI,
                     price_net=price_net,
                     price_vat=price_vat,
@@ -136,7 +136,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 payment_order = create_verkkokauppa_order(self.instance)
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
-                    status=PaymentStatus.DRAFT,
+                    status=OrderStatus.DRAFT,
                     language=self.instance.reservee_language or Language.FI,
                     price_net=price_net,
                     price_vat=price_vat,

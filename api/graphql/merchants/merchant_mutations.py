@@ -4,7 +4,7 @@ from graphene import relay
 from graphene_permissions.mixins import AuthMutation
 from sentry_sdk import capture_message
 
-from merchants.models import PaymentOrder, PaymentStatus
+from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
 from permissions.api_permissions.graphene_permissions import OrderRefreshPermission
@@ -58,16 +58,16 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
 
         if (
             payment.status == "payment_cancelled"
-            and payment_order.status is not PaymentStatus.CANCELLED
+            and payment_order.status is not OrderStatus.CANCELLED
         ):
-            payment_order.status = PaymentStatus.CANCELLED
+            payment_order.status = OrderStatus.CANCELLED
             payment_order.save()
 
         if (
             payment.status == "payment_paid_online"
-            and payment_order.status is not PaymentStatus.PAID
+            and payment_order.status is not OrderStatus.PAID
         ):
-            payment_order.status = PaymentStatus.PAID
+            payment_order.status = OrderStatus.PAID
             payment_order.save()
 
             if payment_order.reservation.state == STATE_CHOICES.WAITING_FOR_PAYMENT:

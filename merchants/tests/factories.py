@@ -5,7 +5,7 @@ from factory import SubFactory, post_generation
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
 
-from merchants.models import Language, PaymentStatus, PaymentType
+from merchants.models import Language, OrderStatus, PaymentType
 
 
 class PaymentMerchantFactory(DjangoModelFactory):
@@ -39,5 +39,5 @@ class PaymentOrderFactory(DjangoModelFactory):
     price_vat = Decimal("2.0")
     price_total = Decimal("12.0")
     payment_type = PaymentType.INVOICE
-    status = PaymentStatus.DRAFT
+    status = OrderStatus.DRAFT
     language = Language.FI

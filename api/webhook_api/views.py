@@ -9,7 +9,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from sentry_sdk import capture_message
 
-from merchants.models import PaymentOrder, PaymentStatus
+from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.order.requests import get_order
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
@@ -73,9 +73,9 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
     )
     def create(self, request):
         needs_update_statuses = [
-            PaymentStatus.DRAFT,
-            PaymentStatus.EXPIRED,
-            PaymentStatus.CANCELLED,
+            OrderStatus.DRAFT,
+            OrderStatus.EXPIRED,
+            OrderStatus.CANCELLED,
         ]
         try:
             self.validate_request(request)
@@ -103,7 +103,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                 raise WebhookError(message="Invalid payment state", status_code=400)
 
             if payment_order.status in needs_update_statuses:
-                payment_order.status = PaymentStatus.PAID
+                payment_order.status = OrderStatus.PAID
                 payment_order.payment_id = payment_id
                 payment_order.processed_at = datetime.now().astimezone(
                     get_default_timezone()
@@ -179,7 +179,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 raise WebhookError(message="Order not found", status_code=404)
 
             # Order is already in a state where no updates are needed
-            if payment_order.status != PaymentStatus.DRAFT:
+            if payment_order.status != OrderStatus.DRAFT:
                 return Response(status=200)
 
             # Check order status from the API
@@ -194,7 +194,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 )
                 raise WebhookError(message="Invalid order state", status_code=400)
 
-            payment_order.status = PaymentStatus.CANCELLED
+            payment_order.status = OrderStatus.CANCELLED
             payment_order.processed_at = datetime.now().astimezone(
                 get_default_timezone()
             )
