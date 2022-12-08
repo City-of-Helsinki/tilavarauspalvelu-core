@@ -23,6 +23,7 @@ type Params = {
 
 const TabPanel = styled(Tabs.TabPanel)`
   margin-top: var(--spacing-s);
+  padding-block: var(--spacing-m);
 `;
 
 const MyUnitView = () => {

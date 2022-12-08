@@ -1,7 +1,13 @@
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { breakpoints } from "common/src/common/style";
 import { differenceInMinutes } from "date-fns";
-import React, { CSSProperties, Fragment } from "react";
+import React, {
+  CSSProperties,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
@@ -49,12 +55,19 @@ const FlexContainer = styled.div<{ $numCols: number }>`
   border-bottom: ${CELL_BORDER};
 `;
 
-const ResourceNameContainer = styled.div`
+const ResourceNameContainer = styled.div<{ $isDraft: boolean }>`
   display: flex;
   align-items: center;
   border-top: ${CELL_BORDER};
+  border-right: ${CELL_BORDER};
+  border-left: ${({ $isDraft }) =>
+    $isDraft ? CELL_BORDER_LEFT_ALERT : CELL_BORDER_LEFT};
   font-size: var(--fontsize-body-s);
   padding-inline: var(--spacing-4-xs);
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--color-white);
 `;
 
 const HeadingRow = styled.div`
@@ -73,10 +86,9 @@ const Time = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
-const Row = styled(HeadingRow)<{ $isDraft: boolean }>`
+const Row = styled(HeadingRow)`
   border-right: ${CELL_BORDER};
-  border-left: ${({ $isDraft }) =>
-    $isDraft ? CELL_BORDER_LEFT_ALERT : CELL_BORDER_LEFT};
+  border-left: 2px solid transparent;
 `;
 
 const CellContent = styled.div<{ $numCols: number }>`
@@ -85,6 +97,7 @@ const CellContent = styled.div<{ $numCols: number }>`
   height: 100%;
   grid-template-columns: repeat(${({ $numCols }) => $numCols}, 1fr);
   border-right: ${CELL_BORDER};
+  position: relative;
 `;
 
 const Cell = styled.div`
@@ -275,17 +288,40 @@ const sortByDraftStatusAndTitle = (resources: Resource[]) => {
 
 const ResourceCalendar = ({ resources }: Props): JSX.Element => {
   const { t } = useTranslation();
+  const calendarRef = useRef<HTMLDivElement>(null);
   // todo find out min and max opening hour of every reservationunit
-  const [beginHour, endHour] = [8, 24];
+  const [beginHour, endHour] = [0, 24];
   const numHours = endHour - beginHour;
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
 
+  const scrollCalendar = useCallback(() => {
+    const ref = calendarRef.current;
+
+    if (!ref) return;
+
+    const lastElementOfHeader = ref.querySelector(
+      ".calendar-header > div:last-of-type"
+    );
+
+    if (lastElementOfHeader) {
+      lastElementOfHeader.scrollIntoView();
+    }
+  }, [calendarRef]);
+
+  useEffect(() => {
+    scrollCalendar();
+  }, [scrollCalendar]);
+
   return (
     <>
-      <FlexContainer $numCols={numHours * 2}>
+      <FlexContainer $numCols={numHours * 2} ref={calendarRef}>
         <HeadingRow>
           <div />
-          <CellContent $numCols={numHours} key="header">
+          <CellContent
+            $numCols={numHours}
+            key="header"
+            className="calendar-header"
+          >
             {Array.from(Array(numHours).keys()).map((i, index) => (
               <Time key={i}>{beginHour + index}</Time>
             ))}
@@ -293,8 +329,8 @@ const ResourceCalendar = ({ resources }: Props): JSX.Element => {
         </HeadingRow>
         {orderedResources.map((row) => (
           <Fragment key={row.url}>
-            <Row $isDraft={row.isDraft}>
-              <ResourceNameContainer title={row.title}>
+            <Row>
+              <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
                 <div
                   style={{
                     overflow: "hidden",
