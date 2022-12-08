@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { useQuery } from "@apollo/client";
-import { get } from "lodash";
-import { endOfISOWeek, startOfISOWeek } from "date-fns";
+import { startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {

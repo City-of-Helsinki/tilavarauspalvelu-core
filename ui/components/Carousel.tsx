@@ -41,48 +41,6 @@ const Button = styled(MediumButton).attrs({
   }
 `;
 
-const StyledCarousel = styled(NukaCarousel)<{
-  $showCenterControls: boolean;
-  children: React.ReactNode;
-}>`
-  width: calc(100% + var(--spacing-xs) * 2) !important;
-  height: fit-content !important;
-  margin-right: calc(var(--spacing-xs) * -1);
-  margin-left: calc(var(--spacing-xs) * -1);
-
-  .slider-control-bottomcenter {
-    ${({ $showCenterControls }) => !$showCenterControls && "display: none;"}
-    position: relative !important;
-    bottom: unset !important;
-    left: unset !important;
-    transform: unset !important;
-
-    ul {
-      gap: var(--spacing-3-xs);
-      flex-wrap: wrap;
-      width: 100%;
-      justify-content: center;
-      position: static !important;
-    }
-
-    .paging-item {
-      button {
-        svg {
-          transform: scale(1.9);
-          border-radius: 50%;
-          fill: var(--color-black-20);
-        }
-      }
-    }
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    width: 100% !important;
-    height: fit-content !important;
-    margin: 0 !important;
-  }
-`;
-
 const SmallArrowButton = styled(Button).attrs({
   "data-testid": "slot-carousel-button",
 })<{
@@ -94,10 +52,9 @@ const SmallArrowButton = styled(Button).attrs({
     --color-bus-dark: transparent;
     --min-size: 0;
 
-    & > span {
-      margin: 0;
-      padding: 0;
-    }
+    background-color: var(--color-gold-light);
+    margin: 0;
+    padding: 0;
 
     ${({ $disabled }) =>
       $disabled
@@ -111,13 +68,14 @@ const SmallArrowButton = styled(Button).attrs({
     opacity: 1;
   `};
 
-    background-color: var(--color-gold-light);
-    margin: 0;
-    padding: 0;
-
     svg {
       color: black;
       transform: scale(1.5);
+    }
+
+    & > span {
+      margin: 0;
+      padding: 0;
     }
   }
 `;
@@ -168,10 +126,47 @@ const MediumArrowButton = styled(Button).attrs({
   }
 `;
 
-const ButtonVarians = {
-  medium: MediumArrowButton,
-  small: SmallArrowButton,
-};
+const StyledCarousel = styled(NukaCarousel)<{
+  children: React.ReactNode;
+  $showCenterControls: boolean;
+}>`
+  width: calc(100% + var(--spacing-xs) * 2) !important;
+  height: fit-content !important;
+  margin-right: calc(var(--spacing-xs) * -1);
+  margin-left: calc(var(--spacing-xs) * -1);
+
+  .slider-control-bottomcenter {
+    ${({ $showCenterControls }) => !$showCenterControls && "display: none;"}
+    position: relative !important;
+    bottom: unset !important;
+    left: unset !important;
+    transform: unset !important;
+
+    .paging-item {
+      button {
+        svg {
+          transform: scale(1.9);
+          border-radius: 50%;
+          fill: var(--color-black-20);
+        }
+      }
+    }
+
+    ul {
+      gap: var(--spacing-3-xs);
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+      position: static !important;
+    }
+  }
+
+  @media (min-width: ${breakpoints.m}) {
+    width: 100% !important;
+    height: fit-content !important;
+    margin: 0 !important;
+  }
+`;
 
 const Carousel = ({
   children,
@@ -184,6 +179,10 @@ const Carousel = ({
   ...rest
 }: Props): JSX.Element => {
   const { t } = useTranslation();
+  const ButtonVarians = {
+    medium: MediumArrowButton,
+    small: SmallArrowButton,
+  };
 
   const ButtonComponent = ButtonVarians[buttonVariant];
 

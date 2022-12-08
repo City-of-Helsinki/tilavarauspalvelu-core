@@ -188,8 +188,8 @@ export const getFuturePricing = (
       const start = new Date(futurePricing.begins);
       return isSlotWithinReservationTime(
         start,
-        new Date(reservationBegins),
-        new Date(reservationEnds)
+        reservationBegins ? new Date(reservationBegins) : undefined,
+        reservationEnds ? new Date(reservationEnds) : undefined
       );
     })
     // TODO: find out should opening hours be checked here
