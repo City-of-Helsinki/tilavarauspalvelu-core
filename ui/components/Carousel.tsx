@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
 import styled from "styled-components";
@@ -13,7 +13,7 @@ type Props = {
   cellSpacing?: number;
   wrapAround?: boolean;
   hideCenterControls?: boolean;
-  button?: ReactNode;
+  buttonVariant?: "medium" | "small";
 };
 
 const Button = styled(MediumButton).attrs({
@@ -83,7 +83,48 @@ const StyledCarousel = styled(NukaCarousel)<{
   }
 `;
 
-const VerticalButton = styled(Button)<{
+const SmallArrowButton = styled(Button).attrs({
+  "data-testid": "slot-carousel-button",
+})<{
+  $disabled: boolean;
+  $side: "left" | "right";
+}>`
+  &&& {
+    --color-bus: transparent;
+    --color-bus-dark: transparent;
+    --min-size: 0;
+
+    & > span {
+      margin: 0;
+      padding: 0;
+    }
+
+    ${({ $disabled }) =>
+      $disabled
+        ? `
+    display: none !important;
+  `
+        : `
+    &:hover {
+      opacity: 0.7;
+    }
+    opacity: 1;
+  `};
+
+    background-color: var(--color-gold-light);
+    margin: 0;
+    padding: 0;
+
+    svg {
+      color: black;
+      transform: scale(1.5);
+    }
+  }
+`;
+
+const MediumArrowButton = styled(Button).attrs({
+  "data-testid": "slot-carousel-button",
+})<{
   $disabled: boolean;
   $side: "left" | "right";
 }>`
@@ -127,6 +168,11 @@ const VerticalButton = styled(Button)<{
   }
 `;
 
+const ButtonVarians = {
+  medium: MediumArrowButton,
+  small: SmallArrowButton,
+};
+
 const Carousel = ({
   children,
   slidesToShow = 1,
@@ -134,12 +180,12 @@ const Carousel = ({
   cellSpacing = 1,
   wrapAround = true,
   hideCenterControls = false,
-  button,
+  buttonVariant = "medium",
   ...rest
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const ButtonComponent = button || VerticalButton;
+  const ButtonComponent = ButtonVarians[buttonVariant];
 
   return (
     <StyledCarousel
