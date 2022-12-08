@@ -159,7 +159,7 @@ class ReservationStaffCreateSerializer(
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_buffer_times(reservation_unit, begin, end)
             self.check_reservation_intervals_for_staff_reservation(
-                begin, reservation_unit
+                reservation_unit, begin
             )
 
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -188,7 +188,7 @@ class ReservationStaffCreateSerializer(
             )
 
     def check_reservation_intervals_for_staff_reservation(
-        self, begin, reservation_unit
+        self, reservation_unit, begin
     ):
         interval_to_minutes = {
             ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
@@ -205,14 +205,14 @@ class ReservationStaffCreateSerializer(
         possible_start_times = set()
 
         start_time = datetime.datetime.combine(
-            datetime.date.today(), datetime.time()
+            begin.date(), datetime.time()
         ).astimezone(DEFAULT_TIMEZONE)
         end_time = start_time + datetime.timedelta(hours=23, minutes=59, seconds=59)
         while start_time < end_time:
-            possible_start_times.add(start_time)
+            possible_start_times.add(start_time.time())
             start_time += interval_timedelta
 
-        if begin not in possible_start_times:
+        if begin.time() not in possible_start_times:
             raise ValidationErrorWithCode(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",
                 ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
