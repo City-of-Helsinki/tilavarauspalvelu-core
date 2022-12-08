@@ -73,7 +73,7 @@ export const RESERVATIONS_QUERY = gql`
     $begin: DateTime
     $end: DateTime
     $reservationUnit: [ID]
-    $paymentStatus: [String]
+    $orderStatus: [String]
   ) {
     reservations(
       first: $first
@@ -84,7 +84,7 @@ export const RESERVATIONS_QUERY = gql`
       reservationUnit: $reservationUnit
       reservationUnitType: $reservationUnitType
       state: $state
-      paymentStatus: $paymentStatus
+      orderStatus: $orderStatus
       textSearch: $textSearch
       priceLte: $priceLte
       priceGte: $priceGte
