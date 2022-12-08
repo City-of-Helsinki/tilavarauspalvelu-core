@@ -66,7 +66,7 @@ const ResourceNameContainer = styled.div<{ $isDraft: boolean }>`
   padding-inline: var(--spacing-4-xs);
   position: sticky;
   left: 0;
-  z-index: 2;
+  z-index: 10;
   background: var(--color-white);
 `;
 
@@ -125,7 +125,6 @@ const EventContent = styled.div`
 
     margin: 0;
     position: absolute;
-    z-index: 5;
     width: calc(100% - var(--spacing-xs) * 2);
     height: calc(100% - var(--spacing-xs) * 2);
     pointer-events: none;
@@ -159,6 +158,7 @@ const getPreBuffer = (
           width,
         }}
         title={t("MyUnits.UnitCalendar.legend.pause")}
+        key={`${event.event?.pk}-pre`}
       />
     );
   }
@@ -184,6 +184,7 @@ const getPostBuffer = (
           width,
         }}
         title={t("MyUnits.UnitCalendar.legend.pause")}
+        key={`${event.event?.pk}-post`}
       />
     );
   }
@@ -248,6 +249,7 @@ const Events = ({
             left,
             ...TemplateProps,
             width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
+            zIndex: 5,
           }}
         >
           <EventContent style={{ ...eventStyleGetter(e).style }}>
