@@ -77,7 +77,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
   },
   {
     headerName: t("Reservations.headings.paymentStatus"),
-    key: "order_status",
+    key: "orderStatus",
     isSortable: true,
     transform: ({ orderStatus }: ReservationType) =>
       orderStatus === null ? "-" : t(`Payment.status.${orderStatus}`),
