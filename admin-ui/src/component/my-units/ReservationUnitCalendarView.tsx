@@ -41,8 +41,10 @@ const intersectingReservationUnits = (
 };
 
 const ReservationUnitCalendarView = (): JSX.Element => {
+  const today = new Date(new Date().setHours(0, 0, 0, 0));
+
   const { notifyError } = useNotification();
-  const [begin, setBegin] = useState(new Date().toISOString());
+  const [begin, setBegin] = useState(today.toISOString());
   const [reservationUnitId, setReservationUnitId] = useState(-1);
   const { unitId } = useParams<Params>();
 
