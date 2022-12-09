@@ -15,7 +15,9 @@ type Params = {
 };
 
 const UnitReservationsView = (): JSX.Element => {
-  const [begin, setBegin] = useState(new Date().toISOString());
+  const today = new Date(new Date().setHours(0, 0, 0, 0));
+
+  const [begin, setBegin] = useState(today.toISOString());
   const { unitId } = useParams<Params>();
 
   const { t } = useTranslation();
