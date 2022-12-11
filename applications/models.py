@@ -23,6 +23,7 @@ from applications.utils.aggregate_data import (
 )
 from reservation_units.models import ReservationUnit
 from spaces.models import District, Unit
+from tilavarauspalvelu.utils.commons import WEEKDAYS
 from tilavarauspalvelu.utils.date_util import (
     next_or_current_matching_weekday,
     previous_or_current_matching_weekday,
@@ -33,18 +34,6 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 DEFAULT_TIMEZONE = get_default_timezone()
-
-DAY_CHOICES = (
-    (0, "Monday"),
-    (1, "Tuesday"),
-    (2, "Wednesday"),
-    (3, "Thursday"),
-    (4, "Friday"),
-    (5, "Saturday"),
-    (6, "Sunday"),
-)
-
-TRANSLATED_DAY_CHOICES = tuple((k, _(v)) for k, v in DAY_CHOICES)
 
 
 def year_not_in_future(year: Optional[int]):
@@ -1238,7 +1227,7 @@ class EventOccurrence(object):
 
 class ApplicationEventSchedule(models.Model):
     day = models.IntegerField(
-        verbose_name=_("Day"), choices=TRANSLATED_DAY_CHOICES, null=False
+        verbose_name=_("Day"), choices=WEEKDAYS.CHOICES, null=False
     )
 
     begin = models.TimeField(
@@ -1343,7 +1332,7 @@ class ApplicationEventScheduleResult(models.Model):
 
     allocated_duration = models.DurationField()
     allocated_day = models.IntegerField(
-        verbose_name=_("Day"), choices=TRANSLATED_DAY_CHOICES, null=False
+        verbose_name=_("Day"), choices=WEEKDAYS.CHOICES, null=False
     )
 
     allocated_begin = models.TimeField(
