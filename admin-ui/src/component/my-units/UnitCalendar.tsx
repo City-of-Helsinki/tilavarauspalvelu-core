@@ -18,6 +18,7 @@ import resourceEventStyleGetter, {
   POST_PAUSE,
   PRE_PAUSE,
 } from "./resourceEventStyleGetter";
+import { getReserveeName } from "../reservations/requested/util";
 
 export type Resource = {
   title: string;
@@ -191,6 +192,16 @@ const getPostBuffer = (
   return null;
 };
 
+const getEventTitle = ({
+  reservation: { title, event },
+}: {
+  reservation: CalendarEvent<ReservationType>;
+}) => {
+  return event && event?.pk !== event?.reservationUnits?.[0]?.pk
+    ? getReserveeName(event)
+    : title;
+};
+
 const Events = ({
   currentReservationUnit,
   firstHour,
@@ -215,6 +226,7 @@ const Events = ({
     }}
   >
     {events.map((e) => {
+      const title = getEventTitle({ reservation: e });
       const startDate = new Date(e.start);
       const endDate = new Date(e.end);
       const dayStartDate = new Date(e.start);
@@ -253,7 +265,7 @@ const Events = ({
           }}
         >
           <EventContent style={{ ...eventStyleGetter(e).style }}>
-            <p>{e.title}</p>
+            <p>{title}</p>
             <Popup
               position={["right center", "left center"]}
               trigger={() => (
