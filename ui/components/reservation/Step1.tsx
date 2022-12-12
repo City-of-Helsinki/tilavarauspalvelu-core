@@ -9,12 +9,12 @@ import {
   ReservationUnitType,
   TermsOfUseType,
 } from "common/types/gql-types";
+import TermsBox from "common/src/termsbox/TermsBox";
 import { Reservation, ReservationStep } from "../../modules/types";
 import { capitalize, getTranslation } from "../../modules/util";
 import { ActionContainer, Subheading, TwoColumnContainer } from "./styles";
 import Sanitize from "../common/Sanitize";
 import { MediumButton } from "../../styles/util";
-import TermsBox from "../common/TermsBox";
 
 type Props = {
   reservation: Reservation;

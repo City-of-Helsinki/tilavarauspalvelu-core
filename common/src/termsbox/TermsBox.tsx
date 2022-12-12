@@ -1,8 +1,8 @@
-import { breakpoints } from "common/src/common/style";
-import { H6 } from "common/src/common/typography";
 import { Checkbox, IconLinkExternal } from "hds-react";
 import React from "react";
 import styled from "styled-components";
+import { breakpoints } from "../common/style";
+import { H6 } from "../common/typography";
 
 type Link = {
   href: string;
@@ -10,7 +10,7 @@ type Link = {
 };
 
 export type Props = {
-  id: string;
+  id?: string;
   heading: string;
   body?: string | JSX.Element;
   links?: Link[];
