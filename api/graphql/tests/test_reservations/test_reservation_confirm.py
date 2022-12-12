@@ -400,6 +400,27 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             "Reservation unit does not support ONLINE payment type. Allowed values: INVOICE, ON_SITE"
         )
 
+    def test_confirm_reservation_allows_unsupported_payment_type_with_zero_price(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        self.reservation.price = Decimal(0)
+        self.reservation.price_net = Decimal(0)
+        self.reservation.save()
+
+        self.client.force_login(self.regular_joe)
+
+        self.reservation_unit.payment_types.add(PaymentType.INVOICE)
+
+        input_data = self.get_valid_confirm_data()
+        input_data["paymentType"] = PaymentType.ONLINE
+
+        response = self.query(self.get_confirm_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
     def test_confirm_reservation_without_payment_type_use_on_site(
         self, mock_periods, mock_opening_hours
     ):
@@ -543,3 +564,60 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(order_data.get("orderUuid")).is_equal_to(str(mock_order.order_id))
         assert_that(order_data.get("receiptUrl")).is_equal_to(mock_order.receipt_url)
         assert_that(order_data.get("checkoutUrl")).is_equal_to(mock_order.checkout_url)
+
+    def test_confirm_reservation_with_price_requires_payment_product(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        self.reservation_unit.payment_product = None
+        self.reservation_unit.save()
+
+        input_data = self.get_valid_confirm_data()
+        query = """
+            mutation confirmReservation($input: ReservationConfirmMutationInput!) {
+                confirmReservation(input: $input) {
+                    state
+                    errors {
+                        field
+                        messages
+                    }
+                }
+            }
+        """
+        response = self.query(query, input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
+            "Reservation unit is missing payment product"
+        )
+
+    def test_confirm_reservation_without_price_does_not_require_payment_product(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        self.reservation_unit.payment_product = None
+        self.reservation_unit.save()
+
+        self.reservation.price = Decimal(0)
+        self.reservation.price_net = Decimal(0)
+        self.reservation.save()
+
+        input_data = self.get_valid_confirm_data()
+        query = """
+            mutation confirmReservation($input: ReservationConfirmMutationInput!) {
+                confirmReservation(input: $input) {
+                    state
+                    errors {
+                        field
+                        messages
+                    }
+                }
+            }
+        """
+        response = self.query(query, input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("confirmReservation")).is_not_none()
