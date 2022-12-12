@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { addDays, subDays } from "date-fns";
+import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 import { intersection } from "lodash";
 import {
   Query,
@@ -41,10 +41,10 @@ const intersectingReservationUnits = (
 };
 
 const ReservationUnitCalendarView = (): JSX.Element => {
-  const today = new Date(new Date().setHours(0, 0, 0, 0));
+  const today = formatISO(startOfDay(new Date()));
 
   const { notifyError } = useNotification();
-  const [begin, setBegin] = useState(today.toISOString());
+  const [begin, setBegin] = useState(today);
   const [reservationUnitId, setReservationUnitId] = useState(-1);
   const { unitId } = useParams<Params>();
 
