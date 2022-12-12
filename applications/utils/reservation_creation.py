@@ -38,6 +38,7 @@ def create_reservation_from_schedule_result(result, application_event):
         application_event=application_event,
         age_group=result.application_event_schedule.application_event.age_group,
         ability_group=result.application_event_schedule.application_event.ability_group,
+        reservation_unit=result.allocated_reservation_unit,
     )
 
     reservation_date = next_or_current_matching_weekday(

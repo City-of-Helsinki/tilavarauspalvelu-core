@@ -19,6 +19,7 @@ from merchants.models import OrderStatus
 from reservation_units.models import ReservationUnit
 from tilavarauspalvelu import settings
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
+from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 Q = models.Q
 User = get_user_model()
@@ -86,7 +87,7 @@ class RecurringReservation(models.Model):
         Application,
         verbose_name=_("Application"),
         related_name="recurring_reservation",
-        null=False,
+        null=True,
         blank=True,
         on_delete=models.PROTECT,
     )
@@ -95,7 +96,7 @@ class RecurringReservation(models.Model):
         ApplicationEvent,
         verbose_name=_("Application event"),
         related_name="recurring_reservation",
-        null=False,
+        null=True,
         blank=True,
         on_delete=models.PROTECT,
     )
@@ -115,6 +116,43 @@ class RecurringReservation(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+
+    reservation_unit = models.ForeignKey(
+        ReservationUnit,
+        verbose_name=_("Reservation unit"),
+        null=False,
+        on_delete=models.PROTECT,
+    )
+
+    created = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    name = models.CharField(
+        max_length=255,
+        null=False,
+        blank=True,
+        default="",
+    )
+
+    interval = models.PositiveIntegerField(
+        null=True,
+    )
+
+    weekdays = models.CharField(
+        max_length=16,
+        choices=WEEKDAYS.CHOICES,
+        default="",
+        blank=True,
+    )
+
+    begin_time = models.TimeField(verbose_name=_("Begin time"), null=True)
+
+    end_time = models.TimeField(verbose_name=_("End time"), null=True)
+
+    begin_date = models.DateField(verbose_name=("Begin date"), null=True)
+
+    end_date = models.DateField(verbose_name=_("End date"), null=True)
 
     @property
     def denied_reservations(self):
