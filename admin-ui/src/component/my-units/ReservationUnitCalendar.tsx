@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { toApiDate } from "common/src/common/util";
 import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { useQuery } from "@apollo/client";
 import { get } from "lodash";
-import { endOfISOWeek, startOfISOWeek } from "date-fns";
+import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   Query,
-  QueryReservationsArgs,
   ReservationType,
+  ReservationUnitByPkTypeReservationsArgs,
+  QueryReservationUnitByPkArgs,
 } from "common/types/gql-types";
 import { reservationUrl } from "../../common/urls";
 import { combineResults } from "../../common/util";
@@ -20,7 +22,6 @@ import { publicUrl } from "../../common/const";
 
 type Props = {
   begin: string;
-  intersectingReservationUnits: number[];
   reservationUnitPk: number;
 };
 
@@ -51,7 +52,6 @@ const updateQuery = (
 const ReservationUnitCalendar = ({
   begin,
   reservationUnitPk,
-  intersectingReservationUnits,
 }: Props): JSX.Element => {
   const [events, setEvents] = useState([] as CalendarEvent<ReservationType>[]);
   const [hasMore, setHasMore] = useState(false);
@@ -59,44 +59,42 @@ const ReservationUnitCalendar = ({
 
   const { t } = useTranslation();
 
-  const { fetchMore } = useQuery<Query, QueryReservationsArgs>(
-    RESERVATIONS_BY_RESERVATIONUNITS,
+  const { fetchMore } = useQuery<
+    Query,
+    QueryReservationUnitByPkArgs & ReservationUnitByPkTypeReservationsArgs
+  >(RESERVATIONS_BY_RESERVATIONUNITS, {
+    fetchPolicy: "network-only",
+    variables: {
+      pk: reservationUnitPk,
+      from: toApiDate(startOfISOWeek(new Date(begin))),
+      to: toApiDate(addDays(endOfISOWeek(new Date(begin)), 1)),
+    },
+    onCompleted: ({ reservationUnitByPk }) => {
+      const reservations =
+        reservationUnitByPk?.reservations?.filter(
+          (item): item is ReservationType => !!item
+        ) || [];
 
-    {
-      fetchPolicy: "network-only",
-      variables: {
-        offset: 0,
-        first: 100,
-        reservationUnit: intersectingReservationUnits.map(String),
-        begin: startOfISOWeek(new Date(begin)),
-        end: endOfISOWeek(new Date(begin)),
-      },
-      onCompleted: ({ reservations }) => {
-        if (reservations) {
-          setEvents(
-            (reservations?.edges || []).map((r) => ({
-              title: `${
-                r?.node?.reserveeOrganisationName ||
-                `${r?.node?.reserveeFirstName || ""} ${
-                  r?.node?.reserveeLastName || ""
-                }`
-              }`,
-              event: r?.node as ReservationType,
-              start: new Date(get(r?.node, "begin")),
-              end: new Date(get(r?.node, "end")),
-            }))
-          );
-
-          if (reservations.pageInfo.hasNextPage) {
-            setHasMore(true);
-          }
-        }
-      },
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
+      if (reservations) {
+        setEvents(
+          reservations.map((reservation) => ({
+            title: `${
+              reservation.reserveeOrganisationName ||
+              `${reservation.reserveeFirstName || ""} ${
+                reservation.reserveeLastName || ""
+              }`
+            }`,
+            event: reservation as ReservationType,
+            start: new Date(get(reservation, "begin")),
+            end: new Date(get(reservation, "end")),
+          }))
+        );
+      }
+    },
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
   useEffect(() => {
     if (hasMore) {
       setHasMore(false);
