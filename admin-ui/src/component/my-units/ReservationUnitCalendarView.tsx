@@ -1,16 +1,7 @@
-import { useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
-import { intersection } from "lodash";
-import {
-  Query,
-  QueryUnitsArgs,
-  ReservationUnitType,
-} from "common/types/gql-types";
-import { useNotification } from "../../context/NotificationContext";
-import Loader from "../Loader";
-import { UNIT_QUERY } from "./queries";
+
 import SingleReservationUnitFilter from "../filters/SingleReservationUnitFilter";
 import { Grid, HorisontalFlex, Span6 } from "../../styles/layout";
 import ReservationUnitCalendar from "./ReservationUnitCalendar";
@@ -21,53 +12,14 @@ type Params = {
   reservationUnitId: string;
 };
 
-const intersectingReservationUnits = (
-  allReservationUnits: ReservationUnitType[],
-  currentReservationUnit: number
-): number[] => {
-  const spacePks = allReservationUnits
-    .filter((ru) => ru.pk === currentReservationUnit)
-    .flatMap((ru) => ru.spaces?.map((space) => space?.pk));
-
-  return allReservationUnits
-    .filter(
-      (ru) =>
-        intersection(
-          ru.spaces?.map((space) => space?.pk),
-          spacePks
-        ).length > 0
-    )
-    .map((ru) => ru.pk as number);
-};
-
 const ReservationUnitCalendarView = (): JSX.Element => {
   const today = formatISO(startOfDay(new Date()));
 
-  const { notifyError } = useNotification();
   const [begin, setBegin] = useState(today);
   const [reservationUnitId, setReservationUnitId] = useState(-1);
   const { unitId } = useParams<Params>();
 
   const hasReservationUnitId = reservationUnitId > 0;
-
-  const { loading: unitLoading, data: unitData } = useQuery<
-    Query,
-    QueryUnitsArgs
-  >(UNIT_QUERY, {
-    variables: {
-      pk: [unitId],
-      offset: 0,
-    },
-    onError: (err) => {
-      notifyError(err.message);
-    },
-  });
-
-  if (unitLoading) {
-    return <Loader />;
-  }
-
-  const unit = unitData?.units?.edges[0];
 
   return (
     <>
@@ -99,10 +51,6 @@ const ReservationUnitCalendarView = (): JSX.Element => {
             key={begin + reservationUnitId}
             begin={begin}
             reservationUnitPk={reservationUnitId}
-            intersectingReservationUnits={intersectingReservationUnits(
-              unit?.node?.reservationUnits as ReservationUnitType[],
-              reservationUnitId
-            )}
           />
         </>
       )}
