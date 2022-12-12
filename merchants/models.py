@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -253,6 +254,19 @@ class PaymentAccounting(models.Model):
         max_length=6,
         validators=[is_numeric],
     )
+
+    def save(self, *args, **kwargs) -> None:
+        from reservation_units.models import ReservationUnit
+        from reservation_units.tasks import refresh_reservation_unit_accounting
+
+        super(PaymentAccounting, self).save(*args, **kwargs)
+        if settings.UPDATE_ACCOUNTING:
+            runits_from_units = ReservationUnit.objects.filter(
+                unit__in=self.units.all()
+            )
+            runits = runits_from_units.union(self.reservation_units.all())
+            for runit in runits:
+                refresh_reservation_unit_accounting.delay(runit.pk)
 
     def __str__(self) -> str:
         return self.name
