@@ -12,7 +12,11 @@ function SortedSelect<T>(
     const opts = [...originalOptions];
     if (props.sort) {
       opts.sort((a, b) =>
-        a.label.toLowerCase().localeCompare(b.label.toLowerCase())
+        a.label && b.label
+          ? a.label.toLowerCase().localeCompare(b.label.toLowerCase())
+          : !a.label
+          ? 1
+          : -1
       );
     }
     return opts;

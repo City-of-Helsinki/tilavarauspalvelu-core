@@ -294,10 +294,13 @@ const Events = ({
 );
 
 const sortByDraftStatusAndTitle = (resources: Resource[]) => {
-  return resources.sort(
-    (a, b) =>
-      Number(a.isDraft) - Number(b.isDraft) || a.title.localeCompare(b.title)
-  );
+  return resources.sort((a, b) => {
+    const draftComparison = Number(a.isDraft) - Number(b.isDraft);
+    const titleComparison =
+      a.title && b.title ? a.title.localeCompare(b.title) : !a.title ? 1 : -1;
+
+    return draftComparison || titleComparison;
+  });
 };
 
 const ResourceCalendar = ({ resources }: Props): JSX.Element => {
