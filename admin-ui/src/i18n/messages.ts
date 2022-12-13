@@ -173,6 +173,7 @@ const translations: ITranslations = {
     increaseByOneAriaLabel: ["Lisää yhdellä"],
     decreaseByOneAriaLabel: ["Vähennä yhdellä"],
     openToNewTab: ["Avaa uuteen välilehteen"],
+    reservationUnit: ["Varausyksikkö"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],

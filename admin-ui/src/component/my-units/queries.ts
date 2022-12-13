@@ -30,9 +30,12 @@ export const UNIT_QUERY = gql`
 export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   query ReservationUnit($pk: Int, $from: Date, $to: Date) {
     reservationUnitByPk(pk: $pk) {
+      pk
       reservations(from: $from, to: $to, includeWithSameComponents: true) {
         id
         user {
+          firstName
+          lastName
           email
         }
         name
@@ -41,6 +44,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
         reserveeOrganisationName
         reservationUnits {
           pk
+          nameFi
         }
         pk
         begin

@@ -19,6 +19,8 @@ import Legend from "../reservations/requested/Legend";
 import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { publicUrl } from "../../common/const";
+import { getReserveeName } from "../reservations/requested/util";
+import Loader from "../Loader";
 
 type Props = {
   begin: string;
@@ -49,6 +51,26 @@ const updateQuery = (
   return combineResults(previousResult, fetchMoreResult, "reservations");
 };
 
+const getEventTitle = ({
+  reservationUnitPk,
+  reservation,
+}: {
+  reservationUnitPk: number;
+  reservation: ReservationType;
+}) => {
+  const reservationUnit = reservation.reservationUnits?.[0];
+  const isOtherReservationUnit = reservationUnitPk !== reservationUnit?.pk;
+
+  if (isOtherReservationUnit) {
+    const reserveeName = getReserveeName(reservation);
+    const reservationUnitName = reservationUnit?.nameFi ?? "";
+
+    return [reserveeName, reservationUnitName];
+  }
+
+  return null;
+};
+
 const ReservationUnitCalendar = ({
   begin,
   reservationUnitPk,
@@ -59,7 +81,7 @@ const ReservationUnitCalendar = ({
 
   const { t } = useTranslation();
 
-  const { fetchMore } = useQuery<
+  const { fetchMore, loading } = useQuery<
     Query,
     QueryReservationUnitByPkArgs & ReservationUnitByPkTypeReservationsArgs
   >(RESERVATIONS_BY_RESERVATIONUNITS, {
@@ -77,17 +99,24 @@ const ReservationUnitCalendar = ({
 
       if (reservations) {
         setEvents(
-          reservations.map((reservation) => ({
-            title: `${
-              reservation.reserveeOrganisationName ||
-              `${reservation.reserveeFirstName || ""} ${
-                reservation.reserveeLastName || ""
-              }`
-            }`,
-            event: reservation as ReservationType,
-            start: new Date(get(reservation, "begin")),
-            end: new Date(get(reservation, "end")),
-          }))
+          reservations.map((reservation) => {
+            const titleParts = getEventTitle({
+              reservationUnitPk,
+              reservation,
+            });
+            const title = titleParts
+              ? `${titleParts[0]} / ${t("common.reservationUnit")} ${
+                  titleParts[1]
+                }`
+              : "";
+
+            return {
+              title,
+              event: reservation as ReservationType,
+              start: new Date(get(reservation, "begin")),
+              end: new Date(get(reservation, "end")),
+            };
+          })
         );
       }
     },
@@ -107,6 +136,8 @@ const ReservationUnitCalendar = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMore, setHasMore]);
+
+  if (loading) return <Loader />;
 
   return (
     <Container>
