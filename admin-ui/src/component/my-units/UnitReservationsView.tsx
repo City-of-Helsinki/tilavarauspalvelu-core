@@ -1,4 +1,4 @@
-import { addDays, formatISO, startOfDay, subDays } from "date-fns";
+import { formatISO, startOfDay } from "date-fns";
 import React, { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -27,6 +27,10 @@ const UnitReservationsView = (): JSX.Element => {
     initialEmptyState
   );
 
+  const onDateChange = ({ date }: { date: Date }) => {
+    setBegin(formatISO(date));
+  };
+
   const tags = toTags(
     state,
     t,
@@ -50,15 +54,7 @@ const UnitReservationsView = (): JSX.Element => {
       </Grid>
       <Tags tags={tags} dispatch={dispatch} t={t} />
       <HorisontalFlex style={{ justifyContent: "center" }}>
-        <DayNavigation
-          date={begin}
-          onPrev={() => {
-            setBegin(subDays(new Date(begin), 1).toISOString());
-          }}
-          onNext={() => {
-            setBegin(addDays(new Date(begin), 1).toISOString());
-          }}
-        />
+        <DayNavigation date={begin} onDateChange={onDateChange} />
       </HorisontalFlex>
       <UnitReservations
         reservationUnitTypes={state.reservationUnitType.map((option) =>

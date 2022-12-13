@@ -1,14 +1,14 @@
 import React from "react";
 import styled from "styled-components";
+import { addDays, parse, subDays } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { Button, IconAngleLeft, IconAngleRight } from "hds-react";
-import { formatDate } from "../../common/util";
+import { Button, IconAngleLeft, IconAngleRight, DateInput } from "hds-react";
+import { toUIDate } from "common/src/common/util";
 import { HorisontalFlex } from "../../styles/layout";
 
 type Props = {
   date: string;
-  onNext: () => void;
-  onPrev: () => void;
+  onDateChange: ({ date }: { date: Date }) => void;
 };
 
 const Wrapper = styled.div`
@@ -23,9 +23,25 @@ const Wrapper = styled.div`
   }
 `;
 
-const DayNavigation = ({ date, onNext, onPrev }: Props): JSX.Element => {
+const SimpleDatePicker = styled(DateInput)`
+  border-color: transparent;
+
+  & input {
+    text-align: center;
+    border-color: transparent !important;
+  }
+
+  & *[class*="hds-text-input__buttons"] > button {
+    padding: 0 !important;
+  }
+`;
+
+const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
   const d = new Date(date);
   const { t } = useTranslation();
+
+  const onPreviousDay = () => onDateChange({ date: subDays(d, 1) });
+  const onNextDay = () => onDateChange({ date: addDays(d, 1) });
 
   return (
     <Wrapper>
@@ -39,19 +55,27 @@ const DayNavigation = ({ date, onNext, onPrev }: Props): JSX.Element => {
           aria-label={t("common.prev")}
           size="small"
           variant="supplementary"
-          onClick={onPrev}
+          onClick={onPreviousDay}
           iconLeft={<IconAngleLeft />}
         >
           {" "}
         </Button>
-        <div style={{ width: "5em", textAlign: "center" }}>
-          {formatDate(d.toISOString())}
-        </div>
+        <SimpleDatePicker
+          disableConfirmation
+          id="date-input"
+          initialMonth={d}
+          language="fi"
+          required
+          onChange={(value) =>
+            onDateChange({ date: parse(value, "d.M.yyyy", new Date()) })
+          }
+          value={toUIDate(d)}
+        />
         <Button
           aria-label={t("common.next")}
           size="small"
-          onClick={onNext}
           variant="supplementary"
+          onClick={onNextDay}
           iconLeft={<IconAngleRight />}
         >
           {" "}
