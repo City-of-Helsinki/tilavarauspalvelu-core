@@ -52,13 +52,13 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.builder._get_begin_time()).is_equal_to("01:00")
 
     def test_get_begin_date(self):
-        assert_that(self.builder._get_begin_date()).is_equal_to("09.02.2022")
+        assert_that(self.builder._get_begin_date()).is_equal_to("9.2.2022")
 
     def test_get_begin_date_respects_timezone(self):
         self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=UTC)
         self.reservation.save()
 
-        assert_that(self.builder._get_begin_date()).is_equal_to("01.03.2022")
+        assert_that(self.builder._get_begin_date()).is_equal_to("1.3.2022")
 
     def test_get_end_time(self):
         assert_that(self.builder._get_end_time()).is_equal_to("12:00")
@@ -70,13 +70,13 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.builder._get_end_time()).is_equal_to("03:00")
 
     def test_get_end_date(self):
-        assert_that(self.builder._get_end_date()).is_equal_to("09.02.2022")
+        assert_that(self.builder._get_end_date()).is_equal_to("9.2.2022")
 
     def test_get_end_date_respects_timezone(self):
         self.reservation.end = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=UTC)
         self.reservation.save()
 
-        assert_that(self.builder._get_end_date()).is_equal_to("01.03.2022")
+        assert_that(self.builder._get_end_date()).is_equal_to("1.3.2022")
 
     def test_get_reservation_number(self):
         resno = self.reservation.id
@@ -213,7 +213,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             system.
         """
         compiled_content = f"""
-            Should contain Dance time! and 09.02.2022 and 10:00 and 09.02.2022
+            Should contain Dance time! and 9.2.2022 and 10:00 and 9.2.2022
             and 12:00 and of course the {self.reservation.id}
             Yours truly:
             system.
