@@ -72,7 +72,7 @@ def get_product_mapping(product_id: UUID, get=_get) -> Optional[Product]:
 
 def create_or_update_accounting(
     product_id: UUID, params: CreateOrUpdateAccountingParams, post=_post
-) -> Optional[Accounting]:
+) -> Accounting:
     """
     Be aware that this endpoint allows creating accouting data for products that
     do not exist. This is intentional, since in some uses cases there is a need

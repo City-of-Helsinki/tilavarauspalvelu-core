@@ -5,8 +5,15 @@ from django.conf import settings
 from sentry_sdk import capture_message
 
 from merchants.models import PaymentProduct
-from merchants.verkkokauppa.product.requests import create_product
-from merchants.verkkokauppa.product.types import CreateProductParams
+from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
+from merchants.verkkokauppa.product.requests import (
+    create_or_update_accounting,
+    create_product,
+)
+from merchants.verkkokauppa.product.types import (
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+)
 from tilavarauspalvelu.celery import app
 
 from .pricing_updates import update_reservation_unit_pricings
@@ -58,8 +65,51 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
             payment_product=payment_product
         )
 
+        refresh_reservation_unit_accounting.delay(reservation_unit_pk)
+
     # Remove product mapping if merchant is removed
     if reservation_unit.payment_product and not payment_merchant:
         ReservationUnit.objects.filter(pk=reservation_unit_pk).update(
             payment_product=None
         )
+
+
+@app.task(
+    name="refresh_reservation_unit_accounting",
+    autoretry_for=(TypeError,),
+    max_retries=5,
+    retry_backoff=True,
+)
+def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
+    from reservation_units.models import ReservationUnit
+
+    reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
+    if reservation_unit is None:
+        capture_message(
+            f"Unable to refresh reservation unit accounting data. Reservation unit not found: {reservation_unit_pk}",
+            level="warning",
+        )
+        return
+
+    accounting = ReservationUnitPaymentHelper.get_accounting(reservation_unit)
+
+    if reservation_unit.payment_product and accounting:
+        params = CreateOrUpdateAccountingParams(
+            vat_code=accounting.vat_code,
+            internal_order=accounting.internal_order,
+            profit_center=accounting.profit_center,
+            project=accounting.project,
+            operation_area=accounting.operation_area,
+            company_code=accounting.company_code,
+            main_ledger_account=accounting.main_ledger_account,
+        )
+        try:
+            accounting = create_or_update_accounting(
+                reservation_unit.payment_product.id, params
+            )
+        except CreateOrUpdateAccountingError as err:
+            capture_message(
+                f"Unable to refresh reservation unit accounting data: ${reservation_unit_pk}. "
+                + f"Problem with Verkkokauppa API: ${err}",
+                level="error",
+            )

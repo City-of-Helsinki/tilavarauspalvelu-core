@@ -41,3 +41,16 @@ class PaymentOrderFactory(DjangoModelFactory):
     payment_type = PaymentType.INVOICE
     status = OrderStatus.DRAFT
     language = Language.FI
+
+
+class PaymentAccountingFactory(DjangoModelFactory):
+    class Meta:
+        model = "merchants.PaymentAccounting"
+
+    company_code = "1234"
+    main_ledger_account = "123456"
+    vat_code = "AB"
+    internal_order = "1234567890"
+    profit_center = "1234567"
+    project = "1234567"
+    operation_area = "123456"

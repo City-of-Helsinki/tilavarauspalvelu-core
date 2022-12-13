@@ -1,6 +1,6 @@
 from typing import Optional
 
-from merchants.models import PaymentMerchant
+from merchants.models import PaymentAccounting, PaymentMerchant
 
 
 class ReservationUnitPaymentHelper:
@@ -30,3 +30,11 @@ class ReservationUnitPaymentHelper:
             return True
 
         return False
+
+    @classmethod
+    def get_accounting(cls, reservation_unit) -> Optional[PaymentAccounting]:
+        if reservation_unit.payment_accounting is not None:
+            return reservation_unit.payment_accounting
+        if reservation_unit.unit:
+            return reservation_unit.unit.payment_accounting
+        return None
