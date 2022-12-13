@@ -1,14 +1,19 @@
 from decimal import Decimal
+from unittest import mock
 from uuid import uuid4
 
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.test import override_settings
 from django.test.testcases import TestCase
 from pytest import raises
 
 from merchants.models import PaymentOrder
+from merchants.tests.factories import PaymentAccountingFactory
+from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.tests.factories import ReservationFactory
+from spaces.tests.factories import UnitFactory
 
 
 class PaymentOrderTestCase(TestCase):
@@ -59,3 +64,60 @@ class PaymentOrderTestCase(TestCase):
         assert_that(e.value.message_dict).is_equal_to(
             {"price_total": ["Must be the sum of net and vat amounts"]}
         )
+
+
+@override_settings(UPDATE_ACCOUNTING=True)
+@mock.patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay")
+class PaymentAccountingTestCase(TestCase):
+    @classmethod
+    def setUp(cls):
+        cls.unit = UnitFactory(name="Test unit")
+        cls.reservation_unit_1 = ReservationUnitFactory(name="Reservation unit 1")
+        cls.reservation_unit_2 = ReservationUnitFactory(
+            name="Reservation unit 2", unit=cls.unit
+        )
+        cls.accounting = PaymentAccountingFactory(name="Test accounting")
+
+    def test_webshop_sync_is_not_triggered_when_accounting_is_not_used(
+        self, mock_upsert_accounting
+    ):
+        self.accounting.save()
+        assert_that(mock_upsert_accounting.called).is_false()
+
+    def test_webshop_sync_trigger_reservation_units(self, mock_upsert_accounting):
+        self.reservation_unit_1.payment_accounting = self.accounting
+        self.reservation_unit_1.save()
+
+        self.accounting.refresh_from_db()
+        self.accounting.save()
+
+        mock_upsert_accounting.assert_called_with(self.reservation_unit_1.pk)
+        assert_that(mock_upsert_accounting.call_count).is_equal_to(1)
+
+    def test_webshop_sync_updates_runits_under_units(self, mock_upsert_accounting):
+        self.unit.payment_accounting = self.accounting
+        self.unit.save()
+
+        self.accounting.refresh_from_db()
+        self.accounting.save()
+
+        mock_upsert_accounting.assert_called_with(self.reservation_unit_2.pk)
+        assert_that(mock_upsert_accounting.call_count).is_equal_to(1)
+
+    def test_webshop_sync_updates_all_unique_runits(self, mock_upsert_accounting):
+        self.reservation_unit_1.payment_accounting = self.accounting
+        self.reservation_unit_1.save()
+
+        self.unit.payment_accounting = self.accounting
+        self.unit.save()
+
+        self.accounting.refresh_from_db()
+        self.accounting.save()
+
+        assert_that(mock_upsert_accounting.mock_calls).is_equal_to(
+            [
+                mock.call(self.reservation_unit_1.pk),
+                mock.call(self.reservation_unit_2.pk),
+            ]
+        )
+        assert_that(mock_upsert_accounting.call_count).is_equal_to(2)
