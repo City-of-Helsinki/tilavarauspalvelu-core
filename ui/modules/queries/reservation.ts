@@ -281,6 +281,13 @@ export const GET_RESERVATION = gql`
         }
         minPersons
         maxPersons
+        metadataSet {
+          id
+          name
+          pk
+          supportedFields
+          requiredFields
+        }
       }
       purpose {
         pk
@@ -297,6 +304,7 @@ export const GET_RESERVATION = gql`
         pk
         name
       }
+      handledAt
     }
   }
 `;
@@ -324,6 +332,21 @@ export const GET_CITIES = gql`
           pk
           name
         }
+      }
+    }
+  }
+`;
+
+export const ADJUST_RESERVATION_TIME = gql`
+  mutation adjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
+    adjustReservationTime(input: $input) {
+      pk
+      state
+      begin
+      end
+      errors {
+        field
+        messages
       }
     }
   }

@@ -2670,6 +2670,12 @@ input ReservationUnitCreateMutationInput {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2810,6 +2816,12 @@ type ReservationUnitCreateMutationPayload {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3433,6 +3445,12 @@ input ReservationUnitUpdateMutationInput {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3572,6 +3590,12 @@ type ReservationUnitUpdateMutationPayload {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

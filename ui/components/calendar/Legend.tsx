@@ -70,6 +70,7 @@ const LegendItem = styled.div<{
     width: 30px;
     height: 32px;
     position: relative;
+    box-sizing: border-box;
     ${({ $inlineCss }) => $inlineCss}
 
     @media (min-width: ${breakpoints.l}) {
@@ -123,11 +124,11 @@ const defaultItems: LegendItem[] = [
     css: css`
       border-top: 4px double var(--color-black-40);
       border-bottom: 4px double var(--color-black-40);
-      height: 18px;
+      height: 32px;
       padding: 4px 0;
 
       @media (min-width: ${breakpoints.l}) {
-        height: 34px !important;
+        height: 40px !important;
       }
     `,
   },

@@ -1,11 +1,21 @@
-import { isAfter } from "date-fns";
+import { isAfter, isValid, subMinutes } from "date-fns";
 import camelCase from "lodash/camelCase";
 import { convertHMSToSeconds, secondsToHms } from "common/src/common/util";
-import { OptionType } from "common/types/common";
+import { ApplicationRound, OptionType } from "common/types/common";
 import {
+  ApplicationRoundType,
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
+  ReservationUnitByPkType,
 } from "common/types/gql-types";
+import {
+  areSlotsReservable,
+  doBuffersCollide,
+  doReservationsCollide,
+  isReservationLongEnough,
+  isReservationShortEnough,
+  isStartTimeWithinInterval,
+} from "common/src/calendar/util";
 
 export const getDurationOptions = (
   minReservationDuration: number,
@@ -61,12 +71,17 @@ export const isReservationWithinCancellationPeriod = (
 };
 
 export const canUserCancelReservation = (
-  reservation: ReservationType
+  reservation: ReservationType,
+  skipTimeCheck = false
 ): boolean => {
   const reservationUnit = reservation.reservationUnits?.[0];
   if (!reservationUnit?.cancellationRule) return false;
   if (reservationUnit?.cancellationRule?.needsHandling) return false;
-  if (isReservationWithinCancellationPeriod(reservation)) return false;
+  if (
+    skipTimeCheck === false &&
+    isReservationWithinCancellationPeriod(reservation)
+  )
+    return false;
 
   return true;
 };
@@ -243,4 +258,149 @@ export const getNormalizedReservationOrderStatus = (
   }
 
   return null;
+};
+
+export type IsReservationReservableProps = {
+  reservationUnit: ReservationUnitByPkType;
+  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
+  start: Date;
+  end: Date;
+  skipLengthCheck;
+};
+
+export const isReservationReservable = (
+  props: IsReservationReservableProps
+): boolean => {
+  const {
+    reservationUnit,
+    activeApplicationRounds,
+    start,
+    end,
+    skipLengthCheck = false,
+  } = props;
+
+  const {
+    reservations,
+    bufferTimeBefore,
+    bufferTimeAfter,
+    openingHours,
+    maxReservationDuration,
+    minReservationDuration,
+    reservationStartInterval,
+    reservationsMinDaysBefore,
+    reservationBegins,
+    reservationEnds,
+  } = reservationUnit;
+
+  if (
+    !isValid(start) ||
+    !isValid(end) ||
+    doBuffersCollide(reservations, {
+      start,
+      end,
+      bufferTimeBefore,
+      bufferTimeAfter,
+    }) ||
+    !isStartTimeWithinInterval(
+      start,
+      openingHours?.openingTimes,
+      reservationStartInterval
+    ) ||
+    !areSlotsReservable(
+      [new Date(start), subMinutes(new Date(end), 1)],
+      openingHours?.openingTimes,
+      activeApplicationRounds,
+      reservationBegins,
+      reservationEnds,
+      reservationsMinDaysBefore
+    ) ||
+    (!skipLengthCheck &&
+      !isReservationLongEnough(start, end, minReservationDuration)) ||
+    !isReservationShortEnough(start, end, maxReservationDuration) ||
+    doReservationsCollide(reservations, { start, end })
+    // || !isSlotWithinTimeframe(start, reservationsMinDaysBefore, start, end)
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
+export const isReservationConfirmed = (reservation: ReservationType): boolean =>
+  reservation.state === "CONFIRMED";
+
+export const isReservationFreeOfCharge = (
+  reservation: ReservationType
+): boolean => parseInt(String(reservation.price), 10) === 0;
+
+export type CanReservationBeChangedProps = {
+  reservation: ReservationType;
+  newReservation?: ReservationType;
+  reservationUnit?: ReservationUnitByPkType;
+  activeApplicationRounds?: ApplicationRoundType[];
+};
+
+export const canReservationTimeBeChanged = (
+  props: CanReservationBeChangedProps
+): [boolean, string?] => {
+  const {
+    reservation,
+    newReservation,
+    reservationUnit,
+    activeApplicationRounds,
+  } = props;
+
+  if (!reservation) return [false];
+
+  // existing reservation state is not CONFIRMED
+  if (!isReservationConfirmed(reservation)) {
+    return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];
+  }
+
+  // existing reservation begin time is in the future
+  if (isReservationInThePast(reservation)) {
+    return [false, "RESERVATION_BEGIN_IN_PAST"];
+  }
+
+  // existing reservation is free
+  if (!isReservationFreeOfCharge(reservation)) {
+    return [false, "CANCELLATION_NOT_ALLOWED"];
+  }
+
+  // existing reservation has valid cancellation rule that does not require handling
+  if (!canUserCancelReservation(reservation, true)) {
+    return [false, "CANCELLATION_NOT_ALLOWED"];
+  }
+
+  // existing reservation cancellation buffer is not exceeded
+  if (!canUserCancelReservation(reservation)) {
+    return [false, "CANCELLATION_TIME_PAST"];
+  }
+
+  // existing reservation has been handled
+  if (reservation.handledAt) {
+    return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];
+  }
+
+  if (reservation && newReservation) {
+    //  new reservation is free
+    if (!isReservationFreeOfCharge(newReservation)) {
+      return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];
+    }
+
+    //  new reservation is valid
+    if (
+      !isReservationReservable({
+        reservationUnit,
+        activeApplicationRounds,
+        start: Boolean(newReservation.begin) && new Date(newReservation.begin),
+        end: Boolean(newReservation.end) && new Date(newReservation.end),
+        skipLengthCheck: false,
+      })
+    ) {
+      return [false, "RESERVATION_TIME_INVALID"];
+    }
+  }
+
+  return [true];
 };

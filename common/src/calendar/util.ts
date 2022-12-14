@@ -13,6 +13,7 @@ import {
 } from "date-fns";
 import { TFunction } from "next-i18next";
 import {
+  ApplicationRoundType,
   OpeningTimesType,
   ReservationType,
   ReservationUnitByPkType,
@@ -23,9 +24,9 @@ import {
   CalendarEventBuffer,
   SlotProps,
   ApplicationEvent,
-  ApplicationRound,
   OptionType,
   PendingReservation,
+  ApplicationRound,
 } from "../../types/common";
 import {
   convertHMSToSeconds,
@@ -150,7 +151,7 @@ export const isSlotWithinTimeframe = (
 };
 
 const doesSlotCollideWithApplicationRounds = (
-  applicationRounds: ApplicationRound[],
+  applicationRounds: ApplicationRound[] | ApplicationRoundType[] = [],
   slot: Date
 ): boolean => {
   if (applicationRounds?.length < 1) return false;
@@ -165,7 +166,7 @@ const doesSlotCollideWithApplicationRounds = (
 export const areSlotsReservable = <T extends Record<string, unknown>>(
   slots: Date[],
   openingHours: T[],
-  activeApplicationRounds: ApplicationRound[] = [],
+  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[] = [],
   reservationBegins?: Date,
   reservationEnds?: Date,
   reservationsMinDaysBefore = 0
@@ -186,7 +187,7 @@ export const areSlotsReservable = <T extends Record<string, unknown>>(
 };
 
 export const doReservationsCollide = (
-  reservations: ReservationType[],
+  reservations: ReservationType[] = [],
   newReservation: { start: Date; end: Date }
 ): boolean => {
   const { start, end } = newReservation;
@@ -270,7 +271,7 @@ export const isStartTimeWithinInterval = (
 export const getSlotPropGetter =
   (
     openingHours: OpeningTimesType[],
-    activeApplicationRounds: ApplicationRound[],
+    activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[],
     reservationBegins: Date,
     reservationEnds: Date,
     reservationsMinDaysBefore?: number
@@ -361,7 +362,7 @@ export const doesBufferCollide = (
 };
 
 export const doBuffersCollide = (
-  reservations: ReservationType[],
+  reservations: ReservationType[] = [],
   newReservation: {
     start: Date;
     end: Date;

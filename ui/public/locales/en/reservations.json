@@ -14,6 +14,10 @@
   "generating": "",
   "errorGeneratingPDF": "",
   "reservationCalendar": "",
+  "editReservationTime": "",
+  "cancelEditReservationTime": "",
+  "saveNewTime": "",
+  "saveNewTimeSuccess": "",
   "cancelReservation": "",
   "cancelReservationCancellation": "",
   "cancelApplication": "",
@@ -24,7 +28,7 @@
   "cancelledReservations": "",
   "upcomingSlug": "",
   "pastSlug": "",
-  "modifyReservation": "",
+  "modifyReservationTime": "",
   "modifyApplication": "",
   "backToReservations": "",
   "showCancellationTerms": "",
@@ -70,6 +74,12 @@
     "4": "",
     "5": ""
   },
+  "modifyTimeReasons": {
+    "RESERVATION_MODIFICATION_NOT_ALLOWED": "",
+    "RESERVATION_BEGIN_IN_PAST": "",
+    "CANCELLATION_NOT_ALLOWED": "",
+    "CANCELLATION_TIME_PAST": ""
+  },
   "cancellationReasons": {
     "termsAreBinding": "",
     "buffer": ""
@@ -79,5 +89,6 @@
     "DRAFT": "",
     "PAID": "",
     "PAID_MANUALLY": ""
-  }
+  },
+  "reservationEditFailed": ""
 }

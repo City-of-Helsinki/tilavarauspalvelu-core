@@ -31,6 +31,7 @@ import { BlackButton } from "../../styles/util";
 import Sanitize from "../../components/common/Sanitize";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
 import {
+  canReservationTimeBeChanged,
   canUserCancelReservation,
   getNormalizedReservationOrderStatus,
   getReservationCancellationReason,
@@ -139,9 +140,13 @@ const Columns = styled.div`
 `;
 
 const Actions = styled.div`
+  &:empty {
+    display: none;
+  }
+
   display: flex;
   gap: var(--spacing-m);
-  margin: var(--spacing-s) 0 var(--spacing-xl);
+  margin: var(--spacing-s) 0 var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
     button {
@@ -150,7 +155,14 @@ const Actions = styled.div`
   }
 `;
 
-const CancellationText = styled.div`
+const Reasons = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+  margin-bottom: var(--spacing-layout-m);
+`;
+
+const ReasonText = styled.div`
   color: var(--color-black-70);
   line-height: var(--lineheight-l);
 `;
@@ -281,6 +293,11 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     );
   }, [reservation, reservationUnit, t]);
 
+  const [canTimeBeModified, modifyTimeReason] = useMemo(
+    () => canReservationTimeBeChanged({ reservation }),
+    [reservation]
+  );
+
   const cancellationReason = useMemo(() => {
     const reason = reservation && getReservationCancellationReason(reservation);
     switch (reason) {
@@ -343,38 +360,49 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
             </StatusContainer>
             <JustForMobile>{bylineContent}</JustForMobile>
             <Actions>
-              {canUserCancelReservation(reservation) &&
-              !isReservationCancelled &&
-              !isBeingHandled ? (
+              {canTimeBeModified && (
                 <BlackButton
                   variant="secondary"
-                  iconRight={<IconCross />}
-                  onClick={() =>
-                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
-                  }
-                  disabled={
-                    !canUserCancelReservation(reservation) ||
-                    isReservationCancelled ||
-                    isBeingHandled
-                  }
-                  data-testid="reservation-detail__button--cancel"
+                  iconRight={<IconCalendar aria-hidden />}
+                  onClick={() => {
+                    router.push(`${reservationsUrl}${reservation.pk}/edit`);
+                  }}
+                  data-testid="reservation-detail__button--edit"
                 >
-                  {t(
-                    `reservations:cancel${
-                      isBeingHandled ? "Application" : "Reservation"
-                    }`
-                  )}
+                  {t("reservations:modifyReservationTime")}
                 </BlackButton>
-              ) : (
-                cancellationReason && (
-                  <CancellationText>
-                    {t(
-                      `reservations:cancellationReasons:${cancellationReason}`
-                    )}
-                  </CancellationText>
-                )
               )}
+              {canUserCancelReservation(reservation) &&
+                !isReservationCancelled &&
+                !isBeingHandled && (
+                  <BlackButton
+                    variant="secondary"
+                    iconRight={<IconCross aria-hidden />}
+                    onClick={() =>
+                      router.push(`${reservationsUrl}${reservation.pk}/cancel`)
+                    }
+                    data-testid="reservation-detail__button--cancel"
+                  >
+                    {t(
+                      `reservations:cancel${
+                        isBeingHandled ? "Application" : "Reservation"
+                      }`
+                    )}
+                  </BlackButton>
+                )}
             </Actions>
+            <Reasons>
+              {modifyTimeReason && (
+                <ReasonText>
+                  {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
+                </ReasonText>
+              )}
+              {cancellationReason && (
+                <ReasonText>
+                  {t(`reservations:cancellationReasons:${cancellationReason}`)}
+                </ReasonText>
+              )}
+            </Reasons>
             <Content>
               {getTranslation(reservationUnit, instructionsKey) && (
                 <ContentContainer>

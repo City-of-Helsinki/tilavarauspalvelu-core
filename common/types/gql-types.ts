@@ -2539,6 +2539,7 @@ export type ReservationType = Node & {
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
   freeOfChargeReason?: Maybe<Scalars["String"]>;
+  handledAt?: Maybe<Scalars["DateTime"]>;
   /** Home city of the group or association */
   homeCity?: Maybe<CityType>;
   /** The ID of the object */

@@ -166,37 +166,6 @@ const Step1 = ({
         </>
       </TwoColumnContainer>
       <TermsBox
-        id="generic-and-service-specific-terms"
-        heading={t("reservationCalendar:heading.termsOfUse")}
-        body={
-          <>
-            <Sanitize
-              html={getTranslation(
-                reservationUnit.serviceSpecificTerms,
-                "text"
-              )}
-            />
-          </>
-        }
-        links={
-          termsOfUse.genericTerms && [
-            {
-              href: "/terms/general",
-              text: t("reservationCalendar:heading.generalTerms"),
-            },
-          ]
-        }
-        acceptLabel={t(
-          `reservationCalendar:label.${
-            reservationUnit.serviceSpecificTerms
-              ? "termsGeneralSpecific"
-              : "termsGeneral"
-          }`
-        )}
-        accepted={areTermsSpaceAccepted}
-        setAccepted={setAreTermsSpaceAccepted}
-      />
-      <TermsBox
         id="cancellation-and-payment-terms"
         heading={t(
           `reservationCalendar:heading.${
@@ -229,6 +198,37 @@ const Step1 = ({
         )}
         accepted={areServiceSpecificTermsAccepted}
         setAccepted={setAreServiceSpecificTermsAccepted}
+      />
+      <TermsBox
+        id="generic-and-service-specific-terms"
+        heading={t("reservationCalendar:heading.termsOfUse")}
+        body={
+          <>
+            <Sanitize
+              html={getTranslation(
+                reservationUnit.serviceSpecificTerms,
+                "text"
+              )}
+            />
+          </>
+        }
+        links={
+          termsOfUse.genericTerms && [
+            {
+              href: "/terms/general",
+              text: t("reservationCalendar:heading.generalTerms"),
+            },
+          ]
+        }
+        acceptLabel={t(
+          `reservationCalendar:label.${
+            reservationUnit.serviceSpecificTerms
+              ? "termsGeneralSpecific"
+              : "termsGeneral"
+          }`
+        )}
+        accepted={areTermsSpaceAccepted}
+        setAccepted={setAreTermsSpaceAccepted}
       />
       <ActionContainer>
         <MediumButton

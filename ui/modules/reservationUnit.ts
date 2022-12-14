@@ -1,12 +1,13 @@
 import { formatters as getFormatters, getReservationVolume } from "common";
 import { flatten, trim, uniq } from "lodash";
+import { addDays } from "date-fns";
 import { i18n } from "next-i18next";
 import {
   ApplicationRound,
   ReservationState,
   ReservationUnit,
 } from "common/types/common";
-import { toUIDate } from "common/src/common/util";
+import { toApiDate, toUIDate } from "common/src/common/util";
 import { isSlotWithinReservationTime } from "common/src/calendar/util";
 import {
   EquipmentType,
@@ -283,3 +284,94 @@ export const getReservationUnitPrice = (
 
   return getPrice(pricing, minutes, trailingZeros, asInt);
 };
+
+export const mockOpeningTimePeriods = [
+  {
+    periodId: 38600,
+    startDate: toApiDate(new Date()),
+    endDate: toApiDate(addDays(new Date(), 30)),
+    resourceState: null,
+    timeSpans: [
+      {
+        startTime: "09:00:00+00:00",
+        endTime: "12:00:00+00:00",
+        weekdays: [6, 1, 7],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+      {
+        startTime: "12:00:00+00:00",
+        endTime: "21:00:00+00:00",
+        weekdays: [7, 2],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+    ],
+    nameFi: "Period name Fi",
+    nameEn: "Period name En",
+    nameSv: "Period name Sv",
+    descriptionFi: "Period desc Fi",
+    descriptionEn: "Period desc En",
+    descriptionSv: "Period desc Sv",
+  },
+  {
+    periodId: 38601,
+    startDate: toApiDate(addDays(new Date(), 30)),
+    endDate: toApiDate(addDays(new Date(), 300)),
+    resourceState: null,
+    timeSpans: [
+      {
+        startTime: "09:00:00+00:00",
+        endTime: "21:00:00+00:00",
+        weekdays: [4, 5, 6],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+      {
+        startTime: "09:00:00+00:00",
+        endTime: "21:00:00+00:00",
+        weekdays: [7],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+    ],
+    nameFi: "Period name Fi",
+    nameEn: "Period name En",
+    nameSv: "Period name Sv",
+    descriptionFi: "Period desc Fi",
+    descriptionEn: "Period desc En",
+    descriptionSv: "Period desc Sv",
+  },
+];
+
+export const mockOpeningTimes = Array.from(Array(100)).map((val, index) => ({
+  date: toApiDate(addDays(new Date(), index)),
+  startTime: "04:00:00+00:00",
+  endTime: "20:00:00+00:00",
+  state: "open",
+  periods: null,
+}));

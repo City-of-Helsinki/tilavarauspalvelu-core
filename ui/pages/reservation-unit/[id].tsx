@@ -14,33 +14,21 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { IconInfoCircleFill, Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  addDays,
-  addSeconds,
-  addYears,
-  isValid,
-  parseISO,
-  subMinutes,
-} from "date-fns";
+import { addSeconds, addYears, parseISO } from "date-fns";
 import {
   formatSecondDuration,
   toApiDate,
   toUIDate,
 } from "common/src/common/util";
 import {
-  areSlotsReservable,
-  doBuffersCollide,
-  doReservationsCollide,
   getEventBuffers,
   getMaxReservation,
   getNormalizedReservationBeginTime,
   getSlotPropGetter,
   getTimeslots,
-  isReservationLongEnough,
   isReservationShortEnough,
   isReservationStartInFuture,
   isReservationUnitReservable,
-  isStartTimeWithinInterval,
 } from "common/src/calendar/util";
 import { formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia, useSessionStorage } from "react-use";
@@ -102,12 +90,15 @@ import {
   getFuturePricing,
   getPrice,
   isReservationUnitPublished,
+  mockOpeningTimePeriods,
+  mockOpeningTimes,
 } from "../../modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
 import { daysByMonths } from "../../modules/const";
 import QuickReservation from "../../components/reservation-unit/QuickReservation";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { CURRENT_USER } from "../../modules/queries/user";
+import { isReservationReservable } from "../../modules/reservation";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -126,97 +117,6 @@ const allowedReservationStates: ReservationsReservationStateChoices[] = [
   ReservationsReservationStateChoices.RequiresHandling,
   ReservationsReservationStateChoices.WaitingForPayment,
 ];
-
-const openingTimePeriods = [
-  {
-    periodId: 38600,
-    startDate: toApiDate(new Date()),
-    endDate: toApiDate(addDays(new Date(), 30)),
-    resourceState: null,
-    timeSpans: [
-      {
-        startTime: "09:00:00+00:00",
-        endTime: "12:00:00+00:00",
-        weekdays: [6, 1, 7],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-      {
-        startTime: "12:00:00+00:00",
-        endTime: "21:00:00+00:00",
-        weekdays: [7, 2],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-    ],
-    nameFi: "Period name Fi",
-    nameEn: "Period name En",
-    nameSv: "Period name Sv",
-    descriptionFi: "Period desc Fi",
-    descriptionEn: "Period desc En",
-    descriptionSv: "Period desc Sv",
-  },
-  {
-    periodId: 38601,
-    startDate: toApiDate(addDays(new Date(), 30)),
-    endDate: toApiDate(addDays(new Date(), 300)),
-    resourceState: null,
-    timeSpans: [
-      {
-        startTime: "09:00:00+00:00",
-        endTime: "21:00:00+00:00",
-        weekdays: [4, 5, 6],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-      {
-        startTime: "09:00:00+00:00",
-        endTime: "21:00:00+00:00",
-        weekdays: [7],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-    ],
-    nameFi: "Period name Fi",
-    nameEn: "Period name En",
-    nameSv: "Period name Sv",
-    descriptionFi: "Period desc Fi",
-    descriptionEn: "Period desc En",
-    descriptionSv: "Period desc Sv",
-  },
-];
-
-const openingTimes = Array.from(Array(100)).map((val, index) => ({
-  date: toApiDate(addDays(new Date(), index)),
-  startTime: "04:00:00+00:00",
-  endTime: "20:00:00+00:00",
-  state: "open",
-  periods: null,
-}));
 
 export const getServerSideProps: GetServerSideProps = async ({
   locale,
@@ -340,11 +240,11 @@ export const getServerSideProps: GetServerSideProps = async ({
           ...reservationUnitData?.reservationUnitByPk,
           openingHours: {
             openingTimes: allowReservationsWithoutOpeningHours
-              ? openingTimes
+              ? mockOpeningTimes
               : additionalData.reservationUnitByPk?.openingHours
                   ?.openingTimes || [],
             openingTimePeriods: allowReservationsWithoutOpeningHours
-              ? openingTimePeriods
+              ? mockOpeningTimePeriods
               : reservationUnitData?.reservationUnitByPk?.openingHours
                   ?.openingTimePeriods || [],
           },
@@ -627,51 +527,13 @@ const ReservationUnit = ({
 
   const isSlotReservable = useCallback(
     (start: Date, end: Date, skipLengthCheck = false): boolean => {
-      const {
-        reservations,
-        bufferTimeBefore,
-        bufferTimeAfter,
-        openingHours,
-        maxReservationDuration,
-        minReservationDuration,
-        reservationStartInterval,
-        reservationsMinDaysBefore,
-        reservationBegins,
-        reservationEnds,
-      } = reservationUnit;
-
-      if (
-        !isValid(start) ||
-        !isValid(end) ||
-        doBuffersCollide(reservations, {
-          start,
-          end,
-          bufferTimeBefore,
-          bufferTimeAfter,
-        }) ||
-        !isStartTimeWithinInterval(
-          start,
-          openingHours?.openingTimes,
-          reservationStartInterval
-        ) ||
-        !areSlotsReservable(
-          [new Date(start), subMinutes(new Date(end), 1)],
-          openingHours?.openingTimes,
-          activeApplicationRounds,
-          reservationBegins,
-          reservationEnds,
-          reservationsMinDaysBefore
-        ) ||
-        (!skipLengthCheck &&
-          !isReservationLongEnough(start, end, minReservationDuration)) ||
-        !isReservationShortEnough(start, end, maxReservationDuration) ||
-        doReservationsCollide(reservations, { start, end })
-        // || !isSlotWithinTimeframe(start, reservationsMinDaysBefore, start, end)
-      ) {
-        return false;
-      }
-
-      return true;
+      return isReservationReservable({
+        reservationUnit,
+        activeApplicationRounds,
+        start,
+        end,
+        skipLengthCheck,
+      });
     },
     [activeApplicationRounds, reservationUnit]
   );
@@ -1121,6 +983,7 @@ const ReservationUnit = ({
                         createReservation={(res) => createReservation(res)}
                         setErrorMsg={setErrorMsg}
                         handleEventChange={handleEventChange}
+                        mode="create"
                       />
                     </CalendarFooter>
                   )}
