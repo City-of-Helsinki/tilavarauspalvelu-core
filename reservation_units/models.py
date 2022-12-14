@@ -368,37 +368,6 @@ class ReservationUnit(models.Model):
         on_delete=models.PROTECT,
     )
 
-    price_unit = models.CharField(
-        max_length=20,
-        verbose_name=_("Price unit"),
-        choices=PriceUnit.choices,
-        default=PriceUnit.PRICE_UNIT_PER_HOUR,
-        help_text="Unit of the price",
-    )
-    lowest_price = models.DecimalField(
-        verbose_name=_("Lowest price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="Minimum price of the reservation unit",
-    )
-    highest_price = models.DecimalField(
-        verbose_name=_("Highest price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="Maximum price of the reservation unit",
-    )
-
-    tax_percentage = models.ForeignKey(
-        TaxPercentage,
-        verbose_name=_("Tax percentage"),
-        related_name="reservation_units",
-        on_delete=models.PROTECT,
-        default=get_default_tax_percentage,
-        help_text="The percentage of tax included in the price",
-    )
-
     RESERVATION_START_INTERVAL_15_MINUTES = "interval_15_mins"
     RESERVATION_START_INTERVAL_30_MINUTES = "interval_30_mins"
     RESERVATION_START_INTERVAL_60_MINUTES = "interval_60_mins"
@@ -512,15 +481,6 @@ class ReservationUnit(models.Model):
         choices=ReservationKind.choices,
         default=ReservationKind.DIRECT_AND_SEASON,
         help_text="What kind of reservations are to be booked with this reservation unit.",
-    )
-
-    pricing_type = models.CharField(
-        max_length=20,
-        verbose_name=_("Pricing type"),
-        choices=PricingType.choices,
-        blank=True,
-        null=True,
-        help_text="What kind of pricing types are available with this reservation unit.",
     )
 
     payment_types = models.ManyToManyField(ReservationUnitPaymentType, blank=True)
