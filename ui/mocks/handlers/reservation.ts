@@ -621,7 +621,7 @@ const reservationData = [
       begin: addDays(new Date(), 5).toISOString(),
       end: addHours(addDays(new Date(), 5), 2).toISOString(),
       user: "user@email.com",
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: ReservationsReservationStateChoices.WaitingForPayment,
       bufferTimeBefore: 3600,
       bufferTimeAfter: 1800,
       reservationUnits: [

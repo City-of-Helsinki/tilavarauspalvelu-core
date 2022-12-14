@@ -5,6 +5,7 @@ import { ApplicationRound, OptionType } from "common/types/common";
 import {
   ApplicationRoundType,
   ReservationsReservationReserveeTypeChoices,
+  ReservationsReservationStateChoices,
   ReservationType,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
@@ -249,12 +250,13 @@ export const getReservationCancellationReason = (
 export const getNormalizedReservationOrderStatus = (
   reservation: ReservationType
 ): string | null => {
-  const orderStatuses = ["DRAFT", "PAID", "PAID_MANUALLY"];
-
   if (!reservation) return null;
 
-  if (orderStatuses.includes(reservation.orderStatus)) {
-    return reservation.orderStatus;
+  const shouldShowOrderStatus = (state: ReservationsReservationStateChoices) =>
+    !["CREATED", "WAITING_FOR_PAYMENT", "REQUIRES_HANDLING"].includes(state);
+
+  if (shouldShowOrderStatus(reservation.state)) {
+    return reservation.orderStatus || null;
   }
 
   return null;

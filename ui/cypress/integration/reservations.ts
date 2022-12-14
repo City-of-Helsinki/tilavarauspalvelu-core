@@ -49,20 +49,20 @@ describe("Tilavaraus user reservations", () => {
     statusTag("desktop")
       .should("have.length", 5)
       .each(($el, $i) => {
-        if ([0, 1, 2, 4].includes($i)) {
+        if ([0, 2, 4].includes($i)) {
           expect($el).to.contain("Hyväksytty");
+        } else if ($i === 1) {
+          expect($el).to.contain("Odottaa maksua");
         } else {
           expect($el).to.contain("Käsiteltävänä");
         }
       });
 
     orderStatusTag("desktop")
-      .should("have.length", 3)
+      .should("have.length", 2)
       .each(($el, $i) => {
         if ($i === 0) {
           expect($el).to.contain("Maksettu");
-        } else if ($i === 1) {
-          expect($el).to.contain("Odottaa maksua");
         } else if ($i === 2) {
           expect($el).to.contain("Paikan päällä");
         }

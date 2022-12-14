@@ -3,9 +3,9 @@ import { IconTicket, IconCross, IconArrowRight } from "hds-react";
 import { i18n, useTranslation } from "next-i18next";
 import { parseISO } from "date-fns";
 import router from "next/router";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { getReservationPrice } from "common";
-import { camelCase, trim } from "lodash";
+import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
 import {
   ReservationsReservationStateChoices,
@@ -18,7 +18,7 @@ import {
   reservationsUrl,
 } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
-import { BlackButton, truncatedText } from "../../styles/util";
+import { BlackButton } from "../../styles/util";
 import {
   canUserCancelReservation,
   getNormalizedReservationOrderStatus,
@@ -30,6 +30,7 @@ import {
 } from "../../modules/reservationUnit";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import ReservationOrderStatus from "./ReservationOrderStatus";
+import ReservationStatus from "./ReservationStatus";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
@@ -157,41 +158,6 @@ const Image = styled.img`
   }
 `;
 
-const Status = styled.div<{ $state: ReservationsReservationStateChoices }>`
-  ${({ $state }) => {
-    switch ($state) {
-      case "REQUIRES_HANDLING":
-        return css`
-          background-color: var(--color-gold-light);
-        `;
-      case "CREATED":
-        return css`
-          background-color: var(--color-bus-light);
-        `;
-      case "DENIED":
-        return css`
-          background-color: var(--color-error-light);
-        `;
-      case "CONFIRMED":
-        return css`
-          background-color: var(--color-success-light);
-        `;
-      default:
-        return css`
-          background-color: var(--color-black-10);
-        `;
-    }
-  }}
-  display: inline-block;
-  padding: var(--spacing-3-xs) var(--spacing-2-xs);
-  font-size: var(--fontsize-body-s);
-  text-align: center;
-  max-width: fit-content;
-  margin-bottom: var(--spacing-m);
-  line-height: var(--lineheight-l);
-  ${truncatedText};
-`;
-
 const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -238,10 +204,6 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
           i18n.language
         );
 
-  const statusText = t(
-    `reservations:status.${camelCase(reservation.state.toLocaleLowerCase())}`
-  );
-
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
 
@@ -257,13 +219,10 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
           data-testid={`reservation__card--order-status-${statusType}`}
         />
       )}
-      <Status
+      <ReservationStatus
         data-testid={`reservation__card--status-${statusType}`}
-        $state={state}
-        title={statusText}
-      >
-        {statusText}
-      </Status>
+        state={state}
+      />
     </StatusContainer>
   );
 

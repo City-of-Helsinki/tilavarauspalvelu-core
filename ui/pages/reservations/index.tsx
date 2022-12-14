@@ -100,7 +100,12 @@ const Reservations = (): JSX.Element => {
     if (currentUser?.pk) {
       fetchReservations({
         variables: {
-          state: ["CONFIRMED", "REQUIRES_HANDLING", "CANCELLED"],
+          state: [
+            "CONFIRMED",
+            "REQUIRES_HANDLING",
+            "CANCELLED",
+            "WAITING_FOR_PAYMENT",
+          ],
           orderBy: "-begin",
           user: currentUser?.pk.toString(),
         },

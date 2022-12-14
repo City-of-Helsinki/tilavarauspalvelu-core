@@ -54,8 +54,9 @@
     "cancelled": "Peruttu",
     "confirmed": "Hyväksytty",
     "denied": "Hylätty",
-    "requiresHandling": "Käsiteltävänä ",
-    "created": "Luonnos"
+    "requiresHandling": "Käsiteltävänä",
+    "created": "Luonnos",
+    "waitingForPayment": "Odottaa maksua"
   },
   "purpose": "Käyttötarkoitus",
   "ageGroup": "Ikäryhmä",
@@ -87,9 +88,12 @@
   },
   "makeReservation": "Tee varaus",
   "orderStatus": {
-    "DRAFT": "Odottaa maksua",
-    "PAID": "Maksettu",
-    "PAID_MANUALLY": "Paikan päällä"
+    "draft": "Odottaa maksua",
+    "paid": "Maksettu",
+    "paidManually": "Paikan päällä",
+    "cancelled": "Peruttu",
+    "expired": "Maksamatta",
+    "refunded": "Palautettu"
   },
   "reservationEditFailed": "Varauksen muokkaaminen epäonnistui"
 }

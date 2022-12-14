@@ -1,9 +1,10 @@
+import { camelCase } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { truncatedText } from "../../styles/util";
 
-type Props = {
+export type Props = {
   orderStatus: string;
 };
 
@@ -26,17 +27,23 @@ const ReservationOrderStatus = ({
   const color = useMemo(() => {
     switch (orderStatus) {
       case "DRAFT":
-        return "var(--color-engel-light)";
+        return "var(--color-summer-light)";
       case "PAID":
         return "var(--color-info-light)";
       case "PAID_MANUALLY":
         return "var(--color-gold-light)";
+      case "CANCELLED":
+        return "var(--color-error-light)";
+      case "EXPIRED":
+        return "var(--color-metro-medium-light)";
+      case "REFUNDED":
+        return "var(--color-bus-light)";
       default:
         return "";
     }
   }, [orderStatus]);
 
-  const statusText = t(`reservations:orderStatus.${orderStatus}`);
+  const statusText = t(`reservations:orderStatus.${camelCase(orderStatus)}`);
 
   return (
     <Wrapper $color={color} {...rest} title={statusText}>

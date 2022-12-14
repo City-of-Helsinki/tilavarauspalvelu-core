@@ -372,31 +372,58 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("return correct value", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        state: "CANCELLED",
         orderStatus: "DRAFT",
       } as ReservationType)
     ).toBe("DRAFT");
 
     expect(
       getNormalizedReservationOrderStatus({
+        state: "CANCELLED",
         orderStatus: "PAID",
       } as ReservationType)
     ).toBe("PAID");
 
     expect(
       getNormalizedReservationOrderStatus({
+        state: "CONFIRMED",
         orderStatus: "PAID_MANUALLY",
       } as ReservationType)
     ).toBe("PAID_MANUALLY");
 
     expect(
       getNormalizedReservationOrderStatus({
+        state: "DENIED",
         orderStatus: "SOMETHING_ELSE",
       } as ReservationType)
-    ).toBe(null);
+    ).toBe("SOMETHING_ELSE");
+  });
 
+  test("return null", () => {
     expect(getNormalizedReservationOrderStatus({} as ReservationType)).toBe(
       null
     );
+
+    expect(
+      getNormalizedReservationOrderStatus({
+        state: "CREATED",
+        orderStatus: "DRAFT",
+      } as ReservationType)
+    ).toBe(null);
+
+    expect(
+      getNormalizedReservationOrderStatus({
+        state: "WAITING_FOR_PAYMENT",
+        orderStatus: "DRAFT",
+      } as ReservationType)
+    ).toBe(null);
+
+    expect(
+      getNormalizedReservationOrderStatus({
+        state: "REQUIRES_HANDLING",
+        orderStatus: "DRAFT",
+      } as ReservationType)
+    ).toBe(null);
   });
 });
 
