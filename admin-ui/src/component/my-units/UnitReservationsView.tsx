@@ -1,7 +1,10 @@
-import { formatISO, startOfDay } from "date-fns";
+import { toUIDate } from "common/src/common/util";
+import { formatISO, parse, startOfDay } from "date-fns";
 import React, { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
+import { useLocation } from "react-use";
+import { useQueryParams } from "../../common/hooks";
 import { OptionType } from "../../common/types";
 import { Grid, HorisontalFlex, Span4, VerticalFlex } from "../../styles/layout";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
@@ -15,11 +18,18 @@ type Params = {
 };
 
 const UnitReservationsView = (): JSX.Element => {
-  const today = formatISO(startOfDay(new Date()));
+  const { hash } = useLocation();
+  const queryParams = useQueryParams();
+  const initialDate = queryParams.get("date")
+    ? parse(queryParams.get("date") || "", "d.M.yyyy", new Date())
+    : new Date();
+  const today = formatISO(startOfDay(initialDate));
 
   const [begin, setBegin] = useState(today);
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
+  const history = useHistory();
+
   const initialEmptyState = { reservationUnitType: [] };
 
   const [state, dispatch] = useReducer(
@@ -29,6 +39,11 @@ const UnitReservationsView = (): JSX.Element => {
 
   const onDateChange = ({ date }: { date: Date }) => {
     setBegin(formatISO(date));
+
+    history.push({
+      hash,
+      search: `?date=${toUIDate(date)}`,
+    });
   };
 
   const tags = toTags(
