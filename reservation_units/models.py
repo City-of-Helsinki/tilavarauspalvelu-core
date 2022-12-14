@@ -683,7 +683,13 @@ class ReservationUnit(models.Model):
             refresh_reservation_unit_product_mapping.delay(self.pk)
 
 
+class ReservationUnitPricingManager(models.QuerySet):
+    def active(self):
+        return self.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+
+
 class ReservationUnitPricing(models.Model):
+    objects = ReservationUnitPricingManager.as_manager()
 
     begins = models.DateField(
         verbose_name=_("Date when price is activated"),
