@@ -1,0 +1,80 @@
+<mjml>
+  <mj-body background-color="#ffffff" width="960px">
+    <mj-section>
+      <mj-group>
+        <mj-column vertical-align="middle" width="200px" padding="0">
+          <mj-image width="200px" align="left" src="https://brand.hel.fi/wp-content/uploads/2018/11/logo_large.svg" />
+        </mj-column>
+        <mj-column vertical-align="middle">
+          <mj-text font-size="24px" align="left" font-weight="700" color="#000000" font-family="helvetica" padding="0">Varaamo</mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="36px" font-weight="700" color="#000000">Hei {{reservee_name}},</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#F7F2E4">
+      <mj-column>
+        <mj-text font-size="18px" line-height="10px" font-weight="400" color="#000000">Olet tehnyt uuden varauksen:</mj-text>
+        <mj-spacer height="30px" />
+        <mj-text font-size="18px" line-height="10px" font-weight="700" color="#000000">{{name}}</mj-text>
+        <mj-text font-size="18px" line-height="10px" font-weight="400" color="#000000">{{reservation_unit}}</mj-text>
+        <mj-text font-size="18px" line-height="10px" font-weight="400" color="#000000">{{reservation_unit_address}}</mj-text>
+        <mj-spacer height="30px" />
+        <mj-text font-size="18px" line-height="10px" font-weight="400" color="#000000" padding-bottom="0" padding-top="0">
+          <p>Alkamisaika: <b>{{begin_date}}</b> klo <b>{{begin_time}}</b></p>
+        </mj-text>
+        <mj-text font-size="18px" line-height="10px" font-weight="400" color="#000000" padding-bottom="0" padding-top="0">
+          <p>Päättymisaika: <b>{{end_date}}</b> klo <b>{{end_time}}</b></p>
+        </mj-text>
+        <mj-spacer height="30px" />
+        <mj-text font-size="18px" line-height="10px" font-weight="400" color="#000000" padding-bottom="0" padding-top="0">
+          <p>Varauksen hinta: <b>{{reservation_price}} € </b> (sis. alv [{{alv_percent}}])</p>
+        </mj-text>
+        <mj-text font-size="18px" line-height="10px" font-weight="400" color="#000000" padding-bottom="0" padding-top="0">
+          <p>Varausnumero: {{reservation_number}}</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" font-weight="700" color="#000000">Lisätietoa varauksestasi</mj-text>
+        <mj-text font-size="16px" font-weight="400" color="#000000">{{confirmed_instructions}}</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" font-weight="700" color="#000000">Hallitse varaustasi varaamossa</mj-text>
+        <mj-text font-size="16px" font-weight="400" color="#000000">Voit perua varauksesi tai tarkistaa varauksesi tiedot sekä Varaamon sopimus- ja peruutusehdot <a href={{my_reservations_ext_link}}>Omat Varaukset-sivulla</a></mj-text>
+        <mj-spacer height="30px" />
+        <mj-text font-size="16px" line-height="10px" font-weight="400" color="#000000">Kiitos, kun käytit Varaamoa!</mj-text>
+        <mj-text font-size="16px" line-height="10px" font-weight="400" color="#000000">Ystävällisin terveisin</mj-text>
+        <mj-text font-size="16px" line-height="10px" font-weight="400" color="#000000">Varaamo</mj-text>
+        <mj-spacer height="30px" />
+        <mj-text font-size="16px" line-height="10px" font-weight="400" color="#000000">Tämä on automaattinen viesti, siihen ei voi vastata</mj-text>
+        <mj-text font-size="16px" line-height="10px" font-weight="400" color="#000000">Lähetä meille <a href={{feedback_ext_link}}>palautetta Varaamosta</a></mj-text>
+        <mj-text font-size="16px" line-height="10px" font-weight="400" color="#000000">Varaa helposti kaupungin tiloja ja laiteteita käyttöösi osoitteesta <a href={{varaamo_ext_link}}>varaamo.hel.fi</a></mj-text>
+        <mj-spacer height="50px" />
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#E6E6E6" padding-bottom="0">
+      <mj-group>
+        <mj-column vertical-align="middle" width="150px" padding="0">
+          <mj-image src="https://brand.hel.fi/wp-content/uploads/2018/11/logo_large.svg" width="100px" />
+        </mj-column>
+        <mj-column vertical-align="middle">
+          <mj-text font-size="16px" align="left" font-weight="700" color="#000000" font-family="helvetica" padding="0">Varaamo</mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+    <mj-section background-color="#E6E6E6">
+      <mj-column>
+        <mj-divider border-width="2px" border-style="solid" border-color="#CCCCCC" padding-top="0" />
+        <mj-spacer height="10px" />
+        <mj-text font-size="14px" line-height="10px" font-weight="400" color="#000000">&copy; Helsingin kaupunki {{current_year}}</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
