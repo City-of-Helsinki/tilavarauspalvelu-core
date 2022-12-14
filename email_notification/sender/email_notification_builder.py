@@ -58,7 +58,7 @@ class ReservationEmailNotificationBuilder:
 
     def _get_begin_date(self):
         return self.reservation.begin.astimezone(get_default_timezone()).strftime(
-            "%d.%m.%Y"
+            "%-d.%-m.%Y"
         )
 
     def _get_begin_time(self):
@@ -68,7 +68,7 @@ class ReservationEmailNotificationBuilder:
 
     def _get_end_date(self):
         return self.reservation.end.astimezone(get_default_timezone()).strftime(
-            "%d.%m.%Y"
+            "%-d.%-m.%Y"
         )
 
     def _get_end_time(self):

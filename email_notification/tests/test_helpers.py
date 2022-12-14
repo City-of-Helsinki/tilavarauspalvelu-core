@@ -2,7 +2,7 @@ import pytest
 from assertpy import assert_that
 from django.test.testcases import TestCase
 
-from email_notification.helpers import get_staff_notification_recipients
+from email_notification.sender.helpers import get_staff_notification_recipients
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.tests.factories import ReservationFactory
