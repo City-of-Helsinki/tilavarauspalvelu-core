@@ -10,7 +10,8 @@
     "start": "react-scripts start",
     "test": "react-scripts test",
     "generate-gql-types": "graphql-codegen && prettier --write 'types/gql-types.ts'",
-    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
+    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql",
+    "generate-email-template": "node email/convertToHTML.js"
   },
   "browserslist": {
     "production": [
