@@ -20,6 +20,7 @@ class EquipmentFactory(DjangoModelFactory):
     class Meta:
         model = "reservation_units.Equipment"
 
+    name = FuzzyText()
     category = SubFactory(EquipmentCategoryFactory)
 
 
@@ -106,6 +107,14 @@ class ReservationUnitFactory(DjangoModelFactory):
 
         for equipment in equipments:
             self.equipments.add(equipment)
+
+    @post_generation
+    def qualifiers(self, create, qualifiers, **kwargs):
+        if not create or not qualifiers:
+            return
+
+        for qualifier in qualifiers:
+            self.qualifiers.add(qualifier)
 
 
 class ReservationUnitImageFactory(DjangoModelFactory):
