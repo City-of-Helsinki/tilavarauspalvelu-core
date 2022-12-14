@@ -16,6 +16,7 @@ from services.models import Service
 from spaces.models import Space, Unit
 from terms_of_use.models import TermsOfUse
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
+from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 Q = models.Q
 User = get_user_model()
@@ -879,16 +880,6 @@ class Day(models.Model):
     Kirjastot.fi API uses closed for both days and periods, don't know which takes precedence
     """
 
-    DAYS_OF_WEEK = (
-        (0, _("Monday")),
-        (1, _("Tuesday")),
-        (2, _("Wednesday")),
-        (3, _("Thursday")),
-        (4, _("Friday")),
-        (5, _("Saturday")),
-        (6, _("Sunday")),
-    )
-
     period = models.ForeignKey(
         Period,
         verbose_name=_("Period"),
@@ -896,7 +887,7 @@ class Day(models.Model):
         related_name="days",
         on_delete=models.CASCADE,
     )
-    weekday = models.IntegerField(verbose_name=_("Weekday"), choices=DAYS_OF_WEEK)
+    weekday = models.IntegerField(verbose_name=_("Weekday"), choices=WEEKDAYS.CHOICES)
     opens = models.TimeField(verbose_name=_("Time when opens"), null=True, blank=True)
     closes = models.TimeField(verbose_name=_("Time when closes"), null=True, blank=True)
 

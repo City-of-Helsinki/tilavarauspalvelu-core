@@ -1,11 +1,13 @@
 from datetime import datetime
 
+import factory
 from factory import post_generation
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyInteger, FuzzyText
 from pytz import UTC
 
 from applications.models import PRIORITIES
+from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
 
 
@@ -22,6 +24,8 @@ class ReservationDenyReasonFactory(DjangoModelFactory):
 class RecurringReservationFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.RecurringReservation"
+
+    reservation_unit = factory.SubFactory(ReservationUnitFactory)
 
 
 class ReservationPurposeFactory(DjangoModelFactory):
