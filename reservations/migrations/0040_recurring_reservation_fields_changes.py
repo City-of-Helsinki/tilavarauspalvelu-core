@@ -10,7 +10,7 @@ def set_reservation_units(apps, schema_editor):
     for recurring in RecurringReservation.objects.filter(reservation_unit__isnull=True):
         reservation = recurring.reservations.first()
         if reservation:
-            recurring.reservation_unit = reservation.reservation_unit
+            recurring.reservation_unit = reservation.reservation_unit.first()
             recurring.save()
         else:
             recurring.delete()
