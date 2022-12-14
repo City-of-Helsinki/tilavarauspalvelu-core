@@ -1,4 +1,4 @@
-import { addDays, subDays } from "date-fns";
+import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 import React, { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -15,13 +15,11 @@ type Params = {
 };
 
 const UnitReservationsView = (): JSX.Element => {
-  const today = new Date(new Date().setHours(0, 0, 0, 0));
+  const today = formatISO(startOfDay(new Date()));
 
-  const [begin, setBegin] = useState(today.toISOString());
+  const [begin, setBegin] = useState(today);
   const { unitId } = useParams<Params>();
-
   const { t } = useTranslation();
-
   const initialEmptyState = { reservationUnitType: [] };
 
   const [state, dispatch] = useReducer(

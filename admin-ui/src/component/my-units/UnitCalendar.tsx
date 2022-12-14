@@ -19,6 +19,7 @@ import resourceEventStyleGetter, {
   PRE_PAUSE,
 } from "./resourceEventStyleGetter";
 import { getReserveeName } from "../reservations/requested/util";
+import { sortByName } from "../../common/util";
 
 export type Resource = {
   title: string;
@@ -294,10 +295,12 @@ const Events = ({
 );
 
 const sortByDraftStatusAndTitle = (resources: Resource[]) => {
-  return resources.sort(
-    (a, b) =>
-      Number(a.isDraft) - Number(b.isDraft) || a.title.localeCompare(b.title)
-  );
+  return resources.sort((a, b) => {
+    const draftComparison: number = Number(a.isDraft) - Number(b.isDraft);
+    const titleComparison = sortByName(a.title, b.title);
+
+    return draftComparison || titleComparison;
+  });
 };
 
 const ResourceCalendar = ({ resources }: Props): JSX.Element => {

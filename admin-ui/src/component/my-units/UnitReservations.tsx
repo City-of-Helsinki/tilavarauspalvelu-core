@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { breakpoints } from "common/src/common/style";
+import { toApiDate } from "common/src/common/util";
 import {
   Query,
   QueryReservationUnitsArgs,
@@ -116,8 +117,8 @@ const UnitReservations = ({
       offset: 0,
       first: 100,
       unit: [unitPk],
-      from: currentDate.toISOString().substring(0, 10),
-      to: addDays(currentDate, 1).toISOString().substring(0, 10),
+      from: toApiDate(currentDate),
+      to: toApiDate(addDays(currentDate, 1)),
       includeWithSameComponents: true,
     },
     onCompleted: ({ reservationUnits }) => {
