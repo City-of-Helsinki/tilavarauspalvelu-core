@@ -390,3 +390,6 @@ export const combineResults = (
 
   return combined;
 };
+
+export const sortByName = (a?: string, b?: string): number =>
+  a && b ? a.toLowerCase().localeCompare(b.toLowerCase()) : !a ? 1 : -1;

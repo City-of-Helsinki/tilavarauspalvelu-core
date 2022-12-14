@@ -19,6 +19,7 @@ import resourceEventStyleGetter, {
   PRE_PAUSE,
 } from "./resourceEventStyleGetter";
 import { getReserveeName } from "../reservations/requested/util";
+import { sortByName } from "../../common/util";
 
 export type Resource = {
   title: string;
@@ -295,9 +296,8 @@ const Events = ({
 
 const sortByDraftStatusAndTitle = (resources: Resource[]) => {
   return resources.sort((a, b) => {
-    const draftComparison = Number(a.isDraft) - Number(b.isDraft);
-    const titleComparison =
-      a.title && b.title ? a.title.localeCompare(b.title) : !a.title ? 1 : -1;
+    const draftComparison: number = Number(a.isDraft) - Number(b.isDraft);
+    const titleComparison = sortByName(a.title, b.title);
 
     return draftComparison || titleComparison;
   });

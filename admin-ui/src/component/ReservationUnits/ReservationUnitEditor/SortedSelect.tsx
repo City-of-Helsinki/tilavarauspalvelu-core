@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import memoize from "lodash/memoize";
 import { Select, SelectProps } from "hds-react";
+import { sortByName } from "../../../common/util";
 
 function SortedSelect<T>(
   props: Partial<SelectProps<T>> & { sort?: boolean; label: string }
@@ -11,13 +12,7 @@ function SortedSelect<T>(
   const sortedOpts = memoize((originalOptions) => {
     const opts = [...originalOptions];
     if (props.sort) {
-      opts.sort((a, b) =>
-        a.label && b.label
-          ? a.label.toLowerCase().localeCompare(b.label.toLowerCase())
-          : !a.label
-          ? 1
-          : -1
-      );
+      opts.sort((a, b) => sortByName(a.label, b.label));
     }
     return opts;
   })(props.options);
