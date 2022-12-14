@@ -889,12 +889,10 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'descriptionFi': '',
                         'equipment': [
                         ],
-                        'highestPrice': '20.00',
                         'images': [
                         ],
                         'isArchived': False,
                         'location': None,
-                        'lowestPrice': '0.00',
                         'maxPersons': 200,
                         'maxReservationDuration': 86400,
                         'maxReservationsPerUser': 5,
@@ -914,11 +912,9 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                                 'code': 'ONLINE'
                             }
                         ],
-                        'priceUnit': 'PER_HOUR',
                         'pricingTerms': {
                             'termsType': 'PRICING_TERMS'
                         },
-                        'pricingType': 'PAID',
                         'pricings': [
                             {
                                 'begins': '2021-01-01',
@@ -982,9 +978,6 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         ],
                         'state': 'SCHEDULED_RESERVATION',
                         'surfaceArea': '150.00',
-                        'taxPercentage': {
-                            'value': '24.00'
-                        },
                         'termsOfUseFi': None
                     }
                 }
