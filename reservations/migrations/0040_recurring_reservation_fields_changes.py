@@ -5,21 +5,6 @@ import django.db.models.deletion
 import django.utils.timezone
 
 
-def update_created_and_reservation_units(apps, schema_editor):
-    RecurringReservation = apps.get_model("reservations", "RecurringReservation")
-
-    for recurring in RecurringReservation.objects.all():
-        reservation = recurring.reservations.first()
-        if reservation:
-            if reservation.created_at:
-                recurring.created = reservation.created_at
-
-            recurring.reservation_unit = reservation.reservation_unit.first()
-            recurring.save()
-        else:
-            recurring.delete()
-
-
 def get_default_reservation_unit():
     from reservation_units.models import ReservationUnit
     res_unit = ReservationUnit.objects.first()
@@ -97,5 +82,4 @@ class Migration(migrations.Migration):
             name='application_event',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='recurring_reservation', to='applications.applicationevent', verbose_name='Application event'),
         ),
-        migrations.RunPython(update_created_and_reservation_units, migrations.RunPython.noop)
     ]
