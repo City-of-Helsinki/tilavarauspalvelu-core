@@ -18,6 +18,8 @@ from merchants.models import OrderStatus, PaymentOrder, PaymentType
 from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.test.factories import OrderFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
+from reservation_units.models import PricingType
+from reservation_units.tests.factories import ReservationUnitPricingFactory
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import ReservationFactory
 
@@ -46,6 +48,10 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             price=Decimal("12.4"),
             tax_percentage_value=Decimal("24.0"),
         )
+        self.reservation_unit_pricing = ReservationUnitPricingFactory(
+            reservation_unit=self.reservation_unit
+        )
+
         EmailTemplateFactory(
             type=EmailType.RESERVATION_CONFIRMED, content="", subject="confirmed"
         )
@@ -405,6 +411,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
+        self.reservation_unit_pricing.pricing_type = PricingType.FREE
+        self.reservation_unit_pricing.save()
+
         self.reservation.price = Decimal(0)
         self.reservation.price_net = Decimal(0)
         self.reservation.save()
@@ -571,6 +580,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
 
+        self.reservation_unit.payment_merchant = None
         self.reservation_unit.payment_product = None
         self.reservation_unit.save()
 
@@ -592,14 +602,18 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             "Reservation unit is missing payment product"
         )
 
-    def test_confirm_reservation_without_price_does_not_require_payment_product(
+    def test_confirm_reservation_without_price_and_with_free_pricing_type_does_not_require_payment_product(
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
 
+        self.reservation_unit.payment_merchant = None
         self.reservation_unit.payment_product = None
         self.reservation_unit.save()
+
+        self.reservation_unit_pricing.pricing_type = PricingType.FREE
+        self.reservation_unit_pricing.save()
 
         self.reservation.price = Decimal(0)
         self.reservation.price_net = Decimal(0)
