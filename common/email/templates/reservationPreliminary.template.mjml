@@ -7,7 +7,7 @@
     <mj-include path="../partials/header.mjml" />
     <mj-section background-color="#F7F2E4">
       <mj-column>
-        <mj-text>Varauksesi on peruttu. Perumisen syy: {{cancel_reason}}</mj-text>
+        <mj-text>Olet tehnyt alustavan varauksen:</mj-text>
         <mj-spacer />
         <mj-text>
           <b>{{name}}</b>
@@ -25,9 +25,17 @@
         <mj-raw>
           {% if price > 0 %}
         </mj-raw>
-        <mj-text>
-          Varauksen hinta: <b>{{price}} € </b> (sis. alv [{{alv_percent}}])
-        </mj-text>
+        <mj-raw>
+          {% if subsidised_price < price %}
+        </mj-raw>
+        <mj-text>Varauksen hinta: <b>{{subsidised_price - price}} € </b> (sis. alv [{{alv_percent}}])</mj-text>
+        <mj-raw>
+          {% else %}
+        </mj-raw>
+        <mj-text>Varauksen hinta: <b>{{price}} € </b> (sis. alv [{{alv_percent}}])</mj-text>
+        <mj-raw>
+          {% endif %}
+        </mj-raw>
         <mj-raw>
           {% else %}
         </mj-raw>
@@ -44,14 +52,19 @@
     </mj-section>
     <mj-section padding-bottom="0">
       <mj-column>
-        <mj-text font-size="20px">
-          <h2>Lisätietoa peruutuksesta</h2>
+        <mj-text>
+          <h2>Lisätietoa varauksestasi</h2>
         </mj-text>
-        <mj-text font-size="16px">{{cancelled_instructions}}</mj-text>
+        <mj-text font-size="16px">{{pending_instructions}}</mj-text>
       </mj-column>
     </mj-section>
     <mj-section>
       <mj-column>
+        <mj-text>
+          <h2>Hallitse varaustasi varaamossa<h2>
+        </mj-text>
+        <mj-text font-size="16px">Voit perua varauksesi tai tarkistaa varauksesi tiedot sekä Varaamon sopimus- ja peruutusehdot <a href={{my_reservations_ext_link}}>Omat Varaukset-sivulla</a></mj-text>
+        <mj-spacer />
         <mj-text font-size="16px">Kiitos, kun käytit Varaamoa!</mj-text>
         <mj-text font-size="16px">Ystävällisin terveisin</mj-text>
         <mj-text font-size="16px">Varaamo</mj-text>
