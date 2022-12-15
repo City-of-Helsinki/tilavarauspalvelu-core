@@ -1,0 +1,12 @@
+@font-face {
+    font-family: "HelsinkiGrotesk";
+    src: url("https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff") format("woff");
+}
+
+p {
+    margin: 0;
+}
+
+h2 {
+    font-size: 20px;
+}

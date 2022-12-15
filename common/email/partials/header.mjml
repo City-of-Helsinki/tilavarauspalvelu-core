@@ -1,0 +1,19 @@
+<mj-section background-color="#FFFFFF">
+  <mj-group>
+    <mj-column vertical-align="middle" width="200px" padding="0">
+      <mj-image width="200px" align="left" src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" />
+    </mj-column>
+    <mj-column vertical-align="middle">
+      <mj-text font-size="24px" align="left" padding="0">
+        <b>Varaamo</b>
+      </mj-text>
+    </mj-column>
+  </mj-group>
+</mj-section>
+<mj-section background-color="#FFFFFF" padding-bottom="30px">
+  <mj-column>
+    <mj-text font-size="36px">
+      <b>Hei {{reservee_name}},</b>
+    </mj-text>
+  </mj-column>
+</mj-section>

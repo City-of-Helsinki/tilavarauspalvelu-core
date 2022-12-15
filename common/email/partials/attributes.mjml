@@ -1,0 +1,6 @@
+<mj-attributes>
+  <mj-text line-height="18px" font-weight="400" font-size="18px" padding-top="4px" padding-bottom="4px" />
+  <mj-spacer height="30px" />
+  <mj-body background-color="#ffffff" width="960px" />
+  <mj-all font-family="HelsinkiGrotesk" color="#000000">
+</mj-attributes>
