@@ -111,12 +111,12 @@ const ReservationInfoCard = ({
   const purpose = getTranslation(reservation?.purpose, "name");
 
   const price: string =
-    reservation?.state === "REQUIRES_HANDLING"
+    reservation?.state === "REQUIRES_HANDLING" && begin
       ? getReservationUnitPrice(reservationUnit, new Date(begin))
       : getReservationPrice(reservation?.price, t("prices:priceFree"));
 
   const shouldDisaplyTaxPercentage: boolean =
-    reservation?.state === "REQUIRES_HANDLING"
+    reservation?.state === "REQUIRES_HANDLING" && begin
       ? getReservationUnitPrice(
           reservationUnit,
           new Date(begin),

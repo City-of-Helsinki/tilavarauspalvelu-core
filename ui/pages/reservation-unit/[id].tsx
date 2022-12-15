@@ -505,8 +505,12 @@ const ReservationUnit = ({
       getSlotPropGetter(
         reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds,
-        new Date(reservationUnit.reservationBegins),
-        new Date(reservationUnit.reservationEnds),
+        reservationUnit.reservationBegins
+          ? new Date(reservationUnit.reservationBegins)
+          : undefined,
+        reservationUnit.reservationEnds
+          ? new Date(reservationUnit.reservationEnds)
+          : undefined,
         reservationUnit.reservationsMinDaysBefore
       ),
     [
