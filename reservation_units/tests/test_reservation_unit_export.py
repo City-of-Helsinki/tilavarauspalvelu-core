@@ -1,4 +1,5 @@
 import csv
+import datetime
 import shutil
 from pathlib import Path
 from typing import Any, List
@@ -7,9 +8,24 @@ from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.utils import timezone
+from django.utils.timezone import get_default_timezone
+
+from reservations.tests.factories import ReservationMetadataSetFactory
+from resources.tests.factories import ResourceFactory
+from services.tests.factories import ServiceFactory
+from spaces.tests.factories import SpaceFactory
+from terms_of_use.models import TermsOfUse
+from terms_of_use.tests.factories import TermsOfUseFactory
 
 from ..utils.export_data import ReservationUnitExporter
-from .factories import ReservationUnitFactory
+from .factories import (
+    EquipmentFactory,
+    PurposeFactory,
+    QualifierFactory,
+    ReservationUnitCancellationRuleFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingFactory,
+)
 
 
 class ReservationUnitDataExporterTestCase(TestCase):
@@ -18,7 +34,26 @@ class ReservationUnitDataExporterTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.reservation_unit = ReservationUnitFactory()
+        cls.reservation_unit = ReservationUnitFactory(
+            spaces=SpaceFactory.create_batch(3),
+            resources=ResourceFactory.create_batch(3),
+            qualifiers=QualifierFactory.create_batch(3),
+            payment_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
+            cancellation_terms=TermsOfUseFactory(
+                terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
+            ),
+            pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
+            cancellation_rule=ReservationUnitCancellationRuleFactory(),
+            reservation_begins=datetime.datetime.now(),
+            reservation_ends=datetime.datetime.now() + datetime.timedelta(days=30),
+            metadata_set=ReservationMetadataSetFactory(),
+            services=ServiceFactory.create_batch(3),
+            purposes=PurposeFactory.create_batch(3),
+            equipments=EquipmentFactory.create_batch(3),
+        )
+        cls.pricing = ReservationUnitPricingFactory(
+            reservation_unit=cls.reservation_unit
+        )
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -63,6 +98,37 @@ class ReservationUnitDataExporterTestCase(TestCase):
             self.reservation_unit.is_draft,
             self.reservation_unit.publish_begins,
             self.reservation_unit.publish_ends,
+            ", ".join(self.reservation_unit.spaces.values_list("name_fi", flat=True)),
+            ", ".join(
+                self.reservation_unit.resources.values_list("name_fi", flat=True)
+            ),
+            ", ".join(
+                self.reservation_unit.qualifiers.all().values_list("name_fi", flat=True)
+            ),
+            self.reservation_unit.payment_terms.name,
+            self.reservation_unit.cancellation_terms.name,
+            self.reservation_unit.pricing_terms.name,
+            self.reservation_unit.cancellation_rule.name,
+            self.pricing.price_unit,
+            self.pricing.lowest_price,
+            self.pricing.highest_price,
+            self.pricing.tax_percentage,
+            self.reservation_unit.reservation_begins.astimezone(
+                get_default_timezone()
+            ).strftime("%d:%m:%Y %H:%M"),
+            self.reservation_unit.reservation_ends.astimezone(
+                get_default_timezone()
+            ).strftime("%d:%m:%Y %H:%M"),
+            ", ".join(
+                self.reservation_unit.services.all().values_list("name_fi", flat=True)
+            ),
+            ", ".join(
+                self.reservation_unit.purposes.all().values_list("name_fi", flat=True)
+            ),
+            self.reservation_unit.require_introduction,
+            ", ".join(
+                self.reservation_unit.equipments.all().values_list("name_fi", flat=True)
+            ),
         ]
 
         self._test_first_data_line(expected_line)
