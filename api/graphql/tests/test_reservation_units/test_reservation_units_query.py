@@ -130,13 +130,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 nameEn
                                 nameSv
                             }
-                            lowestPrice
-                            highestPrice
-                            priceUnit
                             reservationStartInterval
-                            taxPercentage {
-                                value
-                            }
                             reservationBegins
                             reservationEnds
                             publishBegins
@@ -163,7 +157,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             pricingTerms {
                                 termsType
                             }
-                            pricingType
                             paymentTypes {
                                 code
                             }

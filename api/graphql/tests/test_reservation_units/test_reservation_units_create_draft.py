@@ -8,7 +8,7 @@ from django.test import override_settings
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
-from reservation_units.models import PaymentType, PricingType, ReservationUnit
+from reservation_units.models import PaymentType, ReservationUnit
 
 
 class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -107,31 +107,9 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_none()
 
-    # TODO: Deprecated
-    def test_create_with_pricing_fields(self):
-        self.client.force_login(self.general_admin)
-        data = self.get_valid_data()
-        data["pricingType"] = "PAID"
-        data["pricingTermsPk"] = self.pricing_term.pk
-        response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservationUnit").get("pk")
-        ).is_not_none()
-
-        created_unit = ReservationUnit.objects.get(
-            pk=content.get("data").get("createReservationUnit").get("pk")
-        )
-        assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
-
     def test_create_with_payment_types(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_data()
-        data["pricingType"] = "PAID"
         data["paymentTypes"] = ["ON_SITE", "INVOICE"]
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -149,8 +127,6 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
             map(lambda ptype: ptype.code, created_unit.payment_types.all())
         )
         assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-
         assert_that(unit_payment_type_codes).contains_only(
             PaymentType.ON_SITE.value, PaymentType.INVOICE.value
         )

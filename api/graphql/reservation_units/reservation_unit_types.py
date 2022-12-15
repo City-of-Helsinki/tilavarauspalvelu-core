@@ -385,7 +385,6 @@ class ReservationUnitType(
     cancellation_terms = graphene.Field(TermsOfUseType)
     service_specific_terms = graphene.Field(TermsOfUseType)
     pricing_terms = graphene.Field(TermsOfUseType)
-    tax_percentage = graphene.Field(TaxPercentageType)
     buffer_time_before = Duration()
     buffer_time_after = Duration()
     metadata_set = graphene.Field(ReservationMetadataSetType)
@@ -427,10 +426,6 @@ class ReservationUnitType(
             "cancellation_terms",
             "service_specific_terms",
             "pricing_terms",
-            "tax_percentage",
-            "lowest_price",
-            "highest_price",
-            "price_unit",
             "reservation_start_interval",
             "reservation_begins",
             "reservation_ends",
@@ -442,7 +437,6 @@ class ReservationUnitType(
             "authentication",
             "rank",
             "reservation_kind",
-            "pricing_type",
             "payment_types",
             "can_apply_free_of_charge",
             "reservations_max_days_before",
@@ -589,10 +583,6 @@ class ReservationUnitByPkType(
             "cancellation_terms",
             "service_specific_terms",
             "pricing_terms",
-            "tax_percentage",
-            "lowest_price",
-            "highest_price",
-            "price_unit",
             "reservation_start_interval",
             "reservation_begins",
             "reservation_ends",
@@ -604,7 +594,6 @@ class ReservationUnitByPkType(
             "authentication",
             "rank",
             "reservation_kind",
-            "pricing_type",
             "payment_types",
             "can_apply_free_of_charge",
             "reservations_max_days_before",

@@ -12,7 +12,6 @@ from api.graphql.tests.test_reservation_units.base import (
 from opening_hours.errors import HaukiAPIError
 from opening_hours.resources import Resource as HaukiResource
 from reservation_units.models import (
-    PaymentType,
     PriceUnit,
     PricingStatus,
     PricingType,
@@ -66,11 +65,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "bufferTimeAfter": 3600,
             "bufferTimeBefore": 3600,
             "cancellationRulePk": self.rule.pk,
-            "lowestPrice": 0,
-            "highestPrice": 20,
-            "priceUnit": PriceUnit.PRICE_UNIT_PER_HOUR.upper(),
             "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES.upper(),
-            "taxPercentagePk": TaxPercentage.objects.get(value=24).pk,
             "publishBegins": "2021-05-03T00:00:00+00:00",
             "publishEnds": "2021-05-03T00:00:00+00:00",
             "reservationBegins": "2021-05-03T00:00:00+00:00",
@@ -135,14 +130,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             datetime.timedelta(hours=1)
         )
         assert_that(res_unit.cancellation_rule).is_equal_to(self.rule)
-        assert_that(res_unit.lowest_price).is_equal_to(data.get("lowestPrice"))
-        assert_that(res_unit.highest_price).is_equal_to(data.get("highestPrice"))
-        assert_that(res_unit.price_unit.upper()).is_equal_to(data.get("priceUnit"))
         assert_that(res_unit.reservation_start_interval.upper()).is_equal_to(
             data.get("reservationStartInterval")
-        )
-        assert_that(res_unit.tax_percentage).is_equal_to(
-            TaxPercentage.objects.get(value=24)
         )
         publish_begins = datetime.datetime.fromisoformat(data.get("publishBegins"))
         assert_that(res_unit.publish_begins).is_equal_to(publish_begins)
@@ -605,55 +594,6 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.reservation_kind).is_equal_to(
             ReservationKind.DIRECT_AND_SEASON
-        )
-
-    def test_create_with_pricing_fields(self):
-        self.client.force_login(self.general_admin)
-        data = self.get_valid_data()
-        data["pricingType"] = "PAID"
-        data["pricingTermsPk"] = self.pricing_term.pk
-
-        response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservationUnit").get("pk")
-        ).is_not_none()
-
-        created_unit = ReservationUnit.objects.get(
-            pk=content.get("data").get("createReservationUnit").get("pk")
-        )
-        assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
-
-    def test_create_with_payment_types(self):
-        self.client.force_login(self.general_admin)
-        data = self.get_valid_data()
-        data["pricingType"] = "PAID"
-        data["paymentTypes"] = ["ONLINE", "INVOICE"]
-
-        response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservationUnit").get("pk")
-        ).is_not_none()
-
-        created_unit = ReservationUnit.objects.get(
-            pk=content.get("data").get("createReservationUnit").get("pk")
-        )
-        unit_payment_type_codes = list(
-            map(lambda ptype: ptype.code, created_unit.payment_types.all())
-        )
-        assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(unit_payment_type_codes).contains_only(
-            PaymentType.ONLINE.value, PaymentType.INVOICE.value
         )
 
     def test_create_with_instructions(self):

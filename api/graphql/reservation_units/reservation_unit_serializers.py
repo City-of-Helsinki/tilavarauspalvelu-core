@@ -249,26 +249,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
         allow_null=True,
     )
-    lowest_price = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        required=False,
-        help_text="Minimum price of the reservation unit",
-    )
-    highest_price = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        required=False,
-        help_text="Maximum price of the reservation unit",
-    )
-    price_unit = ChoiceCharField(
-        required=False,
-        choices=PriceUnit.choices,
-        help_text=(
-            "Unit of the price. "
-            f"Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
-        ),
-    )
     reservation_start_interval = ChoiceCharField(
         required=False,
         choices=ReservationUnit.RESERVATION_START_INTERVAL_CHOICES,
@@ -278,11 +258,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "begin at minutes 0, 15, 30, or 45. Possible values are "
             f"{', '.join(value[0].upper() for value in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)}."
         ),
-    )
-    tax_percentage_pk = IntegerPrimaryKeyField(
-        queryset=TaxPercentage.objects.all(),
-        source="tax_percentage",
-        required=False,
     )
     metadata_set_pk = IntegerPrimaryKeyField(
         queryset=ReservationMetadataSet.objects.all(),
@@ -316,15 +291,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
 
     is_archived = serializers.BooleanField(
         required=False, default=False, help_text="Is reservation unit archived"
-    )
-
-    pricing_type = ChoiceCharField(
-        required=False,
-        choices=PricingType.choices,
-        help_text=(
-            "What kind of pricing type this reservation unit has. Possible values are "
-            f"{', '.join(value.upper() for value in PricingType)}."
-        ),
     )
 
     payment_types = ValidatingListField(
@@ -375,11 +341,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "payment_terms_pk",
             "cancellation_terms_pk",
             "service_specific_terms_pk",
-            "lowest_price",
-            "highest_price",
-            "price_unit",
             "reservation_start_interval",
-            "tax_percentage_pk",
             "reservation_begins",
             "reservation_ends",
             "publish_begins",
@@ -397,7 +359,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "state",
             "pricing_terms_pk",
             "pricing_terms",
-            "pricing_type",
             "payment_types",
             "pricings",
         ] + get_all_translatable_fields(ReservationUnit)
@@ -413,7 +374,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         self.fields["cancellation_terms_pk"].write_only = True
         self.fields["service_specific_terms_pk"].write_only = True
         self.fields["pricing_terms_pk"].write_only = True
-        self.fields["tax_percentage_pk"].write_only = True
         self.fields["metadata_set_pk"].write_only = True
 
     def _check_pk_list(self, id_list, field_name):

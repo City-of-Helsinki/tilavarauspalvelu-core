@@ -11,13 +11,7 @@ from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.verkkokauppa.product.types import Product
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
-from reservation_units.models import (
-    PaymentType,
-    PriceUnit,
-    PricingType,
-    ReservationUnit,
-    TaxPercentage,
-)
+from reservation_units.models import PaymentType, ReservationUnit, TaxPercentage
 from reservation_units.tests.factories import (
     PurposeFactory,
     QualifierFactory,
@@ -85,10 +79,6 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_confirmed_instructions_fi="Hyväksytyn varauksen lisäohjeita",
             reservation_confirmed_instructions_sv="Ytterligare instruktioner för den godkända reservationen",
             reservation_confirmed_instructions_en="Additional instructions for the approved reservation",
-            tax_percentage=TaxPercentage.objects.get(value=24),
-            lowest_price=0,
-            highest_price=20,
-            price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
             is_draft=False,
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
             reservation_begins=datetime.datetime.now(tz=get_default_timezone()),
@@ -107,7 +97,6 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservations_max_days_before=360,
             reservations_min_days_before=1,
             pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
-            pricing_type=PricingType.PAID,
         )
         cls.reservation_unit.qualifiers.set([qualifier])
         cls.reservation_unit.payment_types.set([PaymentType.ONLINE])

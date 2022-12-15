@@ -9,8 +9,7 @@ from django.test import override_settings
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
-from merchants.models import PaymentType
-from reservation_units.models import PricingType, ReservationUnit, TaxPercentage
+from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.tests.factories import ReservationMetadataSetFactory
 from terms_of_use.models import TermsOfUse
@@ -59,19 +58,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name_fi).is_equal_to("New name")
-
-    def test_update_with_tax_percentage(self):
-        tax_percentage = TaxPercentage.objects.first()
-        data = self.get_valid_update_data()
-        data["taxPercentagePk"] = tax_percentage.pk
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
-        self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.tax_percentage).is_equal_to(tax_percentage)
 
     def test_update_with_metadata_set(self):
         metadata_set = ReservationMetadataSetFactory(name="New form")
@@ -236,12 +222,21 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(self.res_unit.contact_information).is_equal_to("")
 
     def test_audit_log_deletion_on_archive(self):
+        self.res_unit.name = "Updated"
+        self.res_unit.save()
+
         content_type_id = ContentType.objects.get(
             app_label="reservation_units", model="reservationunit"
         ).id
         log_entry_count = LogEntry.objects.filter(
             content_type_id=content_type_id, object_id=self.res_unit.pk
         ).count()
+
+        print(
+            LogEntry.objects.filter(
+                content_type_id=content_type_id, object_id=self.res_unit.pk
+            ).all()
+        )
 
         assert_that(log_entry_count).is_greater_than(1)
 
@@ -264,7 +259,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     def test_update_with_pricing_fields(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_update_data()
-        data["pricingType"] = "PAID"
         data["pricingTermsPk"] = self.pricing_term.pk
 
         response = self.query(self.get_update_query(), input_data=data)
@@ -280,36 +274,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
             pk=content.get("data").get("updateReservationUnit").get("pk")
         )
         assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
-
-    def test_update_with_payment_types(self):
-        self.client.force_login(self.general_admin)
-        data = self.get_valid_update_data()
-        data["pricingType"] = "PAID"
-        data["paymentTypes"] = ["INVOICE", "ONLINE"]
-
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("updateReservationUnit").get("pk")
-        ).is_not_none()
-
-        updated_unit = ReservationUnit.objects.get(
-            pk=content.get("data").get("updateReservationUnit").get("pk")
-        )
-
-        unit_payment_type_codes = list(
-            map(lambda ptype: ptype.code, updated_unit.payment_types.all())
-        )
-        assert_that(updated_unit).is_not_none()
-        assert_that(updated_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(unit_payment_type_codes).contains_only(
-            PaymentType.ONLINE.value, PaymentType.INVOICE.value
-        )
 
     def test_update_with_instructions(self):
         self.client.force_login(self.general_admin)

@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal
 from unittest import mock
 
 from assertpy import assert_that
@@ -11,7 +10,7 @@ from api.graphql.tests.test_reservation_units.base import (
 from merchants.models import PaymentType
 from opening_hours.errors import HaukiAPIError
 from opening_hours.resources import Resource as HaukiResource
-from reservation_units.models import PriceUnit, PricingType, ReservationUnit
+from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import ReservationUnitFactory
 
 
@@ -310,61 +309,6 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.cancellation_rule).is_none()
 
-    def test_update_price_fields(self):
-        expected_lowest_price = Decimal("0.00")
-        expected_highest_price = Decimal("20.00")
-        expected_price_unit = PriceUnit.PRICE_UNIT_PER_HOUR
-        data = self.get_valid_update_data()
-        data["lowestPrice"] = float(expected_lowest_price)
-        data["highestPrice"] = float(expected_highest_price)
-        data["priceUnit"] = expected_price_unit.upper()
-        update_query = """
-            mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
-                updateReservationUnit(input: $input) {
-                    lowestPrice
-                    highestPrice
-                    priceUnit
-                    errors {
-                        messages
-                        field
-                    }
-                }
-            }
-        """
-        response = self.query(update_query, input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
-        assert_that(res_unit_data.get("lowestPrice")).is_equal_to(
-            float(expected_lowest_price)
-        )
-        assert_that(res_unit_data.get("highestPrice")).is_equal_to(
-            float(expected_highest_price)
-        )
-        assert_that(res_unit_data.get("priceUnit")).is_equal_to(
-            expected_price_unit.upper()
-        )
-        self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.lowest_price).is_equal_to(expected_lowest_price)
-        assert_that(self.res_unit.highest_price).is_equal_to(expected_highest_price)
-        assert_that(self.res_unit.price_unit).is_equal_to(expected_price_unit)
-
-    def test_price_unit_cannot_be_invalid(self):
-        invalid_price_unit = "invalid"
-        data = self.get_valid_update_data()
-        data["priceUnit"] = invalid_price_unit
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.price_unit).is_not_equal_to(invalid_price_unit)
-
     def test_reservation_start_interval_cannot_be_invalid(self):
         invalid_interval = "invalid"
         data = self.get_valid_update_data()
@@ -529,7 +473,6 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
     def test_update_with_pricing_fields(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_update_data()
-        data["pricingType"] = "PAID"
         data["pricingTermsPk"] = self.pricing_term.pk
 
         response = self.query(self.get_update_query(), input_data=data)
@@ -545,13 +488,11 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
             pk=content.get("data").get("updateReservationUnit").get("pk")
         )
         assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
 
     def test_update_with_payment_types(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_update_data()
-        data["pricingType"] = "PAID"
         data["paymentTypes"] = ["ON_SITE", "INVOICE"]
 
         response = self.query(self.get_update_query(), input_data=data)
@@ -570,7 +511,6 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
             map(lambda ptype: ptype.code, updated_unit.payment_types.all())
         )
         assert_that(updated_unit).is_not_none()
-        assert_that(updated_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(unit_payment_type_codes).contains_only(
             PaymentType.ON_SITE.value, PaymentType.INVOICE.value
         )
