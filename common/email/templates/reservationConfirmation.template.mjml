@@ -44,7 +44,7 @@
           <b>{{name}}</b>
         </mj-text>
         <mj-text>{{reservation_unit}}</mj-text>
-        <mj-text>{{reservation_unit_address}}</mj-text>
+        <mj-text>{{unit_location}}</mj-text>
         <mj-spacer />
         <mj-text>
           <p>Alkamisaika: <b>{{begin_date}}</b> klo <b>{{begin_time}}</b></p>
@@ -54,7 +54,7 @@
         </mj-text>
         <mj-spacer />
         <mj-text>
-          <p>Varauksen hinta: <b>{{reservation_price}} € </b> (sis. alv [{{alv_percent}}])</p>
+          <p>Varauksen hinta: <b>{{price}} € </b> (sis. alv {{tax_percentage}})</p>
         </mj-text>
         <mj-text>
           <p>Varausnumero: {{reservation_number}}</p>
