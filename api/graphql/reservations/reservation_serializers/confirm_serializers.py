@@ -5,7 +5,10 @@ from api.graphql.reservations.reservation_serializers.update_serializers import 
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from merchants.models import Language, OrderStatus, PaymentOrder
 from merchants.verkkokauppa.helpers import create_verkkokauppa_order
-from reservation_units.models import PaymentType
+from reservation_units.models import PaymentType, PricingType
+from reservation_units.utils.reservation_unit_pricing_helper import (
+    ReservationUnitPricingHelper,
+)
 from reservations.email_utils import send_confirmation_email
 from reservations.models import STATE_CHOICES, Reservation
 from utils.decimal_utils import round_decimal
@@ -79,28 +82,32 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             payment_type = data.get("payment_type", "").upper()
             reservation_unit = self.instance.reservation_unit.first()
 
-            if self.instance.price_net > 0 and not reservation_unit.payment_product:
-                raise ValidationErrorWithCode(
-                    "Reservation unit is missing payment product",
-                    ValidationErrorCodes.MISSING_PAYMENT_PRODUCT,
-                )
-
-            if not payment_type:
-                data["payment_type"] = self._get_default_payment_type()
-            elif (
-                self.instance.price_net > 0
-                and not reservation_unit.payment_types.filter(
-                    code=payment_type
-                ).exists()
+            active_price = ReservationUnitPricingHelper.get_active_price(
+                reservation_unit
+            )
+            if (
+                active_price.pricing_type == PricingType.PAID
+                or self.instance.price_net > 0
             ):
-                allowed_values = list(
-                    map(lambda x: x.code, reservation_unit.payment_types.all())
-                )
-                raise ValidationErrorWithCode(
-                    f"Reservation unit does not support {payment_type} payment type. "
-                    f"Allowed values: {', '.join(allowed_values)}",
-                    ValidationErrorCodes.INVALID_PAYMENT_TYPE,
-                )
+                if not reservation_unit.payment_product:
+                    raise ValidationErrorWithCode(
+                        "Reservation unit is missing payment product",
+                        ValidationErrorCodes.MISSING_PAYMENT_PRODUCT,
+                    )
+
+                if not payment_type:
+                    data["payment_type"] = self._get_default_payment_type()
+                elif not reservation_unit.payment_types.filter(
+                    code=payment_type
+                ).exists():
+                    allowed_values = list(
+                        map(lambda x: x.code, reservation_unit.payment_types.all())
+                    )
+                    raise ValidationErrorWithCode(
+                        f"Reservation unit does not support {payment_type} payment type. "
+                        f"Allowed values: {', '.join(allowed_values)}",
+                        ValidationErrorCodes.INVALID_PAYMENT_TYPE,
+                    )
         return data
 
     @property
