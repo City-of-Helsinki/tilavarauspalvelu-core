@@ -62,8 +62,11 @@
     <style type="text/css">
     @font-face {
         font-family: "HelsinkiGrotesk";
-        src: url("https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff")
-        format("woff");
+        src: url("https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff") format("woff");
+      }
+
+      p {
+        margin: 0;
       }
     </style>
     
@@ -291,7 +294,7 @@
                   
       <div
          style="font-family:HelsinkiGrotesk;font-size:18px;font-weight:400;line-height:18px;text-align:left;color:#000000;"
-      ><b>{{name}}</b></div>
+      ><b>{{reservation_unit}}</b></div>
     
                 </td>
               </tr>
@@ -303,7 +306,7 @@
                   
       <div
          style="font-family:HelsinkiGrotesk;font-size:18px;font-weight:400;line-height:18px;text-align:left;color:#000000;"
-      >{{reservation_unit}}</div>
+      >{{unit_name}}</div>
     
                 </td>
               </tr>
@@ -315,7 +318,7 @@
                   
       <div
          style="font-family:HelsinkiGrotesk;font-size:18px;font-weight:400;line-height:18px;text-align:left;color:#000000;"
-      >{{reservation_unit_address}}</div>
+      >{{unit_location}}</div>
     
                 </td>
               </tr>
@@ -334,19 +337,19 @@
             
               <tr>
                 <td
-                   align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
+                   align="left" style="font-size:0px;padding:10px 25px;padding-top:4px;padding-bottom:4px;word-break:break-word;"
                 >
                   
       <div
          style="font-family:HelsinkiGrotesk;font-size:18px;font-weight:400;line-height:18px;text-align:left;color:#000000;"
-      ><p padding="0">Alkamisaika: <b padding="0">{{begin_date}}</b> klo <b padding="0">{{begin_time}}</b></p></div>
+      ><p>Alkamisaika: <b>{{begin_date}}</b> klo <b>{{begin_time}}</b></p></div>
     
                 </td>
               </tr>
             
               <tr>
                 <td
-                   align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
+                   align="left" style="font-size:0px;padding:10px 25px;padding-top:4px;padding-bottom:4px;word-break:break-word;"
                 >
                   
       <div
@@ -370,19 +373,19 @@
             
               <tr>
                 <td
-                   align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
+                   align="left" style="font-size:0px;padding:10px 25px;padding-top:4px;padding-bottom:4px;word-break:break-word;"
                 >
                   
       <div
          style="font-family:HelsinkiGrotesk;font-size:18px;font-weight:400;line-height:18px;text-align:left;color:#000000;"
-      ><p>Varauksen hinta: <b>{{reservation_price}} € </b> (sis. alv [{{alv_percent}}])</p></div>
+      ><p>Varauksen hinta: <b>{{price}} € </b> (sis. alv {{tax_percentage}})</p></div>
     
                 </td>
               </tr>
             
               <tr>
                 <td
-                   align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
+                   align="left" style="font-size:0px;padding:10px 25px;padding-top:4px;padding-bottom:4px;word-break:break-word;"
                 >
                   
       <div

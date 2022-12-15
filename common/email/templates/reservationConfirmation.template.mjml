@@ -40,8 +40,7 @@
       <mj-column>
         <mj-text>Olet tehnyt uuden varauksen:</mj-text>
         <mj-spacer />
-        <mj-text><b>{{name}}</b></mj-text>
-        <mj-text>{{reservation_unit}}</mj-text>
+        <mj-text><b>{{reservation_unit}}</b></mj-text>
         <mj-text>{{unit_name}}</mj-text>
         <mj-text>{{unit_location}}</mj-text>
         <mj-spacer />
