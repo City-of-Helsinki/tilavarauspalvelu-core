@@ -13,10 +13,11 @@
     <mj-attributes>
       <mj-text line-height="18px" font-weight="400" font-size="18px" padding-top="4px" padding-bottom="4px" />
       <mj-spacer height="30px" />
+      <mj-body background-color="#ffffff" width="960px" />
       <mj-all font-family="HelsinkiGrotesk" color="#000000">
     </mj-attributes>
   </mj-head>
-  <mj-body background-color="#ffffff" width="960px">
+  <mj-body>
     <mj-section>
       <mj-group>
         <mj-column vertical-align="middle" width="200px" padding="0">
@@ -51,9 +52,21 @@
           <p>Päättymisaika: <b>{{end_date}}</b> klo <b>{{end_time}}</b></p>
         </mj-text>
         <mj-spacer />
+        <mj-raw>
+          {% if reservation_price > 0 %}
+        </mj-raw>
         <mj-text>
           <p>Varauksen hinta: <b>{{price}} € </b> (sis. alv {{tax_percentage}})</p>
         </mj-text>
+        <mj-raw>
+          {% else %}
+        </mj-raw>
+        <mj-text>
+          Varauksen hinta: <b>{{reservation_price}} € </b>
+        </mj-text>
+        <mj-raw>
+          {% endif %}
+        </mj-raw>
         <mj-text>
           <p>Varausnumero: {{reservation_number}}</p>
         </mj-text>
