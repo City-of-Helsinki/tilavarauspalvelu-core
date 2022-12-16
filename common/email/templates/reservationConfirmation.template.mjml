@@ -1,10 +1,10 @@
 <mjml>
   <mj-head>
-    <mj-include path="../partials/base.css" type="css" />
-    <mj-include path="../partials/attributes.mjml" />
+    <mj-include path="partials/base.css" type="css" />
+    <mj-include path="partials/attributes.mjml" />
   </mj-head>
   <mj-body>
-    <mj-include path="../partials/header.mjml" />
+    <mj-include path="partials/header.mjml" />
     <mj-section background-color="#F7F2E4">
       <mj-column>
         <mj-text>Olet tehnyt uuden varauksen:</mj-text>
@@ -65,6 +65,6 @@
         <mj-spacer height="50px" />
       </mj-column>
     </mj-section>
-    <mj-include path="../partials/footer.mjml" />
+    <mj-include path="partials/footer.mjml" />
   </mj-body>
 </mjml>
