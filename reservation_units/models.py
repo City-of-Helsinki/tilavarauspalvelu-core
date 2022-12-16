@@ -907,3 +907,4 @@ class Introduction(models.Model):
 
 
 AuditLogger.register(ReservationUnit)
+AuditLogger.register(ReservationUnitPricing)
