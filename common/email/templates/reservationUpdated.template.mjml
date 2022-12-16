@@ -9,11 +9,9 @@
       <mj-column>
         <mj-text>Varaustasi on muutettu:</mj-text>
         <mj-spacer />
-        <mj-text>
-          <b>{{name}}</b>
-        </mj-text>
-        <mj-text>{{reservation_unit}}</mj-text>
-        <mj-text>{{reservation_unit_address}}</mj-text>
+        <mj-text><b>{{reservation_unit}}</b></mj-text>
+        <mj-text>{{unit_name}}</mj-text>
+        <mj-text>{{unit_location}}</mj-text>
         <mj-spacer />
         <mj-text>
           <p>Alkamisaika: <b>{{begin_date}}</b> klo <b>{{begin_time}}</b></p>
@@ -26,7 +24,7 @@
           {% if price > 0 %}
         </mj-raw>
         <mj-text>
-          Varauksen hinta: <b>{{price}} € </b> (sis. alv [{{alv_percent}}])
+          Varauksen hinta: <b>{{price}} € </b> (sis. alv {{tax_percentage}})
         </mj-text>
         <mj-raw>
           {% else %}
