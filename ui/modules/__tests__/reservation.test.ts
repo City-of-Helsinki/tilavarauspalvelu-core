@@ -1,5 +1,5 @@
 import { get as mockGet } from "lodash";
-import { addDays, addHours, addMinutes, format } from "date-fns";
+import { addDays, addHours, addMinutes, format, startOfToday } from "date-fns";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
@@ -85,7 +85,7 @@ describe("getDurationOptions", () => {
   });
 });
 
-describe("canUseCancelReservation", () => {
+describe("canUserCancelReservation", () => {
   test("that needs handling", () => {
     const reservation = {
       begin: new Date().toISOString(),
@@ -432,7 +432,7 @@ describe("canReservationBeChanged", () => {
     id: "123f4w90",
     state: "CONFIRMED",
     price: 0,
-    begin: addHours(new Date(), 1).toISOString(),
+    begin: addHours(startOfToday(), 34).toISOString(),
     reservationUnits: [
       {
         cancellationRule: {
@@ -535,12 +535,13 @@ describe("canReservationBeChanged", () => {
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
+          begin: addHours(new Date(), 1).toISOString(),
           reservationUnits: [
             {
               ...reservation.reservationUnits[0],
               cancellationRule: {
                 ...reservation.reservationUnits[0].cancellationRule,
-                canBeCancelledTimeBefore: 3599,
+                canBeCancelledTimeBefore: 3600,
               },
             },
           ],
@@ -552,12 +553,13 @@ describe("canReservationBeChanged", () => {
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
+          begin: addHours(new Date(), 1).toISOString(),
           reservationUnits: [
             {
               ...reservation.reservationUnits[0],
               cancellationRule: {
                 ...reservation.reservationUnits[0].cancellationRule,
-                canBeCancelledTimeBefore: 3600,
+                canBeCancelledTimeBefore: 3601,
               },
             },
           ],
@@ -590,7 +592,7 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(new Date(), 2).toISOString(),
+            begin: addHours(startOfToday(), 12).toISOString(),
           },
           reservationUnit,
           activeApplicationRounds: [],
@@ -603,7 +605,7 @@ describe("canReservationBeChanged", () => {
           newReservation: {
             ...reservation,
             begin: undefined,
-            end: addHours(new Date(), 2).toISOString(),
+            end: addHours(startOfToday(), 12).toISOString(),
           },
           reservationUnit,
           activeApplicationRounds: [],
@@ -615,8 +617,8 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(new Date(), 1),
-            end: addHours(new Date(), 2),
+            begin: addHours(startOfToday(), 10),
+            end: addHours(startOfToday(), 12),
           },
           reservationUnit: { ...reservationUnit, openingHours: null },
           activeApplicationRounds: [],
@@ -630,8 +632,8 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(new Date(), 1),
-            end: addHours(new Date(), 2),
+            begin: addHours(startOfToday(), 10),
+            end: addHours(startOfToday(), 12),
           },
           reservationUnit: {
             ...reservationUnit,
@@ -682,14 +684,14 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(new Date(), 5),
-            end: addHours(new Date(), 6),
+            begin: addHours(startOfToday(), 10),
+            end: addHours(startOfToday(), 12),
           },
           reservationUnit,
           activeApplicationRounds: [
             {
-              reservationPeriodBegin: addHours(new Date(), 1).toISOString(),
-              reservationPeriodEnd: addHours(new Date(), 2).toISOString(),
+              reservationPeriodBegin: addHours(startOfToday(), 1).toISOString(),
+              reservationPeriodEnd: addHours(startOfToday(), 20).toISOString(),
             },
           ],
         } as CanReservationBeChangedProps)
@@ -702,8 +704,8 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(new Date(), 5),
-            end: addHours(new Date(), 6),
+            begin: addHours(startOfToday(), 35),
+            end: addHours(startOfToday(), 36),
           },
           reservationUnit,
         } as CanReservationBeChangedProps)
