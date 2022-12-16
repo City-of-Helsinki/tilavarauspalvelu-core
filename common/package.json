@@ -11,7 +11,7 @@
     "test": "react-scripts test",
     "generate-gql-types": "graphql-codegen && prettier --write 'types/gql-types.ts'",
     "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql",
-    "generate-email-template": "node email/convertToHTML.js"
+    "generate-email-templates": "node ./email/convertToHTML.mjs"
   },
   "browserslist": {
     "production": [
@@ -51,6 +51,7 @@
     "@types/react-dom": "^17.0.8",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
+    "chalk": "^5.2.0",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-typescript-prettier": "^4.2.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
