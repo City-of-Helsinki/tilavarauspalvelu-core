@@ -312,8 +312,8 @@ export const isReservationReservable = (
       [new Date(start), subMinutes(new Date(end), 1)],
       openingHours?.openingTimes,
       activeApplicationRounds,
-      new Date(reservationBegins),
-      new Date(reservationEnds),
+      reservationBegins ? new Date(reservationBegins) : undefined,
+      reservationEnds ? new Date(reservationEnds) : undefined,
       reservationsMinDaysBefore
     ) ||
     (!skipLengthCheck &&
