@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
+import { Control, FieldValues, useForm } from "react-hook-form";
 import styled from "styled-components";
 import {
   Application,
@@ -21,6 +21,7 @@ import BillingAddress from "./BillingAddress";
 import Buttons from "./Buttons";
 import { deepCopy, applicationErrorText } from "../../modules/util";
 import ControlledSelect from "../common/ControlledSelect";
+import ApplicationForm from "./ApplicationForm";
 
 export const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {
@@ -41,7 +42,7 @@ const OrganisationForm = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const { register, unregister, handleSubmit, control, errors } = useForm({
+  const form = useForm<ApplicationForm>({
     defaultValues: {
       organisation: { ...application.organisation } as Organisation,
       contactPerson: { ...application.contactPerson } as ContactPerson,
@@ -49,6 +50,14 @@ const OrganisationForm = ({
       homeCityId: application.homeCityId,
     },
   });
+
+  const {
+    register,
+    unregister,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = form;
 
   const [hasRegistration, setHasRegistration] = useState(
     Boolean(application.organisation?.identifier) // it is registered if identifier is set
@@ -59,7 +68,7 @@ const OrganisationForm = ({
 
   useEffect(() => {
     if (hasRegistration) {
-      register({ name: "organisation.identifier", required: true });
+      register("organisation.identifier", { required: true });
     } else {
       unregister("organisation.identifier");
     }
@@ -103,10 +112,9 @@ const OrganisationForm = ({
           {t("application:Page3.subHeading.basicInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("organisation.name", { required: true, maxLength: 255 })}
           label={t("application:Page3.organisation.name")}
           id="organisation.name"
-          name="organisation.name"
           required
           invalid={!!errors.organisation?.name?.type}
           errorText={applicationErrorText(t, errors.organisation?.name?.type, {
@@ -114,10 +122,12 @@ const OrganisationForm = ({
           })}
         />
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("organisation.coreBusiness", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.organisation.coreBusiness")}
           id="organisation.coreBusiness"
-          name="organisation.coreBusiness"
           required
           invalid={!!errors.organisation?.coreBusiness?.type}
           errorText={applicationErrorText(
@@ -132,7 +142,7 @@ const OrganisationForm = ({
           name="homeCityId"
           required
           label={t("application:Page3.homeCity")}
-          control={control}
+          control={control as unknown as Control<FieldValues, unknown>}
           options={homeCityOptions}
           error={applicationErrorText(t, errors.homeCityId?.type)}
         />
@@ -148,10 +158,12 @@ const OrganisationForm = ({
         </CheckboxWrapper>
         <Placeholder />
         <TextInput
-          ref={register({ required: hasRegistration, maxLength: 255 })}
+          {...register("organisation.identifier", {
+            required: hasRegistration,
+            maxLength: 255,
+          })}
           label={t("application:Page3.organisation.registrationNumber")}
           id="organisation.identifier"
-          name="organisation.identifier"
           required={hasRegistration}
           disabled={!hasRegistration}
           invalid={!!errors.organisation?.identifier?.type}
@@ -168,7 +180,10 @@ const OrganisationForm = ({
           {t("application:Page3.subHeading.postalAddress")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("organisation.address.streetAddress", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.organisation.streetAddress")}
           id="organisation.address.streetAddress"
           name="organisation.address.streetAddress"
@@ -183,10 +198,12 @@ const OrganisationForm = ({
           )}
         />
         <TextInput
-          ref={register({ required: true, maxLength: 32 })}
+          {...register("organisation.address.postCode", {
+            required: true,
+            maxLength: 32,
+          })}
           label={t("application:Page3.organisation.postCode")}
           id="organisation.address.postCode"
-          name="organisation.address.postCode"
           required
           invalid={!!errors.organisation?.address?.postCode?.type}
           errorText={applicationErrorText(
@@ -196,10 +213,12 @@ const OrganisationForm = ({
           )}
         />
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("organisation.address.city", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.organisation.city")}
           id="organisation.address.city"
-          name="organisation.address.city"
           required
           invalid={!!errors.organisation?.address?.city?.type}
           errorText={applicationErrorText(
@@ -219,17 +238,17 @@ const OrganisationForm = ({
             onClick={() => setHasBillingAddress(!hasBillingAddress)}
           />
         </CheckboxWrapper>
-        {hasBillingAddress ? (
-          <BillingAddress register={register} errors={errors} />
-        ) : null}
+        {hasBillingAddress ? <BillingAddress form={form} /> : null}
         <FormSubHeading>
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("contactPerson.firstName", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.contactPerson.firstName")}
           id="contactPerson.firstName"
-          name="contactPerson.firstName"
           required
           invalid={!!errors.contactPerson?.firstName?.type}
           errorText={applicationErrorText(
@@ -241,10 +260,12 @@ const OrganisationForm = ({
           )}
         />
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("contactPerson.lastName", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.contactPerson.lastName")}
           id="contactPerson.lastName"
-          name="contactPerson.lastName"
           required
           invalid={!!errors.contactPerson?.lastName?.type}
           errorText={applicationErrorText(
@@ -256,10 +277,12 @@ const OrganisationForm = ({
           )}
         />
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("contactPerson.phoneNumber", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.contactPerson.phoneNumber")}
           id="contactPerson.phoneNumber"
-          name="contactPerson.phoneNumber"
           required
           invalid={!!errors.contactPerson?.phoneNumber?.type}
           errorText={applicationErrorText(
@@ -270,7 +293,7 @@ const OrganisationForm = ({
             }
           )}
         />
-        <EmailInput register={register} errors={errors} />
+        <EmailInput form={form} />
       </TwoColumnContainer>
       <Buttons
         onSubmit={handleSubmit(onSubmit)}

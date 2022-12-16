@@ -7,7 +7,7 @@ import {
   TextInput,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 import {
   AccordionState,
@@ -24,6 +24,7 @@ import {
 } from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { omit } from "lodash";
 import ReservationUnitList from "../reservation-unit/ReservationUnitList";
 import {
   apiDateToUIDate,
@@ -180,14 +181,19 @@ const ApplicationEvent = ({
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
 
-  form.register({ name: fieldName("eventReservationUnits") });
-  form.register(fieldName("begin"));
-  form.register(fieldName("end"));
-  form.register(fieldName("minDuration"));
-  form.register(fieldName("maxDuration"));
-  form.register(fieldName("numPersons"));
-  form.register(fieldName("eventsPerWeek"));
-  form.register(fieldName("biweekly"));
+  const {
+    register,
+    formState: { errors },
+  } = form;
+
+  register(fieldName("eventReservationUnits"));
+  register(fieldName("begin"));
+  register(fieldName("end"));
+  register(fieldName("minDuration"));
+  register(fieldName("maxDuration"));
+  register(fieldName("numPersons"));
+  register(fieldName("eventsPerWeek"));
+  register(fieldName("biweekly"));
 
   const eventName = form.watch(fieldName("name"));
   const applicationPeriodBegin = form.watch(fieldName("begin"));
@@ -237,15 +243,17 @@ const ApplicationEvent = ({
         <TwoColumnContainer>
           <div>
             <TextInput
-              ref={form.register({ required: true, maxLength: 255 })}
+              {...form.register(fieldName("name"), {
+                required: true,
+                maxLength: 255,
+              })}
               label={t("application:Page1.name")}
               id={fieldName("name")}
-              name={fieldName("name")}
               required
-              invalid={!!form.errors.applicationEvents?.[index]?.name?.type}
+              invalid={!!errors.applicationEvents?.[index]?.name?.type}
               errorText={applicationErrorText(
                 t,
-                form.errors.applicationEvents?.[index]?.name?.type,
+                errors.applicationEvents?.[index]?.name?.type,
                 { count: 255 }
               )}
             />
@@ -253,14 +261,16 @@ const ApplicationEvent = ({
           <div>
             <NumberInput
               id={fieldName("numPersons")}
-              name={fieldName("numPersons")}
               required
-              ref={form.register({
-                validate: {
-                  required: (val) => Boolean(val),
-                  numPersonsMin: (val) => Number(val) > 0,
-                },
-              })}
+              {...omit(
+                form.register(fieldName("numPersons"), {
+                  validate: {
+                    required: (val) => Boolean(val),
+                    numPersonsMin: (val) => Number(val) > 0,
+                  },
+                }),
+                ["max"]
+              )}
               label={t("application:Page1.groupSize")}
               min={0}
               minusStepButtonAriaLabel={t("common:subtract")}
@@ -268,11 +278,9 @@ const ApplicationEvent = ({
               step={1}
               errorText={applicationErrorText(
                 t,
-                form.errors.applicationEvents?.[index]?.numPersons?.type
+                errors.applicationEvents?.[index]?.numPersons?.type
               )}
-              invalid={
-                !!form.errors.applicationEvents?.[index]?.numPersons?.type
-              }
+              invalid={!!errors.applicationEvents?.[index]?.numPersons?.type}
             />
           </div>
           <ControlledSelect
@@ -283,7 +291,7 @@ const ApplicationEvent = ({
             options={ageGroupOptions}
             error={applicationErrorText(
               t,
-              form.errors.applicationEvents?.[index]?.ageGroupId?.type
+              errors.applicationEvents?.[index]?.ageGroupId?.type
             )}
           />
           <ControlledSelect
@@ -294,7 +302,7 @@ const ApplicationEvent = ({
             options={purposeOptions}
             error={applicationErrorText(
               t,
-              form.errors.applicationEvents?.[index]?.purposeId?.type
+              errors.applicationEvents?.[index]?.purposeId?.type
             )}
           />
         </TwoColumnContainer>
@@ -334,12 +342,7 @@ const ApplicationEvent = ({
           <DateInput
             disableConfirmation
             language={i18n.language as LocalizationLanguages}
-            onChange={(v) => {
-              form.clearErrors([fieldName("begin"), fieldName("end")]);
-              form.setValue(fieldName("begin"), v);
-              form.trigger([fieldName("end"), fieldName("begin")]);
-            }}
-            ref={form.register({
+            {...form.register(fieldName("begin"), {
               validate: {
                 required: (val) => Boolean(val),
                 beginAfterEnd: (val) =>
@@ -361,21 +364,25 @@ const ApplicationEvent = ({
                   ),
               },
             })}
+            onChange={(v) => {
+              form.clearErrors([fieldName("begin"), fieldName("end")]);
+              form.setValue(fieldName("begin"), v);
+              form.trigger([fieldName("end"), fieldName("begin")]);
+            }}
             label={t("application:Page1.periodStartDate")}
             id={fieldName("begin")}
-            name={fieldName("begin")}
             value={form.getValues(fieldName("begin"))}
             required
             minDate={new Date(applicationRound.reservationPeriodBegin)}
             maxDate={new Date(applicationRound.reservationPeriodEnd)}
-            invalid={!!form.errors.applicationEvents?.[index]?.begin?.type}
+            invalid={!!errors?.applicationEvents?.[index]?.begin?.type}
             errorText={applicationErrorText(
               t,
-              form.errors.applicationEvents?.[index]?.begin?.type
+              errors?.applicationEvents?.[index]?.begin?.type
             )}
           />
           <DateInput
-            ref={form.register({
+            {...form.register(fieldName("end"), {
               validate: {
                 required: (val) => {
                   return Boolean(val);
@@ -410,14 +417,13 @@ const ApplicationEvent = ({
             value={form.getValues(fieldName("end"))}
             label={t("application:Page1.periodEndDate")}
             id={fieldName("end")}
-            name={fieldName("end")}
             required
             minDate={new Date(applicationRound.reservationPeriodBegin)}
             maxDate={new Date(applicationRound.reservationPeriodEnd)}
-            invalid={form.errors.applicationEvents?.[index]?.end?.type}
+            invalid={errors.applicationEvents?.[index]?.end?.type}
             errorText={applicationErrorText(
               t,
-              form.errors.applicationEvents?.[index]?.end?.type
+              errors.applicationEvents?.[index]?.end?.type
             )}
           />
           <ControlledSelect
@@ -428,7 +434,7 @@ const ApplicationEvent = ({
             options={getDurationOptions()}
             error={applicationErrorText(
               t,
-              form.errors.applicationEvents?.[index]?.minDuration?.type
+              errors.applicationEvents?.[index]?.minDuration?.type
             )}
             validate={{
               required: (val: string) => {
@@ -451,7 +457,7 @@ const ApplicationEvent = ({
             options={getDurationOptions()}
             error={applicationErrorText(
               t,
-              form.errors.applicationEvents?.[index]?.maxDuration?.type
+              errors.applicationEvents?.[index]?.maxDuration?.type
             )}
             validate={{
               required: (val: string) => {
@@ -468,24 +474,24 @@ const ApplicationEvent = ({
           />
           <NumberInput
             id={fieldName("eventsPerWeek")}
-            name={fieldName("eventsPerWeek")}
             required
-            ref={form.register({
-              validate: {
-                eventsPerWeekMin: (val) => Number(val) > 0,
-              },
-            })}
+            {...omit(
+              form.register(fieldName("eventsPerWeek"), {
+                validate: {
+                  eventsPerWeekMin: (val) => Number(val) > 0,
+                },
+              }),
+              ["max"]
+            )}
             label={t("application:Page1.eventsPerWeek")}
             min={1}
             minusStepButtonAriaLabel={t("common:subtract")}
             plusStepButtonAriaLabel={t("common:add")}
             step={1}
-            invalid={
-              !!form.errors.applicationEvents?.[index]?.eventsPerWeek?.type
-            }
+            invalid={!!errors.applicationEvents?.[index]?.eventsPerWeek?.type}
             errorText={applicationErrorText(
               t,
-              form.errors.applicationEvents?.[index]?.eventsPerWeek?.type
+              errors.applicationEvents?.[index]?.eventsPerWeek?.type
             )}
           />
           <Controller

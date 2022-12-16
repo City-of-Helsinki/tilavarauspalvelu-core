@@ -3,7 +3,7 @@ import { Checkbox, NumberInput, Select, TextArea, TextInput } from "hds-react";
 import camelCase from "lodash/camelCase";
 import get from "lodash/get";
 import React, { useMemo } from "react";
-import { Control, Controller, DeepMap, FieldError } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium } from "common/src/common/typography";
@@ -12,18 +12,12 @@ import { Inputs, Reservation } from "../../modules/types";
 import { CheckboxWrapper } from "../common/common";
 
 type Props = {
-  field: string;
+  field: keyof Inputs;
   options: Record<string, OptionType[]>;
   reserveeType: string;
   reservation: Reservation;
   metadataSet: ReservationMetadataSetType;
-  errors: DeepMap<Inputs, FieldError>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  control: Control<Record<string, any>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  watch: any;
+  form: ReturnType<typeof useForm>;
   params?: Record<string, Record<string, string | number>>;
 };
 
@@ -74,10 +68,12 @@ const ReservationFormField = ({
   reserveeType,
   metadataSet,
   reservation,
-  errors,
-  control,
-  register,
-  watch,
+  form: {
+    register,
+    control,
+    watch,
+    formState: { errors },
+  },
   params = {},
 }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -137,7 +133,11 @@ const ReservationFormField = ({
 
   return Object.keys(options).includes(field) ? (
     <Controller
-      as={
+      name={field}
+      control={control}
+      key={field}
+      rules={{ required }}
+      render={() => (
         <StyledSelect
           label={t(
             `reservationApplication:label.${normalizedReserveeType}.${field}`
@@ -152,11 +152,7 @@ const ReservationFormField = ({
           invalid={!!get(errors, field)}
           $isWide={isWideRow}
         />
-      }
-      name={field}
-      control={control}
-      key={field}
-      rules={{ required }}
+      )}
     />
   ) : field === "applyingForFreeOfCharge" ? (
     <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
@@ -165,11 +161,11 @@ const ReservationFormField = ({
         control={control}
         defaultValue={get(reservation, field)}
         rules={{ required }}
-        render={(props) => (
+        render={({ field: formField }) => (
           <Checkbox
             id={field}
-            onChange={(e) => props.onChange(e.target.checked)}
-            checked={props.value}
+            onChange={(e) => formField.onChange(e.target.checked)}
+            checked={formField.value}
             label={`${t(
               `reservationApplication:label.${normalizedReserveeType}.${field}`
             )}${required ? " * " : ""}`}
@@ -185,11 +181,11 @@ const ReservationFormField = ({
         control={control}
         defaultValue={get(reservation, field)}
         rules={{ required }}
-        render={(props) => (
+        render={({ field: formField }) => (
           <Checkbox
             id={field}
-            onChange={(e) => props.onChange(e.target.checked)}
-            checked={props.value}
+            onChange={(e) => formField.onChange(e.target.checked)}
+            checked={formField.value}
             defaultChecked={watch("reserveeIsUnregisteredAssociation")}
             label={`${t(
               `reservationApplication:label.${normalizedReserveeType}.${field}`
@@ -206,11 +202,11 @@ const ReservationFormField = ({
         control={control}
         defaultValue={get(reservation, field)}
         rules={{ required }}
-        render={(props) => (
+        render={({ field: formField }) => (
           <Checkbox
             id={field}
-            onChange={(e) => props.onChange(e.target.checked)}
-            checked={props.value}
+            onChange={(e) => formField.onChange(e.target.checked)}
+            checked={formField.value}
             defaultChecked={get(reservation, field)}
             label={`${t(
               `reservationApplication:label.${normalizedReserveeType}.${field}`
@@ -226,9 +222,8 @@ const ReservationFormField = ({
         `reservationApplication:label.${normalizedReserveeType}.${field}`
       )}${isFreeOfChargeReasonRequired ? " * " : ""}`}
       id={field}
-      name={field}
-      ref={register({ required: isFreeOfChargeReasonRequired })}
       key={field}
+      {...register(field, { required: isFreeOfChargeReasonRequired })}
       defaultValue={get(reservation, field) || ""}
       errorText={get(errors, field) && t("forms:requiredField")}
       invalid={!!get(errors, field)}
@@ -242,8 +237,7 @@ const ReservationFormField = ({
         `reservationApplication:label.${normalizedReserveeType}.${field}`
       )}${required ? " * " : ""}`}
       id={field}
-      name={field}
-      ref={register({
+      {...register(field, {
         required,
         ...(required && {
           min: 1,
@@ -265,8 +259,7 @@ const ReservationFormField = ({
         `reservationApplication:label.${normalizedReserveeType}.${field}`
       )}${required ? " * " : ""}`}
       id={field}
-      name={field}
-      ref={register({
+      {...register(field, {
         required,
         ...(isEmailField && {
           pattern: {
@@ -301,8 +294,7 @@ const ReservationFormField = ({
         `reservationApplication:label.${normalizedReserveeType}.${field}`
       )}${isReserveeIdRequired ? " * " : ""}`}
       id={field}
-      name={field}
-      ref={register({
+      {...register(field, {
         required: isReserveeIdRequired,
       })}
       key={field}
@@ -324,8 +316,7 @@ const ReservationFormField = ({
         `reservationApplication:label.${normalizedReserveeType}.${field}`
       )}${required ? " * " : ""}`}
       id={field}
-      name={field}
-      ref={register({
+      {...register(field, {
         required,
         ...(isEmailField && {
           pattern: {
@@ -336,7 +327,6 @@ const ReservationFormField = ({
       })}
       key={field}
       type="text"
-      defaultValue={get(reservation, field)}
       errorText={
         get(errors, field) &&
         t(

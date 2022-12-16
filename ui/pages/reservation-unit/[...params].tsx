@@ -265,7 +265,8 @@ const ReservationUnitReservation = ({
   const [reserveeType, setReserveeType] =
     useState<ReservationsReservationReserveeTypeChoices>(null);
 
-  const { register, handleSubmit, watch, errors, control } = useForm<Inputs>();
+  const form = useForm<Inputs>();
+  const { handleSubmit, watch } = form;
 
   const { data: fetchedReservationData } = useQuery<
     Query,
@@ -617,10 +618,7 @@ const ReservationUnitReservation = ({
                   setReserveeType={setReserveeType}
                   cancelReservation={cancelReservation}
                   options={options}
-                  register={register}
-                  errors={errors}
-                  watch={watch}
-                  control={control}
+                  form={form}
                 />
               )}
               {step === 1 && (

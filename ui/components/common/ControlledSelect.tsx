@@ -29,24 +29,21 @@ const ControlledSelect = ({
       control={control}
       name={name}
       rules={{ required, validate }}
-      onFocus={() => {
-        document.getElementById(`${name}-toggle-button`)?.focus();
-      }}
-      render={(props) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { ref, value, ...newProps } = props;
-        const currentValue = getSelectedOption(value, options);
+      render={({ field }) => {
+        const currentValue = getSelectedOption(field.value, options);
         return (
           <Select
-            {...newProps}
             id={name}
+            onFocus={() => {
+              document.getElementById(`${name}-toggle-button`)?.focus();
+            }}
             value={currentValue}
             placeholder={t("common:select")}
             options={options}
             label={label}
             required={required}
             onChange={(selection: OptionType): void => {
-              newProps.onChange(selection.value);
+              field.onChange(selection.value);
             }}
             invalid={Boolean(error)}
             error={error}

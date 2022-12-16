@@ -26,6 +26,8 @@ export type Inputs = {
   homeCity: number;
   applyingForFreeOfCharge: boolean;
   freeOfChargeReason: string;
+  reserveeIsUnregisteredAssociation?: boolean;
+  reserveeId?: number;
 };
 
 export type Reservation = {

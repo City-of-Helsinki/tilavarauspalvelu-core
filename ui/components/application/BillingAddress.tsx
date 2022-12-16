@@ -1,16 +1,21 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { TextInput } from "hds-react";
-import { useForm } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { applicationErrorText } from "../../modules/util";
 import { FormSubHeading } from "../common/common";
+import ApplicationForm from "./ApplicationForm";
 
 type Props = {
-  register: ReturnType<typeof useForm>["register"];
-  errors: ReturnType<typeof useForm>["errors"];
+  form: UseFormReturn<ApplicationForm>;
 };
 
-const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
+const BillingAddress = ({
+  form: {
+    register,
+    formState: { errors },
+  },
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   return (
@@ -19,10 +24,12 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         {t("application:Page3.subHeading.billingAddress")}
       </FormSubHeading>
       <TextInput
-        ref={register({ required: true, maxLength: 255 })}
+        {...register("billingAddress.streetAddress", {
+          required: true,
+          maxLength: 255,
+        })}
         label={t("application:Page3.billingAddress.streetAddress")}
         id="billingAddress.streetAddress"
-        name="billingAddress.streetAddress"
         required
         invalid={!!errors.billingAddress?.streetAddress?.type}
         errorText={applicationErrorText(
@@ -34,10 +41,12 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         )}
       />
       <TextInput
-        ref={register({ required: true, maxLength: 32 })}
+        {...register("billingAddress.postCode", {
+          required: true,
+          maxLength: 32,
+        })}
         label={t("application:Page3.billingAddress.postCode")}
         id="billingAddress.postCode"
-        name="billingAddress.postCode"
         required
         invalid={!!errors.billingAddress?.postCode?.type}
         errorText={applicationErrorText(
@@ -47,10 +56,9 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         )}
       />
       <TextInput
-        ref={register({ required: true, maxLength: 255 })}
+        {...register("billingAddress.city", { required: true, maxLength: 255 })}
         label={t("application:Page3.billingAddress.city")}
         id="billingAddress.city"
-        name="billingAddress.city"
         required
         invalid={!!errors.billingAddress?.city?.type}
         errorText={applicationErrorText(t, errors.billingAddress?.city?.type, {

@@ -2,7 +2,7 @@ import { OptionType } from "common/types/common";
 import { IconArrowLeft, IconArrowRight, IconGroup, IconUser } from "hds-react";
 import Image from "next/image";
 import React, { Fragment, ReactElement, useMemo } from "react";
-import { Control, DeepMap, FieldError } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
@@ -33,13 +33,7 @@ type Props = {
   reservationApplicationFields: string[];
   cancelReservation: () => void;
   options: Record<string, OptionType[]>;
-  errors: DeepMap<Inputs, FieldError>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  control: Control<Record<string, any>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  watch: any;
+  form: UseFormReturn<Inputs>;
 };
 
 const Form = styled.form`
@@ -78,10 +72,7 @@ const Step0 = ({
   reservationApplicationFields,
   cancelReservation,
   options,
-  errors,
-  control,
-  register,
-  watch,
+  form,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -133,13 +124,10 @@ const Step0 = ({
               return (
                 <ReservationFormField
                   key={`key-${field}`}
-                  field={field}
+                  field={field as unknown as keyof Inputs}
                   options={options}
-                  register={register}
-                  errors={errors}
+                  form={form as unknown as ReturnType<typeof useForm>}
                   metadataSet={reservationUnit.metadataSet}
-                  watch={watch}
-                  control={control}
                   reserveeType="common"
                   reservation={reservation}
                   params={{
@@ -221,15 +209,12 @@ const Step0 = ({
                   </GroupHeading>
                 )}
               <ReservationFormField
-                field={field}
+                field={field as unknown as keyof Inputs}
                 options={options}
                 reserveeType={reserveeType}
                 metadataSet={reservationUnit.metadataSet}
                 reservation={reservation}
-                errors={errors}
-                control={control}
-                register={register}
-                watch={watch}
+                form={form as unknown as ReturnType<typeof useForm>}
               />
             </Fragment>
           );

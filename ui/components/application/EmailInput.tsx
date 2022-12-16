@@ -1,16 +1,21 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { UseFormReturn } from "react-hook-form";
 import { Notification, TextInput } from "hds-react";
-import { useForm } from "react-hook-form";
 import { SpanTwoColumns } from "../common/common";
 import { applicationErrorText } from "../../modules/util";
+import ApplicationForm from "./ApplicationForm";
 
 type Props = {
-  register: ReturnType<typeof useForm>["register"];
-  errors: ReturnType<typeof useForm>["errors"];
+  form: UseFormReturn<ApplicationForm>;
 };
 
-const EmailInput = ({ register, errors }: Props): JSX.Element | null => {
+const EmailInput = ({
+  form: {
+    register,
+    formState: { errors },
+  },
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
   return (
     <>
@@ -23,7 +28,7 @@ const EmailInput = ({ register, errors }: Props): JSX.Element | null => {
         </Notification>
       </SpanTwoColumns>
       <TextInput
-        ref={register({
+        {...register("contactPerson.email", {
           required: true,
           maxLength: 255,
           pattern:

@@ -270,11 +270,11 @@ const SearchForm = ({
   const multiSelectFilters = ["unit", "reservationUnitType", "purposes"];
 
   useEffect(() => {
-    register({ name: "minPersons" });
-    register({ name: "maxPersons" });
-    register({ name: "unit" });
-    register({ name: "reservationUnitType" });
-    register({ name: "purposes" });
+    register("minPersons");
+    register("maxPersons");
+    register("unit");
+    register("reservationUnitType");
+    register("purposes");
   }, [register]);
 
   useEffect(() => {
@@ -299,9 +299,8 @@ const SearchForm = ({
         <Filters $areFiltersVisible={areFiltersVisible}>
           <TextInput
             id="search"
-            name="textSearch"
             label={t("searchForm:textSearchLabel")}
-            ref={register()}
+            {...register("textSearch")}
             placeholder={t("searchForm:searchTermPlaceholder")}
             onKeyDown={(e) => {
               if (e.key === "Enter") {

@@ -207,8 +207,8 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
   }, [data, loading, error, t]);
 
   useEffect(() => {
-    register({ name: "reason", required: true });
-    register({ name: "description" });
+    register("reason", { required: true });
+    register("description");
   }, [register]);
 
   const bylineContent = useMemo(() => {
@@ -318,7 +318,9 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                     )}
                     <Form onSubmit={handleSubmit(onSubmit)}>
                       <Controller
-                        as={
+                        name="reason"
+                        control={control}
+                        render={() => (
                           <StyledSelect
                             id="reservation__button--cancel-reason"
                             label={`${t("reservations:cancelReason")}`}
@@ -336,9 +338,7 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                             )}
                             required
                           />
-                        }
-                        name="reason"
-                        control={control}
+                        )}
                       />
                       <TextArea
                         id="reservation__button--cancel-description"
@@ -364,7 +364,7 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                         <MediumButton
                           variant="primary"
                           type="submit"
-                          disabled={!watch("reason")?.value}
+                          disabled={!watch("reason")}
                           data-testid="reservation-cancel__button--cancel"
                         >
                           {t("reservations:cancelReservation")}

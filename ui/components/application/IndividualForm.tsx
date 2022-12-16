@@ -12,6 +12,7 @@ import EmailInput from "./EmailInput";
 import BillingAddress from "./BillingAddress";
 import Buttons from "./Buttons";
 import { deepCopy, applicationErrorText } from "../../modules/util";
+import ApplicationForm from "./ApplicationForm";
 
 type Props = {
   application: Application;
@@ -21,13 +22,19 @@ type Props = {
 const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const { register, handleSubmit, errors } = useForm({
+  const form = useForm<ApplicationForm>({
     defaultValues: {
       contactPerson: { ...application.contactPerson } as ContactPerson,
       billingAddress: { ...application.billingAddress } as Address,
       additionalInformation: application.additionalInformation,
     },
   });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
 
   const prepareData = (data: Application): Application => {
     const applicationCopy = deepCopy(application);
@@ -62,10 +69,12 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           {t("application:Page3.subHeading.basicInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("contactPerson.firstName", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.firstName")}
           id="contactPerson.firstName"
-          name="contactPerson.firstName"
           required
           invalid={!!errors.contactPerson?.firstName?.type}
           errorText={applicationErrorText(
@@ -77,10 +86,12 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           )}
         />
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("contactPerson.lastName", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.lastName")}
           id="contactPerson.lastName"
-          name="contactPerson.lastName"
           required
           invalid={!!errors.contactPerson?.lastName?.type}
           errorText={applicationErrorText(
@@ -91,15 +102,17 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
             }
           )}
         />
-        <BillingAddress register={register} errors={errors} />
+        <BillingAddress form={form} />
         <FormSubHeading as="h2">
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true, maxLength: 255 })}
+          {...register("contactPerson.phoneNumber", {
+            required: true,
+            maxLength: 255,
+          })}
           label={t("application:Page3.phoneNumber")}
           id="contactPerson.phoneNumber"
-          name="contactPerson.phoneNumber"
           required
           invalid={!!errors.contactPerson?.phoneNumber?.type}
           errorText={applicationErrorText(
@@ -112,10 +125,12 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
         />
         <SpanTwoColumns>
           <TextInput
-            ref={register({ required: false, maxLength: 255 })}
+            {...register("additionalInformation", {
+              required: false,
+              maxLength: 255,
+            })}
             label={t("application:Page3.additionalInformation")}
             id="additionalInformation"
-            name="additionalInformation"
             errorText={applicationErrorText(
               t,
               errors.additionalInformation?.type,
@@ -125,7 +140,7 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
             )}
           />
         </SpanTwoColumns>
-        <EmailInput register={register} errors={errors} />
+        <EmailInput form={form} />
       </TwoColumnContainer>
       <Buttons
         onSubmit={handleSubmit(onSubmit)}

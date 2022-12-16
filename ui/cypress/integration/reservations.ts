@@ -1,4 +1,3 @@
-import { hzNavigationBack } from "model/calendar";
 import {
   cancelButton as detailCancelButton,
   accordionToggler,

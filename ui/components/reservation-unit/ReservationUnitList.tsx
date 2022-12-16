@@ -2,7 +2,7 @@ import { IconPlusCircle, Notification as HDSNotification } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { sortBy } from "lodash";
+import { isEqual, sortBy } from "lodash";
 import styled from "styled-components";
 import { ApplicationEvent, OptionType } from "common/types/common";
 import {
@@ -76,20 +76,6 @@ const ReservationUnitList = ({
   };
 
   useEffect(() => {
-    form.setValue(
-      fieldName,
-      reservationUnits.map((resUnit, index) => {
-        return {
-          reservationUnitId: resUnit.pk,
-          priority: index,
-          maxPersons: resUnit.maxPersons,
-        };
-      })
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reservationUnits]);
-
-  useEffect(() => {
     const valid = isValid(reservationUnits);
     if (valid) {
       form.clearErrors([fieldName]);
@@ -147,6 +133,25 @@ const ReservationUnitList = ({
     applicationEvent.eventReservationUnits,
     applicationRound,
   ]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+    const newReservationUnits = reservationUnits.map((resUnit, index) => {
+      return {
+        reservationUnitId: resUnit.pk,
+        priority: index,
+        maxPersons: resUnit.maxPersons,
+      };
+    });
+
+    if (isEqual(newReservationUnits, form.getValues(fieldName))) {
+      return;
+    }
+
+    form.setValue(fieldName, newReservationUnits);
+  }, [isLoading, reservationUnits, fieldName, form]);
 
   const move = (
     units: ReservationUnitType[],
