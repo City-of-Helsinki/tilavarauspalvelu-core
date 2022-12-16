@@ -230,11 +230,27 @@ environ.Env.read_env()
 APP_LOGGING_LEVEL = env("APP_LOGGING_LEVEL")
 
 LOGGING = DEFAULT_LOGGING
+LOGGING["handlers"]["console"] = {
+    "level": "DEBUG",
+    "class": "logging.StreamHandler",
+}
 LOGGING["loggers"]["tilavaraus"] = {
-    "handlers": ["django.server"],
+    "handlers": ["console"],
     "level": APP_LOGGING_LEVEL,
     "propagate": True,
 }
+
+ENABLE_SQL_LOGGING = env("ENABLE_SQL_LOGGING")
+if ENABLE_SQL_LOGGING:
+    LOGGING["loggers"].update(
+        {
+            "django.db.backends": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+                "propagate": True,
+            },
+        }
+    )
 
 logger = getLogger("settings")
 
@@ -553,17 +569,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # Open city profile confs
 OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
 OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES = env("OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES")
-
-ENABLE_SQL_LOGGING = env("ENABLE_SQL_LOGGING")
-
-if ENABLE_SQL_LOGGING:
-    LOGGING = DEFAULT_LOGGING
-    LOGGING["loggers"].update(
-        {
-            "django.db.backends": {
-                "handlers": ["django.server"],
-                "level": "DEBUG",
-                "propagate": True,
-            },
-        }
-    )
