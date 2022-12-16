@@ -1,4 +1,12 @@
-import { addDays, format, addMinutes } from "date-fns";
+import { addDays, addMinutes, format, parse } from "date-fns";
+import { ApplicationRound } from "../../../types/common";
+import {
+  OpeningHoursType,
+  ReservationType,
+  ReservationUnitByPkType,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  ReservationUnitType,
+} from "../../../types/gql-types";
 import {
   areSlotsReservable,
   doBuffersCollide,
@@ -19,14 +27,6 @@ import {
   isSlotWithinTimeframe,
   isStartTimeWithinInterval,
 } from "../util";
-import {
-  OpeningHoursType,
-  ReservationType,
-  ReservationUnitByPkType,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  ReservationUnitType,
-} from "../../../types/gql-types";
-import { ApplicationRound } from "../../../types/common";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -311,7 +311,9 @@ describe("getDayIntervals", () => {
 });
 
 describe("isStartTimeWithinInterval", () => {
-  const timeZoneHours = Math.abs(new Date().getTimezoneOffset() / 60)
+  const timeZoneHours = Math.abs(
+    parse("2019-09-22", "yyyy-MM-dd", new Date()).getTimezoneOffset() / 60
+  )
     .toString()
     .padStart(2, "0");
 
