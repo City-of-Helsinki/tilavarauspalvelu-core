@@ -1,0 +1,107 @@
+<mjml>
+  <mj-head>
+    <mj-style>
+      @font-face {
+        font-family: "HelsinkiGrotesk";
+        src: url("https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff") format("woff");
+      }
+
+      p {
+        margin: 0;
+      }
+    </mj-style>
+    <mj-attributes>
+      <mj-text line-height="18px" font-weight="400" font-size="18px" padding-top="4px" padding-bottom="4px" />
+      <mj-spacer height="30px" />
+      <mj-all font-family="HelsinkiGrotesk" color="#000000">
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#ffffff" width="960px">
+    <mj-section>
+      <mj-group>
+        <mj-column vertical-align="middle" width="200px" padding="0">
+          <mj-image width="200px" align="left" src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" />
+        </mj-column>
+        <mj-column vertical-align="middle">
+          <mj-text font-size="24px" align="left" padding="0">
+            <b>Varaamo</b>
+          </mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="36px">
+          <b>Hei {{reservee_name}},</b>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#F7F2E4">
+      <mj-column>
+        <mj-text>Olet tehnyt uuden varauksen:</mj-text>
+        <mj-spacer />
+        <mj-text><b>{{reservation_unit}}</b></mj-text>
+        <mj-text>{{unit_name}}</mj-text>
+        <mj-text>{{unit_location}}</mj-text>
+        <mj-spacer />
+        <mj-text>
+          <p>Alkamisaika: <b>{{begin_date}}</b> klo <b>{{begin_time}}</b></p>
+        </mj-text>
+        <mj-text>
+          <p>Päättymisaika: <b>{{end_date}}</b> klo <b>{{end_time}}</b></p>
+        </mj-text>
+        <mj-spacer />
+        <mj-text>
+          <p>Varauksen hinta: <b>{{price}} € </b> (sis. alv {{tax_percentage}})</p>
+        </mj-text>
+        <mj-text>
+          <p>Varausnumero: {{reservation_number}}</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px">
+          <b>Lisätietoa varauksestasi</b>
+        </mj-text>
+        <mj-text font-size="16px">{{confirmed_instructions}}</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px">
+          <b>Hallitse varaustasi varaamossa<b>
+        </mj-text>
+        <mj-text font-size="16px">Voit perua varauksesi tai tarkistaa varauksesi tiedot sekä Varaamon sopimus- ja peruutusehdot <a href={{my_reservations_ext_link}}>Omat Varaukset-sivulla</a></mj-text>
+        <mj-spacer />
+        <mj-text font-size="16px">Kiitos, kun käytit Varaamoa!</mj-text>
+        <mj-text font-size="16px">Ystävällisin terveisin</mj-text>
+        <mj-text font-size="16px">Varaamo</mj-text>
+        <mj-spacer />
+        <mj-text font-size="16px">Tämä on automaattinen viesti, siihen ei voi vastata</mj-text>
+        <mj-text font-size="16px">Lähetä meille <a href={{feedback_ext_link}}>palautetta Varaamosta</a></mj-text>
+        <mj-text font-size="16px">Varaa helposti kaupungin tiloja ja laiteteita käyttöösi osoitteesta <a href={{varaamo_ext_link}}>varaamo.hel.fi</a></mj-text>
+        <mj-spacer height="50px" />
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#E6E6E6" padding-bottom="0">
+      <mj-group>
+        <mj-column vertical-align="middle" width="150px" padding="0">
+          <mj-image src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" width="100px" />
+        </mj-column>
+        <mj-column vertical-align="middle">
+          <mj-text font-size="16px" align="left" padding="0">
+            <b>Varaamo</b>
+          </mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+    <mj-section background-color="#E6E6E6">
+      <mj-column>
+        <mj-divider border-width="2px" border-style="solid" border-color="#CCCCCC" padding-top="0" />
+        <mj-spacer height="10px" />
+        <mj-text font-size="14px">&copy; Helsingin kaupunki {{current_year}}</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
