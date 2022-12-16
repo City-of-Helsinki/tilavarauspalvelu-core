@@ -1,9 +1,7 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
 import { H1 } from "common/src/common/typography";
-import { Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { LocationType, Query, QueryUnitsArgs } from "common/types/gql-types";
 import { publicUrl } from "../../common/const";
@@ -15,21 +13,16 @@ import withMainMenu from "../withMainMenu";
 import { UNIT_QUERY } from "./queries";
 import ReservationUnitCalendarView from "./ReservationUnitCalendarView";
 import UnitReservationsView from "./UnitReservationsView";
+import { TabPanel, Tabs } from "../Tabs";
 
 type Params = {
   unitId: string;
   reservationUnitId: string;
 };
 
-const TabPanel = styled(Tabs.TabPanel)`
-  margin-top: var(--spacing-s);
-  padding-block: var(--spacing-m);
-`;
-
 const MyUnitView = () => {
   const { notifyError } = useNotification();
   const { unitId } = useParams<Params>();
-
   const { t } = useTranslation();
 
   const { loading, data: unitData } = useQuery<Query, QueryUnitsArgs>(
@@ -60,15 +53,19 @@ const MyUnitView = () => {
           <H1>{unit?.node?.nameFi}</H1>
           <p>{parseAddress(unit?.node?.location as LocationType)}</p>
         </div>
-        <Tabs>
-          <Tabs.TabList>
-            <Tabs.Tab>{t("MyUnits.UnitCalendar.tab")}</Tabs.Tab>
-            <Tabs.Tab>{t("MyUnits.Calendar.tab")}</Tabs.Tab>
-          </Tabs.TabList>
-          <TabPanel>
+        <Tabs
+          headers={[
+            {
+              key: "unit-reservations",
+              label: `${t("MyUnits.UnitCalendar.tab")}`,
+            },
+            { key: "reservation-unit", label: `${t("MyUnits.Calendar.tab")}` },
+          ]}
+        >
+          <TabPanel key="unit-reservations">
             <UnitReservationsView />
           </TabPanel>
-          <TabPanel>
+          <TabPanel key="reservation-unit">
             <ReservationUnitCalendarView />
           </TabPanel>
         </Tabs>
