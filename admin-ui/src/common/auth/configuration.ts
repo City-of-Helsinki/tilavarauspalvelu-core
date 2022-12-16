@@ -4,8 +4,6 @@ import { oidcClientId, oidcScope, publicUrl, oidcUrl } from "../const";
 const path = publicUrl || "";
 const base = `${document.location.protocol}//${document.location.host}${path}`;
 
-const isBrowser = typeof window !== "undefined";
-
 const configuration: UserManagerSettings = {
   client_id: oidcClientId,
   redirect_uri: `${base}/login/helsinki/return`,
@@ -16,11 +14,6 @@ const configuration: UserManagerSettings = {
   silent_redirect_uri: `${base}/login/helsinki/silent`,
   automaticSilentRenew: true,
   loadUserInfo: true,
-  /** for temp debugging, please remove me! */
-  accessTokenExpiringNotificationTime:
-    isBrowser && window.location.search?.indexOf("expirefast")
-      ? 3560
-      : undefined,
 };
 
 export default configuration;
