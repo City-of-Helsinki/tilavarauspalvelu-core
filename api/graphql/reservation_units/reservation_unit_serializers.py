@@ -25,7 +25,6 @@ from reservation_units.models import (
     PricingStatus,
     PricingType,
     Purpose,
-    Q,
     Qualifier,
     ReservationKind,
     ReservationUnit,
@@ -531,15 +530,15 @@ class ReservationUnitUpdateSerializer(
             PricingStatus.PRICING_STATUS_ACTIVE, pricings
         ):
             ReservationUnitPricing.objects.filter(
-                Q(reservation_unit=reservation_unit)
-                and Q(status=PricingStatus.PRICING_STATUS_ACTIVE)
+                reservation_unit=reservation_unit,
+                status=PricingStatus.PRICING_STATUS_ACTIVE,
             ).delete()
         if not ReservationUnitPricingHelper.contains_status(
             PricingStatus.PRICING_STATUS_FUTURE, pricings
         ):
             ReservationUnitPricing.objects.filter(
-                Q(reservation_unit=reservation_unit)
-                and Q(status=PricingStatus.PRICING_STATUS_FUTURE)
+                reservation_unit=reservation_unit,
+                status=PricingStatus.PRICING_STATUS_FUTURE,
             ).delete()
 
         for pricing in pricings:
@@ -550,7 +549,7 @@ class ReservationUnitUpdateSerializer(
             else:  # Create new pricings
                 status = pricing.get("status")
                 ReservationUnitPricing.objects.filter(
-                    Q(reservation_unit=reservation_unit) and Q(status=status)
+                    reservation_unit=reservation_unit, status=status
                 ).delete()
                 ReservationUnitPricing.objects.create(
                     **pricing, reservation_unit=reservation_unit
