@@ -1,9 +1,16 @@
 import { OptionType } from "common/types/common";
-import { IconArrowLeft, IconArrowRight, IconGroup, IconUser } from "hds-react";
+import {
+  Dialog,
+  IconArrowLeft,
+  IconArrowRight,
+  IconGroup,
+  IconInfoCircleFill,
+  IconUser,
+} from "hds-react";
 import Image from "next/image";
-import React, { Fragment, ReactElement, useMemo } from "react";
+import React, { Fragment, ReactElement, useMemo, useRef } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
 import {
@@ -11,7 +18,7 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import { Inputs, Reservation } from "../../modules/types";
-import { MediumButton } from "../../styles/util";
+import { BlackButton, MediumButton } from "../../styles/util";
 import RadioButtonWithImage from "../form/RadioButtonWithImage";
 import ReservationFormField from "./ReservationFormField";
 import {
@@ -20,6 +27,8 @@ import {
   Subheading,
   TwoColumnContainer,
 } from "./styles";
+import { getTranslation } from "../../modules/util";
+import Sanitize from "../common/Sanitize";
 
 type Props = {
   reservation: Reservation;
@@ -75,6 +84,9 @@ const Step0 = ({
   form,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
+
+  const openPricingTermsRef = useRef();
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const reserveeOptions = useMemo((): {
     id: ReservationsReservationReserveeTypeChoices;
@@ -135,6 +147,24 @@ const Step0 = ({
                       min: reservationUnit.minPersons || 0,
                       max: reservationUnit.maxPersons,
                     },
+                  }}
+                  data={{
+                    subventionLabel: (
+                      <Trans i18nKey="reservationApplication:label.common.applyingForFreeOfChargeWithLink">
+                        Haen maksuttomuutta tai hinnan alennusta ja olen
+                        tutustunut
+                        <a
+                          href="#"
+                          ref={openPricingTermsRef}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsDialogOpen(true);
+                          }}
+                        >
+                          alennusperusteisiin
+                        </a>
+                      </Trans>
+                    ),
                   }}
                 />
               );
@@ -219,6 +249,40 @@ const Step0 = ({
             </Fragment>
           );
         })}
+        <Dialog
+          id="dialog__pricing-terms"
+          isOpen={isDialogOpen}
+          aria-labelledby="dialog__pricing-terms--header"
+          aria-describedby="dialog__pricing-terms--body"
+          scrollable
+        >
+          <Dialog.Header
+            id="dialog__pricing-terms--header"
+            title={getTranslation(reservationUnit.pricingTerms, "name")}
+            iconLeft={
+              <IconInfoCircleFill
+                aria-hidden
+                style={{ color: "var(--color-bus)" }}
+              />
+            }
+          />
+          <Dialog.Content id="dialog__pricing-terms--body">
+            <p>
+              <Sanitize
+                style={{ whiteSpace: "pre-line" }}
+                html={getTranslation(reservationUnit.pricingTerms, "text")}
+              />
+            </p>
+          </Dialog.Content>
+          <Dialog.ActionButtons>
+            <BlackButton
+              variant="secondary"
+              onClick={() => setIsDialogOpen(false)}
+            >
+              {t("common:close")}
+            </BlackButton>
+          </Dialog.ActionButtons>
+        </Dialog>
       </TwoColumnContainer>
       <ActionContainer>
         <MediumButton

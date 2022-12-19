@@ -663,7 +663,10 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         "contain.text",
         "Yhteyshenkilön sähköpostiosoite"
       );
-      cy.get("main#main").should("contain.text", "Haen maksutonta varausta");
+      cy.get("main#main").should(
+        "contain.text",
+        "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin"
+      );
 
       cy.get('button[type="submit"]').click();
 

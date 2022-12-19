@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 type Props = {
   html: string;
+  style?: React.CSSProperties;
 };
 
 const StyledContent = styled.div`
@@ -27,9 +28,10 @@ const config = {
   },
 };
 
-const Sanitize = ({ html }: Props): JSX.Element | null =>
+const Sanitize = ({ html, style }: Props): JSX.Element | null =>
   html ? (
     <StyledContent
+      style={style}
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{
         // eslint-disable-next-line @typescript-eslint/naming-convention

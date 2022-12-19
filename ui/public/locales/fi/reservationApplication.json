@@ -18,7 +18,8 @@
       "purpose": "Varauksen käyttötarkoitus",
       "numPersons": "Osallistujamäärä",
       "ageGroup": "Ikäryhmä",
-      "applyingForFreeOfCharge": "Haen maksutonta varausta",
+      "applyingForFreeOfChargeWithLink": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut <1>alennusperusteisiin</1>",
+      "applyingForFreeOfCharge": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin",
       "freeOfChargeReason": "Perusteet maksuttomaan varaukseen"
     },
     "nonprofit": {
@@ -83,6 +84,9 @@
       "companyInfo": "Yrityksen tiedot",
       "nonprofitInfo": "Yhdistyksen tiedot",
       "contactInfo": "Yhteyshenkilön tiedot"
+    },
+    "subHeadings": {
+      "subvention": "Hinnan alennuksen hakeminen"
     }
   },
   "processLabels": {

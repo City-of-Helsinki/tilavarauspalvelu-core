@@ -60,6 +60,9 @@ export const RESERVATION_UNIT = gql`
         nameSv
       }
       pricingTerms {
+        nameFi
+        nameEn
+        nameSv
         textFi
         textEn
         textSv

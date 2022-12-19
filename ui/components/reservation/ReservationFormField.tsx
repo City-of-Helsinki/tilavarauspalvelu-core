@@ -2,11 +2,15 @@ import { OptionType } from "common/types/common";
 import { Checkbox, NumberInput, Select, TextArea, TextInput } from "hds-react";
 import camelCase from "lodash/camelCase";
 import get from "lodash/get";
-import React, { useMemo } from "react";
+import React, { ReactElement, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { fontMedium } from "common/src/common/typography";
+import {
+  fontMedium,
+  fontRegular,
+  Strongish,
+} from "common/src/common/typography";
 import { ReservationMetadataSetType } from "common/types/gql-types";
 import { Inputs, Reservation } from "../../modules/types";
 import { CheckboxWrapper } from "../common/common";
@@ -19,9 +23,14 @@ type Props = {
   metadataSet: ReservationMetadataSetType;
   form: ReturnType<typeof useForm>;
   params?: Record<string, Record<string, string | number>>;
+  data?: Record<string, ReactElement>;
 };
 
-const StyledCheckboxWrapper = styled(CheckboxWrapper)<{ $break?: boolean }>`
+const StyledCheckboxWrapper = styled(CheckboxWrapper)<{
+  $isWide?: boolean;
+  $break?: boolean;
+}>`
+  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
   ${({ $break }) => $break && "margin-top: 0"}
 `;
 
@@ -32,20 +41,13 @@ type TextAreaProps = {
   $height?: string;
 };
 
-const StyledSelect = styled(Select)<{ $isWide?: boolean }>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
+const Subheading = styled(Strongish)`
+  display: block;
+  margin-bottom: var(--spacing-s);
 `;
 
-const StyledTextArea = styled(TextArea).attrs(({ $height }: TextAreaProps) => ({
-  style: { "--textarea-height": $height },
-}))<TextAreaProps>`
+const StyledSelect = styled(Select)<{ $isWide?: boolean }>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
-  ${({ $hidden }) => $hidden && "display: none"};
-  ${({ $break }) => $break && "grid-column: 1 / -2"};
-
-  label {
-    ${fontMedium};
-  }
 `;
 
 const StyledTextInput = styled(TextInput)<{
@@ -62,6 +64,30 @@ const StyledTextInput = styled(TextInput)<{
   }
 `;
 
+const StyledTextArea = styled(TextArea).attrs(({ $height }: TextAreaProps) => ({
+  style: { "--textarea-height": $height },
+}))<TextAreaProps>`
+  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
+  ${({ $hidden }) => $hidden && "display: none"};
+  ${({ $break }) => $break && "grid-column: 1 / -2"};
+
+  label {
+    ${fontMedium};
+  }
+`;
+
+const StyledCheckbox = styled(Checkbox)`
+  && label {
+    ${fontRegular};
+    line-height: var(--lineheight-l);
+
+    a {
+      text-decoration: underline;
+      color: var(--color-black);
+    }
+  }
+`;
+
 const ReservationFormField = ({
   field,
   options,
@@ -75,6 +101,7 @@ const ReservationFormField = ({
     formState: { errors },
   },
   params = {},
+  data = {},
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -87,6 +114,7 @@ const ReservationFormField = ({
         "name",
         "description",
         "reserveeAddressStreet",
+        "applyingForFreeOfCharge",
         // "reserveeOrganisationName",
         "billingAddressStreet",
         "purpose",
@@ -155,20 +183,33 @@ const ReservationFormField = ({
       )}
     />
   ) : field === "applyingForFreeOfCharge" ? (
-    <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
+    <StyledCheckboxWrapper
+      key={field}
+      $isWide={isWideRow}
+      $break={isBreakingColumn}
+    >
+      <Subheading>
+        {t("reservationApplication:label.subHeadings.subvention")}
+      </Subheading>{" "}
       <Controller
         name={field}
         control={control}
         defaultValue={get(reservation, field)}
         rules={{ required }}
         render={({ field: formField }) => (
-          <Checkbox
+          <StyledCheckbox
             id={field}
             onChange={(e) => formField.onChange(e.target.checked)}
             checked={formField.value}
-            label={`${t(
-              `reservationApplication:label.${normalizedReserveeType}.${field}`
-            )}${required ? " * " : ""}`}
+            label={
+              <>
+                {data?.subventionLabel ||
+                  t(
+                    `reservationApplication:label.${normalizedReserveeType}.${field}`
+                  )}
+                {required ? " * " : ""}
+              </>
+            }
             errorText={get(errors, field) && t("forms:requiredField")}
           />
         )}

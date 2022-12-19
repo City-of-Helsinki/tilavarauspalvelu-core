@@ -1866,7 +1866,7 @@ export type QueryReservationsArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
-  paymentStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
+  orderStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   priceGte?: InputMaybe<Scalars["Float"]>;
   priceLte?: InputMaybe<Scalars["Float"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
