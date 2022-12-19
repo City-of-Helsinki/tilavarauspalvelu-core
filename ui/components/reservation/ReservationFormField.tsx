@@ -165,7 +165,7 @@ const ReservationFormField = ({
       control={control}
       key={field}
       rules={{ required }}
-      render={() => (
+      render={({ field: formField }) => (
         <StyledSelect
           label={t(
             `reservationApplication:label.${normalizedReserveeType}.${field}`
@@ -175,8 +175,10 @@ const ReservationFormField = ({
           defaultValue={options[field].find(
             (n) => n.value === get(reservation, field)
           )}
+          value={formField.value || null}
           error={get(errors, field) && t("forms:requiredField")}
           required={required}
+          onChange={(value) => formField.onChange(value)}
           invalid={!!get(errors, field)}
           $isWide={isWideRow}
         />
