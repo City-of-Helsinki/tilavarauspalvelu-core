@@ -13,14 +13,14 @@ import { useForm, UseFormReturn } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
+import RadioButtonWithImage from "common/src/reservation-form/RadioButtonWithImage";
+import ReservationFormField from "common/src/reservation-form/ReservationFormField";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
-import { Inputs, Reservation } from "../../modules/types";
+import { Inputs, Reservation } from "common/src/reservation-form/types";
 import { BlackButton, MediumButton } from "../../styles/util";
-import RadioButtonWithImage from "../form/RadioButtonWithImage";
-import ReservationFormField from "./ReservationFormField";
 import {
   ActionContainer,
   GroupHeading,
@@ -135,6 +135,7 @@ const Step0 = ({
             {generalFields.map((field) => {
               return (
                 <ReservationFormField
+                  t={t}
                   key={`key-${field}`}
                   field={field as unknown as keyof Inputs}
                   options={options}
@@ -239,6 +240,7 @@ const Step0 = ({
                   </GroupHeading>
                 )}
               <ReservationFormField
+                t={t}
                 field={field as unknown as keyof Inputs}
                 options={options}
                 reserveeType={reserveeType}

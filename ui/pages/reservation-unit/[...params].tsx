@@ -40,6 +40,7 @@ import {
   ReservationUpdateMutationPayload,
   TermsOfUseType,
 } from "common/types/gql-types";
+import { Inputs, Reservation } from "common/src/reservation-form/types";
 import apolloClient from "../../modules/apolloClient";
 import { isBrowser, reservationUnitPrefix } from "../../modules/const";
 import { getTranslation, printErrorMessages } from "../../modules/util";
@@ -68,7 +69,7 @@ import { Subheading } from "../../components/reservation/styles";
 import ReservationConfirmation from "../../components/reservation/ReservationConfirmation";
 import Step0 from "../../components/reservation/Step0";
 import Step1 from "../../components/reservation/Step1";
-import { Inputs, Reservation, ReservationStep } from "../../modules/types";
+import { ReservationStep } from "../../modules/types";
 
 type Props = {
   reservationUnit: ReservationUnitType;

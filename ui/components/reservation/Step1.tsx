@@ -9,8 +9,9 @@ import {
   ReservationUnitType,
   TermsOfUseType,
 } from "common/types/gql-types";
+import { Reservation } from "common/src/reservation-form/types";
 import TermsBox from "common/src/termsbox/TermsBox";
-import { Reservation, ReservationStep } from "../../modules/types";
+import { ReservationStep } from "../../modules/types";
 import { capitalize, getTranslation } from "../../modules/util";
 import { ActionContainer, Subheading, TwoColumnContainer } from "./styles";
 import Sanitize from "../common/Sanitize";

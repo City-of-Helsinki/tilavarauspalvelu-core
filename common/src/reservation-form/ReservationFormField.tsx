@@ -1,19 +1,15 @@
-import { OptionType } from "common/types/common";
 import { Checkbox, NumberInput, Select, TextArea, TextInput } from "hds-react";
 import camelCase from "lodash/camelCase";
 import get from "lodash/get";
 import React, { ReactElement, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { TFunction } from "react-i18next";
 import styled from "styled-components";
-import {
-  fontMedium,
-  fontRegular,
-  Strongish,
-} from "common/src/common/typography";
-import { ReservationMetadataSetType } from "common/types/gql-types";
-import { Inputs, Reservation } from "../../modules/types";
-import { CheckboxWrapper } from "../common/common";
+import { fontMedium, fontRegular, Strongish } from "../common/typography";
+import { ReservationMetadataSetType } from "../../types/gql-types";
+import { Inputs, Reservation } from "./types";
+import { CheckboxWrapper } from "./components";
+import { OptionType } from "../../types/common";
 
 type Props = {
   field: keyof Inputs;
@@ -24,6 +20,7 @@ type Props = {
   form: ReturnType<typeof useForm>;
   params?: Record<string, Record<string, string | number>>;
   data?: Record<string, ReactElement>;
+  t: TFunction;
 };
 
 const StyledCheckboxWrapper = styled(CheckboxWrapper)<{
@@ -102,9 +99,8 @@ const ReservationFormField = ({
   },
   params = {},
   data = {},
+  t,
 }: Props): JSX.Element => {
-  const { t } = useTranslation();
-
   const normalizedReserveeType =
     reserveeType?.toLocaleLowerCase() || "individual";
 
@@ -148,7 +144,9 @@ const ReservationFormField = ({
     [field]
   );
 
-  const required = metadataSet.requiredFields.map(camelCase).includes(field);
+  const required = ((metadataSet.requiredFields || []) as string[])
+    .map(camelCase)
+    .includes(field);
 
   const isReserveeIdRequired =
     field === "reserveeId" &&
@@ -175,10 +173,10 @@ const ReservationFormField = ({
           defaultValue={options[field].find(
             (n) => n.value === get(reservation, field)
           )}
+          {...formField}
           value={formField.value || null}
           error={get(errors, field) && t("forms:requiredField")}
           required={required}
-          onChange={(value) => formField.onChange(value)}
           invalid={!!get(errors, field)}
           $isWide={isWideRow}
         />

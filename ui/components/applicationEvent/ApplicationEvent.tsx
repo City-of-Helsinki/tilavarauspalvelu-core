@@ -25,6 +25,7 @@ import {
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { omit } from "lodash";
+import { CheckboxWrapper } from "common/src/reservation-form/components";
 import ReservationUnitList from "../reservation-unit/ReservationUnitList";
 import {
   apiDateToUIDate,
@@ -34,7 +35,6 @@ import {
   formatDate,
   uiDateToApiDate,
 } from "../../modules/util";
-import { CheckboxWrapper } from "../common/common";
 import ApplicationEventSummary from "./ApplicationEventSummary";
 import ControlledSelect from "../common/ControlledSelect";
 import Accordion from "../common/Accordion";

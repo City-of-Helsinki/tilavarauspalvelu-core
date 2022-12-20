@@ -6,12 +6,12 @@ import { Trans, useTranslation } from "react-i18next";
 import Link from "next/link";
 import styled from "styled-components";
 import { fontMedium, H2 } from "common/src/common/typography";
+import { Reservation } from "common/src/reservation-form/types";
 import {
   ReservationsReservationStateChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
-import { Reservation } from "../../modules/types";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
 import { Paragraph, Subheading } from "./styles";

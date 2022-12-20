@@ -8,11 +8,8 @@ import {
   ContactPerson,
   Organisation,
 } from "common/types/common";
-import {
-  CheckboxWrapper,
-  FormSubHeading,
-  TwoColumnContainer,
-} from "../common/common";
+import { CheckboxWrapper } from "common/src/reservation-form/components";
+import { FormSubHeading, TwoColumnContainer } from "../common/common";
 import EmailInput from "./EmailInput";
 import BillingAddress from "./BillingAddress";
 import Buttons from "./Buttons";
