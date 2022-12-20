@@ -35,6 +35,13 @@ const ActionButtons = styled(Dialog.ActionButtons)`
 `;
 
 const parseNumber = (n: string): number => Number(n.replace(",", "."));
+const calcPriceNet = (price: string, taxPercentageValue?: number | null) => {
+  const priceNet = taxPercentageValue
+    ? Number(price) / ((1 + taxPercentageValue) / 100)
+    : Number(price);
+
+  return Number(priceNet.toFixed(2));
+};
 
 const DialogContent = ({
   reservation,
@@ -136,12 +143,7 @@ const DialogContent = ({
               const res = await approveReservation({
                 pk: reservation.pk,
                 price: parseNumber(price),
-                priceNet: Number(
-                  (
-                    Number(price) /
-                    ((1 + reservation.taxPercentageValue) / 100)
-                  ).toFixed(2)
-                ),
+                priceNet: calcPriceNet(price, reservation.taxPercentageValue),
                 handlingDetails,
               });
 

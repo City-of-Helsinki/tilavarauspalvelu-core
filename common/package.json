@@ -9,7 +9,7 @@
     "lint": "eslint --ext ts,tsx .",
     "start": "react-scripts start",
     "test": "react-scripts test",
-    "generate-gql-types": "graphql-codegen && prettier --write 'types/gql-types.ts'",
+    "generate-gql-types": "graphql-codegen",
     "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql",
     "generate-email-template": "node email/convertToHTML.js"
   },

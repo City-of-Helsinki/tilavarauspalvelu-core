@@ -78,8 +78,8 @@ const merge = (
           reservation && {
             title: reservation.name ?? "",
             event: reservation,
-            start: reservation.begin,
-            end: reservation.end,
+            start: new Date(reservation.begin),
+            end: new Date(reservation.end),
           }
       ) || []) as CalendarEvent<ReservationType>[];
 

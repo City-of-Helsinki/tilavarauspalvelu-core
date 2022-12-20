@@ -3,8 +3,30 @@ generates:
   ./types/gql-types.ts:
     plugins:
       - typescript
-      - typescript-react-apollo
       - typescript-operations
+      - typescript-react-apollo
     config:
+      avoidOptionals:
+        field: false
+        inputValue: false
+        object: false
+        defaultValue: false
       withHooks: true
       withMutationFn: true
+      defaultScalarType: unknown
+      scalars:
+        Date: string
+        DateTime: string
+        Decimal: number
+        Duration: number
+        JSON: string
+        Long: number
+        Time: string
+        Upload: unknown
+        UUID: string
+        Void: unknown
+        GraphQLStringOrFloat: string
+        Hash: unknown
+hooks:
+  afterOneFileWrite:
+    - prettier --write 'types/gql-types.ts'

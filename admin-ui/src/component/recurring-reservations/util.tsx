@@ -163,20 +163,26 @@ export const appEventMapper = (
 
   const applicant = applicantName(appEvent.application);
 
-  const turns = numTurns(
-    appEvent.begin,
-    appEvent.end,
-    appEvent.biweekly,
-    appEvent.eventsPerWeek as number
-  );
+  const turns =
+    appEvent.begin && appEvent.end
+      ? numTurns(
+          appEvent.begin,
+          appEvent.end,
+          appEvent.biweekly,
+          appEvent.eventsPerWeek as number
+        )
+      : 0;
 
-  const totalHours = appEventHours(
-    fromAPIDate(appEvent.begin).toISOString(),
-    fromAPIDate(appEvent.end).toISOString(),
-    appEvent.biweekly,
-    appEvent.eventsPerWeek as number,
-    appEvent.minDuration as number
-  );
+  const totalHours =
+    appEvent.begin && appEvent.end
+      ? appEventHours(
+          fromAPIDate(appEvent.begin).toISOString(),
+          fromAPIDate(appEvent.end).toISOString(),
+          appEvent.biweekly,
+          appEvent.eventsPerWeek as number,
+          appEvent.minDuration as number
+        )
+      : 0;
 
   return {
     applicationId: appEvent.application.pk as number,

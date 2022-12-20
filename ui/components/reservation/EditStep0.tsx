@@ -172,9 +172,9 @@ const EditStep0 = ({
         begin: initialReservation?.begin,
         end: initialReservation?.end,
         state: "INITIAL",
-        bufferTimeBefore: reservationUnit?.bufferTimeBefore,
-        bufferTimeAfter: reservationUnit?.bufferTimeAfter,
-      } as PendingReservation,
+        bufferTimeBefore: reservationUnit?.bufferTimeBefore.toString(),
+        bufferTimeAfter: reservationUnit?.bufferTimeAfter.toString(),
+      },
     ]);
   }, [calendarEvents, initialReservation, reservationUnit]);
   const ToolbarWithProps = React.memo((props: ToolbarProps) => (
@@ -187,8 +187,12 @@ const EditStep0 = ({
       getSlotPropGetter(
         reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds,
-        reservationUnit.reservationBegins,
-        reservationUnit.reservationEnds,
+        reservationUnit.reservationBegins
+          ? new Date(reservationUnit.reservationBegins)
+          : undefined,
+        reservationUnit.reservationEnds
+          ? new Date(reservationUnit.reservationEnds)
+          : undefined,
         reservationUnit.reservationsMinDaysBefore
       ),
     [activeApplicationRounds, reservationUnit]

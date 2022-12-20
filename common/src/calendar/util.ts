@@ -330,10 +330,12 @@ export const doesBufferCollide = (
   }
 ): boolean => {
   const newReservationStartBuffer =
+    reservation.bufferTimeAfter &&
     reservation.bufferTimeAfter > (newReservation.bufferTimeBefore || 0)
       ? reservation.bufferTimeAfter
       : newReservation.bufferTimeBefore;
   const newReservationEndBuffer =
+    reservation.bufferTimeBefore &&
     reservation.bufferTimeBefore > (newReservation.bufferTimeAfter || 0)
       ? reservation.bufferTimeBefore
       : newReservation.bufferTimeAfter;
@@ -387,7 +389,7 @@ export const getEventBuffers = (
 
     if (bufferTimeBefore) {
       buffers.push({
-        start: addSeconds(begin, -1 * bufferTimeBefore),
+        start: addSeconds(begin, -1 * Number(bufferTimeBefore)),
         end: begin,
         event: { ...event, state: "BUFFER" },
       });
@@ -395,7 +397,7 @@ export const getEventBuffers = (
     if (bufferTimeAfter) {
       buffers.push({
         start: end,
-        end: addSeconds(end, bufferTimeAfter),
+        end: addSeconds(end, Number(bufferTimeAfter)),
         event: { ...event, state: "BUFFER" },
       });
     }

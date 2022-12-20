@@ -92,8 +92,8 @@ const selectedReservationUnitQuery = graphql.query<
     nameSv: "Pukinmäen nuorisotalon keittiö SV",
     bufferTimeBefore: 3600,
     bufferTimeAfter: 1800,
-    reservationBegins: addDays(new Date(), -1),
-    reservationEnds: addDays(new Date(), 10),
+    reservationBegins: addDays(new Date(), -1).toISOString(),
+    reservationEnds: addDays(new Date(), 10).toISOString(),
     images: [
       {
         imageUrl: "https://via.placeholder.com/1024x768",
@@ -434,20 +434,32 @@ const selectedReservationUnitQuery = graphql.query<
   }
 
   if (req.variables.pk === 900) {
-    reservationUnitByPk.reservationBegins = addDays(new Date(), 366);
-    reservationUnitByPk.reservationEnds = addDays(new Date(), 375);
-    reservationUnitByPk.publishBegins = addMinutes(new Date(), -10);
-    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10);
+    reservationUnitByPk.reservationBegins = addDays(
+      new Date(),
+      366
+    ).toISOString();
+    reservationUnitByPk.reservationEnds = addDays(
+      new Date(),
+      375
+    ).toISOString();
+    reservationUnitByPk.publishBegins = addMinutes(
+      new Date(),
+      -10
+    ).toISOString();
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10).toISOString();
   }
 
   if (req.variables.pk === 901) {
     reservationUnitByPk.maxReservationsPerUser = 10;
-    reservationUnitByPk.publishBegins = addMinutes(new Date(), -10);
+    reservationUnitByPk.publishBegins = addMinutes(
+      new Date(),
+      -10
+    ).toISOString();
   }
 
   if (req.variables.pk === 902) {
     reservationUnitByPk.maxReservationsPerUser = 30;
-    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10);
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10).toISOString();
   }
 
   if (req.variables.pk === 903) {
@@ -487,17 +499,23 @@ const selectedReservationUnitQuery = graphql.query<
   }
 
   if (req.variables.pk === 905) {
-    reservationUnitByPk.publishBegins = addMinutes(new Date(), 10);
+    reservationUnitByPk.publishBegins = addMinutes(
+      new Date(),
+      10
+    ).toISOString();
   }
 
   if (req.variables.pk === 906) {
-    reservationUnitByPk.publishEnds = addMinutes(new Date(), -10);
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), -10).toISOString();
   }
 
   if (req.variables.pk === 907) {
     reservationUnitByPk.isDraft = true;
-    reservationUnitByPk.publishBegins = addMinutes(new Date(), 10);
-    reservationUnitByPk.publishEnds = addMinutes(new Date(), 20);
+    reservationUnitByPk.publishBegins = addMinutes(
+      new Date(),
+      10
+    ).toISOString();
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 20).toISOString();
   }
 
   if (req.variables.pk === 999) {
@@ -538,13 +556,13 @@ const openingHoursQuery = graphql.query<
               minutes: 30,
               seconds: 0,
               milliseconds: 0,
-            }),
+            }).toISOString(),
             end: set(endOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 }), {
               hours: 15,
               minutes: 0,
               seconds: 0,
               milliseconds: 0,
-            }),
+            }).toISOString(),
             numPersons: 3,
             calendarUrl:
               "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",

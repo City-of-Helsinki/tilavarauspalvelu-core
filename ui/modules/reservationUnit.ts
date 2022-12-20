@@ -188,8 +188,8 @@ export const getFuturePricing = (
       const start = new Date(futurePricing.begins);
       return isSlotWithinReservationTime(
         start,
-        reservationBegins,
-        reservationEnds
+        reservationBegins ? new Date(reservationBegins) : undefined,
+        reservationEnds ? new Date(reservationEnds) : undefined
       );
     })
     // TODO: find out should opening hours be checked here
@@ -238,7 +238,7 @@ export const getPrice = (
 
   const formatters = getFormatters(i18n.language);
 
-  if (pricing?.pricingType === "PAID" && parseFloat(pricing.highestPrice)) {
+  if (pricing?.pricingType === "PAID" && pricing.highestPrice) {
     const volume = getReservationVolume(minutes, pricing.priceUnit);
     const unitStr =
       pricing.priceUnit === "FIXED" || minutes
@@ -249,7 +249,7 @@ export const getPrice = (
       return formatters[currencyFormatter].format(pricing.highestPrice);
     }
 
-    const lowestPrice = parseFloat(pricing.lowestPrice)
+    const lowestPrice = pricing.lowestPrice
       ? formatters[floatFormatter].format(pricing.lowestPrice * volume)
       : 0;
     const highestPrice = formatters[currencyFormatter].format(

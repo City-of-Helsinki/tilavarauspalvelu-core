@@ -22,36 +22,36 @@ export type Scalars = {
    * value as specified by
    * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
    */
-  Date: any;
+  Date: string;
   /**
    * The `DateTime` scalar type represents a DateTime
    * value as specified by
    * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
    */
-  DateTime: any;
+  DateTime: string;
   /** The `Decimal` scalar type represents a python Decimal. */
-  Decimal: any;
+  Decimal: number;
   /**
    * The `Duration` scalar type represents a duration value as an integer in seconds.
    * For example, a value of 900 means a duration of 15 minutes.
    */
-  Duration: any;
+  Duration: number;
   /**
    * The `Time` scalar type represents a Time value as
    * specified by
    * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
    */
-  Time: any;
+  Time: string;
   /**
    * Leverages the internal Python implementation of UUID (uuid.UUID) to provide native UUID objects
    * in fields, resolvers and input.
    */
-  UUID: any;
+  UUID: string;
   /**
    * Create scalar that ignores normal serialization/deserialization, since
    * that will be handled by the multipart request spec
    */
-  Upload: any;
+  Upload: unknown;
 };
 
 export type AbilityGroupType = {

@@ -331,7 +331,11 @@ export const reducer = (state: State, action: Action): State => {
         taxPercentageOptions: (
           action.parameters.taxPercentages?.edges || []
         ).map(
-          (v) => ({ value: v?.node?.pk, label: v?.node?.value } as OptionType)
+          (v) =>
+            ({
+              value: v?.node?.pk,
+              label: v?.node?.value.toString(),
+            } as OptionType)
         ),
         serviceSpecificTermsOptions: makeTermsOptions(
           action,

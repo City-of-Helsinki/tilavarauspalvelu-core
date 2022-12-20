@@ -250,19 +250,19 @@ describe("isReservationInThePast", () => {
     expect(
       isReservationInThePast({
         begin: new Date(),
-      } as ReservationType)
+      } as unknown as ReservationType)
     ).toBe(true);
 
     expect(
       isReservationInThePast({
         begin: addMinutes(new Date(), 10),
-      } as ReservationType)
+      } as unknown as ReservationType)
     ).toBe(false);
 
     expect(
       isReservationInThePast({
         begin: addMinutes(new Date(), -10),
-      } as ReservationType)
+      } as unknown as ReservationType)
     ).toBe(true);
   });
 
@@ -617,8 +617,8 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(startOfToday(), 10),
-            end: addHours(startOfToday(), 12),
+            begin: addHours(startOfToday(), 10).toString(),
+            end: addHours(startOfToday(), 12).toString(),
           },
           reservationUnit: { ...reservationUnit, openingHours: null },
           activeApplicationRounds: [],
@@ -632,8 +632,8 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(startOfToday(), 10),
-            end: addHours(startOfToday(), 12),
+            begin: addHours(startOfToday(), 10).toString(),
+            end: addHours(startOfToday(), 12).toString(),
           },
           reservationUnit: {
             ...reservationUnit,
@@ -650,12 +650,12 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(new Date(), 1),
-            end: addHours(new Date(), 2),
+            begin: addHours(new Date(), 1).toString(),
+            end: addHours(new Date(), 2).toString(),
           },
           reservationUnit: {
             ...reservationUnit,
-            reservationBegins: addDays(new Date(), 1),
+            reservationBegins: addDays(new Date(), 1).toString(),
           },
           activeApplicationRounds: [],
         } as CanReservationBeChangedProps)
@@ -666,12 +666,12 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(new Date(), 1),
-            end: addHours(new Date(), 2),
+            begin: addHours(new Date(), 1).toString(),
+            end: addHours(new Date(), 2).toString(),
           },
           reservationUnit: {
             ...reservationUnit,
-            reservationEnds: addDays(new Date(), -1),
+            reservationEnds: addDays(new Date(), -1).toString(),
           },
           activeApplicationRounds: [],
         } as CanReservationBeChangedProps)
@@ -684,8 +684,8 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(startOfToday(), 10),
-            end: addHours(startOfToday(), 12),
+            begin: addHours(startOfToday(), 10).toString(),
+            end: addHours(startOfToday(), 12).toString(),
           },
           reservationUnit,
           activeApplicationRounds: [
@@ -704,8 +704,8 @@ describe("canReservationBeChanged", () => {
           reservation,
           newReservation: {
             ...reservation,
-            begin: addHours(startOfToday(), 35),
-            end: addHours(startOfToday(), 36),
+            begin: addHours(startOfToday(), 35).toString(),
+            end: addHours(startOfToday(), 36).toString(),
           },
           reservationUnit,
         } as CanReservationBeChangedProps)

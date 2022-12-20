@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { useQuery } from "@apollo/client";
-import { get } from "lodash";
-import { endOfISOWeek, startOfISOWeek } from "date-fns";
+import { startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
@@ -68,34 +67,39 @@ const Calendar = ({
         offset: 0,
         first: 100,
         reservationUnit: [reservationUnitPk],
-        begin: startOfISOWeek(new Date(begin)),
-        end: endOfISOWeek(new Date(begin)),
+        begin,
+        end: begin,
       },
       onCompleted: ({ reservations }) => {
         if (reservations) {
-          setEvents(
-            (reservations?.edges || [])
-              .filter(
-                (r) =>
-                  [
-                    ReservationsReservationStateChoices.Confirmed,
-                    ReservationsReservationStateChoices.RequiresHandling,
-                  ].includes(
-                    r?.node?.state as ReservationsReservationStateChoices
-                  ) || r?.node?.pk === reservation.pk
-              )
-              .map((r) => ({
-                title: `${
-                  r?.node?.reserveeOrganisationName ||
-                  `${r?.node?.reserveeFirstName || ""} ${
-                    r?.node?.reserveeLastName || ""
-                  }`
-                }`,
-                event: r?.node as ReservationType,
-                start: new Date(get(r?.node, "begin")),
-                end: new Date(get(r?.node, "end")),
-              }))
-          );
+          const formattedReservations = reservations?.edges
+            .filter(
+              (r) =>
+                [
+                  ReservationsReservationStateChoices.Confirmed,
+                  ReservationsReservationStateChoices.RequiresHandling,
+                ].includes(
+                  r?.node?.state as ReservationsReservationStateChoices
+                ) || r?.node?.pk === reservation.pk
+            )
+            .map((r) =>
+              r?.node && r.node.begin && r.node.end
+                ? ({
+                    title: `${
+                      r?.node?.reserveeOrganisationName ||
+                      `${r?.node?.reserveeFirstName || ""} ${
+                        r?.node?.reserveeLastName || ""
+                      }`
+                    }`,
+                    event: r?.node as ReservationType,
+                    start: new Date(r.node.begin),
+                    end: new Date(r.node.end),
+                  } as CalendarEvent<ReservationType>)
+                : undefined
+            )
+            .filter((item): item is CalendarEvent<ReservationType> => !!item);
+
+          setEvents(formattedReservations);
 
           if (reservations.pageInfo.hasNextPage) {
             setHasMore(true);
