@@ -14,10 +14,7 @@ import { ReservationType } from "common/types/gql-types";
 import { TFunction, useTranslation } from "react-i18next";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import ReservationPopupContent from "./ReservationPopupContent";
-import resourceEventStyleGetter, {
-  POST_PAUSE,
-  PRE_PAUSE,
-} from "./resourceEventStyleGetter";
+import eventStyleGetter, { POST_PAUSE, PRE_PAUSE } from "./eventStyleGetter";
 import { getReserveeName } from "../reservations/requested/util";
 import { sortByName } from "../../common/util";
 
@@ -35,11 +32,6 @@ const TemplateProps: CSSProperties = {
   zIndex,
   height: "41px",
   position: "absolute",
-};
-
-type EventStyleGetter = ({ event }: CalendarEvent<ReservationType>) => {
-  style: React.CSSProperties;
-  className?: string;
 };
 
 type Props = {
@@ -207,92 +199,94 @@ const Events = ({
   currentReservationUnit,
   firstHour,
   events,
-  eventStyleGetter,
   numHours,
   t,
 }: {
   currentReservationUnit: number;
   firstHour: number;
   events: CalendarEvent<ReservationType>[];
-  eventStyleGetter: EventStyleGetter;
   numHours: number;
   t: TFunction;
-}) => (
-  <div
-    style={{
-      position: "absolute",
-      width: "100%",
-      top: 0,
-      left: 0,
-    }}
-  >
-    {events.map((e) => {
-      const title = getEventTitle({ reservation: e });
-      const startDate = new Date(e.start);
-      const endDate = new Date(e.end);
-      const dayStartDate = new Date(e.start);
-      dayStartDate.setHours(firstHour);
-      dayStartDate.setMinutes(0);
-      dayStartDate.setSeconds(0);
+}) => {
+  const styleGetter = eventStyleGetter(currentReservationUnit);
 
-      const startMinutes = differenceInMinutes(startDate, dayStartDate);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        width: "100%",
+        top: 0,
+        left: 0,
+      }}
+    >
+      {events.map((e) => {
+        const title = getEventTitle({ reservation: e });
+        const startDate = new Date(e.start);
+        const endDate = new Date(e.end);
+        const dayStartDate = new Date(e.start);
+        dayStartDate.setHours(firstHour);
+        dayStartDate.setMinutes(0);
+        dayStartDate.setSeconds(0);
 
-      const hourPercent = 100 / numHours;
-      const hours = startMinutes / 60;
-      const left = `${hourPercent * hours}%`;
+        const startMinutes = differenceInMinutes(startDate, dayStartDate);
 
-      const durationMinutes = differenceInMinutes(endDate, startDate);
+        const hourPercent = 100 / numHours;
+        const hours = startMinutes / 60;
+        const left = `${hourPercent * hours}%`;
 
-      let preBuffer = null;
-      let postBuffer = null;
-      if (currentReservationUnit === e.event?.reservationUnits?.[0]?.pk) {
-        preBuffer = getPreBuffer(e, hourPercent, left, t);
+        const durationMinutes = differenceInMinutes(endDate, startDate);
 
-        const right = `calc(${left} + ${durationMinutes / 60} * ${
-          100 / numHours
-        }% + 1px)`;
-        postBuffer = getPostBuffer(e, hourPercent, right, t);
-      }
+        let preBuffer = null;
+        let postBuffer = null;
+        if (currentReservationUnit === e.event?.reservationUnits?.[0]?.pk) {
+          preBuffer = getPreBuffer(e, hourPercent, left, t);
 
-      return [
-        preBuffer,
-        <div
-          key={String(e.event?.pk)}
-          style={{
-            left,
-            ...TemplateProps,
-            width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
-            zIndex: 5,
-          }}
-        >
-          <EventContent style={{ ...eventStyleGetter(e).style }}>
-            <p>{title}</p>
-            <Popup
-              position={["right center", "left center"]}
-              trigger={() => (
-                <button
-                  type="button"
-                  style={{
-                    background: "transparent",
-                    cursor: "pointer",
-                    border: 0,
-                    width: "100%",
-                    height: "100%",
-                  }}
+          const right = `calc(${left} + ${durationMinutes / 60} * ${
+            100 / numHours
+          }% + 1px)`;
+          postBuffer = getPostBuffer(e, hourPercent, right, t);
+        }
+
+        return [
+          preBuffer,
+          <div
+            key={String(e.event?.pk)}
+            style={{
+              left,
+              ...TemplateProps,
+              width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
+              zIndex: 5,
+            }}
+          >
+            <EventContent style={{ ...styleGetter(e).style }}>
+              <p>{title}</p>
+              <Popup
+                position={["right center", "left center"]}
+                trigger={() => (
+                  <button
+                    type="button"
+                    style={{
+                      background: "transparent",
+                      cursor: "pointer",
+                      border: 0,
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                )}
+              >
+                <ReservationPopupContent
+                  reservation={e.event as ReservationType}
                 />
-              )}
-            >
-              <ReservationPopupContent
-                reservation={e.event as ReservationType}
-              />
-            </Popup>
-          </EventContent>
-        </div>,
-        postBuffer,
-      ];
-    })}
-  </div>
-);
+              </Popup>
+            </EventContent>
+          </div>,
+          postBuffer,
+        ];
+      })}
+    </div>
+  );
+};
 
 const sortByDraftStatusAndTitle = (resources: Resource[]) => {
   return resources.sort((a, b) => {
@@ -366,7 +360,6 @@ const ResourceCalendar = ({ resources }: Props): JSX.Element => {
                   firstHour={beginHour}
                   numHours={numHours}
                   events={row.events}
-                  eventStyleGetter={resourceEventStyleGetter(row.pk)}
                   t={t}
                 />
               </RowCalendarArea>

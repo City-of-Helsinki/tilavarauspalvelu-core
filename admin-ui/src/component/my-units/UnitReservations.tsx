@@ -17,8 +17,8 @@ import { combineResults } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";
 import Legend from "../reservations/requested/Legend";
+import { legend } from "./eventStyleGetter";
 import { RESERVATION_UNITS_BY_UNIT } from "./queries";
-import { legend } from "./resourceEventStyleGetter";
 import ResourceCalendar, { Resource } from "./UnitCalendar";
 
 type Props = {
