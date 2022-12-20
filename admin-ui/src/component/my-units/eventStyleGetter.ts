@@ -127,6 +127,7 @@ const eventStyleGetter =
       display: "block",
       borderColor: "transparent",
       fontSize: "var(--fontsize-body-s)",
+      opacity: 0.8,
       zIndex: 100,
     } as React.CSSProperties;
 
