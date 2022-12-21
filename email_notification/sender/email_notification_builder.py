@@ -1,6 +1,9 @@
+import os
 import re
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.template import Context, Template
 from django.utils.timezone import get_default_timezone
 from jinja2 import StrictUndefined, TemplateError
@@ -48,6 +51,27 @@ class EmailTemplateValidator:
         self._validate_tags(str)
 
         return True
+
+    def validate_html_file(self, value: InMemoryUploadedFile):
+        ext = os.path.splitext(value.name)[1]
+        if not ext.lower() == ".html":
+            raise ValidationError(
+                f"Unsupported file extension {ext}. Only .html files are allowed"
+            )
+
+        if value.size <= 0 or value.size > settings.EMAIL_HTML_MAX_FILE_SIZE:
+            raise ValidationError(
+                f"Invalid HTML file size. Allowed file size: 1-{settings.EMAIL_HTML_MAX_FILE_SIZE} bytes"
+            )
+
+        try:
+            file = value.open()
+            content = file.read().decode("utf-8")
+            self.validate_string(content)
+        except EmailTemplateValidationError as err:
+            raise ValidationError(err.message)
+        except Exception as err:
+            raise ValidationError(f"Unable to read the HTML file: {str(err)}")
 
 
 class ReservationEmailNotificationBuilder:

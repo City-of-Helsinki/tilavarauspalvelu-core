@@ -212,6 +212,7 @@ env = environ.Env(
     EMAIL_MAX_RECIPIENTS=(int, 100),
     SEND_RESERVATION_NOTIFICATION_EMAILS=(str, False),
     DEFAULT_FROM_EMAIL=(str, django_default_from_email),
+    EMAIL_HTML_MAX_FILE_SIZE=(int, 150000),
     # Tprek
     TPREK_UNIT_URL=(str, "https://www.hel.fi/palvelukarttaws/rest/v4/unit/"),
     # GDPR API
@@ -352,6 +353,8 @@ EMAIL_TEMPLATE_CONTEXT_ATTRS = [
 EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS = ["if", "elif", "else", "endif"]
 
 SEND_RESERVATION_NOTIFICATION_EMAILS = env("SEND_RESERVATION_NOTIFICATION_EMAILS")
+EMAIL_HTML_MAX_FILE_SIZE = env("EMAIL_HTML_MAX_FILE_SIZE")
+EMAIL_HTML_TEMPLATES_ROOT = "email_html_templates"
 
 # TPREK
 TPREK_UNIT_URL = env("TPREK_UNIT_URL")

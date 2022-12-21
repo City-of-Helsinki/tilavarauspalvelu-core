@@ -4,7 +4,7 @@ from .models import EmailTemplate
 
 
 class EmailTemplateTranslationOptions(TranslationOptions):
-    fields = ["subject", "content"]
+    fields = ["subject", "content", "html_content"]
 
 
 translator.register(EmailTemplate, EmailTemplateTranslationOptions)

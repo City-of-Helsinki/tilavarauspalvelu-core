@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -44,6 +45,16 @@ class EmailTemplate(models.Model):
         ),
         null=False,
         blank=False,
+    )
+
+    html_content = models.FileField(
+        verbose_name=_("HTML content"),
+        help_text=_(
+            "Email body content as HTML. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."
+        ),
+        null=True,
+        blank=True,
+        upload_to=settings.EMAIL_HTML_TEMPLATES_ROOT,
     )
 
     def __str__(self):

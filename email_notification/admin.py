@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.forms import ModelForm, ValidationError
 
 from email_notification.models import EmailTemplate, EmailType
@@ -39,6 +40,12 @@ class EmailTemplateAdminForm(ModelForm):
             raise ValidationError(e.message) from e
         return data
 
+    def validate_uploaded_html_file(self, language: str):
+        file = self.cleaned_data[f"html_content_{language}"]
+        if file and isinstance(file, InMemoryUploadedFile):
+            EmailTemplateValidator().validate_html_file(file)
+        return file
+
     def clean_subject(self):
         subject = self.get_validated_field("subject")
         return subject
@@ -63,8 +70,21 @@ class EmailTemplateAdminForm(ModelForm):
         content = self.get_validated_field("content_sv")
         return content
 
+    def clean_html_content_fi(self):
+        file = self.validate_uploaded_html_file("fi")
+        return file
+
+    def clean_html_content_en(self):
+        file = self.validate_uploaded_html_file("en")
+        return file
+
+    def clean_html_content_sv(self):
+        file = self.validate_uploaded_html_file("sv")
+        return file
+
 
 @admin.register(EmailTemplate)
 class EmailTemplateAdmin(admin.ModelAdmin):
     model = EmailTemplate
     form = EmailTemplateAdminForm
+    exclude = ["html_content"]
