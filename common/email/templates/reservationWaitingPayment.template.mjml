@@ -7,7 +7,7 @@
     <mj-include path="partials/header.mjml" />
     <mj-section background-color="#F7F2E4">
       <mj-column>
-        <mj-text>Olet tehnyt uuden varauksen:</mj-text>
+        <mj-text>Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla.</mj-text>
         <mj-spacer />
         <mj-text><b>{{reservation_unit}}</b></mj-text>
         <mj-text>{{unit_name}}</mj-text>
@@ -36,8 +36,13 @@
           {% endif %}
         </mj-raw>
         <mj-text>
+          <p>Eräpäivä: {{due_date}}</p>
+        </mj-text>
+        <mj-text>
           <p>Varausnumero: {{reservation_number}}</p>
         </mj-text>
+        <mj-spacer />
+        <mj-button href={{payment_ext_link}}>Maksa varaus</mj-button>
       </mj-column>
     </mj-section>
     <mj-section padding-bottom="0">

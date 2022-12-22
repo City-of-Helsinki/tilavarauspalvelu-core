@@ -1,0 +1,23 @@
+<mjml>
+  <mj-body>
+    <mj-section background-color="#E6E6E6" padding-bottom="0">
+      <mj-group>
+        <mj-column vertical-align="middle" width="150px" padding="0">
+          <mj-image src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" width="100px" />
+        </mj-column>
+        <mj-column vertical-align="middle">
+          <mj-text font-size="16px" align="left" padding="0">
+            <b>Varaamo</b>
+          </mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+    <mj-section background-color="#E6E6E6">
+      <mj-column>
+        <mj-divider border-width="2px" border-style="solid" border-color="#CCCCCC" padding-top="0" />
+        <mj-spacer height="10px" />
+        <mj-text font-size="14px">&copy; Helsingin kaupunki {{current_year}}</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
