@@ -156,8 +156,7 @@ export default class Toolbar extends React.Component<ToolbarProps> {
       case "day": {
         const year = format(date, "yyyy", culture);
         const currentYear = format(new Date(), "yyyy");
-        const dateStr =
-          currentYear !== year ? "EEEEEE d. MMMM yyyy" : "EEEEEE d. MMMM";
+        const dateStr = currentYear !== year ? "EEEEEE d.M yyyy" : "EEEEEE d.M";
 
         title = format(date, dateStr, culture);
         break;
