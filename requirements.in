@@ -33,3 +33,4 @@ social-auth-app-django==5.0.0
 uWSGI==2.0.19.1
 whitenoise==5.2.0
 graphene-file-upload==1.3.0
+Jinja2

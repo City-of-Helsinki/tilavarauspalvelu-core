@@ -167,10 +167,14 @@ inflection==0.5.1
     # via drf-spectacular
 isort==5.6.4
     # via -r requirements.in
+jinja2==3.1.2
+    # via -r requirements.in
 jsonschema==3.2.0
     # via drf-spectacular
 kombu==5.2.4
     # via celery
+markupsafe==2.1.1
+    # via jinja2
 mccabe==0.6.1
     # via flake8
 numpy==1.23.3
