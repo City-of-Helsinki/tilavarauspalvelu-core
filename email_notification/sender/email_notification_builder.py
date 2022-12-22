@@ -3,6 +3,8 @@ import re
 from django.conf import settings
 from django.template import Context, Template
 from django.utils.timezone import get_default_timezone
+from jinja2 import StrictUndefined, TemplateError
+from jinja2.sandbox import SandboxedEnvironment
 
 from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate
@@ -16,8 +18,8 @@ class EmailTemplateValidator:
         return re.compile(r"{{ *(\w+) *}}")
 
     @property
-    def illegal_lookup(self):
-        return re.compile(r"{%|%}")
+    def expression_lookup(self):
+        return re.compile(r"{% *(\w+) *")
 
     def _validate_tags(self, str: str):
         tags = re.findall(self.bracket_lookup, str)
@@ -26,13 +28,25 @@ class EmailTemplateValidator:
                 raise EmailTemplateValidationError(f"Tag {tag} not supported")
 
     def _validate_illegals(self, str: str):
-        illegals = re.findall(self.illegal_lookup, str)
-        if illegals:
-            raise EmailTemplateValidationError("Illegal tags found")
+        expressions = re.findall(self.expression_lookup, str)
+        for expression in expressions:
+            if expression not in settings.EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS:
+                raise EmailTemplateValidationError(
+                    "Illegal tags found: tag was '%s'" % expression
+                )
 
-    def validate_string(self, str: str):
+    def _validate_in_sandbox(self, str: str, context):
+        env = SandboxedEnvironment(undefined=StrictUndefined)
+        try:
+            env.from_string(str).render(context)
+        except TemplateError as e:
+            raise EmailTemplateValidationError(e)
+
+    def validate_string(self, str: str, context_dict=()):
+        self._validate_in_sandbox(str, context_dict)
         self._validate_illegals(str)
         self._validate_tags(str)
+
         return True
 
 
@@ -164,8 +178,8 @@ class ReservationEmailNotificationBuilder:
 
     def validate_template(self):
         validator = self.validator()
-        validator.validate_string(self.template.subject)
-        validator.validate_string(self.template.content)
+        validator.validate_string(self.template.subject, self.context_attr_map)
+        validator.validate_string(self.template.content, self.context_attr_map)
 
     def get_context(self):
         context_dict = {}

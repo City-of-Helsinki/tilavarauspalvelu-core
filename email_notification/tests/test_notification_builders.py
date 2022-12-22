@@ -327,3 +327,56 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_if_else_elif_expressions_supported(self):
+        content = """
+                    {% if True %}This is if{% endif %}
+
+                    {% if False %}No show{% elif True %}This is elif{% endif %}
+
+                    {% if False %}No show{% else %}This is else{% endif %}
+                """
+        compiled_content = """
+                    This is if
+
+                    This is elif
+
+                    This is else
+                """
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_for_loop_not_supported(self):
+        content = """
+                    {% for i in range(0, 100) %}
+                    loopey looper
+                    {% endfor %}
+
+                    {% macro secret_macro() %}
+                    ninja sabotage
+                    {% endmacro %}
+                """
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        with self.assertRaises(EmailTemplateValidationError):
+            ReservationEmailNotificationBuilder(self.reservation, template)
+
+    def test_macros_not_supported(self):
+        content = """
+                    {% for i in range(0, 100) %}
+                    loopey looper
+                    {% endfor %}
+
+                    {% macro secret_macro() %}
+                    ninja sabotage
+                    {% endmacro %}
+                """
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        with self.assertRaises(EmailTemplateValidationError):
+            ReservationEmailNotificationBuilder(self.reservation, template)
