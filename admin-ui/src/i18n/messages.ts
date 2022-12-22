@@ -280,21 +280,20 @@ const translations: ITranslations = {
       "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeudet.",
     ],
     Calendar: {
-      tab: ["Varaukset varausyksiköittäin"],
-      legend: {
-        confirmed: ["Varattu"],
-        unconfirmed: ["Varaustoive"],
-        intersecting: ["Osana toista varausyksikköä"],
+      Tabs: {
+        byUnit: ["Varaukset varausyksiköittäin"],
+        byReservationUnit: ["Kaikki toimipisteen varaukset"],
       },
-    },
-    UnitCalendar: {
-      tab: ["Kaikki toimipisteen varaukset"],
       legend: {
         confirmed: ["Hyväksytty varaus"],
         unconfirmed: ["Varaustoive"],
         intersecting: ["Toisen varausyksikön varaus"],
         pause: ["Tauko"],
         closed: ["Suljettu"],
+        waitingPayment: ["Hyväksytty varaus, Odottaa maksua"],
+        staffReservation: ["Henkilökunnan varaus"],
+        reservationUnitReleased: ["Varausyksikkö julkaistu"],
+        reservationUnitDraft: ["Varausyksikkö luonnostilassa"],
       },
     },
   },

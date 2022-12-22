@@ -13,7 +13,7 @@ import withMainMenu from "../withMainMenu";
 import { UNIT_QUERY } from "./queries";
 import ReservationUnitCalendarView from "./ReservationUnitCalendarView";
 import UnitReservationsView from "./UnitReservationsView";
-import { TabPanel, Tabs } from "../Tabs";
+import { TabHeader, TabPanel, Tabs } from "../Tabs";
 
 type Params = {
   unitId: string;
@@ -24,6 +24,14 @@ const MyUnitView = () => {
   const { notifyError } = useNotification();
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
+
+  const TabHeaders: TabHeader[] = [
+    {
+      key: "unit-reservations",
+      label: `${t("MyUnits.Calendar.Tabs.byReservationUnit")}`,
+    },
+    { key: "reservation-unit", label: `${t("MyUnits.Calendar.Tabs.byUnit")}` },
+  ];
 
   const { loading, data: unitData } = useQuery<Query, QueryUnitsArgs>(
     UNIT_QUERY,
@@ -53,15 +61,7 @@ const MyUnitView = () => {
           <H1>{unit?.node?.nameFi}</H1>
           <p>{parseAddress(unit?.node?.location as LocationType)}</p>
         </div>
-        <Tabs
-          headers={[
-            {
-              key: "unit-reservations",
-              label: `${t("MyUnits.UnitCalendar.tab")}`,
-            },
-            { key: "reservation-unit", label: `${t("MyUnits.Calendar.tab")}` },
-          ]}
-        >
+        <Tabs headers={TabHeaders}>
           <TabPanel key="unit-reservations">
             <UnitReservationsView />
           </TabPanel>

@@ -1,50 +1,13 @@
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { breakpoints } from "common/src/common/style";
-import { differenceInMinutes } from "date-fns";
-import React, {
-  CSSProperties,
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
-import Popup from "reactjs-popup";
+
+import React, { Fragment, useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
-import ReservationPopupContent from "./ReservationPopupContent";
-import resourceEventStyleGetter, {
-  POST_PAUSE,
-  PRE_PAUSE,
-} from "./resourceEventStyleGetter";
-import { getReserveeName } from "../reservations/requested/util";
 import { sortByName } from "../../common/util";
-
-export type Resource = {
-  title: string;
-  pk: number;
-  url: string;
-  isDraft: boolean;
-  events: CalendarEvent<ReservationType>[];
-};
-
-const zIndex = "101";
-
-const TemplateProps: CSSProperties = {
-  zIndex,
-  height: "41px",
-  position: "absolute",
-};
-
-type EventStyleGetter = ({ event }: CalendarEvent<ReservationType>) => {
-  style: React.CSSProperties;
-  className?: string;
-};
-
-type Props = {
-  resources: Resource[];
-};
+import { Events } from "./UnitCalendarEvents";
 
 const FlexContainer = styled.div<{ $numCols: number }>`
   display: flex;
@@ -114,184 +77,12 @@ const RowCalendarArea = styled.div`
   position: relative;
 `;
 
-const EventContent = styled.div`
-  height: 100%;
-  width: 100%;
-  position: relative;
-
-  p {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding: var(--spacing-xs);
-
-    margin: 0;
-    position: absolute;
-    width: calc(100% - var(--spacing-xs) * 2);
-    height: calc(100% - var(--spacing-xs) * 2);
-    pointer-events: none;
-  }
-`;
-
 const Cells = ({ cols }: { cols: number }) => (
   <CellContent $numCols={cols}>
     {Array.from(Array(cols).keys()).map((i) => (
       <Cell key={i} />
     ))}
   </CellContent>
-);
-
-const getPreBuffer = (
-  event: CalendarEvent<ReservationType>,
-  hourPercent: number,
-  left: string,
-  t: TFunction
-): JSX.Element | null => {
-  const buffer = event.event?.reservationUnits?.[0]?.bufferTimeBefore;
-
-  if (buffer) {
-    const width = `${(hourPercent * buffer) / 3600}%`;
-    return (
-      <div
-        style={{
-          ...PRE_PAUSE.style,
-          ...TemplateProps,
-          left: `calc(${left} - ${width})`,
-          width,
-        }}
-        title={t("MyUnits.UnitCalendar.legend.pause")}
-        key={`${event.event?.pk}-pre`}
-      />
-    );
-  }
-  return null;
-};
-
-const getPostBuffer = (
-  event: CalendarEvent<ReservationType>,
-  hourPercent: number,
-  right: string,
-  t: TFunction
-): JSX.Element | null => {
-  const buffer = event.event?.reservationUnits?.[0]?.bufferTimeAfter;
-
-  if (buffer) {
-    const width = `calc(${(hourPercent * buffer) / 3600}% - 1px)`;
-    return (
-      <div
-        style={{
-          ...POST_PAUSE.style,
-          ...TemplateProps,
-          left: right,
-          width,
-        }}
-        title={t("MyUnits.UnitCalendar.legend.pause")}
-        key={`${event.event?.pk}-post`}
-      />
-    );
-  }
-  return null;
-};
-
-const getEventTitle = ({
-  reservation: { title, event },
-}: {
-  reservation: CalendarEvent<ReservationType>;
-}) => {
-  return event && event?.pk !== event?.reservationUnits?.[0]?.pk
-    ? getReserveeName(event)
-    : title;
-};
-
-const Events = ({
-  currentReservationUnit,
-  firstHour,
-  events,
-  eventStyleGetter,
-  numHours,
-  t,
-}: {
-  currentReservationUnit: number;
-  firstHour: number;
-  events: CalendarEvent<ReservationType>[];
-  eventStyleGetter: EventStyleGetter;
-  numHours: number;
-  t: TFunction;
-}) => (
-  <div
-    style={{
-      position: "absolute",
-      width: "100%",
-      top: 0,
-      left: 0,
-    }}
-  >
-    {events.map((e) => {
-      const title = getEventTitle({ reservation: e });
-      const startDate = new Date(e.start);
-      const endDate = new Date(e.end);
-      const dayStartDate = new Date(e.start);
-      dayStartDate.setHours(firstHour);
-      dayStartDate.setMinutes(0);
-      dayStartDate.setSeconds(0);
-
-      const startMinutes = differenceInMinutes(startDate, dayStartDate);
-
-      const hourPercent = 100 / numHours;
-      const hours = startMinutes / 60;
-      const left = `${hourPercent * hours}%`;
-
-      const durationMinutes = differenceInMinutes(endDate, startDate);
-
-      let preBuffer = null;
-      let postBuffer = null;
-      if (currentReservationUnit === e.event?.reservationUnits?.[0]?.pk) {
-        preBuffer = getPreBuffer(e, hourPercent, left, t);
-
-        const right = `calc(${left} + ${durationMinutes / 60} * ${
-          100 / numHours
-        }% + 1px)`;
-        postBuffer = getPostBuffer(e, hourPercent, right, t);
-      }
-
-      return [
-        preBuffer,
-        <div
-          key={String(e.event?.pk)}
-          style={{
-            left,
-            ...TemplateProps,
-            width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
-            zIndex: 5,
-          }}
-        >
-          <EventContent style={{ ...eventStyleGetter(e).style }}>
-            <p>{title}</p>
-            <Popup
-              position={["right center", "left center"]}
-              trigger={() => (
-                <button
-                  type="button"
-                  style={{
-                    background: "transparent",
-                    cursor: "pointer",
-                    border: 0,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                />
-              )}
-            >
-              <ReservationPopupContent
-                reservation={e.event as ReservationType}
-              />
-            </Popup>
-          </EventContent>
-        </div>,
-        postBuffer,
-      ];
-    })}
-  </div>
 );
 
 const sortByDraftStatusAndTitle = (resources: Resource[]) => {
@@ -301,6 +92,18 @@ const sortByDraftStatusAndTitle = (resources: Resource[]) => {
 
     return draftComparison || titleComparison;
   });
+};
+
+export type Resource = {
+  title: string;
+  pk: number;
+  url: string;
+  isDraft: boolean;
+  events: CalendarEvent<ReservationType>[];
+};
+
+type Props = {
+  resources: Resource[];
 };
 
 const ResourceCalendar = ({ resources }: Props): JSX.Element => {
@@ -366,7 +169,6 @@ const ResourceCalendar = ({ resources }: Props): JSX.Element => {
                   firstHour={beginHour}
                   numHours={numHours}
                   events={row.events}
-                  eventStyleGetter={resourceEventStyleGetter(row.pk)}
                   t={t}
                 />
               </RowCalendarArea>

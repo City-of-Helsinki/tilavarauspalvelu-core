@@ -78,8 +78,12 @@ const ReservationUnitCalendar = ({
   const [events, setEvents] = useState([] as CalendarEvent<ReservationType>[]);
   const [hasMore, setHasMore] = useState(false);
   const { notifyError } = useNotification();
-
   const { t } = useTranslation();
+
+  const calendarEventExcludedLegends = [
+    "RESERVATION_UNIT_RELEASED",
+    "RESERVATION_UNIT_DRAFT",
+  ];
 
   const { fetchMore, loading } = useQuery<
     Query,
@@ -153,9 +157,11 @@ const ReservationUnitCalendar = ({
         }}
       />
       <Legends>
-        {legend.map((l) => (
-          <Legend key={l.label} style={l.style} label={t(l.label)} />
-        ))}
+        {legend
+          .filter((l) => !calendarEventExcludedLegends.includes(l.key))
+          .map((l) => (
+            <Legend key={l.label} style={l.style} label={t(l.label)} />
+          ))}
       </Legends>
     </Container>
   );
