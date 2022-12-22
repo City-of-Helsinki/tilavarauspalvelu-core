@@ -33,8 +33,11 @@ export function numPersons(
 }
 
 export function selectOption(id: string, itemIndex: number): void {
-  cy.get(`#${CSS.escape(`${id}-toggle-button`)}`).click();
-  cy.get(`#${CSS.escape(`${id}-item-${itemIndex}`)}`).click();
+  cy.get(`#${CSS.escape(`${id}-toggle-button`)}`)
+    .click({ force: true })
+    .siblings("ul")
+    .children(`li:nth-of-type(${itemIndex + 1})`)
+    .click();
 }
 
 export function acceptAndSaveEvent(

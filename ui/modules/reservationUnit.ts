@@ -234,7 +234,7 @@ export const getPrice = (
   asInt = false
 ): string => {
   const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  const floatFormatter = trailingZeros ? "twoDecimals" : "strippedDecimal";
+  const floatFormatter = trailingZeros ? "twoDecimal" : "strippedDecimal";
 
   const formatters = getFormatters(i18n.language);
 
@@ -249,7 +249,7 @@ export const getPrice = (
       return formatters[currencyFormatter].format(pricing.highestPrice);
     }
 
-    const lowestPrice = pricing.lowestPrice
+    const lowestPrice = parseFloat(pricing.lowestPrice?.toString())
       ? formatters[floatFormatter].format(pricing.lowestPrice * volume)
       : 0;
     const highestPrice = formatters[currencyFormatter].format(

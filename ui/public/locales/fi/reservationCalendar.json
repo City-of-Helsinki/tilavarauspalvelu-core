@@ -57,6 +57,8 @@
   "nextAvailableSlot_plural": "Seuraavat vapaat {{slot}}",
   "showCalendar": "Näytä kalenteri",
   "eventDuration": "Varauksen kesto",
+  "eventDurationLiteral": "{{min}} - {{max}} varaus",
+  "subventionAvailable": "alennusmahdollisuus",
   "dateFormatAssist": "Käytä muotoa p.k.vvvv",
   "timeFormatAssist": "Tunti/minuutit",
   "durationFormatAssist": "Tunti:minuutit",

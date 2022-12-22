@@ -99,6 +99,8 @@ import QuickReservation from "../../components/reservation-unit/QuickReservation
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { CURRENT_USER } from "../../modules/queries/user";
 import { isReservationReservable } from "../../modules/reservation";
+import SubventionSuffix from "../../components/reservation/SubventionSuffix";
+import InfoDialog from "../../components/common/InfoDialog";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -440,14 +442,27 @@ const ReservationUnit = ({
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const [initialReservation, setInitialReservation] =
     useState<PendingReservation | null>(null);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [storedReservation, , removeStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
 
   const calendarRef = useRef(null);
+  const openPricingTermsRef = useRef(null);
   const hash = router.asPath.split("#")[1];
+
+  const subventionSuffix = useCallback(
+    (placement: "reservation-unit-head" | "quick-reservation") =>
+      reservationUnit.canApplyFreeOfCharge ? (
+        <SubventionSuffix
+          placement={placement}
+          ref={openPricingTermsRef}
+          setIsDialogOpen={setIsDialogOpen}
+        />
+      ) : null,
+    [reservationUnit.canApplyFreeOfCharge]
+  );
 
   useEffect(() => {
     const scrollToCalendar = () =>
@@ -786,6 +801,7 @@ const ReservationUnit = ({
             scrollPosition={calendar?.current?.offsetTop - 20}
             setErrorMsg={setErrorMsg}
             idPrefix={type}
+            subventionSuffix={subventionSuffix}
           />
         )
       );
@@ -796,6 +812,7 @@ const ReservationUnit = ({
       isSlotReservable,
       reservationUnit,
       isReservable,
+      subventionSuffix,
     ]
   );
 
@@ -838,6 +855,7 @@ const ReservationUnit = ({
         reservationUnit={reservationUnit}
         // activeOpeningTimes={activeOpeningTimes}
         isReservable={isReservable}
+        subventionSuffix={subventionSuffix}
       />
       <Container>
         <TwoColumnLayout>
@@ -1159,7 +1177,11 @@ const ReservationUnit = ({
                           {{ date: toUIDate(new Date(futurePricing.begins)) }}{" "}
                           alkaen. Uusi hinta on{" "}
                           {{
-                            price: getPrice(futurePricing).toLocaleLowerCase(),
+                            price: getPrice(
+                              futurePricing,
+                              undefined,
+                              true
+                            ).toLocaleLowerCase(),
                           }}
                         </strong>
                       </Trans>
@@ -1247,6 +1269,13 @@ const ReservationUnit = ({
             <Address reservationUnit={reservationUnit} />
           </div>
         </TwoColumnLayout>
+        <InfoDialog
+          id="pricing-terms"
+          heading={t("reservationUnit:pricingTerms")}
+          text={getTranslation(reservationUnit.pricingTerms, "text")}
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+        />
       </Container>
       <BottomWrapper>
         {shouldDisplayBottomWrapper && (

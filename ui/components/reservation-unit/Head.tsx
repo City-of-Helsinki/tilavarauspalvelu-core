@@ -34,6 +34,7 @@ interface PropsType {
   reservationUnit: ReservationUnitByPkType;
   // activeOpeningTimes: ActiveOpeningTime[];
   isReservable?: boolean;
+  subventionSuffix?: (arg: string) => JSX.Element;
 }
 
 const TopContainer = styled.div`
@@ -61,7 +62,7 @@ const StyledIconWithText = styled(IconWithText).attrs({
 })`
   display: grid;
   align-items: flex-start;
-  white-space: nowrap;
+  white-space: pre-line;
   line-height: var(--lineheight-l);
   margin-top: unset;
 `;
@@ -74,7 +75,7 @@ const Props = styled.div`
   ${fontRegular};
   font-size: var(--fontsize-body-s);
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, auto);
   gap: var(--spacing-m) var(--spacing-s);
   margin-bottom: var(--spacing-m);
 
@@ -83,11 +84,11 @@ const Props = styled.div`
   }
 
   @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, auto);
   }
 
   @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, auto);
   }
 `;
 
@@ -112,6 +113,7 @@ const Head = ({
   reservationUnit,
   // activeOpeningTimes,
   isReservable,
+  subventionSuffix,
 }: PropsType): JSX.Element => {
   const { t } = useTranslation();
 
@@ -139,6 +141,10 @@ const Head = ({
 
   const pricing = getActivePricing(reservationUnit);
   const unitPrice = getPrice(pricing);
+
+  const unitPriceSuffix =
+    getPrice(pricing, undefined, false, true) !== "0" &&
+    subventionSuffix("reservation-unit-head");
 
   const reservationUnitName = getReservationUnitName(reservationUnit);
 
@@ -193,16 +199,6 @@ const Head = ({
                       texts={openingTimesTextArr}
                     />
                   )} */}
-                {unitPrice && (
-                  <StyledIconWithText
-                    icon={
-                      <IconTicket
-                        aria-label={t("prices:reservationUnitPriceLabel")}
-                      />
-                    }
-                    text={unitPrice}
-                  />
-                )}
                 {(reservationUnit.minReservationDuration ||
                   reservationUnit.maxReservationDuration) && (
                   <StyledIconWithText
@@ -211,8 +207,25 @@ const Head = ({
                         aria-label={t("reservationCalendar:eventDuration")}
                       />
                     }
-                    text={`${minReservationDuration} – ${maxReservationDuration}
-                    `}
+                    text={t(`reservationCalendar:eventDurationLiteral`, {
+                      min: minReservationDuration,
+                      max: maxReservationDuration,
+                    })}
+                  />
+                )}
+                {unitPrice && (
+                  <StyledIconWithText
+                    icon={
+                      <IconTicket
+                        aria-label={t("prices:reservationUnitPriceLabel")}
+                      />
+                    }
+                    text={
+                      <>
+                        {unitPrice}
+                        {unitPriceSuffix}
+                      </>
+                    }
                   />
                 )}
               </Props>

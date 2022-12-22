@@ -54,6 +54,8 @@
   "nextAvailableSlot_plural": "",
   "showCalendar": "",
   "eventDuration": "",
+  "eventDurationLiteral": "",
+  "subventionAvailable": "",
   "dateFormatAssist": "",
   "timeFormatAssist": "",
   "durationFormatAssist": "",

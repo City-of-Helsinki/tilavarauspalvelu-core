@@ -25,6 +25,7 @@ type Props = {
   reservation: ReservationType;
   reservationUnit: ReservationUnitType | ReservationUnitByPkType;
   type: Type;
+  shouldDisplayReservationUnitPrice?: boolean;
 };
 
 const Wrapper = styled.div<{ $type: Type }>`
@@ -69,6 +70,7 @@ const ReservationInfoCard = ({
   reservation,
   reservationUnit,
   type,
+  shouldDisplayReservationUnitPrice = false,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -111,11 +113,23 @@ const ReservationInfoCard = ({
   const purpose = getTranslation(reservation?.purpose, "name");
 
   const price: string =
-    reservation?.state === "REQUIRES_HANDLING" && begin
-      ? getReservationUnitPrice(reservationUnit, new Date(begin))
-      : getReservationPrice(reservation?.price, t("prices:priceFree"));
+    begin &&
+    (reservation?.state === "REQUIRES_HANDLING" ||
+      shouldDisplayReservationUnitPrice)
+      ? getReservationUnitPrice(
+          reservationUnit,
+          new Date(begin),
+          duration,
+          true
+        )
+      : getReservationPrice(
+          reservation?.price,
+          t("prices:priceFree"),
+          i18n.language,
+          true
+        );
 
-  const shouldDisaplyTaxPercentage: boolean =
+  const shouldDisplayTaxPercentage: boolean =
     reservation?.state === "REQUIRES_HANDLING" && begin
       ? getReservationUnitPrice(
           reservationUnit,
@@ -161,7 +175,7 @@ const ReservationInfoCard = ({
         <Value>
           {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
           {taxPercentageValue &&
-            shouldDisaplyTaxPercentage &&
+            shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {
               taxPercentage: formatters.strippedDecimal.format(
                 reservation?.taxPercentageValue

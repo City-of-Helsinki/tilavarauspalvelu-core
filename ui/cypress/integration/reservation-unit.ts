@@ -55,6 +55,8 @@ import {
   reservationNotice,
   termsOfUse,
   reservationControlsToggleButton,
+  pricingTermsLink,
+  pricingTermsDialog,
 } from "model/reservation-unit";
 import { textWithIcon } from "model/search";
 
@@ -157,8 +159,8 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       // textWithIcon(1).contains("Seuraava vapaa aika:");
       textWithIcon(0).contains("Nuorisopalvelut Fi");
       textWithIcon(1).contains("60 henkilöä");
-      textWithIcon(2).contains("20 € / 15 min");
-      textWithIcon(3).contains("1 t – 1 t 30 min");
+      textWithIcon(2).contains("1 t - 1 t 30 min varaus");
+      textWithIcon(3).contains("20 € / 15 min");
 
       reservationInfo().contains(
         "Voit tehdä varauksen aikaisintaan 12 kuukautta ja viimeistään 2 päivää etukäteen."
@@ -178,7 +180,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         `Huomioi hinnoittelumuutos ${toUIDate(addDays(new Date(), 2))} alkaen.`
       );
       reservationNotice().contains(
-        "Uusi hinta on 10 - 30 € / 15 min (sis. alv. 20%)."
+        "Uusi hinta on 10,00 - 30,00 € / 15 min (sis. alv. 20%)."
       );
 
       paymentAndCancellationTerms().find("> button").contains("Peruutusehdot");
@@ -191,6 +193,25 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         "Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto"
       );
       termsOfUse().should("contain.text", "Sopparijuttuja");
+    });
+  });
+
+  describe("has pricing terms modal", () => {
+    beforeEach(() => {
+      cy.visit("/reservation-unit/3");
+      cy.injectAxe();
+    });
+
+    it("can open and close modal", () => {
+      pricingTermsLink("reservation-unit-head").click();
+
+      pricingTermsDialog().should("contain.text", "Hinnoitteluperiaatteet");
+      pricingTermsDialog().should("contain.text", "Hinnoitteluehdot body Fi");
+
+      pricingTermsDialog().find("button").click();
+      pricingTermsDialog().should("not.exist");
+
+      cy.checkA11y(null, null, null, true);
     });
   });
 
@@ -388,11 +409,10 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       cy.visit("/reservation-unit/902", { failOnStatusCode: false });
 
       dateSelect().click();
-      price("desktop").should("not.exist");
 
       nextAvailableTimeLink("desktop").click();
       timeSlots("desktop").first().click();
-      price("desktop").should("contain.text", "Hinta: 40 - 120\u00a0€");
+      price("desktop").should("contain.text", "Hinta: 40,00 - 120,00\u00a0€");
 
       durationSelect()
         .click()
@@ -400,7 +420,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .children("li:nth-of-type(2)")
         .click();
 
-      price("desktop").should("contain.text", "Hinta: 50 - 150\u00a0€");
+      price("desktop").should("contain.text", "Hinta: 50,00 - 150,00\u00a0€");
 
       durationSelect()
         .click()
@@ -408,11 +428,10 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .children("li:nth-of-type(3)")
         .click();
 
-      price("desktop").should("contain.text", "Hinta: 60 - 180\u00a0€");
+      price("desktop").should("contain.text", "Hinta: 60,00 - 180,00\u00a0€");
       submitButton("desktop").should("not.be.disabled");
 
       timeSlots("desktop").first().click();
-      price("desktop").should("not.exist");
       submitButton("desktop").should("be.disabled");
 
       timeSlots("desktop").first().click();
@@ -424,11 +443,19 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .type(toUIDate(addDays(new Date(), 3), "dd.MM.yyyy"))
         .blur();
 
-      price("desktop").should("not.exist");
       submitButton("desktop").should("be.disabled");
 
       timeSlots("desktop").first().click();
-      price("desktop").should("contain.text", "Hinta: 120 - 300\u00a0€");
+      price("desktop").should("contain.text", "Hinta: 120,00 - 300,00\u00a0€");
+
+      pricingTermsLink("quick-reservation").click();
+
+      pricingTermsDialog().should("contain.text", "Hinnoitteluperiaatteet");
+      pricingTermsDialog().should("contain.text", "Hinnoitteluehdot body Fi");
+
+      pricingTermsDialog().find("button").click();
+      pricingTermsDialog().should("not.exist");
+
       submitButton("desktop").should("not.be.disabled").click();
 
       cy.get("main#main").should("contain.text", "Täytä varauksen tiedot");

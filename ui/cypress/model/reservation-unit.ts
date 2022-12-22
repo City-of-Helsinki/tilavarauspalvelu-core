@@ -58,3 +58,13 @@ export function reservationControlsToggleButton(): Cypress.Chainable<
     "[data-testid='reservation-unit__reservation-controls--toggle-button']"
   );
 }
+
+export function pricingTermsLink(
+  placement: string
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`[data-testid="link__pricing-terms--${placement}"]`);
+}
+
+export function pricingTermsDialog(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("#dialog__pricing-terms");
+}

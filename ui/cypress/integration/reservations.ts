@@ -150,7 +150,7 @@ describe("Tilavaraus user reservations", () => {
         "contain.text",
         "Varauksen kuvaus: Reservation description - a long one with alotta text"
       )
-      .should("contain.text", "Hinta: 42\u00a0€")
+      .should("contain.text", "Hinta: 42,00\u00a0€")
       .should("contain.text", "Käyttötarkoitus: Liikkua tai pelata FI")
       .should("contain.text", "Ikäryhmä: 5 - 8")
       .should("contain.text", "Osallistujamäärä: 18");
@@ -206,7 +206,7 @@ describe("Tilavaraus user reservations", () => {
         "contain.text",
         "Varauksen kuvaus: Reservation description - a long one with alotta text"
       )
-      .should("contain.text", "Hinta: 42\u00a0€")
+      .should("contain.text", "Hinta: 42,00\u00a0€")
       .should("contain.text", "Käyttötarkoitus: Liikkua tai pelata FI")
       .should("contain.text", "Ikäryhmä: 5 - 8")
       .should("contain.text", "Osallistujamäärä: 18");
@@ -253,7 +253,7 @@ describe("Tilavaraus user reservations", () => {
     reservationInfoCard()
       .should("contain.text", ", 2 t")
       // .should("contain.text", "(alv %)")
-      .should("contain.text", "Hinta: 42\u00a0€");
+      .should("contain.text", "Hinta: 42,00\u00a0€");
 
     secondBackButton().should("exist");
   });

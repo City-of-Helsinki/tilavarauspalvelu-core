@@ -69,6 +69,28 @@ describe("getPrice", () => {
     expect(getPrice(pricing)).toBe("0 - 50,5 € / 15 min");
   });
 
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: 60.5,
+      priceUnit: "PER_HOUR",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice(pricing, 60)).toBe("0 - 60,5 €");
+  });
+
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: "60.5",
+      priceUnit: "PER_HOUR",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice(pricing, 61)).toBe("0 - 121 €");
+  });
+
   test("fixed price", () => {
     const pricing = {
       lowestPrice: 50,
@@ -970,9 +992,9 @@ describe("getReservationUnitPrice", () => {
       "40 - 50 € / tunti"
     );
 
-    expect(getReservationUnitPrice(data, addDays(new Date(), 11))).toEqual(
-      "10 - 20 € / tunti"
-    );
+    expect(
+      getReservationUnitPrice(data, addDays(new Date(), 11), undefined, true)
+    ).toEqual("10,00 - 20,00 € / tunti");
   });
 
   it("returns null if incomplete data", () => {

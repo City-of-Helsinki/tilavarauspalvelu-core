@@ -416,6 +416,16 @@ const selectedReservationUnitQuery = graphql.query<
     reservationUnitByPk.pricings = pricings;
   }
 
+  if (req.variables.pk === 3) {
+    reservationUnitByPk.canApplyFreeOfCharge = true;
+    reservationUnitByPk.pricingTerms = {
+      id: "faweoipfv",
+      nameFi: "Hinnoitteluehdot heading Fi",
+      textFi: "Hinnoitteluehdot body Fi",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms,
+    };
+  }
+
   if (req.variables.pk === 800) {
     reservationUnitByPk.equipment = [];
   }
@@ -460,6 +470,13 @@ const selectedReservationUnitQuery = graphql.query<
   if (req.variables.pk === 902) {
     reservationUnitByPk.maxReservationsPerUser = 30;
     reservationUnitByPk.publishEnds = addMinutes(new Date(), 10).toISOString();
+    reservationUnitByPk.canApplyFreeOfCharge = true;
+    reservationUnitByPk.pricingTerms = {
+      id: "faweoipfv",
+      nameFi: "Hinnoitteluehdot heading Fi",
+      textFi: "Hinnoitteluehdot body Fi",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms,
+    };
   }
 
   if (req.variables.pk === 903) {

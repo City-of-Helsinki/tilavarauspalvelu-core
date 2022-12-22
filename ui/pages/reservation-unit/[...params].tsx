@@ -207,6 +207,7 @@ const PinkBox = styled.div<{ $isHiddenOnMobile: boolean }>`
   margin-top: var(--spacing-m);
   padding: 1px var(--spacing-m) var(--spacing-m);
   background-color: var(--color-suomenlinna-light);
+  line-height: var(--lineheight-l);
 
   p {
     &:last-of-type {
@@ -559,6 +560,22 @@ const ReservationUnitReservation = ({
     setPendingReservation(null);
   };
 
+  const shouldDisplayReservationUnitPrice = useMemo(() => {
+    switch (step) {
+      case 0:
+        return (
+          reservationUnit?.canApplyFreeOfCharge &&
+          generalFields?.includes("applyingForFreeOfCharge")
+        );
+      case 1:
+      default:
+        return (
+          reservationUnit?.canApplyFreeOfCharge &&
+          reservation?.applyingForFreeOfCharge === true
+        );
+    }
+  }, [step, generalFields, reservation, reservationUnit]);
+
   if (!isBrowser) {
     return null;
   }
@@ -580,6 +597,9 @@ const ReservationUnitReservation = ({
               reservation={reservation || reservationData}
               reservationUnit={reservationUnit}
               type="pending"
+              shouldDisplayReservationUnitPrice={
+                shouldDisplayReservationUnitPrice
+              }
             />
             <PinkBox $isHiddenOnMobile={step > 0}>
               <Subheading>

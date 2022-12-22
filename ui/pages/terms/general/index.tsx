@@ -51,7 +51,10 @@ const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
   return (
     <Wrapper>
       <h1>{t("reservationCalendar:heading.generalTerms")}</h1>
-      <Sanitize html={getTranslation(genericTerms, "text")} />
+      <Sanitize
+        html={getTranslation(genericTerms, "text")}
+        style={{ whiteSpace: "pre-wrap" }}
+      />
     </Wrapper>
   );
 };

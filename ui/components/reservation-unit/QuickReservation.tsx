@@ -35,6 +35,7 @@ type Props = {
   isSlotReservable: (arg1: Date, arg2: Date, arg3?: boolean) => boolean;
   setErrorMsg: (arg: string) => void;
   idPrefix: string;
+  subventionSuffix?: (arg: string) => JSX.Element;
 };
 
 const mobileBreakpoint = "400px";
@@ -51,6 +52,14 @@ const Heading = styled(H4)`
   margin: var(--spacing-3-xs) 0 var(--spacing-l) 0;
 `;
 
+const Price = styled.div`
+  & > * {
+    display: inline-block;
+  }
+  padding-bottom: var(--spacing-m);
+  height: var(--spacing-m);
+`;
+
 const Selects = styled.div`
   & > *:first-child {
     grid-column: 1/-1;
@@ -59,7 +68,7 @@ const Selects = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
-  margin-bottom: var(--spacing-m);
+  margin-bottom: var(--spacing-l);
 
   label {
     white-space: nowrap;
@@ -82,19 +91,6 @@ const StyledTimeInput = styled(TimeInput)`
       width: var(--spacing-2-xs);
     }
     padding: 0 var(--spacing-xs) 0 var(--spacing-xs) !important;
-  }
-`;
-
-const Price = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-self: flex-end;
-  gap: var(--spacing-3-xs);
-  padding-bottom: var(--spacing-3-xs);
-  grid-column: -1/1;
-
-  @media (min-width: ${mobileBreakpoint}) {
-    grid-column: unset;
   }
 `;
 
@@ -212,6 +208,7 @@ const QuickReservation = ({
   scrollPosition,
   setErrorMsg,
   idPrefix,
+  subventionSuffix,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -252,7 +249,7 @@ const QuickReservation = ({
     const [hours, minutes] =
       duration?.value.toString().split(":").map(Number) || [];
     const length = hours * 60 + minutes;
-    return getReservationUnitPrice(reservationUnit, date, length);
+    return getReservationUnitPrice(reservationUnit, date, length, true);
   }, [duration?.value, reservationUnit, date]);
 
   const [storedReservation, setStoredReservation, removeStoredReservation] =
@@ -429,12 +426,15 @@ const QuickReservation = ({
           onChange={(val: OptionType) => setDuration(val)}
           defaultValue={duration}
         />
-        {price && slot && (
-          <Price data-testid="quick-reservation-price">
-            {t("reservationUnit:price")}: <PriceValue>{price}</PriceValue>
-          </Price>
-        )}
       </Selects>
+      <Price data-testid="quick-reservation-price">
+        {price && slot ? (
+          <>
+            {t("reservationUnit:price")}: <PriceValue>{price}</PriceValue>
+            {subventionSuffix("quick-reservation")}
+          </>
+        ) : null}
+      </Price>
       <Subheading>
         {t("reservationCalendar:quickReservation.subheading")}
       </Subheading>
@@ -464,7 +464,6 @@ const QuickReservation = ({
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-
                           window.scroll({
                             top: scrollPosition,
                             left: 0,
