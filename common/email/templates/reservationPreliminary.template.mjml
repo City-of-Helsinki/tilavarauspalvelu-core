@@ -26,7 +26,7 @@
         <mj-raw>
           {% if subsidised_price < price %}
         </mj-raw>
-        <mj-text>Varauksen hinta: <b>{{subsidised_price - price}} € </b> (sis. alv {{tax_percentage}})</mj-text>
+        <mj-text>Varauksen hinta: <b>{{subsidised_price}} - {{price}} € </b> (sis. alv {{tax_percentage}})</mj-text>
         <mj-raw>
           {% else %}
         </mj-raw>

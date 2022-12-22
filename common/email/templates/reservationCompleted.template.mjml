@@ -10,7 +10,7 @@
         <mj-raw>
           {% if price < non_subsidised_price %}
         </mj-raw>
-        <mj-text>Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus: <b>{{discounted_price}}</b></mj-text>
+        <mj-text>Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:</mj-text>
         <mj-raw>
           {% else %}
         </mj-raw>
