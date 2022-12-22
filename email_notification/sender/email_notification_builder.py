@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.template import Context, Template
 from django.utils.timezone import get_default_timezone
-from jinja2 import StrictUndefined, TemplateError
+from jinja2 import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
 
 from applications.models import CUSTOMER_TYPES
@@ -39,7 +39,7 @@ class EmailTemplateValidator:
                 )
 
     def _validate_in_sandbox(self, str: str, context):
-        env = SandboxedEnvironment(undefined=StrictUndefined)
+        env = SandboxedEnvironment()
         try:
             env.from_string(str).render(context)
         except TemplateError as e:
@@ -52,7 +52,7 @@ class EmailTemplateValidator:
 
         return True
 
-    def validate_html_file(self, value: InMemoryUploadedFile):
+    def validate_html_file(self, value: InMemoryUploadedFile, context_dict=()):
         ext = os.path.splitext(value.name)[1]
         if not ext.lower() == ".html":
             raise ValidationError(
@@ -67,7 +67,7 @@ class EmailTemplateValidator:
         try:
             file = value.open()
             content = file.read().decode("utf-8")
-            self.validate_string(content)
+            self.validate_string(content, context_dict)
         except EmailTemplateValidationError as err:
             raise ValidationError(err.message)
         except Exception as err:
@@ -184,6 +184,13 @@ class ReservationEmailNotificationBuilder:
             instance, f"{field}_{self.language}", getattr(instance, field, "")
         )
 
+    def _get_html_content(self, instance):
+        html_template_file = self._get_by_language(instance, "html_content")
+        if not html_template_file:
+            return ""
+
+        return html_template_file.open().read().decode("utf-8")
+
     def _set_language(self, lang):
         if getattr(self.template, f"content_{lang}", None):
             self.language = lang
@@ -205,6 +212,10 @@ class ReservationEmailNotificationBuilder:
         validator.validate_string(self.template.subject, self.context_attr_map)
         validator.validate_string(self.template.content, self.context_attr_map)
 
+        html_content = self._get_html_content(self.template)
+        if html_content:
+            validator.validate_string(html_content)
+
     def get_context(self):
         context_dict = {}
         for key, value in self.context_attr_map.items():
@@ -222,7 +233,12 @@ class ReservationEmailNotificationBuilder:
         return rendered
 
     def get_content(self):
-        content = self._get_by_language(self.template, "content")
+        html_content = self._get_html_content(self.template)
+        content = (
+            html_content
+            if html_content
+            else self._get_by_language(self.template, "content")
+        )
         rendered = Template(template_string=content).render(context=self.get_context())
         return rendered
 
