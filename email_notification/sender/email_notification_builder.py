@@ -172,6 +172,9 @@ class ReservationEmailNotificationBuilder:
     def _get_price(self):
         return self.reservation.price
 
+    def _get_non_subsidised_price(self):
+        return self.reservation.non_subsidised_price
+
     def _get_tax_percentage(self):
         return self.reservation.tax_percentage_value
 

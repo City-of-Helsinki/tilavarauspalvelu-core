@@ -110,6 +110,11 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
     def test_get_price(self):
         assert_that(self.builder._get_price()).is_equal_to(self.reservation.price)
 
+    def test_get_non_subsidised_price(self):
+        assert_that(self.builder._get_non_subsidised_price()).is_equal_to(
+            self.reservation.non_subsidised_price
+        )
+
     def test_get_tax_percentage(self):
         assert_that(self.builder._get_tax_percentage()).is_equal_to(
             self.reservation.tax_percentage_value
@@ -210,12 +215,20 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         content = """
             Should contain {{ name }} and {{ begin_date }} and {{ begin_time }} and {{ end_date }}
             and {{ end_time }} and of course the {{ reservation_number }}
+
+            {% if price %}Price is {{ price | currency }} €
+            and subsidised price was {{ non_subsidised_price | currency }} €{% endif %}
+
             Yours truly:
             system.
         """
         compiled_content = f"""
             Should contain Dance time! and 9.2.2022 and 10:00 and 9.2.2022
             and 12:00 and of course the {self.reservation.id}
+
+            Price is 52,00 €
+            and subsidised price was 0,00 €
+
             Yours truly:
             system.
         """
