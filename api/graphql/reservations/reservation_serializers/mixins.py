@@ -19,6 +19,7 @@ class PriceCalculationResult:
     tax_percentage: Decimal = Decimal("0")
     non_subsidised_price: Decimal = Decimal("0")
     non_subsidised_price_net: Decimal = Decimal("0")
+    subsidised_price: Decimal = Decimal("0")
 
     def __init__(
         self,
@@ -28,6 +29,8 @@ class PriceCalculationResult:
         tax_percentage: Decimal,
         non_subsidised_price: Decimal,
         non_subsidised_price_net: Decimal,
+        subsidised_price: Decimal,
+        subsidised_price_net: Decimal,
     ) -> None:
         self.reservation_price = reservation_price
         self.reservation_price_net = reservation_price_net
@@ -35,6 +38,8 @@ class PriceCalculationResult:
         self.tax_percentage = tax_percentage
         self.non_subsidised_price = non_subsidised_price
         self.non_subsidised_price_net = non_subsidised_price_net
+        self.subsidised_price = subsidised_price
+        self.subsidised_price_net = subsidised_price_net
 
 
 class ReservationPriceMixin:
@@ -83,6 +88,9 @@ class ReservationPriceMixin:
         total_reservation_price: Decimal = Decimal("0")
         total_reservation_price_net: Decimal = Decimal("0")
 
+        total_reservation_subsidised_price: Decimal = Decimal("0")
+        total_reservation_subsidised_price_net: Decimal = Decimal("0")
+
         first_paid_unit_price: Decimal = Decimal("0")
         first_paid_unit_tax_percentage: Decimal = Decimal("0")
         is_first_paid_set = False
@@ -106,6 +114,10 @@ class ReservationPriceMixin:
                 else pricing.lowest_price_net
             )
 
+            # Subsidised price is always the lowest price.
+            reservation_unit_subsidised_price = pricing.lowest_price
+            reservation_unit_subsidised_price_net = pricing.lowest_price_net
+
             # Time-based calculation is needed only if price unit is not fixed.
             # Otherwise, we can just use the price defined in the reservation unit
             if pricing.price_unit != PriceUnit.PRICE_UNIT_FIXED:
@@ -125,6 +137,19 @@ class ReservationPriceMixin:
                     1 + pricing.tax_percentage.decimal
                 )
 
+                reservation_unit_subsidised_price_net = Decimal(
+                    math.ceil(
+                        reservation_duration_in_minutes
+                        / reservation_unit_price_unit_minutes
+                    )
+                    * reservation_unit_subsidised_price_net
+                )
+
+                reservation_unit_subsidised_price = (
+                    reservation_unit_subsidised_price_net
+                    * (1 + pricing.tax_percentage.decimal)
+                )
+
             # It was agreed in TILA-1765 that when multiple units are given,
             # unit price and tax percentage are fetched from the FIRST unit.
             # https://helsinkisolutionoffice.atlassian.net/browse/TILA-1765
@@ -135,6 +160,10 @@ class ReservationPriceMixin:
 
             total_reservation_price += reservation_unit_price
             total_reservation_price_net += reservation_unit_price_net
+            total_reservation_subsidised_price += reservation_unit_subsidised_price
+            total_reservation_subsidised_price_net += (
+                reservation_unit_subsidised_price_net
+            )
 
         non_subsidised_price = total_reservation_price
         non_subsidised_price_net = total_reservation_price_net
@@ -146,6 +175,8 @@ class ReservationPriceMixin:
             first_paid_unit_tax_percentage,
             non_subsidised_price,
             non_subsidised_price_net,
+            total_reservation_subsidised_price,
+            total_reservation_subsidised_price_net,
         )
 
 
