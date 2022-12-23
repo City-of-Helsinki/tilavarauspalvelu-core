@@ -331,7 +331,7 @@ EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_MAX_RECIPIENTS = env("EMAIL_MAX_RECIPIENTS")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-EMAIL_TEMPLATE_CONTEXT_ATTRS = [
+EMAIL_TEMPLATE_CONTEXT_VARIABLES = [
     "reservee_name",
     "name",
     "begin_date",
@@ -343,6 +343,7 @@ EMAIL_TEMPLATE_CONTEXT_ATTRS = [
     "unit_location",
     "reservation_unit",
     "price",
+    "non_subsidised_price",
     "tax_percentage",
     "confirmed_instructions",
     "pending_instructions",

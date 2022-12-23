@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
@@ -59,4 +60,7 @@ class ReservationEmailBaseTestCase(TestCase):
             begin=cls.begin,
             deny_reason=deny_reason,
             cancel_reason=cancel_reason,
+            price_net=Decimal("52") / Decimal("1.10"),
+            price=Decimal("52.00"),
+            tax_percentage_value=Decimal("10"),
         )

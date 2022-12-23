@@ -1,33 +1,54 @@
 import os
 import re
+from typing import Dict
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.template import Context, Template
 from django.utils.timezone import get_default_timezone
 from jinja2 import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
 
 from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate
+from email_notification.templatetags.email_template_filters import format_currency
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.commons import LANGUAGES
+
+FILTERS_MAP = {"currency": format_currency}
+
+
+def get_sandboxed_environment() -> SandboxedEnvironment:
+    env = SandboxedEnvironment()
+
+    for fil, func in FILTERS_MAP.items():
+        env.filters[fil] = func
+
+    return env
 
 
 class EmailTemplateValidator:
     @property
     def bracket_lookup(self):
-        return re.compile(r"{{ *(\w+) *}}")
+        return re.compile(r"{{ *(\w+) \| *(\w+) *}}|{{ *(\w+) *}}")
 
     @property
     def expression_lookup(self):
         return re.compile(r"{% *(\w+) *")
 
     def _validate_tags(self, str: str):
-        tags = re.findall(self.bracket_lookup, str)
-        for tag in tags:
-            if tag not in settings.EMAIL_TEMPLATE_CONTEXT_ATTRS:
+        tags_inside_brackets = re.findall(self.bracket_lookup, str)
+        variable_tags = []
+
+        for strings in tags_inside_brackets:
+            strings_list = [
+                tag for tag in strings if tag and tag not in FILTERS_MAP.keys()
+            ]
+
+            variable_tags.append(strings_list[0])
+
+        for tag in variable_tags:
+            if tag not in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
                 raise EmailTemplateValidationError(f"Tag {tag} not supported")
 
     def _validate_illegals(self, str: str):
@@ -38,15 +59,17 @@ class EmailTemplateValidator:
                     "Illegal tags found: tag was '%s'" % expression
                 )
 
-    def _validate_in_sandbox(self, str: str, context):
-        env = SandboxedEnvironment()
+    def _validate_in_sandbox(self, str: str, context: Dict, env: SandboxedEnvironment):
         try:
             env.from_string(str).render(context)
         except TemplateError as e:
             raise EmailTemplateValidationError(e)
 
-    def validate_string(self, str: str, context_dict=()):
-        self._validate_in_sandbox(str, context_dict)
+    def validate_string(
+        self, str: str, context_dict: Dict = (), env: SandboxedEnvironment = None
+    ) -> bool:
+        env = env or get_sandboxed_environment()
+        self._validate_in_sandbox(str, context_dict, env)
         self._validate_illegals(str)
         self._validate_tags(str)
 
@@ -84,6 +107,7 @@ class ReservationEmailNotificationBuilder:
         self.template = template
         self._set_language(language or reservation.reservee_language)
         self._init_context_attr_map()
+        self.env = get_sandboxed_environment()
         self.validate_template()
 
     def _get_reservee_name(self):
@@ -148,6 +172,9 @@ class ReservationEmailNotificationBuilder:
     def _get_price(self):
         return self.reservation.price
 
+    def _get_non_subsidised_price(self):
+        return self.reservation.non_subsidised_price
+
     def _get_tax_percentage(self):
         return self.reservation.tax_percentage_value
 
@@ -199,37 +226,31 @@ class ReservationEmailNotificationBuilder:
 
     def _init_context_attr_map(self):
         self.context_attr_map = {}
-        for key in settings.EMAIL_TEMPLATE_CONTEXT_ATTRS:
+        for key in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
             value = getattr(self, f"_get_{key}", False)
             if not value:
                 raise EmailBuilderConfigError(
                     "Email context variable %s did not had _get method defined." % key
                 )
-            self.context_attr_map[key] = value
+            self.context_attr_map[key] = value()
 
     def validate_template(self):
         validator = self.validator()
-        validator.validate_string(self.template.subject, self.context_attr_map)
-        validator.validate_string(self.template.content, self.context_attr_map)
 
         html_content = self._get_html_content(self.template)
         if html_content:
-            validator.validate_string(html_content)
+            validator.validate_string(html_content, self.context_attr_map, env=self.env)
 
-    def get_context(self):
-        context_dict = {}
-        for key, value in self.context_attr_map.items():
-            if callable(value):
-                context_dict[key] = value()
-                continue
-
-            context_dict[key] = getattr(self.reservation, value, None)
-
-        return Context(context_dict)
+        validator.validate_string(
+            self.template.subject, self.context_attr_map, env=self.env
+        )
+        validator.validate_string(
+            self.template.content, self.context_attr_map, env=self.env
+        )
 
     def get_subject(self):
         subject = self._get_by_language(self.template, "subject")
-        rendered = Template(template_string=subject).render(context=self.get_context())
+        rendered = self.env.from_string(subject).render(self.context_attr_map)
         return rendered
 
     def get_content(self):
@@ -239,7 +260,7 @@ class ReservationEmailNotificationBuilder:
             if html_content
             else self._get_by_language(self.template, "content")
         )
-        rendered = Template(template_string=content).render(context=self.get_context())
+        rendered = self.env.from_string(content).render(self.context_attr_map)
         return rendered
 
 
