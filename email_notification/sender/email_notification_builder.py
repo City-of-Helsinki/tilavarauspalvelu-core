@@ -1,10 +1,10 @@
 import os
 import re
+from typing import Dict
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.template import Context, Template
 from django.utils.timezone import get_default_timezone
 from jinja2 import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
@@ -15,7 +15,7 @@ from reservations.models import Reservation
 from tilavarauspalvelu.utils.commons import LANGUAGES
 
 
-def get_sandboxed_environment():
+def get_sandboxed_environment() -> SandboxedEnvironment:
     env = SandboxedEnvironment()
     return env
 
@@ -43,15 +43,17 @@ class EmailTemplateValidator:
                     "Illegal tags found: tag was '%s'" % expression
                 )
 
-    def _validate_in_sandbox(self, str: str, context):
-        env = get_sandboxed_environment()
+    def _validate_in_sandbox(self, str: str, context: Dict, env: SandboxedEnvironment):
         try:
             env.from_string(str).render(context)
         except TemplateError as e:
             raise EmailTemplateValidationError(e)
 
-    def validate_string(self, str: str, context_dict=()):
-        self._validate_in_sandbox(str, context_dict)
+    def validate_string(
+        self, str: str, context_dict: Dict = (), env: SandboxedEnvironment = None
+    ) -> bool:
+        env = env or get_sandboxed_environment()
+        self._validate_in_sandbox(str, context_dict, env)
         self._validate_illegals(str)
         self._validate_tags(str)
 
@@ -89,6 +91,7 @@ class ReservationEmailNotificationBuilder:
         self.template = template
         self._set_language(language or reservation.reservee_language)
         self._init_context_attr_map()
+        self.env = get_sandboxed_environment()
         self.validate_template()
 
     def _get_reservee_name(self):
@@ -210,31 +213,25 @@ class ReservationEmailNotificationBuilder:
                 raise EmailBuilderConfigError(
                     "Email context variable %s did not had _get method defined." % key
                 )
-            self.context_attr_map[key] = value
+            self.context_attr_map[key] = value()
 
     def validate_template(self):
         validator = self.validator()
-        validator.validate_string(self.template.subject, self.context_attr_map)
-        validator.validate_string(self.template.content, self.context_attr_map)
 
         html_content = self._get_html_content(self.template)
         if html_content:
-            validator.validate_string(html_content)
+            validator.validate_string(html_content, self.context_attr_map, env=self.env)
 
-    def get_context(self):
-        context_dict = {}
-        for key, value in self.context_attr_map.items():
-            if callable(value):
-                context_dict[key] = value()
-                continue
-
-            context_dict[key] = getattr(self.reservation, value, None)
-
-        return Context(context_dict)
+        validator.validate_string(
+            self.template.subject, self.context_attr_map, env=self.env
+        )
+        validator.validate_string(
+            self.template.content, self.context_attr_map, env=self.env
+        )
 
     def get_subject(self):
         subject = self._get_by_language(self.template, "subject")
-        rendered = Template(template_string=subject).render(context=self.get_context())
+        rendered = self.env.from_string(subject).render(self.context_attr_map)
         return rendered
 
     def get_content(self):
@@ -244,7 +241,7 @@ class ReservationEmailNotificationBuilder:
             if html_content
             else self._get_by_language(self.template, "content")
         )
-        rendered = Template(template_string=content).render(context=self.get_context())
+        rendered = self.env.from_string(content).render(self.context_attr_map)
         return rendered
 
 
