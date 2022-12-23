@@ -4,6 +4,8 @@ from decimal import Decimal
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
+from sentry_sdk import capture_exception
+
 from .exceptions import ParseOrderError
 
 
@@ -127,10 +129,10 @@ class Order:
                                 order_id=UUID(meta["orderId"]),
                                 key=meta["key"],
                                 value=meta["value"],
-                                label=meta["label"],
-                                visible_in_checkout=meta["visibleInCheckout"]
+                                label=meta.get("label"),
+                                visible_in_checkout=meta.get("visibleInCheckout")
                                 not in [False, "false"],
-                                ordinal=meta["ordinal"],
+                                ordinal=meta.get("ordinal"),
                             )
                             for meta in item["meta"]
                         ],
@@ -162,6 +164,7 @@ class Order:
                 type=json["type"],
             )
         except (KeyError, ValueError) as e:
+            capture_exception(e, {"json": json})
             raise ParseOrderError("Could not parse order") from e
 
 

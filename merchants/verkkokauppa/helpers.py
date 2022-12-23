@@ -4,7 +4,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
-from sentry_sdk import capture_message
+from sentry_sdk import capture_exception, capture_message
 
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from applications.models import CUSTOMER_TYPES
@@ -119,8 +119,9 @@ def create_verkkokauppa_order(reservation: Reservation):
             f"Call to Verkkokauppa Order Experience API failed: {e}",
             level="error",
         )
+        capture_exception(e, {"order_params": order_params})
         raise ValidationErrorWithCode(
             "Upstream service call failed. Unable to confirm the reservation.",
             ValidationErrorCodes.UPSTREAM_CALL_FAILED,
-        )
+        ) from e
     return payment_order
