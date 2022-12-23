@@ -2,7 +2,7 @@ from datetime import date
 from logging import getLogger
 
 from django.conf import settings
-from sentry_sdk import capture_message
+from sentry_sdk import capture_exception, capture_message, push_scope
 
 from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
@@ -108,8 +108,9 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
                 reservation_unit.payment_product.id, params
             )
         except CreateOrUpdateAccountingError as err:
-            capture_message(
-                f"Unable to refresh reservation unit accounting data: ${reservation_unit_pk}. "
-                + f"Problem with Verkkokauppa API: ${err}",
-                level="error",
-            )
+            with push_scope() as scope:
+                scope.set_extra(
+                    "details", "Unable to refresh reservation unit accounting data"
+                )
+                scope.set_extra("reservation-unit-id", reservation_unit_pk)
+                capture_exception(err)

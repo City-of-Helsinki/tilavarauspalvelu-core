@@ -13,7 +13,7 @@ from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
 from rest_framework.exceptions import ValidationError
-from sentry_sdk import capture_message
+from sentry_sdk import capture_exception, push_scope
 
 import tilavarauspalvelu.utils.logging as logging
 from applications.base_models import ContactInformation
@@ -1115,10 +1115,12 @@ class ApplicationEvent(models.Model):
                 name=name,
                 defaults={"value": total_amounts_of_events},
             )
-        except Error:
-            capture_message(
-                "Caught an error while saving event aggregate data", level="error"
-            )
+        except Error as err:
+            with push_scope() as scope:
+                scope.set_extra(
+                    "details", "Caught an error while saving event aggregate data"
+                )
+                capture_exception(err)
         else:
             logger.info("Event #{} aggregate data created.".format(self.id))
 
@@ -1162,11 +1164,13 @@ class ApplicationEvent(models.Model):
                 name=name,
                 defaults={"value": total_reservations},
             )
-        except Error:
-            capture_message(
-                "Caught an error while saving event schedule result aggregate data",
-                level="error",
-            )
+        except Error as err:
+            with push_scope() as scope:
+                scope.set_extra(
+                    "details",
+                    "Caught an error while saving event schedule result aggregate data",
+                )
+                capture_exception(err)
         else:
             logger.info(
                 "Event schedule result #{} aggregate data created.".format(self.pk)
@@ -1422,11 +1426,13 @@ class ApplicationEventScheduleResult(models.Model):
                 name=name,
                 defaults={"value": total_amount_of_events},
             )
-        except Error:
-            capture_message(
-                "Caught an error while saving schedule result aggregate data",
-                level="error",
-            )
+        except Error as err:
+            with push_scope() as scope:
+                scope.set_extra(
+                    "details",
+                    "Caught an error while saving schedule result aggregate data",
+                )
+                capture_exception(err)
         else:
             logger.info("Schedule result #{} aggregate data created.".format(self.pk))
 

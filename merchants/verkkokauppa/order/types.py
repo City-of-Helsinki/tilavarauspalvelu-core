@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
-from sentry_sdk import capture_exception
+from sentry_sdk import capture_exception, push_scope
 
 from .exceptions import ParseOrderError
 
@@ -163,9 +163,12 @@ class Order:
                 else None,
                 type=json["type"],
             )
-        except (KeyError, ValueError) as e:
-            capture_exception(e, {"json": json})
-            raise ParseOrderError("Could not parse order") from e
+        except (KeyError, ValueError) as err:
+            with push_scope() as scope:
+                scope.set_extra("details", "Parsing order failed")
+                scope.set_extra("json", json)
+                capture_exception(err)
+            raise ParseOrderError(f"Could not parse order: {str(err)}") from err
 
 
 @dataclass(frozen=True)

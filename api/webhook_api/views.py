@@ -7,7 +7,7 @@ from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_seriali
 from rest_framework import serializers, viewsets
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
-from sentry_sdk import capture_message
+from sentry_sdk import capture_exception, capture_message, push_scope
 
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
@@ -201,10 +201,13 @@ class WebhookOrderViewSet(viewsets.ViewSet):
             payment_order.save()
 
             return Response(status=200)
-        except WebhookError as e:
-            return Response(data=e.to_json(), status=e.status_code)
-        except GetOrderError as e:
-            capture_message(f"Checking order failed: {str(e)}", level="error")
+        except WebhookError as err:
+            return Response(data=err.to_json(), status=err.status_code)
+        except GetOrderError as err:
+            with push_scope() as scope:
+                scope.set_extra("details", "Order checking failed")
+                scope.set_extra("remote-id", remote_id)
+                capture_exception(err)
             return Response(
                 data={"status": 500, "message": "Problem with upstream service"},
                 status=500,

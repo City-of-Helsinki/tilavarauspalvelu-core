@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from graphene import ClientIDMutation, ResolveInfo
 from graphene_django.rest_framework.mutation import SerializerMutation
 from rest_framework.generics import get_object_or_404
-from sentry_sdk import capture_message
+from sentry_sdk import capture_exception, push_scope
 
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.merchants.merchant_types import PaymentOrderType
@@ -151,13 +151,14 @@ class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
                     payment_order.status = OrderStatus.CANCELLED
                     payment_order.save()
             except CancelOrderError as err:
-                capture_message(
-                    f"Failed to cancel order {payment_order.remote_id}: {err}"
-                )
+                with push_scope() as scope:
+                    scope.set_extra("details", "Order cancellation failed")
+                    scope.set_extra("remote-id", payment_order.remote_id)
+                    capture_exception(err)
                 raise ValidationErrorWithCode(
                     "Unable to cancel the order: problem with external service",
                     ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,
-                )
+                ) from err
 
         return None
 

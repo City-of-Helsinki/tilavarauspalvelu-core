@@ -258,7 +258,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(OrderStatus.PAID)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.capture_message")
+    @mock.patch("api.graphql.merchants.merchant_mutations.capture_exception")
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
     def test_get_payment_exceptions_are_logged(self, mock_get_payment, mock_capture):
         mock_get_payment.side_effect = GetPaymentError("Mock error")
