@@ -129,10 +129,10 @@ class Order:
                                 order_id=UUID(meta["orderId"]),
                                 key=meta["key"],
                                 value=meta["value"],
-                                label=meta["label"],
-                                visible_in_checkout=meta["visibleInCheckout"]
+                                label=meta.get("label"),
+                                visible_in_checkout=meta.get("visibleInCheckout")
                                 not in [False, "false"],
-                                ordinal=meta["ordinal"],
+                                ordinal=meta.get("ordinal"),
                             )
                             for meta in item["meta"]
                         ],
