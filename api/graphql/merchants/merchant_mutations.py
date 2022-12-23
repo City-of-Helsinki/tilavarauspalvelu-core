@@ -2,7 +2,7 @@ import graphene
 from django.conf import settings
 from graphene import relay
 from graphene_permissions.mixins import AuthMutation
-from sentry_sdk import capture_message
+from sentry_sdk import capture_exception, capture_message, push_scope
 
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
@@ -48,13 +48,14 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                     "Unable to check order payment", ValidationErrorCodes.NOT_FOUND
                 )
         except GetPaymentError as err:
-            capture_message(
-                f"Order payment check failed: {str(err)} ({remote_id})", level="error"
-            )
+            with push_scope() as scope:
+                scope.set_extra("details", "Order payment check failed")
+                scope.set_extra("remote-id", remote_id)
+                capture_exception(err)
             raise ValidationErrorWithCode(
                 "Unable to check order payment: problem with external service",
                 ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,
-            )
+            ) from err
 
         if (
             payment.status == "payment_cancelled"

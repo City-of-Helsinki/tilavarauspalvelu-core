@@ -164,10 +164,10 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         payment_order.refresh_from_db()
         assert_that(payment_order.status).is_equal_to(OrderStatus.DRAFT)
 
-    @mock.patch("api.graphql.reservations.reservation_mutations.capture_message")
+    @mock.patch("api.graphql.reservations.reservation_mutations.capture_exception")
     @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
     def test_log_error_on_cancel_order_failure(
-        self, mock_cancel_order, mock_capture_message
+        self, mock_cancel_order, mock_capture_exceptionz
     ):
         mock_cancel_order.side_effect = CancelOrderError("mock-error")
 
@@ -191,7 +191,8 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
             "EXTERNAL_SERVICE_ERROR"
         )
         assert_that(mock_cancel_order.called).is_true()
-        assert_that(mock_capture_message.called).is_true()
+
+        assert_that(mock_capture_exceptionz.called).is_true()
 
     def test_cannot_delete_when_status_not_created_nor_waiting_for_payment(self):
         self.client.force_login(self.general_admin)

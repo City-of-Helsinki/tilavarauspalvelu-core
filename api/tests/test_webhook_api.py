@@ -315,9 +315,9 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         expected_error = {"status": 404, "message": "Order not found"}
         assert_that(response.data).is_equal_to(expected_error)
 
-    @mock.patch("api.webhook_api.views.capture_message")
+    @mock.patch("api.webhook_api.views.capture_exception")
     def test_returns_500_with_error_on_order_fetch_failure(
-        self, mock_capture_message, mock_get_order
+        self, mock_capture_exception, mock_get_order
     ):
         mock_get_order.side_effect = GetOrderError("Mock error")
 
@@ -330,7 +330,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
 
         expected_error = {"status": 500, "message": "Problem with upstream service"}
         assert_that(response.data).is_equal_to(expected_error)
-        assert_that(mock_capture_message.called).is_true()
+        assert_that(mock_capture_exception.called).is_true()
 
     def test_returns_501_with_error_on_invalid_type(self, mock_get_payment):
         data = self.get_valid_data()

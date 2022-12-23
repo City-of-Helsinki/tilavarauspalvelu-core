@@ -98,10 +98,10 @@ class UpdateExpiredOrderTestCase(TestCase):
         order.refresh_from_db()
         assert_that(order.status).is_equal_to(OrderStatus.EXPIRED)
 
-    @mock.patch("merchants.pruning.capture_message")
+    @mock.patch("merchants.pruning.capture_exception")
     @mock.patch("merchants.pruning.get_payment")
     def test_get_payment_errors_are_logged(
-        self, mock_get_payment, mock_capture_message
+        self, mock_get_payment, mock_capture_exception
     ):
         mock_get_payment.side_effect = GetPaymentError("mock-error")
 
@@ -118,9 +118,9 @@ class UpdateExpiredOrderTestCase(TestCase):
 
         order.refresh_from_db()
         assert_that(order.status).is_equal_to(OrderStatus.DRAFT)
-        assert_that(mock_capture_message.called).is_true()
+        assert_that(mock_capture_exception.called).is_true()
 
-    @mock.patch("merchants.pruning.capture_message")
+    @mock.patch("merchants.pruning.capture_exception")
     @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
     def test_cancel_error_errors_are_logged(
