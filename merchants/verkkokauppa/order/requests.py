@@ -7,7 +7,7 @@ from django.conf import settings
 from requests import RequestException
 from requests import get as _get
 from requests import post as _post
-from sentry_sdk import capture_message
+from sentry_sdk import capture_exception, capture_message
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
 from ..exceptions import VerkkokauppaConfigurationError
@@ -53,7 +53,8 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
             raise CreateOrderError(f"Order creation failed: {json.get('errors')}")
         return Order.from_json(json)
     except (RequestException, JSONDecodeError, ParseOrderError) as e:
-        raise CreateOrderError(f"Order creation failed: {e}")
+        capture_exception(e)
+        raise CreateOrderError(f"Order creation failed: {e}") from e
 
 
 def get_order(order_id: UUID, user: str, get=_get) -> Order:

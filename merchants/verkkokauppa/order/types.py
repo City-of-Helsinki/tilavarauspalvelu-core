@@ -4,6 +4,8 @@ from decimal import Decimal
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
+from sentry_sdk import capture_exception
+
 from .exceptions import ParseOrderError
 
 
@@ -162,6 +164,7 @@ class Order:
                 type=json["type"],
             )
         except (KeyError, ValueError) as e:
+            capture_exception(e, {"json": json})
             raise ParseOrderError("Could not parse order") from e
 
 
