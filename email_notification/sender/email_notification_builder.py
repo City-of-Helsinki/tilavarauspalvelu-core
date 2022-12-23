@@ -11,28 +11,44 @@ from jinja2.sandbox import SandboxedEnvironment
 
 from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate
+from email_notification.templatetags.email_template_filters import format_currency
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.commons import LANGUAGES
+
+FILTERS_MAP = {"currency": format_currency}
 
 
 def get_sandboxed_environment() -> SandboxedEnvironment:
     env = SandboxedEnvironment()
+
+    for fil, func in FILTERS_MAP.items():
+        env.filters[fil] = func
+
     return env
 
 
 class EmailTemplateValidator:
     @property
     def bracket_lookup(self):
-        return re.compile(r"{{ *(\w+) *}}")
+        return re.compile(r"{{ *(\w+) \| *(\w+) *}}|{{ *(\w+) *}}")
 
     @property
     def expression_lookup(self):
         return re.compile(r"{% *(\w+) *")
 
     def _validate_tags(self, str: str):
-        tags = re.findall(self.bracket_lookup, str)
-        for tag in tags:
-            if tag not in settings.EMAIL_TEMPLATE_CONTEXT_ATTRS:
+        tags_inside_brackets = re.findall(self.bracket_lookup, str)
+        variable_tags = []
+
+        for strings in tags_inside_brackets:
+            strings_list = [
+                tag for tag in strings if tag and tag not in FILTERS_MAP.keys()
+            ]
+
+            variable_tags.append(strings_list[0])
+
+        for tag in variable_tags:
+            if tag not in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
                 raise EmailTemplateValidationError(f"Tag {tag} not supported")
 
     def _validate_illegals(self, str: str):
@@ -207,7 +223,7 @@ class ReservationEmailNotificationBuilder:
 
     def _init_context_attr_map(self):
         self.context_attr_map = {}
-        for key in settings.EMAIL_TEMPLATE_CONTEXT_ATTRS:
+        for key in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
             value = getattr(self, f"_get_{key}", False)
             if not value:
                 raise EmailBuilderConfigError(

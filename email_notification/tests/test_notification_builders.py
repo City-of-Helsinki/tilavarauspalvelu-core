@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from assertpy import assert_that
 from django.conf import settings
@@ -170,7 +171,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     @override_settings(
-        EMAIL_TEMPLATE_CONTEXT_ATTRS=settings.EMAIL_TEMPLATE_CONTEXT_ATTRS
+        EMAIL_TEMPLATE_CONTEXT_VARIABLES=settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES
         + ["imnotdefined"]
     )
     def test_context_attr_map_fails_on_undefined_methods(self):
@@ -380,3 +381,25 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         with self.assertRaises(EmailTemplateValidationError):
             ReservationEmailNotificationBuilder(self.reservation, template)
+
+    def test_currency_filter_comma_separator(self):
+        content = "{{price | currency}}"
+        compiled_content = "52,00"
+
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_currency_filter_thousand_separator_is_space(self):
+        self.reservation.price = Decimal("10000")
+        self.reservation.save()
+        content = "{{price | currency}}"
+        compiled_content = "10 000,00"
+
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
