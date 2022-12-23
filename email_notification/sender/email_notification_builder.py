@@ -15,6 +15,11 @@ from reservations.models import Reservation
 from tilavarauspalvelu.utils.commons import LANGUAGES
 
 
+def get_sandboxed_environment():
+    env = SandboxedEnvironment()
+    return env
+
+
 class EmailTemplateValidator:
     @property
     def bracket_lookup(self):
@@ -39,7 +44,7 @@ class EmailTemplateValidator:
                 )
 
     def _validate_in_sandbox(self, str: str, context):
-        env = SandboxedEnvironment()
+        env = get_sandboxed_environment()
         try:
             env.from_string(str).render(context)
         except TemplateError as e:
