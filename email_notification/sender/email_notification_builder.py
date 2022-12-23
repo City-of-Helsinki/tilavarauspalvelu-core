@@ -175,6 +175,22 @@ class ReservationEmailNotificationBuilder:
     def _get_non_subsidised_price(self):
         return self.reservation.non_subsidised_price
 
+    def _get_subsidised_price(self):
+        if not self.reservation.applying_for_free_of_charge:
+            return self.reservation.price
+
+        from api.graphql.reservations.reservation_serializers.mixins import (
+            ReservationPriceMixin,
+        )
+
+        calculator = ReservationPriceMixin()
+        prices = calculator.calculate_price(
+            self.reservation.begin,
+            self.reservation.end,
+            self.reservation.reservation_unit.all(),
+        )
+        return prices.subsidised_price
+
     def _get_tax_percentage(self):
         return self.reservation.tax_percentage_value
 

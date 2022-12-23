@@ -416,3 +416,43 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_subsidised_price(self):
+        content = (
+            "{% if price > 0 %}{% if subsidised_price < price %}"
+            "Varauksen hinta: {{subsidised_price | currency}}"
+            "- {{price | currency}} € (sis. alv {{tax_percentage}}%){% else %}"
+            "Varauksen hinta: {{price | currency}} € (sis. alv {{tax_percentage}}%)"
+            "{% endif %}"
+            "{% else %}"
+            "Varauksen hinta: 0 €"
+            "{% endif %}"
+        )
+        compiled_content = "Varauksen hinta: 52,00 € (sis. alv 10%)"
+
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_subsidised_price_from_price_calc(self):
+        self.reservation.applying_for_free_of_charge = True
+        self.reservation.save()
+        content = (
+            "{% if price > 0 %}{% if subsidised_price < price %}"
+            "Varauksen hinta: {{subsidised_price | currency}}"
+            " - {{price | currency}} € (sis. alv {{tax_percentage}}%){% else %}"
+            "Varauksen hinta: {{price | currency}} € (sis. alv {{tax_percentage}}%)"
+            "{% endif %}"
+            "{% else %}"
+            "Varauksen hinta: 0 €"
+            "{% endif %}"
+        )
+        compiled_content = "Varauksen hinta: 0,00 - 52,00 € (sis. alv 10%)"
+
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        assert_that(builder.get_content()).is_equal_to(compiled_content)
