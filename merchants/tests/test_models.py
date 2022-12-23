@@ -114,10 +114,7 @@ class PaymentAccountingTestCase(TestCase):
         self.accounting.refresh_from_db()
         self.accounting.save()
 
-        assert_that(mock_upsert_accounting.mock_calls).is_equal_to(
-            [
-                mock.call(self.reservation_unit_1.pk),
-                mock.call(self.reservation_unit_2.pk),
-            ]
+        assert_that(mock_upsert_accounting.mock_calls).contains_only(
+            mock.call(self.reservation_unit_1.pk), mock.call(self.reservation_unit_2.pk)
         )
         assert_that(mock_upsert_accounting.call_count).is_equal_to(2)
