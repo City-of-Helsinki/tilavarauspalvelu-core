@@ -344,6 +344,7 @@ EMAIL_TEMPLATE_CONTEXT_VARIABLES = [
     "reservation_unit",
     "price",
     "non_subsidised_price",
+    "subsidised_price",
     "tax_percentage",
     "confirmed_instructions",
     "pending_instructions",

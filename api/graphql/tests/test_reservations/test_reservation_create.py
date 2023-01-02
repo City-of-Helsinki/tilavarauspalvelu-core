@@ -1399,7 +1399,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation.price_net
         )
 
-    def test_reservation_subsidised_price_is_equal_to_price(
+    def test_reservation_non_subsidised_price_is_equal_to_price(
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
