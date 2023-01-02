@@ -4,6 +4,7 @@ from decimal import Decimal
 from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
+from django.utils.timezone import get_default_timezone
 from pytz import UTC
 
 from applications.models import CUSTOMER_TYPES
@@ -120,6 +121,10 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             self.reservation.tax_percentage_value
         )
 
+    def test_get_current_year(self):
+        now = datetime.datetime.now(get_default_timezone())
+        assert_that(self.builder._get_current_year()).is_equal_to(now.year)
+
     def test_get_confirmed_instructions(self):
         assert_that(self.builder._get_confirmed_instructions()).contains(
             self.reservation.reservation_unit.first().reservation_confirmed_instructions
@@ -221,7 +226,10 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
             Yours truly:
             system.
+
+            copyright {{ current_year }}
         """
+        year = datetime.datetime.now(get_default_timezone()).year
         compiled_content = f"""
             Should contain Dance time! and 9.2.2022 and 10:00 and 9.2.2022
             and 12:00 and of course the {self.reservation.id}
@@ -231,6 +239,8 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
             Yours truly:
             system.
+
+            copyright {year}
         """
         template = EmailTemplateFactory(
             type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"

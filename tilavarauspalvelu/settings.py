@@ -351,6 +351,7 @@ EMAIL_TEMPLATE_CONTEXT_VARIABLES = [
     "cancelled_instructions",
     "deny_reason",
     "cancel_reason",
+    "current_year",
 ]
 EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS = ["if", "elif", "else", "endif"]
 

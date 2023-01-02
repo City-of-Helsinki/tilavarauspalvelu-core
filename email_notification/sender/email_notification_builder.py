@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 from typing import Dict
@@ -198,6 +199,9 @@ class ReservationEmailNotificationBuilder:
         return self._get_reservation_unit_instruction_field(
             "reservation_confirmed_instructions"
         )
+
+    def _get_current_year(self):
+        return datetime.datetime.now(get_default_timezone()).year
 
     def _get_pending_instructions(self):
         return self._get_reservation_unit_instruction_field(
