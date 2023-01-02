@@ -2,6 +2,7 @@ import datetime
 import os
 import re
 from typing import Dict
+from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -225,6 +226,33 @@ class ReservationEmailNotificationBuilder:
 
     def _get_cancel_reason(self):
         return self._get_by_language(self.reservation.cancel_reason, "reason")
+
+    def _get_varaamo_ext_link(self):
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK
+
+        if self.language.lower() != "fi":
+            return urljoin(url_base, self.language)
+
+        return url_base
+
+    def _get_my_reservations_ext_link(self):
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK
+
+        if self.language.lower() != "fi":
+            url_base = urljoin(url_base, self.language) + "/"
+
+        return urljoin(url_base, "reservations")
+
+    def _get_feedback_ext_link(self):
+        params = urlencode(
+            {
+                "site": "varaamopalaute",
+                "lang": self.language,
+                "ref": settings.EMAIL_VARAAMO_EXT_LINK,
+            }
+        )
+
+        return f"{settings.EMAIL_FEEDBACK_EXT_LINK}?{params}"
 
     def _get_by_language(self, instance, field):
         return getattr(

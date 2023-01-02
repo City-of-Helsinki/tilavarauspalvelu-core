@@ -22,8 +22,10 @@ class ReservationEmailBaseTestCase(TestCase):
             type=EmailType.RESERVATION_CONFIRMED,
             content="This is the {{ reservation_number }} content",
             content_en="This is the {{ reservation_number }} content in english",
+            content_sv="Det är {{ reservation_number }} innehållet på svenska",
             subject="Los subjectos {{ name }}",
             subject_en="Los subjectos inglesa {{ name }}",
+            subject_sv="Los subjectos sueca {{ name }}",
         )
 
         cls.unit = UnitFactory(name="The unit")
