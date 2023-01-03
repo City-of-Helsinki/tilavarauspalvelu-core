@@ -42,7 +42,7 @@ def get_git_revision_hash() -> str:
         git_hash = subprocess.check_output(  # nosec
             ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL, encoding="utf8"
         )
-    # ie. "git" was not found
+    # i.e. "git" was not found
     # should we return a more generic meta hash here?
     # like "undefined"?
     except FileNotFoundError:
@@ -213,6 +213,8 @@ env = environ.Env(
     SEND_RESERVATION_NOTIFICATION_EMAILS=(str, False),
     DEFAULT_FROM_EMAIL=(str, django_default_from_email),
     EMAIL_HTML_MAX_FILE_SIZE=(int, 150000),
+    EMAIL_VARAAMO_EXT_LINK=(str, None),
+    EMAIL_FEEDBACK_EXT_LINK=(str, None),
     # Tprek
     TPREK_UNIT_URL=(str, "https://www.hel.fi/palvelukarttaws/rest/v4/unit/"),
     # GDPR API
@@ -351,12 +353,18 @@ EMAIL_TEMPLATE_CONTEXT_VARIABLES = [
     "cancelled_instructions",
     "deny_reason",
     "cancel_reason",
+    "current_year",
+    "varaamo_ext_link",
+    "my_reservations_ext_link",
+    "feedback_ext_link",
 ]
 EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS = ["if", "elif", "else", "endif"]
 
 SEND_RESERVATION_NOTIFICATION_EMAILS = env("SEND_RESERVATION_NOTIFICATION_EMAILS")
 EMAIL_HTML_MAX_FILE_SIZE = env("EMAIL_HTML_MAX_FILE_SIZE")
 EMAIL_HTML_TEMPLATES_ROOT = "email_html_templates"
+EMAIL_VARAAMO_EXT_LINK = env("EMAIL_VARAAMO_EXT_LINK")
+EMAIL_FEEDBACK_EXT_LINK = env("EMAIL_FEEDBACK_EXT_LINK")
 
 # TPREK
 TPREK_UNIT_URL = env("TPREK_UNIT_URL")
@@ -512,7 +520,7 @@ THUMBNAIL_ALIASES = {
 }
 
 # Do not try to chmod when uploading images.
-# Our environments uses persistent storage for media and operation will not be permitted.
+# Our environments use persistent storage for media and operation will not be permitted.
 # https://dev.azure.com/City-of-Helsinki/devops-guides/_git/devops-handbook?path=/storage.md&_a=preview&anchor=operation-not-permitted
 FILE_UPLOAD_PERMISSIONS = None
 

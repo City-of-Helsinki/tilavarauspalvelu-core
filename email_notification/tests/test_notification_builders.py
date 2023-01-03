@@ -4,6 +4,7 @@ from decimal import Decimal
 from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
+from django.utils.timezone import get_default_timezone
 from pytz import UTC
 
 from applications.models import CUSTOMER_TYPES
@@ -120,6 +121,10 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             self.reservation.tax_percentage_value
         )
 
+    def test_get_current_year(self):
+        now = datetime.datetime.now(get_default_timezone())
+        assert_that(self.builder._get_current_year()).is_equal_to(now.year)
+
     def test_get_confirmed_instructions(self):
         assert_that(self.builder._get_confirmed_instructions()).contains(
             self.reservation.reservation_unit.first().reservation_confirmed_instructions
@@ -175,6 +180,69 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             self.reservation.cancel_reason.reason_en
         )
 
+    @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
+    def test_get_my_reservations_ext_link_fi(self):
+        self.builder._set_language(LANGUAGES.FI)
+        assert_that(self.builder._get_my_reservations_ext_link()).is_equal_to(
+            "https://thesite.com/reservations"
+        )
+
+    @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
+    def test_get_my_reservations_ext_link_en(self):
+        self.builder._set_language(LANGUAGES.EN)
+        assert_that(self.builder._get_my_reservations_ext_link()).is_equal_to(
+            "https://thesite.com/en/reservations"
+        )
+
+    @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
+    def test_get_my_reservations_ext_link_sv(self):
+        self.builder._set_language(LANGUAGES.SV)
+        assert_that(self.builder._get_my_reservations_ext_link()).is_equal_to(
+            "https://thesite.com/sv/reservations"
+        )
+
+    @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
+    def test_get_varaamo_ext_link(self):
+        self.builder._set_language(LANGUAGES.FI)
+        assert_that(self.builder._get_varaamo_ext_link()).is_equal_to(
+            "https://thesite.com"
+        )
+
+    @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
+    def test_get_varaamo_ext_link_en(self):
+        self.builder._set_language(LANGUAGES.EN)
+        assert_that(self.builder._get_varaamo_ext_link()).is_equal_to(
+            "https://thesite.com/en"
+        )
+
+    @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
+    def test_get_varaamo_ext_link_sv(self):
+        self.builder._set_language(LANGUAGES.SV)
+        assert_that(self.builder._get_varaamo_ext_link()).is_equal_to(
+            "https://thesite.com/sv"
+        )
+
+    @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
+    def get_feedback_ext_link_fi(self):
+        self.builder._set_language(LANGUAGES.FI)
+        assert_that(self.builder._get_feedback_ext_link()).is_equal_to(
+            "https://feedback.com/forms/?site=varaamopalaute&lang=fi&ref=https://tilavaraus.hel.fi"
+        )
+
+    @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
+    def get_feedback_ext_link_sv(self):
+        self.builder._set_language(LANGUAGES.SV)
+        assert_that(self.builder._get_feedback_ext_link()).is_equal_to(
+            "https://feedback.com/forms/?site=varaamopalaute&lang=sv&ref=https://tilavaraus.hel.fi"
+        )
+
+    @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
+    def get_feedback_ext_link_en(self):
+        self.builder._set_language(LANGUAGES.EN)
+        assert_that(self.builder._get_feedback_ext_link()).is_equal_to(
+            "https://feedback.com/forms/?site=varaamopalaute&lang=en&ref=https://tilavaraus.hel.fi"
+        )
+
     @override_settings(
         EMAIL_TEMPLATE_CONTEXT_VARIABLES=settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES
         + ["imnotdefined"]
@@ -211,6 +279,10 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_subject()).is_equal_to(compiled_subject)
 
+    @override_settings(
+        EMAIL_FEEDBACK_EXT_LINK="https://feedtheback.com/survey/",
+        EMAIL_VARAAMO_EXT_LINK="https://resourcebooking.com",
+    )
     def test_get_content(self):
         content = """
             Should contain {{ name }} and {{ begin_date }} and {{ begin_time }} and {{ end_date }}
@@ -221,7 +293,17 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
             Yours truly:
             system.
+
+            copyright {{ current_year }}
+            link to varaamo {{ varaamo_ext_link }}
+            link to reservations {{ my_reservations_ext_link }}
+            link to feedback {{ feedback_ext_link }}
         """
+        year = datetime.datetime.now(get_default_timezone()).year
+        feedback_url = (
+            "https://feedtheback.com/survey/?site=varaamopalaute&lang=fi"
+            "&ref=https%3A%2F%2Fresourcebooking.com"
+        )
         compiled_content = f"""
             Should contain Dance time! and 9.2.2022 and 10:00 and 9.2.2022
             and 12:00 and of course the {self.reservation.id}
@@ -231,6 +313,11 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
             Yours truly:
             system.
+
+            copyright {year}
+            link to varaamo https://resourcebooking.com
+            link to reservations https://resourcebooking.com/reservations
+            link to feedback {feedback_url}
         """
         template = EmailTemplateFactory(
             type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
@@ -273,6 +360,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_language_defaults_to_fi_when_content_not_translated(self):
+        self.builder.template.content_sv = None
         self.builder._set_language(LANGUAGES.SV)
         assert_that(self.builder.language).is_equal_to(LANGUAGES.FI)
         assert_that(self.builder._get_deny_reason()).is_equal_to(
