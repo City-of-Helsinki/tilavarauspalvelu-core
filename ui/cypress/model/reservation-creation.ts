@@ -102,3 +102,33 @@ export function reserveeTypeSelector(
     .get('[data-testid="reservation__checkbox--reservee-type"] > button')
     .eq(order);
 }
+
+export function reservationControlsDateInput(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get("input#reservation__input--date");
+}
+
+export function reservationEditActionCancel(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get('[data-testid="reservation-edit__button--cancel"]');
+}
+
+export function reservationEditActionContinue(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get('[data-testid="reservation-edit__button--continue"]');
+}
+
+export function reservationEditActionBack(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get('[data-testid="reservation-edit__button--back"]');
+}
+
+export function reservationEditActionSubmit(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get('[data-testid="reservation-edit__button--submit"]');
+}

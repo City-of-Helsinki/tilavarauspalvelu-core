@@ -1,3 +1,7 @@
+export function modifyButton(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("[data-testid='reservation-detail__button--edit']");
+}
+
 export function cancelButton(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("[data-testid='reservation-detail__button--cancel']");
 }

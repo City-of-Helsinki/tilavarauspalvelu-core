@@ -62,6 +62,7 @@ type Props<T> = {
     skipLengthCheck?: boolean
   ) => boolean;
   mode: "create" | "edit";
+  customAvailabilityValidation?: (start: Date) => boolean;
 };
 
 const Wrapper = styled.div`
@@ -244,6 +245,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   setErrorMsg,
   handleEventChange,
   mode,
+  customAvailabilityValidation,
 }: Props<T>): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -358,7 +360,9 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
             ? new Date(reservationUnit.reservationEnds)
             : undefined,
           reservationUnit.reservationsMinDaysBefore
-        )
+        ) ||
+        (customAvailabilityValidation &&
+          !customAvailabilityValidation(startDate))
       ) {
         setErrorMsg(t(`reservationCalendar:errors.unavailable`));
       }

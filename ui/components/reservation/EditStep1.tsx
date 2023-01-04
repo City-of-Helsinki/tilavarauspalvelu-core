@@ -322,11 +322,17 @@ const EditStep1 = ({
               variant="secondary"
               iconLeft={<IconArrowLeft aria-hidden />}
               onClick={() => setStep(0)}
+              data-testid="reservation-edit__button--back"
             >
               {t("common:prev")}
             </BlackButton>
           </CancelActions>
-          <MediumButton variant="primary" type="submit" disabled={isSubmitting}>
+          <MediumButton
+            variant="primary"
+            type="submit"
+            disabled={isSubmitting}
+            data-testid="reservation-edit__button--submit"
+          >
             {t("reservations:saveNewTime")}
           </MediumButton>
         </Actions>

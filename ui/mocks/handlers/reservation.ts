@@ -29,6 +29,11 @@ import {
   ReservationsReservationReserveeTypeChoices,
   ReservationDeleteMutationPayload,
   ReservationDeleteMutationInput,
+  ReservationUnitsReservationUnitPricingStatusChoices,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
+  ReservationUnitsReservationUnitPricingPriceUnitChoices,
+  ReservationAdjustTimeMutationPayload,
+  ReservationAdjustTimeMutationInput,
 } from "common/types/gql-types";
 
 const createReservation = graphql.mutation<
@@ -153,6 +158,20 @@ const deleteReservation = graphql.mutation<
     ctx.data({
       deleteReservation: {
         deleted: true,
+      },
+    })
+  );
+});
+
+const adjustReservationTime = graphql.mutation<
+  { adjustReservationTime: ReservationAdjustTimeMutationPayload },
+  { input: ReservationAdjustTimeMutationInput }
+>("adjustReservationTime", (req, res, ctx) => {
+  return res(
+    ctx.data({
+      adjustReservationTime: {
+        pk: 42,
+        errors: null,
       },
     })
   );
@@ -421,6 +440,52 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       },
       numPersons: 18,
     } as ReservationType;
+
+    if (pk === 4) {
+      data.price = 0;
+      data.begin = addDays(new Date(), 10).toISOString();
+      data.end = addHours(addDays(new Date(), 10), 2).toISOString();
+      data.reservationUnits[0].pk = 888;
+      data.reservationUnits[0].cancellationRule = {
+        id: "234",
+        canBeCancelledTimeBefore: 0,
+        needsHandling: false,
+      };
+      data.reservationUnits[0].pricings = [
+        {
+          begins: addDays(new Date(), -10).toISOString(),
+          lowestPrice: 0,
+          lowestPriceNet: 0,
+          highestPrice: 0,
+          highestPriceNet: 0,
+          priceUnit:
+            ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
+          pricingType:
+            ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+          status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+          taxPercentage: {
+            id: "fawoifhj",
+            value: 24.0,
+          },
+        },
+        {
+          begins: addDays(new Date(), 10).toISOString(),
+          lowestPrice: 0,
+          lowestPriceNet: 0,
+          highestPrice: 20,
+          highestPriceNet: 15,
+          priceUnit:
+            ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
+          pricingType:
+            ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+          status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+          taxPercentage: {
+            id: "fawoifhj",
+            value: 24.0,
+          },
+        },
+      ];
+    }
 
     if (pk === 11) {
       data.type = ReservationsReservationReserveeTypeChoices.Business;
@@ -1248,6 +1313,7 @@ export const reservationHandlers = [
   confirmReservation,
   cancelReservation,
   deleteReservation,
+  adjustReservationTime,
   listReservations,
   reservationCancelReasons,
   reservationPurposes,

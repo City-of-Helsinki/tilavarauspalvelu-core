@@ -4,11 +4,19 @@ import {
   reservationContent,
   reservationInfoCard,
   calendarLinkButton,
+  modifyButton,
 } from "model/reservation-detail";
+import {
+  startTimeSelectorToggle,
+  reservationControlsDateInput,
+  reservationEditActionCancel,
+  reservationEditActionContinue,
+  reservationEditActionBack,
+  reservationEditActionSubmit,
+} from "model/reservation-creation";
 import {
   cancelButton,
   detailButton,
-  redoReservationButton,
   reservationCards,
   tab,
   statusTag,
@@ -22,6 +30,12 @@ import {
   customReasonInput,
   secondBackButton,
 } from "model/reservation-cancel";
+import { reservationControlsToggleButton } from "model/reservation-unit";
+import {
+  errorNotificationTitle,
+  errorNotificationBody,
+} from "model/notification";
+import { addDays, format } from "date-fns";
 
 describe("Tilavaraus user reservations", () => {
   beforeEach(() => {
@@ -200,13 +214,12 @@ describe("Tilavaraus user reservations", () => {
     reservationInfoCard().find("h3").should("contain.text", "Toimistohuone 1");
     reservationInfoCard()
       .should("contain.text", "Varausnumero: 4")
-      .should("contain.text", "Ke 28.4.2021 klo")
-      .should("contain.text", ", 4 t")
+      .should("contain.text", ", 2 t")
       .should(
         "contain.text",
         "Varauksen kuvaus: Reservation description - a long one with alotta text"
       )
-      .should("contain.text", "Hinta: 42,00\u00a0€")
+      .should("contain.text", "Hinta: Maksuton")
       .should("contain.text", "Käyttötarkoitus: Liikkua tai pelata FI")
       .should("contain.text", "Ikäryhmä: 5 - 8")
       .should("contain.text", "Osallistujamäärä: 18");
@@ -256,5 +269,62 @@ describe("Tilavaraus user reservations", () => {
       .should("contain.text", "Hinta: 42,00\u00a0€");
 
     secondBackButton().should("exist");
+  });
+
+  it("should do time modification", () => {
+    const titles = ["Muuta varauksen aikaa", "Tarkista varauksen tiedot"];
+
+    detailButton().eq(0).click();
+    cy.url({ timeout: 20000 }).should("match", /\/reservations\/4$/);
+    modifyButton().click();
+    cy.url({ timeout: 20000 }).should("match", /\/reservations\/4\/edit$/);
+
+    reservationEditActionCancel().click();
+
+    cy.url({ timeout: 20000 }).should("match", /\/reservations\/4$/);
+    modifyButton().click();
+    cy.url({ timeout: 20000 }).should("match", /\/reservations\/4\/edit$/);
+    cy.get("h1").should("have.text", titles[0]);
+
+    reservationControlsDateInput().should("not.exist");
+    reservationControlsToggleButton().click();
+    reservationControlsDateInput().should("exist");
+
+    const newDate = format(addDays(new Date(), 7), "d.M.yyyy");
+
+    reservationEditActionContinue().should("be.disabled");
+    reservationControlsDateInput().clear().type(newDate).blur();
+    startTimeSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:nth-of-type(2)")
+      .click();
+
+    reservationEditActionContinue().should("not.be.disabled");
+    reservationEditActionContinue().click();
+    cy.get("h1").should("have.text", titles[1]);
+
+    reservationEditActionBack().click();
+    cy.get("h1").should("have.text", titles[0]);
+
+    reservationEditActionContinue().click();
+    cy.get("h1").should("have.text", titles[1]);
+
+    reservationEditActionSubmit().click();
+
+    errorNotificationTitle().should(
+      "have.text",
+      "Varauksen muokkaaminen epäonnistui"
+    );
+    errorNotificationBody().should("have.text", "Hyväksy ehdot jatkaaksesi.");
+
+    cy.get("#cancellation-and-payment-terms-terms-accepted").click();
+    cy.get("#generic-and-service-specific-terms-terms-accepted").click();
+
+    reservationEditActionSubmit().click();
+
+    errorNotificationTitle().should("not.exist");
+
+    cy.url({ timeout: 20000 }).should("match", /\/reservations\/4$/);
   });
 });

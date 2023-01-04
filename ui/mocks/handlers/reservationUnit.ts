@@ -86,7 +86,7 @@ const selectedReservationUnitQuery = graphql.query<
     contactInformation: null,
     authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
     id: "UmVzZXJ2YXRpb25Vbml0QnlQa1R5cGU6MzY=",
-    pk: 1,
+    pk: req.variables.pk,
     nameFi: "Pukinmäen nuorisotalon keittiö FI",
     nameEn: "Pukinmäen nuorisotalon keittiö EN",
     nameSv: "Pukinmäen nuorisotalon keittiö SV",

@@ -247,7 +247,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
             applicationRound.reservationUnits
               .map((n) => n.pk)
               .includes(reservationUnit.pk)
-          )
+          ) || []
       );
     }
   }, [applicationRoundsData, reservationUnit]);
@@ -324,7 +324,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     return (
       <Wrapper>
         <Content>
-          <LoadingSpinner style={{ margin: "var(--spacing-l) auto" }} />
+          <LoadingSpinner style={{ margin: "var(--spacing-layout-xl) auto" }} />
         </Content>
       </Wrapper>
     );

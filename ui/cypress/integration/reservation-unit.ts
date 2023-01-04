@@ -234,7 +234,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
       hzNavigationBack().should("exist");
 
-      cy.url().should("contain", "/reservation-unit/1");
+      cy.url().should("contain", "/reservation-unit/2");
 
       reservationEvent().should("not.exist");
     });

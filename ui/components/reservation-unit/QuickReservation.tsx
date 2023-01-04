@@ -491,7 +491,6 @@ const QuickReservation = ({
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-
                     const nextTime = toUIDate(nextAvailableTime, "HH:mm");
                     nextAvailableTime.setHours(0, 0, 0, 0);
                     setDate(nextAvailableTime);

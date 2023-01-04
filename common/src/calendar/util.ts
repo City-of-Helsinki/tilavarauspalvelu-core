@@ -274,7 +274,8 @@ export const getSlotPropGetter =
     activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[],
     reservationBegins: Date,
     reservationEnds: Date,
-    reservationsMinDaysBefore?: number
+    reservationsMinDaysBefore?: number,
+    customValidation?: (arg: Date) => boolean
   ) =>
   (date: Date): SlotProps => {
     switch (
@@ -285,7 +286,8 @@ export const getSlotPropGetter =
         reservationBegins,
         reservationEnds,
         reservationsMinDaysBefore
-      )
+      ) &&
+      (customValidation ? customValidation(date) : true)
     ) {
       case true:
         return {};
