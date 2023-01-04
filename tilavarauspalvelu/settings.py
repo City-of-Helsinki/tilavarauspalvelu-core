@@ -102,9 +102,12 @@ INSTALLED_APPS = [
     "email_notification",
     "django_celery_beat",
     "adminsortable2",
+    "django_prometheus",
 ]
 
 MIDDLEWARE = [
+    # Make sure PrometheusBeforeMiddleware is the first one
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "tilavarauspalvelu.multi_proxy_middleware.MultipleProxyMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -117,6 +120,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
+    # Make sure PrometheusAfterMiddleware is the last one
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 ROOT_URLCONF = "tilavarauspalvelu.urls"
