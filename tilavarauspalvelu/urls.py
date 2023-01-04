@@ -20,6 +20,7 @@ urlpatterns = [
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include("helusers.urls")),
     path("tinymce/", include("tinymce.urls")),
+    path("", include("django_prometheus.urls")),
 ]
 urlpatterns.extend(other_patterns)
 

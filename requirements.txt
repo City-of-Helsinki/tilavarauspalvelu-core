@@ -109,6 +109,8 @@ django-modeltranslation==0.17.5
     # via -r requirements.in
 django-mptt==0.11.0
     # via -r requirements.in
+django-prometheus==2.2.0
+    # via -r requirements.in
 django-recurrence==1.10.3
     # via -r requirements.in
 django-timezone-field==5.0
@@ -189,6 +191,8 @@ packaging==20.9
     # via deprecation
 pillow==9.3.0
     # via easy-thumbnails
+prometheus-client==0.15.0
+    # via django-prometheus
 promise==2.3
     # via graphene-django
 prompt-toolkit==3.0.23
