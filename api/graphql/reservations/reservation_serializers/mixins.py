@@ -183,19 +183,22 @@ class ReservationPriceMixin:
 class ReservationSchedulingMixin:
     """Common mixin class for reservations containing date and scheduling related checks"""
 
-    def check_reservation_time(self, reservation_unit: ReservationUnit, begin, end):
+    def check_reservation_time(self, reservation_unit: ReservationUnit):
+        now = datetime.datetime.now(get_default_timezone())
+
         is_invalid_begin = (
             reservation_unit.reservation_begins
-            and begin < reservation_unit.reservation_begins
-        )
+            and now < reservation_unit.reservation_begins
+        ) or (reservation_unit.publish_begins and now < reservation_unit.publish_begins)
+
         is_invalid_end = (
             reservation_unit.reservation_ends
-            and end > reservation_unit.reservation_ends
-        )
+            and now >= reservation_unit.reservation_ends
+        ) or (reservation_unit.publish_ends and now >= reservation_unit.publish_ends)
 
         if is_invalid_begin or is_invalid_end:
             raise ValidationErrorWithCode(
-                "Reservation unit is not reservable within this reservation time.",
+                "Reservation unit is not reservable at current time.",
                 ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
             )
 
