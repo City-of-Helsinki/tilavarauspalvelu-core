@@ -44,3 +44,7 @@ uwsgi:
   ignore-sigpipe: true
   ignore-write-errors: true
   disable-write-exception: true
+
+  # Enable stats endpoint for monitoring
+  stats: 0.0.0.0:1717
+  stats-http: true
