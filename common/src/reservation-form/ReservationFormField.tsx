@@ -14,7 +14,7 @@ import { OptionType } from "../../types/common";
 type Props = {
   field: keyof Inputs;
   options: Record<string, OptionType[]>;
-  reserveeType: string;
+  reserveeType?: string;
   reservation: Reservation;
   metadataSet: ReservationMetadataSetType;
   form: ReturnType<typeof useForm>;
@@ -279,6 +279,7 @@ const ReservationFormField = ({
       )}${required ? " * " : ""}`}
       id={field}
       {...register(field, {
+        valueAsNumber: true,
         required,
         ...(required && {
           min: 1,

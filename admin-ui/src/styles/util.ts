@@ -193,7 +193,7 @@ export const ButtonsStripe = styled.div`
   display: flex;
   padding: var(--spacing-s);
   background-color: var(--color-bus-dark);
-  z-index: var(--tilavaraus-admin-button-stripe-stack);
+  z-index: var(--tilavaraus-admin-stack-button-stripe);
 `;
 
 export const WhiteButton = styled(Button)<{
@@ -242,7 +242,7 @@ export const WhiteButton = styled(Button)<{
 `;
 
 export const StyledNotification = styled(Notification)`
-  z-index: var(--tilavaraus-admin-notification-stack);
+  z-index: var(--tilavaraus-admin-stack-notification);
   margin: var(--spacing-xs) var(--spacing-layout-2-xs);
   width: auto;
   @media (min-width: ${breakpoints.xl}) {

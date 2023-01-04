@@ -13,13 +13,13 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import { Inputs, Reservation } from "common/src/reservation-form/types";
-import { MediumButton } from "../../styles/util";
 import {
-  ActionContainer,
   GroupHeading,
   Subheading,
   TwoColumnContainer,
-} from "./styles";
+} from "common/src/reservation-form/styles";
+import { MediumButton } from "../../styles/util";
+import { ActionContainer } from "./styles";
 import { getTranslation } from "../../modules/util";
 import InfoDialog from "../common/InfoDialog";
 

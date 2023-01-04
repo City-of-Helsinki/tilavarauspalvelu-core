@@ -11,10 +11,11 @@ import {
   ReservationsReservationStateChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
+import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
-import { Paragraph, Subheading } from "./styles";
+import { Paragraph } from "./styles";
 
 type Props = {
   reservation: Reservation;

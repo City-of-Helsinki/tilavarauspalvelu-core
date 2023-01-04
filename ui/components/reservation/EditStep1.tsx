@@ -11,16 +11,18 @@ import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { get } from "lodash";
 import { useRouter } from "next/router";
 import { breakpoints } from "common/src/common/style";
-
+import {
+  Subheading,
+  TwoColumnContainer,
+} from "common/src/reservation-form/styles";
+import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
-import { getReservationApplicationFields } from "../../modules/reservation";
 import { capitalize, getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
-import { Subheading, TwoColumnContainer } from "./styles";
 import { BlackButton, MediumButton } from "../../styles/util";
 import { reservationsPrefix } from "../../modules/const";
 
@@ -107,11 +109,11 @@ const EditStep1 = ({
     useState(false);
 
   const generalFields = useMemo(() => {
-    return getReservationApplicationFields(
-      frozenReservationUnit.metadataSet?.supportedFields,
-      "common",
-      true
-    ).filter((n) => n !== "reserveeType");
+    return getReservationApplicationFields({
+      supportedFields: frozenReservationUnit.metadataSet?.supportedFields,
+      reserveeType: "common",
+      camelCaseOutput: true,
+    }).filter((n) => n !== "reserveeType");
   }, [frozenReservationUnit?.metadataSet?.supportedFields]);
 
   const reservationApplicationFields = useMemo(() => {
@@ -121,11 +123,11 @@ const EditStep1 = ({
       ? reservation.reserveeType
       : ReservationsReservationReserveeTypeChoices.Individual;
 
-    return getReservationApplicationFields(
-      frozenReservationUnit.metadataSet?.supportedFields,
-      type,
-      true
-    );
+    return getReservationApplicationFields({
+      supportedFields: frozenReservationUnit.metadataSet?.supportedFields,
+      reserveeType: type,
+      camelCaseOutput: true,
+    });
   }, [
     frozenReservationUnit?.metadataSet?.supportedFields,
     reservation.reserveeType,

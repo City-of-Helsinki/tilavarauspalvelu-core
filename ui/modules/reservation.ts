@@ -17,6 +17,7 @@ import {
   isReservationShortEnough,
   isStartTimeWithinInterval,
 } from "common/src/calendar/util";
+import { getReservationApplicationFields } from "common/src/reservation-form/util";
 
 export const getDurationOptions = (
   minReservationDuration: number,
@@ -87,99 +88,6 @@ export const canUserCancelReservation = (
   return true;
 };
 
-export type ReserveeType = "individual" | "nonprofit" | "business";
-
-const reservationApplicationFields = {
-  individual: [
-    "reservee_first_name",
-    "reservee_last_name",
-    "reservee_address_street",
-    "reservee_address_zip",
-    "reservee_address_city",
-    "reservee_email",
-    "reservee_phone",
-    "billing_first_name",
-    "billing_last_name",
-    "billing_phone",
-    "billing_email",
-    "billing_address_street",
-    "billing_address_zip",
-    "billing_address_city",
-  ],
-  nonprofit: [
-    "reservee_organisation_name",
-    "home_city",
-    "reservee_is_unregistered_association",
-    "reservee_id",
-    "reservee_first_name",
-    "reservee_last_name",
-    "reservee_address_street",
-    "reservee_address_zip",
-    "reservee_address_city",
-    "reservee_email",
-    "reservee_phone",
-    "billing_first_name",
-    "billing_last_name",
-    "billing_phone",
-    "billing_email",
-    "billing_address_street",
-    "billing_address_zip",
-    "billing_address_city",
-  ],
-  business: [
-    "reservee_organisation_name",
-    "home_city",
-    "reservee_id",
-    "reservee_first_name",
-    "reservee_last_name",
-    "reservee_address_street",
-    "reservee_address_zip",
-    "reservee_address_city",
-    "reservee_email",
-    "reservee_phone",
-    "billing_first_name",
-    "billing_last_name",
-    "billing_phone",
-    "billing_email",
-    "billing_address_street",
-    "billing_address_zip",
-    "billing_address_city",
-  ],
-  common: [
-    "reservee_type",
-    "name",
-    "purpose",
-    "num_persons",
-    "age_group",
-    "description",
-    "applying_for_free_of_charge",
-    "free_of_charge_reason",
-  ],
-};
-
-export const getReservationApplicationFields = (
-  supportedFields: string[],
-  reserveeType: ReservationsReservationReserveeTypeChoices | "common",
-  camelCaseOutput = false
-): string[] => {
-  if (!supportedFields || supportedFields?.length === 0 || !reserveeType)
-    return [];
-
-  const fields = reservationApplicationFields[
-    reserveeType.toLocaleLowerCase()
-  ].filter((field) => supportedFields.includes(field));
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < fields.length; i++) {
-    if (fields[i].includes("billing_")) {
-      fields.splice(i, 0, "show_billing_address");
-      break;
-    }
-  }
-
-  return camelCaseOutput ? fields.map(camelCase) : fields;
-};
-
 export const getReservationApplicationMutationValues = (
   payload: Record<string, string | number | boolean>,
   supportedFields: string[],
@@ -192,15 +100,15 @@ export const getReservationApplicationMutationValues = (
     { field: "ageGroup", mutationField: "ageGroupPk" },
     { field: "purpose", mutationField: "purposePk" },
   ];
-  const fields = getReservationApplicationFields(
+  const fields = getReservationApplicationFields({
     supportedFields,
-    reserveeType
-  ).map(camelCase);
+    reserveeType,
+  }).map(camelCase);
 
-  const commonFields = getReservationApplicationFields(
+  const commonFields = getReservationApplicationFields({
     supportedFields,
-    "common"
-  ).map(camelCase);
+    reserveeType: "common",
+  }).map(camelCase);
 
   [...fields, ...commonFields].forEach((field: string) => {
     const key = changes.find((c) => c.field === field)?.mutationField || field;

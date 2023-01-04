@@ -1664,6 +1664,11 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
+"@hookform/resolvers@^2.9.10":
+  version "2.9.10"
+  resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-2.9.10.tgz#e7e88942ee34e97b7bc937b0be4694194c9cd420"
+  integrity sha512-JIL1DgJIlH9yuxcNGtyhsWX/PgNltz+5Gr6+8SX9fhXc/hPbEIk6wPI82nhgvp3uUb6ZfAM5mqg/x7KR7NAb+A==
+
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.5.0.tgz#1407967d4c6eecd7388f83acf1eaf4d0c6e58ef9"
@@ -2038,6 +2043,13 @@
     "@types/node" "*"
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
+
+"@joi/date@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@joi/date/-/date-2.1.0.tgz#fa7e3069a63c17d9ebe51a0b667f090c288de237"
+  integrity sha512-2zN5m0LgxZp/cynHGbzEImVmFIa+n+IOb/Nlw5LX/PLJneeCwG1NbiGw7MvPjsAKUGQK8z31Nn6V6lEN+4fZhg==
+  dependencies:
+    moment "2.x.x"
 
 "@jridgewell/gen-mapping@^0.1.0":
   version "0.1.1"
@@ -13121,7 +13133,7 @@ moment-timezone@^0.5.34:
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@^2.10.3, moment@^2.14.1, moment@^2.29.4:
+moment@2.x.x, "moment@>= 2.9.0", moment@^2.10.3, moment@^2.14.1, moment@^2.29.4:
   version "2.29.4"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==

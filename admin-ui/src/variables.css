@@ -21,18 +21,18 @@
   --tilavaraus-admin-stack-modal: 1000;
   --tilavaraus-admin-stack-seranwrap: 900;
   --tilavaraus-admin-stack-dialog: 800;
-  --tilavaraus-admin-button-stripe-stack: 799;  /* one under hds dialog backdrop */
-  --tilavaraus-admin-notification-stack: 801;
-
-  --tilavaraus-admin-sticky-header: 700;
+  --tilavaraus-admin-stack-button-stripe: 799; /* one under hds dialog backdrop */
+  --tilavaraus-admin-stack-notification: 801;
+  --tilavaraus-admin-stack-sticky-header: 700;
   --tilavaraus-admin-stack-main-menu: 500;
+  --tilavaraus-admin-stack-calendar-buffer: 101;
   --tilavaraus-calendar-selected: var(--color-bus);
   --tilavaraus-calendar-selected-secondary: #ffe977;
   --font-regular: HelsinkiGrotesk, var(--font-default);
   --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
   --font-bold: HelsinkiGrotesk-Bold, var(--font-default);
 
-    /*
+  /*
   calendar
   */
   --tilavaraus-event-current-requires_handling-border-color: var(--color-bus);
@@ -47,7 +47,6 @@
   --tilavaraus-event-other-requires_handling-border-color: var(--color-bus);
   --tilavaraus-event-other-requires_handling-background: rgba(0, 0, 191, 0.1);
 
-  --tilavaraus-event-rest-border-color: #1A1A1A;
+  --tilavaraus-event-rest-border-color: #1a1a1a;
   --tilavaraus-event-rest-background: rgba(26, 26, 26, 0.1);
-
 }

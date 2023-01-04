@@ -24,9 +24,9 @@ export const endOfWeek = (d: Date): Date =>
   dateFnsEndOfWeek(d, { weekStartsOn: 1 });
 
 export const secondsToHms = (
-  duration?: number | null
+  duration: number | null
 ): HMS | Record<string, number> => {
-  if (!duration || duration < 1) return {};
+  if (duration === null || duration < 0) return {};
   const h = Math.floor(duration / 3600);
   const m = Math.floor((duration % 3600) / 60);
   const s = Math.floor((duration % 3600) % 60);

@@ -19,7 +19,7 @@ import Loader from "../Loader";
 import Legend from "../reservations/requested/Legend";
 import { legend } from "./eventStyleGetter";
 import { RESERVATION_UNITS_BY_UNIT } from "./queries";
-import ResourceCalendar, { Resource } from "./UnitCalendar";
+import UnitCalendar, { Resource } from "./UnitCalendar";
 
 type Props = {
   begin: string;
@@ -164,7 +164,7 @@ const UnitReservations = ({
   return (
     <>
       <Container>
-        <ResourceCalendar resources={resourcesData} />
+        <UnitCalendar date={new Date(begin)} resources={resourcesData} />
       </Container>
       <LegendContainer>
         <Legends>

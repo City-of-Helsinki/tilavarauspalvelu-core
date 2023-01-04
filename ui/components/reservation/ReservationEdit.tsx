@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { PendingReservation } from "common/types/common";
 import { toApiDate } from "common/src/common/util";
+import { Subheading } from "common/src/reservation-form/styles";
 import {
   ADJUST_RESERVATION_TIME,
   GET_RESERVATION,
@@ -32,7 +33,6 @@ import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
-import { Subheading } from "./styles";
 import { CURRENT_USER } from "../../modules/queries/user";
 import {
   RESERVATION_UNIT,
