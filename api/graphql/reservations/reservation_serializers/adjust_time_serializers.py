@@ -58,7 +58,7 @@ class ReservationAdjustTimeSerializer(
 
         for reservation_unit in self.instance.reservation_unit.all():
             self.check_cancellation_rules(reservation_unit)
-            self.check_reservation_time(reservation_unit, begin, end)
+            self.check_reservation_time(reservation_unit)
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_reservation_duration(reservation_unit, begin, end)
             self.check_buffer_times(reservation_unit, begin, end)

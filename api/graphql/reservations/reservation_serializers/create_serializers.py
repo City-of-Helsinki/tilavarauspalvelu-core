@@ -175,7 +175,7 @@ class ReservationCreateSerializer(
 
         sku = None
         for reservation_unit in reservation_units:
-            self.check_reservation_time(reservation_unit, begin, end)
+            self.check_reservation_time(reservation_unit)
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_reservation_duration(reservation_unit, begin, end)
             self.check_buffer_times(reservation_unit, begin, end)
