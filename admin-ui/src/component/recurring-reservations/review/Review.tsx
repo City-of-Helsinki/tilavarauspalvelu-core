@@ -115,6 +115,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
             </RecommendationValue>
             <Button
               onClick={() => window.open(`${window.location}/allocation`)}
+              disabled
             >
               {t("ApplicationRound.allocate")}
             </Button>
