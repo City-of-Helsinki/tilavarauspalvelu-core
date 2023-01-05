@@ -173,7 +173,7 @@ const Step0 = ({
       >
         {t("reservationCalendar:reserverInfo")}
       </Subheading>
-      {reservationUnit?.metadataSet?.supportedFields.includes(
+      {reservationUnit?.metadataSet?.supportedFields?.includes(
         "reservee_type"
       ) && (
         <>

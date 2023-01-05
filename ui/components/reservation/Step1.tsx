@@ -128,7 +128,7 @@ const Step1 = ({
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
       <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
         <>
-          {reservationApplicationFields.includes("reserveeType") && (
+          {reservationApplicationFields?.includes("reserveeType") && (
             <ParagraphAlt $isWide>
               <PreviewLabel>
                 {t("reservationApplication:reserveeTypePrefix")}
@@ -143,7 +143,7 @@ const Step1 = ({
             </ParagraphAlt>
           )}
           {reservationApplicationFields
-            .filter(
+            ?.filter(
               (key) =>
                 !["", undefined, false, 0, null].includes(get(reservation, key))
             )

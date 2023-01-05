@@ -16,6 +16,7 @@ import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
+import { reservationUnitPath } from "../../modules/const";
 
 type Props = {
   reservation: Reservation;
@@ -111,6 +112,12 @@ const ReservationConfirmation = ({
             marginTop: "var(--spacing-3-xl)",
           }}
         >
+          <Link href={reservationUnitPath(reservationUnit.pk)} passHref>
+            <Anchor>
+              {t("reservations:backToReservationUnit")}
+              <IconArrowRight aria-hidden size="m" />
+            </Anchor>
+          </Link>
           <Link href="/" passHref>
             <Anchor>
               {t("common:gotoFrontpage")}

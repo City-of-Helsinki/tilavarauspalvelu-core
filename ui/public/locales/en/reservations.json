@@ -91,5 +91,6 @@
     "paid": "",
     "paidManually": ""
   },
-  "reservationEditFailed": ""
+  "reservationEditFailed": "",
+  "backToReservationUnit": ""
 }

@@ -95,5 +95,6 @@
     "expired": "Maksamatta",
     "refunded": "Palautettu"
   },
-  "reservationEditFailed": "Varauksen muokkaaminen epäonnistui"
+  "reservationEditFailed": "Varauksen muokkaaminen epäonnistui",
+  "backToReservationUnit": "Palaa kohteen sivulle"
 }

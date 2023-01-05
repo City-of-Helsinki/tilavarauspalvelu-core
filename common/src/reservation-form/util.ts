@@ -11,7 +11,8 @@ export const getReservationApplicationFields = ({
   reserveeType: ReservationsReservationReserveeTypeChoices | "common";
   camelCaseOutput?: boolean;
 }): string[] => {
-  if (supportedFields?.length === 0 || !reserveeType) return [];
+  if (!supportedFields || supportedFields?.length === 0 || !reserveeType)
+    return [];
 
   const fields = get(
     reservationApplicationFields,

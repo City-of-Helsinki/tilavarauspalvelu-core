@@ -2,6 +2,7 @@ import { getReservationPrice, formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
 import { differenceInMinutes, parseISO } from "date-fns";
+import Link from "next/link";
 import { trim } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ import {
   getMainImage,
   getTranslation,
 } from "../../modules/util";
+import { reservationUnitPath } from "../../modules/const";
 
 type Type = "pending" | "confirmed" | "complete";
 
@@ -53,6 +55,12 @@ const Content = styled.div`
 const Heading = styled(H4).attrs({ as: "h3" })`
   margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-xs);
+`;
+
+const Anchor = styled.a`
+  text-decoration: underline;
+  color: var(--color-black-90);
+  text-underline-offset: 4px;
 `;
 
 const Value = styled.div`
@@ -110,6 +118,15 @@ const ReservationInfoCard = ({
     " - "
   );
 
+  const headingContent =
+    type === "confirmed" ? (
+      <Link passHref href={reservationUnitPath(reservationUnit.pk)}>
+        <Anchor>{getTranslation(reservationUnit, "name")}</Anchor>
+      </Link>
+    ) : (
+      getTranslation(reservationUnit, "name")
+    );
+
   const purpose = getTranslation(reservation?.purpose, "name");
 
   const price: string =
@@ -154,7 +171,7 @@ const ReservationInfoCard = ({
         />
       )}
       <Content data-testid="reservation__reservation-info-card__content">
-        <Heading>{getTranslation(reservationUnit, "name")}</Heading>
+        <Heading>{headingContent}</Heading>
         {["confirmed", "complete"].includes(type) && (
           <Subheading>
             {t("reservations:reservationNumber")}: {reservation?.pk}
