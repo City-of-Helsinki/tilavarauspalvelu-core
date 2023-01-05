@@ -428,6 +428,16 @@ const selectedReservationUnitQuery = graphql.query<
 
   if (req.variables.pk === 800) {
     reservationUnitByPk.equipment = [];
+    reservationUnitByPk.paymentTerms = {
+      id: "faweopfk",
+      textFi: "Maksuehdot Fi",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms,
+    };
+    reservationUnitByPk.pricingTerms = {
+      id: "faweoipfv",
+      textFi: "Hinnoitteluehdot Fi",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms,
+    };
   }
 
   if (req.variables.pk === 801) {
@@ -441,6 +451,7 @@ const selectedReservationUnitQuery = graphql.query<
       textFi: "Hinnoitteluehdot Fi",
       termsType: TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms,
     };
+    reservationUnitByPk.canApplyFreeOfCharge = true;
   }
 
   if (req.variables.pk === 900) {

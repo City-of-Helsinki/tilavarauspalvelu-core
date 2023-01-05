@@ -133,12 +133,12 @@ const ReservationInfoCard = ({
     begin &&
     (reservation?.state === "REQUIRES_HANDLING" ||
       shouldDisplayReservationUnitPrice)
-      ? getReservationUnitPrice(
+      ? getReservationUnitPrice({
           reservationUnit,
-          new Date(begin),
-          duration,
-          true
-        )
+          pricingDate: new Date(begin),
+          minutes: duration,
+          trailingZeros: true,
+        })
       : getReservationPrice(
           reservation?.price,
           t("prices:priceFree"),
@@ -148,13 +148,12 @@ const ReservationInfoCard = ({
 
   const shouldDisplayTaxPercentage: boolean =
     reservation?.state === "REQUIRES_HANDLING" && begin
-      ? getReservationUnitPrice(
+      ? getReservationUnitPrice({
           reservationUnit,
-          new Date(begin),
-          0,
-          false,
-          true
-        ) !== "0"
+          pricingDate: new Date(begin),
+          minutes: 0,
+          asInt: true,
+        }) !== "0"
       : reservation?.price > 0;
 
   const formatters = useMemo(

@@ -197,19 +197,18 @@ const EditStep0 = ({
     reservationUnit?.bufferTimeAfter,
     reservationUnit?.bufferTimeBefore,
   ]);
+
   const ToolbarWithProps = React.memo((props: ToolbarProps) => (
     <Toolbar {...props} />
   ));
 
   const isSlotFree = useCallback(
     (start: Date): boolean => {
-      const price = getReservationUnitPrice(
+      const price = getReservationUnitPrice({
         reservationUnit,
-        start,
-        undefined,
-        false,
-        true
-      );
+        pricingDate: start,
+        asInt: true,
+      });
       return price === "0";
     },
     [reservationUnit]
@@ -282,13 +281,12 @@ const EditStep0 = ({
         return false;
       }
 
-      const price = getReservationUnitPrice(
+      const price = getReservationUnitPrice({
         reservationUnit,
-        start,
-        0,
-        false,
-        true
-      );
+        pricingDate: start,
+        minutes: 0,
+        asInt: true,
+      });
 
       setInitialReservation({
         begin: newReservation.begin,
@@ -316,13 +314,12 @@ const EditStep0 = ({
         return false;
       }
 
-      const price = getReservationUnitPrice(
+      const price = getReservationUnitPrice({
         reservationUnit,
-        start,
-        0,
-        false,
-        true
-      );
+        pricingDate: start,
+        minutes: 0,
+        asInt: true,
+      });
 
       setInitialReservation({
         begin: start.toISOString(),

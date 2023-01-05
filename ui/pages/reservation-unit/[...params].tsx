@@ -382,13 +382,11 @@ const ReservationUnitReservation = ({
   }, [updateData, updateLoading, updateError]);
 
   const steps: ReservationStep[] = useMemo(() => {
-    const price = getReservationUnitPrice(
-      reservationUnit as unknown as ReservationUnitByPkType,
-      new Date(reservation?.begin),
-      null,
-      false,
-      true
-    );
+    const price = getReservationUnitPrice({
+      reservationUnit: reservationUnit as unknown as ReservationUnitByPkType,
+      pricingDate: new Date(reservation?.begin),
+      asInt: true,
+    });
 
     const stepLength = price === "0" ? 2 : 5;
 

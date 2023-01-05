@@ -435,12 +435,12 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     "-"
   );
 
-  const price = getReservationUnitPrice(
+  const price = getReservationUnitPrice({
     reservationUnit,
-    date,
-    convertHMSToSeconds(`0${duration?.value}:00`) / 60,
-    true
-  );
+    pricingDate: date,
+    minutes: convertHMSToSeconds(`0${duration?.value}:00`) / 60,
+    trailingZeros: true,
+  });
 
   const submitButton = createReservation ? (
     <SubmitButtonWrapper>

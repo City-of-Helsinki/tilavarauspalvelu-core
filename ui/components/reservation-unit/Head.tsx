@@ -140,10 +140,10 @@ const Head = ({
   // );
 
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = getPrice(pricing);
+  const unitPrice = getPrice({ pricing });
 
   const unitPriceSuffix =
-    getPrice(pricing, undefined, false, true) !== "0" &&
+    getPrice({ pricing, asInt: true }) !== "0" &&
     subventionSuffix("reservation-unit-head");
 
   const reservationUnitName = getReservationUnitName(reservationUnit);

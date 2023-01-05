@@ -197,7 +197,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
 
   const price =
     reservation.state === "REQUIRES_HANDLING"
-      ? getReservationUnitPrice(reservationUnit)
+      ? getReservationUnitPrice({ reservationUnit })
       : getReservationPrice(
           reservation.price,
           i18n.t("prices:priceFree"),

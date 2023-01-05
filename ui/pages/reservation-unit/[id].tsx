@@ -89,6 +89,7 @@ import {
 import {
   getFuturePricing,
   getPrice,
+  isReservationUnitPaidInFuture,
   isReservationUnitPublished,
   mockOpeningTimePeriods,
   mockOpeningTimes,
@@ -556,6 +557,13 @@ const ReservationUnit = ({
     },
     [activeApplicationRounds, reservationUnit]
   );
+
+  const shouldDisplayPricingTerms = useMemo(() => {
+    return (
+      reservationUnit.canApplyFreeOfCharge &&
+      isReservationUnitPaidInFuture(reservationUnit.pricings)
+    );
+  }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
 
   const handleEventChange = useCallback(
     (
@@ -1177,11 +1185,10 @@ const ReservationUnit = ({
                           {{ date: toUIDate(new Date(futurePricing.begins)) }}{" "}
                           alkaen. Uusi hinta on{" "}
                           {{
-                            price: getPrice(
-                              futurePricing,
-                              undefined,
-                              true
-                            ).toLocaleLowerCase(),
+                            price: getPrice({
+                              pricing: futurePricing,
+                              trailingZeros: true,
+                            }).toLocaleLowerCase(),
                           }}
                         </strong>
                       </Trans>
@@ -1234,7 +1241,7 @@ const ReservationUnit = ({
                 </PaddedContent>
               </Accordion>
             )}
-            {pricingTermsContent && (
+            {shouldDisplayPricingTerms && pricingTermsContent && (
               <Accordion
                 heading={t("reservationUnit:pricingTerms")}
                 theme="thin"

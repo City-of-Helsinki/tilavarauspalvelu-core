@@ -14,6 +14,7 @@ import {
   ReservationsReservationStateChoices,
   ReservationUnitByPkType,
   ReservationUnitPricingType,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitType,
   UnitType,
@@ -227,12 +228,16 @@ export const getFuturePricing = (
     : futurePricings[0];
 };
 
-export const getPrice = (
-  pricing: ReservationUnitPricingType,
-  minutes?: number, // additional minutes for total price calculation
-  trailingZeros = false,
-  asInt = false
-): string => {
+export type GetPriceType = {
+  pricing: ReservationUnitPricingType;
+  minutes?: number; // additional minutes for total price calculation
+  trailingZeros?: boolean;
+  asInt?: boolean;
+};
+
+export const getPrice = (props: GetPriceType): string => {
+  const { pricing, minutes, trailingZeros = false, asInt = false } = props;
+
   const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
   const floatFormatter = trailingZeros ? "twoDecimal" : "strippedDecimal";
 
@@ -265,13 +270,25 @@ export const getPrice = (
   return asInt ? "0" : i18n.t("prices:priceFree");
 };
 
+export type GetReservationUnitPriceProps = {
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType;
+  pricingDate?: Date;
+  minutes?: number;
+  trailingZeros?: boolean;
+  asInt?: boolean;
+};
+
 export const getReservationUnitPrice = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType,
-  pricingDate?: Date,
-  minutes?: number,
-  trailingZeros = false,
-  asInt = false
+  props: GetReservationUnitPriceProps
 ): string => {
+  const {
+    reservationUnit,
+    pricingDate,
+    minutes,
+    trailingZeros = false,
+    asInt = false,
+  } = props;
+
   if (!reservationUnit) return null;
 
   const pricing: ReservationUnitPricingType = pricingDate
@@ -282,7 +299,7 @@ export const getReservationUnitPrice = (
       ) || getActivePricing(reservationUnit as ReservationUnitByPkType)
     : getActivePricing(reservationUnit as ReservationUnitByPkType);
 
-  return getPrice(pricing, minutes, trailingZeros, asInt);
+  return getPrice({ pricing, minutes, trailingZeros, asInt });
 };
 
 export const mockOpeningTimePeriods = [
@@ -375,3 +392,20 @@ export const mockOpeningTimes = Array.from(Array(100)).map((val, index) => ({
   state: "open",
   periods: null,
 }));
+
+export const isReservationUnitPaidInFuture = (
+  pricings: ReservationUnitPricingType[]
+): boolean => {
+  return pricings
+    .filter(
+      (pricing) =>
+        [
+          ReservationUnitsReservationUnitPricingStatusChoices.Active,
+          ReservationUnitsReservationUnitPricingStatusChoices.Future,
+        ].includes(pricing.status) &&
+        pricing.pricingType ===
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+    )
+    .map((pricing) => getPrice({ pricing, asInt: true }))
+    .some((n) => n !== "0");
+};

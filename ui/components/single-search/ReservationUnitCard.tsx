@@ -160,7 +160,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
 
   const unitPrice = useMemo(() => {
     const pricing = getActivePricing(reservationUnit);
-    return getPrice(pricing);
+    return getPrice({ pricing });
   }, [reservationUnit]);
 
   const reservationUnitTypeName = getTranslation(

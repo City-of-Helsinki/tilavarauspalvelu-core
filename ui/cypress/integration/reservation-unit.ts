@@ -481,6 +481,16 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
   });
 
   describe("with payment terms", () => {
+    it("does display an accordion for cancellation/payment terms and without pricing terms", () => {
+      cy.visit("/reservation-unit/800");
+
+      paymentAndCancellationTerms()
+        .find("> button")
+        .contains("Maksu- ja peruutusehdot");
+      paymentAndCancellationTerms().contains("Maksuehdot Fi");
+      pricingTerms().should("not.exist");
+    });
+
     it("does display an accordion for both cancellation/payment and pricing terms", () => {
       cy.visit("/reservation-unit/801");
 

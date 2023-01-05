@@ -249,7 +249,12 @@ const QuickReservation = ({
     const [hours, minutes] =
       duration?.value.toString().split(":").map(Number) || [];
     const length = hours * 60 + minutes;
-    return getReservationUnitPrice(reservationUnit, date, length, true);
+    return getReservationUnitPrice({
+      reservationUnit,
+      pricingDate: date,
+      minutes: length,
+      trailingZeros: true,
+    });
   }, [duration?.value, reservationUnit, date]);
 
   const [storedReservation, setStoredReservation, removeStoredReservation] =

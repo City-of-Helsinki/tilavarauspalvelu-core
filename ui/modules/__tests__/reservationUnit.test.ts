@@ -27,6 +27,7 @@ import {
   getReservationUnitName,
   getReservationUnitPrice,
   getUnitName,
+  isReservationUnitPaidInFuture,
   isReservationUnitPublished,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
@@ -55,7 +56,7 @@ describe("getPrice", () => {
       pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing)).toBe("10 - 50,5 € / 15 min");
+    expect(getPrice({ pricing })).toBe("10 - 50,5 € / 15 min");
   });
 
   test("price range with no min", () => {
@@ -66,7 +67,7 @@ describe("getPrice", () => {
       pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing)).toBe("0 - 50,5 € / 15 min");
+    expect(getPrice({ pricing })).toBe("0 - 50,5 € / 15 min");
   });
 
   test("price range with minutes", () => {
@@ -77,7 +78,7 @@ describe("getPrice", () => {
       pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing, 60)).toBe("0 - 60,5 €");
+    expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60,5 €");
   });
 
   test("price range with minutes", () => {
@@ -88,7 +89,7 @@ describe("getPrice", () => {
       pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing, 61)).toBe("0 - 121 €");
+    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 121 €");
   });
 
   test("fixed price", () => {
@@ -99,7 +100,7 @@ describe("getPrice", () => {
       pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing)).toBe("50 €");
+    expect(getPrice({ pricing })).toBe("50 €");
   });
 
   test("fixed price with decimals", () => {
@@ -110,7 +111,7 @@ describe("getPrice", () => {
       pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing, undefined, true)).toBe("50,00 €");
+    expect(getPrice({ pricing, trailingZeros: true })).toBe("50,00 €");
   });
 
   test("no price", () => {
@@ -118,8 +119,10 @@ describe("getPrice", () => {
       priceUnit: "FIXED",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing)).toBe("Maksuton");
-    expect(getPrice({} as ReservationUnitPricingType)).toBe("Maksuton");
+    expect(getPrice({ pricing })).toBe("Maksuton");
+    expect(getPrice({ pricing: {} as ReservationUnitPricingType })).toBe(
+      "Maksuton"
+    );
   });
 
   test("free", () => {
@@ -128,7 +131,7 @@ describe("getPrice", () => {
       pricingType: "FREE",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing)).toBe("Maksuton");
+    expect(getPrice({ pricing })).toBe("Maksuton");
   });
 
   test("total price with minutes", () => {
@@ -140,7 +143,7 @@ describe("getPrice", () => {
       status: "ACTIVE",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing, 180)).toBe("0 - 606 €");
+    expect(getPrice({ pricing, minutes: 180 })).toBe("0 - 606 €");
   });
 
   test("total price with minutes and decimals", () => {
@@ -152,7 +155,9 @@ describe("getPrice", () => {
       status: "ACTIVE",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice(pricing, 180, true)).toBe("0 - 606,00 €");
+    expect(getPrice({ pricing, minutes: 180, trailingZeros: true })).toBe(
+      "0 - 606,00 €"
+    );
   });
 });
 
@@ -988,18 +993,154 @@ describe("getReservationUnitPrice", () => {
   it("returns future data based on date lookup", () => {
     const data = cloneDeep(reservationUnit);
 
-    expect(getReservationUnitPrice(data, addDays(new Date(), 5))).toEqual(
-      "40 - 50 € / tunti"
-    );
+    expect(
+      getReservationUnitPrice({
+        reservationUnit: data,
+        pricingDate: addDays(new Date(), 5),
+      })
+    ).toEqual("40 - 50 € / tunti");
 
     expect(
-      getReservationUnitPrice(data, addDays(new Date(), 11), undefined, true)
+      getReservationUnitPrice({
+        reservationUnit: data,
+        pricingDate: addDays(new Date(), 11),
+        trailingZeros: true,
+      })
     ).toEqual("10,00 - 20,00 € / tunti");
   });
 
   it("returns null if incomplete data", () => {
-    expect(getReservationUnitPrice(null as ReservationUnitByPkType)).toEqual(
-      null
-    );
+    expect(
+      getReservationUnitPrice({
+        reservationUnit: null as ReservationUnitByPkType,
+      })
+    ).toEqual(null);
+  });
+});
+
+describe("isReservationUnitPaidInFuture", () => {
+  it("return true if active and future are paid", () => {
+    const pricings = [
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 20,
+        highestPriceNet: 20,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      },
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 10,
+        highestPriceNet: 10,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+      },
+    ] as ReservationUnitPricingType[];
+
+    expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
+  });
+
+  it("return true if only active is paid", () => {
+    const pricings = [
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 0,
+        highestPriceNet: 0,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      },
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 10,
+        highestPriceNet: 10,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+      },
+    ] as ReservationUnitPricingType[];
+
+    expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
+  });
+
+  it("return true if only future one paid", () => {
+    const pricings = [
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 20,
+        highestPriceNet: 20,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      },
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 0,
+        highestPriceNet: 0,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+      },
+    ] as ReservationUnitPricingType[];
+
+    expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
+  });
+
+  it("returns false if future one if paid but price is set in zero", () => {
+    const pricings = [
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 0,
+        highestPriceNet: 0,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      },
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 0,
+        highestPriceNet: 0,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+      },
+    ] as ReservationUnitPricingType[];
+
+    expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
+  });
+
+  it("returns false all are free", () => {
+    const pricings = [
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 20,
+        highestPriceNet: 20,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      },
+      {
+        pricingType:
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+        lowestPrice: 0,
+        lowestPriceNet: 0,
+        highestPrice: 20,
+        highestPriceNet: 20,
+        status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+      },
+    ] as ReservationUnitPricingType[];
+
+    expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
   });
 });
