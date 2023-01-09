@@ -4,11 +4,12 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 
 from merchants.validators import is_numeric, validate_accounting_project
 
 
-class PaymentMerchant(models.Model):
+class PaymentMerchant(ExportModelOperationsMixin("payment_merchant"), models.Model):
     """
     ID is not auto-generated. It comes from the Merchant experience API. See admin.py.
     https://checkout-dev-api.test.hel.ninja/v1/merchant/docs/swagger-ui/#
@@ -34,7 +35,7 @@ class PaymentMerchant(models.Model):
         return self.name
 
 
-class PaymentProduct(models.Model):
+class PaymentProduct(ExportModelOperationsMixin("payment_product"), models.Model):
     id = models.UUIDField(
         verbose_name=_("Product ID"),
         help_text=_("Value comes from the Product Experience API"),
@@ -76,7 +77,7 @@ class Language(models.TextChoices):
     EN = "en", _("English")
 
 
-class PaymentOrder(models.Model):
+class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
     reservation = models.ForeignKey(
         "reservations.Reservation",
         verbose_name=_("Reservation"),
@@ -194,7 +195,7 @@ class PaymentOrder(models.Model):
         return super().save(*args, **kwargs)
 
 
-class PaymentAccounting(models.Model):
+class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models.Model):
     """
     Custom validation comes from requirements in SAP
     """

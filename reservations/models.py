@@ -6,6 +6,7 @@ from django.db.models import F, Sum
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 
 from applications.models import (
     CUSTOMER_TYPES,
@@ -246,7 +247,7 @@ class ReservationQuerySet(models.QuerySet):
         )
 
 
-class Reservation(models.Model):
+class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
     objects = ReservationQuerySet.as_manager()
 
     reservee_type = models.CharField(
