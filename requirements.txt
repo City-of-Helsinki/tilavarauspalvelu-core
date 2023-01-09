@@ -27,8 +27,9 @@ celery==5.2.7
     #   -r requirements.in
     #   django-celery-beat
     #   django-celery-results
-certifi==2020.12.5
+certifi==2022.12.7
     # via
+    #   -r requirements.in
     #   requests
     #   sentry-sdk
 cffi==1.14.5

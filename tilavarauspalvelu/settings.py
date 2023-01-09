@@ -152,6 +152,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     DJANGO_LOG_LEVEL=(str, "DEBUG"),
     CONN_MAX_AGE=(int, 0),
+    DATABASE_ENGINE=(str, ""),
     DATABASE_URL=(str, "sqlite:../db.sqlite3"),
     TOKEN_AUTH_ACCEPTED_AUDIENCE=(str, ""),
     TOKEN_AUTH_SHARED_SECRET=(str, ""),
@@ -268,6 +269,10 @@ DEBUG = env("DEBUG")
 # Database configuration
 DATABASES = {"default": env.db()}
 DATABASES["default"]["CONN_MAX_AGE"] = env("CONN_MAX_AGE")
+
+# Database engine can be overridden for Prometheus monitoring
+if env("DATABASE_ENGINE"):
+    DATABASES["default"]["ENGINE"] = env("DATABASE_ENGINE")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Using hard coded in dev environments if not defined.
