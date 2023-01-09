@@ -35,3 +35,4 @@ whitenoise==5.2.0
 graphene-file-upload==1.3.0
 Jinja2
 django-prometheus
+certifi==2022.12.7 # Pinned because older version has a vulnerability: https://pyup.io/v/52365/f17/
