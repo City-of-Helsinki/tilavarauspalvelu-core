@@ -390,7 +390,8 @@ class ReservationUnitWithReservationsMixin:
                 reservations = reservations.filter(end__lte=to)
 
         if state is not None:
-            reservations = reservations.filter(state__in=state)
+            states = [s.lower() for s in state]
+            reservations = reservations.filter(state__in=states)
 
         return reservations
 

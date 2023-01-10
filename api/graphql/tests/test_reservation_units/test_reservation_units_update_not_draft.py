@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from unittest import mock
 
 from assertpy import assert_that
@@ -61,8 +62,8 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
                     "begins": "2022-09-13",
                     "pricingType": "PAID",
                     "priceUnit": "PER_30_MINS",
-                    "lowestPrice": 110.0,
-                    "highestPrice": 115.5,
+                    "lowestPrice": "110.0",
+                    "highestPrice": "115.5",
                     "taxPercentagePk": 2,
                     "status": "ACTIVE",
                 },
@@ -157,7 +158,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     def test_update_surface_area(self):
-        expected_surface_area = 150
+        expected_surface_area = "150"
         data = self.get_valid_update_data()
         data["surfaceArea"] = expected_surface_area
         update_query = """
@@ -178,9 +179,13 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
         assert_that(res_unit_data.get("errors")).is_none()
-        assert_that(res_unit_data.get("surfaceArea")).is_equal_to(expected_surface_area)
+        assert_that(Decimal(res_unit_data.get("surfaceArea"))).is_equal_to(
+            Decimal(expected_surface_area)
+        )
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.surface_area).is_equal_to(expected_surface_area)
+        assert_that(self.res_unit.surface_area).is_equal_to(
+            Decimal(expected_surface_area)
+        )
 
     def test_update_reservation_confirmed_instructions(self):
         expected_fi = "Lisätietoja"

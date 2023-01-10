@@ -27,6 +27,7 @@ from reservation_units.tests.factories import (
 from resources.tests.factories import ResourceFactory
 from services.tests.factories import ServiceFactory
 from spaces.tests.factories import SpaceFactory
+from utils.decimal_utils import round_decimal
 
 
 class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -83,13 +84,17 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
                     "begins": datetime.date.today().strftime("%Y-%m-%d"),
                     "pricingType": PricingType.PAID,
                     "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
-                    "lowestPrice": 10.5,
-                    "lowestPriceNet": round(
-                        float(Decimal("10.5") / (1 + self.tax_percentage.decimal)), 6
+                    "lowestPrice": "10.5",
+                    "lowestPriceNet": str(
+                        round_decimal(
+                            Decimal("10.5") / (1 + self.tax_percentage.decimal), 6
+                        )
                     ),
-                    "highestPrice": 18.8,
-                    "highestPriceNet": round(
-                        float(Decimal("18.8") / (1 + self.tax_percentage.decimal)), 6
+                    "highestPrice": "18.8",
+                    "highestPriceNet": str(
+                        round_decimal(
+                            Decimal("18.8") / (1 + self.tax_percentage.decimal), 6
+                        )
                     ),
                     "taxPercentagePk": self.tax_percentage.id,
                     "status": PricingStatus.PRICING_STATUS_ACTIVE,
@@ -167,10 +172,10 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(pricing.pricing_type).is_equal_to(pricing_data["pricingType"])
         assert_that(pricing.price_unit).is_equal_to(pricing_data["priceUnit"])
         assert_that(pricing.lowest_price).is_close_to(
-            pricing_data["lowestPrice"], 0.001
+            Decimal(pricing_data["lowestPrice"]), Decimal("0.001")
         )
         assert_that(pricing.highest_price).is_close_to(
-            pricing_data["highestPrice"], 0.001
+            Decimal(pricing_data["highestPrice"]), Decimal("0.001")
         )
         assert_that(pricing.tax_percentage).is_equal_to(tax_percentage)
         assert_that(pricing.status).is_equal_to(pricing_data["status"])

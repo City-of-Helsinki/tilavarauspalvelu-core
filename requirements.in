@@ -21,7 +21,7 @@ drf-oidc-auth==0.10.0
 drf-spectacular==0.24.2
 easy-thumbnails
 flake8==3.8.4
-graphene-django==3.0.0b7
+graphene-django
 graphene_permissions==1.1.4
 helsinki-profile-gdpr-api
 icalendar==4.0.7
