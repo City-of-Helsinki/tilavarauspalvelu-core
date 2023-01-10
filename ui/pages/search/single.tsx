@@ -126,10 +126,7 @@ const SearchSingle = (): JSX.Element => {
   );
 
   const [values, setValues] = useState({} as Record<string, string>);
-  const setStoredValues = useLocalStorage(
-    "reservationUnit-search-single",
-    null
-  )[1];
+  const setStoredValues = useLocalStorage("reservationUnit-search", null)[1];
 
   const { data, fetchMore, loading, error, networkStatus } = useQuery<
     Query,

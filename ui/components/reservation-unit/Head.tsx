@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { useLocalStorage } from "react-use";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
+import { omit } from "lodash";
 import styled from "styled-components";
 import {
   getNormalizedReservationBeginTime,
@@ -122,7 +123,7 @@ const Head = ({
   const [storedValues] = useLocalStorage(storageKey, null);
 
   const searchUrlWithParams = useMemo(() => {
-    return singleSearchUrl(storedValues);
+    return singleSearchUrl(omit(storedValues, "applicationRound"));
   }, [storedValues]);
 
   const minReservationDuration = formatSecondDuration(
