@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
@@ -188,7 +189,7 @@ class ReservationUnitPaymentType(models.Model):
         return self.code
 
 
-class ReservationUnit(models.Model):
+class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Model):
     sku = models.CharField(
         verbose_name=_("SKU"), max_length=255, blank=True, default=""
     )
