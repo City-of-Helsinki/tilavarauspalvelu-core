@@ -100,6 +100,8 @@ RUN mkdir -p /broker/queue && chown tvp /broker/queue && chmod g+rw /broker/queu
 
 RUN mkdir -p /broker/processed && chown tvp /broker/processed && chmod g+rw /broker/processed
 
+RUN mkdir -p /metrics && chown tvp /metrics && chmod g+rw /metrics
+
 ENTRYPOINT ["/tvp/deploy/entrypoint.sh"]
 
 EXPOSE 8000
