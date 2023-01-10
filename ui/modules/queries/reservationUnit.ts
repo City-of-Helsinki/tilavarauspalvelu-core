@@ -68,6 +68,7 @@ export const RESERVATION_UNIT = gql`
         textEn
         textSv
       }
+      minPersons
       maxPersons
       minReservationDuration
       maxReservationDuration

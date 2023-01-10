@@ -21,19 +21,7 @@ import {
   timeSlots,
 } from "model/quick-reservation";
 import {
-  reserveeTypeBusinessButton,
-  reserveeTypeIndividualButton,
-  reserveeTypeNonprofitButton,
-} from "model/reservation-application";
-import {
-  confirmationParagraph,
-  reservationConfirmationTimeRange,
-  formField,
-  reservationTitle,
-  updateButton,
   cancelButton,
-  calendarUrlButton,
-  reservationInfoPrice,
   dateSelector,
   reservationEvent,
   durationSelectorToggle,
@@ -158,7 +146,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
       // textWithIcon(1).contains("Seuraava vapaa aika:");
       textWithIcon(0).contains("Nuorisopalvelut Fi");
-      textWithIcon(1).contains("60 henkilöä");
+      textWithIcon(1).contains("10 - 60 henkilöä");
       textWithIcon(2).contains("1 t - 1 t 30 min varaus");
       textWithIcon(3).contains("20 € / 15 min");
 
@@ -203,6 +191,8 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     });
 
     it("can open and close modal", () => {
+      textWithIcon(1).contains("40 henkilöä");
+
       pricingTermsLink("reservation-unit-head").click();
 
       pricingTermsDialog().should("contain.text", "Hinnoitteluperiaatteet");
@@ -222,6 +212,8 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     });
 
     it("can cancel reservation process", () => {
+      textWithIcon(1).contains("20 henkilöä");
+
       drawReservation();
 
       cy.checkA11y(null, null, null, true);
