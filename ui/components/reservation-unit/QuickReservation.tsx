@@ -48,7 +48,7 @@ const Wrapper = styled.div`
   max-width: 400px;
 `;
 
-const Heading = styled(H4)`
+const Heading = styled(H4).attrs({ as: "h3" })`
   margin: var(--spacing-3-xs) 0 var(--spacing-l) 0;
 `;
 
@@ -245,17 +245,21 @@ const QuickReservation = ({
   const [slot, setSlot] = useState<string | null>(null);
   const [isReserving, setIsReserving] = useState(false);
 
-  const price: string = useMemo(() => {
-    const [hours, minutes] =
-      duration?.value.toString().split(":").map(Number) || [];
-    const length = hours * 60 + minutes;
-    return getReservationUnitPrice({
-      reservationUnit,
-      pricingDate: date,
-      minutes: length,
-      trailingZeros: true,
-    });
-  }, [duration?.value, reservationUnit, date]);
+  const getPrice = useCallback(
+    (asInt = false) => {
+      const [hours, minutes] =
+        duration?.value.toString().split(":").map(Number) || [];
+      const length = hours * 60 + minutes;
+      return getReservationUnitPrice({
+        reservationUnit,
+        pricingDate: date,
+        minutes: length,
+        trailingZeros: true,
+        asInt,
+      });
+    },
+    [duration?.value, reservationUnit, date]
+  );
 
   const [storedReservation, setStoredReservation, removeStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
@@ -433,10 +437,10 @@ const QuickReservation = ({
         />
       </Selects>
       <Price data-testid="quick-reservation-price">
-        {price && slot ? (
+        {slot ? (
           <>
-            {t("reservationUnit:price")}: <PriceValue>{price}</PriceValue>
-            {subventionSuffix("quick-reservation")}
+            {t("reservationUnit:price")}: <PriceValue>{getPrice()}</PriceValue>
+            {getPrice(true) !== "0" && subventionSuffix("quick-reservation")}
           </>
         ) : null}
       </Price>
