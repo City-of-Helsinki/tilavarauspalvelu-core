@@ -3,7 +3,7 @@ import { Checkbox, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
-import { sortBy } from "lodash";
+import { get, sortBy } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
@@ -17,8 +17,13 @@ import {
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { Query, TermsOfUseType } from "common/types/gql-types";
-import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
-import { getParameters } from "../../modules/api";
+import {
+  deepCopy,
+  getTranslation,
+  localizedValue,
+  mapOptions,
+} from "../../modules/util";
+import { getParameters, getReservationUnit } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
@@ -108,10 +113,15 @@ const Terms = styled.div`
 `;
 
 const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
+  const { i18n } = useTranslation();
+
   const [ready, setReady] = useState(false);
 
   const [ageGroupOptions, setAgeGroupOptions] = useState<{
     [key: number]: Parameter;
+  }>({});
+  const [reservationUnits, setReservationUnits] = useState<{
+    [key: number]: ReservationUnit;
   }>({});
 
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
@@ -145,6 +155,26 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   useEffect(() => {
     let mounted = true;
     async function fetchData() {
+      const reservationUnitIds = Array.from(
+        new Set(
+          application.applicationEvents.flatMap(
+            (ae) => ae.eventReservationUnits
+          )
+        )
+      );
+
+      const fetchedReservationUnits = await Promise.all(
+        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnitId))
+      );
+
+      if (mounted) {
+        setReservationUnits(
+          mapArrayById(fetchedReservationUnits) as {
+            [key: number]: ReservationUnit;
+          }
+        );
+      }
+
       const fetchedAgeGroupOptions = await getParameters("age_group");
       if (mounted) {
         setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
@@ -279,18 +309,28 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
             </FormSubHeading>
             <UnitList>
               {sortBy(applicationEvent.eventReservationUnits, "priority").map(
-                (reservationUnit, index) => (
-                  <React.Fragment key={reservationUnit.reservationUnitId}>
-                    <UnitName>
+                (reservationUnit, index) => {
+                  const unit = get(
+                    reservationUnits,
+                    [reservationUnit.reservationUnitId],
+                    "unit"
+                  );
+                  return (
+                    <UnitName key={reservationUnit.reservationUnitId}>
                       <div>{index + 1}</div>
                       <div>
                         {getOldReservationUnitName(
                           reservationUnit.reservationUnitDetails
                         )}
+                        {unit &&
+                          `, ${localizedValue(
+                            get(unit, "building.name"),
+                            i18n.language
+                          )}`}
                       </div>
                     </UnitName>
-                  </React.Fragment>
-                )
+                  );
+                }
               )}
             </UnitList>
             <FormSubHeading>
