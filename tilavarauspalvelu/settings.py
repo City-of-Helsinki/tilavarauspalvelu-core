@@ -524,7 +524,7 @@ THUMBNAIL_ALIASES = {
         # Currently, all custom sized images are wanted to be cropped.
         "small": {"size": (250, 250), "crop": True},
         "medium": {"size": (384, 384), "crop": True},
-        "large": {"size": (728, 728), "crop": True},
+        "large": {"size": (0, 728), "crop": False},
         "purpose_image": {"size": (390, 245), "crop": True},
     },
 }
