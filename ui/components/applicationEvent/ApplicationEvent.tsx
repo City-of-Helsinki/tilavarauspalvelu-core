@@ -313,7 +313,7 @@ const ApplicationEvent = ({
           applicationRound={applicationRound}
           form={form}
           fieldName={fieldName("eventReservationUnits")}
-          minSize={numPersons}
+          minSize={parseInt(numPersons, 10)}
           options={{
             purposeOptions,
             reservationUnitTypeOptions,
