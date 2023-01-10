@@ -453,6 +453,7 @@ GRAPHENE = {
     "MIDDLEWARE": [
         "graphql_jwt.middleware.JSONWebTokenMiddleware",
     ],
+    "TESTING_ENDPOINT": "/graphql/",
 }
 
 GRAPHQL_JWT = {"JWT_AUTH_HEADER_PREFIX": "Bearer"}

@@ -55,7 +55,7 @@ class ApplicationPermission(BasePermission):
     @classmethod
     def has_node_permission(cls, info: ResolveInfo, id: str) -> bool:
         user = info.context.user
-        application = Application.objects.filter(id=id)
+        application = Application.objects.filter(id=id).first()
 
         if application:
             return user.is_authenticated and can_read_application(user, application)
@@ -422,6 +422,10 @@ class QualifierPermission(BasePermission):
 
 class AgeGroupPermission(BasePermission):
     @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:
         return True
 
@@ -431,6 +435,10 @@ class AgeGroupPermission(BasePermission):
 
 
 class AbilityGroupPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
     @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:
         return True
