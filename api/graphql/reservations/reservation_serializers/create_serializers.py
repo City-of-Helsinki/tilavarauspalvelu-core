@@ -2,6 +2,7 @@ import datetime
 from typing import List, Optional
 
 from django.utils.timezone import get_default_timezone
+from graphql import GraphQLError
 from rest_framework import serializers
 
 from api.graphql.base_serializers import PrimaryKeySerializer
@@ -282,4 +283,4 @@ class ReservationCreateSerializer(
         ):
             return
 
-        raise serializers.ValidationError("You don't have permissions to set type")
+        raise GraphQLError("You don't have permissions to set type")

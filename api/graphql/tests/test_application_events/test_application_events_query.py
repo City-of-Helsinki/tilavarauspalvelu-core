@@ -26,7 +26,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
     def get_query(self, filter_section=None):
         query_to_type = "applicationEvents"
         if filter_section:
-            query_to_type = f"{query_to_type}({filter_section})"
+            query_to_type = f'{query_to_type}(orderBy: "pk" {filter_section})'
         return (
             "query { %s {" % query_to_type
             + """
@@ -165,6 +165,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_applicant_type(self):
+        self.maxDiff = None
         application = ApplicationFactory(
             applicant_type=Application.APPLICANT_TYPE_COMMUNITY, user=self.regular_joe
         )

@@ -412,7 +412,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
         app = ApplicationFactory(additional_information="I'm also included")
         query = f"""
                     query {{
-                        applications(pk: [{self.application.id}, {app.id}]) {{
+                        applications(orderBy: "pk" pk: [{self.application.id}, {app.id}]) {{
                             edges {{
                                 node {{
                                     additionalInformation

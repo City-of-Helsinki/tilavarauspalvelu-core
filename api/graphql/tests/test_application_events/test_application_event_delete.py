@@ -80,13 +80,7 @@ class ApplicationEventDeleteTestCase(ApplicationEventPermissionsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("deleted")
-        ).is_false()
+        assert_that(content.get("errors")).is_not_none()
 
         assert_that(
             ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()
@@ -107,13 +101,7 @@ class ApplicationEventDeleteTestCase(ApplicationEventPermissionsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("deleted")
-        ).is_false()
+        assert_that(content.get("errors")).is_not_none()
 
         assert_that(
             ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()

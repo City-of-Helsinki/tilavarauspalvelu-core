@@ -2,7 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
-from rest_framework import serializers
+from graphql import GraphQLError
 
 from utils.decimal_utils import round_decimal
 
@@ -49,7 +49,7 @@ class ReservationUnitPricingHelper:
         pricings = data.get("pricings", [])
 
         if not is_draft and not pricings:
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 "pricings is required and must have one ACTIVE and one optional FUTURE pricing"
             )
 
@@ -59,14 +59,10 @@ class ReservationUnitPricingHelper:
         for pricing in pricings:
             if cls.is_active(pricing):
                 if pricing.get("begins") > date.today():
-                    raise serializers.ValidationError(
-                        "ACTIVE pricing must be in the past or today"
-                    )
+                    raise GraphQLError("ACTIVE pricing must be in the past or today")
             elif ReservationUnitPricingHelper.is_future(pricing):
                 if pricing.get("begins") <= date.today():
-                    raise serializers.ValidationError(
-                        "FUTURE pricing must be in the future"
-                    )
+                    raise GraphQLError("FUTURE pricing must be in the future")
 
     @classmethod
     def check_pricing_counts(cls, is_draft: bool, data: Dict[str, Any]):
@@ -85,17 +81,11 @@ class ReservationUnitPricingHelper:
                 other_count += 1
 
         if (not is_draft and active_count != 1) or (is_draft and active_count > 1):
-            raise serializers.ValidationError(
-                "reservation unit must have exactly one ACTIVE pricing"
-            )
+            raise GraphQLError("reservation unit must have exactly one ACTIVE pricing")
         if future_count > 1:
-            raise serializers.ValidationError(
-                "reservation unit can have only one FUTURE pricing"
-            )
+            raise GraphQLError("reservation unit can have only one FUTURE pricing")
         if other_count > 0:
-            raise serializers.ValidationError(
-                "only ACTIVE and FUTURE pricings can be mutated"
-            )
+            raise GraphQLError("only ACTIVE and FUTURE pricings can be mutated")
 
     @classmethod
     def calculate_vat_prices(cls, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -107,9 +97,7 @@ class ReservationUnitPricingHelper:
             lowest_price_net = pricing.get("lowest_price_net", 0)
 
             if highest_price_net < lowest_price_net:
-                raise serializers.ValidationError(
-                    "Highest price cannot be less than lowest price."
-                )
+                raise GraphQLError("Highest price cannot be less than lowest price.")
 
             tax_percentage = pricing.get("tax_percentage")
 

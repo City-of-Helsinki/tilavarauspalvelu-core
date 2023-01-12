@@ -115,10 +115,8 @@ class ApplicationEventCreateTestCase(ApplicationEventPermissionsTestCaseBase):
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        app_event_data = content.get("data").get("createApplicationEvent")
-        assert_that(content.get("errors")).is_none()
-        assert_that(app_event_data.get("errors")).is_not_none()
-        assert_that(app_event_data.get("errors")[0].get("messages")).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Maximum duration should be larger than minimum duration"
         )
 

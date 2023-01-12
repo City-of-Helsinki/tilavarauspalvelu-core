@@ -111,11 +111,9 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
 
-        app_data = content.get("data").get("updateApplication")
-        assert_that(app_data.get("errors")).is_not_none()
-        assert_that(app_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "No permission for status change"
         )
 
@@ -265,11 +263,9 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
 
-        app_data = content.get("data").get("updateApplication")
-        assert_that(app_data.get("errors")).is_not_none()
-        assert_that(app_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Applications in DRAFT or IN_REVIEW status cannot set as SENT."
         )
 
@@ -289,11 +285,9 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
 
-        app_data = content.get("data").get("updateApplication")
-        assert_that(app_data.get("errors")).is_not_none()
-        assert_that(app_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Applications in DRAFT or IN_REVIEW status cannot set as SENT."
         )
 
@@ -628,8 +622,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        app_data = content.get("data").get("updateApplication")
-        assert_that(app_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
 
     def test_application_update_updating_and_adding_application_events(self):
         self.client.force_login(self.regular_joe)

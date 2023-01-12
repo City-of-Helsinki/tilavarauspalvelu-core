@@ -35,9 +35,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
             mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
                 updateReservationUnit(input: $input){
                     pk
-                    errors {
-                        messages field
-                    }
                 }
             }
             """
@@ -53,8 +50,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name_fi).is_equal_to("New name")
@@ -67,8 +62,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.metadata_set).is_equal_to(metadata_set)
 
@@ -79,8 +72,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.metadata_set).is_none()
 
@@ -96,13 +87,15 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["paymentTermsPk"] = payment_terms.pk
         data["cancellationTermsPk"] = cancellation_terms.pk
         data["serviceSpecificTermsPk"] = service_specific_terms.pk
+
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
+
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
+
         self.res_unit.refresh_from_db()
+
         assert_that(self.res_unit.payment_terms).is_equal_to(payment_terms)
         assert_that(self.res_unit.cancellation_terms).is_equal_to(cancellation_terms)
         assert_that(self.res_unit.service_specific_terms).is_equal_to(
@@ -112,12 +105,13 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     def test_update_with_authentication(self):
         data = self.get_valid_update_data()
         data["authentication"] = "STRONG"
+
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
+
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
+
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.authentication).is_equal_to("strong")
 
@@ -127,10 +121,9 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")[0].get("message")).contains(
             'Choice "invalid" is not allowed.'
         )
         self.res_unit.refresh_from_db()
@@ -144,11 +137,8 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "nameFi is required for draft reservation units"
         )
 
@@ -183,9 +173,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     @mock.patch(
@@ -200,9 +188,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
         assert_that(send_resource_mock.call_count).is_equal_to(0)
 
     def test_contact_information_removal_on_archive(self):
@@ -214,8 +200,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.is_archived).is_equal_to(True)
@@ -248,8 +232,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_none()
 
         log_entry_count = LogEntry.objects.filter(
             content_type_id=content_type_id, object_id=self.res_unit.pk

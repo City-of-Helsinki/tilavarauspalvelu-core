@@ -1,4 +1,5 @@
 from graphene.utils.str_converters import to_camel_case
+from graphql import GraphQLError
 from rest_framework import serializers
 
 from api.graphql.base_serializers import (
@@ -60,7 +61,7 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
             Resource.LOCATION_FIXED,
             Resource.LOCATION_MOVABLE,
         ):
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
             )
 
@@ -77,7 +78,7 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
         if data.get("location_type") == Resource.LOCATION_FIXED and not data.get(
             "space"
         ):
-            validation_errors["space"] = serializers.ValidationError(
+            validation_errors["space"] = GraphQLError(
                 "Location type 'fixed' needs a space to be defined."
             )
 
@@ -95,22 +96,20 @@ class ResourceUpdateSerializer(PrimaryKeyUpdateSerializer, ResourceCreateSeriali
                 Resource.LOCATION_FIXED,
                 Resource.LOCATION_MOVABLE,
             ):
-                raise serializers.ValidationError(
+                raise GraphQLError(
                     f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
                 )
 
         for field, value in data.items():
             if field == "name_fi" and (not value or value == "" or value.isspace()):
-                raise serializers.ValidationError(
-                    f"Missing translation for {to_camel_case(field)}."
-                )
+                raise GraphQLError(f"Missing translation for {to_camel_case(field)}.")
 
             if field == "space":
                 location_type = data.get("location_type")
                 if not location_type:
                     location_type = self.instance.location_type
                 if not data.get("space") and location_type == Resource.LOCATION_FIXED:
-                    raise serializers.ValidationError(
+                    raise GraphQLError(
                         "Location type 'fixed' needs a space to be defined."
                     )
 

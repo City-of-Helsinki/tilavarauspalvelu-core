@@ -93,9 +93,7 @@ class ApplicationEventDeclineTestCase(ApplicationEventPermissionsTestCaseBase):
         response = self.query(self.get_decline_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        response_data = content.get("data").get("declineApplicationEvent")
-        assert_that(response_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
         self.application_event.refresh_from_db()
         assert_that(self.application_event.status).is_equal_to(
             ApplicationEventStatus.RESERVED
@@ -112,9 +110,7 @@ class ApplicationEventDeclineTestCase(ApplicationEventPermissionsTestCaseBase):
         response = self.query(self.get_decline_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        response_data = content.get("data").get("declineApplicationEvent")
-        assert_that(response_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
         self.application_event.refresh_from_db()
         assert_that(self.application_event.status).is_equal_to(
             ApplicationEventStatus.CREATED

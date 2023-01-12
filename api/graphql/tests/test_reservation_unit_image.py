@@ -76,7 +76,7 @@ class ReservationUnitImageCreateTestCase(
 
     def test_upload_file_not_an_image_fails(self):
         file_to_upload = SimpleUploadedFile(
-            name="eltest.pdf",
+            name="eltest.xsl",
             content="lostest".encode("utf-8"),
             content_type="application/pdf",
         )
@@ -97,9 +97,7 @@ class ReservationUnitImageCreateTestCase(
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        image_data = content.get("data").get("createReservationUnitImage")
-        assert_that(image_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
 
         self.res_unit.refresh_from_db()
         img = self.res_unit.images.first()
@@ -227,13 +225,10 @@ class ReservationUnitImageDeleteGraphQLTestCase(GrapheneTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteReservationUnitImage").get("errors")
-        ).contains("No permissions to perform delete.")
-        assert_that(
-            content.get("data").get("deleteReservationUnitImage").get("deleted")
-        ).is_false()
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
+            "No permissions to perform delete."
+        )
 
         assert_that(
             ReservationUnitImage.objects.filter(pk=self.res_unit_image.pk).exists()

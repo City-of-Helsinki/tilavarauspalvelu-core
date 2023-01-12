@@ -74,11 +74,8 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         response = self.query(self.get_delete_query())
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("deleteSpace").get("errors")).contains(
-            "Space occurs"
-        )
-        assert_that(content.get("data").get("deleteSpace").get("deleted")).is_false()
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains("Space occurs")
 
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_true()
 
@@ -88,11 +85,10 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         response = self.query(self.get_delete_query())
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("deleteSpace").get("errors")).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "No permissions to perform delete."
         )
-        assert_that(content.get("data").get("deleteSpace").get("deleted")).is_false()
 
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_true()
 
@@ -124,9 +120,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("deleteSpace").get("errors")).is_not_none()
-        assert_that(content.get("data").get("deleteSpace").get("deleted")).is_false()
+        assert_that(content.get("errors")).is_not_none()
 
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_true()
 
@@ -164,9 +158,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("deleteSpace").get("errors")).is_not_none()
-        assert_that(content.get("data").get("deleteSpace").get("deleted")).is_false()
+        assert_that(content.get("errors")).is_not_none()
 
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_true()
 
@@ -181,9 +173,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("deleteSpace").get("errors")).is_not_none()
-        assert_that(content.get("data").get("deleteSpace").get("deleted")).is_false()
+        assert_that(content.get("errors")).is_not_none()
 
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_true()
 
