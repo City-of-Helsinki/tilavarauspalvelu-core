@@ -7,7 +7,9 @@ from django.conf import settings
 from requests import RequestException
 from requests import get as _get
 
-from ..constants import REQUEST_TIMEOUT_SECONDS
+from utils.metrics import ExternalServiceMetric
+
+from ..constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
 from ..exceptions import VerkkokauppaConfigurationError
 from .exceptions import GetPaymentError, ParsePaymentError
 from .types import Payment
@@ -25,11 +27,18 @@ def _get_base_url():
 
 def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
     try:
-        response = get(
-            url=urljoin(_get_base_url(), f"admin/{order_id}"),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY, "namespace": namespace},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
+        with ExternalServiceMetric(
+            METRIC_SERVICE_NAME, "GET", "/payment/admin/{order_id}"
+        ) as metric:
+            response = get(
+                url=urljoin(_get_base_url(), f"admin/{order_id}"),
+                headers={
+                    "api-key": settings.VERKKOKAUPPA_API_KEY,
+                    "namespace": namespace,
+                },
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
+            metric.response_status = response.status_code
 
         json = response.json()
 

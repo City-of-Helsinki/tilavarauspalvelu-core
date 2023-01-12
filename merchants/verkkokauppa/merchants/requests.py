@@ -8,7 +8,9 @@ from requests import RequestException
 from requests import get as _get
 from requests import post as _post
 
-from ..constants import REQUEST_TIMEOUT_SECONDS
+from utils.metrics import ExternalServiceMetric
+
+from ..constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
 from ..exceptions import VerkkokauppaConfigurationError
 from .exceptions import (
     CreateMerchantError,
@@ -32,14 +34,20 @@ def _get_base_url():
 
 def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
     try:
-        response = post(
-            url=urljoin(
-                _get_base_url(), f"create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}"
-            ),
-            json=params.to_json(),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
+        with ExternalServiceMetric(
+            METRIC_SERVICE_NAME, "POST", "/merchant/create/merchant/{namespace}"
+        ) as metric:
+            response = post(
+                url=urljoin(
+                    _get_base_url(),
+                    f"create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}",
+                ),
+                json=params.to_json(),
+                headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
+            metric.response_status = response.status_code
+
         json = response.json()
         if response.status_code != 201:
             raise CreateMerchantError(f"Merchant creation failed: {json.get('errors')}")
@@ -50,15 +58,20 @@ def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
 
 def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merchant:
     try:
-        response = post(
-            url=urljoin(
-                _get_base_url(),
-                f"/update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
-            ),
-            json=params.to_json(),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
+        with ExternalServiceMetric(
+            METRIC_SERVICE_NAME, "POST", "/merchant/update/merchant/{namespace}"
+        ) as metric:
+            response = post(
+                url=urljoin(
+                    _get_base_url(),
+                    f"/update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
+                ),
+                json=params.to_json(),
+                headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
+            metric.response_status = response.status_code
+
         json = response.json()
         if response.status_code == 404:
             raise UpdateMerchantError(
@@ -74,13 +87,19 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
 
 def get_merchants(get=_get) -> List[Merchant]:
     try:
-        response = get(
-            url=urljoin(
-                _get_base_url(), f"/list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}"
-            ),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
+        with ExternalServiceMetric(
+            METRIC_SERVICE_NAME, "GET", "/merchant/list/merchants/{namespace}"
+        ) as metric:
+            response = get(
+                url=urljoin(
+                    _get_base_url(),
+                    f"/list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}",
+                ),
+                headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
+            metric.response_status = response.status_code
+
         json = response.json()
         if response.status_code != 200:
             raise GetMerchantsError(f"Fetching merchants failed: {json.get('errors')}")
@@ -95,13 +114,18 @@ def get_merchants(get=_get) -> List[Merchant]:
 
 def get_merchant(id: UUID, get=_get) -> Optional[MerchantInfo]:
     try:
-        response = get(
-            url=urljoin(
-                _get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"
-            ),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
+        with ExternalServiceMetric(
+            METRIC_SERVICE_NAME, "GET", "/merchant/{namespace}/{merchant_id}"
+        ) as metric:
+            response = get(
+                url=urljoin(
+                    _get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"
+                ),
+                headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
+            metric.response_status = response.status_code
+
         json = response.json()
 
         if response.status_code == 404:
