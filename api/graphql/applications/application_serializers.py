@@ -230,6 +230,14 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
 
         return billing_address
 
+    def validate(self, data):
+        try:
+            data = super().validate(data)
+        except serializers.ValidationError as e:
+            raise self.validation_error_to_graphql_error(e)
+
+        return data
+
 
 class ApplicationUpdateSerializer(
     ApplicationCreateSerializer, PrimaryKeyUpdateSerializer

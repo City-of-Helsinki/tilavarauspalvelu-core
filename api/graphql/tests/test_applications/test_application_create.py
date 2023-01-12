@@ -171,8 +171,7 @@ class ApplicationCreateTestCase(ApplicationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        app_data = content.get("data").get("createApplication")
-        assert_that(app_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
         assert_that(Application.objects.count()).is_equal_to(1)
 
     def test_application_create_organization_address_cannot_be_empty(self):
@@ -237,8 +236,7 @@ class ApplicationCreateTestCase(ApplicationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        app_data = content.get("data").get("createApplication")
-        assert_that(app_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
         assert_that(Application.objects.count()).is_equal_to(1)
 
     @freeze_time("2021-01-15")
@@ -254,9 +252,8 @@ class ApplicationCreateTestCase(ApplicationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        app_data = content.get("data").get("createApplication")
-        assert_that(app_data.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")).is_not_none()
         assert_that(Application.objects.count()).is_equal_to(1)
 
     def test_unauthenticated_cannot_create_application(self):

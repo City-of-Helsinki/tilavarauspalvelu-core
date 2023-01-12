@@ -188,7 +188,7 @@ class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
                 application_events__event_reservation_units__reservation_unit__unit__in=units
             )
             | Q(user=user)
-        ).distinct()
+        )
 
 
 class ApplicationEventsFilter(AuthFilter, django_filters.FilterSet):

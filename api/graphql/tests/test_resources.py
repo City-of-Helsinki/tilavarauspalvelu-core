@@ -272,9 +272,9 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(
-            content.get("data").get("createResource").get("errors")[0].get("messages")
-        ).contains("Location type 'fixed' needs a space to be defined.")
+        assert_that(content.get("errors")[0].get("message")).contains(
+            "Location type 'fixed' needs a space to be defined."
+        )
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             0
         )
@@ -317,12 +317,9 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(
-            content.get("data")
-            .get("createResource")
-            .get("errors")[0]
-            .get("messages")[0]
-        ).contains("Wrong type of location type")
+        assert_that(content.get("errors")[0].get("message")).contains(
+            "Wrong type of location type"
+        )
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             0
         )
@@ -468,10 +465,10 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains("Missing translation for nameFi.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
+            "Missing translation for nameFi."
+        )
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
         data = self.get_valid_input_data()
@@ -479,11 +476,11 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("errors")).is_not_none()
         self.resource.refresh_from_db()
-        assert_that(
-            content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains("Location type 'fixed' needs a space to be defined.")
+        assert_that(content.get("errors")[0].get("message")).contains(
+            "Location type 'fixed' needs a space to be defined."
+        )
 
     def test_space_not_in_data_and_fixed_location_space_not_nulled(self):
         data = self.get_valid_input_data()
@@ -533,24 +530,21 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("errors")).is_not_none()
         self.resource.refresh_from_db()
-        assert_that(
-            content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains("Location type 'fixed' needs a space to be defined.")
+        assert_that(content.get("errors")[0].get("message")).contains(
+            "Location type 'fixed' needs a space to be defined."
+        )
 
     def test_location_type_wrong_errors(self):
         data = {"pk": self.resource.pk, "locationType": "imsowrong"}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("updateResource")
-            .get("errors")[0]
-            .get("messages")[0]
-        ).contains("Wrong type of location type")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
+            "Wrong type of location type"
+        )
 
 
 class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
@@ -588,10 +582,9 @@ class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("deleteResource").get("errors")).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "No permissions to perform delete."
         )
-        assert_that(content.get("data").get("deleteResource").get("deleted")).is_false()
 
         assert_that(Resource.objects.filter(pk=self.resource.pk).exists()).is_true()

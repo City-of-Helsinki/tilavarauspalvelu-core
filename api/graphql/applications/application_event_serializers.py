@@ -121,6 +121,14 @@ class ApplicationEventCreateSerializer(
             "status",
         ]
 
+    def validate(self, data):
+        try:
+            data = super().validate(data)
+        except serializers.ValidationError as e:
+            raise self.validation_error_to_graphql_error(e)
+
+        return data
+
 
 class ApplicationEventUpdateSerializer(
     ApplicationEventCreateSerializer, PrimaryKeyUpdateSerializer

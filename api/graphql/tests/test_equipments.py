@@ -220,13 +220,8 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
         }
         response = self.query(self.get_create_query(), input_data=data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createEquipmentCategory").get("pk")
-        ).is_none()
-        assert_that(
-            content.get("data").get("createEquipmentCategory").get("errors")
-        ).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("data").get("createEquipmentCategory")).is_none()
 
     def test_regular_user_cannot_create(self):
         self.client.force_login(self.regular_joe)

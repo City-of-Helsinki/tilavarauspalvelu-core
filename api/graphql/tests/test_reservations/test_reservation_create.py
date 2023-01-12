@@ -1056,13 +1056,10 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         input_data["type"] = "blocked"
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createReservation")
-            .get("errors")[0]
-            .get("messages")[0]
-        ).is_equal_to("You don't have permissions to set type")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
+            "You don't have permissions to set type"
+        )
 
     def test_create_price_calculation_with_free_reservation_unit(
         self, mock_periods, mock_opening_hours

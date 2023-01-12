@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from graphql import GraphQLError
 
 from api.graphql.base_serializers import PrimaryKeySerializer
 from applications.models import (
@@ -29,7 +29,7 @@ class ApplicationDeclineSerializer(PrimaryKeySerializer):
 
     def validate(self, data):
         if self.instance.status not in self.CAN_DECLINE_STATUSES:
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 f"Only applications with status as {', '.join(self.CAN_DECLINE_STATUSES)} can be approved."
             )
         data = super().validate(data)
@@ -62,7 +62,7 @@ class ApplicationEventDeclineSerializer(PrimaryKeySerializer):
 
     def validate(self, data):
         if self.instance.status not in self.CAN_DECLINE_STATUSES:
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 f"Only application events with status as {', '.join(self.CAN_DECLINE_STATUSES)} can be approved."
             )
 
@@ -70,7 +70,7 @@ class ApplicationEventDeclineSerializer(PrimaryKeySerializer):
             self.instance.application.status
             not in ApplicationDeclineSerializer.CAN_DECLINE_STATUSES
         ):
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 f"Only application events with application status as "
                 f"{', '.join(ApplicationDeclineSerializer.CAN_DECLINE_STATUSES)} can be approved."
             )

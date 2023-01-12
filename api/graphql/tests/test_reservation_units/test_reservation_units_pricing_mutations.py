@@ -57,9 +57,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
         assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
@@ -71,9 +69,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "pricings is required and must have one ACTIVE and one optional FUTURE pricing"
         )
 
@@ -106,9 +103,9 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "reservation unit must have exactly one ACTIVE pricing"
         )
 
@@ -151,9 +148,9 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "reservation unit can have only one FUTURE pricing"
         )
 
@@ -186,9 +183,9 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "only ACTIVE and FUTURE pricings can be mutated"
         )
 
@@ -213,9 +210,9 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).starts_with(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).starts_with(
             "ACTIVE pricing must be in"
         )
 
@@ -240,9 +237,9 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).starts_with(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).starts_with(
             "FUTURE pricing must be in"
         )
 
@@ -306,9 +303,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
         assert_that(updated_resunit.pricings.count()).is_equal_to(1)
@@ -398,9 +393,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed"
         )
 
@@ -441,9 +435,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
         )
 

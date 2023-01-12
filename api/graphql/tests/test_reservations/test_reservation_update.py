@@ -171,10 +171,10 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         data["reserveeType"] = invalid_reservee_type
         response = self.query(self.get_update_query(), input_data=data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("updateReservation").get("errors")
-        ).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
+            'Choice "invalid"'
+        )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.reservee_type).is_not_equal_to(
             invalid_reservee_type
@@ -755,10 +755,10 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("updateReservation").get("errors")
-        ).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
+            'Tämän kentän arvo ei voi olla "null".'
+        )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.reservee_last_name).is_not_equal_to(
             input_data["reserveeLastName"]
@@ -835,13 +835,10 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("updateReservation")
-            .get("errors")[0]
-            .get("messages")[0]
-        ).is_equal_to("You don't have permissions to set type")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
+            "You don't have permissions to set type"
+        )
 
     def test_update_reservation_price_calculation_not_triggered(
         self, mock_periods, mock_opening_hours

@@ -75,10 +75,8 @@ class ApplicationEventFlaggedTestCase(FlaggedTestCaseBase):
         response = self.query(self.get_flag_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        app_event_data = content.get("data").get("flagApplicationEvent")
-        assert_that(app_event_data.get("errors")).is_not_none()
-        assert_that(app_event_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Only application with status as"
         )
 
@@ -107,10 +105,8 @@ class ApplicationEventFlaggedTestCase(FlaggedTestCaseBase):
         response = self.query(self.get_flag_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        app_event_data = content.get("data").get("flagApplicationEvent")
-        assert_that(app_event_data.get("errors")).is_not_none()
-        assert_that(app_event_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Application status is send. Only setting the flagged to False is possible."
         )
 
@@ -194,10 +190,8 @@ class ApplicationFlaggedTestCase(FlaggedTestCaseBase):
         response = self.query(self.get_flag_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        app_event_data = content.get("data").get("flagApplication")
-        assert_that(app_event_data.get("errors")).is_not_none()
-        assert_that(app_event_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Only application with status as"
         )
 
@@ -226,10 +220,8 @@ class ApplicationFlaggedTestCase(FlaggedTestCaseBase):
         response = self.query(self.get_flag_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        app_event_data = content.get("data").get("flagApplication")
-        assert_that(app_event_data.get("errors")).is_not_none()
-        assert_that(app_event_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Application status is send. Only setting the flagged to False is possible."
         )
 
