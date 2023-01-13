@@ -1,1 +1,2 @@
 REQUEST_TIMEOUT_SECONDS = 15  # seconds
+METRIC_SERVICE_NAME = "verkkokauppa"
