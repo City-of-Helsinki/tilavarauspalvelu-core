@@ -64,7 +64,7 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
             response = post(
                 url=urljoin(
                     _get_base_url(),
-                    f"/update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
+                    f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
                 ),
                 json=params.to_json(),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -93,7 +93,7 @@ def get_merchants(get=_get) -> List[Merchant]:
             response = get(
                 url=urljoin(
                     _get_base_url(),
-                    f"/list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}",
+                    f"list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}",
                 ),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
                 timeout=REQUEST_TIMEOUT_SECONDS,
