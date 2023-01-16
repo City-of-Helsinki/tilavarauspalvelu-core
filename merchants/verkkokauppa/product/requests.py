@@ -62,7 +62,7 @@ def get_product_mapping(product_id: UUID, get=_get) -> Optional[Product]:
             METRIC_SERVICE_NAME, "GET", "/product/{product_id}/mapping"
         ) as metric:
             response = get(
-                url=urljoin(_get_base_url(), f"/{str(product_id)}/mapping"),
+                url=urljoin(_get_base_url(), f"{str(product_id)}/mapping"),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
                 timeout=REQUEST_TIMEOUT_SECONDS,
             )
@@ -96,7 +96,7 @@ def create_or_update_accounting(
             METRIC_SERVICE_NAME, "POST", "/product/{product_id}/accounting"
         ) as metric:
             response = post(
-                url=urljoin(_get_base_url(), f"/{product_id}/accounting"),
+                url=urljoin(_get_base_url(), f"{product_id}/accounting"),
                 json=params.to_json(),
                 headers={
                     "api-key": settings.VERKKOKAUPPA_API_KEY,
