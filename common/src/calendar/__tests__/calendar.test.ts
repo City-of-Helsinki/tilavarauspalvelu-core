@@ -692,7 +692,7 @@ describe("isReservationUnitReservable", () => {
           supportedFields: ["name"],
         },
       } as ReservationUnitByPkType)
-    ).toBe(true);
+    ).toBe(false);
 
     expect(
       isReservationUnitReservable({

@@ -412,15 +412,8 @@ export const isReservationUnitReservable = (
   reservationUnit: ReservationUnitByPkType,
   now = new Date()
 ): boolean => {
-  const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
-  const negativeBuffer = Math.abs(bufferDays) * -1;
-
   const isAfterReservationStart =
-    now >=
-    addDays(
-      new Date(reservationUnit.reservationBegins as string),
-      negativeBuffer
-    );
+    now >= new Date(reservationUnit.reservationBegins as string);
   const isBeforeReservationEnd =
     now <= new Date(reservationUnit.reservationEnds as string);
 
