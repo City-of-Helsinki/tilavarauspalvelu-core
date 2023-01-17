@@ -148,6 +148,10 @@ class Unit(models.Model):
     def hauki_resource_data_source_id(self):
         return "tprek"
 
+    @property
+    def hauki_department_id(self):
+        return f"tprek:{self.tprek_department_id}"
+
     def save(self, *args, **kwargs):
         old_values = Unit.objects.filter(pk=self.pk).first()
         result = super(Unit, self).save(*args, **kwargs)
