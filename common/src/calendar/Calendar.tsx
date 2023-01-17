@@ -406,9 +406,10 @@ const locales = {
 };
 
 const localizer = dateFnsLocalizer({
-  format,
+  format: (date: Date, fmt: string) =>
+    format(date, fmt, { locale: locales.fi }),
   parse: parseDate,
-  startOfWeek,
+  startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
   getDay,
   locales,
 });
