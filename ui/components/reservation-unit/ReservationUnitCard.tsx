@@ -11,7 +11,7 @@ import styled from "styled-components";
 import { fontBold, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
-import { getMainImage } from "../../modules/util";
+import { getMainImage, getTranslation } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getReservationUnitName } from "../../modules/reservationUnit";
 
@@ -30,12 +30,14 @@ const NameCardContainer = styled.div`
   margin-top: var(--spacing-l);
 `;
 
-const PreCardLabel = styled(H6).attrs({ as: "h3" })``;
+const PreCardLabel = styled(H6).attrs({ as: "h3" })`
+  margin-bottom: 0;
+`;
 
 const CardButtonContainer = styled.div`
   display: grid;
   grid-template-columns: 8fr 1fr;
-  margin-top: var(--spacing-s);
+  margin-top: var(--spacing-2-xs);
   align-items: center;
   position: relative;
 
@@ -68,6 +70,10 @@ const PaddedCell = styled.div`
 
 const ExtraPaddedCell = styled(PaddedCell)`
   padding: var(--spacing-s);
+
+  @media (min-width: ${breakpoints.s}) {
+    gap: 0;
+  }
 `;
 
 const ImageCell = styled.div<{ $src: string }>`
@@ -85,18 +91,17 @@ const Name = styled.div`
   ${fontBold};
   font-size: var(--fontsize-heading-s);
   line-height: var(--lineheight-xl);
-  margin-bottom: var(--spacing-xs);
-
-  @media (min-width: ${breakpoints.s}) {
-    margin-bottom: 0;
-  }
+  margin-bottom: var(--spacing-3-xs);
 `;
+
+const UnitName = styled.div``;
 
 const MaxPersonsContainer = styled.div`
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
   font-size: var(--fontsize-body-s);
+  margin-top: var(--spacing-xs);
   padding-bottom: var(--spacing-2-xs);
 `;
 
@@ -180,6 +185,7 @@ const ReservationUnitCard = ({
           <ImageCell $src={getMainImage(reservationUnit)?.mediumUrl} />
           <ExtraPaddedCell>
             <Name>{getReservationUnitName(reservationUnit)}</Name>
+            <UnitName>{getTranslation(reservationUnit.unit, "name")}</UnitName>
             <MaxPersonsContainer>
               {reservationUnit.maxPersons && (
                 <>

@@ -3,7 +3,7 @@ import { Checkbox, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
-import { get, sortBy } from "lodash";
+import { get, sortBy, trim } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
@@ -310,23 +310,25 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
             <UnitList>
               {sortBy(applicationEvent.eventReservationUnits, "priority").map(
                 (reservationUnit, index) => {
-                  const unit = get(
-                    reservationUnits,
-                    [reservationUnit.reservationUnitId],
-                    "unit"
-                  );
+                  const resUnit = get(reservationUnits, [
+                    reservationUnit.reservationUnitId,
+                  ]);
                   return (
                     <UnitName key={reservationUnit.reservationUnitId}>
                       <div>{index + 1}</div>
                       <div>
-                        {getOldReservationUnitName(
-                          reservationUnit.reservationUnitDetails
+                        {trim(
+                          `${getOldReservationUnitName(
+                            reservationUnit.reservationUnitDetails
+                          )}${
+                            resUnit &&
+                            `, ${localizedValue(
+                              get(resUnit, "unit.name"),
+                              i18n.language
+                            )}`
+                          }`,
+                          ","
                         )}
-                        {unit &&
-                          `, ${localizedValue(
-                            get(unit, "building.name"),
-                            i18n.language
-                          )}`}
                       </div>
                     </UnitName>
                   );
