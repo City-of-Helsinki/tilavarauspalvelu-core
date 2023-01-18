@@ -5,7 +5,7 @@ from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
 
 from api.graphql.base_serializers import PrimaryKeySerializer
-from api.graphql.choice_char_field import ChoiceCharField
+from api.graphql.choice_fields import ChoiceCharField
 from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.reservations.reservation_serializers.mixins import (

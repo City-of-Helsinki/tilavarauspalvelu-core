@@ -10,7 +10,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
-from api.graphql.choice_char_field import ChoiceCharField
+from api.graphql.choice_fields import ChoiceCharField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import (
     Application,
