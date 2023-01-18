@@ -174,7 +174,7 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
             return generate_hauki_link(
                 self.uuid,
                 getattr(info.context.user, "email", ""),
-                self.unit.tprek_department_id,
+                self.unit.hauki_department_id,
             )
         return None
 
