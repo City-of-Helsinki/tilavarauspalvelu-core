@@ -221,7 +221,7 @@ const Page2 = ({
               ).length > 0
             ) {
               dispatch({
-                type: "setValidatioErrors",
+                type: "setValidationErrors",
                 validationErrors: validationResults,
               });
             } else {

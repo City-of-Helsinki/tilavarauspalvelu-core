@@ -9,7 +9,7 @@ import {
   ReservationUnitPricingUpdateSerializerInput,
   ReservationUnitsReservationUnitImageImageTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
-  ReservationUnitsReservationUnitPricingTypeChoices,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ResourceType,
   SpaceType,
   TermsOfUseTermsOfUseTermsTypeChoices,
@@ -223,7 +223,7 @@ export const reducer = (state: State, action: Action): State => {
                 lowestPriceNet: Number(pricing?.lowestPriceNet),
                 pricingType:
                   pricing?.pricingType ||
-                  ReservationUnitsReservationUnitPricingTypeChoices.Free,
+                  ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
               })
             ),
             (i) =>
@@ -241,7 +241,6 @@ export const reducer = (state: State, action: Action): State => {
             "serviceSpecificTerms.pk"
           ),
           metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
-          pricingType: get(reservationUnit, "pricingType") || undefined, // update api does not allow null
           surfaceArea: Number(get(reservationUnit, "surfaceArea", 0)),
         },
         hasChanges: false,
@@ -541,7 +540,7 @@ export const reducer = (state: State, action: Action): State => {
         qualifierPks: action.qualifiers.map((ot) => ot.value as number),
       });
     }
-    case "setValidatioErrors": {
+    case "setValidationErrors": {
       return {
         ...state,
         validationErrors: action.validationErrors,

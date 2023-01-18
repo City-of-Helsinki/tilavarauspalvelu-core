@@ -11,7 +11,7 @@ import {
 } from "hds-react";
 import {
   ReservationUnitPricingCreateSerializerInput,
-  ReservationUnitsReservationUnitPriceUnitChoices,
+  ReservationUnitsReservationUnitPricingPriceUnitChoices,
 } from "common/types/gql-types";
 import {
   Grid,
@@ -171,7 +171,7 @@ const PricingType = ({
                   required
                   value={pricing.priceUnit as string}
                   label={t("ReservationUnitEditor.label.priceUnit")}
-                  type={ReservationUnitsReservationUnitPriceUnitChoices}
+                  type={ReservationUnitsReservationUnitPricingPriceUnitChoices}
                   onChange={(priceUnit) => setPricingTypeValue({ priceUnit })}
                   tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
                   errorText={getValidationError(

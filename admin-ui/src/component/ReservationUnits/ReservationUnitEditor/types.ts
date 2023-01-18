@@ -58,7 +58,7 @@ export type Action =
   | { type: "setMaxPersons"; maxPersons: number }
   | { type: "setReservationsMaxDaysBefore"; reservationsMaxDaysBefore: number }
   | {
-      type: "setValidatioErrors";
+      type: "setValidationErrors";
       validationErrors: Joi.ValidationResult | null;
     }
   | { type: "setImages"; images: Image[] };

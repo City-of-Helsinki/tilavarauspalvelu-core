@@ -188,7 +188,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         ...omitBy(state.reservationUnitEdit, (v) => v === ""),
         surfaceArea: Number(state.reservationUnitEdit?.surfaceArea),
         isDraft: !publish,
-        priceUnit: state.reservationUnitEdit?.priceUnit?.toLocaleLowerCase(), /// due to api inconsistency
         reservationStartInterval:
           state.reservationUnitEdit?.reservationStartInterval?.toLocaleLowerCase(), /// due to api inconsistency
         maxReservationsPerUser: state.reservationUnitEdit
@@ -1914,11 +1913,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               );
 
               if (validationErrors.error) {
-                dispatch({ type: "setValidatioErrors", validationErrors });
+                dispatch({ type: "setValidationErrors", validationErrors });
               } else {
                 saveReservationUnit(false);
                 dispatch({
-                  type: "setValidatioErrors",
+                  type: "setValidationErrors",
                   validationErrors: null,
                 });
               }
@@ -1936,11 +1935,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               );
 
               if (validationErrors.error) {
-                dispatch({ type: "setValidatioErrors", validationErrors });
+                dispatch({ type: "setValidationErrors", validationErrors });
               } else {
                 saveReservationUnit(true);
                 dispatch({
-                  type: "setValidatioErrors",
+                  type: "setValidationErrors",
                   validationErrors: null,
                 });
               }

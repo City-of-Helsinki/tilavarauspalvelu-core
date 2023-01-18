@@ -91,7 +91,7 @@ const reducer = (state: State, action: Action): State => {
         spaces: state.spaces.filter((s, i) => action.index !== i),
       };
     }
-    case "setValidatioErrors": {
+    case "setValidationErrors": {
       return {
         ...state,
         validationErrors: action.validationErrors,

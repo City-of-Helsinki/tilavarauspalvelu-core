@@ -48,7 +48,7 @@ type EditorProp = any;
 
 type Action =
   | {
-      type: "setValidatioErrors";
+      type: "setValidationErrors";
       validationErrors: Joi.ValidationResult | null;
     }
   | { type: "unitLoaded"; unit: UnitByPkType }
@@ -78,7 +78,7 @@ const withLoadingStatus = (state: State): State => {
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "setValidatioErrors": {
+    case "setValidationErrors": {
       return {
         ...state,
         validationErrors: action.validationErrors,
@@ -261,12 +261,12 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props): JSX.Element => {
 
                     if (validationErrors.error) {
                       dispatch({
-                        type: "setValidatioErrors",
+                        type: "setValidationErrors",
                         validationErrors,
                       });
                     } else {
                       dispatch({
-                        type: "setValidatioErrors",
+                        type: "setValidationErrors",
                         validationErrors: null,
                       });
                       update({ ...state.resourceEdit });

@@ -2616,8 +2616,6 @@ export type ReservationUnitByPkType = Node & {
   descriptionSv?: Maybe<Scalars["String"]>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
   haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
-  /** Maximum price of the reservation unit */
-  highestPrice: Scalars["Decimal"];
   /** The ID of the object */
   id: Scalars["ID"];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
@@ -2626,8 +2624,6 @@ export type ReservationUnitByPkType = Node & {
   isDraft: Scalars["Boolean"];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
-  /** Minimum price of the reservation unit */
-  lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Duration"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
@@ -2644,11 +2640,7 @@ export type ReservationUnitByPkType = Node & {
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
-  /** Unit of the price */
-  priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
   pricingTerms?: Maybe<TermsOfUseType>;
-  /** What kind of pricing types are available with this reservation unit. */
-  pricingType?: Maybe<ReservationUnitsReservationUnitPricingTypeChoices>;
   pricings?: Maybe<Array<Maybe<ReservationUnitPricingType>>>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
@@ -2693,7 +2685,6 @@ export type ReservationUnitByPkType = Node & {
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<ReservationUnitState>;
   surfaceArea?: Maybe<Scalars["Decimal"]>;
-  taxPercentage?: Maybe<TaxPercentageType>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -2768,13 +2759,9 @@ export type ReservationUnitCreateMutationInput = {
   descriptionFi?: InputMaybe<Scalars["String"]>;
   descriptionSv?: InputMaybe<Scalars["String"]>;
   equipmentPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  /** Maximum price of the reservation unit */
-  highestPrice?: InputMaybe<Scalars["Float"]>;
   /** Is reservation unit archived */
   isArchived?: InputMaybe<Scalars["Boolean"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
-  /** Minimum price of the reservation unit */
-  lowestPrice?: InputMaybe<Scalars["Float"]>;
   maxPersons?: InputMaybe<Scalars["Int"]>;
   maxReservationDuration?: InputMaybe<Scalars["Int"]>;
   maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
@@ -2786,12 +2773,8 @@ export type ReservationUnitCreateMutationInput = {
   nameSv?: InputMaybe<Scalars["String"]>;
   paymentTermsPk?: InputMaybe<Scalars["String"]>;
   paymentTypes?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
-  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit?: InputMaybe<Scalars["String"]>;
   pricingTerms?: InputMaybe<Scalars["String"]>;
   pricingTermsPk?: InputMaybe<Scalars["String"]>;
-  /** What kind of pricing type this reservation unit has. Possible values are PAID, FREE. */
-  pricingType?: InputMaybe<Scalars["String"]>;
   pricings?: InputMaybe<
     Array<InputMaybe<ReservationUnitPricingCreateSerializerInput>>
   >;
@@ -2838,7 +2821,6 @@ export type ReservationUnitCreateMutationInput = {
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
   spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   surfaceArea?: InputMaybe<Scalars["Float"]>;
-  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
   termsOfUseEn?: InputMaybe<Scalars["String"]>;
   termsOfUseFi?: InputMaybe<Scalars["String"]>;
   termsOfUseSv?: InputMaybe<Scalars["String"]>;
@@ -2865,8 +2847,6 @@ export type ReservationUnitCreateMutationPayload = {
   descriptionSv?: Maybe<Scalars["String"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  /** Maximum price of the reservation unit */
-  highestPrice?: Maybe<Scalars["Float"]>;
   /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   /** Is reservation unit archived */
@@ -2874,8 +2854,6 @@ export type ReservationUnitCreateMutationPayload = {
   isDraft?: Maybe<Scalars["Boolean"]>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
   location?: Maybe<Scalars["String"]>;
-  /** Minimum price of the reservation unit */
-  lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Int"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
@@ -2886,11 +2864,7 @@ export type ReservationUnitCreateMutationPayload = {
   nameSv?: Maybe<Scalars["String"]>;
   paymentTypes?: Maybe<Array<Maybe<Scalars["String"]>>>;
   pk?: Maybe<Scalars["Int"]>;
-  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit?: Maybe<Scalars["String"]>;
   pricingTerms?: Maybe<Scalars["String"]>;
-  /** What kind of pricing type this reservation unit has. Possible values are PAID, FREE. */
-  pricingType?: Maybe<Scalars["String"]>;
   pricings?: Maybe<Array<Maybe<ReservationUnitPricingType>>>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
@@ -3114,8 +3088,6 @@ export type ReservationUnitType = Node & {
   descriptionFi?: Maybe<Scalars["String"]>;
   descriptionSv?: Maybe<Scalars["String"]>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
-  /** Maximum price of the reservation unit */
-  highestPrice: Scalars["Decimal"];
   /** The ID of the object */
   id: Scalars["ID"];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
@@ -3124,8 +3096,6 @@ export type ReservationUnitType = Node & {
   isDraft: Scalars["Boolean"];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
-  /** Minimum price of the reservation unit */
-  lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Duration"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
@@ -3140,11 +3110,7 @@ export type ReservationUnitType = Node & {
   paymentTerms?: Maybe<TermsOfUseType>;
   paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
   pk?: Maybe<Scalars["Int"]>;
-  /** Unit of the price */
-  priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
   pricingTerms?: Maybe<TermsOfUseType>;
-  /** What kind of pricing types are available with this reservation unit. */
-  pricingType?: Maybe<ReservationUnitsReservationUnitPricingTypeChoices>;
   pricings?: Maybe<Array<Maybe<ReservationUnitPricingType>>>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
@@ -3189,7 +3155,6 @@ export type ReservationUnitType = Node & {
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<ReservationUnitState>;
   surfaceArea?: Maybe<Scalars["Decimal"]>;
-  taxPercentage?: Maybe<TaxPercentageType>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -3274,13 +3239,9 @@ export type ReservationUnitUpdateMutationInput = {
   descriptionFi?: InputMaybe<Scalars["String"]>;
   descriptionSv?: InputMaybe<Scalars["String"]>;
   equipmentPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  /** Maximum price of the reservation unit */
-  highestPrice?: InputMaybe<Scalars["Float"]>;
   /** Is reservation unit archived */
   isArchived?: InputMaybe<Scalars["Boolean"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
-  /** Minimum price of the reservation unit */
-  lowestPrice?: InputMaybe<Scalars["Float"]>;
   maxPersons?: InputMaybe<Scalars["Int"]>;
   maxReservationDuration?: InputMaybe<Scalars["Int"]>;
   maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
@@ -3293,12 +3254,8 @@ export type ReservationUnitUpdateMutationInput = {
   paymentTermsPk?: InputMaybe<Scalars["String"]>;
   paymentTypes?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   pk: Scalars["Int"];
-  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit?: InputMaybe<Scalars["String"]>;
   pricingTerms?: InputMaybe<Scalars["String"]>;
   pricingTermsPk?: InputMaybe<Scalars["String"]>;
-  /** What kind of pricing type this reservation unit has. Possible values are PAID, FREE. */
-  pricingType?: InputMaybe<Scalars["String"]>;
   pricings: Array<InputMaybe<ReservationUnitPricingUpdateSerializerInput>>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: InputMaybe<Scalars["DateTime"]>;
@@ -3343,7 +3300,6 @@ export type ReservationUnitUpdateMutationInput = {
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
   spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   surfaceArea?: InputMaybe<Scalars["Float"]>;
-  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
   termsOfUseEn?: InputMaybe<Scalars["String"]>;
   termsOfUseFi?: InputMaybe<Scalars["String"]>;
   termsOfUseSv?: InputMaybe<Scalars["String"]>;
@@ -3370,8 +3326,6 @@ export type ReservationUnitUpdateMutationPayload = {
   descriptionSv?: Maybe<Scalars["String"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  /** Maximum price of the reservation unit */
-  highestPrice?: Maybe<Scalars["Float"]>;
   /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   /** Is reservation unit archived */
@@ -3379,8 +3333,6 @@ export type ReservationUnitUpdateMutationPayload = {
   isDraft?: Maybe<Scalars["Boolean"]>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
   location?: Maybe<Scalars["String"]>;
-  /** Minimum price of the reservation unit */
-  lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Int"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
@@ -3391,11 +3343,7 @@ export type ReservationUnitUpdateMutationPayload = {
   nameSv?: Maybe<Scalars["String"]>;
   paymentTypes?: Maybe<Array<Maybe<Scalars["String"]>>>;
   pk?: Maybe<Scalars["Int"]>;
-  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit?: Maybe<Scalars["String"]>;
   pricingTerms?: Maybe<Scalars["String"]>;
-  /** What kind of pricing type this reservation unit has. Possible values are PAID, FREE. */
-  pricingType?: Maybe<Scalars["String"]>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
@@ -3473,24 +3421,6 @@ export enum ReservationUnitsReservationUnitImageImageTypeChoices {
 }
 
 /** An enumeration. */
-export enum ReservationUnitsReservationUnitPriceUnitChoices {
-  /** fixed */
-  Fixed = "FIXED",
-  /** per 15 minutes */
-  Per_15Mins = "PER_15_MINS",
-  /** per 30 minutes */
-  Per_30Mins = "PER_30_MINS",
-  /** per day */
-  PerDay = "PER_DAY",
-  /** per half a day */
-  PerHalfDay = "PER_HALF_DAY",
-  /** per hour */
-  PerHour = "PER_HOUR",
-  /** per week */
-  PerWeek = "PER_WEEK",
-}
-
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
   /** fixed */
   Fixed = "FIXED",
@@ -3524,14 +3454,6 @@ export enum ReservationUnitsReservationUnitPricingStatusChoices {
   Future = "FUTURE",
   /** past */
   Past = "PAST",
-}
-
-/** An enumeration. */
-export enum ReservationUnitsReservationUnitPricingTypeChoices {
-  /** Free */
-  Free = "FREE",
-  /** Paid */
-  Paid = "PAID",
 }
 
 /** An enumeration. */

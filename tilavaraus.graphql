@@ -2423,16 +2423,6 @@ type ReservationUnitByPkType implements Node {
   bufferTimeAfter: Duration
   cancellationRule: ReservationUnitCancellationRuleType
 
-  """Unit of the price"""
-  priceUnit: ReservationUnitsReservationUnitPriceUnitChoices!
-
-  """Minimum price of the reservation unit"""
-  lowestPrice: Decimal!
-
-  """Maximum price of the reservation unit"""
-  highestPrice: Decimal!
-  taxPercentage: TaxPercentageType
-
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
@@ -2474,9 +2464,6 @@ type ReservationUnitByPkType implements Node {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
-
-  """What kind of pricing types are available with this reservation unit."""
-  pricingType: ReservationUnitsReservationUnitPricingTypeChoices
   paymentTypes: [ReservationUnitPaymentTypeType]
 
   """
@@ -2577,17 +2564,6 @@ input ReservationUnitCreateMutationInput {
   cancellationTermsPk: String
   serviceSpecificTermsPk: String
 
-  """Minimum price of the reservation unit"""
-  lowestPrice: Float
-
-  """Maximum price of the reservation unit"""
-  highestPrice: Float
-
-  """
-  Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
-  """
-  priceUnit: String
-
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
@@ -2595,7 +2571,6 @@ input ReservationUnitCreateMutationInput {
   INTERVAL_90_MINS.
   """
   reservationStartInterval: String
-  taxPercentagePk: Int
 
   """
   Time when making reservations become possible for this reservation unit.
@@ -2645,31 +2620,26 @@ input ReservationUnitCreateMutationInput {
   isArchived: Boolean
   pricingTermsPk: String
   pricingTerms: String
-
-  """
-  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
-  """
-  pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2718,17 +2688,6 @@ type ReservationUnitCreateMutationPayload {
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
-
-  """Minimum price of the reservation unit"""
-  lowestPrice: Float
-
-  """Maximum price of the reservation unit"""
-  highestPrice: Float
-
-  """
-  Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
-  """
-  priceUnit: String
 
   """
   Determines the interval for the start time of the reservation. For example an
@@ -2785,31 +2744,26 @@ type ReservationUnitCreateMutationPayload {
   isArchived: Boolean
   state: String
   pricingTerms: String
-
-  """
-  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
-  """
-  pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3020,30 +2974,6 @@ enum ReservationUnitsReservationUnitImageImageTypeChoices {
 }
 
 """An enumeration."""
-enum ReservationUnitsReservationUnitPriceUnitChoices {
-  """per 15 minutes"""
-  PER_15_MINS
-
-  """per 30 minutes"""
-  PER_30_MINS
-
-  """per hour"""
-  PER_HOUR
-
-  """per half a day"""
-  PER_HALF_DAY
-
-  """per day"""
-  PER_DAY
-
-  """per week"""
-  PER_WEEK
-
-  """fixed"""
-  FIXED
-}
-
-"""An enumeration."""
 enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
   """per 15 minutes"""
   PER_15_MINS
@@ -3086,15 +3016,6 @@ enum ReservationUnitsReservationUnitPricingStatusChoices {
 
   """future"""
   FUTURE
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitPricingTypeChoices {
-  """Paid"""
-  PAID
-
-  """Free"""
-  FREE
 }
 
 """An enumeration."""
@@ -3175,16 +3096,6 @@ type ReservationUnitType implements Node {
   bufferTimeAfter: Duration
   cancellationRule: ReservationUnitCancellationRuleType
 
-  """Unit of the price"""
-  priceUnit: ReservationUnitsReservationUnitPriceUnitChoices!
-
-  """Minimum price of the reservation unit"""
-  lowestPrice: Decimal!
-
-  """Maximum price of the reservation unit"""
-  highestPrice: Decimal!
-  taxPercentage: TaxPercentageType
-
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
@@ -3226,9 +3137,6 @@ type ReservationUnitType implements Node {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
-
-  """What kind of pricing types are available with this reservation unit."""
-  pricingType: ReservationUnitsReservationUnitPricingTypeChoices
   paymentTypes: [ReservationUnitPaymentTypeType]
 
   """
@@ -3340,17 +3248,6 @@ input ReservationUnitUpdateMutationInput {
   cancellationTermsPk: String
   serviceSpecificTermsPk: String
 
-  """Minimum price of the reservation unit"""
-  lowestPrice: Float
-
-  """Maximum price of the reservation unit"""
-  highestPrice: Float
-
-  """
-  Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
-  """
-  priceUnit: String
-
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
@@ -3358,7 +3255,6 @@ input ReservationUnitUpdateMutationInput {
   INTERVAL_90_MINS.
   """
   reservationStartInterval: String
-  taxPercentagePk: Int
 
   """
   Time when making reservations become possible for this reservation unit.
@@ -3408,31 +3304,26 @@ input ReservationUnitUpdateMutationInput {
   isArchived: Boolean
   pricingTermsPk: String
   pricingTerms: String
-
-  """
-  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
-  """
-  pricingType: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -3481,17 +3372,6 @@ type ReservationUnitUpdateMutationPayload {
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
-
-  """Minimum price of the reservation unit"""
-  lowestPrice: Float
-
-  """Maximum price of the reservation unit"""
-  highestPrice: Float
-
-  """
-  Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
-  """
-  priceUnit: String
 
   """
   Determines the interval for the start time of the reservation. For example an
@@ -3548,30 +3428,25 @@ type ReservationUnitUpdateMutationPayload {
   isArchived: Boolean
   state: String
   pricingTerms: String
-
-  """
-  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
-  """
-  pricingType: String
   paymentTypes: [String]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4316,15 +4191,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -4334,15 +4209,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

@@ -41,7 +41,7 @@ type Action =
     }
   | { type: "clearNotification" }
   | {
-      type: "setValidatioErrors";
+      type: "setValidationErrors";
       validationErrors: Joi.ValidationResult | null;
     }
   | { type: "clearError" }
@@ -149,7 +149,7 @@ const reducer = (state: State, action: Action): State => {
       });
     }
 
-    case "setValidatioErrors": {
+    case "setValidationErrors": {
       return {
         ...state,
         validationErrors: action.validationErrors,
@@ -383,7 +383,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
                   e.preventDefault();
                   const validationErrors = schema.validate(state.spaceEdit);
                   if (validationErrors.error) {
-                    dispatch({ type: "setValidatioErrors", validationErrors });
+                    dispatch({ type: "setValidationErrors", validationErrors });
                   } else {
                     onSave();
                   }

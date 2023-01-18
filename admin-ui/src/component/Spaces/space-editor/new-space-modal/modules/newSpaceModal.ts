@@ -102,7 +102,7 @@ export type Action =
   | { type: "setParent"; parentPk: number | null; parentName: string | null }
   | { type: "setUnit"; unit: UnitByPkType }
   | {
-      type: "setValidatioErrors";
+      type: "setValidationErrors";
       validationErrors: (Joi.ValidationResult | null)[];
     }
   | { type: "nextPage" }

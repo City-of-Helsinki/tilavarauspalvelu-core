@@ -46,7 +46,7 @@ type State = {
 type Action =
   | { type: "set"; value: EditorProp }
   | {
-      type: "setValidatioErrors";
+      type: "setValidationErrors";
       validationErrors: Joi.ValidationResult | null;
     };
 
@@ -63,7 +63,7 @@ const reducer = (state: State, action: Action): State => {
     case "set": {
       return modifyEditorState(state, { ...action.value });
     }
-    case "setValidatioErrors": {
+    case "setValidationErrors": {
       return {
         ...state,
         validationErrors: action.validationErrors,
@@ -214,7 +214,7 @@ const NewResourceModal = ({
             const validationErrors = schema.validate(state.resource);
 
             if (validationErrors.error) {
-              dispatch({ type: "setValidatioErrors", validationErrors });
+              dispatch({ type: "setValidationErrors", validationErrors });
             } else {
               create({ ...state.resource });
             }
