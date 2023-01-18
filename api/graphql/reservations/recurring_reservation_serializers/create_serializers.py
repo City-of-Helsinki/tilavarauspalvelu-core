@@ -49,7 +49,7 @@ class RecurringReservationCreateSerializer(PrimaryKeySerializer):
     end_date = serializers.DateField(
         required=True, help_text="Date when last reservation begins."
     )
-    interval = serializers.IntegerField(required=True)
+    recurrence_in_days = serializers.IntegerField(required=True)
 
     class Meta:
         model = RecurringReservation
@@ -60,7 +60,7 @@ class RecurringReservationCreateSerializer(PrimaryKeySerializer):
             "reservation_unit_pk",
             "age_group_pk",
             "ability_group_pk",
-            "interval",
+            "recurrence_in_days",
             "weekdays",
             "begin_time",
             "end_time",
@@ -112,13 +112,11 @@ class RecurringReservationCreateSerializer(PrimaryKeySerializer):
 
         return ",".join(days)
 
-    def validate_interval(self, interval):
-        allowed_values = [i for i in range(170) if i % 7 == 0]
-        interval = interval or getattr(self.instance, "interval", None)
-        if interval in allowed_values:
-            return interval
+    def validate_recurrence_in_days(self, recurrence_in_days):
+        if recurrence_in_days == 0 or recurrence_in_days % 7 != 0:
+            raise ValidationErrorWithCode(
+                "Interval value not allowed, allowed values are 7,14,28 etc. divisible by seven.",
+                ValidationErrorCodes.INVALID_RECURRENCE_IN_DAY,
+            )
 
-        raise ValidationErrorWithCode(
-            "Interval value not allowed, allowed values are 7,14,28 etc. divisible by seven.",
-            ValidationErrorCodes.INVALID_INTERVAL,
-        )
+        return recurrence_in_days

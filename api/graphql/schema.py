@@ -145,6 +145,9 @@ from .applications.application_mutations import (
     ApplicationFlagMutation,
     ApplicationUpdateMutation,
 )
+from .reservations.recurring_reservation_mutations import (
+    RecurringReservationCreateMutation,
+)
 
 
 class AllowAuthenticatedFilter(AuthFilter):
@@ -477,6 +480,8 @@ class Mutation(graphene.ObjectType):
     update_application_event_schedule_result = (
         ApplicationEventScheduleResultUpdateMutation.Field()
     )
+
+    create_recurring_reservation = RecurringReservationCreateMutation.Field()
 
     create_reservation = ReservationCreateMutation.Field()
     create_staff_reservation = ReservationStaffCreateMutation.Field()
