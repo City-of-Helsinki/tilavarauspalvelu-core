@@ -5,7 +5,7 @@ import React, { useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Link from "next/link";
 import styled from "styled-components";
-import { fontMedium, H1 } from "common/src/common/typography";
+import { fontMedium, fontRegular, H1 } from "common/src/common/typography";
 import { Reservation } from "common/src/reservation-form/types";
 import {
   ReservationsReservationStateChoices,
@@ -49,6 +49,11 @@ const Anchor = styled.a`
   ${fontMedium}
 `;
 
+const InlineAnchor = styled(Anchor)`
+  display: inline;
+  ${fontRegular};
+`;
+
 const ReservationConfirmation = ({
   reservation,
   reservationUnit,
@@ -84,7 +89,9 @@ const ReservationConfirmation = ({
             }`}
             t={t}
             values={{ user: reservation?.user.email }}
-          />
+          >
+            <InlineAnchor href={reservationsUrl}> </InlineAnchor>
+          </Trans>
         </Paragraph>
         <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
           <BlackButton
@@ -118,12 +125,6 @@ const ReservationConfirmation = ({
           <Link href="/" passHref>
             <Anchor>
               {t("common:gotoFrontpage")}
-              <IconArrowRight aria-hidden size="m" />
-            </Anchor>
-          </Link>
-          <Link href={reservationsUrl} passHref>
-            <Anchor>
-              {t("navigation:Item.reservations")}
               <IconArrowRight aria-hidden size="m" />
             </Anchor>
           </Link>

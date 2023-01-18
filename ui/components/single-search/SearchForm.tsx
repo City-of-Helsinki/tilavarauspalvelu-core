@@ -464,6 +464,7 @@ const SearchForm = ({
                 </FilterTags>
                 {Object.keys(formValues).length > 0 && (
                   <ResetButton
+                    aria-label={t("searchForm:resetForm")}
                     onClick={() => removeValue()}
                     onDelete={() => removeValue()}
                     data-test-id="search-form__reset-button"

@@ -79,6 +79,7 @@ export const reservationApplicationFields = {
     "reservee_address_city",
     "reservee_email",
     "reservee_phone",
+    "home_city",
     "billing_first_name",
     "billing_last_name",
     "billing_phone",

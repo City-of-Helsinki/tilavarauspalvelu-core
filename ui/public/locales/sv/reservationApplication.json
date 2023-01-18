@@ -51,6 +51,7 @@
       "reserveeAddressCity": "",
       "reserveeEmail": "",
       "reserveePhone": "",
+      "homeCity": "",
       "showBillingAddress": "",
       "billingFirstName": "",
       "billingLastName": "",
