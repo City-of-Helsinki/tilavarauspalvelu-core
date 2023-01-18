@@ -389,7 +389,14 @@ class RecurringReservationPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        return False
+        reservation_unit_id = input.get("reservation_unit_pk", None)
+
+        if not reservation_unit_id:
+            return False
+
+        reservation_unit_qs = ReservationUnit.objects.filter(id=reservation_unit_id)
+
+        return can_create_staff_reservation(info.context.user, reservation_unit_qs)
 
 
 class PurposePermission(BasePermission):

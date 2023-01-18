@@ -505,7 +505,9 @@ def can_refresh_order(user: User, payment_order: PaymentOrder) -> bool:
     )
 
 
-def can_create_staff_reservation(user: User, reservation_unit):
+def can_create_staff_reservation(
+    user: User, reservation_unit: Iterable[ReservationUnit]
+):
     permission = "can_create_staff_reservations"
 
     units = [r.unit_id for r in reservation_unit]
