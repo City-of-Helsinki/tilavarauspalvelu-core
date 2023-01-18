@@ -25,17 +25,7 @@
     "startNewApplication": "Apply",
     "heading": "Seasonal booking application",
     "createFailedHeading": "Application creation failed",
-    "createFailedContent": "Application creation failed",
-    "faq1": {
-      "question": ""
-    },
-    "faq2": {
-      "question": ""
-    },
-
-    "faq3": {
-      "question": ""
-    }
+    "createFailedContent": "Application creation failed"
   },
   "applicationEventSaved": "Booking saved",
   "Page1": {

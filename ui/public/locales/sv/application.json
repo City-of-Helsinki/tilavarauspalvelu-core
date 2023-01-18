@@ -25,17 +25,7 @@
     "startNewApplication": "Fyll i ansökan",
     "heading": "Säsongbokningsansökan",
     "createFailedHeading": "Kunde inte skapa en ansökan",
-    "createFailedContent": "Försök igen senare",
-    "faq1": {
-      "question": ""
-    },
-    "faq2": {
-      "question": ""
-    },
-
-    "faq3": {
-      "question": ""
-    }
+    "createFailedContent": "Försök igen senare"
   },
   "applicationEventSaved": "Säsongsbokning sparad på ansökningen",
   "Page1": {

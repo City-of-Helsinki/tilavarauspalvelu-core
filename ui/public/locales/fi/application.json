@@ -25,17 +25,7 @@
     "startNewApplication": "Täytä hakemus",
     "heading": "Kausivaraushakemus",
     "createFailedHeading": "Hakemuksen luominen epäonnistui",
-    "createFailedContent": "Yritä myöhemmin uudelleen",
-    "faq1": {
-      "question": "Edustan yhdistystä tai rekisteröitymätöntä ryhmää, kuinka toimin?"
-    },
-    "faq2": {
-      "question": "Kuinka hakemusten käsittely tapahtuu?"
-    },
-
-    "faq3": {
-      "question": "Kuinka täytän kausivaraushakemuksen yksityishenkilönä?"
-    }
+    "createFailedContent": "Yritä myöhemmin uudelleen"
   },
   "applicationEventSaved": "Kausivaraus tallennettu hakemukselle",
   "Page1": {
