@@ -255,7 +255,7 @@ class ReservationCreateSerializer(
         if max_count is not None:
             current_reservation_pk = getattr(self.instance, "pk", None)
             reservation_count = (
-                Reservation.objects.filter(user=user)
+                Reservation.objects.filter(user=user, reservation_unit=reservation_unit)
                 .exclude(pk=current_reservation_pk)
                 .active()
                 .count()

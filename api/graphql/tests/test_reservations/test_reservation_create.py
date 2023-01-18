@@ -866,6 +866,47 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).is_none()
         assert_that(Reservation.objects.exists()).is_true()
 
+    def test_reservations_from_other_runits_are_not_counted_towards_max_reservations_per_user(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.max_reservations_per_user = 1
+        self.reservation_unit.save(update_fields=["max_reservations_per_user"])
+
+        other_reservation_unit = ReservationUnitFactory(
+            spaces=[self.space],
+            name="other resunit",
+            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            buffer_time_before=datetime.timedelta(minutes=30),
+            buffer_time_after=datetime.timedelta(minutes=30),
+        )
+
+        ReservationFactory(
+            reservation_unit=[other_reservation_unit],
+            begin=datetime.datetime.now() + datetime.timedelta(hours=24),
+            end=datetime.datetime.now() + datetime.timedelta(hours=25),
+            state=STATE_CHOICES.CONFIRMED,
+            user=self.regular_joe,
+        )
+
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=datetime.datetime.now() - datetime.timedelta(hours=25),
+            end=datetime.datetime.now() - datetime.timedelta(hours=24),
+            state=STATE_CHOICES.CONFIRMED,
+            user=self.regular_joe,
+        )
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+        assert_that(Reservation.objects.exists()).is_true()
+
     def test_creating_reservation_copies_sku_from_reservation_unit(
         self, mock_periods, mock_opening_hours
     ):
