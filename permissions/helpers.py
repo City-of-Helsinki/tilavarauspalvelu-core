@@ -391,11 +391,8 @@ def can_modify_recurring_reservation(
     user: User, recurring_reservation: RecurringReservation
 ) -> bool:
     permission = "can_manage_reservations"
-    res_unit_ids = recurring_reservation.reservations.values_list(
-        "reservation_unit", flat=True
-    )
-    reservation_units = ReservationUnit.objects.filter(id__in=res_unit_ids)
-    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    res_unit = recurring_reservation.reservation_unit
+    units = Unit.objects.filter(reservationunit=res_unit)
     service_sectors = ServiceSector.objects.filter(units__in=units)
 
     return (

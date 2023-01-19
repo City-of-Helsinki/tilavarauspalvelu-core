@@ -26,6 +26,7 @@ from permissions.helpers import (
     can_manage_units_reservation_units,
     can_manage_units_spaces,
     can_modify_application,
+    can_modify_recurring_reservation,
     can_modify_reservation,
     can_read_application,
     can_refresh_order,
@@ -389,6 +390,17 @@ class RecurringReservationPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk", None)
+
+        if pk:
+            recurring_reservation = RecurringReservation.objects.filter(id=pk).first()
+            if not recurring_reservation:
+                return False
+
+            return can_modify_recurring_reservation(
+                info.context.user, recurring_reservation
+            )
+
         reservation_unit_id = input.get("reservation_unit_pk", None)
 
         if not reservation_unit_id:
