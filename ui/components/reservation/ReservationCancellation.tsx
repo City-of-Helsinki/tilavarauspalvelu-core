@@ -237,16 +237,13 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
 
   const reservationUnit = reservation.reservationUnits[0];
 
-  const onSubmit = (formData: {
-    reason: { value: number };
-    description?: string;
-  }) => {
+  const onSubmit = (formData: { reason: number; description?: string }) => {
     const { reason, description } = formData;
     cancelReservation({
       variables: {
         input: {
           pk: reservation.pk,
-          cancelReasonPk: reason.value,
+          cancelReasonPk: reason,
           cancelDetails: description,
         },
       },
