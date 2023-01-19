@@ -147,6 +147,7 @@ from .applications.application_mutations import (
 )
 from .reservations.recurring_reservation_mutations import (
     RecurringReservationCreateMutation,
+    RecurringReservationUpdateMutation,
 )
 
 
@@ -482,6 +483,7 @@ class Mutation(graphene.ObjectType):
     )
 
     create_recurring_reservation = RecurringReservationCreateMutation.Field()
+    update_recurring_reservation = RecurringReservationUpdateMutation.Field()
 
     create_reservation = ReservationCreateMutation.Field()
     create_staff_reservation = ReservationStaffCreateMutation.Field()

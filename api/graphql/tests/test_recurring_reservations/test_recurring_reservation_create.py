@@ -16,7 +16,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.models import RecurringReservation, Reservation
+from reservations.models import RecurringReservation
 from reservations.tests.factories import AbilityGroupFactory, AgeGroupFactory
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory
 from tilavarauspalvelu.utils.commons import WEEKDAYS
@@ -187,7 +187,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
             "No permission to mutate"
         )
 
-        assert_that(Reservation.objects.exists()).is_false()
+        assert_that(RecurringReservation.objects.exists()).is_false()
 
     def test_create_fails_when_end_time_before_begin(self):
         self.client.force_login(self.general_admin)
@@ -205,7 +205,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
             ValidationErrorCodes.RESERVATION_BEGIN_AFTER_END.value
         )
 
-        assert_that(Reservation.objects.exists()).is_false()
+        assert_that(RecurringReservation.objects.exists()).is_false()
 
     def test_create_fails_when_end_date_before_begin(self):
         self.client.force_login(self.general_admin)
@@ -223,7 +223,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
             ValidationErrorCodes.RESERVATION_BEGIN_AFTER_END.value
         )
 
-        assert_that(Reservation.objects.exists()).is_false()
+        assert_that(RecurringReservation.objects.exists()).is_false()
 
     def test_create_fails_missing_required_fields(self):
         self.client.force_login(self.general_admin)
@@ -245,7 +245,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
             content = json.loads(response.content)
 
             assert_that(content.get("errors")).is_not_none()
-            assert_that(Reservation.objects.exists()).is_false()
+            assert_that(RecurringReservation.objects.exists()).is_false()
 
     def test_optional_fields(self):
         self.client.force_login(self.general_admin)
@@ -292,7 +292,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
             ValidationErrorCodes.INVALID_RECURRENCE_IN_DAY.value
         )
 
-        assert_that(Reservation.objects.exists()).is_false()
+        assert_that(RecurringReservation.objects.exists()).is_false()
 
     def test_user_is_request_user(self):
         self.client.force_login(self.general_admin)
