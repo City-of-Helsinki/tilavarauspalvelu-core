@@ -64,6 +64,7 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
     application_event_pk = graphene.Int()
     age_group = graphene.Field(AgeGroupType)
     ability_group = graphene.Field(AbilityGroupType)
+    weekdays = graphene.List(graphene.Int)
 
     class Meta:
         model = RecurringReservation
@@ -73,7 +74,20 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
             "application_event_pk",
             "age_group",
             "ability_group",
+            "name",
+            "reservation_unit",
+            "begin_time",
+            "end_time",
+            "begin_date",
+            "end_date",
+            "recurrence_in_days",
+            "weekdays",
+            "created",
         ]
+
+        filter_fields = ["name"]
+        interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     @recurring_reservation_non_public_field
     def resolve_user(self, info: ResolveInfo) -> [str]:
@@ -83,17 +97,20 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
 
     @recurring_reservation_non_public_field
     def resolve_application_pk(self, info: ResolveInfo) -> [graphene.Int]:
-        if not self.application_pk:
+        if not self.application_id:
             return None
 
-        return self.application_pk
+        return self.application_id
 
     @recurring_reservation_non_public_field
     def resolve_application_event_pk(self, info: ResolveInfo) -> [str]:
-        if not self.application_event_pk:
+        if not self.application_event_id:
             return None
 
-        return self.application_event_pk
+        return self.application_event_id
+
+    def resolve_weekdays(self, info: ResolveInfo) -> [graphene.List]:
+        return self.weekday_list
 
 
 class ReservationPurposeType(AuthNode, PrimaryKeyObjectType):

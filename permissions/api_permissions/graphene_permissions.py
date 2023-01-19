@@ -386,7 +386,7 @@ class RecurringReservationPermission(BasePermission):
 
     @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:
-        return False
+        return info.context.user.is_authenticated
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:

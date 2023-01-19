@@ -175,7 +175,9 @@ class RecurringReservation(models.Model):
 
     @property
     def weekday_list(self):
-        return [int(i) for i in self.weekdays.split(",")]
+        if self.weekdays:
+            return [int(i) for i in self.weekdays.split(",")]
+        return []
 
 
 class STATE_CHOISE_CONST(object):

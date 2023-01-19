@@ -68,6 +68,7 @@ from api.graphql.reservations.reservation_mutations import (
 )
 from api.graphql.reservations.reservation_types import (
     AgeGroupType,
+    RecurringReservationType,
     ReservationCancelReasonType,
     ReservationDenyReasonType,
     ReservationMetadataSetType,
@@ -108,6 +109,7 @@ from permissions.api_permissions.graphene_permissions import (
     PaymentOrderPermission,
     PurposePermission,
     QualifierPermission,
+    RecurringReservationPermission,
     ReservationMetadataSetPermission,
     ReservationPermission,
     ReservationPurposePermission,
@@ -124,6 +126,8 @@ from permissions.api_permissions.graphene_permissions import (
 from permissions.helpers import (
     can_handle_reservation,
     get_service_sectors_where_can_view_applications,
+    get_service_sectors_where_can_view_reservations,
+    get_units_where_can_view_reservations,
 )
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.models import Reservation
@@ -145,6 +149,7 @@ from .applications.application_mutations import (
     ApplicationFlagMutation,
     ApplicationUpdateMutation,
 )
+from .reservations.recurring_reservation_filtersets import RecurringReservationFilterSet
 from .reservations.recurring_reservation_mutations import (
     RecurringReservationCreateMutation,
     RecurringReservationUpdateMutation,
@@ -242,6 +247,32 @@ class ReservationsFilter(AuthFilter, django_filters.FilterSet):
 
         if not args.get("order_by", None):
             queryset = queryset.order_by("begin")
+        return queryset
+
+
+class RecurringReservationsFilter(AuthFilter, django_filters.FilterSet):
+    permission_classes = (RecurringReservationPermission,)
+
+    @classmethod
+    def resolve_queryset(
+        cls, connection, iterable, info, args, filtering_args, filterset_class
+    ):
+        queryset = super().resolve_queryset(
+            connection, iterable, info, args, filtering_args, filterset_class
+        )
+        user = info.context.user
+        viewable_units = get_units_where_can_view_reservations(user)
+        viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
+        if user.is_anonymous:
+            return queryset.none()
+        queryset = queryset.filter(
+            Q(reservation_unit__unit__in=viewable_units)
+            | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
+            | Q(user=user)
+        ).distinct()
+
+        if not args.get("order_by", None):
+            queryset = queryset.order_by("begin_date", "begin_time", "reservation_unit")
         return queryset
 
 
@@ -348,6 +379,10 @@ class Query(graphene.ObjectType):
         ReservationType, filterset_class=ReservationFilterSet
     )
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
+
+    recurring_reservations = RecurringReservationsFilter(
+        RecurringReservationType, filterset_class=RecurringReservationFilterSet
+    )
 
     reservation_cancel_reasons = ReservationCancelReasonFilter(
         ReservationCancelReasonType
