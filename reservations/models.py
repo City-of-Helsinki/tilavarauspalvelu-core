@@ -137,8 +137,12 @@ class RecurringReservation(models.Model):
         default="",
     )
 
-    interval = models.PositiveIntegerField(
+    recurrence_in_days = models.PositiveIntegerField(
         null=True,
+        help_text=_(
+            "How this recurring reservation's reservations occurs within days. "
+            "E.g 7 means that it occurs every week. 14 every other week"
+        ),
     )
 
     weekdays = models.CharField(
