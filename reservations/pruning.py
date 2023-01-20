@@ -2,8 +2,9 @@ import datetime
 from logging import getLogger
 
 from dateutil.relativedelta import relativedelta
+from django.utils.timezone import get_default_timezone
 
-from reservations.models import Reservation, ReservationStatistic
+from reservations.models import RecurringReservation, Reservation, ReservationStatistic
 
 logger = getLogger(__name__)
 
@@ -44,3 +45,15 @@ def prune_reservation_statistics(older_than_years: int) -> None:
     ).delete()
 
     logger.info(f"Pruned {num_deleted} reservation statistics.")
+
+
+def prune_recurring_reservations(remove_older_than_days) -> None:
+    """Deletes recurring reservations which does not have any reservations."""
+    created_before = datetime.datetime.now(tz=get_default_timezone()) - relativedelta(
+        days=remove_older_than_days
+    )
+    num_deleted, _ = RecurringReservation.objects.filter(
+        created__lte=created_before, reservations__isnull=True
+    ).delete()
+
+    logger.info(f"Pruned {num_deleted} recurring reservations.")

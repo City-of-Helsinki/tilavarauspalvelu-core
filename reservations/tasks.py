@@ -3,6 +3,7 @@ from tilavarauspalvelu.celery import app
 
 from .pruning import (
     prune_inactive_reservations,
+    prune_recurring_reservations,
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
@@ -16,6 +17,8 @@ PRUNE_OLDER_THAN_MINUTES = 20
 PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES = 5
 
 REMOVE_STATS_OLDER_THAN_YEARS = 5
+
+REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
 
 
 @app.task(name="prune_reservations")
@@ -39,3 +42,8 @@ def setup_periodic_tasks(sender, **kwargs) -> None:
 @app.task(name="prune_reservation_statistics")
 def prune_reservation_statistics_task(older_than_years=REMOVE_STATS_OLDER_THAN_YEARS):
     prune_reservation_statistics(older_than_years=older_than_years)
+
+
+@app.task(name="prune_recurring_reservations")
+def prune_recurring_reservations_task() -> None:
+    prune_recurring_reservations(REMOVE_RECURRINGS_OLDER_THAN_DAYS)
