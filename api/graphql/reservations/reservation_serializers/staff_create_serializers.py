@@ -16,6 +16,7 @@ from reservations.models import RESERVEE_LANGUAGE_CHOICES
 from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import (
     AgeGroup,
+    RecurringReservation,
     Reservation,
     ReservationPurpose,
     ReservationType,
@@ -27,6 +28,12 @@ DEFAULT_TIMEZONE = get_default_timezone()
 class ReservationStaffCreateSerializer(
     PrimaryKeySerializer, ReservationSchedulingMixin
 ):
+    recurring_reservation_pk = IntegerPrimaryKeyField(
+        queryset=RecurringReservation.objects.all(),
+        source="recurring_reservation",
+        required=False,
+        allow_null=True,
+    )
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
@@ -102,6 +109,7 @@ class ReservationStaffCreateSerializer(
             "unit_price",
             "type",
             "working_memo",
+            "recurring_reservation_pk",
         ]
 
     def __init__(self, *args, **kwargs):
