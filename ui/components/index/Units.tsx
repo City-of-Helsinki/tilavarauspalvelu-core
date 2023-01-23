@@ -23,12 +23,11 @@ const Heading = styled(H3).attrs({ as: "h2" })``;
 const Content = styled(Container)`
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-layout-s) var(--spacing-m) var(--spacing-layout-m);
+  padding: 0 var(--spacing-m) var(--spacing-layout-m);
 `;
 
 const UnitContainer = styled.div`
   gap: var(--spacing-l) 0;
-  margin-top: var(--spacing-m);
 
   @media (max-width: ${breakpoints.s}) {
     svg {
@@ -63,7 +62,7 @@ const UnitItem = styled.a`
   justify-content: space-between;
   gap: var(--spacing-xs);
   line-height: var(--lineheight-l);
-  font-size: 22px;
+  font-size: var(--fontsize-body-l);
 
   svg {
     min-width: 48px;

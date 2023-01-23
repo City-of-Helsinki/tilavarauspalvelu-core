@@ -27,7 +27,7 @@ const Heading = styled(H3).attrs({ as: "h2" })`
 const Content = styled(Container)`
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-layout-s) var(--spacing-m) var(--spacing-layout-m);
+  padding: var(--spacing-m);
 `;
 
 const Top = styled.div`
@@ -37,7 +37,7 @@ const Top = styled.div`
   gap: var(--spacing-m);
   padding-bottom: var(--spacing-m);
 
-  @media (min-width: ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.s}) {
     flex-direction: row;
     align-items: flex-end;
   }
@@ -47,7 +47,6 @@ const PurposeContainer = styled.div`
   display: grid;
   gap: var(--spacing-l) var(--spacing-m);
   grid-template-columns: 1fr;
-  margin-top: var(--spacing-m);
 
   @media (min-width: ${mobileBreakpoint}) {
     grid-template-columns: repeat(2, minmax(20px, 1fr));

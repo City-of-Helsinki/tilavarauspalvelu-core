@@ -18,12 +18,13 @@ const Wrapper = styled.div`
 const Content = styled(Container)`
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-layout-s) var(--spacing-m) 0;
+  padding: 0 var(--spacing-m);
 `;
 
 const Title = styled(H1)`
   ${fontRegular}
   margin-bottom: 0;
+  margin-top: var(--spacing-m);
 
   @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-l);
@@ -31,7 +32,7 @@ const Title = styled(H1)`
 `;
 
 const Ingress = styled.p`
-  margin: var(--spacing-l) 0;
+  margin: var(--spacing-m) 0;
   font-size: var(--fontsize-body-l);
 `;
 
