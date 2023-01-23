@@ -276,6 +276,8 @@ const ReservationUnitReservation = ({
     skip: !reservationData?.pk,
   });
 
+  useEffect(() => () => setDataContext(null), [setDataContext]);
+
   useEffect(() => {
     if (storedReservation) removeStoredReservation();
   }, [storedReservation, removeStoredReservation]);
