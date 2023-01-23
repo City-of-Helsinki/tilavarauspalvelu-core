@@ -1,13 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { H1 } from "common/src/common/typography";
+import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { HeroSubheading } from "../../modules/style/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import KorosDefault from "../common/KorosDefault";
 
-const Heading = styled(H1)``;
+const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const Container = styled.div`
   background-color: var(--tilavaraus-hero-background-color);

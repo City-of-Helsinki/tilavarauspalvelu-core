@@ -10,7 +10,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isEqual, omit, pick, sortBy } from "lodash";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import { OptionType } from "common/types/common";
-import { H1 } from "common/src/common/typography";
+import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicationRoundType,
@@ -91,7 +91,7 @@ const HeadContainer = styled.div`
   }
 `;
 
-const Title = styled(H1)`
+const Title = styled(H2).attrs({ as: "h1" })`
   margin-top: var(--spacing-xl);
 `;
 

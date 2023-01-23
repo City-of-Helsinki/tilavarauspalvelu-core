@@ -4,7 +4,7 @@ import { GetServerSideProps } from "next";
 import { sortBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H1, H3 } from "common/src/common/typography";
+import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicationRoundType,
@@ -65,7 +65,7 @@ const Head = styled.div`
   }
 `;
 
-const Heading = styled(H1)``;
+const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const SubHeading = styled(HeroSubheading)``;
 

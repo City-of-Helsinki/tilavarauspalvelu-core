@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
-import { H1 } from "common/src/common/typography";
+import { H2 } from "common/src/common/typography";
 import {
   ApplicationRoundType,
   Query,
@@ -66,6 +66,8 @@ const Wrapper = styled.div`
 const Content = styled(Container)`
   display: block;
 `;
+
+const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const Columns = styled.div`
   display: block;
@@ -340,7 +342,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
             </JustForDesktop>
           </div>
           <div>
-            <H1>
+            <Heading>
               {t(
                 `${
                   step === 0
@@ -348,7 +350,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
                     : "reservationCalendar:heading.pendingReservation"
                 }`
               )}
-            </H1>
+            </Heading>
             <StyledStepper
               language={i18n.language}
               selectedStep={step}

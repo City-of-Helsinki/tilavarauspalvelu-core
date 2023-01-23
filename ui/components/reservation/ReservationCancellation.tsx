@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import NotificationBox from "common/src/common/NotificationBox";
-import { fontMedium, H1 } from "common/src/common/typography";
+import { fontMedium, H2 } from "common/src/common/typography";
 import {
   Query,
   QueryReservationCancelReasonsArgs,
@@ -66,6 +66,8 @@ const Container = styled(NarrowCenteredContainer)`
     margin-bottom: var(--spacing-layout-l);
   }
 `;
+
+const Title = styled(H2).attrs({ as: "h1" })``;
 
 const Heading = styled.div`
   font-size: var(--fontsize-body-l);
@@ -261,13 +263,13 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
             <Heading>
               {formState === "unsent" ? (
                 <>
-                  <H1>{t("reservations:cancelReservation")}</H1>
+                  <Title>{t("reservations:cancelReservation")}</Title>
                   <JustForMobile>{bylineContent}</JustForMobile>
                   <p>{t("reservations:cancelReservationBody")}</p>
                 </>
               ) : (
                 <>
-                  <H1>{t("reservations:reservationCancelledTitle")}</H1>
+                  <Title>{t("reservations:reservationCancelledTitle")}</Title>
                   <JustForMobile>{bylineContent}</JustForMobile>
                   <p>
                     {t("reservations:reservationCancelledBody", {

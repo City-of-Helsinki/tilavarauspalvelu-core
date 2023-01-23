@@ -35,20 +35,20 @@ export const H1 = styled.h1`
   margin: var(--spacing-s) 0 var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
-    font-size: 3em;
+    font-size: var(--fontsize-heading-xxl);
     line-height: var(--lineheight-s);
   }
 `;
 
 export const H2 = styled.h2`
-  font-size: var(--fontsize-heading-m);
+  font-size: var(--fontsize-heading-l);
   ${fontRegular}
   line-height: var(--lineheight-s);
   margin-bottom: var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
-    font-size: 2em;
-    line-height: var(--lineheight-m);
+    font-size: var(--fontsize-heading-xl);
+    line-height: var(--lineheight-s);
   }
 `;
 

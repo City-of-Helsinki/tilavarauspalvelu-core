@@ -10,7 +10,7 @@ import { useLocalStorage } from "react-use";
 import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { OptionType } from "common/types/common";
-import { H1 } from "common/src/common/typography";
+import { H2 } from "common/src/common/typography";
 import {
   PageInfo,
   Query,
@@ -42,7 +42,7 @@ const HeadContainer = styled.div`
   padding-top: var(--spacing-layout-xs);
 `;
 
-const Heading = styled(H1)``;
+const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const Subheading = styled(HeroSubheading)`
   margin-bottom: var(--spacing-xs);

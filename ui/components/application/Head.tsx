@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { H1 } from "common/src/common/typography";
+import { H2 } from "common/src/common/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import KorosDefault from "../common/KorosDefault";
 
@@ -11,7 +11,7 @@ type HeadProps = {
   noKoros?: boolean;
 };
 
-const Heading = styled(H1)``;
+const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const Container = styled.div<{ $white: boolean }>`
   background-color: ${({ $white }) =>

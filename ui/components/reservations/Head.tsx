@@ -1,5 +1,5 @@
 import { breakpoints } from "common/src/common/style";
-import { H1 } from "common/src/common/typography";
+import { H2 } from "common/src/common/typography";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -17,6 +17,8 @@ const Content = styled.div`
   }
 `;
 
+const Heading = styled(H2).attrs({ as: "h1" })``;
+
 const Head = (): JSX.Element => {
   const { t } = useTranslation();
 
@@ -24,7 +26,7 @@ const Head = (): JSX.Element => {
     <Container>
       <BreadcrumbWrapper route={["reservations"]} />
       <Content>
-        <H1>{t(`navigation:Item.reservations`)}</H1>
+        <Heading>{t(`navigation:Item.reservations`)}</Heading>
       </Content>
     </Container>
   );

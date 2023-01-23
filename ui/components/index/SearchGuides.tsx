@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
-import { fontMedium, H2 } from "common/src/common/typography";
+import { fontMedium, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import Container from "../common/Container";
 
@@ -19,7 +19,7 @@ const Wrapper = styled(Container)`
   }
 `;
 
-const Heading = styled(H2)`
+const Heading = styled(H3)`
   margin-top: var(--spacing-s);
 `;
 

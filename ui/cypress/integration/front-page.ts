@@ -66,7 +66,7 @@ describe("Tilavaraus ui front page", () => {
   });
 
   it("displays search guide", () => {
-    cy.get('[data-test-id="search-guide__recurring"] h2').should(
+    cy.get('[data-test-id="search-guide__recurring"] h3').should(
       "contain",
       "Kausivarauksen tekeminen"
     );

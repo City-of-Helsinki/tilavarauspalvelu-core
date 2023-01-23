@@ -9,6 +9,11 @@ export const NarrowCenteredContainer = styled(Container)`
     padding-right: 130px;
   }
 `;
+export const ExtraNarrowCenteredContainer = styled(Container)`
+  @media (min-width: ${breakpoints.m}) {
+    max-width: 720px;
+  }
+`;
 
 const MobileWrapper = styled.div<{ $breakpoint: string }>`
   @media (min-width: ${({ $breakpoint }) => $breakpoint}) {

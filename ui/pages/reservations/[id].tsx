@@ -8,7 +8,7 @@ import { IconCalendar, IconCross, Notification } from "hds-react";
 import { useQuery } from "@apollo/client";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { H1, H4 } from "common/src/common/typography";
+import { H2, H4 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   Query,
@@ -109,7 +109,7 @@ const Container = styled(NarrowCenteredContainer)`
   }
 `;
 
-const Heading = styled(H1)`
+const Heading = styled(H2).attrs({ as: "h1" })`
   margin-top: 0;
   margin-bottom: var(--spacing-m);
 `;
