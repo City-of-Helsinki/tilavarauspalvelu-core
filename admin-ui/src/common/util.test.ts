@@ -4,6 +4,7 @@ import {
   parseDuration,
   secondsToHms,
   filterData,
+  formatDecimal,
 } from "./util";
 
 test("secondToHms", () => {
@@ -62,4 +63,17 @@ test("filterData", () => {
       ]
     )
   ).toEqual([{ name: "bar", size: 5 }]);
+});
+
+test("formatDecimal", () => {
+  expect(formatDecimal({ input: undefined, fallbackValue: 1 })).toEqual(1);
+  expect(formatDecimal({ input: undefined })).toEqual(0);
+
+  expect(formatDecimal({ input: "12.123456789" })).toEqual(12.123457);
+  expect(formatDecimal({ input: "12.123456789", decimals: 3 })).toEqual(12.123);
+  expect(formatDecimal({ input: "12.123456789", decimals: 0 })).toEqual(12);
+
+  expect(formatDecimal({ input: 12.123456789 })).toEqual(12.123457);
+  expect(formatDecimal({ input: 12.123456789, decimals: 3 })).toEqual(12.123);
+  expect(formatDecimal({ input: 12.123456789, decimals: 0 })).toEqual(12);
 });
