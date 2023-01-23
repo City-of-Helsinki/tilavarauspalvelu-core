@@ -426,7 +426,6 @@ const QuickReservation = ({
             setTime(timeVal);
           }}
         />
-
         <StyledSelect
           key={`durationSelect-${duration.value}`}
           id={`${idPrefix}-quick-reservation-duration`}

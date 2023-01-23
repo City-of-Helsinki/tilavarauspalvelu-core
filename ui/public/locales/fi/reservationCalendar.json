@@ -84,9 +84,9 @@
   "quickReservation": {
     "heading": "Katso vapaat ajat ja varaa",
     "date": "Päivä",
-    "time": "Aika",
+    "time": "Aika (alkaen)",
     "duration": "Kesto (t:mm)",
-    "subheading": "Vapaat ajat",
+    "subheading": "Seuraavat vapaat ajat",
     "noTimes": "Ei vapaita aikoja",
     "gotoCalendar": "Katso kaikki vapaat ajat",
     "nextAvailableTime": "Näytä seuraava"
