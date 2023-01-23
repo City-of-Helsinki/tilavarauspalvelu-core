@@ -6,7 +6,6 @@ import { truncatedText } from "../../styles/util";
 
 type Props = {
   items?: LegendItem[];
-  wrapBreakpoint?: string;
 };
 
 type LegendItem = {
@@ -16,11 +15,11 @@ type LegendItem = {
   css?: FlattenSimpleInterpolation;
 };
 
-const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
+const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
+  margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-l);
-  padding-top: var(--spacing-l);
   width: 100%;
   gap: var(--spacing-s) var(--spacing-xs);
 
@@ -36,22 +35,8 @@ const Wrapper = styled.div<{ $wrapBreakpoint: string }>`
   }
 
   @media (min-width: ${breakpoints.l}) {
-    margin-top: var(--spacing-m);
-    gap: var(--spacing-m);
+    gap: var(--spacing-s);
   }
-
-  ${({ $wrapBreakpoint }) =>
-    $wrapBreakpoint &&
-    css`
-      @media (min-width: ${$wrapBreakpoint}) {
-        flex-direction: column;
-        position: absolute;
-        top: 440px;
-        left: calc(100% + var(--spacing-xl));
-        width: unset;
-        width: 200px;
-      }
-    `}
 `;
 
 const LegendItem = styled.div<{
@@ -67,16 +52,11 @@ const LegendItem = styled.div<{
       $border
         ? `border: 2px solid ${$border}`
         : "border: 1px solid var(--color-black-20)"};
-    width: 30px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     position: relative;
     box-sizing: border-box;
     ${({ $inlineCss }) => $inlineCss}
-
-    @media (min-width: ${breakpoints.l}) {
-      width: 54px;
-      height: 40px;
-    }
   }
 
   display: flex;
@@ -124,12 +104,8 @@ const defaultItems: LegendItem[] = [
     css: css`
       border-top: 4px double var(--color-black-40);
       border-bottom: 4px double var(--color-black-40);
-      height: 32px;
+      height: 40px;
       padding: 4px 0;
-
-      @media (min-width: ${breakpoints.l}) {
-        height: 40px !important;
-      }
     `,
   },
   {
@@ -142,14 +118,11 @@ const defaultItems: LegendItem[] = [
   },
 ];
 
-const Legend = ({
-  items = defaultItems,
-  wrapBreakpoint,
-}: Props): JSX.Element => {
+const Legend = ({ items = defaultItems }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <Wrapper $wrapBreakpoint={wrapBreakpoint} aria-hidden>
+    <Wrapper aria-hidden>
       {items.map(({ title, color, border, css: inlineCss }) => (
         <LegendItem
           key={title}
