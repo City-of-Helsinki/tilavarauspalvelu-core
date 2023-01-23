@@ -88,7 +88,7 @@ const ReservationInfoCard = ({
     date: begin && parseISO(begin),
   });
 
-  const beginTime = t("common:timeWithPrefix", {
+  const beginTime = t("common:timeWithPrefixInForm", {
     date: begin && parseISO(begin),
   });
 
@@ -96,14 +96,14 @@ const ReservationInfoCard = ({
     date: end && parseISO(end),
   });
 
-  const endTime = t("common:time", {
+  const endTime = t("common:timeInForm", {
     date: end && parseISO(end),
   });
 
   const duration = differenceInMinutes(new Date(end), new Date(begin));
 
   const timeString = trim(
-    `${beginDate} ${beginTime} - ${
+    `${beginDate} ${beginTime}-${
       endDate !== beginDate ? endDate : ""
     }${endTime}`,
     " - "

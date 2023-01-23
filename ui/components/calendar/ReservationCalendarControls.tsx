@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled, { CSSProperties } from "styled-components";
 import {
+  differenceInMinutes,
   differenceInSeconds,
   format,
   isValid,
@@ -46,6 +47,7 @@ import { DataContext, ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
+import { capitalize, formatDurationMinutes } from "../../modules/util";
 
 type Props<T> = {
   reservationUnit: ReservationUnitByPkType;
@@ -107,7 +109,6 @@ const TogglerLabel = styled.div`
 `;
 
 const TogglerDate = styled.div`
-  text-transform: capitalize;
   line-height: var(--lineheight-l);
   ${fontBold}
 `;
@@ -416,7 +417,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     date: begin && parseISO(begin),
   });
 
-  const beginTime = t("common:time", {
+  const beginTime = t("common:timeInForm", {
     date: begin && parseISO(begin),
   });
 
@@ -424,16 +425,23 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     date: end && parseISO(end),
   });
 
-  const endTime = t("common:time", {
+  const endTime = t("common:timeInForm", {
     date: end && parseISO(end),
   });
 
-  const togglerLabel = trim(
-    `${beginDate} ${beginTime}-${
-      endDate !== beginDate ? endDate : ""
-    }${endTime}`,
-    "-"
-  );
+  const togglerLabel = (() => {
+    const dateStr = trim(
+      `${beginDate} ${beginTime}-${
+        endDate !== beginDate ? endDate : ""
+      }${endTime}`,
+      "-"
+    );
+    const durationStr = formatDurationMinutes(
+      differenceInMinutes(new Date(end), new Date(begin))
+    );
+
+    return `${dateStr}, ${durationStr}`;
+  })();
 
   const price = getReservationUnitPrice({
     reservationUnit,
@@ -475,7 +483,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
                 <div>&nbsp;</div>
               ) : (
                 <>
-                  <TogglerDate>{togglerLabel}</TogglerDate>
+                  <TogglerDate>{capitalize(togglerLabel)}</TogglerDate>
                   <TogglerPrice>
                     {t("reservationUnit:price")}: {price}
                   </TogglerPrice>

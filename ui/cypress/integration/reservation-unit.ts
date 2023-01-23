@@ -60,7 +60,7 @@ const matchEvent = (): void => {
             .invoke("text")
             .then((duration) => {
               const [hours, minutes] = startTimeLabel.split(".");
-              const startTime = `${hours.padStart(2, "0")}.${minutes}`;
+              const startTime = `${hours.padStart(2, "0")}:${minutes}`;
               const [durationHours, durationMinutes] = duration.split(":");
               const endTime = format(
                 addMinutes(
@@ -70,9 +70,9 @@ const matchEvent = (): void => {
                   ),
                   Number(durationMinutes)
                 ),
-                "HH.mm"
+                "HH:mm"
               );
-              expect(text).to.eq(`${startTime} – ${endTime}`);
+              expect(text).to.eq(`${startTime}-${endTime}`);
             });
         });
     });
