@@ -30,7 +30,7 @@ interface Props {
 const Container = styled.div`
   display: block;
   background-color: var(--color-white);
-  margin-top: var(--spacing-s);
+  margin-top: var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
     display: grid;

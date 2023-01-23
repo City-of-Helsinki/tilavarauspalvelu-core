@@ -124,31 +124,31 @@ describe("Tilavaraus ui search page (single)", () => {
 
   it("handles mobile features", () => {
     cy.viewport("iphone-x");
+    inputUnitToggler().should("be.visible");
+    inputPurposeToggler().should("be.visible");
 
-    fullTextInput().should("be.visible");
+    fullTextInput().should("not.be.visible");
     inputMinPersons().should("not.be.visible");
     inputMaxPersons().should("not.be.visible");
     inputReservationUnitType().should("not.be.visible");
-    inputUnitToggler().should("not.be.visible");
-    inputPurposeToggler().should("not.be.visible");
 
     filterToggleButton().click();
 
+    inputUnitToggler().should("be.visible");
+    inputPurposeToggler().should("be.visible");
     fullTextInput().should("be.visible");
     inputMinPersons().should("be.visible");
     inputMaxPersons().should("be.visible");
     inputReservationUnitType().should("be.visible");
-    inputUnitToggler().should("be.visible");
-    inputPurposeToggler().should("be.visible");
 
     filterToggleButton().click();
 
-    fullTextInput().should("be.visible");
+    inputUnitToggler().should("be.visible");
+    inputPurposeToggler().should("be.visible");
+    fullTextInput().should("not.be.visible");
     inputMinPersons().should("not.be.visible");
     inputMaxPersons().should("not.be.visible");
     inputReservationUnitType().should("not.be.visible");
-    inputUnitToggler().should("not.be.visible");
-    inputPurposeToggler().should("not.be.visible");
 
     cy.a11yCheck();
   });

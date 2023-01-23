@@ -5,6 +5,7 @@ import styled from "styled-components";
 type Props = {
   from?: string;
   to?: string;
+  style?: React.CSSProperties;
 };
 
 const Wrapper = styled.div<{ $from: string; $to: string }>`
@@ -15,9 +16,9 @@ const Wrapper = styled.div<{ $from: string; $to: string }>`
   margin-bottom: -1px;
 `;
 
-const KorosDefault = ({ from, to }: Props): JSX.Element => {
+const KorosDefault = ({ from, to, ...rest }: Props): JSX.Element => {
   return (
-    <Wrapper $from={from} $to={to}>
+    <Wrapper $from={from} $to={to} {...rest}>
       <Koros type="basic" />
     </Wrapper>
   );

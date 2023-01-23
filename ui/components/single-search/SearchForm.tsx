@@ -54,8 +54,7 @@ const TopContainer = styled.div`
 const FilterToggleWrapper = styled.div`
   display: grid;
   justify-items: center;
-  margin-top: var(--spacing-l);
-  padding-bottom: var(--spacing-m);
+  margin: var(--spacing-xs) 0;
 `;
 
 const Hr = styled.hr`
@@ -64,7 +63,7 @@ const Hr = styled.hr`
 `;
 
 const Filters = styled.div<{ $areFiltersVisible: boolean }>`
-  margin-top: var(--spacing-l);
+  margin-top: 0;
   max-width: 100%;
   display: grid;
   grid-template-columns: 1fr;
@@ -75,7 +74,7 @@ const Filters = styled.div<{ $areFiltersVisible: boolean }>`
     !$areFiltersVisible &&
     `
     @media (max-width: ${desktopBreakpoint}) {
-    & > *:nth-child(n + 2) {
+    & > *:nth-child(n + 3) {
       display: none;
     }}
   `}
@@ -83,6 +82,34 @@ const Filters = styled.div<{ $areFiltersVisible: boolean }>`
   label {
     font-family: var(--font-medium);
     font-weight: 500;
+  }
+
+  @media (min-width: ${breakpoints.m}) {
+    margin-top: var(--spacing-s);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: ${breakpoints.l}) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+`;
+
+const StyledSelect = styled(Select)`
+  button {
+    display: grid;
+    text-align: left;
+  }
+
+  span {
+    ${truncatedText}
+  }
+`;
+
+const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
+  > div:first-of-type {
+    label {
+      width: calc(${({ children }) => children.length} * 100%);
+    }
   }
 
   .inputGroupEnd {
@@ -104,38 +131,13 @@ const Filters = styled.div<{ $areFiltersVisible: boolean }>`
     margin-right: 0;
   }
 
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-`;
-
-const StyledSelect = styled(Select)`
-  button {
-    display: grid;
-    text-align: left;
-  }
-
-  span {
-    ${truncatedText}
-  }
-`;
-
-const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
   display: grid;
   grid-template-columns: repeat(${({ children }) => children.length}, 1fr);
   ${({ $gap }) => $gap && `gap: ${$gap};`}
-
-  label {
-    width: 200%;
-  }
 `;
 
 const ButtonContainer = styled.div`
-  margin: var(--spacing-l) 0;
+  margin: var(--spacing-m) 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -166,20 +168,6 @@ const ResetButton = styled(StyledTag).attrs({
     "--tag-background": "transparent",
   },
 })``;
-
-const StyledMultiSelectDropdown = styled(MultiSelectDropdown)`
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: 2/4;
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: 2/3;
-  }
-
-  @media (min-width: ${breakpoints.xl}) {
-    grid-column: 2/4;
-  }
-`;
 
 const SubmitButton = styled(MediumButton)`
   width: 100%;
@@ -293,21 +281,56 @@ const SearchForm = ({
     [reservationUnitTypeOptions, unitOptions, purposeOptions]
   );
 
+  const formValueKeys = Object.keys(formValues);
+
   return (
     <>
       <TopContainer>
         <Filters $areFiltersVisible={areFiltersVisible}>
-          <TextInput
-            id="search"
-            label={t("searchForm:textSearchLabel")}
-            {...register("textSearch")}
-            placeholder={t("searchForm:searchTermPlaceholder")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSubmit(search)();
-              }
+          <MultiSelectDropdown
+            id="purposeFilter"
+            checkboxName="purposeFilter"
+            inputValue={purposeSearchInput}
+            name="purposes"
+            onChange={(selection: string[]): void => {
+              setValue("purposes", selection.filter((n) => n !== "").join(","));
             }}
-            defaultValue={formValues.textSearch}
+            options={purposeOptions}
+            setInputValue={setPurposeSearchInput}
+            showSearch
+            title={t("searchForm:purposesFilter")}
+            value={watch("purposes")?.split(",") || [""]}
+          />
+          <MultiSelectDropdown
+            id="unitFilter"
+            checkboxName="unitFilter"
+            inputValue={unitSearchInput}
+            name="unit"
+            onChange={(selection: string[]): void => {
+              setValue("unit", selection.filter((n) => n !== "").join(","));
+            }}
+            options={unitOptions}
+            setInputValue={setUnitSearchInput}
+            showSearch
+            title={t("searchForm:unitFilter")}
+            value={watch("unit")?.split(",") || [""]}
+          />
+          <MultiSelectDropdown
+            id="reservationUnitTypeFilter"
+            checkboxName="reservationUnitTypeFilter"
+            inputValue={reservationTypeSearchInput}
+            name="reservationType"
+            onChange={(selection: string[]): void => {
+              setValue(
+                "reservationUnitType",
+                selection.filter((n) => n !== "").join(",")
+              );
+            }}
+            options={reservationUnitTypeOptions}
+            setInputValue={setReservationTypeSearchInput}
+            showSearch
+            title={t("searchForm:typeLabel")}
+            value={watch("reservationUnitType")?.split(",") || [""]}
           />
           <Group>
             <StyledSelect
@@ -327,6 +350,7 @@ const SearchForm = ({
               key={`minPersons${getValues("minPersons")}`}
               className="inputSm inputGroupStart"
             />
+
             <StyledSelect
               id="participantMaxCountFilter"
               placeholder={t("common:maximum")}
@@ -345,50 +369,17 @@ const SearchForm = ({
               className="inputSm inputGroupEnd"
             />
           </Group>
-          <MultiSelectDropdown
-            id="reservationUnitTypeFilter"
-            checkboxName="reservationUnitTypeFilter"
-            inputValue={reservationTypeSearchInput}
-            name="reservationType"
-            onChange={(selection: string[]): void => {
-              setValue(
-                "reservationUnitType",
-                selection.filter((n) => n !== "").join(",")
-              );
+          <TextInput
+            id="search"
+            label={t("searchForm:textSearchLabel")}
+            {...register("textSearch")}
+            placeholder={t("searchForm:searchTermPlaceholder")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmit(search)();
+              }
             }}
-            options={reservationUnitTypeOptions}
-            setInputValue={setReservationTypeSearchInput}
-            showSearch
-            title={t("searchForm:typeLabel")}
-            value={watch("reservationUnitType")?.split(",") || [""]}
-          />
-          <MultiSelectDropdown
-            id="unitFilter"
-            checkboxName="unitFilter"
-            inputValue={unitSearchInput}
-            name="unit"
-            onChange={(selection: string[]): void => {
-              setValue("unit", selection.filter((n) => n !== "").join(","));
-            }}
-            options={unitOptions}
-            setInputValue={setUnitSearchInput}
-            showSearch
-            title={t("searchForm:unitFilter")}
-            value={watch("unit")?.split(",") || [""]}
-          />
-          <StyledMultiSelectDropdown
-            id="purposeFilter"
-            checkboxName="purposeFilter"
-            inputValue={purposeSearchInput}
-            name="purposes"
-            onChange={(selection: string[]): void => {
-              setValue("purposes", selection.filter((n) => n !== "").join(","));
-            }}
-            options={purposeOptions}
-            setInputValue={setPurposeSearchInput}
-            showSearch
-            title={t("searchForm:purposesFilter")}
-            value={watch("purposes")?.split(",") || [""]}
+            defaultValue={formValues.textSearch}
           />
         </Filters>
         <JustForDesktop customBreakpoint={desktopBreakpoint}>
@@ -416,70 +407,64 @@ const SearchForm = ({
       </JustForMobile>
       {areOptionsLoaded && (
         <ButtonContainer>
-          <TagControls>
-            {Object.keys(formValues).length > 0 && (
-              <>
-                <FilterTags data-test-id="search-form__filter--tags">
-                  {Object.keys(formValues)
-                    .sort(
-                      (a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
-                    )
-                    .map((value) => {
-                      const label = t(`searchForm:filters.${value}`, {
-                        label: value,
-                        value: formValues[value],
-                        count: Number(formValues[value]),
-                      });
-                      const result = multiSelectFilters.includes(value) ? (
-                        formValues[value].split(",").map((subValue) => (
-                          <StyledTag
-                            id={`filter-tag__${value}-${subValue}`}
-                            onClick={() => removeValue([subValue], value)}
-                            onDelete={() => removeValue([subValue], value)}
-                            key={`${value}-${subValue}`}
-                            deleteButtonAriaLabel={t(
-                              `searchForm:removeFilter`,
-                              {
-                                value: getFormSubValueLabel(value, subValue),
-                              }
-                            )}
-                          >
-                            {getFormSubValueLabel(value, subValue)}
-                          </StyledTag>
-                        ))
-                      ) : (
+          {formValueKeys.length > 0 && (
+            <TagControls>
+              <FilterTags data-test-id="search-form__filter--tags">
+                {formValueKeys
+                  .sort(
+                    (a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
+                  )
+                  .map((value) => {
+                    const label = t(`searchForm:filters.${value}`, {
+                      label: value,
+                      value: formValues[value],
+                      count: Number(formValues[value]),
+                    });
+                    const result = multiSelectFilters.includes(value) ? (
+                      formValues[value].split(",").map((subValue) => (
                         <StyledTag
-                          id={`filter-tag__${value}`}
-                          onDelete={() => removeValue([value])}
-                          key={value}
+                          id={`filter-tag__${value}-${subValue}`}
+                          onClick={() => removeValue([subValue], value)}
+                          onDelete={() => removeValue([subValue], value)}
+                          key={`${value}-${subValue}`}
                           deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                            value: label,
+                            value: getFormSubValueLabel(value, subValue),
                           })}
                         >
-                          {label}
+                          {getFormSubValueLabel(value, subValue)}
                         </StyledTag>
-                      );
-                      return result;
-                    })}
-                </FilterTags>
-                {Object.keys(formValues).length > 0 && (
-                  <ResetButton
-                    aria-label={t("searchForm:resetForm")}
-                    onClick={() => removeValue()}
-                    onDelete={() => removeValue()}
-                    data-test-id="search-form__reset-button"
-                  >
-                    {t("searchForm:resetForm")}
-                  </ResetButton>
-                )}
-              </>
-            )}
-          </TagControls>
+                      ))
+                    ) : (
+                      <StyledTag
+                        id={`filter-tag__${value}`}
+                        onDelete={() => removeValue([value])}
+                        key={value}
+                        deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+                          value: label,
+                        })}
+                      >
+                        {label}
+                      </StyledTag>
+                    );
+                    return result;
+                  })}
+              </FilterTags>
+              {formValueKeys.length > 0 && (
+                <ResetButton
+                  aria-label={t("searchForm:resetForm")}
+                  onClick={() => removeValue()}
+                  onDelete={() => removeValue()}
+                  data-test-id="search-form__reset-button"
+                >
+                  {t("searchForm:resetForm")}
+                </ResetButton>
+              )}
+            </TagControls>
+          )}
           <JustForMobile
             style={{ width: "100%" }}
             customBreakpoint={desktopBreakpoint}
           >
-            {" "}
             <SubmitButton
               id="searchButton"
               onClick={handleSubmit(search)}

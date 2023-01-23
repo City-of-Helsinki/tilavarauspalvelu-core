@@ -39,8 +39,8 @@ const HitCount = styled.div`
 
 const NoResults = styled.div`
   margin-top: var(--spacing-layout-s);
-  font-weight: 700;
-  font-size: var(--fontsize-heading-m);
+  font-size: var(--fontsize-body-l);
+  margin-bottom: var(--spacing-m);
 `;
 
 const ListContainer = styled.div`
