@@ -26,3 +26,5 @@ export const previewUrlPrefix =
 export const LIST_PAGE_SIZE = 36;
 
 export const ALLOCATION_CALENDAR_TIMES = [7, 23];
+
+export const NUMBER_OF_DECIMALS = 6;

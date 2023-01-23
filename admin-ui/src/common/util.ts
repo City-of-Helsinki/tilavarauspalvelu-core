@@ -20,6 +20,7 @@ import {
   NormalizedApplicationRoundStatus,
   TranslationObject,
 } from "./types";
+import { NUMBER_OF_DECIMALS } from "./const";
 
 export const DATE_FORMAT = "d.M.yyyy";
 export const DATE_FORMAT_SHORT = "d.M";
@@ -50,6 +51,23 @@ export const formatNumber = (
   const number = new Intl.NumberFormat("fi").format(input);
 
   return `${number}${suffix || ""}`;
+};
+
+// Formats decimal to n -places, and trims trailing zeroes
+export const formatDecimal = ({
+  input,
+  decimals = NUMBER_OF_DECIMALS,
+  fallbackValue = 0,
+}: {
+  input?: number | string;
+  decimals?: number;
+  fallbackValue?: number;
+}): number => {
+  if (!input) return fallbackValue;
+
+  const value = typeof input === "string" ? parseFloat(input) : input;
+
+  return parseFloat(value.toFixed(decimals));
 };
 
 interface IFormatDurationOutput {
