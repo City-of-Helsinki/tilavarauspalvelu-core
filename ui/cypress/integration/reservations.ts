@@ -13,6 +13,7 @@ import {
   reservationEditActionContinue,
   reservationEditActionBack,
   reservationEditActionSubmit,
+  durationSelectorToggle,
 } from "model/reservation-creation";
 import {
   cancelButton,
@@ -294,11 +295,14 @@ describe("Tilavaraus user reservations", () => {
 
     reservationEditActionContinue().should("be.disabled");
     reservationControlsDateInput().clear().type(newDate).blur();
+    reservationEditActionContinue().should("be.disabled");
     startTimeSelectorToggle()
       .click()
       .siblings("ul")
       .children("li:nth-of-type(2)")
       .click();
+    reservationEditActionContinue().should("be.disabled");
+    durationSelectorToggle().click().siblings("ul").children().eq(1).click();
 
     reservationEditActionContinue().should("not.be.disabled");
     reservationEditActionContinue().click();

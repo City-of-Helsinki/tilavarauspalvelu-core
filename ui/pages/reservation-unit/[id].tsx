@@ -1021,6 +1021,7 @@ const ReservationUnit = ({
                         end={initialReservation?.end}
                         resetReservation={() => {
                           setInitialReservation(null);
+                          setFocusDate(new Date());
                         }}
                         isSlotReservable={(startDate, endDate) =>
                           isSlotReservable(startDate, endDate)

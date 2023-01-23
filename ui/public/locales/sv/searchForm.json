@@ -13,7 +13,7 @@
   "showLessFilters": "Visa färre alternativ",
   "unitFilter": "Verksamhetsställe",
   "purposesFilter": "Användningsändamål",
-  "resetForm": "Töm sökkriterierna",
+  "resetForm": "Töm",
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
