@@ -27,6 +27,7 @@ import SortedSelect from "./SortedSelect";
 
 import { Action, State } from "./types";
 import { OptionType } from "../../../common/types";
+import { formatDecimal } from "../../../common/util";
 
 type Props = {
   getValidationError: (key: string) => string | undefined;
@@ -216,7 +217,10 @@ const PricingType = ({
                   onChange={(e) => {
                     setPricingTypeValue(
                       {
-                        lowestPriceNet: Number(e.target.value),
+                        lowestPriceNet: formatDecimal({
+                          input: e.target.value,
+                          decimals: 2,
+                        }),
                       },
                       "lowestPriceNet"
                     );
@@ -224,7 +228,7 @@ const PricingType = ({
                   step={1}
                   min={0}
                   errorText={getValidationError(
-                    `pricings,${labelIndex},lowestPrice`
+                    `pricings,${labelIndex},lowestPriceNet`
                   )}
                   invalid={
                     !!getValidationError(
@@ -248,7 +252,10 @@ const PricingType = ({
                   onChange={(e) => {
                     setPricingTypeValue(
                       {
-                        lowestPrice: Number(e.target.value),
+                        lowestPrice: formatDecimal({
+                          input: e.target.value,
+                          decimals: 2,
+                        }),
                       },
                       "lowestPrice"
                     );
@@ -279,7 +286,9 @@ const PricingType = ({
                   onChange={(e) => {
                     setPricingTypeValue(
                       {
-                        highestPriceNet: Number(e.target.value),
+                        highestPriceNet: formatDecimal({
+                          input: e.target.value,
+                        }),
                       },
                       "highestPriceNet"
                     );
@@ -305,7 +314,9 @@ const PricingType = ({
                   onChange={(e) => {
                     setPricingTypeValue(
                       {
-                        highestPrice: Number(e.target.value),
+                        highestPrice: formatDecimal({
+                          input: e.target.value,
+                        }),
                       },
                       "highestPrice"
                     );
