@@ -66,8 +66,8 @@ class PeriodType(graphene.ObjectType):
 
 class OpeningTimesType(graphene.ObjectType):
     date = graphene.Date()
-    start_time = graphene.Time()
-    end_time = graphene.Time()
+    start_time = graphene.DateTime()
+    end_time = graphene.DateTime()
     state = graphene.String()
     periods = graphene.List(graphene.Int)
     is_reservable = graphene.Boolean()
@@ -78,16 +78,14 @@ class OpeningTimesType(graphene.ObjectType):
     def resolve_start_time(self, info):
         if not self.start_time:
             return None
-        tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
-        start = get_time_as_utc(self.start_time, self.date, tzinfo)
-        return start
+
+        return self.start_time
 
     def resolve_end_time(self, info):
         if not self.end_time:
             return None
-        tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
-        end = get_time_as_utc(self.end_time, self.date, tzinfo)
-        return end
+
+        return self.end_time
 
     def resolve_periods(self, info, **kwargs):
         return self.periods
@@ -140,8 +138,8 @@ class OpeningHoursMixin:
                 for time in times:
                     oh = OpeningTimesType(
                         date=date,
-                        start_time=time.start_time.time(),
-                        end_time=time.end_time.time(),
+                        start_time=time.start_time,
+                        end_time=time.end_time,
                         state=time.resource_state,
                         periods=time.periods,
                         is_reservable=opening_hours_client.is_resource_open_for_reservations(

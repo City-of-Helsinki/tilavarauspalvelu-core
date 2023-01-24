@@ -390,13 +390,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             .get("reservationUnitByPk")
             .get("openingHours")
             .get("openingTimes")[0]["startTime"]
-        ).is_equal_to("08:00:00+00:00")
+        ).is_equal_to("2020-01-01T10:00:00+02:00")
         assert_that(
             content.get("data")
             .get("reservationUnitByPk")
             .get("openingHours")
             .get("openingTimes")[0]["endTime"]
-        ).is_equal_to("20:00:00+00:00")
+        ).is_equal_to("2020-01-01T22:00:00+02:00")
         assert_that(
             content.get("data")
             .get("reservationUnitByPk")
