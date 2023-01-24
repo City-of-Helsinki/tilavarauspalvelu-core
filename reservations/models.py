@@ -137,6 +137,13 @@ class RecurringReservation(models.Model):
         default="",
     )
 
+    description = models.CharField(
+        max_length=500,
+        null=False,
+        default="",
+        blank=True,
+    )
+
     recurrence_in_days = models.PositiveIntegerField(
         null=True,
         help_text=_(

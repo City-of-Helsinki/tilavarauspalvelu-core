@@ -12,6 +12,7 @@ class RecurringReservationUpdateSerializer(
 
         self.fields["user"].readonly = True
         self.fields["name"].required = False
+        self.fields["description"].required = False
         self.fields["recurrence_in_days"].required = False
         self.fields["begin_time"].required = False
         self.fields["end_time"].required = False

@@ -58,6 +58,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ) + datetime.timedelta(hours=1)
         self.recurring = RecurringReservationFactory(
             name="movies",
+            description="good movies",
             reservation_unit=self.reservation_unit,
             begin_time=reservation_begin.time(),
             end_time=reservation_end.time(),
@@ -88,6 +89,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             recurrenceInDays
                             weekdays
                             created
+                            name
+                            description
                         }
                     }
                 }

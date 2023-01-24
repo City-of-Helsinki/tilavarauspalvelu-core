@@ -640,8 +640,10 @@ snapshots['ReservationQueryTestCase::test_recurring_reservation_query 1'] = {
                         'beginDate': '2021-10-12',
                         'beginTime': '15:00:00',
                         'created': '2021-10-12T12:00:00+00:00',
+                        'description': 'good movies',
                         'endDate': '2021-10-12',
                         'endTime': '16:00:00',
+                        'name': 'movies',
                         'recurrenceInDays': None,
                         'reservationUnit': {
                             'nameFi': 'resunit'
