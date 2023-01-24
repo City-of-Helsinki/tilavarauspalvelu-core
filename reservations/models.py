@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from django.db.models import F, Sum
 from django.utils import timezone
@@ -136,15 +137,20 @@ class RecurringReservation(models.Model):
         default="",
     )
 
-    interval = models.PositiveIntegerField(
+    recurrence_in_days = models.PositiveIntegerField(
         null=True,
+        help_text=_(
+            "How this recurring reservation's reservations occurs within days. "
+            "E.g 7 means that it occurs every week. 14 every other week"
+        ),
     )
 
     weekdays = models.CharField(
         max_length=16,
+        validators=[validate_comma_separated_integer_list],
         choices=WEEKDAYS.CHOICES,
-        default="",
         blank=True,
+        default="",
     )
 
     begin_time = models.TimeField(verbose_name=_("Begin time"), null=True)
@@ -166,6 +172,12 @@ class RecurringReservation(models.Model):
             ]
 
         return self.reservations.filter(state=STATE_CHOICES.DENIED)
+
+    @property
+    def weekday_list(self):
+        if self.weekdays:
+            return [int(i) for i in self.weekdays.split(",")]
+        return []
 
 
 class STATE_CHOISE_CONST(object):

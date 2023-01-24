@@ -1,4 +1,4 @@
-from api.graphql.choice_char_field import ChoiceCharField
+from api.graphql.choice_fields import ChoiceCharField
 from api.graphql.reservations.reservation_serializers.update_serializers import (
     ReservationUpdateSerializer,
 )

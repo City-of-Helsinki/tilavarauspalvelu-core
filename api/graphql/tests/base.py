@@ -78,6 +78,10 @@ class GrapheneTestCaseBase(GraphQLTestCase):
             role=UnitRoleChoice.objects.get(code="admin"),
             permission="can_validate_applications",
         )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="admin"),
+            permission="can_view_reservations",
+        )
 
         if not unit:
             unit = UnitFactory()

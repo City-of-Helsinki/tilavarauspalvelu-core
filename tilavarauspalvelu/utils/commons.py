@@ -34,3 +34,5 @@ class WEEKDAYS:
         (SATURDAY, _("Saturday")),
         (SUNDAY, _("Sunday")),
     )
+
+    VALUES = (MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)

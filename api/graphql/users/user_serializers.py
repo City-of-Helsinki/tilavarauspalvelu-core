@@ -1,5 +1,5 @@
 from api.graphql.base_serializers import PrimaryKeyUpdateSerializer
-from api.graphql.choice_char_field import ChoiceCharField
+from api.graphql.choice_fields import ChoiceCharField
 from api.users_api import UserSerializer
 from users.models import ReservationNotification
 
