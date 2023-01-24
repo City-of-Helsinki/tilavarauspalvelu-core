@@ -43,8 +43,21 @@ class OpeningHours:
             type(pytz.UTC), pytz.tzinfo.DstTzInfo, pytz.tzinfo.StaticTzInfo
         ],
     ):
-        start = time_element.start_time or datetime.time(0)
-        end = time_element.end_time or datetime.time(23, 59)
+        full_day = time_element.full_day or (
+            time_element.start_time is None and time_element.end_time is None
+        )
+        end_time_on_next_day = time_element.end_time_on_next_day or full_day
+
+        start = (
+            datetime.time(0)
+            if full_day or not time_element.start_time
+            else time_element.start_time
+        )
+        end = (
+            datetime.time(0)
+            if full_day or not time_element.end_time
+            else time_element.end_time
+        )
 
         start_time = timezone.localize(
             datetime.datetime(
@@ -55,7 +68,8 @@ class OpeningHours:
                 start.minute,
             )
         )
-        if time_element.end_time_on_next_day:
+
+        if end_time_on_next_day:
             date += datetime.timedelta(days=1)
         end_time = timezone.localize(
             datetime.datetime(
@@ -66,12 +80,13 @@ class OpeningHours:
                 end.minute,
             )
         )
+
         return OpeningHours(
             start_time=start_time.astimezone(TIMEZONE),
             end_time=end_time.astimezone(TIMEZONE),
             resource_state=time_element.resource_state,
             periods=time_element.periods,
-            end_time_on_next_day=time_element.end_time_on_next_day,
+            end_time_on_next_day=end_time_on_next_day,
         )
 
 
@@ -149,14 +164,14 @@ class OpeningHoursClient:
         self._init_opening_hours_structure()
         self._fetch_opening_hours(self.start, self.end)
 
-    def get_opening_hours_for_resource(self, resource, date) -> [TimeElement]:
+    def get_opening_hours_for_resource(self, resource, date) -> [OpeningHours]:
         resource = self.opening_hours.get(resource, {})
         times = resource.get(date, [])
         return times
 
     def get_opening_hours_for_date_range(
         self, resource: str, date_start: datetime.date, date_end: datetime.date
-    ) -> Dict[datetime.date, List[TimeElement]]:
+    ) -> Dict[datetime.date, List[OpeningHours]]:
         opening_hours = {
             date: times
             for date, times in self.opening_hours.get(resource, {}).items()
