@@ -20,7 +20,7 @@ from permissions.models import (
 )
 from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import AgeGroup, Reservation, ReservationType
-from reservations.tests.factories import ReservationFactory
+from reservations.tests.factories import RecurringReservationFactory, ReservationFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
@@ -34,6 +34,9 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         GeneralRolePermission.objects.create(
             role=GeneralRoleChoice.objects.get(code="admin"),
             permission="can_create_staff_reservations",
+        )
+        cls.recurring = RecurringReservationFactory(
+            reservation_unit=cls.reservation_unit
         )
 
     def get_create_query(self):
@@ -93,6 +96,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             "purposePk": self.purpose.pk,
             "bufferTimeBefore": "00:30:00",
             "bufferTimeAfter": "00:30:00",
+            "recurringReservationPk": self.recurring.id,
         }
 
     def test_general_admin_can_create(self):
@@ -317,6 +321,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.buffer_time_before).is_equal_to(
             datetime.timedelta(minutes=30)
         )
+        assert_that(reservation.recurring_reservation).is_equal_to(self.recurring)
 
     def test_reservation_overlapping_fails(self):
         self.client.force_login(self.general_admin)
