@@ -70,6 +70,7 @@ class OpeningTimesType(graphene.ObjectType):
     end_time = graphene.Time()
     state = graphene.String()
     periods = graphene.List(graphene.Int)
+    is_reservable = graphene.Boolean()
 
     def resolve_date(self, info):
         return self.date
@@ -90,6 +91,9 @@ class OpeningTimesType(graphene.ObjectType):
 
     def resolve_periods(self, info, **kwargs):
         return self.periods
+
+    def resolve_is_reservable(self, info, **kwargs):
+        return self.is_reservable
 
 
 class OpeningHoursType(graphene.ObjectType):
@@ -140,6 +144,11 @@ class OpeningHoursMixin:
                         end_time=time.end_time.time(),
                         state=time.resource_state,
                         periods=time.periods,
+                        is_reservable=opening_hours_client.is_resource_open_for_reservations(
+                            str(self.hauki_resource_origin_id),
+                            time.start_time,
+                            time.end_time,
+                        ),
                     )
                     opening_hours.append(oh)
             return_object.opening_times = opening_hours
