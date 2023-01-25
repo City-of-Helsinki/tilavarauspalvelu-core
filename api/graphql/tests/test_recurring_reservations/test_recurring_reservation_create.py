@@ -67,6 +67,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
         data.update(
             {
                 "name": "Test name",
+                "description": "Recurring reservation description here.",
                 "abilityGroupPk": self.ability_group.id,
                 "ageGroupPk": self.age_group.id,
             }
@@ -130,7 +131,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
         )
         recurring = RecurringReservation.objects.get(id=pk)
 
-        # assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
+        assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
         assert_that(recurring.begin_time).is_equal_to(self.res_begin.time())
         assert_that(recurring.end_time).is_equal_to(self.res_end.time())
         assert_that(recurring.begin_date).is_equal_to(self.res_begin.date())
@@ -166,7 +167,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
         )
         recurring = RecurringReservation.objects.get(id=pk)
 
-        # assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
+        assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
         assert_that(recurring.begin_time).is_equal_to(self.res_begin.time())
         assert_that(recurring.end_time).is_equal_to(self.res_end.time())
         assert_that(recurring.begin_date).is_equal_to(self.res_begin.date())
@@ -268,7 +269,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
         )
         recurring = RecurringReservation.objects.get(id=pk)
 
-        # assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
+        assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
         assert_that(recurring.begin_time).is_equal_to(self.res_begin.time())
         assert_that(recurring.end_time).is_equal_to(self.res_end.time())
         assert_that(recurring.begin_date).is_equal_to(self.res_begin.date())
@@ -278,6 +279,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
         assert_that(recurring.name).is_equal_to("Test name")
         assert_that(recurring.age_group_id).is_equal_to(self.age_group.id)
         assert_that(recurring.ability_group_id).is_equal_to(self.ability_group.id)
+        assert_that(recurring.description).is_equal_to(input_data["description"])
 
     def test_recurrence_in_days_not_in_allowed_values(self):
         self.client.force_login(self.general_admin)

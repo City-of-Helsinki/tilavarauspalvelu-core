@@ -75,6 +75,7 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
             "age_group",
             "ability_group",
             "name",
+            "description",
             "reservation_unit",
             "begin_time",
             "end_time",
