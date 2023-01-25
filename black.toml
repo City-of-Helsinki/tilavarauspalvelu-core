@@ -1,2 +1,2 @@
 [tool.black]
-exclude = '/migrations|venv|snapshots/'
+exclude = '/migrations|venv|snapshots/|.tox'
