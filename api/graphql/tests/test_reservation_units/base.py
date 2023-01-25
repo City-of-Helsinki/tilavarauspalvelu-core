@@ -145,7 +145,7 @@ def mock_create_product(*args, **kwargs):
     )
 
 
-def get_mocked_opening_hours(uuid):
+def get_mocked_opening_hours(uuid, state: State = State.WITH_RESERVATION):
     resource_id = f"{settings.HAUKI_ORIGIN_ID}:{uuid}"
     return [
         {
@@ -158,7 +158,7 @@ def get_mocked_opening_hours(uuid):
                     start_time=datetime.time(hour=10),
                     end_time=datetime.time(hour=22),
                     end_time_on_next_day=False,
-                    resource_state=State.WITH_RESERVATION,
+                    resource_state=state,
                     periods=[1, 2, 3, 4],
                 ),
             ],
@@ -173,7 +173,7 @@ def get_mocked_opening_hours(uuid):
                     start_time=datetime.time(hour=10),
                     end_time=datetime.time(hour=22),
                     end_time_on_next_day=False,
-                    resource_state=State.WITH_RESERVATION,
+                    resource_state=state,
                     periods=[
                         1,
                     ],
