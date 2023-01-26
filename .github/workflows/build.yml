@@ -2,7 +2,8 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
 
 jobs:
@@ -33,6 +34,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install -U setuptools
+          pip install tox
           pip install -r requirements.txt
           pip install -r requirements_dev.txt
           pip install bandit
@@ -50,12 +52,19 @@ jobs:
         run : |
           bandit -a vuln --exclude "tests" -r .
       - name: Safety check
-        run : |
+        run: |
           safety check --full-report
-      - name: Test with pytest
+      - name: Run pytest with cov
+        run: |
+          pytest --cov=./ --cov-report=xml --cov-config=tox.ini --cov-branch
         env:
           DATABASE_URL: postgis://tvp:tvp@localhost/tvp
           DEBUG: true
           SECRET_KEY: build_secret
-        run: |
-          pytest
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

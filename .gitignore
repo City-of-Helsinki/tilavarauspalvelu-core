@@ -28,3 +28,5 @@ perf*csv
 /broker
 celerybeat-schedule
 .python-version
+.tox
+coverage.xml
