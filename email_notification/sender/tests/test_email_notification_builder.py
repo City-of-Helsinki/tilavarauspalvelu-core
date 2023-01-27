@@ -9,8 +9,10 @@ from reservations.tests.factories import ReservationFactory
 from spaces.tests.factories import UnitFactory
 
 from ..email_notification_builder import (
+    EmailNotificationContext,
     EmailTemplateValidationError,
     ReservationEmailNotificationBuilder,
+    ReservationEmailNotificationBuilderException,
 )
 
 
@@ -44,6 +46,19 @@ class EmailNotificationBuilderTestCase(TestCase):
         with raises(EmailTemplateValidationError) as err:
             ReservationEmailNotificationBuilder(self.reservation, template, "fi")
         assert_that(err.value.message).is_equal_to("Tag invalid_tag not supported")
+
+    def test_constructor_raises_error_when_reservation_and_context_are_given(self):
+        template = EmailTemplateFactory(
+            name="Test template", content_fi="Text content FI {{invalid_tag}}"
+        )
+        context = EmailNotificationContext.from_reservation(self.reservation)
+        with raises(ReservationEmailNotificationBuilderException) as err:
+            ReservationEmailNotificationBuilder(
+                self.reservation, template, "fi", context=context
+            )
+        assert_that(str(err.value)).is_equal_to(
+            "Reservation and context cannot be used at the same time. Provide only one of them."
+        )
 
     def test_get_content_with_html_file(self):
         html_file_fi = SimpleUploadedFile(
