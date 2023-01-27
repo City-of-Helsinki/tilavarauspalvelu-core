@@ -76,6 +76,8 @@ django==3.2.16
     #   easy-thumbnails
     #   graphene-django
     #   helsinki-profile-gdpr-api
+django-admin-extra-buttons==1.5.5
+    # via -r requirements.in
 django-admin-sortable2==1.0.4
     # via -r requirements.in
 django-auditlog==2.2.0
@@ -106,7 +108,7 @@ django-helusers==0.6.0
     #   helsinki-profile-gdpr-api
 django-js-asset==1.2.2
     # via django-mptt
-django-modeltranslation==0.17.5
+django-modeltranslation==0.18.7
     # via -r requirements.in
 django-mptt==0.11.0
     # via -r requirements.in
@@ -260,7 +262,6 @@ sentry-sdk==0.19.5
 six==1.15.0
     # via
     #   click-repl
-    #   django-modeltranslation
     #   ecdsa
     #   graphene-file-upload
     #   jsonschema
@@ -276,6 +277,8 @@ sqlparse==0.4.2
     # via django
 text-unidecode==1.3
     # via graphene-django
+typing-extensions==4.4.0
+    # via django-modeltranslation
 tzdata==2022.2
     # via django-celery-beat
 uritemplate==3.0.1
