@@ -2,7 +2,7 @@ from admin_extra_buttons.api import ExtraButtonsMixin, button
 from django.contrib import admin
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.forms import ModelForm, ValidationError
-from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from email_notification.email_tester import EmailTestForm
@@ -110,7 +110,9 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                         recipients=[form.cleaned_data["recipient"]],
                         context=context,
                     )
-                return HttpResponse(request.POST.items())
+                return redirect(
+                    "/admin/email_notification/emailtemplate/template_tester/"
+                )
 
         else:
             recipient = request.user.email if request.user else ""
