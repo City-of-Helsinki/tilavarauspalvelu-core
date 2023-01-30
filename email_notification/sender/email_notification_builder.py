@@ -11,8 +11,10 @@ from django.utils.timezone import get_default_timezone
 from jinja2 import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
 
-from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate
+from email_notification.sender.email_notification_context import (
+    EmailNotificationContext,
+)
 from email_notification.templatetags.email_template_filters import format_currency
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.commons import LANGUAGES
@@ -99,120 +101,85 @@ class EmailTemplateValidator:
             raise ValidationError(f"Unable to read the HTML file: {str(err)}")
 
 
+class ReservationEmailNotificationBuilderException(Exception):
+    pass
+
+
 class ReservationEmailNotificationBuilder:
     validator = EmailTemplateValidator
 
     def __init__(
-        self, reservation: Reservation, template: EmailTemplate, language=None
+        self,
+        reservation: Reservation,
+        template: EmailTemplate,
+        language=None,
+        context: EmailNotificationContext = None,
     ):
-        self.reservation = reservation
+        if reservation and context:
+            raise ReservationEmailNotificationBuilderException(
+                "Reservation and context cannot be used at the same time. Provide only one of them."
+            )
+
+        self.context = context or EmailNotificationContext.from_reservation(reservation)
         self.template = template
-        self._set_language(language or reservation.reservee_language)
+        self._set_language(language or self.context.reservee_language)
         self._init_context_attr_map()
         self.env = get_sandboxed_environment()
         self.validate_template()
 
     def _get_reservee_name(self):
-        if (
-            not self.reservation.reservee_type
-            or self.reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
-        ):
-            return f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
-        return self.reservation.reservee_organisation_name
+        return self.context.reservee_name
 
     def _get_begin_date(self):
-        return self.reservation.begin.astimezone(get_default_timezone()).strftime(
-            "%-d.%-m.%Y"
-        )
+        return self.context.begin_datetime.strftime("%-d.%-m.%Y")
 
     def _get_begin_time(self):
-        return self.reservation.begin.astimezone(get_default_timezone()).strftime(
-            "%H:%M"
-        )
+        return self.context.begin_datetime.strftime("%H:%M")
 
     def _get_end_date(self):
-        return self.reservation.end.astimezone(get_default_timezone()).strftime(
-            "%-d.%-m.%Y"
-        )
+        return self.context.end_datetime.strftime("%-d.%-m.%Y")
 
     def _get_end_time(self):
-        return self.reservation.end.astimezone(get_default_timezone()).strftime("%H:%M")
+        return self.context.end_datetime.strftime("%H:%M")
 
     def _get_reservation_number(self):
-        return self.reservation.id
+        return self.context.reservation_number
 
     def _get_unit_location(self):
-        res_unit = self.reservation.reservation_unit.filter(unit__isnull=False).first()
-        location = getattr(res_unit.unit, "location", None)
-        if not location:
-            return None
-
-        return (
-            f"{location.address_street} {location.address_zip} {location.address_city}"
-        )
+        return self.context.unit_location
 
     def _get_unit_name(self):
-        res_unit = self.reservation.reservation_unit.filter(unit__isnull=False).first()
-        if not res_unit:
-            return None
-
-        return res_unit.unit.name
+        return self.context.unit_name
 
     def _get_name(self):
-        return self.reservation.name
+        return self.context.reservation_name
 
     def _get_reservation_unit(self):
-        if self.reservation.reservation_unit.count() > 1:
-            reservation_unit_names = ", ".join(
-                self.reservation.reservation_unit.values_list("name", flat=True)
-            )
-        else:
-            reservation_unit_names = self.reservation.reservation_unit.first().name
-
-        return reservation_unit_names
+        return self.context.reservation_unit_name
 
     def _get_price(self):
-        return self.reservation.price
+        return self.context.price
 
     def _get_non_subsidised_price(self):
-        return self.reservation.non_subsidised_price
+        return self.context.non_subsidised_price
 
     def _get_subsidised_price(self):
-        if not self.reservation.applying_for_free_of_charge:
-            return self.reservation.price
-
-        from api.graphql.reservations.reservation_serializers.mixins import (
-            ReservationPriceMixin,
-        )
-
-        calculator = ReservationPriceMixin()
-        prices = calculator.calculate_price(
-            self.reservation.begin,
-            self.reservation.end,
-            self.reservation.reservation_unit.all(),
-        )
-        return prices.subsidised_price
+        return self.context.subsidised_price
 
     def _get_tax_percentage(self):
-        return self.reservation.tax_percentage_value
+        return self.context.tax_percentage
 
     def _get_confirmed_instructions(self):
-        return self._get_reservation_unit_instruction_field(
-            "reservation_confirmed_instructions"
-        )
+        return self.context.confirmed_instructions[self.language]
 
     def _get_current_year(self):
         return datetime.datetime.now(get_default_timezone()).year
 
     def _get_pending_instructions(self):
-        return self._get_reservation_unit_instruction_field(
-            "reservation_pending_instructions"
-        )
+        return self.context.pending_instructions[self.language]
 
     def _get_cancelled_instructions(self):
-        return self._get_reservation_unit_instruction_field(
-            "reservation_cancelled_instructions"
-        )
+        return self.context.cancelled_instructions[self.language]
 
     def _get_reservation_unit_instruction_field(self, name):
         instructions = []
@@ -222,10 +189,10 @@ class ReservationEmailNotificationBuilder:
         return "\n-\n".join(instructions)
 
     def _get_deny_reason(self):
-        return self._get_by_language(self.reservation.deny_reason, "reason")
+        return self.context.deny_reason[self.language]
 
     def _get_cancel_reason(self):
-        return self._get_by_language(self.reservation.cancel_reason, "reason")
+        return self.context.cancel_reason[self.language]
 
     def _get_varaamo_ext_link(self):
         url_base = settings.EMAIL_VARAAMO_EXT_LINK

@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+Fooo
+
+{% block content %}
+<h1 id="site-name">Email Template Testing</h1>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    
+    <button>Send Test Emails</button>
+</form>
+{% endblock %}

@@ -1,12 +1,18 @@
+from admin_extra_buttons.api import ExtraButtonsMixin, button
 from django.contrib import admin
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.forms import ModelForm, ValidationError
+from django.http import HttpResponse
+from django.template.response import TemplateResponse
 
+from email_notification.email_tester import EmailTestForm
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
+    EmailNotificationContext,
     EmailTemplateValidationError,
     EmailTemplateValidator,
 )
+from email_notification.sender.senders import send_reservation_email_notification
 
 
 class EmailTemplateAdminForm(ModelForm):
@@ -84,7 +90,31 @@ class EmailTemplateAdminForm(ModelForm):
 
 
 @admin.register(EmailTemplate)
-class EmailTemplateAdmin(admin.ModelAdmin):
+class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     model = EmailTemplate
     form = EmailTemplateAdminForm
     exclude = ["html_content"]
+
+    @button(label="Email Template Testing")
+    def template_tester(self, request):
+        context = self.admin_site.each_context(request)
+        if request.method == "POST":
+            form = EmailTestForm(request.POST)
+            if form.is_valid():
+                context = EmailNotificationContext.from_form(form)
+                for language in ["fi", "sv", "en"]:
+                    context.reservee_language = language
+                    send_reservation_email_notification(
+                        EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
+                        None,
+                        recipients=[form.cleaned_data["recipient"]],
+                        context=context,
+                    )
+                return HttpResponse(request.POST.items())
+
+        else:
+            recipient = request.user.email if request.user else ""
+            form = EmailTestForm(initial={"recipient": recipient})
+
+        context["form"] = form
+        return TemplateResponse(request, "email_tester.html", context=context)

@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "adminsortable2",
     "django_prometheus",
+    "admin_extra_buttons",
 ]
 
 MIDDLEWARE = [
