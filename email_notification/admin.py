@@ -100,12 +100,14 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         context = self.admin_site.each_context(request)
         if request.method == "POST":
             form = EmailTestForm(request.POST)
+            template = EmailTemplate.objects.filter(pk=request.POST["template"]).first()
+
             if form.is_valid():
                 context = EmailNotificationContext.from_form(form)
                 for language in ["fi", "sv", "en"]:
                     context.reservee_language = language
                     send_reservation_email_notification(
-                        EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
+                        template.type,
                         None,
                         recipients=[form.cleaned_data["recipient"]],
                         context=context,
