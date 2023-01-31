@@ -58,7 +58,7 @@ const MyUnitView = () => {
       />
       <Container>
         <div>
-          <H1>{unit?.node?.nameFi}</H1>
+          <H1 $legacy>{unit?.node?.nameFi}</H1>
           <p>{parseAddress(unit?.node?.location as LocationType)}</p>
         </div>
         <Tabs headers={TabHeaders}>

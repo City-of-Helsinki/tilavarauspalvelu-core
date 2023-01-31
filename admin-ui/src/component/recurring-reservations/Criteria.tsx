@@ -38,7 +38,7 @@ const Wrapper = styled.div`
   width: 100%;
 `;
 
-const Title = styled(H1)`
+const Title = styled(H1).attrs({ $legacy: true })`
   margin: var(--spacing-layout-xl) 0 var(--spacing-layout-xl);
 `;
 
@@ -73,6 +73,7 @@ const Details = styled.div`
 
 const ReservationUnitCount = styled(H2).attrs({
   as: "div",
+  $legacy: true,
 })`
   margin-bottom: var(--spacing-3-xs);
 `;

@@ -32,7 +32,7 @@ function AllocatingDialogContent({ callback }: IProps): JSX.Element {
     <Dialog canBeClosed={false}>
       <DialogContent onClick={() => callback && callback()}>
         <LoadingSpinner />
-        <H2>{t("ApplicationRound.allocationDialogHeading")}</H2>
+        <H2 $legacy>{t("ApplicationRound.allocationDialogHeading")}</H2>
         <p>{t("ApplicationRound.allocationDialogBody")}</p>
       </DialogContent>
     </Dialog>

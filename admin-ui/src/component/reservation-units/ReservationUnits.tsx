@@ -28,7 +28,7 @@ const ReservationUnits = (): JSX.Element => {
       <BreadcrumbWrapper route={["spaces-n-settings", "reservation-units"]} />
       <Container>
         <div>
-          <H1>{t("ReservationUnits.reservationUnitListHeading")}</H1>
+          <H1 $legacy>{t("ReservationUnits.reservationUnitListHeading")}</H1>
           <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
         </div>
         <Filters onSearch={debouncedSearch} />

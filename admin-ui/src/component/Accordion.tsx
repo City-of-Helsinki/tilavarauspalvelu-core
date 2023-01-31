@@ -103,7 +103,9 @@ function Accordion({
         data-testid="accordion__header"
         $disabled={disabled}
       >
-        <H2 className="heading">{heading}</H2>
+        <H2 className="heading" $legacy>
+          {heading}
+        </H2>
         <ToggleButton
           type="button"
           aria-label={buttonAriaLabel}

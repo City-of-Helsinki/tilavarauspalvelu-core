@@ -103,7 +103,7 @@ function StageInfo({ activeStage, applicationRound }: IProps): JSX.Element {
   return (
     <Wrapper>
       <Title>{applicationRound.name}</Title>
-      <H1>{t("StageInfo.stagesOfHandling")}</H1>
+      <H1 $legacy>{t("StageInfo.stagesOfHandling")}</H1>
       <Stages>
         {stages.map((stage) => (
           <Stage

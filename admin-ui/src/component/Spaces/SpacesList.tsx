@@ -196,7 +196,7 @@ const SpacesList = (): JSX.Element => {
       <BreadcrumbWrapper route={["spaces-n-settings", "spaces"]} />
       <Container>
         <div>
-          <H1>{t("Spaces.spaceListHeading")}</H1>
+          <H1 $legacy>{t("Spaces.spaceListHeading")}</H1>
           <p>{t("Spaces.spaceListDescription")}</p>
           <SearchContainer>
             <IconSearch className="searchIcon" />

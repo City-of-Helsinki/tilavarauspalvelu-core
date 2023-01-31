@@ -42,7 +42,7 @@ const MyUnits = () => {
       <BreadcrumbWrapper route={["my-units"]} />
       <Container>
         <div>
-          <H1>{t("MyUnits.heading")}</H1>
+          <H1 $legacy>{t("MyUnits.heading")}</H1>
           <p>{t("MyUnits.description")}</p>
         </div>
         <Grid>

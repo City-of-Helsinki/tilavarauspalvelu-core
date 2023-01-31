@@ -29,7 +29,7 @@ const AccordionContainer = styled.div`
   gap: var(--spacing-l);
 `;
 
-const StyledH1 = styled(H1)`
+const StyledH1 = styled(H1).attrs({ $legacy: true })`
   margin-top: 0;
 `;
 

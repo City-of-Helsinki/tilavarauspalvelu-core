@@ -19,7 +19,7 @@ function AuthorizationNeeded(): JSX.Element {
       <PageWrapper>
         <EmptyContent>
           <Wrapper>
-            <H1>{t("errors.authorizationNeeded")}</H1>
+            <H1 $legacy>{t("errors.authorizationNeeded")}</H1>
             <p style={{ marginBottom: "var(--spacing-xl)" }}>
               {t("common.noAuthorization")}
             </p>

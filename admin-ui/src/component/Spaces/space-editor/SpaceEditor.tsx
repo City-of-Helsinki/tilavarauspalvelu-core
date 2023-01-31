@@ -338,7 +338,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
       </IngressContainer>
       <ContentContainer>
         <EditorContainer>
-          <H1>{t("SpaceEditor.details")}</H1>
+          <H1 $legacy>{t("SpaceEditor.details")}</H1>
           <Editor>
             <FormErrorSummary
               fieldNamePrefix="SpaceEditor.label."

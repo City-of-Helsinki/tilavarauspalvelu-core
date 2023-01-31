@@ -53,7 +53,9 @@ const SubPageHead = ({ title, unit, link, state }: IProps): JSX.Element => {
       <ContentContainer>
         <Container>
           <TitleRow>
-            <H1 style={{ flexGrow: 1 }}>{title}</H1>
+            <H1 style={{ flexGrow: 1 }} $legacy>
+              {title}
+            </H1>
             <div style={{ marginTop: "2em" }}>{state}</div>
           </TitleRow>
         </Container>

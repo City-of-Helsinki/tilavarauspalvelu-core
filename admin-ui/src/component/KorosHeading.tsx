@@ -31,7 +31,7 @@ const Wrapper = styled.div.attrs({
   flex-direction: column;
 `;
 
-export const Heading = styled(H1)`
+export const Heading = styled(H1).attrs({ $legacy: true })`
   color: var(--color-white);
   margin: 0 var(--spacing-m);
   margin-bottom: var(--spacing-xs);

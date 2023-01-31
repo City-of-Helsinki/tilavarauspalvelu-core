@@ -22,7 +22,7 @@ import { APPLICATION_ROUNDS_QUERY } from "./queries";
 
 const Wrapper = styled.div``;
 
-const Ingress = styled(H2)`
+const Ingress = styled(H2).attrs({ $legacy: true })`
   max-width: 44rem;
   margin: var(--spacing-3-xl) auto var(--spacing-2-xl);
   padding: 0 var(--spacing-xl);
@@ -30,7 +30,7 @@ const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
-const Heading = styled(H1)`
+const Heading = styled(H1).attrs({ $legacy: true })`
   margin-bottom: var(--spacing-s);
 `;
 

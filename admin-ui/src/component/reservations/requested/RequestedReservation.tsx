@@ -344,7 +344,7 @@ const RequestedReservation = (): JSX.Element | null => {
       <Container>
         <div>
           <NameState ref={ref}>
-            <H1>{getName(reservation, t)}</H1>
+            <H1 $legacy>{getName(reservation, t)}</H1>
 
             <HorisontalFlex>
               <AlignVertically>

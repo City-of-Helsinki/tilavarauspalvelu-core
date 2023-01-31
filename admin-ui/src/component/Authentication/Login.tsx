@@ -23,7 +23,7 @@ function Login(): JSX.Element {
       <PageWrapper>
         <EmptyContent>
           <Wrapper>
-            <H1>{t("errors.loginNeeded")}</H1>
+            <H1 $legacy>{t("errors.loginNeeded")}</H1>
             <p style={{ marginBottom: "var(--spacing-xl)" }}>
               {t("common.loginWithTunnistamo")}
             </p>

@@ -56,7 +56,7 @@ const Content = styled.div`
   }
 `;
 
-const Ingress = styled(H2)`
+const Ingress = styled(H2).attrs({ $legacy: true })`
   line-height: 1.8125rem;
 `;
 

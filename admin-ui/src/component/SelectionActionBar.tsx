@@ -39,7 +39,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const Count = styled(H2)`
+const Count = styled(H2).attrs({ $legacy: true })`
   ${truncatedText}
   overflow-y: hidden;
   display: none;

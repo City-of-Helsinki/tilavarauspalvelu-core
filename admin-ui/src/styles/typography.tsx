@@ -8,7 +8,7 @@ export const truncatedText = css`
   text-overflow: ellipsis;
 `;
 
-export const ContentHeading = styled(H1)`
+export const ContentHeading = styled(H1).attrs({ $legacy: true })`
   @media (min-width: ${breakpoints.xl}) {
     width: 60%;
   }

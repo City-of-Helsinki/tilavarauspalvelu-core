@@ -127,7 +127,7 @@ const ReservationUnitCard = ({
         <BasicLink
           to={`/unit/${unitId}/reservationUnit/edit/${reservationUnit.pk}`}
         >
-          <H2>{reservationUnit.nameFi}</H2>
+          <H2 $legacy>{reservationUnit.nameFi}</H2>
           <IconArrowRight />
         </BasicLink>
         <ComboType>

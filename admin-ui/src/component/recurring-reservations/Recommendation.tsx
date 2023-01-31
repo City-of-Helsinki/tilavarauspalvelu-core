@@ -88,7 +88,7 @@ const LinkToOthers = styled(BasicLink)`
   margin-bottom: var(--spacing-xs);
 `;
 
-const Heading = styled(H1)`
+const Heading = styled(H1).attrs({ $legacy: true })`
   margin-bottom: var(--spacing-3-xs);
 `;
 
@@ -111,7 +111,7 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
-const Subheading = styled(H2)`
+const Subheading = styled(H2).attrs({ $legacy: true })`
   font-size: 2rem;
 `;
 

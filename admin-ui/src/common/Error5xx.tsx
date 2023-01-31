@@ -46,7 +46,7 @@ const Error5xx = (): JSX.Element => {
   return (
     <Wrapper>
       <Content>
-        <H1>Jokin meni vikaan</H1>
+        <H1 $legacy>Jokin meni vikaan</H1>
         <p>
           Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt.
           Yritä myöhemmin uudelleen!

@@ -30,7 +30,7 @@ const Units = (): JSX.Element => {
       <BreadcrumbWrapper route={["spaces-n-settings", "units"]} />
       <Container>
         <div>
-          <H1>{t("MainMenu.units")}</H1>
+          <H1 $legacy>{t("MainMenu.units")}</H1>
           <p>
             {t("Units.description")}
             <Link

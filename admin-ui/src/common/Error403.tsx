@@ -56,7 +56,7 @@ const Error403 = (): JSX.Element => {
   return (
     <Wrapper>
       <Content>
-        <H1>
+        <H1 $legacy>
           403 - Sinulla ei ole käyt&shy;tö&shy;oi&shy;keuk&shy;sia tälle sivulle
         </H1>
         <p>

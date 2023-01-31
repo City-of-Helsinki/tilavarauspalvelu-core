@@ -198,7 +198,7 @@ const ResourcesList = (): JSX.Element => {
       <BreadcrumbWrapper route={["spaces-n-settings", "resources"]} />
       <Container>
         <div>
-          <H1>{t("Resources.resourceListHeading")}</H1>
+          <H1 $legacy>{t("Resources.resourceListHeading")}</H1>
           <p>{t("Resources.resourceListDescription")}</p>
           <SearchContainer>
             <IconSearch className="searchIcon" />

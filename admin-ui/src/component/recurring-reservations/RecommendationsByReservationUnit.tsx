@@ -89,7 +89,7 @@ const ImageFiller = styled.div`
   width: 1px;
 `;
 
-const Title = styled(H1)`
+const Title = styled(H1).attrs({ $legacy: true })`
   margin: var(--spacing-s) 0 var(--spacing-2-xs) 0;
 `;
 
@@ -520,7 +520,9 @@ function RecommendationsByReservationUnit(): JSX.Element {
                 </Ingress>
                 <TitleContainer>
                   <div>
-                    <H1 as="h2">{applicationRound?.name}</H1>
+                    <H1 as="h2" $legacy>
+                      {applicationRound?.name}
+                    </H1>
                     {["approved"].includes(applicationRound?.status) &&
                       reservationUnitCalendarUrl && (
                         <CalendarLink

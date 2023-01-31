@@ -10,8 +10,10 @@ const Content = styled.div`
 function InfoModalContent(): JSX.Element {
   return (
     <Content>
-      <H1>Miten tila- ja resurssihierarkia sekä varausyksiköt toimivat</H1>
-      <H2>Tilojen ja resurssien hallinta</H2>
+      <H1 $legacy>
+        Miten tila- ja resurssihierarkia sekä varausyksiköt toimivat
+      </H1>
+      <H2 $legacy>Tilojen ja resurssien hallinta</H2>
       <p>
         Tilojen ja resurssien hallintanäkymä on listaus niistä huoneista ja
         tarvikkeista, joita toimipisteellä on tarjolla varattavaan käyttöön.
@@ -37,7 +39,7 @@ function InfoModalContent(): JSX.Element {
         jalkapallokentäksi, ja nämä kenttäpuoliskot edelleen voivat jakautua
         kahdeksaksi pienkentäksi.
       </p>
-      <H2>Varausyksiköiden hallinta</H2>
+      <H2 $legacy>Varausyksiköiden hallinta</H2>
       <p>
         Kun tiedot on luotu, voit yhdistellä tiloista toimipisteen päänäkymässä
         millaisia tahansa varausyksiköitä, joissa{" "}
@@ -56,8 +58,8 @@ function InfoModalContent(): JSX.Element {
         varausyksikkönsä. Jos sauna on myönnetty toisaalle, yläkerran ja saunan
         yhdistelmää ei voi enää varata, mutta yläkerran voi.
       </p>
-      <H1>Usein kysyttyä</H1>
-      <H2>Tarvitseeko resurssi oman tilansa?</H2>
+      <H1 $legacy>Usein kysyttyä</H1>
+      <H2 $legacy>Tarvitseeko resurssi oman tilansa?</H2>
       <p>
         Liikuteltavat tai ulosvuokrattavat resurssit eivät tarvitse omaa
         tilaansa. Oma tila täytyy luoda resurssille kuitenkin silloin, jos
@@ -71,7 +73,7 @@ function InfoModalContent(): JSX.Element {
         muuttuu varauskelvottomaksi, joten skannerin käyttöä varten täytyy luoda
         nimellinen, 1 m² kokoinen tila, joka asetetaan aulan alitilaksi.
       </p>
-      <H2>
+      <H2 $legacy>
         Miten muodostan varausyksiköt tilaan, jossa on mahdollista tehdä eri
         asioita?
       </H2>

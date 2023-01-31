@@ -584,7 +584,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             <>
               <DenseVerticalFlex>
                 <HorisontalFlex style={{ justifyContent: "space-between" }}>
-                  <H1>
+                  <H1 $legacy>
                     {state.reservationUnitEdit.nameFi ||
                       t("ReservationUnitEditor.defaultHeading")}
                   </H1>

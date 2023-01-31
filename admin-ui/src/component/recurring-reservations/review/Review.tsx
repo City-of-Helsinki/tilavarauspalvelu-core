@@ -35,7 +35,7 @@ const RecommendationValue = styled.div`
   margin-bottom: var(--spacing-l);
 `;
 
-const StyledH2 = styled(H2)`
+const StyledH2 = styled(H2).attrs({ $legacy: true })`
   margin: 0 0 var(--spacing-xs) 0;
   line-height: 1;
 `;

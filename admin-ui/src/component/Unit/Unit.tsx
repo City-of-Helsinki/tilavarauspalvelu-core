@@ -40,7 +40,7 @@ interface IProps {
 }
 
 const Wrapper = styled.div``;
-const Name = styled(H1)`
+const Name = styled(H1).attrs({ $legacy: true })`
   line-height: 46px;
   margin-bottom: 0;
 `;

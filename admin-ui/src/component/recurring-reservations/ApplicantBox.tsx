@@ -35,7 +35,7 @@ const IconWrapper = styled.div`
   }
 `;
 
-const Heading = styled(H2)`
+const Heading = styled(H2).attrs({ $legacy: true })`
   font-size: 1.375rem;
   margin: var(--spacing-2-xs) 0 var(--spacing-m);
 `;

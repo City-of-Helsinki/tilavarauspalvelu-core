@@ -36,7 +36,7 @@ const Wrapper = styled.div`
   padding: var(--spacing-m) 0 var(--spacing-layout-xl);
 `;
 
-const Heading = styled(H1)`
+const Heading = styled(H1).attrs({ $legacy: true })`
   margin-top: var(--spacing-xl);
   margin-bottom: var(--spacing-s);
 `;

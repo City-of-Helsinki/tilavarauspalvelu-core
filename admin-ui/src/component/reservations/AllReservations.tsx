@@ -28,7 +28,7 @@ const AllReservations = (): JSX.Element => {
       <BreadcrumbWrapper route={["reservations", "all-reservations"]} />
       <Container>
         <div>
-          <H1>{t("Reservations.allReservationListHeading")}</H1>
+          <H1 $legacy>{t("Reservations.allReservationListHeading")}</H1>
           <p>{t("Reservations.allReservationListDescription")}</p>
         </div>
         <Filters onSearch={debouncedSearch} />
