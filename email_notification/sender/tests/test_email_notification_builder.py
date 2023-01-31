@@ -91,9 +91,9 @@ class EmailNotificationBuilderTestCase(TestCase):
             self.reservation, template, "sv"
         )
 
-        assert_that(builder_fi.get_content()).is_equal_to("HTML content FI")
-        assert_that(builder_en.get_content()).is_equal_to("HTML content EN")
-        assert_that(builder_sv.get_content()).is_equal_to("HTML content SV")
+        assert_that(builder_fi.get_html_content()).is_equal_to("HTML content FI")
+        assert_that(builder_en.get_html_content()).is_equal_to("HTML content EN")
+        assert_that(builder_sv.get_html_content()).is_equal_to("HTML content SV")
 
     def test_get_content_with_text_content(self):
         template = EmailTemplateFactory(

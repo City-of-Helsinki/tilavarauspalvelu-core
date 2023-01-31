@@ -40,15 +40,20 @@ def send_reservation_email_notification(
         reservation, mail_template, language=language, context=context
     )
     subject = message_builder.get_subject()
-    message = message_builder.get_content()
+    text_content = message_builder.get_content()
+    html_content = message_builder.get_html_content()
 
     if recipients is None:
         recipients = [reservation.reservee_email]
 
     email = EmailMultiAlternatives(
         subject=subject,
-        body=message,
+        body=text_content,
         from_email=settings.DEFAULT_FROM_EMAIL,
         bcc=recipients,
     )
+
+    if html_content:
+        email.attach_alternative(html_content, "text/html")
+
     email.send(fail_silently=False)
