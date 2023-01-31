@@ -1,3 +1,6 @@
+import datetime
+from decimal import Decimal
+
 from assertpy import assert_that
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
@@ -32,6 +35,61 @@ class EmailNotificationContextTestCase(TestCase):
             deny_reason=self.deny_reason,
             cancel_reason=self.cancel_reason,
         )
+
+    def test_with_mock_data(self):
+        context = EmailNotificationContext.with_mock_data()
+        assert_that(context.reservee_name).is_equal_to("Email Test")
+        assert_that(context.begin_datetime).is_equal_to(
+            datetime.datetime(2100, 1, 1, 12, 00)
+        )
+        assert_that(context.end_datetime).is_equal_to(
+            datetime.datetime(2100, 1, 1, 13, 15)
+        )
+        assert_that(context.reservation_number).is_equal_to(1234567)
+        assert_that(context.unit_location).is_equal_to("Testikatu 99999 Korvatunturi")
+        assert_that(context.unit_name).is_equal_to("TOIMIPISTE")
+        assert_that(context.reservation_name).is_equal_to("TESTIVARAUS")
+        assert_that(context.reservation_unit_name).is_equal_to("VARAUSYKSIKKÖ")
+        assert_that(context.price).is_equal_to(Decimal("12.30"))
+        assert_that(context.non_subsidised_price).is_equal_to(Decimal("15.00"))
+        assert_that(context.subsidised_price).is_equal_to(Decimal("5.00"))
+        assert_that(context.tax_percentage).is_equal_to(24)
+        assert_that(context.confirmed_instructions).is_equal_to(
+            {
+                "fi": "[lisäohje: hyväksytty]",
+                "sv": "[mer information: bekräftats]",
+                "en": "[additional info: confirmed]",
+            }
+        )
+        assert_that(context.pending_instructions).is_equal_to(
+            {
+                "fi": "[lisäohje: käsittelyssä]",
+                "sv": "[mer information: kräver hantering]",
+                "en": "[additional info: requires handling]",
+            }
+        )
+        assert_that(context.cancelled_instructions).is_equal_to(
+            {
+                "fi": "[lisäohje: peruttu]",
+                "sv": "[mer information: avbokad]",
+                "en": "[additional info: cancelled]",
+            }
+        )
+        assert_that(context.deny_reason).is_equal_to(
+            {
+                "fi": "[syy]",
+                "sv": "[orsak]",
+                "en": "[reason]",
+            }
+        )
+        assert_that(context.cancel_reason).is_equal_to(
+            {
+                "fi": "[syy]",
+                "sv": "[orsak]",
+                "en": "[reason]",
+            }
+        )
+        assert_that(len(context.__dict__.keys())).is_equal_to(17)
 
     def test_from_reservation(self):
         context = EmailNotificationContext.from_reservation(self.reservation)

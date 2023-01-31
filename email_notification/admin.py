@@ -33,6 +33,7 @@ class EmailTemplateAdminForm(ModelForm):
         self.fields["type"].choices = [
             (value, label) for value, label in available_types
         ]
+        self.test_context = EmailNotificationContext.with_mock_data().__dict__
 
     def get_validated_field(self, field):
         data = self.cleaned_data[field]
@@ -41,7 +42,9 @@ class EmailTemplateAdminForm(ModelForm):
                 raise ValidationError(f"Field {field} is required.")
             return data
         try:
-            EmailTemplateValidator().validate_string(data)
+            EmailTemplateValidator().validate_string(
+                data, context_dict=self.test_context
+            )
         except EmailTemplateValidationError as e:
             raise ValidationError(e.message) from e
         return data
@@ -49,7 +52,9 @@ class EmailTemplateAdminForm(ModelForm):
     def validate_uploaded_html_file(self, language: str):
         file = self.cleaned_data[f"html_content_{language}"]
         if file and isinstance(file, InMemoryUploadedFile):
-            EmailTemplateValidator().validate_html_file(file)
+            EmailTemplateValidator().validate_html_file(
+                file, context_dict=self.test_context
+            )
         return file
 
     def clean_subject(self):

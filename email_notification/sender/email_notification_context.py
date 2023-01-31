@@ -40,6 +40,49 @@ class EmailNotificationContext:
         return "\n-\n".join(instructions)
 
     @staticmethod
+    def with_mock_data() -> "EmailNotificationContext":
+        """Initialize context with mock data"""
+        context = EmailNotificationContext()
+        context.reservee_name = "Email Test"
+        context.begin_datetime = datetime.datetime(2100, 1, 1, 12, 00)
+        context.end_datetime = datetime.datetime(2100, 1, 1, 13, 15)
+        context.reservation_number = 1234567
+        context.unit_location = "Testikatu 99999 Korvatunturi"
+        context.unit_name = "TOIMIPISTE"
+        context.reservation_name = "TESTIVARAUS"
+        context.reservation_unit_name = "VARAUSYKSIKKÖ"
+        context.price = Decimal("12.30")
+        context.non_subsidised_price = Decimal("15.00")
+        context.subsidised_price = Decimal("5.00")
+        context.tax_percentage = 24
+        context.confirmed_instructions = {
+            "fi": "[lisäohje: hyväksytty]",
+            "sv": "[mer information: bekräftats]",
+            "en": "[additional info: confirmed]",
+        }
+        context.pending_instructions = {
+            "fi": "[lisäohje: käsittelyssä]",
+            "sv": "[mer information: kräver hantering]",
+            "en": "[additional info: requires handling]",
+        }
+        context.cancelled_instructions = {
+            "fi": "[lisäohje: peruttu]",
+            "sv": "[mer information: avbokad]",
+            "en": "[additional info: cancelled]",
+        }
+        context.deny_reason = {
+            "fi": "[syy]",
+            "sv": "[orsak]",
+            "en": "[reason]",
+        }
+        context.cancel_reason = {
+            "fi": "[syy]",
+            "sv": "[orsak]",
+            "en": "[reason]",
+        }
+        return context
+
+    @staticmethod
     def from_reservation(reservation: Reservation) -> "EmailNotificationContext":
         """Build context from reservation"""
         context = EmailNotificationContext()
@@ -142,6 +185,7 @@ class EmailNotificationContext:
         }
         return context
 
+    @staticmethod
     def from_form(form: EmailTestForm) -> "EmailNotificationContext":
         context = EmailNotificationContext()
         context.reservee_name = form.cleaned_data["reservee_name"]
