@@ -10,8 +10,8 @@
     "test": "jest --runInBand",
     "test:browser": "CYPRESS_BASE_URL=https://local-tilavaraus.hel.fi:3000 TZ=Europe/Helsinki cypress run --config-file='cypress.config.ts' --browser firefox",
     "test:watch": "jest --watch",
-    "lint": "next lint --ext ts,tsx .",
-    "lint:fix": "next lint --ext ts,tsx . --fix",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "lint:css": "stylelint '**/*.tsx'",
     "ts-check": "tsc --noEmit --project tsconfig.json",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\""
@@ -68,6 +68,7 @@
     "@types/styled-components": "^5.1.26",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
+    "postcss-scss": "^4.0.2",
     "axe-core": "^4.6.1",
     "cypress": "12.2.0",
     "cypress-axe": "^1.2.0",
