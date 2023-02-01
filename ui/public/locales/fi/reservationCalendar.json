@@ -53,8 +53,6 @@
   "saveReservation": "Tallenna varaus",
   "selectedTime": "Valittu aika",
   "nextAvailableTime": "Seuraava vapaa aika",
-  "nextAvailableSlot_one": "Seuraava vapaa tunti",
-  "nextAvailableSlot_other": "Seuraavat vapaat {{slot}}",
   "showCalendar": "Näytä kalenteri",
   "eventDuration": "Varauksen kesto",
   "eventDurationLiteral": "{{min}} - {{max}} varaus",

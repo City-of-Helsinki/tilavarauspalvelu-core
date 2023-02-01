@@ -50,8 +50,6 @@
   "saveReservation": "",
   "selectedTime": "",
   "nextAvailableTime": "",
-  "nextAvailableSlot_one": "",
-  "nextAvailableSlot_other": "",
   "showCalendar": "",
   "eventDuration": "",
   "eventDurationLiteral": "",

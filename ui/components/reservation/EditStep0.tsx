@@ -28,7 +28,7 @@ import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import { BlackButton, MediumButton } from "../../styles/util";
 import Legend from "../calendar/Legend";
 import ReservationCalendarControls from "../calendar/ReservationCalendarControls";
-import { Toolbar, ToolbarProps } from "../calendar/Toolbar";
+import { Toolbar } from "../calendar/Toolbar";
 
 type Props = {
   reservation: ReservationType;
@@ -126,8 +126,6 @@ const eventStyleGetter = (
     className,
   };
 };
-
-const ToolbarWithProps = (props: ToolbarProps) => <Toolbar {...props} />;
 
 const EditStep0 = ({
   reservation,
@@ -357,9 +355,7 @@ const EditStep0 = ({
             }
             showToolbar
             reservable
-            toolbarComponent={
-              reservationUnit?.nextAvailableSlot ? ToolbarWithProps : Toolbar
-            }
+            toolbarComponent={Toolbar}
             dateCellWrapperComponent={TouchCellWrapper}
             resizable
             draggable

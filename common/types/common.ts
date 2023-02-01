@@ -140,7 +140,6 @@ export type ReservationUnit = {
   unitId: number;
   minReservationDuration?: string;
   maxReservationDuration?: string;
-  nextAvailableSlot?: string;
   openingHours?: OpeningHours;
   reservations?: Reservation[];
 };

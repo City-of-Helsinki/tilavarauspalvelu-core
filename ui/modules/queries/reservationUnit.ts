@@ -75,7 +75,6 @@ export const RESERVATION_UNIT = gql`
       maxReservationsPerUser
       reservationsMinDaysBefore
       reservationsMaxDaysBefore
-      nextAvailableSlot
       unit {
         id
         pk

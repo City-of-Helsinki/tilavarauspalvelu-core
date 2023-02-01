@@ -1104,6 +1104,7 @@ export type Mutation = {
   createEquipment?: Maybe<EquipmentCreateMutationPayload>;
   createEquipmentCategory?: Maybe<EquipmentCategoryCreateMutationPayload>;
   createPurpose?: Maybe<PurposeCreateMutationPayload>;
+  createRecurringReservation?: Maybe<RecurringReservationCreateMutationPayload>;
   createReservation?: Maybe<ReservationCreateMutationPayload>;
   createReservationUnit?: Maybe<ReservationUnitCreateMutationPayload>;
   createReservationUnitImage?: Maybe<ReservationUnitImageCreateMutationPayload>;
@@ -1130,6 +1131,7 @@ export type Mutation = {
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
+  updateRecurringReservation?: Maybe<RecurringReservationUpdateMutationPayload>;
   updateReservation?: Maybe<ReservationUpdateMutationPayload>;
   updateReservationUnit?: Maybe<ReservationUnitUpdateMutationPayload>;
   updateReservationUnitImage?: Maybe<ReservationUnitImageUpdateMutationPayload>;
@@ -1178,6 +1180,10 @@ export type MutationCreateEquipmentCategoryArgs = {
 
 export type MutationCreatePurposeArgs = {
   input: PurposeCreateMutationInput;
+};
+
+export type MutationCreateRecurringReservationArgs = {
+  input: RecurringReservationCreateMutationInput;
 };
 
 export type MutationCreateReservationArgs = {
@@ -1284,6 +1290,10 @@ export type MutationUpdatePurposeArgs = {
   input: PurposeUpdateMutationInput;
 };
 
+export type MutationUpdateRecurringReservationArgs = {
+  input: RecurringReservationUpdateMutationInput;
+};
+
 export type MutationUpdateReservationArgs = {
   input: ReservationUpdateMutationInput;
 };
@@ -1332,6 +1342,7 @@ export type OpeningTimesType = {
   __typename?: "OpeningTimesType";
   date?: Maybe<Scalars["Date"]>;
   endTime?: Maybe<Scalars["Time"]>;
+  isReservable?: Maybe<Scalars["Boolean"]>;
   periods?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   startTime?: Maybe<Scalars["Time"]>;
   state?: Maybe<Scalars["String"]>;
@@ -1561,6 +1572,7 @@ export type Query = {
   order?: Maybe<PaymentOrderType>;
   purposes?: Maybe<PurposeTypeConnection>;
   qualifiers?: Maybe<QualifierTypeConnection>;
+  recurringReservations?: Maybe<RecurringReservationTypeConnection>;
   reservationByPk?: Maybe<ReservationType>;
   reservationCancelReasons?: Maybe<ReservationCancelReasonTypeConnection>;
   reservationDenyReasons?: Maybe<ReservationDenyReasonTypeConnection>;
@@ -1760,6 +1772,28 @@ export type QueryQualifiersArgs = {
   nameFi?: InputMaybe<Scalars["String"]>;
   nameSv?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type QueryRecurringReservationsArgs = {
+  after?: InputMaybe<Scalars["String"]>;
+  before?: InputMaybe<Scalars["String"]>;
+  begin?: InputMaybe<Scalars["DateTime"]>;
+  beginDate?: InputMaybe<Scalars["Date"]>;
+  beginTime?: InputMaybe<Scalars["Time"]>;
+  end?: InputMaybe<Scalars["DateTime"]>;
+  endDate?: InputMaybe<Scalars["Date"]>;
+  endTime?: InputMaybe<Scalars["Time"]>;
+  first?: InputMaybe<Scalars["Int"]>;
+  last?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  reservationUnitNameEn?: InputMaybe<Scalars["String"]>;
+  reservationUnitNameFi?: InputMaybe<Scalars["String"]>;
+  reservationUnitNameSv?: InputMaybe<Scalars["String"]>;
+  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  user?: InputMaybe<Scalars["ID"]>;
 };
 
 export type QueryReservationByPkArgs = {
@@ -1998,14 +2032,141 @@ export type RealEstateType = Node & {
   surfaceArea?: Maybe<Scalars["Decimal"]>;
 };
 
-export type RecurringReservationType = {
+export type RecurringReservationCreateMutationInput = {
+  abilityGroupPk?: InputMaybe<Scalars["Int"]>;
+  ageGroupPk?: InputMaybe<Scalars["Int"]>;
+  /** Date when first reservation begins. */
+  beginDate: Scalars["Date"];
+  /** Time when reservations begins. */
+  beginTime: Scalars["Time"];
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  /** Date when last reservation begins. */
+  endDate: Scalars["Date"];
+  /** Time when reservations ends. */
+  endTime: Scalars["Time"];
+  name?: InputMaybe<Scalars["String"]>;
+  recurrenceInDays: Scalars["Int"];
+  reservationUnitPk: Scalars["Int"];
+  user?: InputMaybe<Scalars["String"]>;
+  /** List of weekdays which days the reservations occurs */
+  weekdays: Array<InputMaybe<Scalars["Int"]>>;
+};
+
+export type RecurringReservationCreateMutationPayload = {
+  __typename?: "RecurringReservationCreateMutationPayload";
+  abilityGroupPk?: Maybe<Scalars["Int"]>;
+  ageGroupPk?: Maybe<Scalars["Int"]>;
+  /** Date when first reservation begins. */
+  beginDate?: Maybe<Scalars["Date"]>;
+  /** Time when reservations begins. */
+  beginTime?: Maybe<Scalars["Time"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  /** Date when last reservation begins. */
+  endDate?: Maybe<Scalars["Date"]>;
+  /** Time when reservations ends. */
+  endTime?: Maybe<Scalars["Time"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  name?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  recurrenceInDays?: Maybe<Scalars["Int"]>;
+  recurringReservation?: Maybe<RecurringReservationType>;
+  reservationUnitPk?: Maybe<Scalars["Int"]>;
+  user?: Maybe<Scalars["String"]>;
+  /** List of weekdays which days the reservations occurs */
+  weekdays?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+};
+
+export type RecurringReservationType = Node & {
   __typename?: "RecurringReservationType";
   abilityGroup?: Maybe<AbilityGroupType>;
   ageGroup?: Maybe<AgeGroupType>;
   applicationEventPk?: Maybe<Scalars["Int"]>;
   applicationPk?: Maybe<Scalars["Int"]>;
+  beginDate?: Maybe<Scalars["Date"]>;
+  beginTime?: Maybe<Scalars["Time"]>;
+  created: Scalars["DateTime"];
+  description: Scalars["String"];
+  endDate?: Maybe<Scalars["Date"]>;
+  endTime?: Maybe<Scalars["Time"]>;
+  /** The ID of the object */
+  id: Scalars["ID"];
+  name: Scalars["String"];
   pk?: Maybe<Scalars["Int"]>;
+  /**
+   * How this recurring reservation's reservations occurs within days. E.g 7 means
+   * that it occurs every week. 14 every other week
+   */
+  recurrenceInDays?: Maybe<Scalars["Int"]>;
+  reservationUnit: ReservationUnitByPkType;
   user?: Maybe<Scalars["String"]>;
+  weekdays?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+};
+
+export type RecurringReservationTypeConnection = {
+  __typename?: "RecurringReservationTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<RecurringReservationTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
+};
+
+/** A Relay edge containing a `RecurringReservationType` and its cursor. */
+export type RecurringReservationTypeEdge = {
+  __typename?: "RecurringReservationTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"];
+  /** The item at the end of the edge */
+  node?: Maybe<RecurringReservationType>;
+};
+
+export type RecurringReservationUpdateMutationInput = {
+  abilityGroupPk?: InputMaybe<Scalars["Int"]>;
+  ageGroupPk?: InputMaybe<Scalars["Int"]>;
+  /** Date when first reservation begins. */
+  beginDate?: InputMaybe<Scalars["Date"]>;
+  /** Time when reservations begins. */
+  beginTime?: InputMaybe<Scalars["Time"]>;
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  /** Date when last reservation begins. */
+  endDate?: InputMaybe<Scalars["Date"]>;
+  /** Time when reservations ends. */
+  endTime?: InputMaybe<Scalars["Time"]>;
+  name?: InputMaybe<Scalars["String"]>;
+  pk: Scalars["Int"];
+  recurrenceInDays?: InputMaybe<Scalars["Int"]>;
+  user?: InputMaybe<Scalars["String"]>;
+  /** List of weekdays which days the reservations occurs */
+  weekdays?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
+};
+
+export type RecurringReservationUpdateMutationPayload = {
+  __typename?: "RecurringReservationUpdateMutationPayload";
+  abilityGroupPk?: Maybe<Scalars["Int"]>;
+  ageGroupPk?: Maybe<Scalars["Int"]>;
+  /** Date when first reservation begins. */
+  beginDate?: Maybe<Scalars["Date"]>;
+  /** Time when reservations begins. */
+  beginTime?: Maybe<Scalars["Time"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  /** Date when last reservation begins. */
+  endDate?: Maybe<Scalars["Date"]>;
+  /** Time when reservations ends. */
+  endTime?: Maybe<Scalars["Time"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  name?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  recurrenceInDays?: Maybe<Scalars["Int"]>;
+  recurringReservation?: Maybe<RecurringReservationType>;
+  user?: Maybe<Scalars["String"]>;
+  /** List of weekdays which days the reservations occurs */
+  weekdays?: Maybe<Array<Maybe<Scalars["Int"]>>>;
 };
 
 export type RefreshOrderMutationInput = {
@@ -2443,6 +2604,7 @@ export type ReservationStaffCreateMutationInput = {
   name?: InputMaybe<Scalars["String"]>;
   numPersons?: InputMaybe<Scalars["Int"]>;
   purposePk?: InputMaybe<Scalars["Int"]>;
+  recurringReservationPk?: InputMaybe<Scalars["Int"]>;
   reservationUnitPks: Array<InputMaybe<Scalars["Int"]>>;
   reserveeAddressCity?: InputMaybe<Scalars["String"]>;
   reserveeAddressStreet?: InputMaybe<Scalars["String"]>;
@@ -2494,6 +2656,7 @@ export type ReservationStaffCreateMutationPayload = {
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   purposePk?: Maybe<Scalars["Int"]>;
+  recurringReservationPk?: Maybe<Scalars["Int"]>;
   reservation?: Maybe<ReservationType>;
   reservationUnitPks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   reserveeAddressCity?: Maybe<Scalars["String"]>;

@@ -643,7 +643,6 @@ const selectedReservationUnitQuery = graphql.query<
     },
     minReservationDuration: 3600,
     maxReservationDuration: 5400,
-    nextAvailableSlot: "2021-09-21T09:30:00Z",
     spaces: [
       {
         id: "U3BhY2VUeXBlOjQx",
