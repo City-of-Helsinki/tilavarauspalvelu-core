@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from sentry_sdk import capture_message
 
+from email_notification.email_tester import EmailTestForm
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
@@ -14,7 +15,7 @@ from reservations.models import Reservation
 
 def send_reservation_email_notification(
     email_type: EmailType,
-    reservation: Reservation,
+    reservation: Optional[Reservation],
     recipients: Optional[List[str]] = None,
     context: Optional[EmailNotificationContext] = None,
 ):
@@ -52,3 +53,15 @@ def send_reservation_email_notification(
         bcc=recipients,
     )
     email.send(fail_silently=False)
+
+
+def send_test_emails(template: EmailTemplate, form: EmailTestForm):
+    context = EmailNotificationContext.from_form(form)
+    for language in ["fi", "sv", "en"]:
+        context.reservee_language = language
+        send_reservation_email_notification(
+            template.type,
+            None,
+            recipients=[form.cleaned_data["recipient"]],
+            context=context,
+        )

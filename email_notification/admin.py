@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from admin_extra_buttons.api import ExtraButtonsMixin, button
 from django.contrib import admin
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -5,14 +7,51 @@ from django.forms import ModelForm, ValidationError
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
-from email_notification.email_tester import EmailTestForm
+from email_notification.email_tester import EmailTestForm, ReservationUnitSelectForm
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
     EmailTemplateValidationError,
     EmailTemplateValidator,
 )
-from email_notification.sender.senders import send_reservation_email_notification
+from email_notification.sender.senders import send_test_emails
+from reservation_units.models import ReservationUnit
+
+
+def get_initial_values(request) -> Dict[str, Any]:
+    recipient = request.user.email if request.user else ""
+    initial_values = {"recipient": recipient}
+
+    reservation_unit_pk = request.GET.get("reservation_unit", None)
+    if not reservation_unit_pk:
+        return initial_values
+
+    runit = ReservationUnit.objects.filter(pk=int(reservation_unit_pk)).first()
+    if not runit:
+        return initial_values
+
+    initial_values["reservation_unit_name"] = runit.name
+
+    for lang in ["fi", "sv", "en"]:
+        initial_values[f"confirmed_instructions_{lang}"] = getattr(
+            runit, f"reservation_confirmed_instructions_{lang}", ""
+        )
+        initial_values[f"pending_instructions_{lang}"] = getattr(
+            runit, f"reservation_pending_instructions_{lang}", ""
+        )
+        initial_values[f"cancelled_instructions_{lang}"] = getattr(
+            runit, f"reservation_cancelled_instructions_{lang}", ""
+        )
+
+    initial_values["unit_name"] = getattr(runit.unit, "name", "")
+
+    location = getattr(runit.unit, "location", None)
+    if location:
+        initial_values[
+            "unit_location"
+        ] = f"{location.address_street} {location.address_zip} {location.address_city}"
+
+    return initial_values
 
 
 class EmailTemplateAdminForm(ModelForm):
@@ -103,27 +142,27 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     @button(label="Email Template Testing")
     def template_tester(self, request):
         context = self.admin_site.each_context(request)
+
         if request.method == "POST":
             form = EmailTestForm(request.POST)
-            template = EmailTemplate.objects.filter(pk=request.POST["template"]).first()
 
             if form.is_valid():
-                context = EmailNotificationContext.from_form(form)
-                for language in ["fi", "sv", "en"]:
-                    context.reservee_language = language
-                    send_reservation_email_notification(
-                        template.type,
-                        None,
-                        recipients=[form.cleaned_data["recipient"]],
-                        context=context,
-                    )
+                template = EmailTemplate.objects.filter(
+                    pk=request.POST["template"]
+                ).first()
+                send_test_emails(template, form)
                 return redirect(
                     "/admin/email_notification/emailtemplate/template_tester/"
                 )
 
-        else:
-            recipient = request.user.email if request.user else ""
-            form = EmailTestForm(initial={"recipient": recipient})
+            context["form"] = form
+            context["runit_form"] = ReservationUnitSelectForm()
+            return TemplateResponse(request, "email_tester.html", context=context)
+
+        initial_values = get_initial_values(request)
+        form = EmailTestForm(initial=initial_values)
 
         context["form"] = form
+        context["runit_form"] = ReservationUnitSelectForm()
+
         return TemplateResponse(request, "email_tester.html", context=context)
