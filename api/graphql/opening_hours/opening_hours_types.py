@@ -5,6 +5,7 @@ import pytz
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
+from opening_hours.enums import State as ResourceState
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -144,11 +145,8 @@ class OpeningHoursMixin:
                         end_time=time.end_time.time(),
                         state=time.resource_state,
                         periods=time.periods,
-                        is_reservable=opening_hours_client.is_resource_open_for_reservations(
-                            str(self.hauki_resource_origin_id),
-                            time.start_time,
-                            time.end_time,
-                        ),
+                        is_reservable=ResourceState(time.resource_state)
+                        in ResourceState.reservable_states(),
                     )
                     opening_hours.append(oh)
             return_object.opening_times = opening_hours
