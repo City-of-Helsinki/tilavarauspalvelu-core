@@ -1,7 +1,7 @@
 import datetime
 import os
 import re
-from typing import Dict
+from typing import Dict, Optional
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
@@ -269,14 +269,14 @@ class ReservationEmailNotificationBuilder:
         return rendered
 
     def get_content(self):
-        html_content = self._get_html_content(self.template)
-        content = (
-            html_content
-            if html_content
-            else self._get_by_language(self.template, "content")
-        )
-        rendered = self.env.from_string(content).render(self.context_attr_map)
-        return rendered
+        content = self._get_by_language(self.template, "content")
+        return self.env.from_string(content).render(self.context_attr_map)
+
+    def get_html_content(self) -> Optional[str]:
+        content = self._get_html_content(self.template)
+        if content:
+            return self.env.from_string(content).render(self.context_attr_map)
+        return None
 
 
 class EmailTemplateValidationError(Exception):
