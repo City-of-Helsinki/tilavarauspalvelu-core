@@ -4,8 +4,8 @@ module.exports = {
     locales: ["fi", "en", "sv"],
     localeDetection: false,
   },
-  react: {
-    useSuspense: false,
-    wait: true,
-  },
+  localePath:
+    typeof window === "undefined"
+      ? require("path").resolve("./public/locales")
+      : "/public/locales",
 };

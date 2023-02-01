@@ -1,1 +1,6 @@
-[{"id":1,"minimum":5,"maximum":8},{"id":2,"minimum":9,"maximum":12},{"id":3,"minimum":12,"maximum":16},{"id":4,"minimum":17,"maximum":20}]
+[
+  { "id": 1, "minimum": 5, "maximum": 8 },
+  { "id": 2, "minimum": 9, "maximum": 12 },
+  { "id": 3, "minimum": 12, "maximum": 16 },
+  { "id": 4, "minimum": 17, "maximum": 20 }
+]

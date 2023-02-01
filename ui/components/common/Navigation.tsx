@@ -185,7 +185,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
         skipTo="#main"
         skipToContentLabel={t("navigation:skipToMainContent")}
       >
-        <HDSNavigation.Row variant="inline">
+        <HDSNavigation.Row variant="inline" ariaLabel="Navigation menu">
           {menuItems.map((item) => (
             <NaviItem
               href="#"

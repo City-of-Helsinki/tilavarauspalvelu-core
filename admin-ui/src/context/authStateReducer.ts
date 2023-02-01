@@ -59,6 +59,7 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
           set(newState, "state", "Authenticated");
         }
       }
+
       if (action.user?.profile.sid) {
         if (!newState.sid || newState.sid !== action.user.profile.sid) {
           set(newState, "sid", action.user.profile.sid);
@@ -83,7 +84,6 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
     case "error": {
       return { ...state, state: "Error" };
     }
-
     case "apiTokenAvailable": {
       const newState = { ...state };
       if (state.state === "Authenticated") {
@@ -96,9 +96,9 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
       const { currentUser } = action;
 
       const hasSomePermissions =
-        get(currentUser, "generalRoles.length") > 0 ||
-        get(currentUser, "serviceSectorRoles.length") > 0 ||
-        get(currentUser, "unitRoles.length") > 0 ||
+        get(currentUser, "generalRoles.length", 0) > 0 ||
+        get(currentUser, "serviceSectorRoles.length", 0) > 0 ||
+        get(currentUser, "unitRoles.length", 0) > 0 ||
         currentUser.isSuperuser;
 
       return {

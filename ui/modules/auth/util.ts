@@ -1,12 +1,5 @@
 import axios from "axios";
-import {
-  apiScope,
-  profileApiScope,
-  isBrowser,
-  apiTokenUrl,
-  oidcClientId,
-  oidcUrl,
-} from "../const";
+import { apiScope, profileApiScope, isBrowser, apiTokenUrl } from "../const";
 
 export const getApiAccessTokens = (): [string | null, string | null] => {
   if (!isBrowser) {
@@ -45,13 +38,13 @@ export const clearApiAccessToken = (): void => {
 };
 
 export const getAccessToken = (): string | null => {
-  const key = `oidc.user:${oidcUrl}:${oidcClientId}`;
+  const key = "oidc.default";
   const data = isBrowser && sessionStorage.getItem(key);
 
   if (data) {
     try {
       const parsed = JSON.parse(data);
-      return parsed.access_token;
+      return parsed.tokens.accessToken;
     } catch (Exception) {
       return undefined;
     }
@@ -68,13 +61,14 @@ export const updateApiAccessTokens = async (
   if (!apiScope) {
     throw new Error("Application configuration error, illegal api scope.");
   }
+
   const response = await axios.request({
     responseType: "json",
     method: "POST",
     url: apiTokenUrl,
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+      // "Content-Type": "application/x-www-form-urlencoded",
     },
   });
 

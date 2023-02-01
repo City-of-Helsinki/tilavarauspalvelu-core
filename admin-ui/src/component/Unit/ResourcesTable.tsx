@@ -3,7 +3,7 @@ import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   ResourceDeleteMutationInput,
   ResourceDeleteMutationPayload,
@@ -58,7 +58,7 @@ const ResourcesTable = ({
   const { t } = useTranslation();
 
   const modal = useRef<ModalRef>();
-  const history = useHistory();
+  const history = useNavigate();
 
   const cellConfig = {
     cols: [
@@ -86,7 +86,7 @@ const ResourcesTable = ({
                 {
                   name: t("ResourceTable.menuEditResource"),
                   onClick: () => {
-                    history.push(resourceUrl(Number(pk), Number(unit.pk)));
+                    history(resourceUrl(Number(pk), Number(unit.pk)));
                   },
                 },
                 {

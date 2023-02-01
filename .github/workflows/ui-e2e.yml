@@ -36,6 +36,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           project: ./ui
+          config-file: cypress.config.ts
       - name: Upload images on failure
         uses: actions/upload-artifact@v1
         if: failure()

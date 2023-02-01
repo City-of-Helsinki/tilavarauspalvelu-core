@@ -14,7 +14,7 @@ import { Notification, Stepper } from "hds-react";
 import { useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
 import { isFinite, omit } from "lodash";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
@@ -411,8 +411,8 @@ const ReservationUnitReservation = ({
         setErrorMsg(msg);
       } else if (confirmData) {
         if (steps?.length > 2) {
-          const { checkoutUrl, receiptUrl } =
-            confirmData.confirmReservation?.order;
+          const order = confirmData.confirmReservation?.order;
+          const { checkoutUrl, receiptUrl } = order ?? {};
           const userId = new URL(receiptUrl)?.searchParams?.get("user");
 
           if (checkoutUrl && receiptUrl && userId) {

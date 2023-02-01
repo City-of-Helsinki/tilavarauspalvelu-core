@@ -3,7 +3,7 @@
   "titleSent": "Varausanomus jätetty",
   "applicationInfo": "Anomuksen tiedot",
   "summaryIngress": "Anomuksesi on nyt käsiteltävänä. Tästä löydät yhteenvedon anomuksestasi.",
-  "reserveeTypePrefix": "Luon hakemuksen",
+  "reserveeTypePrefix": "Varaan",
   "reserveeTypes": {
     "labels": {
       "nonprofit": "järjestön, ryhmän tai yhteisön puolesta",
@@ -18,9 +18,9 @@
       "purpose": "Varauksen käyttötarkoitus",
       "numPersons": "Osallistujamäärä",
       "ageGroup": "Ikäryhmä",
-      "applyingForFreeOfChargeWithLink": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut <1>alennusperusteisiin</1>",
+      "applyingForFreeOfChargeWithLink": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut <a />",
       "applyingForFreeOfCharge": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin",
-      "freeOfChargeReason": "Perusteet maksuttomaan varaukseen"
+      "freeOfChargeReason": "Perustelut maksuttomaan varaukseen"
     },
     "nonprofit": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",

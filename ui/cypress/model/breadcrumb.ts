@@ -15,40 +15,36 @@ type Breadcrumb = {
   url?: string;
 };
 
-export const checkBreadcrumbs = (
-  breadcrumbs: BreadcrumbsByLang,
-  url: string
-) => {
-  const validateBreadcrumbContent = (
-    root: Cypress.Chainable<JQuery<HTMLElement>>,
-    breadcrumbs: Breadcrumb[]
-  ) => {
-    root
-      .find("> div")
-      .each((el: Cypress.Chainable<JQuery<HTMLElement>>, index: number) => {
-        if (breadcrumbs[index].url) {
-          const anchor = el.find("a");
-          cy.wrap(anchor).should("contain.text", breadcrumbs[index].title);
-          cy.wrap(anchor).should(
-            "have.attr",
-            "title",
-            breadcrumbs[index].title
-          );
-          cy.wrap(anchor).should("have.attr", "href", breadcrumbs[index].url);
-        } else {
-          const span = el.find("span");
-          cy.wrap(span).should("contain.text", breadcrumbs[index].title);
-          cy.wrap(span).should("have.attr", "title", breadcrumbs[index].title);
-        }
-      });
-  };
+function breadcrumbsRoot(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("[data-testid='breadcrumb__wrapper']");
+}
 
-  Object.keys(breadcrumbs).forEach((key: string) => {
+export const checkBreadcrumbs = ({
+  breadcrumbs,
+  url,
+}: {
+  breadcrumbs: BreadcrumbsByLang;
+  url: string;
+}) => {
+  for (const [key, value] of Object.entries(breadcrumbs)) {
     const keyString = key === "fi" ? "" : `/${key}`;
     cy.visit(`${keyString}${url}`);
 
-    validateBreadcrumbContent(breadcrumbWrapper(), breadcrumbs[key]);
-  });
+    breadcrumbsRoot()
+      .find("*[class^='Breadcrumb__Item']")
+      .each((el, index) => {
+        const isLastElement = !value[index].url;
+        const wrappedEl = isLastElement
+          ? cy.wrap(el).find("span[class^='Breadcrumb__Slug']")
+          : cy.wrap(el).find("a[class^='Breadcrumb__Anchor']");
+        wrappedEl.should("contain.text", value[index].title);
+        wrappedEl.should("have.attr", "title", value[index].title);
+
+        if (value[index]?.url) {
+          wrappedEl.parent().should("have.attr", "href", value[index].url);
+        }
+      });
+  }
 };
 
 export function breadcrumbWrapper(): Cypress.Chainable<JQuery<HTMLElement>> {

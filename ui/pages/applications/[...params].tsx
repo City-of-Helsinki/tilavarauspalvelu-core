@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { IconLocation } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -154,7 +154,7 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
         }
       />
       <ReservationList
-        groupName={applicationEvent?.name as string}
+        groupName={applicationEvent?.name}
         reservations={unitReservations}
       />
     </Container>

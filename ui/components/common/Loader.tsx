@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { CenterSpinner } from "./common";
 import { ApiData } from "../../hooks/useApiData";
 
@@ -32,10 +32,10 @@ const Loader = ({ children, datas }: Params): JSX.Element => {
   }
 
   if (isLoading) {
-    return <></>;
+    return <> </>;
   }
 
-  return <>{children}</>;
+  return <div>{children}</div>;
 };
 
 export default Loader;

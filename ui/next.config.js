@@ -1,9 +1,12 @@
 const { i18n } = require("./next-i18next.config");
 const { withSentryConfig } = require("@sentry/nextjs");
 const withPlugins = require("next-compose-plugins");
-const withTM = require("next-transpile-modules")(["common"]);
+const nextTranspiler = require("next-transpile-modules")(["common"]);
+const { PHASE_PRODUCTION_SERVER } = require("next/constants");
 
-const moduleExports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: false,
   i18n,
   serverRuntimeConfig: {
     apiBaseUrl: process.env.TILAVARAUS_API_URL,
@@ -26,6 +29,16 @@ const moduleExports = {
     mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
     mockRequests: process.env.NEXT_PUBLIC_MOCK_REQUESTS === "true",
   },
+  transpilePackages: ["common"],
+  compiler: {
+    styledComponents: {
+      ssr: true,
+      displayName: true,
+    },
+  },
+  sentry: {
+    hideSourceMaps: true,
+  },
 };
 
 const sentryWebpackPluginOptions = {
@@ -43,7 +56,4 @@ const sentryWebpackPluginOptions = {
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports = withPlugins(
-  [withTM],
-  withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-);
+module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);

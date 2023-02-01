@@ -17,9 +17,9 @@ import {
 import Loader from "../Loader";
 import { useNotification } from "../../context/NotificationContext";
 
-interface IProps {
+type IProps = {
   applicationRoundId: string;
-}
+};
 
 function ApplicationRound(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
@@ -106,7 +106,7 @@ function ApplicationRound(): JSX.Element | null {
       return <Review applicationRound={applicationRound} />;
 
     default:
-      return null;
+      return <> </>;
   }
 }
 

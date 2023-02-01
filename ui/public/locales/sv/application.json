@@ -60,7 +60,7 @@
   "Page2": {
     "heading": "2. Välj bokningens tidpunkt",
     "subHeading": "Välj alla tidpunkter som du önskar att din bokning faller in på.",
-    "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <0>ansökningsanvisningarna (FI)</0>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
+    "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <a>ansökningsanvisningarna (FI)</a>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
     "text": "Ange de tidpunkter du önskar för säsongbokningen",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
@@ -81,8 +81,8 @@
       "minDuration": {
         "title": "Den totala varaktigheten för begärda tider är kortare än bokningens minsta varaktighet",
         "bodySingle": "Den totala varaktigheten av begärda tider som valts i kalendern är kortare än bokningens minimala längd (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen.",
-        "body": "I bokningen {{title}} är den totala varaktigheten för begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen.",
-        "body_plural": "I bokningarna {{title}} är den totala varaktigheten av begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen."
+        "body_one": "I bokningen {{title}} är den totala varaktigheten för begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen.",
+        "body_other": "I bokningarna {{title}} är den totala varaktigheten av begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen."
       }
     }
   },

@@ -1,4 +1,4 @@
-import { ApplicationEvent, Cell } from "common/types/common";
+import { ApplicationEvent, Cell } from "common";
 import {
   getApplicationEventsWhichMinDurationsIsNotFulfilled,
   getListOfApplicationEventTitles,

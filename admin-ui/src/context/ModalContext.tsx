@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 
 export type ModalContextProps = {
   modalContent: { isHds: boolean; content: JSX.Element | null };
@@ -14,7 +14,11 @@ export const ModalContext = React.createContext<ModalContextProps>({
 
 export const useModal = (): ModalContextProps => useContext(ModalContext);
 
-export const ModalContextProvider: React.FC = ({ children }) => {
+type Props = {
+  children: React.ReactNode;
+};
+
+export const ModalContextProvider: React.FC<Props> = ({ children }: Props) => {
   const [modalContent, setModalContent] = useState<{
     isHds: boolean;
     content: JSX.Element | null;
@@ -37,14 +41,17 @@ export const ModalContextProvider: React.FC = ({ children }) => {
     setModalContent({ isHds, content });
   };
 
+  const modalContextValues = useMemo(
+    () => ({
+      modalContent,
+      setModalContent: toggleModal,
+      isOpen: modalContent !== null,
+    }),
+    [modalContent]
+  );
+
   return (
-    <ModalContext.Provider
-      value={{
-        modalContent,
-        setModalContent: toggleModal,
-        isOpen: modalContent !== null,
-      }}
-    >
+    <ModalContext.Provider value={modalContextValues}>
       {children}
     </ModalContext.Provider>
   );

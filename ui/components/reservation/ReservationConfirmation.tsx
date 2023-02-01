@@ -2,7 +2,7 @@ import { ReservationState } from "common/types/common";
 import { IconArrowRight, IconCalendar, IconSignout } from "hds-react";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
 import { fontMedium, fontRegular, H2 } from "common/src/common/typography";
@@ -91,6 +91,7 @@ const ReservationConfirmation = ({
             }`}
             t={t}
             values={{ user: reservation?.user.email }}
+            components={{ bold: <strong />, br: <br /> }}
           >
             <InlineAnchor href={reservationsUrl}> </InlineAnchor>
           </Trans>

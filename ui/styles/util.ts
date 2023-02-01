@@ -13,12 +13,9 @@ export const pixel =
 
 export const MediumButton = styled(Button)``;
 
-export const BlackButton = styled(Button).attrs({
-  style: {
-    "--color-button-primary": "var(--color-black-90)",
-    "--color-bus": "var(--color-black-90)",
-  },
-})`
+export const BlackButton = styled(Button)`
+  color: var(--color-black-90);
+  border-color: var(--color-black-90) !important;
   font-size: var(--fontsize-body-m);
   ${fontMedium};
 `;

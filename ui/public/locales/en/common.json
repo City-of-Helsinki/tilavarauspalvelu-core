@@ -43,10 +43,10 @@
   "month.9": "October",
   "month.10": "November",
   "month.11": "December",
-  "hour": "{{count}} hour",
-  "hour_plural": "{{count}} hours",
-  "minute": "{{count}} minute",
-  "minute_plural": "{{count}} minutes",
+  "hour_one": "{{count}} hour",
+  "hour_other": "{{count}} hours",
+  "minute_one": "{{count}} minute",
+  "minute_other": "{{count}} minutes",
   "error": {
     "dataError": "Information could not be retrieved",
     "error": "Error",
@@ -105,5 +105,6 @@
   "fyiLabel": "For information",
   "add": "Add",
   "subtract": "Subtract",
-  "inclTax": ""
+  "inclTax": "",
+  "headAlt": "Tilan ikoni"
 }

@@ -9,7 +9,7 @@ jest.mock("next/config", () => () => ({
   publicRuntimeConfig: {},
 }));
 
-jest.mock("react-i18next", () => ({
+jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string) => str,

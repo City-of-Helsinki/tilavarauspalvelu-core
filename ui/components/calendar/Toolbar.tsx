@@ -144,128 +144,126 @@ const ButtonWrapper = styled.div`
   }
 `;
 
-// eslint-disable-next-line react/prefer-stateless-function
-export default class Toolbar extends React.Component<ToolbarProps> {
-  render(): JSX.Element {
-    const { onNavigate, onView, view, date } = this.props;
+const Toolbar = ({ onNavigate, onView, view, date }: ToolbarProps) => {
+  const culture = { locale: locales[i18n.language] };
 
-    const culture = { locale: locales[i18n.language] };
+  let title = "";
+  switch (view) {
+    case "day": {
+      const year = format(date, "yyyy", culture);
+      const currentYear = format(new Date(), "yyyy");
+      const dateStr = currentYear !== year ? "EEEEEE d.M yyyy" : "EEEEEE d.M";
 
-    let title = "";
-    switch (view) {
-      case "day": {
-        const year = format(date, "yyyy", culture);
-        const currentYear = format(new Date(), "yyyy");
-        const dateStr = currentYear !== year ? "EEEEEE d.M yyyy" : "EEEEEE d.M";
-
-        title = format(date, dateStr, culture);
-        break;
-      }
-      case "month": {
-        const month = format(date, "LLLL", culture);
-        const year = format(date, "yyyy", culture);
-        title = `${month} ${year}`;
-        break;
-      }
-      default:
-      case "week": {
-        const start = startOfWeek(date, culture);
-        const end = endOfWeek(date, culture);
-        const startDay = format(start, "d", culture);
-        const endDay = format(end, "d", culture);
-        const startMonth = format(start, "M", culture);
-        const endMonth = format(end, "M", culture);
-        const startYear = format(start, "yyyy", culture);
-        const endYear = format(end, "yyyy", culture);
-        const currentYear = format(new Date(), "yyyy", culture);
-        title = `${startDay}.${
-          startMonth !== endMonth ? `${startMonth}.` : ""
-        }${
-          startYear !== endYear ? `${startYear}` : ""
-        } – ${endDay}.${endMonth}.${
-          startYear !== endYear || endYear !== currentYear ? `${endYear}` : ""
-        }`;
-      }
+      title = format(date, dateStr, culture);
+      break;
     }
-
-    return (
-      <Wrapper className="rbc-toolbar">
-        <ButtonWrapper>
-          <button
-            type="button"
-            onClick={() => {
-              if (view === "month") {
-                onView("week");
-              }
-              onNavigate("TODAY");
-            }}
-            aria-label={i18n.t("reservationCalendar:showCurrentDay")}
-          >
-            {i18n.t("common:today")}
-          </button>
-        </ButtonWrapper>
-        <div className="rbc-toolbar-navigation-hz">
-          <button
-            className="rbc-toolbar-button--borderless"
-            type="button"
-            onClick={() => onNavigate("PREV")}
-            aria-label={i18n.t("reservationCalendar:showPrevious", {
-              view: String(i18n.t(`common:${view}`)).toLowerCase(),
-            })}
-          >
-            <IconAngleLeft />
-          </button>
-          <div className="rbc-toolbar-label">{title}</div>
-          <button
-            className="rbc-toolbar-button--borderless"
-            type="button"
-            onClick={() => onNavigate("NEXT")}
-            aria-label={i18n.t("reservationCalendar:showNext", {
-              view: String(i18n.t(`common:${view}`)).toLowerCase(),
-            })}
-          >
-            <IconAngleRight />
-          </button>
-        </div>
-        <div className="rbc-btn-group">
-          <button
-            className={classNames("", {
-              "rbc-active": view === "day",
-            })}
-            type="button"
-            onClick={() => onView("day")}
-            aria-label={i18n.t("reservationCalendar:showView", {
-              view: String(i18n.t("common:day")).toLowerCase(),
-            })}
-          >
-            {i18n.t("common:day")}
-          </button>
-          <button
-            className={classNames("", {
-              "rbc-active": view === "week",
-            })}
-            type="button"
-            onClick={() => onView("week")}
-            aria-label={i18n.t("reservationCalendar:showView", {
-              view: String(i18n.t("common:week")).toLowerCase(),
-            })}
-          >
-            {i18n.t("common:week")}
-          </button>
-          <button
-            className={classNames("", {
-              "rbc-active": view === "month",
-            })}
-            type="button"
-            onClick={() => onView("month")}
-            aria-label={i18n.t("reservationCalendar:showView", {
-              view: String(i18n.t("common:month")).toLowerCase(),
-            })}
-          >
-            {i18n.t("common:month")}
-          </button>
-        </div>
-      </Wrapper>
-    );
+    case "month": {
+      const month = format(date, "LLLL", culture);
+      const year = format(date, "yyyy", culture);
+      title = `${month} ${year}`;
+      break;
+    }
+    case "week":
+    default: {
+      const start = startOfWeek(date, culture);
+      const end = endOfWeek(date, culture);
+      const startDay = format(start, "d", culture);
+      const endDay = format(end, "d", culture);
+      const startMonth = format(start, "M", culture);
+      const endMonth = format(end, "M", culture);
+      const startYear = format(start, "yyyy", culture);
+      const endYear = format(end, "yyyy", culture);
+      const currentYear = format(new Date(), "yyyy", culture);
+      title = `${startDay}.${startMonth !== endMonth ? `${startMonth}.` : ""}${
+        startYear !== endYear ? `${startYear}` : ""
+      } – ${endDay}.${endMonth}.${
+        startYear !== endYear || endYear !== currentYear ? `${endYear}` : ""
+      }`;
+    }
   }
-}
+
+  return (
+    <Wrapper className="rbc-toolbar">
+      <ButtonWrapper>
+        <button
+          type="button"
+          onClick={() => {
+            if (view === "month") {
+              onView("week");
+            }
+            onNavigate("TODAY");
+          }}
+          aria-label={i18n.t("reservationCalendar:showCurrentDay")}
+        >
+          {i18n.t("common:today")}
+        </button>
+      </ButtonWrapper>
+      <div className="rbc-toolbar-navigation-hz">
+        <button
+          className="rbc-toolbar-button--borderless"
+          type="button"
+          onClick={() => onNavigate("PREV")}
+          aria-label={i18n.t("reservationCalendar:showPrevious", {
+            view: String(i18n.t(`common:${view}`)).toLowerCase(),
+          })}
+        >
+          <IconAngleLeft />
+        </button>
+        <div className="rbc-toolbar-label">{title}</div>
+        <button
+          className="rbc-toolbar-button--borderless"
+          type="button"
+          onClick={() => onNavigate("NEXT")}
+          aria-label={i18n.t("reservationCalendar:showNext", {
+            view: String(i18n.t(`common:${view}`)).toLowerCase(),
+          })}
+        >
+          <IconAngleRight />
+        </button>
+      </div>
+      <div className="rbc-btn-group">
+        <button
+          className={classNames("", {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            "rbc-active": view === "day",
+          })}
+          type="button"
+          onClick={() => onView("day")}
+          aria-label={i18n.t("reservationCalendar:showView", {
+            view: String(i18n.t("common:day")).toLowerCase(),
+          })}
+        >
+          {i18n.t("common:day")}
+        </button>
+        <button
+          className={classNames("", {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            "rbc-active": view === "week",
+          })}
+          type="button"
+          onClick={() => onView("week")}
+          aria-label={i18n.t("reservationCalendar:showView", {
+            view: String(i18n.t("common:week")).toLowerCase(),
+          })}
+        >
+          {i18n.t("common:week")}
+        </button>
+        <button
+          className={classNames("", {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            "rbc-active": view === "month",
+          })}
+          type="button"
+          onClick={() => onView("month")}
+          aria-label={i18n.t("reservationCalendar:showView", {
+            view: String(i18n.t("common:month")).toLowerCase(),
+          })}
+        >
+          {i18n.t("common:month")}
+        </button>
+      </div>
+    </Wrapper>
+  );
+};
+
+export { Toolbar };

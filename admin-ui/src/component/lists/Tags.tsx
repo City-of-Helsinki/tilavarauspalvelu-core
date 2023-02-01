@@ -1,7 +1,7 @@
 import React, { Dispatch } from "react";
 import { Tag as HDSTag } from "hds-react";
 import { get, omit, truncate } from "lodash";
-import { TFunction } from "react-i18next";
+import { TFunction } from "i18next";
 import styled from "styled-components";
 import { OptionType } from "../../common/types";
 
@@ -26,7 +26,7 @@ export type Action<T> =
   | { type: "reset" };
 
 export const toTags = <T,>(
-  state: T,
+  state: object & T,
   t: TFunction,
   multivaluedFields: string[],
   noLabelFields: string[],

@@ -1,29 +1,42 @@
-import React from "react";
-import { appWithTranslation, UserConfig } from "next-i18next";
-import dynamic from "next/dynamic";
-import { format, isValid } from "date-fns";
-import { AppProps } from "next/app";
-import { fi } from "date-fns/locale";
+import React, { useState, useEffect } from "react";
 import { ApolloProvider } from "@apollo/client";
-import apolloClient from "../modules/apolloClient";
-import SessionLost from "../components/common/SessionLost";
+import { appWithTranslation, UserConfig } from "next-i18next";
+import { fi } from "date-fns/locale";
+import { format, isValid } from "date-fns";
+
+import { OidcProvider } from "@axa-fr/react-oidc-context";
+import { AppProps } from "next/app";
 import PageWrapper from "../components/common/PageWrapper";
-import { authEnabled, isBrowser, mockRequests } from "../modules/const";
-import LoggingIn from "../components/common/LoggingIn";
+
+import ExternalScripts from "../components/ExternalScripts";
+import { DataContextProvider } from "../context/DataContext";
+import apolloClient from "../modules/apolloClient";
 import oidcConfiguration from "../modules/auth/configuration";
+import { isBrowser, mockRequests } from "../modules/const";
+import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
-import { TrackingWrapper } from "../modules/tracking";
+import LoggingIn from "../components/common/LoggingIn";
+
 import { FullscreenSpinner } from "../components/common/FullscreenSpinner";
-import { DataContextProvider } from "../context/DataContext";
-import ExternalScripts from "../components/ExternalScripts";
+import SessionLost from "../components/common/SessionLost";
 
 if (mockRequests) {
   require("../mocks");
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-function MyApp({ Component, pageProps }: AppProps) {
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  const [showChild, setShowChild] = useState(false);
+
+  useEffect(() => {
+    setShowChild(true);
+  }, []);
+
+  if (!showChild) {
+    return null;
+  }
+
   if (!isBrowser) {
     return (
       <DataContextProvider>
@@ -36,37 +49,29 @@ function MyApp({ Component, pageProps }: AppProps) {
     );
   }
 
-  const AuthenticationProvider = dynamic(() =>
-    // eslint-disable-next-line import/no-unresolved
-    import("@axa-fr/react-oidc-context").then(
-      (mod) => mod.AuthenticationProvider
-    )
-  );
-
   return (
     <>
       <DataContextProvider>
         <TrackingWrapper>
-          <AuthenticationProvider
-            authenticating={FullscreenSpinner}
-            notAuthenticated={SessionLost}
-            sessionLostComponent={SessionLost}
+          <OidcProvider
             configuration={oidcConfiguration}
-            isEnabled={authEnabled}
-            callbackComponentOverride={LoggingIn}
+            callbackSuccessComponent={LoggingIn}
+            loadingComponent={FullscreenSpinner}
+            authenticatingComponent={FullscreenSpinner}
+            sessionLostComponent={SessionLost}
           >
             <ApolloProvider client={apolloClient}>
               <PageWrapper {...pageProps}>
                 <Component {...pageProps} />
               </PageWrapper>
             </ApolloProvider>
-          </AuthenticationProvider>
+          </OidcProvider>
         </TrackingWrapper>
       </DataContextProvider>
       <ExternalScripts />
     </>
   );
-}
+};
 
 export default appWithTranslation(MyApp, {
   ...(nextI18NextConfig as UserConfig),

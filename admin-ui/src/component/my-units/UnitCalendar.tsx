@@ -11,7 +11,8 @@ import React, {
 import Popup from "reactjs-popup";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import ReservationPopupContent from "./ReservationPopupContent";
 import resourceEventStyleGetter, {
@@ -230,6 +231,19 @@ const getEventTitle = ({
     : title;
 };
 
+const EventTriggerButton = () => (
+  <button
+    type="button"
+    style={{
+      background: "transparent",
+      cursor: "pointer",
+      border: 0,
+      width: "100%",
+      height: "100%",
+    }}
+  />
+);
+
 const Events = ({
   currentReservationUnit,
   firstHour,
@@ -296,18 +310,7 @@ const Events = ({
             <p>{title}</p>
             <Popup
               position={["right center", "left center"]}
-              trigger={() => (
-                <button
-                  type="button"
-                  style={{
-                    background: "transparent",
-                    cursor: "pointer",
-                    border: 0,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                />
-              )}
+              trigger={EventTriggerButton}
             >
               <ReservationPopupContent
                 reservation={e.event as ReservationType}
@@ -359,56 +362,54 @@ const UnitCalendar = ({ date, resources }: Props): JSX.Element => {
   }, [scrollCalendar]);
 
   return (
-    <>
-      <FlexContainer $numCols={numHours * 2} ref={calendarRef}>
-        <HeadingRow>
-          <div />
-          <CellContent
-            $numCols={numHours}
-            key="header"
-            className="calendar-header"
-          >
-            {Array.from(Array(numHours).keys()).map((i, index) => (
-              <Time key={i}>{beginHour + index}</Time>
-            ))}
-          </CellContent>
-        </HeadingRow>
-        {orderedResources.map((row) => (
-          <Fragment key={row.url}>
-            <Row>
-              <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
-                <div
-                  style={{
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                    padding: "var(--spacing-xs)",
-                  }}
-                >
-                  {row.title}
-                </div>
-              </ResourceNameContainer>
-              <RowCalendarArea>
-                <Cells
-                  cols={numHours * 2}
-                  date={startDate}
-                  reservationUnitPk={row.pk}
-                  setModalContent={setModalContent}
-                />
-                <Events
-                  currentReservationUnit={row.pk}
-                  firstHour={beginHour}
-                  numHours={numHours}
-                  events={row.events}
-                  eventStyleGetter={resourceEventStyleGetter(row.pk)}
-                  t={t}
-                />
-              </RowCalendarArea>
-            </Row>
-          </Fragment>
-        ))}
-      </FlexContainer>
-    </>
+    <FlexContainer $numCols={numHours * 2} ref={calendarRef}>
+      <HeadingRow>
+        <div />
+        <CellContent
+          $numCols={numHours}
+          key="header"
+          className="calendar-header"
+        >
+          {Array.from(Array(numHours).keys()).map((i, index) => (
+            <Time key={i}>{beginHour + index}</Time>
+          ))}
+        </CellContent>
+      </HeadingRow>
+      {orderedResources.map((row) => (
+        <Fragment key={row.url}>
+          <Row>
+            <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
+              <div
+                style={{
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                  padding: "var(--spacing-xs)",
+                }}
+              >
+                {row.title}
+              </div>
+            </ResourceNameContainer>
+            <RowCalendarArea>
+              <Cells
+                cols={numHours * 2}
+                date={startDate}
+                reservationUnitPk={row.pk}
+                setModalContent={setModalContent}
+              />
+              <Events
+                currentReservationUnit={row.pk}
+                firstHour={beginHour}
+                numHours={numHours}
+                events={row.events}
+                eventStyleGetter={resourceEventStyleGetter(row.pk)}
+                t={t}
+              />
+            </RowCalendarArea>
+          </Row>
+        </Fragment>
+      ))}
+    </FlexContainer>
   );
 };
 

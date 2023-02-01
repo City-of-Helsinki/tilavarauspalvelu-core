@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import styled from "styled-components";
 import {
   Button,
@@ -495,12 +496,13 @@ function Handling({
                 />
               </div>
               <div>
-                {applicationRound.aggregatedData.totalHourCapacity && capacity && (
-                  <>
-                    <StatusCircle status={capacity.percentage} />
-                    <H3>{t("ApplicationRound.amountReserved")}</H3>
-                  </>
-                )}
+                {applicationRound.aggregatedData.totalHourCapacity &&
+                  capacity && (
+                    <>
+                      <StatusCircle status={capacity.percentage} />
+                      <H3>{t("ApplicationRound.amountReserved")}</H3>
+                    </>
+                  )}
               </div>
             </TopIngress>
           </IngressContainer>

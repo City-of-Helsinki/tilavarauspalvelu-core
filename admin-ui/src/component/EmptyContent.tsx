@@ -2,11 +2,11 @@ import React, { ReactNode } from "react";
 import withMainMenu from "./withMainMenu";
 
 interface IProps {
-  children: ReactNode;
+  children: ReactNode | React.ReactElement;
 }
 
 function EmptyContent({ children }: IProps): JSX.Element {
-  return <>{children}</>;
+  return <div>{children}</div>;
 }
 
 export default withMainMenu(EmptyContent);

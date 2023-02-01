@@ -24,6 +24,7 @@ import {
 describe("Tilavaraus ui search page (recurring)", () => {
   beforeEach(() => {
     cy.visit("/search");
+    cy.injectAxe();
   });
 
   const searchTerm = "haku";
@@ -110,18 +111,18 @@ describe("Tilavaraus ui search page (recurring)", () => {
 
     paginationButton().should("exist");
 
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
   });
 
   it("search results is accessible", () => {
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
     fullTextInput().type("search terms");
     searchButton().click();
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
   });
 
   it("displays correct breadcrumbs", () => {
-    const breadcrumbs = {
+    const breadcrumbLangArray = {
       fi: [
         { title: "Etusivu", url: "/" },
         { title: "Kausivaraus", url: "/recurring" },
@@ -138,8 +139,9 @@ describe("Tilavaraus ui search page (recurring)", () => {
         { title: "Sök" },
       ],
     };
+    const url = "/search";
 
-    checkBreadcrumbs(breadcrumbs, "/search");
+    checkBreadcrumbs({ breadcrumbs: breadcrumbLangArray, url });
   });
 
   it("handles mobile features", () => {
@@ -170,6 +172,6 @@ describe("Tilavaraus ui search page (recurring)", () => {
     inputUnitToggler().should("not.be.visible");
     inputPurposeToggler().should("not.be.visible");
 
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
   });
 });

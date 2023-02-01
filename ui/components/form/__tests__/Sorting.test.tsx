@@ -1,7 +1,7 @@
 import * as React from "react";
 import { get as mockGet } from "lodash";
 
-import { render, screen, userEvent } from "../../../test/testUtils";
+import { getByTestId, render, userEvent } from "../../../test/testUtils";
 import mockTranslations from "../../../public/locales/fi/search.json";
 import Sorting, { SortingProps } from "../Sorting";
 
@@ -25,7 +25,7 @@ jest.mock("next/config", () => () => ({
   publicRuntimeConfig: {},
 }));
 
-jest.mock("react-i18next", () => ({
+jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string) => {
@@ -39,13 +39,12 @@ jest.mock("react-i18next", () => ({
 const renderComponent = (props?: Partial<SortingProps>) =>
   render(<Sorting {...defaultProps} {...props} />);
 
-test("should toggle order", () => {
+test("should toggle order", async () => {
   const setIsOrderingAsc = jest.fn();
-  renderComponent({
-    setIsOrderingAsc,
-  });
-  const toggleButton = screen.getAllByRole("button")[0];
-  userEvent.click(toggleButton);
-  userEvent.click(toggleButton);
-  expect(setIsOrderingAsc).toBeCalledTimes(2);
+  const { container } = renderComponent({ setIsOrderingAsc });
+  const toggleButton = getByTestId(container, "sorting-button");
+
+  await userEvent.click(toggleButton);
+  await userEvent.click(toggleButton);
+  expect(setIsOrderingAsc).toHaveBeenCalledTimes(2);
 });

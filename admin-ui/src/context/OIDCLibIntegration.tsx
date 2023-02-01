@@ -8,7 +8,7 @@ const OIDCLibIntegration = ({
   // eslint-disable-next-line @typescript-eslint/ban-types
   setUser: (user: User, login: Function, logout: Function) => void;
 }): null => {
-  const { oidcUser, login, logout } = useReactOidc();
+  const { login, logout, oidcUser } = useReactOidc();
 
   useEffect(() => {
     setUser(oidcUser, login, logout);

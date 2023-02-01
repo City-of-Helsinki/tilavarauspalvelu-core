@@ -95,10 +95,7 @@ const FilterCheckbox = styled(Checkbox).attrs({
 })``;
 
 const ResetButton = styled(Button).attrs({
-  variant: "supplementary",
-  style: {
-    "--color": "var(--tilavaraus-admin-content-text-color)",
-  },
+  variant: "secondary",
 })`
   & > div {
     margin-left: 0 !important;

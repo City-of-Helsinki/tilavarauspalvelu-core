@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import styled from "styled-components";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import { get } from "lodash";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";
 import { SpaceType } from "common/types/gql-types";
 import { CellConfig, Row, Column, Cell } from "../DataTable";
@@ -141,9 +141,9 @@ function SpaceTreeDataTableGroup({
   children,
   cellConfig,
 }: IProps): JSX.Element {
-  const history = useHistory();
+  const history = useNavigate();
   if (hasGrouping === false) {
-    return <>{children}</>;
+    return <> {children} </>;
   }
   const groupChildren = (
     group.data.length > 1 ? group.data.slice(1) : group.data
@@ -161,7 +161,7 @@ function SpaceTreeDataTableGroup({
           key={rowKey}
           onClick={(): void => {
             if (cellConfig.rowLink) {
-              history.push(cellConfig.rowLink(row));
+              history(cellConfig.rowLink(row));
             }
           }}
           $clickable={!!cellConfig.rowLink}
@@ -188,45 +188,42 @@ function SpaceTreeDataTableGroup({
 
   return (
     <>
-      <>
-        {group.data.length > 1 ? (
-          <>
-            <ParentRow
-              key={root.pk}
-              $clickable={false}
-              $disabled={false}
-              $columnCount={cellConfig.cols.length}
-            >
-              {cellConfig.cols
-                .slice(0, cellConfig.cols.length - 1)
-                .map(
-                  (col: Column, index): JSX.Element =>
-                    renderColumn(root, cellConfig, index, 0, false)
-                )}
-              <Cell
-                key={`${get(root, cellConfig.index)}${
-                  cellConfig.cols[cellConfig.cols.length - 1].key
-                }`}
-              >
-                <span className="cellContent">
-                  <ActionCol>
-                    {lastCol.transform
-                      ? lastCol.transform(root)
-                      : get(root, lastCol.key)}
-                    <GroupToggle as="button" onClick={toggleGroupVisibility}>
-                      {isVisible ? (
-                        <IconAngleUp aria-hidden />
-                      ) : (
-                        <IconAngleDown aria-hidden />
-                      )}
-                    </GroupToggle>
-                  </ActionCol>
-                </span>
-              </Cell>
-            </ParentRow>
-          </>
-        ) : null}
-      </>
+      {group.data.length > 1 ? (
+        <ParentRow
+          key={root.pk}
+          $clickable={false}
+          $disabled={false}
+          $columnCount={cellConfig.cols.length}
+        >
+          {cellConfig.cols
+            .slice(0, cellConfig.cols.length - 1)
+            .map(
+              (col: Column, index): JSX.Element =>
+                renderColumn(root, cellConfig, index, 0, false)
+            )}
+          <Cell
+            key={`${get(root, cellConfig.index)}${
+              cellConfig.cols[cellConfig.cols.length - 1].key
+            }`}
+          >
+            <span className="cellContent">
+              <ActionCol>
+                {lastCol.transform
+                  ? lastCol.transform(root)
+                  : get(root, lastCol.key)}
+                <GroupToggle as="button" onClick={toggleGroupVisibility}>
+                  {isVisible ? (
+                    <IconAngleUp aria-hidden />
+                  ) : (
+                    <IconAngleDown aria-hidden />
+                  )}
+                </GroupToggle>
+              </ActionCol>
+            </span>
+          </Cell>
+        </ParentRow>
+      ) : null}
+
       {isVisible ? groupChildren : null}
       {group.data.length > 1 ? (
         <SpacerRow aria-hidden>

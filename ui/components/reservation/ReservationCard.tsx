@@ -207,11 +207,15 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
 
-  const statusTags = (
-    state: ReservationsReservationStateChoices,
+  const statusTags = ({
+    state,
+    orderStatus,
     statusType = "desktop",
-    orderStatus: string
-  ) => (
+  }: {
+    state: ReservationsReservationStateChoices;
+    orderStatus: string;
+    statusType: "desktop" | "mobile";
+  }) => (
     <StatusContainer>
       {orderStatus && (
         <ReservationOrderStatus
@@ -241,7 +245,11 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
         <Top>
           <Name>{title}</Name>
           <JustForDesktop customBreakpoint={breakpoints.l}>
-            {statusTags(reservation.state, "desktop", normalizedOrderStatus)}
+            {statusTags({
+              state: reservation.state,
+              orderStatus: normalizedOrderStatus,
+              statusType: "desktop",
+            })}
           </JustForDesktop>
         </Top>
         <Bottom>
@@ -253,7 +261,11 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
               customBreakpoint={breakpoints.l}
               style={{ marginTop: "var(--spacing-s)" }}
             >
-              {statusTags(reservation.state, "mobile", normalizedOrderStatus)}
+              {statusTags({
+                state: reservation.state,
+                orderStatus: normalizedOrderStatus,
+                statusType: "mobile",
+              })}
             </JustForMobile>
             <Price
               icon={<IconTicket aria-label={t("reservationUnit:price")} />}

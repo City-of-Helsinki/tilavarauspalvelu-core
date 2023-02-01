@@ -59,7 +59,9 @@ export const CustomTable = (
   <TableWrapper
     $headingBackground="var(--color-black-10)"
     $tableBackground="var(--color-white)"
-    $colWidths={props.cols.map((col) => get(col, "width"))}
+    $colWidths={
+      props?.cols ? props.cols.map((col) => get(col, "width", "auto")) : []
+    }
   >
     <Table {...props} />
   </TableWrapper>

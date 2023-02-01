@@ -200,6 +200,7 @@ const ReservationUnitCard = ({
                 icon={
                   <NextImage
                     src="/icons/icon_premises.svg"
+                    alt={t("common:headAlt")}
                     width="24"
                     height="24"
                     aria-label={t("reservationUnitCard:type")}

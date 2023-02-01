@@ -4,7 +4,7 @@ import {
   ApplicationEventSchedulePriority,
   Cell,
   DAY,
-} from "common/types/common";
+} from "common";
 import {
   cellsToApplicationEventSchedules,
   applicationEventSchedulesToCells,

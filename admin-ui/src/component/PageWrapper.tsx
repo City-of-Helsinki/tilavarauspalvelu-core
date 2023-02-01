@@ -7,7 +7,7 @@ import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
 
 type Props = {
-  children: React.ReactNode;
+  children: React.ReactNode | React.ReactElement;
 };
 
 const Content = styled.main`
@@ -15,14 +15,14 @@ const Content = styled.main`
   height: 100%;
 `;
 
+const FallbackComponent = (err: unknown) => {
+  Sentry.captureException(err);
+  return <div>500 Something went wrong</div>;
+};
+
 export default function PageWrapper({ children }: Props): JSX.Element {
   return (
-    <ErrorBoundary
-      FallbackComponent={(err) => {
-        Sentry.captureException(err);
-        return <div>500 Something went wrong</div>;
-      }}
-    >
+    <ErrorBoundary FallbackComponent={FallbackComponent}>
       <Navigation />
       <Content>
         {children}

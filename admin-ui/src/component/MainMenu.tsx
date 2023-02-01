@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IconAngleDown, IconAngleUp, IconLocation, IconStar } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { NavLink, RouteProps } from "react-router-dom";
+import { NavLink, RouteProps, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
@@ -71,7 +71,7 @@ const SubItemList = styled.ul`
   margin-top: 0.685rem;
 `;
 
-const SubItemHeading = styled(NavLink).attrs({ exact: true })<{
+const SubItemHeading = styled(NavLink)<{
   $disabled: boolean;
 }>`
   &.active {
@@ -175,9 +175,6 @@ const SubItems = ({
           {items.map((child: SubItemChild) => (
             <li key={child.title}>
               <SubItemHeading
-                isActive={(match, location) => {
-                  return location.pathname.startsWith(child.route);
-                }}
                 $disabled={child.route === ""}
                 to={child.route}
                 onClick={() => onItemSelection && onItemSelection()}
@@ -213,6 +210,7 @@ const getFilteredMenuTree = (hasOwnUnits: boolean): IMenuChild[] =>
     {
       title: "MainMenu.reservations",
       icon: <IconIndividualReservation aria-hidden />,
+      route: "/reservations",
       items: [
         {
           title: "MainMenu.requestedReservations",
@@ -228,6 +226,7 @@ const getFilteredMenuTree = (hasOwnUnits: boolean): IMenuChild[] =>
     {
       title: "MainMenu.recurringReservations",
       icon: <IconCalendar aria-hidden />,
+      route: "/recurring-reservations",
       items: [
         {
           title: "MainMenu.applicationRounds",
@@ -238,22 +237,23 @@ const getFilteredMenuTree = (hasOwnUnits: boolean): IMenuChild[] =>
     {
       title: "MainMenu.premisesAndSettings",
       icon: <IconLocation aria-hidden />,
+      route: "/premises-and-settings",
       items: [
         {
           title: "MainMenu.reservationUnits",
-          route: prefixes.reservationUnits,
+          route: `/premises-and-settings/${prefixes.reservationUnits}`,
         },
         {
           title: "MainMenu.spaces",
-          route: "/spaces",
+          route: "/premises-and-settings/spaces",
         },
         {
           title: "MainMenu.resources",
-          route: "/resources",
+          route: "/premises-and-settings/resources",
         },
         {
           title: "MainMenu.units",
-          route: "/units",
+          route: "/premises-and-settings/units",
         },
       ],
     },
@@ -269,6 +269,7 @@ function MainMenu({
   onItemSelection,
 }: MainMenuProps): JSX.Element {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
 
   const { handlingCount, hasOwnUnits } = useData();
 
@@ -280,20 +281,17 @@ function MainMenu({
 
   return (
     <Wrapper placement={placement}>
-      {filteredMenuTree.map((menuItem: IMenuChild) =>
-        menuItem ? (
+      {filteredMenuTree.map((menuItem: IMenuChild) => {
+        const isActive = menuItem?.route
+          ? pathname.startsWith(menuItem?.route)
+          : false;
+
+        return menuItem ? (
           <MenuItem key={menuItem.title}>
             <Icon>{menuItem.icon}</Icon>
             <Heading
               to={menuItem.route || ""}
-              isActive={(match, location) => {
-                if (!menuItem?.route) {
-                  return false;
-                }
-                return menuItem.exact
-                  ? location.pathname === menuItem.route
-                  : location.pathname.startsWith(String(menuItem?.route));
-              }}
+              className={isActive ? "active" : ""}
             >
               {t(menuItem.title)}
             </Heading>
@@ -307,8 +305,8 @@ function MainMenu({
               onItemSelection={onItemSelection}
             />
           </MenuItem>
-        ) : null
-      )}
+        ) : null;
+      })}
     </Wrapper>
   );
 }

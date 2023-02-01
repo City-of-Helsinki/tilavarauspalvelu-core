@@ -1,7 +1,7 @@
 import { IconPlusCircle, Notification as HDSNotification } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { isEqual, sortBy } from "lodash";
 import styled from "styled-components";
 import { ApplicationEvent, OptionType } from "common/types/common";

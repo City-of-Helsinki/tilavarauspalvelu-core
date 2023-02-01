@@ -87,7 +87,7 @@ export const validationErrorResolver =
 
     return i18next.t(`validation.${error.type}`, {
       ...getErrorContext(error.context, labelPrefix),
-    });
+    }) as string;
   };
 
 export default FormErrorSummary;

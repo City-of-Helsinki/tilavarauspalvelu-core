@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled, { css, FlattenSimpleInterpolation } from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { truncatedText } from "../../styles/util";

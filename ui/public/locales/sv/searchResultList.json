@@ -1,8 +1,8 @@
 {
-  "count_plural": "{{count}} resultat",
-  "count": "{{count}} resultat",
-  "paginationSummary": "{{count}} resultat av {{totalCount}} resultat",
-  "paginationSummary_plural": "{{count}} resultat av {{totalCount}} resultat",
+  "count_one": "{{count}} resultat",
+  "count_other": "{{count}} resultat",
+  "paginationSummary_one": "{{count}} resultat av {{totalCount}} resultat",
+  "paginationSummary_other": "{{count}} resultat av {{totalCount}} resultat",
   "paginationSummaryEnd": "Alla {{count}} resultat visas",
   "noResults": "Inga sökresultat",
   "error": "Ett fel uppstod när lokaler söktes",

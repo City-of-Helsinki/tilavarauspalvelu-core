@@ -205,12 +205,15 @@ export const isReservationReservable = (
   if (
     !isValid(start) ||
     !isValid(end) ||
-    doBuffersCollide(reservations, {
-      start,
-      end,
-      bufferTimeBefore,
-      bufferTimeAfter,
-    }) ||
+    doBuffersCollide(
+      {
+        start,
+        end,
+        bufferTimeBefore,
+        bufferTimeAfter,
+      },
+      reservations
+    ) ||
     !isStartTimeWithinInterval(
       start,
       openingHours?.openingTimes,
@@ -219,15 +222,15 @@ export const isReservationReservable = (
     !areSlotsReservable(
       [new Date(start), subMinutes(new Date(end), 1)],
       openingHours?.openingTimes,
-      activeApplicationRounds,
       reservationBegins ? new Date(reservationBegins) : undefined,
       reservationEnds ? new Date(reservationEnds) : undefined,
-      reservationsMinDaysBefore
+      reservationsMinDaysBefore,
+      activeApplicationRounds
     ) ||
     (!skipLengthCheck &&
       !isReservationLongEnough(start, end, minReservationDuration)) ||
     !isReservationShortEnough(start, end, maxReservationDuration) ||
-    doReservationsCollide(reservations, { start, end })
+    doReservationsCollide({ start, end }, reservations)
     // || !isSlotWithinTimeframe(start, reservationsMinDaysBefore, start, end)
   ) {
     return false;

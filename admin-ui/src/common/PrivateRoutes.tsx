@@ -1,22 +1,16 @@
 import React from "react";
+import { RouteProps } from "react-router-dom";
 import { useAuthState } from "../context/AuthStateContext";
+import { AuthState } from "../context/authStateReducer";
 
 import Error403 from "./Error403";
 import Error5xx from "./Error5xx";
 import ErrorNotLoggedIn from "./ErrorNotAuthenticated";
 
-type Props = {
-  children: React.ReactChild[] | React.ReactChild;
-};
-
-const PrivateRoutes = ({ children }: Props): JSX.Element => {
-  const { authState } = useAuthState();
-
-  switch (authState.state) {
+const AuthStateError = (state: AuthState) => {
+  switch (state) {
     case "HasPermissions":
-      return <>{children}</>;
-    case "Error":
-      return <Error5xx />;
+      return null;
     case "NoPermissions":
       return <Error403 />;
     case "NotAutenticated":
@@ -25,9 +19,21 @@ const PrivateRoutes = ({ children }: Props): JSX.Element => {
     case "Unknown":
     case "Authenticated":
       return <span />;
+    case "Error":
     default:
-      throw new Error(`Illegal auth state :'${authState.state}'`);
+      return <Error5xx />;
   }
 };
 
-export default PrivateRoutes;
+type Props = RouteProps;
+
+const PrivateRoute = ({ children }: Props) => {
+  const { authState } = useAuthState();
+  const error = AuthStateError(authState.state);
+
+  if (error) return error;
+
+  return <> {children} </>;
+};
+
+export { PrivateRoute };

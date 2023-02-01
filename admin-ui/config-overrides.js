@@ -3,6 +3,13 @@ var path = require("path");
 const { override, babelInclude } = require("customize-cra");
 
 module.exports = function (config, env) {
+  let loaders = config.resolve;
+
+  loaders.fallback = {
+    fs: false,
+    path: require.resolve("path-browserify"),
+  };
+
   return Object.assign(
     config,
     override(

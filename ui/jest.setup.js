@@ -1,3 +1,5 @@
+import "@testing-library/jest-dom";
+
 import { setConfig } from "next/config";
 import { server } from "./mocks/server";
 import config from "./next.config";

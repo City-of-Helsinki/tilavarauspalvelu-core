@@ -1,6 +1,6 @@
 import { Button, Link } from "hds-react";
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -51,7 +51,7 @@ const ButtonContainer = styled.div`
 
 const Error403 = (): JSX.Element => {
   const { authState } = useAuthState();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <Wrapper>
@@ -84,7 +84,7 @@ const Error403 = (): JSX.Element => {
                 } else {
                   localLogout();
                 }
-                history.push("/");
+                navigate("/");
               }}
             >
               Kirjaudu ulos

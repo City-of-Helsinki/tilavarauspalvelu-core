@@ -26,10 +26,10 @@
 
 function terminalLog(violations) {
   cy.task(
-    'log',
+    "log",
     `${violations.length} accessibility violation${
-      violations.length === 1 ? '' : 's'
-    } ${violations.length === 1 ? 'was' : 'were'} detected`
+      violations.length === 1 ? "" : "s"
+    } ${violations.length === 1 ? "was" : "were"} detected`
   );
   // pluck specific keys to keep the table readable
   const violationData = violations.map(
@@ -41,11 +41,10 @@ function terminalLog(violations) {
     })
   );
 
-  cy.task('table', violationData);
+  cy.task("table", violationData);
 }
 
-
-Cypress.Commands.add('a11yCheck', ()=>{
+Cypress.Commands.add("a11yCheck", () => {
   cy.injectAxe();
-  cy.checkA11y({ exclude: ['header'] }, null, terminalLog); // skip navigation
-})
+  cy.checkA11y({ exclude: ["header"] }, null, terminalLog); // skip navigation
+});

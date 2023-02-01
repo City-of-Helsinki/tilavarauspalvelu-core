@@ -1,7 +1,7 @@
 import { getDay } from "date-fns";
 import { Button, IconCross } from "hds-react";
 import React, { ReactElement, ReactNode } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { parseTimeframeLength } from "common/src/calendar/util";
 import { fontMedium } from "common/src/common/typography";
@@ -73,11 +73,8 @@ const Modal = styled.div<{
 `;
 
 const CloseButton = styled(Button).attrs({
-  variant: "supplementary",
+  variant: "secondary",
   size: "small",
-  style: {
-    "--color-bus-light": "transparent",
-  },
 })`
   &&& {
     > span {
@@ -117,11 +114,11 @@ const ReservationDetails = ({
   label,
   event,
   authComponent,
-}: Props): JSX.Element => {
+}: Props) => {
   const { t } = useTranslation();
 
   if (event.event.state !== "INITIAL") {
-    return <>{children}</>;
+    return { children };
   }
 
   return (

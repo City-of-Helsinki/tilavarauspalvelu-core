@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 export type AllocationContextProps = {
   refreshApplicationEvents: boolean;
@@ -13,17 +13,26 @@ export const AllocationContext = createContext<AllocationContextProps>({
 export const useAllocationContext = (): AllocationContextProps =>
   useContext(AllocationContext);
 
-export const AllocationContextProvider: React.FC = ({ children }) => {
+type Props = {
+  children: React.ReactNode;
+};
+
+export const AllocationContextProvider: React.FC<Props> = ({
+  children,
+}: Props) => {
   const [refreshApplicationEvents, setRefreshApplicationEvents] =
     useState<boolean>(false);
 
+  const allocationContextValues = useMemo(
+    () => ({
+      refreshApplicationEvents,
+      setRefreshApplicationEvents,
+    }),
+    [refreshApplicationEvents, setRefreshApplicationEvents]
+  );
+
   return (
-    <AllocationContext.Provider
-      value={{
-        refreshApplicationEvents,
-        setRefreshApplicationEvents,
-      }}
-    >
+    <AllocationContext.Provider value={allocationContextValues}>
       {children}
     </AllocationContext.Provider>
   );

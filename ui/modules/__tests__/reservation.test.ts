@@ -495,7 +495,7 @@ describe("canReservationBeChanged", () => {
               ...reservation.reservationUnits[0],
               cancellationRule: {
                 ...reservation.reservationUnits[0].cancellationRule,
-                canBeCancelledTimeBefore: 3600,
+                canBeCancelledTimeBefore: 3000,
               },
             },
           ],

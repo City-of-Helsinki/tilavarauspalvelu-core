@@ -27,6 +27,7 @@ import { applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
+  [key: string]: string;
   applicationRoundId: string;
   reservationUnitId: string;
 }
@@ -152,7 +153,10 @@ function ReservationsByReservationUnit(): JSX.Element | null {
   }, [applicationRoundId]);
 
   useEffect(() => {
-    fetchReservations(reservationUnitId);
+    if (reservationUnitId) {
+      fetchReservations(reservationUnitId);
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnitId]);
 
@@ -170,13 +174,15 @@ function ReservationsByReservationUnit(): JSX.Element | null {
     <Wrapper>
       {applicationRound && reservationUnit && reservations && (
         <>
-          <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
-            <LinkPrev
-              route={`${applicationRoundUrl(
-                applicationRoundId
-              )}/reservationUnit/${reservationUnitId}`}
-            />
-          </ContentContainer>
+          {applicationRoundId ? (
+            <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
+              <LinkPrev
+                route={`${applicationRoundUrl(
+                  applicationRoundId
+                )}/reservationUnit/${reservationUnitId}`}
+              />
+            </ContentContainer>
+          ) : null}
           <NarrowContainer>
             <p>{applicationRound.name}</p>
             <div>
@@ -194,14 +200,16 @@ function ReservationsByReservationUnit(): JSX.Element | null {
                   </Space>
                 </div>
               </Location>
-              <BasicLink
-                to={`${applicationRoundUrl(
-                  applicationRoundId
-                )}/reservationUnit/${reservationUnitId}/reservations/summary`}
-              >
-                <IconBulletList aria-hidden />{" "}
-                {t("Reservation.showSummaryOfReservations")}
-              </BasicLink>
+              {applicationRoundId ? (
+                <BasicLink
+                  to={`${applicationRoundUrl(
+                    applicationRoundId
+                  )}/reservationUnit/${reservationUnitId}/reservations/summary`}
+                >
+                  <IconBulletList aria-hidden />{" "}
+                  {t("Reservation.showSummaryOfReservations")}
+                </BasicLink>
+              ) : null}
             </TitleContainer>
             <Divider />
             {reservations && reservations.length > 0 ? (

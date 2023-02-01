@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled, { CSSProperties } from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { IconCross, Select } from "hds-react";
 import {
   ApplicationEventSchedule,
@@ -280,6 +280,7 @@ const ButtonContainer = styled.div`
 
 const ResetButton = styled(SupplementaryButton).attrs({
   style: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     "--color-bus": "var(--color-black)",
   } as CSSProperties,
 })`

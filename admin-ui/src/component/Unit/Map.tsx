@@ -2,17 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import ReactMapGL, {
+  MapboxStyle,
   Marker,
   NavigationControl,
+  PointLike,
   Popup,
-  WebMercatorViewport,
+  ViewState,
 } from "react-map-gl";
-
-type State = {
-  latitude: number;
-  longitude: number;
-  zoom: number;
-};
+import WebMercatorViewport from "viewport-mercator-project";
 
 interface MapMarker {
   latitude: number;
@@ -38,7 +35,7 @@ const defaultMapMarker = (
   </svg>
 );
 
-const mapStyle = (lang: string) => ({
+const getMapStyle = (lang: string): MapboxStyle => ({
   version: 8,
   name: "hel-osm-light",
   metadata: {},
@@ -59,7 +56,6 @@ const mapStyle = (lang: string) => ({
       source: "osm",
     },
   ],
-  id: "hel-osm-light",
 });
 
 const NavControlContainer = styled.div`
@@ -70,7 +66,9 @@ const NavControlContainer = styled.div`
 
 const defaultViewPort = { latitude: 60.192059, longitude: 24.945831, zoom: 15 };
 
-const getBoundsForMarkers = (points: MapMarker[]) => {
+const getBoundsForMarkers = (
+  points: MapMarker[]
+): Pick<ViewState, "longitude" | "latitude" | "zoom"> => {
   // default location when no points are defined
   if (points.length === 0) {
     return defaultViewPort;
@@ -91,31 +89,32 @@ const getBoundsForMarkers = (points: MapMarker[]) => {
 };
 
 const Map = ({ markers }: IProps): JSX.Element | null => {
-  const [viewport, setViewport] = useState(defaultViewPort as State);
+  const [viewport, setViewport] = useState(defaultViewPort as ViewState);
 
   const [popupInfo, setPopupInfo] = useState<MapMarker | null>(null);
 
   useEffect(() => {
     const mapBounds = getBoundsForMarkers(markers);
-    setViewport(mapBounds);
+    setViewport(mapBounds as ViewState);
   }, [markers]);
 
   const { i18n } = useTranslation();
+  const mapStyle = getMapStyle(i18n.language);
+  const offset: PointLike = [28, 13];
 
   return (
     <ReactMapGL
       latitude={viewport.latitude}
       longitude={viewport.longitude}
-      mapStyle={mapStyle(i18n.language)}
-      width="100%"
-      height="380px"
+      mapStyle={mapStyle}
+      style={{ width: "100%", height: "380px" }}
       maxZoom={maxZoom}
       zoom={viewport.zoom}
       minZoom={8}
-      onViewportChange={(newViewPort: State) => {
+      onMove={(event) => {
         setViewport({
-          ...newViewPort,
-          zoom: Math.min(maxZoom, newViewPort.zoom),
+          ...event.viewState,
+          zoom: Math.min(maxZoom, event.viewState.zoom),
         });
       }}
     >
@@ -145,10 +144,8 @@ const Map = ({ markers }: IProps): JSX.Element | null => {
       ))}
       {popupInfo ? (
         <Popup
-          tipSize={15}
           anchor="left"
-          offsetTop={13}
-          offsetLeft={28}
+          offset={offset}
           longitude={popupInfo.longitude}
           latitude={popupInfo.latitude}
           closeOnClick={false}

@@ -2,7 +2,7 @@ import { CalendarEvent } from "common/src/calendar/Calendar";
 import { ReservationType } from "common/types/gql-types";
 import { differenceInMinutes } from "date-fns";
 import React, { CSSProperties } from "react";
-import { TFunction } from "react-i18next";
+import { TFunction } from "i18next";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
 import { getReserveeName } from "../reservations/requested/util";

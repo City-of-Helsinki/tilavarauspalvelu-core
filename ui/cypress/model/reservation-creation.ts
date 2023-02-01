@@ -43,6 +43,10 @@ export function dateSelector(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("#reservation__input--date");
 }
 
+export function datePickerModal(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get('*[class^="DatePicker-module"]');
+}
+
 export function startTimeSelectorToggle(): Cypress.Chainable<
   JQuery<HTMLElement>
 > {

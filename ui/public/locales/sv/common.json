@@ -43,10 +43,10 @@
   "month.9": "Oktober",
   "month.10": "November",
   "month.11": "December",
-  "hour": "{{count}} timme",
-  "hour_plural": "{{count}} timmar",
-  "minute": "{{count}} minut",
-  "minute_plural": "{{count}} minuter",
+  "hour_one": "{{count}} timme",
+  "hour_other": "{{count}} timmar",
+  "minute_one": "{{count}} minut",
+  "minute_other": "{{count}} minuter",
   "error": {
     "dataError": "Uppgifterna hittades inte",
     "error": "Fel",
@@ -105,5 +105,6 @@
   "fyiLabel": "Till kännedom",
   "add": "addera",
   "subtract": "subtrahera",
-  "inclTax": ""
+  "inclTax": "",
+  "headAlt": "Tilan ikoni"
 }

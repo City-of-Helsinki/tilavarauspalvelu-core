@@ -39,6 +39,7 @@ import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
+  [key: string]: string;
   applicationRoundId: string;
 }
 

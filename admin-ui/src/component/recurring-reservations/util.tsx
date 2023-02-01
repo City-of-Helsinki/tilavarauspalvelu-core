@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { orderBy, trim, uniqBy } from "lodash";
-import { TFunction } from "react-i18next";
+import { TFunction } from "i18next";
 import { formatters as getFormatters } from "common";
 import { parse } from "date-fns";
 import {

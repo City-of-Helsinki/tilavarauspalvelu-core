@@ -1,6 +1,7 @@
 import { i18n } from "next-i18next";
 import getConfig from "next/config";
 import { OptionType } from "common/types/common";
+import { MapboxStyle } from "react-map-gl";
 
 export const weekdays = [
   "monday",
@@ -17,10 +18,12 @@ export const searchPrefix = "/search";
 export const singleSearchPrefix = "/search/single";
 export const applicationsPrefix = "/applications";
 export const applicationPrefix = "/application";
+export const applicationRoundPrefix = "/application_round";
 export const reservationsPrefix = "/reservations";
 export const criteriaPrefix = "/criteria";
+export const parametersPrefix = "/parameters";
 
-export const mapStyle = {
+export const mapStyle: MapboxStyle = {
   version: 8,
   name: "hel-osm-light",
   metadata: {},
@@ -39,7 +42,6 @@ export const mapStyle = {
       source: "osm",
     },
   ],
-  id: "hel-osm-light",
 };
 
 export const reservationUnitPath = (id: number): string =>

@@ -13,10 +13,10 @@ import {
 } from "common/types/gql-types";
 import { OptionType } from "../../../common/types";
 
-export interface IProps {
+export type IProps = {
   reservationUnitPk?: string;
   unitPk: string;
-}
+};
 export type NotificationType = {
   title: string;
   text: string;

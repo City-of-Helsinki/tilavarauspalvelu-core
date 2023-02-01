@@ -24,10 +24,10 @@ import AllocatingDialogContent from "./AllocatingDialogContent";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { useNotification } from "../../context/NotificationContext";
 
-interface IProps {
+type IProps = {
   applicationRound: ApplicationRoundType;
   setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
-}
+};
 
 const Wrapper = styled.div`
   width: 100%;
@@ -107,10 +107,10 @@ const ActionContainer = styled.div`
   }
 `;
 
-function Allocation({
+const Allocation = ({
   applicationRound,
   setApplicationRoundStatus,
-}: IProps): JSX.Element {
+}: IProps) => {
   const { notifyError } = useNotification();
   const [isAllocating, setIsAllocating] = useState<boolean>(false);
   const [isAllocated, setIsAllocated] = useState(false);
@@ -223,6 +223,6 @@ function Allocation({
       {isAllocating && <AllocatingDialogContent />}
     </Wrapper>
   );
-}
+};
 
 export default withMainMenu(Allocation);

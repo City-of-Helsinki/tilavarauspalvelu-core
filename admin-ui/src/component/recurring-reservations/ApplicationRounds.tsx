@@ -42,6 +42,12 @@ const Deck = styled.div`
   margin-bottom: var(--spacing-layout-xl);
 `;
 
+const ApplicationRoundsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+`;
+
 function ApplicationRounds(): JSX.Element {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
@@ -104,18 +110,20 @@ function ApplicationRounds(): JSX.Element {
               </RoundTypeIngress>
             </IngressContainer>
             <WideContainer>
-              {handleRounds.length > 0 ? (
-                handleRounds.map((applicationRound) => (
-                  <ApplicationRoundCard
-                    applicationRound={applicationRound}
-                    key={applicationRound.pk}
-                  />
-                ))
-              ) : (
-                <NotificationBox>
-                  {t("ApplicationRound.listHandlingPlaceholder")}
-                </NotificationBox>
-              )}
+              <ApplicationRoundsContainer>
+                {handleRounds.length > 0 ? (
+                  handleRounds.map((applicationRound) => (
+                    <ApplicationRoundCard
+                      applicationRound={applicationRound}
+                      key={applicationRound.pk}
+                    />
+                  ))
+                ) : (
+                  <NotificationBox>
+                    {t("ApplicationRound.listHandlingPlaceholder")}
+                  </NotificationBox>
+                )}
+              </ApplicationRoundsContainer>
             </WideContainer>
           </Deck>
         )}

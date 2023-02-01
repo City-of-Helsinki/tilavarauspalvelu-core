@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { GetServerSideProps } from "next";
 import { sortBy } from "lodash";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";

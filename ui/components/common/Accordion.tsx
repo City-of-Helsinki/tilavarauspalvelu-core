@@ -23,9 +23,11 @@ const AccordionElement = styled.div`
 
 const HeadingButton = styled(Button).attrs({
   style: {
+    /* eslint-disable @typescript-eslint/naming-convention */
     "--color": "var(--color-black-90)",
     "--background-color-hover": "transparent",
     "--background-color-hover-focus": "transparent",
+    /* eslint-enable */
   } as React.CSSProperties,
 })<{ theme: Theme }>`
   &&& {

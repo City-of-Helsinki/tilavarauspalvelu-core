@@ -60,6 +60,7 @@ import { applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
+  [key: string]: string;
   applicationRoundId: string;
   reservationUnitId: string;
 }
@@ -478,7 +479,9 @@ function RecommendationsByReservationUnit(): JSX.Element {
         cellConfig && (
           <>
             <ContentContainer style={{ paddingBottom: "var(--spacing-s)" }}>
-              <LinkPrev route={applicationRoundUrl(applicationRoundId)} />
+              {applicationRoundId ? (
+                <LinkPrev route={applicationRoundUrl(applicationRoundId)} />
+              ) : null}
               <IngressContainer>
                 <Ingress>
                   {mainImage ? (
@@ -564,7 +567,8 @@ function RecommendationsByReservationUnit(): JSX.Element {
                     recommendationCount={recommendations.length}
                     unhandledCount={unhandledRecommendationCount}
                   />
-                  {["approved"].includes(applicationRound.status) && (
+                  {["approved"].includes(applicationRound.status) &&
+                  applicationRoundId ? (
                     <ReservationLink
                       to={`${applicationRoundUrl(
                         applicationRoundId
@@ -576,7 +580,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
                       )}
                       <IconArrowRight aria-hidden />
                     </ReservationLink>
-                  )}
+                  ) : null}
                 </BottomContainer>
               </IngressContainer>
             </ContentContainer>

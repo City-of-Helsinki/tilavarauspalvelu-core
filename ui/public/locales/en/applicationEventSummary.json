@@ -1,8 +1,8 @@
 {
-  "message": "You are making a booking <1>{{name}}</1> for the period <4>{{startDate}} - {{endDate}}</4>. The total duration of the bookings is at least <4>{{hours}} h</4>.",
+  "message": "You are making a booking <bold>{{name}}</bold> for the period <bold>{{startDate}} - {{endDate}}</bold>. The total duration of the bookings is at least <bold>{{hours}} h</bold>.",
   "numPersons": "Group size is {{count}} persons",
   "minDuration": "Minimum duration of a single booking is {{minDuration}}",
   "durations": "Duration of one booking is from {{minDuration}} to {{maxDuration}}",
-  "eventsPerWeek": "{{count}} booking per week",
-  "eventsPerWeek_plural": "{{count}} bookings per week"
+  "eventsPerWeek_one": "{{count}} booking per week",
+  "eventsPerWeek_other": "{{count}} bookings per week"
 }

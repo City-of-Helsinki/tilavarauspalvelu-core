@@ -60,7 +60,7 @@
   "Page2": {
     "heading": "2. Valitse varauksen ajankohta",
     "subHeading": "Valitse kaikki ne ajankohdat, joille toivot varauksesi asettuvan.",
-    "info": "Tarkista tilakohtaiset aukioloajat <0>koosteesta</0> tai tilan sivulta. Valitse ajat, joita ensisijaisesti toivot. Valitse myös toissijaisia aikoja, jotka sopivat sinulle.",
+    "info": "Tarkista tilakohtaiset aukioloajat <a>koosteesta</a> tai tilan sivulta. Valitse ajat, joita ensisijaisesti toivot. Valitse myös toissijaisia aikoja, jotka sopivat sinulle.",
     "text": "Ilmoita toivomasi ajankohdat kausivaraukselle",
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
@@ -81,8 +81,8 @@
       "minDuration": {
         "title": "Valittujen toiveaikojen kesto on pienempi kuin varauksen vähimmäiskesto",
         "bodySingle": "Kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa.",
-        "body": "Varauksella {{title}} kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa.",
-        "body_plural": "Varauksilla {{title}} kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa."
+        "body_one": "Varauksella {{title}} kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa.",
+        "body_other": "Varauksilla {{title}} kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa."
       }
     }
   },
@@ -102,7 +102,7 @@
       "contactInfo": "Yhteyshenkilön tiedot"
     },
     "as": {
-      "prefix": "Luon hakemuksen",
+      "prefix": "Varaan",
       "type": {
         "organisation": "järjestön, ryhmän tai yhteisön puolesta",
         "company": "yrityksen puolesta",

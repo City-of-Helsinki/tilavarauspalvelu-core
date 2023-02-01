@@ -35,6 +35,8 @@ import { reservationControlsToggleButton } from "model/reservation-unit";
 import {
   errorNotificationTitle,
   errorNotificationBody,
+  errorNotificationCloseButton,
+  errorNotification,
 } from "model/notification";
 import { addDays, format } from "date-fns";
 
@@ -174,7 +176,7 @@ describe("Tilavaraus user reservations", () => {
       .should("be.enabled")
       .should("contain.text", "Tallenna kalenteriin");
 
-    cy.checkA11y(null, null, null, true);
+    cy.checkA11y(undefined, undefined, undefined, true);
   });
 
   it("should display reservation detail view with individual reservee", () => {
@@ -229,7 +231,7 @@ describe("Tilavaraus user reservations", () => {
       .should("be.enabled")
       .should("contain.text", "Tallenna kalenteriin");
 
-    cy.checkA11y(null, null, null, true);
+    cy.checkA11y(undefined, undefined, undefined, true);
   });
 
   it("should do cancellation", () => {
@@ -321,13 +323,14 @@ describe("Tilavaraus user reservations", () => {
       "Varauksen muokkaaminen epäonnistui"
     );
     errorNotificationBody().should("have.text", "Hyväksy ehdot jatkaaksesi.");
+    errorNotificationCloseButton().click();
 
     cy.get("#cancellation-and-payment-terms-terms-accepted").click();
     cy.get("#generic-and-service-specific-terms-terms-accepted").click();
 
     reservationEditActionSubmit().click();
 
-    errorNotificationTitle().should("not.exist");
+    errorNotification().should("not.exist");
 
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/4$/);
   });

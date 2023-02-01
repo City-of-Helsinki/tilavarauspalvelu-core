@@ -2,10 +2,21 @@ import {
   ApplicationType,
   EventReservationUnitType,
 } from "common/types/gql-types";
+import { useTranslation } from "react-i18next";
 import { ApplicationRound } from "../../common/types";
 import { appMapper } from "./util";
 
+jest.mock("react-i18next", () => ({
+  useTranslation: () => {
+    return {
+      t: (str: string) => str,
+    };
+  },
+}));
+
 test("Units are ordered according to priority", async () => {
+  const { t } = useTranslation();
+
   const mappedApp = appMapper(
     {} as ApplicationRound,
     {
@@ -40,7 +51,7 @@ test("Units are ordered according to priority", async () => {
         },
       ],
     } as ApplicationType,
-    (str: string) => str
+    t
   );
 
   expect(mappedApp.units[0].nameFi).toBe("unit 200");

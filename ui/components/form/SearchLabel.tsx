@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 interface Props {
+  children: React.ReactNode;
   color?: "white" | "black";
   htmlFor: string;
   srOnly?: boolean;

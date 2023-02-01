@@ -29,6 +29,399 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 
+const getJSONResponse = [
+  {
+    id: 4,
+    name: { fi: "Mika Waltarin sali, kolmasosa", en: null, sv: null },
+    description:
+      "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+    spaces: [
+      {
+        id: 8,
+        name: { fi: "Mika Waltari sali osa 2", en: null, sv: null },
+        parent_id: 2,
+        building_id: 2,
+        surface_area: null,
+        district_id: null,
+      },
+    ],
+    resources: [],
+    services: [
+      {
+        id: 1,
+        name: { fi: "Pöytien konfigurointi", en: null, sv: null },
+        service_type: "configuration",
+        buffer_time_before: "01:00:00",
+        buffer_time_after: "01:00:00",
+      },
+    ],
+    require_introduction: false,
+    purposes: [
+      { id: 2, name: "Lukupiiri" },
+      { id: 4, name: "Pitää kokous" },
+    ],
+    images: [],
+    location: null,
+    max_persons: null,
+    reservation_unit_type: { id: 2, name: "Kokoustila" },
+    building: {
+      id: 2,
+      name: "Töölön kirjasto",
+      district: 1,
+      real_estate: null,
+      surface_area: null,
+    },
+    terms_of_use:
+      "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+    equipment_ids: [],
+    unit_id: 1,
+    uuid: "41640b91-ca66-4f84-bb5c-32c7f499d979",
+    contact_information: "",
+  },
+  {
+    id: 9,
+    name: { fi: "Toimistohuone 1", en: null, sv: null },
+    description: "",
+    spaces: [
+      {
+        id: 36,
+        name: { fi: "Toimistohuone 1", en: null, sv: null },
+        parent_id: null,
+        building_id: 18,
+        surface_area: "50.00",
+        district_id: 8,
+      },
+    ],
+    resources: [],
+    services: [],
+    require_introduction: false,
+    purposes: [{ id: 4, name: "Pitää kokous" }],
+    images: [],
+    location: {
+      address_street: "Jokukatu 5",
+      address_zip: "02600",
+      address_city: "Helsinki",
+      coordinates: { longitude: null, latitude: null },
+    },
+    max_persons: 10,
+    reservation_unit_type: { id: 2, name: "Kokoustila" },
+    building: {
+      id: 18,
+      name: "Ympyrätalo",
+      district: 8,
+      real_estate: null,
+      surface_area: "2000.00",
+    },
+    terms_of_use: "",
+    equipment_ids: [],
+    unit_id: 4,
+    uuid: "82f96c3d-572a-4937-9c62-588f7a112a3c",
+    contact_information: "",
+  },
+  {
+    id: 7,
+    name: { fi: "Fredriksbergin 2-talon aula", en: null, sv: null },
+    description:
+      "Fredriksberg on elävä ja avoin kaupunkitila myös muille kuin siellä työskenteleville. Siellä on viihtyisä trendiravintola Alice Italian, joka palvelee yhtä lailla sekä toimistotalon vuokralaisia että kaikkia kaupunkilaisia. Ravintola on auki myös ilta-aikaan, mikä vilkastuttaa Fredriksbergin kulmia. B-talon ylimpään kerrokseen on avattu kesällä 2020 LoiLoi Rooftop Restaurant and Distillery. Fredriksbergin aulapalvelut on innovoitu aivan uudelle tasolle niin, että toimistotalossa työskentely on mahdollisimman helppoa ja vaivatonta. Wonderland on Fredriksbergin coworking-yhteisö, joka on uusi tapa tehdä töitä. Lyhytaikaiseen vuokraukseen tarkoitettu luova työtila on kaikkien käytössä. Lisäksi Fredriksbergistä löytyvät viihtyisät suihku- ja pukeutumistilat sekä runsaasti pyöräparkkitilaa työmatkapyöräilystä innostuneille. Sähköautot voi ladata helposti omissa latauspisteissään. Lähietäisyydellä on yli 100 ravintolaa ja palveluita tulee jatkuvasti lisää.",
+    spaces: [
+      {
+        id: 10,
+        name: { fi: "Fredriksbergin 2-talon aula", en: null, sv: null },
+        parent_id: 3,
+        building_id: 1,
+        surface_area: null,
+        district_id: null,
+      },
+    ],
+    resources: [],
+    services: [
+      {
+        id: 1,
+        name: { fi: "Pöytien konfigurointi", en: null, sv: null },
+        service_type: "configuration",
+        buffer_time_before: "01:00:00",
+        buffer_time_after: "01:00:00",
+      },
+    ],
+    require_introduction: false,
+    purposes: [],
+    images: [],
+    location: null,
+    max_persons: null,
+    reservation_unit_type: { id: 2, name: "Kokoustila" },
+    building: {
+      id: 1,
+      name: "Fredriksbergin 2-talo",
+      district: null,
+      real_estate: null,
+      surface_area: null,
+    },
+    terms_of_use: "",
+    equipment_ids: [],
+    unit_id: 3,
+    uuid: "71c46195-0a7c-4604-a32f-89ba629502ab",
+    contact_information: "",
+  },
+  {
+    id: 6,
+    name: { fi: "Mika Waltarin sali", en: null, sv: null },
+    description:
+      "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+    spaces: [
+      {
+        id: 2,
+        name: { fi: "Mika Waltari sali", en: null, sv: null },
+        parent_id: null,
+        building_id: 2,
+        surface_area: null,
+        district_id: null,
+      },
+    ],
+    resources: [],
+    services: [
+      {
+        id: 1,
+        name: { fi: "Pöytien konfigurointi", en: null, sv: null },
+        service_type: "configuration",
+        buffer_time_before: "01:00:00",
+        buffer_time_after: "01:00:00",
+      },
+    ],
+    require_introduction: false,
+    purposes: [],
+    images: [],
+    location: null,
+    max_persons: null,
+    reservation_unit_type: { id: 2, name: "Kokoustila" },
+    building: {
+      id: 2,
+      name: "Töölön kirjasto",
+      district: 1,
+      real_estate: null,
+      surface_area: null,
+    },
+    terms_of_use:
+      "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+    equipment_ids: [],
+    unit_id: 1,
+    uuid: "bac0a474-4fb2-4da1-97db-d065218c59c5",
+    contact_information: "",
+  },
+  {
+    id: 3,
+    name: { fi: "Mika Waltarin sali, kolmasosa", en: null, sv: null },
+    description:
+      "Mika Waltari -sali kirjaston 4. kerroksessa on vuokrattavissa sekä kokouksia että erilaisia tilaisuuk­sia ja tapahtumia varten. Mika Waltari -salissa on tilaa yhteensä sadalle hengelle. Tilan yhteydessä on keittiö. Salissa on Helsingin kaupungin langaton verkkoyhteys Stadinetti sekä data­projektori, langaton ClickShare-kuvansiirtojärjestelmä, kaiuttimet ja lehtiötaulu. Mika Waltari -sali on tarkoitettu lähinnä eri­laisten järjestöjen, yhdistys­ten ja muiden pienryhmien ei-kaupalliseen käyttöön, enintään kahdek­san tunnin ajaksi. Tilan vuokra on 40€/100 € alkavalta tunnilta. Mikäli tilassa halutaan järjestää avoin yleisötilai­suus yhteistyössä kirjas­ton kanssa, tulee asiasta sopia sähkö­postitse toolon_kirjasto@hel.fi",
+    spaces: [
+      {
+        id: 7,
+        name: { fi: "Mika Waltari sali osa 1", en: null, sv: null },
+        parent_id: 2,
+        building_id: 2,
+        surface_area: null,
+        district_id: null,
+      },
+    ],
+    resources: [],
+    services: [
+      {
+        id: 1,
+        name: { fi: "Pöytien konfigurointi", en: null, sv: null },
+        service_type: "configuration",
+        buffer_time_before: "01:00:00",
+        buffer_time_after: "01:00:00",
+      },
+    ],
+    require_introduction: false,
+    purposes: [
+      { id: 2, name: "Lukupiiri" },
+      { id: 4, name: "Pitää kokous" },
+    ],
+    images: [],
+    location: null,
+    max_persons: null,
+    reservation_unit_type: { id: 2, name: "Kokoustila" },
+    building: {
+      id: 2,
+      name: "Töölön kirjasto",
+      district: 1,
+      real_estate: null,
+      surface_area: null,
+    },
+    terms_of_use:
+      "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+    equipment_ids: [],
+    unit_id: 1,
+    uuid: "5c4775c5-c590-41f9-8836-e9621caba6ce",
+    contact_information: "",
+  },
+  {
+    id: 1,
+    name: { fi: "Studiohuone 1 + soittimet", en: null, sv: null },
+    description:
+      "HUOMIOITHAN SEURAAVAT ASIAT, KUN KÄYTÄT TILAA KORONAPANDEMIAN AIKANA:\r\n- lähiopastusta ei voida antaa\r\n- tilaa käytetään omalla vastuulla (tilaa ja soittimia ei desinfioida varausten välissä)\r\n- muista turvavälit\r\n- pidä huolta käsihygieniasta\r\n- niistä tai yski kertakäyttönenäliinaan\r\n- älä käytä tilaa, jos olet sairas\r\nStudio 6 on 1-3:lle henkilölle soveltuva tila soittamiseen, laulamiseen ja DJ-käyttöön. Tilasta löytyy mm. piano, DJ-laitteet, kitaravahvistin ja Djembe. Studiossa ei ole tällä hetkellä äänitysmahdollisuutta.\r\n________________________________________________________________________\r\nTilan varustelu:\r\nYamaha U3, piano\r\nTechnics SL-1210GR (2kpl), levysoittimet\r\nPioneer CDJ-2000NXS2 (2kpl), DJ CD-soittimet\r\nPioneer DJM-900NXS2, DJ-mikseri\r\nVox VT20X, kitaravahvistin\r\nAmpeg BA-115, bassovahvistin\r\nOssi Percussion Djembe\r\nSinga -karaokestreamauspalvelu\r\n________________________________________________________________________\r\nLisätietoa: oodi.kaupunkiverstas@hel.fi",
+    spaces: [
+      {
+        id: 4,
+        name: { fi: "Studiohuone 1", en: null, sv: null },
+        parent_id: 1,
+        building_id: 3,
+        surface_area: null,
+        district_id: null,
+      },
+    ],
+    resources: [
+      {
+        id: 1,
+        location_type: "fixed",
+        name: { fi: "Kitara 1", en: null, sv: null },
+        space_id: 1,
+        buffer_time_before: null,
+        buffer_time_after: null,
+      },
+      {
+        id: 2,
+        location_type: "fixed",
+        name: { fi: "Basso 1", en: null, sv: null },
+        space_id: 1,
+        buffer_time_before: null,
+        buffer_time_after: null,
+      },
+    ],
+    services: [
+      {
+        id: 2,
+        name: {
+          fi: "Perehdytys studion käyttämiseen",
+          en: null,
+          sv: null,
+        },
+        service_type: "introduction",
+        buffer_time_before: null,
+        buffer_time_after: null,
+      },
+    ],
+    require_introduction: true,
+    purposes: [],
+    images: [],
+    location: null,
+    max_persons: 33,
+    reservation_unit_type: { id: 1, name: "Äänitysstudio" },
+    building: {
+      id: 3,
+      name: "Oodin kirjasto",
+      district: 2,
+      real_estate: null,
+      surface_area: null,
+    },
+    terms_of_use:
+      "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+    equipment_ids: [1],
+    unit_id: 2,
+    uuid: "d7c4705a-e29c-4148-8302-baf33cb0c9a3",
+    contact_information: "",
+  },
+  {
+    id: 5,
+    name: { fi: "Mika Waltarin sali, kolmasosa", en: null, sv: null },
+    description:
+      "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+    spaces: [
+      {
+        id: 9,
+        name: { fi: "Mika Waltari sali osa 3", en: null, sv: null },
+        parent_id: 2,
+        building_id: 2,
+        surface_area: null,
+        district_id: null,
+      },
+    ],
+    resources: [],
+    services: [
+      {
+        id: 1,
+        name: { fi: "Pöytien konfigurointi", en: null, sv: null },
+        service_type: "configuration",
+        buffer_time_before: "01:00:00",
+        buffer_time_after: "01:00:00",
+      },
+    ],
+    require_introduction: false,
+    purposes: [],
+    images: [],
+    location: null,
+    max_persons: null,
+    reservation_unit_type: { id: 2, name: "Kokoustila" },
+    building: {
+      id: 2,
+      name: "Töölön kirjasto",
+      district: 1,
+      real_estate: null,
+      surface_area: null,
+    },
+    terms_of_use:
+      "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+    equipment_ids: [],
+    unit_id: 1,
+    uuid: "002efad6-9445-49db-8ea9-dac2f7f04634",
+    contact_information: "",
+  },
+  {
+    id: 2,
+    name: { fi: "Studiokompleksi", en: null, sv: null },
+    description:
+      "HUOMIOITHAN SEURAAVAT ASIAT, KUN KÄYTÄT TILAA KORONAPANDEMIAN AIKANA:\r\n- lähiopastusta ei voida antaa\r\n- tilaa käytetään omalla vastuulla (tilaa ja soittimia ei desinfioida varausten välissä)\r\n- muista turvavälit\r\n- pidä huolta käsihygieniasta\r\n- niistä tai yski kertakäyttönenäliinaan\r\n- älä käytä tilaa, jos olet sairas\r\nStudio 6 on 1-3:lle henkilölle soveltuva tila soittamiseen, laulamiseen ja DJ-käyttöön. Tilasta löytyy mm. piano, DJ-laitteet, kitaravahvistin ja Djembe. Studiossa ei ole tällä hetkellä äänitysmahdollisuutta.\r\n________________________________________________________________________\r\nTilan varustelu:\r\nYamaha U3, piano\r\nTechnics SL-1210GR (2kpl), levysoittimet\r\nPioneer CDJ-2000NXS2 (2kpl), DJ CD-soittimet\r\nPioneer DJM-900NXS2, DJ-mikseri\r\nVox VT20X, kitaravahvistin\r\nAmpeg BA-115, bassovahvistin\r\nOssi Percussion Djembe\r\nSinga -karaokestreamauspalvelu\r\n________________________________________________________________________\r\nLisätietoa: oodi.kaupunkiverstas@hel.fi",
+    spaces: [
+      {
+        id: 1,
+        name: { fi: "Studiokompleksi", en: null, sv: null },
+        parent_id: null,
+        building_id: 3,
+        surface_area: null,
+        district_id: 2,
+      },
+    ],
+    resources: [],
+    services: [
+      {
+        id: 2,
+        name: {
+          fi: "Perehdytys studion käyttämiseen",
+          en: null,
+          sv: null,
+        },
+        service_type: "introduction",
+        buffer_time_before: null,
+        buffer_time_after: null,
+      },
+    ],
+    require_introduction: true,
+    purposes: [],
+    images: [],
+    location: {
+      address_street: "Jokukatu 5",
+      address_zip: "02600",
+      address_city: "Helsinki",
+      coordinates: { longitude: null, latitude: null },
+    },
+    max_persons: 20,
+    reservation_unit_type: { id: 1, name: "Äänitysstudio" },
+    building: {
+      id: 3,
+      name: "Oodin kirjasto",
+      district: 2,
+      real_estate: null,
+      surface_area: null,
+    },
+    terms_of_use:
+      "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+    equipment_ids: [1],
+    unit_id: 2,
+    uuid: "13ed2e9c-5822-4ad9-a2e6-f3e19b640b55",
+    contact_information: "",
+  },
+];
+
 const equipmentCategories: EquipmentCategoryType[] = [
   {
     id: "gaiperjg9raepg",
@@ -72,6 +465,12 @@ const equipmentCategories: EquipmentCategoryType[] = [
     nameEn: "Muu En",
     nameSv: "Muu Sv",
   },
+];
+
+const reservationUnitREST = [
+  rest.get(`*/v1/reservation-unit/:id/*`, (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json(getJSONResponse));
+  }),
 ];
 
 const selectedReservationUnitQuery = graphql.query<
@@ -417,6 +816,9 @@ const selectedReservationUnitQuery = graphql.query<
     reservationUnitByPk.pricings = pricings;
     reservationUnitByPk.minPersons = undefined;
     reservationUnitByPk.maxPersons = 20;
+    reservationUnitByPk.maxReservationsPerUser = 30;
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10).toISOString();
+    reservationUnitByPk.canApplyFreeOfCharge = true;
   }
 
   if (req.variables.pk === 3) {
@@ -497,6 +899,9 @@ const selectedReservationUnitQuery = graphql.query<
   }
 
   if (req.variables.pk === 903) {
+    reservationUnitByPk.maxReservationsPerUser = 30;
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10).toISOString();
+    reservationUnitByPk.canApplyFreeOfCharge = true;
     reservationUnitByPk.pk = 903;
     reservationUnitByPk.metadataSet = {
       id: "UmVzZXJ2YXRpb25NZXRhZGF0YVNldFR5cGU6MQ==",
@@ -709,6 +1114,8 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         nameFi: "Pukinmäen nuorisotalon yläkerta Fi",
         nameEn: "Pukinmäen nuorisotalon yläkerta En",
         nameSv: "Pukinmäen nuorisotalon yläkerta Sv",
+        publishBegins: toUIDate(new Date(), "yyyy-MM-dd"),
+        publishEnds: toUIDate(addDays(new Date(), 10), "yyyy-MM-dd"),
         authentication:
           ReservationUnitsReservationUnitAuthenticationChoices.Weak,
         images: [],
@@ -800,6 +1207,8 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         nameFi: "Pukinmäen nuorisotalon sali Fi",
         nameEn: "Pukinmäen nuorisotalon sali En",
         nameSv: "Pukinmäen nuorisotalon sali Sv",
+        publishBegins: toUIDate(new Date(), "yyyy-MM-dd"),
+        publishEnds: toUIDate(addDays(new Date(), 10), "yyyy-MM-dd"),
         authentication:
           ReservationUnitsReservationUnitAuthenticationChoices.Weak,
         pricings: [
@@ -823,16 +1232,19 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         images: [
           {
             imageUrl: "https://via.placeholder.com/1024x768",
+            mediumUrl: "https://via.placeholder.com/250x250",
             smallUrl: "https://via.placeholder.com/250x250",
             imageType: "MAIN",
           },
           {
             imageUrl: "https://via.placeholder.com/1024x768",
+            mediumUrl: "https://via.placeholder.com/250x250",
             smallUrl: "https://via.placeholder.com/250x250",
             imageType: "OTHER",
           },
           {
             imageUrl: "https://via.placeholder.com/1024x768",
+            mediumUrl: "https://via.placeholder.com/250x250",
             smallUrl: "https://via.placeholder.com/250x250",
             imageType: "OTHER",
           },
@@ -1154,6 +1566,7 @@ export const reservationUnitPurposes = graphql.query<Query, QueryPurposesArgs>(
 );
 
 export const reservationUnitHandlers = [
+  ...reservationUnitREST,
   selectedReservationUnitQuery,
   openingHoursQuery,
   relatedReservationUnits,

@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation, TFunction } from "react-i18next";
+import { useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Reservation } from "common/types/common";
 import { Strong } from "common/src/common/typography";

@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs as HDSTabs } from "hds-react";
 import styled from "styled-components";
 
@@ -19,13 +19,13 @@ type Props = {
 };
 
 const Tabs: React.FC<Props> = ({ headers, children: panels }: Props) => {
-  const history = useHistory();
+  const history = useNavigate();
   const { hash } = useLocation();
   const hashIndex = headers.findIndex((header) => header.key === hash);
   const initialSelectedTab = hashIndex > -1 ? hashIndex : 0;
 
   const onTabClick = (tabName: string) => {
-    history.push(`#${tabName}`);
+    history(`#${tabName}`);
   };
 
   if (headers.length !== panels.length) {

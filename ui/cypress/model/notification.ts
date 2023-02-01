@@ -17,5 +17,5 @@ export function errorNotificationBody(): Cypress.Chainable<
 export function errorNotificationCloseButton(): Cypress.Chainable<
   JQuery<HTMLElement>
 > {
-  return errorNotification().find("button");
+  return errorNotification().find("> button");
 }

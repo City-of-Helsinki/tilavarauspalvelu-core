@@ -137,7 +137,7 @@ function RecommendationDataTableGroup({
   );
 
   if (hasGrouping === false) {
-    return <>{children}</>;
+    return <> {children} </>;
   }
 
   return (

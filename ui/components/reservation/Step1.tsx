@@ -1,7 +1,7 @@
 import { OptionType } from "common/types/common";
 import { get } from "lodash";
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
@@ -208,14 +208,9 @@ const Step1 = ({
         id="generic-and-service-specific-terms"
         heading={t("reservationCalendar:heading.termsOfUse")}
         body={
-          <>
-            <Sanitize
-              html={getTranslation(
-                reservationUnit.serviceSpecificTerms,
-                "text"
-              )}
-            />
-          </>
+          <Sanitize
+            html={getTranslation(reservationUnit.serviceSpecificTerms, "text")}
+          />
         }
         links={
           termsOfUse.genericTerms && [

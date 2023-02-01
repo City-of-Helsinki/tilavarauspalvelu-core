@@ -13,7 +13,12 @@ import {
   getApiAccessTokens,
   updateApiAccessTokens,
 } from "./auth/util";
-import { apiBaseUrl, isBrowser, PROFILE_TOKEN_HEADER } from "./const";
+import {
+  apiBaseUrl,
+  authEnabled,
+  isBrowser,
+  PROFILE_TOKEN_HEADER,
+} from "./const";
 
 // list of operations that need authentication
 const needsAuthentication = ["listReservations", "reservationByPk"];
@@ -28,8 +33,10 @@ const authLink = new ApolloLink((operation, forward) => {
     return fromPromise(
       getNewToken().catch(() => {
         // TODO Handle token refresh error
-        if (needsAuthentication.includes(operation.operationName)) {
-          return false;
+        if (authEnabled) {
+          if (needsAuthentication.includes(operation.operationName)) {
+            return false;
+          }
         }
 
         return forward(operation);

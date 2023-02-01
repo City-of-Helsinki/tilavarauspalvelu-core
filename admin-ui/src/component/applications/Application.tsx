@@ -62,9 +62,9 @@ import {
 import { applicantName, getNormalizedApplicationStatus } from "./util";
 import { useNotification } from "../../context/NotificationContext";
 
-interface IRouteParams {
+type IRouteParams = {
   applicationId: string;
-}
+};
 
 const Wrapper = styled.div`
   width: 100%;
@@ -157,6 +157,7 @@ const ResolutionContainer = styled.div`
 
 const DownloadResolutionBtn = styled(Button).attrs({
   style: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     "--color-bus": "var(--color-black)",
   } as React.CSSProperties,
   variant: "secondary",
@@ -179,12 +180,6 @@ const DownloadResolutionBtn = styled(Button).attrs({
     margin-top: var(--spacing-layout-l);
   }
 `;
-
-const StyledAccordion = styled(Accordion).attrs({
-  style: {
-    "--header-font-size": "var(--fontsize-heading-m)",
-  },
-})``;
 
 const ReservationWrapper = styled.div`
   padding-bottom: var(--spacing-layout-m);
@@ -233,7 +228,7 @@ const ActionButton = styled(Button)`
   right: var(--spacing-layout-xl);
 `;
 
-function Application(): JSX.Element | null {
+const Application = () => {
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -500,167 +495,169 @@ function Application(): JSX.Element | null {
               <GridCol />
             </DataGrid>
             {isApplicationRoundApproved && (
-              <>
-                <ResolutionContainer>
-                  <DataGrid>
-                    <GridCol>
-                      <Subheading>{t("Application.resolution")}</Subheading>
-                      {["declined"].includes(application.status) ? (
-                        <>
-                          <p>{t("Application.declinedFromAllocation")}</p>
-                          <p>
-                            <Strong
-                              style={{ fontSize: "var(--fontsize-heading-xs)" }}
-                            >
-                              {t("Application.noAllocatedReservations")}
-                            </Strong>
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p>{t("Application.graduatedToAllocation")}</p>
-                          <table>
-                            <tbody>
-                              {hasReservations ? (
-                                <>
-                                  <tr>
-                                    <th>
-                                      {t("Application.allocatedReservations")}
-                                    </th>
-                                    <td>
-                                      {
-                                        application.aggregatedData
-                                          .createdReservationsTotal
-                                      }{" "}
-                                      {t("common.volumeUnit")}
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <th>
-                                      {t(
-                                        "ApplicationRound.totalReservationTime"
-                                      )}
-                                    </th>
-                                    <td>
-                                      {parseDuration(
-                                        application.aggregatedData
-                                          .reservationsDurationTotal
-                                      )}
-                                    </td>
-                                  </tr>
-                                </>
-                              ) : (
+              <ResolutionContainer>
+                <DataGrid>
+                  <GridCol>
+                    <Subheading>{t("Application.resolution")}</Subheading>
+                    {["declined"].includes(application.status) ? (
+                      <>
+                        <p>{t("Application.declinedFromAllocation")}</p>
+                        <p>
+                          <Strong
+                            style={{ fontSize: "var(--fontsize-heading-xs)" }}
+                          >
+                            {t("Application.noAllocatedReservations")}
+                          </Strong>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p>{t("Application.graduatedToAllocation")}</p>
+                        <table>
+                          <tbody>
+                            {hasReservations ? (
+                              <>
                                 <tr>
+                                  <th>
+                                    {t("Application.allocatedReservations")}
+                                  </th>
                                   <td>
-                                    <Strong
-                                      style={{
-                                        fontSize: "var(--fontsize-heading-xs)",
-                                      }}
-                                    >
-                                      {t("Application.noAllocatedReservations")}
-                                    </Strong>
+                                    {
+                                      application.aggregatedData
+                                        .createdReservationsTotal
+                                    }{" "}
+                                    {t("common.volumeUnit")}
                                   </td>
                                 </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </>
-                      )}
-                    </GridCol>
-                    <GridCol>
-                      <DownloadResolutionBtn
-                        iconLeft={
-                          documentStatus === "loading" ? (
-                            <LoadingSpinner small />
-                          ) : (
-                            <IconDownload aria-hidden />
-                          )
-                        }
-                        onClick={() => {
-                          setTimeout(() => {
-                            import("../pdf/util").then(({ download }) => {
-                              download(
-                                application as ApplicationType,
-                                recurringReservations as RecurringReservation[],
-                                applicationRound.approvedBy || null,
-                                setDocumentStatus
-                              );
-                            });
-                          }, 0);
-                        }}
-                        disabled={documentStatus === "loading"}
-                      >
-                        <Strong>{t("Application.downloadResolution")}</Strong>
-                        <div>(.pdf)</div>
-                      </DownloadResolutionBtn>
-                      {normalizedApplicationStatus === "approved" && (
-                        <p>{t("Application.downloadResolutionHelper")}</p>
-                      )}
-                    </GridCol>
-                  </DataGrid>
-                </ResolutionContainer>
-              </>
+                                <tr>
+                                  <th>
+                                    {t("ApplicationRound.totalReservationTime")}
+                                  </th>
+                                  <td>
+                                    {parseDuration(
+                                      application.aggregatedData
+                                        .reservationsDurationTotal
+                                    )}
+                                  </td>
+                                </tr>
+                              </>
+                            ) : (
+                              <tr>
+                                <td>
+                                  <Strong
+                                    style={{
+                                      fontSize: "var(--fontsize-heading-xs)",
+                                    }}
+                                  >
+                                    {t("Application.noAllocatedReservations")}
+                                  </Strong>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </>
+                    )}
+                  </GridCol>
+                  <GridCol>
+                    <DownloadResolutionBtn
+                      iconLeft={
+                        documentStatus === "loading" ? (
+                          <LoadingSpinner small />
+                        ) : (
+                          <IconDownload aria-hidden />
+                        )
+                      }
+                      onClick={() => {
+                        setTimeout(() => {
+                          import("../pdf/util").then(({ download }) => {
+                            download(
+                              application as ApplicationType,
+                              recurringReservations as RecurringReservation[],
+                              applicationRound.approvedBy || null,
+                              setDocumentStatus
+                            );
+                          });
+                        }, 0);
+                      }}
+                      disabled={documentStatus === "loading"}
+                    >
+                      <Strong>{t("Application.downloadResolution")}</Strong>
+                      <div>(.pdf)</div>
+                    </DownloadResolutionBtn>
+                    {normalizedApplicationStatus === "approved" && (
+                      <p>{t("Application.downloadResolutionHelper")}</p>
+                    )}
+                  </GridCol>
+                </DataGrid>
+              </ResolutionContainer>
             )}
           </NarrowContainer>
           <ContentContainer>
             {isApplicationRoundApproved &&
               !["declined"].includes(application.status) && (
                 <WideContainer>
-                  {recurringReservations && recurringReservations.length > 0 && (
-                    <StyledAccordion
-                      heading={t(
-                        "Application.summaryOfAllocatedApplicationEvents"
-                      )}
-                      defaultOpen={false}
-                    >
-                      <NarrowContainer
-                        style={{
-                          paddingRight: 0,
-                          marginLeft: 'calc(var("--spacing-layout-m") * -1)',
-                        }}
+                  {recurringReservations &&
+                    recurringReservations.length > 0 && (
+                      <Accordion
+                        heading={
+                          t(
+                            "Application.summaryOfAllocatedApplicationEvents"
+                          ) as string
+                        }
+                        defaultOpen={false}
                       >
-                        {recurringReservations.map((recurringReservation) => {
-                          const applicationEvent: ApplicationEvent | undefined =
-                            application.applicationEvents.find(
+                        <NarrowContainer
+                          style={{
+                            paddingRight: 0,
+                            marginLeft: 'calc(var("--spacing-layout-m") * -1)',
+                          }}
+                        >
+                          {recurringReservations.map((recurringReservation) => {
+                            const applicationEvent:
+                              | ApplicationEvent
+                              | undefined = application.applicationEvents.find(
                               (n: ApplicationEvent) =>
                                 n.id ===
                                 get(recurringReservation, "applicationEventId")
                             );
 
-                          const reservationUnit: ReservationUnit | undefined =
-                            get(
+                            const reservationUnit: ReservationUnit | undefined =
+                              recurringReservation.reservations?.[0]
+                                .reservationUnit?.[0];
+
+                            const beginDate: string | null =
+                              recurringReservation.firstReservationBegin;
+
+                            const endDate: string | null =
+                              recurringReservation.lastReservationEnd;
+
+                            const weekday: number | null = get(
                               recurringReservation,
-                              "reservations.0.reservationUnit.0"
+                              "reservations.0.beginWeekday",
+                              null
                             );
 
-                          const beginDate: string | null =
-                            recurringReservation.firstReservationBegin;
-
-                          const endDate: string | null =
-                            recurringReservation.lastReservationEnd;
-
-                          const weekday: number | null = get(
-                            recurringReservation,
-                            "reservations.0.beginWeekday"
-                          );
-
-                          const duration: number = Math.abs(
-                            differenceInSeconds(
-                              new Date(
-                                get(
-                                  recurringReservation,
-                                  "reservations.0.begin"
+                            const duration: number = Math.abs(
+                              differenceInSeconds(
+                                new Date(
+                                  get(
+                                    recurringReservation,
+                                    "reservations.0.begin",
+                                    0
+                                  )
+                                ),
+                                new Date(
+                                  get(
+                                    recurringReservation,
+                                    "reservations.0.end",
+                                    0
+                                  )
                                 )
-                              ),
-                              new Date(
-                                get(recurringReservation, "reservations.0.end")
                               )
-                            )
-                          );
+                            );
 
-                          return (
-                            applicationEvent &&
-                            reservationUnit && (
+                            return applicationEvent && reservationUnit ? (
                               <ReservationWrapper key={applicationEvent.id}>
                                 <H2>{applicationEvent?.name}</H2>
                                 <DataGrid
@@ -741,26 +738,27 @@ function Application(): JSX.Element | null {
                                     </div>
                                   </DeclinedReservations>
                                 )}
-                                <ReservationListLinkWrapper>
-                                  <ReservationListLink
-                                    to={`${applicationUrl(
-                                      applicationId
-                                    )}/recurringReservation/${
-                                      recurringReservation.id
-                                    }`}
-                                  >
-                                    <IconCalendar aria-hidden />{" "}
-                                    {t("Application.showDetailedResultList")}{" "}
-                                    <IconArrowRight aria-hidden />
-                                  </ReservationListLink>
-                                </ReservationListLinkWrapper>
+                                {applicationId ? (
+                                  <ReservationListLinkWrapper>
+                                    <ReservationListLink
+                                      to={`${applicationUrl(
+                                        applicationId
+                                      )}/recurringReservation/${
+                                        recurringReservation.id
+                                      }`}
+                                    >
+                                      <IconCalendar aria-hidden />{" "}
+                                      {t("Application.showDetailedResultList")}{" "}
+                                      <IconArrowRight aria-hidden />
+                                    </ReservationListLink>
+                                  </ReservationListLinkWrapper>
+                                ) : null}
                               </ReservationWrapper>
-                            )
-                          );
-                        })}
-                      </NarrowContainer>
-                    </StyledAccordion>
-                  )}
+                            ) : null;
+                          })}
+                        </NarrowContainer>
+                      </Accordion>
+                    )}
                   <ActionButtonContainer>
                     {normalizedApplicationStatus === "approved" && (
                       <MarkAsResolutionSentBtn
@@ -815,6 +813,6 @@ function Application(): JSX.Element | null {
       )}
     </Wrapper>
   );
-}
+};
 
 export default withMainMenu(Application);

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { IconAngleLeft } from "hds-react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { BasicLink } from "../styles/util";
 
 interface IProps {
@@ -20,7 +20,7 @@ const StyledLink = styled(BasicLink)`
 
 function LinkPrev({ route }: IProps): JSX.Element {
   const { t } = useTranslation();
-  const { goBack } = useHistory();
+  const navigate = useNavigate();
   return (
     <StyledLink
       to={route || "#"}
@@ -28,7 +28,7 @@ function LinkPrev({ route }: IProps): JSX.Element {
       onClick={(e) => {
         if (!route) {
           e.preventDefault();
-          goBack();
+          navigate(-1);
         }
       }}
     >

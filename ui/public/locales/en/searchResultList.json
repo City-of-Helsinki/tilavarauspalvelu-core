@@ -1,8 +1,8 @@
 {
-  "count_plural": "{{count}} results",
-  "count": "{{count}} result",
-  "paginationSummary": "{{count}} result of {{totalCount}} results shown",
-  "paginationSummary_plural": "{{count}} result of {{totalCount}} results shown",
+  "count_one": "{{count}} result",
+  "count_other": "{{count}} results",
+  "paginationSummary_one": "{{count}} result of {{totalCount}} results shown",
+  "paginationSummary_other": "{{count}} result of {{totalCount}} results shown",
   "paginationSummaryEnd": "All {{count}} results shown",
   "noResults": "No search results",
   "error": "Error occurred when searching for spaces. Please try again!",

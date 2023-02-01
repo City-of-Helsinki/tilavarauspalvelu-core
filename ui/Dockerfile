@@ -46,6 +46,7 @@ WORKDIR /app/ui
 ENV NODE_ENV production
 COPY --from=builder /app/ui/next.config.js ./
 COPY --from=builder /app/ui/next-i18next.config.js ./
+COPY --from=builder /app/ui/cypress.config.ts ./
 COPY --from=builder /app/ui/public ./public
 COPY --from=builder --chown=default:root /app/ui/.next ./.next
 COPY --from=builder /app/node_modules /app/node_modules

@@ -22,7 +22,7 @@ const Applicant = ({ application }: Props): JSX.Element => {
     }
 
     default: {
-      return <></>;
+      return <> </>;
     }
   }
 };

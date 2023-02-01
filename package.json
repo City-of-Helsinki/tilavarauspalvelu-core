@@ -9,10 +9,20 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "resolutions": {
-    "@types/react": "17.0.39",
-    "@types/react-dom": "17.0.11",
-    "react-error-overlay": "6.0.9"
+  "scripts": {
+    "ncu": "npm-check-updates -p yarn --deep --target minor --format group",
+    "ncu:upgrade": "npm-check-updates -p yarn --deep --target minor  --format group --upgrade",
+    "clean": "npkill"
   },
-  "dependencies": {}
+  "resolutions": {
+    "@types/node": "^16.0.0",
+    "graphql": "^16.6.0",
+    "next": "13.1.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "npm-check-updates": "^16.6.2",
+    "npkill": "^0.10.0"
+  }
 }

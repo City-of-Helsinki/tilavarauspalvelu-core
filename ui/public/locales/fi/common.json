@@ -43,10 +43,10 @@
   "month.9": "Lokakuu",
   "month.10": "Marraskuu",
   "month.11": "Joulukuu",
-  "hour": "{{count}} tunti",
-  "hour_plural": "{{count}} tuntia",
-  "minute": "{{count}} minuutti",
-  "minute_plural": "{{count}} minuuttia",
+  "hour_one": "{{count}} tunti",
+  "hour_other": "{{count}} tuntia",
+  "minute_one": "{{count}} minuutti",
+  "minute_other": "{{count}} minuuttia",
   "error": {
     "dataError": "Tietoja ei saatu haettua",
     "error": "Virhe",
@@ -105,5 +105,6 @@
   "fyiLabel": "Tiedoksi",
   "add": "Lisää",
   "subtract": "Vähennä",
-  "inclTax": "sis. alv {{taxPercentage}}%"
+  "inclTax": "sis. alv {{taxPercentage}}%",
+  "headAlt": "Tilan ikoni"
 }

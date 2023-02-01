@@ -2,15 +2,13 @@ import { breakpoints } from "common/src/common/style";
 import { IconSearch, TextInput } from "hds-react";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { singleSearchPrefix } from "../../modules/const";
 
 const Wrapper = styled.form``;
 
-const StyledTextInput = styled(TextInput).attrs({
-  style: { "--input-border-color-default": "var(--color-black-30)" },
-})`
+const StyledTextInput = styled(TextInput)`
   position: relative;
   width: 100%;
 
@@ -18,6 +16,7 @@ const StyledTextInput = styled(TextInput).attrs({
     font-size: var(--fontsize-body-m);
     padding-right: var(--spacing-2-xl);
     height: 44px;
+    border-color: var(--color-black-30);
   }
 
   label {

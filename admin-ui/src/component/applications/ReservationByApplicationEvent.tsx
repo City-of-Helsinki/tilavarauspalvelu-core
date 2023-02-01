@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconLocation } from "hds-react";
-import get from "lodash/get";
 import { H2, H3, Strong } from "common/src/common/typography";
 import {
   getApplication,
@@ -31,6 +30,7 @@ import { applicantName } from "./util";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
+  [key: string]: string;
   applicationId: string;
   recurringReservationId: string;
 }
@@ -167,10 +167,8 @@ function ReservationByApplicationEvent(): JSX.Element | null {
       (n: ApplicationEvent) => n.id === recurringReservation?.applicationEventId
     );
 
-  const reservationUnit: ReservationUnit | undefined = get(
-    recurringReservation,
-    "reservations.0.reservationUnit.0"
-  );
+  const reservationUnit: ReservationUnit | undefined =
+    recurringReservation?.reservations?.[0].reservationUnit?.[0];
 
   return (
     <Wrapper>
@@ -180,9 +178,11 @@ function ReservationByApplicationEvent(): JSX.Element | null {
         reservationUnit &&
         recurringReservation && (
           <>
-            <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
-              <LinkPrev route={applicationUrl(applicationId)} />
-            </ContentContainer>
+            {applicationId ? (
+              <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
+                <LinkPrev route={applicationUrl(applicationId)} />
+              </ContentContainer>
+            ) : null}
             <NarrowContainer>
               <p>{customerName}</p>
               <Heading>{applicationEvent.name}</Heading>

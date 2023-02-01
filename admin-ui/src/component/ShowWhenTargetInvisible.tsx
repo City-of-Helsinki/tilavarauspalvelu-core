@@ -22,7 +22,9 @@ const ShowWhenTargetInvisible = ({ target, children }: Props): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <>{visible && children}</>;
+  if (!visible) return <> </>;
+
+  return <> {children} </>;
 };
 
 export default ShowWhenTargetInvisible;

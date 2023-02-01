@@ -2,7 +2,7 @@ import React from "react";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { CenteredContainer } from "../components/common/Container";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {

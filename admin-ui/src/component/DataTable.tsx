@@ -15,7 +15,7 @@ import {
   IconSliders,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import get from "lodash/get";
 import isEqual from "lodash/isEqual";
 import pullAll from "lodash/pullAll";
@@ -499,7 +499,7 @@ function DataTable({
   };
 
   const { t, i18n } = useTranslation();
-  const history = useHistory();
+  const history = useNavigate();
 
   const processedData = useMemo(
     () =>
@@ -773,7 +773,7 @@ function DataTable({
                                 }
                               } else if (cellConfig.rowLink) {
                                 const link: string = cellConfig.rowLink(row);
-                                history.push(link);
+                                history(link);
                               }
                             }}
                             $disabled={

@@ -1,6 +1,6 @@
 import { RadioButton } from "hds-react";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { FormType } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";

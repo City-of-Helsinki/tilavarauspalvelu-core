@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useMedia } from "react-use";
 import Breadcrumb from "common/src/breadcrumb/Breadcrumb";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { trim } from "lodash";

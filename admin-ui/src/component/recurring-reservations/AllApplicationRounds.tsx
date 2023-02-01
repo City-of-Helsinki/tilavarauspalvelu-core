@@ -1,5 +1,4 @@
 import { ApolloError, useQuery } from "@apollo/client";
-import { Accordion } from "hds-react";
 import { groupBy, orderBy } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +21,7 @@ import { getApplicationRoundStatus } from "./ApplicationRoundStatusTag";
 import { TableLink, CustomTable } from "./components";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 import { truncate } from "./util";
+import { Accordion } from "../../common/hds-fork/Accordion";
 
 const AccordionContainer = styled.div`
   display: flex;

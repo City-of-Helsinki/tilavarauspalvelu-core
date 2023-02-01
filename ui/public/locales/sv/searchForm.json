@@ -17,10 +17,10 @@
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
-    "minPersons": "Minst {{value}} person",
-    "minPersons_plural": "Minst {{value}} personer",
-    "maxPersons": "Upp till {{value}} person",
-    "maxPersons_plural": "Upp till {{value}} personer"
+    "minPersons_one": "Minst {{value}} person",
+    "minPersons_other": "Minst {{value}} personer",
+    "maxPersons_one": "Upp till {{value}} person",
+    "maxPersons_other": "Upp till {{value}} personer"
   },
   "all": "Alla",
   "clearSelections": "Redigera",

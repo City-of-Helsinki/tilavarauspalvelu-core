@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { User } from "oidc-client";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Query } from "common/types/gql-types";
 
 import {
@@ -28,7 +28,13 @@ export const AuthStateContext = React.createContext<AuthStateProps>({
 
 export const useAuthState = (): AuthStateProps => useContext(AuthStateContext);
 
-export const AuthStateContextProvider: React.FC = ({ children }) => {
+type Props = {
+  children: React.ReactNode;
+};
+
+export const AuthStateContextProvider: React.FC<Props> = ({
+  children,
+}: Props) => {
   const [authState, dispatch] = React.useReducer(
     authStateReducer,
     getInitialState()
@@ -69,12 +75,15 @@ export const AuthStateContextProvider: React.FC = ({ children }) => {
     }
   }, [checkApiToken]);
 
+  const notificationContextValues = useMemo(
+    () => ({
+      authState,
+    }),
+    [authState]
+  );
+
   return (
-    <AuthStateContext.Provider
-      value={{
-        authState,
-      }}
-    >
+    <AuthStateContext.Provider value={notificationContextValues}>
       {children}
       <OIDCLibIntegration
         setUser={(

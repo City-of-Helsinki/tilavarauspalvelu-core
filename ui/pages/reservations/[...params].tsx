@@ -6,6 +6,7 @@ import ReservationCancellation from "../../components/reservation/ReservationCan
 import { authEnabled, isBrowser } from "../../modules/const";
 import ReservationEdit from "../../components/reservation/ReservationEdit";
 import { clearApiAccessToken } from "../../modules/auth/util";
+import WithOidc from "../../components/common/WithOidc";
 
 type Props = {
   id: number;
@@ -43,8 +44,6 @@ const ReservationParams = (props: Props): JSX.Element => {
   if (!isBrowser || !authEnabled) {
     return <Component {...props} />;
   }
-
-  const WithOidc = require("../../components/common/WithOidc").default;
 
   return (
     <WithOidc

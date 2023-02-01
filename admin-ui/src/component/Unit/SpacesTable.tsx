@@ -4,7 +4,7 @@ import { clone, set, trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   SpaceDeleteMutationInput,
   SpaceDeleteMutationPayload,
@@ -117,6 +117,10 @@ const renderGroup = (
   </SpaceTreeDataTableGroup>
 );
 
+const UnitHeadingName = (space: SpaceType) => (
+  <Name>{trim(space.nameFi as string)}</Name>
+);
+
 const SpacesTable = ({
   spaces,
   unit,
@@ -146,16 +150,14 @@ const SpacesTable = ({
 
   const modal = useRef<ModalRef>();
 
-  const history = useHistory();
+  const history = useNavigate();
 
   const cellConfig = {
     cols: [
       {
         title: "Unit.headings.name",
         key: "nameFi",
-        transform: (space) => {
-          return <Name>{trim(space.nameFi as string)}</Name>;
-        },
+        transform: UnitHeadingName,
         disableSorting: true,
       },
       {
@@ -210,7 +212,7 @@ const SpacesTable = ({
                   {
                     name: t("SpaceTable.menuEditSpace"),
                     onClick: () => {
-                      history.push(`/unit/${unit.pk}/space/edit/${space.pk}`);
+                      history(`/unit/${unit.pk}/space/edit/${space.pk}`);
                     },
                   },
                   {
@@ -222,8 +224,9 @@ const SpacesTable = ({
                         space?.resources?.length > 0
                       ) {
                         notifyError(
-                          t("SpaceTable.removeConflictTitle"),
-                          t("SpaceTable.removeConflictMessage")
+                          t("SpaceTable.removeConflictMessage"),
+                          undefined,
+                          t("SpaceTable.removeConflictTitle")
                         );
                         return;
                       }

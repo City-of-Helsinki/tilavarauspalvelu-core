@@ -17,7 +17,7 @@ import {
 } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import React, { useCallback, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
@@ -280,14 +280,12 @@ const EditStep1 = ({
           id="generic-and-service-specific-terms"
           heading={t("reservationCalendar:heading.termsOfUse")}
           body={
-            <>
-              <Sanitize
-                html={getTranslation(
-                  reservationUnit.serviceSpecificTerms,
-                  "text"
-                )}
-              />
-            </>
+            <Sanitize
+              html={getTranslation(
+                reservationUnit.serviceSpecificTerms,
+                "text"
+              )}
+            />
           }
           links={
             hasTermsOfUse && [

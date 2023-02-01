@@ -1,5 +1,3 @@
-import { breadcrumbWrapper } from "model/breadcrumb";
-import { languageSelector, languageSelectorMenuItem } from "model/navigation";
 import { applicationRoundContainer } from "model/recurring-lander";
 import { checkBreadcrumbs } from "../model/breadcrumb";
 
@@ -52,12 +50,13 @@ describe("recurring search lander", () => {
   });
 
   it("displays correct breadcrumbs", () => {
-    const breadcrumbs = {
+    const breadcrumbLangArray = {
       fi: [{ title: "Etusivu", url: "/" }, { title: "Kausivaraus" }],
       en: [{ title: "Home", url: "/en" }, { title: "Seasonal booking" }],
       sv: [{ title: "Hemsidan", url: "/sv" }, { title: "Säsongbokning" }],
     };
+    const url = "/recurring";
 
-    checkBreadcrumbs(breadcrumbs, "/recurring");
+    checkBreadcrumbs({ breadcrumbs: breadcrumbLangArray, url });
   });
 });

@@ -13,6 +13,7 @@ import Map from "./Map";
 import SubPageHead from "./SubPageHead";
 
 interface IProps {
+  [key: string]: string;
   unitPk: string;
 }
 

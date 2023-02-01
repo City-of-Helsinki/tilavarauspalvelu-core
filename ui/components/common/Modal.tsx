@@ -1,6 +1,6 @@
 import FocusTrap from "focus-trap-react";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { isBrowser } from "../../modules/const";

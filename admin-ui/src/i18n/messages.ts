@@ -691,6 +691,7 @@ const translations: ITranslations = {
       purpose: ["Toimintatyyppi"],
     },
     statuses: {
+      approved: ["Päätös tehty"],
       created: ["Käsittelemättä"],
       validated: ["Ehdotus hyväksytty"],
       declined: ["Ehdotus hylätty"],
@@ -1040,7 +1041,7 @@ const translations: ITranslations = {
     comment: ["Kommentit"],
     reservationInfo: ["Varauksen tiedot"],
     reserverInfo: ["Varaajan tiedot"],
-    reserveeTypePrefix: ["Luon hakemuksen"],
+    reserveeTypePrefix: ["Varaan"],
     reserveeTypes: {
       labels: {
         nonprofit: ["järjestön, ryhmän tai yhteisön puolesta"],
@@ -1069,7 +1070,7 @@ const translations: ITranslations = {
         applyingForFreeOfCharge: [
           "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin",
         ],
-        freeOfChargeReason: ["Perusteet maksuttomaan varaukseen"],
+        freeOfChargeReason: ["Perustelut maksuttomaan varaukseen"],
       },
       nonprofit: {
         reserveeFirstName: ["Yhteyshenkilön etunimi"],
@@ -1100,6 +1101,7 @@ const translations: ITranslations = {
         reserveeAddressCity: ["Postitoimipaikka"],
         reserveeEmail: ["Sähköpostiosoite"],
         reserveePhone: ["Puhelinnumero"],
+        homeCity: ["Kotipaikka"],
         showBillingAddress: ["Erillinen laskutusosoite"],
         billingFirstName: ["Varaajan etunimi"],
         billingLastName: ["Varaajan sukunimi"],
@@ -1800,8 +1802,8 @@ const translations: ITranslations = {
     reserveeId: ["Y-tunnus"],
     save: ["Tallenna"],
     appliesSubvention: ["hakee subventiota"],
-    applyingForFreeOfCharge: ["Hakee suventiota"],
-    freeOfChargeReason: ["Subvention perusteet"],
+    applyingForFreeOfCharge: ["Hakee subventiota"],
+    freeOfChargeReason: ["Subvention perustelu"],
     paymentState: ["Maksutila"],
     workingMemo: ["Kommentit"],
     workingMemoLabel: ["Kirjoita kommentti"],
@@ -1821,7 +1823,7 @@ const translations: ITranslations = {
       ],
       denied: ["Varaus hylätty"],
       title: ["Vahvista varauksen hylkäys"],
-      handlingDetails: ["Tarkempi syy hylkäykselle"],
+      handlingDetails: ["Kommentti"],
       handlingDetailsHelper: ["Näytetään vain henkilökunnalle"],
     },
     ApproveDialog: {

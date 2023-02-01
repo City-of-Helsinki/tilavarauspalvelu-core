@@ -1,6 +1,6 @@
 import { Button, IconAngleDown, IconAngleUp } from "hds-react";
 import React, { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { EquipmentType } from "common/types/gql-types";

@@ -5,7 +5,7 @@ import { differenceInMinutes, parseISO } from "date-fns";
 import Link from "next/link";
 import { trim } from "lodash";
 import React, { useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   ReservationType,
@@ -182,12 +182,13 @@ const ReservationInfoCard = ({
             {capitalize(timeString)}, {formatDurationMinutes(duration)}
           </Strong>
         </Value>
-        {reservation?.description && ["confirmed", "complete"].includes(type) && (
-          <Value>
-            {t("reservationCalendar:label.description")}:{" "}
-            {reservation?.description}
-          </Value>
-        )}
+        {reservation?.description &&
+          ["confirmed", "complete"].includes(type) && (
+            <Value>
+              {t("reservationCalendar:label.description")}:{" "}
+              {reservation?.description}
+            </Value>
+          )}
         <Value>
           {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
           {taxPercentageValue &&

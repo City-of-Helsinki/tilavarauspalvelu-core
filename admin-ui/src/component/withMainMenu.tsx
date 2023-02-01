@@ -14,7 +14,11 @@ const InnerWrapper = styled.div`
     width: calc(100% - var(--main-menu-width) - 2.625rem);
   }
 `;
-export const MainMenuWrapper: React.FC = ({ children }) => {
+export const MainMenuWrapper: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   return (
     <Wrapper>
       <MainMenu placement="default" />
@@ -24,7 +28,7 @@ export const MainMenuWrapper: React.FC = ({ children }) => {
 };
 
 function withMainMenu<TProps>(wrappedComponent: React.ComponentType<TProps>) {
-  return function New(props: TProps): JSX.Element {
+  return function New(props: TProps & JSX.IntrinsicAttributes): JSX.Element {
     // eslint-disable-next-line
     wrappedComponent.displayName =
       wrappedComponent.displayName || wrappedComponent.name || "Component";

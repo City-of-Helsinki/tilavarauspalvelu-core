@@ -1,9 +1,7 @@
 import { IconClock, IconGroup, IconTicket } from "hds-react";
 import React, { useMemo } from "react";
-import { useLocalStorage } from "react-use";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
-import { omit } from "lodash";
 import styled from "styled-components";
 import {
   getNormalizedReservationBeginTime,
@@ -14,6 +12,8 @@ import { formatSecondDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitByPkType } from "common/types/gql-types";
+import { omit } from "lodash";
+import { useLocalStorage } from "react-use";
 import {
   getTranslation,
   orderImages,
@@ -59,6 +59,7 @@ const RightContainer = styled.div`
 `;
 
 const StyledIconWithText = styled(IconWithText).attrs({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   "data-testid": "icon-with-text",
 })`
   display: grid;
@@ -169,6 +170,7 @@ const Head = ({
                     icon={
                       <NextImage
                         src="/icons/icon_premises.svg"
+                        alt={t("common:headAlt")}
                         width="24"
                         height="24"
                         aria-label={t("reservationUnitCard:type")}

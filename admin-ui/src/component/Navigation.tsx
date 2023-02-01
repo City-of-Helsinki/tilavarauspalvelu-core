@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UserInfo } from "common";
 import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
@@ -39,7 +39,7 @@ const Navigation = (): JSX.Element => {
   const [loggingIn, setLoggingIn] = useState(false);
 
   const [isMenuOpen, setMenuState] = useState(false);
-  const history = useHistory();
+  const history = useNavigate();
 
   const { state, user, login, logout } = authState;
 
@@ -54,7 +54,7 @@ const Navigation = (): JSX.Element => {
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t("Navigation.skipToMainContent")}
-      onTitleClick={() => history.push("/")}
+      onTitleClick={() => history("/")}
       onMenuToggle={() => setMenuState(!isMenuOpen)}
       menuOpen={isMenuOpen}
     >

@@ -1,1 +1,6 @@
-[{"id":1,"name":"Liikkua tai pelata"},{"id":2,"name":"Lukupiiri"},{"id":3,"name":"Opastus"},{"id":4,"name":"Pitää kokous"}]
+[
+  { "id": 1, "name": "Liikkua tai pelata" },
+  { "id": 2, "name": "Lukupiiri" },
+  { "id": 3, "name": "Opastus" },
+  { "id": 4, "name": "Pitää kokous" }
+]

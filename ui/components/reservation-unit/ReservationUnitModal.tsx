@@ -10,7 +10,7 @@ import {
 } from "hds-react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
@@ -168,13 +168,15 @@ const ReservationUnitCard = ({
       <Main>
         <Name>{reservationUnitName}</Name>
         <Unit>{getUnitName(reservationUnit.unit)}</Unit>
-        <Link href={reservationUnitPath(reservationUnit.pk)}>
-          <a target="_blank">
-            <LinkContent>
-              <IconLinkExternal />
-              <LinkText>{t("reservationUnitModal:openLinkToNewTab")}</LinkText>
-            </LinkContent>
-          </a>
+        <Link
+          href={reservationUnitPath(reservationUnit.pk)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <LinkContent>
+            <IconLinkExternal />
+            <LinkText>{t("reservationUnitModal:openLinkToNewTab")}</LinkText>
+          </LinkContent>
         </Link>
       </Main>
       <Props>

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { IconAngleDown, IconAngleUp, IconCalendarClock } from "hds-react";
 import { camelCase, startCase } from "lodash";
 import { toUIDate } from "common/src/common/util";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { DATE_TYPES } from "../../modules/const";
 import DateSelectorMenu from "./DateSelectorMenu";
 

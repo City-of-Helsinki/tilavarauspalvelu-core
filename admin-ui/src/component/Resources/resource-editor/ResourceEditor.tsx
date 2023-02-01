@@ -4,7 +4,7 @@ import { Button, TextInput } from "hds-react";
 import { useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { get, pick, upperFirst } from "lodash";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Mutation,
   Query,
@@ -128,8 +128,8 @@ type Props = {
   unitPk: number;
 };
 
-const ResourceEditor = ({ resourcePk, unitPk }: Props): JSX.Element => {
-  const history = useHistory();
+const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
+  const history = useNavigate();
   const { t } = useTranslation();
   const { notifySuccess, notifyError } = useNotification();
 
@@ -180,8 +180,9 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props): JSX.Element => {
 
       if (data?.updateResource?.errors === null) {
         notifySuccess(
-          t("ResourceEditor.resourceUpdated"),
-          t("ResourceEditor.resourceUpdatedNotification")
+          t("ResourceEditor.resourceUpdatedNotification"),
+          undefined,
+          t("ResourceEditor.resourceUpdated")
         );
       } else {
         notifyError(t("ResourceModal.saveError"));
@@ -195,93 +196,87 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props): JSX.Element => {
     return <Loader />;
   }
 
-  return (
-    <>
-      {state.resourceEdit?.pk && state.unit?.pk ? (
-        <ContentContainer>
-          <SubPageHead
-            link={`/unit/${unitPk}/spacesResources`}
-            unit={state.unit}
-            title={
-              state.resourceEdit.nameFi || t("ResourceEditor.defaultHeading")
-            }
-          />
-          <IngressContainer>
-            <FormErrorSummary
-              fieldNamePrefix="ResourceEditor.label."
-              validationErrors={state.validationErrors}
-              linkToError={false}
-            />
-          </IngressContainer>
-          <EditorContainer>
-            <Editor>
-              <EditorColumns>
-                <ParentSelector
-                  label={t("ResourceModal.selectSpace")}
-                  onChange={(parent) => setValue("spacePk", parent)}
-                  unitPk={unitPk}
-                  parentPk={state.resourceEdit.spacePk as number}
-                  disableNull
-                />
-                {languages.map((lang) => {
-                  const fieldName = `name${upperFirst(lang)}`;
-                  return (
-                    <TextInput
-                      key={fieldName}
-                      required={lang === "fi"}
-                      id={fieldName}
-                      maxLength={80}
-                      label={t(`ResourceEditor.label.${fieldName}`)}
-                      placeholder={t("ResourceModal.namePlaceholder", {
-                        language: t(`language.${lang}`),
-                      })}
-                      onChange={(e) => {
-                        setValue(fieldName, e.target.value);
-                      }}
-                      value={get(state.resourceEdit, fieldName, "")}
-                    />
-                  );
-                })}
-              </EditorColumns>
-              <Buttons>
-                <Button
-                  onClick={() => {
-                    history.go(-1);
-                  }}
-                  variant="secondary"
-                >
-                  {t("ResourceModal.cancel")}
-                </Button>
-                <SaveButton
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const validationErrors = schema.validate(
-                      state.resourceEdit
-                    );
+  if (!state.resourceEdit?.pk || !state.unit?.pk) return null;
 
-                    if (validationErrors.error) {
-                      dispatch({
-                        type: "setValidationErrors",
-                        validationErrors,
-                      });
-                    } else {
-                      dispatch({
-                        type: "setValidationErrors",
-                        validationErrors: null,
-                      });
-                      update({ ...state.resourceEdit });
-                    }
+  return (
+    <ContentContainer>
+      <SubPageHead
+        link={`/unit/${unitPk}/spacesResources`}
+        unit={state.unit}
+        title={state.resourceEdit.nameFi || t("ResourceEditor.defaultHeading")}
+      />
+      <IngressContainer>
+        <FormErrorSummary
+          fieldNamePrefix="ResourceEditor.label."
+          validationErrors={state.validationErrors}
+          linkToError={false}
+        />
+      </IngressContainer>
+      <EditorContainer>
+        <Editor>
+          <EditorColumns>
+            <ParentSelector
+              label={t("ResourceModal.selectSpace")}
+              onChange={(parent) => setValue("spacePk", parent)}
+              unitPk={unitPk}
+              parentPk={state.resourceEdit.spacePk as number}
+              disableNull
+            />
+            {languages.map((lang) => {
+              const fieldName = `name${upperFirst(lang)}`;
+              return (
+                <TextInput
+                  key={fieldName}
+                  required={lang === "fi"}
+                  id={fieldName}
+                  maxLength={80}
+                  label={t(`ResourceEditor.label.${fieldName}`)}
+                  placeholder={t("ResourceModal.namePlaceholder", {
+                    language: t(`language.${lang}`),
+                  })}
+                  onChange={(e) => {
+                    setValue(fieldName, e.target.value);
                   }}
-                  variant="secondary"
-                >
-                  {t("ResourceModal.save")}
-                </SaveButton>
-              </Buttons>
-            </Editor>
-          </EditorContainer>
-        </ContentContainer>
-      ) : null}
-    </>
+                  value={get(state.resourceEdit, fieldName, "")}
+                />
+              );
+            })}
+          </EditorColumns>
+          <Buttons>
+            <Button
+              onClick={() => {
+                history(-1);
+              }}
+              variant="secondary"
+            >
+              {t("ResourceModal.cancel")}
+            </Button>
+            <SaveButton
+              onClick={(e) => {
+                e.preventDefault();
+                const validationErrors = schema.validate(state.resourceEdit);
+
+                if (validationErrors.error) {
+                  dispatch({
+                    type: "setValidationErrors",
+                    validationErrors,
+                  });
+                } else {
+                  dispatch({
+                    type: "setValidationErrors",
+                    validationErrors: null,
+                  });
+                  update({ ...state.resourceEdit });
+                }
+              }}
+              variant="secondary"
+            >
+              {t("ResourceModal.save")}
+            </SaveButton>
+          </Buttons>
+        </Editor>
+      </EditorContainer>
+    </ContentContainer>
   );
 };
 

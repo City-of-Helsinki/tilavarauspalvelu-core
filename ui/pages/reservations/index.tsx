@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isAfter } from "date-fns";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel, Notification } from "hds-react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -35,11 +35,15 @@ const Heading = styled.div`
 `;
 
 const StyledTabList = styled(TabList).attrs({
-  style: { "--tablist-border-size": "0" },
+  style: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "--tablist-border-color": "white",
+  } as React.CSSProperties,
 })`
   ul {
     width: 100% !important;
     position: relative;
+    border-width: 0 !important;
   }
 `;
 
@@ -89,29 +93,23 @@ const Reservations = (): JSX.Element => {
 
   const currentUser = useMemo(() => userData?.currentUser, [userData]);
 
-  const [
-    fetchReservations,
-    { data: reservationData, error: reservationError },
-  ] = useLazyQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
+  const { data: reservationData, error: reservationError } = useQuery<
+    Query,
+    QueryReservationsArgs
+  >(LIST_RESERVATIONS, {
+    skip: !currentUser?.pk,
+    variables: {
+      state: [
+        "CONFIRMED",
+        "REQUIRES_HANDLING",
+        "CANCELLED",
+        "WAITING_FOR_PAYMENT",
+      ],
+      orderBy: "-begin",
+      user: currentUser?.pk.toString(),
+    },
     fetchPolicy: "no-cache",
   });
-
-  useEffect(() => {
-    if (currentUser?.pk) {
-      fetchReservations({
-        variables: {
-          state: [
-            "CONFIRMED",
-            "REQUIRES_HANDLING",
-            "CANCELLED",
-            "WAITING_FOR_PAYMENT",
-          ],
-          orderBy: "-begin",
-          user: currentUser?.pk.toString(),
-        },
-      });
-    }
-  }, [currentUser, fetchReservations]);
 
   useEffect(() => {
     const reservations = reservationData?.reservations?.edges

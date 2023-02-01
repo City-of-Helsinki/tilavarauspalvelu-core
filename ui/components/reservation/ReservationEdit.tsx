@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 import { LoadingSpinner, Notification, Stepper } from "hds-react";
 import { addYears } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { PendingReservation } from "common/types/common";
 import { toApiDate } from "common/src/common/util";
@@ -50,6 +50,8 @@ import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 
 type Props = {
   id: number;
+  // eslint-disable-next-line react/no-unused-prop-types
+  logout?: () => void;
 };
 
 const allowedReservationStates: ReservationsReservationStateChoices[] = [

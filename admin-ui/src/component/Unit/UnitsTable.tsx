@@ -1,8 +1,8 @@
 import React from "react";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { memoize } from "lodash";
 import { UnitType } from "common/types/gql-types";
-
+import { TFunction } from "i18next";
 import { unitUrl } from "../../common/urls";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 
@@ -41,7 +41,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Units.headings.reservationUnitCount"),
     key: "typeFi",
     isSortable: false,
-    transform: (unit: UnitType) => <>{unit?.reservationUnits?.length || 0}</>,
+    transform: (unit: UnitType) => <> {unit?.reservationUnits?.length || 0} </>,
     width: "25%",
   },
 ];
@@ -56,23 +56,21 @@ const UnitsTable = ({
   const cols = memoize(() => getColConfig(t))();
 
   return (
-    <>
-      <DataOrMessage
-        filteredData={units}
-        noFilteredData={t("ReservationUnits.noFilteredReservationUnits")}
-      >
-        <CustomTable
-          setSort={onSortChanged}
-          indexKey="pk"
-          rows={units}
-          cols={cols}
-          initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-          initialSortingOrder={
-            sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-          }
-        />
-      </DataOrMessage>
-    </>
+    <DataOrMessage
+      filteredData={units}
+      noFilteredData={t("ReservationUnits.noFilteredReservationUnits")}
+    >
+      <CustomTable
+        setSort={onSortChanged}
+        indexKey="pk"
+        rows={units}
+        cols={cols}
+        initialSortingColumnKey={sort === undefined ? undefined : sort.field}
+        initialSortingOrder={
+          sort === undefined ? undefined : (sort.sort && "asc") || "desc"
+        }
+      />
+    </DataOrMessage>
   );
 };
 

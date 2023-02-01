@@ -1,5 +1,6 @@
 import React from "react";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { CustomTable, DataOrMessage, TableLink } from "../../lists/components";
 
@@ -84,27 +85,21 @@ const ApplicationsTable = ({
   const cols = memoize(() => getColConfig(t))();
 
   return (
-    <>
-      <DataOrMessage
-        filteredData={applications}
-        noFilteredData={t("ReservationUnits.noFilteredReservationUnits")}
-      >
-        <>
-          <CustomTable
-            setSort={onSortChanged}
-            indexKey="pk"
-            rows={applications}
-            cols={cols}
-            initialSortingColumnKey={
-              sort === undefined ? undefined : sort.field
-            }
-            initialSortingOrder={
-              sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-            }
-          />
-        </>
-      </DataOrMessage>
-    </>
+    <DataOrMessage
+      filteredData={applications}
+      noFilteredData={t("ReservationUnits.noFilteredReservationUnits")}
+    >
+      <CustomTable
+        setSort={onSortChanged}
+        indexKey="pk"
+        rows={applications}
+        cols={cols}
+        initialSortingColumnKey={sort === undefined ? undefined : sort.field}
+        initialSortingOrder={
+          sort === undefined ? undefined : (sort.sort && "asc") || "desc"
+        }
+      />
+    </DataOrMessage>
   );
 };
 

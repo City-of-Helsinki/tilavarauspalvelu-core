@@ -188,6 +188,7 @@ export const cancelApplication = async (
 ): Promise<void> => {
   const application = await getApplication(applicationId);
   application.status = "cancelled";
+
   await saveApplication(application);
 };
 

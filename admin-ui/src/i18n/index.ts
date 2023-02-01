@@ -6,6 +6,7 @@ i18n.use(initReactI18next).init({
   resources: messages,
   lng: "fi",
   keySeparator: false,
+  returnNull: false,
   interpolation: {
     escapeValue: false,
   },

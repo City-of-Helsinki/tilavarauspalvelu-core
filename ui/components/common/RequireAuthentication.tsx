@@ -1,6 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import { isBrowser } from "../../modules/const";
+import { authEnabled, isBrowser } from "../../modules/const";
 
 type Props = {
   children: React.ReactNode;
@@ -9,6 +9,10 @@ type Props = {
 const RequireAuthentication = ({ children }: Props): JSX.Element => {
   if (!isBrowser) {
     return null;
+  }
+
+  if (!authEnabled) {
+    return <> {children} </>;
   }
 
   const OidcSecure = dynamic(() =>

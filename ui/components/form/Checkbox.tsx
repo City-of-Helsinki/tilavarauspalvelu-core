@@ -11,6 +11,7 @@ const StyledCheckbox = styled(HdsCheckbox)`
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   (props, ref) => {
     const customStyles = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       "--background-unselected": "var(--color-white)",
       display: "block",
       lineHeight: "24px",

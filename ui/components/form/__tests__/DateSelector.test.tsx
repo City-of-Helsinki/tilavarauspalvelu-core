@@ -32,7 +32,7 @@ jest.mock("next/config", () => () => ({
   publicRuntimeConfig: {},
 }));
 
-jest.mock("react-i18next", () => ({
+jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string) => {
@@ -46,12 +46,12 @@ jest.mock("react-i18next", () => ({
 const renderComponent = (props?: Partial<DateSelectorProps>) =>
   render(<DateSelector {...defaultProps} {...props} />);
 
-test("should render selected date types when single option is selected", () => {
+test("should render selected date types when single option is selected", async () => {
   renderComponent({ dateTypes: [DATE_TYPES.TODAY] });
 
-  expect(
-    screen.queryByText(mockTranslations.dateTypeToday)
-  ).toBeInTheDocument();
+  const date = await screen.findByText(mockTranslations.dateTypeToday);
+
+  expect(date).toBeInTheDocument();
 });
 
 test("should render selected date types when multiple options are selected", () => {
@@ -62,7 +62,7 @@ test("should render selected date types when multiple options are selected", () 
   ).toBeInTheDocument();
 });
 
-test("should add date type", () => {
+test("should add date type", async () => {
   const onChangeDateTypes = jest.fn();
   renderComponent({
     dateTypes: [],
@@ -72,17 +72,17 @@ test("should add date type", () => {
   const toggleButton = screen.getByRole("button", {
     name: mockTranslations.title,
   });
-
   userEvent.click(toggleButton);
-  expect(screen.queryByTestId(testIds.menu)).toBeInTheDocument();
 
-  userEvent.click(
-    screen.getByRole("checkbox", {
-      name: mockTranslations.dateTypeToday,
-    })
-  );
+  const menu = await screen.findByTestId(testIds.menu);
+  expect(menu).toBeInTheDocument();
 
-  expect(onChangeDateTypes).toBeCalledWith([DATE_TYPES.TODAY]);
+  const checkbox = await await screen.findByRole("checkbox", {
+    name: mockTranslations.dateTypeToday,
+  });
+  await userEvent.click(checkbox);
+
+  expect(onChangeDateTypes).toHaveBeenCalledWith([DATE_TYPES.TODAY]);
 });
 
 test("should call toggleIsCustomDate function", async () => {
@@ -96,18 +96,21 @@ test("should call toggleIsCustomDate function", async () => {
     name: mockTranslations.title,
   });
 
-  userEvent.click(toggleButton);
-  expect(screen.queryByTestId(testIds.menu)).toBeInTheDocument();
+  await userEvent.click(toggleButton);
+
+  const menu = await screen.findByTestId(testIds.menu);
+  expect(menu).toBeInTheDocument();
 
   const customDatesButton = screen.getByRole("button", {
     name: mockTranslations.menu.buttonCustom,
   });
-  userEvent.click(customDatesButton);
+
+  await userEvent.click(customDatesButton);
 
   expect(toggleIsCustomDate).toHaveBeenCalled();
 });
 
-test("should remove date type", () => {
+test("should remove date type", async () => {
   const onChangeDateTypes = jest.fn();
   renderComponent({
     dateTypes: [DATE_TYPES.TODAY, DATE_TYPES.TOMORROW],
@@ -118,14 +121,16 @@ test("should remove date type", () => {
     name: mockTranslations.title,
   });
 
-  userEvent.click(toggleButton);
-  expect(screen.queryByTestId(testIds.menu)).toBeInTheDocument();
+  await userEvent.click(toggleButton);
 
-  userEvent.click(
-    screen.getByRole("checkbox", {
-      name: mockTranslations.dateTypeToday,
-    })
-  );
+  const menu = await screen.findByTestId(testIds.menu);
+  expect(menu).toBeInTheDocument();
+
+  const checkbox = screen.getByRole("checkbox", {
+    name: mockTranslations.dateTypeToday,
+  });
+
+  await userEvent.click(checkbox);
 
   expect(onChangeDateTypes).toBeCalledWith([DATE_TYPES.TOMORROW]);
 });
@@ -138,14 +143,14 @@ describe("should open menu with", () => {
       name: mockTranslations.title,
     });
 
-    userEvent.click(toggleButton);
-    expect(screen.queryByTestId(testIds.menu)).toBeInTheDocument();
+    await userEvent.click(toggleButton);
+
+    const menu = await screen.findByTestId(testIds.menu);
+    expect(menu).toBeInTheDocument();
 
     escKeyPressHelper();
 
-    await waitFor(() =>
-      expect(screen.queryByTestId(testIds.menu)).not.toBeInTheDocument()
-    );
+    await waitFor(() => expect(menu).not.toBeInTheDocument());
     expect(toggleButton).toHaveFocus();
   };
 
@@ -154,7 +159,8 @@ describe("should open menu with", () => {
 
     arrowDownKeyPressHelper();
 
-    expect(screen.queryByTestId(testIds.menu)).toBeInTheDocument();
+    const menu = await screen.findByTestId(testIds.menu);
+    expect(menu).toBeInTheDocument();
   });
 
   test("ArrowUp", async () => {
@@ -162,6 +168,7 @@ describe("should open menu with", () => {
 
     arrowUpKeyPressHelper();
 
-    expect(screen.queryByTestId(testIds.menu)).toBeInTheDocument();
+    const menu = await screen.findByTestId(testIds.menu);
+    expect(menu).toBeInTheDocument();
   });
 });

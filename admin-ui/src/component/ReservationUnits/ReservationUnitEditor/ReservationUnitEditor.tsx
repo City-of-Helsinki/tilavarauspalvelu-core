@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
-  Accordion,
   Button,
   Checkbox,
   IconAlertCircleFill,
@@ -19,7 +18,7 @@ import { get, isNull, omitBy, pick, sumBy, upperFirst } from "lodash";
 import i18next from "i18next";
 import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -92,6 +91,7 @@ import FieldGroup from "./FieldGroup";
 import PricingType from "./PricingType";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
 import { parseAddress } from "../../../common/util";
+import { Accordion } from "../../../common/hds-fork/Accordion";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -150,7 +150,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   const { reservationUnitPk, unitPk } = useParams<IProps>();
   const [saving, setSaving] = useState(false);
   const { t } = useTranslation();
-  const history = useHistory();
+  const history = useNavigate();
   const { notifySuccess, notifyError } = useNotification();
 
   const [state, dispatch] = useReducer(
@@ -450,9 +450,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           refetchReservationUnit();
           if (!state.reservationUnitPk) {
             // create, redirect to edit
-            history.replace(
-              `/unit/${unitPk}/reservationUnit/edit/${resUnitPk}`
-            );
+            history(`/unit/${unitPk}/reservationUnit/edit/${resUnitPk}`);
             dispatch({ type: "created", pk: resUnitPk });
           }
           notifySuccess(
@@ -490,7 +488,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return <Loader />;
   }
 
-  const hasPrice = get(state.reservationUnitEdit, "pricings.length") > 0;
+  const hasPrice = get(state.reservationUnitEdit, "pricings.length", 0) > 0;
   const isPaid =
     state.reservationUnitEdit.pricings?.find(
       (p) => p?.pricingType === "PAID"
@@ -581,8 +579,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         />
         <Container>
           {state.unit ? (
-            <>
-              <DenseVerticalFlex>
+            <DenseVerticalFlex>
+              <div>
                 <HorisontalFlex style={{ justifyContent: "space-between" }}>
                   <H1 $legacy>
                     {state.reservationUnitEdit.nameFi ||
@@ -603,8 +601,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     <span>{parseAddress(state.unit.location)}</span>
                   ) : null}
                 </div>
-              </DenseVerticalFlex>
-            </>
+                {state.unit.location ? (
+                  <span>{parseAddress(state.unit.location)}</span>
+                ) : null}
+              </div>
+            </DenseVerticalFlex>
           ) : null}
           <FormErrorSummary
             fieldNamePrefix="ReservationUnitEditor.label."
@@ -1197,9 +1198,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       invalid={
                         !!getValidationError("reservationsMinDaysBefore")
                       }
-                      tooltipText={t(
-                        "ReservationUnitEditor.tooltip.reservationsMinDaysBefore"
-                      )}
+                      tooltipText={
+                        t(
+                          "ReservationUnitEditor.tooltip.reservationsMinDaysBefore"
+                        ) as string
+                      }
                     />
                   </Span6>
                   <Span6>
@@ -1221,18 +1224,22 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         setValue({ reservationStartInterval })
                       }
                       errorText={getValidationError("reservationStartInterval")}
-                      tooltipText={t(
-                        "ReservationUnitEditor.tooltip.reservationStartInterval"
-                      )}
+                      tooltipText={
+                        t(
+                          "ReservationUnitEditor.tooltip.reservationStartInterval"
+                        ) as string
+                      }
                     />
                   </Span6>
                   <Span6 />
                   <Span12>
                     <FieldGroup
                       heading={t("ReservationUnitEditor.bufferSettings")}
-                      tooltip={t(
-                        "ReservationUnitEditor.tooltip.bufferSettings"
-                      )}
+                      tooltip={
+                        t(
+                          "ReservationUnitEditor.tooltip.bufferSettings"
+                        ) as string
+                      }
                     >
                       <Grid>
                         <Span6>
@@ -1287,9 +1294,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   <Span12>
                     <FieldGroup
                       heading={t("ReservationUnitEditor.cancellationSettings")}
-                      tooltip={t(
-                        "ReservationUnitEditor.tooltip.cancellationSettings"
-                      )}
+                      tooltip={
+                        t(
+                          "ReservationUnitEditor.tooltip.cancellationSettings"
+                        ) as string
+                      }
                     >
                       <ActivationGroup
                         id="cancellationIsPossible"
@@ -1303,9 +1312,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       >
                         <SelectionGroup
                           required
-                          label={t(
-                            "ReservationUnitEditor.cancellationGroupLabel"
-                          )}
+                          label={
+                            t(
+                              "ReservationUnitEditor.cancellationGroupLabel"
+                            ) as string
+                          }
                         >
                           {state.cancellationRuleOptions.map((o) => (
                             <RadioButton
@@ -1338,9 +1349,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       onChange={(v) => setValue({ metadataSetPk: v })}
                       value={state.reservationUnitEdit.metadataSetPk || null}
                       errorText={getValidationError("metadataSetPk")}
-                      tooltipText={t(
-                        "ReservationUnitEditor.tooltip.metadataSetPk"
-                      )}
+                      tooltipText={
+                        t(
+                          "ReservationUnitEditor.tooltip.metadataSetPk"
+                        ) as string
+                      }
                     />
                   </Span6>
                   <Span6>
@@ -1356,9 +1369,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       onChange={(authentication) =>
                         setValue({ authentication })
                       }
-                      tooltipText={t(
-                        "ReservationUnitEditor.tooltip.authentication"
-                      )}
+                      tooltipText={
+                        t(
+                          "ReservationUnitEditor.tooltip.authentication"
+                        ) as string
+                      }
                     />
                   </Span6>
                   <Span6>
@@ -1383,17 +1398,21 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           maxReservationsPerUser: e.target.value || null,
                         });
                       }}
-                      tooltipText={t(
-                        "ReservationUnitEditor.tooltip.maxReservationsPerUser"
-                      )}
+                      tooltipText={
+                        t(
+                          "ReservationUnitEditor.tooltip.maxReservationsPerUser"
+                        ) as string
+                      }
                     />
                   </Span6>
                   <Span12>
                     <FieldGroup
                       heading={t("ReservationUnitEditor.introductionSettings")}
-                      tooltip={t(
-                        "ReservationUnitEditor.tooltip.introductionSettings"
-                      )}
+                      tooltip={
+                        t(
+                          "ReservationUnitEditor.tooltip.introductionSettings"
+                        ) as string
+                      }
                     >
                       <Checkbox
                         id="requireIntroduction"
@@ -1415,9 +1434,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   <Span12>
                     <FieldGroup
                       heading={t("ReservationUnitEditor.handlingSettings")}
-                      tooltip={t(
-                        "ReservationUnitEditor.tooltip.handlingSettings"
-                      )}
+                      tooltip={
+                        t(
+                          "ReservationUnitEditor.tooltip.handlingSettings"
+                        ) as string
+                      }
                     >
                       <Checkbox
                         id="requireReservationHandling"
@@ -1530,9 +1551,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                               "pricingTermsPk"
                             ) as string
                           }
-                          tooltipText={t(
-                            "ReservationUnitEditor.tooltip.pricingTermsPk"
-                          )}
+                          tooltipText={
+                            t(
+                              "ReservationUnitEditor.tooltip.pricingTermsPk"
+                            ) as string
+                          }
                         />
                       </Span6>
                     )}
@@ -1548,7 +1571,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 <Grid>
                   {["serviceSpecific", "payment", "cancellation"].map(
                     (name) => {
-                      const options = get(state, `${name}TermsOptions`);
+                      const options = get(state, `${name}TermsOptions`, []);
                       const propName = `${name}TermsPk`;
                       return (
                         <Span6 key={name}>
@@ -1559,22 +1582,28 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             sort
                             id={name}
                             label={t(`ReservationUnitEditor.label.${propName}`)}
-                            placeholder={t(
-                              `ReservationUnitEditor.${name}TermsPlaceholder`
-                            )}
+                            placeholder={
+                              t(
+                                `ReservationUnitEditor.${name}TermsPlaceholder`
+                              ) as string
+                            }
                             options={options}
                             onChange={(selection) => {
                               setValue({
                                 [propName]: selection,
                               });
                             }}
-                            helper={t(
-                              `ReservationUnitEditor.${name}TermsHelperText`
-                            )}
+                            helper={
+                              t(
+                                `ReservationUnitEditor.${name}TermsHelperText`
+                              ) as string
+                            }
                             value={get(state.reservationUnitEdit, propName)}
-                            tooltipText={t(
-                              `ReservationUnitEditor.tooltip.${name}TermsPk`
-                            )}
+                            tooltipText={
+                              t(
+                                `ReservationUnitEditor.tooltip.${name}TermsPk`
+                              ) as string
+                            }
                           />
                         </Span6>
                       );
@@ -1586,7 +1615,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       <Span12 key={lang}>
                         <RichTextInput
                           id={fieldName}
-                          label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                          label={
+                            t(
+                              `ReservationUnitEditor.label.${fieldName}`
+                            ) as string
+                          }
                           value={get(
                             state,
                             `reservationUnitEdit.${fieldName}`,
@@ -1600,7 +1633,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           errorText={getValidationError(fieldName)}
                           tooltipText={
                             lang === "fi"
-                              ? t("ReservationUnitEditor.tooltip.termsOfUseFi")
+                              ? (t(
+                                  "ReservationUnitEditor.tooltip.termsOfUseFi"
+                                ) as string)
                               : ""
                           }
                         />
@@ -1652,9 +1687,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           invalid={!!getValidationError(fieldName)}
                           tooltipText={
                             lang === "fi"
-                              ? t(
+                              ? (t(
                                   "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi"
-                                )
+                                ) as string)
                               : ""
                           }
                         />
@@ -1696,9 +1731,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         invalid={!!getValidationError(fieldName)}
                         tooltipText={
                           lang === "fi"
-                            ? t(
+                            ? (t(
                                 "ReservationUnitEditor.tooltip.reservationConfirmedInstructionsFi"
-                              )
+                              ) as string)
                             : ""
                         }
                       />
@@ -1744,9 +1779,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             invalid={!!getValidationError(fieldName)}
                             tooltipText={
                               lang === "fi"
-                                ? t(
+                                ? (t(
                                     "ReservationUnitEditor.tooltip.reservationCancelledInstructionsFi"
-                                  )
+                                  ) as string)
                                 : ""
                             }
                           />
@@ -1765,12 +1800,16 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         contactInformation: e.target.value,
                       })
                     }
-                    helperText={t(
-                      "ReservationUnitEditor.contactInformationHelperText"
-                    )}
-                    tooltipText={t(
-                      "ReservationUnitEditor.tooltip.contactInformation"
-                    )}
+                    helperText={
+                      t(
+                        "ReservationUnitEditor.contactInformationHelperText"
+                      ) as string
+                    }
+                    tooltipText={
+                      t(
+                        "ReservationUnitEditor.tooltip.contactInformation"
+                      ) as string
+                    }
                   />
                 </Span12>
               </Grid>
@@ -1846,7 +1885,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           notifySuccess(
                             t("ArchiveReservationUnitDialog.success")
                           );
-                          history.replace("/reservation-units");
+                          history("/reservation-units");
                         }
                       } catch (e) {
                         // noop
@@ -1874,7 +1913,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             setModalContent(
               <DiscardChangesDialog
                 onAccept={async () => {
-                  history.go(-1);
+                  setModalContent(null);
+                  history(-1);
                 }}
                 onClose={() => setModalContent(null)}
               />,
@@ -1891,11 +1931,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             disabled={saving || !state.reservationUnitPk}
             href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
             onClick={(e) => state.hasChanges && e.preventDefault()}
-            title={t(
-              state.hasChanges
-                ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
-                : "ReservationUnitEditor.previewTooltip"
-            )}
+            title={
+              t(
+                state.hasChanges
+                  ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
+                  : "ReservationUnitEditor.previewTooltip"
+              ) as string
+            }
           >
             <span>{t("ReservationUnitEditor.preview")}</span>
           </Preview>

@@ -3,7 +3,7 @@ import { IconArrowLeft, IconArrowRight, IconGroup, IconUser } from "hds-react";
 import Image from "next/image";
 import React, { Fragment, ReactElement, useMemo, useRef } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
 import RadioButtonWithImage from "common/src/reservation-form/RadioButtonWithImage";
@@ -99,6 +99,7 @@ const Step0 = ({
         icon: (
           <Image
             src="/icons/icon_premises.svg"
+            alt={t("common:headAlt")}
             width="24"
             height="24"
             aria-hidden
@@ -106,7 +107,7 @@ const Step0 = ({
         ),
       },
     ];
-  }, []);
+  }, [t]);
 
   return (
     <Form
@@ -144,20 +145,24 @@ const Step0 = ({
                   }}
                   data={{
                     subventionLabel: (
-                      <Trans i18nKey="reservationApplication:label.common.applyingForFreeOfChargeWithLink">
-                        Haen maksuttomuutta tai hinnan alennusta ja olen
-                        tutustunut
-                        <a
-                          href="#"
-                          ref={openPricingTermsRef}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setIsDialogOpen(true);
-                          }}
-                        >
-                          alennusperusteisiin
-                        </a>
-                      </Trans>
+                      <Trans
+                        i18nKey="reservationApplication:label.common.applyingForFreeOfChargeWithLink"
+                        defaults="Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut <a />"
+                        components={{
+                          a: (
+                            <a
+                              href="#"
+                              ref={openPricingTermsRef}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setIsDialogOpen(true);
+                              }}
+                            >
+                              alennusperusteisiin
+                            </a>
+                          ),
+                        }}
+                      />
                     ),
                   }}
                 />

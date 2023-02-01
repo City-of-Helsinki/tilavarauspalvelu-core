@@ -42,6 +42,7 @@ import StickyHeader from "../StickyHeader";
 import ApplicationUserBirthDate from "./ApplicationUserBirthDate";
 
 interface IRouteParams {
+  [key: string]: string;
   applicationId: string;
 }
 

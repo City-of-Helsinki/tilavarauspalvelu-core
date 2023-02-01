@@ -63,6 +63,7 @@ export const HorisontalRule = styled.div`
 `;
 
 export const CenterSpinner = styled(LoadingSpinner).attrs({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   "data-testid": "loading-spinner",
 })`
   margin: 0 auto var(--spacing-2-xl) auto;

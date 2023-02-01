@@ -5,14 +5,14 @@ import { render, screen } from "../../../test/testUtils";
 import ReservationStatus, { Props } from "../ReservationStatus";
 import mockTranslations from "../../../public/locales/fi/reservations.json";
 
-jest.mock("react-i18next", () => ({
+jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string, params?: Record<string, string | number>) => {
         const path = str.replace("reservations:", "");
         const key =
-          mockGet(mockTranslations, `${path}_plural`) && params?.count > 1
-            ? `${path}_plural`
+          mockGet(mockTranslations, `${path}_other`) && params?.count > 1
+            ? `${path}_other`
             : path;
         return mockGet(mockTranslations, key)?.replace(
           /{{(.*?)}}/g,

@@ -1,7 +1,7 @@
 import uniqBy from "lodash/uniqBy";
 import get from "lodash/get";
 import groupBy from "lodash/groupBy";
-import { TFunction } from "react-i18next";
+import { TFunction } from "i18next";
 import {
   rejectApplicationEventSchedule,
   setApplicationEventScheduleResultStatus,

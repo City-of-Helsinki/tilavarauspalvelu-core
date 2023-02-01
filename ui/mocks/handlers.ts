@@ -5,6 +5,7 @@ import { applicationRoundHandlers } from "./handlers/applicationRound";
 import { reservationHandlers } from "./handlers/reservation";
 import { applicationHandlers } from "./handlers/application";
 import { userHandlers } from "./handlers/user";
+import { parameterHandlers } from "./handlers/parameters";
 
 export const handlers = [
   ...reservationUnitSearchHandlers,
@@ -15,4 +16,5 @@ export const handlers = [
   ...applicationRoundHandlers,
   ...applicationHandlers,
   ...userHandlers,
+  ...parameterHandlers,
 ];

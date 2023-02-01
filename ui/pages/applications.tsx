@@ -3,10 +3,9 @@ import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation, TFunction } from "next-i18next";
 import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
-import { TFunction } from "next-i18next";
 import { ReducedApplicationStatus } from "common/types/common";
 import {
   ApplicationRoundType,
@@ -49,7 +48,7 @@ const statusGroupOrder: ReducedApplicationStatus[] = [
   "draft",
 ];
 
-function ApplicationGroups({
+const ApplicationGroups = ({
   rounds,
   applications,
   actionCallback,
@@ -59,7 +58,7 @@ function ApplicationGroups({
   applications: { [key: string]: ApplicationType[] };
   actionCallback: (string: "error" | "cancel") => Promise<void>;
   t: TFunction;
-}): JSX.Element {
+}) => {
   if (Object.keys(applications).length === 0) {
     return <span>{t("applications:noApplications")}</span>;
   }
@@ -76,7 +75,7 @@ function ApplicationGroups({
       ))}
     </>
   );
-}
+};
 
 const Applications = (): JSX.Element => {
   const { t } = useTranslation();

@@ -59,7 +59,7 @@ const Label = styled.span`
 
 const StyledCard = styled(Card)`
   padding: var(--spacing-m);
-  background: white;
+  background: var(--color-black-5);
 `;
 
 function Stat({ value, label }: { value: number; label: string }): JSX.Element {

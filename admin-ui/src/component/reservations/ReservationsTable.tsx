@@ -1,5 +1,6 @@
 import React from "react";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { memoize, truncate } from "lodash";
 import { ReservationType } from "common/types/gql-types";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
@@ -101,27 +102,21 @@ const ReservationsTable = ({
   const cols = memoize(() => getColConfig(t))();
 
   return (
-    <>
-      <DataOrMessage
-        filteredData={reservations}
-        noFilteredData={t("Reservations.noFilteredReservations")}
-      >
-        <>
-          <CustomTable
-            setSort={onSortChanged}
-            indexKey="pk"
-            rows={reservations}
-            cols={cols}
-            initialSortingColumnKey={
-              sort === undefined ? undefined : sort.field
-            }
-            initialSortingOrder={
-              sort === undefined ? undefined : (sort.asc && "asc") || "desc"
-            }
-          />
-        </>
-      </DataOrMessage>
-    </>
+    <DataOrMessage
+      filteredData={reservations}
+      noFilteredData={t("Reservations.noFilteredReservations")}
+    >
+      <CustomTable
+        setSort={onSortChanged}
+        indexKey="pk"
+        rows={reservations}
+        cols={cols}
+        initialSortingColumnKey={sort === undefined ? undefined : sort.field}
+        initialSortingOrder={
+          sort === undefined ? undefined : (sort.asc && "asc") || "desc"
+        }
+      />
+    </DataOrMessage>
   );
 };
 

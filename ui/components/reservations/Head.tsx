@@ -1,7 +1,7 @@
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 

@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import trim from "lodash/trim";
 import {
@@ -45,6 +45,7 @@ import { applicantName } from "../applications/util";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
+  [key: string]: string;
   applicationRoundId: string;
   applicationEventScheduleId: string;
 }
@@ -198,7 +199,7 @@ function Recommendation(): JSX.Element {
   ] = useState<boolean>(false);
 
   const { t } = useTranslation();
-  const history = useHistory();
+  const history = useNavigate();
 
   const { applicationRoundId, applicationEventScheduleId } =
     useParams<IRouteParams>();
@@ -263,7 +264,9 @@ function Recommendation(): JSX.Element {
     } catch (error) {
       notifyError(t("errors.errorSavingRecommendation"));
     } finally {
-      history.push(applicationRoundUrl(applicationRoundId));
+      if (applicationRoundId) {
+        history(applicationRoundUrl(applicationRoundId));
+      }
     }
   };
 
@@ -296,9 +299,9 @@ function Recommendation(): JSX.Element {
         payload
       );
 
-      if (revert) {
+      if (revert && applicationRoundId) {
         await deleteAllocationResult(rec.applicationEventScheduleId);
-        history.push(applicationRoundUrl(applicationRoundId));
+        history(applicationRoundUrl(applicationRoundId));
       }
 
       setActionNotification(revert ? null : "ignored");
@@ -495,28 +498,30 @@ function Recommendation(): JSX.Element {
       />
       {application && recommendation && (
         <>
-          <IngressContainer>
-            <Top>
-              <div>
-                <LinkToOthers
-                  to={`${applicationRoundUrl(applicationRoundId)}/applicant/${
-                    recommendation.applicantId
-                  }`}
-                >
-                  {t("Recommendation.linkToOtherRecommendations")}
-                </LinkToOthers>
-                <Heading>{recommendation.applicationEvent.name}</Heading>
-                <div>{applicationRound?.name}</div>
-                <StyledApplicationEventStatusBlock
-                  status={recommendation.applicationEvent.status}
-                  accepted={recommendation.accepted}
-                />
-              </div>
-              <div>
-                {application && <ApplicantBox application={application} />}
-              </div>
-            </Top>
-          </IngressContainer>
+          {applicationRoundId ? (
+            <IngressContainer>
+              <Top>
+                <div>
+                  <LinkToOthers
+                    to={`${applicationRoundUrl(applicationRoundId)}/applicant/${
+                      recommendation.applicantId
+                    }`}
+                  >
+                    {t("Recommendation.linkToOtherRecommendations")}
+                  </LinkToOthers>
+                  <Heading>{recommendation.applicationEvent.name}</Heading>
+                  <div>{applicationRound?.name}</div>
+                  <StyledApplicationEventStatusBlock
+                    status={recommendation.applicationEvent.status}
+                    accepted={recommendation.accepted}
+                  />
+                </div>
+                <div>
+                  {application && <ApplicantBox application={application} />}
+                </div>
+              </Top>
+            </IngressContainer>
+          ) : null}
           <NarrowContainer>
             {actionNotification === "accepted" && (
               <StyledNotification

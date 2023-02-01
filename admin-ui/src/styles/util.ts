@@ -168,13 +168,6 @@ export const Divider = styled.hr`
   grid-column: 1/-1;
 `;
 
-export const PlainButton = styled(Button).attrs({
-  variant: "secondary",
-  style: {
-    "--color-bus": "var(--color-black)",
-  },
-})``;
-
 export const NotificationBox = styled.div`
   background-color: var(--tilavaraus-admin-gray-darker);
   padding: 110px var(--spacing-layout-m) 100px;

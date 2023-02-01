@@ -136,9 +136,9 @@ export const isSlotWithinReservationTime = (
 
 export const isSlotWithinTimeframe = (
   start: Date,
-  reservationsMinDaysBefore = 0,
   reservationBegins?: Date,
-  reservationEnds?: Date
+  reservationEnds?: Date,
+  reservationsMinDaysBefore = 0
 ): boolean => {
   return reservationsMinDaysBefore
     ? isAfter(
@@ -151,11 +151,12 @@ export const isSlotWithinTimeframe = (
 };
 
 const doesSlotCollideWithApplicationRounds = (
-  applicationRounds: ApplicationRound[] | ApplicationRoundType[] = [],
-  slot: Date
+  slot: Date,
+  applicationRounds: ApplicationRound[] | ApplicationRoundType[] = []
 ): boolean => {
   if (applicationRounds?.length < 1) return false;
-  return applicationRounds?.some((applicationRound) =>
+
+  return applicationRounds.some((applicationRound) =>
     isWithinInterval(slot, {
       start: new Date(applicationRound.reservationPeriodBegin),
       end: new Date(applicationRound.reservationPeriodEnd).setHours(23, 59, 59),
@@ -166,10 +167,10 @@ const doesSlotCollideWithApplicationRounds = (
 export const areSlotsReservable = (
   slots: Date[],
   openingHours: OpeningTimesType[],
-  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[] = [],
   reservationBegins?: Date,
   reservationEnds?: Date,
-  reservationsMinDaysBefore = 0
+  reservationsMinDaysBefore = 0,
+  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[] = []
 ): boolean => {
   return slots.every((slot) => {
     const slotDate = new Date(slot);
@@ -177,18 +178,18 @@ export const areSlotsReservable = (
       areOpeningTimesAvailable(openingHours, slotDate) &&
       isSlotWithinTimeframe(
         slotDate,
-        reservationsMinDaysBefore,
         reservationBegins,
-        reservationEnds
+        reservationEnds,
+        reservationsMinDaysBefore
       ) &&
-      !doesSlotCollideWithApplicationRounds(activeApplicationRounds, slot)
+      !doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds)
     );
   });
 };
 
 export const doReservationsCollide = (
-  reservations: ReservationType[] = [],
-  newReservation: { start: Date; end: Date }
+  newReservation: { start: Date; end: Date },
+  reservations: ReservationType[] = []
 ): boolean => {
   const { start, end } = newReservation;
   return reservations.some((reservation) =>
@@ -282,10 +283,10 @@ export const getSlotPropGetter =
       areSlotsReservable(
         [date],
         openingHours,
-        activeApplicationRounds,
         reservationBegins,
         reservationEnds,
-        reservationsMinDaysBefore
+        reservationsMinDaysBefore,
+        activeApplicationRounds
       ) &&
       (customValidation ? customValidation(date) : true)
     ) {
@@ -366,13 +367,13 @@ export const doesBufferCollide = (
 };
 
 export const doBuffersCollide = (
-  reservations: ReservationType[] = [],
   newReservation: {
     start: Date;
     end: Date;
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
-  }
+  },
+  reservations: ReservationType[] = []
 ): boolean => {
   return reservations.some((reservation) =>
     doesBufferCollide(reservation, newReservation)

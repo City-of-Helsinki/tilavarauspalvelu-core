@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import {
   PurposeType,
   Query,
@@ -23,6 +23,23 @@ import {
 type Props = {
   purposes: PurposeType[];
   units: UnitType[];
+};
+
+const Wrapper = styled.div`
+  background-color: var(--color-white);
+`;
+
+const Home = ({ purposes, units }: Props): JSX.Element => {
+  const { t } = useTranslation(["home", "common"]);
+
+  return (
+    <Wrapper>
+      <Header heading={t("head.heading")} text={t("head.text")} />
+      <Purposes purposes={purposes} />
+      <Units units={units} />
+      <SearchGuides />
+    </Wrapper>
+  );
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
@@ -54,26 +71,14 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       purposes,
       units,
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale, [
+        "common",
+        "home",
+        "navigation",
+        "footer",
+      ])),
     },
   };
-};
-
-const Wrapper = styled.div`
-  background-color: var(--color-white);
-`;
-
-const Home = ({ purposes, units }: Props): JSX.Element => {
-  const { t } = useTranslation("home");
-
-  return (
-    <Wrapper>
-      <Header heading={t("head.heading")} text={t("head.text")} />
-      <Purposes purposes={purposes} />
-      <Units units={units} />
-      <SearchGuides />
-    </Wrapper>
-  );
 };
 
 export default Home;

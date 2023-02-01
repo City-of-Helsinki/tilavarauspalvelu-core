@@ -1,8 +1,8 @@
 {
   "maxPersons": "{{count}} person",
-  "maxPersons_plural": "{{count}} personer",
+  "maxPersons_other": "{{count}} personer",
   "personRange": "{{value}} person",
-  "personRange_plural": "{{value}} personer",
+  "personRange_other": "{{value}} personer",
   "RelatedUnits": {
     "heading": "Se även"
   },

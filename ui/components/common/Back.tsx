@@ -8,6 +8,7 @@ import { useLocalStorage } from "react-use";
 
 const Button = styled(HDSButton).attrs({
   style: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     "--color-bus": "var(--color-black)",
   } as React.CSSProperties,
 })`

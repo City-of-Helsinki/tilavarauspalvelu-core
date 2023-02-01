@@ -29,58 +29,45 @@ import {
   startApplicationButton,
 } from "../model/search";
 
+import * as get138Page1JSONResponse from "../../cypress/fixtures/v1/application/138_page_1.json";
+import * as get138Page2JSONResponse from "../../cypress/fixtures/v1/application/138_page_2.json";
+import * as postJSONResponse from "../../cypress/fixtures/v1/application/post.json";
+import * as putPage1Response from "../../cypress/fixtures/v1/application/put_page_1.json";
+import * as putPage3Response from "../../cypress/fixtures/v1/application/put_page_3.json";
+import * as getReservationUnitResponse from "../../cypress/fixtures/v1/reservation_unit/2.json";
+
 const applicationEventNames = ["Kurikan vimma", "Toca"];
 
 describe("application", () => {
   beforeEach(() => {
     Cypress.config("defaultCommandTimeout", 20000);
 
-    cy.fixture("v1/application_round").then((json) => {
-      cy.intercept("GET", "/v1/application_round/*", json);
-    });
-
-    cy.fixture("v1/application_round_1").then((json) => {
-      cy.intercept("GET", "/v1/application_round/1/*", json).as(
-        "applicationRound1"
-      );
-    });
-
-    cy.fixture("v1/application/post").then((json) => {
-      cy.intercept("POST", "/v1/application/", json).as("applicationPost");
-    });
-    cy.fixture("v1/application/put_page_1").then((json) => {
-      cy.intercept("PUT", "/v1/application/138", json);
-    });
-
-    cy.fixture("v1/application/138_page_1.json").then((json) => {
-      cy.intercept("GET", "/v1/application/138/*", json).as("applicationPage1");
-    });
-
-    cy.fixture("v1/parameters/ability_group").then((json) => {
-      cy.intercept("GET", "/v1/parameters/ability_group/*", json).as(
-        "abilityGroup"
-      );
-    });
-
-    cy.fixture("v1/parameters/age_group").then((json) => {
-      cy.intercept("GET", "/v1/parameters/age_group/*", json).as("ageGroup");
-    });
-
-    cy.fixture("v1/parameters/city").then((json) => {
-      cy.intercept("GET", "/v1/parameters/city/*", json).as("city");
-    });
-
-    cy.fixture("v1/reservation_unit/2").then((json) => {
-      cy.intercept("GET", "/v1/reservation_unit/2/*", json);
-    });
-
     cy.window().then((win) => {
       win.sessionStorage.clear();
       cy.visit("/search/?search=");
+      cy.injectAxe();
     });
   });
 
   it("can be submitted and is accessible", () => {
+    cy.window().then((window) => {
+      const { worker, rest } = window.msw;
+
+      worker.use(
+        rest.get(`*/v1/application/138/*`, (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json(get138Page1JSONResponse));
+        }),
+        rest.post(`*/v1/application/`, (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json(postJSONResponse));
+        }),
+        rest.put(`*/v1/application/138`, (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json(putPage1Response));
+        }),
+        rest.get(`*/v1/reservation_unit/2/*`, (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json(getReservationUnitResponse));
+        })
+      );
+    });
     startApplicationButton().should("not.exist");
     addReservationUnitButton(2).click();
     clearSelectionsButton().click();
@@ -92,7 +79,7 @@ describe("application", () => {
     addReservationUnitButton(2).click();
 
     cy.get("h1").should("contain", "Varaa tila koko kaudeksi");
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
 
     startApplicationButton().click();
 
@@ -101,28 +88,19 @@ describe("application", () => {
     selectApplicationRoundButton().click();
     firstAvailableApplicationRound().click();
 
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
 
     proceedToPage1Button().click();
 
-    cy.wait(
-      ["@applicationPost", "@applicationPage1", "@ageGroup", "@abilityGroup"],
-      { timeout: 20000 }
-    );
-
     cy.get("h1").should("contain", "varauksen tiedot");
 
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
 
     applicationName(0).clear().type(applicationEventNames[0]);
     numPersons(0).type("3");
     selectOption("applicationEvents[0].ageGroupId", 1);
     selectOption("applicationEvents[0].purposeId", 1);
-
-    cy.intercept("PUT", "/v1/application/*").as("savePage1");
     acceptAndSaveEvent(0).click();
-
-    cy.wait("@savePage1", { timeout: 20000 });
 
     addNewApplicationButton().click();
     applicationName(1).clear().type(applicationEventNames[1]);
@@ -131,13 +109,20 @@ describe("application", () => {
     selectOption("applicationEvents[1].purposeId", 2);
     acceptAndSaveEvent(1).click();
 
-    cy.fixture("v1/application/138_page_2").then((json) => {
-      cy.intercept("GET", "/v1/application/138/*", json).as("page2");
+    cy.window().then((window) => {
+      const { worker, rest } = window.msw;
+
+      worker.use(
+        rest.get(`*/v1/application/:id`, (req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(get138Page2JSONResponse));
+        }),
+        rest.put(`*/v1/application/:id`, (req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(get138Page2JSONResponse));
+        })
+      );
     });
 
     nextButton().click();
-
-    cy.wait(["@page2"]);
 
     cy.get("h1").should("contain", "ajankohta");
 
@@ -283,13 +268,21 @@ describe("application", () => {
 
     cy.get("h1").should("contain", "varaajan tiedot");
 
-    cy.a11yCheck();
+    cy.checkA11y(undefined, undefined, undefined, true);
 
     fillAsIndividual();
 
-    cy.fixture("v1/application/put_page_3").then((json) => {
-      cy.intercept("PUT", "/v1/application/138", json);
-      cy.intercept("GET", "/v1/application/138/*", json);
+    cy.window().then((window) => {
+      const { worker, rest } = window.msw;
+
+      worker.use(
+        rest.get(`*/v1/application/138/*`, (req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(putPage3Response));
+        }),
+        rest.put(`*/v1/application/:id`, (req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(putPage3Response));
+        })
+      );
     });
 
     nextButton().click();
@@ -329,6 +322,6 @@ describe("application", () => {
       ],
     };
 
-    checkBreadcrumbs(breadcrumbs, "/application/138/sent");
+    checkBreadcrumbs({ breadcrumbs, url: "/application/138/sent" });
   });
 });

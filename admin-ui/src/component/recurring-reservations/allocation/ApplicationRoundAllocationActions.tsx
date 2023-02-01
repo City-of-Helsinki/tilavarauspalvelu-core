@@ -1,6 +1,7 @@
 import { IconCross, Select } from "hds-react";
 import React, { useCallback, useMemo } from "react";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { Strong, Strongish } from "common/src/common/typography";
 import styled from "styled-components";
 import {
@@ -166,8 +167,10 @@ const ApplicationRoundAllocationActions = ({
     if (!selection) return undefined;
     const start = startValue || selection[0];
     const end = endValue || selection[selection.length - 1];
-    const [, startHours, startMinutes] = start?.toString().split("-");
-    const [, endHours, endMinutes] = end?.toString().split("-");
+    const [, startHours, startMinutes] = start
+      ? start.toString().split("-")
+      : [];
+    const [, endHours, endMinutes] = end ? end.toString().split("-") : [];
     const timeSlots = getTimeSlotOptions(
       selection[0].split("-")[0],
       Number(startHours),

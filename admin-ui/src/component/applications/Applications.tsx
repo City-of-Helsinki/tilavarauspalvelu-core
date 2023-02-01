@@ -30,6 +30,7 @@ import { getNormalizedApplicationStatus } from "./util";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
+  [key: string]: string;
   applicationRoundId: string;
 }
 

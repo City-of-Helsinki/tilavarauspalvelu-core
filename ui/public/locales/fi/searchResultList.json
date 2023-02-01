@@ -1,8 +1,8 @@
 {
-  "count_plural": "{{count}} hakutulosta",
-  "count": "{{count}} hakutulos",
-  "paginationSummary": "{{count}} tulos {{totalCount}} tuloksesta näytetty",
-  "paginationSummary_plural": "{{count}} tulosta {{totalCount}} tuloksesta näytetty",
+  "count_one": "{{count}} hakutulos",
+  "count_other": "{{count}} hakutulosta",
+  "paginationSummary_one": "{{count}} tulos {{totalCount}} tuloksesta näytetty",
+  "paginationSummary_other": "{{count}} tulosta {{totalCount}} tuloksesta näytetty",
   "paginationSummaryEnd": "Kaikki {{count}} tulosta näytetty",
   "noResults": "Ei hakutuloksia",
   "error": "Tapahtui virhe haettaessa tiloja. Yritä uudelleen!",

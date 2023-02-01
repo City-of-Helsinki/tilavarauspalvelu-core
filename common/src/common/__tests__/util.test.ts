@@ -1,5 +1,10 @@
 import { convertHMSToSeconds, formatDuration, secondsToHms } from "../util";
 
+jest.mock("next/config", () => () => ({
+  serverRuntimeConfig: {},
+  publicRuntimeConfig: {},
+}));
+
 jest.mock("next-i18next", () => ({
   i18n: {
     t: (str: string, options: { count: number }) => {

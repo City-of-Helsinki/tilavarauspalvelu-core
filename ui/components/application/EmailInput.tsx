@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { UseFormReturn } from "react-hook-form";
 import { Notification, TextInput } from "hds-react";
 import { SpanTwoColumns } from "../common/common";

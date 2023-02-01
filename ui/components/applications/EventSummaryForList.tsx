@@ -8,7 +8,7 @@ import {
 import { uniq } from "lodash";
 import { useRouter } from "next/router";
 import React, { Fragment } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -226,7 +226,10 @@ const ReservationUnitEventsSummaryForList = ({
                   </SpanTwoColumns>
                   <StrongLabel>{t("eventSummary:purpose")}</StrongLabel>
                   <SpanTwoColumns>
-                    {getPurpose(applicationEvent.purposeId as number)?.name}
+                    {
+                      getPurpose(applicationEvent.purposeId as number)
+                        ?.name as string
+                    }
                   </SpanTwoColumns>
                   <SpacerRow />
                   <div>

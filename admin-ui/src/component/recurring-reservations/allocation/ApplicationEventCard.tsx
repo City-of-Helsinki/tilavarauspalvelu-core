@@ -2,7 +2,7 @@ import { IconAngleDown, IconAngleUp, Link, RadioButton } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Strong, Strongish } from "common/src/common/typography";
+import { Strong } from "common/src/common/typography";
 import {
   ApplicationEventType,
   ApplicationType,
@@ -80,16 +80,15 @@ const Details = styled.div`
   padding-top: var(--spacing-xs);
 `;
 
-const StyledLink = styled(Link).attrs({
-  style: {
-    "--link-color": "var(--color-black)",
-    "--link-visited-color": "var(--color-black)",
-  },
-})`
-  && {
-    ${Strongish};
-    border: 0;
-    text-decoration: none;
+const StyledLink = styled(Link)`
+  color: var(--color-black);
+  text-decoration: none;
+  font-size: var(--fontsize-body-s);
+  border: 0;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
   }
 `;
 

@@ -1,8 +1,8 @@
 {
-  "maxPersons": "{{count}} henkilö",
-  "maxPersons_plural": "{{count}} henkilöä",
-  "personRange": "{{value}} henkilö",
-  "personRange_plural": "{{value}} henkilöä",
+  "maxPersons_one": "{{count}} henkilö",
+  "maxPersons_other": "{{count}} henkilöä",
+  "personRange_one": "{{value}} henkilö",
+  "personRange_other": "{{value}} henkilöä",
   "RelatedUnits": {
     "heading": "Samankaltaiset"
   },

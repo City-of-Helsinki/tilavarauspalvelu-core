@@ -1,7 +1,7 @@
 import { IconAngleLeft, IconAngleRight, IconCalendarPlus } from "hds-react";
 import { camelCase, startCase } from "lodash";
 import React, { ChangeEvent, MutableRefObject } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import Checkbox from "./Checkbox";

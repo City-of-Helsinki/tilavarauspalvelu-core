@@ -9,7 +9,11 @@ import {
   startOfDay,
 } from "date-fns";
 import fi from "date-fns/locale/fi";
-import { Calendar as BigCalendar, dateFnsLocalizer } from "react-big-calendar";
+import {
+  Calendar as BigCalendar,
+  dateFnsLocalizer,
+  ToolbarProps,
+} from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { parseDate } from "../common/util";
@@ -60,9 +64,9 @@ type Props<T> = {
   ) => void;
   draggableAccessor?: (event: CalendarEvent<T>) => boolean;
   resizableAccessor?: (event: CalendarEvent<T>) => boolean;
-  toolbarComponent?: React.ReactNode;
-  eventWrapperComponent?: React.ReactNode;
-  dateCellWrapperComponent?: React.ReactNode;
+  toolbarComponent?: (props: ToolbarProps) => JSX.Element | React.ReactNode;
+  eventWrapperComponent?: (props: unknown) => JSX.Element | React.ReactNode;
+  dateCellWrapperComponent?: (props: unknown) => JSX.Element | React.ReactNode;
   showToolbar?: boolean;
   reservable?: boolean;
   draggable?: boolean;
@@ -81,7 +85,6 @@ const StyledCalendar = styled(BigCalendar)<{
   ${({ timeslots }) => {
     switch (timeslots) {
       case 2:
-      default:
         return ``;
       case 3:
         return `
@@ -95,6 +98,8 @@ const StyledCalendar = styled(BigCalendar)<{
             min-height: 29px !important;
           }
         `;
+      default:
+        return ``;
     }
   }}
 

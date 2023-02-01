@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-// eslint-disable-next-line import/no-unresolved
 import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter } from "react-router-dom";

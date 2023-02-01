@@ -14,7 +14,7 @@ import {
 import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
 import { padStart } from "lodash";
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";

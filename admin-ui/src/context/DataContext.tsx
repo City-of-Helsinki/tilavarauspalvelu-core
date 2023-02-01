@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Query, QueryReservationsArgs } from "common/types/gql-types";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 import { useAuthState } from "./AuthStateContext";
@@ -19,7 +19,11 @@ export const DataContext = React.createContext<DataContextProps>({
 
 export const useData = (): DataContextProps => useContext(DataContext);
 
-export const DataContextProvider: React.FC = ({ children }) => {
+type Props = {
+  children: React.ReactNode;
+};
+
+export const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
   const [handlingCount, setHandlingCount] = React.useState(0);
   const [hasOwnUnits, setHasOwnUnits] = React.useState(false);
 
@@ -38,6 +42,15 @@ export const DataContextProvider: React.FC = ({ children }) => {
     }
   );
 
+  const notificationContextValues = useMemo(
+    () => ({
+      handlingCount,
+      hasOwnUnits,
+      updateHandlingCount: refetch,
+    }),
+    [handlingCount, hasOwnUnits, refetch]
+  );
+
   useEffect(() => {
     if (authState.state === "HasPermissions") {
       const timer = setInterval(() => {
@@ -50,13 +63,7 @@ export const DataContextProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <DataContext.Provider
-      value={{
-        handlingCount,
-        hasOwnUnits,
-        updateHandlingCount: refetch,
-      }}
-    >
+    <DataContext.Provider value={notificationContextValues}>
       {children}
     </DataContext.Provider>
   );

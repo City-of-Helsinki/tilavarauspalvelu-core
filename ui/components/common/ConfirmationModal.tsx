@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import ReactDOM from "react-dom";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { MediumButton } from "../../styles/util";

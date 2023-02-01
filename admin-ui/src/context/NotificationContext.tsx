@@ -1,17 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 
 export type NotificationContextProps = {
   notification: NotificationType | null;
   setNotification: (notification: NotificationType) => void;
   notifyError: (
-    title: string,
     message?: string,
-    options?: NotificationOptions
+    options?: NotificationOptions,
+    title?: string
   ) => void;
   notifySuccess: (
-    title: string,
     message?: string,
-    options?: NotificationOptions
+    options?: NotificationOptions,
+    title?: string
   ) => void;
   clearNotification: () => void;
 };
@@ -39,7 +39,13 @@ export type NotificationOptions = {
 export const useNotification = (): NotificationContextProps =>
   useContext(NotificationContext);
 
-export const NotificationContextProvider: React.FC = ({ children }) => {
+type Props = {
+  children: React.ReactNode;
+};
+
+export const NotificationContextProvider: React.FC<Props> = ({
+  children,
+}: Props) => {
   const [notification, setNotification] =
     React.useState<NotificationType | null>(null);
   const [cancel, setCancel] = React.useState<NodeJS.Timeout>();
@@ -56,31 +62,31 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
     setCancel(timeout);
   };
 
-  function notifyError(
-    title = "",
+  const notifyError = (
     message?: string,
-    options?: NotificationOptions
-  ) {
+    options?: NotificationOptions,
+    title = ""
+  ) => {
     showDisappearingNotification({
       type: "error",
       title: title || null,
       message: message || null,
       options,
     });
-  }
+  };
 
-  function notifySuccess(
-    title = "",
+  const notifySuccess = (
     message?: string,
-    options?: NotificationOptions
-  ) {
+    options?: NotificationOptions,
+    title = ""
+  ) => {
     showDisappearingNotification({
       type: "success",
       title: title || null,
       message: message || null,
       options,
     });
-  }
+  };
 
   const [state] = React.useState({
     setNotification: showDisappearingNotification,
@@ -89,8 +95,13 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
     notifySuccess,
   });
 
+  const notificationContextValues = useMemo(
+    () => ({ ...state, notification }),
+    [state, notification]
+  );
+
   return (
-    <NotificationContext.Provider value={{ ...state, notification }}>
+    <NotificationContext.Provider value={notificationContextValues}>
       {children}
     </NotificationContext.Provider>
   );

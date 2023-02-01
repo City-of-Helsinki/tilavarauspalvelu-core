@@ -68,6 +68,7 @@ const Sorting = ({
               isOrderingAsc ? "descending" : "ascending"
             }`
           )}
+          data-testid="sorting-button"
         >
           {isOrderingAsc ? (
             <IconSortAscending

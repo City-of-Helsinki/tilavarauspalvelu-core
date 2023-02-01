@@ -21,8 +21,7 @@ describe("applications", () => {
         items: 17,
       },
     ];
-
-    cy.checkA11y(null, null, null, true);
+    cy.checkA11y(undefined, undefined, undefined, true);
 
     applicationGroups().should("have.length", 2);
     applicationGroups().each((group, index) => {

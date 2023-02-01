@@ -45,6 +45,7 @@ import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
+  [key: string]: string | undefined;
   applicationRoundId: string;
   organisationId?: string;
   applicantId?: string;
@@ -374,46 +375,50 @@ function RecommendationsByApplicant(): JSX.Element {
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={applicationRoundUrl(applicationRoundId)} />
-      </ContentContainer>
+      {applicationRoundId ? (
+        <ContentContainer>
+          <LinkPrev route={applicationRoundUrl(applicationRoundId)} />
+        </ContentContainer>
+      ) : null}
       {recommendations &&
         applicationRound &&
         application &&
         cellConfig &&
         filterConfig && (
           <>
-            <IngressContainer style={{ marginBottom: "var(--spacing-l)" }}>
-              <Top>
-                <div>
-                  <LinkToOthers
-                    to={applicationDetailsUrl(
-                      get(recommendations, "[0].applicationId")
-                    )}
-                  >
-                    {t("Recommendation.showOriginalApplication")}
-                  </LinkToOthers>
-                  <Heading>{applicantName}</Heading>
-                  <div>{applicationRound?.name}</div>
-                  <StyledApplicantApplicationsStatusBlock
-                    applicationRound={applicationRound}
-                    application={application}
-                  />
-                </div>
-                <div>
-                  {application && (
-                    <ApplicantBox
+            {recommendations?.[0].applicantId ? (
+              <IngressContainer style={{ marginBottom: "var(--spacing-l)" }}>
+                <Top>
+                  <div>
+                    <LinkToOthers
+                      to={applicationDetailsUrl(
+                        recommendations?.[0].applicantId
+                      )}
+                    >
+                      {t("Recommendation.showOriginalApplication")}
+                    </LinkToOthers>
+                    <Heading>{applicantName}</Heading>
+                    <div>{applicationRound?.name}</div>
+                    <StyledApplicantApplicationsStatusBlock
+                      applicationRound={applicationRound}
                       application={application}
-                      type={applicantId && "individual"}
                     />
-                  )}
-                </div>
-              </Top>
-              <RecommendationCount
-                recommendationCount={recommendations.length}
-                unhandledCount={unhandledRecommendationCount}
-              />
-            </IngressContainer>
+                  </div>
+                  <div>
+                    {application && (
+                      <ApplicantBox
+                        application={application}
+                        type={applicantId && "individual"}
+                      />
+                    )}
+                  </div>
+                </Top>
+                <RecommendationCount
+                  recommendationCount={recommendations.length}
+                  unhandledCount={unhandledRecommendationCount}
+                />
+              </IngressContainer>
+            ) : null}
             <DataTable
               groups={[{ id: 1, data: recommendations }]}
               setSelections={setSelections}

@@ -1,10 +1,10 @@
 {
-  "message": "Du håller på att göra en bokning <1>{{name}}</1> för säsongen <4>{{startDate}} - {{endDate}}</4>. Bokningarnas sammanlagda varaktighet är minst <4>{{hours}} timme</4>.",
-  "message_plural": "Du håller på att göra en bokning <1>{{name}}</1> för säsongen <4>{{startDate}} - {{endDate}}</4>. Bokningarnas sammanlagda varaktighet är minst <4>{{hours}} timmar</4>.",
-  "numPersons": "Gruppens storlek är {{count}} person",
-  "numPersons_plural": "Gruppens storlek är {{count}} personer",
+  "message_one": "Du håller på att göra en bokning {{name}} för säsongen <bold>{{startDate}} - {{endDate}}</bold>. Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timme</bold>.",
+  "message_other": "Du håller på att göra en bokning {{name}} för säsongen <bold>{{startDate}} - {{endDate}}</bold>. Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timmar</bold>.",
+  "numPersons_one": "Gruppens storlek är {{count}} person",
+  "numPersons_other": "Gruppens storlek är {{count}} personer",
   "minDuration": "En boknings varaktighet är minst {{minDuration}}",
   "durations": "En boknings varaktighet är minst {{minDuration}} och mest {{maxDuration}}",
-  "eventsPerWeek": "{{count}} bokning per vecka",
-  "eventsPerWeek_plural": "{{count}} bokningar per vecka"
+  "eventsPerWeek_one": "{{count}} bokning per vecka",
+  "eventsPerWeek_other": "{{count}} bokningar per vecka"
 }

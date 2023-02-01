@@ -1,6 +1,6 @@
 import { camelCase } from "lodash";
 import React, { useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { truncatedText } from "../../styles/util";
 

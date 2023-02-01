@@ -1,10 +1,10 @@
 {
   "next": "Continue to application",
   "nextShort": "Continue",
-  "count_plural": "{{count}} selected",
   "count": "{{count}} selected",
-  "countShort_plural": "{{count}} selected",
-  "countShort": "{{count}} selected",
+  "count_other": "{{count}} selected",
+  "countShort_one": "{{count}} selected",
+  "countShort_other": "{{count}} selected",
   "deleteSelections": "Remove selected spaces",
   "deleteSelectionsShort": "Remove"
 }

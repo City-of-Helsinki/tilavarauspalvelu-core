@@ -1,7 +1,7 @@
 import { differenceInWeeks } from "date-fns";
 import { IconArrowRedo, IconCalendar, IconClock, IconGroup } from "hds-react";
 import React from "react";
-import { Trans, useTranslation, TFunction } from "react-i18next";
+import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ApplicationEvent } from "common/types/common";
 import { H5 } from "common/src/common/typography";
@@ -94,20 +94,13 @@ const ApplicationEventSummary = ({
       </SubHeadLine>
       <Box>
         <Message>
-          <Trans i18nKey="applicationEventSummary:message" count={hours}>
-            Olet tekemässä varausta {{ name }} kaudeksi{" "}
-            <strong>
-              {{ startDate: begin }} - {{ endDate: end }}
-            </strong>
-            .\nVarausten yhteenlaskettu kesto on vähintään{" "}
-            <strong>
-              {{
-                hours,
-              }}{" "}
-              tuntia
-            </strong>
-            .
-          </Trans>
+          <Trans
+            i18nKey="applicationEventSummary:message"
+            defaults="Olet tekemässä varausta {{ name }} kaudeksi  <bold>{{startDate}} - {{endDate}}</bold>.<br />Varausten yhteenlaskettu kesto on vähintään  <bold>{{hours}} tuntia</bold>."
+            count={hours}
+            values={{ name, startDate: begin, endDate: end, hours }}
+            components={{ bold: <strong />, br: <br /> }}
+          />
         </Message>
         <CustomIconWithText
           icon={<IconGroup aria-hidden />}

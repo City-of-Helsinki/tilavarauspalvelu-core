@@ -60,7 +60,7 @@
   "Page2": {
     "heading": "2. Select booking dates",
     "subHeading": "Select all times for which you want to book spaces",
-    "info": "Check available time slots <0>here</0> (Fin). Select your preferred times. Also select other times that suit you.",
+    "info": "Check available time slots <a>here</a> (Fin). Select your preferred times. Also select other times that suit you.",
     "text": "Indicate your preferred dates for the seasonal booking",
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
@@ -81,8 +81,8 @@
       "minDuration": {
         "title": "The total duration of requested times is lower than minimum duration of the booking",
         "bodySingle": "The total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking.",
-        "body": "In the booking {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking.",
-        "body_plural": "In the bookings {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking."
+        "body_one": "In the booking {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking.",
+        "body_other": "In the bookings {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking."
       }
     }
   },

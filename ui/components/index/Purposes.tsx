@@ -1,7 +1,7 @@
 import { IconAngleDown, IconAngleUp, IconArrowRight } from "hds-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
@@ -61,7 +61,7 @@ const PurposeContainer = styled.div`
   }
 `;
 
-const PurposeItem = styled.a`
+const PurposeItem = styled.div`
   &:hover {
     span {
       text-decoration: underline;
@@ -109,7 +109,7 @@ const MoreLink = styled.a`
 `;
 
 const Purposes = ({ purposes }: Props): JSX.Element => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["home", "common"]);
 
   const [showAll, setShowAll] = React.useState(false);
   const isMobile = useMedia(`(max-width: ${mobileBreakpoint})`, false);
@@ -125,7 +125,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
     <Wrapper>
       <Content>
         <Top>
-          <Heading>{t("home:purposesHeading")}</Heading>
+          <Heading>{t("purposesHeading")}</Heading>
           <ReservationUnitSearch />
         </Top>
         <PurposeContainer>
@@ -133,7 +133,6 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
             <Link
               key={item.pk}
               href={`${singleSearchPrefix}?purposes=${item.pk}`}
-              passHref
             >
               <PurposeItem data-testid="front-page__purposes--purpose">
                 <Image src={item.smallUrl} alt="" aria-hidden />
@@ -150,7 +149,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
             data-testid="front-page__purposes--more-link"
             onClick={() => setShowAll(!showAll)}
           >
-            {t(`common:show${showAll ? "Less" : "More"}`)}{" "}
+            {t(`${showAll ? "common:showLess" : "common:showMore"}`)}{" "}
             {showAll ? (
               <IconAngleUp aria-hidden />
             ) : (

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextInput, Checkbox } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import {
   Address,

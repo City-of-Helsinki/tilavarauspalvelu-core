@@ -3,7 +3,6 @@ import camelCase from "lodash/camelCase";
 import get from "lodash/get";
 import React, { ReactElement, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { TFunction } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular, Strongish } from "../common/typography";
 import { ReservationMetadataSetType } from "../../types/gql-types";
@@ -20,7 +19,7 @@ type Props = {
   form: ReturnType<typeof useForm>;
   params?: Record<string, Record<string, string | number>>;
   data?: Record<string, ReactElement>;
-  t: TFunction;
+  t: (key: string) => string;
 };
 
 const StyledCheckboxWrapper = styled(CheckboxWrapper)<{
@@ -62,6 +61,7 @@ const StyledTextInput = styled(TextInput)<{
 `;
 
 const StyledTextArea = styled(TextArea).attrs(({ $height }: TextAreaProps) => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   style: { "--textarea-height": $height },
 }))<TextAreaProps>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
@@ -100,7 +100,7 @@ const ReservationFormField = ({
   params = {},
   data = {},
   t,
-}: Props): JSX.Element => {
+}: Props) => {
   const normalizedReserveeType =
     reserveeType?.toLocaleLowerCase() || "individual";
 
@@ -165,9 +165,11 @@ const ReservationFormField = ({
       rules={{ required }}
       render={({ field: formField }) => (
         <StyledSelect
-          label={t(
-            `reservationApplication:label.${normalizedReserveeType}.${field}`
-          )}
+          label={
+            t(
+              `reservationApplication:label.${normalizedReserveeType}.${field}`
+            ) as string
+          }
           id={field}
           options={options[field]}
           defaultValue={options[field].find(
@@ -290,8 +292,8 @@ const ReservationFormField = ({
       errorText={get(errors, field) && t("forms:requiredField")}
       invalid={!!get(errors, field)}
       step={1}
-      minusStepButtonAriaLabel={t("common:decrease")}
-      plusStepButtonAriaLabel={t("common:increase")}
+      minusStepButtonAriaLabel={t("common:decrease") || "Decrease"}
+      plusStepButtonAriaLabel={t("common:increase") || "Increase"}
       min={get(params, field)?.min as number}
       max={get(params, field)?.max as number}
     />
@@ -371,13 +373,13 @@ const ReservationFormField = ({
       type="text"
       errorText={
         get(errors, field) &&
-        t(
+        (t(
           `forms:${
             get(errors, field)?.message === "email"
               ? "invalidEmail"
               : "requiredField"
           }`
-        )
+        ) as string)
       }
       invalid={!!get(errors, field)}
       $isWide={isWideRow}

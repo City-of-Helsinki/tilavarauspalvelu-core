@@ -1,6 +1,6 @@
 import { differenceInWeeks } from "date-fns";
 import { isEqual, sum, trim } from "lodash";
-import { TFunction } from "react-i18next";
+import { TFunction } from "i18next";
 import { ApplicationType } from "common/types/gql-types";
 import {
   Application,

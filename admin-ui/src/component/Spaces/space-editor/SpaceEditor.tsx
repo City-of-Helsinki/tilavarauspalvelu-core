@@ -4,7 +4,7 @@ import { isEqual, omitBy, pick } from "lodash";
 
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Joi from "joi";
 import { H1 } from "common/src/common/typography";
@@ -213,7 +213,7 @@ type Props = {
 
 const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
   const [saving, setSaving] = useState(false);
-  const history = useHistory();
+  const history = useNavigate();
 
   const { notifyError, notifySuccess } = useNotification();
 
@@ -263,8 +263,9 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
       });
       if (data?.data?.updateSpace.errors === null) {
         notifySuccess(
-          t("SpaceEditor.spaceUpdated"),
-          t("SpaceEditor.spaceUpdatedNotification")
+          t("SpaceEditor.spaceUpdatedNotification"),
+          undefined,
+          t("SpaceEditor.spaceUpdated")
         );
         refetch();
       } else {
@@ -373,7 +374,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
               <Button
                 disabled={!state.hasChanges}
                 variant="secondary"
-                onClick={() => history.go(-1)}
+                onClick={() => history(-1)}
               >
                 {t("SpaceEditor.cancel")}
               </Button>

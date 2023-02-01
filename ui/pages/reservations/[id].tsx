@@ -7,7 +7,7 @@ import { get, isFinite } from "lodash";
 import { IconCalendar, IconCross, Notification } from "hds-react";
 import { useQuery } from "@apollo/client";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { H2, H4 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -353,10 +353,12 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     <Wrapper>
       <Container>
         <StyledBreadcrumbWrapper
-          route={[
-            "",
-            "/reservations",
-            t("reservations:reservationName", { id: reservation.pk }),
+          route={["", "/reservations", "reservationName"]}
+          aliases={[
+            {
+              slug: "reservationName",
+              title: t("reservations:reservationName", { id: reservation.pk }),
+            },
           ]}
         />
         <Columns>

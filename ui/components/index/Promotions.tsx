@@ -3,7 +3,7 @@ export default {};
 // import React from "react";
 // import styled from "styled-components";
 // import { Linkbox } from "hds-react";
-// import { useTranslation } from "react-i18next";
+// import { useTranslation } from "next-i18next";
 // import Container from "../common/Container";
 // import { breakpoint } from "../../modules/style";
 // import { Promotion } from "../../modules/types";

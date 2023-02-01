@@ -11,7 +11,7 @@ import {
 } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -36,6 +36,7 @@ import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
+  [key: string]: string;
   unitPk: string;
 }
 
@@ -162,7 +163,7 @@ const Unit = (): JSX.Element | null => {
 
   const { t } = useTranslation();
   const unitPk = Number(useParams<IProps>().unitPk);
-  const history = useHistory();
+  const history = useNavigate();
 
   useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
     variables: { pk: unitPk },
@@ -278,7 +279,7 @@ const Unit = (): JSX.Element | null => {
             variant="supplementary"
             iconLeft={<IconPlusCircleFill />}
             onClick={() => {
-              history.push(`/unit/${unitPk}/reservationUnit/edit/`);
+              history(`/unit/${unitPk}/reservationUnit/edit/`);
             }}
           >
             {t("Unit.reservationUnitCreate")}

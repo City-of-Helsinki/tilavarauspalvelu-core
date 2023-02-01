@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import {
   oidcLog,
   AuthenticationProvider,
@@ -11,9 +11,9 @@ import "./index.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Authenticating from "./component/Authentication/Authenticating";
+import MainLander from "./component/MainLander";
 import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
 import { authEnabled } from "./common/const";
-import MainLander from "./component/MainLander";
 import CustomUserStore from "./common/auth/CustomUserStore";
 
 const dsn = process.env.REACT_APP_SENTRY_DSN;
@@ -27,8 +27,9 @@ if (dsn) {
     release,
   });
 }
+const root = createRoot(document.getElementById("root") as HTMLElement);
 
-ReactDOM.render(
+root.render(
   <React.StrictMode>
     <AuthenticationProvider
       notAuthenticated={() => <MainLander withSiteWrapper />}
@@ -43,8 +44,7 @@ ReactDOM.render(
     >
       <App />
     </AuthenticationProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

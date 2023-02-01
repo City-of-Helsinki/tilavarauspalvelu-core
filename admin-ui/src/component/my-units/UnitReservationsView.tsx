@@ -2,7 +2,7 @@ import { toUIDate } from "common/src/common/util";
 import { formatISO, parse, startOfDay } from "date-fns";
 import React, { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-use";
 import { useQueryParams } from "../../common/hooks";
 import { OptionType } from "../../common/types";
@@ -28,7 +28,7 @@ const UnitReservationsView = (): JSX.Element => {
   const [begin, setBegin] = useState(today);
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
-  const history = useHistory();
+  const history = useNavigate();
 
   const initialEmptyState = { reservationUnitType: [] };
 
@@ -40,7 +40,7 @@ const UnitReservationsView = (): JSX.Element => {
   const onDateChange = ({ date }: { date: Date }) => {
     setBegin(formatISO(date));
 
-    history.push({
+    history({
       hash,
       search: `?date=${toUIDate(date)}`,
     });
@@ -71,14 +71,16 @@ const UnitReservationsView = (): JSX.Element => {
       <HorisontalFlex style={{ justifyContent: "center" }}>
         <DayNavigation date={begin} onDateChange={onDateChange} />
       </HorisontalFlex>
-      <UnitReservations
-        reservationUnitTypes={state.reservationUnitType.map((option) =>
-          Number(option.value)
-        )}
-        unitPk={unitId}
-        key={begin}
-        begin={begin}
-      />
+      {unitId ? (
+        <UnitReservations
+          reservationUnitTypes={state.reservationUnitType.map((option) =>
+            Number(option.value)
+          )}
+          unitPk={unitId}
+          key={begin}
+          begin={begin}
+        />
+      ) : null}
     </VerticalFlex>
   );
 };

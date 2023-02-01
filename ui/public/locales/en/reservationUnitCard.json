@@ -1,8 +1,8 @@
 {
   "maxPersons": "{{count}} person",
-  "maxPersons_plural": "{{count}} persons",
+  "maxPersons_other": "{{count}} persons",
   "personRange": "{{value}} person",
-  "personRange_plural": "{{value}} persons",
+  "personRange_other": "{{value}} persons",
   "RelatedUnits": {
     "heading": "Similar"
   },

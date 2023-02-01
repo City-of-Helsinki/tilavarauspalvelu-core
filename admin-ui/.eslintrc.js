@@ -43,37 +43,21 @@ module.exports = {
     "react/prop-types": 0,
     "react/require-default-props": 0,
     "react/static-property-placement": 0,
-    "@typescript-eslint/camelcase": ["off"], // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
-    "@typescript-eslint/naming-convention": [
+    "react/function-component-definition": [
       "error",
       {
-        selector: "default",
-        format: ["camelCase"],
-        // leadingUnderscore: 'allow',
-        // trailingUnderscore: 'allow',
-      },
-      {
-        selector: "function",
-        format: ["camelCase", "PascalCase"],
-      },
-      {
-        selector: "variable",
-        format: ["camelCase", "PascalCase", "UPPER_CASE"],
-      },
-      {
-        selector: "property",
-        format: ["camelCase", "snake_case", "PascalCase", "UPPER_CASE"],
-      },
-      {
-        selector: "typeLike",
-        format: ["PascalCase"],
-      },
-      {
-        selector: "enumMember",
-        format: ["camelCase", "snake_case", "UPPER_CASE"],
+        namedComponents: ["function-declaration", "arrow-function"],
+        unnamedComponents: ["function-expression", "arrow-function"],
       },
     ],
+    "@typescript-eslint/camelcase": ["off"], // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
     "@typescript-eslint/no-empty-function": 0,
+    "react/no-unstable-nested-components": [
+      "warn",
+      {
+        allowAsProps: true,
+      },
+    ],
   },
   plugins: ["jsx-a11y"],
 };

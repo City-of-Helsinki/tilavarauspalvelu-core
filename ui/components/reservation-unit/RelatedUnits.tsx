@@ -1,6 +1,6 @@
 import { IconArrowRight, IconGroup, IconTicket } from "hds-react";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
 import router from "next/router";
 import Link from "next/link";
@@ -41,6 +41,7 @@ const StyledCarousel = styled(Carousel)`
 const Content = styled.div`
   padding: var(--spacing-s);
   height: 180px;
+  position: relative;
 `;
 
 const Unit = styled.div`
@@ -140,6 +141,7 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
                       icon={
                         <NextImage
                           src="/icons/icon_premises.svg"
+                          alt={t("common:headAlt")}
                           width="24"
                           height="24"
                           aria-label={t("reservationUnitCard:type")}

@@ -36,6 +36,7 @@ import NewResourceModal from "../Resources/resource-editor/NewResourceModal";
 import { UNIT_QUERY } from "../../common/queries";
 
 interface IProps {
+  [key: string]: string;
   unitPk: string;
 }
 
