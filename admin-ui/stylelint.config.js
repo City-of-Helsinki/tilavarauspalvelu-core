@@ -6,6 +6,7 @@ const config = {
     "stylelint-config-recommended",
     "stylelint-config-styled-components",
   ],
+  customSyntax: "postcss-scss",
   plugins: ["stylelint-value-no-unknown-custom-properties"],
   rules: {
     "csstools/value-no-unknown-custom-properties": [
