@@ -4,6 +4,21 @@ from decimal import Decimal
 from django import forms
 
 from email_notification.models import EmailTemplate
+from reservation_units.models import ReservationUnit
+
+
+class ReservationUnitSelectForm(forms.Form):
+    reservation_unit = forms.ChoiceField()
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        runit_choices = list(
+            map(
+                lambda runit: (runit.pk, runit.name),
+                ReservationUnit.objects.all().order_by("name_fi"),
+            )
+        )
+        self.fields["reservation_unit"].choices = runit_choices
 
 
 class EmailTestForm(forms.Form):

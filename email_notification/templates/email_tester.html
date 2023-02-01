@@ -4,12 +4,28 @@ Fooo
 {% block content %}
 <h1 id="site-name">Email Template Testing</h1>
 
-<form method="post" novalidate>
-    {% csrf_token %}
-    <table>
-    {{ form.as_table }}
-    </table>
-    
-    <button>Send Test Emails</button>
-</form>
+<div style="display: flex; flex-direction: row-reverse; flex-wrap: wrap; justify-content: flex-end; gap: 40px 10px">
+
+    <form method="get" novalidate>
+        <table>
+            {{ runit_form.as_table }}
+            <tr>
+                <td></td>
+                <td><button>Fill form with Reservation Unit data</button></td>
+            </tr>
+        </table>
+        
+        
+    </form>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+        
+        <button>Send Test Emails</button>
+    </form>
+
+</div>
 {% endblock %}
