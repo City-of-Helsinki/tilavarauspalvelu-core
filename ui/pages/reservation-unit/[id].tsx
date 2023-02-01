@@ -9,21 +9,15 @@ import React, {
 } from "react";
 import { GetServerSideProps } from "next";
 import { Trans, useTranslation } from "next-i18next";
-import styled from "styled-components";
 import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { IconInfoCircleFill, Notification } from "hds-react";
+import { Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { addSeconds, addYears, differenceInMinutes, parseISO } from "date-fns";
-import {
-  formatSecondDuration,
-  toApiDate,
-  toUIDate,
-} from "common/src/common/util";
+import { addSeconds, addYears, differenceInMinutes } from "date-fns";
+import { toApiDate, toUIDate } from "common/src/common/util";
 import {
   getEventBuffers,
   getMaxReservation,
-  getNormalizedReservationBeginTime,
   getSlotPropGetter,
   getTimeslots,
   isReservationShortEnough,
@@ -39,7 +33,6 @@ import {
   PendingReservation,
   Reservation,
 } from "common/types/common";
-import { H4 } from "common/src/common/typography";
 import {
   Query,
   QueryReservationsArgs,
@@ -69,7 +62,6 @@ import Map from "../../components/Map";
 import Legend from "../../components/calendar/Legend";
 import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
 import {
-  formatDate,
   getTranslation,
   parseDate,
   printErrorMessages,
@@ -96,13 +88,27 @@ import {
   mockOpeningTimes,
 } from "../../modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
-import { daysByMonths } from "../../modules/const";
 import QuickReservation from "../../components/reservation-unit/QuickReservation";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { CURRENT_USER } from "../../modules/queries/user";
 import { isReservationReservable } from "../../modules/reservation";
 import SubventionSuffix from "../../components/reservation/SubventionSuffix";
 import InfoDialog from "../../components/common/InfoDialog";
+import {
+  BottomContainer,
+  BottomWrapper,
+  CalendarFooter,
+  CalendarWrapper,
+  Content,
+  Left,
+  MapWrapper,
+  PaddedContent,
+  StyledNotification,
+  Subheading,
+  TwoColumnLayout,
+  Wrapper,
+} from "../../components/reservation-unit/ReservationUnitStyles";
+import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -271,104 +277,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   };
 };
-
-const Wrapper = styled.div`
-  padding-bottom: var(--spacing-layout-xl);
-`;
-
-const TwoColumnLayout = styled.div`
-  display: block;
-  margin-bottom: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.l}) {
-    display: grid;
-    gap: var(--spacing-layout-s);
-    grid-template-columns: 7fr 390px;
-    margin-top: var(--spacing-m);
-    margin-bottom: var(--spacing-xl);
-  }
-`;
-
-const Left = styled.div`
-  max-width: 100%;
-`;
-
-const Content = styled.div`
-  font-size: var(--fontsize-body-l);
-  line-height: var(--lineheight-l);
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin-bottom: var(--spacing-2-xl);
-`;
-
-const PaddedContent = styled(Content)`
-  padding-top: var(--spacing-m);
-  margin-bottom: var(--spacing-m);
-`;
-
-const CalendarFooter = styled.div<{ $cookiehubBannerHeight?: number }>`
-  position: sticky;
-  bottom: ${({ $cookiehubBannerHeight }) =>
-    $cookiehubBannerHeight ? `${$cookiehubBannerHeight}px` : 0};
-  background-color: var(--color-white);
-  z-index: var(--tilavaraus-stack-order-sticky-container);
-
-  display: flex;
-  flex-direction: column-reverse;
-
-  @media (min-width: ${breakpoints.l}) {
-    flex-direction: column;
-    gap: var(--spacing-2-xl);
-    justify-content: space-between;
-  }
-`;
-
-const BottomWrapper = styled.div`
-  margin: 0;
-  padding: 0;
-`;
-
-const BottomContainer = styled(Container)`
-  margin-bottom: calc(var(--spacing-s) * -1 + var(--spacing-layout-xl) * -1);
-  padding-bottom: var(--spacing-layout-xl);
-`;
-
-const Subheading = styled(H4).attrs({ as: "h3" })<{ $withBorder?: boolean }>`
-  ${({ $withBorder }) =>
-    $withBorder &&
-    `
-      border-bottom: 1px solid var(--color-black-50);
-      padding-bottom: var(--spacing-s);
-    `}
-`;
-
-const CalendarWrapper = styled.div`
-  margin-bottom: var(--spacing-layout-l);
-  position: relative;
-`;
-
-const MapWrapper = styled.div`
-  margin-top: var(--spacing-m);
-  margin-bottom: var(--spacing-xs);
-`;
-
-const StyledNotification = styled(Notification)`
-  div > div {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-  }
-  margin-bottom: var(--spacing-xl);
-
-  svg {
-    color: var(--color-info);
-    min-width: 24px;
-  }
-
-  button > svg {
-    color: inherit;
-  }
-`;
 
 const eventStyleGetter = (
   { event }: CalendarEvent<Reservation | ReservationType>,
@@ -896,29 +804,7 @@ const ReservationUnit = ({
                 </Content>
               </>
             )}
-            {isReservationStartInFuture(reservationUnit) && (
-              <StyledNotification
-                type="info"
-                size="small"
-                dismissible
-                closeButtonLabelText={t("common:close")}
-              >
-                <IconInfoCircleFill aria-hidden />
-                <span data-testid="reservation-unit--notification__reservation-start">
-                  {t("reservationUnit:notifications.notReservable")}{" "}
-                  {t("reservationCalendar:reservingStartsAt", {
-                    date: t("common:dateTimeNoYear", {
-                      date: parseISO(
-                        getNormalizedReservationBeginTime(reservationUnit)
-                      ),
-                    }),
-                  })}
-                </span>
-              </StyledNotification>
-            )}
-            {(isReservable ||
-              (!isReservable &&
-                isReservationStartInFuture(reservationUnit))) && (
+            {isReservable && (
               <CalendarWrapper
                 ref={calendarRef}
                 data-testid="reservation-unit__calendar--wrapper"
@@ -1025,127 +911,10 @@ const ReservationUnit = ({
                 <Legend />
               </CalendarWrapper>
             )}
-            {isReservable && (
-              <>
-                <Subheading $withBorder>
-                  {t("reservationCalendar:reservationInfo")}
-                </Subheading>
-                <Content data-testid="reservation-unit__reservation-info">
-                  {(reservationUnit.reservationsMaxDaysBefore ||
-                    reservationUnit.reservationsMinDaysBefore) && (
-                    <p>
-                      {reservationUnit.reservationsMaxDaysBefore > 0 &&
-                        reservationUnit.reservationsMinDaysBefore > 0 && (
-                          <Trans
-                            i18nKey="reservationUnit:reservationInfo1-1"
-                            defaults="Voit tehdä varauksen <strong>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}}</strong> ja <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
-                            values={{
-                              reservationsMaxDaysBefore: daysByMonths.find(
-                                (n) =>
-                                  n.value ===
-                                  reservationUnit.reservationsMaxDaysBefore
-                              )?.label,
-                              unit: t(
-                                `reservationUnit:reservationInfo1-${
-                                  reservationUnit.reservationsMaxDaysBefore ===
-                                  14
-                                    ? "weeks"
-                                    : "months"
-                                }`
-                              ),
-                              reservationsMinDaysBefore:
-                                reservationUnit.reservationsMinDaysBefore,
-                            }}
-                            components={{ bold: <strong /> }}
-                          />
-                        )}
-                      {reservationUnit.reservationsMaxDaysBefore > 0 &&
-                        !reservationUnit.reservationsMinDaysBefore && (
-                          <Trans
-                            i18nKey="reservationUnit:reservationInfo1-2"
-                            defaults="Voit tehdä varauksen <bold>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}} etukäteen</bold>."
-                            values={{
-                              reservationsMaxDaysBefore: daysByMonths.find(
-                                (n) =>
-                                  n.value ===
-                                  reservationUnit.reservationsMaxDaysBefore
-                              )?.label,
-                              unit: t(
-                                `reservationUnit:reservationInfo1-${
-                                  reservationUnit.reservationsMaxDaysBefore ===
-                                  14
-                                    ? "weeks"
-                                    : "months"
-                                }`
-                              ),
-                            }}
-                            components={{ bold: <strong /> }}
-                          />
-                        )}
-                      {reservationUnit.reservationsMaxDaysBefore === 0 &&
-                        reservationUnit.reservationsMinDaysBefore > 0 && (
-                          <Trans
-                            i18nKey="reservationUnit:reservationInfo1-3"
-                            defaults="Voit tehdä varauksen <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
-                            values={{
-                              reservationsMinDaysBefore:
-                                reservationUnit.reservationsMinDaysBefore,
-                            }}
-                            components={{ bold: <strong /> }}
-                          />
-                        )}
-                    </p>
-                  )}
-                  {reservationUnit.reservationEnds && (
-                    <p>
-                      <Trans
-                        i18nKey="reservationUnit:reservationInfo2"
-                        defaults="Varauskalenteri on auki <bold>{{reservationEnds}}</bold> asti."
-                        values={{
-                          reservationEnds: formatDate(
-                            reservationUnit.reservationEnds
-                          ),
-                        }}
-                        components={{ bold: <strong /> }}
-                      />
-                    </p>
-                  )}
-                  {reservationUnit.minReservationDuration &&
-                    reservationUnit.maxReservationDuration && (
-                      <p>
-                        <Trans
-                          i18nKey="reservationUnit:reservationInfo3"
-                          defaults="Varauksen keston tulee olla välillä <bold>{{minReservationDuration}}</bold> ja <bold>{{maxReservationDuration}}</bold>."
-                          values={{
-                            minReservationDuration: formatSecondDuration(
-                              reservationUnit.minReservationDuration,
-                              false
-                            ),
-                            maxReservationDuration: formatSecondDuration(
-                              reservationUnit.maxReservationDuration,
-                              false
-                            ),
-                          }}
-                          components={{ bold: <strong /> }}
-                        />
-                      </p>
-                    )}
-                  {reservationUnit.maxReservationsPerUser && (
-                    <p>
-                      <Trans
-                        i18nKey="reservationUnit:reservationInfo4"
-                        count={reservationUnit.maxReservationsPerUser}
-                        defaults="Sinulla voi olla samanaikaisesti <bold>enintään {{count}} varausta</bold>."
-                        values={{
-                          count: reservationUnit.maxReservationsPerUser,
-                        }}
-                        components={{ bold: <strong /> }}
-                      />
-                    </p>
-                  )}
-                </Content>
-              </>
-            )}
+            <ReservationInfoContainer
+              reservationUnit={reservationUnit}
+              isReservable={isReservable}
+            />
             {termsOfUseContent && (
               <Accordion
                 heading={t("reservationUnit:terms")}

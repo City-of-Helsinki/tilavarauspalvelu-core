@@ -34,7 +34,9 @@
   "reservationInfo1-1": "Voit tehdä varauksen <bold>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}}</bold> ja <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>.",
   "reservationInfo1-2": "Voit tehdä varauksen <bold>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}} etukäteen</bold>.",
   "reservationInfo1-3": "Voit tehdä varauksen <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>.",
-  "reservationInfo2": "<bold>Varauskalenteri on auki {{reservationEnds}}</bold> asti.",
+  "reservationInfo2-1": "<bold>Varauskalenteri avautuu {{date}} klo {{time}}</bold>.",
+  "reservationInfo2-2": "<bold>Varauskalenteri on auki {{date}} klo {{time}}</bold> asti.",
+  "reservationInfo2-3": "<bold>Varauskalenteri on sulkeutunut {{date}} klo {{time}}</bold>.",
   "reservationInfo3": "Varauksen keston tulee olla välillä <bold>{{minReservationDuration}}</bold> ja <bold>{{maxReservationDuration}}</bold>.",
   "reservationInfo4_one": "Sinulla voi olla samanaikaisesti <bold>enintään yksi varaus</bold>.",
   "reservationInfo4_other": "Sinulla voi olla samanaikaisesti <bold>enintään {{count}} varausta</bold>.",
@@ -44,6 +46,6 @@
   "futurePriceNoticeTax": " (sis. alv. {{tax}}%)",
   "notifications": {
     "notReservable": "Kohde ei ole tällä hetkellä varattavissa.",
-    "futureOpening": "Varauskalenteri aukeaa {{date}}."
+    "futureOpening": "Varauskalenteri avautuu {{date}} klo {{time}}."
   }
 }

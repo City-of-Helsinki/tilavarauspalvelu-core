@@ -3,11 +3,7 @@ import React, { useMemo } from "react";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  getNormalizedReservationBeginTime,
-  isReservationStartInFuture,
-} from "common/src/calendar/util";
-import { parseISO } from "date-fns";
+import { isReservationStartInFuture } from "common/src/calendar/util";
 import { formatSecondDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -15,6 +11,7 @@ import { ReservationUnitByPkType } from "common/types/gql-types";
 import { omit } from "lodash";
 import { useLocalStorage } from "react-use";
 import {
+  formatDate,
   getTranslation,
   orderImages,
   singleSearchUrl,
@@ -249,11 +246,11 @@ const Head = ({
                 <StyledAltNotification
                   data-testid="reservation-unit--notification__reservation-start"
                   text={t("reservationUnit:notifications.futureOpening", {
-                    date: t("common:dateTimeNoYear", {
-                      date: parseISO(
-                        getNormalizedReservationBeginTime(reservationUnit)
-                      ),
-                    }),
+                    date: formatDate(
+                      reservationUnit.reservationBegins,
+                      "d.M.yyyy"
+                    ),
+                    time: formatDate(reservationUnit.reservationBegins, "H.mm"),
                   })}
                   type="alert"
                 />

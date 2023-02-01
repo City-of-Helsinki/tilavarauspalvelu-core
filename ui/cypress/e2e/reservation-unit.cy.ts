@@ -79,7 +79,7 @@ const matchEvent = (): void => {
     });
 };
 
-const reservationEnds = format(addDays(new Date(), 10), "d.M.yyyy");
+const reservationEnds = format(addDays(new Date(), 10), "d.M.yyyy 'klo' H.mm");
 
 const drawReservation = (): void => {
   hzNavigationFwd().click();
@@ -512,10 +512,10 @@ describe("with reservation times", () => {
   it("should display no calendar controls when off season", () => {
     cy.visit("/reservation-unit/900");
 
-    calendarWrapper().should("exist");
+    calendarWrapper().should("not.exist");
     reservationControls().should("not.exist");
 
-    reservationStartNotification().should("contain", "Varauskalenteri aukeaa");
+    reservationStartNotification().should("contain", "Varauskalenteri avautuu");
   });
 });
 
