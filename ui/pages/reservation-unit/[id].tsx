@@ -63,6 +63,7 @@ import Legend from "../../components/calendar/Legend";
 import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
 import {
   getTranslation,
+  isTouchDevice,
   parseDate,
   printErrorMessages,
 } from "../../modules/util";
@@ -373,6 +374,8 @@ const ReservationUnit = ({
   const openPricingTermsRef = useRef(null);
   const hash = router.asPath.split("#")[1];
 
+  const isClientATouchDevice = isTouchDevice();
+
   const subventionSuffix = useCallback(
     (placement: "reservation-unit-head" | "quick-reservation") =>
       reservationUnit.canApplyFreeOfCharge ? (
@@ -485,6 +488,9 @@ const ReservationUnit = ({
     );
   }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
 
+  const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
+    useState(false);
+
   const handleEventChange = useCallback(
     (
       { start, end }: CalendarEvent<Reservation | ReservationType>,
@@ -518,9 +524,15 @@ const ReservationUnit = ({
         end: newReservation.end,
         state: "INITIAL",
       } as PendingReservation);
+
+      if (isClientATouchDevice) {
+        setShouldCalendarControlsBeVisible(true);
+      }
+
       return true;
     },
     [
+      isClientATouchDevice,
       isReservationQuotaReached,
       isSlotReservable,
       reservationUnit.maxReservationDuration,
@@ -528,28 +540,39 @@ const ReservationUnit = ({
   );
 
   const handleSlotClick = useCallback(
-    ({ start, action }, skipLengthCheck = false): boolean => {
-      if (action !== "click" || isReservationQuotaReached) {
+    (
+      { start: startTime, end: endTime, action },
+      skipLengthCheck = false
+    ): boolean => {
+      if (isReservationQuotaReached) {
         return false;
       }
 
-      const end = addSeconds(
-        new Date(start),
-        reservationUnit.minReservationDuration || 0
-      );
+      const end =
+        action === "click" ||
+        (action === "select" &&
+          isClientATouchDevice &&
+          differenceInMinutes(endTime, startTime) <= 30)
+          ? addSeconds(
+              new Date(startTime),
+              reservationUnit.minReservationDuration || 0
+            )
+          : new Date(endTime);
 
-      if (!isSlotReservable(start, end, skipLengthCheck)) {
+      if (!isSlotReservable(startTime, end, skipLengthCheck)) {
         return false;
       }
 
       setInitialReservation({
-        begin: start.toISOString(),
+        begin: startTime.toISOString(),
         end: end.toISOString(),
         state: "INITIAL",
       } as PendingReservation);
+
       return true;
     },
     [
+      isClientATouchDevice,
       isReservationQuotaReached,
       isSlotReservable,
       reservationUnit.minReservationDuration,
@@ -861,7 +884,9 @@ const ReservationUnit = ({
                     dateCellWrapperComponent={TouchCellWrapper}
                     eventWrapperComponent={EventWrapperComponent}
                     resizable={!isReservationQuotaReached}
-                    draggable={!isReservationQuotaReached}
+                    draggable={
+                      !isReservationQuotaReached && !isClientATouchDevice
+                    }
                     onEventDrop={handleEventChange}
                     onEventResize={handleEventChange}
                     onSelectSlot={handleSlotClick}
@@ -881,6 +906,7 @@ const ReservationUnit = ({
                     )}
                     culture={i18n.language}
                     aria-hidden
+                    longPressThreshold={100}
                   />
                 </div>
                 {!isReservationQuotaReached &&
@@ -905,6 +931,13 @@ const ReservationUnit = ({
                         setErrorMsg={setErrorMsg}
                         handleEventChange={handleEventChange}
                         mode="create"
+                        shouldCalendarControlsBeVisible={
+                          shouldCalendarControlsBeVisible
+                        }
+                        setShouldCalendarControlsBeVisible={
+                          setShouldCalendarControlsBeVisible
+                        }
+                        isAnimated={isMobile}
                       />
                     </CalendarFooter>
                   )}

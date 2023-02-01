@@ -75,12 +75,14 @@ type Props<T> = {
   step?: number;
   timeslots?: number;
   culture?: string;
+  longPressThreshold?: number;
 };
 
 const StyledCalendar = styled(BigCalendar)<{
   overflowBreakpoint: string;
   step: number;
   timeslots: number;
+  $isDraggable: boolean;
 }>`
   ${({ timeslots }) => {
     switch (timeslots) {
@@ -374,8 +376,10 @@ const StyledCalendar = styled(BigCalendar)<{
     overflow: visible !important;
 
     .rbc-addons-dnd-resize-ns-anchor {
+      ${({ $isDraggable }) => $isDraggable === false && "display: none;"}
+
       &:first-child {
-        top: -15px;
+        top: -10px;
       }
 
       &:last-child {
@@ -454,6 +458,7 @@ const Calendar = <T extends Record<string, unknown>>({
   step = 30,
   timeslots = 2,
   culture = "fi",
+  longPressThreshold = 250,
 }: Props<T>): JSX.Element => {
   const Component: React.ElementType = draggable
     ? StyledCalendarDND
@@ -498,6 +503,8 @@ const Calendar = <T extends Record<string, unknown>>({
       overflowBreakpoint={overflowBreakpoint}
       step={step}
       timeslots={timeslots}
+      longPressThreshold={longPressThreshold}
+      $isDraggable={draggable}
     />
   );
 };

@@ -29,6 +29,7 @@ import {
   applicationsPrefix,
   singleSearchPrefix,
   reservationsPrefix,
+  isBrowser,
 } from "./const";
 
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -460,3 +461,6 @@ export const printErrorMessages = (error: ApolloError): string => {
     }, "")
     .trim();
 };
+
+export const isTouchDevice = (): boolean =>
+  isBrowser && window?.matchMedia("(any-hover: none)").matches;

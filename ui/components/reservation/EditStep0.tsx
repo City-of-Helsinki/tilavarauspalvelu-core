@@ -14,17 +14,19 @@ import {
   ReservationType,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
-import { addSeconds } from "date-fns";
+import { addSeconds, differenceInMinutes } from "date-fns";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
 import React, { Children, useCallback, useMemo, useState } from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
+import { useMedia } from "react-use";
 import styled from "styled-components";
 import {
   canReservationTimeBeChanged,
   isReservationReservable,
 } from "../../modules/reservation";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
+import { isTouchDevice } from "../../modules/util";
 import { BlackButton, MediumButton } from "../../styles/util";
 import Legend from "../calendar/Legend";
 import ReservationCalendarControls from "../calendar/ReservationCalendarControls";
@@ -127,6 +129,16 @@ const eventStyleGetter = (
   };
 };
 
+const EventWrapperComponent = (props) => {
+  let isSmall = false;
+  if (props.event.event.state === "INITIAL") {
+    const { start, end } = props.event;
+    const diff = differenceInMinutes(end, start);
+    if (diff <= 30) isSmall = true;
+  }
+  return <div {...props} className={isSmall ? "isSmall" : ""} />;
+};
+
 const EditStep0 = ({
   reservation,
   reservationUnit,
@@ -140,8 +152,14 @@ const EditStep0 = ({
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
+
   const [focusDate, setFocusDate] = useState(new Date(reservation.begin));
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
+
+  const isClientATouchDevice = isTouchDevice();
+  const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
+    useState(false);
 
   const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
     const shownReservation = initialReservation || {
@@ -290,42 +308,62 @@ const EditStep0 = ({
         state: "INITIAL",
         price,
       } as PendingReservation);
+
+      if (isClientATouchDevice) {
+        setShouldCalendarControlsBeVisible(true);
+      }
+
       return true;
     },
-    [isSlotReservable, reservationUnit, setInitialReservation]
+    [
+      isClientATouchDevice,
+      isSlotReservable,
+      reservationUnit,
+      setInitialReservation,
+    ]
   );
 
   const handleSlotClick = useCallback(
-    ({ start, action }, skipLengthCheck = false): boolean => {
-      if (action !== "click") {
-        return false;
-      }
+    (
+      { start: startTime, end: endTime, action },
+      skipLengthCheck = false
+    ): boolean => {
+      const end =
+        action === "click" ||
+        (action === "select" &&
+          isClientATouchDevice &&
+          differenceInMinutes(endTime, startTime) <= 30)
+          ? addSeconds(
+              new Date(startTime),
+              reservationUnit.minReservationDuration || 0
+            )
+          : new Date(endTime);
 
-      const end = addSeconds(
-        new Date(start),
-        reservationUnit.minReservationDuration || 0
-      );
-
-      if (!isSlotReservable(start, end, skipLengthCheck)) {
+      if (!isSlotReservable(startTime, end, skipLengthCheck)) {
         return false;
       }
 
       const price = getReservationUnitPrice({
         reservationUnit,
-        pricingDate: start,
+        pricingDate: startTime,
         minutes: 0,
         asInt: true,
       });
 
       setInitialReservation({
-        begin: start.toISOString(),
+        begin: startTime.toISOString(),
         end: end.toISOString(),
         state: "INITIAL",
         price,
       } as PendingReservation);
       return true;
     },
-    [isSlotReservable, reservationUnit, setInitialReservation]
+    [
+      isClientATouchDevice,
+      isSlotReservable,
+      reservationUnit,
+      setInitialReservation,
+    ]
   );
 
   return (
@@ -357,8 +395,9 @@ const EditStep0 = ({
             reservable
             toolbarComponent={Toolbar}
             dateCellWrapperComponent={TouchCellWrapper}
+            eventWrapperComponent={EventWrapperComponent}
             resizable
-            draggable
+            draggable={!isClientATouchDevice}
             onEventDrop={handleEventChange}
             onEventResize={handleEventChange}
             onSelectSlot={handleSlotClick}
@@ -372,6 +411,7 @@ const EditStep0 = ({
             timeslots={getTimeslots(reservationUnit.reservationStartInterval)}
             culture={i18n.language}
             aria-hidden
+            longPressThreshold={100}
           />
         </div>
         <CalendarFooter>
@@ -391,6 +431,11 @@ const EditStep0 = ({
             handleEventChange={handleEventChange}
             mode="edit"
             customAvailabilityValidation={isSlotFree}
+            shouldCalendarControlsBeVisible={shouldCalendarControlsBeVisible}
+            setShouldCalendarControlsBeVisible={
+              setShouldCalendarControlsBeVisible
+            }
+            isAnimated={isMobile}
           />
         </CalendarFooter>
         <Legend />
