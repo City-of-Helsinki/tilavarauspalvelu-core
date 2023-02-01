@@ -36,26 +36,6 @@ class TimeElement:
     description: str = field(default="", compare=False)
     periods: Optional[list] = field(default=None, compare=False)
 
-    def get_next_day_part(
-        self,
-    ):  # -> Optional[TimeElement]: # TODO: Causes NameError for some reason
-        """Get the next day part of this time span
-        Returns a new TimeElement with start time set to midnight, or None if
-        this time span doesn't pass midnight."""
-        if not self.end_time_on_next_day:
-            return None
-
-        return TimeElement(
-            start_time=datetime.time(hour=0, minute=0),
-            end_time=self.end_time,
-            end_time_on_next_day=False,
-            resource_state=self.resource_state,
-            override=self.override,
-            full_day=self.full_day,
-            name=self.name,
-            description=self.description,
-        )
-
 
 @dataclass(order=True, frozen=True)
 class TimeSpan:
