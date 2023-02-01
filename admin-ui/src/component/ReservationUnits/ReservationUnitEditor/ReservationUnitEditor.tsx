@@ -1526,7 +1526,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       )}
                     </VerticalFlex>
 
-                    {state.reservationUnitEdit?.canApplyFreeOfCharge && (
+                    {state.reservationUnitEdit?.canApplyFreeOfCharge && isPaid && (
                       <Span6>
                         <Select
                           required
