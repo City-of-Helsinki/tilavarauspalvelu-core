@@ -48,6 +48,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     QualifierType,
     ReservationUnitByPkType,
     ReservationUnitCancellationRuleType,
+    ReservationUnitHaukiUrlType,
     ReservationUnitType,
     ReservationUnitTypeType,
     TaxPercentageType,
@@ -398,6 +399,11 @@ class Query(graphene.ObjectType):
     reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(
         ReservationUnitCancellationRuleType
     )
+    reservation_unit_hauki_url = Field(
+        ReservationUnitHaukiUrlType,
+        pk=graphene.Int(),
+        reservation_units=graphene.List(graphene.Int),
+    )
 
     reservation_unit_types = ReservationUnitTypesFilter(
         ReservationUnitTypeType, filterset_class=ReservationUnitTypeFilterSet
@@ -460,6 +466,18 @@ class Query(graphene.ObjectType):
     def resolve_reservation_unit_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(ReservationUnit, pk=pk)
+
+    def resolve_reservation_unit_hauki_url(self, info, **kwargs):
+        pk = kwargs.get("pk")
+
+        reservation_unit = get_object_or_404(ReservationUnit, pk=pk)
+
+        res_units_to_include = kwargs.get("reservation_units")
+        url_type = ReservationUnitHaukiUrlType(
+            instance=reservation_unit, include_reservation_units=res_units_to_include
+        )
+
+        return url_type
 
     @check_resolver_permission(ResourcePermission)
     def resolve_resource_by_pk(self, info, **kwargs):
