@@ -56,8 +56,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
             "begins": "2022-09-11",
             "pricingType": "PAID",
             "priceUnit": "PER_15_MINS",
-            "lowestPrice": "18.2",
-            "highestPrice": "21.5",
+            "lowestPrice": 18.2,
+            "highestPrice": 21.5,
             "taxPercentagePk": 2,
             "status": "ACTIVE",
         }
@@ -238,7 +238,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data["isDraft"] = False
         update_data["pricings"] = [
             self.get_pricing_data(
-                begins="2022-09-16", lowestPrice="20.2", highestPrice="31.5"
+                begins="2022-09-16", lowestPrice=20.2, highestPrice=31.5
             ),
         ]
 
@@ -269,8 +269,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data["pricings"].append(
             self.get_pricing_data(
                 begins=future_pricing_date.strftime("%Y-%m-%d"),
-                lowestPrice="20.2",
-                highestPrice="31.5",
+                lowestPrice=20.2,
+                highestPrice=31.5,
                 status="FUTURE",
                 taxPercentagePk=1,
             ),
@@ -301,7 +301,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data["pricings"] = [
             self.get_pricing_data(
                 begins="2022-01-01",
-                lowestPrice="20.2",
+                lowestPrice=20.2,
                 highestPrice=31.5,
                 taxPercentagePk=1,
             )
@@ -353,7 +353,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         create_data = self.get_valid_data(True)
         create_data["pricings"] = [
             self.get_pricing_data(
-                begins="2022-01-01", lowestPrice="15.1", highestPrice="18.2"
+                begins="2022-01-01", lowestPrice=15.1, highestPrice=18.2
             ),
             self.get_pricing_data(
                 begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"

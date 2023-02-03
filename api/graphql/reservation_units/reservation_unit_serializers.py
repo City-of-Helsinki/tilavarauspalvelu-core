@@ -10,6 +10,7 @@ from api.graphql.base_serializers import (
     PrimaryKeyUpdateSerializer,
 )
 from api.graphql.choice_fields import ChoiceCharField
+from api.graphql.decimal_field import DecimalField
 from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
@@ -136,6 +137,11 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
             f"Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
         ),
     )
+
+    lowest_price = DecimalField(default=0)
+    lowest_price_net = DecimalField(default=0)
+    highest_price = DecimalField(default=0)
+    highest_price_net = DecimalField(default=0)
 
     class Meta:
         model = ReservationUnitPricing

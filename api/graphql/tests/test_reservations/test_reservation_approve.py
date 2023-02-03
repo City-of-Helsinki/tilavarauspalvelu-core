@@ -70,8 +70,8 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         return {
             "pk": self.reservation.pk,
             "handlingDetails": "You're welcome.",
-            "price": "10.59",
-            "priceNet": "8.61",
+            "price": 10.59,
+            "priceNet": 8.61,
         }
 
     @override_settings(
@@ -113,8 +113,8 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
 
         input_data = self.get_valid_approve_data()
-        input_data["price"] = "0.0"
-        input_data["priceNet"] = "0.0"
+        input_data["price"] = 0.0
+        input_data["priceNet"] = 0.0
 
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)

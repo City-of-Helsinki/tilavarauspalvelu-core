@@ -84,14 +84,14 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
                     "begins": datetime.date.today().strftime("%Y-%m-%d"),
                     "pricingType": PricingType.PAID,
                     "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
-                    "lowestPrice": "10.5",
-                    "lowestPriceNet": str(
+                    "lowestPrice": 10.5,
+                    "lowestPriceNet": float(
                         round_decimal(
                             Decimal("10.5") / (1 + self.tax_percentage.decimal), 6
                         )
                     ),
-                    "highestPrice": "18.8",
-                    "highestPriceNet": str(
+                    "highestPrice": 18.8,
+                    "highestPriceNet": float(
                         round_decimal(
                             Decimal("18.8") / (1 + self.tax_percentage.decimal), 6
                         )
