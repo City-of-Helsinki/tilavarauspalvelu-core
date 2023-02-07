@@ -14,6 +14,7 @@ from .models import (
     Period,
     Purpose,
     Qualifier,
+    ReservationKind,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
@@ -49,6 +50,17 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     search_fields = ["name", "unit__name", "pk__iexact", "unit__service_sectors__name"]
 
     ordering = ["rank"]
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, may_have_duplicates = super().get_search_results(
+            request, queryset, search_term
+        )
+
+        model_name = request.GET.get("model_name")
+        if model_name == "applicationround":
+            queryset = queryset.exclude(reservation_kind=ReservationKind.DIRECT)
+
+        return queryset, may_have_duplicates
 
 
 @admin.register(ReservationUnitImage)
