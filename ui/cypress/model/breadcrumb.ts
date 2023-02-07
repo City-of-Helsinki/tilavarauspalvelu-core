@@ -40,8 +40,8 @@ export const checkBreadcrumbs = ({
         wrappedEl.should("contain.text", value[index].title);
         wrappedEl.should("have.attr", "title", value[index].title);
 
-        if (value[index]?.url) {
-          wrappedEl.parent().should("have.attr", "href", value[index].url);
+        if (!isLastElement) {
+          wrappedEl.should("have.attr", "href", value[index].url);
         }
       });
   }

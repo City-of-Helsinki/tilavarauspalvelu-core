@@ -57,7 +57,7 @@ const Heading = styled(H4).attrs({ as: "h3" })`
   margin-bottom: var(--spacing-xs);
 `;
 
-const Anchor = styled.a`
+const StyledLink = styled(Link)`
   text-decoration: underline;
   color: var(--color-black-90);
   text-underline-offset: 4px;
@@ -120,9 +120,9 @@ const ReservationInfoCard = ({
 
   const headingContent =
     type === "confirmed" ? (
-      <Link passHref href={reservationUnitPath(reservationUnit.pk)}>
-        <Anchor>{getTranslation(reservationUnit, "name")}</Anchor>
-      </Link>
+      <StyledLink href={reservationUnitPath(reservationUnit.pk)}>
+        {getTranslation(reservationUnit, "name")}
+      </StyledLink>
     ) : (
       getTranslation(reservationUnit, "name")
     );

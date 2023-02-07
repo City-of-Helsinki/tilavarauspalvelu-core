@@ -145,7 +145,7 @@ const ButtonContainer = styled.div`
   margin-top: var(--spacing-layout-m);
 `;
 
-const Anchor = styled.a`
+const StyledLink = styled(Link)`
   display: flex;
   align-items: center;
   gap: var(--spacing-2-xs);
@@ -377,20 +377,22 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                       </Paragraph>
                     )}
                     <ButtonContainer>
-                      <Link href="/" passHref>
-                        <Anchor data-testid="reservation-cancel__button--back-front">
-                          {t("common:gotoFrontpage")}
-                          <IconArrowRight size="m" aria-hidden />
-                        </Anchor>
-                      </Link>
+                      <StyledLink
+                        href="/"
+                        data-testid="reservation-cancel__button--back-front"
+                      >
+                        {t("common:gotoFrontpage")}
+                        <IconArrowRight size="m" aria-hidden />
+                      </StyledLink>
                       {logout && (
-                        <Anchor
+                        <StyledLink
+                          as="button"
                           onClick={() => logout()}
                           data-testid="reservation-cancel__button--logout"
                         >
                           {t("common:logout")}
                           <IconSignout size="m" aria-hidden />
-                        </Anchor>
+                        </StyledLink>
                       )}
                     </ButtonContainer>
                   </>

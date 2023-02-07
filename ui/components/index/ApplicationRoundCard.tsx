@@ -68,7 +68,7 @@ const CardButton = styled(MediumButton)`
   }
 `;
 
-const StyledLink = styled.a`
+const StyledLink = styled(Link)`
   display: flex;
   align-items: center;
   gap: var(--spacing-3-xs);
@@ -129,12 +129,10 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
             })}
         </StatusMessage>
         {state !== "past" && (
-          <Link href={`/criteria/${applicationRound.pk}`} passHref>
-            <StyledLink>
-              {t("applicationRound:card.criteria")}
-              <IconArrowRight aria-hidden="true" />
-            </StyledLink>
-          </Link>
+          <StyledLink href={`/criteria/${applicationRound.pk}`}>
+            {t("applicationRound:card.criteria")}
+            <IconArrowRight aria-hidden="true" />
+          </StyledLink>
         )}
       </StyledContainer>
       {state === "active" && (

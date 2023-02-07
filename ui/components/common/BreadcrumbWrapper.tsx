@@ -4,7 +4,7 @@ import { useMedia } from "react-use";
 import Breadcrumb from "common/src/breadcrumb/Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import { trim } from "lodash";
 
 type Alias = {
@@ -22,6 +22,13 @@ const Wrapper = styled.div`
   display: block;
   background-color: var(--color-white);
 `;
+
+// Breadcrumbs are shared with admin ui which uses react-router which requires an anchor elem
+const LinkWrapper = (props: LinkProps & { children?: React.ReactNode }) => (
+  <Link legacyBehavior {...props}>
+    {props.children}
+  </Link>
+);
 
 const BreadcrumbWrapper = ({
   route,
@@ -44,7 +51,7 @@ const BreadcrumbWrapper = ({
   return (
     <Wrapper>
       <Breadcrumb
-        linkComponent={Link}
+        linkComponent={LinkWrapper}
         routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
         isMobile={isMobile}
         className={className}

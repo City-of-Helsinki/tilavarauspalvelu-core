@@ -131,7 +131,7 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
                 style={{ marginTop: 0 }}
               />
               <Content>
-                <Link href={reservationUnitPath(unit.pk)} passHref>
+                <Link href={reservationUnitPath(unit.pk)}>
                   <Name>{getReservationUnitName(unit)}</Name>
                 </Link>
                 <Building>{getUnitName(unit.unit)}</Building>

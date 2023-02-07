@@ -130,8 +130,12 @@ const Image = styled.img`
   }
 `;
 
-const Anchor = styled.a`
+const StyledLink = styled(Link)`
   color: var(--color-black-90);
+  display: inline;
+`;
+
+const StyledInlineLink = styled(StyledLink)`
   display: inline;
 `;
 
@@ -168,21 +172,19 @@ const ReservationUnitCard = ({
 
   return (
     <Container>
-      <Link href={link} passHref>
-        <Anchor style={{ display: "flex" }}>
-          <Image
-            alt={t("common:imgAltForSpace", {
-              name,
-            })}
-            src={getMainImage(reservationUnit)?.smallUrl || pixel}
-          />
-        </Anchor>
-      </Link>
+      <StyledLink href={link}>
+        <Image
+          alt={t("common:imgAltForSpace", {
+            name,
+          })}
+          src={getMainImage(reservationUnit)?.smallUrl || pixel}
+        />
+      </StyledLink>
       <MainContent>
         <Name>
-          <Link href={link} passHref>
-            <Anchor title={name}>{name}</Anchor>
-          </Link>
+          <StyledInlineLink href={link} title={name}>
+            {name}
+          </StyledInlineLink>
         </Name>
         <Description>
           {unitName}

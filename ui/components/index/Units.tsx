@@ -28,6 +28,7 @@ const Content = styled(Container)`
 
 const UnitContainer = styled.div`
   gap: var(--spacing-l) 0;
+  margin-bottom: var(--spacing-xl);
 
   @media (max-width: ${breakpoints.s}) {
     svg {
@@ -51,7 +52,7 @@ const UnitContainer = styled.div`
   }
 `;
 
-const UnitItem = styled.a`
+const UnitItemLink = styled(Link)`
   &:hover {
     text-decoration: underline;
   }
@@ -69,14 +70,17 @@ const UnitItem = styled.a`
   }
 `;
 
-const SearchLink = styled.a`
+const SearchLink = styled(Link)`
   color: var(--color-bus) !important;
   display: flex;
-  align-self: flex-end;
+  align-self: flex-start;
   align-items: center;
   gap: var(--spacing-2-xs);
-  margin-top: var(--spacing-xl);
   ${fontMedium}
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const Units = ({ units }: Props): JSX.Element => {
@@ -89,24 +93,23 @@ const Units = ({ units }: Props): JSX.Element => {
           <Heading>{t("unitsHeading")}</Heading>
           <UnitContainer>
             {units.slice(0, itemLimit).map((unit) => (
-              <Link
+              <UnitItemLink
                 key={unit.pk}
                 href={`${singleSearchPrefix}?unit=${unit.pk}`}
-                passHref
+                data-testid="front-page__units--unit"
               >
-                <UnitItem data-testid="front-page__units--unit">
-                  {getTranslation(unit, "name")}
-                  <IconArrowRight size="l" aria-hidden />
-                </UnitItem>
-              </Link>
+                {getTranslation(unit, "name")}
+                <IconArrowRight size="l" aria-hidden />
+              </UnitItemLink>
             ))}
           </UnitContainer>
           {units?.length > itemLimit && (
-            <Link href={`${singleSearchPrefix}`} passHref>
-              <SearchLink data-testid="front-page__units--more-link">
-                {t("common:showAll")} <IconAngleRight aria-hidden />
-              </SearchLink>
-            </Link>
+            <SearchLink
+              href={`${singleSearchPrefix}`}
+              data-testid="front-page__units--more-link"
+            >
+              {t("common:showAll")} <IconAngleRight aria-hidden />
+            </SearchLink>
           )}
         </Content>
       </Wrapper>

@@ -42,7 +42,7 @@ const ActionContainer2 = styled.div`
   align-items: flex-start;
 `;
 
-const Anchor = styled.a`
+const StyledLink = styled(Link)`
   display: flex;
   align-items: center;
   gap: var(--spacing-2-xs);
@@ -51,7 +51,7 @@ const Anchor = styled.a`
   ${fontMedium}
 `;
 
-const InlineAnchor = styled(Anchor)`
+const InlineStyledLink = styled(Link)`
   display: inline;
   ${fontRegular};
 `;
@@ -93,7 +93,7 @@ const ReservationConfirmation = ({
             values={{ user: reservation?.user.email }}
             components={{ bold: <strong />, br: <br /> }}
           >
-            <InlineAnchor href={reservationsUrl}> </InlineAnchor>
+            <InlineStyledLink href={reservationsUrl}> </InlineStyledLink>
           </Trans>
         </Paragraph>
         <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
@@ -119,23 +119,17 @@ const ReservationConfirmation = ({
             marginTop: "var(--spacing-3-xl)",
           }}
         >
-          <Link href={reservationUnitPath(reservationUnit.pk)} passHref>
-            <Anchor>
-              {t("reservations:backToReservationUnit")}
-              <IconArrowRight aria-hidden size="m" />
-            </Anchor>
-          </Link>
-          <Link href="/" passHref>
-            <Anchor>
-              {t("common:gotoFrontpage")}
-              <IconArrowRight aria-hidden size="m" />
-            </Anchor>
-          </Link>
-          <Link href={reservationsUrl} passHref>
-            <Anchor>
-              {t("common:logout")} <IconSignout size="m" aria-hidden />
-            </Anchor>
-          </Link>
+          <StyledLink href={reservationUnitPath(reservationUnit.pk)}>
+            {t("reservations:backToReservationUnit")}
+            <IconArrowRight aria-hidden size="m" />
+          </StyledLink>
+          <StyledLink href="/">
+            {t("common:gotoFrontpage")}
+            <IconArrowRight aria-hidden size="m" />
+          </StyledLink>
+          <StyledLink href={reservationsUrl}>
+            {t("common:logout")} <IconSignout size="m" aria-hidden />
+          </StyledLink>
         </ActionContainer2>
       </div>
     </Wrapper>
