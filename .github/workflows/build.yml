@@ -34,7 +34,6 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install -U setuptools
-          pip install tox
           pip install -r requirements.txt
           pip install -r requirements_dev.txt
           pip install bandit
@@ -56,7 +55,7 @@ jobs:
           safety check --full-report
       - name: Run pytest with cov
         run: |
-          pytest --cov=./ --cov-report=xml --cov-config=tox.ini --cov-branch
+          pytest --cov=./ --cov-report=xml --cov-branch
         env:
           DATABASE_URL: postgis://tvp:tvp@localhost/tvp
           DEBUG: true
