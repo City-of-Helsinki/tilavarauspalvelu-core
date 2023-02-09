@@ -1,11 +1,10 @@
-import datetime
 import operator
 from functools import reduce
 from typing import List
 
 import django_filters
-from django.db.models import Q
-from django.utils.timezone import get_default_timezone
+from django.db.models import F, Q
+from django.utils import timezone
 
 from applications.models import ApplicationRound
 from reservation_units.enums import ReservationUnitState
@@ -196,10 +195,14 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         return qs.filter(filters)
 
     def get_is_visible(self, qs, property, value):
-        today = datetime.datetime.now(tz=get_default_timezone())
+        now = timezone.now()
         qs = qs.filter(is_draft=False, is_archived=False)
-        published = (Q(publish_begins__lte=today) | Q(publish_begins__isnull=True)) & (
-            Q(publish_ends__gt=today) | Q(publish_ends__isnull=True)
+        published = (Q(publish_begins__lte=now) | Q(publish_begins__isnull=True)) & (
+            Q(publish_ends__gt=now)
+            | Q(publish_ends__isnull=True)
+            | Q(
+                publish_ends__lt=F("publish_begins")
+            )  # When end is before begin and begin is now or before it is considered as (re)published.
         )
 
         if value:
