@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils.timezone import get_default_timezone
 
 from applications.models import ApplicationRound
-from reservation_units.enums import ReservationUnitState
+from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import (
     Equipment,
     KeywordGroup,
@@ -17,6 +17,9 @@ from reservation_units.models import (
     ReservationKind,
     ReservationUnit,
     ReservationUnitType,
+)
+from reservation_units.utils.reservation_unit_reservation_state_helper import (
+    ReservationUnitReservationStateHelper,
 )
 from reservation_units.utils.reservation_unit_state_helper import (
     ReservationUnitStateHelper,
@@ -102,6 +105,17 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
                 state.value,
             )
             for state in ReservationUnitState
+        ),
+    )
+
+    reservation_state = django_filters.MultipleChoiceFilter(
+        method="get_reservation_state",
+        choices=tuple(
+            (
+                state.name,
+                state.value,
+            )
+            for state in ReservationState
         ),
     )
 
@@ -212,10 +226,17 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
         return qs.filter(reservation_kind__icontains=value)
 
-    def get_state(self, qs, property, value: List[ReservationUnitState]):
+    def get_state(self, qs, property, value: List[str]):
         queries = []
         for state in value:
             queries.append(ReservationUnitStateHelper.get_state_query(state))
+        query = reduce(operator.or_, (query for query in queries))
+        return qs.filter(query).distinct()
+
+    def get_reservation_state(self, qs, property, value: List[str]):
+        queries = []
+        for state in value:
+            queries.append(ReservationUnitReservationStateHelper.get_state_query(state))
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
 
