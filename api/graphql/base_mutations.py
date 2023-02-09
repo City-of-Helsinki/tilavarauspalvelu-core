@@ -1,6 +1,7 @@
 import graphene
 from django.core.exceptions import ValidationError
 from graphene_permissions.mixins import AuthMutation
+from graphql import GraphQLError
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 
@@ -24,7 +25,7 @@ class AuthDeleteMutation(AuthMutation):
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         if not cls.has_permission(root, info, input):
-            return cls(errors="No permissions to perform delete.", deleted=False)
+            raise GraphQLError("No permissions to perform delete.")
 
         try:
             if cls.is_valid(root, info, **input):
@@ -32,9 +33,9 @@ class AuthDeleteMutation(AuthMutation):
                 object.delete()
                 return cls(deleted=True)
         except ValidationError as ve:
-            message = ve.message
+            raise GraphQLError(ve.message)
 
-        return cls(errors=message, deleted=False)
+        return cls(deleted=False)
 
     @classmethod
     def validate(self, root, info, **input):

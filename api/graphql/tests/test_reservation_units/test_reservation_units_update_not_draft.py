@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from unittest import mock
 
 from assertpy import assert_that
@@ -149,15 +150,14 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Sending reservation unit as resource to HAUKI failed."
         )
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     def test_update_surface_area(self):
-        expected_surface_area = 150
+        expected_surface_area = "150"
         data = self.get_valid_update_data()
         data["surfaceArea"] = expected_surface_area
         update_query = """
@@ -178,9 +178,13 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
         assert_that(res_unit_data.get("errors")).is_none()
-        assert_that(res_unit_data.get("surfaceArea")).is_equal_to(expected_surface_area)
+        assert_that(Decimal(res_unit_data.get("surfaceArea"))).is_equal_to(
+            Decimal(expected_surface_area)
+        )
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.surface_area).is_equal_to(expected_surface_area)
+        assert_that(self.res_unit.surface_area).is_equal_to(
+            Decimal(expected_surface_area)
+        )
 
     def test_update_reservation_confirmed_instructions(self):
         expected_fi = "Lisätietoja"
@@ -316,9 +320,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.reservation_start_interval).is_not_equal_to(
             invalid_interval
@@ -332,11 +334,9 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
 
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation units must have a translations."
         )
 
@@ -351,10 +351,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.description_en).is_not_empty()
@@ -368,11 +365,9 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
 
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation unit must have one or more space or resource defined"
         )
 
@@ -388,10 +383,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(res_unit_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.reservation_unit_type).is_not_none()
@@ -446,10 +438,8 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "minPersons can't be more than maxPersons"
         )
 

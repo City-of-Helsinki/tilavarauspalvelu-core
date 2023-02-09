@@ -51,15 +51,28 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
             }
             """
 
+    def get_pricing_data(self, **kwargs):
+        data = {
+            "begins": "2022-09-11",
+            "pricingType": "PAID",
+            "priceUnit": "PER_15_MINS",
+            "lowestPrice": 18.2,
+            "highestPrice": 21.5,
+            "taxPercentagePk": 2,
+            "status": "ACTIVE",
+        }
+
+        data.update(kwargs)
+
+        return data
+
     def test_pricing_is_not_required_on_create_for_drafts(self):
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_data(True)
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
         assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
@@ -71,9 +84,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "pricings is required and must have one ACTIVE and one optional FUTURE pricing"
         )
 
@@ -83,32 +95,16 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
     def test_allow_only_one_active_pricing(self):
         input_data = self.get_valid_data(True)
         input_data["pricings"] = [
-            {
-                "begins": "2022-09-10",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            },
-            {
-                "begins": "2022-09-11",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            },
+            self.get_pricing_data(begins="2022-09-10"),
+            self.get_pricing_data(),
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "reservation unit must have exactly one ACTIVE pricing"
         )
 
@@ -119,41 +115,21 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         future_pricing_date = datetime.date.today() + datetime.timedelta(days=2)
         input_data = self.get_valid_data(True)
         input_data["pricings"] = [
-            {
-                "begins": "2022-09-11",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            },
-            {
-                "begins": future_pricing_date.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "FUTURE",
-            },
-            {
-                "begins": future_pricing_date.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "FUTURE",
-            },
+            self.get_pricing_data(),
+            self.get_pricing_data(
+                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
+            ),
+            self.get_pricing_data(
+                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
+            ),
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "reservation unit can have only one FUTURE pricing"
         )
 
@@ -163,32 +139,16 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
     def test_mutating_past_pricings_is_not_allowed(self):
         input_data = self.get_valid_data(True)
         input_data["pricings"] = [
-            {
-                "begins": "2022-09-11",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            },
-            {
-                "begins": "2022-01-01",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "PAST",
-            },
+            self.get_pricing_data(),
+            self.get_pricing_data(begins="2022-01-01", status="PAST"),
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "only ACTIVE and FUTURE pricings can be mutated"
         )
 
@@ -199,23 +159,15 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         pricing_data = datetime.date.today() + datetime.timedelta(days=1)
         input_data = self.get_valid_data(True)
         input_data["pricings"] = [
-            {
-                "begins": pricing_data.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            }
+            self.get_pricing_data(begins=pricing_data.strftime("%Y-%m-%d"))
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).starts_with(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).starts_with(
             "ACTIVE pricing must be in"
         )
 
@@ -226,23 +178,17 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         pricing_date = datetime.date.today()
         input_data = self.get_valid_data(True)
         input_data["pricings"] = [
-            {
-                "begins": pricing_date.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "FUTURE",
-            }
+            self.get_pricing_data(
+                begins=pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
+            )
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).starts_with(
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).starts_with(
             "FUTURE pricing must be in"
         )
 
@@ -291,41 +237,23 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data["pk"] = resunit_pk
         update_data["isDraft"] = False
         update_data["pricings"] = [
-            {
-                "begins": "2022-09-16",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 20.2,
-                "highestPrice": 31.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            }
+            self.get_pricing_data(
+                begins="2022-09-16", lowestPrice=20.2, highestPrice=31.5
+            ),
         ]
 
         response = self.query(self.get_update_query(), input_data=update_data)
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
         assert_that(updated_resunit.pricings.count()).is_equal_to(1)
 
     def test_future_pricing_can_be_created_on_update(self):
         create_data = self.get_valid_data(False)
-        create_data["pricings"] = [
-            {
-                "begins": "2022-09-16",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            }
-        ]
+        create_data["pricings"] = [self.get_pricing_data(begins="2022-09-16")]
         response = self.query(self.get_create_query(), input_data=create_data)
 
         assert_that(response.status_code).is_equal_to(200)
@@ -339,15 +267,13 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data["pk"] = resunit_pk
         update_data["pricings"][0]["pk"] = created_resunit.pricings.first().pk
         update_data["pricings"].append(
-            {
-                "begins": future_pricing_date.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 20.2,
-                "highestPrice": 31.5,
-                "taxPercentagePk": 1,
-                "status": "FUTURE",
-            }
+            self.get_pricing_data(
+                begins=future_pricing_date.strftime("%Y-%m-%d"),
+                lowestPrice=20.2,
+                highestPrice=31.5,
+                status="FUTURE",
+                taxPercentagePk=1,
+            ),
         )
 
         response = self.query(self.get_update_query(), input_data=update_data)
@@ -363,17 +289,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
 
     def test_update_cannot_add_another_active_pricing(self):
         create_data = self.get_valid_data(False)
-        create_data["pricings"] = [
-            {
-                "begins": "2022-09-16",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            }
-        ]
+        create_data["pricings"] = [self.get_pricing_data(begins="2022-09-16")]
         response = self.query(self.get_create_query(), input_data=create_data)
 
         assert_that(response.status_code).is_equal_to(200)
@@ -383,24 +299,20 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data = create_data.copy()
         update_data["pk"] = resunit_pk
         update_data["pricings"] = [
-            {
-                "begins": "2022-01-01",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 20.2,
-                "highestPrice": 31.5,
-                "taxPercentagePk": 1,
-                "status": "ACTIVE",
-            }
+            self.get_pricing_data(
+                begins="2022-01-01",
+                lowestPrice=20.2,
+                highestPrice=31.5,
+                taxPercentagePk=1,
+            )
         ]
 
         response = self.query(self.get_update_query(), input_data=update_data)
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed"
         )
 
@@ -408,15 +320,9 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         future_pricing_date = datetime.date.today() + datetime.timedelta(days=2)
         create_data = self.get_valid_data(True)
         create_data["pricings"] = [
-            {
-                "begins": future_pricing_date.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "FUTURE",
-            }
+            self.get_pricing_data(
+                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
+            ),
         ]
         response = self.query(self.get_create_query(), input_data=create_data)
         assert_that(response.status_code).is_equal_to(200)
@@ -426,24 +332,19 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data = create_data.copy()
         update_data["pk"] = resunit_pk
         update_data["pricings"] = [
-            {
-                "begins": future_pricing_date.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 20.2,
-                "highestPrice": 31.5,
-                "taxPercentagePk": 1,
-                "status": "FUTURE",
-            }
+            self.get_pricing_data(
+                begins=future_pricing_date.strftime("%Y-%m-%d"),
+                taxPercentagePk=1,
+                status="FUTURE",
+            ),
         ]
 
         response = self.query(self.get_update_query(), input_data=update_data)
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).is_equal_to(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
         )
 
@@ -451,24 +352,12 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         future_pricing_date = datetime.date.today() + datetime.timedelta(days=2)
         create_data = self.get_valid_data(True)
         create_data["pricings"] = [
-            {
-                "begins": "2022-01-01",
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 15.1,
-                "highestPrice": 18.2,
-                "taxPercentagePk": 2,
-                "status": "ACTIVE",
-            },
-            {
-                "begins": future_pricing_date.strftime("%Y-%m-%d"),
-                "pricingType": "PAID",
-                "priceUnit": "PER_15_MINS",
-                "lowestPrice": 18.2,
-                "highestPrice": 21.5,
-                "taxPercentagePk": 2,
-                "status": "FUTURE",
-            },
+            self.get_pricing_data(
+                begins="2022-01-01", lowestPrice=15.1, highestPrice=18.2
+            ),
+            self.get_pricing_data(
+                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
+            ),
         ]
         response = self.query(self.get_create_query(), input_data=create_data)
         assert_that(response.status_code).is_equal_to(200)

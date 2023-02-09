@@ -27,6 +27,7 @@ from reservation_units.tests.factories import (
 from resources.tests.factories import ResourceFactory
 from services.tests.factories import ServiceFactory
 from spaces.tests.factories import SpaceFactory
+from utils.decimal_utils import round_decimal
 
 
 class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -84,12 +85,16 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
                     "pricingType": PricingType.PAID,
                     "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
                     "lowestPrice": 10.5,
-                    "lowestPriceNet": round(
-                        float(Decimal("10.5") / (1 + self.tax_percentage.decimal)), 6
+                    "lowestPriceNet": float(
+                        round_decimal(
+                            Decimal("10.5") / (1 + self.tax_percentage.decimal), 6
+                        )
                     ),
                     "highestPrice": 18.8,
-                    "highestPriceNet": round(
-                        float(Decimal("18.8") / (1 + self.tax_percentage.decimal)), 6
+                    "highestPriceNet": float(
+                        round_decimal(
+                            Decimal("18.8") / (1 + self.tax_percentage.decimal), 6
+                        )
                     ),
                     "taxPercentagePk": self.tax_percentage.id,
                     "status": PricingStatus.PRICING_STATUS_ACTIVE,
@@ -167,10 +172,10 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(pricing.pricing_type).is_equal_to(pricing_data["pricingType"])
         assert_that(pricing.price_unit).is_equal_to(pricing_data["priceUnit"])
         assert_that(pricing.lowest_price).is_close_to(
-            pricing_data["lowestPrice"], 0.001
+            Decimal(pricing_data["lowestPrice"]), Decimal("0.001")
         )
         assert_that(pricing.highest_price).is_close_to(
-            pricing_data["highestPrice"], 0.001
+            Decimal(pricing_data["highestPrice"]), Decimal("0.001")
         )
         assert_that(pricing.tax_percentage).is_equal_to(tax_percentage)
         assert_that(pricing.status).is_equal_to(pricing_data["status"])
@@ -219,13 +224,14 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Sending reservation unit as resource to HAUKI failed."
         )
         assert_that(send_resource_mock.call_count).is_equal_to(1)
         res_unit = ReservationUnit.objects.first()
+        assert_that(res_unit.id).is_not_none()
+        assert_that(res_unit.name_fi).is_equal_to(data["nameFi"])
         assert_that(res_unit.hauki_resource_id).is_none()
 
     def test_create_errors_on_empty_name_translations(self):
@@ -236,10 +242,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation units must have a translations."
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -252,10 +256,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation units must have a translations."
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -269,10 +271,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation units must have a translations."
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -286,10 +286,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation units must have a translations."
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -302,10 +300,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation unit must have one or more space or resource defined"
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -318,10 +314,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation unit must have one or more space or resource defined"
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -334,10 +328,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation unit must have one or more space or resource defined"
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -350,10 +342,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft state reservation unit must have one or more space or resource defined"
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -383,10 +373,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "Not draft reservation unit must have a reservation unit type."
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
@@ -398,9 +386,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
         assert_that(ReservationUnit.objects.exists()).is_false()
 
     def test_create_with_multiple_spaces(self):
@@ -572,10 +558,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0].get("message")).contains(
             "minPersons can't be more than maxPersons"
         )
         assert_that(ReservationUnit.objects.exists()).is_false()

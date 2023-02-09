@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 
 from django.core import validators
 from graphene.utils.str_converters import to_camel_case
+from graphql import GraphQLError
 from rest_framework import serializers
 
 from api.graphql.base_serializers import (
@@ -9,6 +10,7 @@ from api.graphql.base_serializers import (
     PrimaryKeyUpdateSerializer,
 )
 from api.graphql.choice_fields import ChoiceCharField
+from api.graphql.decimal_field import DecimalField
 from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
@@ -60,7 +62,7 @@ class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
         no_name_fi = not name_fi or name_fi.isspace()
         if no_name_fi:
-            raise serializers.ValidationError("nameFi is required.")
+            raise GraphQLError("nameFi is required.")
 
         return data
 
@@ -80,7 +82,7 @@ class EquipmentCategoryCreateSerializer(
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
         no_name_fi = not name_fi or name_fi.isspace()
         if no_name_fi:
-            raise serializers.ValidationError("nameFi is required.")
+            raise GraphQLError("nameFi is required.")
 
         return data
 
@@ -135,6 +137,11 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
             f"Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
         ),
     )
+
+    lowest_price = DecimalField(default=0)
+    lowest_price_net = DecimalField(default=0)
+    highest_price = DecimalField(default=0)
+    highest_price_net = DecimalField(default=0)
 
     class Meta:
         model = ReservationUnitPricing
@@ -380,9 +387,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             try:
                 int(identifier)
             except ValueError:
-                raise serializers.ValidationError(
-                    f"Wrong type of id: {identifier} for {field_name}"
-                )
+                raise GraphQLError(f"Wrong type of id: {identifier} for {field_name}")
 
     def validate(self, data):
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
@@ -394,9 +399,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         if "name_fi" in data.keys():
             name = data.get("name_fi")
             if not name or name.isspace():
-                raise serializers.ValidationError(
-                    "nameFi is required for draft reservation units."
-                )
+                raise GraphQLError("nameFi is required for draft reservation units.")
 
         return data
 
@@ -419,7 +422,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         for field in self.translation_fields:
             value = data.get(field, getattr(self.instance, field, None))
             if field not in allowed_empty_fields and (not value or value.isspace()):
-                raise serializers.ValidationError(
+                raise GraphQLError(
                     f"Not draft state reservation units must have a translations. "
                     f"Missing translation for {to_camel_case(field)}."
                 )
@@ -427,7 +430,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         spaces = data.get("spaces", getattr(self.instance, "spaces", None))
         resources = data.get("resources", getattr(self.instance, "resources", None))
         if not (spaces or resources):
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 "Not draft state reservation unit must have one or more space or resource defined"
             )
 
@@ -436,7 +439,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             getattr(self.instance, "reservation_unit_type", None),
         )
         if not reservation_unit_type:
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 "Not draft reservation unit must have a reservation unit type."
             )
 
@@ -448,9 +451,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             and max_persons
             and data.get("min_persons") > max_persons
         ):
-            raise serializers.ValidationError(
-                "minPersons can't be more than maxPersons"
-            )
+            raise GraphQLError("minPersons can't be more than maxPersons")
 
     def validate_pricing_fields(self, data):
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
@@ -509,14 +510,14 @@ class ReservationUnitUpdateSerializer(
                 if current_active_pricing and current_active_pricing.pk != pricing.get(
                     "pk", 0
                 ):
-                    raise serializers.ValidationError(
+                    raise GraphQLError(
                         "ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed"
                     )
             elif ReservationUnitPricingHelper.is_future(pricing):
                 if current_future_pricing and current_future_pricing.pk != pricing.get(
                     "pk", 0
                 ):
-                    raise serializers.ValidationError(
+                    raise GraphQLError(
                         "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
                     )
 
@@ -590,11 +591,15 @@ class ReservationUnitImageCreateSerializer(PrimaryKeySerializer):
     def validate(self, data):
         image = self.context.get("request").FILES.get("image")
         if not image:
-            raise serializers.ValidationError("No image file in request")
-        self.validate_image_field(image)
+            raise GraphQLError("No image file in request")
+        try:
+            self.validate_image_field(image)
 
-        type_field = serializers.ChoiceField(choices=ReservationUnitImage.TYPES)
-        type_field.run_validation(data["image_type"])
+            type_field = serializers.ChoiceField(choices=ReservationUnitImage.TYPES)
+            type_field.run_validation(data["image_type"])
+
+        except serializers.ValidationError as e:
+            raise self.validation_error_to_graphql_error(e)
 
         data["image"] = image
 

@@ -24,6 +24,31 @@ snapshots['ApplicationsGraphQLFiltersTestCase::test_application_filter_by_applic
     }
 }
 
+snapshots['ApplicationsGraphQLFiltersTestCase::test_application_filter_by_multiple_status 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text',
+                        'applicantType': 'COMMUNITY',
+                        'createdDate': '2022-05-02T12:00:00+00:00',
+                        'lastModifiedDate': '2022-05-02T12:00:00+00:00'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Not visible in filter queries but visible in order by',
+                        'applicantType': 'ASSOCIATION',
+                        'createdDate': '2022-05-02T12:00:00+00:00',
+                        'lastModifiedDate': '2022-05-02T12:00:00+00:00'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationsGraphQLFiltersTestCase::test_application_filter_by_status 1'] = {
     'data': {
         'applications': {
@@ -82,6 +107,25 @@ snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_applicant 1'] = {
                 {
                     'node': {
                         'additionalInformation': 'Something to fill the field with text'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_multiple_applicant_type 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Not visible in filter queries but visible in order by'
                     }
                 }
             ]

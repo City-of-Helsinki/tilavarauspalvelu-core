@@ -1,4 +1,7 @@
+from graphene.utils.str_converters import to_camel_case
+from graphql import GraphQLError
 from rest_framework import serializers
+from rest_framework.exceptions import ErrorDetail
 
 
 class PrimaryKeySerializerBase(serializers.ModelSerializer):
@@ -7,9 +10,37 @@ class PrimaryKeySerializerBase(serializers.ModelSerializer):
             try:
                 int(identifier)
             except ValueError:
-                raise serializers.ValidationError(
-                    f"Wrong type of id: {identifier} for {field_name}"
-                )
+                raise GraphQLError(f"Wrong type of id: {identifier} for {field_name}")
+
+    def to_internal_value(self, data):
+        try:
+            int_val = super().to_internal_value(data)
+        except serializers.ValidationError as e:
+            raise self.validation_error_to_graphql_error(e)
+
+        return int_val
+
+    def validation_error_to_graphql_error(self, e: serializers.ValidationError):
+        fields = ["nonFieldError"]
+        messages = []
+        if isinstance(e.detail, dict) and len(e.detail.items()) > 0:
+            fields = []
+            for f, detail in e.detail.items():
+                fields.append(to_camel_case(f))
+                messages.append(" ".join(detail))
+
+        elif isinstance(e.detail, list) and len(e.detail) > 0:
+            for m in e.detail:
+                messages.append(m)
+
+        elif isinstance(e.detail, ErrorDetail):
+            messages.append(e.detail)
+
+        return GraphQLError(
+            " ".join(messages),
+            extensions={"field": ", ".join(fields)},
+            original_error=e,
+        )
 
 
 class PrimaryKeySerializer(PrimaryKeySerializerBase):

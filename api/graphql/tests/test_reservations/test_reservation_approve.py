@@ -70,7 +70,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         return {
             "pk": self.reservation.pk,
             "handlingDetails": "You're welcome.",
-            "price": 10.59,  # This floating point number will float somewhere 10.58999...
+            "price": 10.59,
             "priceNet": 8.61,
         }
 

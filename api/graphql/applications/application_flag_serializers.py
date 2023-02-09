@@ -1,3 +1,4 @@
+from graphql import GraphQLError
 from rest_framework import serializers
 
 from api.graphql.base_serializers import PrimaryKeySerializer
@@ -22,13 +23,13 @@ class SetFlaggedBaseSerializer(PrimaryKeySerializer):
         flagged = data.get("flagged")
 
         if status not in self.CAN_FLAG_STATUSES:
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 f"Only application with status as {', '.join(self.CAN_FLAG_STATUSES)} can be flagged."
             )
 
         # If Application status is SENT only setting flagged to False is possible.
         if status == ApplicationStatus.SENT and flagged:
-            raise serializers.ValidationError(
+            raise GraphQLError(
                 "Application status is send. Only setting the flagged to False is possible."
             )
 

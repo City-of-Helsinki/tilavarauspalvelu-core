@@ -205,13 +205,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("deleted")
-        ).is_false()
+        assert_that(content.get("errors")).is_not_none()
 
         assert_that(
             Reservation.objects.filter(pk=self.reservation.pk).exists()
@@ -232,13 +226,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("deleted")
-        ).is_false()
+        assert_that(content.get("errors")).is_not_none()
 
         assert_that(
             Reservation.objects.filter(pk=self.reservation.pk).exists()

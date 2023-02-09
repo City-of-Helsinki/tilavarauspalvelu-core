@@ -1,10 +1,12 @@
+from typing import Dict
+
 import graphene
 from auditlog.models import LogEntry
 from django.conf import settings
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
-from graphene_django.types import ErrorType
 from graphene_file_upload.scalars import Upload
+from graphql import GraphQLError
 from rest_framework.generics import get_object_or_404
 
 import tilavarauspalvelu.utils.logging as logging
@@ -158,11 +160,7 @@ class ReservationUnitMutationMixin:
         try:
             exporter.send_reservation_unit_to_hauki()
         except (HaukiRequestError, HaukiAPIError):
-            error = ErrorType(
-                field="hauki_resource_id",
-                messages=["Sending reservation unit as resource to HAUKI failed."],
-            )
-            mutation_response.errors = [error]
+            raise GraphQLError("Sending reservation unit as resource to HAUKI failed.")
 
         return mutation_response
 
@@ -187,11 +185,12 @@ class ReservationUnitUpdateMutation(
 
     permission_classes = (ReservationUnitPermission,)
 
-    def remove_personal_data_and_logs_on_archive(input):
+    @classmethod
+    def remove_personal_data_and_logs_on_archive(cls, input: Dict):
         """When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
         Because all changes are stored to the audit log, we also need to delete old audit events related to the unit.
         """
-        if "is_archived" not in input:
+        if "is_archived" not in input.keys():
             return
 
         reservation_unit_pk = input["pk"]

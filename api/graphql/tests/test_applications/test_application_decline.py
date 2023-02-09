@@ -86,9 +86,7 @@ class ApplicationDeclineTestCase(ApplicationTestCaseBase):
         response = self.query(self.get_decline_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        response_data = content.get("data").get("declineApplication")
-        assert_that(response_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
 
         for event in self.application.application_events.all():
             assert_that(event.status).is_equal_to(ApplicationEventStatus.CREATED)

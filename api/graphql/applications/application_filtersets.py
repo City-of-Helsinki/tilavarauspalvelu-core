@@ -4,7 +4,14 @@ from django.db.models import When
 from django.db.models.functions import Concat
 from django_filters import rest_framework as filters
 
-from applications.models import Application, ApplicationEvent, ApplicationRound, User
+from applications.models import (
+    APPLICANT_TYPE_CONST,
+    Application,
+    ApplicationEvent,
+    ApplicationRound,
+    ApplicationStatus,
+    User,
+)
 from reservation_units.models import ReservationUnit
 from spaces.models import Unit
 
@@ -16,15 +23,22 @@ class ApplicationFilterSet(filters.FilterSet):
     application_round = filters.ModelChoiceFilter(
         field_name="application_round", queryset=ApplicationRound.objects.all()
     )
-    status = filters.BaseInFilter(field_name="latest_status")
+    status = filters.MultipleChoiceFilter(
+        field_name="latest_status",
+        lookup_expr="iexact",
+        choices=[(c[0].upper(), c[1]) for c in ApplicationStatus.STATUS_CHOICES],
+    )
     unit = filters.ModelMultipleChoiceFilter(
         method="filter_by_possible_units", queryset=Unit.objects.all()
     )
     user = filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
 
-    applicant_type = filters.BaseInFilter(
+    applicant_type = filters.MultipleChoiceFilter(
         field_name="applicant_type",
         method="filter_by_applicant_type",
+        choices=[
+            (c[0].upper(), c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES
+        ],
     )
 
     order_by = filters.OrderingFilter(fields=("pk", "applicant"))
@@ -113,9 +127,12 @@ class ApplicationEventFilterSet(filters.FilterSet):
         field_name="application__user", queryset=User.objects.all()
     )
 
-    applicant_type = filters.BaseInFilter(
+    applicant_type = filters.MultipleChoiceFilter(
         field_name="application__applicant_type",
         method="filter_by_applicant_type",
+        choices=[
+            (c[0].upper(), c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES
+        ],
     )
 
     order_by = filters.OrderingFilter(

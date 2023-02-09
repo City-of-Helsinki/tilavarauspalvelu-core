@@ -29,7 +29,6 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
             email="zzz.tester@foo.com",
         )
 
-        # This application should not be in any of the test queries
         application = ApplicationFactory(
             applicant_type=Application.APPLICANT_TYPE_ASSOCIATION,
             additional_information="Not visible in filter queries but visible in order by",
@@ -38,7 +37,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
             user=zzz_user,
         )
 
-        ApplicationStatusFactory(
+        self.application_status = ApplicationStatusFactory(
             application=application,
             status=ApplicationStatus.DRAFT,
         )
@@ -70,7 +69,32 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
     def test_application_filter_by_status(self):
         query = f"""
             query {{
-                applications(status: "{self.application.status}") {{
+                applications(status: "{self.application.status.upper()}") {{
+                    edges {{
+                        node {{
+                            applicantType
+                            createdDate
+                            lastModifiedDate
+                            additionalInformation
+                        }}
+                    }}
+                }}
+            }}
+        """
+
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_application_filter_by_multiple_status(self):
+        query = f"""
+            query {{
+                applications(status: ["{self.application.status.upper()}",
+                    "{self.application_status.status.upper()}"]) {{
                     edges {{
                         node {{
                             applicantType
@@ -335,6 +359,32 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filter_by_multiple_applicant_type(self):
+        self.maxDiff = None
+        query = f"""
+            query {{
+                applications(orderBy: "pk" applicantType: ["{Application.APPLICANT_TYPE_COMMUNITY.upper()}",
+                    "{Application.APPLICANT_TYPE_ASSOCIATION.upper()}"]) {{
+                    edges {{
+                        node {{
+                            additionalInformation
+                        }}
+                    }}
+                }}
+            }}
+        """
+
+        ApplicationFactory(
+            applicant_type=Application.APPLICANT_TYPE_COMPANY, user=self.regular_joe
+        )
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filter_by_pk_single(self):
         ApplicationFactory.create_batch(5)
         query = f"""
@@ -362,7 +412,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
         app = ApplicationFactory(additional_information="I'm also included")
         query = f"""
                     query {{
-                        applications(pk: [{self.application.id}, {app.id}]) {{
+                        applications(orderBy: "pk" pk: [{self.application.id}, {app.id}]) {{
                             edges {{
                                 node {{
                                     additionalInformation

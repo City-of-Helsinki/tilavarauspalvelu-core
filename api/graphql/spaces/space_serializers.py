@@ -4,6 +4,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.decimal_field import DecimalField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.space_api import SpaceSerializer
@@ -34,6 +35,7 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
     unit_pk = IntegerPrimaryKeyField(
         queryset=Unit.objects.all(), source="unit", required=False, allow_null=True
     )
+    surface_area = DecimalField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
