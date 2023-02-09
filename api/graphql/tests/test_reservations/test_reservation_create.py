@@ -684,6 +684,46 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "RESERVATION_UNIT_NOT_RESERVABLE"
         )
 
+    def test_create_fails_reservation_unit_state_is_archived(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.is_archived = True
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation unit is not reservable due to status is ReservationUnitState.ARCHIVED."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_NOT_RESERVABLE"
+        )
+
+    def test_create_fails_reservation_unit_state_is_draft(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.is_draft = True
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation unit is not reservable due to status is ReservationUnitState.DRAFT."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_NOT_RESERVABLE"
+        )
+
     def test_create_fails_when_reservation_unit_publish_ends_in_past(
         self, mock_periods, mock_opening_hours
     ):
