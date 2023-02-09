@@ -7,6 +7,7 @@ from easy_thumbnails.files import get_thumbnailer
 from graphene import ResolveInfo
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
+from graphql import GraphQLError
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
@@ -169,12 +170,48 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         fields = ("url",)
         connection_class = TilavarausBaseConnection
 
-    def resolve_url(self, info):
+    def __init__(
+        self,
+        *args,
+        instance: ReservationUnit = None,
+        include_reservation_units: List[int] = None,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+
+        if instance:
+            self.instance = instance
+            self.uuid = instance.uuid
+            self.unit = instance.unit
+            self.include_reservation_units = include_reservation_units
+
+    def resolve_url(self, info, **kwargs):
         if can_manage_units(info.context.user, self.unit):
+            target_uuids = []
+            include_reservation_units = getattr(self, "include_reservation_units", None)
+
+            if include_reservation_units:
+                res_units_in_db = ReservationUnit.objects.filter(
+                    id__in=include_reservation_units
+                )
+
+                difference = set(include_reservation_units).difference(
+                    {res_unit.id for res_unit in res_units_in_db}
+                )
+
+                if difference:
+                    raise GraphQLError(
+                        "Wrong identifier for reservation unit in url generation."
+                    )
+                target_uuids = res_units_in_db.filter(unit=self.unit).values_list(
+                    "uuid", flat=True
+                )
+
             return generate_hauki_link(
                 self.uuid,
                 getattr(info.context.user, "email", ""),
                 self.unit.hauki_department_id,
+                target_resources=target_uuids,
             )
         return None
 
