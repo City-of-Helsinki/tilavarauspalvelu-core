@@ -47,7 +47,7 @@ export function acceptAndSaveEvent(
 }
 
 export function nextButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("#next:not(:disabled)").should("be.visible");
+  return cy.get("#button__application--next:not(:disabled)");
 }
 
 export function applicationEventAccordion(

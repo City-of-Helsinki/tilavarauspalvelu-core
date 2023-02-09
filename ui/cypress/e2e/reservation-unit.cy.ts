@@ -79,7 +79,8 @@ const matchEvent = (): void => {
     });
 };
 
-const reservationEnds = format(addDays(new Date(), 10), "d.M.yyyy 'klo' H.mm");
+const reservationEnds = (date: Date) =>
+  format(addDays(date, 10), "d.M.yyyy 'klo' H.mm");
 
 const drawReservation = (): void => {
   hzNavigationFwd().click();
@@ -352,7 +353,7 @@ describe("renders with basic data", () => {
       "Voit tehdä varauksen aikaisintaan 12 kuukautta ja viimeistään 2 päivää etukäteen."
     );
     reservationInfo().contains(
-      `Varauskalenteri on auki ${reservationEnds} asti.`
+      `Varauskalenteri on auki ${reservationEnds(new Date())} asti.`
     );
     reservationInfo().contains(
       "Varauksen keston tulee olla välillä 1 tunti ja 1 tunti 30 minuuttia."

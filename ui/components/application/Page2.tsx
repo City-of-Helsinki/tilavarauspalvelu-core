@@ -149,12 +149,17 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         </Notification>
       )}
       {application.applicationEvents.map((event, index) => {
-        const summaryDataPrimary = cellsToApplicationEventSchedules(
-          selectorData[index].map((n) => n.filter((nn) => nn.state === 300))
-        );
-        const summaryDataSecondary = cellsToApplicationEventSchedules(
-          selectorData[index].map((n) => n.filter((nn) => nn.state === 200))
-        );
+        const data = selectorData[index];
+        const summaryDataPrimary = data
+          ? cellsToApplicationEventSchedules(
+              data.map((n) => n.filter((nn) => nn.state === 300))
+            )
+          : [];
+        const summaryDataSecondary = data
+          ? cellsToApplicationEventSchedules(
+              data.map((n) => n.filter((nn) => nn.state === 200))
+            )
+          : [];
         return (
           <Accordion
             open={index === 0}
@@ -238,7 +243,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           {t("common:prev")}
         </MediumButton>
         <MediumButton
-          id="next"
+          id="button__application--next"
           iconRight={<IconArrowRight />}
           onClick={() => onSubmit()}
         >

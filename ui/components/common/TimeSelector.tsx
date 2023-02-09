@@ -337,6 +337,8 @@ const TimeSelector = ({
     }));
   }, [t]);
 
+  if (!cells) return null;
+
   const setCellValue = (
     selection: Cell,
     value: ApplicationEventSchedulePriority | false

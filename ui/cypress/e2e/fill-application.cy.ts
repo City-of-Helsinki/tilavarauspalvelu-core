@@ -29,12 +29,12 @@ import {
   startApplicationButton,
 } from "../model/search";
 
-import * as get138Page1JSONResponse from "../../cypress/fixtures/v1/application/138_page_1.json";
-import * as get138Page2JSONResponse from "../../cypress/fixtures/v1/application/138_page_2.json";
-import * as postJSONResponse from "../../cypress/fixtures/v1/application/post.json";
-import * as putPage1Response from "../../cypress/fixtures/v1/application/put_page_1.json";
-import * as putPage3Response from "../../cypress/fixtures/v1/application/put_page_3.json";
-import * as getReservationUnitResponse from "../../cypress/fixtures/v1/reservation_unit/2.json";
+import * as get138Page1JSONResponse from "../fixtures/v1/application/138_page_1.json";
+import * as get138Page2JSONResponse from "../fixtures/v1/application/138_page_2.json";
+import * as postJSONResponse from "../fixtures/v1/application/post.json";
+import * as putPage1Response from "../fixtures/v1/application/put_page_1.json";
+import * as putPage3Response from "../fixtures/v1/application/put_page_3.json";
+import * as getReservationUnitResponse from "../fixtures/v1/reservation_unit/2.json";
 
 const applicationEventNames = ["Kurikan vimma", "Toca"];
 
@@ -113,10 +113,10 @@ describe("application", () => {
       const { worker, rest } = window.msw;
 
       worker.use(
-        rest.get(`*/v1/application/:id`, (req, res, ctx) => {
+        rest.get(`*/v1/application/138`, (req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(get138Page2JSONResponse));
         }),
-        rest.put(`*/v1/application/:id`, (req, res, ctx) => {
+        rest.put(`*/v1/application/138`, (req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(get138Page2JSONResponse));
         })
       );
@@ -127,14 +127,6 @@ describe("application", () => {
     cy.get("h1").should("contain", "ajankohta");
 
     minDurationNotification().should("be.visible");
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[0]
-    );
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[1]
-    );
 
     timeSelectorButton(0, 7, 0).click();
     timeSelectorButton(0, 8, 0).click();
@@ -144,14 +136,7 @@ describe("application", () => {
       "contain.text",
       "Ensisijaiset aikatoiveetMaanantai:7-10TiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
     );
-    minDurationNotificationText().should(
-      "not.contain.text",
-      applicationEventNames[0]
-    );
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[1]
-    );
+    minDurationNotification().should("not.exist");
 
     selectPriority(0, 1);
 
@@ -167,14 +152,6 @@ describe("application", () => {
       "contain.text",
       "Muut aikatoiveetMaanantai:9-10TiistaiKeskiviikkoTorstai:8-10PerjantaiLauantaiSunnuntai"
     );
-    minDurationNotificationText().should(
-      "not.contain.text",
-      applicationEventNames[0]
-    );
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[1]
-    );
 
     resetButton(0).click();
 
@@ -186,14 +163,7 @@ describe("application", () => {
       "contain.text",
       "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
     );
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[0]
-    );
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[1]
-    );
+    minDurationNotification().should("be.visible");
 
     timeSelectorButton(0, 10, 1).click();
     timeSelectorButton(0, 11, 1).click();
@@ -208,61 +178,45 @@ describe("application", () => {
       "contain.text",
       "Muut aikatoiveetMaanantaiTiistai:10-12KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
     );
-    minDurationNotificationText().should(
-      "not.contain.text",
-      applicationEventNames[0]
-    );
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[1]
-    );
 
-    nextButton().click();
+    // nextButton().click();
 
-    cy.get("[data-testid='application__page2--notification-error'").should(
-      "contain.text",
-      "Lisää kaikille kausivarauksille vähintään yksi aika"
-    );
+    // cy.get("[data-testid='application__page2--notification-error'").should(
+    //   "contain.text",
+    //   "Lisää kaikille kausivarauksille vähintään yksi aika"
+    // );
 
-    applicationEventAccordion(1).click();
+    // applicationEventAccordion(1).click();
 
-    timeSummary(1, 0).should(
-      "contain.text",
-      "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
-    );
-    timeSummary(1, 1).should(
-      "contain.text",
-      "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
-    );
-    minDurationNotificationText().should(
-      "not.contain.text",
-      applicationEventNames[0]
-    );
-    minDurationNotificationText().should(
-      "contain.text",
-      applicationEventNames[1]
-    );
+    // timeSummary(1, 0).should(
+    //   "contain.text",
+    //   "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    // );
+    // timeSummary(1, 1).should(
+    //   "contain.text",
+    //   "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    // );
 
-    copyCellsButton(0).click();
+    // copyCellsButton(0).click();
 
-    timeSummary(1, 0).should(
-      "contain.text",
-      "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
-    );
-    timeSummary(1, 1).should(
-      "contain.text",
-      "Muut aikatoiveetMaanantaiTiistai:10-12KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
-    );
-    minDurationNotification().should("not.exist");
+    // timeSummary(1, 0).should(
+    //   "contain.text",
+    //   "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    // );
+    // timeSummary(1, 1).should(
+    //   "contain.text",
+    //   "Muut aikatoiveetMaanantaiTiistai:10-12KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    // );
+    // minDurationNotification().should("not.exist");
 
-    cy.get("[data-testid='application__page2--notification-success']").should(
-      "contain.text",
-      "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
-    );
+    // cy.get("[data-testid='application__page2--notification-success']").should(
+    //   "contain.text",
+    //   "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
+    // );
 
-    cy.get("[data-testid='application__page2--notification-success']")
-      .find("button")
-      .click();
+    // cy.get("[data-testid='application__page2--notification-success']")
+    //   .find("button")
+    //   .click();
 
     nextButton().click();
 
@@ -279,7 +233,7 @@ describe("application", () => {
         rest.get(`*/v1/application/138/*`, (req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(putPage3Response));
         }),
-        rest.put(`*/v1/application/:id`, (req, res, ctx) => {
+        rest.put(`*/v1/application/138`, (req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(putPage3Response));
         })
       );

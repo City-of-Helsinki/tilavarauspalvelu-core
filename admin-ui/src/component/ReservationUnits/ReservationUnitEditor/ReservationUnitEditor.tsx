@@ -1526,39 +1526,40 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       )}
                     </VerticalFlex>
 
-                    {state.reservationUnitEdit?.canApplyFreeOfCharge && isPaid && (
-                      <Span6>
-                        <Select
-                          required
-                          sort
-                          clearable={
-                            !!get(state.reservationUnitEdit, "pricingTermsPk")
-                          }
-                          id="pricingTerms"
-                          label={t(
-                            "ReservationUnitEditor.label.pricingTermsPk"
-                          )}
-                          placeholder={t("common.select")}
-                          options={get(state, "pricingTermsOptions")}
-                          onChange={(pricingTermsPk) => {
-                            setValue({
-                              pricingTermsPk,
-                            });
-                          }}
-                          value={
-                            get(
-                              state.reservationUnitEdit,
-                              "pricingTermsPk"
-                            ) as string
-                          }
-                          tooltipText={
-                            t(
-                              "ReservationUnitEditor.tooltip.pricingTermsPk"
-                            ) as string
-                          }
-                        />
-                      </Span6>
-                    )}
+                    {state.reservationUnitEdit?.canApplyFreeOfCharge &&
+                      isPaid && (
+                        <Span6>
+                          <Select
+                            required
+                            sort
+                            clearable={
+                              !!get(state.reservationUnitEdit, "pricingTermsPk")
+                            }
+                            id="pricingTerms"
+                            label={t(
+                              "ReservationUnitEditor.label.pricingTermsPk"
+                            )}
+                            placeholder={t("common.select")}
+                            options={get(state, "pricingTermsOptions")}
+                            onChange={(pricingTermsPk) => {
+                              setValue({
+                                pricingTermsPk,
+                              });
+                            }}
+                            value={
+                              get(
+                                state.reservationUnitEdit,
+                                "pricingTermsPk"
+                              ) as string
+                            }
+                            tooltipText={
+                              t(
+                                "ReservationUnitEditor.tooltip.pricingTermsPk"
+                              ) as string
+                            }
+                          />
+                        </Span6>
+                      )}
                   </Span12>
                 </Span12>
               </Grid>

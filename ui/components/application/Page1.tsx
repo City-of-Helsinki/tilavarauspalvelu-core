@@ -282,7 +282,7 @@ const Page1 = ({
       <ButtonContainer style={{ marginTop: "var(--spacing-s)" }}>
         <div />
         <MediumButton
-          id="next"
+          id="button__application--next"
           iconRight={<IconArrowRight />}
           disabled={nextButtonDisabled}
           onClick={() => history.push(`${editorState.application.id}/page2`)}

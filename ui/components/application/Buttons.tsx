@@ -22,7 +22,11 @@ const Buttons = ({ onSubmit, applicationId }: Props): JSX.Element | null => {
       >
         {t("common:prev")}
       </MediumButton>
-      <MediumButton id="next" iconRight={<IconArrowRight />} onClick={onSubmit}>
+      <MediumButton
+        id="button__application--next"
+        iconRight={<IconArrowRight />}
+        onClick={onSubmit}
+      >
         {t("common:next")}
       </MediumButton>
     </ButtonContainer>

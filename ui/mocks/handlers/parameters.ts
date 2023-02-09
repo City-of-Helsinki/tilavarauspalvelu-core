@@ -1,4 +1,5 @@
-import { rest } from "msw";
+import { rest, graphql } from "msw";
+import { Query, CityTypeConnection } from "common/types/gql-types";
 
 const getAbilityGroupJSONResponse = [{ id: 1, name: "Keskitaso" }];
 
@@ -15,6 +16,40 @@ const getTypeJSONResponse = [
   { id: 1, name: "Äänitysstudio" },
   { id: 2, name: "Kokoustila" },
 ];
+
+const citiesHandler = graphql.query<Query>("Cities", async (req, res, ctx) => {
+  const cities: CityTypeConnection = {
+    edges: [
+      {
+        node: {
+          id: "fgh",
+          pk: 1,
+          name: "Helsinki",
+          nameFi: "Helsinki",
+          nameEn: "Helsinki",
+          nameSv: "Helsingfors",
+        },
+        cursor: "r234rt",
+      },
+      {
+        node: {
+          id: "grt",
+          pk: 2,
+          name: "Muu",
+          nameFi: "Muu",
+          nameEn: "Other",
+          nameSv: "Annan",
+        },
+        cursor: "2rf3",
+      },
+    ],
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  };
+  return res(ctx.data({ cities }));
+});
 
 const parametersREST = [
   rest.get(`*/v1/parameters/ability_group/*`, (req, res, ctx) => {
@@ -34,4 +69,4 @@ const parametersREST = [
   }),
 ];
 
-export const parameterHandlers = [...parametersREST];
+export const parameterHandlers = [...parametersREST, citiesHandler];
