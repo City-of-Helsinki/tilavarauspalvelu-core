@@ -154,8 +154,8 @@ export const RESERVATION_UNITS = gql`
     $textSearch: String
     $pk: [ID]
     $applicationRound: [ID]
-    $minPersons: Float
-    $maxPersons: Float
+    $minPersons: Decimal
+    $maxPersons: Decimal
     $unit: [ID]
     $reservationUnitType: [ID]
     $purposes: [ID]
@@ -341,7 +341,7 @@ export const OPENING_HOURS = gql`
 `;
 
 export const TERMS_OF_USE = gql`
-  query TermsOfUse($termsType: String) {
+  query TermsOfUse($termsType: TermsOfUseTermsOfUseTermsTypeChoices) {
     termsOfUse(termsType: $termsType) {
       edges {
         node {

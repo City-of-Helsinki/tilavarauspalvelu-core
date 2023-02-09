@@ -4,10 +4,10 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
   query searchReservationUnits(
     $nameFi: String
     $after: String
-    $maxPersonsGte: Float
-    $maxPersonsLte: Float
-    $surfaceAreaGte: Float
-    $surfaceAreaLte: Float
+    $maxPersonsGte: Decimal
+    $maxPersonsLte: Decimal
+    $surfaceAreaGte: Decimal
+    $surfaceAreaLte: Decimal
     $unit: [ID]
     $reservationUnitType: [ID]
     $orderBy: String

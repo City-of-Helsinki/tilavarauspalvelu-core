@@ -39,13 +39,14 @@ import {
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
   TermsOfUseType,
+  TermsOfUseTermsOfUseTermsTypeChoices,
 } from "common/types/gql-types";
 import { Inputs, Reservation } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import apolloClient from "../../modules/apolloClient";
 import { isBrowser, reservationUnitPrefix } from "../../modules/const";
-import { getTranslation, printErrorMessages } from "../../modules/util";
+import { getTranslation } from "../../modules/util";
 import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
@@ -104,7 +105,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     >({
       query: TERMS_OF_USE,
       variables: {
-        termsType: "generic_terms",
+        termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
     const genericTerms =
@@ -276,6 +277,25 @@ const ReservationUnitReservation = ({
     skip: !reservationData?.pk,
   });
 
+  const steps: ReservationStep[] = useMemo(() => {
+    const price = getReservationUnitPrice({
+      reservationUnit: reservationUnit as unknown as ReservationUnitByPkType,
+      pricingDate: new Date(reservation?.begin),
+      asInt: true,
+    });
+
+    const stepLength = price === "0" ? 2 : 5;
+
+    return Array.from(Array(stepLength)).map((n, i) => {
+      const state = i === step ? 0 : i < step ? 1 : 2;
+
+      return {
+        label: `${i + 1}. ${t(`reservations:steps.${i + 1}`)}`,
+        state,
+      };
+    });
+  }, [step, reservationUnit, reservation, t]);
+
   useEffect(() => () => setDataContext(null), [setDataContext]);
 
   useEffect(() => {
@@ -302,140 +322,89 @@ const ReservationUnitReservation = ({
     setPendingReservation,
   ]);
 
-  const [
-    deleteReservation,
-    { data: deleteData, loading: deleteLoading, error: deleteError },
-  ] = useMutation<
+  const [deleteReservation] = useMutation<
     { deleteReservation: ReservationDeleteMutationPayload },
     { input: ReservationDeleteMutationInput }
   >(DELETE_RESERVATION, {
     errorPolicy: "all",
+    onCompleted: () => {
+      setDataContext(null);
+      setPendingReservation(null);
+      router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+    },
+    onError: () => {
+      setDataContext(null);
+      setPendingReservation(null);
+      router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+    },
   });
 
-  const [
-    updateReservation,
-    { data: updateData, loading: updateLoading, error: updateError },
-  ] = useMutation<
+  const [updateReservation] = useMutation<
     { updateReservation: ReservationUpdateMutationPayload },
     { input: ReservationUpdateMutationInput }
   >(UPDATE_RESERVATION, {
     errorPolicy: "all",
+    onCompleted: (data) => {
+      if (data.updateReservation?.reservation?.state === "CANCELLED") {
+        setDataContext(null);
+        setPendingReservation(null);
+        router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+      } else {
+        const payload = {
+          ...omit(data.updateReservation.reservation, "__typename"),
+          purpose: data.updateReservation.reservation.purpose?.pk,
+          ageGroup: data.updateReservation.reservation.ageGroup?.pk,
+          homeCity: data.updateReservation.reservation.homeCity?.pk,
+          showBillingAddress: watch("showBillingAddress"),
+        };
+        setReservation({
+          ...reservation,
+          ...payload,
+          calendarUrl: data.updateReservation?.reservation?.calendarUrl,
+        });
+        setStep(1);
+        window.scrollTo(0, 0);
+      }
+    },
+    onError: () => {
+      const msg = t("errors:general_error");
+      setErrorMsg(msg);
+    },
   });
 
-  const [
-    confirmReservation,
-    { data: confirmData, loading: confirmLoading, error: confirmError },
-  ] = useMutation<
+  const [confirmReservation] = useMutation<
     { confirmReservation: ReservationConfirmMutationPayload },
     { input: ReservationConfirmMutationInput }
-  >(CONFIRM_RESERVATION);
-
-  useEffect(() => {
-    if (!deleteLoading) {
-      if (deleteError) {
-        setDataContext(null);
-        setPendingReservation(null);
-        router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
-      } else if (deleteData) {
-        setDataContext(null);
-        setPendingReservation(null);
-        router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
-      }
-    }
-  }, [
-    deleteLoading,
-    deleteError,
-    deleteData,
-    reservationUnit.pk,
-    setDataContext,
-    setPendingReservation,
-    t,
-  ]);
-
-  useEffect(() => {
-    if (!updateLoading) {
-      if (updateError) {
-        const msg = printErrorMessages(updateError);
-        setErrorMsg(msg);
-      } else if (updateData) {
-        if (updateData.updateReservation?.reservation?.state === "CANCELLED") {
-          setDataContext(null);
-          setPendingReservation(null);
-          router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
-        } else {
-          const payload = {
-            ...omit(updateData.updateReservation.reservation, "__typename"),
-            purpose: updateData.updateReservation.reservation.purpose?.pk,
-            ageGroup: updateData.updateReservation.reservation.ageGroup?.pk,
-            homeCity: updateData.updateReservation.reservation.homeCity?.pk,
-            showBillingAddress: watch("showBillingAddress"),
-          };
-          setReservation({
-            ...reservation,
-            ...payload,
-            calendarUrl: updateData.updateReservation?.reservation?.calendarUrl,
-          });
-          setStep(1);
-          window.scrollTo(0, 0);
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateData, updateLoading, updateError]);
-
-  const steps: ReservationStep[] = useMemo(() => {
-    const price = getReservationUnitPrice({
-      reservationUnit: reservationUnit as unknown as ReservationUnitByPkType,
-      pricingDate: new Date(reservation?.begin),
-      asInt: true,
-    });
-
-    const stepLength = price === "0" ? 2 : 5;
-
-    return Array.from(Array(stepLength)).map((n, i) => {
-      const state = i === step ? 0 : i < step ? 1 : 2;
-
-      return {
-        label: `${i + 1}. ${t(`reservations:steps.${i + 1}`)}`,
-        state,
-      };
-    });
-  }, [step, reservationUnit, reservation, t]);
-
-  useEffect(() => {
-    if (!confirmLoading) {
+  >(CONFIRM_RESERVATION, {
+    onCompleted: (data) => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      if (steps?.length > 2) {
+        const order = data.confirmReservation?.order;
+        const { checkoutUrl, receiptUrl } = order ?? {};
+        const userId = new URL(receiptUrl)?.searchParams?.get("user");
 
-      if (confirmError) {
-        const msg = printErrorMessages(confirmError);
-        setErrorMsg(msg);
-      } else if (confirmData) {
-        if (steps?.length > 2) {
-          const order = confirmData.confirmReservation?.order;
-          const { checkoutUrl, receiptUrl } = order ?? {};
-          const userId = new URL(receiptUrl)?.searchParams?.get("user");
-
-          if (checkoutUrl && receiptUrl && userId) {
-            router.push(
-              `${confirmData.confirmReservation?.order?.checkoutUrl}/paymentmethod?user=${userId}&lang=${i18n.language}`
-            );
-          } else {
-            const msg = printErrorMessages(confirmError);
-            setErrorMsg(msg);
-          }
+        if (checkoutUrl && receiptUrl && userId) {
+          router.push(
+            `${data.confirmReservation?.order?.checkoutUrl}/paymentmethod?user=${userId}&lang=${i18n.language}`
+          );
         } else {
-          setReservation({
-            ...reservation,
-            state: "CONFIRMED",
-          });
-          setFormStatus("sent");
-          setStep(2);
-          setPendingReservation(null);
+          setErrorMsg(t("errors:general_error"));
         }
+      } else {
+        setReservation({
+          ...reservation,
+          state: "CONFIRMED",
+        });
+        setFormStatus("sent");
+        setStep(2);
+        setPendingReservation(null);
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [confirmData, confirmLoading, confirmError]);
+    },
+    onError: () => {
+      const msg = t("errors:general_error");
+      setErrorMsg(msg);
+    },
+  });
 
   const { pk: reservationPk } = reservation || {};
 
@@ -489,7 +458,7 @@ const ReservationUnitReservation = ({
     });
   }, [reservationUnit?.metadataSet?.supportedFields, reserveeType]);
 
-  const onSubmitApplication1 = useCallback(
+  const onSubmitStep0 = useCallback(
     (payload): void => {
       if (
         reservationUnit?.metadataSet?.supportedFields.includes(
@@ -537,7 +506,7 @@ const ReservationUnitReservation = ({
     ]
   );
 
-  const onSubmitOpen2 = () => {
+  const onSubmitStep1 = () => {
     confirmReservation({
       variables: {
         input: {
@@ -630,7 +599,7 @@ const ReservationUnitReservation = ({
                 <Step0
                   reservation={reservation}
                   reservationUnit={reservationUnit}
-                  handleSubmit={handleSubmit(onSubmitApplication1)}
+                  handleSubmit={handleSubmit(onSubmitStep0)}
                   generalFields={generalFields}
                   reservationApplicationFields={reservationApplicationFields}
                   reserveeType={reserveeType}
@@ -644,7 +613,7 @@ const ReservationUnitReservation = ({
                 <Step1
                   reservation={reservation}
                   reservationUnit={reservationUnit}
-                  handleSubmit={handleSubmit(onSubmitOpen2)}
+                  handleSubmit={handleSubmit(onSubmitStep1)}
                   generalFields={generalFields}
                   reservationApplicationFields={reservationApplicationFields}
                   options={options}

@@ -1705,8 +1705,8 @@ export type QueryEquipmentsArgs = {
   name?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
-  rankGte?: InputMaybe<Scalars["Float"]>;
-  rankLte?: InputMaybe<Scalars["Float"]>;
+  rankGte?: InputMaybe<Scalars["Decimal"]>;
+  rankLte?: InputMaybe<Scalars["Decimal"]>;
 };
 
 export type QueryKeywordCategoriesArgs = {
@@ -1864,10 +1864,10 @@ export type QueryReservationUnitsArgs = {
   isVisible?: InputMaybe<Scalars["Boolean"]>;
   keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   last?: InputMaybe<Scalars["Int"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Float"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Float"]>;
-  minPersonsGte?: InputMaybe<Scalars["Float"]>;
-  minPersonsLte?: InputMaybe<Scalars["Float"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Decimal"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Decimal"]>;
+  minPersonsGte?: InputMaybe<Scalars["Decimal"]>;
+  minPersonsLte?: InputMaybe<Scalars["Decimal"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
   nameSv?: InputMaybe<Scalars["String"]>;
@@ -1877,16 +1877,16 @@ export type QueryReservationUnitsArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
-  rankGte?: InputMaybe<Scalars["Float"]>;
-  rankLte?: InputMaybe<Scalars["Float"]>;
+  rankGte?: InputMaybe<Scalars["Decimal"]>;
+  rankLte?: InputMaybe<Scalars["Decimal"]>;
   reservationKind?: InputMaybe<Scalars["String"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
-  surfaceAreaGte?: InputMaybe<Scalars["Float"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Float"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]>;
   textSearch?: InputMaybe<Scalars["String"]>;
-  typeRankGte?: InputMaybe<Scalars["Float"]>;
-  typeRankLte?: InputMaybe<Scalars["Float"]>;
+  typeRankGte?: InputMaybe<Scalars["Decimal"]>;
+  typeRankLte?: InputMaybe<Scalars["Decimal"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
 };
 
@@ -1901,8 +1901,8 @@ export type QueryReservationsArgs = {
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
   orderStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
-  priceGte?: InputMaybe<Scalars["Float"]>;
-  priceLte?: InputMaybe<Scalars["Float"]>;
+  priceGte?: InputMaybe<Scalars["Decimal"]>;
+  priceLte?: InputMaybe<Scalars["Decimal"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
   reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]>;
@@ -1979,7 +1979,7 @@ export type QueryTaxPercentagesArgs = {
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
-  value?: InputMaybe<Scalars["Float"]>;
+  value?: InputMaybe<Scalars["Decimal"]>;
 };
 
 export type QueryTermsOfUseArgs = {
@@ -1988,7 +1988,7 @@ export type QueryTermsOfUseArgs = {
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
-  termsType?: InputMaybe<Scalars["String"]>;
+  termsType?: InputMaybe<TermsOfUseTermsOfUseTermsTypeChoices>;
 };
 
 export type QueryUnitArgs = {
@@ -2013,7 +2013,7 @@ export type QueryUnitsArgs = {
   ownReservations?: InputMaybe<Scalars["Boolean"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]>;
-  serviceSector?: InputMaybe<Scalars["Float"]>;
+  serviceSector?: InputMaybe<Scalars["Decimal"]>;
 };
 
 export type QueryUserArgs = {
@@ -2205,9 +2205,7 @@ export type ReservationApproveMutationInput = {
   /** Additional information for approval. */
   handlingDetails: Scalars["String"];
   pk?: InputMaybe<Scalars["Int"]>;
-  /** The price of this particular reservation including VAT */
   price: Scalars["Float"];
-  /** The price of this particular reservation excluding VAT */
   priceNet: Scalars["Float"];
 };
 
@@ -2221,9 +2219,7 @@ export type ReservationApproveMutationPayload = {
   /** Additional information for approval. */
   handlingDetails?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
-  /** The price of this particular reservation including VAT */
   price?: Maybe<Scalars["Float"]>;
-  /** The price of this particular reservation excluding VAT */
   priceNet?: Maybe<Scalars["Float"]>;
   state?: Maybe<State>;
 };
@@ -2309,18 +2305,18 @@ export type ReservationConfirmMutationPayload = {
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
   /** The non subsidised price of this reservation excluding VAT */
-  nonSubsidisedPrice?: Maybe<Scalars["Float"]>;
+  nonSubsidisedPrice?: Maybe<Scalars["Decimal"]>;
   /** The non subsidised price of this reservation excluding VAT */
-  nonSubsidisedPriceNet?: Maybe<Scalars["Float"]>;
+  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   order?: Maybe<PaymentOrderType>;
   /** Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE. */
   paymentType?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
-  price?: Maybe<Scalars["Float"]>;
+  price?: Maybe<Scalars["Decimal"]>;
   /** The price of this particular reservation excluding VAT */
-  priceNet?: Maybe<Scalars["Float"]>;
+  priceNet?: Maybe<Scalars["Decimal"]>;
   priority?: Maybe<Scalars["Int"]>;
   purposePk?: Maybe<Scalars["Int"]>;
   reserveeAddressCity?: Maybe<Scalars["String"]>;
@@ -2343,11 +2339,11 @@ export type ReservationConfirmMutationPayload = {
    */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
-  taxPercentageValue?: Maybe<Scalars["Float"]>;
+  taxPercentageValue?: Maybe<Scalars["Decimal"]>;
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF. */
   type?: Maybe<Scalars["String"]>;
   /** The unit price of this particular reservation */
-  unitPrice?: Maybe<Scalars["Float"]>;
+  unitPrice?: Maybe<Scalars["Decimal"]>;
 };
 
 export type ReservationCreateMutationInput = {
@@ -2415,15 +2411,15 @@ export type ReservationCreateMutationPayload = {
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
   /** The non subsidised price of this reservation excluding VAT */
-  nonSubsidisedPrice?: Maybe<Scalars["Float"]>;
+  nonSubsidisedPrice?: Maybe<Scalars["Decimal"]>;
   /** The non subsidised price of this reservation excluding VAT */
-  nonSubsidisedPriceNet?: Maybe<Scalars["Float"]>;
+  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
-  price?: Maybe<Scalars["Float"]>;
+  price?: Maybe<Scalars["Decimal"]>;
   /** The price of this particular reservation excluding VAT */
-  priceNet?: Maybe<Scalars["Float"]>;
+  priceNet?: Maybe<Scalars["Decimal"]>;
   priority?: Maybe<Scalars["Int"]>;
   purposePk?: Maybe<Scalars["Int"]>;
   reservation?: Maybe<ReservationType>;
@@ -2444,11 +2440,11 @@ export type ReservationCreateMutationPayload = {
   /** Read only string value for ReservationType's ReservationState enum. */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
-  taxPercentageValue?: Maybe<Scalars["Float"]>;
+  taxPercentageValue?: Maybe<Scalars["Decimal"]>;
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF. */
   type?: Maybe<Scalars["String"]>;
   /** The unit price of this particular reservation */
-  unitPrice?: Maybe<Scalars["Float"]>;
+  unitPrice?: Maybe<Scalars["Decimal"]>;
 };
 
 export type ReservationDeleteMutationInput = {
@@ -2623,7 +2619,7 @@ export type ReservationStaffCreateMutationInput = {
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF. */
   type: Scalars["String"];
   /** The unit price of this particular reservation */
-  unitPrice?: InputMaybe<Scalars["Float"]>;
+  unitPrice?: InputMaybe<Scalars["Decimal"]>;
   /** Working memo for staff users. */
   workingMemo?: InputMaybe<Scalars["String"]>;
 };
@@ -2677,7 +2673,7 @@ export type ReservationStaffCreateMutationPayload = {
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF. */
   type?: Maybe<Scalars["String"]>;
   /** The unit price of this particular reservation */
-  unitPrice?: Maybe<Scalars["Float"]>;
+  unitPrice?: Maybe<Scalars["Decimal"]>;
   /** Working memo for staff users. */
   workingMemo?: Maybe<Scalars["String"]>;
 };
@@ -2983,7 +2979,7 @@ export type ReservationUnitCreateMutationInput = {
   servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
   spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Float"]>;
+  surfaceArea?: InputMaybe<Scalars["Decimal"]>;
   termsOfUseEn?: InputMaybe<Scalars["String"]>;
   termsOfUseFi?: InputMaybe<Scalars["String"]>;
   termsOfUseSv?: InputMaybe<Scalars["String"]>;
@@ -3077,7 +3073,7 @@ export type ReservationUnitCreateMutationPayload = {
   /** Spaces included in the reservation unit as nested related objects. */
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<Scalars["String"]>;
-  surfaceArea?: Maybe<Scalars["Float"]>;
+  surfaceArea?: Maybe<Scalars["Decimal"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -3163,13 +3159,9 @@ export type ReservationUnitPaymentTypeType = Node & {
 export type ReservationUnitPricingCreateSerializerInput = {
   /** When pricing is activated */
   begins: Scalars["Date"];
-  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Float"]>;
-  /** Maximum price of the reservation unit excluding VAT */
   highestPriceNet?: InputMaybe<Scalars["Float"]>;
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
-  /** Minimum price of the reservation unit excluding VAT */
   lowestPriceNet?: InputMaybe<Scalars["Float"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
   priceUnit?: InputMaybe<Scalars["String"]>;
@@ -3206,13 +3198,9 @@ export type ReservationUnitPricingType = {
 export type ReservationUnitPricingUpdateSerializerInput = {
   /** When pricing is activated */
   begins: Scalars["Date"];
-  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Float"]>;
-  /** Maximum price of the reservation unit excluding VAT */
   highestPriceNet?: InputMaybe<Scalars["Float"]>;
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
-  /** Minimum price of the reservation unit excluding VAT */
   lowestPriceNet?: InputMaybe<Scalars["Float"]>;
   pk?: InputMaybe<Scalars["Int"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
@@ -3462,7 +3450,7 @@ export type ReservationUnitUpdateMutationInput = {
   servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
   spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Float"]>;
+  surfaceArea?: InputMaybe<Scalars["Decimal"]>;
   termsOfUseEn?: InputMaybe<Scalars["String"]>;
   termsOfUseFi?: InputMaybe<Scalars["String"]>;
   termsOfUseSv?: InputMaybe<Scalars["String"]>;
@@ -3555,7 +3543,7 @@ export type ReservationUnitUpdateMutationPayload = {
   /** Spaces included in the reservation unit as nested related objects. */
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<Scalars["String"]>;
-  surfaceArea?: Maybe<Scalars["Float"]>;
+  surfaceArea?: Maybe<Scalars["Decimal"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -3712,15 +3700,15 @@ export type ReservationUpdateMutationPayload = {
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
   /** The non subsidised price of this reservation excluding VAT */
-  nonSubsidisedPrice?: Maybe<Scalars["Float"]>;
+  nonSubsidisedPrice?: Maybe<Scalars["Decimal"]>;
   /** The non subsidised price of this reservation excluding VAT */
-  nonSubsidisedPriceNet?: Maybe<Scalars["Float"]>;
+  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   /** The price of this particular reservation including VAT */
-  price?: Maybe<Scalars["Float"]>;
+  price?: Maybe<Scalars["Decimal"]>;
   /** The price of this particular reservation excluding VAT */
-  priceNet?: Maybe<Scalars["Float"]>;
+  priceNet?: Maybe<Scalars["Decimal"]>;
   priority?: Maybe<Scalars["Int"]>;
   purposePk?: Maybe<Scalars["Int"]>;
   reservation?: Maybe<ReservationType>;
@@ -3744,11 +3732,11 @@ export type ReservationUpdateMutationPayload = {
    */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
-  taxPercentageValue?: Maybe<Scalars["Float"]>;
+  taxPercentageValue?: Maybe<Scalars["Decimal"]>;
   /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF. */
   type?: Maybe<Scalars["String"]>;
   /** The unit price of this particular reservation */
-  unitPrice?: Maybe<Scalars["Float"]>;
+  unitPrice?: Maybe<Scalars["Decimal"]>;
 };
 
 export type ReservationWorkingMemoMutationInput = {
@@ -4036,7 +4024,6 @@ export type SpaceCreateMutationInput = {
   nameSv?: InputMaybe<Scalars["String"]>;
   /** PK of the parent space for this space. */
   parentPk?: InputMaybe<Scalars["Int"]>;
-  /** Surface area of the space as square meters */
   surfaceArea?: InputMaybe<Scalars["Float"]>;
   unitPk?: InputMaybe<Scalars["Int"]>;
 };
@@ -4057,7 +4044,6 @@ export type SpaceCreateMutationPayload = {
   parentPk?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   space?: Maybe<SpaceType>;
-  /** Surface area of the space as square meters */
   surfaceArea?: Maybe<Scalars["Float"]>;
   unitPk?: Maybe<Scalars["Int"]>;
 };
@@ -4122,7 +4108,6 @@ export type SpaceUpdateMutationInput = {
   /** PK of the parent space for this space. */
   parentPk?: InputMaybe<Scalars["Int"]>;
   pk: Scalars["Int"];
-  /** Surface area of the space as square meters */
   surfaceArea?: InputMaybe<Scalars["Float"]>;
   unitPk?: InputMaybe<Scalars["Int"]>;
 };
@@ -4143,7 +4128,6 @@ export type SpaceUpdateMutationPayload = {
   parentPk?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   space?: Maybe<SpaceType>;
-  /** Surface area of the space as square meters */
   surfaceArea?: Maybe<Scalars["Float"]>;
   unitPk?: Maybe<Scalars["Int"]>;
 };

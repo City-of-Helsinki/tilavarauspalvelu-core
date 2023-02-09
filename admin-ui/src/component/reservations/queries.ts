@@ -68,8 +68,8 @@ export const RESERVATIONS_QUERY = gql`
     $first: Int
     $state: [String]
     $textSearch: String
-    $priceGte: Float
-    $priceLte: Float
+    $priceGte: Decimal
+    $priceLte: Decimal
     $begin: DateTime
     $end: DateTime
     $reservationUnit: [ID]

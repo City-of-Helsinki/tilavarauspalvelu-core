@@ -5,7 +5,7 @@ export const UNITS_QUERY = gql`
     $first: Int
     $offset: Int
     $orderBy: String
-    $serviceSector: Float
+    $serviceSector: Decimal
     $nameFi: String
   ) {
     units(

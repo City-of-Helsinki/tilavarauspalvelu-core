@@ -1453,232 +1453,232 @@ type QualifierTypeEdge {
 
 type Query {
   applications(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
-    applicationRound: ID = null
-    status: [String] = null
-    unit: [ID] = null
-    user: ID = null
-    pk: [ID] = null
-    applicantType: [String] = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    applicationRound: ID
+    status: [String]
+    unit: [ID]
+    user: ID
+    pk: [ID]
+    applicantType: [String]
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): ApplicationTypeConnection
   applicationEvents(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
-    applicationRound: ID = null
-    status: String = null
-    unit: [ID] = null
-    user: ID = null
-    pk: [ID] = null
-    application: ID = null
-    applicationStatus: String = null
-    reservationUnit: [ID] = null
-    applicantType: [String] = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    applicationRound: ID
+    status: String
+    unit: [ID]
+    user: ID
+    pk: [ID]
+    application: ID
+    applicationStatus: String
+    reservationUnit: [ID]
+    applicantType: [String]
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): ApplicationEventTypeConnection
-  applicationRounds(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): ApplicationRoundTypeConnection
+  applicationRounds(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): ApplicationRoundTypeConnection
   reservations(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
-    begin: DateTime = null
-    end: DateTime = null
-    priceGte: Float = null
-    priceLte: Float = null
-    state: [String] = null
-    requested: Boolean = null
-    onlyWithPermission: Boolean = null
-    user: ID = null
-    reservationUnitNameFi: String = null
-    reservationUnitNameEn: String = null
-    reservationUnitNameSv: String = null
-    unit: [ID] = null
-    reservationUnit: [ID] = null
-    reservationUnitType: [ID] = null
-    textSearch: String = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    begin: DateTime
+    end: DateTime
+    priceGte: Decimal
+    priceLte: Decimal
+    state: [String]
+    requested: Boolean
+    onlyWithPermission: Boolean
+    user: ID
+    reservationUnitNameFi: String
+    reservationUnitNameEn: String
+    reservationUnitNameSv: String
+    unit: [ID]
+    reservationUnit: [ID]
+    reservationUnitType: [ID]
+    textSearch: String
 
     """
     PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
     """
-    orderStatus: [String] = null
+    orderStatus: [String]
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): ReservationTypeConnection
-  reservationByPk(pk: Int = null): ReservationType
+  reservationByPk(pk: Int): ReservationType
   recurringReservations(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
-    begin: DateTime = null
-    end: DateTime = null
-    beginDate: Date = null
-    endDate: Date = null
-    beginTime: Time = null
-    endTime: Time = null
-    user: ID = null
-    reservationUnitNameFi: String = null
-    reservationUnitNameEn: String = null
-    reservationUnitNameSv: String = null
-    unit: [ID] = null
-    reservationUnit: [ID] = null
-    reservationUnitType: [ID] = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    begin: DateTime
+    end: DateTime
+    beginDate: Date
+    endDate: Date
+    beginTime: Time
+    endTime: Time
+    user: ID
+    reservationUnitNameFi: String
+    reservationUnitNameEn: String
+    reservationUnitNameSv: String
+    unit: [ID]
+    reservationUnit: [ID]
+    reservationUnitType: [ID]
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): RecurringReservationTypeConnection
-  reservationCancelReasons(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, reason: String = null): ReservationCancelReasonTypeConnection
-  reservationDenyReasons(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, reason: String = null): ReservationDenyReasonTypeConnection
+  reservationCancelReasons(offset: Int, before: String, after: String, first: Int, last: Int, reason: String): ReservationCancelReasonTypeConnection
+  reservationDenyReasons(offset: Int, before: String, after: String, first: Int, last: Int, reason: String): ReservationDenyReasonTypeConnection
   reservationUnits(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
-    pk: [ID] = null
-    unit: [ID] = null
-    keywordGroups: [ID] = null
-    reservationUnitType: [ID] = null
-    minPersonsGte: Float = null
-    minPersonsLte: Float = null
-    maxPersonsGte: Float = null
-    maxPersonsLte: Float = null
-    textSearch: String = null
-    purposes: [ID] = null
-    qualifiers: [ID] = null
-    isDraft: Boolean = null
-    isVisible: Boolean = null
-    applicationRound: [ID] = null
-    nameFi: String = null
-    nameEn: String = null
-    nameSv: String = null
-    surfaceAreaGte: Float = null
-    surfaceAreaLte: Float = null
-    rankGte: Float = null
-    rankLte: Float = null
-    typeRankGte: Float = null
-    typeRankLte: Float = null
-    reservationKind: String = null
-    state: [String] = null
-    onlyWithPermission: Boolean = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    pk: [ID]
+    unit: [ID]
+    keywordGroups: [ID]
+    reservationUnitType: [ID]
+    minPersonsGte: Decimal
+    minPersonsLte: Decimal
+    maxPersonsGte: Decimal
+    maxPersonsLte: Decimal
+    textSearch: String
+    purposes: [ID]
+    qualifiers: [ID]
+    isDraft: Boolean
+    isVisible: Boolean
+    applicationRound: [ID]
+    nameFi: String
+    nameEn: String
+    nameSv: String
+    surfaceAreaGte: Decimal
+    surfaceAreaLte: Decimal
+    rankGte: Decimal
+    rankLte: Decimal
+    typeRankGte: Decimal
+    typeRankLte: Decimal
+    reservationKind: String
+    state: [String]
+    onlyWithPermission: Boolean
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): ReservationUnitTypeConnection
   reservationUnit(
     """The ID of the object"""
     id: ID!
   ): ReservationUnitType
-  reservationUnitByPk(pk: Int = null): ReservationUnitByPkType
-  reservationUnitCancellationRules(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, name: String = null): ReservationUnitCancellationRuleTypeConnection
+  reservationUnitByPk(pk: Int): ReservationUnitByPkType
+  reservationUnitCancellationRules(offset: Int, before: String, after: String, first: Int, last: Int, name: String): ReservationUnitCancellationRuleTypeConnection
   reservationUnitTypes(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): ReservationUnitTypeTypeConnection
-  resources(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): ResourceTypeConnection
+  resources(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): ResourceTypeConnection
   resource(
     """The ID of the object"""
     id: ID!
   ): ResourceType
-  resourceByPk(pk: Int = null): ResourceType
+  resourceByPk(pk: Int): ResourceType
   equipments(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
-    name: String = null
-    rankGte: Float = null
-    rankLte: Float = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    name: String
+    rankGte: Decimal
+    rankLte: Decimal
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): EquipmentTypeConnection
   equipment(
     """The ID of the object"""
     id: ID!
   ): EquipmentType
-  equipmentByPk(pk: Int = null): EquipmentType
-  equipmentCategories(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): EquipmentCategoryTypeConnection
+  equipmentByPk(pk: Int): EquipmentType
+  equipmentCategories(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): EquipmentCategoryTypeConnection
   equipmentCategory(
     """The ID of the object"""
     id: ID!
   ): EquipmentCategoryType
-  equipmentCategoryByPk(pk: Int = null): EquipmentCategoryType
-  spaces(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): SpaceTypeConnection
+  equipmentCategoryByPk(pk: Int): EquipmentCategoryType
+  spaces(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): SpaceTypeConnection
   space(
     """The ID of the object"""
     id: ID!
   ): SpaceType
-  spaceByPk(pk: Int = null): SpaceType
-  serviceSectors(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ServiceSectorTypeConnection
+  spaceByPk(pk: Int): SpaceType
+  serviceSectors(offset: Int, before: String, after: String, first: Int, last: Int): ServiceSectorTypeConnection
   units(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
-    pk: [ID] = null
-    nameFi: String = null
-    nameEn: String = null
-    nameSv: String = null
-    serviceSector: Float = null
-    onlyWithPermission: Boolean = null
-    publishedReservationUnits: Boolean = null
-    ownReservations: Boolean = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    pk: [ID]
+    nameFi: String
+    nameEn: String
+    nameSv: String
+    serviceSector: Decimal
+    onlyWithPermission: Boolean
+    publishedReservationUnits: Boolean
+    ownReservations: Boolean
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): UnitTypeConnection
   unit(
     """The ID of the object"""
     id: ID!
   ): UnitType
-  unitByPk(pk: Int = null): UnitByPkType
+  unitByPk(pk: Int): UnitByPkType
   currentUser: UserType
-  user(pk: Int = null): UserType
-  keywordCategories(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordCategoryTypeConnection
-  keywordGroups(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordGroupTypeConnection
-  keywords(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordTypeConnection
+  user(pk: Int): UserType
+  keywordCategories(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordCategoryTypeConnection
+  keywordGroups(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordGroupTypeConnection
+  keywords(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordTypeConnection
   purposes(
-    offset: Int = null
-    before: String = null
-    after: String = null
-    first: Int = null
-    last: Int = null
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
 
     """Järjestys"""
-    orderBy: String = null
+    orderBy: String
   ): PurposeTypeConnection
-  qualifiers(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): QualifierTypeConnection
-  reservationPurposes(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): ReservationPurposeTypeConnection
-  termsOfUse(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, termsType: String = null): TermsOfUseTypeConnection
-  taxPercentages(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, value: Float = null): TaxPercentageTypeConnection
-  ageGroups(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): AgeGroupTypeConnection
-  cities(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): CityTypeConnection
-  metadataSets(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ReservationMetadataSetTypeConnection
-  order(orderUuid: String = null): PaymentOrderType
+  qualifiers(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): QualifierTypeConnection
+  reservationPurposes(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): ReservationPurposeTypeConnection
+  termsOfUse(offset: Int, before: String, after: String, first: Int, last: Int, termsType: TermsOfUseTermsOfUseTermsTypeChoices): TermsOfUseTypeConnection
+  taxPercentages(offset: Int, before: String, after: String, first: Int, last: Int, value: Decimal): TaxPercentageTypeConnection
+  ageGroups(offset: Int, before: String, after: String, first: Int, last: Int): AgeGroupTypeConnection
+  cities(offset: Int, before: String, after: String, first: Int, last: Int): CityTypeConnection
+  metadataSets(offset: Int, before: String, after: String, first: Int, last: Int): ReservationMetadataSetTypeConnection
+  order(orderUuid: String): PaymentOrderType
 }
 
 type RealEstateType implements Node {
@@ -1886,11 +1886,7 @@ input ReservationApproveMutationInput {
 
   """Additional information for approval."""
   handlingDetails: String!
-
-  """The price of this particular reservation including VAT"""
   price: Float!
-
-  """The price of this particular reservation excluding VAT"""
   priceNet: Float!
   clientMutationId: String
 }
@@ -1904,11 +1900,7 @@ type ReservationApproveMutationPayload {
 
   """When this reservation was handled."""
   handledAt: DateTime
-
-  """The price of this particular reservation including VAT"""
   price: Float
-
-  """The price of this particular reservation excluding VAT"""
   priceNet: Float
 
   """May contain more than one error for same field."""
@@ -2030,22 +2022,22 @@ type ReservationConfirmMutationPayload {
   confirmedAt: DateTime
 
   """The unit price of this particular reservation"""
-  unitPrice: Float
+  unitPrice: Decimal
 
   """The value of the tax percentage for this particular reservation"""
-  taxPercentageValue: Float
+  taxPercentageValue: Decimal
 
   """The price of this particular reservation including VAT"""
-  price: Float
+  price: Decimal
 
   """The price of this particular reservation excluding VAT"""
-  priceNet: Float
+  priceNet: Decimal
 
   """The non subsidised price of this reservation excluding VAT"""
-  nonSubsidisedPrice: Float
+  nonSubsidisedPrice: Decimal
 
   """The non subsidised price of this reservation excluding VAT"""
-  nonSubsidisedPriceNet: Float
+  nonSubsidisedPriceNet: Decimal
 
   """
   Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
@@ -2152,22 +2144,22 @@ type ReservationCreateMutationPayload {
   confirmedAt: DateTime
 
   """The unit price of this particular reservation"""
-  unitPrice: Float
+  unitPrice: Decimal
 
   """The value of the tax percentage for this particular reservation"""
-  taxPercentageValue: Float
+  taxPercentageValue: Decimal
 
   """The price of this particular reservation including VAT"""
-  price: Float
+  price: Decimal
 
   """The price of this particular reservation excluding VAT"""
-  priceNet: Float
+  priceNet: Decimal
 
   """The non subsidised price of this reservation excluding VAT"""
-  nonSubsidisedPrice: Float
+  nonSubsidisedPrice: Decimal
 
   """The non subsidised price of this reservation excluding VAT"""
-  nonSubsidisedPriceNet: Float
+  nonSubsidisedPriceNet: Decimal
 
   """
   Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
@@ -2402,7 +2394,7 @@ input ReservationStaffCreateMutationInput {
   purposePk: Int
 
   """The unit price of this particular reservation"""
-  unitPrice: Float
+  unitPrice: Decimal
 
   """
   Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
@@ -2462,7 +2454,7 @@ type ReservationStaffCreateMutationPayload {
   handledAt: DateTime
 
   """The unit price of this particular reservation"""
-  unitPrice: Float
+  unitPrice: Decimal
 
   """
   Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
@@ -2656,12 +2648,12 @@ type ReservationUnitByPkType implements Node {
   """Is reservation unit archived."""
   isArchived: Boolean!
   images: [ReservationUnitImageType]
-  applicationRounds(active: Boolean = null): [ApplicationRoundType]
+  applicationRounds(active: Boolean): [ApplicationRoundType]
 
   """The ID of the object"""
   id: ID!
-  reservations(from: Date = null, to: Date = null, state: [String] = null, includeWithSameComponents: Boolean = null): [ReservationType]
-  openingHours(openingTimes: Boolean = null, periods: Boolean = null, startDate: Date = null, endDate: Date = null): OpeningHoursType
+  reservations(from: Date, to: Date, state: [String], includeWithSameComponents: Boolean): [ReservationType]
+  openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
   pk: Int
   qualifiers: [QualifierType]
   location: LocationType
@@ -2733,7 +2725,7 @@ input ReservationUnitCreateMutationInput {
   qualifierPks: [Int]
   servicePks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Float
+  surfaceArea: Decimal
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -2799,24 +2791,24 @@ input ReservationUnitCreateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2861,7 +2853,7 @@ type ReservationUnitCreateMutationPayload {
   isDraft: Boolean
   qualifierPks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Float
+  surfaceArea: Decimal
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -2923,24 +2915,24 @@ type ReservationUnitCreateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3045,17 +3037,9 @@ input ReservationUnitPricingCreateSerializerInput {
   Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
   """
   priceUnit: String
-
-  """Minimum price of the reservation unit including VAT"""
   lowestPrice: Float
-
-  """Minimum price of the reservation unit excluding VAT"""
   lowestPriceNet: Float
-
-  """Maximum price of the reservation unit including VAT"""
   highestPrice: Float
-
-  """Maximum price of the reservation unit excluding VAT"""
   highestPriceNet: Float
   taxPercentagePk: Int
 
@@ -3108,17 +3092,9 @@ input ReservationUnitPricingUpdateSerializerInput {
   Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED.
   """
   priceUnit: String
-
-  """Minimum price of the reservation unit including VAT"""
   lowestPrice: Float
-
-  """Minimum price of the reservation unit excluding VAT"""
   lowestPriceNet: Float
-
-  """Maximum price of the reservation unit including VAT"""
   highestPrice: Float
-
-  """Maximum price of the reservation unit excluding VAT"""
   highestPriceNet: Float
   taxPercentagePk: Int
 
@@ -3331,11 +3307,11 @@ type ReservationUnitType implements Node {
   paymentMerchant: PaymentMerchantType
   paymentProduct: PaymentProductType
   images: [ReservationUnitImageType]
-  applicationRounds(active: Boolean = null): [ApplicationRoundType]
+  applicationRounds(active: Boolean): [ApplicationRoundType]
 
   """The ID of the object"""
   id: ID!
-  reservations(from: Date = null, to: Date = null, state: [String] = null, includeWithSameComponents: Boolean = null): [ReservationType]
+  reservations(from: Date, to: Date, state: [String], includeWithSameComponents: Boolean): [ReservationType]
   pk: Int
   location: LocationType
   equipment: [EquipmentType]
@@ -3417,7 +3393,7 @@ input ReservationUnitUpdateMutationInput {
   qualifierPks: [Int]
   servicePks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Float
+  surfaceArea: Decimal
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -3483,24 +3459,24 @@ input ReservationUnitUpdateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -3545,7 +3521,7 @@ type ReservationUnitUpdateMutationPayload {
   isDraft: Boolean
   qualifierPks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Float
+  surfaceArea: Decimal
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -3606,24 +3582,24 @@ type ReservationUnitUpdateMutationPayload {
   state: String
   pricingTerms: String
   paymentTypes: [String]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3735,22 +3711,22 @@ type ReservationUpdateMutationPayload {
   confirmedAt: DateTime
 
   """The unit price of this particular reservation"""
-  unitPrice: Float
+  unitPrice: Decimal
 
   """The value of the tax percentage for this particular reservation"""
-  taxPercentageValue: Float
+  taxPercentageValue: Decimal
 
   """The price of this particular reservation including VAT"""
-  price: Float
+  price: Decimal
 
   """The price of this particular reservation excluding VAT"""
-  priceNet: Float
+  priceNet: Decimal
 
   """The non subsidised price of this reservation excluding VAT"""
-  nonSubsidisedPrice: Float
+  nonSubsidisedPrice: Decimal
 
   """The non subsidised price of this reservation excluding VAT"""
-  nonSubsidisedPriceNet: Float
+  nonSubsidisedPriceNet: Decimal
 
   """
   Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
@@ -4017,8 +3993,6 @@ type ServiceType implements Node {
 input SpaceCreateMutationInput {
   """PK of the parent space for this space."""
   parentPk: Int
-
-  """Surface area of the space as square meters"""
   surfaceArea: Float
 
   """PK of the district for this space."""
@@ -4037,8 +4011,6 @@ type SpaceCreateMutationPayload {
 
   """PK of the parent space for this space."""
   parentPk: Int
-
-  """Surface area of the space as square meters"""
   surfaceArea: Float
 
   """PK of the district for this space."""
@@ -4108,8 +4080,6 @@ input SpaceUpdateMutationInput {
 
   """PK of the parent space for this space."""
   parentPk: Int
-
-  """Surface area of the space as square meters"""
   surfaceArea: Float
 
   """PK of the district for this space."""
@@ -4128,8 +4098,6 @@ type SpaceUpdateMutationPayload {
 
   """PK of the parent space for this space."""
   parentPk: Int
-
-  """Surface area of the space as square meters"""
   surfaceArea: Float
 
   """PK of the district for this space."""
@@ -4286,7 +4254,7 @@ type UnitByPkType implements Node {
 
   """The ID of the object"""
   id: ID!
-  openingHours(openingTimes: Boolean = null, periods: Boolean = null, startDate: Date = null, endDate: Date = null): OpeningHoursType
+  openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
   pk: Int
   reservationUnits: [ReservationUnitType]
   spaces: [SpaceType]
@@ -4368,15 +4336,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -4386,15 +4354,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

@@ -5,6 +5,7 @@ import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
   ReservationUnitByPkType,
+  TermsOfUseTermsOfUseTermsTypeChoices,
   TermsOfUseType,
 } from "common/types/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
@@ -87,7 +88,7 @@ const EditStep1 = ({
 
   useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE, {
     variables: {
-      termsType: "generic_terms",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
     },
     onCompleted: (data) => {
       const result: TermsOfUseType =

@@ -7,6 +7,7 @@ import {
   QueryTermsOfUseArgs,
   TermsOfUseType,
   Query,
+  TermsOfUseTermsOfUseTermsTypeChoices,
 } from "common/types/gql-types";
 import { H2 } from "common/src/common/typography";
 import apolloClient from "../../../modules/apolloClient";
@@ -26,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   >({
     query: TERMS_OF_USE,
     variables: {
-      termsType: "generic_terms",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
     },
   });
   const genericTerms =

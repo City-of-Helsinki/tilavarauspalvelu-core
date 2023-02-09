@@ -49,6 +49,7 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitType,
   ReservationUnitTypeEdge,
+  TermsOfUseTermsOfUseTermsTypeChoices,
   TermsOfUseType,
 } from "common/types/gql-types";
 import Container from "../../components/common/Container";
@@ -182,7 +183,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       query: TERMS_OF_USE,
       fetchPolicy: "no-cache",
       variables: {
-        termsType: "generic_terms",
+        termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
     const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
@@ -364,6 +365,7 @@ const ReservationUnit = ({
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const [initialReservation, setInitialReservation] =
     useState<PendingReservation | null>(null);
+  const [isReserving, setIsReserving] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -519,6 +521,7 @@ const ReservationUnit = ({
         return false;
       }
 
+      setIsReserving(false);
       setInitialReservation({
         begin: newReservation.begin,
         end: newReservation.end,
@@ -563,6 +566,7 @@ const ReservationUnit = ({
         return false;
       }
 
+      setIsReserving(false);
       setInitialReservation({
         begin: startTime.toISOString(),
         end: end.toISOString(),
@@ -646,48 +650,28 @@ const ReservationUnit = ({
     ]);
   }, [calendarEvents, initialReservation, reservationUnit]);
 
-  const [
-    addReservation,
-    {
-      data: createdReservation,
-      loading: createReservationLoading,
-      error: createReservationError,
-    },
-  ] = useMutation<
+  const [addReservation] = useMutation<
     { createReservation: ReservationCreateMutationPayload },
     { input: ReservationCreateMutationInput }
-  >(CREATE_RESERVATION);
-
-  useEffect(() => {
-    if (!createReservationLoading) {
-      if (createReservationError) {
-        const msg = printErrorMessages(createReservationError);
-        setErrorMsg(msg);
-      } else if (createdReservation) {
-        setPendingReservation({
-          ...reservation,
-          pk: createdReservation.createReservation.pk,
-          price: createdReservation.createReservation.price,
-        });
-
-        router.push(`/reservation-unit/${reservationUnit.pk}/reservation`);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    createdReservation,
-    createReservationLoading,
-    createReservationError,
-    t,
-    router,
-    reservationUnit.pk,
-    setReservation,
-    setPendingReservation,
-  ]);
+  >(CREATE_RESERVATION, {
+    onCompleted: (data) => {
+      setPendingReservation({
+        ...reservation,
+        pk: data.createReservation.pk,
+        price: data.createReservation.price,
+      });
+      router.push(`/reservation-unit/${reservationUnit.pk}/reservation`);
+    },
+    onError: (error) => {
+      const msg = printErrorMessages(error);
+      setErrorMsg(msg || t("errors:general_error"));
+    },
+  });
 
   const createReservation = useCallback(
     (res: ReservationProps): void => {
       setErrorMsg(null);
+      setIsReserving(true);
       const { begin, end } = res;
       const input: ReservationCreateMutationInput = {
         begin,
@@ -925,6 +909,7 @@ const ReservationUnit = ({
                         isSlotReservable={(startDate, endDate) =>
                           isSlotReservable(startDate, endDate)
                         }
+                        isReserving={isReserving}
                         setCalendarFocusDate={setFocusDate}
                         activeApplicationRounds={activeApplicationRounds}
                         createReservation={(res) => createReservation(res)}

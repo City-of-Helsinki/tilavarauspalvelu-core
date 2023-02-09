@@ -17,6 +17,7 @@ import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
   TermsOfUseType,
+  TermsOfUseTermsOfUseTermsTypeChoices,
 } from "common/types/gql-types";
 import apolloClient from "../../modules/apolloClient";
 import { GET_RESERVATION } from "../../modules/queries/reservation";
@@ -66,7 +67,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     >({
       query: TERMS_OF_USE,
       variables: {
-        termsType: "generic_terms",
+        termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
     const genericTerms = genericTermsData?.termsOfUse?.edges[0]?.node || {};
