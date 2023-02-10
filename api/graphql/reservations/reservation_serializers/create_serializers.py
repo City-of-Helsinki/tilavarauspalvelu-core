@@ -232,6 +232,8 @@ class ReservationCreateSerializer(
         reservation_unit_ids = list(map(lambda x: x.pk, reservation_units))
         self.check_reservation_type(user, reservation_unit_ids, reservation_type)
 
+        data = self._prefill_from_from_profile(data)
+
         return data
 
     def _get_biggest_buffer_time_from_reservation_units(
@@ -243,6 +245,10 @@ class ReservationCreateSerializer(
             if getattr(res_unit, field, None) is not None
         ]
         return max(buffer_times, default=None)
+
+    def _prefill_from_from_profile(self, data):
+
+        return data
 
     def check_sku(self, current_sku, new_sku):
         if current_sku is not None and current_sku != new_sku:

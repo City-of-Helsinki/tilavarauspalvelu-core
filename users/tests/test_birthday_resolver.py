@@ -4,7 +4,7 @@ from unittest import mock
 from assertpy import assert_that
 from django.test import TestCase
 
-from users.utils.birthday_resolver import (
+from users.utils.open_city_profile.birthday_resolver import (
     BirthDayReaderQueryError,
     BirthDayReaderTokenNullOrEmptyError,
     UserBirthdayReader,
