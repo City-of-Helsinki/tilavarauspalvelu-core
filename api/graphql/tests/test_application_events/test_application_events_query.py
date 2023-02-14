@@ -170,9 +170,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
             applicant_type=Application.APPLICANT_TYPE_COMMUNITY, user=self.regular_joe
         )
         ApplicationEventFactory(application=application, name="I should be listed")
-        filter_clause = (
-            f'applicantType: "{Application.APPLICANT_TYPE_COMMUNITY.upper()}"'
-        )
+        filter_clause = f'applicantType: "{Application.APPLICANT_TYPE_COMMUNITY}"'
 
         response = self.query(self.get_query(filter_section=filter_clause))
         assert_that(response.status_code).is_equal_to(200)

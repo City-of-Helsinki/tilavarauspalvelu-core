@@ -26,7 +26,7 @@ class ApplicationFilterSet(filters.FilterSet):
     status = filters.MultipleChoiceFilter(
         field_name="latest_status",
         lookup_expr="iexact",
-        choices=[(c[0].upper(), c[1]) for c in ApplicationStatus.STATUS_CHOICES],
+        choices=[(c[0], c[1]) for c in ApplicationStatus.STATUS_CHOICES],
     )
     unit = filters.ModelMultipleChoiceFilter(
         method="filter_by_possible_units", queryset=Unit.objects.all()
@@ -36,9 +36,7 @@ class ApplicationFilterSet(filters.FilterSet):
     applicant_type = filters.MultipleChoiceFilter(
         field_name="applicant_type",
         method="filter_by_applicant_type",
-        choices=[
-            (c[0].upper(), c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES
-        ],
+        choices=[(c[0], c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES],
     )
 
     order_by = filters.OrderingFilter(fields=("pk", "applicant"))
@@ -130,9 +128,7 @@ class ApplicationEventFilterSet(filters.FilterSet):
     applicant_type = filters.MultipleChoiceFilter(
         field_name="application__applicant_type",
         method="filter_by_applicant_type",
-        choices=[
-            (c[0].upper(), c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES
-        ],
+        choices=[(c[0], c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES],
     )
 
     order_by = filters.OrderingFilter(
