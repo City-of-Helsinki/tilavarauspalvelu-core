@@ -69,7 +69,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
     def test_application_filter_by_status(self):
         query = f"""
             query {{
-                applications(status: "{self.application.status.upper()}") {{
+                applications(status: "{self.application.status}") {{
                     edges {{
                         node {{
                             applicantType
@@ -93,8 +93,8 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
     def test_application_filter_by_multiple_status(self):
         query = f"""
             query {{
-                applications(status: ["{self.application.status.upper()}",
-                    "{self.application_status.status.upper()}"]) {{
+                applications(status: ["{self.application.status}",
+                    "{self.application_status.status}"]) {{
                     edges {{
                         node {{
                             applicantType
@@ -345,7 +345,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
                 }
             }
         """
-            % Application.APPLICANT_TYPE_COMMUNITY.upper()
+            % Application.APPLICANT_TYPE_COMMUNITY
         )
 
         ApplicationFactory(
@@ -363,8 +363,8 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
         self.maxDiff = None
         query = f"""
             query {{
-                applications(orderBy: "pk" applicantType: ["{Application.APPLICANT_TYPE_COMMUNITY.upper()}",
-                    "{Application.APPLICANT_TYPE_ASSOCIATION.upper()}"]) {{
+                applications(orderBy: "pk" applicantType: ["{Application.APPLICANT_TYPE_COMMUNITY}",
+                    "{Application.APPLICANT_TYPE_ASSOCIATION}"]) {{
                     edges {{
                         node {{
                             additionalInformation
