@@ -9,7 +9,7 @@ uwsgi:
   #uid: tvp
   umask: 022
   http: :8000
-  buffer-size: 8192
+  buffer-size: 14000
   log-x-forwarded-for: true
 
   # Reload workers regularly to keep memory fresh
