@@ -114,6 +114,7 @@ const areOpeningTimesAvailable = (
     const endDateTime = new Date(`${startDate}T${oh.endTime}`);
 
     return (
+      oh.isReservable &&
       toApiDate(slotDate) === startDate?.toString() &&
       slotDate < endDateTime &&
       startDateTime.getDay() === slotDate.getDay() &&
@@ -250,7 +251,8 @@ export const isStartTimeWithinInterval = (
 
   const startHMS = `${toUIDate(start, "HH:mm")}:00`;
   const { startTime: dayStartTime, endTime: dayEndTime } =
-    openingTimes?.find((n) => n.date === toApiDate(start)) || {};
+    openingTimes?.find((n) => n.isReservable && n.date === toApiDate(start)) ||
+    {};
 
   const [startHours, startMinutes] = dayStartTime?.split(":").map(Number) || [
     0, 0,
@@ -477,7 +479,7 @@ export const getAvailableTimes = (
   const { openingHours, reservationStartInterval } = reservationUnit;
 
   const openingTimes = openingHours?.openingTimes?.find(
-    (n) => n?.date === toUIDate(date, "yyyy-MM-dd")
+    (n) => n?.isReservable && n?.date === toUIDate(date, "yyyy-MM-dd")
   );
 
   const { startTime, endTime } = openingTimes || {};
@@ -508,7 +510,7 @@ export const getOpenDays = (
   const openDays: Date[] = [];
 
   openingHours?.openingTimes?.forEach((openingTime) => {
-    if (openingTime && openingTime.state === "open") {
+    if (openingTime && openingTime.isReservable) {
       const date = new Date(openingTime?.date as string);
       openDays.push(date);
     }

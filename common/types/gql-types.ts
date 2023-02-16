@@ -1341,10 +1341,10 @@ export type OpeningHoursType = {
 export type OpeningTimesType = {
   __typename?: "OpeningTimesType";
   date?: Maybe<Scalars["Date"]>;
-  endTime?: Maybe<Scalars["Time"]>;
+  endTime?: Maybe<Scalars["DateTime"]>;
   isReservable?: Maybe<Scalars["Boolean"]>;
   periods?: Maybe<Array<Maybe<Scalars["Int"]>>>;
-  startTime?: Maybe<Scalars["Time"]>;
+  startTime?: Maybe<Scalars["DateTime"]>;
   state?: Maybe<Scalars["String"]>;
 };
 
@@ -1580,6 +1580,7 @@ export type Query = {
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
   reservationUnitCancellationRules?: Maybe<ReservationUnitCancellationRuleTypeConnection>;
+  reservationUnitHaukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
   reservationUnitTypes?: Maybe<ReservationUnitTypeTypeConnection>;
   reservationUnits?: Maybe<ReservationUnitTypeConnection>;
   reservations?: Maybe<ReservationTypeConnection>;
@@ -1844,6 +1845,11 @@ export type QueryReservationUnitCancellationRulesArgs = {
   last?: InputMaybe<Scalars["Int"]>;
   name?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type QueryReservationUnitHaukiUrlArgs = {
+  pk?: InputMaybe<Scalars["Int"]>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
 };
 
 export type QueryReservationUnitTypesArgs = {

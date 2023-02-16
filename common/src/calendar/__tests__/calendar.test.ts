@@ -25,6 +25,8 @@ import {
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitType,
+  ReservationUnitsReservationUnitAuthenticationChoices,
+  ReservationUnitsReservationUnitReservationKindChoices,
 } from "../../../types/gql-types";
 import { ApplicationRound } from "../../../types/common";
 
@@ -93,13 +95,14 @@ describe("areSlotsReservable", () => {
   const tzOffset = new Date().getTimezoneOffset() / 60;
   const tzOffsetHoursStr = Math.abs(tzOffset).toString().padStart(2, "0");
 
-  const openingTimes = [
+  const openingTimesReservable = [
     {
       date: format(addDays(new Date(), 7), "yyyy-MM-dd"),
       endTime: `21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
       startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
+      isReservable: true,
     },
     {
       date: format(addDays(new Date(), 8), "yyyy-MM-dd"),
@@ -107,6 +110,26 @@ describe("areSlotsReservable", () => {
       periods: null,
       startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
+      isReservable: true,
+    },
+  ];
+
+  const openingTimesNotReservable = [
+    {
+      date: format(addDays(new Date(), 7), "yyyy-MM-dd"),
+      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
+      periods: null,
+      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
+      state: "open",
+      isReservable: false,
+    },
+    {
+      date: format(addDays(new Date(), 8), "yyyy-MM-dd"),
+      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
+      periods: null,
+      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
+      state: "open",
+      isReservable: false,
     },
   ];
 
@@ -122,7 +145,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         undefined,
         undefined,
@@ -136,7 +159,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         undefined,
         undefined,
@@ -150,7 +173,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 8)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         undefined,
         undefined,
@@ -164,7 +187,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 8)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         undefined,
         undefined,
@@ -177,7 +200,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date(), 10)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         undefined,
         undefined,
@@ -191,17 +214,18 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         undefined,
         7,
         []
       )
     ).toBe(true);
+
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimes,
+        openingTimesReservable,
         addDays(new Date(), 8),
         undefined,
         7,
@@ -211,7 +235,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         addDays(new Date(), 6),
         7,
@@ -222,13 +246,89 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimes,
+        openingTimesReservable,
         undefined,
         undefined,
         8,
         []
       )
     ).toBe(false);
+  });
+
+  describe("Closed days", () => {
+    test("Plus 7 days 09:00", () => {
+      const hours = 11 + tzOffset;
+      expect(
+        areSlotsReservable(
+          [addDays(new Date().setUTCHours(hours), 7)],
+          openingTimesNotReservable,
+          undefined,
+          undefined,
+          undefined,
+          []
+        )
+      ).toBe(false);
+    });
+
+    test("Plus 7 days 10:00", () => {
+      const hours = 12 + tzOffset;
+      expect(
+        areSlotsReservable(
+          [addDays(new Date().setUTCHours(hours), 7)],
+          openingTimesNotReservable,
+          undefined,
+          undefined,
+          undefined,
+          []
+        )
+      ).toBe(false);
+    });
+
+    test("Buffer days", () => {
+      const hours = 11 + tzOffset;
+      expect(
+        areSlotsReservable(
+          [addDays(new Date().setUTCHours(hours), 7)],
+          openingTimesNotReservable,
+          undefined,
+          undefined,
+          7,
+          []
+        )
+      ).toBe(false);
+
+      expect(
+        areSlotsReservable(
+          [addDays(new Date().setUTCHours(hours), 7)],
+          openingTimesNotReservable,
+          addDays(new Date(), 8),
+          undefined,
+          7,
+          []
+        )
+      ).toBe(false);
+      expect(
+        areSlotsReservable(
+          [addDays(new Date().setUTCHours(hours), 7)],
+          openingTimesNotReservable,
+          undefined,
+          addDays(new Date(), 6),
+          7,
+          []
+        )
+      ).toBe(false);
+
+      expect(
+        areSlotsReservable(
+          [addDays(new Date().setUTCHours(hours), 7)],
+          openingTimesNotReservable,
+          undefined,
+          undefined,
+          8,
+          []
+        )
+      ).toBe(false);
+    });
   });
 });
 
@@ -356,6 +456,7 @@ describe("isStartTimeWithinInterval", () => {
       startTime: `06:00:00+${timeZoneHours}:00`,
       endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
+      isReservable: true,
       periods: [38600],
     },
     {
@@ -363,6 +464,15 @@ describe("isStartTimeWithinInterval", () => {
       startTime: `06:00:00+${timeZoneHours}:00`,
       endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
+      isReservable: true,
+      periods: [38600],
+    },
+    {
+      date: "2019-09-24",
+      startTime: `06:00:00+${timeZoneHours}:00`,
+      endTime: `18:00:00+${timeZoneHours}:00`,
+      state: "open",
+      isReservable: false,
       periods: [38600],
     },
     {
@@ -370,6 +480,7 @@ describe("isStartTimeWithinInterval", () => {
       startTime: `06:00:00+${timeZoneHours}:00`,
       endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
+      isReservable: true,
       periods: [38600],
     },
   ];
@@ -382,6 +493,22 @@ describe("isStartTimeWithinInterval", () => {
         "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
     ).toBe(true);
+
+    expect(
+      isStartTimeWithinInterval(
+        new Date(`2019-09-22T12:15:00+${timeZoneHours}:00`),
+        openingTimes,
+        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(true);
+
+    expect(
+      isStartTimeWithinInterval(
+        new Date(`2019-09-24T12:15:00+${timeZoneHours}:00`),
+        openingTimes,
+        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(false);
   });
 
   test("returns sane results", () => {
@@ -636,130 +763,177 @@ describe("getEventBuffers", () => {
 });
 
 describe("isReservationUnitReservable", () => {
-  const openingHours = {
-    openingTimes: [
-      {
-        date: new Date().toISOString(),
-        startTime: "04:00:00+00:00",
-        endTime: "20:00:00+00:00",
-        state: "open",
-        periods: null,
-      },
-    ],
+  const reservationUnit: ReservationUnitByPkType = {
+    id: "1234",
+    allowReservationsWithoutOpeningHours: false,
+    authentication: ReservationUnitsReservationUnitAuthenticationChoices.Strong,
+    canApplyFreeOfCharge: false,
+    contactInformation: "",
+    isArchived: false,
+    isDraft: false,
+    requireIntroduction: false,
+    requireReservationHandling: false,
+    reservationKind:
+      ReservationUnitsReservationUnitReservationKindChoices.Direct,
+    reservationStartInterval:
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+    uuid: "1234",
+    openingHours: {
+      openingTimes: [
+        {
+          date: new Date().toISOString(),
+          startTime: `${new Date().toISOString()}T04:00:00+00:00`,
+          endTime: `${new Date().toISOString()}T20:00:00+00:00`,
+          state: "open",
+          isReservable: true,
+          periods: null,
+        },
+      ],
+    },
   };
+
   test("returns true for a unit that is reservable", () => {
     expect(
       isReservationUnitReservable({
-        id: "1234",
+        ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-        reservationBegins: addMinutes(new Date(), -10),
-        openingHours,
+        reservationBegins: addMinutes(new Date(), -10).toISOString(),
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(true);
 
     expect(
       isReservationUnitReservable({
+        ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-        reservationEnds: addMinutes(new Date(), 10),
-        openingHours,
+        reservationEnds: addMinutes(new Date(), 10).toISOString(),
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(true);
 
     expect(
       isReservationUnitReservable({
+        ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-        reservationBegins: addMinutes(new Date(), -10),
-        reservationEnds: addMinutes(new Date(), 10),
-        openingHours,
+        reservationBegins: addMinutes(new Date(), -10).toISOString(),
+        reservationEnds: addMinutes(new Date(), 10).toISOString(),
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(true);
 
     expect(
       isReservationUnitReservable({
+        ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-        openingHours,
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(true);
   });
 
   test("returns false for a unit that is not reservable", () => {
     expect(
       isReservationUnitReservable({
+        ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
+        openingHours: undefined,
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
-        reservationBegins: addMinutes(new Date(), 10),
+        ...reservationUnit,
+        reservationBegins: addMinutes(new Date(), 10).toISOString(),
+        openingHours: undefined,
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
-        reservationEnds: addMinutes(new Date(), -10),
+        ...reservationUnit,
+        reservationEnds: addMinutes(new Date(), -10).toISOString(),
+        openingHours: undefined,
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
-        reservationBegins: addMinutes(new Date(), -10),
-        reservationEnds: addMinutes(new Date(), -1),
+        ...reservationUnit,
+        reservationBegins: addMinutes(new Date(), -10).toISOString(),
+        reservationEnds: addMinutes(new Date(), -1).toISOString(),
+        openingHours: undefined,
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(false);
   });
 
   test("returns correct value with buffer days", () => {
     expect(
       isReservationUnitReservable({
+        ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-        reservationBegins: addDays(new Date(), 5),
+        reservationBegins: addDays(new Date(), 5).toISOString(),
         reservationsMaxDaysBefore: 5,
-        openingHours,
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
-        reservationBegins: addDays(new Date(), 5),
+        ...reservationUnit,
+        reservationBegins: addDays(new Date(), 5).toISOString(),
         reservationsMaxDaysBefore: 4,
+        openingHours: undefined,
         metadataSet: {
+          id: "1234",
+          name: "Test",
           supportedFields: ["name"],
         },
-      } as ReservationUnitByPkType)
+      })
     ).toBe(false);
   });
 });
@@ -769,7 +943,7 @@ describe("isReservationStartInFuture", () => {
     expect(
       isReservationStartInFuture({
         reservationBegins: addMinutes(new Date(), 10),
-      } as ReservationUnitType)
+      } as unknown as ReservationUnitType)
     ).toBe(true);
   });
 
@@ -777,13 +951,13 @@ describe("isReservationStartInFuture", () => {
     expect(
       isReservationStartInFuture({
         reservationBegins: addMinutes(new Date(), -10),
-      } as ReservationUnitType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
 
     expect(
       isReservationStartInFuture({
         reservationBegins: new Date(),
-      } as ReservationUnitType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
 
     expect(isReservationStartInFuture({} as ReservationUnitType)).toBe(false);
@@ -794,14 +968,14 @@ describe("isReservationStartInFuture", () => {
       isReservationStartInFuture({
         reservationBegins: addDays(new Date(), 10),
         reservationsMaxDaysBefore: 9,
-      } as ReservationUnitType)
+      } as unknown as ReservationUnitType)
     ).toBe(true);
 
     expect(
       isReservationStartInFuture({
         reservationBegins: addDays(new Date(), 10),
         reservationsMaxDaysBefore: 10,
-      } as ReservationUnitType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
   });
 });
@@ -907,6 +1081,7 @@ describe("getAvailableTimes", () => {
           startTime: "04:00:00+00:00",
           endTime: "20:00:00+00:00",
           state: "open",
+          isReservable: true,
           periods: null,
         },
       ],
@@ -944,6 +1119,7 @@ describe("getAvailableTimes", () => {
           startTime: "04:00:00+00:00",
           endTime: "06:00:00+00:00",
           state: "open",
+          isReservable: true,
           periods: null,
         },
       ],
@@ -981,6 +1157,7 @@ describe("getOpenDays", () => {
           startTime: "04:00:00+00:00",
           endTime: "06:00:00+00:00",
           state: "open",
+          isReservable: true,
           periods: null,
         },
         {
@@ -988,6 +1165,7 @@ describe("getOpenDays", () => {
           startTime: "04:00:00+00:00",
           endTime: "06:00:00+00:00",
           state: "open",
+          isReservable: true,
           periods: null,
         },
         {
@@ -995,6 +1173,7 @@ describe("getOpenDays", () => {
           startTime: "04:00:00+00:00",
           endTime: "06:00:00+00:00",
           state: "open",
+          isReservable: false,
           periods: null,
         },
         {
@@ -1002,6 +1181,7 @@ describe("getOpenDays", () => {
           startTime: "04:00:00+00:00",
           endTime: "06:00:00+00:00",
           state: "open",
+          isReservable: true,
           periods: null,
         },
         {
@@ -1009,6 +1189,7 @@ describe("getOpenDays", () => {
           startTime: "04:00:00+00:00",
           endTime: "06:00:00+00:00",
           state: "open",
+          isReservable: true,
           periods: null,
         },
       ],
@@ -1017,7 +1198,6 @@ describe("getOpenDays", () => {
     expect(getOpenDays({ openingHours } as ReservationUnitByPkType)).toEqual([
       new Date("2022-08-10T00:00:00.000Z"),
       new Date("2022-08-12T00:00:00.000Z"),
-      new Date("2022-08-13T00:00:00.000Z"),
       new Date("2022-08-14T00:00:00.000Z"),
       new Date("2022-09-14T00:00:00.000Z"),
     ]);

@@ -981,6 +981,7 @@ const openingHoursQuery = graphql.query<
             endTime: "20:00:00+00:00",
             state: "open",
             periods: null,
+            isReservable: true,
           })),
         },
         reservations: [

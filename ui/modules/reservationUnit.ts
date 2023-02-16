@@ -391,6 +391,7 @@ export const mockOpeningTimes = Array.from(Array(100)).map((val, index) => ({
   endTime: "20:00:00+00:00",
   state: "open",
   periods: null,
+  isReservable: true,
 }));
 
 export const isReservationUnitPaidInFuture = (

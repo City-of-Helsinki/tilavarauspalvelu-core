@@ -16,6 +16,7 @@ import {
   isReservationInThePast,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
+import { toApiDate } from "common/src/common/util";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -406,6 +407,7 @@ describe("canReservationBeChanged", () => {
         endTime: "20:00:00+00:00",
         state: "open",
         periods: null,
+        isReservable: true,
       })),
     },
     reservations: [],
