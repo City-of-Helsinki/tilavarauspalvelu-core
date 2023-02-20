@@ -1,6 +1,7 @@
 {
   "home": "Kausivaraus",
   "search": "Haku",
+  "searchSingle": "Tilan varaus",
   "application": "Kausivaraushakemus",
   "criteria": "Hakuehdot",
   "singleReservations": "Yksittäisvaraukset",

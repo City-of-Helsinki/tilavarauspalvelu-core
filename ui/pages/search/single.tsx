@@ -28,6 +28,7 @@ import Sorting from "../../components/form/Sorting";
 import ClientOnly from "../../components/ClientOnly";
 import ListWithPagination from "../../components/common/ListWithPagination";
 import ReservationUnitCard from "../../components/single-search/ReservationUnitCard";
+import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 
 const pagingLimit = 36;
 
@@ -235,6 +236,7 @@ const SearchSingle = (): JSX.Element => {
         </Notification>
       ) : null}
       <HeadContainer>
+        <BreadcrumbWrapper route={["searchSingle"]} />
         <StyledContainer>
           <Heading>{t("search:single.heading")}</Heading>
           <SearchForm

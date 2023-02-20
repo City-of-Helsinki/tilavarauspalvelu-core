@@ -1,6 +1,7 @@
 {
   "home": "Säsongbokning",
   "search": "Sök",
+  "searchSingle": "Bokning av lokal",
   "application": "Säsongbokningsansökan",
   "criteria": "Ansökningsvillkor",
   "singleReservations": "Enstaka bokningar",
