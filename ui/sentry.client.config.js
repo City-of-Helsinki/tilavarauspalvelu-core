@@ -9,8 +9,10 @@ const SENTRY_ENVIRONMENT =
   process.env.SENTRY_ENVIRONMENT || process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT;
 const VERSION = process.env.npm_package_version;
 
-Sentry.init({
-  dsn: SENTRY_DSN,
-  environment: SENTRY_ENVIRONMENT,
-  release: `tilavarauspalvelu-ui@${VERSION}`,
-});
+SENTRY_DSN &&
+  SENTRY_ENVIRONMENT &&
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    environment: SENTRY_ENVIRONMENT,
+    release: `tilavarauspalvelu-ui@${VERSION}`,
+  });
