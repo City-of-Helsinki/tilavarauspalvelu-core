@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
@@ -31,6 +32,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
         cls.reservation_unit = ReservationUnitFactory(
             name="resu", unit=UnitFactory(name="mesta", tprek_id="1234")
         )
+        cls.recurring = RecurringReservationFactory()
         cls.reservation_data = {
             "reservee_type": CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
             "reservee_is_unregistered_association": False,
@@ -52,6 +54,9 @@ class ReservationStatisticsCreateTestCase(TestCase):
             "tax_percentage_value": 24,
             "price": 10,
             "working_memo": "its like that",
+            "non_subsidised_price": Decimal("11.00"),
+            "non_subsidised_price_net": Decimal("8.87"),
+            "recurring_reservation": cls.recurring,
         }
         cls.reservation = ReservationFactory(
             reservation_unit=[cls.reservation_unit], **cls.reservation_data
@@ -113,6 +118,18 @@ class ReservationStatisticsCreateTestCase(TestCase):
             self.reservation_unit.unit.tprek_id
         )
         assert_that(stat.ability_group_name).is_empty()
+        assert_that(stat.is_subsidised).is_true()
+        assert_that(stat.non_subsidised_price).is_equal_to(
+            self.reservation.non_subsidised_price
+        )
+        assert_that(stat.non_subsidised_price_net).is_equal_to(
+            self.reservation.non_subsidised_price_net
+        )
+        assert_that(stat.is_recurring).is_true()
+        assert_that(stat.recurrence_begin_date).is_equal_to(self.recurring.begin_date)
+        assert_that(stat.recurrence_end_date).is_equal_to(self.recurring.end_date)
+        assert_that(stat.recurrence_uuid).is_equal_to(str(self.recurring.uuid))
+        assert_that(stat.reservee_uuid).is_equal_to(str(self.reservation.user.tvp_uuid))
 
     def test_statistics_update_on_when_updating(self):
         self.reservation.purpose = ReservationPurposeFactory(name="Syy")

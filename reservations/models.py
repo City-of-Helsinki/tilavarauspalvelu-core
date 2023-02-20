@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
@@ -78,6 +79,7 @@ class ReservationDenyReason(models.Model):
 
 
 class RecurringReservation(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
     user = models.ForeignKey(
         User,
         verbose_name=_("User"),
@@ -622,6 +624,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         )
 
     def __create_or_update_reservation_statistics(self):
+        recurring = getattr(self, "recurring_reservation", None)
         stat, created = ReservationStatistic.objects.update_or_create(
             reservation=self,
             defaults={
@@ -639,7 +642,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
                 "age_group": self.age_group,
                 "age_group_min": getattr(self.age_group, "minimum", None),
                 "age_group_max": getattr(self.age_group, "maximum", None),
-                "is_applied": True if self.recurring_reservation else False,
+                "is_applied": getattr(recurring, "application", None) is not None,
                 "ability_group": getattr(
                     self.recurring_reservation, "ability_group", None
                 ),
@@ -654,6 +657,14 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
                 "deny_reason_text": getattr(self.deny_reason, "reason", ""),
                 "price": self.price,
                 "tax_percentage_value": self.tax_percentage_value,
+                "non_subsidised_price": self.non_subsidised_price,
+                "non_subsidised_price_net": self.non_subsidised_price_net,
+                "is_subsidised": self.price < self.non_subsidised_price,
+                "is_recurring": recurring is not None,
+                "recurrence_begin_date": getattr(recurring, "begin_date", None),
+                "recurrence_end_date": getattr(recurring, "end_date", None),
+                "recurrence_uuid": getattr(recurring, "uuid", ""),
+                "reservee_uuid": str(self.user.tvp_uuid) if self.user else "",
             },
         )
 
@@ -894,6 +905,38 @@ class ReservationStatistic(models.Model):
         decimal_places=2,
         default=0,
         help_text="The price of this particular reservation",
+    )
+    non_subsidised_price = models.DecimalField(
+        verbose_name=_("Non subsidised price"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="The non subsidised price of the reservation excluding VAT",
+    )
+    non_subsidised_price_net = models.DecimalField(
+        verbose_name=_("Non subsidised net price"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="The non subsidised price of the reservation excluding VAT",
+    )
+    is_subsidised = models.BooleanField(
+        help_text="Is the reservation price subsidised", default=False
+    )
+    is_recurring = models.BooleanField(
+        help_text="Is the reservation recurring", default=False
+    )
+    recurrence_begin_date = models.DateField(
+        verbose_name="Recurrence begin date", null=True
+    )
+    recurrence_end_date = models.DateField(
+        verbose_name="Recurrence end date", null=True
+    )
+    recurrence_uuid = models.CharField(
+        verbose_name="Recurrence UUID", max_length=255, default="", blank=True
+    )
+    reservee_uuid = models.CharField(
+        verbose_name="Reservee UUID", max_length=255, default="", blank=True
     )
     tax_percentage_value = models.DecimalField(
         verbose_name=_("Tax percentage value"),
