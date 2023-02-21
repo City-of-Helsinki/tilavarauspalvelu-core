@@ -117,3 +117,20 @@ class BirthdayResolverGetUserBirthDayTestCase(TestCase):
         response_mock.json.return_value = {"data": {"myProfile": None}}
 
         assert_that(self.reader.get_user_birthday()).is_none()
+
+    def test_get_token_with_no_bearer_prefix(self, gql_mock):
+        request = mock.MagicMock()
+        token = b"jwtokeny"
+        request.headers = {"X-Authorization": token}
+        reader = UserBirthdayReader(request)
+        expected_token = b"Bearer " + token
+
+        assert_that(reader.token).is_equal_to(expected_token)
+
+    def test_get_token_with_bearer_prefix(self, gql_mock):
+        request = mock.MagicMock()
+        token = b"Bearer jwtokeny"
+        request.headers = {"X-Authorization": token}
+        reader = UserBirthdayReader(request)
+
+        assert_that(reader.token).is_equal_to(token)
