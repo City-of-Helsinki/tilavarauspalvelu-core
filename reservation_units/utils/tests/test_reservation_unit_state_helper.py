@@ -47,31 +47,14 @@ class ReservationUnitStateHelperTestCase(TestCase):
             ReservationUnitState.SCHEDULED_PUBLISHING
         )
 
-    def test_get_state_with_scheduled_publishing_and_publish_end(self):
+    def test_get_state_with_scheduled_publishing_when_ends_in_past_begins_future(self):
         one_hour = datetime.timedelta(hours=1)
         self.reservation_unit.is_archived = False
         self.reservation_unit.is_draft = False
+        self.reservation_unit.publish_begins = self.now + one_hour
         self.reservation_unit.publish_ends = self.now - one_hour
         assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
             ReservationUnitState.SCHEDULED_PUBLISHING
-        )
-
-    def test_get_state_with_scheduled_reservation_and_reservation_begins(self):
-        one_hour = datetime.timedelta(hours=1)
-        self.reservation_unit.is_archived = False
-        self.reservation_unit.is_draft = False
-        self.reservation_unit.reservation_begins = self.now + one_hour
-        assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
-            ReservationUnitState.SCHEDULED_RESERVATION
-        )
-
-    def test_get_state_with_scheduled_reservation_and_reservation_ends(self):
-        one_hour = datetime.timedelta(hours=1)
-        self.reservation_unit.is_archived = False
-        self.reservation_unit.is_draft = False
-        self.reservation_unit.reservation_ends = self.now - one_hour
-        assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
-            ReservationUnitState.SCHEDULED_RESERVATION
         )
 
     def test_get_state_with_published(self):
@@ -79,4 +62,31 @@ class ReservationUnitStateHelperTestCase(TestCase):
         self.reservation_unit.is_draft = False
         assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
             ReservationUnitState.PUBLISHED
+        )
+
+    def test_get_state_with_hidden(self):
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.publish_begins = self.now - datetime.timedelta(hours=2)
+        self.reservation_unit.publish_ends = self.now - datetime.timedelta(hours=1)
+        assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
+            ReservationUnitState.HIDDEN
+        )
+
+    def test_get_state_with_scheduled_hiding(self):
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.publish_begins = self.now - datetime.timedelta(hours=1)
+        self.reservation_unit.publish_ends = self.now + datetime.timedelta(hours=1)
+        assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
+            ReservationUnitState.SCHEDULED_HIDING
+        )
+
+    def test_get_state_with_scheduled_period(self):
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.publish_begins = self.now + datetime.timedelta(hours=1)
+        self.reservation_unit.publish_ends = self.now + datetime.timedelta(days=1)
+        assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
+            ReservationUnitState.SCHEDULED_PERIOD
         )

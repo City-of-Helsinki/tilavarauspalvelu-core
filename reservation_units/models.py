@@ -5,12 +5,13 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
-from reservation_units.enums import ReservationUnitState
+from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.tasks import refresh_reservation_unit_product_mapping
 from resources.models import Resource
 from services.models import Service
@@ -189,7 +190,21 @@ class ReservationUnitPaymentType(models.Model):
         return self.code
 
 
+class ReservationUnitQuerySet(models.QuerySet):
+    def scheduled_for_publishing(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+        return self.filter(
+            Q(is_archived=False, is_draft=False)
+            & (
+                Q(publish_begins__isnull=False, publish_begins__gt=now)
+                | Q(publish_ends__isnull=False, publish_ends__lte=now)
+            )
+        )
+
+
 class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Model):
+    objects = ReservationUnitQuerySet.as_manager()
+
     sku = models.CharField(
         verbose_name=_("SKU"), max_length=255, blank=True, default=""
     )
@@ -637,6 +652,14 @@ class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Mod
         )
 
         return ReservationUnitStateHelper.get_state(self)
+
+    @property
+    def reservation_state(self) -> ReservationState:
+        from reservation_units.utils.reservation_unit_reservation_state_helper import (
+            ReservationUnitReservationStateHelper,
+        )
+
+        return ReservationUnitReservationStateHelper.get_state(self)
 
     def save(self, *args, **kwargs) -> None:
         super(ReservationUnit, self).save(*args, **kwargs)

@@ -21,34 +21,37 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         cls.archived_reservation_unit = ReservationUnitFactory(
             name="I am a draft!", is_archived=False, is_draft=True
         )
-        cls.scheduled_publishing_reservation_unit_1 = ReservationUnitFactory(
+        cls.scheduled_publishing_reservation_unit = ReservationUnitFactory(
             name="I am scheduled for publishing!",
             is_archived=False,
             is_draft=False,
             publish_begins=(now + datetime.timedelta(hours=1)),
         )
-        cls.scheduled_publishing_reservation_unit_2 = ReservationUnitFactory(
-            name="I am also scheduled for publishing!",
-            is_archived=False,
-            is_draft=False,
-            publish_ends=(now - datetime.timedelta(hours=1)),
-        )
-        cls.scheduled_reservation_reservation_unit_1 = ReservationUnitFactory(
-            name="I am scheduled for reservation!",
-            is_archived=False,
-            is_draft=False,
-            reservation_begins=(now + datetime.timedelta(hours=1)),
-        )
-        cls.scheduled_reservation_reservation_unit_2 = ReservationUnitFactory(
-            name="I am also scheduled for reservation!",
-            is_archived=False,
-            is_draft=False,
-            reservation_ends=(now - datetime.timedelta(hours=1)),
-        )
         cls.published_reservation_unit = ReservationUnitFactory(
             name="Yey! I'm published!",
             is_archived=False,
             is_draft=False,
+        )
+        cls.scheduled_period = ReservationUnitFactory(
+            name="I am scheduled period",
+            is_archived=False,
+            is_draft=False,
+            publish_begins=(now + datetime.timedelta(days=1)),
+            publish_ends=(now + datetime.timedelta(days=2)),
+        )
+        cls.scheduled_hiding = ReservationUnitFactory(
+            name="I am scheduled hiding",
+            is_archived=False,
+            is_draft=False,
+            publish_begins=(now - datetime.timedelta(days=1)),
+            publish_ends=(now + datetime.timedelta(days=1)),
+        )
+        cls.hidden = ReservationUnitFactory(
+            name="I am hidden",
+            is_archived=False,
+            is_draft=False,
+            publish_begins=(now - datetime.timedelta(days=2)),
+            publish_ends=(now - datetime.timedelta(days=1)),
         )
 
     # Archived reservation units are always hidden
@@ -115,27 +118,6 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_filtering_by_scheduled_reservation(self):
-        response = self.query(
-            """
-            query {
-                reservationUnits(state:"SCHEDULED_RESERVATION"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
     def test_filtering_by_published(self):
         response = self.query(
             """
@@ -162,6 +144,69 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
             """
             query {
                 reservationUnits(state:["DRAFT", "SCHEDULED_PUBLISHING"]){
+                    edges {
+                        node {
+                            nameFi
+                            state
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_scheduled_period(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(state:"SCHEDULED_PERIOD"){
+                    edges {
+                        node {
+                            nameFi
+                            state
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_scheduled_hiding(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(state:"SCHEDULED_HIDING"){
+                    edges {
+                        node {
+                            nameFi
+                            state
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_hidden(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(state:"HIDDEN"){
                     edges {
                         node {
                             nameFi

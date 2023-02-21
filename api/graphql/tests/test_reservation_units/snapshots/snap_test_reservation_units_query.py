@@ -976,7 +976,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                                 'nameFi': 'Small space'
                             }
                         ],
-                        'state': 'SCHEDULED_RESERVATION',
+                        'state': 'SCHEDULED_HIDING',
                         'surfaceArea': '150.00',
                         'termsOfUseFi': None
                     }
@@ -1810,6 +1810,81 @@ snapshots['ReservationUnitQueryTestCase::test_show_payment_product 1'] = {
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_that_reservation_state_is_reservable 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be reservable',
+                        'reservationState': 'RESERVABLE'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_that_reservation_state_is_reservation_closed 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be reservation closed',
+                        'reservationState': 'RESERVATION_CLOSED'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_that_reservation_state_is_scheduled_closing 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be scheduled closing',
+                        'reservationState': 'SCHEDULED_CLOSING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_that_reservation_state_is_scheduled_period 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be scheduled period',
+                        'reservationState': 'SCHEDULED_PERIOD'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_that_reservation_state_is_scheduled_reservation 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be scheduled reservation',
+                        'reservationState': 'SCHEDULED_RESERVATION'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_that_state_is_draft 1'] = {
     'data': {
         'reservationUnits': {
@@ -1825,6 +1900,21 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_draft 1'] = {
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_that_state_is_hidden 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be state hidden',
+                        'state': 'HIDDEN'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_that_state_is_published 1'] = {
     'data': {
         'reservationUnits': {
@@ -1833,6 +1923,36 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_published 1'] = {
                     'node': {
                         'nameFi': 'This should be published',
                         'state': 'PUBLISHED'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_hiding 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be scheduled hiding',
+                        'state': 'SCHEDULED_HIDING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_period 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'This should be scheduled period',
+                        'state': 'SCHEDULED_PERIOD'
                     }
                 }
             ]

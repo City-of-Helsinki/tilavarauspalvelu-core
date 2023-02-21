@@ -42,7 +42,7 @@ from permissions.api_permissions.graphene_permissions import (
     UnitPermission,
 )
 from permissions.helpers import can_manage_units, can_modify_reservation_unit
-from reservation_units.enums import ReservationUnitState
+from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -427,6 +427,7 @@ class ReservationUnitType(
     buffer_time_after = Duration()
     metadata_set = graphene.Field(ReservationMetadataSetType)
     state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
+    reservation_state = graphene.Field(graphene.Enum.from_enum(ReservationState))
     payment_types = graphene.List(ReservationUnitPaymentTypeType)
     payment_merchant = graphene.Field(PaymentMerchantType)
     payment_product = graphene.Field(PaymentProductType)
@@ -482,6 +483,7 @@ class ReservationUnitType(
             "allow_reservations_without_opening_hours",
             "is_archived",
             "state",
+            "reservation_state",
             "payment_merchant",
             "payment_product",
         ] + get_all_translatable_fields(model)

@@ -1979,6 +1979,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.is_draft = False
         self.reservation_unit.is_archived = False
         self.reservation_unit.publish_begins = now + datetime.timedelta(hours=1)
+        self.reservation_unit.publish_ends = None
         self.reservation_unit.save()
         response = self.query(
             f"""
@@ -1999,13 +2000,70 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_that_state_is_scheduled_reservation(self):
+    def test_that_state_is_scheduled_hiding(self):
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        self.reservation_unit.name = "This should be scheduled reservation"
+        self.reservation_unit.name = "This should be scheduled hiding"
         self.reservation_unit.is_draft = False
         self.reservation_unit.is_archived = False
-        self.reservation_unit.reservation_begins = now + datetime.timedelta(hours=1)
+        self.reservation_unit.publish_begins = now - datetime.timedelta(days=1)
+        self.reservation_unit.publish_ends = now + datetime.timedelta(days=2)
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_state_is_hidden(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be state hidden"
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.publish_begins = now - datetime.timedelta(days=2)
+        self.reservation_unit.publish_ends = now - datetime.timedelta(days=1)
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_state_is_scheduled_period(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be scheduled period"
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.publish_begins = now + datetime.timedelta(days=2)
+        self.reservation_unit.publish_ends = now + datetime.timedelta(days=3)
         self.reservation_unit.save()
         response = self.query(
             f"""
@@ -2044,6 +2102,136 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                         node {{
                             nameFi
                             state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_reservation_state_is_scheduled_reservation(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be scheduled reservation"
+        self.reservation_unit.reservation_begins = now + datetime.timedelta(hours=1)
+        self.reservation_unit.reservation_ends = None
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            reservationState
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_reservation_state_is_scheduled_period(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be scheduled period"
+        self.reservation_unit.reservation_begins = now + datetime.timedelta(hours=1)
+        self.reservation_unit.reservation_ends = now + datetime.timedelta(hours=2)
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            reservationState
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_reservation_state_is_reservable(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be reservable"
+        self.reservation_unit.reservation_begins = now - datetime.timedelta(hours=1)
+        self.reservation_unit.reservation_ends = None
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            reservationState
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_reservation_state_is_scheduled_closing(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be scheduled closing"
+        self.reservation_unit.reservation_begins = now - datetime.timedelta(hours=1)
+        self.reservation_unit.reservation_ends = now + datetime.timedelta(hours=2)
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            reservationState
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_reservation_state_is_reservation_closed(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be reservation closed"
+        self.reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
+        self.reservation_unit.reservation_ends = now - datetime.timedelta(hours=2)
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            reservationState
                         }}
                     }}
                 }}
