@@ -3,13 +3,7 @@ import uuid
 
 from auditlog.models import LogEntry
 
-from applications.models import (
-    Address,
-    Application,
-    ApplicationEvent,
-    Organisation,
-    Person,
-)
+from applications.models import Address, Application, ApplicationEvent, Person
 from reservations.models import Reservation
 
 FIRST_NAMES = [
@@ -77,6 +71,7 @@ def anonymize_user(user):
     user.email = f"{user.first_name}.{user.last_name}@anonymized.net"
     user.uuid = uuid.uuid4()
     user.username = f"anonymized-{user.uuid}"
+    user.date_of_birth = None
     user.save()
 
 
@@ -99,11 +94,10 @@ def anonymize_user_reservations(user):
         billing_address_zip="99999",
         billing_address_city="Anonymized",
         billing_address_street="Anonymized",
-        reservee_id="1234567-2",
-        reservee_organisation_name="Anonymized",
         working_memo="",
         free_of_charge_reason="Sensitive data of this reservation has been anonymized by a script",
         cancel_details="Sensitive data of this reservation has been anonymized by a script",
+        handling_details="Sensitive data of this reservation has been anonymized by a script",
     )
     audit_log_ids = LogEntry.objects.get_for_objects(reservations).values_list(
         "id", flat=True
@@ -123,26 +117,6 @@ def anonymize_user_applications(user):
         last_name=user.last_name,
         email=user.email,
         phone_number="",
-    )
-    Organisation.objects.filter(application__user=user).update(
-        name="Anonymized",
-        identifier="1234567-2",
-        email=user.email,
-        core_business="Anonymized",
-        core_business_fi="Anonymized",
-        core_business_en="Anonymized",
-        core_business_sv="Anonymized",
-    )
-    Address.objects.filter(organisation__application__user=user).update(
-        post_code="99999",
-        street_address="Anonymized",
-        street_address_fi="Anonymized",
-        street_address_en="Anonymized",
-        street_address_sv="Anonymized",
-        city="Anonymized",
-        city_fi="Anonymized",
-        city_en="Anonymized",
-        city_sv="Anonymized",
     )
     Address.objects.filter(application__user=user).update(
         post_code="99999",

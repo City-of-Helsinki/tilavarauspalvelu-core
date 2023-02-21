@@ -21,6 +21,7 @@ class ProfileUser(SerializableMixin):
     serialize_fields = (
         {"name": "user", "accessor": lambda u: u.get_full_name()},
         {"name": "email"},
+        {"name": "date_of_birth"},
         {"name": "reservations"},
         {"name": "applications"},
     )
@@ -138,6 +139,10 @@ class ProfileUser(SerializableMixin):
     @property
     def email(self):
         return self.user.email
+
+    @property
+    def date_of_birth(self):
+        return self.user.date_of_birth
 
 
 class TilavarauspalveluGDPRAPIView(GDPRAPIView):
