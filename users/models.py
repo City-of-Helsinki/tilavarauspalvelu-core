@@ -64,3 +64,5 @@ class PersonalInfoViewLog(models.Model):
         editable=False,
     )
     access_time = models.DateTimeField(auto_now=True, editable=False)
+    viewer_user_email = models.CharField(max_length=255, default="", blank=True)
+    viewer_user_full_name = models.CharField(max_length=255, default="", blank=True)

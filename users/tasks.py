@@ -18,4 +18,6 @@ def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str):
         viewer_user=viewer_user,
         viewer_username=viewer_user.username,
         field=field,
+        viewer_user_full_name=viewer_user.get_full_name(),
+        viewer_user_email=viewer_user.email,
     )
