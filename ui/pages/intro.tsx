@@ -55,6 +55,7 @@ const Intro = (): JSX.Element => {
   const { t } = useTranslation();
 
   useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS, {
+    fetchPolicy: "no-cache",
     onCompleted: (data) => {
       const now = new Date();
       const ars = data?.applicationRounds?.edges

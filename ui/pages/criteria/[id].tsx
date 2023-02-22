@@ -27,6 +27,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const id = Number(params.id);
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
+    fetchPolicy: "no-cache",
     query: APPLICATION_ROUNDS,
   });
   const applicationRound = data?.applicationRounds?.edges
