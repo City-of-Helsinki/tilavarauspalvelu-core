@@ -7,13 +7,22 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 from helusers.settings import api_token_auth_settings
 from jose import jwt
 from rest_framework.test import APITestCase
 
 from api.tests.test_gdpr.gdpr_key import rsa_key
-from applications.tests.factories import AddressFactory, ApplicationFactory
+from applications.models import ApplicationStatus
+from applications.tests.factories import (
+    AddressFactory,
+    ApplicationFactory,
+    ApplicationStatusFactory,
+)
+from merchants.models import OrderStatus
+from merchants.tests.factories import PaymentOrderFactory
+from reservations.models import STATE_CHOICES as ReservationState
 from reservations.tests.factories import ReservationFactory
 
 User = get_user_model()
@@ -131,6 +140,68 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
         self.user.refresh_from_db()
         assert_that(self.user.uuid).is_not_equal_to(old_uuid)
         assert_that(self.user.username).contains("anonymized")
+        assert_that(self.user.pk).is_not_none()
+
+    @requests_mock.Mocker()
+    def test_delete_user_does_not_anonymize_data_when_open_payments(self, req_mock):
+        reservation = ReservationFactory(user=self.user)
+        PaymentOrderFactory(
+            reservation=reservation, status=OrderStatus.DRAFT, remote_id=uuid.uuid4()
+        )
+
+        auth_header = self.get_auth_header(
+            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
+        )
+        old_uuid = self.user.uuid
+        self.client.credentials(HTTP_AUTHORIZATION=auth_header)
+        response = self.client.delete(self.url)
+
+        assert_that(response.status_code).is_equal_to(403)
+
+        self.user.refresh_from_db()
+        assert_that(self.user.uuid).is_equal_to(old_uuid)
+        assert_that(self.user.username).does_not_contain("anonymized")
+        assert_that(self.user.pk).is_not_none()
+
+    @requests_mock.Mocker()
+    def test_delete_user_does_not_anonymize_data_when_open_reservations(self, req_mock):
+        begin = timezone.now()
+        end = begin + datetime.timedelta(hours=2)
+        ReservationFactory(
+            user=self.user, begin=begin, end=end, state=ReservationState.CREATED
+        )
+
+        auth_header = self.get_auth_header(
+            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
+        )
+        old_uuid = self.user.uuid
+        self.client.credentials(HTTP_AUTHORIZATION=auth_header)
+        response = self.client.delete(self.url)
+
+        assert_that(response.status_code).is_equal_to(403)
+
+        self.user.refresh_from_db()
+        assert_that(self.user.uuid).is_equal_to(old_uuid)
+        assert_that(self.user.username).does_not_contain("anonymized")
+        assert_that(self.user.pk).is_not_none()
+
+    @requests_mock.Mocker()
+    def test_delete_user_does_not_anonymize_data_when_open_applications(self, req_mock):
+        app = ApplicationFactory(user=self.user)
+        ApplicationStatusFactory(application=app, status=ApplicationStatus.ALLOCATED)
+
+        auth_header = self.get_auth_header(
+            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
+        )
+        old_uuid = self.user.uuid
+        self.client.credentials(HTTP_AUTHORIZATION=auth_header)
+        response = self.client.delete(self.url)
+
+        assert_that(response.status_code).is_equal_to(403)
+
+        self.user.refresh_from_db()
+        assert_that(self.user.uuid).is_equal_to(old_uuid)
+        assert_that(self.user.username).does_not_contain("anonymized")
         assert_that(self.user.pk).is_not_none()
 
     @requests_mock.Mocker()
