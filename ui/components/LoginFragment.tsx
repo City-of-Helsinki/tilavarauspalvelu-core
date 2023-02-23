@@ -1,10 +1,9 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { UserProfile } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
-import { authEnabled, isBrowser } from "../modules/const";
-import RequireAuthentication from "./common/RequireAuthentication";
+import { signIn, useSession } from "next-auth/react";
+import { authEnabled, authenticationIssuer, isBrowser } from "../modules/const";
 import { MediumButton } from "../styles/util";
 
 type Props = {
@@ -53,53 +52,42 @@ const LoginFragment = ({
   isActionDisabled,
   actionCallback,
 }: Props): JSX.Element => {
-  type InnerProps = {
-    profile: UserProfile | null;
-  };
-
+  const session = useSession();
   const { t } = useTranslation();
 
-  const [shouldLogin, setShouldLogin] = React.useState(false);
+  const isAuthenticated = session?.status === "authenticated";
 
-  if (shouldLogin) {
-    return (
-      <RequireAuthentication>
-        <div />
-      </RequireAuthentication>
-    );
-  }
+  const [shouldLogin, setShouldLogin] = React.useState(false);
 
   if (!isBrowser) {
     return null;
   }
 
-  const WithOidc = require("./common/WithOidc").default;
+  if (shouldLogin) {
+    signIn(authenticationIssuer, {
+      callbackUrl: window.location.href,
+    });
+  }
 
-  return (
-    <WithOidc
-      render={({ profile }: InnerProps) => {
-        return !profile && authEnabled ? (
-          <Wrapper>
-            <SubmitButton
-              onClick={() => {
-                if (actionCallback) {
-                  actionCallback();
-                }
-                setShouldLogin(true);
-              }}
-              aria-label={t("reservationCalendar:loginAndReserve")}
-              className="login-fragment__button--login"
-              disabled={isActionDisabled}
-            >
-              {t("reservationCalendar:loginAndReserve")}
-            </SubmitButton>
-            {text}
-          </Wrapper>
-        ) : (
-          componentIfAuthenticated
-        );
-      }}
-    />
+  return !isAuthenticated && authEnabled ? (
+    <Wrapper>
+      <SubmitButton
+        onClick={() => {
+          if (actionCallback) {
+            actionCallback();
+          }
+          setShouldLogin(true);
+        }}
+        aria-label={t("reservationCalendar:loginAndReserve")}
+        className="login-fragment__button--login"
+        disabled={isActionDisabled}
+      >
+        {t("reservationCalendar:loginAndReserve")}
+      </SubmitButton>
+      {text}
+    </Wrapper>
+  ) : (
+    <Wrapper>{componentIfAuthenticated}</Wrapper>
   );
 };
 

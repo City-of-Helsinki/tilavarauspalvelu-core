@@ -499,9 +499,9 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     <SubmitButtonWrapper>
       <LoginFragment
         isActionDisabled={!isReservable}
-        actionCallback={() => {
-          setStoredReservation({ ...reservation, pk: reservationUnit.pk });
-        }}
+        actionCallback={() =>
+          setStoredReservation({ ...reservation, pk: reservationUnit.pk })
+        }
         componentIfAuthenticated={
           <SubmitButton
             onClick={() => {

@@ -1,13 +1,9 @@
-import { NextApiRequest } from "next";
-import axios, { AxiosRequestConfig } from "axios";
-import createAuthRefreshInterceptor from "axios-auth-refresh";
+import axios from "axios";
 import applyCaseMiddleware from "axios-case-converter";
-import { isBrowser, authEnabled, PROFILE_TOKEN_HEADER } from "../const";
-import {
-  getAccessToken,
-  getApiAccessTokens,
-  updateApiAccessTokens,
-} from "./util";
+
+import { getSession } from "next-auth/react";
+import { ExtendedSession } from "../../pages/api/auth/[...nextauth]";
+import { authEnabled, isBrowser, PROFILE_TOKEN_HEADER } from "../const";
 
 const axiosOptions = {
   timeout: 20000,
@@ -18,41 +14,21 @@ const axiosOptions = {
 };
 
 const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
+
 if (isBrowser && authEnabled) {
-  axiosClient.interceptors.request.use(
-    (req: AxiosRequestConfig & NextApiRequest) => {
-      const [apiAccessToken, profileApiAccessToken] = getApiAccessTokens();
+  axiosClient.interceptors.request.use(async (req) => {
+    const session = (await getSession()) as ExtendedSession;
 
-      if (apiAccessToken) {
-        req.headers.Authorization = `Bearer ${apiAccessToken}`;
-      }
-      if (profileApiAccessToken) {
-        req.headers[PROFILE_TOKEN_HEADER] = `${profileApiAccessToken}`;
-      }
-      return req;
+    if (session?.apiTokens?.tilavaraus) {
+      req.headers.Authorization = `Bearer ${session.apiTokens.tilavaraus}`;
     }
-  );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const refreshAuthLogic = (failedRequest: any) => {
-    const accessToken = getAccessToken();
-    return updateApiAccessTokens(accessToken).then((apiAccessTokens) => {
-      const [apiAccessToken, profileApiAccessToken] = apiAccessTokens;
-      if (apiAccessToken) {
-        // eslint-disable-next-line no-param-reassign
-        failedRequest.response.config.headers.Authorization = `Bearer ${apiAccessToken}`;
-      }
-      if (profileApiAccessToken) {
-        // eslint-disable-next-line no-param-reassign
-        failedRequest.response.config.headers[
-          PROFILE_TOKEN_HEADER
-        ] = `${profileApiAccessToken}`;
-      }
-      return Promise.resolve();
-    });
-  };
+    if (session?.apiTokens?.profile) {
+      req.headers[PROFILE_TOKEN_HEADER] = `${session?.apiTokens.profile}`;
+    }
 
-  createAuthRefreshInterceptor(axiosClient, refreshAuthLogic);
+    return req;
+  });
 }
 
 export default axiosClient;

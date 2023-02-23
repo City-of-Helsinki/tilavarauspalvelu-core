@@ -19,3 +19,4 @@ export {
 };
 
 export * from "./types/common";
+export * from "./src/themeConfig";

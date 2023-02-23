@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import Navigation from "./Navigation";
 import Footer from "./Footer";
+import { Navigation } from "./Navigation";
 import ServiceNotification from "./ServiceNotification";
 import Title from "./Title";
 

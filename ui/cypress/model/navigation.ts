@@ -1,9 +1,9 @@
 export function languageSelector(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get(".navigation__language-selector--button").last();
+  return cy.get("#languageSelector-button");
 }
 
 export function languageSelectorMenu(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return languageSelector().find("#languageSelector-menu");
+  return cy.get("#languageSelector-menu");
 }
 
 export function languageSelectorMenuItem(

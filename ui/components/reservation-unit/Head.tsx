@@ -137,10 +137,6 @@ const Head = ({
     true
   );
 
-  // const openingTimesTextArr = activeOpeningTimes?.map((openingTime, index) =>
-  //   getDayOpeningTimes(openingTime, index)
-  // );
-
   const pricing = getActivePricing(reservationUnit);
   const unitPrice = getPrice({ pricing });
 

@@ -1,8 +1,4 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosHeaders,
-  RawAxiosRequestHeaders,
-} from "axios";
+import axios from "axios";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import applyCaseMiddleware from "axios-case-converter";
 import { authEnabled } from "../const";
@@ -18,15 +14,7 @@ const axiosOptions = {
 const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
 const apiAccessToken = getApiAccessToken();
 
-type RequestParams = Omit<AxiosRequestConfig, "headers"> & {
-  headers?: (RawAxiosRequestHeaders | AxiosHeaders) & {
-    Authorization?: string;
-  };
-};
-
-axiosClient.interceptors.request.use((req: RequestParams) => {
-  if (!req.headers) req.headers = {};
-
+axiosClient.interceptors.request.use((req) => {
   if (apiAccessToken) {
     req.headers.Authorization = `Bearer ${apiAccessToken}`;
   }

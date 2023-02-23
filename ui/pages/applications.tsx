@@ -17,7 +17,6 @@ import {
 } from "common/types/gql-types";
 import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
-import RequireAuthentication from "../components/common/RequireAuthentication";
 import { CenterSpinner } from "../components/common/common";
 import { APPLICATIONS } from "../modules/queries/application";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
@@ -77,7 +76,7 @@ const ApplicationGroups = ({
   );
 };
 
-const Applications = (): JSX.Element => {
+const ApplicationsPage = (): JSX.Element => {
   const { t } = useTranslation();
 
   const [state, setState] = useState<"loading" | "error" | "done">("loading");
@@ -169,56 +168,55 @@ const Applications = (): JSX.Element => {
   return (
     <>
       <Head />
-      <RequireAuthentication>
-        <Container>
-          {state === "done" ? (
-            <ApplicationGroups
-              t={t}
-              rounds={rounds}
-              applications={applications}
-              actionCallback={actionCallback}
-            />
-          ) : state === "error" ? (
-            <Notification
-              type="error"
-              label={t("common:error.error")}
-              position="top-center"
-            >
-              {t("common:error.dataError")}
-            </Notification>
-          ) : (
-            state === "loading" && <CenterSpinner />
-          )}
-        </Container>
-        {cancelled && (
-          <Notification
-            type="success"
-            position="top-center"
-            dismissible
-            autoClose
-            onClose={() => setCancelled(false)}
-            closeButtonLabelText={t("common:close")}
-            displayAutoCloseProgress={false}
-          >
-            {t("applicationCard:cancelled")}
-          </Notification>
-        )}
-        {cancelError && (
+
+      <Container>
+        {state === "done" ? (
+          <ApplicationGroups
+            t={t}
+            rounds={rounds}
+            applications={applications}
+            actionCallback={actionCallback}
+          />
+        ) : state === "error" ? (
           <Notification
             type="error"
+            label={t("common:error.error")}
             position="top-center"
-            dismissible
-            autoClose
-            onClose={() => setCancelError(false)}
-            closeButtonLabelText={t("common:close")}
-            displayAutoCloseProgress={false}
           >
-            {t("applicationCard:cancelFailed")}
+            {t("common:error.dataError")}
           </Notification>
+        ) : (
+          state === "loading" && <CenterSpinner />
         )}
-      </RequireAuthentication>
+      </Container>
+      {cancelled && (
+        <Notification
+          type="success"
+          position="top-center"
+          dismissible
+          autoClose
+          onClose={() => setCancelled(false)}
+          closeButtonLabelText={t("common:close")}
+          displayAutoCloseProgress={false}
+        >
+          {t("applicationCard:cancelled")}
+        </Notification>
+      )}
+      {cancelError && (
+        <Notification
+          type="error"
+          position="top-center"
+          dismissible
+          autoClose
+          onClose={() => setCancelError(false)}
+          closeButtonLabelText={t("common:close")}
+          displayAutoCloseProgress={false}
+        >
+          {t("applicationCard:cancelFailed")}
+        </Notification>
+      )}
     </>
   );
 };
 
-export default Applications;
+export default ApplicationsPage;

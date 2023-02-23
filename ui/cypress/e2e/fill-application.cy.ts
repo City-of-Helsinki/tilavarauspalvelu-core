@@ -276,6 +276,6 @@ describe("application", () => {
       ],
     };
 
-    checkBreadcrumbs({ breadcrumbs, url: "/application/138/sent" });
+    checkBreadcrumbs({ breadcrumbs });
   });
 });

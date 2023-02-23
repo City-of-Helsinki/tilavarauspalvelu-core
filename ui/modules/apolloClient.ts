@@ -1,115 +1,56 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  fromPromise,
-  HttpLink,
-  InMemoryCache,
-  from,
-} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
-import {
-  getAccessToken,
-  getApiAccessTokens,
-  updateApiAccessTokens,
-} from "./auth/util";
+import { getSession, signOut } from "next-auth/react";
+import { GraphQLError } from "graphql";
+
 import {
   apiBaseUrl,
-  authEnabled,
   isBrowser,
   PROFILE_TOKEN_HEADER,
+  SESSION_EXPIRED_ERROR,
 } from "./const";
+import { ExtendedSession } from "../pages/api/auth/[...nextauth]";
 
-// list of operations that need authentication
-const needsAuthentication = ["listReservations", "reservationByPk"];
+const authLink = setContext(
+  async (notUsed, { headers }: { headers: Headers }) => {
+    const session = (await getSession()) as ExtendedSession;
 
-const getNewToken = (): Promise<[string, string]> =>
-  updateApiAccessTokens(getAccessToken());
-
-const authLink = new ApolloLink((operation, forward) => {
-  const [apiAccessToken, profileApiAccessToken] = getApiAccessTokens();
-
-  if (!apiAccessToken) {
-    return fromPromise(
-      getNewToken().catch(() => {
-        // TODO Handle token refresh error
-        if (authEnabled) {
-          if (needsAuthentication.includes(operation.operationName)) {
-            return false;
-          }
-        }
-
-        return forward(operation);
-      })
-    )
-      .filter((value) => Boolean(value))
-      .flatMap((accessTokens) => {
-        if (Array.isArray(accessTokens)) {
-          const oldHeaders = operation.getContext().headers;
-          const [newApiAccessToken, newProfileApiAccessToken] =
-            accessTokens || ["", ""];
-          operation.setContext({
-            headers: {
-              ...oldHeaders,
-              authorization: `Bearer ${newApiAccessToken}`,
-              [PROFILE_TOKEN_HEADER]: newProfileApiAccessToken,
-            },
-          });
-        }
-        return forward(operation);
-      });
+    const modifiedHeader = {
+      headers: {
+        ...headers,
+        authorization: session?.apiTokens?.tilavaraus
+          ? `Bearer ${session.apiTokens.tilavaraus}`
+          : "",
+        [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
+      },
+    };
+    return modifiedHeader;
   }
-  operation.setContext(({ headers }) => ({
-    headers: {
-      ...headers,
-      authorization: apiAccessToken ? `Bearer ${apiAccessToken}` : "",
-      [PROFILE_TOKEN_HEADER]: profileApiAccessToken || "",
-    },
-  }));
+);
 
-  return forward(operation);
-});
+const handleSignOut = async () => {
+  await signOut();
+};
 
-// eslint-disable-next-line consistent-return
-const errorLink = onError(({ graphQLErrors, operation, forward }) => {
+const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    const authError = graphQLErrors.find((e) => {
-      return (
-        e.message !== null &&
-        (e.message.indexOf("AnonymousUser") !== -1 ||
-          e.message.indexOf("has expired") !== -1 ||
-          e.message.indexOf("too old") !== -1 ||
-          e.message.indexOf("No permission to mutate") !== -1)
-      );
-    });
+    const isSessionExpired = graphQLErrors.some((error) =>
+      error.message.includes(SESSION_EXPIRED_ERROR)
+    );
 
-    const hasAuthError = Boolean(authError !== undefined); // token has expired?
-
-    if (hasAuthError) {
-      return fromPromise(
-        getNewToken().catch(() => {
-          // TODO Handle token refresh error
-          return false;
-        })
-      )
-        .filter((value) => Boolean(value))
-        .flatMap((accessTokens) => {
-          if (Array.isArray(accessTokens)) {
-            const [newApiAccessToken, newProfileApiAccessToken] =
-              accessTokens || ["", ""];
-
-            const oldHeaders = operation.getContext().headers;
-            operation.setContext({
-              headers: {
-                ...oldHeaders,
-                authorization: `Bearer ${newApiAccessToken}`,
-                [PROFILE_TOKEN_HEADER]: newProfileApiAccessToken,
-              },
-            });
-          }
-          return forward(operation);
-        });
+    if (isSessionExpired) {
+      handleSignOut();
     }
+
+    graphQLErrors.forEach(async (error: GraphQLError) => {
+      console.error(`GQL_ERROR: ${error.message}`);
+    });
+  }
+
+  if (networkError) {
+    console.error(`NETWORK_ERROR: ${networkError.message}`);
   }
 });
 
@@ -126,14 +67,14 @@ const client = new ApolloClient({
     },
   }),
   link: isBrowser ? from([errorLink, authLink, httpLink]) : from([httpLink]),
-  ssrMode: typeof window === undefined,
+  ssrMode: !isBrowser,
   defaultOptions: {
     watchQuery: {
       errorPolicy: "ignore",
     },
     query: {
       errorPolicy: "ignore",
-      fetchPolicy: typeof window === undefined ? "no-cache" : "cache-first",
+      fetchPolicy: isBrowser ? "cache-first" : "no-cache",
     },
   },
 });

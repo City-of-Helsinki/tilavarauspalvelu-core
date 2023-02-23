@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation, UserConfig } from "next-i18next";
+import type { AppProps } from "next/app";
 import { fi } from "date-fns/locale";
+import { SessionProvider } from "next-auth/react";
 import { format, isValid } from "date-fns";
-
-import { OidcProvider } from "@axa-fr/react-oidc-context";
-import { AppProps } from "next/app";
+import { ThemeProvider } from "styled-components";
+import { theme } from "common";
 import PageWrapper from "../components/common/PageWrapper";
-
 import ExternalScripts from "../components/ExternalScripts";
 import { DataContextProvider } from "../context/DataContext";
 import apolloClient from "../modules/apolloClient";
-import oidcConfiguration from "../modules/auth/configuration";
-import { isBrowser, mockRequests } from "../modules/const";
+import {
+  authenticationApiRoute,
+  isBrowser,
+  mockRequests,
+} from "../modules/const";
 import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
-import LoggingIn from "../components/common/LoggingIn";
-
-import { FullscreenSpinner } from "../components/common/FullscreenSpinner";
-import SessionLost from "../components/common/SessionLost";
+import { initMocks } from "../mocks";
 
 if (mockRequests) {
-  require("../mocks");
+  initMocks();
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -53,19 +53,18 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     <>
       <DataContextProvider>
         <TrackingWrapper>
-          <OidcProvider
-            configuration={oidcConfiguration}
-            callbackSuccessComponent={LoggingIn}
-            loadingComponent={FullscreenSpinner}
-            authenticatingComponent={FullscreenSpinner}
-            sessionLostComponent={SessionLost}
+          <SessionProvider
+            session={pageProps.session}
+            basePath={authenticationApiRoute}
           >
             <ApolloProvider client={apolloClient}>
-              <PageWrapper {...pageProps}>
-                <Component {...pageProps} />
-              </PageWrapper>
+              <ThemeProvider theme={theme}>
+                <PageWrapper {...pageProps}>
+                  <Component {...pageProps} />
+                </PageWrapper>
+              </ThemeProvider>
             </ApolloProvider>
-          </OidcProvider>
+          </SessionProvider>
         </TrackingWrapper>
       </DataContextProvider>
       <ExternalScripts />

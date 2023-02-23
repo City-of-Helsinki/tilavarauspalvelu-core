@@ -13,7 +13,6 @@ import { saveApplication } from "../modules/api";
 import { applicationRoundState, deepCopy } from "../modules/util";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
 import { MediumButton } from "../styles/util";
-import RequireAuthentication from "../components/common/RequireAuthentication";
 import Head from "../components/application/Head";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { CenterSpinner } from "../components/common/common";
@@ -45,7 +44,7 @@ const Container = styled.div`
   }
 `;
 
-const Intro = (): JSX.Element => {
+const IntroPage = (): JSX.Element => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
   const [applicationRounds, setApplicationRounds] = useState<OptionType[]>([]);
@@ -97,7 +96,7 @@ const Intro = (): JSX.Element => {
   };
 
   return (
-    <RequireAuthentication>
+    <>
       <Head noKoros heading={t("application:Intro.heading")}>
         <Container>
           {applicationRounds.length > 0 ? (
@@ -142,8 +141,8 @@ const Intro = (): JSX.Element => {
           {error}
         </Notification>
       ) : null}
-    </RequireAuthentication>
+    </>
   );
 };
 
-export default Intro;
+export default IntroPage;

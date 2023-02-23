@@ -600,11 +600,9 @@ const Application = () => {
                   {recurringReservations &&
                     recurringReservations.length > 0 && (
                       <Accordion
-                        heading={
-                          t(
-                            "Application.summaryOfAllocatedApplicationEvents"
-                          ) as string
-                        }
+                        heading={t(
+                          "Application.summaryOfAllocatedApplicationEvents"
+                        )}
                         defaultOpen={false}
                       >
                         <NarrowContainer

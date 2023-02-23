@@ -34,14 +34,9 @@ import {
   getTranslation,
   uiDateToApiDate,
 } from "../../modules/util";
-import RequireAuthentication from "../../components/common/RequireAuthentication";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
 import apolloClient from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
-
-type Props = {
-  tos: TermsOfUseType[];
-};
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const { data: tosData } = await apolloClient.query<
@@ -63,7 +58,11 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const Application = ({ tos }: Props): JSX.Element | null => {
+type Props = {
+  tos: TermsOfUseType[];
+};
+
+const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const [error, setError] = useState<string | null>();
@@ -300,10 +299,4 @@ const Application = ({ tos }: Props): JSX.Element | null => {
   );
 };
 
-const AppWithAuthentication = ({ tos }: Props): JSX.Element => (
-  <RequireAuthentication>
-    <Application tos={tos} />
-  </RequireAuthentication>
-);
-
-export default AppWithAuthentication;
+export default ApplicationRootPage;

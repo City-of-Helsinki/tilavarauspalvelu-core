@@ -108,22 +108,17 @@ export const isBrowser = typeof window !== "undefined";
 
 export const PROFILE_TOKEN_HEADER = "X-Authorization";
 
+export const SESSION_EXPIRED_ERROR = "JWT too old";
+
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 export const {
-  sentryDSN,
   cookiehubEnabled,
   matomoEnabled,
   hotjarEnabled,
-  sentryEnvironment,
-  oidcClientId,
-  oidcUrl,
-  oidcScope,
-  apiScope,
-  profileApiScope,
-  mapboxToken,
-  apiTokenUrl,
   mockRequests,
+  mapboxToken,
+  baseUrl,
 } = publicRuntimeConfig;
 
 export const apiBaseUrl = isBrowser
@@ -132,3 +127,7 @@ export const apiBaseUrl = isBrowser
 export const authEnabled = isBrowser
   ? publicRuntimeConfig.authEnabled
   : serverRuntimeConfig.authEnabled;
+
+export const authenticationIssuer = "tunnistamo";
+export const authenticationApiRoute = "/api/auth";
+export const authenticationLogoutApiRoute = "/api/auth/logout";

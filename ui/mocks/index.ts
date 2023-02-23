@@ -12,6 +12,4 @@ const initMocks = async () => {
   }
 };
 
-initMocks();
-
-export {};
+export { initMocks };
