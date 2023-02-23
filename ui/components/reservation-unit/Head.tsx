@@ -7,7 +7,10 @@ import { isReservationStartInFuture } from "common/src/calendar/util";
 import { formatSecondDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationUnitByPkType } from "common/types/gql-types";
+import {
+  ReservationUnitByPkType,
+  ReservationUnitsReservationUnitReservationKindChoices,
+} from "common/types/gql-types";
 import { omit } from "lodash";
 import { useLocalStorage } from "react-use";
 import {
@@ -238,7 +241,14 @@ const Head = ({
               {!isReservable &&
                 !isReservationStartInFuture(reservationUnit) && (
                   <StyledAltNotification
-                    text={t("reservationUnit:notifications.notReservable")}
+                    text={t(
+                      `reservationUnit:notifications.${
+                        reservationUnit.reservationKind ===
+                        ReservationUnitsReservationUnitReservationKindChoices.Direct
+                          ? "notReservable"
+                          : "onlyRecurring"
+                      }`
+                    )}
                     type="alert"
                   />
                 )}

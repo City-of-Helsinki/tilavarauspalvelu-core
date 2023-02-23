@@ -1,7 +1,6 @@
-import { IconGroup, IconCheck, IconPlus } from "hds-react";
+import { IconGroup, IconCheck, IconPlus, IconLinkExternal } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import Link from "next/link";
 import NextImage from "next/image";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
@@ -13,7 +12,12 @@ import {
   getTranslation,
 } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
-import { MediumButton, pixel, truncatedText } from "../../styles/util";
+import {
+  BlackButton,
+  MediumButton,
+  pixel,
+  truncatedText,
+} from "../../styles/util";
 import { reservationUnitPrefix } from "../../modules/const";
 import {
   getReservationUnitName,
@@ -78,35 +82,37 @@ const Bottom = styled.span`
     }
   }
 
-  @media (min-width: ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.l}) {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 2fr;
     gap: var(--spacing-l);
   }
 `;
 
 const Props = styled.div`
   display: block;
+  margin-bottom: var(--spacing-s);
 
-  @media (min-width: ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.m}) {
     display: flex;
     gap: var(--spacing-l);
   }
 `;
 
 const Actions = styled.div`
-  display: block;
-  padding: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-s) 0 var(--spacing-s) 0;
+  gap: var(--spacing-s);
 
   > button {
     white-space: nowrap;
   }
 
   @media (min-width: ${breakpoints.m}) {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row;
     padding: 0;
+    justify-content: flex-end;
   }
 `;
 
@@ -128,15 +134,6 @@ const Image = styled.img`
   @media (min-width: ${breakpoints.l}) {
     max-height: 150px;
   }
-`;
-
-const StyledLink = styled(Link)`
-  color: var(--color-black-90);
-  display: inline;
-`;
-
-const StyledInlineLink = styled(StyledLink)`
-  display: inline;
 `;
 
 const StyledIconWithText = styled(IconWithText)`
@@ -172,20 +169,14 @@ const ReservationUnitCard = ({
 
   return (
     <Container>
-      <StyledLink href={link}>
-        <Image
-          alt={t("common:imgAltForSpace", {
-            name,
-          })}
-          src={getMainImage(reservationUnit)?.smallUrl || pixel}
-        />
-      </StyledLink>
+      <Image
+        alt={t("common:imgAltForSpace", {
+          name,
+        })}
+        src={getMainImage(reservationUnit)?.smallUrl || pixel}
+      />
       <MainContent>
-        <Name>
-          <StyledInlineLink href={link} title={name}>
-            {name}
-          </StyledInlineLink>
-        </Name>
+        <Name>{name}</Name>
         <Description>
           {unitName}
           {addressString && (
@@ -228,23 +219,32 @@ const ReservationUnitCard = ({
             ) : null}
           </Props>
           <Actions>
-            <div style={{ flexGrow: 1 }} />
             {containsReservationUnit(reservationUnit) ? (
               <MediumButton
-                iconLeft={<IconCheck />}
+                iconRight={<IconCheck />}
                 onClick={() => removeReservationUnit(reservationUnit)}
+                data-testid="reservation-unit-card__button--select"
               >
                 {t("common:removeReservationUnit")}
               </MediumButton>
             ) : (
-              <MediumButton
-                iconLeft={<IconPlus />}
+              <BlackButton
+                iconRight={<IconPlus />}
                 onClick={() => selectReservationUnit(reservationUnit)}
                 variant="secondary"
+                data-testid="reservation-unit-card__button--select"
               >
                 {t("common:selectReservationUnit")}
-              </MediumButton>
+              </BlackButton>
             )}
+            <BlackButton
+              variant="secondary"
+              iconRight={<IconLinkExternal aria-hidden />}
+              onClick={() => window.open(link, "_blank")}
+              data-testid="reservation-unit-card__button--link"
+            >
+              {t("reservationUnitCard:seeMore")}
+            </BlackButton>
           </Actions>
         </Bottom>
       </MainContent>

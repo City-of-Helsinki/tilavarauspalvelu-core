@@ -11,7 +11,7 @@ export function addReservationUnitButton(
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy
     .get(`#searchResultList > div:nth-of-type(2) > div:nth-of-type(${order})`)
-    .find("button:not(:disabled)")
+    .find("button[data-testid='reservation-unit-card__button--select']")
     .should("be.visible");
 }
 

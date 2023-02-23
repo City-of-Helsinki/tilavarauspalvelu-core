@@ -23,6 +23,7 @@ export const RESERVATION_UNIT = gql`
       termsOfUseFi
       termsOfUseEn
       termsOfUseSv
+      reservationKind
       reservationPendingInstructionsFi
       reservationPendingInstructionsEn
       reservationPendingInstructionsSv

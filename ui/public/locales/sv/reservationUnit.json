@@ -45,6 +45,7 @@
   "futurePriceNoticeTax": "",
   "notifications": {
     "notReservable": "",
+    "onlyRecurring": "",
     "futureOpening": ""
   }
 }

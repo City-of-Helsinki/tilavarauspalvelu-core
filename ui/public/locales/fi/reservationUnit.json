@@ -46,6 +46,7 @@
   "futurePriceNoticeTax": " (sis. alv. {{tax}}%)",
   "notifications": {
     "notReservable": "Kohde ei ole tällä hetkellä varattavissa.",
+    "onlyRecurring": "Varattavissa vain kausittain.",
     "futureOpening": "Varauskalenteri avautuu {{date}} klo {{time}}."
   }
 }

@@ -11,7 +11,10 @@ export const truncatedText = css`
 export const pixel =
   "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
-export const MediumButton = styled(Button)``;
+export const MediumButton = styled(Button)`
+  font-size: var(--fontsize-body-m);
+  ${fontMedium};
+`;
 
 export const BlackButton = styled(Button)`
   color: var(--color-black-90);

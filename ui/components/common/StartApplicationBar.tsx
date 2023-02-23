@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import Container from "./Container";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
+import { truncatedText } from "../../styles/util";
 
 type Props = {
   count: number;
@@ -68,11 +69,14 @@ const DeleteButton = styled(Button).attrs({
   iconLeft: <IconCross />,
   // eslint-disable-next-line @typescript-eslint/naming-convention
   "data-testid": "start-application-bar__button--clear-selections",
-})``;
+})`
+  ${truncatedText}
+`;
 
 const SubmitButton = styled(Button)`
   background-color: var(--color-white);
   color: var(--color-bus);
+  ${truncatedText}
 `;
 
 const StartApplicationBar = ({
