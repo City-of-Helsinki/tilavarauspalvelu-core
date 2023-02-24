@@ -118,15 +118,6 @@ const ReservationInfoCard = ({
     " - "
   );
 
-  const headingContent =
-    type === "confirmed" ? (
-      <StyledLink href={reservationUnitPath(reservationUnit.pk)}>
-        {getTranslation(reservationUnit, "name")}
-      </StyledLink>
-    ) : (
-      getTranslation(reservationUnit, "name")
-    );
-
   const purpose = getTranslation(reservation?.purpose, "name");
 
   const price: string =
@@ -170,7 +161,11 @@ const ReservationInfoCard = ({
         />
       )}
       <Content data-testid="reservation__reservation-info-card__content">
-        <Heading>{headingContent}</Heading>
+        <Heading>
+          <StyledLink href={reservationUnitPath(reservationUnit.pk)}>
+            {getTranslation(reservationUnit, "name")}
+          </StyledLink>
+        </Heading>
         {["confirmed", "complete"].includes(type) && (
           <Subheading>
             {t("reservations:reservationNumber")}: {reservation?.pk}

@@ -11,6 +11,7 @@ import { breakpoints } from "common/src/common/style";
 import {
   Query,
   QueryReservationsArgs,
+  ReservationsReservationStateChoices,
   ReservationType,
 } from "common/types/gql-types";
 import Container from "../../components/common/Container";
@@ -100,10 +101,10 @@ const Reservations = (): JSX.Element => {
     skip: !currentUser?.pk,
     variables: {
       state: [
-        "CONFIRMED",
-        "REQUIRES_HANDLING",
-        "CANCELLED",
-        "WAITING_FOR_PAYMENT",
+        ReservationsReservationStateChoices.Confirmed,
+        ReservationsReservationStateChoices.RequiresHandling,
+        ReservationsReservationStateChoices.Cancelled,
+        ReservationsReservationStateChoices.WaitingForPayment,
       ],
       orderBy: "-begin",
       user: currentUser?.pk.toString(),

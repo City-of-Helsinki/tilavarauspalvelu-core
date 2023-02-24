@@ -53,6 +53,7 @@ const Name = styled.div`
     opacity: 0.5;
   }
 
+  color: var(--color-black-90);
   cursor: pointer;
   font-family: var(--font-bold);
   font-weight: 700;

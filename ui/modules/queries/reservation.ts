@@ -166,6 +166,17 @@ export const LIST_RESERVATIONS = gql`
               imageUrl
               mediumUrl
             }
+            pricings {
+              begins
+              priceUnit
+              pricingType
+              lowestPrice
+              highestPrice
+              taxPercentage {
+                value
+              }
+              status
+            }
           }
         }
       }

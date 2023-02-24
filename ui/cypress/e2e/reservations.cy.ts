@@ -112,6 +112,11 @@ describe("Tilavaraus user reservations", () => {
       .find('[data-testid="reservation__card--status-desktop"]')
       .should("contain.text", "Käsiteltävänä");
 
+    reservationCards()
+      .eq(3)
+      .find('[data-testid="reservation__card--price"]')
+      .should("contain.text", "80,00 - 240,00\u00a0€");
+
     tab(2).click();
 
     reservationCards().should("have.length", 2);

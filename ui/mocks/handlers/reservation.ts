@@ -35,11 +35,22 @@ import {
   ReservationAdjustTimeMutationPayload,
   ReservationAdjustTimeMutationInput,
 } from "common/types/gql-types";
+import { toUIDate } from "common/src/common/util";
 
 const createReservation = graphql.mutation<
   { createReservation: ReservationCreateMutationPayload },
   { input: ReservationCreateMutationInput }
 >("createReservation", (req, res, ctx) => {
+  const getPk = (resUnitPk: number): number => {
+    switch (resUnitPk) {
+      case 908:
+      case 909:
+        return 99;
+      default:
+        return 42;
+    }
+  };
+
   const getPrice = (pk: number): number => {
     switch (pk) {
       case 903:
@@ -49,11 +60,13 @@ const createReservation = graphql.mutation<
     }
   };
 
+  const resUnitPk = req.variables?.input?.reservationUnitPks[0];
+
   return res(
     ctx.data({
       createReservation: {
-        pk: 42,
-        price: getPrice(req.variables?.input?.reservationUnitPks[0]),
+        pk: getPk(resUnitPk),
+        price: getPrice(resUnitPk),
         errors: null,
       },
     })
@@ -518,6 +531,10 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       data.price = 0;
     }
 
+    if (pk === 99) {
+      data.description = "";
+    }
+
     return res(
       ctx.data({
         reservationByPk: data as unknown as ReservationType,
@@ -975,6 +992,42 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
               cancellationRule: null,
               location: null,
               images: [],
+              pricings: [
+                {
+                  begins: toUIDate(addDays(new Date(), 2), "yyyy-MM-dd"),
+                  lowestPrice: 10,
+                  lowestPriceNet: 10 / 1.24,
+                  highestPrice: 30,
+                  highestPriceNet: 30 / 1.24,
+                  priceUnit:
+                    ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
+                  pricingType:
+                    ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+                  taxPercentage: {
+                    id: "goier1",
+                    value: 20,
+                  },
+                  status:
+                    ReservationUnitsReservationUnitPricingStatusChoices.Future,
+                },
+                {
+                  begins: toUIDate(new Date(), "yyyy-MM-dd"),
+                  lowestPrice: 20,
+                  lowestPriceNet: 20 / 1.24,
+                  highestPrice: 20,
+                  highestPriceNet: 20 / 1.24,
+                  priceUnit:
+                    ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
+                  pricingType:
+                    ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+                  taxPercentage: {
+                    id: "goier1",
+                    value: 20,
+                  },
+                  status:
+                    ReservationUnitsReservationUnitPricingStatusChoices.Active,
+                },
+              ],
             } as ReservationUnitType,
           ],
         },

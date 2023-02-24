@@ -13,7 +13,11 @@ const Content = styled.div`
   @media (min-width: ${breakpoints.m}) {
     max-width: var(--container-width-xl);
     margin: 0 auto;
-    padding: 0 0 var(--spacing-m);
+    padding: 0 0 var(--spacing-m) var(--spacing-m);
+  }
+
+  @media (min-width: ${breakpoints.xl}) {
+    padding-left: 0;
   }
 `;
 

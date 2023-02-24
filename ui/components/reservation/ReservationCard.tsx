@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { IconTicket, IconCross, IconArrowRight } from "hds-react";
 import { i18n, useTranslation } from "next-i18next";
-import { parseISO } from "date-fns";
+import { differenceInMinutes, parseISO } from "date-fns";
 import router from "next/router";
 import styled from "styled-components";
 import { getReservationPrice } from "common";
@@ -196,8 +196,16 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
   );
 
   const price =
-    reservation.state === "REQUIRES_HANDLING"
-      ? getReservationUnitPrice({ reservationUnit })
+    reservation.state === ReservationsReservationStateChoices.RequiresHandling
+      ? getReservationUnitPrice({
+          reservationUnit,
+          pricingDate: new Date(reservation.begin),
+          minutes: differenceInMinutes(
+            new Date(reservation.end),
+            new Date(reservation.begin)
+          ),
+          trailingZeros: true,
+        })
       : getReservationPrice(
           reservation.price,
           i18n.t("prices:priceFree"),

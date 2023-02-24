@@ -956,6 +956,43 @@ const selectedReservationUnitQuery = graphql.query<
     reservationUnitByPk.publishEnds = addMinutes(new Date(), 20).toISOString();
   }
 
+  if (req.variables.pk === 908) {
+    reservationUnitByPk.requireReservationHandling = true;
+    reservationUnitByPk.maxReservationsPerUser = 50;
+  }
+
+  if (req.variables.pk === 909) {
+    reservationUnitByPk.requireReservationHandling = false;
+    reservationUnitByPk.maxReservationsPerUser = 50;
+    reservationUnitByPk.metadataSet = {
+      id: "UmVzZXJ2YXRpb25NZXRhZGF0YVNldFR5cGU6MQ==",
+      name: "Test",
+      supportedFields: [
+        "reservee_type",
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_organisation_name",
+        "reservee_phone",
+        "reservee_email",
+        "reservee_id",
+        "reservee_is_unregistered_association",
+        "reservee_address_street",
+        "reservee_address_city",
+        "reservee_address_zip",
+        "home_city",
+        "age_group",
+        "applying_for_free_of_charge",
+        "free_of_charge_reason",
+        "name",
+        "description",
+        "num_persons",
+        "purpose",
+      ],
+      requiredFields: ["reservee_first_name"],
+      pk: 1,
+    };
+  }
+
   if (req.variables.pk === 999) {
     reservationUnitByPk.isDraft = true;
   }

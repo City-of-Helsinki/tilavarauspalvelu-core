@@ -726,6 +726,73 @@ describe("with metadataset", () => {
   });
 });
 
+describe("with application", () => {
+  Cypress.config("defaultCommandTimeout", 20000);
+
+  it("can do a reservation application", () => {
+    cy.visit("/reservation-unit/908");
+    cy.injectAxe();
+
+    drawReservation();
+
+    reservationSubmitButton().click();
+
+    cy.get("#name").type("Reservation name");
+    cy.get("#description").type("Reservation description");
+
+    cy.get("#reserveeFirstName").type("Forename");
+    cy.get("#reserveeLastName").type("Surname");
+
+    cy.get('button[type="submit"]').click();
+
+    cy.get("#generic-and-service-specific-terms-terms-accepted").click();
+    cy.get("#cancellation-and-payment-terms-terms-accepted").click();
+
+    cy.get('button[type="submit"]').click();
+
+    cy.get("h1").should("contain.text", "Varaus käsittelyssä");
+
+    cy.get("main#main").should(
+      "contain.text",
+      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun varaus on käsitelty."
+    );
+  });
+
+  it("can do a reservation application with applied subvention", () => {
+    cy.visit("/reservation-unit/909");
+    cy.injectAxe();
+
+    drawReservation();
+
+    reservationSubmitButton().click();
+
+    cy.get("#name").type("Reservation name");
+    cy.get("#description").type("Reservation description");
+
+    cy.get("#applyingForFreeOfCharge").click();
+    cy.get("#freeOfChargeReason").type("Free of charge reason");
+
+    reserveeTypeSelector(0).click();
+
+    cy.get("#reserveeFirstName").type("Forename");
+    cy.get("#reserveeLastName").type("Surname");
+
+    cy.get('button[type="submit"]').click();
+
+    cy.get("#generic-and-service-specific-terms-terms-accepted").click();
+    cy.get("#cancellation-and-payment-terms-terms-accepted").click();
+
+    cy.get('button[type="submit"]').click();
+
+    cy.get("h1").should("contain.text", "Varaus käsittelyssä");
+
+    cy.get("main#main").should(
+      "contain.text",
+      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun varaus on käsitelty."
+    );
+  });
+});
+
 describe("publish times", () => {
   Cypress.config("defaultCommandTimeout", 20000);
 

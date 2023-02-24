@@ -40,6 +40,7 @@ import {
   ReservationUpdateMutationPayload,
   TermsOfUseType,
   TermsOfUseTermsOfUseTermsTypeChoices,
+  ReservationsReservationStateChoices,
 } from "common/types/gql-types";
 import { Inputs, Reservation } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -277,6 +278,10 @@ const ReservationUnitReservation = ({
     skip: !reservationData?.pk,
   });
 
+  const requireHandling =
+    reservationUnit.requireReservationHandling ||
+    reservation?.applyingForFreeOfCharge;
+
   const steps: ReservationStep[] = useMemo(() => {
     const price = getReservationUnitPrice({
       reservationUnit: reservationUnit as unknown as ReservationUnitByPkType,
@@ -284,7 +289,7 @@ const ReservationUnitReservation = ({
       asInt: true,
     });
 
-    const stepLength = price === "0" ? 2 : 5;
+    const stepLength = price === "0" || requireHandling ? 2 : 5;
 
     return Array.from(Array(stepLength)).map((n, i) => {
       const state = i === step ? 0 : i < step ? 1 : 2;
@@ -294,7 +299,7 @@ const ReservationUnitReservation = ({
         state,
       };
     });
-  }, [step, reservationUnit, reservation, t]);
+  }, [step, requireHandling, reservationUnit, reservation, t]);
 
   useEffect(() => () => setDataContext(null), [setDataContext]);
 
@@ -393,7 +398,9 @@ const ReservationUnitReservation = ({
       } else {
         setReservation({
           ...reservation,
-          state: "CONFIRMED",
+          state: requireHandling
+            ? ReservationsReservationStateChoices.RequiresHandling
+            : ReservationsReservationStateChoices.Confirmed,
         });
         setFormStatus("sent");
         setStep(2);

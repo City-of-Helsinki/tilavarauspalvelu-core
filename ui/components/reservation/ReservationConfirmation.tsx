@@ -52,8 +52,12 @@ const StyledLink = styled(Link)`
 `;
 
 const InlineStyledLink = styled(Link)`
-  display: inline;
-  ${fontRegular};
+  && {
+    display: inline;
+    color: var(--color-black);
+    text-decoration: underline;
+    ${fontRegular};
+  }
 `;
 
 const ReservationConfirmation = ({
@@ -91,21 +95,31 @@ const ReservationConfirmation = ({
             }`}
             t={t}
             values={{ user: reservation?.user.email }}
-            components={{ bold: <strong />, br: <br /> }}
+            components={{
+              br: <br />,
+              lnk: (
+                <InlineStyledLink href={reservationsUrl}>
+                  Omat varaukset -sivulta
+                </InlineStyledLink>
+              ),
+            }}
           >
-            <InlineStyledLink href={reservationsUrl}> </InlineStyledLink>
+            {" "}
           </Trans>
         </Paragraph>
-        <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
-          <BlackButton
-            data-testid="reservation__confirmation--button__calendar-url"
-            onClick={() => router.push(reservation.calendarUrl)}
-            variant="secondary"
-            iconRight={<IconCalendar aria-hidden />}
-          >
-            {t("reservations:saveToCalendar")}
-          </BlackButton>
-        </ActionContainer1>
+        {reservation.state ===
+          ReservationsReservationStateChoices.Confirmed && (
+          <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
+            <BlackButton
+              data-testid="reservation__confirmation--button__calendar-url"
+              onClick={() => router.push(reservation.calendarUrl)}
+              variant="secondary"
+              iconRight={<IconCalendar aria-hidden />}
+            >
+              {t("reservations:saveToCalendar")}
+            </BlackButton>
+          </ActionContainer1>
+        )}
         {getTranslation(reservationUnit, instructionsKey) && (
           <>
             <Subheading>{t("reservations:reservationInfo")}</Subheading>
