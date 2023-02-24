@@ -205,7 +205,7 @@ class CreateOrderParams:
                     "priceNet": str(item.price_net),
                     "priceGross": str(item.price_gross),
                     "priceVat": str(item.price_vat),
-                    "vatPercentage": str(item.vat_percentage),
+                    "vatPercentage": str(int(item.vat_percentage)),
                     "meta": [
                         {
                             "key": meta.key,
