@@ -101,6 +101,12 @@ class Order:
     def from_json(cls, json: Dict[str, Any]) -> "Order":
         from ..helpers import parse_datetime
 
+        subscription_id = json.get("subscriptionId")
+        try:
+            subscription_id = UUID(subscription_id)
+        except (TypeError, ValueError):
+            subscription_id = None
+
         try:
             return Order(
                 order_id=UUID(json["orderId"]),
@@ -155,12 +161,10 @@ class Order:
                     first_name=json["customer"]["firstName"],
                     last_name=json["customer"]["lastName"],
                     email=json["customer"]["email"],
-                    phone=json["customer"]["phone"],
+                    phone=json["customer"].get("phone", ""),
                 ),
                 status=json["status"],
-                subscription_id=UUID(json["subscriptionId"])
-                if json["subscriptionId"]
-                else None,
+                subscription_id=subscription_id if subscription_id else None,
                 type=json["type"],
             )
         except (KeyError, ValueError) as err:
@@ -201,7 +205,7 @@ class CreateOrderParams:
                     "priceNet": str(item.price_net),
                     "priceGross": str(item.price_gross),
                     "priceVat": str(item.price_vat),
-                    "vatPercentage": str(item.vat_percentage),
+                    "vatPercentage": str(int(item.vat_percentage)),
                     "meta": [
                         {
                             "key": meta.key,

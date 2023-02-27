@@ -54,6 +54,23 @@ def get_validated_phone_number(phone_number: str) -> str:
 
 
 def create_verkkokauppa_order(reservation: Reservation):
+    order_params = _get_order_params(reservation)
+
+    try:
+        payment_order = create_order(order_params)
+    except (CreateOrderError) as err:
+        with push_scope() as scope:
+            scope.set_extra("details", "Creating order in Verkkokauppa failed")
+            scope.set_extra("reservation-id", reservation.pk)
+            capture_exception(err)
+        raise ValidationErrorWithCode(
+            "Upstream service call failed. Unable to confirm the reservation.",
+            ValidationErrorCodes.UPSTREAM_CALL_FAILED,
+        ) from err
+    return payment_order
+
+
+def _get_order_params(reservation: Reservation):
     runit = reservation.reservation_unit.first()
     quantity = 1  # Currently, we don't support quantities larger than 1
     price_net = quantity * reservation.price_net
@@ -112,15 +129,4 @@ def create_verkkokauppa_order(reservation: Reservation):
         + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES),
     )
 
-    try:
-        payment_order = create_order(order_params)
-    except (CreateOrderError) as err:
-        with push_scope() as scope:
-            scope.set_extra("details", "Creating order in Verkkokauppa failed")
-            scope.set_extra("reservation-id", reservation.pk)
-            capture_exception(err)
-        raise ValidationErrorWithCode(
-            "Upstream service call failed. Unable to confirm the reservation.",
-            ValidationErrorCodes.UPSTREAM_CALL_FAILED,
-        ) from err
-    return payment_order
+    return order_params
