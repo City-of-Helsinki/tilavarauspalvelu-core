@@ -50,6 +50,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
         self.user.first_name = "joe"
         self.user.last_name = "regular"
         self.user.email = "joe.regular@foo.com"
+        self.user.date_of_birth = datetime.date(2000, 1, 1)
         self.user.save()
 
     def get_auth_header(self, user, scopes, req_mock):
