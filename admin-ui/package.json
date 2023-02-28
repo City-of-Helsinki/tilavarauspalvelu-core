@@ -9,7 +9,7 @@
     "lint:css": "stylelint './src/**/*.tsx'",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "start": "HOST=local-tilavaraus.hel.fi HTTPS=true SSL_CRT_FILE=../common/certificates/local-tilavaraus.crt SSL_KEY_FILE=../common/certificates/local-tilavaraus.key react-app-rewired start",
-    "test": "react-app-rewired test",
+    "test": "TZ=Europe/Helsinki react-app-rewired test",
     "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
     "ts-check": "tsc --noEmit --project tsconfig.json"
   },

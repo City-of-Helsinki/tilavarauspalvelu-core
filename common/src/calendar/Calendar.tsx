@@ -62,6 +62,8 @@ type Props<T> = {
     }: { start: Date; action: "select" | "click" | "doubleClick" },
     skipLengthCheck: boolean
   ) => void;
+  min?: Date;
+  max?: Date;
   draggableAccessor?: (event: CalendarEvent<T>) => boolean;
   resizableAccessor?: (event: CalendarEvent<T>) => boolean;
   toolbarComponent?: (props: ToolbarProps) => JSX.Element | React.ReactNode;
@@ -424,8 +426,17 @@ const locales = {
 };
 
 const localizer = dateFnsLocalizer({
-  format: (date: Date, fmt: string) =>
-    format(date, fmt, { locale: locales.fi }),
+  format: (date: Date, originalFormat: string) => {
+    let fmt = "";
+    switch (originalFormat) {
+      case "h:mma":
+        fmt = "H:mm";
+        break;
+      default:
+        fmt = originalFormat;
+    }
+    return format(date, fmt, { locale: locales.fi });
+  },
   parse: parseDate,
   startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
   getDay,
@@ -444,6 +455,8 @@ const Calendar = <T extends Record<string, unknown>>({
   dateCellWrapperComponent,
   onNavigate = () => {},
   onView = () => {},
+  min,
+  max,
   onSelectEvent = () => {},
   onEventDrop = () => {},
   onEventResize = () => {},
@@ -479,8 +492,8 @@ const Calendar = <T extends Record<string, unknown>>({
       onNavigate={onNavigate}
       view={viewType}
       onView={onView}
-      min={addHours(startOfDay(begin), 6)}
-      max={endOfMonth(begin)}
+      min={min || addHours(startOfDay(begin), 6)}
+      max={max || endOfMonth(begin)}
       localizer={localizer}
       toolbar={showToolbar}
       views={["day", "week", "month"]}
@@ -504,6 +517,7 @@ const Calendar = <T extends Record<string, unknown>>({
       step={step}
       timeslots={timeslots}
       longPressThreshold={longPressThreshold}
+      showMultiDayTimes
       $isDraggable={draggable}
     />
   );

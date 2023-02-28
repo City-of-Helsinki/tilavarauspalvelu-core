@@ -95,20 +95,23 @@ describe("areSlotsReservable", () => {
   const tzOffset = new Date().getTimezoneOffset() / 60;
   const tzOffsetHoursStr = Math.abs(tzOffset).toString().padStart(2, "0");
 
+  const date1 = format(addDays(new Date(), 7), "yyyy-MM-dd");
+  const date2 = format(addDays(new Date(), 8), "yyyy-MM-dd");
+
   const openingTimesReservable = [
     {
-      date: format(addDays(new Date(), 7), "yyyy-MM-dd"),
-      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
+      date: date1,
+      startTime: `${date1}T09:00:00+${tzOffsetHoursStr}:00`,
+      endTime: `${date1}T21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
       isReservable: true,
     },
     {
-      date: format(addDays(new Date(), 8), "yyyy-MM-dd"),
-      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
+      date: date2,
+      startTime: `${date2}T09:00:00+${tzOffsetHoursStr}:00`,
+      endTime: `${date2}T21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
       isReservable: true,
     },
@@ -116,18 +119,18 @@ describe("areSlotsReservable", () => {
 
   const openingTimesNotReservable = [
     {
-      date: format(addDays(new Date(), 7), "yyyy-MM-dd"),
-      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
+      date: date1,
+      startTime: `${date1}T09:00:00+${tzOffsetHoursStr}:00`,
+      endTime: `${date1}T21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
       isReservable: false,
     },
     {
-      date: format(addDays(new Date(), 8), "yyyy-MM-dd"),
-      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
+      date: date2,
+      startTime: `${date2}T09:00:00+${tzOffsetHoursStr}:00`,
+      endTime: `${date2}T21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
       isReservable: false,
     },
@@ -383,7 +386,7 @@ describe("getDayIntervals", () => {
     const result = getDayIntervals(
       "09:00:00",
       "12:00:00",
-      "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
     );
 
     expect(result).toEqual([
@@ -406,7 +409,7 @@ describe("getDayIntervals", () => {
     const result = getDayIntervals(
       "09:00:00",
       "21:00:00",
-      "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
     );
 
     expect(result).toEqual([
@@ -424,9 +427,9 @@ describe("getDayIntervals", () => {
 
   test("outputs empty result", () => {
     const result = getDayIntervals(
-      "09:00:00",
-      "09:00:00",
-      "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      "09:00",
+      "09:00",
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
     );
 
     expect(result).toEqual([]);
@@ -434,8 +437,8 @@ describe("getDayIntervals", () => {
 
   test("outputs empty result", () => {
     const result = getDayIntervals(
-      "09:00:00",
-      "21:00:00",
+      "09:00",
+      "21:00",
       "INVALID_INTERVAL" as ReservationUnitsReservationUnitReservationStartIntervalChoices
     );
 
@@ -453,16 +456,16 @@ describe("isStartTimeWithinInterval", () => {
   const openingTimes = [
     {
       date: "2019-09-21",
-      startTime: `06:00:00+${timeZoneHours}:00`,
-      endTime: `18:00:00+${timeZoneHours}:00`,
+      startTime: `2019-09-21T06:00:00+${timeZoneHours}:00`,
+      endTime: `2019-09-21T18:00:00+${timeZoneHours}:00`,
       state: "open",
       isReservable: true,
       periods: [38600],
     },
     {
       date: "2019-09-22",
-      startTime: `06:00:00+${timeZoneHours}:00`,
-      endTime: `18:00:00+${timeZoneHours}:00`,
+      startTime: `2019-09-22T06:00:00+${timeZoneHours}:00`,
+      endTime: `2019-09-22T18:00:00+${timeZoneHours}:00`,
       state: "open",
       isReservable: true,
       periods: [38600],
@@ -477,8 +480,8 @@ describe("isStartTimeWithinInterval", () => {
     },
     {
       date: "2019-09-28",
-      startTime: `06:00:00+${timeZoneHours}:00`,
-      endTime: `18:00:00+${timeZoneHours}:00`,
+      startTime: `2019-09-28T06:00:00+${timeZoneHours}:00`,
+      endTime: `2019-09-28T18:00:00+${timeZoneHours}:00`,
       state: "open",
       isReservable: true,
       periods: [38600],
@@ -490,7 +493,7 @@ describe("isStartTimeWithinInterval", () => {
       isStartTimeWithinInterval(
         new Date(`2019-09-22T12:15:00+${timeZoneHours}:00`),
         openingTimes,
-        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(true);
 
@@ -498,7 +501,7 @@ describe("isStartTimeWithinInterval", () => {
       isStartTimeWithinInterval(
         new Date(`2019-09-22T12:15:00+${timeZoneHours}:00`),
         openingTimes,
-        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(true);
 
@@ -506,7 +509,7 @@ describe("isStartTimeWithinInterval", () => {
       isStartTimeWithinInterval(
         new Date(`2019-09-24T12:15:00+${timeZoneHours}:00`),
         openingTimes,
-        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(false);
   });
@@ -516,7 +519,7 @@ describe("isStartTimeWithinInterval", () => {
       isStartTimeWithinInterval(
         new Date(`2019-09-22T12:10:00+${timeZoneHours}:00`),
         openingTimes,
-        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(false);
   });
@@ -533,7 +536,7 @@ describe("isStartTimeWithinInterval", () => {
       isStartTimeWithinInterval(
         new Date(`2019-09-22T11:30:00+${tz}:00`),
         openingTimes,
-        "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
       )
     ).toBe(false);
   });
@@ -547,7 +550,50 @@ describe("isStartTimeWithinInterval", () => {
       isStartTimeWithinInterval(
         new Date(),
         [],
-        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      )
+    ).toBe(false);
+  });
+
+  test("with multiple slots in one day", () => {
+    openingTimes.push({
+      date: "2019-09-28",
+      startTime: `2019-09-28T19:15:00+${timeZoneHours}:00`,
+      endTime: `2019-09-28T21:00:00+${timeZoneHours}:00`,
+      state: "open",
+      isReservable: true,
+      periods: [38600],
+    });
+
+    expect(
+      isStartTimeWithinInterval(
+        new Date(`2019-09-28T11:00:00+${timeZoneHours}:00`),
+        openingTimes,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins
+      )
+    ).toBe(true);
+
+    expect(
+      isStartTimeWithinInterval(
+        new Date(`2019-09-28T19:20:00+${timeZoneHours}:00`),
+        openingTimes,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      )
+    ).toBe(false);
+
+    expect(
+      isStartTimeWithinInterval(
+        new Date(`2019-09-28T19:15:00+${timeZoneHours}:00`),
+        openingTimes,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      )
+    ).toBe(true);
+
+    expect(
+      isStartTimeWithinInterval(
+        new Date(`2019-09-28T21:00:00+${timeZoneHours}:00`),
+        openingTimes,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(false);
   });
@@ -763,6 +809,8 @@ describe("getEventBuffers", () => {
 });
 
 describe("isReservationUnitReservable", () => {
+  const dateTime = new Date().toISOString();
+  const date = new Date().toISOString().split("T")[0];
   const reservationUnit: ReservationUnitByPkType = {
     id: "1234",
     allowReservationsWithoutOpeningHours: false,
@@ -781,9 +829,9 @@ describe("isReservationUnitReservable", () => {
     openingHours: {
       openingTimes: [
         {
-          date: new Date().toISOString(),
-          startTime: `${new Date().toISOString()}T04:00:00+00:00`,
-          endTime: `${new Date().toISOString()}T20:00:00+00:00`,
+          date: dateTime,
+          startTime: `${date}T04:00:00+00:00`,
+          endTime: `${date}T20:00:00+00:00`,
           state: "open",
           isReservable: true,
           periods: null,
@@ -960,7 +1008,9 @@ describe("isReservationStartInFuture", () => {
       } as unknown as ReservationUnitType)
     ).toBe(false);
 
-    expect(isReservationStartInFuture({} as ReservationUnitType)).toBe(false);
+    expect(
+      isReservationStartInFuture({} as unknown as ReservationUnitType)
+    ).toBe(false);
   });
 
   test("returns correct value with buffer days", () => {
@@ -1077,9 +1127,9 @@ describe("getAvailableTimes", () => {
       openingTimePeriods: [],
       openingTimes: [
         {
-          date: "2022-09-14",
-          startTime: "04:00:00+00:00",
-          endTime: "20:00:00+00:00",
+          date: "2022-11-14",
+          startTime: "2022-11-14T04:00:00+02:00",
+          endTime: "2022-11-14T20:00:00+02:00",
           state: "open",
           isReservable: true,
           periods: null,
@@ -1093,7 +1143,7 @@ describe("getAvailableTimes", () => {
           openingHours,
           reservationStartInterval: "INTERVAL_90_MINS",
         } as ReservationUnitByPkType,
-        new Date("2022-09-14T00:00:00+00:00")
+        new Date("2022-11-14T00:00:00+02:00")
       )
     ).toEqual([
       "04:00",
@@ -1115,9 +1165,9 @@ describe("getAvailableTimes", () => {
       openingTimePeriods: [],
       openingTimes: [
         {
-          date: "2022-09-14",
-          startTime: "04:00:00+00:00",
-          endTime: "06:00:00+00:00",
+          date: "2022-11-14",
+          startTime: "2022-11-14T04:00:00+02:00",
+          endTime: "2022-11-14T06:00:00+02:00",
           state: "open",
           isReservable: true,
           periods: null,
@@ -1131,7 +1181,7 @@ describe("getAvailableTimes", () => {
           openingHours,
           reservationStartInterval: "INTERVAL_15_MINS",
         } as ReservationUnitByPkType,
-        new Date("2022-09-14T00:00:00+00:00")
+        new Date("2022-11-14T00:00:00+02:00")
       )
     ).toEqual([
       "04:00",
@@ -1142,7 +1192,6 @@ describe("getAvailableTimes", () => {
       "05:15",
       "05:30",
       "05:45",
-      "06:00",
     ]);
   });
 });

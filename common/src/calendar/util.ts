@@ -106,21 +106,20 @@ export const isReservationLongEnough = (
 
 const areOpeningTimesAvailable = (
   openingHours: OpeningTimesType[],
-  slotDate: Date
+  slotDate: Date,
+  validateEnding = false
 ): boolean => {
   return !!openingHours?.some((oh) => {
-    const startDate = oh.date;
-    const startDateTime = new Date(`${startDate}T${oh.startTime}`);
-    const endDateTime = new Date(`${startDate}T${oh.endTime}`);
+    const { startTime, endTime, isReservable } = oh;
 
-    return (
-      oh.isReservable &&
-      toApiDate(slotDate) === startDate?.toString() &&
-      slotDate < endDateTime &&
-      startDateTime.getDay() === slotDate.getDay() &&
-      startDateTime.getHours() <= slotDate.getHours() &&
-      endDateTime.getHours() >= slotDate.getHours()
-    );
+    if (!isReservable || !startTime || !endTime) return false;
+
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+
+    return validateEnding
+      ? startDate <= slotDate && endDate >= slotDate
+      : startDate <= slotDate && endDate > slotDate;
   });
 };
 
@@ -171,12 +170,14 @@ export const areSlotsReservable = (
   reservationBegins?: Date,
   reservationEnds?: Date,
   reservationsMinDaysBefore = 0,
-  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[] = []
+  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[] = [],
+  validateEnding = false
 ): boolean => {
   return slots.every((slot) => {
     const slotDate = new Date(slot);
+
     return (
-      areOpeningTimesAvailable(openingHours, slotDate) &&
+      areOpeningTimesAvailable(openingHours, slotDate, validateEnding) &&
       isSlotWithinTimeframe(
         slotDate,
         reservationBegins,
@@ -206,8 +207,11 @@ export const getDayIntervals = (
   endTime: string,
   interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): string[] => {
+  // normalize end time to allow comparison
+  const normalizedEndTime = endTime === "00:00" ? "23:59" : endTime;
+
   const start = convertHMSToSeconds(startTime?.substring(0, 5));
-  const end = convertHMSToSeconds(endTime?.substring(0, 5));
+  const end = convertHMSToSeconds(normalizedEndTime?.substring(0, 5));
   const intervals: string[] = [];
 
   let intervalSeconds = 0;
@@ -238,7 +242,7 @@ export const getDayIntervals = (
     );
   }
 
-  return intervals.filter((n) => n.substring(0, 5) !== endTime);
+  return intervals.filter((n) => n.substring(0, 5) !== normalizedEndTime);
 };
 
 export const isStartTimeWithinInterval = (
@@ -250,25 +254,33 @@ export const isStartTimeWithinInterval = (
   if (!interval) return true;
 
   const startHMS = `${toUIDate(start, "HH:mm")}:00`;
-  const { startTime: dayStartTime, endTime: dayEndTime } =
-    openingTimes?.find((n) => n.isReservable && n.date === toApiDate(start)) ||
-    {};
 
-  const [startHours, startMinutes] = dayStartTime?.split(":").map(Number) || [
-    0, 0,
-  ];
-  const startTime = new Date();
-  startTime.setUTCHours(startHours, startMinutes, 0);
+  const timeframe: OpeningTimesType =
+    openingTimes?.find((n) => {
+      if (!n.startTime || !n.endTime) return false;
+      const startTime = `${toUIDate(new Date(n.startTime), "HH:mm")}:00`;
+      const endTime = `${toUIDate(
+        addMinutes(new Date(n.endTime), -1),
+        "HH:mm"
+      )}:00`;
 
-  const [endHours, endMinutes] = dayEndTime?.split(":").map(Number) || [0, 0];
-  const endTime = new Date();
-  endTime.setUTCHours(endHours, endMinutes, 0);
+      return (
+        n.isReservable &&
+        n.date === toApiDate(start) &&
+        startTime <= startHMS &&
+        endTime > startHMS
+      );
+    }) || {};
 
-  return getDayIntervals(
-    format(startTime, "HH:mm"),
-    format(endTime, "HH:mm"),
-    interval
-  ).includes(startHMS);
+  return (
+    !!timeframe.startTime &&
+    !!timeframe.endTime &&
+    getDayIntervals(
+      format(new Date(timeframe.startTime), "HH:mm"),
+      format(new Date(timeframe.endTime), "HH:mm"),
+      interval
+    ).includes(startHMS)
+  );
 };
 
 export const getSlotPropGetter =
@@ -288,7 +300,8 @@ export const getSlotPropGetter =
         reservationBegins,
         reservationEnds,
         reservationsMinDaysBefore,
-        activeApplicationRounds
+        activeApplicationRounds,
+        false
       ) &&
       (customValidation ? customValidation(date) : true)
     ) {
@@ -476,30 +489,32 @@ export const getAvailableTimes = (
   reservationUnit: ReservationUnitByPkType,
   date: Date
 ): string[] => {
+  const allTimes: string[] = [];
   const { openingHours, reservationStartInterval } = reservationUnit;
 
-  const openingTimes = openingHours?.openingTimes?.find(
+  const openingTimes = openingHours?.openingTimes?.filter(
     (n) => n?.isReservable && n?.date === toUIDate(date, "yyyy-MM-dd")
   );
 
-  const { startTime, endTime } = openingTimes || {};
+  openingTimes?.forEach((openingTime) => {
+    if (!openingTime?.startTime || !openingTime?.endTime) return;
 
-  const intervals = getDayIntervals(
-    startTime as string,
-    endTime as string,
-    reservationStartInterval
-  );
+    const intervals = getDayIntervals(
+      format(new Date(openingTime.startTime), "HH:mm"),
+      format(new Date(openingTime.endTime), "HH:mm"),
+      reservationStartInterval
+    );
 
-  const times: string[] = intervals.map((val) => {
-    const [startHours, startMinutes] = val.split(":").map(Number);
+    const times: string[] = intervals.map((val) => {
+      const [startHours, startMinutes] = val.split(":");
 
-    const start = new Date(date);
-    start.setHours(startHours, startMinutes);
+      return `${startHours}:${startMinutes}`;
+    });
 
-    return toUIDate(start, "HH:mm");
+    allTimes.push(...times);
   });
 
-  return times;
+  return allTimes;
 };
 
 export const getOpenDays = (

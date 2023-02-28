@@ -13,7 +13,15 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { addSeconds, addYears, differenceInMinutes } from "date-fns";
+import styled from "styled-components";
+import {
+  addHours,
+  addSeconds,
+  addYears,
+  differenceInMinutes,
+  roundToNearestMinutes,
+  startOfDay,
+} from "date-fns";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import {
   getEventBuffers,
@@ -253,8 +261,9 @@ export const getServerSideProps: GetServerSideProps = async ({
           openingHours: {
             openingTimes: allowReservationsWithoutOpeningHours
               ? mockOpeningTimes
-              : additionalData.reservationUnitByPk?.openingHours
-                  ?.openingTimes || [],
+              : additionalData.reservationUnitByPk?.openingHours?.openingTimes.filter(
+                  (n) => n.isReservable
+                ) || [],
             openingTimePeriods: allowReservationsWithoutOpeningHours
               ? mockOpeningTimePeriods
               : reservationUnitData?.reservationUnitByPk?.openingHours
@@ -328,14 +337,17 @@ const eventStyleGetter = (
   };
 };
 
+const EventWrapper = styled.div``;
+
 const EventWrapperComponent = (props) => {
+  const { event } = props;
   let isSmall = false;
-  if (props.event.event.state === "INITIAL") {
+  if (event.event.state === "INITIAL") {
     const { start, end } = props.event;
     const diff = differenceInMinutes(end, start);
     if (diff <= 30) isSmall = true;
   }
-  return <div {...props} className={isSmall ? "isSmall" : ""} />;
+  return <EventWrapper {...props} className={isSmall ? "isSmall" : ""} />;
 };
 
 const ReservationUnit = ({
@@ -498,10 +510,13 @@ const ReservationUnit = ({
       { start, end }: CalendarEvent<Reservation | ReservationType>,
       skipLengthCheck = false
     ): boolean => {
+      const normalizedEnd = roundToNearestMinutes(end);
+
       const newReservation = {
         begin: start?.toISOString(),
-        end: end?.toISOString(),
+        end: normalizedEnd?.toISOString(),
       } as PendingReservation;
+
       if (
         !isReservationShortEnough(
           start,
@@ -547,20 +562,26 @@ const ReservationUnit = ({
       { start: startTime, end: endTime, action },
       skipLengthCheck = false
     ): boolean => {
+      const isTouchClick = action === "select" && isClientATouchDevice;
+
+      if (action === "select" && !isClientATouchDevice) {
+        return false;
+      }
+
       if (isReservationQuotaReached) {
         return false;
       }
 
       const end =
         action === "click" ||
-        (action === "select" &&
-          isClientATouchDevice &&
-          differenceInMinutes(endTime, startTime) <= 30)
+        (isTouchClick && differenceInMinutes(endTime, startTime) <= 30)
           ? addSeconds(
               new Date(startTime),
               reservationUnit.minReservationDuration || 0
             )
           : new Date(endTime);
+
+      const normalizedEnd = roundToNearestMinutes(end);
 
       if (!isSlotReservable(startTime, end, skipLengthCheck)) {
         return false;
@@ -569,7 +590,7 @@ const ReservationUnit = ({
       setIsReserving(false);
       setInitialReservation({
         begin: startTime.toISOString(),
-        end: end.toISOString(),
+        end: normalizedEnd.toISOString(),
         state: "INITIAL",
       } as PendingReservation);
 
@@ -785,6 +806,10 @@ const ReservationUnit = ({
     [i18n.language]
   );
 
+  const currentDate = focusDate || new Date();
+
+  const dayStartTime = addHours(startOfDay(currentDate), 6);
+
   return reservationUnit ? (
     <Wrapper>
       <Head
@@ -843,7 +868,7 @@ const ReservationUnit = ({
                 <div aria-hidden>
                   <Calendar<Reservation | ReservationType>
                     events={[...calendarEvents, ...eventBuffers]}
-                    begin={focusDate || new Date()}
+                    begin={currentDate}
                     onNavigate={(d: Date) => {
                       setFocusDate(d);
                     }}
@@ -862,6 +887,7 @@ const ReservationUnit = ({
                     onSelecting={(
                       event: CalendarEvent<Reservation | ReservationType>
                     ) => handleEventChange(event, true)}
+                    min={dayStartTime}
                     showToolbar
                     reservable={!isReservationQuotaReached}
                     toolbarComponent={Toolbar}
@@ -904,7 +930,6 @@ const ReservationUnit = ({
                         end={initialReservation?.end}
                         resetReservation={() => {
                           setInitialReservation(null);
-                          setFocusDate(new Date());
                         }}
                         isSlotReservable={(startDate, endDate) =>
                           isSlotReservable(startDate, endDate)
@@ -922,6 +947,7 @@ const ReservationUnit = ({
                         setShouldCalendarControlsBeVisible={
                           setShouldCalendarControlsBeVisible
                         }
+                        minTime={dayStartTime}
                         isAnimated={isMobile}
                       />
                     </CalendarFooter>

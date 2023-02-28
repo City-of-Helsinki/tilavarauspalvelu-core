@@ -1,4 +1,4 @@
-import { isAfter, isValid, subMinutes } from "date-fns";
+import { addMinutes, isAfter, isValid } from "date-fns";
 import camelCase from "lodash/camelCase";
 import { convertHMSToSeconds, secondsToHms } from "common/src/common/util";
 import { ApplicationRound, OptionType } from "common/types/common";
@@ -189,6 +189,8 @@ export const isReservationReservable = (
     skipLengthCheck = false,
   } = props;
 
+  const normalizedEnd = addMinutes(end, -1);
+
   const {
     reservations,
     bufferTimeBefore,
@@ -220,12 +222,13 @@ export const isReservationReservable = (
       reservationStartInterval
     ) ||
     !areSlotsReservable(
-      [new Date(start), subMinutes(new Date(end), 1)],
+      [new Date(start), normalizedEnd],
       openingHours?.openingTimes,
       reservationBegins ? new Date(reservationBegins) : undefined,
       reservationEnds ? new Date(reservationEnds) : undefined,
       reservationsMinDaysBefore,
-      activeApplicationRounds
+      activeApplicationRounds,
+      false
     ) ||
     (!skipLengthCheck &&
       !isReservationLongEnough(start, end, minReservationDuration)) ||

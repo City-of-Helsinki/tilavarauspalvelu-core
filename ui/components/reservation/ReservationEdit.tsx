@@ -210,8 +210,9 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
               ?.openingTimePeriods || [],
         openingTimes: allowReservationsWithoutOpeningHours
           ? mockOpeningTimes
-          : additionalData?.reservationUnitByPk?.openingHours?.openingTimes ||
-            [],
+          : additionalData?.reservationUnitByPk?.openingHours?.openingTimes.filter(
+              (n) => n.isReservable
+            ) || [],
       },
       reservations: additionalData?.reservationUnitByPk?.reservations,
     });

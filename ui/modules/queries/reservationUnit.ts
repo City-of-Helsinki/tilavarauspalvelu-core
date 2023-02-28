@@ -319,6 +319,7 @@ export const OPENING_HOURS = gql`
           endTime
           state
           periods
+          isReservable
         }
       }
       reservations(
