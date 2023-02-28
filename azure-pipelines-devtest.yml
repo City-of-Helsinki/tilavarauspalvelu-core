@@ -1,7 +1,7 @@
-# Continuous integration (CI) triggers cause a pipeline to run whenever you push 
+# Continuous integration (CI) triggers cause a pipeline to run whenever you push
 # an update to the specified branches or you push specified tags.
 trigger:
-  batch: true
+  batch: false
   branches:
     include:
     - main
@@ -9,26 +9,19 @@ trigger:
     exclude:
     - README.md
 
-# Pull request (PR) triggers cause a pipeline to run whenever a pull request is 
-# opened with one of the specified target branches, or when updates are made to 
+# Pull request (PR) triggers cause a pipeline to run whenever a pull request is
+# opened with one of the specified target branches, or when updates are made to
 # such a pull request.
 #
-# GitHub creates a new ref when a pull request is created. The ref points to a 
-# merge commit, which is the merged code between the source and target branches 
+# GitHub creates a new ref when a pull request is created. The ref points to a
+# merge commit, which is the merged code between the source and target branches
 # of the pull request.
 #
-# Opt out of pull request validation 
+# Opt out of pull request validation
 pr: none
 
 # By default, use self-hosted agents
 pool: Default
-
-# Image tag name for Fuse projects
-#parameters:
-#- name: imagetag
-#  displayName: Image tag to be built and/or deployed
-#  type: string
-#  default: latest
 
 resources:
   repositories:
@@ -43,5 +36,3 @@ extends:
   # Django example: azure-pipelines-PROJECTNAME-api-release.yml
   # Drupal example: azure-pipelines-drupal-release.yml
   template: azure-pipelines-tilavarauspalvelu-core-devtest.yml@tilavarauspalvelu-pipelines
-  #parameters:
-    #imagetag: ${{ parameters.imagetag }}
