@@ -3,9 +3,11 @@ import math
 from decimal import Decimal
 from typing import Iterable
 
+from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from reservation_units.enums import ReservationUnitState
 from reservation_units.models import PriceUnit, PricingType, ReservationUnit
 from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
@@ -183,18 +185,56 @@ class ReservationPriceMixin:
 class ReservationSchedulingMixin:
     """Common mixin class for reservations containing date and scheduling related checks"""
 
-    def check_reservation_time(self, reservation_unit: ReservationUnit):
-        now = datetime.datetime.now(get_default_timezone())
-
-        is_invalid_begin = (
+    @classmethod
+    def _get_invalid_begin(cls, reservation_unit, now: datetime.datetime):
+        return (
             reservation_unit.reservation_begins
             and now < reservation_unit.reservation_begins
         ) or (reservation_unit.publish_begins and now < reservation_unit.publish_begins)
 
-        is_invalid_end = (
+    @classmethod
+    def _get_invalid_end(
+        cls, reservation_unit: ReservationUnit, now: datetime.datetime
+    ):
+        reservation_in_reservations_closed_period = (
             reservation_unit.reservation_ends
             and now >= reservation_unit.reservation_ends
-        ) or (reservation_unit.publish_ends and now >= reservation_unit.publish_ends)
+            and (
+                reservation_unit.reservation_begins is None
+                or reservation_unit.reservation_begins
+                <= reservation_unit.reservation_ends
+            )
+        )
+
+        reservation_in_non_published_reservation_unit = (
+            reservation_unit.publish_ends
+            and now >= reservation_unit.publish_ends
+            and (
+                reservation_unit.publish_begins is None
+                or (reservation_unit.publish_begins <= reservation_unit.publish_ends)
+            )
+        )
+        return (
+            reservation_in_reservations_closed_period
+            or reservation_in_non_published_reservation_unit
+        )
+
+    def check_reservation_time(self, reservation_unit: ReservationUnit):
+        state = reservation_unit.state
+        if (
+            state == ReservationUnitState.DRAFT
+            or state == ReservationUnitState.ARCHIVED
+        ):
+            raise ValidationErrorWithCode(
+                f"Reservation unit is not reservable due to status is {state}.",
+                ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
+            )
+
+        now = timezone.now()
+
+        is_invalid_begin = self._get_invalid_begin(reservation_unit, now)
+
+        is_invalid_end = self._get_invalid_end(reservation_unit, now)
 
         if is_invalid_begin or is_invalid_end:
             raise ValidationErrorWithCode(

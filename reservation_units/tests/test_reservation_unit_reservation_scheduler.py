@@ -168,7 +168,9 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
     ):
         self.app_round.reservation_period_begin = datetime.date(2022, 1, 1)
         self.app_round.reservation_period_end = datetime.date(2022, 1, 2)
-        self.reservation_unit.reservation_ends = datetime.datetime(2021, 12, 31, 0)
+        self.reservation_unit.reservation_ends = datetime.datetime(
+            2021, 12, 31, 0
+        ).astimezone(DEFAULT_TIMEZONE)
         self.reservation_unit.save()
         self.app_round.set_status(ApplicationRoundStatus.IN_REVIEW)
         self.app_round.save()

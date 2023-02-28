@@ -136,8 +136,11 @@ class ReservationUnitReservationScheduler:
 
         return DEFAULT_TIMEZONE.localize(datetime.datetime.now() + delta)
 
-    def _get_reservation_period_end(self, start: datetime.date) -> datetime.date:
-        if self.reservation_unit.reservation_ends:
+    def _get_reservation_period_end(self, start: datetime.datetime) -> datetime.date:
+        if (
+            self.reservation_unit.reservation_ends
+            and self.reservation_unit.reservation_ends > start
+        ):
             return self.reservation_unit.reservation_ends.date()
 
         delta = 720  # Two years ahead by default.
