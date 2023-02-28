@@ -190,6 +190,9 @@ env = environ.Env(
     CSRF_TRUSTED_ORIGINS=(list, []),
     MULTI_PROXY_HEADERS=(bool, False),
     ICAL_HASH_SECRET=(str, ""),
+    PRIMARY_MUNICIPALITY_NUMBER=(str, "091"),  # Default to Helsinki
+    PRIMARY_MUNICIPALITY_NAME=(str, "Helsinki"),  # Default to Helsinki
+    SECONDARY_MUNICIPALITY_NAME=(str, "Other"),  # Default to Other
     # Celery
     CELERY_ENABLED=(bool, True),
     CELERY_RESULT_BACKEND=(str, "django-db"),
@@ -230,6 +233,7 @@ env = environ.Env(
     # Open City Profile
     OPEN_CITY_PROFILE_GRAPHQL_API=(str, "https://profile-api.test.hel.ninja/graphql/"),
     OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES=(list, ["substantial", "high"]),
+    PREFILL_RESERVATION_WITH_PROFILE_DATA=(bool, False),
     # Logging
     ENABLE_SQL_LOGGING=(bool, False),
     APP_LOGGING_LEVEL=(str, "WARNING"),
@@ -321,6 +325,10 @@ RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
 RESERVATION_UNIT_PURPOSE_IMAGES_ROOT = "reservation_unit_purpose_images"
 
 ICAL_HASH_SECRET = env("ICAL_HASH_SECRET")
+
+PRIMARY_MUNICIPALITY_NUMBER = env("PRIMARY_MUNICIPALITY_NUMBER")
+PRIMARY_MUNICIPALITY_NAME = env("PRIMARY_MUNICIPALITY_NAME")
+SECONDARY_MUNICIPALITY_NAME = env("SECONDARY_MUNICIPALITY_NAME")
 
 # Whether to trust X-Forwarded-Host headers for all purposes
 # where Django would need to make use of its own hostname
@@ -596,3 +604,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # Open city profile confs
 OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
 OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES = env("OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES")
+PREFILL_RESERVATION_WITH_PROFILE_DATA = env("PREFILL_RESERVATION_WITH_PROFILE_DATA")

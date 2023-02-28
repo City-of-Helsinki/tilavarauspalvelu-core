@@ -1,10 +1,11 @@
 import datetime
 import json
 from decimal import Decimal
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import freezegun
 from assertpy import assert_that
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import (
@@ -12,7 +13,7 @@ from api.graphql.tests.test_reservations.base import (
     ReservationTestCaseBase,
 )
 from applications.models import PRIORITY_CONST, City
-from applications.tests.factories import ApplicationRoundFactory
+from applications.tests.factories import ApplicationRoundFactory, CityFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservation_units.models import (
     PriceUnit,
@@ -28,6 +29,10 @@ from reservation_units.tests.factories import (
 )
 from reservations.models import STATE_CHOICES, AgeGroup, Reservation, ReservationType
 from reservations.tests.factories import ReservationFactory
+
+
+def get_profile_data():
+    return {"data": {"myProfile": {"firstName": "John", "lastName": "Doe"}}}
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
@@ -131,6 +136,162 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.buffer_time_before).is_equal_to(
             self.reservation_unit.buffer_time_before
         )
+
+    @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
+    @patch(
+        "users.utils.open_city_profile.basic_info_resolver.requests.get",
+        return_value=MagicMock(
+            status_code=200, json=MagicMock(return_value=get_profile_data())
+        ),
+    )
+    def test_reservation_succeed_with_minimum_data(
+        self, mock_profile_call, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = {
+            "name": "Test reservation",
+            "description": "Test description",
+            "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
+            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
+                "%Y%m%dT%H%M%SZ"
+            ),
+            "reservationUnitPks": [self.reservation_unit.pk],
+        }
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.user).is_equal_to(self.regular_joe)
+        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+        assert_that(reservation.priority).is_equal_to(PRIORITY_CONST.PRIORITY_MEDIUM)
+
+        assert_that(reservation.buffer_time_after).is_equal_to(
+            self.reservation_unit.buffer_time_after
+        )
+        assert_that(reservation.buffer_time_before).is_equal_to(
+            self.reservation_unit.buffer_time_before
+        )
+
+    @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
+    @patch("users.utils.open_city_profile.basic_info_resolver.requests.get")
+    def test_reservation_details_prefilled_with_profile_data(
+        self, mock_profile_call, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        city = CityFactory(name="Helsinki", municipality_code="12345")
+        data = {
+            "data": {
+                "myProfile": {
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "primaryAddress": {
+                        "postalCode": "00100",
+                        "address": "Test street 1",
+                        "city": "Helsinki",
+                        "addressType": "HOME",
+                    },
+                    "primaryPhone": {
+                        "phone": "123456789",
+                    },
+                    "verifiedPersonalInformation": {
+                        "municipalityOfResidence": "Helsinki",
+                        "municipalityOfResidenceNumber": "12345",
+                    },
+                }
+            }
+        }
+        mock_profile_call.return_value = MagicMock(
+            status_code=200, json=MagicMock(return_value=data)
+        )
+
+        input_data = {
+            "name": "Test reservation",
+            "description": "Test description",
+            "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
+            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
+                "%Y%m%dT%H%M%SZ"
+            ),
+            "reservationUnitPks": [self.reservation_unit.pk],
+        }
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.reservee_first_name).is_equal_to("John")
+        assert_that(reservation.reservee_last_name).is_equal_to("Doe")
+        assert_that(reservation.reservee_address_city).is_equal_to("Helsinki")
+        assert_that(reservation.reservee_address_street).is_equal_to("Test street 1")
+        assert_that(reservation.reservee_address_zip).is_equal_to("00100")
+        assert_that(reservation.home_city).is_equal_to(city)
+
+    @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
+    @patch("users.utils.open_city_profile.basic_info_resolver.requests.get")
+    def test_reservation_details_prefilled_with_profile_data_with_foreign_address(
+        self, mock_profile_call, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        data = {
+            "data": {
+                "myProfile": {
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "primaryPhone": {
+                        "phone": "123456789",
+                    },
+                    "verifiedPersonalInformation": {
+                        "permanentForeignAddress": {
+                            "streetAddress": "Foreign street 1",
+                            "additionalAddress": "Foreign city",
+                            "countryCode": "AX",
+                        },
+                    },
+                }
+            }
+        }
+        mock_profile_call.return_value = MagicMock(
+            status_code=200, json=MagicMock(return_value=data)
+        )
+
+        input_data = {
+            "name": "Test reservation",
+            "description": "Test description",
+            "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
+            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
+                "%Y%m%dT%H%M%SZ"
+            ),
+            "reservationUnitPks": [self.reservation_unit.pk],
+        }
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.reservee_address_city).is_equal_to("Foreign city AX")
+        assert_that(reservation.reservee_address_street).is_equal_to("Foreign street 1")
+        assert_that(reservation.reservee_address_zip).is_empty()
 
     def test_creating_reservation_with_reservation_language_succeed(
         self, mock_periods, mock_opening_hours

@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from helusers.user_utils import convert_to_uuid
 
-from users.utils.birthday_resolver import resolve_user
+from users.utils.open_city_profile.birthday_resolver import resolve_user
 
 response_mock = mock.MagicMock()
 

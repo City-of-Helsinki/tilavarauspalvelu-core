@@ -5,8 +5,9 @@ import requests
 from django.conf import settings
 from helusers.user_utils import get_or_create_user
 from requests import RequestException
-from rest_framework import HTTP_HEADER_ENCODING
 from sentry_sdk import capture_exception, capture_message
+
+from users.utils.open_city_profile.mixins import ProfileReaderTokenMixin
 
 
 def resolve_user(request, payload):
@@ -50,7 +51,7 @@ class BirthDayReaderQueryError(BirthDayReaderError):
     pass
 
 
-class UserBirthdayReader:
+class UserBirthdayReader(ProfileReaderTokenMixin):
     """Reads birthday from national identification number stored in open city profile"""
 
     CENTURY = {
@@ -70,17 +71,6 @@ class UserBirthdayReader:
 
     def __init__(self, request):
         self.request = request
-
-    def __get_token(self):
-        token = self.request.headers.get("X-Authorization", b"")
-
-        if isinstance(token, str):
-            token = token.encode(HTTP_HEADER_ENCODING)
-
-        if token and not token.startswith(b"Bearer"):
-            token = b"Bearer " + token
-
-        return token
 
     def get_user_birthday(self) -> [datetime.date, None]:
         nin = self.__get_national_identification_number()
@@ -102,11 +92,12 @@ class UserBirthdayReader:
     def __get_national_identification_number(self) -> [str, None]:
         nin = None
 
-        token = self.__get_token()
-        if not token:
+        if not self.token:
             raise BirthDayReaderTokenNullOrEmptyError()
 
-        response_data = self.__read_national_identification_number_from_source(token)
+        response_data = self.__read_national_identification_number_from_source(
+            self.token
+        )
 
         if response_data.get("errors"):
             message = next(iter(response_data.get("errors"))).get("message")

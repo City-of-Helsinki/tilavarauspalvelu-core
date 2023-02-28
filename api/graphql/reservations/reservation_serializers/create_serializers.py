@@ -1,9 +1,11 @@
 import datetime
 from typing import List, Optional
 
+from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from graphql import GraphQLError
 from rest_framework import serializers
+from sentry_sdk import capture_exception as log_exception_to_sentry
 
 from api.graphql.base_serializers import PrimaryKeySerializer
 from api.graphql.choice_fields import ChoiceCharField
@@ -27,6 +29,10 @@ from reservations.models import (
     Reservation,
     ReservationPurpose,
     ReservationType,
+)
+from users.utils.open_city_profile.basic_info_resolver import (
+    ProfileReadError,
+    ProfileUserInfoReader,
 )
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -232,6 +238,9 @@ class ReservationCreateSerializer(
         reservation_unit_ids = list(map(lambda x: x.pk, reservation_units))
         self.check_reservation_type(user, reservation_unit_ids, reservation_type)
 
+        if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
+            data = self._prefill_from_from_profile(user, data)
+
         return data
 
     def _get_biggest_buffer_time_from_reservation_units(
@@ -243,6 +252,44 @@ class ReservationCreateSerializer(
             if getattr(res_unit, field, None) is not None
         ]
         return max(buffer_times, default=None)
+
+    def _prefill_from_from_profile(self, user, data):
+        try:
+            reader = ProfileUserInfoReader(user, self.context.get("request"))
+
+            basic_details = {
+                "reservee_first_name": reader.get_first_name(),
+                "reservee_last_name": reader.get_last_name(),
+                "reservee_email": reader.get_email(),
+                "reservee_phone": reader.get_phone(),
+                "home_city": reader.get_user_home_city(),
+            }
+
+            for key, value in [
+                (key, value) for key, value in basic_details.items() if value
+            ]:
+                data[key] = value
+
+            address = reader.get_address()
+            if address and not address.get("countryCode"):
+                data["reservee_address_street"] = address.get("address")
+                data["reservee_address_zip"] = address.get("postalCode")
+                data["reservee_address_city"] = address.get("city")
+
+            elif address and address.get("countryCode"):
+                # If countryCode is present then address is abroad address and
+                # then the format can be ambiguous, so we use the street address and city only.
+                data["reservee_address_street"] = address.get("address")
+                data[
+                    "reservee_address_city"
+                ] = f"{address.get('city')} {address.get('countryCode')}"
+
+        except ProfileReadError as prof_err:
+            log_exception_to_sentry(prof_err)
+        except Exception as ex:
+            log_exception_to_sentry(ex)
+
+        return data
 
     def check_sku(self, current_sku, new_sku):
         if current_sku is not None and current_sku != new_sku:
