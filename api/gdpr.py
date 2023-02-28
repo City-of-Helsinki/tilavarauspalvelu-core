@@ -3,11 +3,15 @@ from typing import List
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from helsinki_gdpr.models import SerializableMixin
 from helsinki_gdpr.views import DeletionNotAllowed, DryRunSerializer, GDPRAPIView
 from rest_framework import status
 from rest_framework.response import Response
 
+from applications.models import ApplicationStatus
+from merchants.models import OrderStatus
+from reservations.models import STATE_CHOICES as ReservationState
 from tilavarauspalvelu.utils.anonymisation import anonymize_user_data
 
 User = get_user_model()
@@ -160,12 +164,29 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
         anonymize_user_data(profile_user.user)
 
     def _check_user_can_be_anonymized(self, user):
-        # TODO: Something to check with applications, are there any applications that needs to be handled still.
-        #       Something to check with reservations, are there any reservations that are pending payments or needs
-        #       handling?
-        #       Are any status changes needed for above?
+        now = timezone.now()
 
-        return True
+        has_open_reservations = (
+            user.reservation_set.filter(end__gte=now)
+            .exclude(state__in=[ReservationState.CANCELLED, ReservationState.DENIED])
+            .exists()
+        )
+
+        has_open_applications = user.application_set.exclude(
+            cached_latest_status__in=[
+                ApplicationStatus.DRAFT,
+                ApplicationStatus.EXPIRED,
+                ApplicationStatus.CANCELLED,
+            ]
+        ).exists()  # As in MVP we don't know what's the real status of the application when e.g. SENT or HANDLED.
+
+        has_open_payments = user.reservation_set.filter(
+            payment_order__isnull=False,
+            payment_order__remote_id__isnull=False,
+            payment_order__status=OrderStatus.DRAFT,
+        ).exists()
+
+        return not (has_open_reservations or has_open_applications or has_open_payments)
 
     def delete(self, request, *args, **kwargs):
         dry_run_serializer = DryRunSerializer(data=request.data)
