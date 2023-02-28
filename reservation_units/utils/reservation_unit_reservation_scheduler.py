@@ -125,7 +125,7 @@ class ReservationUnitReservationScheduler:
 
     def _get_reservation_period_start(self) -> datetime.datetime:
         if self.reservation_unit.reservation_begins:
-            return self.reservation_unit.reservation_begins
+            return self.reservation_unit.reservation_begins.astimezone(DEFAULT_TIMEZONE)
 
         delta = datetime.timedelta(days=0)
 
@@ -141,7 +141,9 @@ class ReservationUnitReservationScheduler:
             self.reservation_unit.reservation_ends
             and self.reservation_unit.reservation_ends > start
         ):
-            return self.reservation_unit.reservation_ends.date()
+            return self.reservation_unit.reservation_ends.astimezone(
+                DEFAULT_TIMEZONE
+            ).date()
 
         delta = 720  # Two years ahead by default.
 
