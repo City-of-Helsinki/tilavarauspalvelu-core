@@ -454,7 +454,7 @@ OIDC_API_TOKEN_AUTH = {
     "AUDIENCE": env("TUNNISTAMO_JWT_AUDIENCE"),
     "ISSUER": env("TUNNISTAMO_JWT_ISSUER"),
     # Use a custom resolve user for fetching date of birth.
-    "USER_RESOLVER": "users.utils.birthday_resolver.resolve_user",
+    "USER_RESOLVER": "users.utils.resolve_user",
 }
 
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
