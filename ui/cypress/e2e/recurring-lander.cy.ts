@@ -1,4 +1,4 @@
-import { applicationRoundContainer } from "model/recurring-lander";
+import { applicationRoundContainer } from "../model/recurring-lander";
 import { checkBreadcrumbs } from "../model/breadcrumb";
 
 describe("recurring search lander", () => {
@@ -38,7 +38,7 @@ describe("recurring search lander", () => {
       .children("h2")
       .should("contain.text", "Päättyneet haut");
 
-    cy.checkA11y(null, null, null, true);
+    cy.checkA11y(undefined, undefined, undefined, true);
 
     applicationRoundContainer("active")
       .children("div")
@@ -55,8 +55,7 @@ describe("recurring search lander", () => {
       en: [{ title: "Home", url: "/en" }, { title: "Seasonal booking" }],
       sv: [{ title: "Hemsidan", url: "/sv" }, { title: "Säsongbokning" }],
     };
-    const url = "/recurring";
 
-    checkBreadcrumbs({ breadcrumbs: breadcrumbLangArray, url });
+    checkBreadcrumbs({ breadcrumbs: breadcrumbLangArray });
   });
 });

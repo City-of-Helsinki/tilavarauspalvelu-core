@@ -1,4 +1,4 @@
-import { applicationGroups, confirmationModal } from "model/applications";
+import { applicationGroups, confirmationModal } from "../model/applications";
 
 describe("applications", () => {
   beforeEach(() => {

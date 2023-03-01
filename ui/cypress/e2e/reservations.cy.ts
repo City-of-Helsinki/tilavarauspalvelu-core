@@ -1,3 +1,4 @@
+import { addDays, format } from "date-fns";
 import {
   cancelButton as detailCancelButton,
   accordionToggler,
@@ -5,7 +6,7 @@ import {
   reservationInfoCard,
   calendarLinkButton,
   modifyButton,
-} from "model/reservation-detail";
+} from "../model/reservation-detail";
 import {
   startTimeSelectorToggle,
   reservationControlsDateInput,
@@ -14,7 +15,7 @@ import {
   reservationEditActionBack,
   reservationEditActionSubmit,
   durationSelectorToggle,
-} from "model/reservation-creation";
+} from "../model/reservation-creation";
 import {
   cancelButton,
   detailButton,
@@ -22,23 +23,21 @@ import {
   tab,
   statusTag,
   orderStatusTag,
-} from "model/reservation-list";
+} from "../model/reservation-list";
 import {
   title as cancelTitle,
   cancelButton as cancelCancelButton,
   backButton,
   reasonSelect,
-  customReasonInput,
   secondBackButton,
-} from "model/reservation-cancel";
-import { reservationControlsToggleButton } from "model/reservation-unit";
+} from "../model/reservation-cancel";
+import { reservationControlsToggleButton } from "../model/reservation-unit";
 import {
   errorNotificationTitle,
   errorNotificationBody,
   errorNotificationCloseButton,
   errorNotification,
-} from "model/notification";
-import { addDays, format } from "date-fns";
+} from "../model/notification";
 
 describe("Tilavaraus user reservations", () => {
   beforeEach(() => {

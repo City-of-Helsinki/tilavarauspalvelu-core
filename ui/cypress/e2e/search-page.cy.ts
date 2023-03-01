@@ -1,4 +1,4 @@
-import { checkBreadcrumbs } from "model/breadcrumb";
+import { checkBreadcrumbs } from "../model/breadcrumb";
 import {
   searchButton,
   fullTextInput,
@@ -139,9 +139,8 @@ describe("Tilavaraus ui search page (recurring)", () => {
         { title: "Sök" },
       ],
     };
-    const url = "/search";
 
-    checkBreadcrumbs({ breadcrumbs: breadcrumbLangArray, url });
+    checkBreadcrumbs({ breadcrumbs: breadcrumbLangArray });
   });
 
   it("handles mobile features", () => {

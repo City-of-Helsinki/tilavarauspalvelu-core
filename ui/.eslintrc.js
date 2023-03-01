@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 module.exports = {
   extends: [
     "airbnb-typescript-prettier",
@@ -6,7 +7,7 @@ module.exports = {
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: "./tsconfig.eslint.json",
+    project: "./tsconfig.json",
     tsconfigRootDir: __dirname,
     sourceType: "module",
   },

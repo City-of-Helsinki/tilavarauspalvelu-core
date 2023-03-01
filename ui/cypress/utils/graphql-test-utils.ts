@@ -1,17 +1,17 @@
-export const hasOperationName = (req, operationName) => {
+export const hasOperationName = (req, operationName: string) => {
   const { body } = req;
   return (
     body.hasProperty("operationName") && body.operationName === operationName
   );
 };
 
-export const aliasQuery = (req, operationName) => {
+export const aliasQuery = (req, operationName: string) => {
   if (hasOperationName(req, operationName)) {
     req.alias = `gql-${operationName}-query`;
   }
 };
 
-export const aliasMutation = (req, operationName) => {
+export const aliasMutation = (req, operationName: string) => {
   if (hasOperationName(req, operationName)) {
     req.alias = `gql-${operationName}-mutation`;
   }

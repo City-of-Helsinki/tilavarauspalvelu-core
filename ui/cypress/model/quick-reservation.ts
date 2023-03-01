@@ -1,4 +1,4 @@
-type viewType = "mobile" | "desktop";
+type ViewType = "mobile" | "desktop";
 
 export function dateSelect(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("#desktop-quick-reservation-date");
@@ -13,7 +13,7 @@ export function durationSelect(): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 export function price(
-  viewType: viewType
+  viewType: ViewType
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(
     `#quick-reservation-${viewType} [data-testid="quick-reservation-price"]`
@@ -21,7 +21,7 @@ export function price(
 }
 
 export function nextAvailableTimeLink(
-  viewType: viewType
+  viewType: ViewType
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(
     `#quick-reservation-${viewType} [data-testid="quick-reservation-next-available-time"]`
@@ -29,7 +29,7 @@ export function nextAvailableTimeLink(
 }
 
 export function carouselButton(
-  viewType: viewType,
+  viewType: ViewType,
   label: string
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(
@@ -38,7 +38,7 @@ export function carouselButton(
 }
 
 export function timeSlots(
-  viewType: viewType
+  viewType: ViewType
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(
     `#quick-reservation-${viewType} [data-testid="quick-reservation-slot"]`
@@ -46,7 +46,7 @@ export function timeSlots(
 }
 
 export function submitButton(
-  viewType: viewType
+  viewType: ViewType
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(
     `#quick-reservation-${viewType} [data-test="quick-reservation__button--submit"]`

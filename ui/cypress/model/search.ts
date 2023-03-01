@@ -109,7 +109,7 @@ export function reservationUnitCards(
   order: number
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(
-    "#searchResultList > div:nth-of-type(2) > div:nth-of-type(" + order + ")"
+    `#searchResultList > div:nth-of-type(2) > div:nth-of-type(${order})`
   );
 }
 

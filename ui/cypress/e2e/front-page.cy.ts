@@ -48,7 +48,7 @@ describe("Tilavaraus ui front page", () => {
       });
 
     purposeLinks().eq(3).click();
-    cy.url().should("match", new RegExp("purposes=4$"));
+    cy.url().should("match", /purposes=4$/);
   });
 
   it("displays unit links", () => {
@@ -62,7 +62,7 @@ describe("Tilavaraus ui front page", () => {
 
   it("follows general units link", () => {
     unitLinkSearchForm().click();
-    cy.url().should("match", new RegExp("/search/single$"));
+    cy.url().should("match", /\/search\/single$/);
   });
 
   it("displays search guide", () => {
@@ -78,6 +78,6 @@ describe("Tilavaraus ui front page", () => {
   });
 
   it("is accessible", () => {
-    cy.checkA11y(null, null, null, true);
+    cy.checkA11y(undefined, undefined, undefined, true);
   });
 });

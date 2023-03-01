@@ -14,19 +14,24 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": ["cypress", "cypress-axe"]
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "*.d.ts",
     "jest.setup.js",
-    "jest.config.ts"
+    "jest.config.ts",
+    ".eslintrc.js"
   ],
   "exclude": [
     "node_modules",
+    // ignore tests till this is added to all test files
+    // import {expect, jest, test} from '@jest/globals';
     "**/*.spec.ts",
-    "cypress.config.ts",
-    "cypress/**/*.ts"
+    "**/*.test.ts",
+    "**/*.spec.tsx",
+    "**/*.test.tsx"
   ]
 }

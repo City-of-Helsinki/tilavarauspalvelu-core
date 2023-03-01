@@ -1,4 +1,10 @@
-import { checkBreadcrumbs } from "model/breadcrumb";
+import type {
+  RequestHandler,
+  ResponseFunction,
+  RestContext,
+  RestRequest,
+} from "msw";
+import { checkBreadcrumbs } from "../model/breadcrumb";
 import {
   firstAvailableApplicationRound,
   selectApplicationRoundButton,
@@ -16,12 +22,7 @@ import {
   timeSummary,
   resetButton,
   addNewApplicationButton,
-  notificationTitle,
-  applicationEventAccordion,
-  copyCellsButton,
   minDurationNotification,
-  minDurationNotificationText,
-  successNotification,
 } from "../model/application";
 import {
   addReservationUnitButton,
@@ -51,21 +52,33 @@ describe("application", () => {
 
   it("can be submitted and is accessible", () => {
     cy.window().then((window) => {
-      const { worker, rest } = window.msw;
+      const { worker, rest } = (window as any).msw;
 
       worker.use(
-        rest.get(`*/v1/application/138/*`, (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(get138Page1JSONResponse));
-        }),
-        rest.post(`*/v1/application/`, (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(postJSONResponse));
-        }),
-        rest.put(`*/v1/application/138`, (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(putPage1Response));
-        }),
-        rest.get(`*/v1/reservation_unit/2/*`, (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(getReservationUnitResponse));
-        })
+        rest.get(
+          `*/v1/application/138/*`,
+          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+            return res(ctx.status(200), ctx.json(get138Page1JSONResponse));
+          }
+        ),
+        rest.post(
+          `*/v1/application/`,
+          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+            return res(ctx.status(200), ctx.json(postJSONResponse));
+          }
+        ),
+        rest.put(
+          `*/v1/application/138`,
+          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+            return res(ctx.status(200), ctx.json(putPage1Response));
+          }
+        ),
+        rest.get(
+          `*/v1/reservation_unit/2/*`,
+          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+            return res(ctx.status(200), ctx.json(getReservationUnitResponse));
+          }
+        )
       );
     });
     startApplicationButton().should("not.exist");
@@ -110,7 +123,7 @@ describe("application", () => {
     acceptAndSaveEvent(1).click();
 
     cy.window().then((window) => {
-      const { worker, rest } = window.msw;
+      const { worker, rest } = (window as any).msw;
 
       worker.use(
         rest.get(`*/v1/application/138`, (req, res, ctx) => {
@@ -227,7 +240,7 @@ describe("application", () => {
     fillAsIndividual();
 
     cy.window().then((window) => {
-      const { worker, rest } = window.msw;
+      const { worker, rest } = (window as any).msw;
 
       worker.use(
         rest.get(`*/v1/application/138/*`, (req, res, ctx) => {

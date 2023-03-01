@@ -1,3 +1,4 @@
+import "cypress-axe";
 import {
   searchButton,
   fullTextInput,

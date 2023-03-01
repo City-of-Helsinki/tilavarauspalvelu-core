@@ -1,8 +1,13 @@
 node_modules
-cypress
 dist
 build
 public
 next-env.d.ts
 gql-types.ts
 setupTests.ts
+# ignore tests till they work with TS
+*.test.*
+*.spec.*
+# ignore the two js files till we confirm that ts compiler can be run on js files
+_document.js
+_error.js

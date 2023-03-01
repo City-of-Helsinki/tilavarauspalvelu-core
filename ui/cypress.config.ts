@@ -16,7 +16,9 @@ export default defineConfig({
           launchOptions.args.push("--ignore-certificate-errors");
           return launchOptions;
         }
+        return launchOptions;
       });
+      // eslint-disable-next-line import/extensions
       return require("./cypress/plugins/index.js")(on, config);
     },
   },

@@ -5,13 +5,13 @@ import {
   hzNavigationFwd,
   reservationSubmitButton,
   timeColumn,
-} from "model/calendar";
-import { error404Body, error404Title } from "model/error";
+} from "../model/calendar";
+import { error404Body, error404Title } from "../model/error";
 import {
   errorNotificationBody,
   errorNotificationCloseButton,
   errorNotificationTitle,
-} from "model/notification";
+} from "../model/notification";
 import {
   dateSelect,
   durationSelect,
@@ -19,7 +19,7 @@ import {
   price,
   submitButton,
   timeSlots,
-} from "model/quick-reservation";
+} from "../model/quick-reservation";
 import {
   cancelButton,
   dateSelector,
@@ -31,8 +31,8 @@ import {
   reservationQuotaNotification,
   reserveeTypeSelector,
   datePickerModal,
-} from "model/reservation-creation";
-import { reservationInfoCard } from "model/reservation-detail";
+} from "../model/reservation-creation";
+import { reservationInfoCard } from "../model/reservation-detail";
 import {
   addressContainer,
   description,
@@ -46,8 +46,8 @@ import {
   reservationControlsToggleButton,
   pricingTermsLink,
   pricingTermsDialog,
-} from "model/reservation-unit";
-import { textWithIcon } from "model/search";
+} from "../model/reservation-unit";
+import { textWithIcon } from "../model/search";
 
 const matchEvent = (): void => {
   reservationEvent()

@@ -1,13 +1,9 @@
-import {
-  languageSelector,
-  languageSelectorMenu,
-  languageSelectorMenuItem,
-} from "model/navigation";
+import { languageSelector, languageSelectorMenuItem } from "./navigation";
 
-type langs = "fi" | "sv" | "en";
+type Langs = "fi" | "sv" | "en";
 
 type BreadcrumbsByLang = {
-  [key in langs]: Breadcrumb[];
+  [key in Langs]: Breadcrumb[];
 };
 
 type Breadcrumb = {
@@ -24,11 +20,13 @@ export const checkBreadcrumbs = ({
 }: {
   breadcrumbs: BreadcrumbsByLang;
 }) => {
+  // eslint-disable-next-line no-restricted-syntax
   for (const [key, value] of Object.entries(breadcrumbs)) {
     languageSelector().click();
     languageSelectorMenuItem(key)
       .click()
       .wait(1000)
+      // eslint-disable-next-line no-loop-func
       .then(() => {
         breadcrumbsRoot()
           .find("*[class^='Breadcrumb__Item']")
@@ -40,7 +38,7 @@ export const checkBreadcrumbs = ({
             wrappedEl.should("contain.text", value[index].title);
             wrappedEl.should("have.attr", "title", value[index].title);
 
-            if (!!value[index]?.url) {
+            if (value[index]?.url) {
               wrappedEl.should("have.attr", "href", value[index].url);
             }
           });
