@@ -4,6 +4,14 @@ from django.db import migrations, models
 import uuid
 
 
+
+def set_uuids_for_existing(apps, schema_editor):
+    RecurringReservation = apps.get_model("reservations", "RecurringReservation")
+    for recurring in RecurringReservation.objects.all():
+        recurring.uuid = uuid.uuid4()
+        recurring.save(update_fields=["uuid"])
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -14,8 +22,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='recurringreservation',
             name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
+            field=models.UUIDField(null=True, editable=False),
         ),
+        migrations.RunPython(set_uuids_for_existing, migrations.RunPython.noop),
+        migrations.AlterField(
+            model_name='recurringreservation',
+            name='uuid',
+            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True, null=False),
+        ),
+        migrations.RunSQL(migrations.RunSQL.noop, reverse_sql='SET CONSTRAINTS ALL IMMEDIATE'),
         migrations.AddField(
             model_name='reservationstatistic',
             name='is_recurring',
