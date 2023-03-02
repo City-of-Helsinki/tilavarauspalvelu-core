@@ -120,6 +120,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -176,6 +177,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -232,6 +234,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -288,6 +291,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -344,6 +348,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -405,6 +410,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -466,6 +472,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -522,6 +529,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -578,6 +586,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -634,6 +643,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             "",
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -690,6 +700,7 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -746,6 +757,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -803,6 +815,7 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -859,12 +872,13 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
                 f" - {event.end.day}.{event.end.month}.{event.end.year}"
             ),
-            "",
+            "muu",
             event.purpose.name,
             str(event.age_group),
             application.applicant_type,
@@ -915,6 +929,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -971,6 +986,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             f"{event.end.day}.{event.end.month}.{event.end.year}",
             application.home_city.name,
@@ -1024,6 +1040,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             f"{event.begin.day}.{event.begin.month}.{event.begin.year}",
             application.home_city.name,
@@ -1078,6 +1095,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             "",
             application.home_city.name,
@@ -1134,6 +1152,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -1193,6 +1212,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
