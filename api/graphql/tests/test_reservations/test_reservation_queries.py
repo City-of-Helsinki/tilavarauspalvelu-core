@@ -1578,3 +1578,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         assert_that(view_log.viewer_user).is_equal_to(self.general_admin)
         assert_that(view_log.viewer_username).is_equal_to(self.general_admin.username)
         assert_that(view_log.field).is_equal_to("User.date_of_birth")
+        assert_that(view_log.viewer_user_full_name).is_equal_to(
+            self.general_admin.get_full_name()
+        )
+        assert_that(view_log.viewer_user_email).is_equal_to(self.general_admin.email)
