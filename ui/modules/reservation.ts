@@ -1,7 +1,11 @@
 import { addMinutes, isAfter, isValid } from "date-fns";
 import camelCase from "lodash/camelCase";
 import { convertHMSToSeconds, secondsToHms } from "common/src/common/util";
-import { ApplicationRound, OptionType } from "common/types/common";
+import {
+  ApplicationRound,
+  OptionType,
+  PendingReservation,
+} from "common/types/common";
 import {
   ApplicationRoundType,
   ReservationsReservationReserveeTypeChoices,
@@ -248,12 +252,12 @@ export const isReservationConfirmed = (reservation: ReservationType): boolean =>
   reservation.state === "CONFIRMED";
 
 export const isReservationFreeOfCharge = (
-  reservation: ReservationType
+  reservation: ReservationType | PendingReservation
 ): boolean => parseInt(String(reservation.price), 10) === 0;
 
 export type CanReservationBeChangedProps = {
   reservation: ReservationType;
-  newReservation?: ReservationType;
+  newReservation?: ReservationType | PendingReservation;
   reservationUnit?: ReservationUnitByPkType;
   activeApplicationRounds?: ApplicationRoundType[];
 };

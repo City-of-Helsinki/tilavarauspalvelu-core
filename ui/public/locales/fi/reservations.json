@@ -77,7 +77,8 @@
     "RESERVATION_MODIFICATION_NOT_ALLOWED": "Valitettavasti varauksen muuttaminen ei ole mahdollista. Jos haluat muuttaa varaustasi, sinun on peruttava varaus ja tehtävä uusi. Tarkista kuitenkin ensin varauksen peruutusehdot.",
     "RESERVATION_BEGIN_IN_PAST": "Varauksen peruminen tai muuttaminen ei ole mahdollista, koska varausaika on mennyt.",
     "CANCELLATION_NOT_ALLOWED": "Maksu- ja peruutusehtojemme mukaisesti varaus on sitova. Tätä varausta ei voi perua.",
-    "CANCELLATION_TIME_PAST": "Varauksen peruutusaika on umpeutunut. Varauksen ajankohdan muuttaminen tai varauksen peruminen ei ole mahdollista."
+    "CANCELLATION_TIME_PAST": "Varauksen peruutusaika on umpeutunut. Varauksen ajankohdan muuttaminen tai varauksen peruminen ei ole mahdollista.",
+    "RESERVATION_TIME_INVALID": "Varauksen aika on liian lyhyt."
   },
   "cancellationReasons": {
     "termsAreBinding": "Maksu- ja peruutusehtojemme mukaisesti varaus on sitova. Tätä varausta ei voi perua.",

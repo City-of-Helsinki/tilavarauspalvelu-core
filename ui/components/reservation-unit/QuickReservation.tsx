@@ -305,10 +305,11 @@ const QuickReservation = ({
         begin: begin.toISOString(),
         end: end.toISOString(),
         price: null,
+        reservationUnitPk: reservationUnit.pk,
       };
       setLocalReservation(res);
     }
-  }, [date, duration, slot]);
+  }, [date, duration, slot, reservationUnit.pk]);
 
   const availableTimes = useCallback(
     (day: Date, fromStartOfDay = false): string[] => {

@@ -246,7 +246,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   useEffect(() => {
     if (applicationRoundsData && reservationUnit) {
       setActiveApplicationRounds(
-        applicationRoundsData.applicationRounds.edges
+        applicationRoundsData?.applicationRounds?.edges
           .map(({ node }) => node)
           .filter((applicationRound) =>
             applicationRound.reservationUnits

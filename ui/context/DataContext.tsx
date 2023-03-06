@@ -10,6 +10,7 @@ export type ReservationProps = {
   begin: string | null;
   end: string | null;
   price: number | null;
+  reservationUnitPk: number | null;
 };
 
 export const DataContext = React.createContext<DataContextProps>({

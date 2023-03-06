@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled, { CSSProperties } from "styled-components";
 import {
@@ -34,7 +34,12 @@ import {
   doReservationsCollide,
   getDayIntervals,
 } from "common/src/calendar/util";
-import { ApplicationRound, Language, OptionType } from "common/types/common";
+import {
+  ApplicationRound,
+  Language,
+  OptionType,
+  PendingReservation,
+} from "common/types/common";
 import {
   fontBold,
   fontMedium,
@@ -46,7 +51,7 @@ import {
   ReservationUnitByPkType,
 } from "common/types/gql-types";
 import { MediumButton } from "../../styles/util";
-import { DataContext, ReservationProps } from "../../context/DataContext";
+import { ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
@@ -55,9 +60,8 @@ import { capitalize, formatDurationMinutes } from "../../modules/util";
 
 type Props<T> = {
   reservationUnit: ReservationUnitByPkType;
-  begin?: string;
-  end?: string;
-  resetReservation: () => void;
+  initialReservation: PendingReservation;
+  setInitialReservation: (reservation: PendingReservation) => void;
   isSlotReservable: (start: Date, end: Date) => boolean;
   isReserving: boolean;
   setCalendarFocusDate: (date: Date) => void;
@@ -264,9 +268,8 @@ const SubmitButton = styled(MediumButton)`
 
 const ReservationCalendarControls = <T extends Record<string, unknown>>({
   reservationUnit,
-  begin,
-  end,
-  resetReservation,
+  initialReservation,
+  setInitialReservation,
   isSlotReservable,
   isReserving,
   setCalendarFocusDate,
@@ -283,6 +286,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 }: Props<T>): JSX.Element => {
   const { t, i18n } = useTranslation();
 
+  const { begin, end } = initialReservation || {};
+
   const durationOptions = useMemo(() => {
     const options = getDurationOptions(
       reservationUnit.minReservationDuration,
@@ -294,7 +299,6 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     reservationUnit.maxReservationDuration,
   ]);
 
-  const { reservation, setReservation } = useContext(DataContext);
   const [date, setDate] = useState<Date | null>(new Date());
   const [startTime, setStartTime] = useState<string | null>(null);
   const [duration, setDuration] = useState<OptionType | null>(
@@ -307,10 +311,10 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     useLocalStorage<ReservationProps>("reservation");
 
   useEffect(() => {
-    if (!reservation) {
+    if (!initialReservation) {
       setStartTime(null);
     }
-  }, [reservation]);
+  }, [initialReservation]);
 
   const debouncedStartTime = useDebounce(begin, 200);
   const debouncedEndTime = useDebounce(end, 200);
@@ -364,15 +368,16 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           start: startDate,
           end: endDate,
         });
-        setReservation({
-          pk: null,
+        setInitialReservation({
           begin: startDate.toISOString(),
           end: endDate.toISOString(),
-          price: null,
         });
       } else {
-        setReservation({ pk: null, begin: null, end: null, price: null });
-        resetReservation();
+        setInitialReservation({
+          begin: null,
+          end: null,
+        });
+        setInitialReservation(null);
       }
       if (
         doBuffersCollide(
@@ -419,11 +424,14 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, startTime, duration?.value]);
+  }, [date, startTime, duration?.value, reservationUnit]);
 
   useEffect(() => {
-    setReservation({ pk: null, begin: null, end: null, price: null });
-  }, [setReservation]);
+    setInitialReservation({
+      begin: null,
+      end: null,
+    });
+  }, [setInitialReservation]);
 
   const {
     startTime: dayStartTime,
@@ -464,11 +472,14 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   const isReservable = useMemo(
     () =>
       !!duration &&
-      !!reservation &&
-      reservation?.begin &&
-      reservation?.end &&
-      isSlotReservable(new Date(reservation.begin), new Date(reservation.end)),
-    [duration, reservation, isSlotReservable]
+      !!initialReservation &&
+      initialReservation?.begin &&
+      initialReservation?.end &&
+      isSlotReservable(
+        new Date(initialReservation.begin),
+        new Date(initialReservation.end)
+      ),
+    [duration, initialReservation, isSlotReservable]
   );
 
   const beginDate = t("common:dateWithWeekday", {
@@ -513,12 +524,21 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       <LoginFragment
         isActionDisabled={!isReservable}
         actionCallback={() =>
-          setStoredReservation({ ...reservation, pk: reservationUnit.pk })
+          setStoredReservation({
+            ...initialReservation,
+            pk: null,
+            price: null,
+            reservationUnitPk: reservationUnit.pk,
+          })
         }
         componentIfAuthenticated={
           <SubmitButton
             onClick={() => {
-              createReservation(reservation);
+              createReservation({
+                ...initialReservation,
+                price: null,
+                reservationUnitPk: reservationUnit.pk,
+              });
             }}
             disabled={!isReservable || isReserving}
             data-test="reservation__button--submit"
@@ -585,7 +605,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
                   !isValid(valueAsDate) ||
                   toApiDate(valueAsDate) < toApiDate(new Date())
                 ) {
-                  resetReservation();
+                  setInitialReservation(null);
                 } else {
                   setDate(valueAsDate);
                   setCalendarFocusDate(valueAsDate);
@@ -627,8 +647,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               onClick={() => {
                 setStartTime(null);
                 setDuration(null);
-                resetReservation();
-                setReservation(null);
+                setInitialReservation(null);
               }}
               disabled={!startTime}
             >

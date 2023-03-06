@@ -289,7 +289,8 @@ export type Reservation = {
 export type PendingReservation = {
   begin: string;
   end: string;
-  state: "INITIAL";
+  price?: string;
+  reservationUnitPk?: number | null;
   bufferTimeBefore?: string;
   bufferTimeAfter?: string;
 };

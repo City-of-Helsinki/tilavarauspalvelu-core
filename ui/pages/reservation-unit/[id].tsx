@@ -1,7 +1,6 @@
 import React, {
   Children,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -84,7 +83,7 @@ import {
   TERMS_OF_USE,
 } from "../../modules/queries/reservationUnit";
 import { getApplicationRounds } from "../../modules/api";
-import { DataContext, ReservationProps } from "../../context/DataContext";
+import { ReservationProps } from "../../context/DataContext";
 import {
   CREATE_RESERVATION,
   LIST_RESERVATIONS,
@@ -256,6 +255,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         ...(await serverSideTranslations(locale)),
+        key: id,
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
           openingHours: {
@@ -361,14 +361,13 @@ const ReservationUnit = ({
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
   const router = useRouter();
+
   const [, setPendingReservation] = useSessionStorage(
     "pendingReservation",
     null
   );
 
   const now = useMemo(() => new Date().toISOString(), []);
-
-  const { reservation, setReservation } = useContext(DataContext);
 
   const [userReservations, setUserReservations] = useState<
     ReservationType[] | null
@@ -382,7 +381,7 @@ const ReservationUnit = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [storedReservation, , removeStoredReservation] =
-    useLocalStorage<ReservationProps>("reservation");
+    useLocalStorage<PendingReservation>("reservation");
 
   const calendarRef = useRef(null);
   const openPricingTermsRef = useRef(null);
@@ -410,17 +409,17 @@ const ReservationUnit = ({
         behavior: "smooth",
       });
 
-    if (storedReservation?.pk === reservationUnit.pk) {
+    if (storedReservation?.reservationUnitPk === reservationUnit.pk) {
       setFocusDate(new Date(storedReservation.begin));
       scrollToCalendar();
-      setReservation(storedReservation);
+      setInitialReservation(storedReservation);
       removeStoredReservation();
-    } else if (hash === "calendar" && reservation) {
+    } else if (hash === "calendar" && initialReservation) {
       scrollToCalendar();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reservation]);
+  }, [initialReservation]);
 
   const { data: userData } = useQuery<Query>(CURRENT_USER, {
     fetchPolicy: "no-cache",
@@ -540,7 +539,6 @@ const ReservationUnit = ({
       setInitialReservation({
         begin: newReservation.begin,
         end: newReservation.end,
-        state: "INITIAL",
       } as PendingReservation);
 
       if (isClientATouchDevice) {
@@ -591,7 +589,6 @@ const ReservationUnit = ({
       setInitialReservation({
         begin: startTime.toISOString(),
         end: normalizedEnd.toISOString(),
-        state: "INITIAL",
       } as PendingReservation);
 
       return true;
@@ -618,8 +615,10 @@ const ReservationUnit = ({
   }, [isMobile]);
 
   useEffect(() => {
-    const start = reservation?.begin ? new Date(reservation.begin) : null;
-    const end = reservation?.end ? new Date(reservation.end) : null;
+    const start = storedReservation?.begin
+      ? new Date(storedReservation.begin)
+      : null;
+    const end = storedReservation?.end ? new Date(storedReservation.end) : null;
 
     if (start && end) {
       handleEventChange(
@@ -628,7 +627,7 @@ const ReservationUnit = ({
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reservation?.begin, reservation?.end]);
+  }, [storedReservation?.begin, storedReservation?.end]);
 
   const shouldDisplayBottomWrapper = useMemo(
     () => relatedReservationUnits?.length > 0,
@@ -638,7 +637,10 @@ const ReservationUnit = ({
   const calendarEvents: CalendarEvent<Reservation | ReservationType>[] =
     useMemo(() => {
       return userReservations && reservationUnit?.reservations
-        ? [...reservationUnit.reservations, initialReservation]
+        ? [
+            ...reservationUnit.reservations,
+            { ...initialReservation, state: "INITIAL" },
+          ]
             .filter((n: ReservationType) => n)
             .map((n: ReservationType) => {
               const event = {
@@ -660,7 +662,7 @@ const ReservationUnit = ({
 
   const eventBuffers = useMemo(() => {
     return getEventBuffers([
-      ...(calendarEvents.flatMap((e) => e.event) as ReservationType[]),
+      ...calendarEvents.flatMap((e) => e.event),
       {
         begin: initialReservation?.begin,
         end: initialReservation?.end,
@@ -677,7 +679,7 @@ const ReservationUnit = ({
   >(CREATE_RESERVATION, {
     onCompleted: (data) => {
       setPendingReservation({
-        ...reservation,
+        ...initialReservation,
         pk: data.createReservation.pk,
         price: data.createReservation.price,
       });
@@ -700,7 +702,10 @@ const ReservationUnit = ({
         reservationUnitPks: [reservationUnit.pk],
       };
 
-      setReservation({ begin, end, pk: reservationUnit.pk, price: null });
+      setInitialReservation({
+        begin,
+        end,
+      });
 
       addReservation({
         variables: {
@@ -708,7 +713,7 @@ const ReservationUnit = ({
         },
       });
     },
-    [addReservation, reservationUnit.pk, setReservation]
+    [addReservation, reservationUnit.pk, setInitialReservation]
   );
 
   const isReservable = useMemo(() => {
@@ -926,11 +931,8 @@ const ReservationUnit = ({
                     >
                       <ReservationCalendarControls
                         reservationUnit={reservationUnit}
-                        begin={initialReservation?.begin}
-                        end={initialReservation?.end}
-                        resetReservation={() => {
-                          setInitialReservation(null);
-                        }}
+                        initialReservation={initialReservation}
+                        setInitialReservation={setInitialReservation}
                         isSlotReservable={(startDate, endDate) =>
                           isSlotReservable(startDate, endDate)
                         }

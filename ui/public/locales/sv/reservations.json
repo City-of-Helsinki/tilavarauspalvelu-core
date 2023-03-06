@@ -75,7 +75,8 @@
     "RESERVATION_MODIFICATION_NOT_ALLOWED": "",
     "RESERVATION_BEGIN_IN_PAST": "",
     "CANCELLATION_NOT_ALLOWED": "",
-    "CANCELLATION_TIME_PAST": ""
+    "CANCELLATION_TIME_PAST": "",
+    "RESERVATION_TIME_INVALID": ""
   },
   "cancellationReasons": {
     "termsAreBinding": "",

@@ -8,7 +8,7 @@ import {
 } from "common/src/calendar/util";
 import { breakpoints } from "common/src/common/style";
 import { parseDate } from "common/src/common/util";
-import { PendingReservation } from "common/types/common";
+import { PendingReservation, Reservation } from "common/types/common";
 import {
   ApplicationRoundType,
   ReservationType,
@@ -88,7 +88,7 @@ const Actions = styled.div`
 `;
 
 const eventStyleGetter = (
-  { event }: CalendarEvent<ReservationType>,
+  { event }: CalendarEvent<Reservation | ReservationType>,
   ownReservations: number[],
   draggable = true
 ): { style: React.CSSProperties; className?: string } => {
@@ -170,39 +170,53 @@ const EditStep0 = ({
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
 
-  const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
-    const shownReservation = initialReservation || {
-      begin: reservation.begin,
-      end: reservation.end,
-      state: "OWN",
-    };
-    return userReservations && reservationUnit?.reservations
-      ? [...reservationUnit.reservations, shownReservation]
-          .filter((n: ReservationType) => n)
-          .map((n: ReservationType) => {
-            const event = {
-              title: `${
-                n.state === "CANCELLED"
-                  ? `${t("reservationCalendar:prefixForCancelled")}: `
-                  : ""
-              }`,
-              start: parseDate(n.begin),
-              end: parseDate(n.end),
-              allDay: false,
-              event: n,
-            };
+  const calendarEvents: CalendarEvent<Reservation | ReservationType>[] =
+    useMemo(() => {
+      const shownReservation = { ...initialReservation, state: "INITIAL" } || {
+        begin: reservation.begin,
+        end: reservation.end,
+        state: "OWN",
+      };
+      const reservations = initialReservation?.begin
+        ? reservationUnit?.reservations.filter((n) => n.pk !== reservation.pk)
+        : reservationUnit?.reservations;
+      return userReservations && reservationUnit?.reservations
+        ? [...reservations, shownReservation]
+            .filter((n: ReservationType) => n)
+            .map((n: ReservationType) => {
+              const event = {
+                title: `${
+                  n.state === "CANCELLED"
+                    ? `${t("reservationCalendar:prefixForCancelled")}: `
+                    : ""
+                }`,
+                start: parseDate(n.begin),
+                end: parseDate(n.end),
+                allDay: false,
+                event: n,
+              };
 
-            return event;
-          })
-      : [];
-  }, [
-    reservationUnit,
-    t,
-    initialReservation,
-    userReservations,
-    reservation.begin,
-    reservation.end,
-  ]);
+              return event;
+            })
+        : [];
+    }, [
+      reservationUnit,
+      t,
+      initialReservation,
+      userReservations,
+      reservation.pk,
+      reservation.begin,
+      reservation.end,
+    ]);
+
+  const normalizedReservationUnit = useMemo(() => {
+    return {
+      ...reservationUnit,
+      reservations: reservationUnit.reservations?.filter(
+        (n) => n.pk !== reservation.pk
+      ),
+    };
+  }, [reservation.pk, reservationUnit]);
 
   const eventBuffers = useMemo(() => {
     return getEventBuffers([
@@ -211,7 +225,6 @@ const EditStep0 = ({
       {
         begin: initialReservation?.begin || reservation.begin,
         end: initialReservation?.end || reservation.end,
-        state: "INITIAL",
         bufferTimeBefore: reservationUnit?.bufferTimeBefore?.toString(),
         bufferTimeAfter: reservationUnit?.bufferTimeAfter?.toString(),
       },
@@ -268,7 +281,7 @@ const EditStep0 = ({
     (start: Date, end: Date, skipLengthCheck = false): boolean => {
       return (
         isReservationReservable({
-          reservationUnit,
+          reservationUnit: normalizedReservationUnit,
           activeApplicationRounds,
           start,
           end,
@@ -276,7 +289,7 @@ const EditStep0 = ({
         }) && isSlotFree(start)
       );
     },
-    [activeApplicationRounds, reservationUnit, isSlotFree]
+    [activeApplicationRounds, isSlotFree, normalizedReservationUnit]
   );
 
   const handleEventChange = useCallback(
@@ -307,18 +320,9 @@ const EditStep0 = ({
         return false;
       }
 
-      const price = getReservationUnitPrice({
-        reservationUnit,
-        pricingDate: start,
-        minutes: 0,
-        asInt: true,
-      });
-
       setInitialReservation({
         begin: newReservation.begin,
         end: newReservation.end,
-        state: "INITIAL",
-        price,
       } as PendingReservation);
 
       if (isClientATouchDevice) {
@@ -361,18 +365,9 @@ const EditStep0 = ({
         return false;
       }
 
-      const price = getReservationUnitPrice({
-        reservationUnit,
-        pricingDate: startTime,
-        minutes: 0,
-        asInt: true,
-      });
-
       setInitialReservation({
         begin: startTime.toISOString(),
         end: normalizedEnd.toISOString(),
-        state: "INITIAL",
-        price,
       } as PendingReservation);
       return true;
     },
@@ -392,7 +387,7 @@ const EditStep0 = ({
     <>
       <CalendarWrapper>
         <div aria-hidden>
-          <Calendar<ReservationType>
+          <Calendar<Reservation | ReservationType>
             events={[...calendarEvents, ...eventBuffers]}
             begin={currentDate}
             onNavigate={(d: Date) => {
@@ -439,12 +434,9 @@ const EditStep0 = ({
         </div>
         <CalendarFooter>
           <ReservationCalendarControls
-            reservationUnit={reservationUnit}
-            begin={initialReservation?.begin}
-            end={initialReservation?.end}
-            resetReservation={() => {
-              setInitialReservation(null);
-            }}
+            reservationUnit={normalizedReservationUnit}
+            initialReservation={initialReservation}
+            setInitialReservation={setInitialReservation}
             isSlotReservable={(startDate, endDate) =>
               isSlotReservable(startDate, endDate)
             }
@@ -479,14 +471,24 @@ const EditStep0 = ({
         <MediumButton
           variant="primary"
           iconRight={<IconArrowRight aria-hidden />}
-          disabled={!initialReservation}
+          disabled={!initialReservation?.begin || !initialReservation?.end}
           onClick={() => {
+            const newReservation: PendingReservation = {
+              ...initialReservation,
+              price: getReservationUnitPrice({
+                reservationUnit,
+                pricingDate: initialReservation.begin
+                  ? new Date(initialReservation.begin)
+                  : null,
+                minutes: 0,
+                asInt: true,
+              }),
+            };
             const [isNewReservationValid, validationError] =
               canReservationTimeBeChanged({
                 reservation,
-                newReservation:
-                  initialReservation as unknown as ReservationType,
-                reservationUnit,
+                newReservation,
+                reservationUnit: normalizedReservationUnit,
                 activeApplicationRounds,
               });
 
