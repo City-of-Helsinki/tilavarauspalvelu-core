@@ -12,7 +12,7 @@
   "RESERVATION_UNIT_IN_OPEN_ROUND": "Varausyksikkö on mukana avoimella hakukierroksella.",
   "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Varauksen enimmäiskesto on ylitetty.",
   "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Varauksen vähimmäiskesto ei ole ylitetty.",
-  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Liian monta aktiivista varausta varausyksikölle.",
+  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Liian monta aktiivista varausta - sinulla on keskeneräinen varaus kohteelle.",
   "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",
   "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Virheellinen varausaika.",
   "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Varaus ei ole sallittu aikavälillä.",

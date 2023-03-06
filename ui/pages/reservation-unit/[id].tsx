@@ -854,8 +854,13 @@ const ReservationUnit = ({
                 {reservationUnit.maxReservationsPerUser &&
                   userReservations?.length > 0 && (
                     <StyledNotification
-                      type="alert"
-                      label={t("common:fyiLabel")}
+                      $isSticky={isReservationQuotaReached}
+                      type={isReservationQuotaReached ? "alert" : "info"}
+                      label={t(
+                        `reservationCalendar:reservationQuota${
+                          isReservationQuotaReached ? "Full" : ""
+                        }Label`
+                      )}
                     >
                       <span data-testid="reservation-unit--notification__reservation-quota">
                         {t(

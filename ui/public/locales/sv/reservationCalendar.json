@@ -74,8 +74,12 @@
     "termsNotAccepted": ""
   },
   "reservingStartsAt": "",
-  "reservationQuota": "",
-  "reservationQuotaFull": "",
+  "reservationQuotaLabel": "",
+  "reservationQuota_one": "",
+  "reservationQuota_other": "",
+  "reservationQuotaFullLabel": "",
+  "reservationQuotaFull_one": "",
+  "reservationQuotaFull_other": "",
   "quickReservation": {
     "heading": "",
     "date": "",

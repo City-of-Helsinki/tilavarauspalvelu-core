@@ -77,8 +77,12 @@
     "termsNotAccepted": "Hyväksy ehdot jatkaaksesi."
   },
   "reservingStartsAt": "Varauskalenteri aukeaa {{date}}.",
-  "reservationQuota": "Sinulla on jo {{count}}/{{total}} varausta tähän tilaan.",
-  "reservationQuotaFull": "Sinulla on jo {{count}} varausta tähän tilaan. Et voi tehdä uusia varauksia.",
+  "reservationQuotaLabel": "Olemassaolevia varauksia",
+  "reservationQuota_one": "Sinulla on jo {{count}}/{{total}} varaus tähän tilaan.",
+  "reservationQuota_other": "Sinulla on jo {{count}}/{{total}} varausta tähän tilaan.",
+  "reservationQuotaFullLabel": "Enimmäismäärä varauksia tehty",
+  "reservationQuotaFull_one": "Sinulla on jo {{count}} varaus tähän tilaan. Et voi tehdä uusia varauksia.",
+  "reservationQuotaFull_other": "Sinulla on jo {{count}} varausta tähän tilaan. Et voi tehdä uusia varauksia.",
   "quickReservation": {
     "heading": "Katso vapaat ajat ja varaa",
     "date": "Päivä",

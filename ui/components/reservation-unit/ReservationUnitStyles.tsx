@@ -86,14 +86,19 @@ export const MapWrapper = styled.div`
   margin-bottom: var(--spacing-xs);
 `;
 
-export const StyledNotification = styled(Notification)`
+export const StyledNotification = styled(Notification)<{ $isSticky?: boolean }>`
   div > div {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
   }
-  margin-bottom: var(--spacing-xl);
 
+  ${({ $isSticky }) =>
+    $isSticky &&
+    `
+    position: sticky;
+    top: 0;
+    z-index: var(--tilavaraus-stack-order-sticky-container);`};
   svg {
     color: var(--color-info);
     min-width: 24px;
