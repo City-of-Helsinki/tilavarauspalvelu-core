@@ -182,7 +182,7 @@ describe("reservation", () => {
       'button[aria-label="Seuraava kuukausi"]'
     );
     nextMonthBtn.should("exist");
-    nextMonthBtn.click();
+    nextMonthBtn.click({ force: true });
 
     dateSelector()
       .parent()

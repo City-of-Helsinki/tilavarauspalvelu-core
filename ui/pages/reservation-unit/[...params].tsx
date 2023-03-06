@@ -70,6 +70,8 @@ import ReservationConfirmation from "../../components/reservation/ReservationCon
 import Step0 from "../../components/reservation/Step0";
 import Step1 from "../../components/reservation/Step1";
 import { ReservationStep } from "../../modules/types";
+import { JustForDesktop } from "../../modules/style/layout";
+import { PinkBox } from "../../components/reservation-unit/ReservationUnitStyles";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -200,30 +202,6 @@ const Title = styled(H2).attrs({ as: "h1" })`
 
   svg {
     color: var(--color-tram);
-  }
-`;
-
-const PinkBox = styled.div<{ $isHiddenOnMobile: boolean }>`
-  margin-top: var(--spacing-m);
-  padding: 1px var(--spacing-m) var(--spacing-m);
-  background-color: var(--color-suomenlinna-light);
-  line-height: var(--lineheight-l);
-
-  p {
-    &:last-of-type {
-      margin-bottom: 0;
-    }
-
-    margin-bottom: var(--spacing-s);
-  }
-
-  ${Subheading} {
-    margin-top: var(--spacing-m);
-  }
-
-  @media (max-width: ${breakpoints.m}) {
-    display: ${({ $isHiddenOnMobile }) =>
-      $isHiddenOnMobile ? "none" : "block"};
   }
 `;
 
@@ -550,6 +528,8 @@ const ReservationUnitReservation = ({
     }
   }, [step, generalFields, reservation, reservationUnit]);
 
+  const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
+
   if (!isBrowser) {
     return null;
   }
@@ -575,12 +555,16 @@ const ReservationUnitReservation = ({
                 shouldDisplayReservationUnitPrice
               }
             />
-            <PinkBox $isHiddenOnMobile={step > 0}>
-              <Subheading>
-                {t("reservations:reservationInfoBoxHeading")}
-              </Subheading>
-              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
-            </PinkBox>
+            {termsOfUseContent && (
+              <JustForDesktop>
+                <PinkBox>
+                  <Subheading>
+                    {t("reservations:reservationInfoBoxHeading")}
+                  </Subheading>
+                  <Sanitize html={termsOfUseContent} />
+                </PinkBox>
+              </JustForDesktop>
+            )}
           </div>
         )}
         <BodyContainer>

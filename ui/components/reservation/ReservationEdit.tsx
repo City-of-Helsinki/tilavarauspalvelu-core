@@ -297,6 +297,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
       step === 1
         ? { ...reservation, ...pick(initialReservation, ["begin", "end"]) }
         : reservation;
+    const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
 
     return (
       reservation &&
@@ -307,12 +308,12 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
             reservationUnit={reservationUnit}
             type="confirmed"
           />
-          {step === 0 && (
+          {step === 0 && termsOfUse && (
             <PinkBox>
               <Subheading>
                 {t("reservations:reservationInfoBoxHeading")}
               </Subheading>
-              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
+              <Sanitize html={termsOfUse} />
             </PinkBox>
           )}
         </BylineContent>

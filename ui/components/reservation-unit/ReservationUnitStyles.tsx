@@ -103,3 +103,22 @@ export const StyledNotification = styled(Notification)`
     color: inherit;
   }
 `;
+
+export const PinkBox = styled.div`
+  margin-top: var(--spacing-m);
+  padding: 1px var(--spacing-m) var(--spacing-m);
+  background-color: var(--color-suomenlinna-light);
+  line-height: var(--lineheight-l);
+
+  p {
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+
+    margin-bottom: var(--spacing-s);
+  }
+
+  ${Subheading} {
+    margin-top: var(--spacing-m);
+  }
+`;

@@ -20,6 +20,8 @@ import { capitalize, getTranslation } from "../../modules/util";
 import { ActionContainer } from "./styles";
 import Sanitize from "../common/Sanitize";
 import { MediumButton } from "../../styles/util";
+import { JustForMobile } from "../../modules/style/layout";
+import { PinkBox } from "../reservation-unit/ReservationUnitStyles";
 
 type Props = {
   reservation: Reservation;
@@ -72,6 +74,8 @@ const Step1 = ({
   const [areTermsSpaceAccepted, setAreTermsSpaceAccepted] = useState(false);
   const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
+
+  const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
 
   return (
     <form
@@ -230,6 +234,16 @@ const Step1 = ({
         accepted={areTermsSpaceAccepted}
         setAccepted={setAreTermsSpaceAccepted}
       />
+      {termsOfUseContent && (
+        <JustForMobile style={{ marginBottom: "var(--spacing-layout-m)" }}>
+          <PinkBox>
+            <Subheading>
+              {t("reservations:reservationInfoBoxHeading")}
+            </Subheading>
+            <Sanitize html={termsOfUseContent} />
+          </PinkBox>
+        </JustForMobile>
+      )}
       <ActionContainer>
         <MediumButton
           variant="primary"
