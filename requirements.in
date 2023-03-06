@@ -1,5 +1,5 @@
 celery==5.2.7
-Django==3.2.16
+Django==3.2.18
 django-auditlog==2.2.0
 django-admin-sortable2==1.0.4 # Pin to this since the latest has dropped django 3.2 support.
 django-celery-beat==2.3.0
