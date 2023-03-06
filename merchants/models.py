@@ -100,6 +100,12 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
         null=True,
         max_length=128,
     )
+    refund_id = models.UUIDField(
+        verbose_name=_("Refund ID"),
+        help_text=_("Available only when order has been refunded"),
+        blank=True,
+        null=True,
+    )
     payment_type = models.CharField(
         verbose_name=_("Payment type"),
         blank=False,
