@@ -6,10 +6,6 @@ export function reasonSelect(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("#reservation__button--cancel-reason-toggle-button");
 }
 
-export function customReasonInput(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("#reservation__button--cancel-description");
-}
-
 export function backButton(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("button[data-testid='reservation-cancel__button--back']");
 }

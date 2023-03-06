@@ -11,7 +11,6 @@ import {
   IconSignout,
   Notification,
   Select,
-  TextArea,
 } from "hds-react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
@@ -336,18 +335,6 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                             required
                           />
                         )}
-                      />
-                      <TextArea
-                        id="reservation__button--cancel-description"
-                        name="description"
-                        label={t("reservations:cancelDescription")}
-                        placeholder={t(
-                          "reservations:cancelDescriptionPlaceholder"
-                        )}
-                        onChange={(e) =>
-                          setValue("description", e.target.value)
-                        }
-                        maxLength={200}
                       />
                       <Actions>
                         <BlackButton

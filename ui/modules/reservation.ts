@@ -77,6 +77,8 @@ export const canUserCancelReservation = (
   skipTimeCheck = false
 ): boolean => {
   const reservationUnit = reservation.reservationUnits?.[0];
+  if (reservation.state !== ReservationsReservationStateChoices.Confirmed)
+    return false;
   if (!reservationUnit?.cancellationRule) return false;
   if (reservationUnit?.cancellationRule?.needsHandling) return false;
   if (

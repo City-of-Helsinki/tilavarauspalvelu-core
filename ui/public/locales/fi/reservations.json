@@ -38,8 +38,6 @@
   "cancelInfoBody": "Voidaksemme jatkossa palvella sinua paremmin, kertoisiko syyn varauksen perumiseen?",
   "reasonOther": "Muu, mikä?",
   "cancelReason": "Perumisen syy",
-  "cancelDescription": "Perumisen kuvaus",
-  "cancelDescriptionPlaceholder": "Kuvaile tähän miksi perut varauksen.",
   "reservationCancelledTitle": "Varaus peruttu!",
   "reservationCancelledBody": "Saat sähköpostiisi ({{user}}) varausvahvistuksen hetken kuluttua.",
   "reservationCancellationFailed": "Varauksen peruuttaminen epäonnistui",

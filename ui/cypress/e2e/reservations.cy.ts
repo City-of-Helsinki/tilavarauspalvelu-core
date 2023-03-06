@@ -266,7 +266,6 @@ describe("Tilavaraus user reservations", () => {
 
     reasonSelect().click().siblings("ul").children().eq(1).click();
     cancelCancelButton().should("not.be.disabled");
-    customReasonInput().type("A reason");
 
     cancelCancelButton().click();
     cancelTitle().should("have.text", "Varaus peruttu!");

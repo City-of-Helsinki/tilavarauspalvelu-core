@@ -2,6 +2,7 @@ import { get as mockGet } from "lodash";
 import { addDays, addHours, addMinutes, format, startOfToday } from "date-fns";
 import {
   ReservationsReservationReserveeTypeChoices,
+  ReservationsReservationStateChoices,
   ReservationType,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
@@ -102,6 +103,7 @@ describe("canUserCancelReservation", () => {
   test("that does not need handling", () => {
     const reservation = {
       begin: addMinutes(new Date(), 10).toISOString(),
+      state: ReservationsReservationStateChoices.Confirmed,
       reservationUnits: [
         {
           cancellationRule: {
@@ -116,6 +118,7 @@ describe("canUserCancelReservation", () => {
   test("that does not need handling", () => {
     const reservation = {
       begin: new Date().toISOString(),
+      state: ReservationsReservationStateChoices.Confirmed,
       reservationUnits: [
         {
           cancellationRule: {
@@ -127,9 +130,25 @@ describe("canUserCancelReservation", () => {
     expect(canUserCancelReservation(reservation)).toBe(true);
   });
 
+  test("with non-confirmed state", () => {
+    const reservation = {
+      begin: new Date().toISOString(),
+      state: ReservationsReservationStateChoices.RequiresHandling,
+      reservationUnits: [
+        {
+          cancellationRule: {
+            needsHandling: false,
+          },
+        },
+      ],
+    } as ReservationType;
+    expect(canUserCancelReservation(reservation)).toBe(false);
+  });
+
   test("with 0 secs of buffer time", () => {
     const reservation = {
       begin: new Date().toISOString(),
+      state: ReservationsReservationStateChoices.Confirmed,
       reservationUnits: [
         {
           cancellationRule: {

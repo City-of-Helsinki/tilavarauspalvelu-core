@@ -37,8 +37,6 @@
   "cancelInfoBody": "",
   "reasonOther": "",
   "cancelReason": "",
-  "cancelDescription": "",
-  "cancelDescriptionPlaceholder": "",
   "reservationCancelledTitle": "",
   "reservationCancelledBody": "",
   "reservationCancellationFailed": "",
