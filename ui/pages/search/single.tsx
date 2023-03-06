@@ -141,7 +141,7 @@ const SearchSingle = (): JSX.Element => {
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
     variables: processVariables(values, i18n.language),
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
     skip: Object.keys(values).length === 0,
     notifyOnNetworkStatusChange: true,
   });
