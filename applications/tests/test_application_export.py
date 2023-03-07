@@ -73,6 +73,19 @@ class ApplicationDataExporterTestCase(TestCase):
             "id", flat=True
         )
 
+        cls.space_2_name = (
+            f"{cls.event_reservation_unit_2.reservation_unit.name}, "
+            f"{cls.event_reservation_unit_2.reservation_unit.unit.name}"
+        )
+        cls.space_3_name = (
+            f"{cls.event_reservation_unit_3.reservation_unit.name}, "
+            f"{cls.event_reservation_unit_3.reservation_unit.unit.name}"
+        )
+        cls.space_1_name = (
+            f"{cls.event_reservation_unit_1.reservation_unit.name}, "
+            f"{cls.event_reservation_unit_1.reservation_unit.unit.name}"
+        )
+
         # Find random unused ID
         while True:
             potential = FuzzyInteger(0, 100).fuzz()
@@ -120,6 +133,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -131,9 +145,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -176,6 +190,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -187,9 +202,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -232,6 +247,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -243,9 +259,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -288,6 +304,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -299,9 +316,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 1 h 30 min",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -344,6 +361,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -355,9 +373,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "30 min - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -405,6 +423,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -416,9 +435,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "10:00 - 12:00, 12:00 - 14:00",
             "",
@@ -466,6 +485,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -477,9 +497,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -522,6 +542,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -533,9 +554,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -578,6 +599,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -589,9 +611,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -634,6 +656,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             "",
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -645,9 +668,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -690,6 +713,7 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -701,9 +725,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -746,6 +770,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -757,9 +782,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -803,6 +828,7 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -814,9 +840,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -859,20 +885,21 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
                 f" - {event.end.day}.{event.end.month}.{event.end.year}"
             ),
-            "",
+            "muu",
             event.purpose.name,
             str(event.age_group),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -915,6 +942,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -926,9 +954,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -971,6 +999,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             f"{event.end.day}.{event.end.month}.{event.end.year}",
             application.home_city.name,
@@ -979,9 +1008,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -1024,6 +1053,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             f"{event.begin.day}.{event.begin.month}.{event.begin.year}",
             application.home_city.name,
@@ -1032,9 +1062,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -1078,6 +1108,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             "",
             application.home_city.name,
@@ -1086,9 +1117,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -1134,6 +1165,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -1145,9 +1177,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -1193,6 +1225,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            str(event.id),
             event.name,
             (
                 f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
@@ -1204,9 +1237,9 @@ class ApplicationDataExporterTestCase(TestCase):
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
             "",
             "12:00 - 14:00",
             "",
@@ -1275,3 +1308,62 @@ class ApplicationDataExporterTestCase(TestCase):
     def test_empty_arguments_throw_error(self):
         with pytest.raises(Exception):
             call_command("export_applications")
+
+    def test_spaces_columns_are_added_dynamically(self):
+        event_resunit = EventReservationUnitFactory(
+            application_event=self.application_event, priority=PRIORITIES.PRIORITY_HIGH
+        )
+
+        call_command("export_applications", self.application_round_id)
+
+        event: ApplicationEvent = self.application_event
+        application: Application = event.application
+
+        expected_row = [
+            str(application.id),
+            ApplicationStatus.get_verbose_status(self.application_status.status),
+            application.organisation.name,
+            application.contact_person.first_name,
+            application.contact_person.last_name,
+            application.contact_person.email,
+            str(event.id),
+            event.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
+            application.home_city.name,
+            event.purpose.name,
+            str(event.age_group),
+            application.applicant_type,
+            str(event.events_per_week),
+            "1 h - 2 h",
+            self.space_2_name,
+            self.space_3_name,
+            self.space_1_name,
+            f"{event_resunit.reservation_unit.name}, {event_resunit.reservation_unit.unit.name}",
+            "",
+            "12:00 - 14:00",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+
+        file_name = self._get_filename_for_round(self.application_round_id)
+        self._test_first_data_line(file_name, expected_row)

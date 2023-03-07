@@ -5,7 +5,7 @@ from typing import Dict, List
 
 from _csv import QUOTE_ALL
 from django.conf import settings
-from django.db.models import OuterRef, Prefetch, Subquery
+from django.db.models import Count, Max, OuterRef, Prefetch, Subquery
 from django.utils import timezone
 
 from ..models import (
@@ -69,13 +69,21 @@ class ApplicationDataExporter:
             )
         )
 
+        cls.spaces_max_count = (
+            ApplicationEvent.objects.filter(
+                application__application_round=application_round
+            )
+            .annotate(spaces_count=Count("event_reservation_units"))
+            .aggregate(spaces_max_count=Max("spaces_count"))
+        ).get("spaces_max_count", 0)
+
         if len(application_events):
             file_name = f"application_data_round_{application_round}_{now.strftime('%d-%m-%Y')}.csv"
 
             with open(path / file_name, "w", newline="") as applications_file:
                 applications_writer = writer(applications_file)
 
-                cls._write_header_row(applications_writer)
+                cls._write_header_row(applications_writer, cls.spaces_max_count)
 
                 for event in application_events:
                     application: Application = event.application
@@ -119,11 +127,7 @@ class ApplicationDataExporter:
                         5: "",
                         6: "",
                     }
-                    reservation_units = {
-                        0: "",
-                        1: "",
-                        2: "",
-                    }
+                    reservation_units = []
                     contact_person_first_name = ""
                     contact_person_last_name = ""
                     contact_person_email = ""
@@ -172,38 +176,47 @@ class ApplicationDataExporter:
 
                     # Loop through event reservation units and update strings
                     # by priority.
-                    # Limit reservation units to three first units.
                     event_reservation_unit: EventReservationUnit
                     for i, event_reservation_unit in enumerate(
                         event.event_reservation_units.all()
                         .select_related("reservation_unit")
                         .order_by("priority")
-                        .only("reservation_unit__name")[:3]
+                        .only("reservation_unit__name")
                     ):
-                        reservation_units[
-                            i
-                        ] = event_reservation_unit.reservation_unit.name
+                        reservation_units.append(
+                            f"{event_reservation_unit.reservation_unit.name}, "
+                            f"{event_reservation_unit.reservation_unit.unit.name}"
+                        )
 
                     # Write application event to CSV file
-                    applications_writer.writerow(
+                    row = [
+                        application.id,
+                        ApplicationStatus.get_verbose_status(event.current_status),
+                        applicant,
+                        contact_person_first_name,
+                        contact_person_last_name,
+                        contact_person_email,
+                        event.id,
+                        event.name,
+                        cls._get_time_range_string(event_begin, event_end),
+                        getattr(application.home_city, "name", "muu"),
+                        getattr(event.purpose, "name", ""),
+                        event.age_group,
+                        application.applicant_type,
+                        event.events_per_week,
+                        duration_range_string,
+                    ]
+                    row.extend(reservation_units)
+                    row.extend(
                         [
-                            application.id,
-                            ApplicationStatus.get_verbose_status(event.current_status),
-                            applicant,
-                            contact_person_first_name,
-                            contact_person_last_name,
-                            contact_person_email,
-                            event.name,
-                            cls._get_time_range_string(event_begin, event_end),
-                            getattr(application.home_city, "name", ""),
-                            getattr(event.purpose, "name", ""),
-                            event.age_group,
-                            application.applicant_type,
-                            event.events_per_week,
-                            duration_range_string,
-                            reservation_units[0],
-                            reservation_units[1],
-                            reservation_units[2],
+                            ""
+                            for _ in range(
+                                cls.spaces_max_count - len(reservation_units)
+                            )
+                        ]
+                    )
+                    row.extend(
+                        [
                             event_schedules_prio_high[0],
                             event_schedules_prio_high[1],
                             event_schedules_prio_high[2],
@@ -227,9 +240,10 @@ class ApplicationDataExporter:
                             event_schedules_prio_low[6],
                         ]
                     )
+                    applications_writer.writerow(row)
 
     @staticmethod
-    def _write_header_row(writer):
+    def _write_header_row(writer, spaces_count):
         # Write header rows
         writer.writerow(
             [
@@ -311,6 +325,7 @@ class ApplicationDataExporter:
                 "yhteyshenkilö etunimi",
                 "yhteyshenkilö sukunimi",
                 "sähköpostiosoite",
+                "hakemusosan numero",
                 "varauksen nimi",
                 "hakijan ilmoittama kausi",
                 "kotikunta",
@@ -319,9 +334,9 @@ class ApplicationDataExporter:
                 "hakijan tyyppi",
                 "vuoroja, kpl / vko",
                 "aika",
-                "tilatoive 1",
-                "tilatoive 2",
-                "tilatoive 3",
+            ]
+            + [f"tilatoive {i}" for i in range(1, spaces_count + 1)]
+            + [
                 "ma",
                 "ti",
                 "ke",
