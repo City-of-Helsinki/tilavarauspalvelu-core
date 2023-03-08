@@ -18,6 +18,18 @@ from permissions.api_permissions.drf_permissions import WebhookPermission
 from reservations.email_utils import send_confirmation_email
 from reservations.models import STATE_CHOICES, Reservation
 
+default_responses = (
+    {
+        200: OpenApiResponse(description="OK"),
+        400: OpenApiResponse(description="Invalid payload or namespace"),
+        404: OpenApiResponse(description="Order not found"),
+        500: OpenApiResponse(
+            description="Internal server error or problem with upstream service"
+        ),
+        501: OpenApiResponse(description="Unsupported type"),
+    },
+)
+
 
 class WebhookError(APIException):
     def __init__(self, message: str, status_code: int):
@@ -40,12 +52,12 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        type = request.data.get("type", None)
+        webhook_type = request.data.get("type", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
 
-        if type != "PAYMENT_PAID":
+        if webhook_type != "PAYMENT_PAID":
             raise WebhookError(message="Unsupported type", status_code=501)
 
     @extend_schema(
@@ -56,20 +68,17 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                 "orderId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
                 "type": serializers.ChoiceField(
-                    choices=[("PAYMENT_PAID", "PAYMENT_PAID")]
+                    choices=[
+                        (
+                            "PAYMENT_PAID",
+                            "PAYMENT_PAID",
+                        )
+                    ]
                 ),
                 "timestamp": serializers.DateTimeField(),
             },
         ),
-        responses={
-            200: OpenApiResponse(description="OK"),
-            400: OpenApiResponse(description="Invalid payload, namespace or type"),
-            404: OpenApiResponse(description="Order not found"),
-            500: OpenApiResponse(
-                description="Internal server error or problem with upstream service"
-            ),
-            501: OpenApiResponse(description="Unsupported type"),
-        },
+        responses=default_responses,
     )
     def create(self, request):
         needs_update_statuses = [
@@ -139,12 +148,12 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        type = request.data.get("type", None)
+        webhook_type = request.data.get("type", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
 
-        if type != "ORDER_CANCELLED":
+        if webhook_type != "ORDER_CANCELLED":
             raise WebhookError(message="Unsupported type", status_code=501)
 
     @extend_schema(
@@ -159,15 +168,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 "timestamp": serializers.DateTimeField(),
             },
         ),
-        responses={
-            200: OpenApiResponse(description="OK"),
-            400: OpenApiResponse(description="Invalid payload, namespace or type"),
-            404: OpenApiResponse(description="Order not found"),
-            500: OpenApiResponse(
-                description="Internal server error or problem with upstream service"
-            ),
-            501: OpenApiResponse(description="Unsupported type"),
-        },
+        responses=default_responses,
     )
     def create(self, request):
         try:
@@ -212,3 +213,73 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 data={"status": 500, "message": "Problem with upstream service"},
                 status=500,
             )
+
+
+class WebhookRefundViewSet(viewsets.ViewSet):
+    permission_classes = [WebhookPermission]
+
+    def validate_request(self, request):
+        required_field = [
+            "orderId",
+            "refundId",
+            "refundPaymentId",
+            "namespace",
+            "type",
+            "timestamp",
+        ]
+        for field in required_field:
+            if field not in request.data:
+                raise WebhookError(
+                    message=f"Required field missing: {field}", status_code=400
+                )
+
+        namespace = request.data.get("namespace", None)
+        webhook_type = request.data.get("type", None)
+
+        if namespace != settings.VERKKOKAUPPA_NAMESPACE:
+            raise WebhookError(message="Invalid namespace", status_code=400)
+
+        if webhook_type != "REFUND_PAID":
+            raise WebhookError(message="Unsupported type", status_code=501)
+
+    @extend_schema(
+        request=inline_serializer(
+            name="WebhookRefundPayload",
+            fields={
+                "orderId": serializers.UUIDField(),
+                "refundId": serializers.UUIDField(),
+                "refundPaymentId": serializers.UUIDField(),
+                "namespace": serializers.CharField(),
+                "type": serializers.ChoiceField(
+                    choices=[("REFUND_PAID", "REFUND_PAID")]
+                ),
+                "timestamp": serializers.DateTimeField(),
+            },
+        ),
+        responses=default_responses,
+    )
+    def create(self, request):
+        try:
+            self.validate_request(request)
+
+            remote_id = request.data.get("orderId", "")
+
+            # TODO: Add refund_id to filters when it is implemented
+            payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
+
+            if not payment_order:
+                raise WebhookError(message="Order not found", status_code=404)
+
+            # Order is already in a state where no updates are needed
+            if payment_order.status != OrderStatus.PAID:
+                return Response(status=200)
+
+            payment_order.status = OrderStatus.REFUNDED
+            payment_order.processed_at = datetime.now().astimezone(
+                get_default_timezone()
+            )
+            payment_order.save()
+
+            return Response(status=200)
+        except WebhookError as err:
+            return Response(data=err.to_json(), status=err.status_code)

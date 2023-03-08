@@ -345,3 +345,114 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
 
         expected_error = {"status": 501, "message": "Unsupported type"}
         assert_that(response.data).is_equal_to(expected_error)
+
+
+@override_settings(VERKKOKAUPPA_NAMESPACE="tilanvaraus")
+class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.payment_order.status = OrderStatus.PAID
+        self.payment_order.remote_id = self.verkkokauppa_order.order_id
+        self.payment_order.save()
+
+    def get_valid_data(self):
+        return {
+            "orderId": self.verkkokauppa_order.order_id,
+            "refundId": uuid4(),  # TODO: Get from verkkokauppa_payment when it is available
+            "refundPaymentId": uuid4(),
+            "namespace": self.verkkokauppa_order.namespace,
+            "type": "REFUND_PAID",
+            "timestamp": self.verkkokauppa_payment.timestamp.isoformat(),
+        }
+
+    def test_refund_returns_200_without_body_on_success(self):
+        response = self.client.post(
+            reverse("refund-list"),
+            data=self.get_valid_data(),
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.data).is_none()
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.REFUNDED)
+
+    def test_refund_returns_200_when_order_is_already_handled(self):
+        self.payment_order.status = OrderStatus.REFUNDED
+        self.payment_order.save()
+
+        response = self.client.post(
+            reverse("refund-list"),
+            data=self.get_valid_data(),
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.data).is_none()
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.REFUNDED)
+
+    def test_refund_returns_404_with_no_changes_when_order_is_not_found(self):
+        self.payment_order.remote_id = uuid4()
+        self.payment_order.save()
+
+        response = self.client.post(
+            reverse("refund-list"),
+            data=self.get_valid_data(),
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(404)
+        assert_that(response.data["status"]).is_equal_to(404)
+        assert_that(response.data["message"]).is_equal_to("Order not found")
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+
+    def test_refund_returns_400_when_payload_is_invalid(self):
+        data = self.get_valid_data()
+        data.pop("refundPaymentId")
+        response = self.client.post(
+            reverse("refund-list"),
+            data=data,
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        assert_that(response.data["status"]).is_equal_to(400)
+        assert_that(response.data["message"]).is_equal_to(
+            "Required field missing: refundPaymentId"
+        )
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+
+    def test_refund_returns_400_on_invalid_namespace(self):
+        data = self.get_valid_data()
+        data["namespace"] = "invalid"
+
+        response = self.client.post(
+            reverse("refund-list"),
+            data=data,
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        assert_that(response.data["status"]).is_equal_to(400)
+        assert_that(response.data["message"]).is_equal_to("Invalid namespace")
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+
+    def test_refund_returns_501_on_invalid_namespace(self):
+        data = self.get_valid_data()
+        data["type"] = "invalid"
+
+        response = self.client.post(
+            reverse("refund-list"),
+            data=data,
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(501)
+        assert_that(response.data["status"]).is_equal_to(501)
+        assert_that(response.data["message"]).is_equal_to("Unsupported type")
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
