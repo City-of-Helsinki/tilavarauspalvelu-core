@@ -11,6 +11,7 @@ const main = () => {
     let html;
     let fileContent;
 
+    fs.mkdirSync(path.join(__dirname, "/html/"), { recursive: true } );
     files.forEach((file) => {
       fileContent = fs.readFileSync(
         path.join(__dirname, "../email/templates", file)

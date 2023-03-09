@@ -7,7 +7,7 @@
         </mj-column>
         <mj-column vertical-align="middle">
           <mj-text font-size="24px" align="left" padding="0">
-            <b>Varaamo</b>
+            <b>${serviceName}</b>
           </mj-text>
         </mj-column>
       </mj-group>
@@ -15,7 +15,7 @@
     <mj-section background-color="#FFFFFF" padding-bottom="30px">
       <mj-column>
         <mj-text font-size="36px">
-          <b>Hei {{reservee_name}},</b>
+          <b>${salutation} {{reservee_name}},</b>
         </mj-text>
       </mj-column>
     </mj-section>

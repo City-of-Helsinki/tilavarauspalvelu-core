@@ -1,0 +1,42 @@
+{
+    "serviceName": "Varaamo",
+    "serviceUrl": "varaamo.hel.fi",
+    "helsinkiCity": "Helsingin kaupunki",
+    "salutation": "Hei",
+
+    "manageReservationHeading": "Hallitse varaustasi Varaamossa",
+    "checkYourReservation": "Voit perua varauksesi tai tarkistaa varauksesi tiedot sekä Varaamon sopimus- ja peruutusehdot",
+    "ownReservationsPage": "Omat Varaukset-sivulla",
+    "thankYouForUsing": "Kiitos, kun käytit Varaamoa!",
+
+    "withRegards": "Ystävällisin terveisin,",
+    "automaticMessage": "Tämä on automaattinen viesti, siihen ei voi vastata.",
+    "sendUs": "Lähetä meille",
+    "feedbackOnService": "palautetta Varaamosta",
+    "reserveCityResourcesAt": "Varaa helposti kaupungin tiloja ja laiteteita käyttöösi osoitteesta",
+
+    "reservationPending": "Olet tehnyt alustavan varauksen:",
+    "reservationCompleted": "Olet tehnyt uuden varauksen:",
+    "reservationConfirmed": "Varauksesi on vahvistettu!",
+    "reservationSubsidized": "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:",
+    "reservationNeedsPayment": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla.",
+    "reservationRejected": "Valitettavasti alla olevaa varaustasi ei voida vahvistaa.",
+    "reservationUpdated": "Varaustasi on muutettu:",
+    "reservationCancelled": "Varauksesi on peruttu.",
+
+    "cancellationReason": "Perumisen syy",
+    "rejectionReason": "Peruutuksen syy",
+    "cancellationInstructions": "Lisätietoa peruutuksesta",
+    "rejectionInstructions": "Lisätietoa",
+    "reservationInstruction": "Lisätietoa varauksestasi",
+
+    "reservationBegins": "Alkamisaika",
+    "reservationEnds": "Päättymisaika",
+    "reservationPrice": "Varauksen hinta",
+    "reservationNumber": "Varausnumero",
+
+    "oClock": "klo",
+    "vatIncluded": "sis. alv",
+    "paymentDue": "Eräpäivä",
+    "payReservation": "Maksa varaus"
+}

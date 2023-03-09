@@ -1,0 +1,30 @@
+${salutation} {{reservee_name}},
+
+${reservationNeedsPayment}
+
+{{reservation_unit}}
+{{unit_name}}
+{{unit_location}}
+
+${reservationBegins}: {{begin_date}} ${oClock} {{begin_time}}
+${reservationEnds}: {{end_date}} ${oClock} {{end_time}}
+
+${reservationPrice}: {{price | currency}} € (${vatIncluded} {{tax_percentage}} %)
+${paymentDue}: {{due_date}}
+${reservationNumber}: {{reservation_number}}
+
+${payReservation}: {{my_reservations_ext_link}}
+
+${reservationInstruction}
+{{confirmed_instructions}}
+
+${manageReservationHeading}
+${checkYourReservation} ${ownReservationsPage}: {{my_reservations_ext_link}}
+
+${thankYouForUsing}
+${withRegards}
+${serviceName}
+
+${automaticMessage}
+${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${reserveCityResourcesAt} {{varaamo_ext_link}}

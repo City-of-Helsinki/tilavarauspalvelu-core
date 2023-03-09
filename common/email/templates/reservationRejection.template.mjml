@@ -7,44 +7,34 @@
     <mj-include path="partials/header.mjml" />
     <mj-section background-color="#F7F2E4">
       <mj-column>
-        <mj-text>Valitettavasti alla olevaa varaustasi ei voida vahvistaa.</mj-text>
-        <mj-text>Peruutuksen syy: {{deny_reason}}</mj-text>
+        <mj-text>${reservationRejected}</mj-text>
+        <mj-text>${rejectionReason}: {{deny_reason}}</mj-text>
         <mj-spacer />
         <mj-text><b>{{reservation_unit}}</b></mj-text>
         <mj-text>{{unit_name}}</mj-text>
         <mj-text>{{unit_location}}</mj-text>
         <mj-spacer />
         <mj-text>
-          <p>Alkamisaika: <b>{{begin_date}}</b> klo <b>{{begin_time}}</b></p>
+          <p>${reservationBegins}: <b>{{begin_date}}</b> ${oClock} <b>{{begin_time}}</b></p>
         </mj-text>
         <mj-text>
-          <p>Päättymisaika: <b>{{end_date}}</b> klo <b>{{end_time}}</b></p>
+          <p>${reservationEnds}: <b>{{end_date}}</b> ${oClock} <b>{{end_time}}</b></p>
         </mj-text>
         <mj-spacer />
         <mj-text>
-          <p>Varausnumero: {{reservation_number}}</p>
+          <p>${reservationNumber}: {{reservation_number}}</p>
         </mj-text>
       </mj-column>
     </mj-section>
     <mj-section padding-bottom="0">
       <mj-column>
         <mj-text font-size="20px">
-          <h2>Lisätietoa</h2>
+          <h2>${rejectionInstructions}</h2>
         </mj-text>
         <mj-text font-size="16px">{{cancelled_instructions}}</mj-text>
       </mj-column>
     </mj-section>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">Ystävällisin terveisin,</mj-text>
-        <mj-text font-size="16px">Varaamo</mj-text>
-        <mj-spacer />
-        <mj-text font-size="16px">Tämä on automaattinen viesti, siihen ei voi vastata</mj-text>
-        <mj-text font-size="16px">Lähetä meille <a href={{feedback_ext_link}}>palautetta Varaamosta</a></mj-text>
-        <mj-text font-size="16px">Varaa helposti kaupungin tiloja ja laiteteita käyttöösi osoitteesta <a href={{varaamo_ext_link}}>varaamo.hel.fi</a></mj-text>
-        <mj-spacer height="50px" />
-      </mj-column>
-    </mj-section>
+    <mj-include path="partials/closing.mjml" />
     <mj-include path="partials/footer.mjml" />
   </mj-body>
 </mjml>

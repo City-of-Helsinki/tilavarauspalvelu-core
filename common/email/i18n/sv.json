@@ -1,0 +1,42 @@
+{
+    "serviceName": "Varaamo",
+    "serviceUrl": "varaamo.hel.fi",
+    "helsinkiCity": "Helsingfors stad",
+    "salutation": "Hej",
+
+    "manageReservationHeading": "Hantera din bokning på Varaamo",
+    "checkYourReservation": "Du kan kontrollera uppgifterna om din bokning samt Varaamos avtals- och avbokningsvillkor på sidan",
+    "ownReservationsPage": "Mina bokningar",
+    "thankYouForUsing": "Tack för att du använder Varaamo!",
+
+    "withRegards": "Med vänliga hälsningar,",
+    "automaticMessage": "Detta är ett automatiskt meddelande som inte kan besvaras.",
+    "sendUs": "Skicka oss",
+    "feedbackOnService": "feedback om Varaamo",
+    "reserveCityResourcesAt": "Boka enkelt stadens lokaler och utrustning för eget bruk på",
+
+    "reservationPending": "Du har gjort en ny bokningsförfrågan:",
+    "reservationCompleted": "Du har gjort en ny bokning:",
+    "reservationConfirmed": "Din bokning har bekräftats!",
+    "reservationSubsidized": "Din bokning har bekräftats med följande rabatt:",
+    "reservationNeedsPayment": "Din bokning har bekräftats och kan betalas.",
+    "reservationRejected": "Tyvärr kan vi inte bekräfta din bokning.",
+    "reservationUpdated": "Din bokning har uppdaterats:",
+    "reservationCancelled": "Din bokning har avbokats.",
+
+    "cancellationReason": "Orsak till avbokning",
+    "rejectionReason": "Orsak till avbokning",
+    "cancellationInstructions": "Mer information om avbokning",
+    "rejectionInstructions": "Mer information",
+    "reservationInstruction": "Mer information om din bokning",
+
+    "reservationBegins": "Börjar",
+    "reservationEnds": "Slutar",
+    "reservationPrice": "Bokningspris",
+    "reservationNumber": "Bokningsnummer",
+
+    "oClock": "kl",
+    "vatIncluded": "inkl. moms",
+    "paymentDue": "Förfallodatum",
+    "payReservation": "Betala bokningen"
+}

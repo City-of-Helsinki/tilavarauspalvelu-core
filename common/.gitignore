@@ -23,5 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 
-# generated email htmls
+# generated email htmls and texts
 email/html/
+email/txt/

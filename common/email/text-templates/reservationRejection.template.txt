@@ -1,0 +1,24 @@
+${salutation} {{reservee_name}},
+
+${reservationRejected}
+${rejectionReason}: {{deny_reason}}
+
+{{reservation_unit}}
+{{unit_name}}
+{{unit_location}}
+
+${reservationBegins}: {{begin_date}} ${oClock} {{begin_time}}
+${reservationEnds}: {{end_date}} ${oClock} {{end_time}}
+
+${reservationNumber}: {{reservation_number}}
+
+${rejectionInstructions}
+{{cancelled_instructions}}
+
+${thankYouForUsing}
+${withRegards}
+${serviceName}
+
+${automaticMessage}
+${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${reserveCityResourcesAt} {{varaamo_ext_link}}
