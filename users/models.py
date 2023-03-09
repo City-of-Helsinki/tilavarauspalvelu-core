@@ -36,6 +36,8 @@ class User(AbstractUser):
 
     date_of_birth = models.DateField(verbose_name=_("Date of birth"), null=True)
 
+    profile_id = models.CharField(max_length=255, null=False, blank=True, default="")
+
     def get_display_name(self):
         return "{0} {1}".format(self.first_name, self.last_name).strip()
 

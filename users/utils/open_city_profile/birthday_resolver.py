@@ -22,11 +22,13 @@ def resolve_user(request, payload):
         b_day_reader = UserBirthdayReader(request)
         try:
             birthday = b_day_reader.get_user_birthday()
+            profile_id = b_day_reader.get_user_profile_id()
         except (BirthDayReaderError, RequestException) as e:
             capture_exception(e)
         else:
             if birthday:
                 user.date_of_birth = birthday
+                user.profile_id = profile_id
                 user.save()
 
                 return user
@@ -71,6 +73,7 @@ class UserBirthdayReader(ProfileReaderTokenMixin):
 
     def __init__(self, request):
         self.request = request
+        self.response_data = None
 
     def get_user_birthday(self) -> [datetime.date, None]:
         nin = self.__get_national_identification_number()
@@ -89,26 +92,44 @@ class UserBirthdayReader(ProfileReaderTokenMixin):
 
         return b_day
 
+    def get_user_profile_id(self) -> [str, None]:
+        if not self.response_data:
+            self.response_data = self.__make_profile_request(self.token)
+
+        self.__check_for_errors()
+
+        my_profile_data = self.__get_my_profile_data()
+
+        if not my_profile_data:
+            return None
+
+        return my_profile_data.get("id")
+
+    def __check_for_errors(self):
+        if self.response_data.get("errors"):
+            message = next(iter(self.response_data.get("errors"))).get("message")
+            raise BirthDayReaderQueryError(message)
+
+    def __get_my_profile_data(self):
+        data = self.response_data.get("data")
+
+        if not data:
+            return None
+
+        return data.get("myProfile")
+
     def __get_national_identification_number(self) -> [str, None]:
         nin = None
 
         if not self.token:
             raise BirthDayReaderTokenNullOrEmptyError()
 
-        response_data = self.__read_national_identification_number_from_source(
-            self.token
-        )
+        if not self.response_data:
+            self.response_data = self.__make_profile_request(self.token)
 
-        if response_data.get("errors"):
-            message = next(iter(response_data.get("errors"))).get("message")
-            raise BirthDayReaderQueryError(message)
+        self.__check_for_errors()
 
-        data = response_data.get("data")
-
-        if not data:
-            return None
-
-        my_profile_data = data.get("myProfile")
+        my_profile_data = self.__get_my_profile_data()
 
         if not my_profile_data:
             return None
@@ -119,10 +140,11 @@ class UserBirthdayReader(ProfileReaderTokenMixin):
 
         return nin
 
-    def __read_national_identification_number_from_source(self, token) -> dict:
+    def __make_profile_request(self, token) -> dict:
         query = """
                     query {
                         myProfile {
+                            id
                             verifiedPersonalInformation {
                                 nationalIdentificationNumber
                             }

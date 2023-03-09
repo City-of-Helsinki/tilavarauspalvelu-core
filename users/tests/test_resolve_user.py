@@ -20,9 +20,10 @@ class ResolveUserTestCase(TestCase):
         return {
             "data": {
                 "myProfile": {
+                    "id": "aaa-bbb-ccc",
                     "verifiedPersonalInformation": {
                         "nationalIdentificationNumber": "120345-6789"
-                    }
+                    },
                 }
             }
         }
@@ -75,3 +76,10 @@ class ResolveUserTestCase(TestCase):
         self.user.refresh_from_db()
         assert_that(self.user.date_of_birth).is_equal_to(birth_of_day)
         assert_that(req_mock.call_count).is_zero()
+
+    def test_user_profile_id_is_updated(self, req_mock):
+        resolve_user(self.request, self.get_payload())
+        profile_id = "aaa-bbb-ccc"
+
+        self.user.refresh_from_db()
+        assert_that(self.user.profile_id).is_equal_to(profile_id)
