@@ -353,12 +353,13 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         super().setUp()
         self.payment_order.status = OrderStatus.PAID
         self.payment_order.remote_id = self.verkkokauppa_order.order_id
+        self.payment_order.refund_id = uuid4()
         self.payment_order.save()
 
     def get_valid_data(self):
         return {
             "orderId": self.verkkokauppa_order.order_id,
-            "refundId": uuid4(),  # TODO: Get from verkkokauppa_payment when it is available
+            "refundId": self.payment_order.refund_id,
             "refundPaymentId": uuid4(),
             "namespace": self.verkkokauppa_order.namespace,
             "type": "REFUND_PAID",
