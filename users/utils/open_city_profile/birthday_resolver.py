@@ -9,6 +9,8 @@ from sentry_sdk import capture_exception, capture_message
 
 from users.utils.open_city_profile.mixins import ProfileReaderTokenMixin
 
+REQUEST_TIMEOUT_SECONDS = 5
+
 
 def resolve_user(request, payload):
     user = get_or_create_user(payload, oidc=True)
@@ -156,6 +158,7 @@ class UserBirthdayReader(ProfileReaderTokenMixin):
             settings.OPEN_CITY_PROFILE_GRAPHQL_API,
             json={"query": query},
             headers={"Authorization": token},
+            timeout=REQUEST_TIMEOUT_SECONDS,
         )
 
         status = response.status_code
