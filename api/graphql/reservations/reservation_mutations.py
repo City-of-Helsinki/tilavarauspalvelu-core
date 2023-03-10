@@ -19,6 +19,9 @@ from api.graphql.reservations.reservation_serializers import (
     ReservationUpdateSerializer,
     ReservationWorkingMemoSerializer,
 )
+from api.graphql.reservations.reservation_serializers.refund_serializers import (
+    ReservationRefundSerializer,
+)
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from merchants.models import OrderStatus, PaymentOrder
@@ -90,6 +93,14 @@ class ReservationDenyMutation(AuthSerializerMutation, SerializerMutation):
     class Meta:
         lookup_field = "pk"
         serializer_class = ReservationDenySerializer
+
+
+class ReservationRefundMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (ReservationHandlingPermission,)
+
+    class Meta:
+        lookup_field = "pk"
+        serializer_class = ReservationRefundSerializer
 
 
 class ReservationApproveMutation(AuthSerializerMutation, SerializerMutation):
