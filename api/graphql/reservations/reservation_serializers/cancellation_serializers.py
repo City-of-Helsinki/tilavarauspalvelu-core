@@ -6,8 +6,10 @@ from rest_framework import serializers
 from api.graphql.base_serializers import PrimaryKeyUpdateSerializer
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from merchants.models import OrderStatus, PaymentOrder
 from reservations.email_utils import send_cancellation_email
 from reservations.models import STATE_CHOICES, Reservation, ReservationCancelReason
+from reservations.tasks import refund_paid_reservation_task
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -82,5 +84,16 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
+
+        payment_order = PaymentOrder.objects.filter(reservation=self.instance).first()
+        payment_is_refundable = (
+            payment_order
+            and payment_order.status == OrderStatus.PAID
+            and not payment_order.refund_id
+        )
+
+        if payment_is_refundable and self.instance.price_net > 0:
+            refund_paid_reservation_task.delay(self.instance.pk)
+
         send_cancellation_email(instance)
         return instance

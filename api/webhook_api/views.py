@@ -263,9 +263,10 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             self.validate_request(request)
 
             remote_id = request.data.get("orderId", "")
-
-            # TODO: Add refund_id to filters when it is implemented
-            payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
+            refund_id = request.data.get("refundId", "")
+            payment_order = PaymentOrder.objects.filter(
+                remote_id=remote_id, refund_id=refund_id
+            ).first()
 
             if not payment_order:
                 raise WebhookError(message="Order not found", status_code=404)

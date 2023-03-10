@@ -1,5 +1,8 @@
 import datetime
 import json
+from decimal import Decimal
+from unittest import mock
+from uuid import uuid4
 
 import freezegun
 from assertpy import assert_that
@@ -11,6 +14,8 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
+from merchants.models import OrderStatus, PaymentType
+from merchants.tests.factories import PaymentOrderFactory
 from reservation_units.tests.factories import ReservationUnitCancellationRuleFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import (
@@ -292,3 +297,48 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(cancel_data.get("errors")).is_none()
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("cancelled")
+
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
+    @mock.patch("reservations.tasks.refund_order")
+    def test_cancellation_starts_refund_process_on_paid_reservation(
+        self, mock_refund_order
+    ):
+        self.client.force_login(self.regular_joe)
+
+        self.reservation.price_net = Decimal("124.00")
+        self.reservation.save()
+
+        remote_id = uuid4()
+        payment_order = PaymentOrderFactory.create(
+            reservation=self.reservation,
+            remote_id=remote_id,
+            payment_type=PaymentType.ONLINE,
+            status=OrderStatus.PAID,
+            price_net=Decimal("100.00"),
+            price_vat=Decimal("24.00"),
+            price_total=Decimal("124.00"),
+        )
+
+        refund_id = uuid4()
+        mock_refund = mock.MagicMock()
+        mock_refund.refund_id = refund_id
+
+        mock_refund_order.return_value = mock_refund
+
+        input_data = self.get_valid_cancel_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_none()
+
+        mock_refund_order.assert_called_with(remote_id)
+
+        payment_order.refresh_from_db()
+        assert_that(payment_order.refund_id).is_equal_to(refund_id)

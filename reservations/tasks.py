@@ -1,4 +1,7 @@
+from merchants.models import PaymentOrder
 from merchants.pruning import update_expired_orders
+from merchants.verkkokauppa.payment.requests import refund_order
+from reservations.models import Reservation
 from tilavarauspalvelu.celery import app
 
 from .pruning import (
@@ -47,3 +50,23 @@ def prune_reservation_statistics_task(older_than_years=REMOVE_STATS_OLDER_THAN_Y
 @app.task(name="prune_recurring_reservations")
 def prune_recurring_reservations_task() -> None:
     prune_recurring_reservations(REMOVE_RECURRINGS_OLDER_THAN_DAYS)
+
+
+@app.task(
+    name="refund_paid_reservation",
+    autoretry_for=(Exception,),
+    max_retries=5,
+    retry_backoff=True,
+)
+def refund_paid_reservation_task(reservation_pk: int) -> None:
+    reservation = Reservation.objects.filter(pk=reservation_pk).first()
+    if not reservation:
+        return
+
+    payment_order = PaymentOrder.objects.filter(reservation=reservation).first()
+    if not payment_order:
+        return
+
+    refund = refund_order(payment_order.remote_id)
+    payment_order.refund_id = refund.refund_id
+    payment_order.save()
