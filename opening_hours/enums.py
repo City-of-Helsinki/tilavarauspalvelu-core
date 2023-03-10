@@ -14,7 +14,7 @@ class State(Enum):
     ENTER_ONLY = "enter_only"
     EXIT_ONLY = "exit_only"
     WEATHER_PERMITTING = "weather_permitting"
-    NOT_IN_USER = "not_in_use"
+    NOT_IN_USE = "not_in_use"
     MAINTENANCE = "maintenance"
 
     class Labels:
