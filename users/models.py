@@ -30,7 +30,7 @@ class User(AbstractUser):
         choices=ReservationNotification.choices,
         blank=False,
         null=False,
-        default=ReservationNotification.NONE,
+        default=ReservationNotification.ONLY_HANDLING_REQUIRED,
         help_text="When user wants to receive reservation notification emails.",
     )
 
