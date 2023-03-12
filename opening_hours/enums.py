@@ -51,6 +51,13 @@ class State(Enum):
             cls.WITH_KEY_AND_RESERVATION,
         ]
 
+    @classmethod
+    def get(cls, state):
+        try:
+            return State(state)
+        except ValueError:
+            return State.UNDEFINED
+
 
 class Weekday(Enum):
     MONDAY = 1

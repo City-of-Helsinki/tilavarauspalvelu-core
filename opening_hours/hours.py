@@ -126,6 +126,7 @@ def get_opening_hours(
             for time_data_in in opening_hours["times"]:
                 start_time = time_data_in.pop("start_time")
                 end_time = time_data_in.pop("end_time")
+                state = time_data_in.pop("resource_state", None)
 
                 day_data_out["times"].append(
                     TimeElement(
@@ -135,6 +136,7 @@ def get_opening_hours(
                         end_time=datetime.time.fromisoformat(end_time)
                         if end_time
                         else None,
+                        resource_state=State.get(state),
                         **time_data_in,
                     )
                 )
