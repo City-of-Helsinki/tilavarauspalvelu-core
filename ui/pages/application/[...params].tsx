@@ -24,6 +24,7 @@ import Page1 from "../../components/application/Page1";
 import Page2 from "../../components/application/Page2";
 import Page3 from "../../components/application/Page3";
 import Preview from "../../components/application/Preview";
+import View from "../../components/application/View";
 import applicationReducer from "../../modules/application/applicationReducer";
 import useReservationUnitList from "../../hooks/useReservationUnitList";
 import Sent from "../../components/application/Sent";
@@ -84,9 +85,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     if (applicationId && Number(applicationId)) {
       try {
         const application = await getApplication(Number(applicationId));
-        // const applicationRound = await getApplicationRound({
-        //   id: application.applicationRoundId,
-        // });
         const { data } = await apolloClient.query<
           Query,
           QueryApplicationRoundsArgs
@@ -279,6 +277,19 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
             onNext={saveAndNavigate("sent")}
             tos={tos}
           />
+        </ApplicationPage>
+      )}
+      {pageId === "view" && (
+        <ApplicationPage
+          application={state.application}
+          translationKeyPrefix="application:view"
+          headContent={getTranslation(
+            applicationLoadingStatus.value?.applicationRound,
+            "name"
+          )}
+          hideStepper
+        >
+          <View application={state.application} tos={tos} />
         </ApplicationPage>
       )}
       {pageId === "sent" && <Sent />}

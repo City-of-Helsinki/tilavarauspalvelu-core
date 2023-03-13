@@ -1,4 +1,10 @@
-import { applicationGroups, confirmationModal } from "../model/applications";
+import { notificationTitle } from "model/application";
+import { notificationContainer } from "model/reservation-creation";
+import {
+  applicationCard,
+  applicationGroups,
+  confirmationModal,
+} from "../model/applications";
 
 describe("applications", () => {
   beforeEach(() => {
@@ -31,21 +37,32 @@ describe("applications", () => {
         .should("have.length", groupData[index].items);
     });
 
-    applicationGroups()
-      .eq(0)
-      .find('> div button[aria-label="Peru hakemus"]')
-      .click();
+    applicationCard().eq(0).find('button[aria-label="Peru"]').click();
     confirmationModal().should("be.visible");
     confirmationModal().find("button").eq(0).click();
     confirmationModal().should("not.exist");
 
-    applicationGroups()
-      .eq(0)
-      .find('> div button[aria-label="Peru hakemus"]')
-      .click();
+    applicationCard().eq(0).find('button[aria-label="Peru"]').click();
     confirmationModal().should("be.visible");
     confirmationModal().find("button").eq(1).click();
 
     cy.contains("Hakemus on peruutettu onnistuneesti.").should("be.visible");
+  });
+
+  it("can view an application", () => {
+    applicationCard()
+      .eq(0)
+      .find('> div > button[aria-label="Näytä"]')
+      .eq(0)
+      .click();
+
+    cy.get("h1").should("contain.text", "Kausivaraushakemus");
+
+    notificationTitle().should("contain.text", "Käsittely");
+
+    notificationContainer().should(
+      "contain.text",
+      "Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista."
+    );
   });
 });
