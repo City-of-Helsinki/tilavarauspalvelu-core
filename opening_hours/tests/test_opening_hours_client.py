@@ -458,3 +458,21 @@ class OpeningHoursClientTestCase(TestCase):
         )
         origin_id = mock.call_args.args[3]
         assert_that(origin_id).is_same_as(self.unit.hauki_resource_data_source_id)
+
+    def test_times_is_not_present_if_length_is_zero(self, mock):
+        data = self.get_mocked_opening_hours()
+        data[0]["times"][0] = TimeElement(
+            start_time=datetime.time(hour=10),
+            end_time=datetime.time(hour=10),
+            end_time_on_next_day=False,
+            resource_state=State.OPEN_AND_RESERVABLE.value,
+        )
+
+        mock.return_value = data
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
+        )
+        assert_that(len(times)).is_zero()

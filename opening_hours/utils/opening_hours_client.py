@@ -81,6 +81,12 @@ class OpeningHours:
             )
         )
 
+        # If the length of opening is zero, return None for helping the UI.
+        if not end_time_on_next_day and (end_time - start_time) == datetime.timedelta(
+            seconds=0
+        ):
+            return None
+
         return OpeningHours(
             start_time=start_time.astimezone(TIMEZONE),
             end_time=end_time.astimezone(TIMEZONE),
@@ -156,7 +162,8 @@ class OpeningHoursClient:
                 opening_times = OpeningHours.get_opening_hours_class_from_time_element(
                     time, date, timezone
                 )
-                opening_hours.append(opening_times)
+                if opening_times:
+                    opening_hours.append(opening_times)
 
             self.opening_hours[res_id][date].extend(opening_hours)
 
