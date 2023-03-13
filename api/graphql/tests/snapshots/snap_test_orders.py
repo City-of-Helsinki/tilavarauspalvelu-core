@@ -20,6 +20,7 @@ snapshots['OrderQueryTestCase::test_returns_order_when_user_can_handle_reservati
             'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
             'paymentType': 'INVOICE',
             'receiptUrl': None,
+            'refundId': None,
             'reservationPk': '1',
             'status': 'DRAFT'
         }
@@ -33,6 +34,21 @@ snapshots['OrderQueryTestCase::test_returns_order_when_user_owns_reservation 1']
             'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
             'paymentType': 'INVOICE',
             'receiptUrl': None,
+            'refundId': None,
+            'reservationPk': '1',
+            'status': 'DRAFT'
+        }
+    }
+}
+
+snapshots['OrderQueryTestCase::test_returns_refund_id_when_it_exists 1'] = {
+    'data': {
+        'order': {
+            'checkoutUrl': None,
+            'orderUuid': 'b3fef99e-6c18-422e-943d-cf00702af53e',
+            'paymentType': 'INVOICE',
+            'receiptUrl': None,
+            'refundId': 'd55db3a0-0786-4259-ab9e-c4211cae162e',
             'reservationPk': '1',
             'status': 'DRAFT'
         }

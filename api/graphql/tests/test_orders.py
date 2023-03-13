@@ -1,6 +1,7 @@
 import json
 from typing import Dict, Optional
 from unittest import mock
+from uuid import UUID
 
 import snapshottest
 from assertpy import assert_that
@@ -50,6 +51,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     receiptUrl
                     checkoutUrl
                     reservationPk
+                    refundId
                 }
             }
             """
@@ -73,6 +75,18 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self.assertMatchSnapshot(content)
 
     def test_returns_order_when_user_can_handle_reservations(self):
+        self.client.force_login(self.general_admin)
+
+        response = self.query(self.get_order_query())
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_returns_refund_id_when_it_exists(self):
+        self.order.refund_id = UUID("d55db3a0-0786-4259-ab9e-c4211cae162e")
+        self.order.save()
+
         self.client.force_login(self.general_admin)
 
         response = self.query(self.get_order_query())

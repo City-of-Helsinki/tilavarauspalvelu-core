@@ -48,6 +48,7 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
     checkout_url = graphene.String()
     receipt_url = graphene.String()
     reservation_pk = graphene.String()
+    refund_id = graphene.String()
 
     class Meta:
         model = PaymentOrder
@@ -59,6 +60,7 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
             "checkout_url",
             "receipt_url",
             "reservation_pk",
+            "refund_id",
         ]
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
