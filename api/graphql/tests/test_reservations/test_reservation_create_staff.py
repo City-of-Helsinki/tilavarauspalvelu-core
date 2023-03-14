@@ -413,3 +413,50 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL"
         )
         assert_that(Reservation.objects.exists()).is_false()
+
+    def test_reservation_type_not_allowed(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_minimum_input_data()
+        input_data["type"] = ReservationType.NORMAL
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_TYPE_NOT_ALLOWED"
+        )
+        assert_that(Reservation.objects.exists()).is_false()
+
+    def test_reservation_type_behalf_accepted(self):
+        self.client.force_login(self.general_admin)
+
+        input_data = self.get_valid_minimum_input_data()
+        input_data["type"] = ReservationType.BEHALF
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data")
+            .get("createStaffReservation")
+            .get("reservation")
+            .get("pk")
+        ).is_not_none()
+        pk = (
+            content.get("data")
+            .get("createStaffReservation")
+            .get("reservation")
+            .get("pk")
+        )
+        reservation = Reservation.objects.get(id=pk)
+
+        assert_that(reservation.type).is_equal_to(ReservationType.BEHALF)
+        assert_that(reservation.begin).is_equal_to(self.res_begin)
+        assert_that(reservation.end).is_equal_to(self.res_end)
+        assert_that(reservation.reservation_unit.first()).is_equal_to(
+            self.reservation_unit
+        )
+        assert_that(reservation.buffer_time_after).is_none()
+        assert_that(reservation.buffer_time_before).is_none()

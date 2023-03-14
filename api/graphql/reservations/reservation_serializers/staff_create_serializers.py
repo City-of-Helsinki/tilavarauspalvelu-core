@@ -180,6 +180,22 @@ class ReservationStaffCreateSerializer(
 
         return data
 
+    def validate_type(self, reservation_type):
+        allowed_types = [
+            ReservationType.BLOCKED,
+            ReservationType.STAFF,
+            ReservationType.BEHALF,
+        ]
+
+        if reservation_type not in allowed_types:
+            raise ValidationErrorWithCode(
+                f"Reservation type {reservation_type} is not allowed in this mutation. "
+                f"Allowed choices are {', '.join(allowed_types)}.",
+                ValidationErrorCodes.RESERVATION_TYPE_NOT_ALLOWED,
+            )
+
+        return reservation_type
+
     def check_begin(self, begin, end):
         if begin > end:
             raise ValidationErrorWithCode(
