@@ -34,6 +34,7 @@ class ReservationType(models.TextChoices):
     NORMAL = "normal"
     BLOCKED = "blocked"
     STAFF = "staff"
+    BEHALF = "behalf"
 
 
 class AgeGroup(models.Model):
