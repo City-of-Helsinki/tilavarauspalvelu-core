@@ -37,7 +37,7 @@ class RecurringReservationCreateSerializer(PrimaryKeySerializer):
     )
 
     name = serializers.CharField(required=False, default="")
-    description = serializers.CharField(required=False, default="")
+    description = serializers.CharField(required=False, default="", allow_blank=True)
     begin_time = serializers.TimeField(
         required=True, help_text="Time when reservations begins."
     )

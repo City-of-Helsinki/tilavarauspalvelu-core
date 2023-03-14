@@ -281,6 +281,30 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
         assert_that(recurring.ability_group_id).is_equal_to(self.ability_group.id)
         assert_that(recurring.description).is_equal_to(input_data["description"])
 
+    def test_description_can_be_emptied(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_optional_full_input_data()
+        input_data["description"] = ""
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data")
+            .get("createRecurringReservation")
+            .get("recurringReservation")
+            .get("pk")
+        ).is_not_none()
+        pk = (
+            content.get("data")
+            .get("createRecurringReservation")
+            .get("recurringReservation")
+            .get("pk")
+        )
+        recurring = RecurringReservation.objects.get(id=pk)
+
+        assert_that(recurring.description).is_empty()
+
     def test_recurrence_in_days_not_in_allowed_values(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_minimum_input_data()
