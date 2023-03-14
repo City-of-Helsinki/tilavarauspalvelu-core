@@ -1151,10 +1151,20 @@ const translations: ITranslations = {
       "Valituilla suodattimilla ei löytynyt yhtään varausyksikköä. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
     ],
     state: {
+      ARCHIVED: ["Arkistoitu"],
       DRAFT: ["Luonnos"],
-      SCHEDULED_PUBLISHING: ["Julkaisu ajastettu"],
-      SCHEDULED_RESERVATION: ["Julkaistu, varaus ajastettu"],
+      HIDDEN: ["Varaus piilotettu"],
       PUBLISHED: ["Julkaistu"],
+      SCHEDULED_HIDING: ["Piilotus ajastettu"],
+      SCHEDULED_PERIOD: ["Julkaisuväli ajastettu"],
+      SCHEDULED_PUBLISHING: ["Julkaisu ajastettu"],
+    },
+    reservationState: {
+      RESERVABLE: ["Varattavissa"],
+      SCHEDULED_RESERVATION: ["Varaus ajastettu"],
+      SCHEDULED_PERIOD: ["Varausväli ajastettu"],
+      SCHEDULED_CLOSING: ["Sulku ajastettu"],
+      RESERVATION_CLOSED: ["Suljettu"],
     },
     headings: {
       name: ["Nimi"],
@@ -1164,6 +1174,7 @@ const translations: ITranslations = {
       maxPersons: ["Hlömäärä (max)"],
       surfaceArea: ["Pinta-ala"],
       state: ["Tila"],
+      reservationState: ["Varauskalenteri"],
     },
   },
   ReservationUnitsSearch: {

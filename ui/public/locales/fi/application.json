@@ -186,6 +186,9 @@
       "applicationInfo": "Varauksen tiedot"
     }
   },
+  "view": {
+    "heading": "Kausivaraushakemus"
+  },
   "sent": {
     "heading": "Kiitos hakemuksesta!",
     "subHeading": "Hakemuksesi on vastaanotettu ja siirtyy käsiteltäväksi hakuajan päätyttyä.",

@@ -3,8 +3,9 @@
   "cancelContent": "If you cancel your application, you can no longer edit or send it.",
   "cancelFailed": "Application cancellation failed",
   "cancelled": "Your application has been cancelled.",
-  "edit": "Edit application",
-  "cancel": "Cancel application",
+  "edit": "Edit",
+  "cancel": "Cancel",
+  "view": "",
   "status": {
     "draft": "Draft",
     "processing": "In process",

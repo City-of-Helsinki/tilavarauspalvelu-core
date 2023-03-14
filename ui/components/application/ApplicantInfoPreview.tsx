@@ -27,11 +27,14 @@ const ApplicantInfoPreview = ({
           />
           <StyledLabelValue
             label={t("application:preview.applicantTypeLabel")}
-            value={String(
-              t(
-                `application:preview.applicantType.${application.applicantType}`
+            value={
+              application.applicantType &&
+              String(
+                t(
+                  `application:preview.applicantType.${application.applicantType}`
+                )
               )
-            )}
+            }
           />
           <SpanTwoColumns>
             <StyledLabelValue

@@ -124,8 +124,7 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
 
   useEffect(() => {
     onSearch(state);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [onSearch, state]);
 
   const tags = toTags(
     state,

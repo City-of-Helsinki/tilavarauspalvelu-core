@@ -46,6 +46,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
           maxPersons
           surfaceArea
           state
+          reservationState
         }
       }
       pageInfo {

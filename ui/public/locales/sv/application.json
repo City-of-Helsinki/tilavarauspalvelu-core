@@ -186,6 +186,9 @@
       "applicationInfo": "Bokningsinformation"
     }
   },
+  "view": {
+    "heading": "Säsongbokningsansökan"
+  },
   "sent": {
     "heading": "Tack för din ansökan!",
     "subHeading": "Din ansökan är mottagen och kommer att behandlas efter ansökningsperioden avslutat.",

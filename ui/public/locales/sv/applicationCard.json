@@ -3,8 +3,9 @@
   "cancelContent": "Om du ångrar din ansökan kan du inte längre redigera eller skicka den.",
   "cancelFailed": "Ansökningen kunde inte ångras",
   "cancelled": "Din ansökan har avbrutits.",
-  "edit": "Redigera din ansökan",
-  "cancel": "Ångra ansökan",
+  "edit": "Redigera",
+  "cancel": "Ångra",
+  "view": "",
   "status": {
     "draft": "Utkast",
     "processing": "I behandling",

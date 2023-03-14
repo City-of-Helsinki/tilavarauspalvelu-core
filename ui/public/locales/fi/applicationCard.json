@@ -3,8 +3,9 @@
   "cancelContent": "Jos perut hakemuksen, et voi enää muokata tai lähettää sitä.",
   "cancelFailed": "Hakemuksen peruminen epäonnistui",
   "cancelled": "Hakemus on peruutettu onnistuneesti.",
-  "edit": "Muokkaa hakemusta",
-  "cancel": "Peru hakemus",
+  "edit": "Muokkaa",
+  "cancel": "Peru",
+  "view": "Näytä",
   "status": {
     "draft": "Kesken",
     "processing": "Käsittelyssä",

@@ -72,32 +72,27 @@ const Calendar = ({
       },
       onCompleted: ({ reservations }) => {
         if (reservations) {
-          const formattedReservations = reservations?.edges
-            .filter(
-              (r) =>
-                [
-                  ReservationsReservationStateChoices.Confirmed,
-                  ReservationsReservationStateChoices.RequiresHandling,
-                ].includes(
-                  r?.node?.state as ReservationsReservationStateChoices
-                ) || r?.node?.pk === reservation.pk
-            )
-            .map((r) =>
-              r?.node && r.node.begin && r.node.end
-                ? ({
-                    title: `${
-                      r?.node?.reserveeOrganisationName ||
-                      `${r?.node?.reserveeFirstName || ""} ${
-                        r?.node?.reserveeLastName || ""
-                      }`
-                    }`,
-                    event: r?.node as ReservationType,
-                    start: new Date(r.node.begin),
-                    end: new Date(r.node.end),
-                  } as CalendarEvent<ReservationType>)
-                : undefined
-            )
-            .filter((item): item is CalendarEvent<ReservationType> => !!item);
+          const formattedReservations: CalendarEvent<ReservationType>[] =
+            reservations?.edges
+              .map((e) => e?.node)
+              .filter((r): r is ReservationType => r != null)
+              .filter(
+                (r) =>
+                  [
+                    ReservationsReservationStateChoices.Confirmed,
+                    ReservationsReservationStateChoices.RequiresHandling,
+                  ].includes(r.state) || r.pk === reservation.pk
+              )
+              .map((r) => ({
+                title: `${
+                  r.reserveeOrganisationName ||
+                  `${r.reserveeFirstName || ""} ${r.reserveeLastName || ""}`
+                }`,
+                event: r,
+                // TODO use zod for datetime conversions
+                start: new Date(r.begin),
+                end: new Date(r.end),
+              }));
 
           setEvents(formattedReservations);
 
@@ -131,8 +126,8 @@ const Calendar = ({
         begin={startOfISOWeek(new Date(begin))}
         eventStyleGetter={eventStyleGetter(reservation)}
         onSelectEvent={(e) => {
-          if (e.event?.pk !== reservation.pk) {
-            window.open(reservationUrl(e.event?.pk as number), "_blank");
+          if (e.event?.pk != null && e.event.pk !== reservation.pk) {
+            window.open(reservationUrl(e.event.pk), "_blank");
           }
         }}
       />

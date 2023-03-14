@@ -83,9 +83,9 @@ const ReservationUnitsDataReader = ({
     return <Loader />;
   }
 
-  const reservationUnits = (data?.reservationUnits?.edges || []).map(
-    (edge) => edge?.node as ReservationUnitType
-  );
+  const reservationUnits = (data?.reservationUnits?.edges || [])
+    .map((edge) => edge?.node)
+    .filter((x): x is ReservationUnitType => x != null);
 
   return (
     <>

@@ -1886,6 +1886,7 @@ export type QueryReservationUnitsArgs = {
   rankGte?: InputMaybe<Scalars["Decimal"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]>;
   reservationKind?: InputMaybe<Scalars["String"]>;
+  reservationState?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]>;
@@ -2684,6 +2685,15 @@ export type ReservationStaffCreateMutationPayload = {
   workingMemo?: Maybe<Scalars["String"]>;
 };
 
+/** An enumeration. */
+export enum ReservationState {
+  Reservable = "RESERVABLE",
+  ReservationClosed = "RESERVATION_CLOSED",
+  ScheduledClosing = "SCHEDULED_CLOSING",
+  ScheduledPeriod = "SCHEDULED_PERIOD",
+  ScheduledReservation = "SCHEDULED_RESERVATION",
+}
+
 export type ReservationType = Node & {
   __typename?: "ReservationType";
   ageGroup?: Maybe<AgeGroupType>;
@@ -2840,6 +2850,7 @@ export type ReservationUnitByPkType = Node & {
    * interval_90_mins.
    */
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+  reservationState?: Maybe<ReservationState>;
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]>;
@@ -3222,9 +3233,11 @@ export type ReservationUnitPricingUpdateSerializerInput = {
 export enum ReservationUnitState {
   Archived = "ARCHIVED",
   Draft = "DRAFT",
+  Hidden = "HIDDEN",
   Published = "PUBLISHED",
+  ScheduledHiding = "SCHEDULED_HIDING",
+  ScheduledPeriod = "SCHEDULED_PERIOD",
   ScheduledPublishing = "SCHEDULED_PUBLISHING",
-  ScheduledReservation = "SCHEDULED_RESERVATION",
 }
 
 export type ReservationUnitType = Node & {
@@ -3302,6 +3315,7 @@ export type ReservationUnitType = Node & {
    * interval_90_mins.
    */
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+  reservationState?: Maybe<ReservationState>;
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]>;

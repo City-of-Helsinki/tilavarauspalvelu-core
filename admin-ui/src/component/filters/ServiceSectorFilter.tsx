@@ -1,7 +1,7 @@
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import { Query } from "common/types/gql-types";
+import { Query, ServiceSectorType } from "common/types/gql-types";
 import { OptionType } from "../../common/types";
 import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
 
@@ -31,11 +31,12 @@ const ServiceSectorFilter = ({ onChange, value }: Props): JSX.Element => {
     return <>{t("Units.filters.serviceSector")}</>;
   }
 
-  const options = (data?.serviceSectors?.edges || [])
+  const options: OptionType[] = (data?.serviceSectors?.edges || [])
     .map((e) => e?.node)
+    .filter((e): e is ServiceSectorType => e != null)
     .map((serviceSector) => ({
-      label: serviceSector?.nameFi as string,
-      value: serviceSector?.pk as number,
+      label: serviceSector?.nameFi ?? "",
+      value: serviceSector?.pk ?? 0,
     }));
 
   return (

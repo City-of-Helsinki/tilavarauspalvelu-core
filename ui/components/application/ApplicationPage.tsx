@@ -13,17 +13,20 @@ type ApplicationPageProps = {
   overrideText?: string;
   children?: React.ReactNode;
   headContent?: React.ReactNode;
+  hideStepper?: boolean;
 };
 
 const StyledContainer = styled(Container)`
   background-color: var(--color-white);
 `;
 
-const InnerContainer = styled.div`
+const InnerContainer = styled.div<{ $hideStepper: boolean }>`
   display: grid;
   gap: 1em;
-  grid-template-columns: 18em 1fr;
-  margin-top: var(--spacing-l);
+  ${({ $hideStepper }) =>
+    $hideStepper
+      ? `grid-template-columns: 6em 1fr;`
+      : `grid-template-columns: 18em 1fr;`}
 
   @media (max-width: ${breakpoints.l}) {
     grid-template-columns: 1fr;
@@ -45,6 +48,7 @@ const ApplicationPage = ({
   headContent,
   overrideText,
   children,
+  hideStepper = false,
 }: ApplicationPageProps): JSX.Element => {
   const { t } = useTranslation();
 
@@ -54,8 +58,8 @@ const ApplicationPage = ({
         {headContent || overrideText || t(`${translationKeyPrefix}.text`)}
       </Head>
       <StyledContainer main>
-        <InnerContainer>
-          <Stepper application={application} />
+        <InnerContainer $hideStepper={hideStepper}>
+          {hideStepper ? <div /> : <Stepper application={application} />}
           <Main>{children}</Main>
         </InnerContainer>
       </StyledContainer>

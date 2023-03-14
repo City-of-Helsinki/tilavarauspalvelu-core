@@ -2,7 +2,13 @@ import React, { useRef, useState } from "react";
 import { useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { Card as HdsCard, Tag as HdsTag } from "hds-react";
+import {
+  Card as HdsCard,
+  IconArrowRight,
+  IconCross,
+  IconPen,
+  Tag as HdsTag,
+} from "hds-react";
 import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import { ApplicationRoundType, ApplicationType } from "common/types/gql-types";
@@ -14,7 +20,7 @@ import {
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
 import { cancelApplication } from "../../modules/api";
-import { MediumButton } from "../../styles/util";
+import { BlackButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 
 const Card = styled(HdsCard)`
@@ -28,7 +34,7 @@ const Card = styled(HdsCard)`
 
   @media (min-width: ${breakpoints.m}) {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: var(--spacing-m);
   }
 `;
@@ -59,7 +65,7 @@ const Buttons = styled.div`
   font-size: var(--fontsize-body-s);
   margin-top: var(--spacing-m);
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: var(--spacing-xs);
 
   @media (min-width: ${breakpoints.s}) {
@@ -68,8 +74,17 @@ const Buttons = styled.div`
   }
 
   @media (min-width: ${breakpoints.m}) {
+    flex-direction: column;
     align-items: flex-end;
     justify-content: flex-end;
+
+    > button {
+      width: 100%;
+    }
+  }
+
+  @media (min-width: ${breakpoints.l}) {
+    flex-direction: row;
   }
 `;
 
@@ -103,8 +118,15 @@ const Modified = styled.div`
   }
 `;
 
-const StyledButton = styled(MediumButton)`
+const StyledButton = styled(BlackButton).attrs({
+  variant: "secondary",
+  size: "small",
+})`
   white-space: nowrap;
+
+  svg {
+    min-width: 24px;
+  }
 
   @media (max-width: ${breakpoints.s}) {
     width: 100%;
@@ -170,7 +192,7 @@ const ApplicationCard = ({
 
   const modal = useRef<ModalRef>();
   return (
-    <Card border key={application.pk}>
+    <Card border key={application.pk} data-testid="applications__card--wrapper">
       <div>
         <C>{t(`applicationCard:status.${reducedApplicationStatus}`)}</C>
         <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
@@ -191,17 +213,16 @@ const ApplicationCard = ({
         {state === "cancelling" ? (
           <CenterSpinner />
         ) : (
-          editable && (
-            <StyledButton
-              aria-label={t("applicationCard:cancel")}
-              onClick={() => {
-                modal?.current?.open();
-              }}
-              variant="secondary"
-            >
-              {t("applicationCard:cancel")}
-            </StyledButton>
-          )
+          <StyledButton
+            aria-label={t("applicationCard:cancel")}
+            onClick={() => {
+              modal?.current?.open();
+            }}
+            disabled={!editable}
+            iconRight={<IconCross aria-hidden />}
+          >
+            {t("applicationCard:cancel")}
+          </StyledButton>
         )}
         <StyledButton
           aria-label={t("applicationCard:edit")}
@@ -209,9 +230,18 @@ const ApplicationCard = ({
           onClick={() => {
             router.push(`${applicationUrl(application.pk)}/page1`);
           }}
-          variant="primary"
+          iconRight={<IconPen aria-hidden />}
         >
           {t("applicationCard:edit")}
+        </StyledButton>
+        <StyledButton
+          aria-label={t("applicationCard:view")}
+          onClick={() => {
+            router.push(`${applicationUrl(application.pk)}/view`);
+          }}
+          iconRight={<IconArrowRight aria-hidden />}
+        >
+          {t("applicationCard:view")}
         </StyledButton>
       </Buttons>
       <ConfirmationModal

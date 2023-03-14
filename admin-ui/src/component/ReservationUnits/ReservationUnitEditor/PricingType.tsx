@@ -167,7 +167,7 @@ const PricingType = ({
                 placeholder={t("common.select")}
                 id={`pricings,${labelIndex},priceUnit`}
                 required
-                value={pricing.priceUnit as string}
+                value={pricing.priceUnit}
                 label={t("ReservationUnitEditor.label.priceUnit")}
                 type={ReservationUnitsReservationUnitPricingPriceUnitChoices}
                 onChange={(priceUnit) => setPricingTypeValue({ priceUnit })}

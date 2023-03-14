@@ -186,6 +186,9 @@
       "applicationInfo": "Application information"
     }
   },
+  "view": {
+    "heading": "Seasonal booking application"
+  },
   "sent": {
     "heading": "Thank you for the application",
     "subHeading": "Your application has been received and will be processed at the end of the application round.",
