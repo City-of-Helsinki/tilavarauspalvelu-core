@@ -2102,6 +2102,7 @@ type Query {
     typeRankLte: Decimal
     reservationKind: String
     state: [String]
+    reservationState: [String]
     onlyWithPermission: Boolean
 
     """
@@ -3383,6 +3384,15 @@ type ReservationStaffCreateMutationPayload {
   clientMutationId: String
 }
 
+"""An enumeration."""
+enum ReservationState {
+  SCHEDULED_RESERVATION
+  SCHEDULED_PERIOD
+  RESERVABLE
+  SCHEDULED_CLOSING
+  RESERVATION_CLOSED
+}
+
 type ReservationType implements Node {
   """
   Type of reservee
@@ -3617,6 +3627,7 @@ type ReservationUnitByPkType implements Node {
   unit: UnitType
   keywordGroups: [KeywordGroupType]
   state: ReservationUnitState
+  reservationState: ReservationState
   paymentMerchant: PaymentMerchantType
   paymentProduct: PaymentProductType
   pricings: [ReservationUnitPricingType]
@@ -3767,24 +3778,24 @@ input ReservationUnitCreateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3911,24 +3922,24 @@ type ReservationUnitCreateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
 
   """
   May contain more than one error for same field.
@@ -4300,7 +4311,9 @@ An enumeration.
 enum ReservationUnitState {
   DRAFT
   SCHEDULED_PUBLISHING
-  SCHEDULED_RESERVATION
+  SCHEDULED_HIDING
+  SCHEDULED_PERIOD
+  HIDDEN
   PUBLISHED
   ARCHIVED
 }
@@ -4435,6 +4448,7 @@ type ReservationUnitType implements Node {
   unit: UnitType
   keywordGroups: [KeywordGroupType]
   state: ReservationUnitState
+  reservationState: ReservationState
   pricings: [ReservationUnitPricingType]
 }
 
@@ -4610,24 +4624,24 @@ input ReservationUnitUpdateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -4753,24 +4767,24 @@ type ReservationUnitUpdateMutationPayload {
   state: String
   pricingTerms: String
   paymentTypes: [String]
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
 
   """
   May contain more than one error for same field.
@@ -5700,15 +5714,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -5718,15 +5732,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """
   May contain more than one error for same field.

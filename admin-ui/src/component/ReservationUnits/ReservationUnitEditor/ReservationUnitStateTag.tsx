@@ -7,16 +7,20 @@ interface IProps {
   state: ReservationUnitState;
 }
 
-export const statusColor = (state: ReservationUnitState): string => {
+export const statusColor = (state: ReservationUnitState) => {
   switch (state) {
     case ReservationUnitState.Draft:
+      return "var(--color-bus-light)";
+    case ReservationUnitState.Hidden:
       return "var(--color-silver-light)";
     case ReservationUnitState.Published:
-      return "var(--color-success-light)";
-    case ReservationUnitState.ScheduledReservation:
-      return "var(--color-engel-light)";
+      return "var(--color-fog-light)";
+    case ReservationUnitState.ScheduledHiding:
+      return "var(--color-suomenlinna-light)";
+    case ReservationUnitState.ScheduledPeriod:
+      return "var(--color-summer-light)";
     case ReservationUnitState.ScheduledPublishing:
-      return "var(--color-gold-medium-light)";
+      return "var(--color-gold-light)";
     default:
       return "white";
   }

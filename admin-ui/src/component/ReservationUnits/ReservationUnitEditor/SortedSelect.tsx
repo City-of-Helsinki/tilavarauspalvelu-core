@@ -5,17 +5,22 @@ import { Select, SelectProps } from "hds-react";
 import { sortByName } from "../../../common/util";
 
 function SortedSelect<T>(
-  props: Partial<SelectProps<T>> & { sort?: boolean; label: string }
+  props: Partial<SelectProps<{ label: string; value: T }>> & {
+    sort?: boolean;
+    label: string;
+  }
 ): JSX.Element {
   const { t } = useTranslation();
 
-  const sortedOpts = memoize((originalOptions) => {
-    const opts = [...originalOptions];
-    if (props.sort) {
-      opts.sort((a, b) => sortByName(a.label, b.label));
+  const sortedOpts = memoize(
+    (originalOptions: Array<{ label: string; value: T }>) => {
+      const opts = [...originalOptions];
+      if (props.sort) {
+        opts.sort((a, b) => sortByName(a.label, b.label));
+      }
+      return opts;
     }
-    return opts;
-  })(props.options);
+  )(props.options ?? []);
 
   const actualProps = {
     ...{

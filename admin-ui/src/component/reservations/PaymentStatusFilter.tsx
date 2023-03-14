@@ -21,16 +21,18 @@ const PaymentStatuses = [
 const PaymentStatusFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
 
+  const opts: OptionType[] = PaymentStatuses.map((s) => ({
+    value: s,
+    label: t(`Payment.status.${s}`),
+  }));
+
   return (
     <SortedSelect
       sort
       label={t("ReservationsSearch.paymentStatus")}
       multiselect
       placeholder={t("common.filter")}
-      options={PaymentStatuses.map((s) => ({
-        value: s,
-        label: t(`Payment.status.${s}`),
-      }))}
+      options={opts}
       value={value || []}
       onChange={onChange}
       id="payment-status-combobox"

@@ -4,6 +4,7 @@ export const RESERVATIONUNIT_QUERY = gql`
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
       state
+      reservationState
       images {
         pk
         mediumUrl

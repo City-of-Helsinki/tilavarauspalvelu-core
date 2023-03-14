@@ -19,6 +19,7 @@ import i18next from "i18next";
 import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -32,6 +33,8 @@ import {
   ReservationUnitImageCreateMutationInput,
   ReservationUnitsReservationUnitAuthenticationChoices,
   ReservationUnitByPkType,
+  UnitByPkType,
+  ReservationState,
   ReservationUnitState,
 } from "common/types/gql-types";
 
@@ -92,6 +95,7 @@ import PricingType from "./PricingType";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
 import { parseAddress } from "../../../common/util";
 import { Accordion } from "../../../common/hds-fork/Accordion";
+import ReservationStateTag from "./ReservationStateTag";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -143,6 +147,73 @@ const getSelectedOptions = (
       // eslint-disable-next-line
       .map((optionPk: any) => options.find((so: any) => so.value === optionPk))
       .filter(Boolean) as OptionType[]
+  );
+};
+
+const TitleSectionWithTags = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--spacing-m);
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--spacing-s) 0 var(--spacing-m);
+  & > h1 {
+    margin: 0;
+  }
+`;
+
+const TagContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-m);
+`;
+
+const DisplayUnit = ({
+  heading,
+  unit,
+  unitState,
+  reservationState,
+}: {
+  heading: string;
+  unit?: UnitByPkType;
+  unitState?: ReservationUnitState;
+  reservationState?: ReservationState;
+}) => {
+  if (!unit) {
+    return null;
+  }
+
+  return (
+    <DenseVerticalFlex>
+      <div>
+        <TitleSectionWithTags>
+          <H1 $legacy>{heading}</H1>
+          <TagContainer>
+            {reservationState !== undefined && (
+              <ReservationStateTag state={reservationState} />
+            )}
+            {unitState !== undefined && (
+              <ReservationUnitStateTag state={unitState} />
+            )}
+          </TagContainer>
+        </TitleSectionWithTags>
+        <div
+          style={{
+            lineHeight: "24px",
+            fontSize: "var(--fontsize-heading-s)",
+          }}
+        >
+          <div>
+            <Strong>{unit.nameFi}</Strong>
+          </div>
+          {unit.location ? <span>{parseAddress(unit.location)}</span> : null}
+        </div>
+        {unit.location ? <span>{parseAddress(unit.location)}</span> : null}
+      </div>
+    </DenseVerticalFlex>
   );
 };
 
@@ -554,12 +625,33 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       state.reservationUnitEdit.reservationKind as string
     ) || false;
 
-  const reservationUnitState =
-    Number(state?.reservationUnitPk) > 0 ? (
-      <ReservationUnitStateTag
-        state={state.reservationUnit?.state as ReservationUnitState}
-      />
-    ) : undefined;
+  const handleSaveAsDraft = () => {
+    const validationErrors = draftSchema.validate(state.reservationUnitEdit);
+
+    if (validationErrors.error) {
+      dispatch({ type: "setValidationErrors", validationErrors });
+    } else {
+      saveReservationUnit(false);
+      dispatch({
+        type: "setValidationErrors",
+        validationErrors: null,
+      });
+    }
+  };
+
+  const handlePublish = () => {
+    const validationErrors = schema.validate(state.reservationUnitEdit);
+
+    if (validationErrors.error) {
+      dispatch({ type: "setValidationErrors", validationErrors });
+    } else {
+      saveReservationUnit(true);
+      dispatch({
+        type: "setValidationErrors",
+        validationErrors: null,
+      });
+    }
+  };
 
   return (
     <Wrapper key={JSON.stringify(state.validationErrors)}>
@@ -578,35 +670,17 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           ]}
         />
         <Container>
-          {state.unit ? (
-            <DenseVerticalFlex>
-              <div>
-                <HorisontalFlex style={{ justifyContent: "space-between" }}>
-                  <H1 $legacy>
-                    {state.reservationUnitEdit.nameFi ||
-                      t("ReservationUnitEditor.defaultHeading")}
-                  </H1>
-                  <span>{reservationUnitState}</span>
-                </HorisontalFlex>
-                <div
-                  style={{
-                    lineHeight: "24px",
-                    fontSize: "var(--fontsize-heading-s)",
-                  }}
-                >
-                  <div>
-                    <Strong>{state.unit.nameFi}</Strong>
-                  </div>
-                  {state.unit.location ? (
-                    <span>{parseAddress(state.unit.location)}</span>
-                  ) : null}
-                </div>
-                {state.unit.location ? (
-                  <span>{parseAddress(state.unit.location)}</span>
-                ) : null}
-              </div>
-            </DenseVerticalFlex>
-          ) : null}
+          <DisplayUnit
+            heading={
+              state.reservationUnitEdit.nameFi ??
+              t("ReservationUnitEditor.defaultHeading")
+            }
+            unit={state.unit}
+            reservationState={
+              state?.reservationUnit?.reservationState ?? undefined
+            }
+            unitState={state?.reservationUnit?.state ?? undefined}
+          />
           <FormErrorSummary
             fieldNamePrefix="ReservationUnitEditor.label."
             validationErrors={state.validationErrors}
@@ -1208,10 +1282,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       id="reservationStartInterval"
                       placeholder={t("common.select")}
                       required
-                      value={
-                        state.reservationUnitEdit
-                          .reservationStartInterval as string
-                      }
+                      value={state.reservationUnitEdit.reservationStartInterval}
                       label={t(
                         "ReservationUnitEditor.label.reservationStartInterval"
                       )}
@@ -1910,45 +1981,17 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             disabled={saving}
             variant="secondary"
             isLoading={saving}
+            type="button"
             loadingText={t("ReservationUnitEditor.saving")}
-            onClick={(e) => {
-              e.preventDefault();
-              const validationErrors = draftSchema.validate(
-                state.reservationUnitEdit
-              );
-
-              if (validationErrors.error) {
-                dispatch({ type: "setValidationErrors", validationErrors });
-              } else {
-                saveReservationUnit(false);
-                dispatch({
-                  type: "setValidationErrors",
-                  validationErrors: null,
-                });
-              }
-            }}
+            onClick={handleSaveAsDraft}
           >
             {t("ReservationUnitEditor.saveAsDraft")}
           </WhiteButton>
           <WhiteButton
             variant="primary"
             disabled={saving}
-            onClick={(e) => {
-              e.preventDefault();
-              const validationErrors = schema.validate(
-                state.reservationUnitEdit
-              );
-
-              if (validationErrors.error) {
-                dispatch({ type: "setValidationErrors", validationErrors });
-              } else {
-                saveReservationUnit(true);
-                dispatch({
-                  type: "setValidationErrors",
-                  validationErrors: null,
-                });
-              }
-            }}
+            type="button"
+            onClick={handlePublish}
           >
             {t("ReservationUnitEditor.saveAndPublish")}
           </WhiteButton>

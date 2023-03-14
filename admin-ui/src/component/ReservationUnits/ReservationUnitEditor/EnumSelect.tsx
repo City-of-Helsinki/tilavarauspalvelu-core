@@ -10,11 +10,12 @@ type OptionType = {
 function selectedOptions<T>(
   value: T,
   options: OptionType[]
-): OptionType | OptionType[] | "" {
+): OptionType | undefined {
   if (Array.isArray(value)) {
-    return options.filter((o) => value.includes(o.value));
+    const f = options.filter((o) => value.includes(o.value));
+    return f.length > 0 ? f[0] : undefined;
   }
-  return options.find((o) => o.value === String(value)) || "";
+  return options.find((o) => o.value === String(value));
 }
 
 const EnumSelect = <T,>({
