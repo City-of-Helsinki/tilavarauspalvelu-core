@@ -48,8 +48,10 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-cryptography==3.4.7
-    # via social-auth-core
+cryptography==39.0.2
+    # via
+    #   -r requirements.in
+    #   social-auth-core
 defusedxml==0.7.1
     # via
     #   python3-openid

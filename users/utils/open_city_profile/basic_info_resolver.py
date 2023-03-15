@@ -7,6 +7,8 @@ from django.conf import settings
 from applications.models import City
 from users.utils.open_city_profile.mixins import ProfileReaderTokenMixin
 
+REQUEST_TIMEOUT_SECONDS = 5
+
 
 class ProfileReadError(Exception):
     pass
@@ -99,6 +101,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
             settings.OPEN_CITY_PROFILE_GRAPHQL_API,
             json={"query": query},
             headers={"Authorization": self.token},
+            timeout=REQUEST_TIMEOUT_SECONDS,
         )
 
         status = response.status_code

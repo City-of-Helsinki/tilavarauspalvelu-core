@@ -11,6 +11,7 @@ from opening_hours.hauki_request import make_hauki_get_request
 from spaces.models import Location, Unit
 
 logger = getLogger(__name__)
+REQUEST_TIMEOUT_SECONDS = 15
 
 
 class UnitImporter:
@@ -93,7 +94,7 @@ class UnitImporter:
     def import_units(self, import_hauki_resource_id=False):
         self.import_hauki_resource_ids = import_hauki_resource_id
 
-        resp = requests.get(self.url)
+        resp = requests.get(self.url, timeout=REQUEST_TIMEOUT_SECONDS)
         resp.raise_for_status()
         unit_data = resp.json()
 
