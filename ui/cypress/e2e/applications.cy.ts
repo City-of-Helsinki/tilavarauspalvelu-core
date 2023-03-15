@@ -1,5 +1,5 @@
-import { notificationTitle } from "model/application";
-import { notificationContainer } from "model/reservation-creation";
+import { notificationTitle } from "../model/application";
+import { notificationContainer } from "../model/reservation-creation";
 import {
   applicationCard,
   applicationGroups,

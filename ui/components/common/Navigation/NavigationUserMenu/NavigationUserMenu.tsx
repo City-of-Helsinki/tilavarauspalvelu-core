@@ -4,12 +4,12 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
-import { MenuItem } from "../NavigationMenu";
 import { NavigationUserMenuUserCard } from "./NavigationUserMenuUserCard";
 import {
   authenticationIssuer,
   authenticationLogoutApiRoute,
 } from "../../../../modules/const";
+import { MenuItem } from "../types";
 
 const StyledUserMenu = styled(HDSNavigation.User)<{
   $active?: boolean;
@@ -32,16 +32,21 @@ const NavigationUserMenuItem = styled(HDSNavigation.Item)<{
   $divider?: boolean;
   icon?: JSX.Element;
 }>`
+  &:last-of-type {
+    padding-bottom: 0;
+  }
+
   cursor: pointer;
   display: flex;
   padding-block: ${(props) => props.theme.spacing.xs};
-  padding-inline: ${(props) => props.theme.spacing.s};
   color: ${(props) => props.theme.colors.black.dark};
   text-decoration: none;
 
-  &:hover {
-    background: ${(props) => props.theme.colors.blue.medium};
-    color: ${(props) => props.theme.colors.white.dark};
+  @media (min-width: ${(props) => props.theme.breakpoints.m}) {
+    &:last-of-type {
+      padding-bottom: ${(props) => props.theme.spacing.xs};
+    }
+    padding-left: ${(props) => props.theme.spacing.s};
   }
 
   & > span {
@@ -56,7 +61,7 @@ const NavigationUserMenuItem = styled(HDSNavigation.Item)<{
     $divider &&
     css`
       position: relative;
-      margin-top: var(--spacing-xs) !important;
+      margin-top: var(--spacing-m) !important;
 
       &:after {
         content: "";
@@ -65,7 +70,7 @@ const NavigationUserMenuItem = styled(HDSNavigation.Item)<{
         border-top-color: ${(props) => props.theme.colors.black.light};
         position: absolute;
         width: 100%;
-        top: 0;
+        top: calc(var(--spacing-xs) * -1);
 
         @media (min-width: ${(props) => props.theme.breakpoints.m}) {
           width: 80%;
@@ -138,7 +143,6 @@ const NavigationUserMenu = () => {
           ))}
         </>
       ) : null}
-
       <NavigationUserMenuItem
         href="#"
         onClick={handleSignOut}

@@ -4,7 +4,7 @@ import styled from "styled-components";
 const StyledUserInfo = styled.div`
   word-break: break-all;
   padding-bottom: ${(props) => props.theme.spacing.s};
-  padding-left: ${(props) => props.theme.spacing.s};
+  padding-left: 36px;
   border: 0;
 
   @media (min-width: ${(props) => props.theme.breakpoints.s}) {
@@ -21,6 +21,7 @@ const Name = styled.div`
     display: block;
   }
 `;
+
 const Email = styled.div`
   color: ${(props) => props.theme.colors.black.medium};
   font-size: ${(props) => props.theme.fontSizes.body.s};
