@@ -175,3 +175,31 @@ class RecurringReservationUpdateTestCase(GrapheneTestCaseBase):
 
         recurring = RecurringReservation.objects.first()
         assert_that(recurring.reservation_unit).is_equal_to(self.reservation_unit)
+
+    def test_description_can_be_emptied(self):
+        self.recurring.description = "Some description"
+        self.recurring.save()
+
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_input_data()
+        input_data["description"] = ""
+
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data")
+            .get("updateRecurringReservation")
+            .get("recurringReservation")
+            .get("pk")
+        ).is_not_none()
+        pk = (
+            content.get("data")
+            .get("updateRecurringReservation")
+            .get("recurringReservation")
+            .get("pk")
+        )
+        recurring = RecurringReservation.objects.get(id=pk)
+
+        assert_that(recurring.description).is_empty()
