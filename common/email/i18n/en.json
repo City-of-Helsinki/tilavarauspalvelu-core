@@ -1,0 +1,42 @@
+{
+    "serviceName": "Varaamo",
+    "serviceUrl": "varaamo.hel.fi",
+    "helsinkiCity": "City of Helsinki",
+    "salutation": "Hi",
+
+    "manageReservationHeading": "Manage your reservation at Varaamo",
+    "checkYourReservation": "You can check the details of your reservation and Varaamo’s terms of contract and cancellation on the",
+    "ownReservationsPage": "‘Your reservations’ page",
+    "thankYouForUsing": "Thank you for choosing Varaamo!",
+
+    "withRegards": "Kind regards,",
+    "automaticMessage": "This is an automated message, please do not reply.",
+    "sendUs": "Send us",
+    "feedbackOnService": "feedback one Varaamo",
+    "reserveCityResourcesAt": "Easy reservation of the city’s premises and equipment for personal use at",
+
+    "reservationPending": "You have made a new reservation request:",
+    "reservationCompleted": "You have made a new reservation:",
+    "reservationConfirmed": "Your reservation has been confirmed!",
+    "reservationSubsidized": "Your reservation has been confirmed with the following discount:",
+    "reservationNeedsPayment": "Your reservation has been confirmed, and can be paid.",
+    "reservationRejected": "Unfortunately your reservation cannot be confirmed.",
+    "reservationUpdated": "Your reservation has been updated:",
+    "reservationCancelled": "Your reservation has been cancelled.",
+
+    "cancellationReason": "Reason for cancellation",
+    "rejectionReason": "Reason for cancellation",
+    "cancellationInstructions": "Additional information about cancellation",
+    "rejectionInstructions": "Additional information",
+    "reservationInstruction": "Additional information about your reservation",
+
+    "reservationBegins": "From",
+    "reservationEnds": "To",
+    "reservationPrice": "Reservation price",
+    "reservationNumber": "Reservation number",
+
+    "oClock": "at",
+    "vatIncluded": "incl. VAT",
+    "paymentDue": "Due date",
+    "payReservation": "Pay the reservation"
+}
