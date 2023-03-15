@@ -118,9 +118,9 @@ def _get_order_params(reservation: Reservation):
         price_vat=sum(item.row_price_vat for item in items),
         price_total=sum(item.row_price_total for item in items),
         customer=OrderCustomer(
-            first_name="First",
-            last_name="Name",
-            email="asdasd@asdasd.fi",
+            first_name=reservation.reservee_first_name,
+            last_name=reservation.reservee_last_name,
+            email=reservation.reservee_email,
             phone=get_validated_phone_number(reservation.reservee_phone)
             if reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
             else "",

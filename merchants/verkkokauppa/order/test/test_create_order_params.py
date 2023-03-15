@@ -34,6 +34,10 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             price=Decimal("12.4"),
             tax_percentage_value=Decimal("24"),
             reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="Firstname",
+            reservee_last_name="Lastname",
+            reservee_email="test@example.com",
+            reservee_phone="+358 50 123 4567",
         )
         order_params = _get_order_params(reservation)
 
@@ -45,9 +49,9 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         assert_that(json["priceNet"]).is_equal_to("10")
         assert_that(json["priceVat"]).is_equal_to("2.40")
         assert_that(json["priceTotal"]).is_equal_to("12.40")
-        assert_that(json["customer"]["firstName"]).is_equal_to("First")
-        assert_that(json["customer"]["lastName"]).is_equal_to("Name")
-        assert_that(json["customer"]["email"]).is_equal_to("asdasd@asdasd.fi")
+        assert_that(json["customer"]["firstName"]).is_equal_to("Firstname")
+        assert_that(json["customer"]["lastName"]).is_equal_to("Lastname")
+        assert_that(json["customer"]["email"]).is_equal_to("test@example.com")
         assert_that(json["customer"]["phone"]).is_equal_to(
             get_validated_phone_number(reservation.reservee_phone)
         )
