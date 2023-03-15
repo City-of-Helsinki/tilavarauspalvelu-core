@@ -220,16 +220,6 @@ const Page1 = ({
     }
   };
 
-  const onAddApplicationEvent = (data: Application) => {
-    if (
-      data.applicationEvents &&
-      data.applicationEvents.some((e) => Boolean(e.id))
-    ) {
-      return;
-    }
-    addNewApplicationEvent();
-  };
-
   if (!ready) {
     return <CenterSpinner />;
   }
@@ -272,7 +262,7 @@ const Page1 = ({
           id="addApplicationEvent"
           variant="supplementary"
           iconLeft={<IconPlusCircle />}
-          onClick={() => form.handleSubmit(onAddApplicationEvent)()}
+          onClick={() => form.handleSubmit(addNewApplicationEvent)()}
           size="small"
           style={{ gap: "var(--spacing-s)" }}
         >
