@@ -14,7 +14,7 @@ class State(Enum):
     ENTER_ONLY = "enter_only"
     EXIT_ONLY = "exit_only"
     WEATHER_PERMITTING = "weather_permitting"
-    NOT_IN_USER = "not_in_use"
+    NOT_IN_USE = "not_in_use"
     MAINTENANCE = "maintenance"
 
     class Labels:
@@ -50,6 +50,13 @@ class State(Enum):
             cls.OPEN_AND_RESERVABLE,
             cls.WITH_KEY_AND_RESERVATION,
         ]
+
+    @classmethod
+    def get(cls, state):
+        try:
+            return State(state)
+        except ValueError:
+            return State.UNDEFINED
 
 
 class Weekday(Enum):
