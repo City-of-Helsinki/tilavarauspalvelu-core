@@ -72,8 +72,8 @@ const formatNumber = (n: number): string => `00${n}`.slice(-2);
 export const getDurationOptions = (): OptionType[] => {
   const result = [] as OptionType[];
   let h = 1;
-  let m = 30;
-  for (let i = 0; i < 35; i += 1) {
+  let m = 0;
+  for (let i = 0; i < 45; i += 1) {
     result.push(
       option(
         `${i18n.t("common:abbreviations.hour", { count: h })} ${

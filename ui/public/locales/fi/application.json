@@ -59,8 +59,8 @@
   },
   "Page2": {
     "heading": "2. Valitse varauksen ajankohta",
-    "subHeading": "Valitse kaikki ne ajankohdat, joille toivot varauksesi asettuvan.",
-    "info": "Tarkista tilakohtaiset aukioloajat <a>koosteesta</a> tai tilan sivulta. Valitse ajat, joita ensisijaisesti toivot. Valitse myös toissijaisia aikoja, jotka sopivat sinulle.",
+    "subHeading": "Ilmoita kaikki sinulle sopivat ajankohdat. Tarkista aukioloajat tilan kuvauksesta.",
+    "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Useamman tila- ja aikatoiveen ilmoittaminen parantaa mahdollisuuksiasi saada toiveidesi mukaiset tilat ja ajat.",
     "text": "Ilmoita toivomasi ajankohdat kausivaraukselle",
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
@@ -79,10 +79,10 @@
     "notification": {
       "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille",
       "minDuration": {
-        "title": "Valittujen toiveaikojen kesto on pienempi kuin varauksen vähimmäiskesto",
-        "bodySingle": "Kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa.",
-        "body_one": "Varauksella {{title}} kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa.",
-        "body_other": "Varauksilla {{title}} kalenterista valittu toiveaikojen kesto on pienempi kuin edellisessä vaiheessa toivottu varauksen vähimmäiskesto. Valitse kalenterista enemmän toiveaikoja, tai pienennä valitsemaasi vähimmäiskestoa."
+        "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
+        "bodySingle": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+        "body_one": "Valitse varauksen {{title}} kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+        "body_other": "Valitse varausten {{title}} kalentereista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa."
       }
     }
   },

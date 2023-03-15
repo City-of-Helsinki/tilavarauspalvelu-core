@@ -8,7 +8,7 @@ import {
 } from "date-fns";
 import { isNumber } from "lodash";
 import { i18n } from "next-i18next";
-import { HMS } from "../../types/common";
+import { HMS, Parameter } from "../../types/common";
 
 export const parseDate = (date: string): Date => parseISO(date);
 
@@ -98,4 +98,16 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
   }
 
   return result;
+};
+
+export const sortAgeGroups = (ageGroups: Parameter[]): Parameter[] => {
+  return ageGroups.sort((a, b) => {
+    const order = ["1-99"];
+    const strA = `${a.minimum || ""}-${a.maximum || ""}`;
+    const strB = `${b.minimum || ""}-${b.maximum || ""}`;
+
+    return order.indexOf(strA) > -1 || order.indexOf(strB) > -1
+      ? order.indexOf(strA) - order.indexOf(strB)
+      : (a.minimum || 0) - (b.minimum || 0);
+  });
 };

@@ -1,6 +1,6 @@
 import { IconArrowRight, Notification as HDSNotification } from "hds-react";
 import React, { useState } from "react";
-import { Trans, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Application, Cell } from "common/types/common";
@@ -27,9 +27,7 @@ const SubHeading = styled.p`
   margin-top: var(--spacing-2-xs);
 `;
 
-const Notification = styled(HDSNotification)`
-  z-index: 0;
-`;
+const Notification = styled(HDSNotification)``;
 
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
@@ -125,7 +123,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           aria-label={t(successMsg)}
           position="top-center"
           autoClose
-          autoCloseDuration={2000}
+          autoCloseDuration={3000}
           displayAutoCloseProgress={false}
           onClose={() => setSuccessMsg("")}
           dismissible
@@ -174,28 +172,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
               size="small"
               type="info"
             >
-              <Trans
-                i18nKey="application:Page2.info"
-                components={{
-                  a: (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="/Tilavarauspalvelu_Varausyksikoiden-aukioloajat.pdf"
-                    >
-                      {" "}
-                    </a>
-                  ),
-                }}
-              >
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="/Tilavarauspalvelu_Varausyksikoiden-aukioloajat.pdf"
-                >
-                  {" "}
-                </a>
-              </Trans>
+              {t("application:Page2.info")}
             </StyledNotification>
             <TimeSelector
               key={event.id || "NEW"}

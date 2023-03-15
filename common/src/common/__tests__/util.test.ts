@@ -1,4 +1,10 @@
-import { convertHMSToSeconds, formatDuration, secondsToHms } from "../util";
+import { Parameter } from "../../../types/common";
+import {
+  convertHMSToSeconds,
+  formatDuration,
+  secondsToHms,
+  sortAgeGroups,
+} from "../util";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -33,4 +39,19 @@ test("formatDuration", () => {
   expect(formatDuration("2:00:00")).toEqual("2 plural");
   expect(formatDuration("foo")).toEqual("-");
   expect(formatDuration("")).toEqual("-");
+});
+
+test("sortAgeGroups", () => {
+  const ageGroups: Parameter[] = [
+    { id: 12, minimum: 3 },
+    { id: 3, minimum: 10, maximum: 20 },
+    { id: 1, minimum: 1, maximum: 99 },
+    { id: 2, minimum: 1, maximum: 3 },
+  ];
+  expect(sortAgeGroups(ageGroups)).toEqual([
+    { id: 2, minimum: 1, maximum: 3 },
+    { id: 12, minimum: 3 },
+    { id: 3, minimum: 10, maximum: 20 },
+    { id: 1, minimum: 1, maximum: 99 },
+  ]);
 });

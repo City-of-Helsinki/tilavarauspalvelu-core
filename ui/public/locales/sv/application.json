@@ -59,8 +59,8 @@
   },
   "Page2": {
     "heading": "2. Välj bokningens tidpunkt",
-    "subHeading": "Välj alla tidpunkter som du önskar att din bokning faller in på.",
-    "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <a>ansökningsanvisningarna (FI)</a>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
+    "subHeading": "Ange alla lämpliga tider som passar dig. Kontrollera öppettiderna i lokalens beskrivning.",
+    "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Att ange flera önskemål om lokaler och tider förbättrar dina chanser att få de lokaler och tider du vill ha.",
     "text": "Ange de tidpunkter du önskar för säsongbokningen",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
@@ -79,10 +79,10 @@
     "notification": {
       "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades",
       "minDuration": {
-        "title": "Den totala varaktigheten för begärda tider är kortare än bokningens minsta varaktighet",
-        "bodySingle": "Den totala varaktigheten av begärda tider som valts i kalendern är kortare än bokningens minimala längd (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen.",
-        "body_one": "I bokningen {{title}} är den totala varaktigheten för begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen.",
-        "body_other": "I bokningarna {{title}} är den totala varaktigheten av begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen."
+        "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
+        "bodySingle": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
+        "body_one": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
+        "body_other": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg."
       }
     }
   },

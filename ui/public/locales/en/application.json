@@ -59,8 +59,8 @@
   },
   "Page2": {
     "heading": "2. Select booking dates",
-    "subHeading": "Select all times for which you want to book spaces",
-    "info": "Check available time slots <a>here</a> (Fin). Select your preferred times. Also select other times that suit you.",
+    "subHeading": "List all suitable times. Check opening hours in the spaces' description.",
+    "info": "Please select both preferred times and also select other times that suit you. Providing more space and time options will improve your chances of getting spaces and times you like.",
     "text": "Indicate your preferred dates for the seasonal booking",
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
@@ -79,10 +79,10 @@
     "notification": {
       "copyCells": "Times successfully copied for all booking requests",
       "minDuration": {
-        "title": "The total duration of requested times is lower than minimum duration of the booking",
-        "bodySingle": "The total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking.",
-        "body_one": "In the booking {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking.",
-        "body_other": "In the bookings {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking."
+        "title": "Your selected time slots do not correspond to the duration of your booking",
+        "bodySingle": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
+        "body_one": "Select more time slots from the calendar of {{title}} or shorten the minimum duration selected in the previous step of the application.",
+        "body_other": "Select more time slots from the calendar of {{title}} or shorten the minimum duration selected in the previous step of the application."
       }
     }
   },

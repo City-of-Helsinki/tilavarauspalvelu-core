@@ -13,6 +13,7 @@ import {
   OptionType,
   StringParameter,
 } from "common/types/common";
+import { sortAgeGroups } from "common/src/common/util";
 import {
   Query,
   ApplicationRoundType,
@@ -126,13 +127,9 @@ const Page1 = ({
         getParameters("reservation_unit_type"),
       ]);
 
-      fetchedAgeGroupOptions.sort((a, b) => {
-        return (a.minimum || 0) - (b.minimum || 0);
-      });
-
       setOptions({
         ageGroupOptions: mapOptions(
-          fetchedAgeGroupOptions,
+          sortAgeGroups(fetchedAgeGroupOptions),
           undefined,
           i18n.language
         ),
