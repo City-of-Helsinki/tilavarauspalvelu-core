@@ -13,7 +13,7 @@ type Props = {
 const ReservationStateFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const opts: OptionType[] = Object.keys(
+  const opts: OptionType[] = Object.values(
     ReservationsReservationStateChoices
   ).map((s) => ({
     value: s,
