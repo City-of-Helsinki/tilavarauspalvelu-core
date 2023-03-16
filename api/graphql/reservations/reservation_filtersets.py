@@ -14,7 +14,7 @@ from permissions.helpers import (
     get_units_where_can_view_reservations,
 )
 from reservation_units.models import ReservationUnit, ReservationUnitType
-from reservations.models import STATE_CHOICES, Reservation, User
+from reservations.models import STATE_CHOICES, RecurringReservation, Reservation, User
 from spaces.models import Unit
 
 
@@ -42,6 +42,10 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
     price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
+
+    recurring_reservation = django_filters.ModelChoiceFilter(
+        field_name="recurring_reservation", queryset=RecurringReservation.objects.all()
+    )
 
     # Filter for displaying reservations which requires or had required handling.
     requested = django_filters.BooleanFilter(method="get_requested")
