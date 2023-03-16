@@ -4,8 +4,8 @@ from unittest.mock import patch
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.utils import timezone
 from freezegun import freeze_time
-from pytz import UTC
 
 from applications.models import CUSTOMER_TYPES
 from merchants.tests.factories import PaymentProductFactory
@@ -33,7 +33,7 @@ class HelpersTestCase(TestCase):
             name_fi="Suomeksi", name_sv="Ruotsiksi", name_en="Englanniksi"
         )
 
-        begin = datetime.now(UTC)
+        begin = datetime.now().astimezone(timezone.get_default_timezone())
         end = begin + timedelta(hours=2)
         self.reservation = ReservationFactory(
             reservation_unit=[self.reservation_unit],

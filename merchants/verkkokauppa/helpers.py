@@ -31,10 +31,14 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
     Weekday is localized based on user's preferred language, but rest
     of the format is always the same: ww dd.mm.yyyy hh:mm-hh:mm
     """
+    begin = reservation.begin.astimezone(get_default_timezone())
+    end = reservation.end.astimezone(get_default_timezone())
+
     preferred_language = reservation.user.preferred_language or "fi"
-    weekday = localized_short_weekday(reservation.begin.weekday(), preferred_language)
-    end_time = reservation.end.strftime("%H:%M")
-    return reservation.begin.strftime(f"{weekday} %d.%m.%Y %H:%M-{end_time}")
+    weekday = localized_short_weekday(begin.weekday(), preferred_language)
+    end_time = end.strftime("%H:%M")
+
+    return begin.strftime(f"{weekday} %d.%m.%Y %H:%M-{end_time}")
 
 
 def get_validated_phone_number(phone_number: str) -> str:
