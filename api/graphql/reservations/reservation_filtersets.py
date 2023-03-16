@@ -19,56 +19,12 @@ from spaces.models import Unit
 
 
 class ReservationFilterSet(django_filters.FilterSet):
-    begin = django_filters.DateTimeFilter(field_name="begin", lookup_expr="gte")
     end = django_filters.DateTimeFilter(field_name="end", lookup_expr="lte")
-    price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
-    price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
-    state = django_filters.MultipleChoiceFilter(
-        field_name="state",
-        lookup_expr="iexact",
-        choices=tuple(
-            (
-                key.upper(),  # Must use upper case characters to comply with GraphQL Enum
-                value,
-            )
-            for key, value in STATE_CHOICES.STATE_CHOICES
-        ),
-    )
-
-    # Filter for displaying reservations which requires or had required handling.
-    requested = django_filters.BooleanFilter(method="get_requested")
+    begin = django_filters.DateTimeFilter(field_name="begin", lookup_expr="gte")
 
     only_with_permission = django_filters.BooleanFilter(
         method="get_only_with_permission"
     )
-
-    user = django_filters.ModelChoiceFilter(
-        field_name="user", queryset=User.objects.all()
-    )
-
-    reservation_unit_name_fi = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
-    reservation_unit_name_en = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
-    reservation_unit_name_sv = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
-
-    unit = django_filters.ModelMultipleChoiceFilter(
-        method="get_unit", queryset=Unit.objects.all()
-    )
-
-    reservation_unit = django_filters.ModelMultipleChoiceFilter(
-        method="get_reservation_unit", queryset=ReservationUnit.objects.all()
-    )
-
-    reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
-        method="get_reservation_unit_type", queryset=ReservationUnitType.objects.all()
-    )
-
-    text_search = django_filters.CharFilter(method="get_text_search")
 
     order_status = django_filters.MultipleChoiceFilter(
         field_name="payment_order__status",
@@ -83,6 +39,52 @@ class ReservationFilterSet(django_filters.FilterSet):
         label="PaymentOrder's statuses; %s"
         % ", ".join([k for k, v in OrderStatus.choices]),
     )
+
+    price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
+    price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
+
+    # Filter for displaying reservations which requires or had required handling.
+    requested = django_filters.BooleanFilter(method="get_requested")
+
+    reservation_unit = django_filters.ModelMultipleChoiceFilter(
+        method="get_reservation_unit", queryset=ReservationUnit.objects.all()
+    )
+
+    reservation_unit_name_fi = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+    reservation_unit_name_en = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+    reservation_unit_name_sv = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+
+    reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
+        method="get_reservation_unit_type", queryset=ReservationUnitType.objects.all()
+    )
+
+    state = django_filters.MultipleChoiceFilter(
+        field_name="state",
+        lookup_expr="iexact",
+        choices=tuple(
+            (
+                key.upper(),  # Must use upper case characters to comply with GraphQL Enum
+                value,
+            )
+            for key, value in STATE_CHOICES.STATE_CHOICES
+        ),
+    )
+
+    unit = django_filters.ModelMultipleChoiceFilter(
+        method="get_unit", queryset=Unit.objects.all()
+    )
+
+    user = django_filters.ModelChoiceFilter(
+        field_name="user", queryset=User.objects.all()
+    )
+
+    text_search = django_filters.CharFilter(method="get_text_search")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -134,12 +136,6 @@ class ReservationFilterSet(django_filters.FilterSet):
 
         return super().filter_queryset(queryset)
 
-    def get_requested(self, qs, property, value: str):
-        query = Q(state=STATE_CHOICES.REQUIRES_HANDLING) | Q(handled_at__isnull=False)
-        if value:
-            return qs.filter(query)
-        return qs.exclude(query)
-
     def get_only_with_permission(self, qs, property, value: bool):
         if not value:
             return qs
@@ -154,6 +150,18 @@ class ReservationFilterSet(django_filters.FilterSet):
             | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
             | Q(user=user)
         ).distinct()
+
+    def get_requested(self, qs, property, value: str):
+        query = Q(state=STATE_CHOICES.REQUIRES_HANDLING) | Q(handled_at__isnull=False)
+        if value:
+            return qs.filter(query)
+        return qs.exclude(query)
+
+    def get_reservation_unit(self, qs, property, value):
+        if not value:
+            return qs
+
+        return qs.filter(reservation_unit__in=value)
 
     def get_reservation_unit_name(self, qs, property: str, value: str):
         language = property[-2:]
@@ -170,18 +178,6 @@ class ReservationFilterSet(django_filters.FilterSet):
 
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
-
-    def get_unit(self, qs, property, value):
-        if not value:
-            return qs
-
-        return qs.filter(reservation_unit__unit__in=value)
-
-    def get_reservation_unit(self, qs, property, value):
-        if not value:
-            return qs
-
-        return qs.filter(reservation_unit__in=value)
 
     def get_reservation_unit_type(self, qs, property, value):
         if not value:
@@ -217,3 +213,9 @@ class ReservationFilterSet(django_filters.FilterSet):
         return queryset.filter(
             Q(name__icontains=value) | Q(reservee_name__icontains=value)
         )
+
+    def get_unit(self, qs, property, value):
+        if not value:
+            return qs
+
+        return qs.filter(reservation_unit__unit__in=value)
