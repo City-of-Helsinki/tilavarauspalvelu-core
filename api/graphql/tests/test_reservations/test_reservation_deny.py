@@ -269,3 +269,46 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
         assert_that(len(mail.outbox)).is_equal_to(0)
+
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
+    def test_can_deny_when_reservation_started_but_not_ended(self):
+        self.reservation.type = ReservationType.BLOCKED
+        self.reservation.save()
+
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_deny_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+
+        with freezegun.freeze_time("2021-10-12T13:30:00Z"):
+            response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        deny_data = content.get("data").get("denyReservation")
+        assert_that(deny_data.get("errors")).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
+
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
+    def test_cannot_deny_when_reservation_ended(self):
+        self.reservation.type = ReservationType.BLOCKED
+        self.reservation.save()
+
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_deny_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+
+        with freezegun.freeze_time("2021-10-12T15:30:00Z"):
+            response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.handling_details).is_empty()

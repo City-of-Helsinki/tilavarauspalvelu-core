@@ -63,9 +63,21 @@ class ReservationDenySerializer(PrimaryKeySerializer):
                 f"Only reservations with state as {', '.join(allowed_states)} can be denied.",
                 ValidationErrorCodes.DENYING_NOT_ALLOWED,
             )
+
+        self.check_reservation_has_not_ended()
+
         data = super().validate(data)
 
         return data
+
+    def check_reservation_has_not_ended(self):
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+
+        if self.instance.end < now:
+            raise ValidationErrorWithCode(
+                "Reservation cannot be denied when the reservation has ended.",
+                ValidationErrorCodes.DENYING_NOT_ALLOWED,
+            )
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
