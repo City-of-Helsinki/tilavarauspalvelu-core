@@ -45,10 +45,12 @@ const calcPriceNet = (price: string, taxPercentageValue?: number | null) => {
 
 const DialogContent = ({
   reservation,
+  isFree,
   onClose,
   onAccept,
 }: {
   reservation: ReservationType;
+  isFree: boolean;
   onClose: () => void;
   onAccept: () => void;
 }) => {
@@ -79,7 +81,7 @@ const DialogContent = ({
                   {t("RequestedReservation.ApproveDialog.subventionReason")}
                 </Label>
                 <Content>
-                  {trim(reservation.freeOfChargeReason as string) || "-"}
+                  {trim(reservation.freeOfChargeReason ?? "") || "-"}
                 </Content>
               </div>
               <Notification>
@@ -87,7 +89,7 @@ const DialogContent = ({
               </Notification>
             </>
           )}
-          {hasPrice ? (
+          {!isFree && hasPrice ? (
             <>
               <Checkbox
                 label={t("RequestedReservation.ApproveDialog.clearPrice")}
@@ -173,11 +175,12 @@ const DialogContent = ({
 
 const ApproveDialog = ({
   reservation,
+  isFree,
   onClose,
   onAccept,
 }: {
   reservation: ReservationType;
-
+  isFree: boolean;
   onClose: () => void;
   onAccept: () => void;
 }): JSX.Element => {
@@ -199,6 +202,7 @@ const ApproveDialog = ({
         />
 
         <DialogContent
+          isFree={isFree}
           reservation={reservation}
           onAccept={onAccept}
           onClose={onClose}

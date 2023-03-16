@@ -18,7 +18,6 @@ import {
   ReservationsReservationStateChoices,
   ReservationsReservationReserveeTypeChoices,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
-  ReservationUnitType,
 } from "common/types/gql-types";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
@@ -220,15 +219,18 @@ const RequestedReservation = (): JSX.Element | null => {
     return null;
   }
 
-  const pricing = getReservatinUnitPricing(
-    reservation?.reservationUnits?.[0] as ReservationUnitType,
-    reservation.begin
-  );
+  const pricing = reservation?.reservationUnits?.[0]
+    ? getReservatinUnitPricing(
+        reservation?.reservationUnits?.[0],
+        reservation.begin
+      )
+    : undefined;
 
   const isNonFree =
     pricing?.pricingType ===
       ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid &&
     pricing.highestPrice >= 0;
+
   const buttons =
     reservation.state ===
     ReservationsReservationStateChoices.RequiresHandling ? (
@@ -245,6 +247,7 @@ const RequestedReservation = (): JSX.Element | null => {
             e.preventDefault();
             setModalContent(
               <ApproveDialog
+                isFree={!isNonFree}
                 reservation={reservation}
                 onAccept={closeDialogAndRefetch}
                 onClose={closeDialog}
