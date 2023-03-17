@@ -7,7 +7,12 @@ from api.graphql.base_serializers import PrimaryKeySerializer
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from reservations.email_utils import send_deny_email
-from reservations.models import STATE_CHOICES, Reservation, ReservationDenyReason
+from reservations.models import (
+    STATE_CHOICES,
+    Reservation,
+    ReservationDenyReason,
+    ReservationType,
+)
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -46,21 +51,38 @@ class ReservationDenySerializer(PrimaryKeySerializer):
         validated_data = super().validated_data
         validated_data["state"] = STATE_CHOICES.DENIED
         validated_data["handled_at"] = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        # For now we wan't to copy the handling details to working memo. In future perhaps not.
+        # For now, we want to copy the handling details to working memo. In future perhaps not.
         validated_data["working_memo"] = validated_data["handling_details"]
         return validated_data
 
     def validate(self, data):
-        if self.instance.state != STATE_CHOICES.REQUIRES_HANDLING:
+        allowed_states = [STATE_CHOICES.REQUIRES_HANDLING, STATE_CHOICES.CONFIRMED]
+
+        if self.instance.state not in allowed_states:
             raise ValidationErrorWithCode(
-                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be denied.",
+                f"Only reservations with state as {', '.join(allowed_states)} can be denied.",
                 ValidationErrorCodes.DENYING_NOT_ALLOWED,
             )
+
+        self.check_reservation_has_not_ended()
+
         data = super().validate(data)
 
         return data
 
+    def check_reservation_has_not_ended(self):
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+
+        if self.instance.end < now:
+            raise ValidationErrorWithCode(
+                "Reservation cannot be denied when the reservation has ended.",
+                ValidationErrorCodes.DENYING_NOT_ALLOWED,
+            )
+
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        send_deny_email(instance)
+
+        if instance.type == ReservationType.NORMAL:
+            send_deny_email(instance)
+
         return instance
