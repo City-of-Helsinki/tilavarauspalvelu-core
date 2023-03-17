@@ -3,21 +3,21 @@
   "dateTypeThisWeek": "This week",
   "dateTypeToday": "Today",
   "dateTypeTomorrow": "Tomorrow",
-  "dateTypeWeekend": "Weekend",
-  "infoDate": "pp.kk.vvvv",
+  "dateTypeWeekend": "On the weekend",
+  "infoDate": "dd.mm.yyyy",
   "labelEndDate": "End date",
   "labelStartDate": "Start date",
-  "errorEndDateBeforeStartDate": "Start date must be before end date",
-  "errorDateFormat": "Date must be in format: dd.mm.yyyy",
+  "errorEndDateBeforeStartDate": "The start date must be before the end date",
+  "errorDateFormat": "The date must be in the format dd.mm.yyyy",
   "menu": {
     "buttonBack": "Back",
     "buttonClose": "Close",
     "buttonCustom": "Select dates"
   },
-  "title": "Select dates",
+  "title": "Select time",
   "accessibility": {
-    "chooseDayPrefix": "Choose",
+    "chooseDayPrefix": "Select",
     "nextMonth": "Next month",
-    "previousMonth": "Prev month"
+    "previousMonth": "Previous month"
   }
 }

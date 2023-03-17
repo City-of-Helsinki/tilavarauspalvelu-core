@@ -267,7 +267,7 @@ describe("Tilavaraus user reservations", () => {
     cancelCancelButton().should("not.be.disabled");
 
     cancelCancelButton().click();
-    cancelTitle().should("have.text", "Varaus peruttu!");
+    cancelTitle().should("have.text", "Varauksesi on peruttu!");
 
     reservationInfoCard()
       .should("contain.text", ", 2 t")
@@ -325,7 +325,10 @@ describe("Tilavaraus user reservations", () => {
       "have.text",
       "Varauksen muokkaaminen epäonnistui"
     );
-    errorNotificationBody().should("have.text", "Hyväksy ehdot jatkaaksesi.");
+    errorNotificationBody().should(
+      "have.text",
+      "Hyväksy sopimusehdot jatkaaksesi varausta."
+    );
     errorNotificationCloseButton().click();
 
     cy.get("#cancellation-and-payment-terms-terms-accepted").click();

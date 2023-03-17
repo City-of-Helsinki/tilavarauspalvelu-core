@@ -6,15 +6,15 @@
     "body": "Jotain meni pieleen"
   },
   "general_error": "Tapahtui määrittämätön virhe.",
-  "RESERVATION_UNIT_NOT_RESERVABLE": "Varausyksikkö ei ole varattavissa.",
+  "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
   "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
-  "RESERVATION_UNIT_IS_NOT_OPEN": "Varausyksikkö ei ole avoinna.",
-  "RESERVATION_UNIT_IN_OPEN_ROUND": "Varausyksikkö on mukana avoimella hakukierroksella.",
-  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Varauksen enimmäiskesto on ylitetty.",
-  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Varauksen vähimmäiskesto ei ole ylitetty.",
-  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Liian monta aktiivista varausta - sinulla on keskeneräinen varaus kohteelle.",
+  "RESERVATION_UNIT_IS_NOT_OPEN": "Kohde on tällä hetkellä suljettu.",
+  "RESERVATION_UNIT_IN_OPEN_ROUND": "Voit tehdä kausivaraushakemuksen tähän kohteeseen.",
+  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Lyhennä varausaikaa.",
+  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Pidennä varausaikaa.",
+  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
   "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",
-  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Virheellinen varausaika.",
-  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Varaus ei ole sallittu aikavälillä.",
-  "RESERVATION_UNIT_TYPE_IS_SEASON": "Yksittäisvaraus ei ole sallittu."
+  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Tarkista varausaika.",
+  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Tarkista varausaika.",
+  "RESERVATION_UNIT_TYPE_IS_SEASON": "Tähän kohteeseen voit tehdä vain kausivaraushakemuksen."
 }

@@ -79,8 +79,10 @@ const matchEvent = (): void => {
     });
 };
 
-const reservationEnds = (date: Date) =>
-  format(addDays(date, 10), "d.M.yyyy 'klo' H.mm");
+const reservationEnds = (date: Date, justDate = false) => {
+  const fmt = justDate ? "d.M.yyyy" : "d.M.yyyy 'klo' H.mm";
+  return format(addDays(date, 10), fmt);
+};
 
 const drawReservation = (): void => {
   hzNavigationFwd().click();
@@ -353,10 +355,10 @@ describe("renders with basic data", () => {
       "Voit tehdä varauksen aikaisintaan 12 kuukautta ja viimeistään 2 päivää etukäteen."
     );
     reservationInfo().contains(
-      `Varauskalenteri on auki ${reservationEnds(new Date())} asti.`
+      `Tämä kohde on varattavissa ${reservationEnds(new Date(), true)}`
     );
     reservationInfo().contains(
-      "Varauksen keston tulee olla välillä 1 tunti ja 1 tunti 30 minuuttia."
+      "Varauksen keston tulee olla välillä 1 tunti - 1 tunti 30 minuuttia."
     );
     reservationInfo().contains(
       "Sinulla voi olla samanaikaisesti enintään yksi varaus."
@@ -364,7 +366,7 @@ describe("renders with basic data", () => {
 
     reservationNotice().click();
     reservationNotice().contains(
-      `Huomioi hinnoittelumuutos ${toUIDate(addDays(new Date(), 2))} alkaen.`
+      `Tämän kohteen hinta muuttuu ${toUIDate(addDays(new Date(), 2))} alkaen.`
     );
     reservationNotice().contains(
       "Uusi hinta on 10,00 - 30,00 € / 15 min (sis. alv. 20%)"
@@ -394,7 +396,7 @@ describe("has pricing terms modal", () => {
 
     pricingTermsLink("reservation-unit-head").click();
 
-    pricingTermsDialog().should("contain.text", "Hinnoitteluperiaatteet");
+    pricingTermsDialog().should("contain.text", "Alennusryhmät");
     pricingTermsDialog().should("contain.text", "Hinnoitteluehdot body Fi");
 
     pricingTermsDialog().find("button").click();
@@ -450,7 +452,7 @@ describe("quick reservation", () => {
 
     pricingTermsLink("quick-reservation").click();
 
-    pricingTermsDialog().should("contain.text", "Hinnoitteluperiaatteet");
+    pricingTermsDialog().should("contain.text", "Alennusryhmät");
     pricingTermsDialog().should("contain.text", "Hinnoitteluehdot body Fi");
 
     pricingTermsDialog().find("button").click();
@@ -500,7 +502,7 @@ describe("with payment terms", () => {
     paymentAndCancellationTerms().contains("Maksuehdot Fi");
     paymentAndCancellationTerms().contains("Peruutusehdot Fi");
 
-    pricingTerms().find("> button").contains("Hinnoitteluperiaatteet");
+    pricingTerms().find("> button").contains("Alennusryhmät");
     pricingTerms().contains("Hinnoitteluehdot Fi");
   });
 });
@@ -516,7 +518,10 @@ describe("with reservation times", () => {
     calendarWrapper().should("not.exist");
     reservationControls().should("not.exist");
 
-    reservationStartNotification().should("contain", "Varauskalenteri avautuu");
+    reservationStartNotification().should(
+      "contain",
+      "Voit tehdä varauksen tähän kohteeseen"
+    );
   });
 });
 
@@ -535,12 +540,10 @@ describe("with reservation quota notification", () => {
 
     reservationSubmitButton().should("not.exist");
 
-    reservationQuotaNotification()
-      .invoke("text")
-      .should(
-        "match",
-        /^Sinulla on jo \d+ varausta tähän tilaan. Et voi tehdä uusia varauksia.$/
-      );
+    reservationQuotaNotification().should(
+      "contain.text",
+      "Et voi tehdä uusia varauksia."
+    );
 
     reservationInfo().contains(
       "Sinulla voi olla samanaikaisesti enintään 10 varausta."
@@ -565,7 +568,7 @@ describe("with reservation quota notification", () => {
 
     reservationQuotaNotification()
       .invoke("text")
-      .should("match", /^Sinulla on jo \d+\/\d+ varausta tähän tilaan.$/);
+      .should("match", /^Sinulla on \d+\/\d+ varausta tähän kohteeseen.$/);
 
     reservationInfo().contains(
       "Sinulla voi olla samanaikaisesti enintään 30 varausta."
@@ -687,7 +690,7 @@ describe("with metadataset", () => {
     );
     cy.get("main#main").should(
       "contain.text",
-      "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin"
+      "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut alennusryhmiin."
     );
 
     cy.get('button[type="submit"]').click();
@@ -696,7 +699,10 @@ describe("with metadataset", () => {
       "contain.text",
       "Varauksen päivitys epäonnistui"
     );
-    errorNotificationBody().should("contain.text", "Hyväksy ehdot jatkaaksesi");
+    errorNotificationBody().should(
+      "contain.text",
+      "Hyväksy sopimusehdot jatkaaksesi varausta."
+    );
     errorNotificationCloseButton().click();
 
     cy.get("#generic-and-service-specific-terms-terms-accepted").click();
@@ -707,7 +713,10 @@ describe("with metadataset", () => {
       "contain.text",
       "Varauksen päivitys epäonnistui"
     );
-    errorNotificationBody().should("contain.text", "Hyväksy ehdot jatkaaksesi");
+    errorNotificationBody().should(
+      "contain.text",
+      "Hyväksy sopimusehdot jatkaaksesi varausta."
+    );
     errorNotificationCloseButton().click();
 
     cy.get("#cancellation-and-payment-terms-terms-accepted").click();
@@ -754,7 +763,7 @@ describe("with application", () => {
 
     cy.get("main#main").should(
       "contain.text",
-      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun varaus on käsitelty."
+      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun olemme käsitelleet varauksesi."
     );
   });
 
@@ -788,7 +797,7 @@ describe("with application", () => {
 
     cy.get("main#main").should(
       "contain.text",
-      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun varaus on käsitelty."
+      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun olemme käsitelleet varauksesi."
     );
   });
 });

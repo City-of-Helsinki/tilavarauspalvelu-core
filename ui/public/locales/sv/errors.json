@@ -6,15 +6,15 @@
     "body": "Något oväntat hände"
   },
   "general_error": "Odefinierat fel.",
-  "RESERVATION_UNIT_NOT_RESERVABLE": "",
-  "OVERLAPPING_RESERVATIONS": "",
-  "RESERVATION_UNIT_IS_NOT_OPEN": "",
-  "RESERVATION_UNIT_IN_OPEN_ROUND": "",
-  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "",
-  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "",
-  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "",
-  "RESERVATION_OVERLAP": "",
-  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "",
-  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "",
-  "RESERVATION_UNIT_TYPE_IS_SEASON": ""
+  "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
+  "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
+  "RESERVATION_UNIT_IS_NOT_OPEN": "Objektet är för närvarande stängt.",
+  "RESERVATION_UNIT_IN_OPEN_ROUND": "Du kan ansöka om en säsongsbokning för detta objekt.",
+  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Förkorta bokningstiden.",
+  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Förläng bokningstiden.",
+  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
+  "RESERVATION_OVERLAP": "Överlappande bokningar.",
+  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Kontrollera bokningstiden.",
+  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
+  "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt."
 }

@@ -35,7 +35,7 @@ const renderComponent = (props?: Partial<Props>) =>
   { status: "PAID_MANUALLY", label: "Paikan päällä" },
   { status: "CANCELLED", label: "Peruttu" },
   { status: "EXPIRED", label: "Maksamatta" },
-  { status: "REFUNDED", label: "Palautettu" },
+  { status: "REFUNDED", label: "Hyvitetty" },
 ].forEach((state) => {
   test(`should render ${state.status}`, () => {
     renderComponent({ orderStatus: state.status });

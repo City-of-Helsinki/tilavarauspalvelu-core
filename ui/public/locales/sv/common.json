@@ -105,6 +105,6 @@
   "fyiLabel": "Till kännedom",
   "add": "addera",
   "subtract": "subtrahera",
-  "inclTax": "",
+  "inclTax": "inkl. moms {{taxPercentage}} %",
   "headAlt": "Tilan ikoni"
 }

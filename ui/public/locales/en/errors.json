@@ -6,15 +6,15 @@
     "body": "Something unexpected happened"
   },
   "general_error": "Undefined error.",
-  "RESERVATION_UNIT_NOT_RESERVABLE": "",
-  "OVERLAPPING_RESERVATIONS": "",
-  "RESERVATION_UNIT_IS_NOT_OPEN": "",
-  "RESERVATION_UNIT_IN_OPEN_ROUND": "",
-  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "",
-  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "",
-  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "",
-  "RESERVATION_OVERLAP": "",
-  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "",
-  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "",
-  "RESERVATION_UNIT_TYPE_IS_SEASON": ""
+  "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be reserved.",
+  "OVERLAPPING_RESERVATIONS": "There are duplicate reservations.",
+  "RESERVATION_UNIT_IS_NOT_OPEN": "The space is closed at the moment.",
+  "RESERVATION_UNIT_IN_OPEN_ROUND": "You can make a seasonal booking application for this space.",
+  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Please shorten the reservation time.",
+  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Please extend the reservation time.",
+  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of reservations.",
+  "RESERVATION_OVERLAP": "There are duplicate reservations.",
+  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Please check the reservation time.",
+  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Please check the reservation time.",
+  "RESERVATION_UNIT_TYPE_IS_SEASON": "You can only make a seasonal booking application for this space."
 }

@@ -105,6 +105,6 @@
   "fyiLabel": "For information",
   "add": "Add",
   "subtract": "Subtract",
-  "inclTax": "",
+  "inclTax": "incl. VAT {{taxPercentage}} %",
   "headAlt": "Tilan ikoni"
 }

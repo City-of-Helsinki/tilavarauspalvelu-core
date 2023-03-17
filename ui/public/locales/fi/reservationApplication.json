@@ -1,12 +1,12 @@
 {
-  "title": "Uusi varausanomus",
-  "titleSent": "Varausanomus jätetty",
-  "applicationInfo": "Anomuksen tiedot",
-  "summaryIngress": "Anomuksesi on nyt käsiteltävänä. Tästä löydät yhteenvedon anomuksestasi.",
+  "title": "Uusi varaus",
+  "titleSent": "Varauksesi on nyt käsiteltävänä",
+  "applicationInfo": "Varauksen tiedot",
+  "summaryIngress": "Varaksesi on käsiteltävänä. Tutustu varauksen yhteenvetoon.",
   "reserveeTypePrefix": "Varaan",
   "reserveeTypes": {
     "labels": {
-      "nonprofit": "järjestön, ryhmän tai yhteisön puolesta",
+      "nonprofit": "Järjestön tai muun yhteisön puolesta",
       "business": "yrityksen puolesta",
       "individual": "yksityishenkilönä"
     }
@@ -18,9 +18,9 @@
       "purpose": "Varauksen käyttötarkoitus",
       "numPersons": "Osallistujamäärä",
       "ageGroup": "Ikäryhmä",
-      "applyingForFreeOfChargeWithLink": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut <a />",
-      "applyingForFreeOfCharge": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin",
-      "freeOfChargeReason": "Perustelut maksuttomaan varaukseen"
+      "applyingForFreeOfChargeWithLink": "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut <1>alennusryhmiin</1>.",
+      "applyingForFreeOfCharge": "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut alennusryhmiin.",
+      "freeOfChargeReason": "Perustelut"
     },
     "nonprofit": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",
@@ -32,7 +32,7 @@
       "reserveePhone": "Yhteyshenkilön puhelinnumero",
       "reserveeOrganisationName": "Virallinen nimi",
       "reserveeId": "Y-tunnus",
-      "reserveeIsUnregisteredAssociation": "Yhdistystä ei ole rekisteröity",
+      "reserveeIsUnregisteredAssociation": "Yhteisöä ei ole rekisteröity",
       "homeCity": "Kotipaikka",
       "showBillingAddress": "Erillinen laskutusosoite",
       "billingFirstName": "Varaajan etunimi",

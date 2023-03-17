@@ -1,96 +1,99 @@
 {
-  "title": "",
-  "titleSent": "",
-  "applicationInfo": "",
-  "summaryIngress": "",
-  "reserveeTypePrefix": "",
+  "title": "New booking",
+  "titleSent": "Your booking is now being processed",
+  "applicationInfo": "Booking details",
+  "summaryIngress": "Your booking is being processed. Please see the reservation summary.",
+  "reserveeTypePrefix": "I create the application..",
   "reserveeTypes": {
     "labels": {
-      "nonprofit": "",
-      "business": "",
-      "individual": ""
+      "nonprofit": "on behalf of an association or community",
+      "business": "on behalf of the company",
+      "individual": "as a private person"
     }
   },
   "label": {
     "common": {
-      "name": "",
-      "description": "",
-      "purpose": "",
-      "numPersons": "",
-      "ageGroup": "",
-      "applyingForFreeOfChargeWithLink": "",
-      "applyingForFreeOfCharge": "",
-      "freeOfChargeReason": ""
+      "name": "Name of the booking (public)",
+      "description": "Description of the booking",
+      "purpose": "Purpose of use of the booking",
+      "numPersons": "Number of participants",
+      "ageGroup": "Age group",
+      "applyingForFreeOfChargeWithLink": "I apply for a reduced fee and I have familiarised myself with <1>the discount groups</1>.",
+      "applyingForFreeOfCharge": "I apply for a reduced fee and I have familiarised myself with the discount groups.",
+      "freeOfChargeReason": "Justification"
     },
     "nonprofit": {
-      "reserveeFirstName": "",
-      "reserveeLastName": "",
-      "reserveeAddressStreet": "",
-      "reserveeAddressZip": "",
-      "reserveeAddressCity": "",
-      "reserveeEmail": "",
-      "reserveePhone": "",
-      "reserveeOrganisationName": "",
-      "reserveeId": "",
-      "reserveeIsUnregisteredAssociation": "",
-      "homeCity": "",
-      "showBillingAddress": "",
-      "billingFirstName": "",
-      "billingLastName": "",
-      "billingPhone": "",
-      "billingEmail": "",
-      "billingAddressStreet": "",
-      "billingAddressZip": "",
-      "billingAddressCity": ""
+      "reserveeFirstName": "Contact person’s first name",
+      "reserveeLastName": "Contact person’s last name",
+      "reserveeAddressStreet": "Street address",
+      "reserveeAddressZip": "Postal code",
+      "reserveeAddressCity": "City",
+      "reserveeEmail": "Contact person’s e-mail address",
+      "reserveePhone": "Contact person’s telephone number",
+      "reserveeOrganisationName": "Official name",
+      "reserveeId": "Business ID",
+      "reserveeIsUnregisteredAssociation": "The community is not registered",
+      "homeCity": "Domicile",
+      "showBillingAddress": "Invoicing address",
+      "billingFirstName": "Booker’s first name",
+      "billingLastName": "Booker’s last name",
+      "billingPhone": "Telephone",
+      "billingEmail": "E-mail address",
+      "billingAddressStreet": "Street address",
+      "billingAddressZip": "Postal code",
+      "billingAddressCity": "City"
     },
     "individual": {
-      "reserveeFirstName": "",
-      "reserveeLastName": "",
-      "reserveeAddressStreet": "",
-      "reserveeAddressZip": "",
-      "reserveeAddressCity": "",
-      "reserveeEmail": "",
-      "reserveePhone": "",
-      "homeCity": "",
-      "showBillingAddress": "",
-      "billingFirstName": "",
-      "billingLastName": "",
-      "billingPhone": "",
-      "billingEmail": "",
-      "billingAddressStreet": "",
-      "billingAddressZip": "",
-      "billingAddressCity": ""
+      "reserveeFirstName": "First name",
+      "reserveeLastName": "Last name",
+      "reserveeAddressStreet": "Street address",
+      "reserveeAddressZip": "Postal code",
+      "reserveeAddressCity": "City",
+      "reserveeEmail": "E-mail address",
+      "reserveePhone": "Telephone",
+      "homeCity": "Domicile",
+      "showBillingAddress": "Invoicing address",
+      "billingFirstName": "Booker’s first name",
+      "billingLastName": "Booker’s last name",
+      "billingPhone": "Telephone",
+      "billingEmail": "E-mail address",
+      "billingAddressStreet": "Street address",
+      "billingAddressZip": "Postal code",
+      "billingAddressCity": "City"
     },
     "business": {
-      "reserveeFirstName": "",
-      "reserveeLastName": "",
-      "reserveeAddressStreet": "",
-      "reserveeAddressZip": "",
-      "reserveeAddressCity": "",
-      "reserveeEmail": "",
-      "reserveePhone": "",
-      "reserveeOrganisationName": "",
-      "reserveeId": "",
-      "homeCity": "",
-      "showBillingAddress": "",
-      "billingFirstName": "",
-      "billingLastName": "",
-      "billingPhone": "",
-      "billingEmail": "",
-      "billingAddressStreet": "",
-      "billingAddressZip": "",
-      "billingAddressCity": ""
+      "reserveeFirstName": "Contact person’s first name",
+      "reserveeLastName": "Contact person’s last name",
+      "reserveeAddressStreet": "Street address",
+      "reserveeAddressZip": "Postal code",
+      "reserveeAddressCity": "City",
+      "reserveeEmail": "Contact person’s e-mail address",
+      "reserveePhone": "Contact person’s telephone number",
+      "reserveeOrganisationName": "Official name",
+      "reserveeId": "Business ID",
+      "homeCity": "Domicile",
+      "showBillingAddress": "Invoicing address",
+      "billingFirstName": "Booker’s first name",
+      "billingLastName": "Booker’s last name",
+      "billingPhone": "Telephone",
+      "billingEmail": "E-mail address",
+      "billingAddressStreet": "Street address",
+      "billingAddressZip": "Postal code",
+      "billingAddressCity": "City"
     },
     "headings": {
-      "companyInfo": "",
-      "nonprofitInfo": "",
-      "contactInfo": ""
+      "companyInfo": "Company information",
+      "nonprofitInfo": "Information of the association",
+      "contactInfo": "Contact person’s information"
+    },
+    "subHeadings": {
+      "subvention": "Apply for a reduced price"
     }
   },
   "processLabels": {
-    "handlingRequired": ""
+    "handlingRequired": "Booking is being processed"
   },
   "errors": {
-    "noFormType": ""
+    "noFormType": "Select applicant type"
   }
 }

@@ -1,6 +1,6 @@
 {
   "prefixForCancelled": "Peruttu",
-  "linkToResourceUnitLabel": "Tutustu tilaan",
+  "linkToResourceUnitLabel": "Tutustu kohteeseen",
   "legend": {
     "okLabel": "Voimassa oleva varaus",
     "cancelledLabel": "Peruttu varaus",
@@ -8,13 +8,13 @@
     "unavailable": "Ei varattavissa",
     "busy": "Varattu",
     "buffer": "Tauko",
-    "initial": "Oma varaus",
+    "initial": "Varauksesi",
     "timeIndicator": "Kuluva aika"
   },
   "selectTime": "Valitse aika",
   "loginAndReserve": "Kirjaudu ja varaa",
-  "loginInfo": "Sinun täytyy kirjautua sisään, jotta voit tehdä varauksen tähän tilaan.",
-  "showCurrentDay": "Näytä nykyinen päivä",
+  "loginInfo": "Kirjaudu sisään varataksesi.",
+  "showCurrentDay": "Näytä tämä päivä",
   "showPrevious": "Naytä edellinen {{view}}",
   "showNext": "Naytä seuraava {{view}}",
   "showView": "Näytä {{view}}näkymä",
@@ -23,9 +23,9 @@
   "reserverInfo": "Varaajan tiedot",
   "reservationInfo": "Varauksen tiedot",
   "notification": {
-    "reservationAlertTitle": "Varauksen nimi voi näkyä toimipisteen infonäytöllä.",
-    "reservationApplicationAlertTitle": "Huom. Julkiset kentät näkyvät huoneen näytöllä.",
-    "reservationAlertBody": "Älä koskaan täytä henkilötietoja tai muita arkaluontoisia tietoja näihin kenttiin."
+    "reservationAlertTitle": "Varauksen nimi voi näkyä tilan näytöllä.",
+    "reservationApplicationAlertTitle": "Varauksen nimi voi näkyä tilan näytöllä.",
+    "reservationAlertBody": "Älä täytä henkilökohtaisia tai arkaluontoisia tietoja tähän kenttään."
   },
   "label": {
     "reserveeName": "Varaaja",
@@ -33,13 +33,13 @@
     "reserveeLastName": "Varaajan sukunimi",
     "name": "Varauksen nimi (julkinen)",
     "description": "Varauksen kuvaus",
-    "termsGeneral": "Olen lukenut ja hyväksyn kaupungin yleiset ehdot",
-    "termsGeneralSpecific": "Olen lukenut ja hyväksyn sopimusehdot ja kaupungin yleiset ehdot",
+    "termsGeneral": "Olen lukenut ja hyväksyn Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot",
+    "termsGeneralSpecific": "Olen lukenut ja hyväksyn tilakohtaiset sopimusehdot sekä Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot",
     "termsCancellation": "Olen lukenut ja hyväksyn peruutusehdot",
     "termsPayment": "Olen lukenut ja hyväksyn maksuehdot",
     "termsCancellationPayment": "Olen lukenut ja hyväksyn peruutus- ja maksuehdot",
     "reservationDate": "Varauksen ajankohta",
-    "reservationSpace": "Tila"
+    "reservationSpace": "Varauksen kohde"
   },
   "heading": {
     "generalTerms": "Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot",
@@ -56,8 +56,8 @@
   "showCalendar": "Näytä kalenteri",
   "eventDuration": "Varauksen kesto",
   "eventDurationLiteral": "{{min}} - {{max}} varaus",
-  "subventionAvailable": "alennusmahdollisuus",
-  "dateFormatAssist": "Käytä muotoa p.k.vvvv",
+  "subventionAvailable": "Tarkista alennusryhmät",
+  "dateFormatAssist": "Päivämäärän tulee olla muodossa pp.kk.vvvv",
   "timeFormatAssist": "Tunti/minuutit",
   "durationFormatAssist": "Tunti:minuutit",
   "startDate": "Päivä",
@@ -71,18 +71,18 @@
   "nextStep": "Jatka",
   "reservationSummary": "Varauksen yhteenveto",
   "errors": {
-    "bufferCollision": "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika.",
-    "collision": "Valittu aika on varattu. Valitse toinen aika.",
-    "unavailable": "Valittu aika ei ole varattavissa. Valitse toinen aloitusaika tai kesto.",
-    "termsNotAccepted": "Hyväksy ehdot jatkaaksesi."
+    "bufferCollision": "Varaus on liian lähellä edellistä tai seuraavaa varausta. Muuta varauksen ajankohtaa.",
+    "collision": "Kohde on jo varattu valitsemanasi ajankohtana. Muuta varauksen ajankohtaa.",
+    "unavailable": "Kohde ei ole varattavissa kyseisenä ajankohtana. Muuta varauksen ajankohtaa.",
+    "termsNotAccepted": "Hyväksy sopimusehdot jatkaaksesi varausta."
   },
-  "reservingStartsAt": "Varauskalenteri aukeaa {{date}}.",
+  "reservingStartsAt": "Kohde on varattavissa {{date}} alkaen.",
   "reservationQuotaLabel": "Olemassaolevia varauksia",
-  "reservationQuota_one": "Sinulla on jo {{count}}/{{total}} varaus tähän tilaan.",
-  "reservationQuota_other": "Sinulla on jo {{count}}/{{total}} varausta tähän tilaan.",
-  "reservationQuotaFullLabel": "Enimmäismäärä varauksia tehty",
-  "reservationQuotaFull_one": "Sinulla on jo {{count}} varaus tähän tilaan. Et voi tehdä uusia varauksia.",
-  "reservationQuotaFull_other": "Sinulla on jo {{count}} varausta tähän tilaan. Et voi tehdä uusia varauksia.",
+  "reservationQuota_one": "Sinulla on jo {{count}}/{{total}} varaus tähän kohteeseen.",
+  "reservationQuota_other": "Sinulla on {{count}}/{{total}} varausta tähän kohteeseen.",
+  "reservationQuotaFullLabel": "Varausten enimmäismäärä on täynnä.",
+  "reservationQuotaFull_one": "Et voi tehdä uusia varauksia.",
+  "reservationQuotaFull_other": "Et voi tehdä uusia varauksia.",
   "quickReservation": {
     "heading": "Katso vapaat ajat ja varaa",
     "date": "Päivä",
