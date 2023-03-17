@@ -47,7 +47,7 @@
   "futurePriceNoticeTax": "(inkl. moms {{tax}} %)",
   "notifications": {
     "notReservable": "Objektet går inte att boka just nu.",
-    "onlyRecurring": "Kan bokas endast periodvist",
+    "onlyRecurring": "Kan bokas endast säsongsbokning",
     "futureOpening": "Du kan boka detta objekt från och med {{date}}."
   }
 }
