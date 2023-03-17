@@ -1,7 +1,7 @@
 {
   "selectReservationUnit": "Add to application",
   "unSelectReservationUnit": "Remove from application",
-  "heading": "Add spaces to the application",
+  "heading": "Add items to the application",
   "searchTermLabel": "Search term",
   "searchPurposeLabel": "Purpose of use",
   "searchReservationUnitTypeLabel": "Type of facility",
