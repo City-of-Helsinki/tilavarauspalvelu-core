@@ -6,7 +6,7 @@
     "cancelledLabel": "Cancelled booking",
     "free": "Vacant",
     "unavailable": "Cannot be reserved",
-    "busy": "Reserved",
+    "busy": "Booked",
     "buffer": "Break",
     "initial": "Your booking",
     "timeIndicator": "Current time"
