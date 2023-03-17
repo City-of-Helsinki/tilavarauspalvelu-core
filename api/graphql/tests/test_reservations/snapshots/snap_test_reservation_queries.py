@@ -127,6 +127,24 @@ snapshots['ReservationQueryTestCase::test_filter_by_price_lte 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_recurring_reservation 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'From the series of recurring reservations',
+                        'recurringReservation': {
+                            'name': 'Recurring reservation'
+                        }
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit 1'] = {
     'data': {
         'reservations': {

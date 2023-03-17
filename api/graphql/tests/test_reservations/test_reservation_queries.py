@@ -18,6 +18,7 @@ from reservation_units.tests.factories import (
 )
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import (
+    RecurringReservationFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,
 )
@@ -878,6 +879,41 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                 }
             }
             """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_recurring_reservation(self):
+
+        rec = RecurringReservationFactory(
+            name="Recurring reservation", reservation_unit=self.reservation_unit
+        )
+
+        ReservationFactory(
+            recurring_reservation=rec,
+            name="From the series of recurring reservations",
+            price=50,
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(recurringReservation: %s) {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            recurringReservation {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % rec.pk
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
