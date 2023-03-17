@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
+from graphene_django.views import GraphQLView
 from graphene_file_upload.django import FileUploadGraphQLView
 from rest_framework import routers
 
@@ -23,6 +24,7 @@ from .applications_api.views import (
 from .city_api import CityViewSet
 from .declined_reservation_units_api import DeclinedReservationUnitViewSet
 from .gdpr import TilavarauspalveluGDPRAPIView
+from .graphql.schema import file_upload_schema, schema
 from .hauki_api import OpeningHoursViewSet
 from .ical_api import (
     ApplicationEventIcalViewset,
@@ -132,9 +134,16 @@ router.register(r"parameters/city", CityViewSet, "city")
 router.register(r"webhook/payment", WebhookPaymentViewSet, "payment")
 router.register(r"webhook/order", WebhookOrderViewSet, "order")
 router.register(r"webhook/refund", WebhookRefundViewSet, "refund")
+
 urlpatterns = [
+    path("graphql/", GraphQLView.as_view(schema=schema, graphiql=settings.DEBUG)),
     path(
-        "graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))
+        "graphql/images/",
+        csrf_exempt(
+            FileUploadGraphQLView.as_view(
+                schema=file_upload_schema, graphiql=settings.DEBUG
+            )
+        ),
     ),
     path(
         "gdpr/v1/user/<str:uuid>/",

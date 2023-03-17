@@ -49,6 +49,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     ReservationUnitByPkType,
     ReservationUnitCancellationRuleType,
     ReservationUnitHaukiUrlType,
+    ReservationUnitImageType,
     ReservationUnitType,
     ReservationUnitTypeType,
     TaxPercentageType,
@@ -132,7 +133,12 @@ from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
-from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
+from reservation_units.models import (
+    Equipment,
+    EquipmentCategory,
+    ReservationUnit,
+    ReservationUnitImage,
+)
 from reservations.models import Reservation
 from resources.models import Resource
 from spaces.models import Space, Unit
@@ -560,10 +566,6 @@ class Mutation(graphene.ObjectType):
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()
 
-    create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
-    update_reservation_unit_image = ReservationUnitImageUpdateMutation.Field()
-    delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()
-
     create_purpose = PurposeCreateMutation.Field()
     update_purpose = PurposeUpdateMutation.Field()
 
@@ -590,4 +592,21 @@ class Mutation(graphene.ObjectType):
     refresh_order = RefreshOrderMutation.Field()
 
 
+class ReservationUnitImageMutations(graphene.ObjectType):
+    create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
+    update_reservation_unit_image = ReservationUnitImageUpdateMutation.Field()
+    delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()
+
+
+class ReservationUnitImageQuery(graphene.ObjectType):
+    reservation_unit_image = Field(ReservationUnitImageType, pk=graphene.Int())
+
+    @check_resolver_permission(ReservationUnitPermission)
+    def resolve_reservation_unit_image(self, info, **kwargs):
+        return get_object_or_404(ReservationUnitImage, pk=kwargs.get("pk"))
+
+
 schema = graphene.Schema(query=Query, mutation=Mutation)
+file_upload_schema = graphene.Schema(
+    query=ReservationUnitImageQuery, mutation=ReservationUnitImageMutations
+)

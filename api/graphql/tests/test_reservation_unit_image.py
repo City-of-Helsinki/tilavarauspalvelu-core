@@ -16,13 +16,13 @@ from reservation_units.tests.factories import (
     ReservationUnitImageFactory,
 )
 
-DEFAULT_GRAPHQL_URL = "/graphql/"
-
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationUnitImageCreateTestCase(
     GrapheneTestCaseBase, GraphQLFileUploadTestCase
 ):
+    GRAPHQL_URL = "/graphql/images/"
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -60,6 +60,7 @@ class ReservationUnitImageCreateTestCase(
                 }
             },
             client=self.client,
+            graphql_url=self.GRAPHQL_URL,
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -96,6 +97,7 @@ class ReservationUnitImageCreateTestCase(
                 }
             },
             client=self.client,
+            graphql_url=self.GRAPHQL_URL,
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -119,6 +121,7 @@ class ReservationUnitImageCreateTestCase(
                 }
             },
             client=self.client,
+            graphql_url=self.GRAPHQL_URL,
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -131,6 +134,8 @@ class ReservationUnitImageCreateTestCase(
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
+    GRAPHQL_URL = "/graphql/images/"
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -185,6 +190,8 @@ class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationUnitImageDeleteGraphQLTestCase(GrapheneTestCaseBase):
+    GRAPHQL_URL = "/graphql/images/"
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
