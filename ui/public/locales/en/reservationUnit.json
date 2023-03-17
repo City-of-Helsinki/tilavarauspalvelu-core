@@ -46,7 +46,7 @@
   "futurePriceNoticeTax": "(incl. VAT {{tax}} %)",
   "notifications": {
     "notReservable": "This item is not available for booking at the moment.",
-    "onlyRecurring": "Can only be booked periodically",
+    "onlyRecurring": "Can only be booked seasonally",
     "futureOpening": "You can make bookings for this item starting on {{date}}."
   }
 }
