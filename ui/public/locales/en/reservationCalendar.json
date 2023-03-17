@@ -34,7 +34,7 @@
     "name": "Name of the booking (public)",
     "description": "Description of the booking",
     "termsGeneral": "I have read and I accept the terms and conditions of reserving premises and equipment from the City of Helsinki.",
-    "termsGeneralSpecific": "I have read and I accept the space-specific terms of contract and terms and conditions of reserving premises and equipment from the City of Helsinki.",
+    "termsGeneralSpecific": "I have read and I accept the object-specific terms of contract and terms and conditions of reserving premises and equipment from the City of Helsinki.",
     "termsCancellation": "I have read and I accept the cancellation terms",
     "termsPayment": "I have read and I accept the payment terms",
     "termsCancellationPayment": "I have read and I accept the terms of payment and cancellation",
