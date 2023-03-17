@@ -61,3 +61,16 @@ export const arrowDown = css`
   border-right: 5px solid transparent;
   border-top: 8px solid var(--color-white);
 `;
+
+export const LinkButton = styled.button`
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0;
+  ${fontMedium};
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+`;

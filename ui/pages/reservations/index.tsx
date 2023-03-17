@@ -6,6 +6,7 @@ import { useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel, Notification } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -73,6 +74,9 @@ const EmptyMessage = styled.div`
 `;
 
 const Reservations = (): JSX.Element => {
+  const router = useRouter();
+  const { error: routerError } = router.query;
+
   const [error, setError] = useState(false);
   const { t } = useTranslation();
 
@@ -212,6 +216,17 @@ const Reservations = (): JSX.Element => {
             position="top-center"
           >
             {t("common:error.dataError")}
+          </Notification>
+        )}
+        {routerError === "order1" && (
+          <Notification
+            type="error"
+            label={t("reservations:confirmationError.heading")}
+            position="top-center"
+            dismissible
+            closeButtonLabelText={t("common:close")}
+          >
+            {t("reservations:confirmationError.body")}
           </Notification>
         )}
       </Wrapper>

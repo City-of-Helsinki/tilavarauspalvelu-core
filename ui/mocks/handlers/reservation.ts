@@ -456,9 +456,10 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
 
     if (pk === 4) {
       data.price = 0;
-      data.begin = addDays(new Date(), 10).toISOString();
-      data.end = addHours(addDays(new Date(), 10), 2).toISOString();
+      data.begin = addDays(new Date(), 11).toISOString();
+      data.end = addHours(addDays(new Date(), 11), 2).toISOString();
       data.reservationUnits[0].pk = 888;
+      data.reservationUnits[0].canApplyFreeOfCharge = true;
       data.reservationUnits[0].cancellationRule = {
         id: "234",
         canBeCancelledTimeBefore: 0,

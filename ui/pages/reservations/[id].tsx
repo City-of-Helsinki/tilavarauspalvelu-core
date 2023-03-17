@@ -1,11 +1,16 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
 import { get, isFinite } from "lodash";
-import { IconCalendar, IconCross, Notification } from "hds-react";
-import { useQuery } from "@apollo/client";
+import {
+  IconCalendar,
+  IconCross,
+  IconLinkExternal,
+  Notification,
+} from "hds-react";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { H2, H4 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -18,9 +23,11 @@ import {
   TermsOfUseType,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationsReservationStateChoices,
+  QueryOrderArgs,
+  PaymentOrderType,
 } from "common/types/gql-types";
 import apolloClient from "../../modules/apolloClient";
-import { GET_RESERVATION } from "../../modules/queries/reservation";
+import { GET_ORDER, GET_RESERVATION } from "../../modules/queries/reservation";
 import {
   JustForDesktop,
   JustForMobile,
@@ -147,13 +154,18 @@ const Actions = styled.div`
   }
 
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-m);
-  margin: var(--spacing-s) 0 var(--spacing-m);
+  margin: var(--spacing-m) 0 var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
     button {
       max-width: 300px;
     }
+  }
+
+  @media (min-width: ${breakpoints.m}) {
+    flex-direction: row;
   }
 `;
 
@@ -173,9 +185,18 @@ const SecondaryActions = styled.div`
   margin-top: var(--spacing-l);
   display: flex;
   gap: var(--spacing-m);
+  flex-direction: column;
+
+  @media (min-width: ${breakpoints.s}) {
+    > button {
+      justify-self: flex-end;
+      max-width: 300px;
+    }
+  }
 
   @media (min-width: ${breakpoints.m}) {
-    justify-content: flex-end;
+    display: inline-flex;
+    justify-items: flex-end;
   }
 `;
 
@@ -223,6 +244,9 @@ const Terms = styled.div`
 const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
   const { t } = useTranslation();
 
+  const [reservation, setReservation] = useState<ReservationType>(null);
+  const [order, setOrder] = useState<PaymentOrderType>(null);
+
   const {
     data: reservationData,
     loading,
@@ -234,13 +258,33 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     },
   });
 
-  const reservation: ReservationType = useMemo(
-    () => ({
-      ...reservationData?.reservationByPk,
-      applyingForFreeOfCharge: true,
-    }),
-    [reservationData]
-  );
+  const [getOrder, { loading: orderLoading }] = useLazyQuery<
+    Query,
+    QueryOrderArgs
+  >(GET_ORDER, {
+    fetchPolicy: "no-cache",
+    onCompleted: (data) => {
+      if (!data.order) {
+        return;
+      }
+      setOrder(data.order);
+    },
+    onError: () => {},
+  });
+
+  useEffect(() => {
+    if (reservationData?.reservationByPk) {
+      setReservation(reservationData.reservationByPk);
+
+      if (reservationData.reservationByPk.orderUuid) {
+        getOrder({
+          variables: {
+            orderUuid: reservationData.reservationByPk.orderUuid,
+          },
+        });
+      }
+    }
+  }, [reservationData, getOrder]);
 
   const reservationUnit = get(reservation?.reservationUnits, "0");
 
@@ -308,12 +352,22 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
               >
                 {t("reservations:saveToCalendar")}
               </BlackButton>
+              {order?.receiptUrl && (
+                <BlackButton
+                  data-testid="reservation__confirmation--button__receipt-link"
+                  onClick={() => window.open(order.receiptUrl, "_blank")}
+                  variant="secondary"
+                  iconRight={<IconLinkExternal aria-hidden />}
+                >
+                  {t("reservations:downloadReceipt")}
+                </BlackButton>
+              )}
             </SecondaryActions>
           )}
         </>
       )
     );
-  }, [reservation, reservationUnit, t]);
+  }, [reservation, reservationUnit, order?.receiptUrl, t]);
 
   const [canTimeBeModified, modifyTimeReason] = useMemo(
     () => canReservationTimeBeChanged({ reservation }),
@@ -350,9 +404,15 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
 
-  return loading || !reservation ? (
-    <Spinner />
-  ) : (
+  if (loading || orderLoading) {
+    return <Spinner />;
+  }
+
+  if (!reservation || !reservationUnit) {
+    return null;
+  }
+
+  return (
     <Wrapper>
       <Container>
         <StyledBreadcrumbWrapper

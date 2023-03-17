@@ -152,9 +152,7 @@ describe("Tilavaraus user reservations", () => {
     cy.contains("div", "Payment terms FI").should("be.visible");
     cy.contains("div", "Cancellation terms FI").should("be.visible");
 
-    cy.contains("div", "Pricing terms FI").should("not.be.visible");
-    accordionToggler("reservation__pricing-terms").click();
-    cy.contains("div", "Pricing terms FI").should("be.visible");
+    cy.contains("div", "Pricing terms FI").should("not.exist");
 
     cy.contains("div", "Sopparijuttuja").should("not.be.visible");
     cy.contains("div", "Toinen rivi").should("not.be.visible");

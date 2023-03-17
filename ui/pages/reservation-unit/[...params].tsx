@@ -341,13 +341,30 @@ const ReservationUnitReservation = ({
     },
   });
 
+  const reservationConfirmSuccess = () => {
+    setReservation({
+      ...reservation,
+      state: requireHandling
+        ? ReservationsReservationStateChoices.RequiresHandling
+        : ReservationsReservationStateChoices.Confirmed,
+    });
+    setFormStatus("sent");
+    setStep(2);
+    setPendingReservation(null);
+  };
+
   const [confirmReservation] = useMutation<
     { confirmReservation: ReservationConfirmMutationPayload },
     { input: ReservationConfirmMutationInput }
   >(CONFIRM_RESERVATION, {
     onCompleted: (data) => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      if (steps?.length > 2) {
+      if (
+        data?.confirmReservation?.state ===
+        ReservationsReservationStateChoices.Confirmed
+      ) {
+        reservationConfirmSuccess();
+      } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
         const { checkoutUrl, receiptUrl } = order ?? {};
         const userId = new URL(receiptUrl)?.searchParams?.get("user");
@@ -360,15 +377,7 @@ const ReservationUnitReservation = ({
           setErrorMsg(t("errors:general_error"));
         }
       } else {
-        setReservation({
-          ...reservation,
-          state: requireHandling
-            ? ReservationsReservationStateChoices.RequiresHandling
-            : ReservationsReservationStateChoices.Confirmed,
-        });
-        setFormStatus("sent");
-        setStep(2);
-        setPendingReservation(null);
+        reservationConfirmSuccess();
       }
     },
     onError: () => {

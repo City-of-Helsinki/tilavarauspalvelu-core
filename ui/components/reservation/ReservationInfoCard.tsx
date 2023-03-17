@@ -152,6 +152,8 @@ const ReservationInfoCard = ({
     [i18n.language]
   );
 
+  if (!reservation || !reservationUnit) return null;
+
   return (
     <Wrapper $type={type}>
       {mainImage?.mediumUrl && (
@@ -168,7 +170,7 @@ const ReservationInfoCard = ({
         </Heading>
         {["confirmed", "complete"].includes(type) && (
           <Subheading>
-            {t("reservations:reservationNumber")}: {reservation?.pk}
+            {t("reservations:reservationNumber")}: {reservation.pk}
           </Subheading>
         )}
         <Subheading>{getTranslation(reservationUnit.unit, "name")}</Subheading>
@@ -177,11 +179,11 @@ const ReservationInfoCard = ({
             {capitalize(timeString)}, {formatDurationMinutes(duration)}
           </Strong>
         </Value>
-        {reservation?.description &&
+        {reservation.description &&
           ["confirmed", "complete"].includes(type) && (
             <Value>
               {t("reservationCalendar:label.description")}:{" "}
-              {reservation?.description}
+              {reservation.description}
             </Value>
           )}
         <Value>
@@ -190,7 +192,7 @@ const ReservationInfoCard = ({
             shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {
               taxPercentage: formatters.strippedDecimal.format(
-                reservation?.taxPercentageValue
+                reservation.taxPercentageValue
               ),
             })})`}
         </Value>
@@ -204,9 +206,9 @@ const ReservationInfoCard = ({
             {t("reservations:ageGroup")}: {ageGroup}
           </Value>
         )}
-        {reservation?.numPersons > 0 && ["complete"].includes(type) && (
+        {reservation.numPersons > 0 && ["complete"].includes(type) && (
           <Value>
-            {t("reservations:numPersons")}: {reservation?.numPersons}
+            {t("reservations:numPersons")}: {reservation.numPersons}
           </Value>
         )}
       </Content>

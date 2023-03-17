@@ -322,7 +322,7 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
 export const getMainImage = (
   ru: ReservationUnit | ReservationUnitType | ReservationUnitByPkType
 ): Image | ReservationUnitImageType | null => {
-  if (!ru.images || ru.images.length === 0) {
+  if (!ru || !ru.images || ru.images.length === 0) {
     return null;
   }
   const images = [...ru.images].sort((a, b) => {

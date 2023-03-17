@@ -3,7 +3,7 @@ import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation, UserConfig } from "next-i18next";
 import type { AppProps } from "next/app";
 import { fi } from "date-fns/locale";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, signOut } from "next-auth/react";
 import { format, isValid } from "date-fns";
 import { ThemeProvider } from "styled-components";
 import { theme } from "common";
@@ -13,6 +13,7 @@ import { DataContextProvider } from "../context/DataContext";
 import apolloClient from "../modules/apolloClient";
 import {
   authenticationApiRoute,
+  authenticationLogoutApiRoute,
   isBrowser,
   mockRequests,
 } from "../modules/const";
@@ -20,6 +21,7 @@ import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
 import { initMocks } from "../mocks";
+import { useLogout } from "../hooks/useLogout";
 
 if (mockRequests) {
   initMocks();
@@ -27,13 +29,20 @@ if (mockRequests) {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const MyApp = ({ Component, pageProps }: AppProps) => {
+  const { shouldLogout, removeShouldLogout } = useLogout();
+
   const [showChild, setShowChild] = useState(false);
 
   useEffect(() => {
-    setShowChild(true);
-  }, []);
+    if (shouldLogout) {
+      removeShouldLogout();
+      signOut({ redirect: true, callbackUrl: authenticationLogoutApiRoute });
+    } else {
+      setShowChild(true);
+    }
+  }, [removeShouldLogout, shouldLogout, showChild]);
 
-  if (!showChild) {
+  if (!showChild || shouldLogout) {
     return null;
   }
 

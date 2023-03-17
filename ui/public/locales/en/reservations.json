@@ -66,6 +66,7 @@
   "contactPhone": "Contact person’s telephone number",
   "contactEmail": "Contact person’s e-mail address",
   "saveToCalendar": "Save to calendar",
+  "downloadReceipt": "",
   "reservationInfoBoxHeading": "Please note before booking",
   "steps": {
     "1": "Booking details",
@@ -95,5 +96,13 @@
     "refunded": "Refunded"
   },
   "reservationEditFailed": "Failed to edit the booking",
-  "backToReservationUnit": "Go back to the item’s front page"
+  "backToReservationUnit": "Go back to the item’s front page",
+  "reservationExpired": "",
+  "reservationExpiredDescription": "",
+  "orderInvalid": "",
+  "backToSearch": "",
+  "confirmationError": {
+    "heading": "",
+    "body": ""
+  }
 }

@@ -205,6 +205,7 @@ export const GET_RESERVATION = gql`
       priceNet
       taxPercentageValue
       orderStatus
+      orderUuid
       reservationUnits {
         pk
         nameFi
@@ -359,6 +360,25 @@ export const ADJUST_RESERVATION_TIME = gql`
         field
         messages
       }
+    }
+  }
+`;
+
+export const GET_ORDER = gql`
+  query order($orderUuid: String!) {
+    order(orderUuid: $orderUuid) {
+      reservationPk
+      status
+      paymentType
+    }
+  }
+`;
+
+export const REFRESH_ORDER = gql`
+  mutation refreshOrder($input: RefreshOrderMutationInput!) {
+    refreshOrder(input: $input) {
+      orderUuid
+      status
     }
   }
 `;

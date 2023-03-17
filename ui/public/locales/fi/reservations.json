@@ -67,6 +67,7 @@
   "contactPhone": "Yhteyshenkilön puhelinnumero",
   "contactEmail": "Yhteyshenkilön sähköposti",
   "saveToCalendar": "Tallenna kalenteriin",
+  "downloadReceipt": "Näytä kuitti",
   "reservationInfoBoxHeading": "Huomioi varatessa",
   "steps": {
     "1": "Varaustiedot",
@@ -96,5 +97,13 @@
     "refunded": "Hyvitetty"
   },
   "reservationEditFailed": "Varauksen muokkaaminen epäonnistui",
-  "backToReservationUnit": "Palaa kohteen sivulle"
+  "backToReservationUnit": "Palaa kohteen sivulle",
+  "reservationExpired": "Varauksesi on vanhentunut",
+  "reservationExpiredDescription": "Varauksesi ehti vanhentua ennen maksamista. Ole hyvä ja tee varaus uudelleen.",
+  "orderInvalid": "Virheellinen tilausnumero",
+  "backToSearch": "Palaa hakusivulle",
+  "confirmationError": {
+    "heading": "Maksu odottaa vahvistusta",
+    "body": "Maksuasi ei voitu vielä vahvistaa. Tarkista varauksen tila hetken kuluttua Omat varaukset -sivulta. Jos varaus ei onnistunut, ole hyvä ja tee uusi varaus. Asiakaspalvelumme auttaa tarvittaessa."
+  }
 }

@@ -65,6 +65,7 @@
   "contactPhone": "Kontaktpersonens telefonnummer",
   "contactEmail": "Kontaktpersonens e-post",
   "saveToCalendar": "Spara i kalender",
+  "downloadReceipt": "",
   "reservationInfoBoxHeading": "Observera innan du bokar",
   "steps": {
     "1": "Bokningsuppgifter",
@@ -94,5 +95,13 @@
     "refunded": "Återbetald"
   },
   "reservationEditFailed": "Det gick inte att redigera bokningen",
-  "backToReservationUnit": "Gå tillbaka till objektets sida"
+  "backToReservationUnit": "Gå tillbaka till objektets sida",
+  "reservationExpired": "",
+  "reservationExpiredDescription": "",
+  "orderInvalid": "",
+  "backToSearch": "",
+  "confirmationError": {
+    "heading": "",
+    "body": ""
+  }
 }

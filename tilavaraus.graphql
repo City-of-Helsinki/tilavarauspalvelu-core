@@ -3384,7 +3384,9 @@ type ReservationStaffCreateMutationPayload {
   clientMutationId: String
 }
 
-"""An enumeration."""
+"""
+An enumeration.
+"""
 enum ReservationState {
   SCHEDULED_RESERVATION
   SCHEDULED_PERIOD
