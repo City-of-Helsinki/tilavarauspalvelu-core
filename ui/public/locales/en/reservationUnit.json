@@ -25,7 +25,7 @@
   "openingTimes": "Opening hours",
   "additionalInfo": "Booking details",
   "reservationFailed": "Booking creation failed",
-  "reservationNotPossible": "Unfortunately, the item cannot be reserved at the selected time. Please select a different time.",
+  "reservationNotPossible": "Unfortunately, the item cannot be booked at the selected time. Please select a different time.",
   "reservationCancellingFailed": "Booking cancellation failed",
   "reservationUpdateFailed": "Booking update failed",
   "priceFree": "Free",
