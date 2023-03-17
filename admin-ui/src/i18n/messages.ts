@@ -1153,7 +1153,7 @@ const translations: ITranslations = {
     state: {
       ARCHIVED: ["Arkistoitu"],
       DRAFT: ["Luonnos"],
-      HIDDEN: ["Varaus piilotettu"],
+      HIDDEN: ["Piilotettu"],
       PUBLISHED: ["Julkaistu"],
       SCHEDULED_HIDING: ["Piilotus ajastettu"],
       SCHEDULED_PERIOD: ["Julkaisuväli ajastettu"],
