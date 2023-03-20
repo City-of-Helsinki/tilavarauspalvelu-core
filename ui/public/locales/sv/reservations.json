@@ -96,12 +96,12 @@
   },
   "reservationEditFailed": "Det gick inte att redigera bokningen",
   "backToReservationUnit": "Gå tillbaka till objektets sida",
-  "reservationExpired": "",
-  "reservationExpiredDescription": "",
-  "orderInvalid": "",
-  "backToSearch": "",
+  "reservationExpired": "Bokningen har gått ut",
+  "reservationExpiredDescription": "Din bokning gick ut innan betalningen behandlades. Vänligen upprepa bokningsprocessen.",
+  "orderInvalid": "Ordernummer ogiltigt",
+  "backToSearch": "Tillbaka till sökningen",
   "confirmationError": {
-    "heading": "",
-    "body": ""
+    "heading": "Väntar på betalning",
+    "body": "Din betalning kunde inte bekräftas. Vänligen kontrollera efter en stund statusen för bokningen från Dina bokningar sidan. Om bokningen misslyckades, vänligen upprepa bokningsprocessen. Vår kundtjänst hjälper dig vid behov."
   }
 }
