@@ -55,16 +55,9 @@ def send_deny_email(reservation: Reservation):
 
 def send_approve_email(reservation: Reservation):
     if reservation.state == STATE_CHOICES.CONFIRMED:
-        if reservation.price > 0:
-            send_reservation_email_task.delay(
-                reservation.id, RESERVATION_STATE_EMAIL_TYPE_MAP["NEEDS_PAYMENT"]
-            )
-        else:
-            send_reservation_email_task.delay(
-                reservation.id, RESERVATION_STATE_EMAIL_TYPE_MAP["APPROVED"]
-            )
-
-    if reservation.state == STATE_CHOICES.CONFIRMED:
+        send_reservation_email_task.delay(
+            reservation.id, RESERVATION_STATE_EMAIL_TYPE_MAP["APPROVED"]
+        )
         send_staff_reservation_email_task.delay(
             reservation.id,
             EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
@@ -73,7 +66,10 @@ def send_approve_email(reservation: Reservation):
 
 
 def send_requires_handling_email(reservation: Reservation):
-    if reservation.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
+    if (
+        reservation.state != STATE_CHOICES.REQUIRES_HANDLING
+        and reservation.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys()
+    ):
         send_reservation_email_task.delay(
             reservation.id, RESERVATION_STATE_EMAIL_TYPE_MAP[reservation.state]
         )

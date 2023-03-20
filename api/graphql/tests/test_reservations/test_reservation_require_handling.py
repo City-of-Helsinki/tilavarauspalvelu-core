@@ -99,9 +99,8 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         assert_that(self.confirmed_reservation.state).is_equal_to(
             STATE_CHOICES.REQUIRES_HANDLING
         )
-        assert_that(len(mail.outbox)).is_equal_to(2)
-        assert_that(mail.outbox[0].subject).is_equal_to("handling")
-        assert_that(mail.outbox[1].subject).is_equal_to("staff requires handling")
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("staff requires handling")
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
@@ -125,8 +124,7 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         assert_that(self.denied_reservation.state).is_equal_to(
             STATE_CHOICES.REQUIRES_HANDLING
         )
-        assert_that(len(mail.outbox)).is_equal_to(1)
-        assert_that(mail.outbox[0].subject).is_equal_to("handling")
+        assert_that(len(mail.outbox)).is_equal_to(0)
 
     def test_cant_deny_if_regular_user(self):
         self.client.force_login(self.regular_joe)
