@@ -27,6 +27,10 @@ REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
 @app.task(name="prune_reservations")
 def _prune_reservations() -> None:
     prune_inactive_reservations(PRUNE_OLDER_THAN_MINUTES)
+
+
+@app.task(name="prune_reservations_with_inactive_payment")
+def prune_reservations_with_inactive_payment_task() -> None:
     prune_reservations_with_inactive_payment(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
 
 
