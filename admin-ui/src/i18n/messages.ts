@@ -1839,6 +1839,7 @@ const translations: ITranslations = {
     },
     ApproveDialog: {
       title: ["Hyväksy varaus ja määritä subventoitu hinta"],
+      titleWithoutSubvention: ["Hyväksy varaus"],
       subventionReason: ["Varaajan antamat subvention perusteet"],
       accept: ["Hyväksy varaus"],
       errorSaving: ["Hyväksyminen ei onnistunut. {{error}}"],

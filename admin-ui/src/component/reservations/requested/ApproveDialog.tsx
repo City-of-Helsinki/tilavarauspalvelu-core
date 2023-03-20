@@ -198,7 +198,11 @@ const ApproveDialog = ({
       <VerticalFlex>
         <Dialog.Header
           id="modal-header"
-          title={t("RequestedReservation.ApproveDialog.title")}
+          title={
+            isFree
+              ? t("RequestedReservation.ApproveDialog.titleWithoutSubvention")
+              : t("RequestedReservation.ApproveDialog.title")
+          }
         />
 
         <DialogContent
