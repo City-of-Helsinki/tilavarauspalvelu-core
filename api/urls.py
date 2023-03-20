@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from graphene_file_upload.django import FileUploadGraphQLView
@@ -132,7 +133,9 @@ router.register(r"webhook/payment", WebhookPaymentViewSet, "payment")
 router.register(r"webhook/order", WebhookOrderViewSet, "order")
 router.register(r"webhook/refund", WebhookRefundViewSet, "refund")
 urlpatterns = [
-    path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
+    path(
+        "graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))
+    ),
     path(
         "gdpr/v1/user/<str:uuid>/",
         TilavarauspalveluGDPRAPIView.as_view(),
