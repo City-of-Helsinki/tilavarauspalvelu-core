@@ -20,7 +20,7 @@ from ..pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
     prune_reservation_statistics,
-    prune_reservation_with_inactive_payments,
+    prune_reservations_with_inactive_payment,
 )
 from .factories import RecurringReservationFactory, ReservationFactory
 
@@ -110,7 +110,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
 
         with freeze_time(now):
-            prune_reservation_with_inactive_payments(older_than_minutes=5)
+            prune_reservations_with_inactive_payment(older_than_minutes=5)
             assert_that(Reservation.objects.exists()).is_false()
 
     def test_prune_does_not_delete_reservations_with_fresh_payments(self):
@@ -149,7 +149,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
 
         with freeze_time(now):
-            prune_reservation_with_inactive_payments(older_than_minutes=5)
+            prune_reservations_with_inactive_payment(older_than_minutes=5)
             assert_that(Reservation.objects.count()).is_equal_to(2)
 
     def test_prune_does_not_delete_reservations_in_other_states(self):
@@ -176,7 +176,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
                 )
 
             with freeze_time(now):
-                prune_reservation_with_inactive_payments(older_than_minutes=5)
+                prune_reservations_with_inactive_payment(older_than_minutes=5)
                 assert_that(Reservation.objects.count()).is_equal_to(1)
                 Reservation.objects.all().delete()
 
@@ -191,7 +191,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             PaymentOrderFactory(reservation=reservation, status=OrderStatus.CANCELLED)
 
         with freeze_time(now):
-            prune_reservation_with_inactive_payments(older_than_minutes=5)
+            prune_reservations_with_inactive_payment(older_than_minutes=5)
             assert_that(Reservation.objects.exists()).is_true()
 
     def test_prune_does_not_delete_reservations_without_order(self):
@@ -199,7 +199,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             name="do not delete_me", state=STATE_CHOICES.WAITING_FOR_PAYMENT
         )
 
-        prune_reservation_with_inactive_payments(older_than_minutes=5)
+        prune_reservations_with_inactive_payment(older_than_minutes=5)
         assert_that(Reservation.objects.exists()).is_true()
 
 

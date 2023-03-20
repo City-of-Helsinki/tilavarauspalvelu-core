@@ -21,7 +21,7 @@ def prune_inactive_reservations(older_than_minutes: int) -> None:
     logger.info(f"Pruned {num_deleted} inactive reservations.")
 
 
-def prune_reservation_with_inactive_payments(older_than_minutes: int) -> None:
+def prune_reservations_with_inactive_payment(older_than_minutes: int) -> None:
     """
     Finds reservations with order that was created given minutes ago and
     are expired or cancelled, and deletes them

@@ -8,7 +8,7 @@ from .pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
     prune_reservation_statistics,
-    prune_reservation_with_inactive_payments,
+    prune_reservations_with_inactive_payment,
 )
 
 # The pruning task will be run periodically at every PRUNE_INTERVAL_SECONDS
@@ -27,7 +27,7 @@ REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
 @app.task(name="prune_reservations")
 def _prune_reservations() -> None:
     prune_inactive_reservations(PRUNE_OLDER_THAN_MINUTES)
-    prune_reservation_with_inactive_payments(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
+    prune_reservations_with_inactive_payment(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
 
 
 @app.task(name="update_expired_orders")
