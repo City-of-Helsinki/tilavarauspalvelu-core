@@ -65,7 +65,7 @@
   "contactPhone": "Kontaktpersonens telefonnummer",
   "contactEmail": "Kontaktpersonens e-post",
   "saveToCalendar": "Spara i kalender",
-  "downloadReceipt": "",
+  "downloadReceipt": "Ladda ner kvitto",
   "reservationInfoBoxHeading": "Observera innan du bokar",
   "steps": {
     "1": "Bokningsuppgifter",
