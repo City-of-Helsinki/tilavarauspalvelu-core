@@ -17,7 +17,7 @@
   "editReservationTime": "Change the booking time",
   "cancelEditReservationTime": "Stop editing",
   "saveNewTime": "Save the new time",
-  "saveNewTimeSuccess": "Time of the reservation has been changed",
+  "saveNewTimeSuccess": "Time of the booking has been changed",
   "cancelReservation": "Cancel booking",
   "cancelReservationCancellation": "Undo the cancelling",
   "cancelApplication": "Cancel application",
@@ -41,7 +41,7 @@
   "cancelDescriptionPlaceHolder": "Please explain briefly why you are cancelling the booking.",
   "reservationCancelledTitle": "Your booking has been cancelled.",
   "reservationCancelledBody": "You will receive a booking confirmation by email in a moment.",
-  "reservationCancellationFailed": "Failed to cancel the reservation",
+  "reservationCancellationFailed": "Failed to cancel the booking",
   "makeNewReservation": "Please make a new booking for the same item.",
   "reservationInfo": "Information about your booking",
   "gotoReservations": "Go to My bookings",
@@ -66,7 +66,7 @@
   "contactPhone": "Contact person’s telephone number",
   "contactEmail": "Contact person’s e-mail address",
   "saveToCalendar": "Save to calendar",
-  "downloadReceipt": "",
+  "downloadReceipt": "Download receipt",
   "reservationInfoBoxHeading": "Please note before booking",
   "steps": {
     "1": "Booking details",
@@ -76,8 +76,8 @@
     "5": "Payment"
   },
   "modifyTimeReasons": {
-    "RESERVATION_MODIFICATION_NOT_ALLOWED": "Unfortunately, the booking could not be changed. If necessary, you can cancel it and make a new reservation.",
-    "RESERVATION_BEGIN_IN_PAST": "The booking can no longer be cancelled or changed because the reservation time has passed.",
+    "RESERVATION_MODIFICATION_NOT_ALLOWED": "Unfortunately, the booking could not be changed. If necessary, you can cancel it and make a new booking.",
+    "RESERVATION_BEGIN_IN_PAST": "The booking can no longer be cancelled or changed because the booking time has passed.",
     "CANCELLATION_NOT_ALLOWED": "The booking is binding and cannot be cancelled.",
     "CANCELLATION_TIME_PAST": "Unfortunately, the booking could not be cancelled, because the cancellation time has passed.",
     "RESERVATION_TIME_INVALID": "The booking period is too short"
@@ -97,12 +97,12 @@
   },
   "reservationEditFailed": "Failed to edit the booking",
   "backToReservationUnit": "Go back to the item’s front page",
-  "reservationExpired": "",
-  "reservationExpiredDescription": "",
-  "orderInvalid": "",
-  "backToSearch": "",
+  "reservationExpired": "Booking has expired",
+  "reservationExpiredDescription": "Your booking expired before the payment was processed. Please, repeat the booking process.",
+  "orderInvalid": "Order number invalid",
+  "backToSearch": "Return to search",
   "confirmationError": {
-    "heading": "",
-    "body": ""
+    "heading": "Awaiting for payment",
+    "body": "Your payment could not be confirmed. Please check the status of your booking in a moment from Your bookings -page. If the booking was unsuccessful, please repeat the booking process. Our customer service will provide assistance if necessary."
   }
 }

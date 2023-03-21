@@ -25,7 +25,7 @@
   "openingTimes": "Opening hours",
   "additionalInfo": "Booking details",
   "reservationFailed": "Booking creation failed",
-  "reservationNotPossible": "Unfortunately, the item cannot be reserved at the selected time. Please select a different time.",
+  "reservationNotPossible": "Unfortunately, the item cannot be booked at the selected time. Please select a different time.",
   "reservationCancellingFailed": "Booking cancellation failed",
   "reservationUpdateFailed": "Booking update failed",
   "priceFree": "Free",
@@ -36,7 +36,7 @@
   "reservationInfo2": "<bold>This item will be available until {{reservationEnds}}</bold>.",
   "reservationInfo2-1": "<bold>This item will be available {{date}} at {{time}}</bold>.",
   "reservationInfo2-2": "<bold>This item will be available until {{date}} at {{time}}</bold>.",
-  "reservationInfo2-3": "<bold>Booking of this item has ended {{date}} at {{time}}</bold>.",",
+  "reservationInfo2-3": "<bold>Booking of this item has ended {{date}} at {{time}}</bold>.",
   "reservationInfo3": "The duration of the booking should be between <bold>{{minReservationDuration}}</bold> – <bold>{{maxReservationDuration}}</bold>.",
   "reservationInfo4_one": "You can have <bold>up to one booking at a time</bold>.",
   "reservationInfo4_other": "You can have <bold>up to {{count}} bookings at a time</bold>.",
@@ -46,7 +46,7 @@
   "futurePriceNoticeTax": "(incl. VAT {{tax}} %)",
   "notifications": {
     "notReservable": "This item is not available for booking at the moment.",
-    "onlyRecurring": "Can only be booked periodically",
+    "onlyRecurring": "Can only be booked seasonally",
     "futureOpening": "You can make bookings for this item starting on {{date}}."
   }
 }
