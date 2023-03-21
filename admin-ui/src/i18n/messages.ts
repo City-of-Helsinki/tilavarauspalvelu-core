@@ -1579,12 +1579,12 @@ const translations: ITranslations = {
     serviceSpecificTermsHelperText: ["Valitse tästä"],
     openingHours: ["Aukioloajat"],
     openingHoursHelperTextHasLink: [
-      'Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Huom. Käytä aukioloaikatyyppeinä ainoastaan "varattavissa" ja "suljettu".',
+      'Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Huom. Käytä aukioloaikatyyppeinä ainoastaan "varauksella" ja "suljettu".',
     ],
     openingHoursHelperTextNoLink: [
       "Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Pääset muokkaamaan aukioloaikoja kun varausyksikkö on tallennettu.",
     ],
-    openingTimesExternalLink: ["Siirry aukioloaikasovellukseen"],
+    openingTimesExternalLink: ["Siirry aukiolosovellukseen"],
     previewCalendarLink: ["Siirry varaamon kalenterinäkymään"],
     cancel: ["Palaa tallentamatta muutoksia"],
     archive: ["Arkistoi"],
