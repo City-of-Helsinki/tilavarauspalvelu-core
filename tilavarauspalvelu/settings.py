@@ -104,6 +104,8 @@ INSTALLED_APPS = [
     "adminsortable2",
     "django_prometheus",
     "admin_extra_buttons",
+    "import_export",
+    "rangefilter",
 ]
 
 MIDDLEWARE = [

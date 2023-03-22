@@ -2,6 +2,9 @@ from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from import_export.admin import ExportMixin
+from import_export.formats.base_formats import CSV
+from rangefilter.filters import DateRangeFilter
 
 from .models import (
     AbilityGroup,
@@ -13,6 +16,7 @@ from .models import (
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
+    ReservationStatistic,
 )
 
 
@@ -97,3 +101,12 @@ class ReservationMetadataSetForm(forms.ModelForm):
 class ReservationMetadataSetAdmin(admin.ModelAdmin):
     exclude = ("id",)
     form = ReservationMetadataSetForm
+
+
+@admin.register(ReservationStatistic)
+class ReservationStatisticsAdmin(ExportMixin, admin.ModelAdmin):
+    list_filter = (
+        ("reservation_created_at", DateRangeFilter),
+        ("begin", DateRangeFilter),
+    )
+    formats = [CSV]
