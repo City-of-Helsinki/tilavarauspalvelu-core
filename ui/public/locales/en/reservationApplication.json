@@ -18,7 +18,7 @@
       "purpose": "Purpose of use of the booking",
       "numPersons": "Number of participants",
       "ageGroup": "Age group",
-      "applyingForFreeOfChargeWithLink": "I apply for a reduced fee and I have familiarised myself with <1>the discount groups</1>.",
+      "applyingForFreeOfChargeButton": "I apply for a reduced fee and I have familiarised myself with <button>the discount groups</button>.",
       "applyingForFreeOfCharge": "I apply for a reduced fee and I have familiarised myself with the discount groups.",
       "freeOfChargeReason": "Justification"
     },

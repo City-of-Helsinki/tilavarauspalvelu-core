@@ -120,9 +120,9 @@ const ReservationsDataLoader = ({
     return <Loader />;
   }
 
-  const reservations = (data?.reservations?.edges || []).map(
-    (edge) => edge?.node as ReservationType
-  );
+  const reservations = (data?.reservations?.edges || [])
+    .map((edge) => edge?.node)
+    .filter((x): x is ReservationType => x != null);
 
   return (
     <>

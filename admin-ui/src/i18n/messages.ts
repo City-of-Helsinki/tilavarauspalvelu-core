@@ -95,6 +95,7 @@ const translations: ITranslations = {
     close: ["Sulje"],
     approve: ["Hyväksy"],
     cancel: ["Peruuta"],
+    reserve: ["Varaa"],
     accordion: ["sisältö"],
     search: ["Hae"],
     noResults: ["Ei tuloksia"],
@@ -284,6 +285,9 @@ const translations: ITranslations = {
         byUnit: ["Varaukset varausyksiköittäin"],
         byReservationUnit: ["Kaikki toimipisteen varaukset"],
       },
+      header: {
+        recurringReservation: ["Tee toistuva varaus"],
+      },
       legend: {
         confirmed: ["Hyväksytty varaus"],
         unconfirmed: ["Varaustoive"],
@@ -294,6 +298,101 @@ const translations: ITranslations = {
         staffReservation: ["Henkilökunnan varaus"],
         reservationUnitReleased: ["Varausyksikkö julkaistu"],
         reservationUnitDraft: ["Varausyksikkö luonnostilassa"],
+      },
+    },
+    RecurringReservation: {
+      error: {
+        invalidUnitId: ["Virheellinen yksikön numero."],
+        notPossibleForThisUnit: [
+          "Tälle yksikölle ei ole mahdollista tehdä toistuvaa varausta.",
+        ],
+      },
+      pageTitle: ["Tee toistuva varaus"],
+      Confirmation: {
+        title: ["Toistuva varaus tehty"],
+        failedTitle: ["Päällekkäiset varaukset"],
+        successTitle: ["Varaukset"],
+        successInfo: ["Kaikki varaukset tehtiin onnistuneesti."],
+        failureInfo: [
+          "{{conflicts}} / {{total}} epäonnistui päällekkäisyyksien takia.",
+        ],
+        holidayInfo: [
+          "{{holidays}} / {{total}} varaus osuu pyhäpäivälle, mutta varaus päivälle on silti tehty.",
+        ],
+        failureInfoSecondParagraph: [
+          "Voit halutessasi etsiä näille toistoille uuden ajan varauksen sivulta.",
+        ],
+        buttonToUnit: ["Palaa toimipisteen sivulle"],
+        buttonToReservation: ["Siirry varauksen sivulle"],
+      },
+    },
+    // TODO these are duplicates from ReservationDialog ex. reservationType
+    RecurringReservationForm: {
+      reservationUnit: ["Varausyksikkö"],
+      startingDate: ["Aloituspäivä"],
+      endingDate: ["Päättymispäivä"],
+      repeatPattern: ["Varauksen toisto"],
+      startingTime: ["Aloitusaika"],
+      endingTime: ["Lopetusaika"],
+      repeatOnDays: ["Toistoviikonpäivät"],
+      reservationsList_zero: ["Ei yhtään varausta aikavälille"],
+      reservationsList_one: ["Olet tekemässä yhden varauksen"],
+      reservationsList_other: ["Olet tekemässä {{count}} varausta"],
+      typeOfReservation: ["Varauksen tyyppi"],
+      name: ["Varaussarjan nimi"],
+      comments: ["Kommentit"],
+      reservationType: {
+        STAFF: [
+          "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
+        ],
+        NORMAL: ["Asiakkaan puolesta"],
+        BLOCKED: ["Suljettu"],
+      },
+      bufferTimeBefore: ["Ennen vuoroa ({{minutes}} min)"],
+      bufferTimeAfter: ["Vuoron jälkeen ({{minutes}} min)"],
+      errors: {
+        formNotValid: ["Lomakkeessa vikaa."],
+        noReservations: [
+          "Mahdotonta tehdä toistuvaa varausta ilman yhtään varauspäivää.",
+        ],
+        "Invalid date": ["Virheellinen päivämäärä."],
+        "End time can't be more than 24 hours.": [
+          "Loppumisaika ei voi olla yli 24 tuntia.",
+        ],
+        "Start time can't be more than 24 hours.": [
+          "Aloitusaika ei voi olla yli 24 tuntia.",
+        ],
+        "Starting time has to be in 15 minutes increments.": [
+          "Aloitusajan pitää olla 15 minuutin välein.",
+        ],
+        "Starting time has to be in 30 minutes increments.": [
+          "Aloitusajan pitää olla 30 minuutin välein.",
+        ],
+        "Starting time has to be in 60 minutes increments.": [
+          "Aloitusajan pitää olla 60 minuutin välein.",
+        ],
+        "Starting time has to be in 90 minutes increments.": [
+          "Aloitusajan pitää olla 90 minuutin välein.",
+        ],
+        "End time has to be increment of 15 minutes.": [
+          "Loppumisajan pitää olla 15 minuutin välein.",
+        ],
+        "Start time is not in time format.": ["Aloitusaika ei ole aika."],
+        "End time is not in time format.": ["Loppumisaika ei ole aika."],
+        "Start date can't be in the past": ["Aloituspäivä menneisyydessä."],
+        "End time needs to be after start time.": [
+          "Loppumisajan pitää olla aloitusajan jälkeen.",
+        ],
+        "Start date can't be after end date.": [
+          "Aloituspäivän tulee olla ennen päättymispäivää",
+        ],
+        "Array must contain at least 1 element(s)": [
+          "Valitse vähintään yksi päivä.",
+        ],
+        "Start and end time needs to be within a decade.": [
+          "Aikaväli pitää olla alle kymmenen vuotta.",
+        ],
+        Required: ["Pakollinen"],
       },
     },
   },
@@ -1030,7 +1129,7 @@ const translations: ITranslations = {
     typeInfo: ["Lorem ipsum dolor sit amet, consectetur adipisicing elit."],
     reservationType: {
       STAFF: [
-        "Kaupungin oma käytto, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
+        "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
       ],
       NORMAL: ["Asiakkaan puolesta"],
       BLOCKED: ["Suljettu"],
@@ -1064,8 +1163,8 @@ const translations: ITranslations = {
         purpose: ["Varauksen käyttötarkoitus"],
         numPersons: ["Osallistujamäärä"],
         ageGroup: ["Ikäryhmä"],
-        applyingForFreeOfChargeWithLink: [
-          "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut <1>alennusperusteisiin</1>",
+        applyingForFreeOfChargeButton: [
+          "Lue lisää <button>alennusperusteista</button>.",
         ],
         applyingForFreeOfCharge: [
           "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin",
@@ -1140,6 +1239,7 @@ const translations: ITranslations = {
       noPastDate: ["Aloitusaika menneisyydessä"],
       endAfterBegin: ["Lopetusaika liian aikainen"],
       interval: ["Virheellinen aloitusaika, intervallit: {{interval}}"],
+      Required: ["Pakollinen"],
     },
   },
   ReservationUnits: {

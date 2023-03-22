@@ -1,22 +1,19 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { Notification, TextInput } from "hds-react";
 import { SpanTwoColumns } from "../common/common";
 import { applicationErrorText } from "../../modules/util";
 import ApplicationForm from "./ApplicationForm";
 
-type Props = {
-  form: UseFormReturn<ApplicationForm>;
-};
+const EmailInput = () => {
+  const { t } = useTranslation();
 
-const EmailInput = ({
-  form: {
+  const {
     register,
     formState: { errors },
-  },
-}: Props): JSX.Element | null => {
-  const { t } = useTranslation();
+  } = useFormContext<ApplicationForm>();
+
   return (
     <>
       <SpanTwoColumns>

@@ -25,6 +25,9 @@ import { NUMBER_OF_DECIMALS } from "./const";
 export const DATE_FORMAT = "d.M.yyyy";
 export const DATE_FORMAT_SHORT = "d.M";
 
+export const toMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
+  day === 0 ? 6 : day - 1;
+
 export const formatDate = (
   date: string | null,
   outputFormat = DATE_FORMAT

@@ -34,8 +34,7 @@ import { prefixes } from "./common/urls";
 import ExternalScripts from "./common/ExternalScripts";
 import ApplicationRoundAllocation from "./component/recurring-reservations/allocation/ApplicationRoundAllocation";
 import { PrivateRoute } from "./common/PrivateRoutes";
-import MyUnits from "./component/my-units/MyUnits";
-import MyUnitView from "./component/my-units/MyUnitView";
+import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
 
 const App = () => {
   return (
@@ -260,18 +259,10 @@ const App = () => {
             }
           />
           <Route
-            path="/my-units/"
+            path="/my-units/*"
             element={
               <PrivateRoute>
-                <MyUnits />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/my-units/:unitId"
-            element={
-              <PrivateRoute>
-                <MyUnitView />
+                <MyUnitsRouter />
               </PrivateRoute>
             }
           />

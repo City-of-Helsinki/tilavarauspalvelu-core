@@ -37,11 +37,11 @@ const MyUnitView = () => {
   const { loading, data: unitData } = useQuery<Query, QueryUnitsArgs>(
     UNIT_QUERY,
     {
-      skip: !unitId,
+      skip: unitId == null,
       onError: (err) => {
         notifyError(err.message);
       },
-      variables: { pk: [unitId as string], offset: 0 },
+      variables: { pk: [unitId ?? ""], offset: 0 },
     }
   );
 

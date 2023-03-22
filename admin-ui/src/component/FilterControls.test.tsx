@@ -1,18 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
+import { test, expect } from "@jest/globals";
 import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
 import FilterControls from "./FilterControls";
-
-jest.mock("react-i18next", () => ({
-  useTranslation: () => {
-    return {
-      t: (str: string) => str,
-      i18n: {
-        changeLanguage: () => new Promise(() => {}),
-      },
-    };
-  },
-}));
 
 test("Filter Controls", async () => {
   const filterConfig = [

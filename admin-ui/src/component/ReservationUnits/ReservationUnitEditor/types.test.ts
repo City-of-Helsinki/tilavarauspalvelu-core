@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { test, expect } from "@jest/globals";
 import { schema } from "./types";
 
 test("conditional validation", () => {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import {
   Address,
   Application,
@@ -181,7 +181,11 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
             onClick={() => setHasBillingAddress(!hasBillingAddress)}
           />
         </CheckboxWrapper>
-        {hasBillingAddress ? <BillingAddress form={form} /> : null}
+        {hasBillingAddress ? (
+          <FormProvider {...form}>
+            <BillingAddress />
+          </FormProvider>
+        ) : null}
         <FormSubHeading>
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
@@ -237,7 +241,9 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
             }
           )}
         />
-        <EmailInput form={form} />
+        <FormProvider {...form}>
+          <EmailInput />
+        </FormProvider>
       </TwoColumnContainer>
       <Buttons
         onSubmit={handleSubmit(onSubmit)}

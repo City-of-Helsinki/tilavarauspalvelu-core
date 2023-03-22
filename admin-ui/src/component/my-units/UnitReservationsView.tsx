@@ -1,16 +1,27 @@
 import { toUIDate } from "common/src/common/util";
 import { formatISO, parse, startOfDay } from "date-fns";
+import { Button } from "hds-react";
 import React, { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-use";
+import styled from "styled-components";
 import { useQueryParams } from "../../common/hooks";
 import { OptionType } from "../../common/types";
-import { Grid, HorisontalFlex, Span4, VerticalFlex } from "../../styles/layout";
+import { myUnitUrl } from "../../common/urls";
+import { Grid, Span4, VerticalFlex } from "../../styles/layout";
+import { BasicLink } from "../../styles/util";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import Tags, { getReducer, toTags } from "../lists/Tags";
 import DayNavigation from "./DayNavigation";
 import UnitReservations from "./UnitReservations";
+
+const HorisontalFlexWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
 
 type Params = {
   unitId: string;
@@ -54,6 +65,12 @@ const UnitReservationsView = (): JSX.Element => {
     "UnitReservationsView"
   );
 
+  // NOTE This should never happen but the code should be restructured so it can't happen
+  const recurringReservationUrl =
+    unitId != null
+      ? `${myUnitUrl(parseInt(unitId, 10))}/recurring-reservation`
+      : null;
+
   return (
     <VerticalFlex>
       <Grid>
@@ -68,9 +85,23 @@ const UnitReservationsView = (): JSX.Element => {
         </Span4>
       </Grid>
       <Tags tags={tags} dispatch={dispatch} t={t} />
-      <HorisontalFlex style={{ justifyContent: "center" }}>
+      <HorisontalFlexWrapper>
+        <Button
+          disabled={false}
+          variant="secondary"
+          onClick={() => {
+            onDateChange({ date: new Date() });
+          }}
+        >
+          {t("common.today")}
+        </Button>
         <DayNavigation date={begin} onDateChange={onDateChange} />
-      </HorisontalFlex>
+        <BasicLink to={recurringReservationUrl ?? ""}>
+          <Button disabled={false} variant="secondary">
+            {t("MyUnits.Calendar.header.recurringReservation")}
+          </Button>
+        </BasicLink>
+      </HorisontalFlexWrapper>
       {unitId ? (
         <UnitReservations
           reservationUnitTypes={state.reservationUnitType.map((option) =>

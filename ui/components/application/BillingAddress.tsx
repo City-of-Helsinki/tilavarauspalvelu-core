@@ -1,22 +1,18 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { TextInput } from "hds-react";
-import { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { applicationErrorText } from "../../modules/util";
 import { FormSubHeading } from "../common/common";
 import ApplicationForm from "./ApplicationForm";
 
-type Props = {
-  form: UseFormReturn<ApplicationForm>;
-};
+const BillingAddress = () => {
+  const { t } = useTranslation();
 
-const BillingAddress = ({
-  form: {
+  const {
     register,
     formState: { errors },
-  },
-}: Props): JSX.Element | null => {
-  const { t } = useTranslation();
+  } = useFormContext<ApplicationForm>();
 
   return (
     <>

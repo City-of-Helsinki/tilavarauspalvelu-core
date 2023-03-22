@@ -1,25 +1,33 @@
 import { Checkbox, NumberInput, Select, TextArea, TextInput } from "hds-react";
-import camelCase from "lodash/camelCase";
 import get from "lodash/get";
-import React, { ReactElement, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
+import React, { useMemo } from "react";
+import {
+  Control,
+  Controller,
+  FieldValues,
+  useFormContext,
+} from "react-hook-form";
 import styled from "styled-components";
 import { fontMedium, fontRegular, Strongish } from "../common/typography";
-import { ReservationMetadataSetType } from "../../types/gql-types";
+import { ReservationsReservationReserveeTypeChoices } from "../../types/gql-types";
 import { Inputs, Reservation } from "./types";
 import { CheckboxWrapper } from "./components";
 import { OptionType } from "../../types/common";
+import { removeRefParam } from "./util";
 
 type Props = {
   field: keyof Inputs;
   options: Record<string, OptionType[]>;
-  reserveeType?: string;
+  reserveeType?: ReservationsReservationReserveeTypeChoices | "COMMON";
   reservation: Reservation;
-  metadataSet: ReservationMetadataSetType;
-  form: ReturnType<typeof useForm>;
-  params?: Record<string, Record<string, string | number>>;
-  data?: Record<string, ReactElement>;
+  required: boolean;
+  // Not good to pass the translation function here but this is because this is shared between ui and admin
+  // and admin is lacking translation namespaces
   t: (key: string) => string;
+  params?: Record<string, Record<string, string | number>>;
+  data?: {
+    termsForDiscount?: JSX.Element | string;
+  };
 };
 
 const StyledCheckboxWrapper = styled(CheckboxWrapper)<{
@@ -85,21 +93,42 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
+const ControlledCheckbox = (props: {
+  field: string;
+  control: Control<FieldValues, boolean>;
+  required: boolean;
+  label: string;
+  defaultValue?: boolean;
+  errorText?: string;
+  defaultChecked?: boolean;
+}) => (
+  <Controller
+    name={props.field}
+    control={props.control}
+    defaultValue={props.defaultValue}
+    rules={{ required: props.required }}
+    render={({ field: { value, onChange } }) => (
+      <StyledCheckbox
+        id={props.field}
+        onChange={(e) => onChange(e.target.checked)}
+        checked={value}
+        defaultChecked={props.defaultChecked}
+        label={props.label}
+        errorText={props.errorText}
+      />
+    )}
+  />
+);
+
 const ReservationFormField = ({
   field,
   options,
   reserveeType,
-  metadataSet,
+  required,
   reservation,
-  form: {
-    register,
-    control,
-    watch,
-    formState: { errors },
-  },
+  t,
   params = {},
   data = {},
-  t,
 }: Props) => {
   const normalizedReserveeType =
     reserveeType?.toLocaleLowerCase() || "individual";
@@ -117,6 +146,13 @@ const ReservationFormField = ({
       ].includes(field),
     [field]
   );
+
+  const {
+    watch,
+    register,
+    control,
+    formState: { errors },
+  } = useFormContext();
 
   const isTextArea = useMemo(
     (): boolean => ["description"].includes(field),
@@ -144,10 +180,6 @@ const ReservationFormField = ({
     [field]
   );
 
-  const required = ((metadataSet.requiredFields || []) as string[])
-    .map(camelCase)
-    .includes(field);
-
   const isReserveeIdRequired =
     field === "reserveeId" &&
     watch("reserveeIsUnregisteredAssociation") !== undefined
@@ -157,6 +189,30 @@ const ReservationFormField = ({
   const isFreeOfChargeReasonRequired =
     field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
 
+  const label = `${t(
+    `reservationApplication:label.${normalizedReserveeType}.${field}`
+  )}`;
+
+  const error = get(errors, field);
+  const errorText = error && t("forms:requiredField");
+
+  // TODO this is not really a default value any more
+  // how should it be set? passed directly here or some other mechanism
+  const defaultValue = get(reservation, field);
+  const checkParams = {
+    field,
+    control,
+    defaultValue: typeof defaultValue === "boolean" ? defaultValue : undefined,
+    label,
+    required,
+    errorText,
+  };
+
+  const emailPattern = {
+    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+    message: "email",
+  };
+
   return Object.keys(options).includes(field) ? (
     <Controller
       name={field}
@@ -165,6 +221,8 @@ const ReservationFormField = ({
       rules={{ required }}
       render={({ field: formField }) => (
         <StyledSelect
+          // TODO some (like this) get the * added by the component
+          // others (so far seems all the others) get it from the label text.
           label={t(
             `reservationApplication:label.${normalizedReserveeType}.${field}`
           )}
@@ -173,11 +231,11 @@ const ReservationFormField = ({
           defaultValue={options[field].find(
             (n) => n.value === get(reservation, field)
           )}
-          {...formField}
+          {...removeRefParam(formField)}
           value={formField.value || null}
-          error={get(errors, field) && t("forms:requiredField")}
+          error={errorText}
           required={required}
-          invalid={!!get(errors, field)}
+          invalid={!!error}
           $isWide={isWideRow}
         />
       )}
@@ -189,94 +247,44 @@ const ReservationFormField = ({
       $break={isBreakingColumn}
     >
       <Subheading>
-        {t("reservationApplication:label.subHeadings.subvention") as string}
+        {t("reservationApplication:label.subHeadings.subvention")}
       </Subheading>{" "}
-      <Controller
-        name={field}
-        control={control}
-        defaultValue={get(reservation, field)}
-        rules={{ required }}
-        render={({ field: formField }) => (
-          <StyledCheckbox
-            id={field}
-            onChange={(e) => formField.onChange(e.target.checked)}
-            checked={formField.value}
-            label={
-              <>
-                {data?.subventionLabel ||
-                  t(
-                    `reservationApplication:label.${normalizedReserveeType}.${field}`
-                  )}
-                {required ? " * " : ""}
-              </>
-            }
-            errorText={get(errors, field) && t("forms:requiredField")}
-          />
-        )}
-      />
+      <ControlledCheckbox {...checkParams} />
+      {data.termsForDiscount && (
+        <div style={{ marginTop: "0.5rem" }}>{data.termsForDiscount}</div>
+      )}
     </StyledCheckboxWrapper>
   ) : field === "reserveeIsUnregisteredAssociation" ? (
     <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
-      <Controller
-        name={field}
-        control={control}
-        defaultValue={get(reservation, field)}
-        rules={{ required }}
-        render={({ field: formField }) => (
-          <Checkbox
-            id={field}
-            onChange={(e) => formField.onChange(e.target.checked)}
-            checked={formField.value}
-            defaultChecked={watch("reserveeIsUnregisteredAssociation")}
-            label={`${t(
-              `reservationApplication:label.${normalizedReserveeType}.${field}`
-            )}${required ? " * " : ""}`}
-            errorText={get(errors, field) && t("forms:requiredField")}
-          />
-        )}
+      <ControlledCheckbox
+        {...checkParams}
+        defaultChecked={watch("reserveeIsUnregisteredAssociation")}
       />
     </StyledCheckboxWrapper>
   ) : field === "showBillingAddress" ? (
     <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
-      <Controller
-        name={field}
-        control={control}
-        defaultValue={get(reservation, field)}
-        rules={{ required }}
-        render={({ field: formField }) => (
-          <Checkbox
-            id={field}
-            onChange={(e) => formField.onChange(e.target.checked)}
-            checked={formField.value}
-            defaultChecked={get(reservation, field)}
-            label={`${t(
-              `reservationApplication:label.${normalizedReserveeType}.${field}`
-            )}${required ? " * " : ""}`}
-            errorText={get(errors, field) && t("forms:requiredField")}
-          />
-        )}
-      />
+      <ControlledCheckbox {...checkParams} />
     </StyledCheckboxWrapper>
   ) : field === "freeOfChargeReason" ? (
     <StyledTextArea
-      label={`${t(
+      // TODO this needs to be separated or use required like all the other components
+      label={t(
         `reservationApplication:label.${normalizedReserveeType}.${field}`
-      )}${isFreeOfChargeReasonRequired ? " * " : ""}`}
+      )}
       id={field}
       key={field}
       {...register(field, { required: isFreeOfChargeReasonRequired })}
-      defaultValue={get(reservation, field) || ""}
-      errorText={get(errors, field) && t("forms:requiredField")}
-      invalid={!!get(errors, field)}
+      defaultValue={defaultValue ?? ""}
+      errorText={errorText}
+      invalid={!!error}
+      required={isFreeOfChargeReasonRequired}
       $hidden={!watch("applyingForFreeOfCharge")}
       $isWide
       $height="92px"
     />
   ) : isNumField ? (
     <NumberInput
-      label={`${t(
-        `reservationApplication:label.${normalizedReserveeType}.${field}`
-      )}${required ? " * " : ""}`}
+      label={`${label}`}
       id={field}
       {...register(field, {
         valueAsNumber: true,
@@ -286,34 +294,37 @@ const ReservationFormField = ({
         }),
       })}
       key={field}
-      defaultValue={get(reservation, field) as number}
-      errorText={get(errors, field) && t("forms:requiredField")}
-      invalid={!!get(errors, field)}
+      errorText={errorText}
+      invalid={!!error}
+      required={required}
       step={1}
       minusStepButtonAriaLabel={t("common:decrease") || "Decrease"}
       plusStepButtonAriaLabel={t("common:increase") || "Increase"}
-      min={get(params, field)?.min as number}
-      max={get(params, field)?.max as number}
+      min={
+        get(params, field)?.min != null && !Number.isNaN(get(params, field).min)
+          ? Number(get(params, field)?.min)
+          : undefined
+      }
+      max={
+        get(params, field)?.max != null && !Number.isNaN(get(params, field).max)
+          ? Number(get(params, field)?.max)
+          : undefined
+      }
     />
   ) : isTextArea ? (
     <StyledTextArea
-      label={`${t(
-        `reservationApplication:label.${normalizedReserveeType}.${field}`
-      )}${required ? " * " : ""}`}
+      label={label}
       id={field}
       {...register(field, {
         required,
         ...(isEmailField && {
-          pattern: {
-            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-            message: "email",
-          },
+          pattern: emailPattern,
         }),
       })}
       key={field}
-      defaultValue={get(reservation, field)}
+      defaultValue={defaultValue}
       errorText={
-        get(errors, field) &&
+        error &&
         t(
           `forms:${
             get(errors, field)?.message === "email"
@@ -322,7 +333,8 @@ const ReservationFormField = ({
           }`
         )
       }
-      invalid={!!get(errors, field)}
+      invalid={!!error}
+      required={required}
       $isWide={isWideRow}
       $hidden={
         field.includes("billing") && watch("showBillingAddress") !== true
@@ -332,18 +344,17 @@ const ReservationFormField = ({
     />
   ) : field === "reserveeId" ? (
     <StyledTextInput
-      label={`${t(
-        `reservationApplication:label.${normalizedReserveeType}.${field}`
-      )}${isReserveeIdRequired ? " * " : ""}`}
+      label={label}
       id={field}
       {...register(field, {
         required: isReserveeIdRequired,
       })}
       key={field}
       type="text"
-      defaultValue={get(reservation, field)}
-      errorText={get(errors, field) && t("forms:requiredField")}
-      invalid={!!get(errors, field)}
+      defaultValue={typeof defaultValue === "string" ? defaultValue : ""}
+      errorText={errorText}
+      invalid={!!error}
+      required={required}
       $isWide={isWideRow}
       $hidden={
         watch("reserveeIsUnregisteredAssociation") === undefined
@@ -354,32 +365,30 @@ const ReservationFormField = ({
     />
   ) : (
     <StyledTextInput
-      label={`${t(
-        `reservationApplication:label.${normalizedReserveeType}.${field}`
-      )}${required ? " * " : ""}`}
+      label={label}
       id={field}
       {...register(field, {
         required,
         ...(isEmailField && {
-          pattern: {
-            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-            message: "email",
-          },
+          pattern: emailPattern,
         }),
       })}
       key={field}
       type="text"
       errorText={
-        get(errors, field) &&
-        t(
-          `forms:${
-            get(errors, field)?.message === "email"
-              ? "invalidEmail"
-              : "requiredField"
-          }`
+        error &&
+        String(
+          t(
+            `forms:${
+              get(errors, field)?.message === "email"
+                ? "invalidEmail"
+                : "requiredField"
+            }`
+          )
         )
       }
-      invalid={!!get(errors, field)}
+      invalid={!!error}
+      required={required}
       $isWide={isWideRow}
       $hidden={
         field.includes("billing") && watch("showBillingAddress") !== true

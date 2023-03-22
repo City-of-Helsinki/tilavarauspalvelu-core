@@ -1,7 +1,7 @@
 import React from "react";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Address, Application, ContactPerson } from "common/types/common";
 import {
   FormSubHeading,
@@ -102,7 +102,9 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
             }
           )}
         />
-        <BillingAddress form={form} />
+        <FormProvider {...form}>
+          <BillingAddress />
+        </FormProvider>
         <FormSubHeading as="h2">
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
@@ -140,7 +142,9 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
             )}
           />
         </SpanTwoColumns>
-        <EmailInput form={form} />
+        <FormProvider {...form}>
+          <EmailInput />
+        </FormProvider>
       </TwoColumnContainer>
       <Buttons
         onSubmit={handleSubmit(onSubmit)}

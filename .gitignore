@@ -8,3 +8,6 @@ yarn-error.log
 
 # local config
 .env.local
+tsconfig.tsbuildinfo
+.local
+.DS_Store

@@ -6,6 +6,7 @@ import {
   isValid,
   isAfter,
 } from "date-fns";
+import { fi } from "date-fns/locale";
 import { isNumber } from "lodash";
 import { i18n } from "next-i18next";
 import { HMS, Parameter } from "../../types/common";
@@ -85,7 +86,7 @@ export const toUIDate = (date: Date, formatStr = "d.M.yyyy"): string => {
   if (!date || !isValidDate(date)) {
     return "";
   }
-  return format(date, formatStr);
+  return format(date, formatStr, { locale: fi });
 };
 
 export const chunkArray = <T>(array: T[], size: number): T[][] => {

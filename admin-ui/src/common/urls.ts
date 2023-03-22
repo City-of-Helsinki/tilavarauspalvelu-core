@@ -39,7 +39,10 @@ export const resourceUrl = (resourceId: number, unitId: number): string =>
 
 export const unitUrl = (unitId: number): string => `/unit/${unitId}`;
 
-export const myUnitUrl = (unitId: number): string => `/my-units/${unitId}`;
+// ids start from 1
+// fallback to root route instead of alerting on errors
+export const myUnitUrl = (unitId: number): string =>
+  `/my-units/${!Number.isNaN(unitId) && unitId > 0 ? unitId : ""}`;
 
 export const myReservationUnitUrl = (
   unitId: number,

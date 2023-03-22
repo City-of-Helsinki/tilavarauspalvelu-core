@@ -11,7 +11,7 @@
     "test": "TZ=Europe/Helsinki react-scripts test",
     "generate-gql-types": "graphql-codegen",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
-    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql",
+    "update-schema": "npx --yes get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql",
     "generate-email-templates": "node ./email/convertToHTML.mjs"
   },
   "browserslist": {
@@ -45,6 +45,7 @@
     "@graphql-codegen/typescript": "^2.8.5",
     "@graphql-codegen/typescript-operations": "^2.5.10",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
+    "@jest/globals": "^29.5.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",

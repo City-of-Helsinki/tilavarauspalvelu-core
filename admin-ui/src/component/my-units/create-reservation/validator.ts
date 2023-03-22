@@ -52,7 +52,7 @@ export const reservationSchema = (
         }),
       startTime: timeWithIntervals(interval),
       endTime: joi.string().pattern(TIME_PATTERN).required(),
-      workingMemo: joi.string().allow(""),
+      comments: joi.string().allow(""),
     })
     .options({
       allowUnknown: true,

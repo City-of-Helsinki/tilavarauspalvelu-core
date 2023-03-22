@@ -1,33 +1,27 @@
+/**
+ *  First part of the Reservation process form
+ *  This component needs to be wrapped inside a Form context
+ */
 import { OptionType } from "common/types/common";
-import { IconArrowLeft, IconArrowRight, IconGroup, IconUser } from "hds-react";
-import Image from "next/image";
-import React, { Fragment, ReactElement, useMemo, useRef } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
-import { useTranslation, Trans } from "next-i18next";
+import { IconArrowLeft, IconArrowRight } from "hds-react";
+import React from "react";
+import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
-import RadioButtonWithImage from "common/src/reservation-form/RadioButtonWithImage";
-import ReservationFormField from "common/src/reservation-form/ReservationFormField";
+import MetaFields from "common/src/reservation-form/MetaFields";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
-import { Inputs, Reservation } from "common/src/reservation-form/types";
-import {
-  GroupHeading,
-  Subheading,
-  TwoColumnContainer,
-} from "common/src/reservation-form/styles";
 import { MediumButton } from "../../styles/util";
 import { ActionContainer } from "./styles";
 import { getTranslation } from "../../modules/util";
 import InfoDialog from "../common/InfoDialog";
 import { JustForMobile } from "../../modules/style/layout";
-import { PinkBox } from "../reservation-unit/ReservationUnitStyles";
+import { PinkBox, Subheading } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
 
 type Props = {
-  reservation: Reservation;
   reservationUnit: ReservationUnitType;
   reserveeType: ReservationsReservationReserveeTypeChoices;
   setReserveeType: React.Dispatch<
@@ -38,7 +32,6 @@ type Props = {
   reservationApplicationFields: string[];
   cancelReservation: () => void;
   options: Record<string, OptionType[]>;
-  form: UseFormReturn<Inputs>;
 };
 
 const Form = styled.form`
@@ -59,16 +52,19 @@ const Form = styled.form`
   }
 `;
 
-const ReserveeTypeContainer = styled.div`
-  display: flex;
-  margin-bottom: var(--spacing-3-xl);
-  width: 100%;
-  gap: var(--spacing-xs);
-  flex-wrap: wrap;
+const StyledActionContainer = styled(ActionContainer)`
+  padding-top: var(--spacing-xl);
+`;
+
+const LinkLikeButton = styled.button`
+  border: unset;
+  background: unset;
+  color: blue;
+  padding: unset;
+  cursor: pointer;
 `;
 
 const Step0 = ({
-  reservation,
   reservationUnit,
   reserveeType,
   setReserveeType,
@@ -77,40 +73,10 @@ const Step0 = ({
   reservationApplicationFields,
   cancelReservation,
   options,
-  form,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const openPricingTermsRef = useRef();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-
-  const reserveeOptions = useMemo((): {
-    id: ReservationsReservationReserveeTypeChoices;
-    icon?: ReactElement;
-  }[] => {
-    return [
-      {
-        id: ReservationsReservationReserveeTypeChoices.Individual,
-        icon: <IconUser aria-hidden />,
-      },
-      {
-        id: ReservationsReservationReserveeTypeChoices.Nonprofit,
-        icon: <IconGroup aria-hidden />,
-      },
-      {
-        id: ReservationsReservationReserveeTypeChoices.Business,
-        icon: (
-          <Image
-            src="/icons/icon_premises.svg"
-            alt={t("common:headAlt")}
-            width="24"
-            height="24"
-            aria-hidden
-          />
-        ),
-      },
-    ];
-  }, [t]);
 
   const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
 
@@ -120,159 +86,51 @@ const Step0 = ({
         e.preventDefault();
         handleSubmit();
       }}
+      noValidate
     >
-      {generalFields?.length > 0 && (
-        <>
-          <Subheading
-            style={{
-              margin: "var(--spacing-layout-m) 0 var(--spacing-xs)",
-            }}
-          >
-            {t("reservationCalendar:reservationInfo")}
-          </Subheading>
-          <TwoColumnContainer>
-            {generalFields.map((field) => {
-              return (
-                <ReservationFormField
-                  t={t}
-                  key={`key-${field}`}
-                  field={field as unknown as keyof Inputs}
-                  options={options}
-                  form={form as unknown as ReturnType<typeof useForm>}
-                  metadataSet={reservationUnit.metadataSet}
-                  reserveeType="common"
-                  reservation={reservation}
-                  params={{
-                    numPersons: {
-                      min: reservationUnit.minPersons || 0,
-                      max: reservationUnit.maxPersons,
-                    },
-                  }}
-                  data={{
-                    subventionLabel: (
-                      <Trans
-                        i18nKey="reservationApplication:label.common.applyingForFreeOfChargeWithLink"
-                        defaults="Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut <a />"
-                        components={{
-                          a: (
-                            <a
-                              href="#"
-                              ref={openPricingTermsRef}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setIsDialogOpen(true);
-                              }}
-                            >
-                              alennusperusteisiin
-                            </a>
-                          ),
-                        }}
-                      />
-                    ),
-                  }}
-                />
-              );
-            })}
-          </TwoColumnContainer>
-        </>
-      )}
-      <Subheading
-        style={{
-          margin: "var(--spacing-layout-m) 0 var(--spacing-xs)",
+      <MetaFields
+        reservationUnit={reservationUnit}
+        options={options}
+        reserveeType={reserveeType}
+        setReserveeType={setReserveeType}
+        generalFields={generalFields}
+        reservationApplicationFields={reservationApplicationFields}
+        data={{
+          termsForDiscount: (
+            <Trans
+              i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
+              defaults="Lue lisää <button>alennusperiaatteista</button>"
+              components={{
+                button: (
+                  <LinkLikeButton
+                    type="button"
+                    onClick={() => setIsDialogOpen(true)}
+                  />
+                ),
+              }}
+            />
+          ),
         }}
-      >
-        {t("reservationCalendar:reserverInfo")}
-      </Subheading>
-      {reservationUnit?.metadataSet?.supportedFields?.includes(
-        "reservee_type"
-      ) && (
-        <>
-          <p>{t("reservationApplication:reserveeTypePrefix")}</p>
-          <ReserveeTypeContainer data-testid="reservation__checkbox--reservee-type">
-            {reserveeOptions.map(({ id, icon }) => (
-              <RadioButtonWithImage
-                key={id}
-                id={id}
-                label={t(
-                  `reservationApplication:reserveeTypes.labels.${id.toLocaleLowerCase()}`
-                )}
-                onClick={() => {
-                  setReserveeType(id);
-                }}
-                icon={icon}
-                checked={reserveeType === id}
-              />
-            ))}
-          </ReserveeTypeContainer>
-        </>
+        t={t}
+      />
+      <InfoDialog
+        id="pricing-terms"
+        heading={t("reservationUnit:pricingTerms")}
+        text={getTranslation(reservationUnit.pricingTerms, "text")}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
+      {termsOfUse && (
+        <JustForMobile>
+          <PinkBox>
+            <Subheading>
+              {t("reservations:reservationInfoBoxHeading")}
+            </Subheading>
+            <Sanitize html={termsOfUse} />
+          </PinkBox>
+        </JustForMobile>
       )}
-      <TwoColumnContainer
-        style={{
-          margin: "var(--spacing-layout-m) 0 var(--spacing-layout-m)",
-        }}
-      >
-        {reservationApplicationFields.map((field, index) => {
-          return (
-            <Fragment key={`key-${field}`}>
-              {reserveeType ===
-                ReservationsReservationReserveeTypeChoices.Nonprofit &&
-                index === 0 && (
-                  <GroupHeading style={{ marginTop: 0 }}>
-                    {t("reservationApplication:label.headings.nonprofitInfo")}
-                  </GroupHeading>
-                )}
-              {reserveeType ===
-                ReservationsReservationReserveeTypeChoices.Nonprofit &&
-                field === "reserveeFirstName" && (
-                  <GroupHeading>
-                    {t("reservationApplication:label.headings.contactInfo")}
-                  </GroupHeading>
-                )}
-              {reserveeType ===
-                ReservationsReservationReserveeTypeChoices.Business &&
-                index === 0 && (
-                  <GroupHeading style={{ marginTop: 0 }}>
-                    {t("reservationApplication:label.headings.companyInfo")}
-                  </GroupHeading>
-                )}{" "}
-              {reserveeType ===
-                ReservationsReservationReserveeTypeChoices.Business &&
-                field === "reserveeFirstName" && (
-                  <GroupHeading>
-                    {t("reservationApplication:label.headings.contactInfo")}
-                  </GroupHeading>
-                )}
-              <ReservationFormField
-                t={t}
-                field={field as unknown as keyof Inputs}
-                options={options}
-                reserveeType={reserveeType}
-                metadataSet={reservationUnit.metadataSet}
-                reservation={reservation}
-                form={form as unknown as ReturnType<typeof useForm>}
-              />
-            </Fragment>
-          );
-        })}
-        <InfoDialog
-          id="pricing-terms"
-          heading={t("reservationUnit:pricingTerms")}
-          text={getTranslation(reservationUnit.pricingTerms, "text")}
-          isOpen={isDialogOpen}
-          onClose={() => setIsDialogOpen(false)}
-        />
-        {termsOfUse && (
-          <JustForMobile>
-            <PinkBox>
-              <Subheading>
-                {t("reservations:reservationInfoBoxHeading")}
-              </Subheading>
-              <Sanitize html={termsOfUse} />
-            </PinkBox>
-          </JustForMobile>
-        )}
-      </TwoColumnContainer>
-      <ActionContainer>
+      <StyledActionContainer>
         <MediumButton
           variant="primary"
           type="submit"
@@ -291,7 +149,7 @@ const Step0 = ({
         >
           {t("common:cancel")}
         </MediumButton>
-      </ActionContainer>
+      </StyledActionContainer>
     </Form>
   );
 };

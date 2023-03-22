@@ -10,7 +10,7 @@ export type ReservationFormType = Reservation & {
   date: string;
   startTime: string;
   endTime?: string;
-  workingMemo?: string;
+  comments?: string;
   type?: ReservationType;
   bufferTimeAfter: boolean;
   bufferTimeBefore: boolean;

@@ -18,7 +18,7 @@
       "purpose": "Bokningens användningsändamål",
       "numPersons": "Antal deltagare",
       "ageGroup": "Åldersgrupp",
-      "applyingForFreeOfChargeWithLink": "Jag ansöker om avgiftsfri användning eller rabatt och jag har bekantat mig med <1>rabattgrupperna</1>.",
+      "applyingForFreeOfChargeButton": "Jag ansöker om avgiftsfri användning eller rabatt och jag har bekantat mig med <button>rabattgrupperna</button>.",
       "applyingForFreeOfCharge": "Jag ansöker om avgiftsfri användning eller rabatt och jag har bekantat mig med rabattgrupperna.",
       "freeOfChargeReason": "Motiveringar"
     },

@@ -13,6 +13,7 @@
   --tilavaraus-ui-gray: var(--color-black-40);
   --tilavaraus-admin-handling-count-color: #ff8003;
   --container-width-xxl: 1440px;
+  --container-width-small: 944px;
   --main-menu-width: 200px;
   --ingress-container-width: 1080px;
   --tilavaraus-admin-font: "HelsinkiGrotesk", var(--font-default);
@@ -31,6 +32,9 @@
   --font-regular: HelsinkiGrotesk, var(--font-default);
   --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
   --font-bold: HelsinkiGrotesk-Bold, var(--font-default);
+  --prose-width: 66ch;
+
+  --helper-color-invalid: #b01038;
 
   /*
   calendar

@@ -29,6 +29,7 @@ body {
   color: var(--tilavaraus-admin-content-text-color);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  line-height: var(--lineheight-l);
 }
 
 a {

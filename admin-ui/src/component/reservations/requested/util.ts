@@ -7,6 +7,7 @@ import {
 import {
   differenceInHours,
   differenceInMinutes,
+  getDay,
   isSameDay,
   parse,
 } from "date-fns";
@@ -22,7 +23,7 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
 } from "common/types/gql-types";
-import { formatDate, formatTime } from "../../../common/util";
+import { formatDate, formatTime, toMondayFirst } from "../../../common/util";
 
 export const reservationDateTime = (
   start: string,
@@ -32,7 +33,7 @@ export const reservationDateTime = (
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  const startDay = t(`dayShort.${startDate.getDay()}`);
+  const startDay = t(`dayShort.${toMondayFirst(getDay(startDate))}`);
 
   const endTimeFormat = endDate.getMinutes() === 0 ? "HH" : "HH:mm";
   const startTimeFormat = startDate.getMinutes() === 0 ? "HH" : "HH:mm";
