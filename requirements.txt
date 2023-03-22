@@ -54,10 +54,13 @@ cryptography==39.0.2
     #   social-auth-core
 defusedxml==0.7.1
     # via
+    #   odfpy
     #   python3-openid
     #   social-auth-core
 deprecation==2.1.0
     # via django-helusers
+diff-match-patch==20200713
+    # via django-import-export
 django==3.2.18
     # via
     #   -r requirements.in
@@ -69,6 +72,7 @@ django==3.2.18
     #   django-filter
     #   django-graphql-jwt
     #   django-helusers
+    #   django-import-export
     #   django-modeltranslation
     #   django-mptt
     #   django-recurrence
@@ -79,6 +83,8 @@ django==3.2.18
     #   graphene-django
     #   helsinki-profile-gdpr-api
 django-admin-extra-buttons==1.5.5
+    # via -r requirements.in
+django-admin-rangefilter==0.9.0
     # via -r requirements.in
 django-admin-sortable2==1.0.4
     # via -r requirements.in
@@ -108,6 +114,8 @@ django-helusers==0.6.0
     # via
     #   -r requirements.in
     #   helsinki-profile-gdpr-api
+django-import-export==3.1.0
+    # via -r requirements.in
 django-js-asset==1.2.2
     # via django-mptt
 django-modeltranslation==0.18.7
@@ -139,6 +147,8 @@ easy-thumbnails==2.8.3
     # via -r requirements.in
 ecdsa==0.14.1
     # via python-jose
+et-xmlfile==1.1.0
+    # via openpyxl
 flake8==3.8.4
     # via -r requirements.in
 future==0.18.3
@@ -182,6 +192,8 @@ jsonschema==3.2.0
     # via drf-spectacular
 kombu==5.2.4
     # via celery
+markuppy==1.14
+    # via tablib
 markupsafe==2.1.1
     # via jinja2
 mccabe==0.6.1
@@ -192,6 +204,10 @@ oauthlib==3.1.0
     # via
     #   requests-oauthlib
     #   social-auth-core
+odfpy==1.4.1
+    # via tablib
+openpyxl==3.1.2
+    # via tablib
 ortools==9.4.1874
     # via -r requirements.in
 packaging==20.9
@@ -250,7 +266,9 @@ pytz==2022.1
     #   django-timezone-field
     #   icalendar
 pyyaml==5.4.1
-    # via drf-spectacular
+    # via
+    #   drf-spectacular
+    #   tablib
 requests==2.25.1
     # via
     #   django-helusers
@@ -279,6 +297,8 @@ social-auth-core==4.1.0
     # via social-auth-app-django
 sqlparse==0.4.2
     # via django
+tablib[html,ods,xls,xlsx,yaml]==3.3.0
+    # via django-import-export
 text-unidecode==1.3
     # via graphene-django
 typing-extensions==4.4.0
@@ -302,6 +322,10 @@ wcwidth==0.2.5
     # via prompt-toolkit
 whitenoise==5.2.0
     # via -r requirements.in
+xlrd==2.0.1
+    # via tablib
+xlwt==1.3.0
+    # via tablib
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
