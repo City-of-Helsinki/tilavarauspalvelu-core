@@ -6,6 +6,8 @@ from typing import Any, List
 
 from assertpy import assert_that
 from django.conf import settings
+from django.http import FileResponse
+from django.test import RequestFactory
 from django.test.testcases import TestCase
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
@@ -17,6 +19,7 @@ from spaces.tests.factories import SpaceFactory
 from terms_of_use.models import TermsOfUse
 from terms_of_use.tests.factories import TermsOfUseFactory
 
+from ..admin import ReservationUnitAdmin
 from ..models import ReservationUnit
 from ..utils.export_data import ReservationUnitExporter
 from .factories import (
@@ -273,3 +276,15 @@ class ReservationUnitDataExporterTestCase(TestCase):
         ]
 
         self._test_first_data_line(expected_line)
+
+
+class TestReservationUnitExportFromAdmin(TestCase):
+    def test_admin_action_results_file_response(self):
+        reservation_unit = ReservationUnitFactory()
+        ReservationUnitPricingFactory(reservation_unit=reservation_unit)
+        view = ReservationUnitAdmin(ReservationUnit, None)
+        request = RequestFactory().get("/admin/reservation_units/reservationunit/")
+
+        response = view.export_to_csv(request, ReservationUnit.objects.all())
+
+        assert_that(response).is_instance_of(FileResponse)

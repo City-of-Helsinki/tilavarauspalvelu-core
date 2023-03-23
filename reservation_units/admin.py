@@ -1,6 +1,8 @@
+from admin_extra_buttons.api import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.forms import CharField, ModelForm
+from django.http import FileResponse
 from tinymce.widgets import TinyMCE
 
 from .models import (
@@ -22,6 +24,7 @@ from .models import (
     ReservationUnitType,
     TaxPercentage,
 )
+from .utils.export_data import ReservationUnitExporter
 
 
 class ReservationUnitAdminForm(ModelForm):
@@ -42,9 +45,10 @@ class ReservationUnitPricingInline(admin.TabularInline):
 
 
 @admin.register(ReservationUnit)
-class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
+class ReservationUnitAdmin(ExtraButtonsMixin, SortableAdminMixin, admin.ModelAdmin):
     model = ReservationUnit
     form = ReservationUnitAdminForm
+    actions = ["export_to_csv"]
     inlines = [ReservationUnitImageInline, ReservationUnitPricingInline]
     readonly_fields = ["uuid", "payment_product"]
     search_fields = ["name", "unit__name", "pk__iexact", "unit__service_sectors__name"]
@@ -61,6 +65,21 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
             queryset = queryset.exclude(reservation_kind=ReservationKind.DIRECT)
 
         return queryset, may_have_duplicates
+
+    @admin.action(description="Export selected reservation units to CSV")
+    def export_to_csv(self, request, queryset):
+        try:
+            path = ReservationUnitExporter.export_reservation_unit_data(
+                queryset=queryset
+            )
+        except Exception as e:
+            self.message_user(
+                request,
+                f"Error while exporting reservation units: {e}",
+                level=messages.ERROR,
+            )
+        else:
+            return FileResponse(open(path, "rb"))
 
 
 @admin.register(ReservationUnitImage)
