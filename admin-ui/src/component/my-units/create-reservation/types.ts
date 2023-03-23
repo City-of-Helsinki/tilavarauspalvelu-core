@@ -2,7 +2,7 @@ import { Reservation } from "common/src/reservation-form/types";
 
 export enum ReservationType {
   STAFF = "STAFF",
-  NORMAL = "NORMAL",
+  NORMAL = "BEHALF",
   BLOCKED = "BLOCKED",
 }
 

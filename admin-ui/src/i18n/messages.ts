@@ -341,13 +341,6 @@ const translations: ITranslations = {
       typeOfReservation: ["Varauksen tyyppi"],
       name: ["Varaussarjan nimi"],
       comments: ["Kommentit"],
-      reservationType: {
-        STAFF: [
-          "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
-        ],
-        NORMAL: ["Asiakkaan puolesta"],
-        BLOCKED: ["Suljettu"],
-      },
       bufferTimeBefore: ["Ennen vuoroa ({{minutes}} min)"],
       bufferTimeAfter: ["Vuoron jälkeen ({{minutes}} min)"],
       errors: {
@@ -1131,7 +1124,7 @@ const translations: ITranslations = {
       STAFF: [
         "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
       ],
-      NORMAL: ["Asiakkaan puolesta"],
+      BEHALF: ["Asiakkaan puolesta"],
       BLOCKED: ["Suljettu"],
     },
     buffers: ["Varauksen tauko"],

@@ -1542,6 +1542,9 @@ type Mutation {
   approveReservation(
     input: ReservationApproveMutationInput!
   ): ReservationApproveMutationPayload
+  refundReservation(
+    input: ReservationRefundMutationInput!
+  ): ReservationRefundMutationPayload
   requireHandlingForReservation(
     input: ReservationRequiresHandlingMutationInput!
   ): ReservationRequiresHandlingMutationPayload
@@ -1734,6 +1737,7 @@ type PaymentMerchantType implements Node {
 }
 
 type PaymentOrderType implements Node {
+  refundId: String
   paymentType: String
   status: String
   processedAt: DateTime
@@ -2005,24 +2009,25 @@ type Query {
     last: Int
     begin: DateTime
     end: DateTime
-    priceGte: Decimal
-    priceLte: Decimal
-    state: [String]
-    requested: Boolean
     onlyWithPermission: Boolean
-    user: ID
-    reservationUnitNameFi: String
-    reservationUnitNameEn: String
-    reservationUnitNameSv: String
-    unit: [ID]
-    reservationUnit: [ID]
-    reservationUnitType: [ID]
-    textSearch: String
 
     """
     PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
     """
     orderStatus: [String]
+    priceGte: Decimal
+    priceLte: Decimal
+    recurringReservation: ID
+    requested: Boolean
+    reservationUnit: [ID]
+    reservationUnitNameFi: String
+    reservationUnitNameEn: String
+    reservationUnitNameSv: String
+    reservationUnitType: [ID]
+    state: [String]
+    unit: [ID]
+    user: ID
+    textSearch: String
 
     """
     Järjestys
@@ -2835,7 +2840,7 @@ type ReservationConfirmMutationPayload {
   nonSubsidisedPriceNet: Decimal
 
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
   """
   type: String
 
@@ -2891,7 +2896,7 @@ input ReservationCreateMutationInput {
   purposePk: Int
 
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
   """
   type: String
   clientMutationId: String
@@ -2977,7 +2982,7 @@ type ReservationCreateMutationPayload {
   nonSubsidisedPriceNet: Decimal
 
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
   """
   type: String
 
@@ -3159,6 +3164,21 @@ type ReservationPurposeTypeEdge {
   cursor: String!
 }
 
+input ReservationRefundMutationInput {
+  pk: Int
+  clientMutationId: String
+}
+
+type ReservationRefundMutationPayload {
+  pk: Int
+
+  """
+  May contain more than one error for same field.
+  """
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
 input ReservationRequiresHandlingMutationInput {
   pk: Int
   clientMutationId: String
@@ -3298,7 +3318,7 @@ input ReservationStaffCreateMutationInput {
   unitPrice: Decimal
 
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
   """
   type: String!
 
@@ -3366,7 +3386,7 @@ type ReservationStaffCreateMutationPayload {
   unitPrice: Decimal
 
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
   """
   type: String
 
@@ -3783,18 +3803,18 @@ input ReservationUnitCreateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -3927,18 +3947,18 @@ type ReservationUnitCreateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -4629,18 +4649,18 @@ input ReservationUnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -4772,18 +4792,18 @@ type ReservationUnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
@@ -4847,7 +4867,7 @@ input ReservationUpdateMutationInput {
   purposePk: Int
 
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
   """
   type: String
   clientMutationId: String
@@ -4934,7 +4954,7 @@ type ReservationUpdateMutationPayload {
   nonSubsidisedPriceNet: Decimal
 
   """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF.
+  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
   """
   type: String
 
@@ -5716,12 +5736,12 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
@@ -5734,12 +5754,12 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
