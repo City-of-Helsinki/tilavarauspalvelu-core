@@ -38,3 +38,5 @@ django-prometheus
 certifi==2022.12.7 # Pinned because older version has a vulnerability: https://pyup.io/v/52365/f17/
 cryptography==39.0.2 # Pinned because older version has a vulnerability: https://pyup.io/v/53048/f17/
 django-admin-extra-buttons
+django-import-export
+django-admin-rangefilter
