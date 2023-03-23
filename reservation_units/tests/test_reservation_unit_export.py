@@ -44,8 +44,9 @@ class ReservationUnitDataExporterTestCase(TestCase):
             ),
             pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
             cancellation_rule=ReservationUnitCancellationRuleFactory(),
-            reservation_begins=datetime.datetime.now(),
-            reservation_ends=datetime.datetime.now() + datetime.timedelta(days=30),
+            reservation_begins=datetime.datetime.now(tz=get_default_timezone()),
+            reservation_ends=datetime.datetime.now(tz=get_default_timezone())
+            + datetime.timedelta(days=30),
             metadata_set=ReservationMetadataSetFactory(),
             services=ServiceFactory.create_batch(3),
             purposes=PurposeFactory.create_batch(3),
@@ -129,6 +130,8 @@ class ReservationUnitDataExporterTestCase(TestCase):
             ", ".join(
                 self.reservation_unit.equipments.all().values_list("name_fi", flat=True)
             ),
+            self.reservation_unit.state.value,
+            self.reservation_unit.reservation_state.value,
         ]
 
         self._test_first_data_line(expected_line)
@@ -160,6 +163,8 @@ class ReservationUnitDataExporterTestCase(TestCase):
             self.reservation_unit.is_draft,
             self.reservation_unit.publish_begins,
             self.reservation_unit.publish_ends,
+            self.reservation_unit.state.value,
+            self.reservation_unit.reservation_state.value,
         ]
 
         self._test_first_data_line(expected_line)
@@ -191,6 +196,8 @@ class ReservationUnitDataExporterTestCase(TestCase):
             self.reservation_unit.is_draft,
             self.reservation_unit.publish_begins,
             self.reservation_unit.publish_ends,
+            self.reservation_unit.state.value,
+            self.reservation_unit.reservation_state.value,
         ]
 
         self._test_first_data_line(expected_line)

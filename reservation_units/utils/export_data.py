@@ -135,6 +135,8 @@ class ReservationUnitExporter:
                                     "name_fi", flat=True
                                 )
                             ),
+                            reservation_unit.state.value,
+                            reservation_unit.reservation_state.value,
                         ]
                     )
 
@@ -210,5 +212,7 @@ class ReservationUnitExporter:
                 "Purposes",
                 "Require introduction",
                 "Equipments",
+                "State",
+                "Reservation state",
             ]
         )
