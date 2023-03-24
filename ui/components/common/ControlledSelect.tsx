@@ -30,13 +30,13 @@ const ControlledSelect = ({
       name={name}
       rules={{ required, validate }}
       render={({ field }) => {
-        const currentValue = getSelectedOption(field.value, options);
+        const currentValue = getSelectedOption(field.value, options) ?? {
+          label: "",
+          value: "",
+        };
         return (
           <Select
             id={name}
-            onFocus={() => {
-              document.getElementById(`${name}-toggle-button`)?.focus();
-            }}
             value={currentValue}
             placeholder={t("common:select")}
             options={options}
