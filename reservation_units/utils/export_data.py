@@ -1,6 +1,6 @@
 from csv import QUOTE_ALL, writer
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from django.conf import settings
 from django.utils import timezone
@@ -11,12 +11,14 @@ from ..models import ReservationUnit
 
 class ReservationUnitExporter:
     @classmethod
-    def export_reservation_unit_data(cls):
+    def export_reservation_unit_data(cls, queryset=None) -> Optional[Path]:
         now = timezone.now()
         root = Path(settings.BASE_DIR)
         path = root / "exports" / "reservation_unit_exports"
         path.mkdir(parents=True, exist_ok=True)
-        reservation_units: List[ReservationUnit] = list(ReservationUnit.objects.all())
+        reservation_units: List[ReservationUnit] = (
+            list(queryset) if queryset else list(ReservationUnit.objects.all())
+        )
 
         if reservation_units:
             file_name = f"reservation_units__{now.strftime('%d-%m-%Y')}.csv"
@@ -135,8 +137,11 @@ class ReservationUnitExporter:
                                     "name_fi", flat=True
                                 )
                             ),
+                            reservation_unit.state.value,
+                            reservation_unit.reservation_state.value,
                         ]
                     )
+            return path / file_name
 
     @staticmethod
     def _write_header_row(writer):
@@ -210,5 +215,7 @@ class ReservationUnitExporter:
                 "Purposes",
                 "Require introduction",
                 "Equipments",
+                "State",
+                "Reservation state",
             ]
         )
