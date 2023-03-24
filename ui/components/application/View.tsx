@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Checkbox, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
-import { get, sortBy, trim } from "lodash";
+import { sortBy, trim } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
@@ -15,8 +15,8 @@ import {
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { Query, TermsOfUseType } from "common/types/gql-types";
-import { getTranslation, localizedValue, mapOptions } from "../../modules/util";
-import { getParameters, getReservationUnit } from "../../modules/api";
+import { getTranslation, mapOptions } from "../../modules/util";
+import { getParameters } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
@@ -104,17 +104,37 @@ const Terms = styled.div`
   }
 `;
 
-const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
-  const { t, i18n } = useTranslation();
-
-  const [ready, setReady] = useState(false);
+// Page specific hook so we don't make extra REST calls
+const useViewHook = (application: Application) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetched, setIsFetched] = useState(false);
 
   const [ageGroupOptions, setAgeGroupOptions] = useState<{
     [key: number]: Parameter;
   }>({});
-  const [reservationUnits, setReservationUnits] = useState<{
-    [key: number]: { id: number };
-  }>({});
+
+  useEffect(() => {
+    async function fetchData() {
+      const fetchedAgeGroupOptions = await getParameters("age_group");
+      setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
+      setIsLoading(false);
+      setIsFetched(true);
+    }
+
+    if (!isLoading && !isFetched) {
+      setIsLoading(true);
+      fetchData();
+    }
+  }, [isLoading, isFetched, application, ageGroupOptions]);
+
+  return {
+    isLoading: isLoading || !isFetched,
+    ageGroupOptions,
+  };
+};
+
+const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
+  const { t, i18n } = useTranslation();
 
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
   const [citiesOptions, setCitiesOptions] = useState<OptionType[]>([]);
@@ -144,42 +164,16 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
     },
   });
 
-  useEffect(() => {
-    let mounted = true;
-    async function fetchData() {
-      const reservationUnitIds = Array.from(
-        new Set(
-          application.applicationEvents.flatMap(
-            (ae) => ae.eventReservationUnits
-          )
-        )
-      );
-
-      const fetchedReservationUnits = await Promise.all(
-        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnitId))
-      );
-
-      if (mounted) {
-        setReservationUnits(mapArrayById(fetchedReservationUnits));
-      }
-
-      const fetchedAgeGroupOptions = await getParameters("age_group");
-      if (mounted) {
-        setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
-        setReady(true);
-      }
-    }
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
-  }, [application]);
-
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
-  return ready ? (
+  const { isLoading, ageGroupOptions } = useViewHook(application);
+
+  if (isLoading) {
+    return null;
+  }
+
+  return (
     <>
       <Accordion
         open
@@ -272,30 +266,19 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
             </FormSubHeading>
             <UnitList>
               {sortBy(applicationEvent.eventReservationUnits, "priority").map(
-                (reservationUnit, index) => {
-                  const resUnit = get(reservationUnits, [
-                    reservationUnit.reservationUnitId,
-                  ]);
-                  return (
-                    <UnitName key={reservationUnit.reservationUnitId}>
-                      <div>{index + 1}</div>
-                      <div>
-                        {trim(
-                          `${getOldReservationUnitName(
-                            reservationUnit.reservationUnitDetails
-                          )}${
-                            resUnit &&
-                            `, ${localizedValue(
-                              get(resUnit, "unit.name"),
-                              i18n.language
-                            )}`
-                          }`,
-                          ","
-                        )}
-                      </div>
-                    </UnitName>
-                  );
-                }
+                (reservationUnit, index) => (
+                  <UnitName key={reservationUnit.reservationUnitId}>
+                    <div>{index + 1}</div>
+                    <div>
+                      {trim(
+                        `${getOldReservationUnitName(
+                          reservationUnit.reservationUnitDetails,
+                          i18n.language
+                        )}`
+                      )}
+                    </div>
+                  </UnitName>
+                )
               )}
             </UnitList>
             <FormSubHeading>
@@ -338,7 +321,7 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
         </BlackButton>
       </ButtonContainer>
     </>
-  ) : null;
+  );
 };
 
 export default ViewApplication;

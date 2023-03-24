@@ -151,18 +151,26 @@ const clearDurationErrors = (
   form.clearErrors([fieldName("minDuration"), fieldName("maxDuration")]);
 };
 
-const ApplicationEvent = ({
+const ApplicationEventInner = ({
   applicationEvent,
   index,
   applicationRound,
   form,
   selectedReservationUnits,
   optionTypes,
-  editorState,
-  dispatch,
+  del,
   onSave,
-  onDeleteEvent,
-}: Props): JSX.Element => {
+}: Omit<Props, "dispatch" | "onDeleteEvent"> & {
+  del: () => void;
+}): JSX.Element => {
+  const { t, i18n } = useTranslation();
+  const fieldName = (nameField: string) =>
+    `applicationEvents[${index}].${nameField}`;
+
+  const {
+    formState: { errors },
+  } = form;
+
   const periodStartDate = formatApiDate(
     applicationRound.reservationPeriodBegin
   );
@@ -176,15 +184,367 @@ const ApplicationEvent = ({
     unitOptions,
   } = optionTypes;
 
-  const { t, i18n } = useTranslation();
+  const applicationPeriodBegin = form.watch(fieldName("begin"));
+  const applicationPeriodEnd = form.watch(fieldName("end"));
+  const numPersons = form.watch(fieldName("numPersons"));
+  const modalRef = useRef<ModalRef>();
+
+  const selectDefaultPeriod = (): void => {
+    form.setValue(fieldName("begin"), apiDateToUIDate(periodStartDate));
+    form.setValue(fieldName("end"), apiDateToUIDate(periodEndDate));
+  };
+
+  const selectionIsDefaultPeriod =
+    applicationPeriodEnd &&
+    applicationPeriodBegin &&
+    uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
+    uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
+
+  const eventName = form.watch(fieldName("name"));
+
+  return (
+    <>
+      <SubHeadLine>
+        {t("application:Page1.basicInformationSubHeading")}
+      </SubHeadLine>
+      <TwoColumnContainer>
+        <div>
+          <TextInput
+            {...form.register(fieldName("name"), {
+              required: true,
+              maxLength: 255,
+            })}
+            label={t("application:Page1.name")}
+            id={fieldName("name")}
+            required
+            invalid={!!errors.applicationEvents?.[index]?.name?.type}
+            errorText={applicationErrorText(
+              t,
+              errors.applicationEvents?.[index]?.name?.type,
+              { count: 255 }
+            )}
+          />
+        </div>
+        <div>
+          <NumberInput
+            id={fieldName("numPersons")}
+            required
+            {...omit(
+              form.register(fieldName("numPersons"), {
+                validate: {
+                  required: (val) => Boolean(val),
+                  numPersonsMin: (val) => Number(val) > 0,
+                },
+              }),
+              ["max"]
+            )}
+            label={t("application:Page1.groupSize")}
+            min={0}
+            minusStepButtonAriaLabel={t("common:subtract")}
+            plusStepButtonAriaLabel={t("common:add")}
+            step={1}
+            errorText={applicationErrorText(
+              t,
+              errors.applicationEvents?.[index]?.numPersons?.type
+            )}
+            invalid={!!errors.applicationEvents?.[index]?.numPersons?.type}
+          />
+        </div>
+        <ControlledSelect
+          name={fieldName("ageGroupId")}
+          required
+          label={t("application:Page1.ageGroup")}
+          control={form.control}
+          options={ageGroupOptions}
+          error={applicationErrorText(
+            t,
+            errors.applicationEvents?.[index]?.ageGroupId?.type
+          )}
+        />
+        <ControlledSelect
+          name={fieldName("purposeId")}
+          required
+          label={t("application:Page1.purpose")}
+          control={form.control}
+          options={purposeOptions}
+          error={applicationErrorText(
+            t,
+            errors.applicationEvents?.[index]?.purposeId?.type
+          )}
+        />
+      </TwoColumnContainer>
+      <SubHeadLine>{t("application:Page1.spacesSubHeading")}</SubHeadLine>
+      <ReservationUnitList
+        selectedReservationUnits={selectedReservationUnits}
+        applicationEvent={applicationEvent}
+        applicationRound={applicationRound}
+        form={form}
+        fieldName={fieldName("eventReservationUnits")}
+        minSize={parseInt(numPersons, 10)}
+        options={{
+          purposeOptions,
+          reservationUnitTypeOptions,
+          participantCountOptions,
+          unitOptions,
+        }}
+      />
+      <SubHeadLine>
+        {t("application:Page1.applicationRoundSubHeading")}
+      </SubHeadLine>
+      <CheckboxWrapper>
+        <Checkbox
+          id={fieldName("defaultPeriod")}
+          checked={selectionIsDefaultPeriod}
+          label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDate(
+            applicationRound.reservationPeriodBegin
+          )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
+          onChange={() => {
+            form.clearErrors([fieldName("begin"), fieldName("end")]);
+            selectDefaultPeriod();
+          }}
+          disabled={selectionIsDefaultPeriod}
+        />
+      </CheckboxWrapper>
+      <PeriodContainer>
+        <DateInput
+          disableConfirmation
+          language={i18n.language as LocalizationLanguages}
+          {...form.register(fieldName("begin"), {
+            validate: {
+              required: (val) => Boolean(val),
+              beginAfterEnd: (val) =>
+                !after(
+                  uiDateToApiDate(
+                    form.getValues().applicationEvents?.[index]?.end
+                  ),
+                  uiDateToApiDate(val)
+                ),
+              beginBeforePeriodBegin: (val) =>
+                !before(
+                  applicationRound.reservationPeriodBegin,
+                  uiDateToApiDate(val)
+                ),
+              beginAfterPeriodEnd: (val) =>
+                !after(
+                  applicationRound.reservationPeriodEnd,
+                  uiDateToApiDate(val)
+                ),
+            },
+          })}
+          onChange={(v) => {
+            form.clearErrors([fieldName("begin"), fieldName("end")]);
+            form.setValue(fieldName("begin"), v);
+            form.trigger([fieldName("end"), fieldName("begin")]);
+          }}
+          label={t("application:Page1.periodStartDate")}
+          id={fieldName("begin")}
+          value={form.getValues(fieldName("begin"))}
+          required
+          minDate={new Date(applicationRound.reservationPeriodBegin)}
+          maxDate={new Date(applicationRound.reservationPeriodEnd)}
+          invalid={!!errors?.applicationEvents?.[index]?.begin?.type}
+          errorText={applicationErrorText(
+            t,
+            errors?.applicationEvents?.[index]?.begin?.type
+          )}
+        />
+        <DateInput
+          {...form.register(fieldName("end"), {
+            validate: {
+              required: (val) => {
+                return Boolean(val);
+              },
+              endBeforeBegin: (val) => {
+                return !before(
+                  uiDateToApiDate(
+                    form.getValues().applicationEvents?.[index]?.begin
+                  ),
+                  uiDateToApiDate(val)
+                );
+              },
+              endBeforePeriodBegin: (val) =>
+                !before(
+                  applicationRound.reservationPeriodBegin,
+                  uiDateToApiDate(val)
+                ),
+              endAfterPeriodEnd: (val) =>
+                !after(
+                  applicationRound.reservationPeriodEnd,
+                  uiDateToApiDate(val)
+                ),
+            },
+          })}
+          disableConfirmation
+          language={i18n.language as LocalizationLanguages}
+          onChange={(v) => {
+            form.clearErrors([fieldName("begin"), fieldName("end")]);
+            form.setValue(fieldName("end"), v);
+            form.trigger([fieldName("end"), fieldName("begin")]);
+          }}
+          value={form.getValues(fieldName("end"))}
+          label={t("application:Page1.periodEndDate")}
+          id={fieldName("end")}
+          required
+          minDate={new Date(applicationRound.reservationPeriodBegin)}
+          maxDate={new Date(applicationRound.reservationPeriodEnd)}
+          invalid={errors.applicationEvents?.[index]?.end?.type}
+          errorText={applicationErrorText(
+            t,
+            errors.applicationEvents?.[index]?.end?.type
+          )}
+        />
+        <ControlledSelect
+          name={fieldName("minDuration")}
+          required
+          label={t("application:Page1.minDuration")}
+          control={form.control}
+          options={getDurationOptions()}
+          error={applicationErrorText(
+            t,
+            errors.applicationEvents?.[index]?.minDuration?.type
+          )}
+          validate={{
+            required: (val: string) => {
+              clearDurationErrors(form, fieldName);
+              return val !== "00:00:00";
+            },
+            minDurationBiggerThanMaxDuration: (val: string) =>
+              apiDurationToMinutes(val) <=
+              apiDurationToMinutes(
+                form.getValues().applicationEvents?.[index]
+                  ?.maxDuration as string
+              ),
+          }}
+        />
+        <ControlledSelect
+          name={fieldName("maxDuration")}
+          required
+          label={t("application:Page1.maxDuration")}
+          control={form.control}
+          options={getDurationOptions()}
+          error={applicationErrorText(
+            t,
+            errors.applicationEvents?.[index]?.maxDuration?.type
+          )}
+          validate={{
+            required: (val: string) => {
+              clearDurationErrors(form, fieldName);
+              return val !== "00:00:00";
+            },
+            maxDurationSmallerThanMinDuration: (val: string) =>
+              apiDurationToMinutes(val) >=
+              apiDurationToMinutes(
+                form.getValues().applicationEvents?.[index]
+                  ?.minDuration as string
+              ),
+          }}
+        />
+        <NumberInput
+          id={fieldName("eventsPerWeek")}
+          required
+          {...omit(
+            form.register(fieldName("eventsPerWeek"), {
+              validate: {
+                eventsPerWeekMin: (val) => Number(val) > 0,
+              },
+            }),
+            ["max"]
+          )}
+          label={t("application:Page1.eventsPerWeek")}
+          min={1}
+          minusStepButtonAriaLabel={t("common:subtract")}
+          plusStepButtonAriaLabel={t("common:add")}
+          step={1}
+          invalid={!!errors.applicationEvents?.[index]?.eventsPerWeek?.type}
+          errorText={applicationErrorText(
+            t,
+            errors.applicationEvents?.[index]?.eventsPerWeek?.type
+          )}
+        />
+        <Controller
+          control={form.control}
+          name={fieldName("biweekly")}
+          // render={(props) => {
+          //   return (
+          //     <CheckboxWrapper>
+          //       <Checkbox
+          //         {...props}
+          //         id={fieldName("biweekly")}
+          //         checked={props.value}
+          //         onChange={() => props.onChange(!props.value)}
+          //         label={t("application:Page1.biweekly")}
+          //       />
+          //     </CheckboxWrapper>
+          //   );
+          // }}
+          render={() => {
+            return (
+              <input
+                type="hidden"
+                id={fieldName("biweekly")}
+                name={fieldName("biweekly")}
+                value=""
+              />
+            );
+          }}
+        />
+      </PeriodContainer>
+      <ApplicationEventSummary
+        applicationEvent={getApplicationEventData(
+          applicationEvent,
+          (form.getValues() as Application).applicationEvents?.[index]
+        )}
+        name={eventName}
+      />
+      <ActionContainer>
+        <Button
+          type="button"
+          variant="secondary"
+          id={`applicationEvents[${index}].delete`}
+          onClick={() => {
+            modalRef?.current?.open();
+          }}
+        >
+          {t("application:Page1.deleteEvent")}
+        </Button>
+        <Button
+          type="submit"
+          id={`applicationEvents[${index}].save`}
+          onClick={onSave}
+        >
+          {t("application:Page1.saveEvent")}
+        </Button>
+        <ConfirmationModal
+          id="application-event-confirmation"
+          okLabel="application:Page1.deleteEvent"
+          cancelLabel="application:Page1.deleteEventCancel"
+          heading={t("application:Page1.deleteEventHeading")}
+          content={t("application:Page1.deleteEventContent")}
+          onOk={del}
+          ref={modalRef}
+          type="confirm"
+        />
+      </ActionContainer>
+    </>
+  );
+};
+
+const ApplicationEvent = (props: Props): JSX.Element => {
+  const {
+    applicationEvent,
+    index,
+    form,
+    editorState,
+    dispatch,
+    onDeleteEvent,
+  } = props;
+
+  const { t } = useTranslation();
 
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
 
-  const {
-    register,
-    formState: { errors },
-  } = form;
+  const { register } = form;
 
   register(fieldName("eventReservationUnits"));
   register(fieldName("begin"));
@@ -196,368 +556,33 @@ const ApplicationEvent = ({
   register(fieldName("biweekly"));
 
   const eventName = form.watch(fieldName("name"));
-  const applicationPeriodBegin = form.watch(fieldName("begin"));
-  const applicationPeriodEnd = form.watch(fieldName("end"));
-  const numPersons = form.watch(fieldName("numPersons"));
   form.watch(fieldName("eventsPerWeek"));
   form.watch(fieldName("biweekly"));
 
-  const modalRef = useRef<ModalRef>();
-
-  const selectDefaultPeriod = (): void => {
-    form.setValue(fieldName("begin"), apiDateToUIDate(periodStartDate));
-    form.setValue(fieldName("end"), apiDateToUIDate(periodEndDate));
-  };
-
   const del = () => {
     if (!applicationEvent.id) {
-      // freshly created event can just be deleted
       dispatch({ type: "removeApplicationEvent", eventId: undefined });
     } else {
       onDeleteEvent();
     }
   };
 
-  const selectionIsDefaultPeriod =
-    applicationPeriodEnd &&
-    applicationPeriodBegin &&
-    uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
-    uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
-
+  const isVisible = isOpen(applicationEvent.id, editorState.accordionStates);
   return (
     <Wrapper>
       <Accordion
-        onToggle={() =>
+        onToggle={() => {
           dispatch({
             type: "toggleAccordionState",
             eventId: applicationEvent.id,
-          })
-        }
-        open={isOpen(applicationEvent.id, editorState.accordionStates)}
+          });
+        }}
+        open={isVisible}
         heading={`${eventName}` || t("application:Page1.applicationEventName")}
         theme="thin"
       >
-        <SubHeadLine>
-          {t("application:Page1.basicInformationSubHeading")}
-        </SubHeadLine>
-        <TwoColumnContainer>
-          <div>
-            <TextInput
-              {...form.register(fieldName("name"), {
-                required: true,
-                maxLength: 255,
-              })}
-              label={t("application:Page1.name")}
-              id={fieldName("name")}
-              required
-              invalid={!!errors.applicationEvents?.[index]?.name?.type}
-              errorText={applicationErrorText(
-                t,
-                errors.applicationEvents?.[index]?.name?.type,
-                { count: 255 }
-              )}
-            />
-          </div>
-          <div>
-            <NumberInput
-              id={fieldName("numPersons")}
-              required
-              {...omit(
-                form.register(fieldName("numPersons"), {
-                  validate: {
-                    required: (val) => Boolean(val),
-                    numPersonsMin: (val) => Number(val) > 0,
-                  },
-                }),
-                ["max"]
-              )}
-              label={t("application:Page1.groupSize")}
-              min={0}
-              minusStepButtonAriaLabel={t("common:subtract")}
-              plusStepButtonAriaLabel={t("common:add")}
-              step={1}
-              errorText={applicationErrorText(
-                t,
-                errors.applicationEvents?.[index]?.numPersons?.type
-              )}
-              invalid={!!errors.applicationEvents?.[index]?.numPersons?.type}
-            />
-          </div>
-          <ControlledSelect
-            name={fieldName("ageGroupId")}
-            required
-            label={t("application:Page1.ageGroup")}
-            control={form.control}
-            options={ageGroupOptions}
-            error={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.ageGroupId?.type
-            )}
-          />
-          <ControlledSelect
-            name={fieldName("purposeId")}
-            required
-            label={t("application:Page1.purpose")}
-            control={form.control}
-            options={purposeOptions}
-            error={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.purposeId?.type
-            )}
-          />
-        </TwoColumnContainer>
-        <SubHeadLine>{t("application:Page1.spacesSubHeading")}</SubHeadLine>
-        <ReservationUnitList
-          selectedReservationUnits={selectedReservationUnits}
-          applicationEvent={applicationEvent}
-          applicationRound={applicationRound}
-          form={form}
-          fieldName={fieldName("eventReservationUnits")}
-          minSize={parseInt(numPersons, 10)}
-          options={{
-            purposeOptions,
-            reservationUnitTypeOptions,
-            participantCountOptions,
-            unitOptions,
-          }}
-        />
-        <SubHeadLine>
-          {t("application:Page1.applicationRoundSubHeading")}
-        </SubHeadLine>
-        <CheckboxWrapper>
-          <Checkbox
-            id={fieldName("defaultPeriod")}
-            checked={selectionIsDefaultPeriod}
-            label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDate(
-              applicationRound.reservationPeriodBegin
-            )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
-            onChange={() => {
-              form.clearErrors([fieldName("begin"), fieldName("end")]);
-              selectDefaultPeriod();
-            }}
-            disabled={selectionIsDefaultPeriod}
-          />
-        </CheckboxWrapper>
-        <PeriodContainer>
-          <DateInput
-            disableConfirmation
-            language={i18n.language as LocalizationLanguages}
-            {...form.register(fieldName("begin"), {
-              validate: {
-                required: (val) => Boolean(val),
-                beginAfterEnd: (val) =>
-                  !after(
-                    uiDateToApiDate(
-                      form.getValues().applicationEvents?.[index]?.end
-                    ),
-                    uiDateToApiDate(val)
-                  ),
-                beginBeforePeriodBegin: (val) =>
-                  !before(
-                    applicationRound.reservationPeriodBegin,
-                    uiDateToApiDate(val)
-                  ),
-                beginAfterPeriodEnd: (val) =>
-                  !after(
-                    applicationRound.reservationPeriodEnd,
-                    uiDateToApiDate(val)
-                  ),
-              },
-            })}
-            onChange={(v) => {
-              form.clearErrors([fieldName("begin"), fieldName("end")]);
-              form.setValue(fieldName("begin"), v);
-              form.trigger([fieldName("end"), fieldName("begin")]);
-            }}
-            label={t("application:Page1.periodStartDate")}
-            id={fieldName("begin")}
-            value={form.getValues(fieldName("begin"))}
-            required
-            minDate={new Date(applicationRound.reservationPeriodBegin)}
-            maxDate={new Date(applicationRound.reservationPeriodEnd)}
-            invalid={!!errors?.applicationEvents?.[index]?.begin?.type}
-            errorText={applicationErrorText(
-              t,
-              errors?.applicationEvents?.[index]?.begin?.type
-            )}
-          />
-          <DateInput
-            {...form.register(fieldName("end"), {
-              validate: {
-                required: (val) => {
-                  return Boolean(val);
-                },
-                endBeforeBegin: (val) => {
-                  return !before(
-                    uiDateToApiDate(
-                      form.getValues().applicationEvents?.[index]?.begin
-                    ),
-                    uiDateToApiDate(val)
-                  );
-                },
-                endBeforePeriodBegin: (val) =>
-                  !before(
-                    applicationRound.reservationPeriodBegin,
-                    uiDateToApiDate(val)
-                  ),
-                endAfterPeriodEnd: (val) =>
-                  !after(
-                    applicationRound.reservationPeriodEnd,
-                    uiDateToApiDate(val)
-                  ),
-              },
-            })}
-            disableConfirmation
-            language={i18n.language as LocalizationLanguages}
-            onChange={(v) => {
-              form.clearErrors([fieldName("begin"), fieldName("end")]);
-              form.setValue(fieldName("end"), v);
-              form.trigger([fieldName("end"), fieldName("begin")]);
-            }}
-            value={form.getValues(fieldName("end"))}
-            label={t("application:Page1.periodEndDate")}
-            id={fieldName("end")}
-            required
-            minDate={new Date(applicationRound.reservationPeriodBegin)}
-            maxDate={new Date(applicationRound.reservationPeriodEnd)}
-            invalid={errors.applicationEvents?.[index]?.end?.type}
-            errorText={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.end?.type
-            )}
-          />
-          <ControlledSelect
-            name={fieldName("minDuration")}
-            required
-            label={t("application:Page1.minDuration")}
-            control={form.control}
-            options={getDurationOptions()}
-            error={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.minDuration?.type
-            )}
-            validate={{
-              required: (val: string) => {
-                clearDurationErrors(form, fieldName);
-                return val !== "00:00:00";
-              },
-              minDurationBiggerThanMaxDuration: (val: string) =>
-                apiDurationToMinutes(val) <=
-                apiDurationToMinutes(
-                  form.getValues().applicationEvents?.[index]
-                    ?.maxDuration as string
-                ),
-            }}
-          />
-          <ControlledSelect
-            name={fieldName("maxDuration")}
-            required
-            label={t("application:Page1.maxDuration")}
-            control={form.control}
-            options={getDurationOptions()}
-            error={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.maxDuration?.type
-            )}
-            validate={{
-              required: (val: string) => {
-                clearDurationErrors(form, fieldName);
-                return val !== "00:00:00";
-              },
-              maxDurationSmallerThanMinDuration: (val: string) =>
-                apiDurationToMinutes(val) >=
-                apiDurationToMinutes(
-                  form.getValues().applicationEvents?.[index]
-                    ?.minDuration as string
-                ),
-            }}
-          />
-          <NumberInput
-            id={fieldName("eventsPerWeek")}
-            required
-            {...omit(
-              form.register(fieldName("eventsPerWeek"), {
-                validate: {
-                  eventsPerWeekMin: (val) => Number(val) > 0,
-                },
-              }),
-              ["max"]
-            )}
-            label={t("application:Page1.eventsPerWeek")}
-            min={1}
-            minusStepButtonAriaLabel={t("common:subtract")}
-            plusStepButtonAriaLabel={t("common:add")}
-            step={1}
-            invalid={!!errors.applicationEvents?.[index]?.eventsPerWeek?.type}
-            errorText={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.eventsPerWeek?.type
-            )}
-          />
-          <Controller
-            control={form.control}
-            name={fieldName("biweekly")}
-            // render={(props) => {
-            //   return (
-            //     <CheckboxWrapper>
-            //       <Checkbox
-            //         {...props}
-            //         id={fieldName("biweekly")}
-            //         checked={props.value}
-            //         onChange={() => props.onChange(!props.value)}
-            //         label={t("application:Page1.biweekly")}
-            //       />
-            //     </CheckboxWrapper>
-            //   );
-            // }}
-            render={() => {
-              return (
-                <input
-                  type="hidden"
-                  id={fieldName("biweekly")}
-                  name={fieldName("biweekly")}
-                  value=""
-                />
-              );
-            }}
-          />
-        </PeriodContainer>
-        <ApplicationEventSummary
-          applicationEvent={getApplicationEventData(
-            applicationEvent,
-            (form.getValues() as Application).applicationEvents?.[index]
-          )}
-          name={eventName}
-        />
-        <ActionContainer>
-          <Button
-            type="button"
-            variant="secondary"
-            id={`applicationEvents[${index}].delete`}
-            onClick={() => {
-              modalRef?.current?.open();
-            }}
-          >
-            {t("application:Page1.deleteEvent")}
-          </Button>
-          <Button
-            type="submit"
-            id={`applicationEvents[${index}].save`}
-            onClick={onSave}
-          >
-            {t("application:Page1.saveEvent")}
-          </Button>
-          <ConfirmationModal
-            id="application-event-confirmation"
-            okLabel="application:Page1.deleteEvent"
-            cancelLabel="application:Page1.deleteEventCancel"
-            heading={t("application:Page1.deleteEventHeading")}
-            content={t("application:Page1.deleteEventContent")}
-            onOk={del}
-            ref={modalRef}
-            type="confirm"
-          />
-        </ActionContainer>
+        {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
+        {isVisible && <ApplicationEventInner {...props} del={del} />}
       </Accordion>
       {editorState.savedEventId &&
       editorState.savedEventId === applicationEvent.id ? (

@@ -54,6 +54,58 @@ type OptionTypes = {
   participantCountOptions: OptionType[];
 };
 
+const useOptions = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [options, setOptions] = useState<OptionTypes | null>(null);
+
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    async function fetchData() {
+      const [
+        fetchedAbilityGroupOptions,
+        fetchedAgeGroupOptions,
+        fetchedReservationUnitType,
+      ] = await Promise.all([
+        getParameters("ability_group"),
+        getParameters("age_group"),
+        getParameters("reservation_unit_type"),
+      ]);
+
+      setOptions({
+        ageGroupOptions: mapOptions(
+          sortAgeGroups(fetchedAgeGroupOptions),
+          undefined,
+          i18n.language
+        ),
+        abilityGroupOptions: mapOptions(
+          fetchedAbilityGroupOptions,
+          undefined,
+          i18n.language
+        ),
+        reservationUnitTypeOptions: mapOptions(
+          fetchedReservationUnitType,
+          undefined,
+          i18n.language
+        ),
+        participantCountOptions,
+      });
+      setIsLoading(false);
+    }
+
+    if (!isLoading && !options) {
+      setIsLoading(true);
+      fetchData();
+    }
+  }, [isLoading, i18n.language, options]);
+
+  return {
+    isLoading: !options && isLoading,
+    options,
+    refetch: () => setIsLoading(false),
+  };
+};
+
 const Page1 = ({
   save,
   addNewApplicationEvent,
@@ -63,15 +115,12 @@ const Page1 = ({
   selectedReservationUnits,
   setError,
 }: Props): JSX.Element | null => {
-  const [ready, setReady] = useState(false);
-  const [options, setOptions] = useState<OptionTypes>();
-
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
   const [unitOptions, setUnitOptions] = useState<OptionType[]>([]);
 
   const history = useRouter();
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const { application } = editorState;
 
@@ -107,48 +156,14 @@ const Page1 = ({
     mode: "onChange",
     defaultValues: {
       applicationEvents: application.applicationEvents,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as Record<string, any>,
+    },
   });
 
   const {
     formState: { errors },
   } = form;
 
-  useEffect(() => {
-    async function fetchData() {
-      const [
-        fetchedAbilityGroupOptions,
-        fetchedAgeGroupOptions,
-        fetchedReservationUnitType,
-      ] = await Promise.all([
-        getParameters("ability_group"),
-        getParameters("age_group"),
-        getParameters("reservation_unit_type"),
-      ]);
-
-      setOptions({
-        ageGroupOptions: mapOptions(
-          sortAgeGroups(fetchedAgeGroupOptions),
-          undefined,
-          i18n.language
-        ),
-        abilityGroupOptions: mapOptions(
-          fetchedAbilityGroupOptions,
-          undefined,
-          i18n.language
-        ),
-        reservationUnitTypeOptions: mapOptions(
-          fetchedReservationUnitType,
-          undefined,
-          i18n.language
-        ),
-        participantCountOptions,
-      });
-      setReady(true);
-    }
-    fetchData();
-  }, [i18n.language]);
+  const { isLoading, options } = useOptions();
 
   const prepareData = (data: Application): Application => {
     const applicationCopy = {
@@ -167,7 +182,7 @@ const Page1 = ({
     const appToSave = {
       ...prepareData(data),
       // override status in order to validate correctly when modifying existing application
-      status: "draft" as ApplicationStatus,
+      status: "draft" as const,
     };
     if (appToSave.applicationEvents.length === 0) {
       setError(t("application:error.noEvents"));
@@ -183,6 +198,8 @@ const Page1 = ({
       return;
     }
 
+    // TODO this breaks the form submission state i.e. form.isSubmitting returns false
+    // even though the form is being saved. Too scared to change though.
     form.reset({ applicationEvents: appToSave.applicationEvents });
     save({ application: appToSave, eventId });
   };
@@ -217,10 +234,9 @@ const Page1 = ({
     }
   };
 
-  if (!ready) {
+  if (isLoading || !options) {
     return <CenterSpinner />;
   }
-
   const addNewEventButtonDisabled =
     application.applicationEvents.filter((ae) => !ae.id).length > 0;
 
