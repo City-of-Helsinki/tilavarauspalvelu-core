@@ -370,8 +370,12 @@ const translations: ITranslations = {
         "End time has to be increment of 15 minutes.": [
           "Loppumisajan pitää olla 15 minuutin välein.",
         ],
-        "Start time is not in time format.": ["Aloitusaika ei ole aika."],
-        "End time is not in time format.": ["Loppumisaika ei ole aika."],
+        "Start time is not in time format.": [
+          "Aloitusaika tulee olla muodossa tt:mm",
+        ],
+        "End time is not in time format.": [
+          "Loppumisaika tulee olla muodossa tt:mm",
+        ],
         "Start date can't be in the past": ["Aloituspäivä menneisyydessä."],
         "End time needs to be after start time.": [
           "Loppumisajan pitää olla aloitusajan jälkeen.",

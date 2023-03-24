@@ -84,7 +84,7 @@ const MyUnitRecurringReservationForm = ({
     control,
     register,
     watch,
-    formState: { errors, isSubmitting, dirtyFields },
+    formState: { errors, isSubmitting, dirtyFields, isSubmitted },
   } = form;
 
   const selectedReservationUnit = watch("reservationUnit");
@@ -295,13 +295,12 @@ const MyUnitRecurringReservationForm = ({
   const getZodError = (
     field: "startingDate" | "endingDate" | "startingTime" | "endingTime"
   ) =>
-    dirtyFields[field] && !newReservations?.success
+    (isSubmitted || dirtyFields[field]) && !newReservations?.success
       ? String(
           translateError(
             newReservations.error.issues
               .filter((x) => x.path.includes(field))
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              .find((_) => true)?.message
+              .find(() => true)?.message
           )
         )
       : "";
