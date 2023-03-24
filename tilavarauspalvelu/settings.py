@@ -181,6 +181,7 @@ env = environ.Env(
     TUNNISTAMO_ADMIN_KEY=(str, "tilavaraus-django-admin-dev"),
     TUNNISTAMO_ADMIN_SECRET=(str, None),
     TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://tunnistamo.test.hel.ninja/openid"),
+    OIDC_LEEWAY=(int, 60 * 60),
     IPWARE_META_PRECEDENCE_ORDER=(str, "HTTP_X_FORWARDED_FOR"),
     HAUKI_API_URL=(str, None),
     HAUKI_ADMIN_UI_URL=(str, None),
@@ -458,6 +459,8 @@ OIDC_API_TOKEN_AUTH = {
     # Use a custom resolve user for fetching date of birth.
     "USER_RESOLVER": "users.utils.open_city_profile.resolve_user",
 }
+
+OIDC_AUTH = {"OIDC_LEEWAY": env("OIDC_LEEWAY")}
 
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
