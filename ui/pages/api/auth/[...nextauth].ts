@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { NextAuthOptions, Session, Awaitable, User } from "next-auth";
@@ -123,6 +124,11 @@ const getApiAccessTokens = async (accessToken: string | undefined) => {
   return [apiAccessToken, profileApiAccessToken];
 };
 
+// Tunnistamo tokens are valid for 10 minutes
+// Half the expire time so leaving the browser inactive for 5 minutes at the tail end of 9 min session
+// doesn't cut the session.
+const EXP_MS = (10 / 2) * 60 * 1000;
+
 const refreshAccessToken = async (token: ExtendedJWT) => {
   try {
     const response = await axios.request({
@@ -140,21 +146,39 @@ const refreshAccessToken = async (token: ExtendedJWT) => {
       },
     });
 
-    const { data } = response;
+    const { data }: { data: unknown } = response;
 
     if (!data) {
       throw new Error("Unable to refresh tokens");
     }
 
+    if (typeof data !== "object") {
+      throw new Error("RefreshToken req.data is NOT an object");
+    }
+    const { access_token, expires_in, refresh_token } = data as Record<
+      string,
+      unknown
+    >;
+
+    if (!access_token || typeof access_token !== "string") {
+      throw new Error("RefreshToken req.data contains NO access_token");
+    }
+    if (!expires_in || typeof expires_in !== "number") {
+      throw new Error("RefreshToken req.data contains contains NO expires_in");
+    }
+    if (!refresh_token || typeof refresh_token !== "string") {
+      throw new Error("RefreshToken req.data contains NO refresh_token");
+    }
     const [tilavarausAPIToken, profileAPIToken] = await getApiAccessTokens(
-      data.access_token
+      access_token
     );
 
     return {
       ...token,
-      accessToken: data.access_token,
-      accessTokenExpires: Date.now() + data.expires_in * 1000,
-      refreshToken: data.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+      accessToken: access_token,
+      // HACK to deal with incorrect exp value
+      accessTokenExpires: Date.now() + EXP_MS, // account.expires_at * 1000,
+      refreshToken: refresh_token ?? token.refreshToken, // Fall back to old refresh token
       apiTokens: {
         tilavaraus: tilavarausAPIToken,
         profile: profileAPIToken,
@@ -215,7 +239,8 @@ const options = (): NextAuthOptions => {
             await getApiAccessTokens(account.access_token);
           return {
             accessToken: account.access_token,
-            accessTokenExpires: account.expires_at * 1000,
+            // HACK to deal with incorrect exp value
+            accessTokenExpires: Date.now() + EXP_MS, // account.expires_at * 1000,
             refreshToken: account.refresh_token,
             user,
             apiTokens: {
