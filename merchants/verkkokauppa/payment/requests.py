@@ -48,18 +48,13 @@ def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
             metric.response_status = response.status_code
 
         json = response.json()
+        errors = json.get("errors", [])
 
-        # Endpoint returns 200 with empty body is payment does not exists
-        # TODO: This will change to 500 with the following body:
-        # {
-        #     "errors": [
-        #         {
-        #             "code": "failed-to-get-payment-for-order",
-        #             "message": "Failed to get payment for order"
-        #         }
-        #     ]
-        # }
-        if response.status_code == 200 and json == {}:
+        if (
+            response.status_code == 500
+            and errors
+            and errors[0].get("code") == "failed-to-get-payment-for-order"
+        ):
             return None
 
         if response.status_code != 200:

@@ -58,6 +58,22 @@ class GetPaymentRequestsTestCase(TestCase):
         expected = Payment.from_json(self.get_payment_response)
         assert_that(payment).is_equal_to(expected)
 
+    def test_get_payment_returns_none_when_payment_is_missing(self):
+        error_response = {
+            "errors": [
+                {
+                    "code": "failed-to-get-payment-for-order",
+                    "message": "Failed to get payment for order",
+                }
+            ]
+        }
+        order_id = UUID(self.get_payment_response["orderId"])
+        namespace = self.get_payment_response["namespace"]
+        payment = get_payment(
+            order_id, namespace, mock_get(error_response, status_code=500)
+        )
+        assert_that(payment).is_none()
+
     def test_get_payment_raises_exception_if_key_is_missing(self):
         response = self.get_payment_response.copy()
         order_id = UUID(response.pop("orderId"))
