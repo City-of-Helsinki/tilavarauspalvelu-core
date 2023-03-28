@@ -24,6 +24,7 @@ from api.graphql.spaces.space_types import LocationType, SpaceType
 from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.graphql.units.unit_types import UnitType
+from applications.models import ApplicationRound
 from opening_hours.hauki_link_generator import generate_hauki_link
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
@@ -63,6 +64,8 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
 from reservations.models import Reservation
+from spaces.models import Space
+from utils.query_performance import QueryPerformanceOptimizerMixin
 
 
 def get_payment_type_codes() -> List[str]:
@@ -397,7 +400,10 @@ class ReservationUnitWithReservationsMixin:
 
 
 class ReservationUnitType(
-    AuthNode, PrimaryKeyObjectType, ReservationUnitWithReservationsMixin
+    QueryPerformanceOptimizerMixin,
+    AuthNode,
+    PrimaryKeyObjectType,
+    ReservationUnitWithReservationsMixin,
 ):
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
@@ -498,6 +504,50 @@ class ReservationUnitType(
 
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+    class QueryOptimization:
+        field_name = "reservationUnit"
+        query_optimization = {
+            "spaces": (
+                "prefetch",
+                {
+                    "field_name": "spaces",
+                    "base_queryset": Space.objects.all().select_related("location"),
+                    "child_optimizations": {
+                        "resource_set": ("prefetch", "resources"),
+                    },
+                },
+            ),
+            "resources": ("prefetch", "resources"),
+            "services": ("prefetch", "services"),
+            "purposes": ("prefetch", "purposes"),
+            "qualifiers": ("prefetch", "qualifiers"),
+            "images": ("prefetch", "images"),
+            "location": ("select", "location"),
+            "reservation_unit_type": ("select", "reservation_unit_type"),
+            "equipment": ("prefetch", "equipment"),
+            "unit": ("select", "unit"),
+            "keyword_groups": ("prefetch", "keyword_groups"),
+            "application_rounds": (
+                "prefetch",
+                {
+                    "field_name": "application_rounds",
+                    "base_queryset": ApplicationRound.objects.all(),
+                    "child_optimizations": {
+                        "purposes": ("prefetch", "purposes"),
+                        "serviceSector": ("select", "service_sector"),
+                        "applicationRoundBaskets": (
+                            "prefetch",
+                            "application_round_baskets",
+                        ),
+                    },
+                },
+            ),
+            "metadata_set": ("select", "metadata_set"),
+            "payment_types": ("prefetch", "payment_types"),
+            "payment_merchant": ("select", "payment_merchant"),
+            "payment_product": ("select", "payment_product"),
+        }
 
     def resolve_location(self, info):
         return self.get_location()
