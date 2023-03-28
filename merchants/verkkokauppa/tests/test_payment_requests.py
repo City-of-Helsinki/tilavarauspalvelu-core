@@ -18,50 +18,82 @@ from ..payment.types import Payment, Refund
 from .mocks import mock_get, mock_post
 
 
-def test_get_payment_makes_valid_request(get_payment_response):
-    order_id = UUID(get_payment_response["orderId"])
-    namespace = get_payment_response["namespace"]
-    get = mock_get(get_payment_response)
-    get_payment(order_id, namespace, get)
-    get.assert_called_with(
-        url=urljoin(settings.VERKKOKAUPPA_PAYMENT_API_URL, f"admin/{order_id}"),
-        headers={
-            "api-key": settings.VERKKOKAUPPA_API_KEY,
-            "namespace": get_payment_response["namespace"],
-        },
-        timeout=REQUEST_TIMEOUT_SECONDS,
-    )
+class GetPaymentRequestsTestCase(TestCase):
+    get_payment_response: Dict[str, Any] = {
+        "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
+        "namespace": "tilavarauspalvelu",
+        "orderId": "08c2d282-eb98-3271-a3fc-81fe200f129b",
+        "userId": "Esperanza_Daniel23",
+        "status": "payment_created",
+        "paymentMethod": "nordea",
+        "paymentType": "order",
+        "totalExclTax": 100,
+        "total": 124,
+        "taxAmount": 24,
+        "description": "Test description",
+        "additionalInfo": '{"payment_method": nordea}',
+        "token": "354477a1a009a1514fa3cc1132179a60163f5650aaf27ec98bb98158b04e0a63",
+        "timestamp": "20211115-122645",
+        "paymentMethodLabel": "Nordea",
+    }
 
+    def test_get_payment_makes_valid_request(self):
+        order_id = UUID(self.get_payment_response["orderId"])
+        namespace = self.get_payment_response["namespace"]
+        get = mock_get(self.get_payment_response)
+        get_payment(order_id, namespace, get)
+        get.assert_called_with(
+            url=urljoin(settings.VERKKOKAUPPA_PAYMENT_API_URL, f"admin/{order_id}"),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "namespace": self.get_payment_response["namespace"],
+            },
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
 
-def test_get_payment_returns_payment(get_payment_response):
-    order_id = UUID(get_payment_response["orderId"])
-    namespace = get_payment_response["namespace"]
-    payment = get_payment(order_id, namespace, mock_get(get_payment_response))
-    expected = Payment.from_json(get_payment_response)
-    assert_that(payment).is_equal_to(expected)
+    def test_get_payment_returns_payment(self):
+        order_id = UUID(self.get_payment_response["orderId"])
+        namespace = self.get_payment_response["namespace"]
+        payment = get_payment(order_id, namespace, mock_get(self.get_payment_response))
+        expected = Payment.from_json(self.get_payment_response)
+        assert_that(payment).is_equal_to(expected)
 
+    def test_get_payment_returns_none_when_payment_is_missing(self):
+        error_response = {
+            "errors": [
+                {
+                    "code": "failed-to-get-payment-for-order",
+                    "message": "Failed to get payment for order",
+                }
+            ]
+        }
+        order_id = UUID(self.get_payment_response["orderId"])
+        namespace = self.get_payment_response["namespace"]
+        payment = get_payment(
+            order_id, namespace, mock_get(error_response, status_code=500)
+        )
+        assert_that(payment).is_none()
 
-def test_get_payment_raises_exception_if_key_is_missing(get_payment_response):
-    order_id = UUID(get_payment_response.pop("orderId"))
-    namespace = get_payment_response["namespace"]
-    with raises(GetPaymentError):
-        get_payment(order_id, namespace, mock_get(get_payment_response))
+    def test_get_payment_raises_exception_if_key_is_missing(self):
+        response = self.get_payment_response.copy()
+        order_id = UUID(response.pop("orderId"))
+        namespace = self.get_payment_response["namespace"]
+        with raises(GetPaymentError):
+            get_payment(order_id, namespace, mock_get(response))
 
+    def test_get_payment_raises_exception_if_value_is_invalid(self):
+        response = self.get_payment_response.copy()
+        order_id = UUID(response["orderId"])
+        response["orderId"] = "invalid-id"
+        namespace = response["namespace"]
+        with raises(GetPaymentError):
+            get_payment(order_id, namespace, mock_get(response))
 
-def test_get_payment_raises_exception_if_value_is_invalid(get_payment_response):
-    order_id = UUID(get_payment_response["orderId"])
-    get_payment_response["orderId"] = "invalid-id"
-    namespace = get_payment_response["namespace"]
-    with raises(GetPaymentError):
-        get_payment(order_id, namespace, mock_get(get_payment_response))
-
-
-def test_get_payment_raises_exception_on_timeout(get_payment_response):
-    order_id = UUID(get_payment_response["orderId"])
-    get_payment_response["orderId"] = "invalid-id"
-    namespace = get_payment_response["namespace"]
-    with raises(GetPaymentError):
-        get_payment(order_id, namespace, Mock(side_effect=Timeout()))
+    def test_get_payment_raises_exception_on_timeout(self):
+        order_id = UUID(self.get_payment_response["orderId"])
+        namespace = self.get_payment_response["namespace"]
+        with raises(GetPaymentError):
+            get_payment(order_id, namespace, Mock(side_effect=Timeout()))
 
 
 class RefundPaymentRequestsTestCase(TestCase):
