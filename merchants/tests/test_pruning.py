@@ -98,6 +98,27 @@ class UpdateExpiredOrderTestCase(TestCase):
         order.refresh_from_db()
         assert_that(order.status).is_equal_to(OrderStatus.EXPIRED)
 
+    @mock.patch("merchants.pruning.cancel_order")
+    @mock.patch("merchants.pruning.get_payment")
+    def test_handle_missing_payment(self, mock_get_payment, mock_cancel_order):
+        mock_get_payment.return_value = None
+
+        six_minutes_ago = datetime.now() - timedelta(minutes=6)
+        order = PaymentOrderFactory.create(
+            status=OrderStatus.DRAFT,
+            created_at=six_minutes_ago,
+            reservation=self.reservation,
+            remote_id=uuid4(),
+        )
+
+        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=TIMEZONE)):
+            update_expired_orders(5)
+
+        assert_that(mock_cancel_order.called).is_true()
+
+        order.refresh_from_db()
+        assert_that(order.status).is_equal_to(OrderStatus.EXPIRED)
+
     @mock.patch("merchants.pruning.capture_exception")
     @mock.patch("merchants.pruning.get_payment")
     def test_get_payment_errors_are_logged(

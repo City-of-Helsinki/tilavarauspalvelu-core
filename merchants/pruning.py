@@ -28,10 +28,10 @@ def update_expired_orders(older_than_minutes: int) -> None:
     for order in expired_orders:
         try:
             result = get_payment(order.remote_id, settings.VERKKOKAUPPA_NAMESPACE)
-            if result.status == WebShopPaymentStatus.CANCELLED:
+            if result and result.status == WebShopPaymentStatus.CANCELLED:
                 order.status = OrderStatus.CANCELLED
 
-            elif result.status == WebShopPaymentStatus.PAID_ONLINE:
+            elif result and result.status == WebShopPaymentStatus.PAID_ONLINE:
                 order.status = OrderStatus.PAID
             else:
                 order.status = OrderStatus.EXPIRED
