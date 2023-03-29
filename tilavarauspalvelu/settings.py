@@ -575,15 +575,6 @@ if CELERY_FILESYSTEM_BACKEND:
     }
 
 
-# local_settings.py can be used to override environment-specific settings
-# like database and email that differ between development and production.
-local_settings_path = os.path.join(BASE_DIR, "local_settings.py")
-if os.path.exists(local_settings_path):
-    with open(local_settings_path) as fp:
-        code = compile(fp.read(), local_settings_path, "exec")
-    exec(code, globals(), locals())  # nosec
-
-
 if not all(
     [
         OIDC_API_TOKEN_AUTH["AUDIENCE"],
@@ -610,3 +601,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
 OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES = env("OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES")
 PREFILL_RESERVATION_WITH_PROFILE_DATA = env("PREFILL_RESERVATION_WITH_PROFILE_DATA")
+
+
+# local_settings.py can be used to override environment-specific settings
+# like database and email that differ between development and production.
+local_settings_path = os.path.join(BASE_DIR, "local_settings.py")
+if os.path.exists(local_settings_path):
+    with open(local_settings_path) as fp:
+        code = compile(fp.read(), local_settings_path, "exec")
+    exec(code, globals(), locals())  # nosec
