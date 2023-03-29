@@ -192,7 +192,10 @@ class CreateOrderParams:
             "namespace": self.namespace,
             "user": str(self.user),
             "language": self.language,
-            "lastValidPurchaseDateTime": self.last_valid_purchase_datetime.isoformat(),
+            # Order Experience API does not support standard ISO 8601 format with UTC offset
+            "lastValidPurchaseDateTime": self.last_valid_purchase_datetime.strftime(
+                "%Y-%m-%dT%H:%M:%S"
+            ),
             "items": [
                 {
                     "productId": str(item.product_id),
