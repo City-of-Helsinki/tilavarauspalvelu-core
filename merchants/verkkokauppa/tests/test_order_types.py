@@ -130,7 +130,7 @@ class OrderTypesTestCase(TestCase):
                 "namespace": "test-namespace",
                 "user": "test-user",
                 "language": "fi",
-                "lastValidPurchaseDateTime": "2022-11-24T12:00:00+00:00",
+                "lastValidPurchaseDateTime": "2022-11-24T12:00:00",
                 "priceNet": "100.0",
                 "priceVat": "24.0",
                 "priceTotal": "124.0",

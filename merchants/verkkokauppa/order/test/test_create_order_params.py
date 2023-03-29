@@ -59,7 +59,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             (
                 datetime.now(tz=get_default_timezone())
                 + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
-            ).isoformat()
+            ).strftime("%Y-%m-%dT%H:%M:%S")
         )
         assert_that(json["items"]).is_length(1)
         assert_that(json["items"][0]["productId"]).is_equal_to(
