@@ -410,7 +410,6 @@ class ReservationUnitType(
     services = graphene.List(ServiceType)
     purposes = graphene.List(PurposeType)
     qualifiers = graphene.List(QualifierType)
-    images = graphene.List(ReservationUnitImageType)
     location = graphene.Field(LocationType)
     reservation_unit_type = graphene.Field(ReservationUnitTypeType)
     equipment = graphene.List(EquipmentType)
@@ -471,6 +470,7 @@ class ReservationUnitType(
             "cancellation_terms",
             "service_specific_terms",
             "pricing_terms",
+            "pricings",
             "reservation_start_interval",
             "reservation_begins",
             "reservation_ends",
@@ -506,7 +506,7 @@ class ReservationUnitType(
         connection_class = TilavarausBaseConnection
 
     class QueryOptimization:
-        field_name = "reservationUnit"
+        field_name = "reservationUnits"
         query_optimization = {
             "spaces": (
                 "prefetch",
@@ -514,7 +514,7 @@ class ReservationUnitType(
                     "field_name": "spaces",
                     "base_queryset": Space.objects.all().select_related("location"),
                     "child_optimizations": {
-                        "resource_set": ("prefetch", "resources"),
+                        "location": ("select", "location"),
                     },
                 },
             ),
@@ -523,9 +523,8 @@ class ReservationUnitType(
             "purposes": ("prefetch", "purposes"),
             "qualifiers": ("prefetch", "qualifiers"),
             "images": ("prefetch", "images"),
-            "location": ("select", "location"),
             "reservationUnitType": ("select", "reservation_unit_type"),
-            "equipment": ("prefetch", "equipment"),
+            "equipment": ("prefetch", "equipments"),
             "unit": ("select", "unit"),
             "keywordGroups": ("prefetch", "keyword_groups"),
             "applicationRounds": (
@@ -547,6 +546,21 @@ class ReservationUnitType(
             "paymentTypes": ("prefetch", "payment_types"),
             "paymentMerchant": ("select", "payment_merchant"),
             "paymentProduct": ("select", "payment_product"),
+            "pricings": (
+                "prefetch",
+                {
+                    "field_name": "pricings",
+                    "base_queryset": ReservationUnitPricing.objects.all().select_related(
+                        "tax_percentage"
+                    ),
+                    "child_optimizations": {
+                        "taxPercentage": ("select", "tax_percentage"),
+                    },
+                },
+            ),
+            "pricingTerms": ("select", "pricing_terms"),
+            "cancelationTerms": ("select", "cancellation_terms"),
+            "cancellationRule": ("select", "cancellation_rule"),
         }
 
     def resolve_location(self, info):
@@ -570,9 +584,6 @@ class ReservationUnitType(
     @check_resolver_permission(QualifierPermission)
     def resolve_qualifiers(self, info):
         return self.qualifiers.all()
-
-    def resolve_images(self, info):
-        return self.images.all()
 
     @check_resolver_permission(ResourcePermission)
     def resolve_resources(self, info):
