@@ -524,11 +524,11 @@ class ReservationUnitType(
             "qualifiers": ("prefetch", "qualifiers"),
             "images": ("prefetch", "images"),
             "location": ("select", "location"),
-            "reservation_unit_type": ("select", "reservation_unit_type"),
+            "reservationUnitType": ("select", "reservation_unit_type"),
             "equipment": ("prefetch", "equipment"),
             "unit": ("select", "unit"),
-            "keyword_groups": ("prefetch", "keyword_groups"),
-            "application_rounds": (
+            "keywordGroups": ("prefetch", "keyword_groups"),
+            "applicationRounds": (
                 "prefetch",
                 {
                     "field_name": "application_rounds",
@@ -543,10 +543,10 @@ class ReservationUnitType(
                     },
                 },
             ),
-            "metadata_set": ("select", "metadata_set"),
-            "payment_types": ("prefetch", "payment_types"),
-            "payment_merchant": ("select", "payment_merchant"),
-            "payment_product": ("select", "payment_product"),
+            "metadataSet": ("select", "metadata_set"),
+            "paymentTypes": ("prefetch", "payment_types"),
+            "paymentMerchant": ("select", "payment_merchant"),
+            "paymentProduct": ("select", "payment_product"),
         }
 
     def resolve_location(self, info):
