@@ -20,16 +20,16 @@ class PaymentMerchantForm(forms.ModelForm):
     business_id = forms.CharField(
         label=_("Business ID"),
         max_length=16,
-        required=False,
+        required=True,
     )
-    street = forms.CharField(label=_("Street address"), max_length=128, required=False)
-    zip = forms.CharField(label=_("ZIP code"), max_length=16, required=False)
-    city = forms.CharField(label=_("City"), max_length=128, required=False)
-    email = forms.CharField(label=_("Email address"), max_length=128, required=False)
-    phone = forms.CharField(label=_("Phone number"), max_length=32, required=False)
-    url = forms.CharField(label=_("URL"), max_length=256, required=False)
+    street = forms.CharField(label=_("Street address"), max_length=128, required=True)
+    zip = forms.CharField(label=_("ZIP code"), max_length=16, required=True)
+    city = forms.CharField(label=_("City"), max_length=128, required=True)
+    email = forms.CharField(label=_("Email address"), max_length=128, required=True)
+    phone = forms.CharField(label=_("Phone number"), max_length=32, required=True)
+    url = forms.CharField(label=_("URL"), max_length=256, required=True)
     tos_url = forms.CharField(
-        label=_("Terms of service URL"), max_length=256, required=False
+        label=_("Terms of service URL"), max_length=256, required=True
     )
 
     def __init__(self, *args, **kwargs):
