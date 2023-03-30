@@ -1,0 +1,21 @@
+name: 'Setup python environment'
+runs:
+  using: "composite"
+  steps:
+    - name: Install psycopg2 and graphviz dependencies
+      run: |
+        sudo apt update
+        sudo apt install libpq-dev gdal-bin graphviz graphviz-dev -y
+      shell: bash
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -U setuptools
+        pip install -r requirements.txt
+        pip install -r requirements_dev.txt
+      shell: bash
