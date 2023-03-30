@@ -27,28 +27,18 @@ const Content = styled(Container)`
 `;
 
 const UnitContainer = styled.div`
-  gap: var(--spacing-l) 0;
   margin-bottom: var(--spacing-xl);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 3rem;
 
   @media (max-width: ${breakpoints.s}) {
     svg {
       transform: scale(0.5);
     }
-  }
-
-  @media (min-width: ${breakpoints.s}) {
-    display: grid;
-    grid-template-columns: repeat(2, 200px);
-    justify-content: space-between;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: repeat(3, 200px);
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: repeat(4, 200px);
-    padding-right: var(--spacing-layout-l);
+    /* lower the gap because svg icon forces elements to be 48px min-height */
+    gap: 0.5rem 3rem;
   }
 `;
 

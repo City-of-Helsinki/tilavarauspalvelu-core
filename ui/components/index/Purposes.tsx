@@ -46,19 +46,7 @@ const Top = styled.div`
 const PurposeContainer = styled.div`
   display: grid;
   gap: var(--spacing-l) var(--spacing-m);
-  grid-template-columns: 1fr;
-
-  @media (min-width: ${mobileBreakpoint}) {
-    grid-template-columns: repeat(2, minmax(20px, 1fr));
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: repeat(3, minmax(20px, 1fr));
-  }
-
-  @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns: repeat(4, minmax(20px, 1fr));
-  }
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 `;
 
 const PurposeItem = styled.div`
@@ -82,7 +70,7 @@ const PurposeItem = styled.div`
 
 const Image = styled.img`
   height: 125px;
-  object-fit: none;
+  object-fit: cover;
 
   @media (min-width: ${breakpoints.m}) {
     height: 180px;
