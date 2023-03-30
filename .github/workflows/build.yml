@@ -1,4 +1,4 @@
-name: Build
+name: Tests
 
 on:
   push:
@@ -7,7 +7,54 @@ on:
   pull_request:
 
 jobs:
-  build:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Install flake8
+        run: |
+          pip install flake8
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --show-source --statistics
+          flake8 . --count --exit-zero --statistics
+  Format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Install black and isort
+        run: |
+          pip install isort==5.6.4
+          pip install black==20.8b1
+          # Needs to be pinned for black to work
+          pip install click==8.0.3
+      - name: Check format with black and isort
+        run: |
+          black --check --config black.toml .
+          isort --check-only .
+  Vulnerabilities-and-Safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-python-env
+      - name: Install safety and bandit
+        run: |
+          pip install safety
+          pip install bandit
+      - name: Check safety
+        run: |
+          bandit -a vuln --exclude "tests" -r .
+          safety check --full-report
+  Unit-Tests-and-SonarCloud:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -24,38 +71,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: psycopg2 and graphviz prerequisites
-        run: |
-          sudo apt update
-          sudo apt install libpq-dev gdal-bin graphviz graphviz-dev -y
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install -U setuptools
-          pip install -r requirements.txt
-          pip install -r requirements_dev.txt
-          pip install bandit
-          pip install safety
-      - name: Lint with flake8
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --show-source --statistics
-          flake8 . --count --exit-zero --statistics
-      - name: Check format
-        run: |
-          black --check --config black.toml .
-          isort --check-only .
-      - name: bandit check
-        run : |
-          bandit -a vuln --exclude "tests" -r .
-      - name: Safety check
-        run: |
-          safety check --full-report
-      - name: Run pytest with cov
+      - uses: ./.github/actions/setup-python-env
+      - name: Run pytest with coverage
         run: |
           pytest --cov=./ --cov-report=xml --cov-branch
         env:
