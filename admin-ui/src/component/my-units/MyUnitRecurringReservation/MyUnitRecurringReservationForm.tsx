@@ -12,8 +12,8 @@ import { camelCase, get } from "lodash";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@apollo/client";
-import { addYears, format } from "date-fns";
-import { Button, DateInput, TextInput, TimeInput } from "hds-react";
+import { format } from "date-fns";
+import { Button, TextInput } from "hds-react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { removeRefParam } from "common/src/reservation-form/util";
@@ -27,34 +27,22 @@ import { useNotification } from "../../../context/NotificationContext";
 import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
-import { ActionsWrapper } from "./commonStyling";
+import { ActionsWrapper, Grid, Element } from "./commonStyling";
 import { flattenMetadata } from "../create-reservation/utils";
 import { useMultipleReservation } from "./hooks";
 import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
+import ControlledTimeInput from "../components/ControlledTimeInput";
+import ControlledDateInput from "../components/ControlledDateInput";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
   font-weight: ${({ $bold }) => ($bold ? "700" : "500")};
 `;
 
-// Three column grid on desktop and one on small screens.
-const Grid = styled.div`
-  max-width: var(--container-width-small);
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: 1rem 2rem;
-`;
-
-const Element = styled.div<{ $wide?: boolean; $start?: boolean }>`
-  grid-column: ${({ $wide, $start }) =>
-    $wide ? "1 / -1" : $start ? "1 / span 1" : "auto / span 1"};
-  max-width: var(--prose-width);
-`;
-
 const InnerTextInput = styled(TextInput)`
+  grid-column: 1 / -1;
   max-width: var(--prose-width);
-  margin: 1rem 0;
 `;
 
 const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
@@ -139,6 +127,7 @@ const MyUnitRecurringReservationForm = ({
   );
 
   const onSubmit = async (data: RecurringReservationForm) => {
+    // TODO notifyError does a double translation somewhere
     if (!newReservations.success) {
       notifyError(t(translateError("formNotValid")));
       return;
@@ -168,9 +157,9 @@ const MyUnitRecurringReservationForm = ({
       const input: RecurringReservationCreateMutationInput = {
         reservationUnitPk: unitPk,
         beginDate: format(data.startingDate, "yyyy-MM-dd"),
-        beginTime: data.startingTime,
+        beginTime: data.startTime,
         endDate: format(data.endingDate, "yyyy-MM-dd"),
-        endTime: data.endingTime,
+        endTime: data.endTime,
         weekdays: data.repeatOnDays,
         recurrenceInDays: data.repeatPattern.value === "weekly" ? 7 : 14,
         name,
@@ -293,7 +282,7 @@ const MyUnitRecurringReservationForm = ({
   // Do custom error checking for fields since resolver only checks the current field
   // Takes the first error only since this updates live while the user types
   const getZodError = (
-    field: "startingDate" | "endingDate" | "startingTime" | "endingTime"
+    field: "startingDate" | "endingDate" | "startTime" | "endTime"
   ) =>
     (isSubmitted || dirtyFields[field]) && !newReservations?.success
       ? String(
@@ -331,48 +320,22 @@ const MyUnitRecurringReservationForm = ({
           </Element>
 
           <Element $start>
-            <Controller
+            <ControlledDateInput
               name="startingDate"
-              control={control}
-              render={({ field: { name, onChange } }) => (
-                <DateInput
-                  name={name}
-                  id="startingDate"
-                  disabled={reservationUnit == null}
-                  label={t(`${TRANS_PREFIX}.startingDate`)}
-                  minDate={new Date()}
-                  maxDate={addYears(new Date(), 3)}
-                  placeholder={t("common.select")}
-                  onChange={(_, date) => onChange(date)}
-                  disableConfirmation
-                  language="fi"
-                  required
-                  errorText={getZodError("startingDate")}
-                />
-              )}
+              control={form.control}
+              error={getZodError("startingDate")}
+              disabled={reservationUnit == null}
+              required
             />
           </Element>
 
           <Element>
-            <Controller
+            <ControlledDateInput
               name="endingDate"
-              control={control}
-              render={({ field: { name, onChange } }) => (
-                <DateInput
-                  id="endingDate"
-                  name={name}
-                  disabled={reservationUnit == null}
-                  label={t(`${TRANS_PREFIX}.endingDate`)}
-                  minDate={new Date()}
-                  maxDate={addYears(new Date(), 3)}
-                  placeholder={t("common.select")}
-                  onChange={(_, date) => onChange(date)}
-                  disableConfirmation
-                  language="fi"
-                  required
-                  errorText={getZodError("endingDate")}
-                />
-              )}
+              control={form.control}
+              error={getZodError("endingDate")}
+              disabled={reservationUnit == null}
+              required
             />
           </Element>
           <Element>
@@ -398,41 +361,21 @@ const MyUnitRecurringReservationForm = ({
           </Element>
 
           <Element $start>
-            <Controller
-              name="startingTime"
-              control={control}
-              render={({ field }) => (
-                <TimeInput
-                  {...removeRefParam(field)}
-                  id="ReservationDialog.startTime"
-                  label={t("ReservationDialog.startTime")}
-                  hoursLabel={t("common.hoursLabel")}
-                  minutesLabel={t("common.minutesLabel")}
-                  disabled={reservationUnit == null}
-                  required
-                  invalid={errors.startingTime != null}
-                  errorText={getZodError("startingTime")}
-                />
-              )}
+            <ControlledTimeInput
+              name="startTime"
+              control={form.control}
+              error={getZodError("startTime")}
+              disabled={reservationUnit == null}
+              required
             />
           </Element>
           <Element>
-            <Controller
-              name="endingTime"
-              control={control}
-              render={({ field }) => (
-                <TimeInput
-                  {...removeRefParam(field)}
-                  id="ReservationDialog.endtime"
-                  label={t("ReservationDialog.endTime")}
-                  hoursLabel={t("common.hoursLabel")}
-                  minutesLabel={t("common.minutesLabel")}
-                  disabled={reservationUnit == null}
-                  required
-                  errorText={getZodError("endingTime")}
-                  invalid={errors.endingTime != null}
-                />
-              )}
+            <ControlledTimeInput
+              name="endTime"
+              control={form.control}
+              error={getZodError("endTime")}
+              disabled={reservationUnit == null}
+              required
             />
           </Element>
 
@@ -463,21 +406,19 @@ const MyUnitRecurringReservationForm = ({
             </Element>
           )}
 
-          <Element $wide>
-            {reservationUnit != null && (
-              <ReservationTypeForm reservationUnit={reservationUnit}>
-                <InnerTextInput
-                  id="name"
-                  disabled={reservationUnit == null}
-                  label={t(`${TRANS_PREFIX}.name`)}
-                  required
-                  {...register("seriesName")}
-                  invalid={errors.seriesName != null}
-                  errorText={translateError(errors.seriesName?.message)}
-                />
-              </ReservationTypeForm>
-            )}
-          </Element>
+          {reservationUnit != null && (
+            <ReservationTypeForm reservationUnit={reservationUnit}>
+              <InnerTextInput
+                id="name"
+                disabled={reservationUnit == null}
+                label={t(`${TRANS_PREFIX}.name`)}
+                required
+                {...register("seriesName")}
+                invalid={errors.seriesName != null}
+                errorText={translateError(errors.seriesName?.message)}
+              />
+            </ReservationTypeForm>
+          )}
 
           <ActionsWrapper>
             {/* cancel is disabled while sending because we have no rollback */}

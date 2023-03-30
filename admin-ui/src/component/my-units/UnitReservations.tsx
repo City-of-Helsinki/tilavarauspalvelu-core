@@ -109,6 +109,7 @@ const UnitReservations = ({
     loading: reservationUnitsLoading,
     data: reservationUnitsData,
     fetchMore,
+    refetch,
   } = useQuery<
     Query,
     QueryReservationUnitsArgs & ReservationUnitByPkTypeReservationsArgs
@@ -164,7 +165,11 @@ const UnitReservations = ({
   return (
     <>
       <Container>
-        <UnitCalendar date={new Date(begin)} resources={resourcesData} />
+        <UnitCalendar
+          date={new Date(begin)}
+          resources={resourcesData}
+          refetch={refetch}
+        />
       </Container>
       <LegendContainer>
         <Legends>

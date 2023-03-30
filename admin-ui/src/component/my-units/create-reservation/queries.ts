@@ -16,6 +16,23 @@ export const RESERVATION_UNIT_QUERY = gql`
             supportedFields
             requiredFields
           }
+          cancellationTerms {
+            textFi
+            nameFi
+          }
+          paymentTerms {
+            textFi
+            nameFi
+          }
+          pricingTerms {
+            textFi
+            nameFi
+          }
+          termsOfUseFi
+          serviceSpecificTerms {
+            textFi
+            nameFi
+          }
         }
       }
     }

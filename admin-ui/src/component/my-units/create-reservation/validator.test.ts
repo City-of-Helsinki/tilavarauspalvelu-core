@@ -1,14 +1,15 @@
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import { addDays, addHours, format, setMinutes, subDays } from "date-fns";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { expect, test, describe } from "@jest/globals";
 import { formatDate } from "../../../common/util";
-import { reservationSchema } from "./validator";
+import { ReservationFormSchema } from "./validator";
 
 const TIME_FORMAT = "HH:mm";
 
 describe("with schema", () => {
-  const futureEndTime = format(addHours(new Date(), 3), TIME_FORMAT);
-
-  const tomorrow = formatDate(addDays(new Date(), 1).toISOString(), "d.M.yyyy");
+  const futureEndTime = format(addHours(new Date(), 3), "HH:00");
+  const tomorrow = addDays(new Date(), 1);
 
   test(`date ${tomorrow} is valid`, () => {
     const futureStartTime = format(
@@ -23,9 +24,10 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const validationResult = reservationSchema().validate(reservation);
-
-    expect(validationResult.error).toBeUndefined();
+    const res = ReservationFormSchema(
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+    ).safeParse(reservation);
+    expect(res.success).toBeTruthy();
   });
 
   const yesterday = formatDate(
@@ -43,8 +45,16 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const validationResult = reservationSchema().validate(reservation);
-    expect(validationResult.error?.details[0].path[0]).toEqual("date");
+    const res = ReservationFormSchema(
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+    ).safeParse(reservation);
+    expect(res.success).toBeFalsy();
+    if (!res.success) {
+      expect(
+        res.error.issues.filter((x) => x.path.includes("date"))
+      ).toHaveLength(1);
+      // TODO check error message
+    }
   });
 
   test(`date ${tomorrow},  with correct interval is valid`, () => {
@@ -60,11 +70,10 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const validationResult = reservationSchema(
+    const res = ReservationFormSchema(
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins
-    ).validate(reservation);
-
-    expect(validationResult.error).toBeUndefined();
+    ).safeParse(reservation);
+    expect(res.success).toBeTruthy();
   });
 
   test(`date ${tomorrow} with incorrect interval is invalid`, () => {
@@ -80,10 +89,19 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const validationResult = reservationSchema(
+    const res = ReservationFormSchema(
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins
-    ).validate(reservation);
-
-    expect(validationResult.error?.details[0].path[0]).toEqual("startTime");
+    ).safeParse(reservation);
+    expect(res.success).toBeFalsy();
+    if (!res.success) {
+      expect(
+        res.error.issues.filter((x) => x.path.includes("startTime"))
+      ).toHaveLength(1);
+      // TODO check error message
+    }
   });
 });
+
+test.todo("validate date < today => error");
+test.todo("end time < start time => error");
+test.todo("end time | start time not a time => error");

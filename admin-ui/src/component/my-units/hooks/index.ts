@@ -6,11 +6,13 @@ import { useTranslation } from "react-i18next";
 import type {
   Query,
   QueryReservationUnitsArgs,
+  QueryUnitsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { ReservationsReservationReserveeTypeChoices } from "common/types/gql-types";
+import { useNotification } from "../../../context/NotificationContext";
 import { RESERVATION_UNIT_QUERY } from "../create-reservation/queries";
-import { OPTIONS_QUERY } from "./queries";
+import { OPTIONS_QUERY, UNIT_QUERY } from "./queries";
 
 // Custom hook to fix admin-ui lacking translation namespaces
 export const useReservationTranslation = () => {
@@ -106,4 +108,18 @@ export const useReservationUnitQuery = (unitPk?: number) => {
     data?.reservationUnits?.edges.find((ru) => ru)?.node ?? undefined;
 
   return { reservationUnit, loading };
+};
+
+export const useUnitQuery = (pk?: number | string) => {
+  const { notifyError } = useNotification();
+
+  const res = useQuery<Query, QueryUnitsArgs>(UNIT_QUERY, {
+    skip: pk == null,
+    onError: (err) => {
+      notifyError(err.message);
+    },
+    variables: { pk: [pk ? String(pk) : ""], offset: 0 },
+  });
+
+  return res;
 };

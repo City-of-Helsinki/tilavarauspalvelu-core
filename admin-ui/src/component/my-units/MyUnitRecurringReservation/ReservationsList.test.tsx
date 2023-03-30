@@ -14,8 +14,8 @@ const twoWeeksOnceAWeek = {
   startingDate: today,
   // two weeks is 13 days since the last day is inclusive
   endingDate: addDays(dtoday, 13),
-  startingTime: "00:00",
-  endingTime: "01:00",
+  startTime: "00:00",
+  endTime: "01:00",
   repeatOnDays: [1],
   repeatPattern: {
     label: "",

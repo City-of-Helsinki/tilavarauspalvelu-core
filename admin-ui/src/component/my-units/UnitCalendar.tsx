@@ -46,6 +46,7 @@ type EventStyleGetter = ({ event }: CalendarEvent<ReservationType>) => {
 type Props = {
   date: Date;
   resources: Resource[];
+  refetch: () => void;
 };
 
 const FlexContainer = styled.div<{ $numCols: number }>`
@@ -140,11 +141,13 @@ const Cells = ({
   reservationUnitPk,
   date,
   setModalContent,
+  onComplete,
 }: {
   cols: number;
   reservationUnitPk: number;
   date: Date;
   setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
+  onComplete: () => void;
 }) => {
   const onClick =
     (offset: number) => (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -155,7 +158,7 @@ const Cells = ({
           start={addMinutes(new Date(date), offset * 30)}
           onClose={() => {
             setModalContent(null);
-            // TODO refresh calendar content
+            onComplete();
           }}
         />,
         true
@@ -333,7 +336,7 @@ const sortByDraftStatusAndTitle = (resources: Resource[]) => {
   });
 };
 
-const UnitCalendar = ({ date, resources }: Props): JSX.Element => {
+const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
   const { t } = useTranslation();
   const calendarRef = useRef<HTMLDivElement>(null);
   // todo find out min and max opening hour of every reservationunit
@@ -396,6 +399,7 @@ const UnitCalendar = ({ date, resources }: Props): JSX.Element => {
                 date={startDate}
                 reservationUnitPk={row.pk}
                 setModalContent={setModalContent}
+                onComplete={refetch}
               />
               <Events
                 currentReservationUnit={row.pk}

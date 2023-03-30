@@ -3,7 +3,10 @@ import {
   ReservationsReservationReserveeTypeChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
-import MetaFields from "common/src/reservation-form/MetaFields";
+import {
+  ReserverMetaFields,
+  ReservationMetaFields,
+} from "common/src/reservation-form/MetaFields";
 import {
   useApplicatioonFields,
   useGeneralFields,
@@ -15,7 +18,28 @@ type Props = {
   reservationUnit: ReservationUnitType;
 };
 
-const MetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
+export const ReservationMetadataSetForm = ({
+  reservationUnit,
+}: Props): JSX.Element => {
+  const options = useOptions();
+  const { t } = useReservationTranslation();
+  // TODO naming: generalFields = reservationFields (Varauksen tiedot)
+  // or maybe metadataReservationFields?
+  const generalFields = useGeneralFields(reservationUnit);
+
+  return (
+    <ReservationMetaFields
+      fields={generalFields}
+      reservationUnit={reservationUnit}
+      options={options}
+      t={t}
+    />
+  );
+};
+
+export const ReserverMetadataSetForm = ({
+  reservationUnit,
+}: Props): JSX.Element => {
   const [reserveeType, setReserveeType] = useState<
     ReservationsReservationReserveeTypeChoices | undefined
   >(undefined);
@@ -23,23 +47,20 @@ const MetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
 
   const options = useOptions();
 
-  const generalFields = useGeneralFields(reservationUnit);
+  // TODO naming: applicationFields = reserverFields (Varaajan tiedot)
   const reservationApplicationFields = useApplicatioonFields(
     reservationUnit,
     reserveeType
   );
 
   return (
-    <MetaFields
-      reservationUnit={reservationUnit}
-      options={options}
+    <ReserverMetaFields
       reserveeType={reserveeType}
       setReserveeType={setReserveeType}
-      generalFields={generalFields}
-      reservationApplicationFields={reservationApplicationFields}
+      fields={reservationApplicationFields}
+      reservationUnit={reservationUnit}
+      options={options}
       t={t}
     />
   );
 };
-
-export default MetadataSetForm;

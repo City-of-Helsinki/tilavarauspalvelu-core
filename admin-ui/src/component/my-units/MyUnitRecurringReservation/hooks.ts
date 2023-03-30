@@ -21,8 +21,8 @@ export const useMultipleReservation = (
   const selectedReservationParams = watch([
     "startingDate",
     "endingDate",
-    "startingTime",
-    "endingTime",
+    "startTime",
+    "endTime",
     "repeatPattern",
     "repeatOnDays",
   ]);
@@ -33,8 +33,8 @@ export const useMultipleReservation = (
         {
           startingDate: selectedReservationParams[0],
           endingDate: selectedReservationParams[1],
-          startingTime: selectedReservationParams[2],
-          endingTime: selectedReservationParams[3],
+          startTime: selectedReservationParams[2],
+          endTime: selectedReservationParams[3],
           repeatPattern: selectedReservationParams[4],
           repeatOnDays: selectedReservationParams[5],
         },

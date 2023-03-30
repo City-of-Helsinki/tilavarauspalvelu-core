@@ -1,7 +1,13 @@
 import { z } from "zod";
-import { subDays } from "date-fns";
-
-const TEN_YEARS_MS = 10 * 365 * 24 * 60 * 60 * 1000;
+import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import {
+  ReservationTypeSchema,
+  checkDate,
+  checkReservationInterval,
+  checkStartEndTime,
+  checkTimeStringFormat,
+} from "../create-reservation/validator";
+import { intervalToNumber } from "../create-reservation/utils";
 
 // TODO handle metadata (variable form fields) instead of using .passthrough
 // It should be it's own schema object that is included in both forms
@@ -11,10 +17,9 @@ const TEN_YEARS_MS = 10 * 365 * 24 * 60 * 60 * 1000;
 // always use the exact refined scheme for validation and displaying errors to the user
 // the merged schemes are for type inferance.
 
-// NOTE be careful if using zod refined schemes in react-hook-form resolvers
-// it doesn't handle complex cases that depend on multiple values
-// often needs a custom isDirty + getError with the full zod error map.
-
+// NOTE zod doesn't run refinements if part of the required data is missing
+// i.e. the core zod schema is run first if it passes then refinements are run
+// solutions to that are either use partial schemas or split schemas and check the parts.
 const Option = z.object({
   label: z.string(),
   value: z.string(),
@@ -23,8 +28,8 @@ const Option = z.object({
 const timeSelectionSchemaBase = z.object({
   startingDate: z.coerce.date(),
   endingDate: z.coerce.date(),
-  startingTime: z.string(),
-  endingTime: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
   repeatOnDays: z.array(z.number()).min(1).max(7),
   repeatPattern: z.object({
     label: z.string(),
@@ -35,7 +40,7 @@ const timeSelectionSchemaBase = z.object({
 export const RecurringReservationFormSchema = z
   .object({
     reservationUnit: Option,
-    type: z.string(),
+    type: ReservationTypeSchema,
     seriesName: z.string().optional(),
     comments: z.string().max(500).optional(),
     bufferTimeBefore: z.boolean().optional(),
@@ -44,7 +49,7 @@ export const RecurringReservationFormSchema = z
   .merge(timeSelectionSchemaBase)
   // need passthrough otherwise zod will strip the metafields
   .passthrough()
-  // this refine works in this case since it's the last required value (unlike datetimes)
+  // this refine works without partial since it's the last required value
   .refine(
     (s) =>
       s.type === "BLOCKED" ||
@@ -55,54 +60,43 @@ export const RecurringReservationFormSchema = z
     }
   );
 
-const TIME_PATTERN = /^[0-9+]{2}:[0-9+]{2}$/;
+export const timeSelectionSchema = (
+  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+) =>
+  timeSelectionSchemaBase
+    .partial()
+    .superRefine((val, ctx) => checkDate(val.startingDate, ctx, "startingDate"))
+    .superRefine((val, ctx) => checkDate(val.endingDate, ctx, "endingDate"))
+    .refine(
+      (s) =>
+        s.startingDate &&
+        s.endingDate &&
+        s.startingDate.getTime() < s.endingDate.getTime(),
+      {
+        path: ["endingDate"],
+        message: "Start date can't be after end date.",
+      }
+    )
+    .superRefine((val, ctx) =>
+      checkTimeStringFormat(val.startTime, ctx, "startTime")
+    )
+    .superRefine((val, ctx) =>
+      checkTimeStringFormat(val.endTime, ctx, "endTime")
+    )
+    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
+    .superRefine((val, ctx) =>
+      checkReservationInterval(
+        val.startTime,
+        ctx,
+        "startTime",
+        intervalToNumber(interval)
+      )
+    )
+    .superRefine((val, ctx) =>
+      checkReservationInterval(val.endTime, ctx, "endTime", 15)
+    );
 
-export const timeSelectionSchema = timeSelectionSchemaBase
-  .refine((s) => s.startingDate > subDays(new Date(), 1), {
-    path: ["startingDate"],
-    message: "Start date can't be in the past",
-  })
-  .refine((s) => s.startingDate < s.endingDate, {
-    path: ["endingDate"],
-    message: "Start date can't be after end date.",
-  })
-  // Need to have a year limit otherwise a single backspace can crash the application (due to computing).
-  // 1.1.2023 -> press backspace => 1.1.203 calculates the interval of 1820 years.
-  // Similarly mis typing 20234 as a year results in 18200 year interval.
-  .refine(
-    (s) =>
-      Math.abs(s.endingDate.getTime() - s.startingDate.getTime()) <
-      TEN_YEARS_MS,
-    {
-      path: ["endingDate"],
-      message: "Start and end time needs to be within a decade.",
-    }
-  )
-  .refine((s) => s.startingTime.match(TIME_PATTERN), {
-    path: ["startingTime"],
-    message: "Start time is not in time format.",
-  })
-  .refine((s) => s.endingTime.match(TIME_PATTERN), {
-    path: ["endingTime"],
-    message: "End time is not in time format.",
-  })
-  .refine((s) => Number(s.startingTime.replace(":", ".")) < 24, {
-    path: ["startingTime"],
-    message: "Start time can't be more than 24 hours.",
-  })
-  .refine((s) => Number(s.endingTime.replace(":", ".")) < 24, {
-    path: ["endingTime"],
-    message: "End time can't be more than 24 hours.",
-  })
-  .refine(
-    (s) =>
-      Number(s.startingTime.replace(":", ".")) <
-      Number(s.endingTime.replace(":", ".")),
-    {
-      path: ["endingTime"],
-      message: "End time needs to be after start time.",
-    }
-  );
+export type TimeSelectorType = z.infer<typeof timeSelectionSchemaBase>;
 
 export type RecurringReservationForm = z.infer<
   typeof RecurringReservationFormSchema

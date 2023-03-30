@@ -54,6 +54,11 @@ const units: ReservationUnitType[] = [
   },
 ];
 
+const emptyTerms = {
+  textFi: "",
+  nameFi: "",
+};
+
 const unitResponse = [
   {
     node: {
@@ -63,6 +68,11 @@ const unitResponse = [
       bufferTimeBefore: null,
       bufferTimeAfter: null,
       reservationStartInterval: "INTERVAL_15_MINS",
+      pricingTerms: emptyTerms,
+      paymentTerms: emptyTerms,
+      cancellationTerms: emptyTerms,
+      serviceSpecificTerms: emptyTerms,
+      termsOfUseFi: "",
       metadataSet: {
         name: "full_meta",
         supportedFields: [
@@ -320,5 +330,8 @@ test.todo("Form has reservation type selection.");
 test.todo("Form submission can bypass required meta field");
 test.todo("Cancel button returns to previous page");
 test.todo("Succesful form submission calls makes a GQL request");
-test.todo("Succesful form submission calls a cb");
+test.todo("Succesful form submission calls a cb after GQL request");
 test.todo("Form can't be submitted if all fields are not defined");
+test.todo("If STAFF or BEHALF form shows and requires seriesName");
+test.todo("If STAFF or BEHALF form shows metafields");
+test.todo("If BLOCKED form has no metafields or seriesName");

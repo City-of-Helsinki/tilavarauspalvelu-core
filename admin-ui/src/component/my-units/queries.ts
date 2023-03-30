@@ -1,32 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const UNIT_QUERY = gql`
-  query units($pk: [ID]) {
-    units(pk: $pk) {
-      edges {
-        node {
-          location {
-            addressStreetFi
-            addressZip
-            addressCityFi
-          }
-          nameFi
-          pk
-          serviceSectors {
-            nameFi
-          }
-          reservationUnits {
-            pk
-            spaces {
-              pk
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   query units($pk: [ID]) {
     units(pk: $pk) {

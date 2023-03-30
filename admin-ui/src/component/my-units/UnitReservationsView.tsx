@@ -18,6 +18,7 @@ import UnitReservations from "./UnitReservations";
 
 const HorisontalFlexWrapper = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -97,7 +98,11 @@ const UnitReservationsView = (): JSX.Element => {
         </Button>
         <DayNavigation date={begin} onDateChange={onDateChange} />
         <BasicLink to={recurringReservationUrl ?? ""}>
-          <Button disabled={false} variant="secondary">
+          <Button
+            disabled={false}
+            variant="secondary"
+            style={{ width: "100%" }}
+          >
             {t("MyUnits.Calendar.header.recurringReservation")}
           </Button>
         </BasicLink>

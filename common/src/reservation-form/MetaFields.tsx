@@ -205,33 +205,36 @@ const ReservationFormFields = ({
   );
 };
 
-const MetaFields = ({
+// TODO reduce prop drilling / remove unused props
+export const ReservationMetaFields = ({
+  fields,
   reservationUnit,
-  reserveeType,
-  setReserveeType,
-  generalFields,
-  reservationApplicationFields,
   options,
   t,
   data,
-}: Props) => {
+}: {
+  fields: string[];
+  reservationUnit: ReservationUnitType;
+  options: Record<string, OptionType[]>;
+  t: (key: string) => string;
+  data?: {
+    termsForDiscount?: JSX.Element | string;
+  };
+}) => {
+  if (fields.length === 0) {
+    return null;
+  }
   if (!reservationUnit.metadataSet) {
     return null;
   }
 
-  const isTypeSelectable =
-    reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type") ??
-    false;
-
   return (
-    <Container>
-      {generalFields.length > 0 && (
-        <InfoHeading>{t("reservationCalendar:reservationInfo")}</InfoHeading>
-      )}
+    <>
+      <InfoHeading>{t("reservationCalendar:reservationInfo")}</InfoHeading>
       <TwoColumnContainer>
         <ReservationFormFields
           options={options}
-          fields={generalFields}
+          fields={fields}
           metadata={reservationUnit.metadataSet}
           reserveeType="COMMON"
           params={{
@@ -249,6 +252,42 @@ const MetaFields = ({
           t={t}
         />
       </TwoColumnContainer>
+    </>
+  );
+};
+
+// TODO reduce prop drilling / remove unused props
+export const ReserverMetaFields = ({
+  fields,
+  reservationUnit,
+  options,
+  reserveeType,
+  setReserveeType,
+  t,
+  data,
+}: {
+  fields: string[];
+  reservationUnit: ReservationUnitType;
+  options: Record<string, OptionType[]>;
+  t: (key: string) => string;
+  reserveeType?: ReservationsReservationReserveeTypeChoices | "COMMON";
+  setReserveeType: React.Dispatch<
+    React.SetStateAction<ReservationsReservationReserveeTypeChoices | undefined>
+  >;
+  data?: {
+    termsForDiscount?: JSX.Element | string;
+  };
+}) => {
+  const isTypeSelectable =
+    reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type") ??
+    false;
+
+  if (!reservationUnit.metadataSet) {
+    return null;
+  }
+
+  return (
+    <>
       <ReserverInfoHeading>
         {t("reservationCalendar:reserverInfo")}
       </ReserverInfoHeading>
@@ -275,7 +314,7 @@ const MetaFields = ({
       )}
       <ReservationApplicationFieldsContainer>
         <ReservationFormFields
-          fields={reservationApplicationFields}
+          fields={fields}
           metadata={reservationUnit.metadataSet}
           options={options}
           hasSubheading
@@ -284,6 +323,46 @@ const MetaFields = ({
           data={data}
         />
       </ReservationApplicationFieldsContainer>
+    </>
+  );
+};
+
+// TODO this should be deprecated (use the individual components instead)
+// because we need the individual components for admin-ui (placement in dom changes)
+// and this component has more props than dom nodes.
+// Not removed yet since requires ui/ refactoring.
+const MetaFields = ({
+  reservationUnit,
+  reserveeType,
+  setReserveeType,
+  generalFields,
+  reservationApplicationFields,
+  options,
+  t,
+  data,
+}: Props) => {
+  if (!reservationUnit.metadataSet) {
+    return null;
+  }
+
+  return (
+    <Container>
+      <ReservationMetaFields
+        fields={generalFields}
+        options={options}
+        reservationUnit={reservationUnit}
+        t={t}
+        data={data}
+      />
+      <ReserverMetaFields
+        fields={reservationApplicationFields}
+        reserveeType={reserveeType}
+        setReserveeType={setReserveeType}
+        options={options}
+        reservationUnit={reservationUnit}
+        t={t}
+        data={data}
+      />
     </Container>
   );
 };
