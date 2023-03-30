@@ -79,7 +79,7 @@
     "termsNotAccepted": "Godkänn avtalsvillkoren för att fortsätta bokningen."
   },
   "reservingStartsAt": "Objektet går att boka från och med {{date}}.",
-  "reservationQuotaLabel": "",
+  "reservationQuotaLabel": "Befintliga bokningar",
   "reservationQuota_one": "Du har {{count}}/{{total}} bokning för det här objektet.",
   "reservationQuota_other": "Du har {{count}}/{{total}} bokningar för det här objektet.",
   "reservationQuotaFullLabel": "Det maximala antalet bokningar har fyllts.",
