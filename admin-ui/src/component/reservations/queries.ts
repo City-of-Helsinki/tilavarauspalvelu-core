@@ -95,7 +95,6 @@ export const RESERVATIONS_QUERY = gql`
       edges {
         node {
           pk
-          workingMemo
           state
           reservationUnits {
             nameFi
@@ -107,9 +106,7 @@ export const RESERVATIONS_QUERY = gql`
           end
           reserveeFirstName
           reserveeLastName
-          reserveeEmail
           name
-          price
           orderStatus
           createdAt
         }

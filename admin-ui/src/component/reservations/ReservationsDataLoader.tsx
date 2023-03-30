@@ -53,17 +53,19 @@ const mapFilterParams = (
     reservationUnit: params.reservationUnit?.map((ru) => ru.value as string),
     state:
       params.reservationState.length > 0
-        ? params.reservationState?.map((ru) => ru.value as string)
+        ? params.reservationState
+            ?.map((ru) => ru.value)
+            ?.map((x) => (x != null ? String(x) : null))
         : defaults.state,
     textSearch: params.textSearch || undefined,
     begin: parseDate(params.begin) || defaults.begin,
     end: parseDate(params.end),
     priceGte: params.minPrice !== "" ? Number(params.minPrice) : undefined,
     priceLte: params.maxPrice !== "" ? Number(params.maxPrice) : undefined,
-    paymentStatus: params.paymentStatuses?.map(
-      (status) => status.value as string
-    ),
-  } as QueryReservationsArgs;
+    orderStatus: params.paymentStatuses
+      ?.map((status) => status.value)
+      .map((x) => (x != null ? String(x) : null)),
+  };
 };
 
 const updateQuery = (
@@ -77,16 +79,14 @@ const updateQuery = (
   return combineResults(previousResult, fetchMoreResult, "reservations");
 };
 
-const ReservationsDataLoader = ({
-  filters,
-  sort,
-  sortChanged: onSortChanged,
-  defaultFiltering,
-}: Props): JSX.Element => {
+const useReservations = (
+  filters: FilterArguments,
+  defaultFiltering: QueryReservationsArgs,
+  sort?: Sort
+) => {
   const { notifyError } = useNotification();
 
   let sortString;
-
   if (sort) {
     if (sort.field === "begin") {
       if (sort.asc) {
@@ -116,29 +116,49 @@ const ReservationsDataLoader = ({
     }
   );
 
-  if (loading) {
-    return <Loader />;
-  }
-
   const reservations = (data?.reservations?.edges || [])
     .map((edge) => edge?.node)
     .filter((x): x is ReservationType => x != null);
 
+  return {
+    fetchMore,
+    loading,
+    data: reservations,
+    totalCount: data?.reservations?.totalCount,
+    offset: data?.reservations?.edges?.length,
+  };
+};
+
+const ReservationsDataLoader = ({
+  filters,
+  sort,
+  sortChanged: onSortChanged,
+  defaultFiltering,
+}: Props): JSX.Element => {
+  const { fetchMore, loading, data, totalCount, offset } = useReservations(
+    filters,
+    defaultFiltering,
+    sort
+  );
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <>
       <ReservationsTable
-        reservations={reservations}
+        reservations={data}
         sort={sort}
         sortChanged={onSortChanged}
       />
       <More
-        key={reservations.length}
-        totalCount={data?.reservations?.totalCount || 0}
-        count={reservations.length}
+        totalCount={totalCount || 0}
+        count={data.length}
         fetchMore={() =>
           fetchMore({
             variables: {
-              offset: data?.reservations?.edges.length,
+              offset,
             },
             updateQuery,
           })

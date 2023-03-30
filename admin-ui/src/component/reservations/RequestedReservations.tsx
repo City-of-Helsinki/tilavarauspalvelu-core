@@ -43,7 +43,6 @@ const Reservations = (): JSX.Element => {
           defaultFiltering={{
             state: ["DENIED", "CONFIRMED", "REQUIRES_HANDLING"],
           }}
-          key={JSON.stringify({ ...search, ...sort })}
           filters={search}
           sort={sort}
           sortChanged={onSortChanged}
