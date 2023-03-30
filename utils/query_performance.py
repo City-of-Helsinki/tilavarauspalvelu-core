@@ -117,6 +117,11 @@ class QueryPerformanceOptimizerMixin:
                             children=child.selection_set.selections,
                             **optimization_value
                         )
+
+                        # If no child prefetches, just prefetch the base model
+                        if not prefetch:
+                            prefetch = optimization_value.get("field_name")
+
                         prefetches.append(prefetch)
 
                     # CASE: No child fields, simply add field name to prefetch list to fetch base model
