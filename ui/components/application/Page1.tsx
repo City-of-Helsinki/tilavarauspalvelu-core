@@ -20,7 +20,12 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import ApplicationEvent from "../applicationEvent/ApplicationEvent";
-import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
+import {
+  apiDateToUIDate,
+  deepCopy,
+  getTranslation,
+  mapOptions,
+} from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import { participantCountOptions } from "../../modules/const";
 import { ButtonContainer, CenterSpinner } from "../common/common";
@@ -155,7 +160,18 @@ const Page1 = ({
   const form = useForm<ApplicationForm>({
     mode: "onChange",
     defaultValues: {
-      applicationEvents: application.applicationEvents,
+      // hack to make sure form dates are in correct format
+      applicationEvents: application.applicationEvents.map(
+        (applicationEvent) => ({
+          ...applicationEvent,
+          begin: applicationEvent.begin?.includes("-")
+            ? apiDateToUIDate(applicationEvent.begin)
+            : applicationEvent.begin,
+          end: applicationEvent.end?.includes("-")
+            ? apiDateToUIDate(applicationEvent.end)
+            : applicationEvent.end,
+        })
+      ),
     },
   });
 
