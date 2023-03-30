@@ -2,11 +2,11 @@
   <mj-body>
     <mj-section background-color="#E6E6E6" padding-bottom="0">
       <mj-group>
-        <mj-column vertical-align="middle" width="150px" padding="0">
-          <mj-image src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" width="100px" />
+        <mj-column vertical-align="middle" width="15%" padding="0">
+          <mj-image align="left" padding-right="0" src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" />
         </mj-column>
         <mj-column vertical-align="middle">
-          <mj-text font-size="16px" align="left" padding="0">
+          <mj-text font-size="16px" align="left">
             <b>${serviceName}</b>
           </mj-text>
         </mj-column>

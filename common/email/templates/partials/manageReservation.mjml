@@ -2,10 +2,7 @@
   <mj-body>
     <mj-section>
       <mj-column>
-        <mj-text>
-          <h2>${manageReservationHeading}<h2>
-        </mj-text>
-        <mj-text font-size="16px">${checkYourReservation} <a href={{my_reservations_ext_link}}>${ownReservationsPage}</a>.</mj-text>
+        <mj-text font-size="16px">${manageReservation} <a href={{my_reservations_ext_link}}>${ownReservationsPage}</a>.</mj-text>
       </mj-column>
     </mj-section>
   </mj-body>

@@ -4,9 +4,8 @@
     "helsinkiCity": "City of Helsinki",
     "salutation": "Hi",
 
-    "manageReservationHeading": "Manage your reservation at Varaamo",
-    "checkYourReservation": "You can check the details of your reservation and Varaamo’s terms of contract and cancellation on the",
-    "ownReservationsPage": "‘Your reservations’ page",
+    "manageReservation": "Manage your reservation at Varaamo. You can check the details of your reservation and Varaamo’s terms of contract and cancellation on the",
+    "ownReservationsPage": "‘My bookings’ page",
     "thankYouForUsing": "Thank you for choosing Varaamo!",
 
     "withRegards": "Kind regards,",

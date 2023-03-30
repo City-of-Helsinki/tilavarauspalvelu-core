@@ -18,8 +18,7 @@ ${payReservation}: {{my_reservations_ext_link}}
 ${reservationInstruction}
 {{confirmed_instructions}}
 
-${manageReservationHeading}
-${checkYourReservation} ${ownReservationsPage}: {{my_reservations_ext_link}}
+${manageReservation} ${ownReservationsPage}: {{my_reservations_ext_link}}
 
 ${thankYouForUsing}
 ${withRegards}

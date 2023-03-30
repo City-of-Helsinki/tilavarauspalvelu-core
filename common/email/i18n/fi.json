@@ -4,16 +4,15 @@
     "helsinkiCity": "Helsingin kaupunki",
     "salutation": "Hei",
 
-    "manageReservationHeading": "Hallitse varaustasi Varaamossa",
-    "checkYourReservation": "Voit perua varauksesi tai tarkistaa varauksesi tiedot sekä Varaamon sopimus- ja peruutusehdot",
+    "manageReservation": "Hallitse varaustasi Varaamossa. Voit perua varauksesi tai tarkistaa varauksesi tiedot sekä Varaamon sopimus- ja peruutusehdot",
     "ownReservationsPage": "Omat Varaukset-sivulla",
     "thankYouForUsing": "Kiitos, kun käytit Varaamoa!",
 
     "withRegards": "Ystävällisin terveisin,",
-    "automaticMessage": "Tämä on automaattinen viesti, siihen ei voi vastata.",
+    "automaticMessage": "Tämä on automaattinen viesti, johon ei voi vastata.",
     "sendUs": "Lähetä meille",
     "feedbackOnService": "palautetta Varaamosta",
-    "reserveCityResourcesAt": "Varaa helposti kaupungin tiloja ja laiteteita käyttöösi osoitteesta",
+    "reserveCityResourcesAt": "Varaa helposti kaupungin tiloja ja laitteita käyttöösi osoitteessa",
 
     "reservationPending": "Olet tehnyt alustavan varauksen:",
     "reservationCompleted": "Olet tehnyt uuden varauksen:",

@@ -4,9 +4,8 @@
     "helsinkiCity": "Helsingfors stad",
     "salutation": "Hej",
 
-    "manageReservationHeading": "Hantera din bokning på Varaamo",
-    "checkYourReservation": "Du kan kontrollera uppgifterna om din bokning samt Varaamos avtals- och avbokningsvillkor på sidan",
-    "ownReservationsPage": "Mina bokningar",
+    "manageReservation": "Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din bokning samt Varaamos avtals- och avbokningsvillkor på sidan",
+    "ownReservationsPage": "”Mina bokningar”",
     "thankYouForUsing": "Tack för att du använder Varaamo!",
 
     "withRegards": "Med vänliga hälsningar,",

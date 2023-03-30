@@ -15,7 +15,6 @@ ${reservationNumber}: {{reservation_number}}
 ${rejectionInstructions}
 {{cancelled_instructions}}
 
-${thankYouForUsing}
 ${withRegards}
 ${serviceName}
 

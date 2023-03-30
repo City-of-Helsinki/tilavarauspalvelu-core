@@ -23,8 +23,7 @@ ${reservationNumber}: {{reservation_number}}
 ${reservationInstruction}
 {{pending_instructions}}
 
-${manageReservationHeading}
-${checkYourReservation} ${ownReservationsPage}: {{my_reservations_ext_link}}
+${manageReservation} ${ownReservationsPage}: {{my_reservations_ext_link}}
 
 ${thankYouForUsing}
 ${withRegards}
