@@ -2,6 +2,7 @@ from datetime import date
 from logging import getLogger
 
 from django.conf import settings
+from easy_thumbnails.exceptions import InvalidImageFormatError
 from sentry_sdk import capture_exception, capture_message, push_scope
 
 from merchants.models import PaymentProduct
@@ -114,3 +115,18 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
                 )
                 scope.set_extra("reservation-unit-id", reservation_unit_pk)
                 capture_exception(err)
+
+
+@app.task(name="update_reservation_unit_image_urls")
+def update_urls():
+    from .models import ReservationUnitImage
+
+    for image in ReservationUnitImage.objects.all():
+        try:
+            image.large_url = image.image["large"].url
+            image.medium_url = image.image["medium"].url
+            image.small_url = image.image["small"].url
+            image.save()
+
+        except InvalidImageFormatError as err:
+            capture_exception(err)
