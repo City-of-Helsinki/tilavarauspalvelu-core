@@ -240,28 +240,26 @@ class ReservationUnitImageType(PrimaryKeyObjectType):
     def resolve_image_url(self, info):
         if not self.image:
             return None
+
         return info.context.build_absolute_uri(self.image.url)
 
     def resolve_large_url(self, info):
-        if not self.image:
+        if not self.large_url:
             return None
-        url = get_thumbnailer(self.image)["large"].url
 
-        return info.context.build_absolute_uri(url)
+        return info.context.build_absolute_uri(self.large_url)
 
     def resolve_small_url(self, info):
-        if not self.image:
+        if not self.small_url:
             return None
-        url = get_thumbnailer(self.image)["small"].url
 
-        return info.context.build_absolute_uri(url)
+        return info.context.build_absolute_uri(self.small_url)
 
     def resolve_medium_url(self, info):
-        if not self.image:
+        if not self.medium_url:
             return None
-        url = get_thumbnailer(self.image)["medium"].url
 
-        return info.context.build_absolute_uri(url)
+        return info.context.build_absolute_uri(self.medium_url)
 
 
 class ReservationUnitCancellationRuleType(AuthNode, PrimaryKeyObjectType):
