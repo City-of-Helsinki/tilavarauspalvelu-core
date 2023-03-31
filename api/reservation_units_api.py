@@ -2,7 +2,6 @@ from dateutil.parser import parse
 from django.conf import settings
 from django.db.models import Prefetch, Sum
 from django_filters import rest_framework as filters
-from easy_thumbnails.files import get_thumbnailer
 from rest_framework import filters as drf_filters
 from rest_framework import mixins, serializers, viewsets
 from rest_framework.decorators import action
@@ -93,23 +92,23 @@ class ReservationUnitImageSerializer(serializers.ModelSerializer):
     def get_small_url(self, obj):
         if not obj.image:
             return None
-        url = get_thumbnailer(obj.image)["small"].url
+
         request = self.context.get("request")
-        return request.build_absolute_uri(url)
+        return request.build_absolute_uri(obj.small_url)
 
     def get_medium_url(self, obj):
         if not obj.image:
             return None
-        url = get_thumbnailer(obj.image)["medium"].url
+
         request = self.context.get("request")
-        return request.build_absolute_uri(url)
+        return request.build_absolute_uri(obj.medium_url)
 
     def get_large_url(self, obj):
         if not obj.image:
             return None
-        url = get_thumbnailer(obj.image)["large"].url
+
         request = self.context.get("request")
-        return request.build_absolute_uri(url)
+        return request.build_absolute_uri(obj.large_url)
 
 
 class ReservationUnitTypeSerializer(serializers.ModelSerializer):
@@ -252,6 +251,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
                 "services",
                 "images",
                 "unit",
+                "purposes",
                 Prefetch("equipments", queryset=Equipment.objects.all().only("id")),
                 Prefetch(
                     "spaces",
