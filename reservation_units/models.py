@@ -781,6 +781,10 @@ class ReservationUnitImage(models.Model):
         null=True,
     )
 
+    large_url = models.URLField(null=False, blank=True, max_length=255, default="")
+    medium_url = models.URLField(null=False, blank=True, max_length=255, default="")
+    small_url = models.URLField(null=False, blank=True, max_length=255, default="")
+
     def __str__(self):
         return "{} ({})".format(
             self.reservation_unit.name, self.get_image_type_display()
