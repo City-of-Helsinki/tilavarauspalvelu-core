@@ -49,30 +49,32 @@ const hslUrl = (locale: string, location: LocationType): string | null => {
   )}`;
 };
 
-const googleUrl = (location: LocationType): string | null => {
+const googleUrl = (locale: string, location: LocationType): string | null => {
   if (!location) {
     return null;
   }
-  return `https://www.google.com/maps/dir/?api=1&destination=${getTranslation(
+  return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${getTranslation(
     location,
     "addressStreet"
   )},${getTranslation(location, "addressCity")}`;
 };
 
-const mapUrl = (unit: UnitType): string | null => {
+const mapUrl = (locale: string, unit: UnitType): string | null => {
   if (!unit?.tprekId) {
     return null;
   }
 
-  return `https://palvelukartta.hel.fi/fi/unit/${unit.tprekId}`;
+  return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}`;
 };
 
 const Address = ({ reservationUnit }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
   const location = reservationUnit.unit?.location;
-  const addressStreet = getTranslation(location, "addressStreet");
-  const addressCity = getTranslation(location, "addressCity");
+  const addressStreet =
+    getTranslation(location, "addressStreet") || location.addressStreetFi;
+  const addressCity =
+    getTranslation(location, "addressCity") || location.addressCityFi;
 
   if (!location || !addressStreet || !addressCity) {
     return <div />;
@@ -87,11 +89,11 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
       )}
       <Links>
         <ExternalLink
-          href={mapUrl(reservationUnit.unit)}
+          href={mapUrl(i18n.language, reservationUnit.unit)}
           name={t("reservationUnit:linkMap")}
         />
         <ExternalLink
-          href={googleUrl(location)}
+          href={googleUrl(i18n.language, location)}
           name={t("reservationUnit:linkGoogle")}
         />
         <ExternalLink

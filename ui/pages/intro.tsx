@@ -99,7 +99,7 @@ const IntroPage = (): JSX.Element => {
     <>
       <Head noKoros heading={t("application:Intro.heading")}>
         <Container>
-          {applicationRounds.length > 0 ? (
+          {applicationRounds?.length > 0 ? (
             <>
               <Select
                 id="applicationRoundSelect"
