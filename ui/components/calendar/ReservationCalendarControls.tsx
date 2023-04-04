@@ -18,7 +18,7 @@ import {
   IconAngleUp,
   Select,
 } from "hds-react";
-import { trim, trimStart } from "lodash";
+import { maxBy, trim, trimStart } from "lodash";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   convertHMSToSeconds,
@@ -522,6 +522,11 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     trailingZeros: true,
   });
 
+  const lastOpeningDate = maxBy(
+    reservationUnit.openingHours?.openingTimes,
+    (n) => n.date
+  );
+
   const submitButton = createReservation ? (
     <SubmitButtonWrapper>
       <LoginFragment
@@ -620,6 +625,11 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               label={t("reservationCalendar:startDate")}
               language={i18n.language as Language}
               minDate={new Date()}
+              maxDate={
+                lastOpeningDate?.date
+                  ? new Date(lastOpeningDate.date)
+                  : new Date()
+              }
             />
             <StyledSelect
               key={`startTime-${startTime}`}

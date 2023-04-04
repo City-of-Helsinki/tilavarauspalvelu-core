@@ -12,7 +12,7 @@ import {
   isValid,
 } from "date-fns";
 import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
-import { padStart } from "lodash";
+import { maxBy, padStart } from "lodash";
 
 import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
@@ -383,6 +383,11 @@ const QuickReservation = ({
     [date, getNextAvailableTime]
   );
 
+  const lastOpeningDate = maxBy(
+    reservationUnit.openingHours?.openingTimes,
+    (n) => n.date
+  );
+
   if (
     !reservationUnit.openingHours ||
     !minReservationDuration ||
@@ -407,6 +412,10 @@ const QuickReservation = ({
             }
           }}
           value={toUIDate(date)}
+          minDate={new Date()}
+          maxDate={
+            lastOpeningDate?.date ? new Date(lastOpeningDate.date) : new Date()
+          }
         />
         <StyledTimeInput
           key={`timeInput-${time}`}
