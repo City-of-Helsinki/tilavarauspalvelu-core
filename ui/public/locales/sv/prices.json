@@ -3,7 +3,7 @@
   "priceUnits": {
     "PER_15_MINS": "15 min",
     "PER_30_MINS": "30 min",
-    "PER_HOUR": "hour",
+    "PER_HOUR": "timme",
     "PER_HALF_DAY": "½ dag",
     "PER_DAY": "dag",
     "PER_WEEK": "vecka"

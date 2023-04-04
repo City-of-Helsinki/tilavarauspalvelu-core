@@ -241,7 +241,7 @@ export const getPrice = (props: GetPriceType): string => {
   const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
   const floatFormatter = trailingZeros ? "twoDecimal" : "strippedDecimal";
 
-  const formatters = getFormatters(i18n.language);
+  const formatters = getFormatters("fi");
 
   if (pricing?.pricingType === "PAID" && pricing.highestPrice) {
     const volume = getReservationVolume(minutes, pricing.priceUnit);
