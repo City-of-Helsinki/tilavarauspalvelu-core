@@ -43,6 +43,8 @@ const createReservation = graphql.mutation<
 >("createReservation", (req, res, ctx) => {
   const getPk = (resUnitPk: number): number => {
     switch (resUnitPk) {
+      case 903:
+        return 43;
       case 908:
       case 909:
         return 99;
@@ -129,15 +131,25 @@ const confirmReservation = graphql.mutation<
   { input: ReservationConfirmMutationInput }
 >("confirmReservation", (req, res, ctx) => {
   const { input } = req.variables;
+  let state: ReservationsReservationStateChoices;
+  switch (input.pk) {
+    case 43:
+      state = ReservationsReservationStateChoices.WaitingForPayment;
+      break;
+    default:
+      state = ReservationsReservationStateChoices.Confirmed;
+  }
+
   return res(
     ctx.data({
       confirmReservation: {
         pk: input.pk,
-        state: ReservationsReservationStateChoices.Confirmed,
+        state,
         order: {
           pk: 1234,
           id: "vmearo094r",
-          checkoutUrl: "https://www.google.com/00-11-22-33",
+          checkoutUrl:
+            "https://www.google.com/00-11-22-33?user=1234-abcd-9876-efgh",
           receiptUrl:
             "https://www.google.com/receiptUrl/00-11-22-33/receipt?user=1234-abcd-9876",
         },

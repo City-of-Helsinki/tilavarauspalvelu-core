@@ -693,6 +693,12 @@ describe("with metadataset", () => {
       "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut alennusryhmiin."
     );
 
+    cancelButton().click();
+    cy.get("#applyingForFreeOfCharge").click();
+    cy.get('button[type="submit"]').click();
+
+    cy.get("main#main").should("contain.text", "Tarkista varauksen tiedot");
+
     cy.get('button[type="submit"]').click();
 
     errorNotificationTitle().should(
@@ -723,15 +729,10 @@ describe("with metadataset", () => {
 
     cy.get('button[type="submit"]').click();
 
-    cy.on("url:changed", (newUrl) => {
-      const isGoogleDomain = newUrl.includes("www.google.com");
-
-      if (isGoogleDomain) {
-        expect(newUrl).to.contain(
-          "https://www.google.com/00-11-22-33/paymentmethod?user=1234-abcd-9876&lang=fi"
-        );
-      }
-    });
+    cy.url().should(
+      "contain",
+      "https://www.google.com/00-11-22-33/paymentmethod?user=1234-abcd-9876-efgh&lang=fi"
+    );
   });
 });
 

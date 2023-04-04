@@ -367,11 +367,13 @@ const ReservationUnitReservation = ({
       } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
         const { checkoutUrl, receiptUrl } = order ?? {};
-        const userId = new URL(receiptUrl)?.searchParams?.get("user");
+        const { origin, pathname, searchParams } = new URL(checkoutUrl) || {};
+        const userId = searchParams?.get("user");
 
-        if (checkoutUrl && receiptUrl && userId) {
+        if (checkoutUrl && receiptUrl && userId && origin && pathname) {
+          const baseUrl = `${origin}${pathname}`;
           router.push(
-            `${data.confirmReservation?.order?.checkoutUrl}/paymentmethod?user=${userId}&lang=${i18n.language}`
+            `${baseUrl}/paymentmethod?user=${userId}&lang=${i18n.language}`
           );
         } else {
           setErrorMsg(t("errors:general_error"));
