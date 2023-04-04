@@ -21,7 +21,7 @@ import { RecurringReservationFormSchema } from "./RecurringReservationSchema";
 import type { RecurringReservationForm } from "./RecurringReservationSchema";
 import SortedSelect from "../../ReservationUnits/ReservationUnitEditor/SortedSelect";
 import { WeekdaysSelector } from "./WeekdaysSelector";
-import { ReservationList } from "./ReservationsList";
+import ReservationList from "./ReservationsList";
 import { CREATE_RECURRING_RESERVATION } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
@@ -49,13 +49,9 @@ const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
 
 type Props = {
   reservationUnits: ReservationUnitType[];
-  onReservation: (res: ReservationMade[]) => void;
 };
 
-const MyUnitRecurringReservationForm = ({
-  reservationUnits,
-  onReservation,
-}: Props) => {
+const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const { t } = useTranslation();
 
   const form = useForm<RecurringReservationForm>({
@@ -125,6 +121,8 @@ const MyUnitRecurringReservationForm = ({
     form,
     reservationUnit?.reservationStartInterval
   );
+
+  const navigate = useNavigate();
 
   const onSubmit = async (data: RecurringReservationForm) => {
     // TODO notifyError does a double translation somewhere
@@ -256,8 +254,10 @@ const MyUnitRecurringReservationForm = ({
           }
         });
 
-        const result = await Promise.all(rets).then((y) => y);
-        onReservation(result);
+        const result: ReservationMade[] = await Promise.all(rets).then(
+          (y) => y
+        );
+        navigate("completed", { state: result });
       }
     } catch (e) {
       notifyError(
@@ -268,8 +268,6 @@ const MyUnitRecurringReservationForm = ({
       // Based on documentation backend will do this for us.
     }
   };
-
-  const navigate = useNavigate();
 
   const handleCancel = () => {
     navigate(-1);

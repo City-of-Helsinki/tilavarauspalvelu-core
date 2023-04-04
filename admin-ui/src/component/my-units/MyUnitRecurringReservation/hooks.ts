@@ -7,7 +7,7 @@ import type {
 } from "common/types/gql-types";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import type { UseFormReturn } from "react-hook-form";
-import { generateReservations } from "./ReservationsList";
+import { generateReservations } from "./generateReservations";
 import type { RecurringReservationForm } from "./RecurringReservationSchema";
 import { useNotification } from "../../../context/NotificationContext";
 import { RECURRING_RESERVATION_UNIT_QUERY } from "../queries";
