@@ -8,6 +8,7 @@ export const CURRENT_USER = gql`
       lastName
       isSuperuser
       username
+      pk
       unitRoles {
         pk
         role {

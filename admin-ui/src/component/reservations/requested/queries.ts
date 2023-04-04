@@ -34,6 +34,9 @@ export const RESERVATION_QUERY = gql`
         unit {
           pk
           nameFi
+          serviceSectors {
+            pk
+          }
         }
         pricings {
           begins

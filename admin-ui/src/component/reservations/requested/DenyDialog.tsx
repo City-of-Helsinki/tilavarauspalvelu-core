@@ -8,6 +8,7 @@ import {
   Query,
   QueryReservationDenyReasonsArgs,
   ReservationDenyMutationInput,
+  ReservationDenyReasonType,
   ReservationType,
 } from "common/types/gql-types";
 import { useModal } from "../../../context/ModalContext";
@@ -51,21 +52,45 @@ const DialogContent = ({
       onCompleted: ({ reservationDenyReasons }) => {
         if (reservationDenyReasons) {
           setDenyReasonOptions(
-            reservationDenyReasons.edges.map(
-              (dr): OptionType => ({
-                value: dr?.node?.pk as number,
-                label: dr?.node?.reasonFi as string,
-              })
-            )
+            reservationDenyReasons.edges
+              .map((x) => x?.node)
+              .filter((x): x is ReservationDenyReasonType => x != null)
+              .map(
+                (dr): OptionType => ({
+                  value: dr?.pk ?? 0,
+                  label: dr?.reasonFi ?? "",
+                })
+              )
           );
         }
       },
-
       onError: () => {
         notifyError(t("RequestedReservation.errorFetchingData"));
       },
     }
   );
+
+  const handleDeny = async () => {
+    try {
+      if (denyReasonPk == null) {
+        throw new Error("Deny PK undefined");
+      }
+      const res = await denyReservation({
+        pk: reservation.pk,
+        denyReasonPk,
+        handlingDetails,
+      });
+
+      if (res.errors) {
+        notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
+      } else {
+        notifySuccess(t("RequestedReservation.DenyDialog.denied"));
+        onReject();
+      }
+    } catch (e) {
+      notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
+    }
+  };
 
   if (loading) {
     return <Loader />;
@@ -100,27 +125,7 @@ const DialogContent = ({
         <Button variant="secondary" onClick={onClose} theme="black">
           {t("common.prev")}
         </Button>
-        <Button
-          disabled={!denyReasonPk}
-          onClick={async () => {
-            try {
-              const res = await denyReservation({
-                pk: reservation.pk,
-                denyReasonPk: denyReasonPk as number,
-                handlingDetails,
-              });
-
-              if (res.errors) {
-                notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
-              } else {
-                notifySuccess(t("RequestedReservation.DenyDialog.denied"));
-                onReject();
-              }
-            } catch (e) {
-              notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
-            }
-          }}
-        >
+        <Button disabled={!denyReasonPk} onClick={handleDeny}>
           {t("RequestedReservation.DenyDialog.reject")}
         </Button>
       </ActionButtons>
@@ -134,7 +139,6 @@ const DenyDialog = ({
   onReject,
 }: {
   reservation: ReservationType;
-
   onClose: () => void;
   onReject: () => void;
 }): JSX.Element => {

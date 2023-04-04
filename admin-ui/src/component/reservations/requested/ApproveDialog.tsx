@@ -70,6 +70,32 @@ const DialogContent = ({
   const hasPrice = Boolean(reservation.price !== undefined);
   const priceIsValid = !hasPrice || !Number.isNaN(parseNumber(price));
 
+  const handleApprove = async () => {
+    try {
+      const res = await approveReservation({
+        pk: reservation.pk,
+        price: parseNumber(price),
+        priceNet: calcPriceNet(price, reservation.taxPercentageValue),
+        handlingDetails,
+      });
+
+      if (res.data?.approveReservation?.errors) {
+        notifyError(
+          t("RequestedReservation.ApproveDialog.errorSaving", {
+            error: res.data?.approveReservation?.errors
+              .map((e) => `${e?.field}: ${e?.messages}`)
+              .join(", "),
+          })
+        );
+      } else {
+        notifySuccess(t("RequestedReservation.ApproveDialog.approved"));
+        onAccept();
+      }
+    } catch (e) {
+      notifyError(t("RequestedReservation.ApproveDialog.errorSaving"));
+    }
+  };
+
   return (
     <>
       <Dialog.Content>
@@ -138,34 +164,7 @@ const DialogContent = ({
           {t("common.cancel")}
         </Button>
 
-        <Button
-          disabled={!priceIsValid}
-          onClick={async () => {
-            try {
-              const res = await approveReservation({
-                pk: reservation.pk,
-                price: parseNumber(price),
-                priceNet: calcPriceNet(price, reservation.taxPercentageValue),
-                handlingDetails,
-              });
-
-              if (res.data?.approveReservation?.errors) {
-                notifyError(
-                  t("RequestedReservation.ApproveDialog.errorSaving", {
-                    error: res.data?.approveReservation?.errors
-                      .map((e) => `${e?.field}: ${e?.messages}`)
-                      .join(", "),
-                  })
-                );
-              } else {
-                notifySuccess(t("RequestedReservation.ApproveDialog.approved"));
-                onAccept();
-              }
-            } catch (e) {
-              notifyError(t("RequestedReservation.ApproveDialog.errorSaving"));
-            }
-          }}
-        >
+        <Button disabled={!priceIsValid} onClick={handleApprove}>
           {t("RequestedReservation.ApproveDialog.accept")}
         </Button>
       </ActionButtons>

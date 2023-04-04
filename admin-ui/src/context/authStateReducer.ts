@@ -22,7 +22,7 @@ export type Auth = {
   hasPermission: (
     permissionName: string,
     unitPk: number,
-    serviceSectorPk?: number
+    serviceSectorPks: number[]
   ) => boolean;
 };
 

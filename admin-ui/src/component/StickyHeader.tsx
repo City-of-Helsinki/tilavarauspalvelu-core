@@ -51,7 +51,7 @@ const Tagline = styled.div`
 type Props = {
   name: string;
   tagline: string;
-  buttons?: JSX.Element;
+  buttons?: React.ReactNode;
 };
 
 const StickyHeader = ({ name, tagline, buttons }: Props): JSX.Element => (
