@@ -635,14 +635,23 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
                 "reservation_confirmed_at": self.confirmed_at,
                 "reservee_type": self.reservee_type,
                 "applying_for_free_of_charge": self.applying_for_free_of_charge,
+                "buffer_time_before": self.buffer_time_before,
+                "buffer_time_after": self.buffer_time_after,
                 "reservee_language": self.reservee_language,
                 "num_persons": self.num_persons,
                 "priority": self.priority,
+                "priority_name": PRIORITIES.get_priority_name_from_constant(
+                    self.priority
+                ),
                 "home_city": self.home_city,
+                "home_city_name": self.home_city.name if self.home_city else "",
+                "home_city_municipality_code": self.home_city.municipality_code
+                if self.home_city
+                else "",
                 "purpose": self.purpose,
+                "purpose_name": self.purpose.name if self.purpose else "",
                 "age_group": self.age_group,
-                "age_group_min": getattr(self.age_group, "minimum", None),
-                "age_group_max": getattr(self.age_group, "maximum", None),
+                "age_group_name": str(self.age_group),
                 "is_applied": getattr(recurring, "application", None) is not None,
                 "ability_group": getattr(
                     self.recurring_reservation, "ability_group", None
@@ -657,6 +666,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
                 "deny_reason": self.deny_reason,
                 "deny_reason_text": getattr(self.deny_reason, "reason", ""),
                 "price": self.price,
+                "price_net": self.price_net,
                 "tax_percentage_value": self.tax_percentage_value,
                 "non_subsidised_price": self.non_subsidised_price,
                 "non_subsidised_price_net": self.non_subsidised_price_net,
@@ -665,6 +675,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
                 "recurrence_begin_date": getattr(recurring, "begin_date", None),
                 "recurrence_end_date": getattr(recurring, "end_date", None),
                 "recurrence_uuid": getattr(recurring, "uuid", ""),
+                "reservee_is_unregistered_association": self.reservee_is_unregistered_association,
                 "reservee_uuid": str(self.user.tvp_uuid) if self.user else "",
             },
         )
@@ -761,6 +772,13 @@ class ReservationStatistic(models.Model):
         verbose_name=_("Confirmed at"), null=True
     )
 
+    buffer_time_before = models.DurationField(
+        verbose_name=_("Buffer time before"), blank=True, null=True
+    )
+    buffer_time_after = models.DurationField(
+        verbose_name=_("Buffer time after"), blank=True, null=True
+    )
+
     updated_at = models.DateTimeField(
         verbose_name=_("Statistics updated at"), null=True, blank=True, auto_now=True
     )
@@ -795,6 +813,8 @@ class ReservationStatistic(models.Model):
         choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
     )
 
+    priority_name = models.CharField(max_length=255, null=False, default="", blank=True)
+
     home_city = models.ForeignKey(
         City,
         verbose_name=_("Home city"),
@@ -805,6 +825,18 @@ class ReservationStatistic(models.Model):
         help_text="Home city of the group or association",
     )
 
+    home_city_name = models.CharField(
+        verbose_name=_("Home city name"),
+        max_length=100,
+        null=False,
+        default="",
+        blank=True,
+    )
+
+    home_city_municipality_code = models.CharField(
+        verbose_name=_("Home city municipality code"), default="", max_length=30
+    )
+
     purpose = models.ForeignKey(
         "ReservationPurpose",
         verbose_name=_("Reservation purpose"),
@@ -812,6 +844,8 @@ class ReservationStatistic(models.Model):
         null=True,
         blank=True,
     )
+
+    purpose_name = models.CharField(max_length=200, null=False, default="", blank=True)
 
     age_group = models.ForeignKey(
         AgeGroup,
@@ -821,12 +855,8 @@ class ReservationStatistic(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    age_group_min = models.fields.PositiveIntegerField(
-        verbose_name=_("Minimum"), null=True, blank=False
-    )
-
-    age_group_max = models.fields.PositiveIntegerField(
-        verbose_name=_("Maximum"), null=True, blank=True
+    age_group_name = models.fields.CharField(
+        max_length=255, null=False, default="", blank=True
     )
 
     is_applied = models.BooleanField(
@@ -908,6 +938,15 @@ class ReservationStatistic(models.Model):
         default=0,
         help_text="The price of this particular reservation",
     )
+
+    price_net = models.DecimalField(
+        verbose_name=_("Price net"),
+        max_digits=20,
+        decimal_places=6,
+        default=0,
+        help_text="The price of this particular reservation excluding VAT",
+    )
+
     non_subsidised_price = models.DecimalField(
         verbose_name=_("Non subsidised price"),
         max_digits=20,
@@ -936,6 +975,12 @@ class ReservationStatistic(models.Model):
     )
     recurrence_uuid = models.CharField(
         verbose_name="Recurrence UUID", max_length=255, default="", blank=True
+    )
+    reservee_is_unregistered_association = models.BooleanField(
+        verbose_name=_("Reservee is an unregistered association"),
+        null=True,
+        default=False,
+        blank=True,
     )
     reservee_uuid = models.CharField(
         verbose_name="Reservee UUID", max_length=255, default="", blank=True
