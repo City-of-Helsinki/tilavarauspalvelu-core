@@ -114,6 +114,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
             self.reservation_unit.name
         )
         assert_that(stat.primary_unit_name).is_equal_to(self.reservation_unit.unit.name)
+        assert_that(stat.primary_reservation_unit).is_equal_to(self.reservation_unit)
         assert_that(stat.primary_unit_tprek_id).is_equal_to(
             self.reservation_unit.unit.tprek_id
         )
@@ -179,4 +180,5 @@ class ReservationStatisticsCreateTestCase(TestCase):
         ).is_equal_to(resu)
         assert_that(stat.primary_reservation_unit_name).is_equal_to(resu.name)
         assert_that(stat.primary_unit_name).is_equal_to(resu.unit.name)
+        assert_that(stat.primary_reservation_unit).is_equal_to(resu)
         assert_that(stat.primary_unit_tprek_id).is_equal_to(resu.unit.tprek_id)

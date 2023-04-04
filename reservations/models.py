@@ -688,6 +688,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
 
         res_unit = self.reservation_unit.first()
         if res_unit:
+            stat.primary_reservation_unit = res_unit
             stat.primary_reservation_unit_name = res_unit.name
             stat.primary_unit_name = res_unit.unit.name
             stat.primary_unit_tprek_id = res_unit.unit.tprek_id
