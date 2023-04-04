@@ -10,7 +10,6 @@ import { GetServerSideProps } from "next";
 import { Trans, useTranslation } from "next-i18next";
 import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import {
@@ -118,6 +117,7 @@ import {
   Wrapper,
 } from "../../components/reservation-unit/ReservationUnitStyles";
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
+import { Toast } from "../../styles/util";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -1094,7 +1094,7 @@ const ReservationUnit = ({
         )}
       </BottomWrapper>
       {errorMsg && (
-        <Notification
+        <Toast
           type="error"
           label={t("reservationUnit:reservationFailed")}
           position="top-center"
@@ -1105,7 +1105,7 @@ const ReservationUnit = ({
           closeButtonLabelText={t("common:error.closeErrorMsg")}
         >
           {errorMsg}
-        </Notification>
+        </Toast>
       )}
     </Wrapper>
   ) : null;

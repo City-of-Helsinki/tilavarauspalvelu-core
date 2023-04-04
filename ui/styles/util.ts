@@ -1,5 +1,5 @@
 import { fontMedium } from "common/src/common/typography";
-import { Button } from "hds-react";
+import { Button, Notification } from "hds-react";
 import styled, { css, CSSProperties } from "styled-components";
 
 export const truncatedText = css`
@@ -73,4 +73,8 @@ export const LinkButton = styled.button`
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
+`;
+
+export const Toast = styled(Notification)`
+  --notification-z-index-toast: var(--tilavaraus-stack-order-toast);
 `;

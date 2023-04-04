@@ -16,7 +16,7 @@ import {
 } from "common/types/gql-types";
 import { pick } from "lodash";
 import { useRouter } from "next/router";
-import { LoadingSpinner, Notification, Stepper } from "hds-react";
+import { LoadingSpinner, Stepper } from "hds-react";
 import { addYears } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
@@ -47,6 +47,7 @@ import EditStep0 from "./EditStep0";
 import EditStep1 from "./EditStep1";
 import { reservationsPrefix } from "../../modules/const";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
+import { Toast } from "../../styles/util";
 
 type Props = {
   id: number;
@@ -406,7 +407,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
         </Columns>
       </Content>
       {errorMsg && (
-        <Notification
+        <Toast
           type="error"
           label={t("reservations:reservationEditFailed")}
           position="top-center"
@@ -417,10 +418,10 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
           closeButtonLabelText={t("common:error.closeErrorMsg")}
         >
           {errorMsg}
-        </Notification>
+        </Toast>
       )}
       {showSuccessMsg && (
-        <Notification
+        <Toast
           type="success"
           label={t("reservations:saveNewTimeSuccess")}
           position="top-center"
@@ -432,7 +433,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
           closeButtonLabelText={t("common:error.closeErrorMsg")}
         >
           {errorMsg}
-        </Notification>
+        </Toast>
       )}
     </Wrapper>
   );

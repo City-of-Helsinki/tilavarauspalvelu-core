@@ -3,7 +3,7 @@ import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isAfter } from "date-fns";
 import { useQuery } from "@apollo/client";
-import { Tabs, TabList, Tab, TabPanel, Notification } from "hds-react";
+import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -21,6 +21,7 @@ import ReservationCard from "../../components/reservation/ReservationCard";
 import Head from "../../components/reservations/Head";
 import { CenterSpinner } from "../../components/common/common";
 import { CURRENT_USER } from "../../modules/queries/user";
+import { Toast } from "../../styles/util";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -210,16 +211,16 @@ const Reservations = (): JSX.Element => {
           </Tabs>
         </Heading>
         {error && (
-          <Notification
+          <Toast
             type="error"
             label={t("common:error.error")}
             position="top-center"
           >
             {t("common:error.dataError")}
-          </Notification>
+          </Toast>
         )}
         {routerError === "order1" && (
-          <Notification
+          <Toast
             type="error"
             label={t("reservations:confirmationError.heading")}
             position="top-center"
@@ -227,7 +228,7 @@ const Reservations = (): JSX.Element => {
             closeButtonLabelText={t("common:close")}
           >
             {t("reservations:confirmationError.body")}
-          </Notification>
+          </Toast>
         )}
       </Wrapper>
     </>
