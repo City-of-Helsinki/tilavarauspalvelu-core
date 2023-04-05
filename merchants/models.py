@@ -119,6 +119,7 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
         null=False,
         max_length=128,
         choices=OrderStatus.choices,
+        db_index=True,
     )
     price_net = models.DecimalField(
         verbose_name=_("Net amount"),
