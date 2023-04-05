@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.models import CUSTOMER_TYPES, City
+from applications.models import CUSTOMER_TYPES, PRIORITIES, City
 from applications.tests.factories import ApplicationEventFactory, ApplicationFactory
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES, AgeGroup, ReservationStatistic
@@ -33,10 +33,12 @@ class ReservationStatisticsCreateTestCase(TestCase):
             name="resu", unit=UnitFactory(name="mesta", tprek_id="1234")
         )
         cls.recurring = RecurringReservationFactory()
+        cls.priority = PRIORITIES.PRIORITY_LOW
+        cls.priority_name = PRIORITIES.get_priority_name_from_constant(cls.priority)
         cls.reservation_data = {
             "reservee_type": CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
             "reservee_is_unregistered_association": False,
-            "home_city": City.objects.create(name="Test"),
+            "home_city": City.objects.create(name="Test", municipality_code="1234"),
             "applying_for_free_of_charge": True,
             "free_of_charge_reason": "This is some reason.",
             "age_group": AgeGroup.objects.create(minimum=18, maximum=30),
@@ -48,7 +50,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
             "end": datetime.datetime(2020, 1, 1, 14, 0, tzinfo=get_default_timezone()),
             "state": STATE_CHOICES.CREATED,
             "user": cls.joe_the_reggie,
-            "priority": 100,
+            "priority": cls.priority,
             "purpose": ReservationPurposeFactory(name="PurpleChoice"),
             "unit_price": 10,
             "tax_percentage_value": 24,
@@ -86,11 +88,16 @@ class ReservationStatisticsCreateTestCase(TestCase):
         )
         assert_that(stat.num_persons).is_equal_to(self.reservation.num_persons)
         assert_that(stat.priority).is_equal_to(self.reservation.priority)
+        assert_that(stat.priority_name).is_equal_to(self.priority_name)
         assert_that(stat.home_city).is_equal_to(self.reservation.home_city)
+        assert_that(stat.home_city_name).is_equal_to(self.reservation.home_city.name)
+        assert_that(stat.home_city_municipality_code).is_equal_to(
+            self.reservation.home_city.municipality_code
+        )
         assert_that(stat.purpose).is_equal_to(self.reservation.purpose)
+        assert_that(stat.purpose_name).is_equal_to(self.reservation.purpose.name)
         assert_that(stat.age_group).is_equal_to(self.reservation.age_group)
-        assert_that(stat.age_group_min).is_equal_to(self.reservation.age_group.minimum)
-        assert_that(stat.age_group_max).is_equal_to(self.reservation.age_group.maximum)
+        assert_that(stat.age_group_name).is_equal_to(str(self.reservation.age_group))
         assert_that(stat.is_applied).is_false()
         assert_that(stat.ability_group).is_none()
         assert_that(stat.begin).is_equal_to(self.reservation.begin)
@@ -114,6 +121,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
             self.reservation_unit.name
         )
         assert_that(stat.primary_unit_name).is_equal_to(self.reservation_unit.unit.name)
+        assert_that(stat.primary_reservation_unit).is_equal_to(self.reservation_unit)
         assert_that(stat.primary_unit_tprek_id).is_equal_to(
             self.reservation_unit.unit.tprek_id
         )
@@ -130,6 +138,16 @@ class ReservationStatisticsCreateTestCase(TestCase):
         assert_that(stat.recurrence_end_date).is_equal_to(self.recurring.end_date)
         assert_that(stat.recurrence_uuid).is_equal_to(str(self.recurring.uuid))
         assert_that(stat.reservee_uuid).is_equal_to(str(self.reservation.user.tvp_uuid))
+        assert_that(stat.price_net).is_equal_to(self.reservation.price_net)
+        assert_that(stat.reservee_is_unregistered_association).is_equal_to(
+            self.reservation.reservee_is_unregistered_association
+        )
+        assert_that(stat.buffer_time_before).is_equal_to(
+            self.reservation.buffer_time_before
+        )
+        assert_that(stat.buffer_time_after).is_equal_to(
+            self.reservation.buffer_time_after
+        )
 
     def test_statistics_update_on_when_updating(self):
         self.reservation.purpose = ReservationPurposeFactory(name="Syy")
@@ -179,4 +197,5 @@ class ReservationStatisticsCreateTestCase(TestCase):
         ).is_equal_to(resu)
         assert_that(stat.primary_reservation_unit_name).is_equal_to(resu.name)
         assert_that(stat.primary_unit_name).is_equal_to(resu.unit.name)
+        assert_that(stat.primary_reservation_unit).is_equal_to(resu)
         assert_that(stat.primary_unit_tprek_id).is_equal_to(resu.unit.tprek_id)
