@@ -1,5 +1,6 @@
 import { Notification, Select } from "hds-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -17,6 +18,7 @@ import Head from "../components/application/Head";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { CenterSpinner } from "../components/common/common";
 import { getApplicationRoundName } from "../modules/applicationRound";
+import { authEnabled, authenticationIssuer } from "../modules/const";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
@@ -45,6 +47,8 @@ const Container = styled.div`
 `;
 
 const IntroPage = (): JSX.Element => {
+  const session = useSession();
+
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
   const [applicationRounds, setApplicationRounds] = useState<OptionType[]>([]);
@@ -52,6 +56,17 @@ const IntroPage = (): JSX.Element => {
 
   const history = useRouter();
   const { t } = useTranslation();
+
+  const isUserUnauthenticated =
+    authEnabled && session?.status === "unauthenticated";
+
+  useEffect(() => {
+    if (isUserUnauthenticated) {
+      signIn(authenticationIssuer, {
+        callbackUrl: window.location.href,
+      });
+    }
+  }, [isUserUnauthenticated]);
 
   useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS, {
     fetchPolicy: "no-cache",
@@ -115,7 +130,7 @@ const IntroPage = (): JSX.Element => {
               />
               <MediumButton
                 id="start-application"
-                disabled={!applicationRound || saving}
+                disabled={isUserUnauthenticated || !applicationRound || saving}
                 onClick={() => {
                   createNewApplication(applicationRound);
                 }}
