@@ -164,7 +164,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         CELERY_TASK_ALWAYS_EAGER=True,
         SEND_RESERVATION_NOTIFICATION_EMAILS=False,
     )
-    def test_handling_details_saves_to_working_memo_also(self):
+    def test_handling_details_does_not_save_to_working_memo(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_deny_data()
         response = self.query(self.get_handle_query(), input_data=input_data)
@@ -173,7 +173,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
-        assert_that(self.reservation.handling_details).is_equal_to(
+        assert_that(self.reservation.handling_details).is_not_equal_to(
             self.reservation.working_memo
         )
 

@@ -38,8 +38,7 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
         validated_data = super().validated_data
         validated_data["state"] = STATE_CHOICES.CONFIRMED
         validated_data["handled_at"] = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        # For now we wan't to copy the handling details to working memo. In future perhaps not.
-        validated_data["working_memo"] = validated_data["handling_details"]
+
         return validated_data
 
     def validate(self, data):
