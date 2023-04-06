@@ -64,7 +64,9 @@ class ReservationDenySerializer(PrimaryKeySerializer):
                 ValidationErrorCodes.DENYING_NOT_ALLOWED,
             )
 
-        self.check_reservation_has_not_ended()
+        # For confirmed reservations check that the reservation has not ended.
+        if self.instance.state == STATE_CHOICES.CONFIRMED:
+            self.check_reservation_has_not_ended()
 
         data = super().validate(data)
 
@@ -81,8 +83,10 @@ class ReservationDenySerializer(PrimaryKeySerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
-        if instance.type == ReservationType.NORMAL:
+        # Send the notification email only for normal reservations which has not ended.
+        if instance.type == ReservationType.NORMAL and instance.end > now:
             send_deny_email(instance)
 
         return instance
