@@ -168,7 +168,7 @@ class ReservationCreateSerializer(
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
 
-    def validate(self, data):
+    def validate(self, data, prefill_from_profile=True):
         begin = data.get("begin", getattr(self.instance, "begin", None))
         end = data.get("end", getattr(self.instance, "end", None))
         begin = begin.astimezone(DEFAULT_TIMEZONE)
@@ -238,7 +238,7 @@ class ReservationCreateSerializer(
         reservation_unit_ids = list(map(lambda x: x.pk, reservation_units))
         self.check_reservation_type(user, reservation_unit_ids, reservation_type)
 
-        if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
+        if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA and prefill_from_profile:
             data = self._prefill_from_from_profile(user, data)
 
         return data
