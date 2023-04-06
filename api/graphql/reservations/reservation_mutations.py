@@ -29,6 +29,7 @@ from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.order.requests import cancel_order
 from permissions.api_permissions.graphene_permissions import (
     ReservationCommentPermission,
+    ReservationDenyPermission,
     ReservationHandlingPermission,
     ReservationPermission,
     ReservationStaffCreatePermission,
@@ -88,7 +89,7 @@ class ReservationCancellationMutation(AuthSerializerMutation, SerializerMutation
 
 
 class ReservationDenyMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (ReservationHandlingPermission,)
+    permission_classes = (ReservationDenyPermission,)
 
     class Meta:
         lookup_field = "pk"

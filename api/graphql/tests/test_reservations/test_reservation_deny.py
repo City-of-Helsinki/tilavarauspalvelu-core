@@ -3,6 +3,7 @@ import json
 
 import freezegun
 from assertpy import assert_that
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
@@ -10,6 +11,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
+from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservations.models import STATE_CHOICES, ReservationType
 from reservations.tests.factories import (
     ReservationDenyReasonFactory,
@@ -100,6 +102,49 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_deny_data()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        deny_data = content.get("data").get("denyReservation")
+        assert_that(deny_data.get("errors")).is_none()
+        assert_that(deny_data.get("state")).is_equal_to(STATE_CHOICES.DENIED.upper())
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
+        assert_that(self.reservation.handling_details).is_equal_to("no can do")
+        assert_that(self.reservation.handled_at).is_not_none()
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("denied")
+
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_deny_success_when_own_reservation_with_reservation_staff_create_permissions(
+        self,
+    ):
+        staff_person = get_user_model().objects.create(
+            username="unit_admin",
+            first_name="Staff",
+            last_name="Persson",
+            email="staff.persson@foo.com",
+        )
+
+        unit_role = UnitRole.objects.create(
+            user=staff_person, role=UnitRoleChoice.objects.get(code="admin")
+        )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="admin"),
+            permission="can_create_staff_reservations",
+        )
+        unit_role.unit.add(self.unit)
+
+        self.reservation.user = staff_person
+        self.reservation.save()
+        self.client.force_login(staff_person)
+        input_data = self.get_valid_deny_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
