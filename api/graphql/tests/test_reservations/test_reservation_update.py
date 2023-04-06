@@ -1,11 +1,12 @@
 import datetime
 import json
 from decimal import Decimal
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import freezegun
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
@@ -1134,3 +1135,62 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
             "REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE"
         )
+
+    @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
+    @patch("users.utils.open_city_profile.basic_info_resolver.requests.get")
+    def test_reservation_details_does_not_get_overriden_with_profile_data(
+        self, mock_profile_call, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        data = {
+            "data": {
+                "myProfile": {
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "primaryAddress": {
+                        "postalCode": "00100",
+                        "address": "Test street 1",
+                        "city": "Helsinki",
+                        "addressType": "HOME",
+                    },
+                    "primaryPhone": {
+                        "phone": "123456789",
+                    },
+                    "verifiedPersonalInformation": {
+                        "municipalityOfResidence": "Helsinki",
+                        "municipalityOfResidenceNumber": "12345",
+                    },
+                }
+            }
+        }
+        mock_profile_call.return_value = MagicMock(
+            status_code=200, json=MagicMock(return_value=data)
+        )
+
+        input_data = self.get_valid_update_data()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(mock_profile_call.call_count).is_zero()
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("updateReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.user).is_equal_to(self.regular_joe)
+        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+        assert_that(reservation.priority).is_equal_to(
+            self.get_valid_update_data()["priority"]
+        )
+        assert_that(reservation.begin).is_equal_to(
+            self.reservation_begin + datetime.timedelta(hours=1)
+        )
+        assert_that(reservation.end).is_equal_to(
+            (self.reservation_end + datetime.timedelta(hours=1))
+        )
+        assert_that(reservation.reservee_first_name).is_not_equal_to("John")

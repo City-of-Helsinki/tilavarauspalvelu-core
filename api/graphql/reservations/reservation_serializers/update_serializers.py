@@ -39,7 +39,7 @@ class ReservationUpdateSerializer(
         self.fields["reservation_unit_pks"].required = False
         self.fields["purpose_pk"].required = False
 
-    def validate(self, data):
+    def validate(self, data, prefill_from_profile=False):
         if self.instance.state not in (STATE_CHOICES.CREATED,):
             raise ValidationErrorWithCode(
                 "Reservation cannot be changed anymore.",
@@ -53,7 +53,7 @@ class ReservationUpdateSerializer(
                 ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED,
             )
 
-        data = super().validate(data)
+        data = super().validate(data, prefill_from_profile)
         data["state"] = new_state
 
         reservation_units = data.get(
