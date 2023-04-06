@@ -9,7 +9,7 @@ import { z } from "zod";
 import { H1, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ActionsWrapper } from "./commonStyling";
-import ReservationList from "./ReservationsList";
+import ReservationList from "../../ReservationsList";
 import withMainMenu from "../../withMainMenu";
 
 const InfoSection = styled.p`
@@ -128,11 +128,11 @@ const RecurringReservationDone = () => {
           {t(`${locPrefix}.failedTitle`)} ({failed.length})
         </StyledH6>
       )}
-      <ReservationList items={failed} />
+      <ReservationList items={failed} hasPadding />
       <StyledH6 as="h2">
         {t(`${locPrefix}.successTitle`)} ({successes.length})
       </StyledH6>
-      <ReservationList items={successes} />
+      <ReservationList items={successes} hasPadding />
       <ActionsWrapper>
         <Button
           variant="secondary"

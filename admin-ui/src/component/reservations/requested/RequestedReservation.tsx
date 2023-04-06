@@ -43,7 +43,7 @@ import {
 import { publicUrl } from "../../../common/const";
 import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
 import StickyHeader from "../../StickyHeader";
-import { formatDateTime } from "../../../common/util";
+import { formatDate, formatDateTime, formatTime } from "../../../common/util";
 import Calendar from "./Calendar";
 import ReservationUserBirthDate from "./ReservationUserBirthDate";
 import VisibleIfPermission from "./VisibleIfPermission";
@@ -51,6 +51,7 @@ import { Accordion } from "../../../common/hds-fork/Accordion";
 import ApprovalButtons from "./ApprovalButtons";
 import { CURRENT_USER } from "../../../context/queries";
 import { useAuthState } from "../../../context/AuthStateContext";
+import RecurringReservationsView from "./RecurringReservationsView";
 
 const Dot = styled.div`
   display: inline-block;
@@ -220,6 +221,52 @@ const ButtonsWithPermChecks = ({
   return null;
 };
 
+// recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
+// single format   : {weekday} {date} {time}, {duration} | {unit}
+const createTagString = (reservation: ReservationType, t: TFunction) => {
+  const recurringTag =
+    reservation.recurringReservation?.beginDate &&
+    reservation.recurringReservation?.endDate
+      ? `${formatDate(reservation.recurringReservation.beginDate)}-${formatDate(
+          reservation.recurringReservation.endDate
+        )}`
+      : "";
+  const unitTag = reservation?.reservationUnits
+    ?.map(reservationUnitName)
+    .join(", ");
+
+  const singleDateTimeTag = `${reservationDateTime(
+    reservation.begin,
+    reservation.end,
+    t
+  )}`;
+
+  const weekDayTag = reservation.recurringReservation?.weekdays
+    ?.map((x) => t(`dayShort.${x}`))
+    ?.reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, "");
+
+  const recurringDateTag =
+    reservation.begin && reservation.end
+      ? `${weekDayTag} ${formatTime(reservation.begin, "HH:mm")}-${formatTime(
+          reservation.end,
+          "HH:mm"
+        )}`
+      : "";
+
+  const durationTag = `${reservationDuration(
+    reservation.begin,
+    reservation.end
+  )}`;
+
+  const reservationTagline = `${
+    reservation.recurringReservation ? recurringDateTag : singleDateTimeTag
+  }, ${durationTag}t ${
+    recurringTag.length > 0 ? " | " : ""
+  } ${recurringTag} | ${unitTag}`;
+
+  return reservationTagline;
+};
+
 const RequestedReservation = (): JSX.Element | null => {
   const { id } = useParams() as { id: string };
   const [reservation, setReservation] = useState<ReservationType>();
@@ -273,14 +320,7 @@ const RequestedReservation = (): JSX.Element | null => {
       ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid &&
     pricing.highestPrice >= 0;
 
-  const reservationTagline = `${reservationDateTime(
-    reservation.begin,
-    reservation.end,
-    t
-  )} ${reservationDuration(
-    reservation.begin,
-    reservation.end
-  )}t | ${reservation?.reservationUnits?.map(reservationUnitName).join(", ")}`;
+  const reservationTagline = createTagString(reservation, t);
 
   return (
     <>
@@ -463,6 +503,11 @@ const RequestedReservation = (): JSX.Element | null => {
               </VisibleIfPermission>
             </VerticalFlex>
           </Accordion>
+          {reservation.recurringReservation && (
+            <Accordion heading={t("RequestedReservation.recurring")}>
+              <RecurringReservationsView reservation={reservation} />
+            </Accordion>
+          )}
           <Accordion heading={t("RequestedReservation.calendar")}>
             <Calendar
               key={reservation.state}

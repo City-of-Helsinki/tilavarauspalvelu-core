@@ -50,6 +50,12 @@ export const RESERVATION_QUERY = gql`
           status
         }
       }
+      recurringReservation {
+        pk
+        beginDate
+        endDate
+        weekdays
+      }
       orderStatus
       ageGroup {
         minimum
@@ -97,6 +103,21 @@ export const RESERVATION_QUERY = gql`
       billingAddressZip
       freeOfChargeReason
       applyingForFreeOfCharge
+    }
+  }
+`;
+
+export const RECURRING_RESERVATION_QUERY = gql`
+  query recurringReservation($pk: ID!) {
+    reservations(recurringReservation: $pk, state: ["CONFIRMED", "DENIED"]) {
+      edges {
+        node {
+          pk
+          begin
+          end
+          state
+        }
+      }
     }
   }
 `;

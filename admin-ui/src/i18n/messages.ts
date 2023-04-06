@@ -320,6 +320,7 @@ const translations: ITranslations = {
       },
       pageTitle: ["Tee toistuva varaus"],
       Confirmation: {
+        removed: ["Poistettu"],
         title: ["Toistuva varaus tehty"],
         failedTitle: ["Epäonnistuneet varaukset"],
         successTitle: ["Varaukset"],
@@ -1809,6 +1810,9 @@ const translations: ITranslations = {
     removeFailed: ["Resurssin poistaminen ei onnistunut."],
     removeSuccess: ["Resurssi poistettu."],
   },
+  RecurringReservationsView: {
+    Heading: ["Ajankohta"],
+  },
   RequestedReservations: {
     heading: {
       unit: ["Toimipiste"],
@@ -1883,6 +1887,7 @@ const translations: ITranslations = {
     heading: ["Varauksen tarkastelu"],
     calendar: ["Varauskalenteri"],
     summary: ["Varauksen yhteenveto"],
+    recurring: ["Toistokerrat"],
     state: {
       REQUIRES_HANDLING: ["Käsittelemättä"],
       CONFIRMED: ["Hyväksytty"],

@@ -7,7 +7,7 @@ import { addDays, nextMonday } from "date-fns";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import { toUIDate } from "common/src/common/util";
 import { generateReservations } from "./generateReservations";
-import ReservationList from "./ReservationsList";
+import ReservationList from "../../ReservationsList";
 
 const today = new Date();
 const dtoday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());

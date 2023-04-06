@@ -35,17 +35,16 @@ export const reservationDateTime = (
 
   const startDay = t(`dayShort.${toMondayFirst(getDay(startDate))}`);
 
-  const endTimeFormat = endDate.getMinutes() === 0 ? "HH" : "HH:mm";
-  const startTimeFormat = startDate.getMinutes() === 0 ? "HH" : "HH:mm";
-  return isSameDay(startDate, endDate)
-    ? `${startDay} ${formatDate(start)} klo ${formatTime(
-        start,
-        startTimeFormat
-      )} - ${formatTime(end, endTimeFormat)}`
-    : `${formatDate(start)} klo ${formatTime(
-        start,
-        startTimeFormat
-      )} - ${formatDate(end, endTimeFormat)} klo ${formatTime(end)}`;
+  if (isSameDay(startDate, endDate)) {
+    return `${startDay} ${formatDate(start)} ${formatTime(
+      start,
+      "HH:mm"
+    )}-${formatTime(end, "HH:mm")}`;
+  }
+  return `${formatDate(start)} ${formatTime(start, "HH:mm")}-${formatDate(
+    end,
+    "HH:mm"
+  )} ${formatTime(end, "HH:mm")}`;
 };
 
 export const reservationDuration = (start: string, end: string): string => {
