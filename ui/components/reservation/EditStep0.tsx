@@ -27,6 +27,7 @@ import React, { Children, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
+import { Toolbar } from "common/src/calendar/Toolbar";
 import {
   canReservationTimeBeChanged,
   isReservationReservable,
@@ -36,7 +37,6 @@ import { isTouchDevice } from "../../modules/util";
 import { BlackButton, MediumButton } from "../../styles/util";
 import Legend from "../calendar/Legend";
 import ReservationCalendarControls from "../calendar/ReservationCalendarControls";
-import { Toolbar } from "../calendar/Toolbar";
 
 type Props = {
   reservation: ReservationType;

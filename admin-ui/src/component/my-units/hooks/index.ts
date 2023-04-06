@@ -3,16 +3,24 @@ import { sortBy } from "lodash";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
+import { addDays } from "date-fns";
 import type {
   Query,
   QueryReservationUnitsArgs,
   QueryUnitsArgs,
+  ReservationType,
+  ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { ReservationsReservationReserveeTypeChoices } from "common/types/gql-types";
+import { toApiDate } from "common/src/common/util";
 import { useNotification } from "../../../context/NotificationContext";
 import { RESERVATION_UNIT_QUERY } from "../create-reservation/queries";
-import { OPTIONS_QUERY, UNIT_QUERY } from "./queries";
+import {
+  OPTIONS_QUERY,
+  UNIT_QUERY,
+  RESERVATION_UNITS_BY_UNIT,
+} from "./queries";
 
 // Custom hook to fix admin-ui lacking translation namespaces
 export const useReservationTranslation = () => {
@@ -122,4 +130,53 @@ export const useUnitQuery = (pk?: number | string) => {
   });
 
   return res;
+};
+
+export const useUnitResources = (
+  begin: Date,
+  unitPk: string,
+  reservationUnitTypes?: number[]
+) => {
+  const { notifyError } = useNotification();
+
+  const { data, ...rest } = useQuery<
+    Query,
+    QueryReservationUnitsArgs & ReservationUnitByPkTypeReservationsArgs
+  >(RESERVATION_UNITS_BY_UNIT, {
+    variables: {
+      unit: [unitPk],
+      from: toApiDate(begin),
+      to: toApiDate(addDays(begin, 1)),
+    },
+    onError: () => {
+      notifyError("Varauksia ei voitu hakea");
+    },
+  });
+
+  const resources = (data?.reservationUnits?.edges || [])
+    .map((e) => e?.node)
+    .filter((x): x is ReservationUnitType => x != null)
+    .filter(
+      (x) =>
+        !reservationUnitTypes?.length ||
+        (x.reservationUnitType?.pk != null &&
+          reservationUnitTypes.includes(x.reservationUnitType.pk))
+    )
+    .map((x) => ({
+      title: x.nameFi ?? "",
+      url: String(x.pk || 0),
+      isDraft: x.isDraft,
+      pk: x.pk ?? 0,
+      events:
+        x.reservations
+          ?.filter((y): y is ReservationType => y != null)
+          .map((y) => ({
+            event: y,
+            title: y.name ?? "",
+            start: new Date(y.begin),
+            end: new Date(y.end),
+          })) ?? [],
+    }));
+
+  return { ...rest, resources };
 };
