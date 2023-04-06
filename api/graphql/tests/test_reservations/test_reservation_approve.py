@@ -209,7 +209,9 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         CELERY_TASK_ALWAYS_EAGER=True,
         SEND_RESERVATION_NOTIFICATION_EMAILS=False,
     )
-    def test_handling_details_saves_to_working_memo_also(self):
+    def test_handling_details_does_not_save_to_working_memo(self):
+        """Previously we had a feature which copied to handling details to working memo."""
+
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_approve_data()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
@@ -219,7 +221,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
-        assert_that(self.reservation.handling_details).is_equal_to(
+        assert_that(self.reservation.handling_details).is_not_equal_to(
             self.reservation.working_memo
         )
 
