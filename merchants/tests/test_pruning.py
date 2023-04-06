@@ -32,7 +32,7 @@ class UpdateExpiredOrderTestCase(TestCase):
     @mock.patch("merchants.pruning.get_payment")
     def test_handle_cancelled_orders(self, mock_get_payment):
         mock_get_payment.return_value = PaymentFactory(
-            status=WebShopPaymentStatus.CANCELLED
+            status=WebShopPaymentStatus.CANCELLED.value
         )
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
@@ -53,7 +53,7 @@ class UpdateExpiredOrderTestCase(TestCase):
     @mock.patch("merchants.pruning.get_payment")
     def test_handle_paid_orders(self, mock_get_payment, mock_confirmation_email):
         mock_get_payment.return_value = PaymentFactory(
-            status=WebShopPaymentStatus.PAID_ONLINE
+            status=WebShopPaymentStatus.PAID_ONLINE.value
         )
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
