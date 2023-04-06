@@ -408,6 +408,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         choices=STATE_CHOICES.STATE_CHOICES,
         verbose_name=_("State"),
         default=STATE_CHOICES.CREATED,
+        db_index=True,
     )
 
     priority = models.IntegerField(

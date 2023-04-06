@@ -768,6 +768,7 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
         verbose_name=_("Applicant type"),
         choices=APPLICANT_TYPES.APPLICANT_TYPE_CHOICES,
         null=True,
+        db_index=True,
     )
 
     organisation = models.ForeignKey(
