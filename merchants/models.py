@@ -262,6 +262,19 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
         validators=[is_numeric],
     )
 
+    def clean(self) -> None:
+        if not self.project and not self.profit_center and not self.internal_order:
+            error_message = _(
+                "One of the following fields must be given: internal_order, profit_center, project"
+            )
+            raise ValidationError(
+                {
+                    "internal_order": [error_message],
+                    "profit_center": [error_message],
+                    "project": [error_message],
+                }
+            )
+
     def save(self, *args, **kwargs) -> None:
         from reservation_units.models import ReservationUnit
         from reservation_units.tasks import refresh_reservation_unit_accounting
