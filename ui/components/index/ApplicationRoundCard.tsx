@@ -128,12 +128,10 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
               closingDate: parseISO(applicationRound.applicationPeriodEnd),
             })}
         </StatusMessage>
-        {state !== "past" && (
-          <StyledLink href={`/criteria/${applicationRound.pk}`}>
-            {t("applicationRound:card.criteria")}
-            <IconArrowRight aria-hidden="true" />
-          </StyledLink>
-        )}
+        <StyledLink href={`/criteria/${applicationRound.pk}`}>
+          {t("applicationRound:card.criteria")}
+          <IconArrowRight aria-hidden="true" />
+        </StyledLink>
       </StyledContainer>
       {state === "active" && (
         <CardButton
