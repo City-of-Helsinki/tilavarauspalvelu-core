@@ -10,7 +10,8 @@ interface Props {
 }
 
 const Wrapper = styled.div`
-  position: relative;
+  position: absolute;
+  width: 100%;
   background: var(--color-white);
   color: var(--color-black);
   box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2);
@@ -30,10 +31,8 @@ const Wrapper = styled.div`
 `;
 
 const Menu = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    max-height: 18.35rem;
-    overflow: auto;
-  }
+  max-height: 18.35rem;
+  overflow: auto;
 `;
 
 const ClearButton = styled.button`
