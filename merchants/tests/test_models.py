@@ -118,3 +118,23 @@ class PaymentAccountingTestCase(TestCase):
             mock.call(self.reservation_unit_1.pk), mock.call(self.reservation_unit_2.pk)
         )
         assert_that(mock_upsert_accounting.call_count).is_equal_to(2)
+
+    def test_one_of_the_fields_is_required(self, mock_upsert_accounting):
+        failing = PaymentAccountingFactory(
+            name="Invalid", internal_order=None, profit_center=None, project=None
+        )
+        with raises(ValidationError) as err:
+            failing.full_clean()
+        assert_that(err.value.message_dict).is_equal_to(
+            {
+                "internal_order": [
+                    "One of the following fields must be given: internal_order, profit_center, project"
+                ],
+                "profit_center": [
+                    "One of the following fields must be given: internal_order, profit_center, project"
+                ],
+                "project": [
+                    "One of the following fields must be given: internal_order, profit_center, project"
+                ],
+            }
+        )
