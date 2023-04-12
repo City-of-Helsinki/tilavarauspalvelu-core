@@ -119,6 +119,16 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
+    def test_filter_by_name(self):
+        application = ApplicationFactory()
+        ApplicationEventFactory(application=application, name="Don't show me!")
+        filter_clause = 'name: "Test"'
+
+        response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
     def test_filter_by_unit(self):
         application = ApplicationFactory()
         ApplicationEventFactory(application=application, name="I shouldn't be listed")

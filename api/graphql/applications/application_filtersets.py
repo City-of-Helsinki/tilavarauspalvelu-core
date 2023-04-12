@@ -98,37 +98,39 @@ class ApplicationEventFilterSet(filters.FilterSet):
         field_name="pk", method="filter_by_pk", queryset=ApplicationEvent.objects.all()
     )
 
+    application = filters.ModelChoiceFilter(
+        field_name="application", queryset=Application.objects.all()
+    )
+
     application_round = filters.ModelChoiceFilter(
         field_name="application__application_round",
         queryset=ApplicationRound.objects.all(),
     )
 
-    application = filters.ModelChoiceFilter(
-        field_name="application", queryset=Application.objects.all()
-    )
-
-    unit = filters.ModelMultipleChoiceFilter(
-        method="filter_by_possible_units", queryset=Unit.objects.all()
-    )
-
-    status = filters.CharFilter(field_name="latest_status", lookup_expr="iexact")
-
     application_status = filters.CharFilter(
         field_name="application__latest_status", method="filter_by_application_status"
-    )
-
-    reservation_unit = filters.ModelMultipleChoiceFilter(
-        method="filter_by_reservation_units", queryset=ReservationUnit.objects.all()
-    )
-
-    user = filters.ModelChoiceFilter(
-        field_name="application__user", queryset=User.objects.all()
     )
 
     applicant_type = filters.MultipleChoiceFilter(
         field_name="application__applicant_type",
         method="filter_by_applicant_type",
         choices=[(c[0], c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES],
+    )
+
+    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
+
+    reservation_unit = filters.ModelMultipleChoiceFilter(
+        method="filter_by_reservation_units", queryset=ReservationUnit.objects.all()
+    )
+
+    status = filters.CharFilter(field_name="latest_status", lookup_expr="iexact")
+
+    unit = filters.ModelMultipleChoiceFilter(
+        method="filter_by_possible_units", queryset=Unit.objects.all()
+    )
+
+    user = filters.ModelChoiceFilter(
+        field_name="application__user", queryset=User.objects.all()
     )
 
     order_by = filters.OrderingFilter(
