@@ -137,6 +137,7 @@ from resources.models import Resource
 from spaces.models import Space, Unit
 from users.models import User
 
+from .application_rounds.application_round_filtersets import ApplicationRoundFilterSet
 from .application_rounds.application_round_types import ApplicationRoundType
 from .applications.application_mutations import (
     ApplicationCreateMutation,
@@ -375,7 +376,9 @@ class Query(graphene.ObjectType):
     application_events = ApplicationEventsFilter(
         ApplicationEventType, filterset_class=ApplicationEventFilterSet
     )
-    application_rounds = ApplicationRoundFilter(ApplicationRoundType)
+    application_rounds = ApplicationRoundFilter(
+        ApplicationRoundType, filterset_class=ApplicationRoundFilterSet
+    )
 
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet

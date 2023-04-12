@@ -143,3 +143,25 @@ class ApplicationRoundQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_filter_by_pk(self):
+        ApplicationRoundFactory()
+
+        response = self.query(
+            """
+            query {
+                applicationRounds(pk: %i) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+            % self.application_round.id
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
