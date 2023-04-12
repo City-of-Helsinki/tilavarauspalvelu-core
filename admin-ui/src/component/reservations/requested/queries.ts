@@ -116,6 +116,9 @@ export const RECURRING_RESERVATION_QUERY = gql`
           begin
           end
           state
+          recurringReservation {
+            pk
+          }
         }
       }
     }

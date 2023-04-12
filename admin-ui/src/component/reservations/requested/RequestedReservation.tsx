@@ -221,6 +221,64 @@ const ButtonsWithPermChecks = ({
   return null;
 };
 
+const ReservationSummary = ({
+  reservation,
+  isFree,
+}: {
+  reservation: ReservationType;
+  isFree: boolean;
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <Summary>
+      {[
+        {
+          l: "reserveeType",
+          v: reservation.reserveeType
+            ? t(
+                getTranslationKeyForType(
+                  reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
+                  reservation.reserveeIsUnregisteredAssociation
+                )
+              )
+            : undefined,
+        },
+        { l: "numPersons", v: reservation.numPersons },
+        {
+          l: "ageGroup",
+          v: reservation.ageGroup
+            ? `${ageGroup(reservation.ageGroup)} ${t(
+                "RequestedReservation.ageGroupSuffix"
+              )}`
+            : "",
+        },
+        {
+          l: "purpose",
+          v: reservation.purpose ? `${reservation.purpose.nameFi}` : undefined,
+        },
+        { l: "description", v: reservation.description },
+        {
+          l: "price",
+          v: !isFree
+            ? `${reservationPrice(reservation, t)}${
+                reservation.applyingForFreeOfCharge
+                  ? `, ${t("RequestedReservation.appliesSubvention")}`
+                  : ""
+              }`
+            : undefined,
+        },
+      ].map((e) => (
+        <ApplicationProp
+          key={e.l}
+          label={t(`RequestedReservation.${e.l}`)}
+          data={e.v}
+        />
+      ))}
+    </Summary>
+  );
+};
+
 // recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
 // single format   : {weekday} {date} {time}, {duration} | {unit}
 const createTagString = (reservation: ReservationType, t: TFunction) => {
@@ -269,9 +327,14 @@ const createTagString = (reservation: ReservationType, t: TFunction) => {
 
 const RequestedReservation = (): JSX.Element | null => {
   const { id } = useParams() as { id: string };
-  const [reservation, setReservation] = useState<ReservationType>();
+  const [reservation, setReservation] = useState<ReservationType | undefined>(
+    undefined
+  );
   const [workingMemo, setWorkingMemo] = useState<string>();
   const { notifyError, notifySuccess } = useNotification();
+  const [selectedReservation, setSelectedReservation] = useState<
+    ReservationType | undefined
+  >(undefined);
   const { t } = useTranslation();
 
   const { loading, refetch } = useQuery<Query, QueryReservationByPkArgs>(
@@ -284,6 +347,7 @@ const RequestedReservation = (): JSX.Element | null => {
       onCompleted: ({ reservationByPk }) => {
         if (reservationByPk) {
           setReservation(reservationByPk);
+          setSelectedReservation(reservationByPk);
           setWorkingMemo(reservationByPk.workingMemo || "");
         }
       },
@@ -387,53 +451,7 @@ const RequestedReservation = (): JSX.Element | null => {
             isFree={!isNonFree}
           />
         </HorisontalFlex>
-        <Summary>
-          {[
-            {
-              l: "reserveeType",
-              v: reservation.reserveeType
-                ? t(
-                    getTranslationKeyForType(
-                      reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
-                      reservation.reserveeIsUnregisteredAssociation
-                    )
-                  )
-                : undefined,
-            },
-            { l: "numPersons", v: reservation.numPersons },
-            {
-              l: "ageGroup",
-              v: reservation.ageGroup
-                ? `${ageGroup(reservation.ageGroup)} ${t(
-                    "RequestedReservation.ageGroupSuffix"
-                  )}`
-                : "",
-            },
-            {
-              l: "purpose",
-              v: reservation.purpose
-                ? `${reservation.purpose.nameFi}`
-                : undefined,
-            },
-            { l: "description", v: reservation.description },
-            {
-              l: "price",
-              v: isNonFree
-                ? `${reservationPrice(reservation, t)}${
-                    reservation.applyingForFreeOfCharge
-                      ? `, ${t("RequestedReservation.appliesSubvention")}`
-                      : ""
-                  }`
-                : undefined,
-            },
-          ].map((e) => (
-            <ApplicationProp
-              key={e.l}
-              label={t(`RequestedReservation.${e.l}`)}
-              data={e.v}
-            />
-          ))}
-        </Summary>
+        <ReservationSummary reservation={reservation} isFree={!isNonFree} />
         <div>
           <Accordion
             heading={t("RequestedReservation.workingMemo")}
@@ -505,15 +523,16 @@ const RequestedReservation = (): JSX.Element | null => {
           </Accordion>
           {reservation.recurringReservation && (
             <Accordion heading={t("RequestedReservation.recurring")}>
-              <RecurringReservationsView reservation={reservation} />
+              <RecurringReservationsView
+                reservation={reservation}
+                onSelect={setSelectedReservation}
+              />
             </Accordion>
           )}
           <Accordion heading={t("RequestedReservation.calendar")}>
             <Calendar
-              key={reservation.state}
-              begin={reservation.begin}
               reservationUnitPk={String(reservation?.reservationUnits?.[0]?.pk)}
-              reservation={reservation}
+              reservation={selectedReservation ?? reservation}
             />
           </Accordion>
           <Accordion heading={t("RequestedReservation.reservationDetails")}>

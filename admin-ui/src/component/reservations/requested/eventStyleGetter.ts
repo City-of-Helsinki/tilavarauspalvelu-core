@@ -15,6 +15,13 @@ const CURRENT = (state: string) => {
   };
 };
 
+const SELECTED = {
+  style: {
+    outline: "2px solid var(--color-bus)",
+    outlineOffset: "3px",
+  },
+};
+
 const UNCONFIRMED = {
   style: {
     border: `2px solid var(--tilavaraus-event-other-requires_handling-border-color)`,
@@ -71,10 +78,24 @@ const eventStyleGetter =
       borderColor: "transparent",
       padding: "3px 6px",
       fontSize: "var(--fontsize-body-s)",
-    } as Record<string, string>;
+    };
 
+    const isPartOfRecurrance =
+      currentReservation?.recurringReservation &&
+      currentReservation.recurringReservation?.pk ===
+        event?.recurringReservation?.pk;
     if (currentReservation?.pk === event?.pk) {
-      Object.assign(style, CURRENT(event?.state as string).style);
+      return {
+        style: {
+          ...style,
+          ...CURRENT(event?.state ?? "").style,
+          ...SELECTED.style,
+        },
+      };
+    }
+
+    if (currentReservation?.pk === event?.pk || isPartOfRecurrance) {
+      Object.assign(style, CURRENT(event?.state ?? "").style);
       style.cursor = "default";
     } else if (event?.state !== ReservationsReservationStateChoices.Confirmed) {
       Object.assign(style, UNCONFIRMED.style);

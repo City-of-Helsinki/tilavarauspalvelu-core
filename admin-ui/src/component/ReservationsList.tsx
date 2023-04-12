@@ -2,23 +2,19 @@ import React from "react";
 import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Button, IconArrowUndo, IconCross } from "hds-react";
 
-type CallbackButton = {
-  callback: () => void;
-  type: "remove" | "restore";
-};
 type NewReservationListItem = {
   date: Date;
   startTime: string;
   endTime: string;
   error?: string;
   reservationPk?: number;
-  button?: CallbackButton;
+  buttons?: React.ReactNode;
   isRemoved?: boolean;
 };
 
 type Props = {
+  header?: React.ReactNode;
   items: NewReservationListItem[];
   hasPadding?: boolean;
 };
@@ -71,13 +67,14 @@ const ErrorLabel = styled.div`
 const stripTimeZeros = (time: string) =>
   time.substring(0, 1) === "0" ? time.substring(1) : time;
 
-const ReservationList = ({ items, hasPadding }: Props) => {
+const ReservationList = ({ header, items, hasPadding }: Props) => {
   const { t } = useTranslation();
 
   if (!items.length) return null;
 
   return (
     <ListWrapper>
+      {header}
       <StyledList $hasPadding={hasPadding ?? false}>
         {items.map((item) => (
           <StyledListItem
@@ -106,26 +103,7 @@ const ReservationList = ({ items, hasPadding }: Props) => {
                 </ErrorLabel>
               )}
             </TextWrapper>
-            {item.button != null &&
-              (item.button.type === "remove" ? (
-                <Button
-                  variant="supplementary"
-                  onClick={item.button.callback}
-                  iconLeft={<IconCross />}
-                  size="small"
-                >
-                  {t("common.remove")}
-                </Button>
-              ) : (
-                <Button
-                  variant="supplementary"
-                  onClick={item.button.callback}
-                  iconLeft={<IconArrowUndo />}
-                  size="small"
-                >
-                  {t("common.restore")}
-                </Button>
-              ))}
+            {item.buttons}
           </StyledListItem>
         ))}
       </StyledList>

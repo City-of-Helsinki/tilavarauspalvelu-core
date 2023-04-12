@@ -1865,6 +1865,10 @@ const translations: ITranslations = {
       state: ["Käsittelytila"],
     },
   },
+  ReservationsListButton: {
+    changeTime: ["Muuta aikaa"],
+    showInCalendar: ["Näytä kalenterissa"],
+  },
 
   ReservationsSearch: {
     textSearch: ["Hae varausta"],

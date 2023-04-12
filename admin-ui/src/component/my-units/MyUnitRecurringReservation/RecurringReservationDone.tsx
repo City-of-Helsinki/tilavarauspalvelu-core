@@ -1,15 +1,15 @@
 import React from "react";
 import type { ErrorType } from "common/types/gql-types";
-import { Button } from "hds-react/components/Button";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { Container } from "hds-react";
+import { Container, Button } from "hds-react";
 import { z } from "zod";
 import { H1, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ActionsWrapper } from "./commonStyling";
 import ReservationList from "../../ReservationsList";
+import ReservationListButton from "../../ReservationListButton";
 import withMainMenu from "../../withMainMenu";
 
 const InfoSection = styled.p`
@@ -75,7 +75,7 @@ const RecurringReservationDone = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .map(({ error, ...x }) => x)
     // TODO button is temp code till another feature is implemented
-    .map((x, i) => ({ ...x, button: btn[i % 2] }));
+    .map((x, i) => ({ ...x, buttons: [ReservationListButton(btn[i % 2])] }));
 
   const { t } = useTranslation();
 
