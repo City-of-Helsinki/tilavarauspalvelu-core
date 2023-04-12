@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timedelta
+from decimal import Decimal
 from typing import Optional
 
 from django.conf import settings
@@ -18,6 +19,7 @@ from merchants.verkkokauppa.order.types import (
 )
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
+from utils.decimal_utils import round_decimal
 
 
 def parse_datetime(string: Optional[str]) -> Optional[datetime]:
@@ -77,9 +79,12 @@ def create_verkkokauppa_order(reservation: Reservation):
 def _get_order_params(reservation: Reservation):
     runit = reservation.reservation_unit.first()
     quantity = 1  # Currently, we don't support quantities larger than 1
-    price_net = quantity * reservation.price_net
-    price_vat = (
-        quantity * reservation.price_net * (reservation.tax_percentage_value / 100)
+    price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)
+    price_vat = round_decimal(
+        Decimal(
+            quantity * reservation.price_net * (reservation.tax_percentage_value / 100)
+        ),
+        2,
     )
     preferred_language = getattr(reservation, "preferred_language", "fi")
     items = [
