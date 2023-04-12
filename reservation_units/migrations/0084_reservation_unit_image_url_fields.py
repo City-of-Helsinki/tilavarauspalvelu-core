@@ -11,7 +11,7 @@ def update_urls(apps, schema_editor):
             image.large_url = image.image["large"].url
             image.medium_url = image.image["medium"].url
             image.small_url = image.image["small"].url
-            image.save()
+            image.save(update_urls=False)
         except InvalidImageFormatError:
             pass
 
