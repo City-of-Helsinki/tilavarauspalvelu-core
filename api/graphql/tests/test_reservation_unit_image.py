@@ -3,6 +3,7 @@ import json
 from assertpy import assert_that
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from graphene_file_upload.django.testing import (
     GraphQLFileUploadTestCase,
     file_graphql_query,
@@ -18,6 +19,7 @@ from reservation_units.tests.factories import (
 DEFAULT_GRAPHQL_URL = "/graphql/"
 
 
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationUnitImageCreateTestCase(
     GrapheneTestCaseBase, GraphQLFileUploadTestCase
 ):
@@ -127,6 +129,7 @@ class ReservationUnitImageCreateTestCase(
         assert_that(img).is_none()
 
 
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
     @classmethod
     def setUpTestData(cls):
@@ -180,6 +183,7 @@ class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
         assert_that(content.get("errors")).is_not_none()
 
 
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationUnitImageDeleteGraphQLTestCase(GrapheneTestCaseBase):
     @classmethod
     def setUpTestData(cls):

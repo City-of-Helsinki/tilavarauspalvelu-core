@@ -12,7 +12,10 @@ from easy_thumbnails.fields import ThumbnailerImageField
 
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from reservation_units.enums import ReservationState, ReservationUnitState
-from reservation_units.tasks import refresh_reservation_unit_product_mapping
+from reservation_units.tasks import (
+    refresh_reservation_unit_product_mapping,
+    update_urls,
+)
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
@@ -789,6 +792,27 @@ class ReservationUnitImage(models.Model):
         return "{} ({})".format(
             self.reservation_unit.name, self.get_image_type_display()
         )
+
+    def save(
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+        update_urls=True,
+    ):
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
+
+        if update_urls:
+            self.update_image_urls()
+
+    def update_image_urls(self):
+        update_urls.delay(self.pk)
 
 
 class Purpose(models.Model):
