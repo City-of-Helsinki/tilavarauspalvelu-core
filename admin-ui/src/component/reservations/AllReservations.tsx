@@ -8,6 +8,7 @@ import ReservationsDataLoader, { Sort } from "./ReservationsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "../lists/components";
 import { Container } from "../../styles/layout";
+import { DATE_FORMAT, formatDate } from "../../common/util";
 
 const AllReservations = (): JSX.Element => {
   const [search, setSearch] = useState<FilterArguments>(emptyState);
@@ -31,11 +32,15 @@ const AllReservations = (): JSX.Element => {
           <H1 $legacy>{t("Reservations.allReservationListHeading")}</H1>
           <p>{t("Reservations.allReservationListDescription")}</p>
         </div>
-        <Filters onSearch={debouncedSearch} />
+        <Filters
+          onSearch={debouncedSearch}
+          initialFiltering={{
+            begin: formatDate(new Date().toISOString(), DATE_FORMAT) as string,
+          }}
+        />
         <HR />
         <ReservationsDataLoader
           defaultFiltering={{}}
-          key={JSON.stringify({ ...search, ...sort })}
           filters={search}
           sort={sort}
           sortChanged={onSortChanged}

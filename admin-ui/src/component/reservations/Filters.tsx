@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import i18next from "i18next";
 import { OptionType } from "../../common/types";
-import { Grid, Span3 } from "../../styles/layout";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
 import UnitFilter from "../filters/UnitFilter";
@@ -62,7 +61,11 @@ const ThinButton = styled(Button)`
   }
 `;
 
-const Buttons = styled.div``;
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--spacing-m);
+`;
 
 export const emptyState: FilterArguments = {
   reservationUnitType: [],
@@ -134,47 +137,55 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
     <div>
       <Wrapper>
         <Grid>
-          <Span3>
+          <div>
             <ReservationUnitTypeFilter
               onChange={(reservationUnitType) =>
                 dispatch({ type: "set", value: { reservationUnitType } })
               }
               value={state.reservationUnitType}
             />
-          </Span3>
-          <Span3>
+          </div>
+          <div>
             <ReservationStateFilter
               onChange={(reservationState) =>
                 dispatch({ type: "set", value: { reservationState } })
               }
               value={state.reservationState}
             />
-          </Span3>
-          <Span3>
+          </div>
+          <div>
             <UnitFilter
               onChange={(unit) => dispatch({ type: "set", value: { unit } })}
               value={state.unit}
             />
-          </Span3>
-          <Span3>
+          </div>
+          <div>
             <MyTextInput
               id="textSearch"
               dispatch={dispatch}
               value={state.textSearch || ""}
             />
-          </Span3>
-          <Span3>
+          </div>
+          <div>
             <PaymentStatusFilter
               onChange={(paymentStatuses) =>
                 dispatch({ type: "set", value: { paymentStatuses } })
               }
               value={state.paymentStatuses || []}
             />
-          </Span3>
+          </div>
+          <div>
+            <ReservationUnitFilter
+              onChange={(reservationUnit) =>
+                dispatch({ type: "set", value: { reservationUnit } })
+              }
+              value={state.reservationUnit}
+            />
+          </div>
         </Grid>
         {more && (
           <Grid>
-            <Span3>
+            <div>
               <DateInput
                 language="fi"
                 id="begin"
@@ -184,8 +195,8 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
                 }
                 value={state.begin}
               />
-            </Span3>
-            <Span3>
+            </div>
+            <div>
               <DateInput
                 id="end"
                 language="fi"
@@ -193,8 +204,8 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
                 onChange={(end) => dispatch({ type: "set", value: { end } })}
                 value={state.end}
               />
-            </Span3>
-            <Span3>
+            </div>
+            <div>
               <NumberInput
                 type="number"
                 value={
@@ -215,8 +226,8 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
                   })
                 }
               />
-            </Span3>
-            <Span3>
+            </div>
+            <div>
               <NumberInput
                 type="number"
                 value={
@@ -239,20 +250,12 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
                   });
                 }}
               />
-            </Span3>
-            <Span3>
-              <ReservationUnitFilter
-                onChange={(reservationUnit) =>
-                  dispatch({ type: "set", value: { reservationUnit } })
-                }
-                value={state.reservationUnit}
-              />
-            </Span3>
+            </div>
           </Grid>
         )}
       </Wrapper>
 
-      <Buttons>
+      <div>
         <ThinButton
           variant="supplementary"
           onClick={() => setMore(!more)}
@@ -264,7 +267,7 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
               : "ReservationUnitsSearch.moreFilters"
           )}
         </ThinButton>
-      </Buttons>
+      </div>
       <Tags tags={tags} t={t} dispatch={dispatch} />
     </div>
   );
