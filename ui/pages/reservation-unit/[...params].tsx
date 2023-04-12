@@ -7,7 +7,7 @@ import { useLocalStorage, useSessionStorage } from "react-use";
 import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
-import { isFinite, omit } from "lodash";
+import { isFinite, omit, pick } from "lodash";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
@@ -55,7 +55,10 @@ import {
 } from "../../modules/queries/reservation";
 import Sanitize from "../../components/common/Sanitize";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
-import { getReservationApplicationMutationValues } from "../../modules/reservation";
+import {
+  getReservationApplicationMutationValues,
+  profileUserFields,
+} from "../../modules/reservation";
 import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import { ReservationProps } from "../../context/DataContext";
 import Container from "../../components/common/Container";
@@ -294,6 +297,10 @@ const ReservationUnitReservation = ({
     reservationUnit?.pk,
     setPendingReservation,
   ]);
+
+  const defaultValues = useMemo(() => {
+    return reservation !== null ? pick(reservation, profileUserFields) : {};
+  }, [reservation]);
 
   const [deleteReservation] = useMutation<
     { deleteReservation: ReservationDeleteMutationPayload },
@@ -594,6 +601,7 @@ const ReservationUnitReservation = ({
                   setReserveeType={setReserveeType}
                   cancelReservation={cancelReservation}
                   options={options}
+                  defaultValues={defaultValues}
                 />
               )}
               {step === 1 && (

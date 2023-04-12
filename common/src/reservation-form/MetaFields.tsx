@@ -46,6 +46,7 @@ type Props = CommonProps & {
   >;
   generalFields: Field[];
   reservationApplicationFields: Field[];
+  defaultValues?: Record<string, string | number>;
 };
 
 const Container = styled.div`
@@ -157,11 +158,13 @@ const ReservationFormFields = ({
   metadata,
   params,
   data,
+  defaultValues,
 }: CommonProps & {
   fields: Field[];
   hasSubheading?: boolean;
   metadata?: ReservationMetadataSetType;
   params?: { numPersons: { min?: number; max?: number } };
+  defaultValues?: Record<string, string | number>;
 }) => {
   const { getValues } = useFormContext<Reservation>();
 
@@ -198,6 +201,7 @@ const ReservationFormFields = ({
             params={params}
             t={t}
             data={data}
+            defaultValues={defaultValues}
           />
         </Fragment>
       ))}
@@ -265,6 +269,7 @@ export const ReserverMetaFields = ({
   setReserveeType,
   t,
   data,
+  defaultValues,
 }: {
   fields: string[];
   reservationUnit: ReservationUnitType;
@@ -277,6 +282,7 @@ export const ReserverMetaFields = ({
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
+  defaultValues?: Record<string, string | number>;
 }) => {
   const isTypeSelectable =
     reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type") ??
@@ -321,6 +327,7 @@ export const ReserverMetaFields = ({
           reserveeType={reserveeType}
           t={t}
           data={data}
+          defaultValues={defaultValues}
         />
       </ReservationApplicationFieldsContainer>
     </>
@@ -340,6 +347,7 @@ const MetaFields = ({
   options,
   t,
   data,
+  defaultValues,
 }: Props) => {
   if (!reservationUnit.metadataSet) {
     return null;
@@ -362,6 +370,7 @@ const MetaFields = ({
         reservationUnit={reservationUnit}
         t={t}
         data={data}
+        defaultValues={defaultValues}
       />
     </Container>
   );

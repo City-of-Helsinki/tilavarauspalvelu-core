@@ -43,6 +43,8 @@ const createReservation = graphql.mutation<
 >("createReservation", (req, res, ctx) => {
   const getPk = (resUnitPk: number): number => {
     switch (resUnitPk) {
+      case 700:
+        return 701;
       case 903:
         return 43;
       case 908:
@@ -330,6 +332,18 @@ const cities = graphql.query<Query, QueryCitiesArgs>(
                 name: "Helsinki",
               },
             },
+            {
+              node: {
+                pk: 2,
+                name: "Lande",
+              },
+            },
+            {
+              node: {
+                pk: 3,
+                name: "Muu",
+              },
+            },
           ],
         } as CityTypeConnection,
       })
@@ -546,6 +560,17 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
 
     if (pk === 99) {
       data.description = "";
+    }
+
+    if (pk === 701) {
+      data.reserveeFirstName = "Foo";
+      data.reserveeLastName = "Bar";
+      data.reserveeEmail = "foo@bar.baz";
+      data.reserveePhone = "123456789";
+      data.reserveeAddressStreet = "Katu 13";
+      data.reserveeAddressCity = "Helsinki";
+      data.reserveeAddressZip = "00100";
+      data.homeCity = { id: "123", name: "Lande", pk: 2 };
     }
 
     return res(

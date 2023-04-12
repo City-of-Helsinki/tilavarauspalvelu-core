@@ -326,3 +326,14 @@ export const canReservationTimeBeChanged = (
 
   return [true];
 };
+
+export const profileUserFields = [
+  "reserveeFirstName",
+  "reserveeLastName",
+  "reserveePhone",
+  "reserveeEmail",
+  "reserveeAddressStreet",
+  "reserveeAddressCity",
+  "reserveeAddressZip",
+  "homeCity",
+] as const;

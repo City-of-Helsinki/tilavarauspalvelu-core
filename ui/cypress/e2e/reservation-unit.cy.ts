@@ -583,12 +583,10 @@ describe("with reservation quota notification", () => {
 describe("with metadataset", () => {
   Cypress.config("defaultCommandTimeout", 20000);
 
-  beforeEach(() => {
+  it("can cancel an reservation with an application", () => {
     cy.visit("/reservation-unit/903");
     cy.injectAxe();
-  });
 
-  it("can cancel an reservation with an application", () => {
     drawReservation();
 
     reservationSubmitButton().click();
@@ -603,6 +601,9 @@ describe("with metadataset", () => {
   });
 
   it("can do reservation", () => {
+    cy.visit("/reservation-unit/903");
+    cy.injectAxe();
+
     drawReservation();
 
     reservationSubmitButton().click();
@@ -669,7 +670,7 @@ describe("with metadataset", () => {
       error.should("contain.text", "Kenttä on pakollinen")
     );
 
-    cy.get("#reserveeEmail").type("foo").blur();
+    cy.get("#reserveeEmail").clear().type("foo").blur();
     cy.get("#reserveeEmail-error").should(
       "contain.text",
       "Virheellinen sähköpostiosoite"
@@ -733,6 +734,24 @@ describe("with metadataset", () => {
       "contain",
       "https://www.google.com/00-11-22-33/paymentmethod?user=1234-abcd-9876-efgh&lang=fi"
     );
+  });
+
+  it("should populate default values", () => {
+    cy.visit("/reservation-unit/700");
+    cy.injectAxe();
+
+    drawReservation();
+
+    reservationSubmitButton().click();
+
+    cy.get("#reserveeFirstName").should("have.value", "Foo");
+    cy.get("#reserveeLastName").should("have.value", "Bar");
+    cy.get("#reserveeEmail").should("have.value", "foo@bar.baz");
+    cy.get("#reserveePhone").should("have.value", "123456789");
+    cy.get("#reserveeAddressStreet").should("have.value", "Katu 13");
+    cy.get("#reserveeAddressCity").should("have.value", "Helsinki");
+    cy.get("#reserveeAddressZip").should("have.value", "00100");
+    cy.get("#homeCity-toggle-button > span").should("contain", "Lande");
   });
 });
 

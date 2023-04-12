@@ -833,6 +833,25 @@ const selectedReservationUnitQuery = graphql.query<
     reservationUnitByPk.maxPersons = 40;
   }
 
+  if (req.variables.pk === 700) {
+    reservationUnitByPk.maxReservationsPerUser = 100;
+    reservationUnitByPk.metadataSet = {
+      id: "UmVzZXJ2YXRpb25NZXRhZGF0YVNldFR5cGU6MQ==",
+      name: "Test",
+      supportedFields: [
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_phone",
+        "reservee_email",
+        "reservee_address_street",
+        "reservee_address_city",
+        "reservee_address_zip",
+        "home_city",
+      ],
+      pk: 1,
+    };
+  }
+
   if (req.variables.pk === 800) {
     reservationUnitByPk.equipment = [];
     reservationUnitByPk.paymentTerms = {

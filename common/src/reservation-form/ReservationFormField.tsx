@@ -28,6 +28,7 @@ type Props = {
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
+  defaultValues?: Record<string, string | number>;
 };
 
 const StyledCheckboxWrapper = styled(CheckboxWrapper)<{
@@ -129,6 +130,7 @@ const ReservationFormField = ({
   t,
   params = {},
   data = {},
+  defaultValues = {},
 }: Props) => {
   const normalizedReserveeType =
     reserveeType?.toLocaleLowerCase() || "individual";
@@ -196,9 +198,8 @@ const ReservationFormField = ({
   const error = get(errors, field);
   const errorText = error && t("forms:requiredField");
 
-  // TODO this is not really a default value any more
-  // how should it be set? passed directly here or some other mechanism
-  const defaultValue = get(reservation, field);
+  const defaultValue = get(defaultValues, field);
+
   const checkParams = {
     field,
     control,
@@ -228,11 +229,12 @@ const ReservationFormField = ({
           )}
           id={field}
           options={options[field]}
-          defaultValue={options[field].find(
-            (n) => n.value === get(reservation, field)
-          )}
           {...removeRefParam(formField)}
-          value={formField.value || null}
+          value={
+            formField.value ||
+            options[field].find((n) => n.value === defaultValue) ||
+            null
+          }
           error={errorText}
           required={required}
           invalid={!!error}
@@ -387,6 +389,7 @@ const ReservationFormField = ({
           )
         )
       }
+      defaultValue={defaultValue ? String(defaultValue) : undefined}
       invalid={!!error}
       required={required}
       $isWide={isWideRow}

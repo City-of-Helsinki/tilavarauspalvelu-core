@@ -192,6 +192,7 @@ export const GET_RESERVATION = gql`
       description
       reserveeFirstName
       reserveeLastName
+      reserveeEmail
       reserveePhone
       reserveeType
       begin
