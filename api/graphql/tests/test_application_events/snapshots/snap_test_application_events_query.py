@@ -159,6 +159,170 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_application_status 1'] 
     }
 }
 
+snapshots['ApplicationEventQueryTestCase::test_filter_by_applied_count_gte 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'begin': '12:00:00',
+                                'day': 1,
+                                'end': '13:00:00',
+                                'priority': 300
+                            },
+                            {
+                                'begin': '13:00:00',
+                                'day': 2,
+                                'end': '14:00:00',
+                                'priority': 200
+                            },
+                            {
+                                'begin': '14:00:00',
+                                'day': 3,
+                                'end': '15:00:00',
+                                'priority': 100
+                            }
+                        ],
+                        'eventReservationUnits': [
+                            {
+                                'reservationUnit': {
+                                    'nameFi': 'Declined unit FI 1',
+                                    'reservationUnitType': {
+                                        'nameFi': 'Type of resunit'
+                                    },
+                                    'resources': [
+                                    ],
+                                    'unit': {
+                                        'nameFi': None
+                                    }
+                                }
+                            }
+                        ],
+                        'name': 'Test application',
+                        'numPersons': 10,
+                        'status': 'created'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationEventQueryTestCase::test_filter_by_applied_count_gte_lte 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'begin': '12:00:00',
+                                'day': 1,
+                                'end': '13:00:00',
+                                'priority': 300
+                            },
+                            {
+                                'begin': '13:00:00',
+                                'day': 2,
+                                'end': '14:00:00',
+                                'priority': 200
+                            },
+                            {
+                                'begin': '14:00:00',
+                                'day': 3,
+                                'end': '15:00:00',
+                                'priority': 100
+                            }
+                        ],
+                        'eventReservationUnits': [
+                            {
+                                'reservationUnit': {
+                                    'nameFi': 'Declined unit FI 1',
+                                    'reservationUnitType': {
+                                        'nameFi': 'Type of resunit'
+                                    },
+                                    'resources': [
+                                    ],
+                                    'unit': {
+                                        'nameFi': None
+                                    }
+                                }
+                            }
+                        ],
+                        'name': 'Test application',
+                        'numPersons': 10,
+                        'status': 'created'
+                    }
+                },
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                        ],
+                        'eventReservationUnits': [
+                        ],
+                        'name': 'Show me',
+                        'numPersons': None,
+                        'status': 'created'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationEventQueryTestCase::test_filter_by_applied_count_lte 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'begin': '12:00:00',
+                                'day': 1,
+                                'end': '13:00:00',
+                                'priority': 300
+                            },
+                            {
+                                'begin': '13:00:00',
+                                'day': 2,
+                                'end': '14:00:00',
+                                'priority': 200
+                            },
+                            {
+                                'begin': '14:00:00',
+                                'day': 3,
+                                'end': '15:00:00',
+                                'priority': 100
+                            }
+                        ],
+                        'eventReservationUnits': [
+                            {
+                                'reservationUnit': {
+                                    'nameFi': 'Declined unit FI 1',
+                                    'reservationUnitType': {
+                                        'nameFi': 'Type of resunit'
+                                    },
+                                    'resources': [
+                                    ],
+                                    'unit': {
+                                        'nameFi': None
+                                    }
+                                }
+                            }
+                        ],
+                        'name': 'Test application',
+                        'numPersons': 10,
+                        'status': 'created'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationEventQueryTestCase::test_filter_by_name 1'] = {
     'data': {
         'applicationEvents': {

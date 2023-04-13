@@ -20,6 +20,11 @@ class ApplicationFilterSet(filters.FilterSet):
     pk = filters.ModelMultipleChoiceFilter(
         field_name="pk", method="filter_by_pk", queryset=Application.objects.all()
     )
+
+    applied_count_gte = filters.NumberFilter(method="filter_by_applied_count_gte")
+
+    applied_count_lte = filters.NumberFilter(method="filter_by_applied_count_lte")
+
     application_round = filters.ModelChoiceFilter(
         field_name="application_round", queryset=ApplicationRound.objects.all()
     )
@@ -72,6 +77,18 @@ class ApplicationFilterSet(filters.FilterSet):
 
         return super().filter_queryset(queryset)
 
+    def filter_by_applied_count_gte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="applied_min_duration_total",
+            aggregated_data__value__gte=value,
+        )
+
+    def filter_by_applied_count_lte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="applied_min_duration_total",
+            aggregated_data__value__lte=value,
+        )
+
     def filter_by_possible_units(self, qs, property, value):
         if not value:
             return qs
@@ -101,6 +118,10 @@ class ApplicationEventFilterSet(filters.FilterSet):
     application = filters.ModelChoiceFilter(
         field_name="application", queryset=Application.objects.all()
     )
+
+    applied_count_gte = filters.NumberFilter(method="filter_by_applied_count_gte")
+
+    applied_count_lte = filters.NumberFilter(method="filter_by_applied_count_lte")
 
     application_round = filters.ModelChoiceFilter(
         field_name="application__application_round",
@@ -170,6 +191,16 @@ class ApplicationEventFilterSet(filters.FilterSet):
         )
 
         return super().filter_queryset(queryset)
+
+    def filter_by_applied_count_gte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="duration_total", aggregated_data__value__gte=value
+        )
+
+    def filter_by_applied_count_lte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="duration_total", aggregated_data__value__lte=value
+        )
 
     def filter_by_possible_units(self, qs, property, value):
         if not value:

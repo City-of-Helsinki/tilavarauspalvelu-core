@@ -4,7 +4,7 @@ import freezegun
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 
-from applications.models import Application, ApplicationStatus
+from applications.models import Application, ApplicationAggregateData, ApplicationStatus
 from applications.tests.factories import (
     ApplicationFactory,
     ApplicationStatusFactory,
@@ -40,6 +40,22 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
         self.application_status = ApplicationStatusFactory(
             application=application,
             status=ApplicationStatus.DRAFT,
+        )
+
+    def get_query_with_filter(self, filter_clause):
+        return (
+            """
+                query {
+                applications(%s) {
+                    edges {
+                        node {
+                            additionalInformation
+                        }
+                    }
+                }
+            }
+        """
+            % filter_clause
         )
 
     def test_application_filter_by_application_round(self):
@@ -330,6 +346,70 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_applied_count_lte(self):
+        ApplicationAggregateData.objects.create(
+            application=self.application, name="applied_min_duration_total", value=8600
+        )
+        application = ApplicationFactory(additional_information="Don't show me")
+        ApplicationAggregateData.objects.create(
+            application=application, name="applied_min_duration_total", value=9000
+        )
+
+        filter_clause = "appliedCountLte: 8601"
+
+        response = self.query(self.get_query_with_filter(filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_applied_count_gte(self):
+        ApplicationAggregateData.objects.create(
+            application=self.application, name="applied_min_duration_total", value=9000
+        )
+        application = ApplicationFactory(additional_information="Don't show me")
+        ApplicationAggregateData.objects.create(
+            application=application, name="applied_min_duration_total", value=8600
+        )
+
+        filter_clause = "appliedCountGte: 8601"
+
+        response = self.query(self.get_query_with_filter(filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_applied_count_gte_lte(self):
+        ApplicationAggregateData.objects.create(
+            application=self.application,
+            name="applied_min_duration_total",
+            value=8600,
+        )
+        application = ApplicationFactory(additional_information="Show me")
+        ApplicationAggregateData.objects.create(
+            application=application, name="applied_min_duration_total", value=9000
+        )
+        application_too = ApplicationFactory(additional_information="Don't show me")
+        ApplicationAggregateData.objects.create(
+            application=application_too,
+            name="applied_min_duration_total",
+            value=9500,
+        )
+        application_too_too = ApplicationFactory(
+            additional_information="Don't show me either"
+        )
+        ApplicationAggregateData.objects.create(
+            application=application_too_too,
+            name="applied_min_duration_total",
+            value=8000,
+        )
+
+        filter_clause = "appliedCountGte: 8200 appliedCountLte: 9400"
+
+        response = self.query(self.get_query_with_filter(filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
     def test_filter_by_applicant(self):
