@@ -1,13 +1,19 @@
 from typing import Dict, List
+from unittest import mock
 from unittest.mock import MagicMock, patch
 
 from assertpy import assert_that
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from requests import Response
 
 from applications.tests.factories import CityFactory
-from users.utils.open_city_profile.basic_info_resolver import ProfileUserInfoReader
+from users.utils.open_city_profile.basic_info_resolver import (
+    ProfileNodeIdReader,
+    ProfileReadError,
+    ProfileUserInfoReader,
+)
 
 
 def get_email_nodes() -> List:
@@ -349,3 +355,76 @@ class ProfileUserInfoReaderTestCase(TestCase):
     def test_get_user_home_city_returns_none_if_no_match_for_secondary(self):
         CityFactory(name="Nu York")
         assert_that(self.reader.get_user_home_city()).is_none()
+
+    @patch("requests.get")
+    def test_cannot_parse_json_raises(self, mock_get):
+        ret_val = Response()
+        ret_val.status_code = 400
+        mock_get.return_value = ret_val
+
+        with self.assertRaises(ProfileReadError):
+            ProfileUserInfoReader(self.user, self.request)
+
+    @patch("requests.get")
+    def test_getting_500_from_profile_raises(self, mock_get):
+        ret_val = Response()
+        ret_val.status_code = 500
+        mock_get.return_value = ret_val
+
+        with self.assertRaises(ProfileReadError):
+            ProfileUserInfoReader(self.user, self.request)
+
+
+response_mock = mock.MagicMock()
+
+
+@mock.patch("requests.get", return_value=response_mock)
+class ProfileNodeIdReaderTestCase(TestCase):
+    @classmethod
+    def __get_profile_gql_response(self, century_code="-"):
+        return {
+            "data": {
+                "myProfile": {
+                    "id": "aaa-bbb-ccc",
+                }
+            }
+        }
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        response_mock.status_code = 200
+        response_mock.json.return_value = cls.__get_profile_gql_response()
+        cls.request = mock.MagicMock()
+        cls.request.headers = {"X-Authorization": b"jwtokeny"}
+        cls.reader = ProfileNodeIdReader(cls.request)
+
+    def test_get_profile_id(self, gql_mock):
+        response_mock.json.return_value = self.__get_profile_gql_response()
+        assert_that(self.reader.get_user_profile_id()).is_equal_to("aaa-bbb-ccc")
+
+    def test_profile_id_none_when_no_data(self, gql_mock):
+        response_mock.json.return_value = {}
+        assert_that(self.reader.get_user_profile_id()).is_none()
+
+    def test_gql_response_has_errors_raises(self, gql_mock):
+        response_mock.json.return_value = {"errors": [{"message": "Error!"}]}
+
+        with self.assertRaises(ProfileReadError):
+            self.reader.get_user_profile_id()
+
+    def test_cannot_parse_json_raises(self, gql_mock):
+        ret_val = Response()
+        ret_val.status_code = 400
+        gql_mock.return_value = ret_val
+
+        with self.assertRaises(ProfileReadError):
+            self.reader.get_user_profile_id()
+
+    def test_getting_500_from_profile_raises(self, gql_mock):
+        ret_val = Response()
+        ret_val.status_code = 500
+        gql_mock.return_value = ret_val
+
+        with self.assertRaises(ProfileReadError):
+            self.reader.get_user_profile_id()

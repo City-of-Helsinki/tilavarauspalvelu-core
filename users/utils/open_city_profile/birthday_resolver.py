@@ -7,6 +7,7 @@ from helusers.user_utils import get_or_create_user
 from requests import RequestException
 from sentry_sdk import capture_exception, capture_message
 
+from users.utils.open_city_profile.basic_info_resolver import ProfileNodeIdReader
 from users.utils.open_city_profile.mixins import ProfileReaderTokenMixin
 
 REQUEST_TIMEOUT_SECONDS = 5
@@ -14,6 +15,11 @@ REQUEST_TIMEOUT_SECONDS = 5
 
 def resolve_user(request, payload):
     user = get_or_create_user(payload, oidc=True)
+
+    if not user.profile_id:
+        profile_id_reader = ProfileNodeIdReader(request)
+        user.profile_id = profile_id_reader.get_user_profile_id()
+        user.save()
 
     # If auth method is in configured loa levels we can try to read the date of birth of the user.
     if (
@@ -24,13 +30,11 @@ def resolve_user(request, payload):
         b_day_reader = UserBirthdayReader(request)
         try:
             birthday = b_day_reader.get_user_birthday()
-            profile_id = b_day_reader.get_user_profile_id()
         except (BirthDayReaderError, RequestException) as e:
             capture_exception(e)
         else:
             if birthday:
                 user.date_of_birth = birthday
-                user.profile_id = profile_id
                 user.save()
 
                 return user
@@ -146,7 +150,6 @@ class UserBirthdayReader(ProfileReaderTokenMixin):
         query = """
                     query {
                         myProfile {
-                            id
                             verifiedPersonalInformation {
                                 nationalIdentificationNumber
                             }
