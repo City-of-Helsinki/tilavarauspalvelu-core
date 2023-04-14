@@ -19,7 +19,7 @@
   "pricingTerms": "Rabattgrupper",
   "backToSearch": "Tillbaka till resultaten",
   "reservationSuccessful": "Bokningen lyckades",
-  "reservationReminderText": "Du får en påminnelse om bokningen till din e-post ({{user}}).\n\nDu finner de också på sidan <link>Egna bokningar</link>.",
+  "reservationReminderText": "Du får en påminnelse om bokningen till din e-post.\n\nDu finner de också på sidan <link>Egna bokningar</link>.",
   "reservationReminderTextHandling": "Du får en bokningsbekräftelse per e-post när vi har behandlat din bokning.",
   "reservationNotPossible": "Tyvärr går objektet inte längre att boka vid tidpunkten i fråga. Välj en annan tid.",
   "loadReservationCalendar": "Ladda en påminnelse till din kalender <calendarLink>här<calendarLink>.",

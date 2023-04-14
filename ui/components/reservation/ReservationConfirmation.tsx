@@ -115,7 +115,6 @@ const ReservationConfirmation = ({
               requiresHandling ? "Handling" : ""
             }`}
             t={t}
-            values={{ user: reservation?.user?.email }}
             components={{
               br: <br />,
               lnk: (

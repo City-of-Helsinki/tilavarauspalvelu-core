@@ -19,7 +19,7 @@
   "pricingTerms": "Discount groups",
   "backToSearch": "Back to results",
   "reservationSuccessful": "Booking successful",
-  "reservationReminderText": "At your email ({{user}}) you will receive reminders of your bookings.\n\nYou can also find them on <link>My Bookings</link> page.",
+  "reservationReminderText": "You will receive a reminder email of your bookings.\n\nYou can also find them on <link>My Bookings</link> page.",
   "reservationReminderTextHandling": "You will receive a booking confirmation by email when we have processed your booking.",
   "loadReservationCalendar": "Download a reminder to your calendar <calendarLink>here</calendarLink>.",
   "openingTimes": "Opening hours",

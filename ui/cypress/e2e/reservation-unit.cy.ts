@@ -783,7 +783,7 @@ describe("with application", () => {
 
     cy.get("main#main").should(
       "contain.text",
-      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun olemme käsitelleet varauksesi."
+      "Saat sähköpostiisi varausvahvistuksen, kun olemme käsitelleet varauksesi."
     );
   });
 
@@ -817,7 +817,7 @@ describe("with application", () => {
 
     cy.get("main#main").should(
       "contain.text",
-      "Saat sähköpostiisi (USER@NA.ME) varausvahvistuksen, kun olemme käsitelleet varauksesi."
+      "Saat sähköpostiisi varausvahvistuksen, kun olemme käsitelleet varauksesi."
     );
   });
 });

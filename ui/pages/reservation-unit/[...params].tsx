@@ -105,6 +105,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       QueryTermsOfUseArgs
     >({
       query: TERMS_OF_USE,
+      fetchPolicy: "no-cache",
       variables: {
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
@@ -121,6 +122,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           QueryReservationPurposesArgs
         >({
           query: RESERVATION_PURPOSES,
+          fetchPolicy: "no-cache",
         });
         reservationPurposes =
           reservationPurposesData.reservationPurposes.edges?.map(
@@ -132,6 +134,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           QueryAgeGroupsArgs
         >({
           query: AGE_GROUPS,
+          fetchPolicy: "no-cache",
         });
         ageGroups = ageGroupsData.ageGroups.edges?.map((edge) => edge.node);
 
@@ -140,6 +143,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           QueryCitiesArgs
         >({
           query: GET_CITIES,
+          fetchPolicy: "no-cache",
         });
         cities = citiesData.cities.edges?.map((edge) => edge.node);
       }
