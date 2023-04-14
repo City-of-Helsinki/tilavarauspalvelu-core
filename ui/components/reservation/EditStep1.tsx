@@ -135,11 +135,16 @@ const EditStep1 = ({
   ]);
 
   const getValue = useCallback(
-    (key) => {
+    (key: string) => {
       if (key === "ageGroup") {
         const { minimum, maximum } = reservation[key];
         return `${minimum} - ${maximum}`;
       }
+
+      if (key === "homeCity") {
+        return `${reservation[key].name}`;
+      }
+
       const rawValue = get(reservation, key);
       return get(rawValue, "pk")
         ? getTranslation(rawValue, "name")
