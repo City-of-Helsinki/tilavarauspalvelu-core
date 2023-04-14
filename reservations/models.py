@@ -348,7 +348,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         verbose_name=_("Billing email"), null=True, blank=True
     )
     billing_address_street = models.CharField(
-        verbose_name=_("Reservee address street"),
+        verbose_name=_("Billing address street"),
         max_length=255,
         blank=True,
         default="",
@@ -360,7 +360,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         default="",
     )
     billing_address_zip = models.CharField(
-        verbose_name=_("Reservee address zip code"),
+        verbose_name=_("Billing address zip code"),
         max_length=255,
         blank=True,
         default="",
@@ -507,7 +507,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         max_digits=20,
         decimal_places=6,
         default=0,
-        help_text="The non subsidised price of this reservation excluding VAT",
+        help_text="The non subsidised price of this reservation including VAT",
     )
     non_subsidised_price_net = models.DecimalField(
         verbose_name=_("Non subsidised net price"),
