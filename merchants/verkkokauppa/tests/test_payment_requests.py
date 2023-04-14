@@ -13,8 +13,8 @@ from requests import Timeout
 
 from ..constants import REQUEST_TIMEOUT_SECONDS
 from ..payment.exceptions import GetPaymentError, RefundPaymentError
-from ..payment.requests import get_payment, refund_order
-from ..payment.types import Payment, Refund
+from ..payment.requests import get_payment, get_refund_status, refund_order
+from ..payment.types import Payment, Refund, RefundStatusResult
 from .mocks import mock_get, mock_post
 
 
@@ -171,3 +171,31 @@ class RefundPaymentRequestsTestCase(TestCase):
             "Payment refund failed: Could not parse refund: badly formed hexadecimal UUID string"
         )
         assert_that(mock_capture.called).is_true()
+
+
+class GetRefundStatusRequestsTestCase(TestCase):
+    refund_status_response: Dict[str, Any] = {
+        "refundPaymentId": "ea0f16e8-14d7-4510-b83f-1a29494756f0_at_20230329-073612",
+        "refundTransactionId": "61b2d842-ce04-11ed-9991-c7842594818f",
+        "namespace": "tilanvaraus",
+        "orderId": "63c0e5b7-a460-38f1-97d8-2ffce25cce31",
+        "userId": "qwerty",
+        "status": "refund_paid_online",
+        "refundMethod": "nordea",
+        "refundGateway": "online-paytrail",
+        "totalExclTax": 100,
+        "total": 124,
+        "refundId": "ea0f16e8-14d7-4510-b83f-1a29494756f0",
+        "taxAmount": 24,
+        "timestamp": "20230329-073613",
+        "createdAt": "2023-03-29T07:36:13.576",
+        "updatedAt": None,
+    }
+
+    def test_get_refund_status_returns_status(self):
+        order_id = UUID(self.refund_status_response["orderId"])
+        namespace = self.refund_status_response["namespace"]
+        get = mock_get(self.refund_status_response, status_code=200)
+        refund_status = get_refund_status(order_id, namespace, get)
+        expected = RefundStatusResult.from_json(self.refund_status_response)
+        assert_that(refund_status).is_equal_to(expected)

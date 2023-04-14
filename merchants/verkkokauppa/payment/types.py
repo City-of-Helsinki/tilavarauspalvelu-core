@@ -7,7 +7,11 @@ from uuid import UUID
 
 from sentry_sdk import capture_exception, push_scope
 
-from ..payment.exceptions import ParsePaymentError, ParseRefundError
+from ..payment.exceptions import (
+    ParsePaymentError,
+    ParseRefundError,
+    ParseRefundStatusError,
+)
 
 
 class PaymentStatus(Enum):
@@ -21,6 +25,12 @@ class PaymentStatus(Enum):
     PAID_ONLINE = "payment_paid_online"
     CANCELLED = "payment_cancelled"
     AUTHORIZED = "authorized"
+
+
+class RefundStatus(Enum):
+    CREATED = "refund_created"
+    PAID_ONLINE = "refund_paid_online"
+    CANCELLED = "refund_cancelled"
 
 
 @dataclass(frozen=True)
@@ -107,3 +117,35 @@ class Refund:
                 scope.set_extra("json", json)
                 capture_exception(err)
             raise ParseRefundError(f"Could not parse refund: {str(err)}") from err
+
+
+@dataclass(frozen=True)
+class RefundStatusResult:
+    order_id: UUID
+    refund_payment_id: str
+    refund_transaction_id: UUID
+    namespace: str
+    status: str
+    created_at: datetime
+
+    @classmethod
+    def from_json(cls, json: Dict[str, Any]) -> "RefundStatusResult":
+        from ..helpers import parse_datetime
+
+        try:
+            return RefundStatusResult(
+                order_id=UUID(json["orderId"]),
+                refund_payment_id=json["refundPaymentId"],
+                refund_transaction_id=UUID(json["refundTransactionId"]),
+                namespace=json["namespace"],
+                status=json["status"],
+                created_at=parse_datetime(json["createdAt"]),
+            )
+        except (KeyError, ValueError) as err:
+            with push_scope() as scope:
+                scope.set_extra("details", "Parsing refund status failed")
+                scope.set_extra("json", json)
+                capture_exception(err)
+            raise ParseRefundStatusError(
+                f"Could not parse refund status: {str(err)}"
+            ) from err
