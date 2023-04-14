@@ -110,6 +110,7 @@ const Reservations = (): JSX.Element => {
         ReservationsReservationStateChoices.RequiresHandling,
         ReservationsReservationStateChoices.Cancelled,
         ReservationsReservationStateChoices.WaitingForPayment,
+        ReservationsReservationStateChoices.Denied,
       ],
       orderBy: "-begin",
       user: currentUser?.pk.toString(),
@@ -122,7 +123,9 @@ const Reservations = (): JSX.Element => {
       ?.map((edge) => edge?.node)
       .reduce(
         (acc, reservation) => {
-          if (reservation.state === "CANCELLED") {
+          if (
+            reservation.state === ReservationsReservationStateChoices.Cancelled
+          ) {
             acc[2].push(reservation);
           } else if (isAfter(new Date(reservation?.begin), new Date())) {
             acc[0].push(reservation);

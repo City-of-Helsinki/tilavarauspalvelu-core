@@ -575,6 +575,10 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       data.homeCity = { id: "123", name: "Lande", pk: 2 };
     }
 
+    if (pk === 702) {
+      data.state = ReservationsReservationStateChoices.Denied;
+    }
+
     return res(
       ctx.data({
         reservationByPk: data as unknown as ReservationType,
@@ -1360,6 +1364,76 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
             {
               pk: 3,
               nameFi: "Studiohuone 3 + soittimet",
+              nameEn: null,
+              nameSv: null,
+              termsOfUseFi:
+                "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+              unit: {
+                nameFi: "Helsingin keskustakirjasto Oodi",
+                nameEn: null,
+                nameSv: null,
+              },
+              cancellationRule: {
+                canBeCancelledTimeBefore: 86400,
+                needsHandling: false,
+              },
+              location: null,
+              images: [],
+            } as ReservationUnitType,
+          ],
+        },
+      },
+      {
+        node: {
+          id: "UmVzZXJ2YXRpb25UeXBlOjIx",
+          pk: 22,
+          name: "Cancelled reservation",
+          begin: addDays(new Date(), 21).toISOString(),
+          end: addHours(addDays(new Date(), 21), 1).toISOString(),
+          user: "user@email.com",
+          state: ReservationsReservationStateChoices.Denied,
+          bufferTimeBefore: 3600,
+          bufferTimeAfter: 1800,
+          orderStatus: "PAID_MANUALLY",
+          reservationUnits: [
+            {
+              pk: 3,
+              nameFi: "Studiohuone 42 + soittimet",
+              nameEn: null,
+              nameSv: null,
+              termsOfUseFi:
+                "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+              unit: {
+                nameFi: "Helsingin keskustakirjasto Oodi",
+                nameEn: null,
+                nameSv: null,
+              },
+              cancellationRule: {
+                canBeCancelledTimeBefore: 86400,
+                needsHandling: false,
+              },
+              location: null,
+              images: [],
+            } as ReservationUnitType,
+          ],
+        },
+      },
+      {
+        node: {
+          id: "UmVzZXJ2YXRpb25UeXBlOjIx",
+          pk: 23,
+          name: "Cancelled reservation",
+          begin: addDays(new Date(), -25).toISOString(),
+          end: addHours(addDays(new Date(), -25), 1).toISOString(),
+          user: "user@email.com",
+          state: ReservationsReservationStateChoices.Denied,
+          bufferTimeBefore: 3600,
+          bufferTimeAfter: 1800,
+          orderStatus: "PAID_MANUALLY",
+          reservationUnits: [
+            {
+              pk: 3,
+              nameFi: "Studiohuone 43 + soittimet",
               nameEn: null,
               nameSv: null,
               termsOfUseFi:
