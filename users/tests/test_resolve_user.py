@@ -75,7 +75,7 @@ class ResolveUserTestCase(TestCase):
 
         self.user.refresh_from_db()
         assert_that(self.user.date_of_birth).is_equal_to(birth_of_day)
-        assert_that(req_mock.call_count).is_zero()
+        assert_that(req_mock.call_count).is_equal_to(1)
 
     def test_user_profile_id_is_updated(self, req_mock):
         resolve_user(self.request, self.get_payload())

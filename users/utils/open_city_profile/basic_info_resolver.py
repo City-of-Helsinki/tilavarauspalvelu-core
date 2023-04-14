@@ -230,3 +230,67 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
                 if email.get("node", {}).get("emailType") == type:
                     return email.get("node", {}).get("email")
         return None
+
+
+class ProfileNodeIdReader(ProfileReaderTokenMixin):
+    def __init__(self, request):
+        self.request = request
+
+    def get_user_profile_id(self) -> [str, None]:
+        self.response_data = self.__make_profile_request(self.token)
+
+        self.__check_for_errors()
+
+        my_profile_data = self.__get_my_profile_data()
+
+        if not my_profile_data:
+            return None
+
+        return my_profile_data.get("id")
+
+    def __check_for_errors(self):
+        if self.response_data.get("errors"):
+            message = next(iter(self.response_data.get("errors"))).get("message")
+            raise ProfileReadError(message)
+
+    def __get_my_profile_data(self):
+        data = self.response_data.get("data")
+
+        if not data:
+            return None
+
+        return data.get("myProfile")
+
+    def __make_profile_request(self, token) -> dict:
+        query = """
+                    query {
+                        myProfile {
+                            id
+                        }
+                    }
+                """
+
+        response = requests.get(
+            settings.OPEN_CITY_PROFILE_GRAPHQL_API,
+            json={"query": query},
+            headers={"Authorization": token},
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+
+        status = response.status_code
+        if status >= 400 and status < 500:
+            try:
+                data = response.json()
+            except JSONDecodeError:
+                raise ProfileReadError(
+                    "Got %s status code from profile and could not json decode the data"
+                    % response.status_code
+                )
+        elif status >= 500:
+            raise ProfileReadError(
+                "Got internal server error while querying profile data"
+            )
+        else:
+            data = response.json()
+
+        return data

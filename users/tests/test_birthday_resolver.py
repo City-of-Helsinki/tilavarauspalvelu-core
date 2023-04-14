@@ -135,7 +135,3 @@ class BirthdayResolverGetUserBirthDayTestCase(TestCase):
         reader = UserBirthdayReader(request)
 
         assert_that(reader.token).is_equal_to(token)
-
-    def test_get_profile_id(self, gql_mock):
-        response_mock.json.return_value = self.__get_profile_gql_response()
-        assert_that(self.reader.get_user_profile_id()).is_equal_to("aaa-bbb-ccc")
