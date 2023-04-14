@@ -134,7 +134,7 @@ const Reservations = (): JSX.Element => {
         [[], [], []] as ReservationType[][]
       );
     if (reservations?.length > 0) {
-      setUpcomingReservations(reservations[0]);
+      setUpcomingReservations([...reservations[0]].reverse());
       setPastReservations(reservations[1]);
       setCancelledReservations(reservations[2]);
     }
