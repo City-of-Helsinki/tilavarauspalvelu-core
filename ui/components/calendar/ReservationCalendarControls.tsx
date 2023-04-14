@@ -16,6 +16,7 @@ import {
   DateInput,
   IconAngleDown,
   IconAngleUp,
+  IconCross,
   Select,
 } from "hds-react";
 import { maxBy, trim, trimStart } from "lodash";
@@ -50,7 +51,7 @@ import {
   ApplicationRoundType,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
-import { MediumButton } from "../../styles/util";
+import { MediumButton, truncatedText } from "../../styles/util";
 import { ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
@@ -168,21 +169,14 @@ const Content = styled.div<{ $isAnimated: boolean }>`
   }
 
   @media (min-width: ${breakpoints.m}) {
-    > *:nth-child(5) {
-      grid-column: 3/3;
-    }
-
     grid-template-columns: repeat(4, 24%);
     gap: var(--spacing-xs);
     justify-content: space-between;
+    padding-bottom: var(--spacing-s);
   }
 
   @media (min-width: ${breakpoints.xl}) {
-    > *:nth-child(5) {
-      grid-column: unset;
-    }
-
-    grid-template-columns: 154px 120px 100px minmax(100px, 1fr) 100px 140px;
+    grid-template-columns: 154px 120px 100px minmax(100px, 1fr) 100px auto;
   }
 `;
 
@@ -226,25 +220,45 @@ const Price = styled.div`
 `;
 
 const ResetButton = styled(Button).attrs({
-  variant: "secondary",
+  variant: "supplementary",
+  iconLeft: <IconCross aria-hidden />,
   style: {
-    /* eslint-disable @typescript-eslint/naming-convention */
-    "--border-color": "var(--color-black)",
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     "--color": "var(--color-black)",
-    /* eslint-enable */
   } as CSSProperties,
-})`
+})<{ $isLast: boolean }>`
   white-space: nowrap;
   order: 1;
 
-  > span {
-    margin: 0 !important;
-    padding-right: var(--spacing-3-xs);
-    padding-left: var(--spacing-3-xs);
+  svg {
+    min-width: 24px;
   }
 
   @media (min-width: ${breakpoints.m}) {
     order: unset;
+    grid-column: ${({ $isLast }) => ($isLast ? "4" : "3")} / 4;
+  }
+
+  @media (min-width: ${breakpoints.xl}) {
+    grid-column: unset;
+
+    svg {
+      display: none;
+    }
+  }
+`;
+
+const SelectButton = styled(Button)`
+  order: 7;
+  ${truncatedText}
+
+  @media (min-width: ${breakpoints.m}) {
+    display: none;
+    grid-column: 4/4;
+  }
+
+  @media (min-width: ${breakpoints.xl}) {
+    grid-column: unset;
   }
 `;
 
@@ -663,9 +677,18 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
                 setInitialReservation(null);
               }}
               disabled={!startTime}
+              $isLast={mode === "edit"}
             >
               {t("searchForm:resetForm")}
             </ResetButton>
+            {mode === "edit" && (
+              <SelectButton
+                onClick={() => setAreControlsVisible(false)}
+                disabled={!startTime}
+              >
+                {t("reservationCalendar:selectTime")}
+              </SelectButton>
+            )}
             {mode === "create" && submitButton}
           </Content>
         )}
