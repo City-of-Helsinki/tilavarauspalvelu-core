@@ -267,6 +267,8 @@ describe("Tilavaraus user reservations", () => {
     cancelCancelButton().click();
     cancelTitle().should("have.text", "Varauksesi on peruttu!");
 
+    cy.get("main#main").should("contain.text", "Ohjeet perutulle varaukselle");
+
     reservationInfoCard()
       .should("contain.text", ", 2 t")
       // .should("contain.text", "(alv %)")
