@@ -38,6 +38,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             reservee_last_name="Lastname",
             reservee_email="test@example.com",
             reservee_phone="+358 50 123 4567",
+            reservee_language="fi",
         )
         order_params = _get_order_params(reservation)
 
@@ -79,7 +80,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         assert_that(json["items"][0]["vatPercentage"]).is_equal_to(
             "24"  # Note this needs to be 24, not 24.00.
         )
-        assert_that(json["items"][0]["meta"]).is_length(2)
+        assert_that(json["items"][0]["meta"]).is_length(3)
         assert_that(json["items"][0]["meta"][0]["key"]).is_equal_to(
             "namespaceProductId"
         )
@@ -90,3 +91,40 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         assert_that(json["items"][0]["meta"][0]["visibleInCheckout"]).is_false()
         assert_that(json["items"][0]["meta"][0]["ordinal"]).is_equal_to(0)
         assert_that(json["items"][0]["meta"][1]["key"]).is_equal_to("reservationPeriod")
+        assert_that(json["items"][0]["meta"][1]["label"]).is_equal_to("Varausaika")
+        assert_that(json["items"][0]["meta"][2]["key"]).is_equal_to("reservationNumber")
+        assert_that(json["items"][0]["meta"][2]["label"]).is_equal_to("Varausnumero")
+        assert_that(json["items"][0]["meta"][2]["value"]).is_equal_to(
+            str(reservation.pk)
+        )
+
+    @freezegun.freeze_time("2023-01-01 00:00:00")
+    def test_meta_label_language_support(self):
+        payment_product = PaymentProductFactory()
+        reservation_unit = ReservationUnitFactory(payment_product=payment_product)
+        user = get_user_model().objects.create_user(
+            username="test",
+            email="test@localhost",
+            first_name="First",
+            last_name="Name",
+        )
+
+        reservation = ReservationFactory(
+            reservation_unit=[reservation_unit],
+            user=user,
+            price_net=Decimal("10.12"),
+            price=Decimal("12.5488"),
+            tax_percentage_value=Decimal("24"),
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="Firstname",
+            reservee_last_name="Lastname",
+            reservee_email="test@example.com",
+            reservee_phone="+358 50 123 4567",
+            reservee_language="en",
+        )
+        order_params = _get_order_params(reservation)
+        json = order_params.to_json()
+
+        assert_that(json["items"][0]["meta"]).is_length(3)
+        assert_that(json["items"][0]["meta"][1]["label"]).is_equal_to("Booking time")
+        assert_that(json["items"][0]["meta"][2]["label"]).is_equal_to("Booking number")

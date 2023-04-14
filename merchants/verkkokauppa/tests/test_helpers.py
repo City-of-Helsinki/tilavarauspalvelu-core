@@ -6,15 +6,18 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest import raises
 
 from applications.models import CUSTOMER_TYPES
 from merchants.tests.factories import PaymentProductFactory
+from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.tests.factories import ReservationFactory
 
 from ..helpers import (
     create_verkkokauppa_order,
     get_formatted_reservation_time,
+    get_meta_label,
     get_validated_phone_number,
 )
 
@@ -43,22 +46,22 @@ class HelpersTestCase(TestCase):
         )
 
     def test_get_formatted_reservation_time_fi(self):
-        self.user.preferred_language = "fi"
-        self.user.save()
+        self.reservation.reservee_language = "fi"
+        self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
         assert_that(date).is_equal_to("La 05.11.2022 10:00-12:00")
 
     def test_get_formatted_reservation_time_sv(self):
-        self.user.preferred_language = "sv"
-        self.user.save()
+        self.reservation.reservee_language = "sv"
+        self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
         assert_that(date).is_equal_to("Lö 05.11.2022 10:00-12:00")
 
     def test_get_formatted_reservation_time_en(self):
-        self.user.preferred_language = "en"
-        self.user.save()
+        self.reservation.reservee_language = "en"
+        self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
         assert_that(date).is_equal_to("Sa 05.11.2022 10:00-12:00")
@@ -157,3 +160,14 @@ class HelpersTestCase(TestCase):
 
         create_verkkokauppa_order(reservation)
         assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to("")
+
+    def test_get_meta_label_returns_label_with_supported_key(self):
+        period_label = get_meta_label("reservationPeriod", self.reservation)
+        number_label = get_meta_label("reservationNumber", self.reservation)
+        assert_that(period_label).is_equal_to("Varausaika")
+        assert_that(number_label).is_equal_to("Varausnumero")
+
+    def test_get_meta_label_raises_exception_with_unsupported_key(self):
+        with raises(UnsupportedMetaKey) as err:
+            get_meta_label("unsupported", self.reservation)
+        assert_that(str(err.value)).is_equal_to("Invalid meta label key 'unsupported'")
