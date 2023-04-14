@@ -83,7 +83,6 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = ApplicationRound
         fields = [
-            "id",
             "reservation_units",
             "application_period_begin",
             "application_period_end",
@@ -101,12 +100,6 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
             "applications_sent",
             "target_group",
         ] + get_all_translatable_fields(model)
-
-        filter_fields = {
-            "name_fi": ["exact", "icontains", "istartswith"],
-            "name_sv": ["exact", "icontains", "istartswith"],
-            "name_en": ["exact", "icontains", "istartswith"],
-        }
 
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection

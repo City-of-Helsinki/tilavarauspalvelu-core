@@ -114,6 +114,53 @@ snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_applicant 1'] = {
     }
 }
 
+snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_applied_count_gte 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_applied_count_gte_lte 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Show me'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_applied_count_lte 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_multiple_applicant_type 1'] = {
     'data': {
         'applications': {

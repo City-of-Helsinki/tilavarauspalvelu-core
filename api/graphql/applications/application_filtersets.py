@@ -20,6 +20,11 @@ class ApplicationFilterSet(filters.FilterSet):
     pk = filters.ModelMultipleChoiceFilter(
         field_name="pk", method="filter_by_pk", queryset=Application.objects.all()
     )
+
+    applied_count_gte = filters.NumberFilter(method="filter_by_applied_count_gte")
+
+    applied_count_lte = filters.NumberFilter(method="filter_by_applied_count_lte")
+
     application_round = filters.ModelChoiceFilter(
         field_name="application_round", queryset=ApplicationRound.objects.all()
     )
@@ -72,6 +77,18 @@ class ApplicationFilterSet(filters.FilterSet):
 
         return super().filter_queryset(queryset)
 
+    def filter_by_applied_count_gte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="applied_min_duration_total",
+            aggregated_data__value__gte=value,
+        )
+
+    def filter_by_applied_count_lte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="applied_min_duration_total",
+            aggregated_data__value__lte=value,
+        )
+
     def filter_by_possible_units(self, qs, property, value):
         if not value:
             return qs
@@ -98,37 +115,43 @@ class ApplicationEventFilterSet(filters.FilterSet):
         field_name="pk", method="filter_by_pk", queryset=ApplicationEvent.objects.all()
     )
 
+    application = filters.ModelChoiceFilter(
+        field_name="application", queryset=Application.objects.all()
+    )
+
+    applied_count_gte = filters.NumberFilter(method="filter_by_applied_count_gte")
+
+    applied_count_lte = filters.NumberFilter(method="filter_by_applied_count_lte")
+
     application_round = filters.ModelChoiceFilter(
         field_name="application__application_round",
         queryset=ApplicationRound.objects.all(),
     )
 
-    application = filters.ModelChoiceFilter(
-        field_name="application", queryset=Application.objects.all()
-    )
-
-    unit = filters.ModelMultipleChoiceFilter(
-        method="filter_by_possible_units", queryset=Unit.objects.all()
-    )
-
-    status = filters.CharFilter(field_name="latest_status", lookup_expr="iexact")
-
     application_status = filters.CharFilter(
         field_name="application__latest_status", method="filter_by_application_status"
-    )
-
-    reservation_unit = filters.ModelMultipleChoiceFilter(
-        method="filter_by_reservation_units", queryset=ReservationUnit.objects.all()
-    )
-
-    user = filters.ModelChoiceFilter(
-        field_name="application__user", queryset=User.objects.all()
     )
 
     applicant_type = filters.MultipleChoiceFilter(
         field_name="application__applicant_type",
         method="filter_by_applicant_type",
         choices=[(c[0], c[1]) for c in APPLICANT_TYPE_CONST.APPLICANT_TYPE_CHOICES],
+    )
+
+    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
+
+    reservation_unit = filters.ModelMultipleChoiceFilter(
+        method="filter_by_reservation_units", queryset=ReservationUnit.objects.all()
+    )
+
+    status = filters.CharFilter(field_name="latest_status", lookup_expr="iexact")
+
+    unit = filters.ModelMultipleChoiceFilter(
+        method="filter_by_possible_units", queryset=Unit.objects.all()
+    )
+
+    user = filters.ModelChoiceFilter(
+        field_name="application__user", queryset=User.objects.all()
     )
 
     order_by = filters.OrderingFilter(
@@ -168,6 +191,16 @@ class ApplicationEventFilterSet(filters.FilterSet):
         )
 
         return super().filter_queryset(queryset)
+
+    def filter_by_applied_count_gte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="duration_total", aggregated_data__value__gte=value
+        )
+
+    def filter_by_applied_count_lte(self, qs, property, value):
+        return qs.filter(
+            aggregated_data__name="duration_total", aggregated_data__value__lte=value
+        )
 
     def filter_by_possible_units(self, qs, property, value):
         if not value:

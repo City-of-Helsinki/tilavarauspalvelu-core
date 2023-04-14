@@ -6,6 +6,7 @@ from assertpy import assert_that
 from api.graphql.tests.test_application_events.base import ApplicationEventTestCaseBase
 from applications.models import (
     Application,
+    ApplicationEventAggregateData,
     ApplicationEventStatus,
     ApplicationEventWeeklyAmountReduction,
     ApplicationStatus,
@@ -109,10 +110,76 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
+    def test_filter_by_applied_count_lte(self):
+        ApplicationEventAggregateData.objects.create(
+            application_event=self.application_event, name="duration_total", value=8600
+        )
+        event = ApplicationEventFactory(name="Don't show me")
+        ApplicationEventAggregateData.objects.create(
+            application_event=event, name="duration_total", value=9000
+        )
+
+        filter_clause = "appliedCountLte: 8601"
+
+        response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_applied_count_gte(self):
+        ApplicationEventAggregateData.objects.create(
+            application_event=self.application_event, name="duration_total", value=9000
+        )
+        event = ApplicationEventFactory(name="Don't show me")
+        ApplicationEventAggregateData.objects.create(
+            application_event=event, name="duration_total", value=8600
+        )
+
+        filter_clause = "appliedCountGte: 8601"
+
+        response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_applied_count_gte_lte(self):
+        ApplicationEventAggregateData.objects.create(
+            application_event=self.application_event, name="duration_total", value=8600
+        )
+        event = ApplicationEventFactory(name="Show me")
+        ApplicationEventAggregateData.objects.create(
+            application_event=event, name="duration_total", value=9000
+        )
+        event_too = ApplicationEventFactory(name="Don't show me")
+        ApplicationEventAggregateData.objects.create(
+            application_event=event_too, name="duration_total", value=9500
+        )
+        event_too_too = ApplicationEventFactory(name="Don't show me either")
+        ApplicationEventAggregateData.objects.create(
+            application_event=event_too_too, name="duration_total", value=8000
+        )
+
+        filter_clause = "appliedCountGte: 8200 appliedCountLte: 9400"
+
+        response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
     def test_filter_by_application_round(self):
         application = ApplicationFactory()
         ApplicationEventFactory(application=application, name="I should be only event")
         filter_clause = f"applicationRound: {application.application_round.id}"
+
+        response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_name(self):
+        application = ApplicationFactory()
+        ApplicationEventFactory(application=application, name="Don't show me!")
+        filter_clause = 'name: "Test"'
 
         response = self.query(self.get_query(filter_section=filter_clause))
         assert_that(response.status_code).is_equal_to(200)

@@ -22,6 +22,20 @@ snapshots['ApplicationRoundQueryTestCase::test_applications_count_does_not_inclu
     }
 }
 
+snapshots['ApplicationRoundQueryTestCase::test_filter_by_pk 1'] = {
+    'data': {
+        'applicationRounds': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test application round fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationRoundQueryTestCase::test_getting_application_rounds 1'] = {
     'data': {
         'applicationRounds': {
