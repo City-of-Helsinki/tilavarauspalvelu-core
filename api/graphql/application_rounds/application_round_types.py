@@ -151,7 +151,11 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_applications_count(self, info: graphene.ResolveInfo):
         applications_count = self.applications.exclude(
-            cached_latest_status=ApplicationStatus.DRAFT
+            cached_latest_status__in=[
+                ApplicationStatus.DRAFT,
+                ApplicationStatus.CANCELLED,
+                ApplicationStatus.EXPIRED,
+            ]
         ).count()
 
         return applications_count
