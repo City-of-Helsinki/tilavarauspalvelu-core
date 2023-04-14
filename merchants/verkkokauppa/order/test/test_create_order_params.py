@@ -30,8 +30,8 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         reservation = ReservationFactory(
             reservation_unit=[reservation_unit],
             user=user,
-            price_net=Decimal("10"),
-            price=Decimal("12.4"),
+            price_net=Decimal("10.12"),
+            price=Decimal("12.5488"),
             tax_percentage_value=Decimal("24"),
             reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
             reservee_first_name="Firstname",
@@ -46,9 +46,9 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         assert_that(json["namespace"]).is_equal_to(settings.VERKKOKAUPPA_NAMESPACE)
         assert_that(json["user"]).is_equal_to(str(reservation.user.uuid))
         assert_that(json["language"]).is_equal_to(reservation.reservee_language or "fi")
-        assert_that(json["priceNet"]).is_equal_to("10")
-        assert_that(json["priceVat"]).is_equal_to("2.40")
-        assert_that(json["priceTotal"]).is_equal_to("12.40")
+        assert_that(json["priceNet"]).is_equal_to("10.12")
+        assert_that(json["priceVat"]).is_equal_to("2.43")
+        assert_that(json["priceTotal"]).is_equal_to("12.55")
         assert_that(json["customer"]["firstName"]).is_equal_to("Firstname")
         assert_that(json["customer"]["lastName"]).is_equal_to("Lastname")
         assert_that(json["customer"]["email"]).is_equal_to("test@example.com")
@@ -70,12 +70,12 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         )
         assert_that(json["items"][0]["quantity"]).is_equal_to(1)
         assert_that(json["items"][0]["unit"]).is_equal_to("pcs")
-        assert_that(json["items"][0]["rowPriceNet"]).is_equal_to("10")
-        assert_that(json["items"][0]["rowPriceVat"]).is_equal_to("2.40")
-        assert_that(json["items"][0]["rowPriceTotal"]).is_equal_to("12.40")
-        assert_that(json["items"][0]["priceNet"]).is_equal_to("10")
-        assert_that(json["items"][0]["priceVat"]).is_equal_to("2.40")
-        assert_that(json["items"][0]["priceGross"]).is_equal_to("12.40")
+        assert_that(json["items"][0]["rowPriceNet"]).is_equal_to("10.12")
+        assert_that(json["items"][0]["rowPriceVat"]).is_equal_to("2.43")
+        assert_that(json["items"][0]["rowPriceTotal"]).is_equal_to("12.55")
+        assert_that(json["items"][0]["priceNet"]).is_equal_to("10.12")
+        assert_that(json["items"][0]["priceVat"]).is_equal_to("2.43")
+        assert_that(json["items"][0]["priceGross"]).is_equal_to("12.55")
         assert_that(json["items"][0]["vatPercentage"]).is_equal_to(
             "24"  # Note this needs to be 24, not 24.00.
         )
