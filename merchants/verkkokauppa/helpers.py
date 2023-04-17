@@ -9,6 +9,7 @@ from sentry_sdk import capture_exception, push_scope
 
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from applications.models import CUSTOMER_TYPES
+from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.order.requests import create_order
 from merchants.verkkokauppa.order.types import (
@@ -36,7 +37,7 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
     begin = reservation.begin.astimezone(get_default_timezone())
     end = reservation.end.astimezone(get_default_timezone())
 
-    preferred_language = reservation.user.preferred_language or "fi"
+    preferred_language = reservation.reservee_language or "fi"
     weekday = localized_short_weekday(begin.weekday(), preferred_language)
     end_time = end.strftime("%H:%M")
 
@@ -57,6 +58,26 @@ def get_validated_phone_number(phone_number: str) -> str:
         return match.group(0)
 
     return ""
+
+
+def get_meta_label(key: str, reservation: Reservation) -> str:
+    labels = {
+        "reservationPeriod": {
+            "fi": "Varausaika",
+            "en": "Booking time",
+            "sv": "Bokningstiden",
+        },
+        "reservationNumber": {
+            "fi": "Varausnumero",
+            "en": "Booking number",
+            "sv": "Bokningsnummer",
+        },
+    }
+    if key not in labels:
+        raise UnsupportedMetaKey(f"Invalid meta label key '{key}'")
+
+    preferred_language = reservation.reservee_language or "fi"
+    return labels[key][preferred_language]
 
 
 def create_verkkokauppa_order(reservation: Reservation):
@@ -111,9 +132,16 @@ def _get_order_params(reservation: Reservation):
                 OrderItemMetaParams(
                     key="reservationPeriod",
                     value=get_formatted_reservation_time(reservation),
-                    label="Varausaika",
+                    label=get_meta_label("reservationPeriod", reservation),
                     visible_in_checkout=True,
                     ordinal=1,
+                ),
+                OrderItemMetaParams(
+                    key="reservationNumber",
+                    value=reservation.pk,
+                    label=get_meta_label("reservationNumber", reservation),
+                    visible_in_checkout=True,
+                    ordinal=2,
                 ),
             ],
         )
