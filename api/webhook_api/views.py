@@ -127,9 +127,17 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
 
             return Response(status=200)
         except WebhookError as e:
+            with push_scope() as scope:
+                scope.set_extra("details", "Invalid payment webhook")
+                scope.set_extra("data", e.to_json())
+                scope.set_extra("status_code", e.status_code)
+                capture_exception(e)
             return Response(data=e.to_json(), status=e.status_code)
         except GetPaymentError as e:
-            capture_message(f"Checking order payment failed: {str(e)}", level="error")
+            with push_scope() as scope:
+                scope.set_extra("details", "Checking order payment failed")
+                scope.set_extra("remote_id", remote_id)
+                capture_exception(e)
             return Response(
                 data={"status": 500, "message": "Problem with upstream service"},
                 status=500,
@@ -203,11 +211,16 @@ class WebhookOrderViewSet(viewsets.ViewSet):
 
             return Response(status=200)
         except WebhookError as err:
+            with push_scope() as scope:
+                scope.set_extra("details", "Invalid order webhook")
+                scope.set_extra("data", err.to_json())
+                scope.set_extra("status_code", err.status_code)
+                capture_exception(err)
             return Response(data=err.to_json(), status=err.status_code)
         except GetOrderError as err:
             with push_scope() as scope:
                 scope.set_extra("details", "Order checking failed")
-                scope.set_extra("remote-id", remote_id)
+                scope.set_extra("remote_id", remote_id)
                 capture_exception(err)
             return Response(
                 data={"status": 500, "message": "Problem with upstream service"},
@@ -283,4 +296,9 @@ class WebhookRefundViewSet(viewsets.ViewSet):
 
             return Response(status=200)
         except WebhookError as err:
+            with push_scope() as scope:
+                scope.set_extra("details", "Invalid refund webhook")
+                scope.set_extra("data", err.to_json())
+                scope.set_extra("status_code", err.status_code)
+                capture_exception(err)
             return Response(data=err.to_json(), status=err.status_code)
