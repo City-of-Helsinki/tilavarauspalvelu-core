@@ -44,7 +44,13 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
     permission_classes = [WebhookPermission]
 
     def validate_request(self, request):
-        required_field = ["paymentId", "orderId", "namespace", "type", "timestamp"]
+        required_field = [
+            "paymentId",
+            "orderId",
+            "namespace",
+            "eventType",
+            "eventTimestamp",
+        ]
         for field in required_field:
             if field not in request.data:
                 raise WebhookError(
@@ -52,7 +58,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        webhook_type = request.data.get("type", None)
+        webhook_type = request.data.get("eventType", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
@@ -67,7 +73,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                 "paymentId": serializers.UUIDField(),
                 "orderId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "type": serializers.ChoiceField(
+                "eventType": serializers.ChoiceField(
                     choices=[
                         (
                             "PAYMENT_PAID",
@@ -75,7 +81,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                         )
                     ]
                 ),
-                "timestamp": serializers.DateTimeField(),
+                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,
@@ -127,9 +133,17 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
 
             return Response(status=200)
         except WebhookError as e:
+            with push_scope() as scope:
+                scope.set_extra("details", "Invalid payment webhook")
+                scope.set_extra("data", e.to_json())
+                scope.set_extra("status_code", e.status_code)
+                capture_exception(e)
             return Response(data=e.to_json(), status=e.status_code)
         except GetPaymentError as e:
-            capture_message(f"Checking order payment failed: {str(e)}", level="error")
+            with push_scope() as scope:
+                scope.set_extra("details", "Checking order payment failed")
+                scope.set_extra("remote_id", remote_id)
+                capture_exception(e)
             return Response(
                 data={"status": 500, "message": "Problem with upstream service"},
                 status=500,
@@ -140,7 +154,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
     permission_classes = [WebhookPermission]
 
     def validate_request(self, request):
-        required_field = ["orderId", "namespace", "type", "timestamp"]
+        required_field = ["orderId", "namespace", "eventType", "eventTimestamp"]
         for field in required_field:
             if field not in request.data:
                 raise WebhookError(
@@ -148,7 +162,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        webhook_type = request.data.get("type", None)
+        webhook_type = request.data.get("eventType", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
@@ -162,10 +176,10 @@ class WebhookOrderViewSet(viewsets.ViewSet):
             fields={
                 "orderId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "type": serializers.ChoiceField(
+                "eventType": serializers.ChoiceField(
                     choices=[("ORDER_CANCELLED", "ORDER_CANCELLED")]
                 ),
-                "timestamp": serializers.DateTimeField(),
+                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,
@@ -203,11 +217,16 @@ class WebhookOrderViewSet(viewsets.ViewSet):
 
             return Response(status=200)
         except WebhookError as err:
+            with push_scope() as scope:
+                scope.set_extra("details", "Invalid order webhook")
+                scope.set_extra("data", err.to_json())
+                scope.set_extra("status_code", err.status_code)
+                capture_exception(err)
             return Response(data=err.to_json(), status=err.status_code)
         except GetOrderError as err:
             with push_scope() as scope:
                 scope.set_extra("details", "Order checking failed")
-                scope.set_extra("remote-id", remote_id)
+                scope.set_extra("remote_id", remote_id)
                 capture_exception(err)
             return Response(
                 data={"status": 500, "message": "Problem with upstream service"},
@@ -224,8 +243,8 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             "refundId",
             "refundPaymentId",
             "namespace",
-            "type",
-            "timestamp",
+            "eventType",
+            "eventTimestamp",
         ]
         for field in required_field:
             if field not in request.data:
@@ -234,7 +253,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        webhook_type = request.data.get("type", None)
+        webhook_type = request.data.get("eventType", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
@@ -250,10 +269,10 @@ class WebhookRefundViewSet(viewsets.ViewSet):
                 "refundId": serializers.UUIDField(),
                 "refundPaymentId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "type": serializers.ChoiceField(
+                "eventType": serializers.ChoiceField(
                     choices=[("REFUND_PAID", "REFUND_PAID")]
                 ),
-                "timestamp": serializers.DateTimeField(),
+                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,
@@ -283,4 +302,9 @@ class WebhookRefundViewSet(viewsets.ViewSet):
 
             return Response(status=200)
         except WebhookError as err:
+            with push_scope() as scope:
+                scope.set_extra("details", "Invalid refund webhook")
+                scope.set_extra("data", err.to_json())
+                scope.set_extra("status_code", err.status_code)
+                capture_exception(err)
             return Response(data=err.to_json(), status=err.status_code)

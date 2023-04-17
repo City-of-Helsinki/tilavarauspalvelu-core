@@ -79,8 +79,8 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
             "paymentId": self.verkkokauppa_payment.payment_id,
             "orderId": self.verkkokauppa_payment.order_id,
             "namespace": self.verkkokauppa_payment.namespace,
-            "type": "PAYMENT_PAID",
-            "timestamp": self.verkkokauppa_payment.timestamp.isoformat(),
+            "eventType": "PAYMENT_PAID",
+            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     @mock.patch("api.webhook_api.views.send_confirmation_email")
@@ -119,9 +119,12 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         assert_that(response.data).is_none()
 
-    def test_returns_400_with_error_on_invalid_payload(self, mock_get_payment):
+    @mock.patch("api.webhook_api.views.capture_exception")
+    def test_returns_400_with_error_on_invalid_payload(
+        self, mock_capture_exception, mock_get_payment
+    ):
         data = self.get_valid_data()
-        data.pop("type")
+        data.pop("eventType")
 
         response = self.client.post(
             reverse("payment-list"),
@@ -130,10 +133,14 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         )
         assert_that(response.status_code).is_equal_to(400)
 
-        expected_error = {"status": 400, "message": "Required field missing: type"}
+        expected_error = {"status": 400, "message": "Required field missing: eventType"}
         assert_that(response.data).is_equal_to(expected_error)
+        assert_that(mock_capture_exception.called).is_true
 
-    def test_returns_400_with_error_on_invalid_namespace(self, mock_get_payment):
+    @mock.patch("api.webhook_api.views.capture_exception")
+    def test_returns_400_with_error_on_invalid_namespace(
+        self, mock_capture_exception, mock_get_payment
+    ):
         data = self.get_valid_data()
         data["namespace"] = "invalid"
 
@@ -146,10 +153,12 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
 
         expected_error = {"status": 400, "message": "Invalid namespace"}
         assert_that(response.data).is_equal_to(expected_error)
+        assert_that(mock_capture_exception.called).is_true()
 
+    @mock.patch("api.webhook_api.views.capture_exception")
     @mock.patch("api.webhook_api.views.capture_message")
     def test_returns_400_with_error_on_invalid_payment_state(
-        self, mock_capture_message, mock_get_payment
+        self, mock_capture_message, mock_capture_exception, mock_get_payment
     ):
         self.verkkokauppa_payment = dataclasses.replace(
             self.verkkokauppa_payment, status="something_else"
@@ -166,6 +175,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         expected_error = {"status": 400, "message": "Invalid payment state"}
         assert_that(response.data).is_equal_to(expected_error)
         assert_that(mock_capture_message.called).is_true()
+        assert_that(mock_capture_exception.called).is_true()
 
     def test_returns_404_with_error_on_order_not_found(self, mock_get_payment):
         data = self.get_valid_data()
@@ -181,9 +191,9 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         expected_error = {"status": 404, "message": "Order not found"}
         assert_that(response.data).is_equal_to(expected_error)
 
-    @mock.patch("api.webhook_api.views.capture_message")
+    @mock.patch("api.webhook_api.views.capture_exception")
     def test_returns_500_with_error_on_payment_fetch_failure(
-        self, mock_capture_message, mock_get_payment
+        self, mock_capture_exception, mock_get_payment
     ):
         mock_get_payment.side_effect = GetPaymentError("Mock error")
 
@@ -196,11 +206,11 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
 
         expected_error = {"status": 500, "message": "Problem with upstream service"}
         assert_that(response.data).is_equal_to(expected_error)
-        assert_that(mock_capture_message.called).is_true()
+        assert_that(mock_capture_exception.called).is_true()
 
     def test_returns_501_with_error_on_invalid_type(self, mock_get_payment):
         data = self.get_valid_data()
-        data["type"] = "invalid"
+        data["eventType"] = "invalid"
 
         response = self.client.post(
             reverse("payment-list"),
@@ -220,8 +230,8 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         return {
             "orderId": self.verkkokauppa_payment.order_id,
             "namespace": self.verkkokauppa_payment.namespace,
-            "type": "ORDER_CANCELLED",
-            "timestamp": self.verkkokauppa_payment.timestamp.isoformat(),
+            "eventType": "ORDER_CANCELLED",
+            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     def test_returns_200_without_body_on_success(self, mock_get_order):
@@ -253,9 +263,12 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID_MANUALLY)
 
-    def test_returns_400_with_error_on_invalid_payload(self, mock_get_payment):
+    @mock.patch("api.webhook_api.views.capture_exception")
+    def test_returns_400_with_error_on_invalid_payload(
+        self, mock_capture_exception, mock_get_payment
+    ):
         data = self.get_valid_data()
-        data.pop("type")
+        data.pop("eventType")
 
         response = self.client.post(
             reverse("order-list"),
@@ -264,10 +277,14 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         )
         assert_that(response.status_code).is_equal_to(400)
 
-        expected_error = {"status": 400, "message": "Required field missing: type"}
+        expected_error = {"status": 400, "message": "Required field missing: eventType"}
         assert_that(response.data).is_equal_to(expected_error)
+        assert_that(mock_capture_exception.called).is_true()
 
-    def test_returns_400_with_error_on_invalid_namespace(self, mock_get_payment):
+    @mock.patch("api.webhook_api.views.capture_exception")
+    def test_returns_400_with_error_on_invalid_namespace(
+        self, mock_capture_exception, mock_get_payment
+    ):
         data = self.get_valid_data()
         data["namespace"] = "invalid"
 
@@ -280,10 +297,12 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
 
         expected_error = {"status": 400, "message": "Invalid namespace"}
         assert_that(response.data).is_equal_to(expected_error)
+        assert_that(mock_capture_exception.called).is_true()
 
+    @mock.patch("api.webhook_api.views.capture_exception")
     @mock.patch("api.webhook_api.views.capture_message")
     def test_returns_400_with_error_on_invalid_order_state(
-        self, mock_capture_message, mock_get_order
+        self, mock_capture_message, mock_capture_exception, mock_get_order
     ):
         self.verkkokauppa_order = dataclasses.replace(
             self.verkkokauppa_order, status="something_else"
@@ -300,6 +319,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         expected_error = {"status": 400, "message": "Invalid order state"}
         assert_that(response.data).is_equal_to(expected_error)
         assert_that(mock_capture_message.called).is_true()
+        assert_that(mock_capture_exception.called).is_true()
 
     def test_returns_404_with_error_on_order_not_found(self, mock_get_payment):
         data = self.get_valid_data()
@@ -334,7 +354,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
 
     def test_returns_501_with_error_on_invalid_type(self, mock_get_payment):
         data = self.get_valid_data()
-        data["type"] = "invalid"
+        data["eventType"] = "invalid"
 
         response = self.client.post(
             reverse("order-list"),
@@ -362,8 +382,8 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
             "refundId": self.payment_order.refund_id,
             "refundPaymentId": uuid4(),
             "namespace": self.verkkokauppa_order.namespace,
-            "type": "REFUND_PAID",
-            "timestamp": self.verkkokauppa_payment.timestamp.isoformat(),
+            "eventType": "REFUND_PAID",
+            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     def test_refund_returns_200_without_body_on_success(self):
@@ -409,7 +429,8 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
 
-    def test_refund_returns_400_when_payload_is_invalid(self):
+    @mock.patch("api.webhook_api.views.capture_exception")
+    def test_refund_returns_400_when_payload_is_invalid(self, mock_capture_exception):
         data = self.get_valid_data()
         data.pop("refundPaymentId")
         response = self.client.post(
@@ -425,8 +446,10 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+        assert_that(mock_capture_exception.called).is_true()
 
-    def test_refund_returns_400_on_invalid_namespace(self):
+    @mock.patch("api.webhook_api.views.capture_exception")
+    def test_refund_returns_400_on_invalid_namespace(self, mock_capture_exception):
         data = self.get_valid_data()
         data["namespace"] = "invalid"
 
@@ -441,10 +464,11 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+        assert_that(mock_capture_exception.called).is_true()
 
     def test_refund_returns_501_on_invalid_namespace(self):
         data = self.get_valid_data()
-        data["type"] = "invalid"
+        data["eventType"] = "invalid"
 
         response = self.client.post(
             reverse("refund-list"),
