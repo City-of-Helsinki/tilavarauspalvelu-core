@@ -44,7 +44,13 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
     permission_classes = [WebhookPermission]
 
     def validate_request(self, request):
-        required_field = ["paymentId", "orderId", "namespace", "type", "timestamp"]
+        required_field = [
+            "paymentId",
+            "orderId",
+            "namespace",
+            "eventType",
+            "eventTimestamp",
+        ]
         for field in required_field:
             if field not in request.data:
                 raise WebhookError(
@@ -52,7 +58,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        webhook_type = request.data.get("type", None)
+        webhook_type = request.data.get("eventType", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
@@ -67,7 +73,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                 "paymentId": serializers.UUIDField(),
                 "orderId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "type": serializers.ChoiceField(
+                "eventType": serializers.ChoiceField(
                     choices=[
                         (
                             "PAYMENT_PAID",
@@ -75,7 +81,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                         )
                     ]
                 ),
-                "timestamp": serializers.DateTimeField(),
+                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,
@@ -148,7 +154,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
     permission_classes = [WebhookPermission]
 
     def validate_request(self, request):
-        required_field = ["orderId", "namespace", "type", "timestamp"]
+        required_field = ["orderId", "namespace", "eventType", "eventTimestamp"]
         for field in required_field:
             if field not in request.data:
                 raise WebhookError(
@@ -156,7 +162,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        webhook_type = request.data.get("type", None)
+        webhook_type = request.data.get("eventType", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
@@ -170,10 +176,10 @@ class WebhookOrderViewSet(viewsets.ViewSet):
             fields={
                 "orderId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "type": serializers.ChoiceField(
+                "eventType": serializers.ChoiceField(
                     choices=[("ORDER_CANCELLED", "ORDER_CANCELLED")]
                 ),
-                "timestamp": serializers.DateTimeField(),
+                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,
@@ -237,8 +243,8 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             "refundId",
             "refundPaymentId",
             "namespace",
-            "type",
-            "timestamp",
+            "eventType",
+            "eventTimestamp",
         ]
         for field in required_field:
             if field not in request.data:
@@ -247,7 +253,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
                 )
 
         namespace = request.data.get("namespace", None)
-        webhook_type = request.data.get("type", None)
+        webhook_type = request.data.get("eventType", None)
 
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
             raise WebhookError(message="Invalid namespace", status_code=400)
@@ -263,10 +269,10 @@ class WebhookRefundViewSet(viewsets.ViewSet):
                 "refundId": serializers.UUIDField(),
                 "refundPaymentId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "type": serializers.ChoiceField(
+                "eventType": serializers.ChoiceField(
                     choices=[("REFUND_PAID", "REFUND_PAID")]
                 ),
-                "timestamp": serializers.DateTimeField(),
+                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,

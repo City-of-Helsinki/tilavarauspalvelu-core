@@ -79,8 +79,8 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
             "paymentId": self.verkkokauppa_payment.payment_id,
             "orderId": self.verkkokauppa_payment.order_id,
             "namespace": self.verkkokauppa_payment.namespace,
-            "type": "PAYMENT_PAID",
-            "timestamp": self.verkkokauppa_payment.timestamp.isoformat(),
+            "eventType": "PAYMENT_PAID",
+            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     @mock.patch("api.webhook_api.views.send_confirmation_email")
@@ -124,7 +124,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         self, mock_capture_exception, mock_get_payment
     ):
         data = self.get_valid_data()
-        data.pop("type")
+        data.pop("eventType")
 
         response = self.client.post(
             reverse("payment-list"),
@@ -133,7 +133,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         )
         assert_that(response.status_code).is_equal_to(400)
 
-        expected_error = {"status": 400, "message": "Required field missing: type"}
+        expected_error = {"status": 400, "message": "Required field missing: eventType"}
         assert_that(response.data).is_equal_to(expected_error)
         assert_that(mock_capture_exception.called).is_true
 
@@ -210,7 +210,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
 
     def test_returns_501_with_error_on_invalid_type(self, mock_get_payment):
         data = self.get_valid_data()
-        data["type"] = "invalid"
+        data["eventType"] = "invalid"
 
         response = self.client.post(
             reverse("payment-list"),
@@ -230,8 +230,8 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         return {
             "orderId": self.verkkokauppa_payment.order_id,
             "namespace": self.verkkokauppa_payment.namespace,
-            "type": "ORDER_CANCELLED",
-            "timestamp": self.verkkokauppa_payment.timestamp.isoformat(),
+            "eventType": "ORDER_CANCELLED",
+            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     def test_returns_200_without_body_on_success(self, mock_get_order):
@@ -268,7 +268,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         self, mock_capture_exception, mock_get_payment
     ):
         data = self.get_valid_data()
-        data.pop("type")
+        data.pop("eventType")
 
         response = self.client.post(
             reverse("order-list"),
@@ -277,7 +277,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         )
         assert_that(response.status_code).is_equal_to(400)
 
-        expected_error = {"status": 400, "message": "Required field missing: type"}
+        expected_error = {"status": 400, "message": "Required field missing: eventType"}
         assert_that(response.data).is_equal_to(expected_error)
         assert_that(mock_capture_exception.called).is_true()
 
@@ -354,7 +354,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
 
     def test_returns_501_with_error_on_invalid_type(self, mock_get_payment):
         data = self.get_valid_data()
-        data["type"] = "invalid"
+        data["eventType"] = "invalid"
 
         response = self.client.post(
             reverse("order-list"),
@@ -382,8 +382,8 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
             "refundId": self.payment_order.refund_id,
             "refundPaymentId": uuid4(),
             "namespace": self.verkkokauppa_order.namespace,
-            "type": "REFUND_PAID",
-            "timestamp": self.verkkokauppa_payment.timestamp.isoformat(),
+            "eventType": "REFUND_PAID",
+            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     def test_refund_returns_200_without_body_on_success(self):
@@ -468,7 +468,7 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
 
     def test_refund_returns_501_on_invalid_namespace(self):
         data = self.get_valid_data()
-        data["type"] = "invalid"
+        data["eventType"] = "invalid"
 
         response = self.client.post(
             reverse("refund-list"),
