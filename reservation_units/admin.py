@@ -39,6 +39,8 @@ class ReservationUnitAdminForm(ModelForm):
 class ReservationUnitImageInline(admin.TabularInline):
     model = ReservationUnitImage
 
+    readonly_fields = ["large_url", "medium_url", "small_url"]
+
 
 class ReservationUnitPricingInline(admin.TabularInline):
     model = ReservationUnitPricing
