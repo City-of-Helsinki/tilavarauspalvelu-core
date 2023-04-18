@@ -144,6 +144,56 @@ class ApplicationRoundQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_applications_count_does_not_include_expired_applications(self):
+        application = ApplicationFactory(application_round=self.application_round)
+        ApplicationStatus(application=application, status=ApplicationStatus.EXPIRED)
+
+        self.client.force_login(self.regular_joe)
+
+        response = self.query(
+            """
+            query {
+                applicationRounds {
+                    totalCount
+                    edges {
+                        node {
+                            applicationsCount
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_applications_count_does_not_include_cancelled_applications(self):
+        application = ApplicationFactory(application_round=self.application_round)
+        ApplicationStatus(application=application, status=ApplicationStatus.CANCELLED)
+
+        self.client.force_login(self.regular_joe)
+
+        response = self.query(
+            """
+            query {
+                applicationRounds {
+                    totalCount
+                    edges {
+                        node {
+                            applicationsCount
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filter_by_pk(self):
         ApplicationRoundFactory()
 

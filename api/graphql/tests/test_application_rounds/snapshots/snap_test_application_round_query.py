@@ -7,7 +7,37 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ApplicationRoundQueryTestCase::test_applications_count_does_not_include_cancelled_applications 1'] = {
+    'data': {
+        'applicationRounds': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationsCount': 1
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ApplicationRoundQueryTestCase::test_applications_count_does_not_include_draft_applications 1'] = {
+    'data': {
+        'applicationRounds': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationsCount': 1
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ApplicationRoundQueryTestCase::test_applications_count_does_not_include_expired_applications 1'] = {
     'data': {
         'applicationRounds': {
             'edges': [
