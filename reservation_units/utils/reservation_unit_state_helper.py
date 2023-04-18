@@ -68,7 +68,11 @@ class ReservationUnitStateHelper:
             publish_begins__isnull=False,
             publish_begins__gt=now,
         )
-        second_q = Q(publish_ends__isnull=True) | Q(publish_ends__lt=now)
+        second_q = (
+            Q(publish_ends__isnull=True)
+            | Q(publish_ends__lte=now)
+            | Q(Q(publish_ends__gt=now, publish_begins__gt=F("publish_ends")))
+        )
 
         return Q(first_q) & Q(second_q)
 
