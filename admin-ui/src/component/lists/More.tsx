@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Button } from "hds-react";
 import { useTranslation } from "react-i18next";
@@ -16,11 +16,16 @@ type Props = {
   count: number;
   totalCount: number;
   fetchMore: () => void;
+  isLoading?: boolean;
 };
 
-export const More = ({ count, totalCount, fetchMore }: Props): JSX.Element => {
+export const More = ({
+  count,
+  totalCount,
+  isLoading,
+  fetchMore,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
 
   return (
     <Wrapper>
@@ -32,14 +37,7 @@ export const More = ({ count, totalCount, fetchMore }: Props): JSX.Element => {
               totalCount,
             })}
           </Counts>
-          <Button
-            isLoading={loading}
-            variant="secondary"
-            onClick={() => {
-              setLoading(true);
-              fetchMore();
-            }}
-          >
+          <Button isLoading={isLoading} variant="secondary" onClick={fetchMore}>
             {t("common.showMore")}
           </Button>
         </div>

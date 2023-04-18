@@ -1,9 +1,5 @@
-import React from "react";
-import {
-  Query,
-  QueryReservationByPkArgs,
-  type ReservationType,
-} from "common/types/gql-types";
+import React, { useState } from "react";
+import { Query, type ReservationType } from "common/types/gql-types";
 import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
@@ -12,6 +8,8 @@ import { RECURRING_RESERVATION_QUERY } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 import ReservationList from "../../ReservationsList";
 import ReservationListButton from "../../ReservationListButton";
+
+const LIMIT = 100;
 
 const RecurringReservationsView = ({
   reservation,
@@ -22,28 +20,37 @@ const RecurringReservationsView = ({
 }) => {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
+  const [reservations, setReservations] = useState<ReservationType[]>([]);
 
-  const { loading, data } = useQuery<Query, QueryReservationByPkArgs>(
-    RECURRING_RESERVATION_QUERY,
-    {
-      skip: !reservation.recurringReservation?.pk,
-      variables: {
-        pk: Number(reservation.recurringReservation?.pk),
-      },
-      onError: () => {
-        notifyError(t("RequestedReservation.errorFetchingData"));
-      },
-    }
-  );
+  const { loading } = useQuery<
+    Query,
+    { pk: number; offset: number; count: number }
+  >(RECURRING_RESERVATION_QUERY, {
+    skip: !reservation.recurringReservation?.pk,
+    variables: {
+      pk: Number(reservation.recurringReservation?.pk),
+      offset: reservations.length,
+      count: LIMIT,
+    },
+    onCompleted: (data) => {
+      const qd = data?.reservations;
+      if (qd?.edges.length != null && qd?.totalCount && qd?.edges.length > 0) {
+        const ds =
+          qd?.edges
+            ?.map((x) => x?.node)
+            .filter((x): x is ReservationType => x != null) ?? [];
 
-  if (loading || data == null) {
+        setReservations([...reservations, ...ds]);
+      }
+    },
+    onError: () => {
+      notifyError(t("RequestedReservation.errorFetchingData"));
+    },
+  });
+
+  if (loading) {
     return <div>Loading</div>;
   }
-
-  const reservations =
-    data?.reservations?.edges
-      ?.map((x) => x?.node)
-      .filter((x): x is ReservationType => x != null) ?? [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleChange = (_x: ReservationType) => {
@@ -65,8 +72,8 @@ const RecurringReservationsView = ({
 
   const forDisplay = reservations.map((x) => ({
     date: new Date(x.begin),
-    startTime: format(new Date(x.begin), "hh:mm"),
-    endTime: format(new Date(x.begin), "hh:mm"),
+    startTime: format(new Date(x.begin), "HH:mm"),
+    endTime: format(new Date(x.end), "HH:mm"),
     isRemoved: x.state !== "CONFIRMED",
     buttons: [
       <ReservationListButton callback={() => handleChange(x)} type="change" />,
