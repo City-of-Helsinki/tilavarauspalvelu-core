@@ -146,7 +146,7 @@ class ReservationUnitStateHelper:
                 reservation_unit.publish_begins is None
                 or (
                     reservation_unit.publish_begins <= now
-                    and reservation_unit.publish_begins < reservation_unit.publish_ends
+                    and reservation_unit.publish_begins <= reservation_unit.publish_ends
                 )
             )
             or (
@@ -165,7 +165,10 @@ class ReservationUnitStateHelper:
             Q(
                 Q(publish_ends__lte=now)
                 & (
-                    Q(publish_begins__lte=now, publish_begins__lt=F("publish_ends"))
+                    Q(
+                        Q(publish_begins__lte=now)
+                        & Q(publish_begins__lte=F("publish_ends"))
+                    )
                     | Q(publish_begins__isnull=True)
                 )
             )
