@@ -84,8 +84,8 @@ ENV PYTHONUSERBASE /pythonbase
 # Copy and install requirements files to image
 COPY requirements.txt ./
 
-RUN pip install --no-cache-dir setuptools wheel
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir wheel
+RUN pip install --use-pep517 --no-cache-dir -r requirements.txt
 
 COPY . .
 
