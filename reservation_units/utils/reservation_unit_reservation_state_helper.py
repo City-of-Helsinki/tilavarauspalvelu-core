@@ -143,7 +143,7 @@ class ReservationUnitReservationStateHelper:
                 or (
                     reservation_unit.reservation_begins <= now
                     and reservation_unit.reservation_begins
-                    < reservation_unit.reservation_ends
+                    <= reservation_unit.reservation_ends
                 )
             )
             or (
@@ -165,8 +165,8 @@ class ReservationUnitReservationStateHelper:
                 Q(reservation_ends__lte=now)
                 & (
                     Q(
-                        reservation_begins__lte=now,
-                        reservation_begins__lt=F("reservation_ends"),
+                        Q(reservation_begins__lte=now)
+                        & Q(reservation_begins__lte=F("reservation_ends"))
                     )
                     | Q(reservation_begins__isnull=True)
                 )

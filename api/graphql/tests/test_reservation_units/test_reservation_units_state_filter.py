@@ -222,3 +222,33 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(self.content_is_empty(content)).is_false()
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_filtering_by_scheduled_publishing_when_begin_after_end(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        ReservationUnitFactory(
+            name="I'm scheduled for publishing and my begins is after end.",
+            is_archived=False,
+            is_draft=False,
+            publish_begins=(now + datetime.timedelta(days=2)),
+            publish_ends=(now + datetime.timedelta(days=1)),
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(state:"SCHEDULED_PUBLISHING"){
+                    edges {
+                        node {
+                            nameFi
+                            state
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)

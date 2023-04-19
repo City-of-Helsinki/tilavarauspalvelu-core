@@ -132,3 +132,24 @@ snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_publ
         }
     }
 }
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_publishing_when_begin_after_end 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I am scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': "I'm scheduled for publishing and my begins is after end.",
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -90,3 +90,12 @@ class ReservationUnitStateHelperTestCase(TestCase):
         assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
             ReservationUnitState.SCHEDULED_PERIOD
         )
+
+    def test_state_is_hidden_when_publish_end_and_begins_in_the_past_and_the_same(self):
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.publish_begins = self.now - datetime.timedelta(hours=1)
+        self.reservation_unit.publish_ends = self.reservation_unit.publish_begins
+        assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
+            ReservationUnitState.HIDDEN
+        )

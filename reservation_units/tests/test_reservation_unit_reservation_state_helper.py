@@ -65,3 +65,15 @@ class ReservationUnitReservationStateHelperTestCase(TestCase):
         assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
             ReservationState.RESERVATION_CLOSED
         )
+
+    def test_state_is_closed_when_reservation_begin_and_end_in_past_and_same_value(
+        self,
+    ):
+        self.reservation_unit.reservation_begins = self.now - datetime.timedelta(days=1)
+        self.reservation_unit.reservation_ends = (
+            self.reservation_unit.reservation_begins
+        )
+
+        assert_that(Helper.get_state(self.reservation_unit)).is_equal_to(
+            ReservationState.RESERVATION_CLOSED
+        )

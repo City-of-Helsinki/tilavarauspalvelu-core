@@ -68,7 +68,11 @@ class ReservationUnitStateHelper:
             publish_begins__isnull=False,
             publish_begins__gt=now,
         )
-        second_q = Q(publish_ends__isnull=True) | Q(publish_ends__lt=now)
+        second_q = (
+            Q(publish_ends__isnull=True)
+            | Q(publish_ends__lte=now)
+            | Q(Q(publish_ends__gt=now, publish_begins__gt=F("publish_ends")))
+        )
 
         return Q(first_q) & Q(second_q)
 
@@ -146,7 +150,7 @@ class ReservationUnitStateHelper:
                 reservation_unit.publish_begins is None
                 or (
                     reservation_unit.publish_begins <= now
-                    and reservation_unit.publish_begins < reservation_unit.publish_ends
+                    and reservation_unit.publish_begins <= reservation_unit.publish_ends
                 )
             )
             or (
@@ -165,7 +169,10 @@ class ReservationUnitStateHelper:
             Q(
                 Q(publish_ends__lte=now)
                 & (
-                    Q(publish_begins__lte=now, publish_begins__lt=F("publish_ends"))
+                    Q(
+                        Q(publish_begins__lte=now)
+                        & Q(publish_begins__lte=F("publish_ends"))
+                    )
                     | Q(publish_begins__isnull=True)
                 )
             )
