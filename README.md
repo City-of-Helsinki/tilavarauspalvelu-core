@@ -11,21 +11,14 @@ To run tilavarauspalvelu locally you need to have DEBUG=True in your .env file.
 Easiest way is to copy and rename .env.example to .env and make sure DEBUG=True is set. 
  
 ## Installation with docker
+To run the service locally in Docker, you can run the following command:
 
-You'll need a redhat developer account to gain access to redhat subsriptions
-needed to run the docker image. 
+```
+docker-compose up backend
+```
 
-Register at https://developers.redhat.com/register and confirm your email address. 
 
-Set following environment variables in .env file or pass them to docker compose
-- BUILD_MODE=local
-- REDHAT_USERNAME=your redhat account username 
-- REDHAT_PASSWORD=your redhat account password
-
-Then you can run docker image with
-
-`docker-compose up dev`
-
+This will start the service and also runs the database in a separate docker container.
 ## Requirements
 
 Workflow with requirements is as follows.

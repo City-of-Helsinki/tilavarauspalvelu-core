@@ -13,6 +13,20 @@ services:
         volumes:
             - postgres-data-volume:/var/lib/postgresql/data
 
+    backend:
+        container_name: tilavarauspalvelu_core
+        image: tilavarauspalvelu_core_local
+        depends_on:
+            - db
+        build:
+            context: ./
+            dockerfile: ./Dockerfile.local
+        environment:
+            - DATABASE_URL=postgis://tvp:tvp@db/tvp
+            - CELERY_ENABLED=false
+        ports:
+            - "8000:8000"
+
     dev:
         image: tilavarauspalvelu_dev
         depends_on:
