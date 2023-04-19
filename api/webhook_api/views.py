@@ -49,7 +49,6 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
             "orderId",
             "namespace",
             "eventType",
-            "eventTimestamp",
         ]
         for field in required_field:
             if field not in request.data:
@@ -81,7 +80,6 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
                         )
                     ]
                 ),
-                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,
@@ -154,7 +152,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
     permission_classes = [WebhookPermission]
 
     def validate_request(self, request):
-        required_field = ["orderId", "namespace", "eventType", "eventTimestamp"]
+        required_field = ["orderId", "namespace", "eventType"]
         for field in required_field:
             if field not in request.data:
                 raise WebhookError(
@@ -179,7 +177,6 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 "eventType": serializers.ChoiceField(
                     choices=[("ORDER_CANCELLED", "ORDER_CANCELLED")]
                 ),
-                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,
@@ -244,7 +241,6 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             "refundPaymentId",
             "namespace",
             "eventType",
-            "eventTimestamp",
         ]
         for field in required_field:
             if field not in request.data:
@@ -272,7 +268,6 @@ class WebhookRefundViewSet(viewsets.ViewSet):
                 "eventType": serializers.ChoiceField(
                     choices=[("REFUND_PAID", "REFUND_PAID")]
                 ),
-                "eventTimestamp": serializers.DateTimeField(),
             },
         ),
         responses=default_responses,

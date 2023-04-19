@@ -80,7 +80,6 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
             "orderId": self.verkkokauppa_payment.order_id,
             "namespace": self.verkkokauppa_payment.namespace,
             "eventType": "PAYMENT_PAID",
-            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     @mock.patch("api.webhook_api.views.send_confirmation_email")
@@ -231,7 +230,6 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
             "orderId": self.verkkokauppa_payment.order_id,
             "namespace": self.verkkokauppa_payment.namespace,
             "eventType": "ORDER_CANCELLED",
-            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     def test_returns_200_without_body_on_success(self, mock_get_order):
@@ -383,7 +381,6 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
             "refundPaymentId": uuid4(),
             "namespace": self.verkkokauppa_order.namespace,
             "eventType": "REFUND_PAID",
-            "eventTimestamp": self.verkkokauppa_payment.timestamp.isoformat(),
         }
 
     def test_refund_returns_200_without_body_on_success(self):
