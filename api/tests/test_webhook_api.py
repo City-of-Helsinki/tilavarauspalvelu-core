@@ -15,8 +15,15 @@ from merchants.models import OrderStatus
 from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.order.types import Order
-from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.types import Payment
+from merchants.verkkokauppa.payment.exceptions import (
+    GetPaymentError,
+    GetRefundStatusError,
+)
+from merchants.verkkokauppa.payment.types import (
+    Payment,
+    RefundStatus,
+    RefundStatusResult,
+)
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import ReservationFactory
 
@@ -68,6 +75,14 @@ class WebhookAPITestCaseBase(TestCase):
             status="cancelled",
             subscription_id=None,
             type="order",
+        )
+        self.refund_status = RefundStatusResult(
+            order_id=uuid4(),
+            refund_payment_id=str(uuid4()),
+            refund_transaction_id=uuid4(),
+            namespace="tilanvaraus",
+            status=RefundStatus.PAID_ONLINE.value,
+            created_at=datetime.now(tz=get_default_timezone()),
         )
 
 
@@ -365,6 +380,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.data).is_equal_to(expected_error)
 
 
+@mock.patch("api.webhook_api.views.get_refund_status")
 @override_settings(VERKKOKAUPPA_NAMESPACE="tilanvaraus")
 class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
     def setUp(self) -> None:
@@ -383,7 +399,8 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
             "eventType": "REFUND_PAID",
         }
 
-    def test_refund_returns_200_without_body_on_success(self):
+    def test_refund_returns_200_without_body_on_success(self, mock_get_refund_status):
+        mock_get_refund_status.return_value = self.refund_status
         response = self.client.post(
             reverse("refund-list"),
             data=self.get_valid_data(),
@@ -395,7 +412,9 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.REFUNDED)
 
-    def test_refund_returns_200_when_order_is_already_handled(self):
+    def test_refund_returns_200_when_order_is_already_handled(
+        self, mock_get_refund_status
+    ):
         self.payment_order.status = OrderStatus.REFUNDED
         self.payment_order.save()
 
@@ -410,7 +429,65 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.REFUNDED)
 
-    def test_refund_returns_404_with_no_changes_when_order_is_not_found(self):
+    def test_refund_returns_400_with_no_changes_when_refund_is_not_found(
+        self, mock_get_refund_status
+    ):
+        mock_get_refund_status.return_value = None
+
+        response = self.client.post(
+            reverse("refund-list"),
+            data=self.get_valid_data(),
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        assert_that(response.data["status"]).is_equal_to(400)
+        assert_that(response.data["message"]).is_equal_to("Refund not found")
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+
+    def test_refund_returns_400_with_no_changes_when_refund_is_in_invalid_state(
+        self, mock_get_refund_status
+    ):
+        refund_status = dataclasses.replace(
+            self.refund_status, status=RefundStatus.CANCELLED.value
+        )
+        mock_get_refund_status.return_value = refund_status
+
+        response = self.client.post(
+            reverse("refund-list"),
+            data=self.get_valid_data(),
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        assert_that(response.data["status"]).is_equal_to(400)
+        assert_that(response.data["message"]).is_equal_to("Invalid refund state")
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+
+    def test_refund_returns_500_with_no_changes_when_get_refund_status_fails(
+        self, mock_get_refund_status
+    ):
+        mock_get_refund_status.side_effect = GetRefundStatusError("mock-error")
+
+        response = self.client.post(
+            reverse("refund-list"),
+            data=self.get_valid_data(),
+            format="json",
+        )
+        assert_that(response.status_code).is_equal_to(500)
+        assert_that(response.data["status"]).is_equal_to(500)
+        assert_that(response.data["message"]).is_equal_to(
+            "Problem with upstream service"
+        )
+
+        self.payment_order.refresh_from_db()
+        assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
+
+    def test_refund_returns_404_with_no_changes_when_order_is_not_found(
+        self, mock_get_refund_status
+    ):
         self.payment_order.remote_id = uuid4()
         self.payment_order.save()
 
@@ -427,7 +504,9 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_refund_returns_400_when_payload_is_invalid(self, mock_capture_exception):
+    def test_refund_returns_400_when_payload_is_invalid(
+        self, mock_capture_exception, mock_get_refund_status
+    ):
         data = self.get_valid_data()
         data.pop("refundPaymentId")
         response = self.client.post(
@@ -446,7 +525,9 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         assert_that(mock_capture_exception.called).is_true()
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_refund_returns_400_on_invalid_namespace(self, mock_capture_exception):
+    def test_refund_returns_400_on_invalid_namespace(
+        self, mock_capture_exception, mock_get_refund_status
+    ):
         data = self.get_valid_data()
         data["namespace"] = "invalid"
 
@@ -463,7 +544,7 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
         assert_that(mock_capture_exception.called).is_true()
 
-    def test_refund_returns_501_on_invalid_namespace(self):
+    def test_refund_returns_501_on_invalid_namespace(self, mock_get_refund_status):
         data = self.get_valid_data()
         data["eventType"] = "invalid"
 

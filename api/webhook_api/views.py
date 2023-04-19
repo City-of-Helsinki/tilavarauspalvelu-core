@@ -12,8 +12,12 @@ from sentry_sdk import capture_exception, capture_message, push_scope
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.order.requests import get_order
-from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.requests import get_payment
+from merchants.verkkokauppa.payment.exceptions import (
+    GetPaymentError,
+    GetRefundStatusError,
+)
+from merchants.verkkokauppa.payment.requests import get_payment, get_refund_status
+from merchants.verkkokauppa.payment.types import RefundStatus
 from permissions.api_permissions.drf_permissions import WebhookPermission
 from reservations.email_utils import send_confirmation_email
 from reservations.models import STATE_CHOICES, Reservation
@@ -289,6 +293,14 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             if payment_order.status != OrderStatus.PAID:
                 return Response(status=200)
 
+            refund_status = get_refund_status(
+                remote_id, settings.VERKKOKAUPPA_NAMESPACE
+            )
+            if not refund_status:
+                raise WebhookError(message="Refund not found", status_code=400)
+            if refund_status.status != RefundStatus.PAID_ONLINE.value:
+                raise WebhookError(message="Invalid refund state", status_code=400)
+
             payment_order.status = OrderStatus.REFUNDED
             payment_order.processed_at = datetime.now().astimezone(
                 get_default_timezone()
@@ -303,3 +315,12 @@ class WebhookRefundViewSet(viewsets.ViewSet):
                 scope.set_extra("status_code", err.status_code)
                 capture_exception(err)
             return Response(data=err.to_json(), status=err.status_code)
+        except GetRefundStatusError as err:
+            with push_scope() as scope:
+                scope.set_extra("details", f"Fetching refund status failed: {str(err)}")
+                scope.set_extra("data", request.data)
+                capture_exception(err)
+            return Response(
+                data={"status": 500, "message": "Problem with upstream service"},
+                status=500,
+            )
