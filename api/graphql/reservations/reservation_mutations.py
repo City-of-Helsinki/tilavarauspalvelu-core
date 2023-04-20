@@ -22,6 +22,9 @@ from api.graphql.reservations.reservation_serializers import (
 from api.graphql.reservations.reservation_serializers.refund_serializers import (
     ReservationRefundSerializer,
 )
+from api.graphql.reservations.reservation_serializers.staff_adjust_time_serializers import (
+    StaffReservationAdjustTimeSerializer,
+)
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from merchants.models import OrderStatus, PaymentOrder
@@ -33,6 +36,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationHandlingPermission,
     ReservationPermission,
     ReservationStaffCreatePermission,
+    StaffAdjustTimePermission,
 )
 from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import Reservation
@@ -135,6 +139,15 @@ class ReservationAdjustTimeMutation(AuthSerializerMutation, SerializerMutation):
         model_operations = ["update"]
         lookup_field = "pk"
         serializer_class = ReservationAdjustTimeSerializer
+
+
+class ReservationStaffAdjustTimeMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (StaffAdjustTimePermission,)
+
+    class Meta:
+        model_operations = ["update"]
+        lookup_field = "pk"
+        serializer_class = StaffReservationAdjustTimeSerializer
 
 
 class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
