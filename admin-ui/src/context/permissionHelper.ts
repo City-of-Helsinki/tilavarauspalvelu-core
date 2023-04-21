@@ -69,14 +69,14 @@ const permissionHelper =
   (user: UserType) =>
   (
     permissionName: string,
-    unitPk: number,
+    unitPk?: number,
     serviceSectorPk?: number[]
   ): boolean => {
     if (user.isSuperuser) {
       return true;
     }
 
-    if (hasUnitPermission(permissionName, unitPk, user)) {
+    if (unitPk && hasUnitPermission(permissionName, unitPk, user)) {
       return true;
     }
 

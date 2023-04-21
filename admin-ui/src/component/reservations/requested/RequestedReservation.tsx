@@ -201,12 +201,17 @@ const ButtonsWithPermChecks = ({
   };
 
   const { hasPermission } = useAuthState().authState;
-  const permission =
-    unitPk != null
-      ? hasPermission("can_manage_reservations", unitPk, serviceSectorPks)
-      : false;
+  const permission = hasPermission(
+    "can_manage_reservations",
+    unitPk,
+    serviceSectorPks
+  );
 
-  if (permission || isUsersOwnReservation) {
+  const ownPermissions = isUsersOwnReservation
+    ? hasPermission("can_create_staff_reservations", unitPk, serviceSectorPks)
+    : false;
+
+  if (permission || ownPermissions) {
     return (
       <ApprovalButtons
         state={reservation.state}

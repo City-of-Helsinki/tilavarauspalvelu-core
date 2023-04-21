@@ -21,8 +21,8 @@ export type Auth = {
   logout?: () => void;
   hasPermission: (
     permissionName: string,
-    unitPk: number,
-    serviceSectorPks: number[]
+    unitPk?: number,
+    serviceSectorPks?: number[]
   ) => boolean;
 };
 

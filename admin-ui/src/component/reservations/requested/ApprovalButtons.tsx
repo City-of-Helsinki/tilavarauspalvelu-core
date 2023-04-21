@@ -10,6 +10,28 @@ import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
 import { useModal } from "../../../context/ModalContext";
 
+/* Rules
+ * Approve only if REQUIRES_HANDLING
+ * Deny if REQUIRES_HANDLING or CONFIRMED
+ * Return to handling if DENIED or CONFIRMED
+ * Other states (e.g. WAITING_FOR_PAYMENT) are not allowed to be modified
+ */
+const isPossibleToApprove = (
+  state: ReservationsReservationStateChoices
+): boolean => state === ReservationsReservationStateChoices.RequiresHandling;
+
+const isPossibleToDeny = (
+  state: ReservationsReservationStateChoices
+): boolean =>
+  state === ReservationsReservationStateChoices.Confirmed ||
+  state === ReservationsReservationStateChoices.RequiresHandling;
+
+const isPossibleToReturn = (
+  state: ReservationsReservationStateChoices
+): boolean =>
+  state === ReservationsReservationStateChoices.Denied ||
+  state === ReservationsReservationStateChoices.Confirmed;
+
 const ApprovalButtons = ({
   state,
   isFree,
@@ -60,9 +82,12 @@ const ApprovalButtons = ({
     );
   };
 
-  // Backend doesn't allow changing the status if the reservation has ended
+  // Only Requires handling is allowed to be modified after it has ended
   const endTime = new Date(reservation.end);
-  if (endTime < new Date()) {
+  if (
+    endTime < new Date() &&
+    state !== ReservationsReservationStateChoices.RequiresHandling
+  ) {
     return <div>{t("RequestedReservation.alreadyEnded")}</div>;
   }
 
@@ -75,18 +100,17 @@ const ApprovalButtons = ({
 
   return (
     <>
-      {/* Backend doesn't allow approving anything that isn't in RequiresHandling state */}
-      {state === ReservationsReservationStateChoices.RequiresHandling && (
+      {endTime > new Date() && isPossibleToApprove(state) && (
         <Button {...btnCommon} onClick={handleApproveClick}>
           {t("RequestedReservation.approve")}
         </Button>
       )}
-      {state !== ReservationsReservationStateChoices.Denied && (
+      {isPossibleToDeny(state) && (
         <Button {...btnCommon} onClick={handleDenyClick}>
           {t("RequestedReservation.reject")}
         </Button>
       )}
-      {state !== ReservationsReservationStateChoices.RequiresHandling && (
+      {isPossibleToReturn(state) && (
         <Button {...btnCommon} onClick={handleReturnToHandlingClick}>
           {t("RequestedReservation.returnToHandling")}
         </Button>
