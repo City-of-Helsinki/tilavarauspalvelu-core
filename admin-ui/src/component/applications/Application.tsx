@@ -48,7 +48,7 @@ import {
   formatDate,
   formatNumber,
   localizedValue,
-  parseDuration,
+  formatDuration,
 } from "../../common/util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
 import Accordion from "../Accordion";
@@ -228,6 +228,140 @@ const ActionButton = styled(Button)`
   right: var(--spacing-layout-xl);
 `;
 
+const AccordionContent = ({
+  recurringReservations,
+  applicationId,
+  applicationEvents,
+}: {
+  recurringReservations: RecurringReservation[];
+  applicationId?: number;
+  applicationEvents: ApplicationEvent[];
+}) => {
+  const { t, i18n } = useTranslation();
+
+  return (
+    <Accordion
+      heading={t("Application.summaryOfAllocatedApplicationEvents")}
+      defaultOpen={false}
+    >
+      <NarrowContainer
+        style={{
+          paddingRight: 0,
+          marginLeft: 'calc(var("--spacing-layout-m") * -1)',
+        }}
+      >
+        {recurringReservations.map((recurringReservation) => {
+          const applicationEvent: ApplicationEvent | undefined =
+            applicationEvents.find(
+              (n: ApplicationEvent) =>
+                n.id === get(recurringReservation, "applicationEventId")
+            );
+
+          const reservationUnit: ReservationUnit | undefined =
+            recurringReservation.reservations?.[0].reservationUnit?.[0];
+
+          const beginDate: string | null =
+            recurringReservation.firstReservationBegin;
+
+          const endDate: string | null =
+            recurringReservation.lastReservationEnd;
+
+          const weekday: number | null = get(
+            recurringReservation,
+            "reservations.0.beginWeekday",
+            null
+          );
+
+          const duration: number = Math.abs(
+            differenceInSeconds(
+              new Date(get(recurringReservation, "reservations.0.begin", 0)),
+              new Date(get(recurringReservation, "reservations.0.end", 0))
+            )
+          );
+
+          return applicationEvent && reservationUnit ? (
+            <ReservationWrapper>
+              <H2>{applicationEvent?.name}</H2>
+              <DataGrid
+                style={{
+                  borderTop: 0,
+                  paddingTop: 0,
+                  marginBottom: "var(--spacing-layout-s)",
+                }}
+              >
+                <GridCol>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>{t("Application.space")}</th>
+                        <td>
+                          {trim(
+                            `${reservationUnit.unit?.name.fi || ""}, ${
+                              localizedValue(
+                                reservationUnit.name,
+                                i18n.language
+                              ) || ""
+                            }`,
+                            ", "
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>{t("Application.headings.purpose")}</th>
+                        <td>{applicationEvent.purpose}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </GridCol>
+                <GridCol />
+              </DataGrid>
+              <table>
+                <RecommendedSlot
+                  id={applicationEvent.id || null}
+                  start={beginDate}
+                  end={endDate}
+                  weekday={weekday}
+                  biweekly={applicationEvent.biweekly || false}
+                  durationStr={formatDuration(duration)}
+                  timeStart={formatDate(beginDate || "", "H:mm:ss")}
+                  timeEnd={formatDate(endDate || "", "H:mm:ss")}
+                />
+              </table>
+              {recurringReservation.deniedReservations?.length > 0 && (
+                <DeclinedReservations>
+                  <H3>{t("Application.declinedReservations")}</H3>
+                  <div>
+                    {trim(
+                      recurringReservation.deniedReservations
+                        .map((n: Reservation) => `${formatDate(n.begin)}, `)
+                        .reverse()
+                        .join(", "),
+                      ", "
+                    )}
+                  </div>
+                </DeclinedReservations>
+              )}
+              {applicationId ? (
+                <ReservationListLinkWrapper>
+                  <ReservationListLink
+                    to={`${applicationUrl(
+                      applicationId
+                    )}/recurringReservation/${recurringReservation.id}`}
+                  >
+                    <IconCalendar aria-hidden />{" "}
+                    {t("Application.showDetailedResultList")}{" "}
+                    <IconArrowRight aria-hidden />
+                  </ReservationListLink>
+                </ReservationListLinkWrapper>
+              ) : null}
+            </ReservationWrapper>
+          ) : null;
+        })}
+      </NarrowContainer>
+    </Accordion>
+  );
+};
+
 const Application = () => {
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
@@ -245,7 +379,7 @@ const Application = () => {
     useState<ApplicationStatus | null>(null);
 
   const { applicationId } = useParams<IRouteParams>();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const fetchApplication = async (id: number) => {
     try {
@@ -485,7 +619,7 @@ const Application = () => {
                     </tr>
                     <tr>
                       <th>{t("ApplicationRound.totalReservationTime")}</th>
-                      <td data-testid="application__data--applied-min-duration-total">{`${parseDuration(
+                      <td data-testid="application__data--applied-min-duration-total">{`${formatDuration(
                         application.aggregatedData.appliedMinDurationTotal
                       )}`}</td>
                     </tr>
@@ -534,7 +668,7 @@ const Application = () => {
                                     {t("ApplicationRound.totalReservationTime")}
                                   </th>
                                   <td>
-                                    {parseDuration(
+                                    {formatDuration(
                                       application.aggregatedData
                                         .reservationsDurationTotal
                                     )}
@@ -599,163 +733,11 @@ const Application = () => {
                 <WideContainer>
                   {recurringReservations &&
                     recurringReservations.length > 0 && (
-                      <Accordion
-                        heading={t(
-                          "Application.summaryOfAllocatedApplicationEvents"
-                        )}
-                        defaultOpen={false}
-                      >
-                        <NarrowContainer
-                          style={{
-                            paddingRight: 0,
-                            marginLeft: 'calc(var("--spacing-layout-m") * -1)',
-                          }}
-                        >
-                          {recurringReservations.map((recurringReservation) => {
-                            const applicationEvent:
-                              | ApplicationEvent
-                              | undefined = application.applicationEvents.find(
-                              (n: ApplicationEvent) =>
-                                n.id ===
-                                get(recurringReservation, "applicationEventId")
-                            );
-
-                            const reservationUnit: ReservationUnit | undefined =
-                              recurringReservation.reservations?.[0]
-                                .reservationUnit?.[0];
-
-                            const beginDate: string | null =
-                              recurringReservation.firstReservationBegin;
-
-                            const endDate: string | null =
-                              recurringReservation.lastReservationEnd;
-
-                            const weekday: number | null = get(
-                              recurringReservation,
-                              "reservations.0.beginWeekday",
-                              null
-                            );
-
-                            const duration: number = Math.abs(
-                              differenceInSeconds(
-                                new Date(
-                                  get(
-                                    recurringReservation,
-                                    "reservations.0.begin",
-                                    0
-                                  )
-                                ),
-                                new Date(
-                                  get(
-                                    recurringReservation,
-                                    "reservations.0.end",
-                                    0
-                                  )
-                                )
-                              )
-                            );
-
-                            return applicationEvent && reservationUnit ? (
-                              <ReservationWrapper key={applicationEvent.id}>
-                                <H2>{applicationEvent?.name}</H2>
-                                <DataGrid
-                                  style={{
-                                    borderTop: 0,
-                                    paddingTop: 0,
-                                    marginBottom: "var(--spacing-layout-s)",
-                                  }}
-                                >
-                                  <GridCol>
-                                    <table>
-                                      <tbody>
-                                        <tr>
-                                          <th>{t("Application.space")}</th>
-                                          <td>
-                                            {trim(
-                                              `${
-                                                reservationUnit.unit?.name.fi ||
-                                                ""
-                                              }, ${
-                                                localizedValue(
-                                                  reservationUnit.name,
-                                                  i18n.language
-                                                ) || ""
-                                              }`,
-                                              ", "
-                                            )}
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <th>
-                                            {t("Application.headings.purpose")}
-                                          </th>
-                                          <td>{applicationEvent.purpose}</td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </GridCol>
-                                  <GridCol />
-                                </DataGrid>
-                                <table>
-                                  <RecommendedSlot
-                                    id={applicationEvent.id || null}
-                                    start={beginDate}
-                                    end={endDate}
-                                    weekday={weekday}
-                                    biweekly={
-                                      applicationEvent.biweekly || false
-                                    }
-                                    durationStr={parseDuration(duration)}
-                                    timeStart={formatDate(
-                                      beginDate || "",
-                                      "H:mm:ss"
-                                    )}
-                                    timeEnd={formatDate(
-                                      endDate || "",
-                                      "H:mm:ss"
-                                    )}
-                                  />
-                                </table>
-                                {recurringReservation.deniedReservations
-                                  ?.length > 0 && (
-                                  <DeclinedReservations>
-                                    <H3>
-                                      {t("Application.declinedReservations")}
-                                    </H3>
-                                    <div>
-                                      {trim(
-                                        recurringReservation.deniedReservations
-                                          .map(
-                                            (n: Reservation) =>
-                                              `${formatDate(n.begin)}, `
-                                          )
-                                          .reverse()
-                                          .join(", "),
-                                        ", "
-                                      )}
-                                    </div>
-                                  </DeclinedReservations>
-                                )}
-                                {applicationId ? (
-                                  <ReservationListLinkWrapper>
-                                    <ReservationListLink
-                                      to={`${applicationUrl(
-                                        applicationId
-                                      )}/recurringReservation/${
-                                        recurringReservation.id
-                                      }`}
-                                    >
-                                      <IconCalendar aria-hidden />{" "}
-                                      {t("Application.showDetailedResultList")}{" "}
-                                      <IconArrowRight aria-hidden />
-                                    </ReservationListLink>
-                                  </ReservationListLinkWrapper>
-                                ) : null}
-                              </ReservationWrapper>
-                            ) : null;
-                          })}
-                        </NarrowContainer>
-                      </Accordion>
+                      <AccordionContent
+                        recurringReservations={recurringReservations}
+                        applicationId={applicantId ?? undefined}
+                        applicationEvents={application.applicationEvents}
+                      />
                     )}
                   <ActionButtonContainer>
                     {normalizedApplicationStatus === "approved" && (

@@ -173,8 +173,8 @@ function AllApplicationRounds(): JSX.Element | null {
                     <TableLink
                       to={applicationRoundUrl(Number(applicationRound.pk))}
                     >
-                      <span title={applicationRound.nameFi as string}>
-                        {truncate(applicationRound.nameFi as string, 20)}
+                      <span title={applicationRound.nameFi ?? ""}>
+                        {truncate(applicationRound.nameFi ?? "", 20)}
                       </span>
                     </TableLink>
                   ),
@@ -183,7 +183,7 @@ function AllApplicationRounds(): JSX.Element | null {
                 {
                   headerName: t("ApplicationRound.headings.service"),
                   transform: (applicationRound: ApplicationRoundType) =>
-                    applicationRound.serviceSector?.nameFi as string,
+                    applicationRound.serviceSector?.nameFi ?? "",
                   key: "serviceSectorName",
                 },
                 {

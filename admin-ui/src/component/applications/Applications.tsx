@@ -23,7 +23,7 @@ import {
 } from "../../common/types";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
-import { formatNumber, parseDuration } from "../../common/util";
+import { formatNumber, formatDuration } from "../../common/util";
 import StatusCell from "../StatusCell";
 import { applicationUrl } from "../../common/urls";
 import { getNormalizedApplicationStatus } from "./util";
@@ -141,7 +141,7 @@ const appMapper = (
       `${formatNumber(
         app.aggregatedData?.appliedReservationsTotal,
         t("common.volumeUnit")
-      )} / ${parseDuration(app.aggregatedData?.appliedMinDurationTotal)}`,
+      )} / ${formatDuration(app.aggregatedData?.appliedMinDurationTotal)}`,
       " / "
     ),
     applicationCountSort: app.aggregatedData?.appliedReservationsTotal || 0,

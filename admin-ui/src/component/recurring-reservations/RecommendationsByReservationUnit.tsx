@@ -43,7 +43,7 @@ import {
   localizedValue,
   parseAddress,
   parseAgeGroups,
-  parseDuration,
+  formatDuration,
 } from "../../common/util";
 import {
   prepareAllocationResults,
@@ -227,7 +227,7 @@ const getCellConfig = (
               `${formatNumber(
                 aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(aggregatedData?.durationTotal)}`,
+              )} / ${formatDuration(aggregatedData?.durationTotal)}`,
               " / "
             )}
           </>

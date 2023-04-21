@@ -32,7 +32,7 @@ import {
   formatDate,
   localizedValue,
   parseAgeGroups,
-  parseDuration,
+  formatDuration,
 } from "../../common/util";
 import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
 import RecommendedSlot from "./RecommendedSlot";
@@ -297,7 +297,7 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
                           end={endDate}
                           weekday={weekday}
                           biweekly={recurringReservation.biweekly} // TODO
-                          durationStr={parseDuration(duration)}
+                          durationStr={formatDuration(duration)}
                           timeStart={formatDate(beginDate || "", "H:mm:ss")}
                           timeEnd={formatDate(endDate || "", "H:mm:ss")}
                         />

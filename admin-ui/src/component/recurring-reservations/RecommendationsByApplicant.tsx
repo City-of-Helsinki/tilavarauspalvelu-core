@@ -35,7 +35,7 @@ import {
   formatNumber,
   getNormalizedApplicationEventStatus,
   parseAgeGroups,
-  parseDuration,
+  formatDuration,
 } from "../../common/util";
 import {
   modifyAllocationResults,
@@ -130,7 +130,7 @@ const getCellConfig = (
               `${formatNumber(
                 aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(aggregatedData?.durationTotal)}`,
+              )} / ${formatDuration(aggregatedData?.durationTotal)}`,
               " / "
             )}
           </>

@@ -12,7 +12,7 @@ import {
   MutationUpdateApplicationEventScheduleResultArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
-import { parseDuration } from "../../../common/util";
+import { formatDuration } from "../../../common/util";
 import { useAllocationContext } from "../../../context/AllocationContext";
 import { useNotification } from "../../../context/NotificationContext";
 import { SmallRoundButton } from "../../../styles/buttons";
@@ -141,7 +141,7 @@ const ApplicationEventScheduleCard = ({
   });
 
   const selectionDuration = useMemo(
-    () => selection && parseDuration(selection.length * 30 * 60),
+    () => selection && formatDuration(selection.length * 30 * 60),
     [selection]
   );
 
@@ -162,8 +162,8 @@ const ApplicationEventScheduleCard = ({
   const parsedDuration = useMemo(
     () =>
       applicationEvent.minDuration === applicationEvent.maxDuration
-        ? parseDuration(applicationEvent.minDuration)
-        : `${parseDuration(applicationEvent.minDuration)} - ${parseDuration(
+        ? formatDuration(applicationEvent.minDuration)
+        : `${formatDuration(applicationEvent.minDuration)} - ${formatDuration(
             applicationEvent.maxDuration
           )}`,
     [applicationEvent.minDuration, applicationEvent.maxDuration]

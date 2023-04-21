@@ -17,6 +17,7 @@ import UnitFilter from "../filters/UnitFilter";
 import ReservationUnitFilter from "../filters/ReservationUnitFilter";
 import ReservationStateFilter from "../filters/ReservationStateFilter";
 import PaymentStatusFilter from "./PaymentStatusFilter";
+import { AutoGrid } from "../../styles/layout";
 
 export type FilterArguments = {
   reservationUnitType: OptionType[];
@@ -59,12 +60,6 @@ const ThinButton = styled(Button)`
     padding: 0;
     line-height: 1;
   }
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-  gap: var(--spacing-m);
 `;
 
 export const emptyState: FilterArguments = {
@@ -136,7 +131,7 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
   return (
     <div>
       <Wrapper>
-        <Grid>
+        <AutoGrid>
           <div>
             <ReservationUnitTypeFilter
               onChange={(reservationUnitType) =>
@@ -182,9 +177,9 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
               value={state.reservationUnit}
             />
           </div>
-        </Grid>
+        </AutoGrid>
         {more && (
-          <Grid>
+          <AutoGrid>
             <div>
               <DateInput
                 language="fi"
@@ -251,7 +246,7 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
                 }}
               />
             </div>
-          </Grid>
+          </AutoGrid>
         )}
       </Wrapper>
 

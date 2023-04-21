@@ -27,7 +27,7 @@ import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading } from "../../styles/typography";
 import DataTable, { CellConfig, OrderTypes } from "../DataTable";
 import Dialog from "../Dialog";
-import { formatNumber, parseDuration } from "../../common/util";
+import { formatNumber, formatDuration } from "../../common/util";
 import {
   prepareAllocationResults,
   processAllocationResult,
@@ -245,7 +245,7 @@ const getCellConfig = (
                     `${formatNumber(
                       aggregatedData?.reservationsTotal,
                       t("common.volumeUnit")
-                    )} / ${parseDuration(aggregatedData?.durationTotal)}`,
+                    )} / ${formatDuration(aggregatedData?.durationTotal)}`,
                     " / "
                   )
                 : t("Recommendation.noRecommendations")}

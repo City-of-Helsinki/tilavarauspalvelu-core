@@ -6,7 +6,7 @@ import { weekdays } from "../../common/const";
 import {
   convertHMSToSeconds,
   formatDate,
-  parseDuration,
+  formatDuration,
 } from "../../common/util";
 import { ReactComponent as IconCalendar } from "../../images/icon_calendar.svg";
 
@@ -89,6 +89,11 @@ function Label({ type, children }: IDateLabelProps): JSX.Element {
   );
 }
 
+const formatTime = (input: string) => {
+  const hm = input.split(":").slice(0, -1);
+  return hm.join(":");
+};
+
 function RecommendedSlot({
   id,
   start,
@@ -101,11 +106,6 @@ function RecommendedSlot({
   durationStr,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
-
-  const formatTime = (input: string) => {
-    const hm = input.split(":").slice(0, -1);
-    return hm.join(":");
-  };
 
   return (
     <Wrapper data-test-id={`recommendation__slot--${id}`}>
@@ -150,7 +150,7 @@ function RecommendedSlot({
                     duration:
                       durationStr ||
                       (duration &&
-                        parseDuration(convertHMSToSeconds(duration))),
+                        formatDuration(convertHMSToSeconds(duration))),
                   })}
                 </Duration>
               </Col>

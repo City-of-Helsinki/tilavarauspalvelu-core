@@ -142,9 +142,9 @@ export const VerticalFlexNoGap = styled.div`
 
 VerticalFlexNoGap.displayName = "VerticalFlexNoGap";
 
+// grid because flex causes overflow problems in children
 export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--spacing-layout-2-xs);
 
   max-width: var(--container-width-xl);
@@ -163,6 +163,24 @@ export const Content = styled.div`
 `;
 
 Content.displayName = "Content";
+
+export const AutoGrid = styled.div<{ $minWidth?: string }>`
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(
+      ${({ $minWidth }) =>
+        $minWidth && $minWidth?.length > 0 ? $minWidth : "16rem"},
+      1fr
+    )
+  );
+  align-items: baseline;
+  gap: var(--spacing-m);
+`;
+
+export const FullRow = styled.div`
+  grid-column: 1 / -1;
+`;
 
 export const Grid = styled.div`
   display: grid;

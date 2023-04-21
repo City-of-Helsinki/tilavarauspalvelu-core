@@ -6,6 +6,9 @@ import styled from "styled-components";
 const TabPanel = styled(HDSTabs.TabPanel)`
   margin-top: var(--spacing-s);
   padding-block: var(--spacing-m);
+  & > div {
+    display: grid;
+  }
 `;
 
 type TabHeader = {

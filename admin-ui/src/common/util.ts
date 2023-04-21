@@ -73,20 +73,7 @@ export const formatDecimal = ({
   return parseFloat(value.toFixed(decimals));
 };
 
-interface IFormatDurationOutput {
-  hours: number;
-  minutes: number;
-}
-
 export type ApplicationRoundStatusView = "listing";
-
-export const formatDuration = (time: string): IFormatDurationOutput => {
-  const [hours, minutes] = time.split(":");
-  return {
-    hours: Number(hours),
-    minutes: Number(minutes),
-  };
-};
 
 export const getNormalizedApplicationEventStatus = (
   status: ApplicationEventStatus,
@@ -184,28 +171,48 @@ export const secondsToHms = (duration?: number | null): HMS => {
   return { h, m, s };
 };
 
-export const parseDuration = (
+export const parseDurationString = (time: string): HMS | undefined => {
+  const [hours, minutes] = time.split(":");
+  if (!hours && !minutes) {
+    return undefined;
+  }
+  const h = Number(hours);
+  const m = Number(minutes);
+  if (
+    Number.isNaN(h) ||
+    Number.isNaN(m) ||
+    h >= 24 ||
+    h < 0 ||
+    m < 0 ||
+    m >= 60
+  ) {
+    return undefined;
+  }
+  return { h, m };
+};
+
+export const formatDurationShort = (hms: HMS): string =>
+  `${hms.h ? i18next.t("common.hoursUnit", { count: hms.h }) : ""} ${
+    hms.m ? i18next.t("common.minutesUnit", { count: hms.m }) : ""
+  }`;
+
+export const formatDurationLong = (hms: HMS): string =>
+  `${hms.h ? i18next.t("common.hoursUnitLong", { count: hms.h }) : ""} ${
+    hms.m ? i18next.t("common.minutesUnitLong", { count: hms.m }) : ""
+  }`;
+
+export const formatDuration = (
   duration: number | null | undefined,
   unitFormat?: "long"
 ): string => {
   const hms = secondsToHms(duration);
-  let hoursUnit: string;
-  let minutesUnit: string;
-  let output = "";
 
   switch (unitFormat) {
     case "long":
-      hoursUnit = "common.hoursUnitLong";
-      minutesUnit = "common.minutesUnitLong";
-      break;
+      return formatDurationLong(hms).trim();
     default:
-      hoursUnit = "common.hoursUnit";
-      minutesUnit = "common.minutesUnit";
+      return formatDurationShort(hms).trim();
   }
-  if (hms.h) output += `${i18next.t(hoursUnit, { count: hms.h })} `;
-  if (hms.m) output += `${i18next.t(minutesUnit, { count: hms.m })}`;
-
-  return output.trim();
 };
 
 export const convertHMSToSeconds = (input: string): number | null => {

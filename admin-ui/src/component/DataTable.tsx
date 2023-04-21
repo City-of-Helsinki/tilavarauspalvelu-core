@@ -97,7 +97,9 @@ interface IToggleableButton {
   $isActive: boolean;
 }
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: grid;
+`;
 
 const tableBorder = (size = "0.5em"): string =>
   `${size} solid var(--tilavaraus-admin-gray)`;

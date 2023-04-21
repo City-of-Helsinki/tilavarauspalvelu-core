@@ -1,14 +1,11 @@
 import { differenceInWeeks } from "date-fns";
-import { isEqual, sum, trim } from "lodash";
-import { TFunction } from "i18next";
+import { sum } from "lodash";
 import { ApplicationType } from "common/types/gql-types";
 import {
   Application,
-  ApplicationEvent,
   ApplicationRoundStatus,
   ApplicationStatus,
 } from "../../common/types";
-import { formatDuration } from "../../common/util";
 
 export const applicantName = (app: Application | ApplicationType): string => {
   return app.applicantType === "individual" ||
@@ -126,35 +123,3 @@ export const applicationTurns = (application: Application): number =>
       )
     )
   );
-
-const parseDuration = (
-  duration: string | null,
-  t: TFunction,
-  type?: "min" | "max"
-): string => {
-  if (!duration) return "";
-  const durationObj = formatDuration(duration);
-  const translationKey = `common.${type}Amount`;
-  let result = "";
-  result += `${type ? t(translationKey) : ""} ${
-    durationObj.hours && durationObj.hours + t("common.hoursUnit")
-  }`;
-  if (durationObj.minutes) {
-    result += ` ${durationObj.minutes + t("common.minutesUnit")}`;
-  }
-  return result;
-};
-
-export const appEventDuration = (
-  applicationEvent: ApplicationEvent,
-  t: TFunction
-): string => {
-  let duration = "";
-  if (isEqual(applicationEvent.minDuration, applicationEvent.maxDuration)) {
-    duration += parseDuration(applicationEvent.minDuration, t);
-  } else {
-    duration += parseDuration(applicationEvent?.minDuration, t, "min");
-    duration += `, ${parseDuration(applicationEvent?.maxDuration, t, "max")}`;
-  }
-  return trim(duration, ", ");
-};

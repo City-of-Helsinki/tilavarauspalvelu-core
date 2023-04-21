@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { orderBy, set } from "lodash";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Card, Table } from "hds-react";
-import isEqual from "lodash/isEqual";
+import { isEqual, set, orderBy, trim } from "lodash";
 import omit from "lodash/omit";
+import { TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import Accordion from "../Accordion";
@@ -28,10 +28,12 @@ import {
   formatDate,
   parseApplicationEventSchedules,
   parseAgeGroups,
+  parseDurationString,
+  formatDurationShort,
 } from "../../common/util";
 import ValueBox from "./ValueBox";
 import { publicUrl, weekdays } from "../../common/const";
-import { appEventDuration, applicantName } from "./util";
+import { applicantName } from "./util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
 import { useNotification } from "../../context/NotificationContext";
 import TimeSelector from "./time-selector/TimeSelector";
@@ -166,6 +168,37 @@ const KV = ({
   </div>
 );
 
+const formatDuration = (
+  duration: string | null,
+  t: TFunction,
+  type?: "min" | "max"
+): string => {
+  if (!duration) {
+    return "";
+  }
+  const dur = parseDurationString(duration);
+  const translationKey = `common.${type}Amount`;
+  if (!dur) {
+    return "";
+  }
+  return `${type ? t(translationKey) : ""} ${formatDurationShort(dur)}`;
+};
+
+const appEventDuration = (
+  min: string | null,
+  max: string | null,
+  t: TFunction
+): string => {
+  let duration = "";
+  if (isEqual(min, max)) {
+    duration += formatDuration(min, t);
+  } else {
+    duration += formatDuration(min, t, "min");
+    duration += `, ${formatDuration(max, t, "max")}`;
+  }
+  return trim(duration, ", ");
+};
+
 function ApplicationDetails(): JSX.Element | null {
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
@@ -257,7 +290,7 @@ function ApplicationDetails(): JSX.Element | null {
           <ShowWhenTargetInvisible target={ref}>
             <StickyHeader
               name={customerName}
-              tagline={`${t("Application.id")}:${application.id}`}
+              tagline={`${t("Application.id")}: ${application.id}`}
             />
           </ShowWhenTargetInvisible>
 
@@ -304,8 +337,8 @@ function ApplicationDetails(): JSX.Element | null {
                     k={t("Application.numHours")}
                     v={`${t("common.hoursUnitLong", {
                       count:
-                        (application.aggregatedData
-                          .appliedMinDurationTotal as number) / 3600,
+                        (application.aggregatedData.appliedMinDurationTotal ??
+                          0) / 3600,
                     })}`}
                   />
                   <KV
@@ -322,7 +355,11 @@ function ApplicationDetails(): JSX.Element | null {
           <IngressContainer>
             {application.applicationEvents.map(
               (applicationEvent: ApplicationEvent) => {
-                const duration = appEventDuration(applicationEvent, t);
+                const duration = appEventDuration(
+                  applicationEvent.minDuration,
+                  applicationEvent.maxDuration,
+                  t
+                );
 
                 return (
                   <ScrollIntoView
@@ -412,7 +449,7 @@ function ApplicationDetails(): JSX.Element | null {
                                 return (
                                   <EventSchedule key={day}>
                                     <Strong>{t(`calendar.${day}`)}</Strong>
-                                    {schedulesTxt ? `,${schedulesTxt}` : ""}
+                                    {schedulesTxt ? `: ${schedulesTxt}` : ""}
                                   </EventSchedule>
                                 );
                               })}
@@ -432,7 +469,7 @@ function ApplicationDetails(): JSX.Element | null {
                                 return (
                                   <EventSchedule key={day}>
                                     <Strong>{t(`calendar.${day}`)}</Strong>
-                                    {schedulesTxt ? `,${schedulesTxt}` : ""}
+                                    {schedulesTxt ? `: ${schedulesTxt}` : ""}
                                   </EventSchedule>
                                 );
                               })}

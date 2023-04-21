@@ -73,6 +73,7 @@ function Stat({ value, label }: { value: number; label: string }): JSX.Element {
 
 function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
   const { t } = useTranslation();
+
   return (
     <StyledCard>
       <Layout>
@@ -93,15 +94,15 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
           </Times>
           <Stats>
             <Stat
-              value={applicationRound.reservationUnitCount as number}
+              value={applicationRound.reservationUnitCount ?? 0}
               label={t("ApplicationRound.reservationUnitCount", {
-                count: applicationRound.reservationUnitCount as number,
+                count: applicationRound.reservationUnitCount ?? 0,
               })}
             />
             <Stat
-              value={applicationRound.applicationsCount as number}
+              value={applicationRound.applicationsCount ?? 0}
               label={t("ApplicationRound.applicationCount", {
-                count: applicationRound.applicationsCount as number,
+                count: applicationRound.applicationsCount ?? 0,
               })}
             />
           </Stats>

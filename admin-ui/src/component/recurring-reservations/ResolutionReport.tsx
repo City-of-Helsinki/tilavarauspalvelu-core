@@ -19,7 +19,7 @@ import { ContentContainer, IngressContainer } from "../../styles/layout";
 import withMainMenu from "../withMainMenu";
 import { ContentHeading } from "../../styles/typography";
 import DataTable, { CellConfig, OrderTypes } from "../DataTable";
-import { formatNumber, parseDuration } from "../../common/util";
+import { formatNumber, formatDuration } from "../../common/util";
 import {
   IAllocationCapacity,
   prepareAllocationResults,
@@ -199,7 +199,7 @@ const getCellConfig = (
                     `${formatNumber(
                       aggregatedData?.reservationsTotal,
                       t("common.volumeUnit")
-                    )} / ${parseDuration(aggregatedData?.durationTotal)}`,
+                    )} / ${formatDuration(aggregatedData?.durationTotal)}`,
                     " / "
                   )
                 : t("Recommendation.noRecommendations")}

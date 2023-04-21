@@ -10,7 +10,7 @@ import {
 } from "common/types/gql-types";
 import { publicUrl } from "../../../common/const";
 import { AllocationApplicationEventCardType } from "../../../common/types";
-import { parseDuration } from "../../../common/util";
+import { formatDuration } from "../../../common/util";
 import { ageGroup } from "../../reservations/requested/util";
 import {
   getApplicantName,
@@ -127,8 +127,8 @@ const ApplicationEventCard = ({
   const isActive = applicationEvent === selectedApplicationEvent;
   const parsedDuration =
     applicationEvent.minDuration === applicationEvent.maxDuration
-      ? parseDuration(applicationEvent.minDuration)
-      : `${parseDuration(applicationEvent.minDuration)} - ${parseDuration(
+      ? formatDuration(applicationEvent.minDuration)
+      : `${formatDuration(applicationEvent.minDuration)} - ${formatDuration(
           applicationEvent.maxDuration
         )}`;
   const otherReservationUnits = applicationEvent?.eventReservationUnits

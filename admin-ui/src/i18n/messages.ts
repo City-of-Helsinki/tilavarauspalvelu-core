@@ -116,22 +116,22 @@ const translations: ITranslations = {
     apply: ["Käytä"],
     areaUnitSquareMeter: [" m²"],
     volumeUnit: [" kpl", " ", " "],
-    personUnit: ["{{count}} henkilö"],
-    personUnit_plural: ["{{count}} henkeä"],
+    personUnit_one: ["{{count}} henkilö"],
+    personUnit_other: ["{{count}} henkeä"],
     hoursUnit: ["{{count}} h", "{{count}} h", "{{count}} h"],
-    hoursUnitLong: ["{{count}} tunti", "{{count}} hour", "{{count}} timme"],
-    hoursUnitLong_plural: [
+    hoursUnitLong_one: ["{{count}} tunti", "{{count}} hour", "{{count}} timme"],
+    hoursUnitLong_other: [
       "{{count}} tuntia",
       "{{count}} hours",
       "{{count}} timmar",
     ],
     minutesUnit: ["{{count}} min", "{{count}} min", "{{count}} min"],
-    minutesUnitLong: [
+    minutesUnitLong_one: [
       "{{count}} minuutti",
       "{{count}} minute",
       "{{count}} minut",
     ],
-    minutesUnitLong_plural: [
+    minutesUnitLong_other: [
       "{{count}} minuuttia",
       "{{count}} minutes",
       "{{count}} minuter",
@@ -418,9 +418,9 @@ const translations: ITranslations = {
     },
   },
   Application: {
-    id: ["Hakemnustunnus"],
-    application: ["Hakemus", "Application"],
-    application_plural: ["Hakemusta", "Applications"],
+    id: ["Hakemustunnus"],
+    application_one: ["Hakemus", "Application"],
+    application_other: ["Hakemusta", "Applications"],
     applicantType: ["Asiakastyyppi"],
     showAllApplications: ["Näytä kaikki hakemukset"],
     showResolutions: ["Näytä päätöslauselma"],
@@ -508,8 +508,8 @@ const translations: ITranslations = {
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Y-tunnus"],
-    applicationsSelected: ["{{count}} hakemus valittu"],
-    applicationsSelected_plural: ["{{count}} hakemusta valittu"],
+    applicationsSelected_one: ["{{count}} hakemus valittu"],
+    applicationsSelected_other: ["{{count}} hakemusta valittu"],
     allApplications: ["Kaikki hakemukset"],
     resolution: ["Päätös"],
     graduatedToAllocation: ["Edennyt jakoon esitarkastuksessa"],
@@ -667,19 +667,19 @@ const translations: ITranslations = {
     listHandlingIngressEmpty: [
       "Vastuullasi ei ole tällä hetkellä ole lainkaan tulevia tai käsittelyvaiheessa olevia hakukierroksia.",
     ],
-    listHandlingIngress: [
+    listHandlingIngress_one: [
       "Vastuullasi on tällä hetkellä {{count}} tuleva tai käsittelyvaiheessa oleva hakukierros.",
     ],
-    listHandlingIngress_plural: [
+    listHandlingIngress_other: [
       "Vastuullasi on tällä hetkellä {{count}} tulevaa tai käsittelyvaiheessa olevaa hakukierrosta.",
     ],
     listHandlingPlaceholder: [
       "Ei vielä tulevia tai käsittelyvaiheessa olevia hakukierroksia.",
     ],
-    listApprovalIngress: [
+    listApprovalIngress_one: [
       "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselma.",
     ],
-    listApprovalIngress_plural: [
+    listApprovalIngress_other: [
       "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselmaa",
     ],
     allRecurringApplicationRounds: ["Vakiovuorojen kaikki hakukierrokset"],
@@ -796,8 +796,8 @@ const translations: ITranslations = {
     labelAppliedReservations: ["Vuoroja"],
     labelReservationUnitRank: ["Tarjottu tila toivesijalla {{rank}}"],
     actionMassActionSubmit: ["Massakäsittele valitut"],
-    recommendationCount: ["{{count}} ehdotus tehty"],
-    recommendationCount_plural: ["{{count}} ehdotusta tehty"],
+    recommendationCount_one: ["{{count}} ehdotus tehty"],
+    recommendationCount_other: ["{{count}} ehdotusta tehty"],
     showOriginalApplication: ["Näytä alkuperäinen hakemus"],
     headings: {
       applicationEventName: ["Ryhmä"],
@@ -866,8 +866,8 @@ const translations: ITranslations = {
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],
-    purposeCount: ["{{count}} käyttötarkoitus"],
-    purposeCount_plural: ["{{count}} käyttötarkoitusta"],
+    purposeCount_one: ["{{count}} käyttötarkoitus"],
+    purposeCount_other: ["{{count}} käyttötarkoitusta"],
     downloadSpaceCalendar: ["Lataa tilan kalenterimerkinnät (.ics)"],
     isDraft: {
       true: ["Luonnos"],
@@ -986,13 +986,13 @@ const translations: ITranslations = {
       maxPersons: ["Henkilömäärä"],
       area: ["Alue"],
     },
-    reservationUnits: ["{{count}} varausyksikkö"],
-    reservationUnits_plural: ["{{count}} varausyksikköä"],
+    reservationUnits_one: ["{{count}} varausyksikkö"],
+    reservationUnits_other: ["{{count}} varausyksikköä"],
     noReservationUnits: ["Ei varausyksiköitä"],
     noArea: ["Alue puuttuu"],
     noService: ["Palvelu puuttuu"],
-    unitCount: ["{{count}} toimipiste"],
-    unitCount_plural: ["{{count}} toimipistettä"],
+    unitCount_one: ["{{count}} toimipiste"],
+    unitCount_other: ["{{count}} toimipistettä"],
     noUnits: ["Ei toimipisteitä"],
     showOnMap: ["Näytä kartalla"],
     showOpeningHours: ["Aukioloajat"],
@@ -1124,8 +1124,8 @@ const translations: ITranslations = {
     },
   },
   SpaceTable: {
-    subSpaceCount: ["alitila"],
-    subSpaceCount_plural: ["alitilaa"],
+    subSpaceCount_one: ["alitila"],
+    subSpaceCount_other: ["alitilaa"],
     menuAddSubSpace: ["Lisää alitiloja"],
     menuEditSpace: ["Muokkaa tilatietoja"],
     menuRemoveSpace: ["Poista tila"],
@@ -1296,8 +1296,8 @@ const translations: ITranslations = {
     },
   },
   ReservationUnitsSearch: {
-    resultCount: ["{{count}} hakutulos"],
-    resultCount_plural: ["{{count}} hakutulosta"],
+    resultCount_one: ["{{count}} hakutulos"],
+    resultCount_other: ["{{count}} hakutulosta"],
     textSearchLabel: ["Varausyksikön nimi"],
     textSearchPlaceHolder: ["Hae"],
     typeLabel: ["Tilan tyyppi"],
@@ -1340,8 +1340,8 @@ const translations: ITranslations = {
     noMaxPersons: ["Maksimihenkilömäärä puuttuu"],
     noReservationUnitType: ["Varausyksikön tyyppi puuttuu"],
     noPurpose: ["Käyttötarkoitus puuttuu"],
-    purpose: ["{{count}} käyttötarkoitus"],
-    purpose_plural: ["{{count}} käyttötarkoitusta"],
+    purpose_one: ["{{count}} käyttötarkoitus"],
+    purpose_other: ["{{count}} käyttötarkoitusta"],
     statePublished: ["Julkaistu"],
     stateDraft: ["Luonnos"],
   },

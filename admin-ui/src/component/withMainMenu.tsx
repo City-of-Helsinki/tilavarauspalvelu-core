@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
 
 const Wrapper = styled.div`
@@ -9,10 +8,6 @@ const Wrapper = styled.div`
 
 const InnerWrapper = styled.div`
   width: 100%;
-
-  @media (min-width: ${breakpoints.m}) {
-    width: calc(100% - var(--main-menu-width) - 2.625rem);
-  }
 `;
 export const MainMenuWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
