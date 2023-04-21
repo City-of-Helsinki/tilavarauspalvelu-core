@@ -13,11 +13,17 @@ services:
         volumes:
             - postgres-data-volume:/var/lib/postgresql/data
 
+    redis:
+        image: "redis:7-alpine"
+        ports:
+            - "127.0.0.1:6379:6379"
+
     backend:
         container_name: tilavarauspalvelu_core
         image: tilavarauspalvelu_core_local
         depends_on:
             - db
+            - redis
         build:
             context: ./
             dockerfile: ./Dockerfile.local
