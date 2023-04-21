@@ -19,6 +19,7 @@ type Props = {
   filters: FilterArguments;
   sort?: Sort;
   sortChanged: (field: string) => void;
+  isMyUnits?: boolean;
 };
 
 const mapFilterParams = (params: FilterArguments) => ({
@@ -41,6 +42,7 @@ const UnitsDataLoader = ({
   filters,
   sort,
   sortChanged: onSortChanged,
+  isMyUnits,
 }: Props): JSX.Element => {
   const { notifyError } = useNotification();
 
@@ -75,7 +77,12 @@ const UnitsDataLoader = ({
 
   return (
     <>
-      <UnitsTable units={units} sort={sort} sortChanged={onSortChanged} />
+      <UnitsTable
+        units={units}
+        sort={sort}
+        sortChanged={onSortChanged}
+        isMyUnits={isMyUnits}
+      />
       <More
         key={units.length}
         totalCount={data?.units?.totalCount || 0}

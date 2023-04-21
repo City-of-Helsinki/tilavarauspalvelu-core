@@ -1,41 +1,29 @@
-import { useQuery } from "@apollo/client";
-import { H1 } from "common/src/common/typography";
-import React from "react";
+import React, { useState } from "react";
+import { debounce } from "lodash";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
-import { Query, QueryUnitsArgs, UnitType } from "common/types/gql-types";
-import { useNotification } from "../../context/NotificationContext";
+import { H1 } from "common/src/common/typography";
 import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import Loader from "../Loader";
-import { UNITS_QUERY } from "../Unit/queries";
 import withMainMenu from "../withMainMenu";
-import MyUnitCard from "./MyUnitCard";
+import { Sort } from "../Unit/UnitsTable";
+import Filters, { FilterArguments, emptyFilterState } from "../Unit/Filters";
+import { HR } from "../lists/components";
+import UnitsDataLoader from "../Unit/UnitsDataLoader";
 
-const Grid = styled.div`
-  display: grid;
-  gap: var(--spacing-s);
-  grid-template-columns: 1fr 1fr;
-`;
-
+// NOTE copy pasta from Unit/Units.tsx
 const MyUnits = () => {
+  const [search, setSearch] = useState<FilterArguments>(emptyFilterState);
+  const [sort, setSort] = useState<Sort>();
+  const debouncedSearch = debounce((value) => setSearch(value), 300);
+
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
 
-  const { loading, data } = useQuery<Query, QueryUnitsArgs>(UNITS_QUERY, {
-    variables: {
-      orderBy: "nameFi",
-      offset: 0,
-    },
-    onError: (err) => {
-      notifyError(err.message);
-    },
-    fetchPolicy: "cache-and-network",
-  });
-
-  if (loading) {
-    return <Loader />;
-  }
+  const onSortChanged = (sortField: string) => {
+    setSort({
+      field: sortField,
+      sort: sort?.field === sortField ? !sort?.sort : true,
+    });
+  };
 
   return (
     <>
@@ -45,11 +33,14 @@ const MyUnits = () => {
           <H1 $legacy>{t("MyUnits.heading")}</H1>
           <p>{t("MyUnits.description")}</p>
         </div>
-        <Grid>
-          {data?.units?.edges.map((unit) => (
-            <MyUnitCard unit={unit?.node as UnitType} key={unit?.node?.pk} />
-          ))}
-        </Grid>
+        <Filters onSearch={debouncedSearch} />
+        <HR />
+        <UnitsDataLoader
+          filters={search}
+          sort={sort}
+          sortChanged={onSortChanged}
+          isMyUnits
+        />
       </Container>
     </>
   );
