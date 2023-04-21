@@ -240,6 +240,11 @@ env = environ.Env(
     # Logging
     ENABLE_SQL_LOGGING=(bool, False),
     APP_LOGGING_LEVEL=(str, "WARNING"),
+    # Redis cache
+    REDIS_MASTER=(str, None),
+    REDIS_SENTINEL_SERVICE=(str, None),
+    REDIS_URL=(str, None),
+    REDIS_PASSWORD=(str, None),
 )
 
 environ.Env.read_env()
@@ -602,6 +607,35 @@ OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
 OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES = env("OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES")
 PREFILL_RESERVATION_WITH_PROFILE_DATA = env("PREFILL_RESERVATION_WITH_PROFILE_DATA")
 
+# Configure Redis cache for local dev environment
+if env("REDIS_URL"):
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": env("REDIS_URL"),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        }
+    }
+
+# Configure Redis cache for production OpenShift environment
+elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER"):
+    sentinel_host, sentinel_port = env("REDIS_SENTINEL_SERVICE").split(":")
+    DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": env("REDIS_MASTER"),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.SentinelClient",
+                "SENTINELS": [(sentinel_host, sentinel_port)],
+                "SENTINEL_KWARGS": {"password": env("REDIS_PASSWORD")},
+            },
+        }
+    }
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
