@@ -15,11 +15,13 @@ from ..constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
 from ..exceptions import VerkkokauppaConfigurationError
 from .exceptions import (
     GetPaymentError,
+    GetRefundStatusError,
     ParsePaymentError,
     ParseRefundError,
+    ParseRefundStatusError,
     RefundPaymentError,
 )
-from .types import Payment, Refund
+from .types import Payment, Refund, RefundStatusResult
 
 
 def _get_base_url():
@@ -50,11 +52,16 @@ def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
         json = response.json()
         errors = json.get("errors", [])
 
+        # API documentation says it returns 404 but in reality it
+        # returns 500 with error code. They have plans to fix this
+        # but just to avoid breaking things with unnotified changes we
+        # are handling both cases. 500 handling can be removed after
+        # webshop API is updated.
         if (
             response.status_code == 500
             and errors
             and errors[0].get("code") == "failed-to-get-payment-for-order"
-        ):
+        ) or response.status_code == 404:
             return None
 
         if response.status_code != 200:
@@ -62,6 +69,49 @@ def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
         return Payment.from_json(json)
     except (RequestException, JSONDecodeError, ParsePaymentError) as e:
         raise GetPaymentError("Payment retrieval failed") from e
+
+
+def get_refund_status(
+    order_id: UUID, namespace: str, get=_get
+) -> Optional[RefundStatusResult]:
+    try:
+        with ExternalServiceMetric(
+            METRIC_SERVICE_NAME, "GET", "/payment/admin/refund-payment/{order_id}"
+        ) as metric:
+            response = get(
+                url=urljoin(_get_base_url(), f"admin/refund-payment/{order_id}"),
+                headers={
+                    "api-key": settings.VERKKOKAUPPA_API_KEY,
+                    "namespace": namespace,
+                },
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
+            metric.response_status = response.status_code
+
+        json = response.json()
+        errors = json.get("errors", [])
+
+        # API documentation says it returns 404 but in reality it
+        # returns 500 with error code. They have plans to fix this
+        # but just to avoid breaking things with unnotified changes we
+        # are handling both cases. 500 handling can be removed after
+        # webshop API is updated.
+        if (
+            response.status_code == 500
+            and len(errors) > 0
+            and errors[0].get("code") == "failed-to-get-refund-payment-for-order"
+        ) or response.status_code == 404:
+            return None
+
+        if response.status_code != 200:
+            raise GetRefundStatusError(
+                f"Payment refund status retrieval failed: {json.get('errors')}"
+            )
+        return RefundStatusResult.from_json(json)
+    except (RequestException, JSONDecodeError, ParseRefundStatusError) as e:
+        raise GetRefundStatusError(
+            f"Payment refund status retrieval failed: {str(e)}"
+        ) from e
 
 
 def refund_order(order_id: UUID, post=_post) -> Optional[Refund]:

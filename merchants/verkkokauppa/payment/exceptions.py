@@ -19,3 +19,11 @@ class ParseRefundError(PaymentError):
 
 class RefundPaymentError(PaymentError):
     pass
+
+
+class GetRefundStatusError(PaymentError):
+    pass
+
+
+class ParseRefundStatusError(PaymentError):
+    pass
