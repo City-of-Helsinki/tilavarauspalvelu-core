@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from helusers.user_utils import convert_to_uuid
 
+from permissions.models import GeneralRole, GeneralRoleChoice
 from users.utils.open_city_profile.birthday_resolver import resolve_user
 
 response_mock = mock.MagicMock()
@@ -30,7 +31,6 @@ class ResolveUserTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        response_mock.status_code = 200
         response_mock.json.return_value = cls.__get_profile_gql_response()
         cls.request = mock.MagicMock()
         cls.request.headers = {"X-Authorization": b"jwtokeny"}
@@ -43,6 +43,9 @@ class ResolveUserTestCase(TestCase):
             email="prof.user@localhost",
             uuid=UUID(cls.uuid),
         )
+
+    def setUp(self) -> None:
+        response_mock.status_code = 200
 
     def get_payload(self):
         return {
@@ -83,3 +86,25 @@ class ResolveUserTestCase(TestCase):
 
         self.user.refresh_from_db()
         assert_that(self.user.profile_id).is_equal_to(profile_id)
+
+    @mock.patch("users.utils.open_city_profile.birthday_resolver.capture_exception")
+    def test_reading_user_profile_id_raises_sends_to_sentry(
+        self, mock_sentry, req_mock
+    ):
+        req_mock.return_value.status_code = 500
+
+        resolve_user(self.request, self.get_payload())
+
+        self.user.refresh_from_db()
+        assert_that(self.user.profile_id).is_empty()
+        assert_that(mock_sentry.call_count).is_greater_than(0)
+
+    def test_staff_user_is_profile_id_is_not_read(self, req_mock):
+        GeneralRole.objects.create(
+            user=self.user,
+            role=GeneralRoleChoice.objects.get(code="admin"),
+        )
+        resolve_user(self.request, self.get_payload())
+
+        self.user.refresh_from_db()
+        assert_that(self.user.profile_id).is_empty()
