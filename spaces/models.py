@@ -93,7 +93,7 @@ class Unit(models.Model):
     )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
-        verbose_name=_("Description"), max_length=500, blank=True, default=""
+        verbose_name=_("Description"), max_length=4000, blank=True, default=""
     )
     short_description = models.CharField(
         verbose_name=_("Short description"), max_length=255, blank=True, default=""
