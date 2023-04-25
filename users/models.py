@@ -47,6 +47,14 @@ class User(AbstractUser):
         else:
             return self.preferred_language
 
+    @property
+    def has_staff_permissions(self):
+        return (
+            self.general_roles.exists()
+            or self.service_sector_roles.exists()
+            or self.unit_roles.exists()
+        )
+
 
 class PersonalInfoViewLog(models.Model):
     field = models.CharField(max_length=255, null=False, blank=False, editable=False)
