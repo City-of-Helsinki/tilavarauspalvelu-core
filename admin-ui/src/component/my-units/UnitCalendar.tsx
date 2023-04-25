@@ -1,7 +1,13 @@
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { breakpoints } from "common/src/common/style";
 import { addMinutes, differenceInMinutes, startOfDay } from "date-fns";
-import React, { CSSProperties, useCallback, useEffect, useRef } from "react";
+import React, {
+  CSSProperties,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
@@ -252,6 +258,13 @@ const EventTriggerButton = () => (
   />
 );
 
+const EventContainer = styled.div`
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+`;
+
 const Events = ({
   currentReservationUnit,
   firstHour,
@@ -265,14 +278,7 @@ const Events = ({
   eventStyleGetter: EventStyleGetter;
   numHours: number;
 }) => (
-  <div
-    style={{
-      position: "absolute",
-      width: "100%",
-      top: 0,
-      left: 0,
-    }}
-  >
+  <EventContainer>
     {events.map((e) => {
       const title = getEventTitle({ reservation: e });
       const startDate = new Date(e.start);
@@ -290,56 +296,53 @@ const Events = ({
 
       const durationMinutes = differenceInMinutes(endDate, startDate);
 
-      let preBuffer = null;
-      let postBuffer = null;
-      if (currentReservationUnit === e.event?.reservationUnits?.[0]?.pk) {
-        preBuffer = (
-          <PreBuffer
-            event={e}
-            hourPercent={hourPercent}
-            left={left}
-            style={TemplateProps}
-          />
-        );
+      const isEventInCurrentReservationUnit =
+        currentReservationUnit === e.event?.reservationUnits?.[0]?.pk;
 
-        const right = `calc(${left} + ${durationMinutes / 60} * ${
-          100 / numHours
-        }% + 1px)`;
-        postBuffer = (
-          <PostBuffer
-            event={e}
-            hourPercent={hourPercent}
-            right={right}
-            style={TemplateProps}
-          />
-        );
-      }
+      const right = `calc(${left} + ${durationMinutes / 60} * ${
+        100 / numHours
+      }% + 1px)`;
 
-      return [
-        preBuffer,
-        <div
-          key={String(e.event?.pk)}
-          style={{
-            left,
-            ...TemplateProps,
-            width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
-            zIndex: 5,
-          }}
-        >
-          <EventContent style={{ ...eventStyleGetter(e).style }}>
-            <p>{title}</p>
-            <Popup
-              position={["right center", "left center"]}
-              trigger={EventTriggerButton}
-            >
-              {e.event && <ReservationPopupContent reservation={e.event} />}
-            </Popup>
-          </EventContent>
-        </div>,
-        postBuffer,
-      ];
+      return (
+        <Fragment key={`${title}-${startDate.toISOString()}`}>
+          {isEventInCurrentReservationUnit && (
+            <PreBuffer
+              event={e}
+              hourPercent={hourPercent}
+              left={left}
+              style={TemplateProps}
+            />
+          )}
+          <div
+            style={{
+              left,
+              ...TemplateProps,
+              width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
+              zIndex: 5,
+            }}
+          >
+            <EventContent style={{ ...eventStyleGetter(e).style }}>
+              <p>{title}</p>
+              <Popup
+                position={["right center", "left center"]}
+                trigger={EventTriggerButton}
+              >
+                {e.event && <ReservationPopupContent reservation={e.event} />}
+              </Popup>
+            </EventContent>
+          </div>
+          {isEventInCurrentReservationUnit && (
+            <PostBuffer
+              event={e}
+              hourPercent={hourPercent}
+              right={right}
+              style={TemplateProps}
+            />
+          )}
+        </Fragment>
+      );
     })}
-  </div>
+  </EventContainer>
 );
 
 const sortByDraftStatusAndTitle = (resources: Resource[]) => {
