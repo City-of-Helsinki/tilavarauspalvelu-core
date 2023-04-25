@@ -35,13 +35,6 @@ def update_expired_orders_task(older_than_minutes=PRUNE_WITH_ORDERS_OLDER_THAN_M
     update_expired_orders(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
 
 
-@app.on_after_finalize.connect
-def setup_periodic_tasks(sender, **kwargs) -> None:
-    sender.add_periodic_task(
-        PRUNE_INTERVAL_SECONDS, _prune_reservations.s(), name="reservations_pruning"
-    )
-
-
 @app.task(name="prune_reservation_statistics")
 def prune_reservation_statistics_task(older_than_years=REMOVE_STATS_OLDER_THAN_YEARS):
     prune_reservation_statistics(older_than_years=older_than_years)
