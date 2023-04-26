@@ -18,6 +18,7 @@ type Props = {
   children: React.ReactNode;
 };
 
+// TODO non HDS modals should be deprecated (start by removing the default values)
 export const ModalContextProvider: React.FC<Props> = ({ children }: Props) => {
   const [modalContent, setModalContent] = useState<{
     isHds: boolean;
@@ -25,18 +26,20 @@ export const ModalContextProvider: React.FC<Props> = ({ children }: Props) => {
   }>({ isHds: true, content: null });
 
   const toggleModal = (content: JSX.Element | null, isHds = false): void => {
-    const bodyEl = document.getElementsByTagName("body")[0];
-    const classes = ["noScroll"];
-    if (
-      window.document.body.scrollHeight >
-      window.document.documentElement.clientHeight
-    ) {
-      classes.push("scrollbarActive");
-    }
-    if (content) {
-      bodyEl.classList.add(...classes);
-    } else {
-      bodyEl.classList.remove(...classes);
+    if (!isHds) {
+      const bodyEl = document.getElementsByTagName("body")[0];
+      const classes = ["noScroll"];
+      if (
+        window.document.body.scrollHeight >
+        window.document.documentElement.clientHeight
+      ) {
+        classes.push("scrollbarActive");
+      }
+      if (content) {
+        bodyEl.classList.add(...classes);
+      } else {
+        bodyEl.classList.remove(...classes);
+      }
     }
     setModalContent({ isHds, content });
   };

@@ -12,7 +12,7 @@ const ReservationListButton = ({
   type,
   callback,
 }: {
-  type: "remove" | "restore" | "change" | "show";
+  type: "remove" | "deny" | "restore" | "change" | "show";
   callback: () => void;
 }) => {
   const { t } = useTranslation();
@@ -29,6 +29,7 @@ const ReservationListButton = ({
           {t("ReservationsListButton.showInCalendar")}
         </Button>
       );
+    case "deny":
     case "remove":
       return (
         <Button
@@ -37,7 +38,7 @@ const ReservationListButton = ({
           iconLeft={<IconCross />}
           size="small"
         >
-          {t("common.remove")}
+          {type === "deny" ? t("common.deny") : t("common.remove")}
         </Button>
       );
     case "restore":

@@ -94,6 +94,7 @@ const translations: ITranslations = {
     open: ["Avaa"],
     close: ["Sulje"],
     approve: ["Hyväksy"],
+    deny: ["Hylkää"],
     cancel: ["Peruuta"],
     reserve: ["Varaa"],
     accordion: ["sisältö"],
