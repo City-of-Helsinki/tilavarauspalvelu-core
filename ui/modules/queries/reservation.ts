@@ -371,6 +371,7 @@ export const GET_ORDER = gql`
       reservationPk
       status
       paymentType
+      receiptUrl
     }
   }
 `;

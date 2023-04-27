@@ -84,7 +84,7 @@ const ReservationConfirmation = ({
   reservationUnit,
   order,
 }: Props): JSX.Element => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const { logout } = useLogout();
 
@@ -141,7 +141,12 @@ const ReservationConfirmation = ({
             {order?.receiptUrl && (
               <BlackButton
                 data-testid="reservation__confirmation--button__receipt-link"
-                onClick={() => window.open(order.receiptUrl, "_blank")}
+                onClick={() =>
+                  window.open(
+                    `${order.receiptUrl}&lang=${i18n.language}`,
+                    "_blank"
+                  )
+                }
                 variant="secondary"
                 iconRight={<IconLinkExternal aria-hidden />}
               >

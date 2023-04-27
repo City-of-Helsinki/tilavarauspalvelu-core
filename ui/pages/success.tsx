@@ -1,31 +1,18 @@
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
-import {
-  MutationRefreshOrderArgs,
-  PaymentOrderType,
-  Query,
-  QueryOrderArgs,
-  QueryReservationByPkArgs,
-  ReservationType,
-  ReservationsReservationStateChoices,
-} from "common/types/gql-types";
+import { ReservationsReservationStateChoices } from "common/types/gql-types";
 import { LoadingSpinner } from "hds-react";
 import { signIn, useSession } from "next-auth/react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Container from "../components/common/Container";
-import {
-  GET_ORDER,
-  GET_RESERVATION,
-  REFRESH_ORDER,
-} from "../modules/queries/reservation";
 import ReservationFail from "../components/reservation/ReservationFail";
-import { authenticationIssuer } from "../modules/const";
+import { authEnabled, authenticationIssuer } from "../modules/const";
+import { useOrder, useReservation } from "../hooks/reservation";
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale)),
@@ -33,9 +20,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   };
 };
 
-type Error = 1 | 2;
-
-const howManyTimeShouldWeRetryOrder = 1;
+const howManyTimeShouldWeRetryOrder = 2;
 
 const StyledContainer = styled(Container)`
   display: flex;
@@ -48,26 +33,18 @@ const StyledContainer = styled(Container)`
   }
 `;
 
-const ErrorWrapper = ({ error }: { error: Error }) => {
-  return error === 1 ? (
-    <ReservationFail type="reservation" />
-  ) : error === 2 ? (
-    <ReservationFail type="order" />
-  ) : null;
-};
-
 const ReservationSuccess = () => {
   const session = useSession();
   const router = useRouter();
   const { orderId } = router.query as { orderId: string };
 
-  const [error, setError] = useState<Error>(null);
-  const [order, setOrder] = useState<PaymentOrderType>(null);
-  const [reservation, setReservation] = useState<ReservationType>(null);
+  const [isReservationInvalid, setIsReservationInvalid] =
+    useState<boolean>(false);
   const [refreshRetries, setRefreshRetries] = useState<number>(0);
 
   const isCheckingAuth = session?.status === "loading";
-  const isLoggedOut = session?.status === "unauthenticated";
+  const isLoggedOut = authEnabled && session?.status === "unauthenticated";
+
   useEffect(() => {
     if (isLoggedOut) {
       signIn(authenticationIssuer, {
@@ -76,112 +53,64 @@ const ReservationSuccess = () => {
     }
   }, [isLoggedOut]);
 
-  const [
-    refreshOrder,
-    {
-      data: refreshData,
-      error: refreshError,
-      loading: refreshLoading,
-      reset: refreshReset,
-    },
-  ] = useMutation<Query, MutationRefreshOrderArgs>(REFRESH_ORDER, {
-    fetchPolicy: "no-cache",
-    variables: { input: { orderUuid: orderId } },
-    onError: () => {},
-  });
-
-  const processOrder = async (paymentOrder: PaymentOrderType) => {
-    if (!paymentOrder) {
-      return;
-    }
-
-    const { reservationPk, status } = paymentOrder;
-
-    if (!reservationPk) {
-      setError(1);
-      return;
-    }
-
-    if (status !== "PAID") {
-      await refreshOrder({
-        variables: { input: { orderUuid: orderId } },
-      });
-    } else {
-      setOrder(paymentOrder);
-    }
-  };
-
-  useQuery<Query, QueryOrderArgs>(GET_ORDER, {
-    fetchPolicy: "no-cache",
-    variables: { orderUuid: orderId },
-    onCompleted: (data) => {
-      if (!data.order) {
-        setError(2);
-      }
-      processOrder(data.order);
-    },
-    onError: () => {},
-    skip: !orderId || isLoggedOut || isCheckingAuth,
-  });
-
-  const [getReservation] = useLazyQuery<Query, QueryReservationByPkArgs>(
-    GET_RESERVATION,
-    {
-      fetchPolicy: "no-cache",
-      onCompleted: (data) => {
-        if (data.reservationByPk?.pk) {
-          setReservation(data.reservationByPk);
-        } else {
-          setError(1);
-        }
-      },
-      onError: () => {
-        setError(1);
-      },
-    }
-  );
-
-  useEffect(() => {
-    if (refreshError && !refreshLoading) {
-      try {
-        const errors = refreshError.graphQLErrors;
-        switch (errors[0].extensions.error_code) {
-          case "EXTERNAL_SERVICE_ERROR":
-            if (refreshRetries < howManyTimeShouldWeRetryOrder) {
-              refreshReset();
-              refreshOrder({
-                variables: { input: { orderUuid: orderId } },
-              });
-              setRefreshRetries(refreshRetries + 1);
-            } else {
-              setError(1);
-            }
-            break;
-          default:
-        }
-      } catch (e) {
-        /* empty */
-      }
-    }
-  }, [
-    refreshData,
+  const {
+    order,
+    error: orderError,
     refreshError,
-    refreshReset,
-    refreshOrder,
-    refreshRetries,
-    setRefreshRetries,
-    refreshLoading,
-    orderId,
-  ]);
+    loading: orderLoading,
+    refresh,
+    called: orderCalled,
+  } = useOrder(orderId);
+
+  const {
+    reservation,
+    error: reservationError,
+    loading: reservationLoading,
+  } = useReservation(parseInt(order?.reservationPk, 10));
 
   useEffect(() => {
-    if (order?.reservationPk && !refreshLoading) {
-      getReservation({ variables: { pk: Number(order?.reservationPk) } });
+    if (order && !orderLoading) {
+      const { reservationPk, status } = order;
+      if (!reservationPk) {
+        setIsReservationInvalid(true);
+        return;
+      }
+
+      if (status !== "PAID") {
+        if (refreshRetries < howManyTimeShouldWeRetryOrder) {
+          setRefreshRetries(refreshRetries + 1);
+          refresh();
+        } else {
+          setIsReservationInvalid(true);
+        }
+      }
     }
-  }, [order, getReservation, refreshLoading]);
+  }, [order, refresh, refreshRetries, orderLoading]);
 
   useEffect(() => {
-    if (!reservation?.state || error) return;
+    if (refreshError && !orderLoading) {
+      const errors = refreshError.graphQLErrors;
+      if (errors[0].extensions.error_code === "EXTERNAL_SERVICE_ERROR") {
+        if (refreshRetries < howManyTimeShouldWeRetryOrder) {
+          const retries = refreshRetries + 1;
+          setRefreshRetries(retries);
+          refresh();
+        } else {
+          setIsReservationInvalid(true);
+        }
+      }
+    }
+  }, [refreshError, orderLoading, refreshRetries, refresh]);
+
+  const isOrderFetched = orderCalled && order && !orderError;
+  const isOrderValid = isOrderFetched && order?.status === "PAID";
+  const isReservationValid = !reservationError && !isReservationInvalid;
+
+  const readyToReport =
+    !isLoggedOut && !isCheckingAuth && !orderLoading && !reservationLoading;
+
+  useEffect(() => {
+    if (!reservation?.state || !isOrderValid || reservationError) return;
 
     const { state } = reservation;
 
@@ -195,10 +124,14 @@ const ReservationSuccess = () => {
       default:
         router.replace(`/reservation/confirmation/${reservation.pk}`);
     }
-  }, [orderId, reservation, router, error]);
+  }, [orderId, reservation, router, isOrderValid, reservationError]);
 
-  if (error && !isLoggedOut && !isCheckingAuth) {
-    return <ErrorWrapper error={error} />;
+  if (readyToReport && !isOrderFetched) {
+    return <ReservationFail type="order" />;
+  }
+
+  if (readyToReport && !isReservationValid) {
+    return <ReservationFail type="reservation" />;
   }
 
   return (

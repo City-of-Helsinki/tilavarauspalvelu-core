@@ -39,3 +39,9 @@ export function reservationInfoCard(): Cypress.Chainable<JQuery<HTMLElement>> {
 export function calendarLinkButton(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("[data-testid='reservation__button--calendar-link']");
 }
+
+export function receiptLinkButton(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(
+    "[data-testid='reservation__confirmation--button__receipt-link']"
+  );
+}

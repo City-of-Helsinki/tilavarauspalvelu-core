@@ -1619,9 +1619,12 @@ export type QueryApplicationEventsArgs = {
   application?: InputMaybe<Scalars["ID"]>;
   applicationRound?: InputMaybe<Scalars["ID"]>;
   applicationStatus?: InputMaybe<Scalars["String"]>;
+  appliedCountGte?: InputMaybe<Scalars["Decimal"]>;
+  appliedCountLte?: InputMaybe<Scalars["Decimal"]>;
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
+  name?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
@@ -1636,22 +1639,16 @@ export type QueryApplicationRoundsArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
-  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
-  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
-  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
 };
 
 export type QueryApplicationsArgs = {
   after?: InputMaybe<Scalars["String"]>;
   applicantType?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   applicationRound?: InputMaybe<Scalars["ID"]>;
+  appliedCountGte?: InputMaybe<Scalars["Decimal"]>;
+  appliedCountLte?: InputMaybe<Scalars["Decimal"]>;
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
@@ -2318,7 +2315,7 @@ export type ReservationConfirmMutationPayload = {
   freeOfChargeReason?: Maybe<Scalars["String"]>;
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
-  /** The non subsidised price of this reservation excluding VAT */
+  /** The non subsidised price of this reservation including VAT */
   nonSubsidisedPrice?: Maybe<Scalars["Decimal"]>;
   /** The non subsidised price of this reservation excluding VAT */
   nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]>;
@@ -2424,7 +2421,7 @@ export type ReservationCreateMutationPayload = {
   freeOfChargeReason?: Maybe<Scalars["String"]>;
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
-  /** The non subsidised price of this reservation excluding VAT */
+  /** The non subsidised price of this reservation including VAT */
   nonSubsidisedPrice?: Maybe<Scalars["Decimal"]>;
   /** The non subsidised price of this reservation excluding VAT */
   nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]>;
@@ -2813,7 +2810,7 @@ export type ReservationUnitByPkType = Node & {
   haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
   /** The ID of the object */
   id: Scalars["ID"];
-  images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
+  images: Array<ReservationUnitImageType>;
   /** Is reservation unit archived. */
   isArchived: Scalars["Boolean"];
   isDraft: Scalars["Boolean"];
@@ -3043,7 +3040,7 @@ export type ReservationUnitCreateMutationPayload = {
   descriptionSv?: Maybe<Scalars["String"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  /** Images of the reservation unit as nested related objects. */
+  /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   /** Is reservation unit archived */
   isArchived?: Maybe<Scalars["Boolean"]>;
@@ -3280,7 +3277,7 @@ export type ReservationUnitType = Node & {
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
   /** The ID of the object */
   id: Scalars["ID"];
-  images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
+  images: Array<ReservationUnitImageType>;
   /** Is reservation unit archived. */
   isArchived: Scalars["Boolean"];
   isDraft: Scalars["Boolean"];
@@ -3517,7 +3514,7 @@ export type ReservationUnitUpdateMutationPayload = {
   descriptionSv?: Maybe<Scalars["String"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  /** Images of the reservation unit as nested related objects. */
+  /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   /** Is reservation unit archived */
   isArchived?: Maybe<Scalars["Boolean"]>;
@@ -3739,7 +3736,7 @@ export type ReservationUpdateMutationPayload = {
   freeOfChargeReason?: Maybe<Scalars["String"]>;
   homeCityPk?: Maybe<Scalars["Int"]>;
   name?: Maybe<Scalars["String"]>;
-  /** The non subsidised price of this reservation excluding VAT */
+  /** The non subsidised price of this reservation including VAT */
   nonSubsidisedPrice?: Maybe<Scalars["Decimal"]>;
   /** The non subsidised price of this reservation excluding VAT */
   nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]>;

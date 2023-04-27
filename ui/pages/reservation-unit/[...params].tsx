@@ -384,11 +384,11 @@ const ReservationUnitReservation = ({
         reservationConfirmSuccess();
       } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
-        const { checkoutUrl, receiptUrl } = order ?? {};
+        const { checkoutUrl } = order ?? {};
         const { origin, pathname, searchParams } = new URL(checkoutUrl) || {};
         const userId = searchParams?.get("user");
 
-        if (checkoutUrl && receiptUrl && userId && origin && pathname) {
+        if (checkoutUrl && userId && origin && pathname) {
           const baseUrl = `${origin}${pathname}`;
           router.push(
             `${baseUrl}/paymentmethod?user=${userId}&lang=${i18n.language}`

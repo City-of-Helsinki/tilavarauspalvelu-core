@@ -1,10 +1,8 @@
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
-  PaymentOrderType,
   Query,
-  QueryOrderArgs,
   QueryReservationByPkArgs,
   ReservationType,
 } from "common/types/gql-types";
@@ -12,17 +10,15 @@ import { LoadingSpinner } from "hds-react";
 import { get } from "lodash";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import Container from "../../../components/common/Container";
 import ReservationConfirmation from "../../../components/reservation/ReservationConfirmation";
 import ReservationInfoCard from "../../../components/reservation/ReservationInfoCard";
 import { Paragraph } from "../../../components/reservation/styles";
-import {
-  GET_ORDER,
-  GET_RESERVATION,
-} from "../../../modules/queries/reservation";
+import { GET_RESERVATION } from "../../../modules/queries/reservation";
+import { useOrder } from "../../../hooks/reservation";
 
 type Props = {
   reservationPk: number;
@@ -68,40 +64,6 @@ const Columns = styled.div`
     grid-template-columns: 1fr 378px;
   }
 `;
-
-const useOrder = (
-  orderUuid: string
-): { order: PaymentOrderType | null; error: boolean; loading: boolean } => {
-  const [error, setError] = useState<boolean>(false);
-  const [order, setOrder] = useState<PaymentOrderType>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const [getOrder] = useLazyQuery<Query, QueryOrderArgs>(GET_ORDER, {
-    fetchPolicy: "no-cache",
-    onCompleted: (data) => {
-      if (!data.order) {
-        setError(true);
-        setLoading(false);
-        return;
-      }
-      setOrder(data.order);
-      setLoading(false);
-    },
-    onError: () => {
-      setError(true);
-      setLoading(false);
-    },
-  });
-
-  useEffect(() => {
-    if (orderUuid) {
-      setLoading(true);
-      getOrder({ variables: { orderUuid } });
-    }
-  }, [getOrder, orderUuid]);
-
-  return { order, error, loading };
-};
 
 const ReservationSuccess = ({ reservationPk }: Props) => {
   const { t } = useTranslation();
