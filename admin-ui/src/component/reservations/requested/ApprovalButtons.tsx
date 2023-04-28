@@ -51,7 +51,7 @@ const ApprovalButtons = ({
   const handleDenyClick = () => {
     setModalContent(
       <DenyDialog
-        reservation={reservation}
+        reservations={[reservation]}
         onReject={handleAccept}
         onClose={handleClose}
       />,

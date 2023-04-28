@@ -5,14 +5,12 @@ import { Query, ReservationUnitType } from "common/types/gql-types";
 import { OptionType } from "../../common/types";
 import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
 import { RESERVATION_UNITS_QUERY } from "./queries";
+import { GQL_MAX_RESULTS_PER_QUERY } from "../../common/const";
 
 type Props = {
   onChange: (reservationUnits: OptionType[]) => void;
   value: OptionType[];
 };
-
-// Doing repeated GQL requests because the backend (or Apollo) limits us to 100 results per query
-const LIMIT = 100;
 
 const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -20,7 +18,7 @@ const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
 
   // TODO this request is rerun whenever the selection changes (it'll return 0 every time)
   const { loading } = useQuery<Query>(RESERVATION_UNITS_QUERY, {
-    variables: { offset: resUnits.length, count: LIMIT },
+    variables: { offset: resUnits.length, count: GQL_MAX_RESULTS_PER_QUERY },
     onCompleted: (data) => {
       const qd = data?.reservationUnits;
       if (qd?.edges.length != null && qd?.totalCount && qd?.edges.length > 0) {

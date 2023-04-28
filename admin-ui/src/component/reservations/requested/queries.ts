@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { ReservationsReservationStateChoices } from "common/types/gql-types";
 
 export const UPDATE_WORKING_MEMO = gql`
   mutation updateWorkingMemo($input: ReservationWorkingMemoMutationInput!) {
@@ -108,33 +107,11 @@ export const RESERVATION_QUERY = gql`
   }
 `;
 
-export const RECURRING_RESERVATION_QUERY = gql`
-  query recurringReservation($pk: ID!, $offset: Int, $count: Int) {
-    reservations(
-      offset: $offset
-      recurringReservation: $pk
-      state: ["${ReservationsReservationStateChoices.Confirmed}", "${ReservationsReservationStateChoices.Denied}"]
-      first: $count
-    ) {
-      edges {
-        node {
-          pk
-          begin
-          end
-          state
-          recurringReservation {
-            pk
-          }
-        }
-      }
-      totalCount
-    }
-  }
-`;
-
 export const APPROVE_RESERVATION = gql`
   mutation approveReservation($input: ReservationApproveMutationInput!) {
     approveReservation(input: $input) {
+      pk
+      state
       errors {
         field
         messages
@@ -146,6 +123,8 @@ export const APPROVE_RESERVATION = gql`
 export const DENY_RESERVATION = gql`
   mutation denyReservation($input: ReservationDenyMutationInput!) {
     denyReservation(input: $input) {
+      pk
+      state
       errors {
         field
         messages
@@ -157,6 +136,8 @@ export const DENY_RESERVATION = gql`
 export const REQUIRE_HANDLING_RESERVATION = gql`
   mutation requireHandling($input: ReservationRequiresHandlingMutationInput!) {
     requireHandlingForReservation(input: $input) {
+      pk
+      state
       errors {
         field
         messages

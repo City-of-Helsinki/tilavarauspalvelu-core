@@ -1,99 +1,147 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Button, Dialog, TextArea } from "hds-react";
+import { GraphQLError } from "graphql";
+import { z } from "zod";
 import {
   Mutation,
-  Query,
-  QueryReservationDenyReasonsArgs,
   ReservationDenyMutationInput,
-  ReservationDenyReasonType,
   ReservationType,
+  ReservationTypeConnection,
+  ReservationsReservationStateChoices,
 } from "common/types/gql-types";
 import { useModal } from "../../../context/ModalContext";
-import { DENY_RESERVATION, RESERVATION_DENY_REASONS } from "./queries";
+import { DENY_RESERVATION } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import Select from "../../ReservationUnits/ReservationUnitEditor/Select";
-import { OptionType } from "../../../common/types";
 import { VerticalFlex } from "../../../styles/layout";
 import { CustomDialogHeader } from "../../CustomDialogHeader";
+import { useDenyReasonOptions } from "./hooks";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
 
 const DialogContent = ({
-  reservation,
+  reservations,
   onClose,
   onReject,
 }: {
-  reservation: ReservationType;
+  reservations: ReservationType[];
   onClose: () => void;
   onReject: () => void;
 }) => {
-  const [denyReservationMutation] = useMutation<Mutation>(DENY_RESERVATION);
+  const [denyReservationMutation] = useMutation<Mutation>(DENY_RESERVATION, {
+    update(cache, { data }) {
+      // Manually update the cache instead of invalidating the whole query
+      // because we can't invalidate single elements in the recurring list.
+      // For a single reservation doing a query invalidation is fine
+      // but doing that to a list of 2000 reservations when a single one of them gets
+      // denied would cause 5s delay and full rerender of the list on every button press.
+      cache.modify({
+        fields: {
+          // find the pk => slice the array => replace the state variable in the slice
+          reservations(existing: ReservationTypeConnection) {
+            const queryRes = data?.denyReservation;
+            if (queryRes?.errors) {
+              // eslint-disable-next-line no-console
+              console.error(
+                "NOT updating cache: mutation failed with: ",
+                queryRes?.errors
+              );
+            } else if (!queryRes?.errors && !queryRes?.pk) {
+              // eslint-disable-next-line no-console
+              console.error(
+                "NOT updating cache: mutation success but PK missing"
+              );
+            } else {
+              const { state, pk } = queryRes;
+              const fid = existing.edges.findIndex((x) => x?.node?.pk === pk);
+              if (fid > -1) {
+                const cpy = structuredClone(existing.edges[fid]);
+                if (cpy?.node && state) {
+                  // State === ReservationsReservationStateChoices: are the exact same enum
+                  // but Typescript complains about them so use zod just in case.
+                  const val = z
+                    .nativeEnum(ReservationsReservationStateChoices)
+                    .parse(state.valueOf());
+                  cpy.node.state = val;
+                }
+                return {
+                  ...existing,
+                  edges: [
+                    ...existing.edges.slice(0, fid),
+                    cpy,
+                    ...existing.edges.slice(fid + 1),
+                  ],
+                };
+              }
+            }
+            return existing;
+          },
+        },
+      });
+    },
+  });
 
   const denyReservation = (input: ReservationDenyMutationInput) =>
     denyReservationMutation({ variables: { input } });
 
   const [handlingDetails, setHandlingDetails] = useState<string>(
-    reservation.workingMemo || ""
+    reservations.length === 1 ? reservations[0].workingMemo ?? "" : ""
   );
   const [denyReasonPk, setDenyReason] = useState<number | null>(null);
-  const [denyReasonOptions, setDenyReasonOptions] = useState<OptionType[]>([]);
+  const [inProgress, setInProgress] = useState(false);
   const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
 
-  const { loading } = useQuery<Query, QueryReservationDenyReasonsArgs>(
-    RESERVATION_DENY_REASONS,
-    {
-      onCompleted: ({ reservationDenyReasons }) => {
-        if (reservationDenyReasons) {
-          setDenyReasonOptions(
-            reservationDenyReasons.edges
-              .map((x) => x?.node)
-              .filter((x): x is ReservationDenyReasonType => x != null)
-              .map(
-                (dr): OptionType => ({
-                  value: dr?.pk ?? 0,
-                  label: dr?.reasonFi ?? "",
-                })
-              )
-          );
-        }
-      },
-      onError: () => {
-        notifyError(t("RequestedReservation.errorFetchingData"));
-      },
-    }
-  );
+  const { options, loading } = useDenyReasonOptions();
 
   const handleDeny = async () => {
     try {
       if (denyReasonPk == null) {
         throw new Error("Deny PK undefined");
       }
-      const res = await denyReservation({
-        pk: reservation.pk,
-        denyReasonPk,
-        handlingDetails,
-      });
 
-      if (res.errors) {
+      setInProgress(true);
+      const denyPromises = reservations.map((x) =>
+        denyReservation({
+          pk: x.pk,
+          denyReasonPk,
+          handlingDetails,
+        })
+      );
+
+      const res = await Promise.all(denyPromises);
+
+      const errors = res
+        .map((x) => x.errors)
+        .filter((x): x is GraphQLError[] => x != null);
+
+      if (errors.length !== 0) {
+        // eslint-disable-next-line no-console
+        console.error("Deny failed with: ", errors);
         notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
       } else {
-        notifySuccess(t("RequestedReservation.DenyDialog.denied"));
+        notifySuccess(t("RequestedReservation.DenyDialog.successNotify"));
         onReject();
       }
     } catch (e) {
       notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
+    } finally {
+      setInProgress(false);
     }
   };
 
-  if (loading) {
-    return <Loader />;
+  if (loading || inProgress) {
+    return (
+      <Dialog.Content>
+        <Loader />
+      </Dialog.Content>
+    );
   }
 
   return (
@@ -103,7 +151,7 @@ const DialogContent = ({
           <Select
             required
             id="denyReason"
-            options={denyReasonOptions}
+            options={options}
             placeholder={t("common.select")}
             label={t("RequestedReservation.DenyDialog.denyReason")}
             onChange={(v) => setDenyReason(Number(v))}
@@ -134,13 +182,15 @@ const DialogContent = ({
 };
 
 const DenyDialog = ({
-  reservation,
+  reservations,
   onClose,
   onReject,
+  title,
 }: {
-  reservation: ReservationType;
+  reservations: ReservationType[];
   onClose: () => void;
   onReject: () => void;
+  title?: string;
 }): JSX.Element => {
   const { isOpen } = useModal();
   const { t } = useTranslation();
@@ -155,11 +205,11 @@ const DenyDialog = ({
       <VerticalFlex>
         <CustomDialogHeader
           id="modal-header"
-          title={t("RequestedReservation.DenyDialog.title")}
+          title={title ?? t("RequestedReservation.DenyDialog.title")}
           close={onClose}
         />
         <DialogContent
-          reservation={reservation}
+          reservations={reservations}
           onReject={onReject}
           onClose={onClose}
         />

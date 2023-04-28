@@ -28,3 +28,8 @@ export const LIST_PAGE_SIZE = 20;
 export const ALLOCATION_CALENDAR_TIMES = [7, 23];
 
 export const NUMBER_OF_DECIMALS = 6;
+
+export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
+
+// This is a backend (or library) limit based on testing
+export const GQL_MAX_RESULTS_PER_QUERY = 100;

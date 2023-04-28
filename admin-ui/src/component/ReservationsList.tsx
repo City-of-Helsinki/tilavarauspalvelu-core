@@ -2,6 +2,7 @@ import React from "react";
 import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { Button } from "hds-react";
 
 type NewReservationListItem = {
   date: Date;
@@ -17,6 +18,8 @@ type Props = {
   header?: React.ReactNode;
   items: NewReservationListItem[];
   hasPadding?: boolean;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
 };
 
 // In the UI spec parent container max height is 22rem, but overflow forces us to define child max-height
@@ -64,10 +67,22 @@ const ErrorLabel = styled.div`
   }
 `;
 
+const CenterContent = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+`;
+
 const stripTimeZeros = (time: string) =>
   time.substring(0, 1) === "0" ? time.substring(1) : time;
 
-const ReservationList = ({ header, items, hasPadding }: Props) => {
+const ReservationList = ({
+  header,
+  items,
+  hasPadding,
+  onLoadMore,
+  hasMore,
+}: Props) => {
   const { t } = useTranslation();
 
   if (!items.length) return null;
@@ -106,6 +121,18 @@ const ReservationList = ({ header, items, hasPadding }: Props) => {
             {item.buttons}
           </StyledListItem>
         ))}
+        {hasMore && onLoadMore && (
+          <CenterContent>
+            <Button
+              variant="secondary"
+              size="small"
+              type="button"
+              onClick={onLoadMore}
+            >
+              {t("common.showMore")}
+            </Button>
+          </CenterContent>
+        )}
       </StyledList>
     </ListWrapper>
   );

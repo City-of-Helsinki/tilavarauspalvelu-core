@@ -7,7 +7,8 @@ import {
 import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
-import { set } from "lodash";
+import { set, uniqBy } from "lodash";
+import { ReservationTypeConnection } from "common/types/gql-types";
 
 import { getApiAccessToken, updateApiAccessToken } from "./auth/util";
 import { apiBaseUrl } from "./const";
@@ -72,7 +73,52 @@ const errorLink = onError(({ graphQLErrors, operation, forward }) => {
 });
 
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          reservations: {
+            // Separate caches for all query params
+            // causes a full refetch when anything changes which is bad (e.g. sorting)
+            // but otherwise we get weird UI behaviour: "Load more" button loads
+            // new elements into positions 20 - 40 while it's own position is after 200+ list elements
+            // primary usecase is that recurringReservation loading 2000 reservations needs to be cached
+            // added benefit is that it allows fast swapping between the same query param values
+            keyArgs: [
+              "recurringReservation",
+              "unit",
+              "state",
+              "orderBy",
+              "reservationUnitType",
+              "reservationUnit",
+              "textSearch",
+              "begin",
+              "end",
+              "priceGte",
+              "priceLte",
+              "orderStatus",
+            ],
+            read(existing: ReservationTypeConnection) {
+              return existing;
+            },
+            merge(
+              existing: ReservationTypeConnection,
+              incoming: ReservationTypeConnection
+            ) {
+              // TODO this should be optimized using both spread and uniqBy creates a lot of copies
+              return {
+                ...incoming,
+                edges: uniqBy(
+                  [...(existing?.edges ?? []), ...incoming.edges],
+                  (x) => x?.node?.pk
+                ),
+              };
+            },
+          },
+        },
+      },
+    },
+  }),
   link: ApolloLink.from([errorLink, authLink, terminatingLink]),
 });
 
