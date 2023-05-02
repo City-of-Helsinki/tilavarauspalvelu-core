@@ -1,0 +1,18 @@
+${salutation},
+
+${staffReservationMade}: {{name}}
+${unit}: {{unit_name}}, {{unit_location}}
+
+${reserveeName}: {{reservee_name}}
+${reservationNumber}: {{reservation_number}}
+
+${reservationBegins}: {{begin_date}} ${oClock} {{begin_time}}
+${reservationEnds}: {{end_date}} ${oClock} {{end_time}}
+
+${staffCheckDetailsMade}:
+${handleReservationsUrl}{{reservation_number}}
+
+${withRegards}
+${serviceName}
+
+${automaticMessage}

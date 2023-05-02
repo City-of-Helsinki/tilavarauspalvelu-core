@@ -1,6 +1,6 @@
 ${salutation} {{reservee_name}},
 
-${reservationPending}
+${reservationMadePreliminary}
 
 {{reservation_unit}}
 {{unit_name}}
@@ -20,6 +20,8 @@ ${reservationPrice}: 0 €
 {% endif %}
 ${reservationNumber}: {{reservation_number}}
 
+${pendingNotification}
+
 ${reservationInstruction}
 {{pending_instructions}}
 
@@ -29,6 +31,6 @@ ${thankYouForUsing}
 ${withRegards}
 ${serviceName}
 
-${automaticMessage}
-${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${automaticMessage} ${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+
 ${reserveCityResourcesAt} {{varaamo_ext_link}}

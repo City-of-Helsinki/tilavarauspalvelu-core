@@ -1,9 +1,9 @@
 ${salutation} {{reservee_name}},
 
 {% if price < non_subsidised_price %}
-${reservationSubsidized}
+${reservationHandledSubsidized}
 {% else %}
-${reservationConfirmed}
+${reservationHandledConfirmed}
 {% endif %}
 
 {{reservation_unit}}
@@ -29,6 +29,6 @@ ${thankYouForUsing}
 ${withRegards}
 ${serviceName}
 
-${automaticMessage}
-${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${automaticMessage} ${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+
 ${reserveCityResourcesAt} {{varaamo_ext_link}}

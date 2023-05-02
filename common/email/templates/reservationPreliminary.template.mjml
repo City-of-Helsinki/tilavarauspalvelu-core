@@ -2,12 +2,13 @@
   <mj-head>
     <mj-include path="partials/base.css" type="css" />
     <mj-include path="partials/attributes.mjml" />
+    <mj-title>${subjectPreliminary}</mj-title>
   </mj-head>
   <mj-body>
     <mj-include path="partials/header.mjml" />
     <mj-section background-color="#F7F2E4">
       <mj-column>
-        <mj-text>${reservationPending}</mj-text>
+        <mj-text>${reservationMadePreliminary}</mj-text>
         <mj-spacer />
         <mj-text><b>{{reservation_unit}}</b></mj-text>
         <mj-text>{{unit_name}}</mj-text>
@@ -50,6 +51,8 @@
     </mj-section>
     <mj-section padding-bottom="0">
       <mj-column>
+        <mj-text font-size="16px">${pendingNotification}</mj-text>
+        <mj-spacer />
         <mj-text>
           <h2>${reservationInstruction}</h2>
         </mj-text>

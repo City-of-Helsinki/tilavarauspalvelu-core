@@ -25,6 +25,6 @@ ${thankYouForUsing}
 ${withRegards}
 ${serviceName}
 
-${automaticMessage}
-${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${automaticMessage} ${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+
 ${reserveCityResourcesAt} {{varaamo_ext_link}}

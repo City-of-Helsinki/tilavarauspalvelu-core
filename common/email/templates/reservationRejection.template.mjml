@@ -2,6 +2,7 @@
   <mj-head>
     <mj-include path="partials/base.css" type="css" />
     <mj-include path="partials/attributes.mjml" />
+    <mj-title>${subjectRejected}</mj-title>
   </mj-head>
   <mj-body>
     <mj-include path="partials/header.mjml" />

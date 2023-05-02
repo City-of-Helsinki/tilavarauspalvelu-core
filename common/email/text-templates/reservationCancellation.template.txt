@@ -1,6 +1,7 @@
 ${salutation} {{reservee_name}},
 
-${reservationCancelled} ${cancellationReason}: {{cancel_reason}}
+${reservationCancelled}
+${cancellationReason}: {{cancel_reason}}
 
 {{reservation_unit}}
 {{unit_name}}
@@ -19,10 +20,9 @@ ${reservationNumber}: {{reservation_number}}
 ${cancellationInstructions}
 {{cancelled_instructions}}
 
-${thankYouForUsing}
 ${withRegards}
 ${serviceName}
 
-${automaticMessage}
-${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${automaticMessage} ${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+
 ${reserveCityResourcesAt} {{varaamo_ext_link}}

@@ -2,12 +2,14 @@
   <mj-head>
     <mj-include path="partials/base.css" type="css" />
     <mj-include path="partials/attributes.mjml" />
+    <mj-title>${subjectCancelled}</mj-title>
   </mj-head>
   <mj-body>
     <mj-include path="partials/header.mjml" />
     <mj-section background-color="#F7F2E4">
       <mj-column>
-        <mj-text>${reservationCancelled} ${cancellationReason}: {{cancel_reason}}</mj-text>
+        <mj-text>${reservationCancelled}</mj-text>
+        <mj-text>${cancellationReason}: {{cancel_reason}}</mj-text>
         <mj-spacer />
         <mj-text><b>{{reservation_unit}}</b></mj-text>
         <mj-text>{{unit_name}}</mj-text>
@@ -48,7 +50,17 @@
         <mj-text font-size="16px">{{cancelled_instructions}}</mj-text>
       </mj-column>
     </mj-section>
-    <mj-include path="partials/closing.mjml" />
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="16px">${withRegards}</mj-text>
+        <mj-text font-size="16px">${serviceName}</mj-text>
+        <mj-spacer />
+        <mj-text font-size="16px">${automaticMessage}</mj-text>
+        <mj-text font-size="16px">${sendUs} <a href={{feedback_ext_link}}>${feedbackOnService}</a>.</mj-text>
+        <mj-text font-size="16px">${reserveCityResourcesAt} <a href={{varaamo_ext_link}}>${serviceUrl}</a>.</mj-text>
+        <mj-spacer height="50px" />
+      </mj-column>
+    </mj-section>
     <mj-include path="partials/footer.mjml" />
   </mj-body>
 </mjml>

@@ -2,12 +2,13 @@
   <mj-head>
     <mj-include path="partials/base.css" type="css" />
     <mj-include path="partials/attributes.mjml" />
+    <mj-title>${subjectConfirmed}</mj-title>
   </mj-head>
   <mj-body>
     <mj-include path="partials/header.mjml" />
     <mj-section background-color="#F7F2E4">
       <mj-column>
-        <mj-text>${reservationCompleted}</mj-text>
+        <mj-text>${reservationMadeConfirmed}</mj-text>
         <mj-spacer />
         <mj-text><b>{{reservation_unit}}</b></mj-text>
         <mj-text>{{unit_name}}</mj-text>

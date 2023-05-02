@@ -1,6 +1,6 @@
 ${salutation} {{reservee_name}},
 
-${reservationCompleted}
+${reservationMadeConfirmed}
 
 {{reservation_unit}}
 {{unit_name}}
@@ -25,6 +25,6 @@ ${thankYouForUsing}
 ${withRegards}
 ${serviceName}
 
-${automaticMessage}
-${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${automaticMessage} ${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+
 ${reserveCityResourcesAt} {{varaamo_ext_link}}
