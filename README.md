@@ -18,7 +18,7 @@ docker-compose up backend
 ```
 
 
-This will start the service and also runs the database in a separate docker container.
+This will start the service and also runs the database and Redis cache in a separate docker containers.
 ## Requirements
 
 Workflow with requirements is as follows.
@@ -54,6 +54,13 @@ To remove a dependency, remove it from requirements.in, run pip-compile and then
 ### Database requirements
 
 Postgresql 11 database with postgis extension. Find postgis installation instructions [here](https://postgis.net/install/).
+
+### Cache requirements
+
+Redis 7 is required to run the service. The easiest way to run it locally is to use docker-compose with `docker-compose up backend`. You can also start Redis separately and let in run in the backround with `docker-compose up -d redis`.
+
+For local installation and command line tools check
+[Installing Redis](https://redis.io/docs/getting-started/installation/).
 
 ### Installation issues on Mac
 
@@ -94,6 +101,9 @@ If a build fails, remove the failed `dev` docker container and all intermediary 
 # Running tests and formatting
 
 Tests are run with pytest. Use `pytest` to run all tests. Use `pytest -W default` to show third party warnings ignored in `pytest.ini`.
+
+Running tests locally requires that database and Redis cache are up and running. You can start them with
+`docker-compose up -d db redis`.
 
 To run static code checks and tests with coverage:
 

@@ -67,6 +67,15 @@ jobs:
           SECRET_KEY: build_secret
         ports:
           - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@v3
         with:
@@ -77,6 +86,7 @@ jobs:
           pytest --cov=./ --cov-report=xml --cov-branch
         env:
           DATABASE_URL: postgis://tvp:tvp@localhost/tvp
+          CACHE_LOCATION: redis://localhost:6379/0
           DEBUG: true
           SECRET_KEY: build_secret
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
