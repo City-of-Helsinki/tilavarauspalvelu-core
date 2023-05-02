@@ -635,6 +635,7 @@ elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER"):
                 "CLIENT_CLASS": "django_redis.client.SentinelClient",
                 "SENTINELS": [(sentinel_host, sentinel_port)],
                 "SENTINEL_KWARGS": {"password": env("REDIS_PASSWORD")},
+                "PASSWORD": env("REDIS_PASSWORD"),
             },
         }
     }
