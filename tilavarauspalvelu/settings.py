@@ -624,6 +624,8 @@ if env("REDIS_URL"):
 # Configure Redis cache for production OpenShift environment
 elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER"):
     sentinel_host, sentinel_port = env("REDIS_SENTINEL_SERVICE").split(":")
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
     CACHES = {
         "default": {
