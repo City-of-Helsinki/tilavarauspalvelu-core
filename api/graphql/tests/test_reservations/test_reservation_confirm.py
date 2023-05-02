@@ -387,6 +387,35 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             STATE_CHOICES.WAITING_FOR_PAYMENT
         )
 
+    @patch(
+        "api.graphql.reservations.reservation_serializers.confirm_serializers.create_verkkokauppa_order"
+    )
+    def test_confirm_reservation_does_not_save_when_api_call_fails(
+        self, mock_create_vk_order, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        mock_create_vk_order.side_effect = Exception("Test exception")
+
+        self.client.force_login(self.regular_joe)
+
+        self.reservation_unit.payment_types.add(PaymentType.INVOICE)
+
+        input_data = self.get_valid_confirm_data()
+        input_data["paymentType"] = PaymentType.INVOICE
+
+        response = self.query(self.get_confirm_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")[0]["message"]).is_equal_to("Test exception")
+
+        assert_that(mock_create_vk_order.called).is_true()
+
+        local_order = PaymentOrder.objects.first()
+        assert_that(local_order).is_none()
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+
     def test_confirm_reservation_does_not_allow_unsupported_payment_type(
         self, mock_periods, mock_opening_hours
     ):
