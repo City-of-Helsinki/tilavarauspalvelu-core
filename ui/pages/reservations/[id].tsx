@@ -9,6 +9,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { H2, H4 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { signIn, useSession } from "next-auth/react";
 import {
   Query,
   QueryReservationByPkArgs,
@@ -50,6 +51,7 @@ import ReservationStatus from "../../components/reservation/ReservationStatus";
 import Address from "../../components/reservation-unit/Address";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import ReservationOrderStatus from "../../components/reservation/ReservationOrderStatus";
+import { authEnabled, authenticationIssuer } from "../../modules/const";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -239,6 +241,18 @@ const Terms = styled.div`
 
 const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
+  const session = useSession();
+
+  const isUserUnauthenticated =
+    authEnabled && session?.status === "unauthenticated";
+
+  useEffect(() => {
+    if (isUserUnauthenticated) {
+      signIn(authenticationIssuer, {
+        callbackUrl: window.location.href,
+      });
+    }
+  }, [isUserUnauthenticated]);
 
   const [reservation, setReservation] = useState<ReservationType>(null);
   const [order, setOrder] = useState<PaymentOrderType>(null);
@@ -395,6 +409,8 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
         return null;
     }
   }, [reservation]);
+
+  if (isUserUnauthenticated) return null;
 
   if (error) {
     return (

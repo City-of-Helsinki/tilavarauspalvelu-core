@@ -4,6 +4,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation, TFunction } from "next-i18next";
+import { signIn, useSession } from "next-auth/react";
 import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
 import { ReducedApplicationStatus } from "common/types/common";
@@ -22,6 +23,7 @@ import { APPLICATIONS } from "../modules/queries/application";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { getReducedApplicationStatus } from "../modules/util";
 import { CURRENT_USER } from "../modules/queries/user";
+import { authEnabled, authenticationIssuer } from "../modules/const";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
@@ -78,6 +80,18 @@ const ApplicationGroups = ({
 
 const ApplicationsPage = (): JSX.Element => {
   const { t } = useTranslation();
+  const session = useSession();
+
+  const isUserUnauthenticated =
+    authEnabled && session?.status === "unauthenticated";
+
+  useEffect(() => {
+    if (isUserUnauthenticated) {
+      signIn(authenticationIssuer, {
+        callbackUrl: window.location.href,
+      });
+    }
+  }, [isUserUnauthenticated]);
 
   const [state, setState] = useState<"loading" | "error" | "done">("loading");
   const [cancelled, setCancelled] = useState(false);
@@ -164,6 +178,8 @@ const ApplicationsPage = (): JSX.Element => {
       default:
     }
   };
+
+  if (isUserUnauthenticated) return null;
 
   return (
     <>

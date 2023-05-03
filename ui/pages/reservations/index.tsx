@@ -8,6 +8,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { fontMedium } from "common/src/common/typography";
+import { signIn, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
 import {
   Query,
@@ -22,6 +23,7 @@ import Head from "../../components/reservations/Head";
 import { CenterSpinner } from "../../components/common/common";
 import { CURRENT_USER } from "../../modules/queries/user";
 import { Toast } from "../../styles/util";
+import { authEnabled, authenticationIssuer } from "../../modules/const";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -76,10 +78,23 @@ const EmptyMessage = styled.div`
 
 const Reservations = (): JSX.Element => {
   const router = useRouter();
+  const session = useSession();
+
   const { error: routerError } = router.query;
 
   const [error, setError] = useState(false);
   const { t } = useTranslation();
+
+  const isUserUnauthenticated =
+    authEnabled && session?.status === "unauthenticated";
+
+  useEffect(() => {
+    if (isUserUnauthenticated) {
+      signIn(authenticationIssuer, {
+        callbackUrl: window.location.href,
+      });
+    }
+  }, [isUserUnauthenticated]);
 
   const [upcomingReservations, setUpcomingReservations] = useState<
     ReservationType[]
@@ -151,6 +166,8 @@ const Reservations = (): JSX.Element => {
       setError(true);
     }
   }, [userData, reservationError]);
+
+  if (isUserUnauthenticated) return null;
 
   return (
     <>
