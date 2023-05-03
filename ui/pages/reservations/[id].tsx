@@ -54,7 +54,11 @@ import ReservationStatus from "../../components/reservation/ReservationStatus";
 import Address from "../../components/reservation-unit/Address";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import ReservationOrderStatus from "../../components/reservation/ReservationOrderStatus";
-import { reservationUnitPath, authEnabled, authenticationIssuer } from "../../modules/const";
+import {
+  reservationUnitPath,
+  authEnabled,
+  authenticationIssuer,
+} from "../../modules/const";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
