@@ -3,5 +3,7 @@
   "selectAll": "Välj alla",
   "inputPlaceholder": "Skriv sökord",
   "invalidEmail": "Ogiltig e-postadress",
-  "requiredField": "Obligatorisk"
+  "requiredField": "Obligatorisk",
+  "min": "Värdet är för litet",
+  "max": "Värdet är för stort"
 }

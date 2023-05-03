@@ -3,5 +3,7 @@
   "selectAll": "Select all",
   "inputPlaceholder": "Search",
   "invalidEmail": "Invalid e-mail",
-  "requiredField": "Required field"
+  "requiredField": "Required field",
+  "min": "Value is too small",
+  "max": "Value is too big"
 }

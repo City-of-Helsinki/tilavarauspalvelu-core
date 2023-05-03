@@ -3,5 +3,7 @@
   "selectAll": "Valitse kaikki",
   "inputPlaceholder": "Kirjoita hakusana",
   "invalidEmail": "Virheellinen sähköpostiosoite",
-  "requiredField": "Kenttä on pakollinen"
+  "requiredField": "Kenttä on pakollinen",
+  "min": "Arvo on liian pieni",
+  "max": "Arvo on liian suuri"
 }

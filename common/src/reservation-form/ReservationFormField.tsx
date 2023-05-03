@@ -214,6 +214,17 @@ const ReservationFormField = ({
     message: "email",
   };
 
+  const minValue =
+    get(params, field)?.min != null && !Number.isNaN(get(params, field).min)
+      ? Number(get(params, field)?.min)
+      : 1;
+  const maxValue =
+    get(params, field)?.max != null && !Number.isNaN(get(params, field).max)
+      ? Number(get(params, field)?.max) < 200
+        ? Number(get(params, field)?.max)
+        : 200
+      : undefined;
+
   return Object.keys(options).includes(field) ? (
     <Controller
       name={field}
@@ -291,27 +302,24 @@ const ReservationFormField = ({
       {...register(field, {
         valueAsNumber: true,
         required,
-        ...(required && {
-          min: 1,
-        }),
+        min: minValue,
+        max: maxValue,
       })}
       key={field}
-      errorText={errorText}
+      errorText={
+        error?.type === "min"
+          ? t("forms:min")
+          : error?.type === "max"
+          ? t("forms:max")
+          : errorText
+      }
       invalid={!!error}
       required={required}
       step={1}
       minusStepButtonAriaLabel={t("common:decrease") || "Decrease"}
       plusStepButtonAriaLabel={t("common:increase") || "Increase"}
-      min={
-        get(params, field)?.min != null && !Number.isNaN(get(params, field).min)
-          ? Number(get(params, field)?.min)
-          : undefined
-      }
-      max={
-        get(params, field)?.max != null && !Number.isNaN(get(params, field).max)
-          ? Number(get(params, field)?.max)
-          : undefined
-      }
+      min={minValue}
+      max={maxValue}
     />
   ) : isTextArea ? (
     <StyledTextArea
