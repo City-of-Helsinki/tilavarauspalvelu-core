@@ -185,10 +185,33 @@ const deleteReservation = graphql.mutation<
   { deleteReservation: ReservationDeleteMutationPayload },
   { input: ReservationDeleteMutationInput }
 >("deleteReservation", (req, res, ctx) => {
+  const { pk } = req.variables.input;
+  let deleted: boolean;
+  switch (pk) {
+    case 3333:
+      deleted = false;
+      break;
+    default:
+      deleted = true;
+  }
+
+  if (pk === 6666) {
+    return res(
+      ctx.errors([
+        {
+          message: "No Reservation matches the given query.",
+          extensions: {
+            error_code: "OOPS",
+          },
+        },
+      ])
+    );
+  }
+
   return res(
     ctx.data({
       deleteReservation: {
-        deleted: true,
+        deleted,
       },
     })
   );

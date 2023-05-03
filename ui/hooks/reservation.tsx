@@ -7,9 +7,12 @@ import {
   QueryReservationByPkArgs,
   RefreshOrderMutationInput,
   RefreshOrderMutationPayload,
+  ReservationDeleteMutationInput,
+  ReservationDeleteMutationPayload,
   ReservationType,
 } from "common/types/gql-types";
 import {
+  DELETE_RESERVATION,
   GET_ORDER,
   GET_RESERVATION,
   REFRESH_ORDER,
@@ -23,10 +26,17 @@ export const useOrder = (
   refreshError: ApolloError;
   loading: boolean;
   refresh: () => void;
+  deleteReservation: (
+    arg: Record<"variables", Record<"input", Record<"pk", number>>>
+  ) => void;
+  deleteError: ApolloError;
+  deleteLoading: boolean;
   called: boolean;
+  deleted: boolean;
 } => {
   const [data, setData] = useState<PaymentOrderType | null>(null);
   const [called, setCalled] = useState(false);
+  const [deleted, setDeleted] = useState(false);
 
   const { error, loading: orderLoading } = useQuery<Query, QueryOrderArgs>(
     GET_ORDER,
@@ -57,13 +67,31 @@ export const useOrder = (
       onError: () => {},
     });
 
+  const [deleteReservation, { error: deleteError, loading: deleteLoading }] =
+    useMutation<
+      { deleteReservation: ReservationDeleteMutationPayload },
+      { input: ReservationDeleteMutationInput }
+    >(DELETE_RESERVATION, {
+      fetchPolicy: "no-cache",
+      onCompleted: (res) => {
+        if (res.deleteReservation.deleted) {
+          setDeleted(true);
+        }
+      },
+      onError: () => {},
+    });
+
   return {
     order: data,
     error: error != null,
     refreshError,
     loading: orderLoading || refreshLoading,
     refresh,
+    deleteReservation,
+    deleteError,
+    deleteLoading,
     called,
+    deleted,
   };
 };
 
