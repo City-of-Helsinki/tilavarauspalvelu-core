@@ -17,49 +17,37 @@ const ReservationListButton = ({
 }) => {
   const { t } = useTranslation();
 
+  const btnCommon = {
+    variant: "supplementary",
+    onClick: callback,
+    size: "small",
+  } as const;
+
   switch (type) {
     case "show":
       return (
-        <Button
-          variant="supplementary"
-          onClick={callback}
-          iconLeft={<IconClock />}
-          size="small"
-        >
-          {t("ReservationsListButton.showInCalendar")}
-        </Button>
+        <a href="#reservation-calendar" style={{ textDecoration: "none" }}>
+          <Button {...btnCommon} iconLeft={<IconClock />}>
+            {t("ReservationsListButton.showInCalendar")}
+          </Button>
+        </a>
       );
     case "deny":
     case "remove":
       return (
-        <Button
-          variant="supplementary"
-          onClick={callback}
-          iconLeft={<IconCross />}
-          size="small"
-        >
+        <Button {...btnCommon} iconLeft={<IconCross />}>
           {type === "deny" ? t("common.deny") : t("common.remove")}
         </Button>
       );
     case "restore":
       return (
-        <Button
-          variant="supplementary"
-          onClick={callback}
-          iconLeft={<IconArrowUndo />}
-          size="small"
-        >
+        <Button {...btnCommon} iconLeft={<IconArrowUndo />}>
           {t("common.restore")}
         </Button>
       );
     case "change":
       return (
-        <Button
-          variant="supplementary"
-          onClick={callback}
-          iconLeft={<IconPen />}
-          size="small"
-        >
+        <Button {...btnCommon} iconLeft={<IconPen />}>
           {t("ReservationsListButton.changeTime")}
         </Button>
       );

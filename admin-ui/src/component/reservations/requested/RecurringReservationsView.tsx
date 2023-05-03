@@ -1,11 +1,11 @@
 import React from "react";
-import { format } from "date-fns";
+import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
 import {
   ReservationsReservationStateChoices,
   type ReservationType,
 } from "common/types/gql-types";
-import { H6 } from "common/src/common/typography";
 import { useRecurringReservations } from "./hooks";
 import { RECURRING_AUTOMATIC_REFETCH_LIMIT } from "../../../common/const";
 import ReservationList from "../../ReservationsList";
@@ -16,11 +16,9 @@ import { useModal } from "../../../context/ModalContext";
 const RecurringReservationsView = ({
   reservation,
   onSelect,
-  onChange,
 }: {
   reservation: ReservationType;
   onSelect: (selected: ReservationType) => void;
-  onChange: () => void;
 }) => {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
@@ -41,10 +39,7 @@ const RecurringReservationsView = ({
     console.warn("Change NOT Implemented.");
   };
 
-  const handleCloseRemoveDialog = (shouldRefetch?: boolean, pk?: number) => {
-    if (shouldRefetch && pk) {
-      onChange();
-    }
+  const handleCloseRemoveDialog = () => {
     setModalContent(null);
   };
 
@@ -52,8 +47,8 @@ const RecurringReservationsView = ({
     setModalContent(
       <DenyDialog
         reservations={[res]}
-        onReject={() => handleCloseRemoveDialog(true, res.pk ?? undefined)}
-        onClose={() => handleCloseRemoveDialog(false)}
+        onReject={handleCloseRemoveDialog}
+        onClose={handleCloseRemoveDialog}
       />,
       true
     );
@@ -94,8 +89,8 @@ const RecurringReservationsView = ({
     }
     return {
       date: startDate,
-      startTime: format(startDate, "hh:mm"),
-      endTime: format(new Date(x.end), "hh:mm"),
+      startTime: format(startDate, "H:mm"),
+      endTime: format(new Date(x.end), "H:mm"),
       isRemoved: x.state === "DENIED",
       buttons,
     };

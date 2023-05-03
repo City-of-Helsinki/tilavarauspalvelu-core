@@ -12,6 +12,8 @@ import { useReservationData } from "./hooks";
 type Props = {
   reservationUnitPk: string;
   reservation: ReservationType;
+  selected?: ReservationType;
+  focusDate: Date;
 };
 
 const Legends = styled.div`
@@ -29,13 +31,17 @@ const Container = styled.div`
 
 type WeekOptions = "day" | "week" | "month";
 
-const Calendar = ({ reservationUnitPk, reservation }: Props): JSX.Element => {
+/// @param reservation the current reservation to show in calendar
+/// @param selected (for recurring only) different styling
+/// @param focusDate date to show in the calendar
+const Calendar = ({
+  reservationUnitPk,
+  reservation,
+  selected,
+  focusDate: initialFocusDate,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [focusDate, setFocusDate] = useState(
-    startOfISOWeek(
-      reservation?.begin ? new Date(reservation?.begin) : new Date()
-    )
-  );
+  const [focusDate, setFocusDate] = useState(initialFocusDate);
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
 
   // No month view so always query the whole week even if a single day is selected
@@ -45,15 +51,15 @@ const Calendar = ({ reservationUnitPk, reservation }: Props): JSX.Element => {
     startOfISOWeek(focusDate),
     add(startOfISOWeek(focusDate), { days: 7 }),
     reservationUnitPk,
-    reservation.pk ?? undefined
+    reservation?.pk ?? undefined
   );
 
-  // switch date when the selected reservation changes
+  // outside control of the calendar navigation
   useEffect(() => {
-    if (reservation) {
-      setFocusDate(new Date(reservation.begin));
+    if (initialFocusDate) {
+      setFocusDate(initialFocusDate);
     }
-  }, [reservation]);
+  }, [initialFocusDate]);
 
   // TODO the calendar is from 6am - 11pm (so anything outside that gets rendered at the edges)
   // either do something to the event data (filter) or allow for a larger calendar
@@ -64,7 +70,7 @@ const Calendar = ({ reservationUnitPk, reservation }: Props): JSX.Element => {
         toolbarComponent={Toolbar}
         showToolbar
         begin={focusDate}
-        eventStyleGetter={eventStyleGetter(reservation)}
+        eventStyleGetter={eventStyleGetter(reservation, selected)}
         /* TODO if we want to onSelect use router or use a Popup / Modal to show it
         onSelectEvent={(e) => {}}}
         */

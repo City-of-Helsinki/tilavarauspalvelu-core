@@ -1,13 +1,13 @@
 import {
-  Query,
-  QueryReservationDenyReasonsArgs,
-  QueryReservationsArgs,
-  ReservationDenyReasonType,
+  type Query,
+  type ReservationType,
+  type QueryReservationsArgs,
   ReservationsReservationStateChoices,
-  ReservationType,
+  type ReservationDenyReasonType,
+  type QueryReservationDenyReasonsArgs,
 } from "common/types/gql-types";
-import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@apollo/client";
 import { useState } from "react";
 import {
   RESERVATIONS_BY_RESERVATIONUNIT,

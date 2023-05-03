@@ -62,7 +62,10 @@ export const legend = [
 ];
 
 const eventStyleGetter =
-  (currentReservation?: ReservationType) =>
+  (
+    currentReservation?: ReservationType,
+    selectedReservation?: ReservationType
+  ) =>
   ({
     event,
   }: CalendarEvent<ReservationType>): {
@@ -84,7 +87,7 @@ const eventStyleGetter =
       currentReservation?.recurringReservation &&
       currentReservation.recurringReservation?.pk ===
         event?.recurringReservation?.pk;
-    if (currentReservation?.pk === event?.pk) {
+    if (selectedReservation?.pk === event?.pk) {
       return {
         style: {
           ...style,
