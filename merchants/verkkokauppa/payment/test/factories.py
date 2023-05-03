@@ -3,8 +3,11 @@ from decimal import Decimal
 from uuid import uuid4
 
 import factory
+from django.utils.timezone import get_default_timezone
 
 from ..types import Payment
+
+TIMEZONE = get_default_timezone()
 
 
 class PaymentFactory(factory.Factory):
@@ -24,5 +27,5 @@ class PaymentFactory(factory.Factory):
     description = "Mock description"
     additional_info = '{"payment_method": creditcards}'
     token = uuid4()
-    timestamp = datetime.now()
+    timestamp = datetime.now(tz=TIMEZONE)
     payment_method_label = "Visa"
