@@ -375,9 +375,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
             reservationUnit={reservationUnit}
             type="complete"
           />
-          {reservation.state ===
-            ReservationsReservationStateChoices.Confirmed && (
-            <SecondaryActions>
+          <SecondaryActions>
+            {reservation.state ===
+              ReservationsReservationStateChoices.Confirmed && (
               <BlackButton
                 variant="secondary"
                 iconRight={<IconCalendar aria-hidden />}
@@ -387,24 +387,24 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
               >
                 {t("reservations:saveToCalendar")}
               </BlackButton>
-              {order?.receiptUrl &&
-                ["PAID", "REFUNDED"].includes(order?.status) && (
-                  <BlackButton
-                    data-testid="reservation__confirmation--button__receipt-link"
-                    onClick={() =>
-                      window.open(
-                        `${order.receiptUrl}&lang=${i18n.language}`,
-                        "_blank"
-                      )
-                    }
-                    variant="secondary"
-                    iconRight={<IconLinkExternal aria-hidden />}
-                  >
-                    {t("reservations:downloadReceipt")}
-                  </BlackButton>
-                )}
-            </SecondaryActions>
-          )}
+            )}
+            {order?.receiptUrl &&
+              ["PAID", "REFUNDED"].includes(order?.status) && (
+                <BlackButton
+                  data-testid="reservation__confirmation--button__receipt-link"
+                  onClick={() =>
+                    window.open(
+                      `${order.receiptUrl}&lang=${i18n.language}`,
+                      "_blank"
+                    )
+                  }
+                  variant="secondary"
+                  iconRight={<IconLinkExternal aria-hidden />}
+                >
+                  {t("reservations:downloadReceipt")}
+                </BlackButton>
+              )}
+          </SecondaryActions>
         </>
       )
     );
