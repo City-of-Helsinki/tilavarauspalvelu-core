@@ -73,7 +73,7 @@ const Navigation = () => {
       title={t("common:applicationName")}
       onTitleClick={handleNavigationTitleClick}
       menuToggleAriaLabel="Menu"
-      skipTo="main"
+      skipTo="#main"
       skipToContentLabel={t("navigation:skipToMainContent")}
     >
       <HDSNavigation.Row variant="inline">
