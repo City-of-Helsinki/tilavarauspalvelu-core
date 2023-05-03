@@ -21,7 +21,7 @@ class PaymentStatus(Enum):
     paymentapi/src/main/java/fi/hel/verkkokauppa/payment/model/PaymentStatus.java
     """
 
-    CREATED = "created"
+    CREATED = "payment_created"
     PAID_ONLINE = "payment_paid_online"
     CANCELLED = "payment_cancelled"
     AUTHORIZED = "authorized"
