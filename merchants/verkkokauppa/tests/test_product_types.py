@@ -82,6 +82,7 @@ class ProductTypesTestCase(TestCase):
             "operationArea": params.operation_area,
             "companyCode": params.company_code,
             "mainLedgerAccount": params.main_ledger_account,
+            "balanceProfitCenter": " ",
         }
         assert_that(json).is_equal_to(expected)
 
@@ -101,6 +102,7 @@ class ProductTypesTestCase(TestCase):
             "operationArea": params.operation_area,
             "companyCode": params.company_code,
             "mainLedgerAccount": params.main_ledger_account,
+            "balanceProfitCenter": " ",
         }
         assert_that(json).is_equal_to(expected)
 
