@@ -85,6 +85,25 @@ class ProductTypesTestCase(TestCase):
         }
         assert_that(json).is_equal_to(expected)
 
+    def test_create_or_update_accounting_params_to_json_drops_null_fields(self):
+        params = CreateOrUpdateAccountingParams(
+            vat_code="vat-code",
+            internal_order=None,
+            profit_center=None,
+            project=None,
+            operation_area="operation-area",
+            company_code="company-code",
+            main_ledger_account="main-ledger-account",
+        )
+        json = params.to_json()
+        expected = {
+            "vatCode": params.vat_code,
+            "operationArea": params.operation_area,
+            "companyCode": params.company_code,
+            "mainLedgerAccount": params.main_ledger_account,
+        }
+        assert_that(json).is_equal_to(expected)
+
     def test_accounting_from_json(self):
         json = {
             "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
