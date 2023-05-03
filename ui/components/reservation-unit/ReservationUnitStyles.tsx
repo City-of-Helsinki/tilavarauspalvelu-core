@@ -79,6 +79,22 @@ export const Subheading = styled(H4).attrs({ as: "h3" })<{
 export const CalendarWrapper = styled.div`
   margin-bottom: var(--spacing-layout-l);
   position: relative;
+
+  .rbc-event {
+    padding: 2px;
+
+    @media (min-width: ${breakpoints.m}) {
+      padding: 2px 5px;
+    }
+
+    @media (min-width: ${breakpoints.l}) {
+      padding: 2px;
+    }
+
+    @media (min-width: ${breakpoints.xl}) {
+      padding: 2px 5px;
+    }
+  }
 `;
 
 export const MapWrapper = styled.div`

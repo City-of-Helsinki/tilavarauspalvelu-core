@@ -293,6 +293,7 @@ export type PendingReservation = {
   reservationUnitPk?: number | null;
   bufferTimeBefore?: string;
   bufferTimeAfter?: string;
+  state?: string;
 };
 
 export type RecurringReservation = {

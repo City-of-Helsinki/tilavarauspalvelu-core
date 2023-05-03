@@ -35,6 +35,7 @@ import { useLocalStorage, useMedia, useSessionStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
+import classNames from "classnames";
 import {
   ApplicationRound,
   PendingReservation,
@@ -70,6 +71,7 @@ import Map from "../../components/Map";
 import Legend from "../../components/calendar/Legend";
 import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
 import {
+  formatDurationMinutes,
   getTranslation,
   isTouchDevice,
   parseDate,
@@ -342,12 +344,16 @@ const EventWrapper = styled.div``;
 const EventWrapperComponent = (props) => {
   const { event } = props;
   let isSmall = false;
+  let isMedium = false;
   if (event.event.state === "INITIAL") {
     const { start, end } = props.event;
     const diff = differenceInMinutes(end, start);
     if (diff <= 30) isSmall = true;
+    if (diff <= 120) isMedium = true;
   }
-  return <EventWrapper {...props} className={isSmall ? "isSmall" : ""} />;
+  return (
+    <EventWrapper {...props} className={classNames({ isSmall, isMedium })} />
+  );
 };
 
 const ReservationUnit = ({
@@ -636,18 +642,30 @@ const ReservationUnit = ({
 
   const calendarEvents: CalendarEvent<Reservation | ReservationType>[] =
     useMemo(() => {
+      const diff =
+        initialReservation &&
+        differenceInMinutes(
+          new Date(initialReservation.end),
+          new Date(initialReservation.begin)
+        );
+      const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
+
       return userReservations && reservationUnit?.reservations
         ? [
             ...reservationUnit.reservations,
-            { ...initialReservation, state: "INITIAL" },
+            {
+              ...initialReservation,
+              state: "INITIAL",
+            },
           ]
             .filter((n: ReservationType) => n)
-            .map((n: ReservationType) => {
+            .map((n: ReservationType | PendingReservation) => {
+              const suffix = n.state === "INITIAL" ? duration : "";
               const event = {
                 title: `${
                   n.state === "CANCELLED"
                     ? `${t("reservationCalendar:prefixForCancelled")}: `
-                    : ""
+                    : suffix
                 }`,
                 start: parseDate(n.begin),
                 end: parseDate(n.end),
@@ -655,7 +673,7 @@ const ReservationUnit = ({
                 event: n,
               };
 
-              return event;
+              return event as CalendarEvent<Reservation>;
             })
         : [];
     }, [reservationUnit, t, initialReservation, userReservations]);

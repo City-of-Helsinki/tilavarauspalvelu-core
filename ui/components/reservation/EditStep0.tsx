@@ -21,6 +21,7 @@ import {
   roundToNearestMinutes,
   startOfDay,
 } from "date-fns";
+import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
 import React, { Children, useCallback, useMemo, useState } from "react";
@@ -33,10 +34,11 @@ import {
   isReservationReservable,
 } from "../../modules/reservation";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
-import { isTouchDevice } from "../../modules/util";
+import { formatDurationMinutes, isTouchDevice } from "../../modules/util";
 import { BlackButton, MediumButton } from "../../styles/util";
 import Legend from "../calendar/Legend";
 import ReservationCalendarControls from "../calendar/ReservationCalendarControls";
+import { CalendarWrapper } from "../reservation-unit/ReservationUnitStyles";
 
 type Props = {
   reservation: ReservationType;
@@ -54,10 +56,6 @@ type Props = {
 type ReservationStateWithInitial = string;
 
 type WeekOptions = "day" | "week" | "month";
-
-const CalendarWrapper = styled.div`
-  position: relative;
-`;
 
 const CalendarFooter = styled.div`
   position: sticky;
@@ -140,12 +138,16 @@ const EventWrapper = styled.div``;
 const EventWrapperComponent = (props) => {
   const { event } = props;
   let isSmall = false;
+  let isMedium = false;
   if (event.event.state === "INITIAL") {
     const { start, end } = props.event;
     const diff = differenceInMinutes(end, start);
     if (diff <= 30) isSmall = true;
+    if (diff <= 120) isMedium = true;
   }
-  return <EventWrapper {...props} className={isSmall ? "isSmall" : ""} />;
+  return (
+    <EventWrapper {...props} className={classNames({ isSmall, isMedium })} />
+  );
 };
 
 const EditStep0 = ({
@@ -172,6 +174,13 @@ const EditStep0 = ({
 
   const calendarEvents: CalendarEvent<Reservation | ReservationType>[] =
     useMemo(() => {
+      const diff =
+        initialReservation &&
+        differenceInMinutes(
+          new Date(initialReservation.end),
+          new Date(initialReservation.begin)
+        );
+      const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
       const shownReservation = { ...initialReservation, state: "INITIAL" } || {
         begin: reservation.begin,
         end: reservation.end,
@@ -183,12 +192,13 @@ const EditStep0 = ({
       return userReservations && reservationUnit?.reservations
         ? [...reservations, shownReservation]
             .filter((n: ReservationType) => n)
-            .map((n: ReservationType) => {
+            .map((n: ReservationType | PendingReservation) => {
+              const suffix = n.state === "INITIAL" ? duration : "";
               const event = {
                 title: `${
                   n.state === "CANCELLED"
                     ? `${t("reservationCalendar:prefixForCancelled")}: `
-                    : ""
+                    : suffix
                 }`,
                 start: parseDate(n.begin),
                 end: parseDate(n.end),
@@ -196,7 +206,7 @@ const EditStep0 = ({
                 event: n,
               };
 
-              return event;
+              return event as CalendarEvent<Reservation>;
             })
         : [];
     }, [

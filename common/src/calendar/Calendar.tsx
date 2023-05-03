@@ -412,9 +412,19 @@ const StyledCalendar = styled(BigCalendar)<{
   .rbc-event-label {
     text-overflow: unset;
     white-space: normal;
+    line-height: var(--lineheight-m);
+  }
+
+  .rbc-event-content {
+    font-size: 80%;
+    margin-top: var(--spacing-3-xs);
   }
 
   .isSmall .rbc-event-label {
+    white-space: nowrap;
+  }
+
+  .isMedium .rbc-event-content {
     white-space: nowrap;
   }
 `;
