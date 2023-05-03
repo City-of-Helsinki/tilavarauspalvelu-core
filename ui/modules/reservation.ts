@@ -22,6 +22,7 @@ import {
   isStartTimeWithinInterval,
 } from "common/src/calendar/util";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
+import { getTranslation } from "./util";
 
 export const getDurationOptions = (
   minReservationDuration: number,
@@ -286,12 +287,12 @@ export const canReservationTimeBeChanged = (
 
   // existing reservation is free
   if (!isReservationFreeOfCharge(reservation)) {
-    return [false, "CANCELLATION_NOT_ALLOWED"];
+    return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];
   }
 
   // existing reservation has valid cancellation rule that does not require handling
   if (!canUserCancelReservation(reservation, true)) {
-    return [false, "CANCELLATION_NOT_ALLOWED"];
+    return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];
   }
 
   // existing reservation cancellation buffer is not exceeded
@@ -337,3 +338,24 @@ export const profileUserFields = [
   "reserveeAddressZip",
   "homeCity",
 ] as const;
+
+export const getReservationValue = (
+  reservation: ReservationType,
+  key: string
+): string | number | null => {
+  switch (key) {
+    case "ageGroup": {
+      const { minimum, maximum } = reservation.ageGroup || {};
+      return minimum && maximum ? `${minimum} - ${maximum}` : null;
+    }
+    case "purpose":
+      return getTranslation(reservation.purpose, "name");
+    case "homeCity":
+      return (
+        getTranslation(reservation.homeCity, "name") ||
+        reservation.homeCity.name
+      );
+    default:
+      return reservation[key] ?? null;
+  }
+};

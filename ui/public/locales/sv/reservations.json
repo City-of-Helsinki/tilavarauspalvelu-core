@@ -75,10 +75,11 @@
     "5": "Betalning"
   },
   "modifyTimeReasons": {
-    "RESERVATION_MODIFICATION_NOT_ALLOWED": "Tyvärr går det inte att ändra bokningen. Vid behov kan du avboka och göra en ny bokning.",
+    "RESERVATION_MODIFICATION_NOT_ALLOWED": "Tyvärr går det inte att ändra bokningen.",
+    "RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX": "Vid behov kan du avboka och göra en ny bokning.",
     "RESERVATION_BEGIN_IN_PAST": "Bokningen kan inte längre avbokas eller ändras eftersom bokningstiden har passerat.",
     "CANCELLATION_NOT_ALLOWED": "Bokningen är bindande och kan inte avbokas.",
-    "CANCELLATION_TIME_PAST": "Tyvärr går det inte längre att avboka bokningen eftersom avbokningstiden har gått ut.",
+    "CANCELLATION_TIME_PAST": "Tyvärr går det inte längre att avboka eller ändra bokningen eftersom avbokningstiden har gått ut.",
     "RESERVATION_TIME_INVALID": "Bokningstiden är för kort."
   },
   "cancellationReasons": {

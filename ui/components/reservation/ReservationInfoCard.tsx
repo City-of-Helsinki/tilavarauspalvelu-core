@@ -111,15 +111,6 @@ const ReservationInfoCard = ({
 
   const mainImage = getMainImage(reservationUnit);
 
-  const ageGroup = trim(
-    `${reservation?.ageGroup?.minimum || ""} - ${
-      reservation?.ageGroup?.maximum || ""
-    }`,
-    " - "
-  );
-
-  const purpose = getTranslation(reservation?.purpose, "name");
-
   const price: string =
     begin &&
     (reservation?.state === "REQUIRES_HANDLING" ||
@@ -179,13 +170,6 @@ const ReservationInfoCard = ({
             {capitalize(timeString)}, {formatDurationMinutes(duration)}
           </Strong>
         </Value>
-        {reservation.description &&
-          ["confirmed", "complete"].includes(type) && (
-            <Value>
-              {t("reservationCalendar:label.description")}:{" "}
-              {reservation.description}
-            </Value>
-          )}
         <Value>
           {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
           {taxPercentageValue &&
@@ -196,21 +180,6 @@ const ReservationInfoCard = ({
               ),
             })})`}
         </Value>
-        {purpose && ["complete"].includes(type) && (
-          <Value>
-            {t("reservations:purpose")}: {purpose}
-          </Value>
-        )}
-        {ageGroup && ["complete"].includes(type) && (
-          <Value>
-            {t("reservations:ageGroup")}: {ageGroup}
-          </Value>
-        )}
-        {reservation.numPersons > 0 && ["complete"].includes(type) && (
-          <Value>
-            {t("reservations:numPersons")}: {reservation.numPersons}
-          </Value>
-        )}
       </Content>
     </Wrapper>
   );

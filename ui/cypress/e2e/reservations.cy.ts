@@ -174,14 +174,15 @@ describe("Tilavaraus user reservations", () => {
       .should("contain.text", "Varausnumero: 11")
       .should("contain.text", "Ke 28.4.2021 klo")
       .should("contain.text", ", 4 t")
-      .should(
-        "contain.text",
-        "Varauksen kuvaus: Reservation description - a long one with alotta text"
-      )
-      .should("contain.text", "Hinta: 42,00\u00a0€")
-      .should("contain.text", "Käyttötarkoitus: Liikkua tai pelata FI")
-      .should("contain.text", "Ikäryhmä: 5 - 8")
-      .should("contain.text", "Osallistujamäärä: 18");
+      .should("contain.text", "Hinta: 42,00\u00a0€");
+
+    cy.contains(
+      "div",
+      "Varauksen kuvaus: Reservation description - a long one with alotta text"
+    );
+    cy.contains("div", "Varauksen käyttötarkoitus: Liikkua tai pelata FI");
+    cy.contains("div", "Ikäryhmä: 5 - 8");
+    cy.contains("div", "Osallistujamäärä: 18");
 
     calendarLinkButton()
       .should("be.enabled")
@@ -231,14 +232,15 @@ describe("Tilavaraus user reservations", () => {
     reservationInfoCard()
       .should("contain.text", "Varausnumero: 4")
       .should("contain.text", ", 2 t")
-      .should(
-        "contain.text",
-        "Varauksen kuvaus: Reservation description - a long one with alotta text"
-      )
-      .should("contain.text", "Hinta: Maksuton")
-      .should("contain.text", "Käyttötarkoitus: Liikkua tai pelata FI")
-      .should("contain.text", "Ikäryhmä: 5 - 8")
-      .should("contain.text", "Osallistujamäärä: 18");
+      .should("contain.text", "Hinta: Maksuton");
+
+    cy.contains(
+      "div",
+      "Varauksen kuvaus: Reservation description - a long one with alotta text"
+    );
+    cy.contains("div", "Varauksen käyttötarkoitus: Liikkua tai pelata FI");
+    cy.contains("div", "Ikäryhmä: 5 - 8");
+    cy.contains("div", "Osallistujamäärä: 18");
 
     calendarLinkButton()
       .should("be.enabled")

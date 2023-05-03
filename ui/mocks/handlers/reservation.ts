@@ -387,7 +387,8 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       type: ReservationsReservationReserveeTypeChoices.Individual,
       id: "UmVzZXJ2YXRpb246Mg==",
       name: "Reservation name",
-      description: "Reservation description - a long one with alotta text",
+      description:
+        "Reservation description - a long one with alotta text and then some",
       reserveeFirstName: "First name",
       reserveeLastName: "Last name",
       reserveePhone: "+358 123 4567",
@@ -553,12 +554,42 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
           },
         },
       ];
+      data.reservationUnits[0].metadataSet = {
+        id: "fawoifhj",
+        name: "Company metadata",
+        supportedFields: [
+          "reservee_organisation_name",
+          "reservee_first_name",
+          "reservee_last_name",
+          "reservee_phone",
+          "reservee_email",
+          "description",
+          "purpose",
+          "ageGroup",
+          "numPersons",
+        ],
+      };
     }
 
     if (pk === 11) {
-      data.type = ReservationsReservationReserveeTypeChoices.Business;
+      data.reserveeType = ReservationsReservationReserveeTypeChoices.Business;
       data.reserveeOrganisationName = "Acme Oyj";
       data.orderStatus = "PAID";
+      data.reservationUnits[0].metadataSet = {
+        id: "fawoifhj",
+        name: "Company metadata",
+        supportedFields: [
+          "reservee_organisation_name",
+          "reservee_first_name",
+          "reservee_last_name",
+          "reservee_phone",
+          "reservee_email",
+          "description",
+          "purpose",
+          "ageGroup",
+          "numPersons",
+        ],
+      };
     }
 
     if (pk === 20) {
@@ -582,6 +613,31 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       data.reservationUnits[0].reservationCancelledInstructionsFi =
         "Ohjeet perutulle varaukselle";
       data.orderStatus = "foobar";
+      data.reservationUnits[0].metadataSet = {
+        pk: 4,
+        id: "fawoifhj",
+        name: "Metadata set",
+        supportedFields: [
+          "reservee_first_name",
+          "reservee_last_name",
+          "reservee_address_street",
+          "reservee_address_zip",
+          "reservee_address_city",
+          "reservee_email",
+          "reservee_phone",
+          "name",
+          "purpose",
+          "num_persons",
+          "age_group",
+          "description",
+          "applying_for_free_of_charge",
+          "free_of_charge_reason",
+          "reservee_organisation_name",
+          "home_city",
+          "reservee_is_unregistered_association",
+          "reservee_id",
+        ],
+      };
     }
 
     if (pk === 42) {

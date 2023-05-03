@@ -136,9 +136,17 @@ const EditStep1 = ({
 
   const getValue = useCallback(
     (key: string) => {
+      if (key === "purpose") {
+        return getTranslation(reservation[key], "name");
+      }
+
       if (key === "ageGroup") {
         const { minimum, maximum } = reservation[key];
         return `${minimum} - ${maximum}`;
+      }
+
+      if (key === "purpose") {
+        return getTranslation(reservation[key], "name");
       }
 
       if (key === "homeCity") {

@@ -195,6 +195,8 @@ export const GET_RESERVATION = gql`
       reserveeEmail
       reserveePhone
       reserveeType
+      reserveeId
+      reserveeOrganisationName
       begin
       end
       calendarUrl
@@ -317,6 +319,7 @@ export const GET_RESERVATION = gql`
         pk
         name
       }
+      numPersons
       handledAt
     }
   }

@@ -77,10 +77,11 @@
     "5": "Maksu"
   },
   "modifyTimeReasons": {
-    "RESERVATION_MODIFICATION_NOT_ALLOWED": "Valitettavasti varausta ei voi muuttaa. Tarvittaessa voit perua ja tehdä uuden varauksen.",
+    "RESERVATION_MODIFICATION_NOT_ALLOWED": "Valitettavasti varausta ei voi muuttaa.",
+    "RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX": "Tarvittaessa voit perua ja tehdä uuden varauksen.",
     "RESERVATION_BEGIN_IN_PAST": "Varausta ei voi enää perua tai muuttaa, koska varausaika on mennyt.",
     "CANCELLATION_NOT_ALLOWED": "Varaus on sitova ja sitä ei voi perua.",
-    "CANCELLATION_TIME_PAST": "Valitettavasti varausta ei voi enää perua, koska peruutusaika on umpeutunut.",
+    "CANCELLATION_TIME_PAST": "Valitettavasti varausta ei voi enää perua tai muuttaa, koska peruutusaika on umpeutunut.",
     "RESERVATION_TIME_INVALID": "Varauksen aika on liian lyhyt."
   },
   "cancellationReasons": {
