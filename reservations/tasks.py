@@ -3,6 +3,7 @@ from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.payment.requests import refund_order
 from reservations.models import Reservation
 from tilavarauspalvelu.celery import app
+from tilavarauspalvelu.settings import VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
 
 from .pruning import (
     prune_inactive_reservations,
@@ -17,8 +18,6 @@ PRUNE_INTERVAL_SECONDS = 60 * 5
 # Reservations older than PRUNE_OLDER_THAN_MINUTES will be deleted when the task is run
 PRUNE_OLDER_THAN_MINUTES = 20
 
-PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES = 5
-
 REMOVE_STATS_OLDER_THAN_YEARS = 5
 
 REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
@@ -27,12 +26,14 @@ REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
 @app.task(name="prune_reservations")
 def _prune_reservations() -> None:
     prune_inactive_reservations(PRUNE_OLDER_THAN_MINUTES)
-    prune_reservation_with_inactive_payments(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
+    prune_reservation_with_inactive_payments(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
 
 
 @app.task(name="update_expired_orders")
-def update_expired_orders_task(older_than_minutes=PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES):
-    update_expired_orders(PRUNE_WITH_ORDERS_OLDER_THAN_MINUTES)
+def update_expired_orders_task(
+    older_than_minutes=VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES,
+):
+    update_expired_orders(older_than_minutes)
 
 
 @app.task(name="prune_reservation_statistics")
