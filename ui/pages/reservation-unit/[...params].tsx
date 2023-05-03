@@ -601,19 +601,21 @@ const ReservationUnitReservation = ({
             <FormProvider {...form}>
               <div>
                 <Title>{pageTitle}</Title>
-                <StyledStepper
-                  language={i18n.language}
-                  selectedStep={step}
-                  small={steps.length > 2}
-                  onStepClick={(e) => {
-                    const target = e.currentTarget;
-                    const s = target
-                      .getAttribute("data-testid")
-                      .replace("hds-stepper-step-", "");
-                    setStep(parseInt(s, 10));
-                  }}
-                  steps={steps}
-                />
+                {steps.length <= 2 && (
+                  <StyledStepper
+                    language={i18n.language}
+                    selectedStep={step}
+                    small={false}
+                    onStepClick={(e) => {
+                      const target = e.currentTarget;
+                      const s = target
+                        .getAttribute("data-testid")
+                        .replace("hds-stepper-step-", "");
+                      setStep(parseInt(s, 10));
+                    }}
+                    steps={steps}
+                  />
+                )}
               </div>
               {step === 0 && (
                 <Step0
