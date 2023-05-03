@@ -38,7 +38,6 @@ import {
 import { getSelectedOption, getTranslation } from "../../modules/util";
 import { CenterSpinner } from "../common/common";
 import { BlackButton, MediumButton, Toast } from "../../styles/util";
-import { emptyOption } from "../../modules/const";
 import ReservationInfoCard from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 
@@ -316,10 +315,7 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                             onChange={(val: OptionType) => {
                               setValue("reason", val.value);
                             }}
-                            options={[
-                              emptyOption(t("common:select")),
-                              ...reasons,
-                            ]}
+                            options={[...reasons]}
                             placeholder={t("common:select")}
                             value={getSelectedOption(
                               getValues("reason"),

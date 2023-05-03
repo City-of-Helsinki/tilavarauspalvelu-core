@@ -273,9 +273,6 @@ describe("Tilavaraus user reservations", () => {
 
     cancelCancelButton().should("be.disabled");
 
-    reasonSelect().click().siblings("ul").children().eq(0).click();
-    cancelCancelButton().should("be.disabled");
-
     reasonSelect().click().siblings("ul").children().eq(1).click();
     cancelCancelButton().should("not.be.disabled");
 
