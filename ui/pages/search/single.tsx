@@ -64,9 +64,13 @@ const StyledSorting = styled(Sorting)`
   }
 `;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale,
+  query,
+}) => {
   return {
     props: {
+      key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale)),
     },
@@ -182,10 +186,7 @@ const SearchSingle = (): JSX.Element => {
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
 
-  const loadingMore = useMemo(
-    () => networkStatus === NetworkStatus.fetchMore,
-    [networkStatus]
-  );
+  const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
   const history = useRouter();
 

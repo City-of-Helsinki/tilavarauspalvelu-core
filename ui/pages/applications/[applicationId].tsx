@@ -26,9 +26,14 @@ import { TwoColumnContainer } from "../../components/common/common";
 import { isBrowser } from "../../modules/const";
 import { MediumButton } from "../../styles/util";
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale,
+  query,
+}) => {
+  const { applicationId } = query;
   return {
     props: {
+      key: `{locale}${applicationId}`,
       ...(await serverSideTranslations(locale)),
     },
   };

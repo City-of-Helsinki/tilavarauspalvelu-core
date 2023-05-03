@@ -303,16 +303,10 @@ const SearchForm = ({
 
   const areOptionsLoaded = useMemo(
     () =>
-      applicationPeriodOptions.length > 0 &&
       reservationUnitTypeOptions.length > 0 &&
       unitOptions.length > 0 &&
       purposeOptions.length > 0,
-    [
-      applicationPeriodOptions,
-      reservationUnitTypeOptions,
-      unitOptions,
-      purposeOptions,
-    ]
+    [reservationUnitTypeOptions, unitOptions, purposeOptions]
   );
 
   const formValueKeys = Object.keys(formValues);
@@ -452,78 +446,74 @@ const SearchForm = ({
         </FilterToggleWrapper>
         <Hr />
       </JustForMobile>
-      {areOptionsLoaded && (
-        <ButtonContainer>
-          {formValueKeys.length > 0 && (
-            <TagControls>
-              <FilterTags data-test-id="search-form__filter--tags">
-                {formValueKeys
-                  .sort(
-                    (a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
-                  )
-                  .map((value) => {
-                    const label = t(`searchForm:filters.${value}`, {
-                      label: getFormValueLabel(value),
-                      value: formValues[value],
-                      count: Number(formValues[value]),
-                    });
+      <ButtonContainer>
+        {areOptionsLoaded && formValueKeys.length > 0 && (
+          <TagControls>
+            <FilterTags data-test-id="search-form__filter--tags">
+              {formValueKeys
+                .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
+                .map((value) => {
+                  const label = t(`searchForm:filters.${value}`, {
+                    label: getFormValueLabel(value),
+                    value: formValues[value],
+                    count: Number(formValues[value]),
+                  });
 
-                    const result = multiSelectFilters.includes(value) ? (
-                      formValues[value].split(",").map((subValue) => (
-                        <StyledTag
-                          id={`filter-tag__${value}-${subValue}`}
-                          onClick={() => removeValue([subValue], value)}
-                          onDelete={() => removeValue([subValue], value)}
-                          key={`${value}-${subValue}`}
-                          deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                            value: getFormSubValueLabel(value, subValue),
-                          })}
-                        >
-                          {getFormSubValueLabel(value, subValue)}
-                        </StyledTag>
-                      ))
-                    ) : (
+                  const result = multiSelectFilters.includes(value) ? (
+                    formValues[value].split(",").map((subValue) => (
                       <StyledTag
-                        id={`filter-tag__${value}`}
-                        onClick={() => removeValue([value])}
-                        onDelete={() => removeValue([value])}
-                        key={value}
+                        id={`filter-tag__${value}-${subValue}`}
+                        onClick={() => removeValue([subValue], value)}
+                        onDelete={() => removeValue([subValue], value)}
+                        key={`${value}-${subValue}`}
                         deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                          value: label,
+                          value: getFormSubValueLabel(value, subValue),
                         })}
                       >
-                        {label}
+                        {getFormSubValueLabel(value, subValue)}
                       </StyledTag>
-                    );
-                    return result;
-                  })}
-              </FilterTags>
-              {formValueKeys.length > 0 && (
-                <ResetButton
-                  aria-label={t("searchForm:resetForm")}
-                  onClick={() => removeValue()}
-                  onDelete={() => removeValue()}
-                  data-test-id="search-form__reset-button"
-                >
-                  {t("searchForm:resetForm")}
-                </ResetButton>
-              )}
-            </TagControls>
-          )}
-          <JustForMobile
-            style={{ width: "100%" }}
-            customBreakpoint={desktopBreakpoint}
+                    ))
+                  ) : (
+                    <StyledTag
+                      id={`filter-tag__${value}`}
+                      onClick={() => removeValue([value])}
+                      onDelete={() => removeValue([value])}
+                      key={value}
+                      deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+                        value: label,
+                      })}
+                    >
+                      {label}
+                    </StyledTag>
+                  );
+                  return result;
+                })}
+            </FilterTags>
+            {formValueKeys.length > 0 && (
+              <ResetButton
+                aria-label={t("searchForm:resetForm")}
+                onClick={() => removeValue()}
+                onDelete={() => removeValue()}
+                data-test-id="search-form__reset-button"
+              >
+                {t("searchForm:resetForm")}
+              </ResetButton>
+            )}
+          </TagControls>
+        )}
+        <JustForMobile
+          style={{ width: "100%" }}
+          customBreakpoint={desktopBreakpoint}
+        >
+          <SubmitButton
+            id="searchButton-mobile"
+            onClick={handleSubmit(search)}
+            iconLeft={<IconSearch />}
           >
-            <SubmitButton
-              id="searchButton-mobile"
-              onClick={handleSubmit(search)}
-              iconLeft={<IconSearch />}
-            >
-              {t("searchForm:searchButton")}
-            </SubmitButton>
-          </JustForMobile>
-        </ButtonContainer>
-      )}
+            {t("searchForm:searchButton")}
+          </SubmitButton>
+        </JustForMobile>
+      </ButtonContainer>
     </>
   );
 };

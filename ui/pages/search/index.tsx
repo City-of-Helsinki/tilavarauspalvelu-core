@@ -45,7 +45,10 @@ type Props = {
   applicationRounds: ApplicationRoundType[];
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale,
+  query,
+}) => {
   const now = new Date();
 
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
@@ -69,6 +72,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   return {
     props: {
+      key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       applicationRounds: activeApplicationRounds,
       ...(await serverSideTranslations(locale)),

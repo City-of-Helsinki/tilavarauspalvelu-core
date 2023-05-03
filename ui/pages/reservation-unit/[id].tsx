@@ -255,7 +255,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         ...(await serverSideTranslations(locale)),
-        key: id,
+        key: `${id}-${locale}`,
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
           openingHours: {

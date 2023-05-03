@@ -21,6 +21,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         ...(await serverSideTranslations(locale)),
+        key: `${id}${slug}${locale}`,
         id,
         mode: slug,
       },

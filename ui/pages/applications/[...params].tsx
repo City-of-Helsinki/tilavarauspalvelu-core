@@ -26,6 +26,7 @@ import { isBrowser } from "../../modules/const";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
+    key: locale,
     props: {
       ...(await serverSideTranslations(locale)),
     },

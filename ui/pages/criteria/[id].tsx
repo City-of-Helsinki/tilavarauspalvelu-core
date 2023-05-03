@@ -36,6 +36,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   return {
     props: {
+      key: `${id}${locale}`,
       applicationRound,
       ...(await serverSideTranslations(locale)),
     },
