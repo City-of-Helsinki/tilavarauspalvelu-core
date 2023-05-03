@@ -5,7 +5,7 @@ import { FilterArguments } from "./Filters";
 import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";
 import UnitsTable from "./UnitsTable";
-import { LIST_PAGE_SIZE } from "../../common/const";
+import { LARGE_LIST_PAGE_SIZE } from "../../common/const";
 import { More } from "../lists/More";
 import { combineResults } from "../../common/util";
 import { UNITS_QUERY } from "./queries";
@@ -57,7 +57,7 @@ const UnitsDataLoader = ({
       variables: {
         orderBy: sortString,
         offset: 0,
-        first: LIST_PAGE_SIZE,
+        first: LARGE_LIST_PAGE_SIZE,
         ...mapFilterParams(filters),
       },
       onError: (err: ApolloError) => {

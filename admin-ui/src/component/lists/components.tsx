@@ -18,6 +18,7 @@ export const HR = styled.hr`
 
 const StyledTable = styled(Table)<TableWrapperProps>`
   &&& {
+    width: 100%;
     white-space: nowrap;
     border-collapse: collapse;
     th {

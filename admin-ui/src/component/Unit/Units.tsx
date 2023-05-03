@@ -3,7 +3,7 @@ import { Link } from "hds-react";
 import { H1 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { debounce } from "lodash";
-import { Container, VerticalFlex } from "../../styles/layout";
+import { Container } from "../../styles/layout";
 import withMainMenu from "../withMainMenu";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Filters, { emptyFilterState, FilterArguments } from "./Filters";
@@ -43,16 +43,14 @@ const Units = (): JSX.Element => {
             </Link>
           </p>
         </div>
-        <VerticalFlex>
-          <Filters onSearch={debouncedSearch} />
-          <HR />
-          <UnitsDataLoader
-            key={JSON.stringify({ ...search, ...sort })}
-            filters={search}
-            sort={sort}
-            sortChanged={onSortChanged}
-          />
-        </VerticalFlex>
+        <Filters onSearch={debouncedSearch} />
+        <HR />
+        <UnitsDataLoader
+          key={JSON.stringify({ ...search, ...sort })}
+          filters={search}
+          sort={sort}
+          sortChanged={onSortChanged}
+        />
       </Container>
     </>
   );

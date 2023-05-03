@@ -11,7 +11,7 @@ import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";
 import ReservationUnitsTable from "./ReservationUnitsTable";
 import { More } from "../lists/More";
-import { LIST_PAGE_SIZE } from "../../common/const";
+import { LARGE_LIST_PAGE_SIZE } from "../../common/const";
 import { combineResults } from "../../common/util";
 
 export type Sort = {
@@ -70,7 +70,7 @@ const ReservationUnitsDataReader = ({
   >(SEARCH_RESERVATION_UNITS_QUERY, {
     variables: {
       orderBy: sortString,
-      first: LIST_PAGE_SIZE,
+      first: LARGE_LIST_PAGE_SIZE,
       ...mapFilterParams(filters),
     },
     onError: (err: ApolloError) => {
