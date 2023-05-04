@@ -282,6 +282,12 @@ class Space(MPTTModel):
     def __str__(self):
         return "{} ({})".format(self.name, self.building.name if self.building else "")
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        tree_id = self.parent.tree_id if self.parent else self.tree_id
+        self.__class__.objects.partial_rebuild(tree_id)
+
 
 class Location(models.Model):
     """
