@@ -50,15 +50,32 @@ class CreateOrUpdateAccountingParams:
     main_ledger_account: str
 
     def to_json(self) -> Dict[str, Any]:
-        return {
+        # balanceProfitCenter was added to web shop as a required field
+        # and that broke the agreed API contract. We don't have the field
+        # in our model because we don't need it so value is hard-coded to
+        # single whitespace.
+        json = {
             "vatCode": self.vat_code,
-            "internalOrder": self.internal_order,
-            "profitCenter": self.profit_center,
-            "project": self.project,
-            "operationArea": self.operation_area,
             "companyCode": self.company_code,
             "mainLedgerAccount": self.main_ledger_account,
+            "balanceProfitCenter": " ",
         }
+
+        # Verkkokauppa API does not work if these values are None.
+        # Fields can be there only if they have a value
+        if self.internal_order:
+            json["internalOrder"] = self.internal_order
+
+        if self.profit_center:
+            json["profitCenter"] = self.profit_center
+
+        if self.project:
+            json["project"] = self.project
+
+        if self.operation_area:
+            json["operationArea"] = self.operation_area
+
+        return json
 
 
 @dataclass(frozen=True)

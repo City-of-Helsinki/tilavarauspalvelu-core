@@ -32,6 +32,14 @@ def update_expired_orders(older_than_minutes: int) -> None:
 
             elif result and result.status == WebShopPaymentStatus.PAID_ONLINE.value:
                 order.status = OrderStatus.PAID
+            elif (
+                result
+                and result.status == WebShopPaymentStatus.CREATED.value
+                and result.timestamp
+                and result.timestamp > expired_datetime
+            ):
+                # user has entered actual payment phase from web shop; skip expire until more time passed
+                continue
             else:
                 order.status = OrderStatus.EXPIRED
                 cancel_order(order.remote_id, order.reservation_user_uuid)
