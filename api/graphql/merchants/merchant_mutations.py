@@ -27,6 +27,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
 
     order_uuid = graphene.UUID()
     status = graphene.String()
+    reservation_pk = graphene.Int()
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
@@ -85,5 +86,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 send_confirmation_email(payment_order.reservation)
 
         return RefreshOrderMutation(
-            order_uuid=payment_order.remote_id, status=payment_order.status
+            order_uuid=payment_order.remote_id,
+            status=payment_order.status,
+            reservation_pk=payment_order.reservation.pk,
         )
