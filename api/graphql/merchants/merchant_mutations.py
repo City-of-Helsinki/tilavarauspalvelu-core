@@ -1,5 +1,8 @@
+from datetime import datetime
+
 import graphene
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 from graphene import relay
 from graphene_permissions.mixins import AuthMutation
 from sentry_sdk import capture_exception, capture_message, push_scope
@@ -12,6 +15,8 @@ from reservations.email_utils import send_confirmation_email
 from reservations.models import STATE_CHOICES
 
 from ..validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+
+TIMEZONE = get_default_timezone()
 
 
 class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
@@ -56,6 +61,9 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 "Unable to check order payment: problem with external service",
                 ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,
             ) from err
+
+        payment_order.payment_id = payment.payment_id
+        payment_order.processed_at = datetime.now().astimezone(TIMEZONE)
 
         if (
             payment.status == "payment_cancelled"
