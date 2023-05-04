@@ -10,7 +10,7 @@ from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
 )
 from reservations.email_utils import send_confirmation_email
-from reservations.models import STATE_CHOICES, Reservation
+from reservations.models import STATE_CHOICES
 from utils.decimal_utils import round_decimal
 
 
@@ -113,9 +113,12 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     @property
     def validated_data(self):
         validated_data = super().validated_data
+        payment_type = validated_data.get("payment_type", "").upper()
 
         if self.instance._requires_handling():
             validated_data["state"] = STATE_CHOICES.REQUIRES_HANDLING
+        elif self.instance.price_net > 0 and payment_type != PaymentType.ON_SITE:
+            validated_data["state"] = STATE_CHOICES.WAITING_FOR_PAYMENT
         else:
             validated_data["state"] = STATE_CHOICES.CONFIRMED
 
@@ -123,10 +126,12 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
     def save(self, **kwargs):
         self.fields.pop("payment_type")
-        instance = super().save(**kwargs)
-
         state = self.validated_data["state"]
-        if state == STATE_CHOICES.CONFIRMED and self.instance.price_net > 0:
+
+        if (
+            state in [STATE_CHOICES.CONFIRMED, STATE_CHOICES.WAITING_FOR_PAYMENT]
+            and self.instance.price_net > 0
+        ):
             payment_type = self.validated_data["payment_type"].upper()
             price_net = round_decimal(self.instance.price_net, 2)
             price_vat = round_decimal(
@@ -159,10 +164,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     checkout_url=payment_order.checkout_url,
                     receipt_url=payment_order.receipt_url,
                 )
-                Reservation.objects.filter(pk=self.instance.pk).update(
-                    state=STATE_CHOICES.WAITING_FOR_PAYMENT
-                )
-                self.instance.refresh_from_db()
 
+        instance = super().save(**kwargs)
         send_confirmation_email(instance)
         return instance
