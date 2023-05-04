@@ -107,7 +107,7 @@ def _get_order_params(reservation: Reservation):
         ),
         2,
     )
-    preferred_language = getattr(reservation, "preferred_language", "fi")
+    preferred_language = getattr(reservation, "reservee_language", "fi")
     items = [
         OrderItemParams(
             product_id=runit.payment_product.id,
