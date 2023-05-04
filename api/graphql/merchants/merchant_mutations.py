@@ -36,11 +36,24 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 "No permission to refresh the order", ValidationErrorCodes.NO_PERMISSION
             )
 
+        needs_update_statuses = [
+            OrderStatus.DRAFT,
+            OrderStatus.EXPIRED,
+            OrderStatus.CANCELLED,
+        ]
+
         remote_id = input.get("order_uuid")
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:
             raise ValidationErrorWithCode(
                 "Order not found", ValidationErrorCodes.NOT_FOUND
+            )
+
+        if payment_order.status not in needs_update_statuses:
+            return RefreshOrderMutation(
+                order_uuid=payment_order.remote_id,
+                status=payment_order.status,
+                reservation_pk=payment_order.reservation.pk,
             )
 
         try:
