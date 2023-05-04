@@ -1,5 +1,8 @@
+from datetime import datetime
+
 import graphene
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 from graphene import relay
 from graphene_permissions.mixins import AuthMutation
 from sentry_sdk import capture_exception, capture_message, push_scope
@@ -13,6 +16,8 @@ from reservations.models import STATE_CHOICES
 
 from ..validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 
+TIMEZONE = get_default_timezone()
+
 
 class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
     permission_classes = (OrderRefreshPermission,)
@@ -22,6 +27,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
 
     order_uuid = graphene.UUID()
     status = graphene.String()
+    reservation_pk = graphene.Int()
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
@@ -30,11 +36,24 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 "No permission to refresh the order", ValidationErrorCodes.NO_PERMISSION
             )
 
+        needs_update_statuses = [
+            OrderStatus.DRAFT,
+            OrderStatus.EXPIRED,
+            OrderStatus.CANCELLED,
+        ]
+
         remote_id = input.get("order_uuid")
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:
             raise ValidationErrorWithCode(
                 "Order not found", ValidationErrorCodes.NOT_FOUND
+            )
+
+        if payment_order.status not in needs_update_statuses:
+            return RefreshOrderMutation(
+                order_uuid=payment_order.remote_id,
+                status=payment_order.status,
+                reservation_pk=payment_order.reservation.pk,
             )
 
         try:
@@ -57,6 +76,9 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,
             ) from err
 
+        payment_order.payment_id = payment.payment_id
+        payment_order.processed_at = datetime.now().astimezone(TIMEZONE)
+
         if (
             payment.status == "payment_cancelled"
             and payment_order.status is not OrderStatus.CANCELLED
@@ -77,5 +99,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 send_confirmation_email(payment_order.reservation)
 
         return RefreshOrderMutation(
-            order_uuid=payment_order.remote_id, status=payment_order.status
+            order_uuid=payment_order.remote_id,
+            status=payment_order.status,
+            reservation_pk=payment_order.reservation.pk,
         )

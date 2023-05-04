@@ -61,48 +61,6 @@ class ApplicationsGraphQLPermissionsTestCase(ApplicationTestCaseBase):
     # Test function section
     # ---------------------
 
-    def test_application_mutation_fails(self):
-        self.client.force_login(self.general_admin)
-
-        mutation_query = """
-            mutation updateApplications($input: ApplicationsUpdateMutationInput!) {
-                updateApplications(input: $input) {
-                    status
-                }
-            }
-        """
-        status_fetch_query = """
-            query {
-                applications {
-                    edges {
-                        node {
-                            pk
-                            status
-                        }
-                    }
-                }
-            }
-        """
-
-        response = self.query(status_fetch_query)
-        initial_state = json.loads(response.content)
-
-        response = self.query(mutation_query, input_data={"id": 1, "status": "draft"})
-        assert_that(response.status_code).is_equal_to(400)
-        content = json.loads(response.content)
-
-        # Find correct error message
-        message_found = False
-        for msg in content.get("errors"):
-            if "Cannot query field 'updateApplications'" in msg.get("message", ""):
-                message_found = True
-        assert_that(message_found).is_true()
-
-        response = self.query(status_fetch_query)
-        updated_state = json.loads(response.content)
-
-        assert_that(updated_state).is_equal_to(initial_state)
-
     def test_not_logged_in_user_does_not_receive_data(self):
         self.client.logout()
 

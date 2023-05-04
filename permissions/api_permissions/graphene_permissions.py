@@ -714,7 +714,4 @@ class OrderRefreshPermission(BasePermission):
     def has_mutation_permission(cls, root, info, input):
         remote_id = input.get("order_uuid")
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
-        if not payment_order:
-            return False
-
         return can_refresh_order(info.context.user, payment_order)

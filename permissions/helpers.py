@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Iterable, List, Union
+from typing import Iterable, List, Optional, Union
 
 from django.contrib.auth.models import User
 from django.db.models import Q, QuerySet
@@ -490,7 +490,7 @@ def can_view_users(user: User):
     )
 
 
-def can_refresh_order(user: User, payment_order: PaymentOrder) -> bool:
+def can_refresh_order(user: User, payment_order: Optional[PaymentOrder]) -> bool:
     if not user.is_authenticated:
         return False
 
@@ -498,7 +498,7 @@ def can_refresh_order(user: User, payment_order: PaymentOrder) -> bool:
     return (
         is_superuser(user)
         or has_general_permission(user, permission)
-        or user.uuid == payment_order.reservation_user_uuid
+        or (payment_order and user.uuid == payment_order.reservation_user_uuid)
     )
 
 
