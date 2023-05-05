@@ -505,7 +505,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
     non_subsidised_price = models.DecimalField(
         verbose_name=_("Non subsidised price"),
         max_digits=20,
-        decimal_places=6,
+        decimal_places=2,
         default=0,
         help_text="The non subsidised price of this reservation including VAT",
     )
@@ -951,7 +951,7 @@ class ReservationStatistic(models.Model):
     non_subsidised_price = models.DecimalField(
         verbose_name=_("Non subsidised price"),
         max_digits=20,
-        decimal_places=6,
+        decimal_places=2,
         default=0,
         help_text="The non subsidised price of the reservation excluding VAT",
     )
