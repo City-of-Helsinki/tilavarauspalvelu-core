@@ -161,6 +161,46 @@ class HelpersTestCase(TestCase):
         create_verkkokauppa_order(reservation)
         assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to("")
 
+    @patch("merchants.verkkokauppa.helpers.create_order")
+    def test_create_verkkokauppa_order_respect_reservee_language(
+        self, mock_create_order
+    ):
+        user = get_user_model().objects.create(
+            username="testuser",
+            first_name="Test",
+            last_name="User",
+            email="test.user@example.com",
+        )
+        payment_product = PaymentProductFactory()
+        runit = ReservationUnitFactory(
+            payment_product=payment_product,
+            name_fi="Nimi",
+            name_en="Name",
+            name_sv="Namn",
+        )
+        reservation_en = ReservationFactory(
+            reservation_unit=[runit],
+            user=user,
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_language="en",
+        )
+        reservation_sv = ReservationFactory(
+            reservation_unit=[runit],
+            user=user,
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_language="sv",
+        )
+
+        create_verkkokauppa_order(reservation_en)
+        assert_that(
+            mock_create_order.call_args.args[0].items[0].product_name
+        ).is_equal_to("Name")
+
+        create_verkkokauppa_order(reservation_sv)
+        assert_that(
+            mock_create_order.call_args.args[0].items[0].product_name
+        ).is_equal_to("Namn")
+
     def test_get_meta_label_returns_label_with_supported_key(self):
         period_label = get_meta_label("reservationPeriod", self.reservation)
         number_label = get_meta_label("reservationNumber", self.reservation)
