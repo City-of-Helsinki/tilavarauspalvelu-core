@@ -50,25 +50,25 @@ class HelpersTestCase(TestCase):
         self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("La 05.11.2022 10:00-12:00")
+        assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
 
     def test_get_formatted_reservation_time_sv(self):
         self.reservation.reservee_language = "sv"
         self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("Lö 05.11.2022 10:00-12:00")
+        assert_that(date).is_equal_to("Lö 5.11.2022 10:00-12:00")
 
     def test_get_formatted_reservation_time_en(self):
         self.reservation.reservee_language = "en"
         self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("Sa 05.11.2022 10:00-12:00")
+        assert_that(date).is_equal_to("Sa 5.11.2022 10:00-12:00")
 
     def test_get_formatted_reservation_time_fi_fallback(self):
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("La 05.11.2022 10:00-12:00")
+        assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
 
     def test_get_validated_phone_number(self):
         assert_that(get_validated_phone_number("+358 50 123 4567")).is_equal_to(

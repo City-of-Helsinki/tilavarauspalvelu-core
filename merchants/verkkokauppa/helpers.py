@@ -39,9 +39,11 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
 
     preferred_language = reservation.reservee_language or "fi"
     weekday = localized_short_weekday(begin.weekday(), preferred_language)
+    date = "{d.day}.{d.month}.{d.year}".format(d=begin)
+    start_time = begin.strftime("%H:%M")
     end_time = end.strftime("%H:%M")
 
-    return begin.strftime(f"{weekday} %d.%m.%Y %H:%M-{end_time}")
+    return begin.strftime(f"{weekday} {date} {start_time}-{end_time}")
 
 
 def get_validated_phone_number(phone_number: str) -> str:
