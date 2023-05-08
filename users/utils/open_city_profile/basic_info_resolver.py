@@ -89,6 +89,11 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
                          postalCode
                          postOffice
                     }
+                    permanentForeignAddress {
+                        streetAddress
+                        additionalAddress
+                        countryCode
+                    }
                 }
             }
         }
@@ -204,7 +209,6 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
         if address:
             return {
                 "address": address.get("streetAddress"),
-                "city": address.get("additionalAddress"),
                 "countryCode": address.get("countryCode"),
             }
 
