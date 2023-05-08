@@ -562,6 +562,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'name': 'movies',
                         'orderStatus': None,
                         'orderUuid': None,
+                        'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -604,6 +605,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'name': 'admin movies',
                         'orderStatus': None,
                         'orderUuid': None,
+                        'refundUuid': None,
                         'reserveeAddressCity': 'Nowhere',
                         'reserveeAddressStreet': 'Mystery street 2',
                         'reserveeAddressZip': '00100',
@@ -636,6 +638,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'name': 'movies',
                         'orderStatus': None,
                         'orderUuid': None,
+                        'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -678,6 +681,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'name': 'admin movies',
                         'orderStatus': None,
                         'orderUuid': None,
+                        'refundUuid': None,
                         'reserveeAddressCity': 'Nowhere',
                         'reserveeAddressStreet': 'Mystery street 2',
                         'reserveeAddressZip': '00100',
@@ -710,6 +714,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'name': 'movies',
                         'orderStatus': None,
                         'orderUuid': None,
+                        'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -894,6 +899,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'name': 'admin movies',
                         'orderStatus': None,
                         'orderUuid': None,
+                        'refundUuid': None,
                         'reserveeAddressCity': None,
                         'reserveeAddressStreet': None,
                         'reserveeAddressZip': None,
@@ -924,6 +930,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'name': 'movies',
                         'orderStatus': None,
                         'orderUuid': None,
+                        'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
                         'reserveeAddressZip': '00100',
@@ -1474,6 +1481,7 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                             'nameFi': 'purpose'
                         },
                         'recurringReservation': None,
+                        'refundUuid': None,
                         'reservationUnits': [
                             {
                                 'nameFi': 'resunit'
@@ -1582,6 +1590,27 @@ snapshots['ReservationQueryTestCase::test_reservee_date_of_birth_is_shown_to_uni
                 }
             ],
             'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_show_refund_uuid_when_it_is_available 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'refundUuid': None
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'show me',
+                        'refundUuid': 'e521e259-af10-40dc-84ce-308fe66f77d5'
+                    }
+                }
+            ]
         }
     }
 }

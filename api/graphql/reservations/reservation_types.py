@@ -162,6 +162,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     order_uuid = graphene.String()
     order_status = graphene.String()
     handled_at = graphene.DateTime()
+    refund_uuid = graphene.String()
 
     class Meta:
         model = Reservation
@@ -213,6 +214,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "order_uuid",
             "order_status",
             "handled_at",
+            "refund_uuid",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -359,6 +361,11 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     def resolve_order_status(self, info: ResolveInfo) -> Optional[str]:
         payment_order = self.payment_order.first()
         return payment_order.status if payment_order else None
+
+    @reservation_non_public_field
+    def resolve_refund_uuid(self, info: ResolveInfo) -> Optional[str]:
+        payment_order = self.payment_order.first()
+        return getattr(payment_order, "refund_id", None)
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
