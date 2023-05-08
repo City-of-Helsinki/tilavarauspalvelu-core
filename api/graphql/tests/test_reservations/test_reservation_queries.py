@@ -1,5 +1,6 @@
 import datetime
 import json
+from uuid import UUID
 
 import freezegun
 from assertpy import assert_that
@@ -106,6 +107,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             end
                             orderUuid
                             orderStatus
+                            refundUuid
                         }
                     }
                 }
@@ -216,6 +218,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             type
                             orderUuid
                             orderStatus
+                            refundUuid
                         }
                     }
                 }
@@ -370,6 +373,39 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             state
                             name
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_show_refund_uuid_when_it_is_available(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        metadata = ReservationMetadataSetFactory()
+        res_unit = ReservationUnitFactory(metadata_set=metadata)
+        res = ReservationFactory(
+            state=STATE_CHOICES.REQUIRES_HANDLING,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="show me",
+        )
+        PaymentOrderFactory(
+            reservation=res, refund_id=UUID("e521e259-af10-40dc-84ce-308fe66f77d5")
+        )
+        response = self.query(
+            """
+            query {
+                reservations(orderBy:"name") {
+                    edges {
+                        node {
+                            name
+                            refundUuid
                         }
                     }
                 }
