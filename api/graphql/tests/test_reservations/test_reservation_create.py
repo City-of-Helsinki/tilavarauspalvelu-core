@@ -289,7 +289,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.reservee_address_city).is_equal_to("Foreign city AX")
+        assert_that(reservation.reservee_address_city).is_empty()
         assert_that(reservation.reservee_address_street).is_equal_to("Foreign street 1")
         assert_that(reservation.reservee_address_zip).is_empty()
 

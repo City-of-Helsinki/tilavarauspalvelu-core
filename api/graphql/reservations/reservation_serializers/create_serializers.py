@@ -271,18 +271,12 @@ class ReservationCreateSerializer(
                 data[key] = value
 
             address = reader.get_address()
-            if address and not address.get("countryCode"):
+            if address and address.get("address"):
                 data["reservee_address_street"] = address.get("address")
+            if address and address.get("postalCode"):
                 data["reservee_address_zip"] = address.get("postalCode")
+            if address and address.get("city"):
                 data["reservee_address_city"] = address.get("city")
-
-            elif address and address.get("countryCode"):
-                # If countryCode is present then address is abroad address and
-                # then the format can be ambiguous, so we use the street address and city only.
-                data["reservee_address_street"] = address.get("address")
-                data[
-                    "reservee_address_city"
-                ] = f"{address.get('city')} {address.get('countryCode')}"
 
         except ProfileReadError as prof_err:
             log_exception_to_sentry(prof_err)

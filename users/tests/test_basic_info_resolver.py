@@ -259,7 +259,7 @@ class ProfileUserInfoReaderTestCase(TestCase):
 
         assert_that(address.get("address")).is_equal_to("Foreign street 1")
         assert_that(address.get("postalCode")).is_none()
-        assert_that(address.get("city")).is_equal_to("Foreign city")
+        assert_that(address.get("city")).is_none()
         assert_that(address.get("countryCode")).is_equal_to("AX")
 
     @patch("requests.get")
