@@ -127,28 +127,24 @@ const NavigationUserMenu = () => {
       closeOnItemClick
       $active={isActive}
     >
-      {user ? (
-        <>
-          <NavigationUserMenuUserCard user={user} />
-          {userMenuItems.map((item) => (
-            <NavigationUserMenuItem
-              href="#"
-              key={item.path}
-              onClick={() =>
-                router.push(item.path, item.path, { locale: router.locale })
-              }
-            >
-              {t(`navigation:Item.${item.title}`)}
-            </NavigationUserMenuItem>
-          ))}
-        </>
-      ) : null}
+      <NavigationUserMenuUserCard user={user} />
+      {userMenuItems.map((item) => (
+        <NavigationUserMenuItem
+          href="#"
+          key={item.path}
+          onClick={() =>
+            router.push(item.path, item.path, { locale: router.locale })
+          }
+        >
+          {t(`navigation:Item.${item.title}`)}
+        </NavigationUserMenuItem>
+      ))}
       <NavigationUserMenuItem
         href="#"
         onClick={handleSignOut}
         icon={<IconSignout aria-hidden />}
         label={t("common:logout")}
-        $divider={!!user}
+        $divider
       />
     </StyledUserMenu>
   );

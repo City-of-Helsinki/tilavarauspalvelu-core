@@ -4,6 +4,7 @@ import { Navigation as HDSNavigation } from "hds-react";
 import { useRouter } from "next/router";
 import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "next-i18next";
+import { fontBold } from "common/src/common/typography";
 import { NavigationUserMenu } from "./NavigationUserMenu/NavigationUserMenu";
 import { NavigationMenuItem } from "./NavigationMenuItem";
 import { LanguageOption, MenuItem } from "./types";
@@ -21,6 +22,14 @@ const StyledNavigation = styled(HDSNavigation)`
   #languageSelector-menu {
     right: 0;
     left: unset;
+  }
+
+  a[aria-label="Varaamo"] {
+    ${fontBold};
+  }
+
+  &&& a:not([href]) {
+    cursor: pointer;
   }
 
   @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
@@ -71,6 +80,7 @@ const Navigation = () => {
   return (
     <StyledNavigation
       title={t("common:applicationName")}
+      titleAriaLabel={t("common:applicationName")}
       onTitleClick={handleNavigationTitleClick}
       menuToggleAriaLabel="Menu"
       skipTo="#main"

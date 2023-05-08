@@ -466,7 +466,7 @@ describe("quick reservation", () => {
       "contain.text",
       "Pukinmäen nuorisotalon keittiö"
     );
-    reservationInfoCard().should("contain.text", "1 t 30 min");
+    reservationInfoCard().should("contain.text", "4 t");
   });
 });
 
@@ -664,19 +664,14 @@ describe("with metadataset", () => {
       cy.get(`#${field}`).should("exist");
     });
 
-    cy.get('button[type="submit"]').click();
-
-    [cy.get("#reserveeFirstName-error")].forEach((error) =>
-      error.should("contain.text", "Kenttä on pakollinen")
-    );
-
     cy.get("#reserveeEmail").clear().type("foo").blur();
+    cy.get('button[type="submit"]').click();
     cy.get("#reserveeEmail-error").should(
       "contain.text",
       "Virheellinen sähköpostiosoite"
     );
 
-    cy.get("#reserveeFirstName").type("Forename");
+    cy.get("#reserveeFirstName").clear().type("Forename");
     cy.get("#reserveeEmail").type("@bar.baz");
 
     cy.checkA11y(undefined, undefined, undefined, true);

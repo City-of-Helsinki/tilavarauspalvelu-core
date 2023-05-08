@@ -28,7 +28,6 @@ type Props = {
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
-  defaultValues?: Record<string, string | number>;
 };
 
 const StyledCheckboxWrapper = styled(CheckboxWrapper)<{
@@ -130,7 +129,6 @@ const ReservationFormField = ({
   t,
   params = {},
   data = {},
-  defaultValues = {},
 }: Props) => {
   const normalizedReserveeType =
     reserveeType?.toLocaleLowerCase() || "individual";
@@ -198,7 +196,7 @@ const ReservationFormField = ({
   const error = get(errors, field);
   const errorText = error && t("forms:requiredField");
 
-  const defaultValue = get(defaultValues, field);
+  const defaultValue = get(reservation, field);
 
   const checkParams = {
     field,
@@ -242,9 +240,9 @@ const ReservationFormField = ({
           options={options[field]}
           {...removeRefParam(formField)}
           value={
-            formField.value ||
-            options[field].find((n) => n.value === defaultValue) ||
-            null
+            typeof formField.value === "object"
+              ? formField.value
+              : options[field].find((n) => n.value === defaultValue) || null
           }
           error={errorText}
           required={required}
