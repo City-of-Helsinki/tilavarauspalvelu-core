@@ -388,3 +388,34 @@ class ReservationSchedulingMixin:
                 "One or more reservation units are in open application round.",
                 ValidationErrorCodes.RESERVATION_UNIT_IN_OPEN_ROUND,
             )
+
+    def check_reservation_intervals_for_staff_reservation(
+        self, reservation_unit, begin
+    ):
+        interval_to_minutes = {
+            ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
+            ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,
+            ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES: 60,
+            ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES: 90,
+        }
+        interval = (
+            reservation_unit.reservation_start_interval
+            or ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
+        )
+        interval_minutes = interval_to_minutes[interval]
+        interval_timedelta = datetime.timedelta(minutes=interval_minutes)
+        possible_start_times = set()
+
+        start_time = datetime.datetime.combine(
+            begin.date(), datetime.time()
+        ).astimezone(get_default_timezone())
+        end_time = start_time + datetime.timedelta(hours=23, minutes=59, seconds=59)
+        while start_time < end_time:
+            possible_start_times.add(start_time.time())
+            start_time += interval_timedelta
+
+        if begin.time() not in possible_start_times:
+            raise ValidationErrorWithCode(
+                f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",
+                ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
+            )
