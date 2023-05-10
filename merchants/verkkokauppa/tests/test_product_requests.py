@@ -43,6 +43,7 @@ class ProductRequestsTestCaseBase(TestCase):
             operation_area="333333",
             company_code="4444",
             main_ledger_account="555555",
+            balance_profit_center="2983300",
         )
 
     @classmethod
