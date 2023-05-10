@@ -48,17 +48,14 @@ class CreateOrUpdateAccountingParams:
     operation_area: str
     company_code: str
     main_ledger_account: str
+    balance_profit_center: str
 
     def to_json(self) -> Dict[str, Any]:
-        # balanceProfitCenter was added to web shop as a required field
-        # and that broke the agreed API contract. We don't have the field
-        # in our model because we don't need it so value is hard-coded to
-        # single whitespace.
         json = {
             "vatCode": self.vat_code,
             "companyCode": self.company_code,
             "mainLedgerAccount": self.main_ledger_account,
-            "balanceProfitCenter": " ",
+            "balanceProfitCenter": self.balance_profit_center,
         }
 
         # Verkkokauppa API does not work if these values are None.
@@ -88,6 +85,7 @@ class Accounting:
     operation_area: str
     company_code: str
     main_ledger_account: str
+    balance_profit_center: str
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "Accounting":
@@ -101,6 +99,7 @@ class Accounting:
                 operation_area=json["operationArea"],
                 company_code=json["companyCode"],
                 main_ledger_account=json["mainLedgerAccount"],
+                balance_profit_center=json["balanceProfitCenter"],
             )
         except (KeyError, ValueError) as e:
             raise ParseAccountingError("Could not parse accounting") from e

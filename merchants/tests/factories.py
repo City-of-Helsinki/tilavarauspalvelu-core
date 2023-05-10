@@ -54,3 +54,4 @@ class PaymentAccountingFactory(DjangoModelFactory):
     profit_center = "1234567"
     project = "1234567"
     operation_area = "123456"
+    balance_profit_center = "2983300"
