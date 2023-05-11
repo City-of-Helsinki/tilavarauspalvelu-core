@@ -1,6 +1,9 @@
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import graphene
+from django.conf import settings
+from django.utils.timezone import get_default_timezone
 from graphene_permissions.mixins import AuthNode
 
 from api.graphql.base_connection import TilavarausBaseConnection
@@ -70,3 +73,14 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_reservation_pk(self, info) -> str:
         return self.reservation.pk
+
+    def resolve_checkout_url(self, info) -> Optional[str]:
+        now = datetime.now(tz=timezone.utc).astimezone(get_default_timezone())
+        expired = now - timedelta(
+            minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
+        )
+
+        if self.created_at > expired:
+            return self.checkout_url
+
+        return None

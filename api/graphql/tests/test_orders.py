@@ -1,11 +1,15 @@
 import json
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 from unittest import mock
 from uuid import UUID
 
+import freezegun
 import snapshottest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
+from django.test import override_settings
+from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
@@ -17,7 +21,12 @@ from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import ReservationFactory
 
+NOW = datetime(2023, 5, 10, 13, 0, 0, tzinfo=timezone.utc).astimezone(
+    get_default_timezone()
+)
 
+
+@freezegun.freeze_time(NOW)
 class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -94,6 +103,29 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
+    def test_checkout_url_no_visible_when_expired(self):
+        self.order.checkout_url = "https://example.url/checkout"
+        self.order.save()
+
+        self.client.force_login(self.general_admin)
+
+        response = self.query(self.get_order_query())
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("order").get("checkoutUrl")).is_equal_to(
+            "https://example.url/checkout"
+        )
+
+        with freezegun.freeze_time(NOW + timedelta(minutes=6)):
+            response = self.query(self.get_order_query())
+            assert_that(response.status_code).is_equal_to(200)
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            assert_that(content.get("data").get("order").get("checkoutUrl")).is_none()
 
 
 class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
