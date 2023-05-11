@@ -1,13 +1,16 @@
 import json
 
+import pytest
 from assertpy import assert_that
 
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
 )
 from spaces.tests.factories import SpaceFactory
+from utils.test_utils import skip_long_running
 
 
+@pytest.mark.skipif(skip_long_running(), reason="Slow test")
 class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):
     def test_filtering_by_type_fi(self):
         response = self.query(
