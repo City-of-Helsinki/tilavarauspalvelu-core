@@ -9,7 +9,7 @@ LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]
 
 
 class HierarchyModelMultipleChoiceFilter(filters.ModelMultipleChoiceFilter):
-    """ Filters using the given object and it's children. Use with MPTT models. """
+    """Filters using the given object and it's children. Use with MPTT models."""
 
     def filter(self, qs, value):
         # qs is the initial list of objects to be filtered
