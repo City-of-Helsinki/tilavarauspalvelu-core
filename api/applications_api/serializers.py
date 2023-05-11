@@ -129,6 +129,9 @@ class NullableCurrentUserDefault(object):
     def __init__(self):
         self.user = None
 
+    # DEPRECATED: This does not work anymore. It was deprecated ealier and removed in
+    # the latest djangorestframework:
+    # https://github.com/encode/django-rest-framework/pull/8589
     def set_context(self, serializer_field):
         user = self.user = serializer_field.context["request"].user
 
