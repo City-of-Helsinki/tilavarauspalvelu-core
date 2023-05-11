@@ -16,9 +16,11 @@ class ReservationUnitAdminApplicationRoundTestCase(TestCase):
             4, reservation_kind=ReservationKind.DIRECT
         )
 
-        cls.radmin = ReservationUnitAdmin(ReservationUnit, None)
         cls.queryset = ReservationUnit.objects.all()
         cls.req_factory = RequestFactory()
+
+    def setUp(self):
+        self.radmin = ReservationUnitAdmin(ReservationUnit, None)
 
     def test_reservation_kind_is_direct_are_excluded_from_queryset(self):
         get_request = self.req_factory.get(
