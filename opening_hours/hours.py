@@ -1,8 +1,8 @@
 import datetime
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
+from zoneinfo import ZoneInfo
 
-import pytz
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
@@ -110,7 +110,7 @@ def get_opening_hours(
 
     days_data_out = []
     for day_data_in in days_data_in["results"]:
-        timezone = pytz.timezone(
+        timezone = ZoneInfo(
             day_data_in.get("resource", {}).get("timezone", DEFAULT_TIMEZONE.zone)
         )
         for opening_hours in day_data_in["opening_hours"]:

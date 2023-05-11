@@ -1,4 +1,5 @@
 import datetime
+from datetime import timezone
 from decimal import Decimal
 from typing import Optional
 
@@ -6,7 +7,6 @@ from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
-from pytz import UTC
 
 from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate, EmailType
@@ -58,7 +58,9 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_begin_time()).is_equal_to("10:00")
 
     def test_get_begin_time_respects_timezone(self):
-        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=UTC)
+        self.reservation.begin = datetime.datetime(
+            2022, 2, 28, 23, 00, tzinfo=timezone.utc
+        )
         self.reservation.save()
 
         assert_that(self.get_builder()._get_begin_time()).is_equal_to("01:00")
@@ -67,7 +69,9 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_begin_date()).is_equal_to("9.2.2022")
 
     def test_get_begin_date_respects_timezone(self):
-        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=UTC)
+        self.reservation.begin = datetime.datetime(
+            2022, 2, 28, 23, 00, tzinfo=timezone.utc
+        )
         self.reservation.save()
 
         assert_that(self.get_builder()._get_begin_date()).is_equal_to("1.3.2022")
@@ -76,7 +80,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_end_time()).is_equal_to("12:00")
 
     def test_get_end_time_respects_timezone(self):
-        self.reservation.end = datetime.datetime(2022, 3, 1, 1, 00, tzinfo=UTC)
+        self.reservation.end = datetime.datetime(2022, 3, 1, 1, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
         assert_that(self.get_builder()._get_end_time()).is_equal_to("03:00")
@@ -85,7 +89,9 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_end_date()).is_equal_to("9.2.2022")
 
     def test_get_end_date_respects_timezone(self):
-        self.reservation.end = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=UTC)
+        self.reservation.end = datetime.datetime(
+            2022, 2, 28, 23, 00, tzinfo=timezone.utc
+        )
         self.reservation.save()
 
         assert_that(self.get_builder()._get_end_date()).is_equal_to("1.3.2022")

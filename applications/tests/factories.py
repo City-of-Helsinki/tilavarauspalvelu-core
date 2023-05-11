@@ -1,4 +1,5 @@
 import datetime
+from datetime import timezone
 
 from django.utils.timezone import get_default_timezone
 from factory import LazyAttribute, SubFactory, post_generation
@@ -12,7 +13,6 @@ from factory.fuzzy import (
     FuzzyInteger,
     FuzzyText,
 )
-from pytz import UTC
 
 from applications.models import (
     PRIORITIES,
@@ -84,12 +84,12 @@ class ApplicationRoundFactory(DjangoModelFactory):
     )
     service_sector = SubFactory(ServiceSectorFactory)
     application_period_begin = FuzzyDateTime(
-        start_dt=datetime.datetime.now(tz=UTC),
-        end_dt=datetime.datetime.now(tz=UTC),
+        start_dt=datetime.datetime.now(tz=timezone.utc),
+        end_dt=datetime.datetime.now(tz=timezone.utc),
     )
     application_period_end = FuzzyDateTime(
-        start_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
-        end_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
+        start_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
+        end_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
     )
     reservation_period_begin = FuzzyDate(
         start_date=datetime.date.today(), end_date=datetime.date.today()
@@ -99,12 +99,12 @@ class ApplicationRoundFactory(DjangoModelFactory):
         end_date=(datetime.date.today() + datetime.timedelta(weeks=4)),
     )
     public_display_begin = FuzzyDateTime(
-        start_dt=datetime.datetime.now(tz=UTC),
-        end_dt=datetime.datetime.now(tz=UTC),
+        start_dt=datetime.datetime.now(tz=timezone.utc),
+        end_dt=datetime.datetime.now(tz=timezone.utc),
     )
     public_display_end = FuzzyDateTime(
-        start_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
-        end_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
+        start_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
+        end_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
     )
 
     @post_generation

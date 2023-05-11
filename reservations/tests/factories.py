@@ -1,10 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import factory
 from factory import post_generation
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyInteger, FuzzyText
-from pytz import UTC
 
 from applications.models import PRIORITIES
 from reservation_units.tests.factories import ReservationUnitFactory
@@ -72,12 +71,12 @@ class ReservationFactory(DjangoModelFactory):
         low=PRIORITIES.PRIORITY_LOW, high=PRIORITIES.PRIORITY_HIGH, step=100
     )
     begin = FuzzyDateTime(
-        start_dt=datetime(2021, 1, 1, tzinfo=UTC),
-        end_dt=datetime(2022, 5, 31, tzinfo=UTC),
+        start_dt=datetime(2021, 1, 1, tzinfo=timezone.utc),
+        end_dt=datetime(2022, 5, 31, tzinfo=timezone.utc),
     )
     end = FuzzyDateTime(
-        start_dt=datetime(2021, 1, 1, tzinfo=UTC),
-        end_dt=datetime(2022, 5, 31, tzinfo=UTC),
+        start_dt=datetime(2021, 1, 1, tzinfo=timezone.utc),
+        end_dt=datetime(2022, 5, 31, tzinfo=timezone.utc),
     )
 
     @post_generation

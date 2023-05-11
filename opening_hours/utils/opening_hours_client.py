@@ -1,7 +1,7 @@
 import datetime
-from typing import Dict, List, Union
+from datetime import timezone
+from typing import Any, Dict, List, Tuple, Union
 
-import pytz
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
@@ -40,7 +40,9 @@ class OpeningHours:
         time_element: TimeElement,
         date: datetime.date,
         timezone: Union[
-            type(pytz.UTC), pytz.tzinfo.DstTzInfo, pytz.tzinfo.StaticTzInfo
+            timezone,
+            Any,
+            Any,
         ],
     ):
         full_day = time_element.full_day or (
@@ -58,7 +60,6 @@ class OpeningHours:
             if full_day or not time_element.end_time
             else time_element.end_time
         )
-
         start_time = timezone.localize(
             datetime.datetime(
                 date.year,
@@ -99,7 +100,7 @@ class OpeningHours:
 class OpeningHoursClient:
     def __init__(
         self,
-        resources: [str],
+        resources: List[str],
         start: datetime.date,
         end: datetime.date,
         single=False,
@@ -171,7 +172,7 @@ class OpeningHoursClient:
         self._init_opening_hours_structure()
         self._fetch_opening_hours(self.start, self.end)
 
-    def get_opening_hours_for_resource(self, resource, date) -> [OpeningHours]:
+    def get_opening_hours_for_resource(self, resource, date) -> List[OpeningHours]:
         resource = self.opening_hours.get(resource, {})
         times = resource.get(date, [])
         return times
@@ -210,7 +211,7 @@ class OpeningHoursClient:
 
     def next_opening_times(
         self, resource: str, date: datetime.date
-    ) -> (datetime.date, [OpeningHours]):
+    ) -> Tuple[datetime.date, List[OpeningHours]]:
         times_for_resource = self.opening_hours.get(resource, {})
         times = times_for_resource.get(date)
 

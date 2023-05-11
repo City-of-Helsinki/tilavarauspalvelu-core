@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
+# from pytz import UTC
+from datetime import datetime, timedelta, timezone
 from unittest import TestCase as UnitTestCase
 
 import pytest
 from django.test.testcases import TestCase
-from pytz import UTC
 
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
@@ -41,7 +41,7 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             spaces=[cls.space_corner_of_second_half],
         )
 
-        cls.begin = datetime.now(tz=UTC)
+        cls.begin = datetime.now(tz=timezone.utc)
         cls.end = cls.begin + timedelta(minutes=120)
 
     def test_no_reservations_no_overlaps(self):
