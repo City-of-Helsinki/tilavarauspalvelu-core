@@ -116,6 +116,7 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
             operation_area=self.accounting.operation_area,
             company_code=self.accounting.company_code,
             main_ledger_account=self.accounting.main_ledger_account,
+            balance_profit_center=self.accounting.balance_profit_center,
         )
         mock_create_or_update_accounting.assert_called_with(
             self.runit.payment_product.id, expected_params

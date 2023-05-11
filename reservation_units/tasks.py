@@ -103,6 +103,7 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
             operation_area=accounting.operation_area,
             company_code=accounting.company_code,
             main_ledger_account=accounting.main_ledger_account,
+            balance_profit_center=accounting.balance_profit_center,
         )
         try:
             accounting = create_or_update_accounting(

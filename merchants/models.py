@@ -263,6 +263,10 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
         validators=[is_numeric],
     )
 
+    balance_profit_center = models.CharField(
+        verbose_name=_("Balance profit center"), blank=False, null=False, max_length=10
+    )
+
     def clean(self) -> None:
         if not self.project and not self.profit_center and not self.internal_order:
             error_message = _(

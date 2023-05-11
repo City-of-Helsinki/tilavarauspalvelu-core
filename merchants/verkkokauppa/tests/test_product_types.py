@@ -72,6 +72,7 @@ class ProductTypesTestCase(TestCase):
             operation_area="operation-area",
             company_code="company-code",
             main_ledger_account="main-ledger-account",
+            balance_profit_center="2983300",
         )
         json = params.to_json()
         expected = {
@@ -82,7 +83,7 @@ class ProductTypesTestCase(TestCase):
             "operationArea": params.operation_area,
             "companyCode": params.company_code,
             "mainLedgerAccount": params.main_ledger_account,
-            "balanceProfitCenter": " ",
+            "balanceProfitCenter": "2983300",
         }
         assert_that(json).is_equal_to(expected)
 
@@ -95,6 +96,7 @@ class ProductTypesTestCase(TestCase):
             operation_area="operation-area",
             company_code="company-code",
             main_ledger_account="main-ledger-account",
+            balance_profit_center="2983300",
         )
         json = params.to_json()
         expected = {
@@ -102,7 +104,7 @@ class ProductTypesTestCase(TestCase):
             "operationArea": params.operation_area,
             "companyCode": params.company_code,
             "mainLedgerAccount": params.main_ledger_account,
-            "balanceProfitCenter": " ",
+            "balanceProfitCenter": "2983300",
         }
         assert_that(json).is_equal_to(expected)
 
@@ -116,6 +118,7 @@ class ProductTypesTestCase(TestCase):
             "operationArea": "operation-area",
             "companyCode": "CODE",
             "mainLedgerAccount": "main-ledger-account",
+            "balanceProfitCenter": "2983300",
         }
         accounting = Accounting.from_json(json)
         expected = Accounting(
@@ -127,6 +130,7 @@ class ProductTypesTestCase(TestCase):
             operation_area=json["operationArea"],
             company_code=json["companyCode"],
             main_ledger_account=json["mainLedgerAccount"],
+            balance_profit_center=json["balanceProfitCenter"],
         )
         assert_that(accounting).is_equal_to(expected)
 
