@@ -30,3 +30,4 @@ celerybeat-schedule
 .python-version
 .tox
 coverage.xml
+celery.exchange
