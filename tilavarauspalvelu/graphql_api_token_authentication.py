@@ -1,9 +1,9 @@
 from django.dispatch import Signal
-from helusers._oidc_auth_impl import ApiTokenAuthentication
+from helusers.oidc import ApiTokenAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
-token_authentication_successful = Signal(providing_args=["user", "request"])
-token_authentication_failed = Signal(providing_args=["error", "request"])
+token_authentication_successful = Signal()
+token_authentication_failed = Signal()
 
 
 class GraphQLApiTokenAuthentication(ApiTokenAuthentication):
