@@ -1,6 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 import factory
+from django.utils import timezone
 from factory import post_generation
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyInteger, FuzzyText

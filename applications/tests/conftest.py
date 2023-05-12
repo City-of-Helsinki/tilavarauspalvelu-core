@@ -1,8 +1,8 @@
 import datetime
-from datetime import timezone
 
 import pytest
 from django.conf import settings
+from django.utils import timezone
 
 from applications.models import (
     Application,

@@ -1,14 +1,13 @@
 import datetime
-from datetime import timezone
 
 import graphene
 from django.conf import settings
-from django.utils.timezone import get_default_timezone
+from django.utils import timezone
 
 from opening_hours.enums import State as ResourceState
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 
-DEFAULT_TIMEZONE = get_default_timezone()
+DEFAULT_TIMEZONE = timezone.get_default_timezone()
 
 
 def get_time_as_utc(time: datetime.time, date: datetime.date, tz_info: timezone):

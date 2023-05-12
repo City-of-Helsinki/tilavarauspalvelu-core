@@ -1,9 +1,9 @@
 import io
 import uuid
-from datetime import timezone
 
 import pytest
 from assertpy import assert_that
+from django.utils import timezone
 from rest_framework.reverse import reverse
 
 from api.ical_api import hmac_signature

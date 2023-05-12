@@ -1,12 +1,11 @@
 import datetime
-from datetime import timezone
 from decimal import Decimal
 from typing import Optional
 
 from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
-from django.utils.timezone import get_default_timezone
+from django.utils import timezone
 
 from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate, EmailType
@@ -138,7 +137,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_get_current_year(self):
-        now = datetime.datetime.now(get_default_timezone())
+        now = datetime.datetime.now(timezone.get_default_timezone())
         assert_that(self.get_builder()._get_current_year()).is_equal_to(now.year)
 
     def test_get_confirmed_instructions(self):
@@ -313,7 +312,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             link to reservations {{ my_reservations_ext_link }}
             link to feedback {{ feedback_ext_link }}
         """
-        year = datetime.datetime.now(get_default_timezone()).year
+        year = datetime.datetime.now(timezone.get_default_timezone()).year
         feedback_url = (
             "https://feedtheback.com/survey/?site=varaamopalaute&lang=fi"
             "&ref=https%3A%2F%2Fresourcebooking.com"

@@ -46,7 +46,7 @@ from terms_of_use.models import TermsOfUse
 from terms_of_use.tests.factories import TermsOfUseFactory
 from users.models import PersonalInfoViewLog
 
-DEFAULT_TIMEZONE = get_default_timezone()
+TIMEZONE = get_default_timezone()
 
 
 @freeze_time("2021-05-03")
@@ -1078,7 +1078,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_timestamps(self):
-        now = datetime.datetime.now(get_default_timezone())
+        now = datetime.datetime.now(TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -1121,7 +1121,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_reservation_state(self):
         self.maxDiff = None
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -1163,7 +1163,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_reservation_states(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         two_hours = datetime.timedelta(hours=2)
         matching_reservations = [
@@ -1288,7 +1288,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_visible_true(self):
-        today = datetime.datetime.now(tz=get_default_timezone())
+        today = datetime.datetime.now(tz=TIMEZONE)
         # No publish times should be included in results.
         ReservationUnitFactory(name_fi="show me")
 
@@ -1973,7 +1973,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_publishing(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled publishing"
         self.reservation_unit.is_draft = False
@@ -2001,7 +2001,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_hiding(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled hiding"
         self.reservation_unit.is_draft = False
@@ -2029,7 +2029,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_hidden(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be state hidden"
         self.reservation_unit.is_draft = False
@@ -2057,7 +2057,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_period(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled period"
         self.reservation_unit.is_draft = False
@@ -2114,7 +2114,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_scheduled_reservation(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled reservation"
         self.reservation_unit.reservation_begins = now + datetime.timedelta(hours=1)
@@ -2140,7 +2140,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_scheduled_period(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled period"
         self.reservation_unit.reservation_begins = now + datetime.timedelta(hours=1)
@@ -2166,7 +2166,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_reservable(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be reservable"
         self.reservation_unit.reservation_begins = now - datetime.timedelta(hours=1)
@@ -2192,7 +2192,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_scheduled_closing(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled closing"
         self.reservation_unit.reservation_begins = now - datetime.timedelta(hours=1)
@@ -2218,7 +2218,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_reservation_closed(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = datetime.datetime.now(tz=TIMEZONE)
 
         self.reservation_unit.name = "This should be reservation closed"
         self.reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
@@ -2591,7 +2591,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_by_pk_has_reservations(self):
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = datetime.datetime.now(tz=TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -2599,8 +2599,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             state=STATE_CHOICES.CREATED,
         )
         other_reservation = ReservationFactory(
-            begin=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-            end=datetime.datetime(2021, 1, 2, tzinfo=DEFAULT_TIMEZONE),
+            begin=datetime.datetime(2021, 1, 1, tzinfo=TIMEZONE),
+            end=datetime.datetime(2021, 1, 2, tzinfo=TIMEZONE),
         )
         self.reservation_unit.reservation_set.set(
             [matching_reservation, other_reservation]
@@ -2698,7 +2698,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_include_reservations_with_same_components(self):
-        now = datetime.datetime.now(get_default_timezone())
+        now = datetime.datetime.now(TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         ReservationFactory(
             begin=now,

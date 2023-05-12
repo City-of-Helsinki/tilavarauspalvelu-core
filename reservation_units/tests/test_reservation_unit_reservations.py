@@ -1,9 +1,9 @@
-# from pytz import UTC
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from unittest import TestCase as UnitTestCase
 
 import pytest
 from django.test.testcases import TestCase
+from django.utils import timezone
 
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
