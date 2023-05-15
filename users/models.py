@@ -2,8 +2,11 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from helusers.models import AbstractUser
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationNotification(models.TextChoices):
@@ -37,6 +40,10 @@ class User(AbstractUser):
     date_of_birth = models.DateField(verbose_name=_("Date of birth"), null=True)
 
     profile_id = models.CharField(max_length=255, null=False, blank=True, default="")
+
+    def __str__(self):
+        default = super().__str__()
+        return f"{default} - {self.last_login.astimezone(DEFAULT_TIMEZONE).strftime('%d.%m.%Y %H:%M')}"
 
     def get_display_name(self):
         return "{0} {1}".format(self.first_name, self.last_name).strip()
