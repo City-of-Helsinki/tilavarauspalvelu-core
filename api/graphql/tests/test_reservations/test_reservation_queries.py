@@ -92,6 +92,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             reserveeAddressCity
                             reserveeAddressZip
                             reserveeOrganisationName
+                            reserveeName
                             freeOfChargeReason
                             billingFirstName
                             billingLastName
@@ -181,6 +182,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             numPersons
                             reserveeFirstName
                             reserveeLastName
+                            reserveeName
                             reserveeType
                             reserveeOrganisationName
                             reserveeAddressStreet
@@ -1654,3 +1656,70 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
             self.general_admin.get_full_name()
         )
         assert_that(view_log.viewer_user_email).is_equal_to(self.general_admin.email)
+
+    def test_reservee_name_for_individual_reservee(self):
+        reservation = ReservationFactory(
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="First",
+            reservee_last_name="Last",
+        )
+
+        self.client.force_login(self.general_admin)
+        query = f"""
+            {{
+                reservationByPk(pk: {reservation.pk}) {{
+                    reserveeName
+                }}
+            }}
+        """
+        response = self.query(query)
+        content = json.loads(response.content)
+        assert_that(content["data"]).is_not_none()
+        assert_that(content["data"]["reservationByPk"]).is_not_none()
+        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to(
+            "First Last"
+        )
+
+    def test_reservee_name_for_business_reservee(self):
+        reservation = ReservationFactory(
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_organisation_name="Business Oy",
+        )
+
+        self.client.force_login(self.general_admin)
+        query = f"""
+            {{
+                reservationByPk(pk: {reservation.pk}) {{
+                    reserveeName
+                }}
+            }}
+        """
+        response = self.query(query)
+        content = json.loads(response.content)
+        assert_that(content["data"]).is_not_none()
+        assert_that(content["data"]["reservationByPk"]).is_not_none()
+        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to(
+            "Business Oy"
+        )
+
+    def test_reservee_name_for_nonprofit_reservee(self):
+        reservation = ReservationFactory(
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+            reservee_organisation_name="Nonprofit Ry",
+        )
+
+        self.client.force_login(self.general_admin)
+        query = f"""
+            {{
+                reservationByPk(pk: {reservation.pk}) {{
+                    reserveeName
+                }}
+            }}
+        """
+        response = self.query(query)
+        content = json.loads(response.content)
+        assert_that(content["data"]).is_not_none()
+        assert_that(content["data"]["reservationByPk"]).is_not_none()
+        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to(
+            "Nonprofit Ry"
+        )

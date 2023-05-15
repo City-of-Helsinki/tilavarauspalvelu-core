@@ -570,6 +570,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
                         'reserveeLastName': 'Vee',
+                        'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
                         'user': {
@@ -613,6 +614,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeFirstName': 'Shouldbe',
                         'reserveeId': '5727586-5',
                         'reserveeLastName': 'Hidden',
+                        'reserveeName': 'Shouldbe Hidden',
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
                         'user': {
@@ -646,6 +648,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
                         'reserveeLastName': 'Vee',
+                        'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
                         'user': {
@@ -689,6 +692,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'reserveeFirstName': 'Shouldbe',
                         'reserveeId': '5727586-5',
                         'reserveeLastName': 'Hidden',
+                        'reserveeName': 'Shouldbe Hidden',
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
                         'user': {
@@ -722,6 +726,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
                         'reserveeLastName': 'Vee',
+                        'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
                         'user': {
@@ -907,6 +912,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'reserveeFirstName': None,
                         'reserveeId': None,
                         'reserveeLastName': None,
+                        'reserveeName': None,
                         'reserveeOrganisationName': None,
                         'reserveePhone': None,
                         'user': None
@@ -938,6 +944,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
                         'reserveeLastName': 'Vee',
+                        'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
                         'user': {
@@ -1495,6 +1502,7 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         'reserveeId': '5727586-5',
                         'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Vee',
+                        'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
                         'reserveeType': 'INDIVIDUAL',

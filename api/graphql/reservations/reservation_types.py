@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 import graphene
 from graphene import ResolveInfo
@@ -10,7 +10,9 @@ from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.duration_field import Duration
 from api.graphql.translate_fields import get_all_translatable_fields
+from api.graphql.users.user_types import UserType
 from api.ical_api import hmac_signature
+from applications.models import CUSTOMER_TYPES
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
     recurring_reservation_non_public_field,
@@ -91,26 +93,26 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
         connection_class = TilavarausBaseConnection
 
     @recurring_reservation_non_public_field
-    def resolve_user(self, info: ResolveInfo) -> [str]:
+    def resolve_user(self, info: ResolveInfo) -> Optional[str]:
         if not self.user:
             return None
         return self.user.email
 
     @recurring_reservation_non_public_field
-    def resolve_application_pk(self, info: ResolveInfo) -> [graphene.Int]:
+    def resolve_application_pk(self, info: ResolveInfo) -> Optional[graphene.Int]:
         if not self.application_id:
             return None
 
         return self.application_id
 
     @recurring_reservation_non_public_field
-    def resolve_application_event_pk(self, info: ResolveInfo) -> [str]:
+    def resolve_application_event_pk(self, info: ResolveInfo) -> Optional[str]:
         if not self.application_event_id:
             return None
 
         return self.application_event_id
 
-    def resolve_weekdays(self, info: ResolveInfo) -> [graphene.List]:
+    def resolve_weekdays(self, info: ResolveInfo) -> List[graphene.List]:
         return self.weekday_list
 
 
@@ -140,6 +142,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     reservee_address_zip = graphene.String()
     reservee_phone = graphene.String()
     reservee_organisation_name = graphene.String()
+    reservee_name = graphene.String()
     billing_first_name = graphene.String()
     billing_last_name = graphene.String()
     billing_address_street = graphene.String()
@@ -246,7 +249,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         return f"{scheme}://{host}{calendar_url}?hash={signature}"
 
     @reservation_non_public_field
-    def resolve_user(self, info: ResolveInfo) -> [str]:
+    def resolve_user(self, info: ResolveInfo) -> Optional[UserType]:
         if not self.user:
             return None
         return self.user
@@ -262,6 +265,16 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_reservee_last_name(self, info: ResolveInfo) -> Optional[str]:
         return self.reservee_last_name
+
+    @reservation_non_public_field
+    def resolve_reservee_name(self, info: ResolveInfo) -> Optional[str]:
+        if self.reservee_type in [
+            CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+        ]:
+            return self.reservee_organisation_name
+        else:
+            return f"{self.reservee_first_name} {self.reservee_last_name}"
 
     @reservation_non_public_field
     def resolve_reservee_phone(self, info: ResolveInfo) -> Optional[str]:
