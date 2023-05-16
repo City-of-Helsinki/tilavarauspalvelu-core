@@ -1,6 +1,6 @@
 import datetime
 
-from django.utils.timezone import get_default_timezone
+from django.utils import timezone
 from factory import LazyAttribute, SubFactory, post_generation
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
@@ -12,7 +12,6 @@ from factory.fuzzy import (
     FuzzyInteger,
     FuzzyText,
 )
-from pytz import UTC
 
 from applications.models import (
     PRIORITIES,
@@ -26,6 +25,8 @@ from applications.models import (
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.tests.factories import AgeGroupFactory, ReservationPurposeFactory
 from spaces.tests.factories import ServiceSectorFactory
+
+DEFAULT_TIMEZONE = timezone.get_default_timezone()
 
 
 class AddressFactory(DjangoModelFactory):
@@ -84,12 +85,12 @@ class ApplicationRoundFactory(DjangoModelFactory):
     )
     service_sector = SubFactory(ServiceSectorFactory)
     application_period_begin = FuzzyDateTime(
-        start_dt=datetime.datetime.now(tz=UTC),
-        end_dt=datetime.datetime.now(tz=UTC),
+        start_dt=datetime.datetime.now(tz=timezone.utc),
+        end_dt=datetime.datetime.now(tz=timezone.utc),
     )
     application_period_end = FuzzyDateTime(
-        start_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
-        end_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
+        start_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
+        end_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
     )
     reservation_period_begin = FuzzyDate(
         start_date=datetime.date.today(), end_date=datetime.date.today()
@@ -99,12 +100,12 @@ class ApplicationRoundFactory(DjangoModelFactory):
         end_date=(datetime.date.today() + datetime.timedelta(weeks=4)),
     )
     public_display_begin = FuzzyDateTime(
-        start_dt=datetime.datetime.now(tz=UTC),
-        end_dt=datetime.datetime.now(tz=UTC),
+        start_dt=datetime.datetime.now(tz=timezone.utc),
+        end_dt=datetime.datetime.now(tz=timezone.utc),
     )
     public_display_end = FuzzyDateTime(
-        start_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
-        end_dt=(datetime.datetime.now(tz=UTC) + datetime.timedelta(weeks=4)),
+        start_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
+        end_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
     )
 
     @post_generation
@@ -200,8 +201,8 @@ class ApplicationEventScheduleFactory(DjangoModelFactory):
         model = "applications.ApplicationEventSchedule"
 
     day = FuzzyInteger(low=0, high=6)
-    begin = datetime.time(12, 0, tzinfo=get_default_timezone())
-    end = datetime.time(14, 0, tzinfo=get_default_timezone())
+    begin = datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE)
+    end = datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE)
     application_event = SubFactory(ApplicationEventFactory)
     priority = FuzzyChoice(
         choices=[choice[0] for choice in PRIORITIES.PRIORITY_CHOICES]
@@ -216,8 +217,8 @@ class ApplicationEventScheduleResultFactory(DjangoModelFactory):
     allocated_reservation_unit = SubFactory(ReservationUnitFactory)
     allocated_duration = "01:00"
     allocated_day = FuzzyInteger(low=0, high=6)
-    allocated_begin = datetime.time(12, 0, tzinfo=get_default_timezone())
-    allocated_end = datetime.time(14, 0, tzinfo=get_default_timezone())
+    allocated_begin = datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE)
+    allocated_end = datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE)
 
 
 class ApplicationStatusFactory(DjangoModelFactory):

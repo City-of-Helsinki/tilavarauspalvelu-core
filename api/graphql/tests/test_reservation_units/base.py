@@ -27,7 +27,7 @@ from spaces.tests.factories import SpaceFactory, UnitFactory
 from terms_of_use.models import TermsOfUse
 from terms_of_use.tests.factories import TermsOfUseFactory
 
-DEFAULT_TIMEZONE = get_default_timezone()
+TIMEZONE = get_default_timezone()
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
@@ -81,10 +81,10 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_confirmed_instructions_en="Additional instructions for the approved reservation",
             is_draft=False,
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
-            reservation_begins=datetime.datetime.now(tz=get_default_timezone()),
-            reservation_ends=datetime.datetime.now(tz=get_default_timezone()),
-            publish_begins=datetime.datetime.now(tz=get_default_timezone()),
-            publish_ends=datetime.datetime.now(tz=get_default_timezone())
+            reservation_begins=datetime.datetime.now(tz=TIMEZONE),
+            reservation_ends=datetime.datetime.now(tz=TIMEZONE),
+            publish_begins=datetime.datetime.now(tz=TIMEZONE),
+            publish_ends=datetime.datetime.now(tz=TIMEZONE)
             + datetime.timedelta(days=7),
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=15),
@@ -149,7 +149,7 @@ def get_mocked_opening_hours(uuid, state: State = State.WITH_RESERVATION):
     resource_id = f"{settings.HAUKI_ORIGIN_ID}:{uuid}"
     return [
         {
-            "timezone": DEFAULT_TIMEZONE,
+            "timezone": TIMEZONE,
             "resource_id": resource_id,
             "origin_id": str(uuid),
             "date": datetime.date(2020, 1, 1),
@@ -164,7 +164,7 @@ def get_mocked_opening_hours(uuid, state: State = State.WITH_RESERVATION):
             ],
         },
         {
-            "timezone": DEFAULT_TIMEZONE,
+            "timezone": TIMEZONE,
             "resource_id": resource_id,
             "origin_id": str(uuid),
             "date": datetime.date(2020, 1, 2),
@@ -242,6 +242,3 @@ def get_mocked_periods():
         }
     ]
     return data
-
-
-DEFAULT_TIMEZONE = get_default_timezone()

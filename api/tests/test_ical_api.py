@@ -2,8 +2,8 @@ import io
 import uuid
 
 import pytest
-import pytz
 from assertpy import assert_that
+from django.utils import timezone
 from rest_framework.reverse import reverse
 
 from api.ical_api import hmac_signature
@@ -64,10 +64,10 @@ def test_getting_reservation_unit_calendar(
         io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
     )
 
-    expected_start = f"DTSTART;VALUE=DATE-TIME:{reservation.begin.astimezone(pytz.UTC).strftime('%Y%m%dT%H%M%SZ')}"
+    expected_start = f"DTSTART:{reservation.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     unexpected_start = (
-        f"DTSTART;VALUE=DATE-TIME:"
-        f"{reservation_in_second_unit.begin.astimezone(pytz.UTC).strftime('%Y%m%dT%H%M%SZ')}"
+        f"DTSTART:"
+        f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     )
 
     assert_that(expected_start in zip_content).is_true()
@@ -180,10 +180,10 @@ def test_getting_reservation_calendar(
     expected_description = "DESCRIPTION:" + reservation.get_ical_description().replace(
         "\n", "\\n"
     )
-    expected_start = f"DTSTART;VALUE=DATE-TIME:{reservation.begin.astimezone(pytz.UTC).strftime('%Y%m%dT%H%M%SZ')}"
+    expected_start = f"DTSTART:{reservation.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     unexpected_start = (
-        f"DTSTART;VALUE=DATE-TIME:"
-        f"{reservation_in_second_unit.begin.astimezone(pytz.UTC).strftime('%Y%m%dT%H%M%SZ')}"
+        f"DTSTART:"
+        f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     )
 
     assert_that(zip_content).contains(expected_summary)

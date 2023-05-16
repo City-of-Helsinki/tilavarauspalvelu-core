@@ -19,6 +19,8 @@ excluded_application_statuses = [
     ApplicationStatus.CANCELLED,
 ]
 
+TIMEZONE = timezone.get_default_timezone()
+
 
 class AllocationDataBuilder(object):
     def __init__(
@@ -102,14 +104,14 @@ class AllocationDataBuilder(object):
                     the_date.month,
                     the_date.day,
                     hour=10,
-                    tzinfo=timezone.get_default_timezone(),
+                    tzinfo=TIMEZONE,
                 ),
                 end=datetime.datetime(
                     the_date.year,
                     the_date.month,
                     the_date.day,
                     hour=22,
-                    tzinfo=timezone.get_default_timezone(),
+                    tzinfo=TIMEZONE,
                 ),
             )
         return space
@@ -140,7 +142,7 @@ class AllocationDataBuilder(object):
                         day=date.day,
                         hour=time.start_time.hour,
                         minute=time.start_time.minute,
-                        tzinfo=timezone.get_default_timezone(),
+                        tzinfo=TIMEZONE,
                     ),
                     end=datetime.datetime(
                         year=date.year,
@@ -148,7 +150,7 @@ class AllocationDataBuilder(object):
                         day=date.day,
                         hour=time.end_time.hour,
                         minute=time.end_time.minute,
-                        tzinfo=timezone.get_default_timezone(),
+                        tzinfo=TIMEZONE,
                     ),
                 )
         return space

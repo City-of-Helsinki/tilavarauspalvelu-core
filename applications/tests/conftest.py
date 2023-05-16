@@ -1,8 +1,8 @@
 import datetime
 
 import pytest
-import pytz
 from django.conf import settings
+from django.utils import timezone
 
 from applications.models import (
     Application,
@@ -88,18 +88,18 @@ def matching_event_reservation_unit(
 def default_application_round(purpose) -> ApplicationRound:
     application_round = ApplicationRound.objects.create(
         application_period_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=pytz.UTC
+            year=2020, month=1, day=1, tzinfo=timezone.utc
         ),
         application_period_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=pytz.UTC
+            year=2020, month=8, day=30, tzinfo=timezone.utc
         ),
         reservation_period_begin=datetime.date(year=2020, month=1, day=1),
         reservation_period_end=datetime.date(year=2020, month=8, day=30),
         public_display_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=pytz.UTC
+            year=2020, month=1, day=1, tzinfo=timezone.utc
         ),
         public_display_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=pytz.UTC
+            year=2020, month=8, day=30, tzinfo=timezone.utc
         ),
     )
     application_round.purposes.set([purpose])
@@ -110,18 +110,18 @@ def default_application_round(purpose) -> ApplicationRound:
 def second_application_round(purpose) -> ApplicationRound:
     application_round = ApplicationRound.objects.create(
         application_period_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=pytz.UTC
+            year=2020, month=1, day=1, tzinfo=timezone.utc
         ),
         application_period_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=pytz.UTC
+            year=2020, month=8, day=30, tzinfo=timezone.utc
         ),
         reservation_period_begin=datetime.date(year=2020, month=1, day=1),
         reservation_period_end=datetime.date(year=2020, month=8, day=30),
         public_display_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=pytz.UTC
+            year=2020, month=1, day=1, tzinfo=timezone.utc
         ),
         public_display_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=pytz.UTC
+            year=2020, month=8, day=30, tzinfo=timezone.utc
         ),
     )
     application_round.purposes.set([purpose])

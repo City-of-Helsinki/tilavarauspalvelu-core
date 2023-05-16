@@ -6,7 +6,6 @@ from api.applications_api.serializers import (
     AddressSerializer,
     ApplicationEventSerializer,
     ApplicationSerializer,
-    NullableCurrentUserDefault,
     OrganisationSerializer,
     PersonSerializer,
 )
@@ -101,8 +100,6 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
         source="application_round",
         help_text="Id of the application period for which this application is targeted to",
     )
-
-    user = serializers.HiddenField(default=NullableCurrentUserDefault())
 
     application_events = ApplicationEventInApplicationSerializer(
         help_text="List of applications events", many=True
@@ -233,6 +230,11 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
     def validate(self, data):
         try:
             data = super().validate(data)
+            user = self.context.get("request").user
+            if user.is_anonymous:
+                user = None
+
+            data["user"] = user
         except serializers.ValidationError as e:
             raise self.validation_error_to_graphql_error(e)
 

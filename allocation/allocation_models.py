@@ -8,6 +8,8 @@ from applications.models import EventOccurrence
 from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
+TIMEZONE = timezone.get_default_timezone()
+
 
 class AvailableTime(object):
     def __init__(self, start: int, end: int):
@@ -53,7 +55,7 @@ class AllocationSpace(object):
                     hour=0,
                     minute=0,
                     second=0,
-                    tzinfo=timezone.get_default_timezone(),
+                    tzinfo=TIMEZONE,
                 )
             )
         )
@@ -67,7 +69,7 @@ class AllocationSpace(object):
                     hour=0,
                     minute=0,
                     second=0,
-                    tzinfo=timezone.get_default_timezone(),
+                    tzinfo=TIMEZONE,
                 )
             )
         )

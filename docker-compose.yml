@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
     db:
-        image: "postgis/postgis:11-3.0-alpine"
+        image: "postgis/postgis:13-3.3-alpine"
         environment:
             POSTGRES_USER: tvp
             POSTGRES_PASSWORD: tvp

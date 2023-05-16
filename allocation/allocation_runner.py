@@ -6,6 +6,8 @@ from allocation.allocation_solver import AllocationSolver
 from allocation.models import AllocationRequest
 from applications.allocation_result_mapper import AllocationResultMapper
 
+TIMEZONE = get_default_timezone()
+
 
 def start_allocation(allocation_request: AllocationRequest):
     data = AllocationDataBuilder(
@@ -28,13 +30,13 @@ def start_allocation(allocation_request: AllocationRequest):
         # Safeguard so we don't lock allocation on unexpected exceptions even though this shouldn't throw anything
         allocation_request.application_round.allocating = False
         allocation_request.application_round.save()
-        allocation_request.end_date = datetime.now(tz=get_default_timezone())
+        allocation_request.end_date = datetime.now(tz=TIMEZONE)
         allocation_request.completed = False
         allocation_request.save()
         raise
 
     allocation_request.application_round.allocating = False
     allocation_request.application_round.save()
-    allocation_request.end_date = datetime.now(tz=get_default_timezone())
+    allocation_request.end_date = datetime.now(tz=TIMEZONE)
     allocation_request.completed = True
     allocation_request.save()

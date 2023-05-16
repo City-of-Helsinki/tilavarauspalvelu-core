@@ -291,7 +291,7 @@ def reservation_in_second_unit(reservation_unit2, user) -> Reservation:
 
 @pytest.fixture
 def valid_allocation_request_data(application_round):
-    """ Valid JSON data for creating a new Reservation """
+    """Valid JSON data for creating a new Reservation"""
     return {
         "application_round_id": application_round.id,
         "application_round_basket_ids": [],
@@ -300,7 +300,7 @@ def valid_allocation_request_data(application_round):
 
 @pytest.fixture
 def valid_reservation_data(reservation_unit):
-    """ Valid JSON data for creating a new Reservation """
+    """Valid JSON data for creating a new Reservation"""
     return {
         "begin": "2020-11-10T08:00",
         "end": "2020-11-10T09:30",
@@ -333,7 +333,7 @@ def valid_application_round_data(
     purpose2,
     valid_application_round_basket_data,
 ):
-    """ Valid JSON data for creating a new application round """
+    """Valid JSON data for creating a new application round"""
     return {
         "name": "Kevään nuorten säännöllisten vuorojen haku 2021",
         "reservation_unit_ids": [reservation_unit.id, reservation_unit2.id],
@@ -352,7 +352,7 @@ def valid_application_round_data(
 
 @pytest.fixture
 def valid_resource_data(space):
-    """ Valid JSON data for creating a new Resource """
+    """Valid JSON data for creating a new Resource"""
     return {
         "location_type": "fixed",
         "name": {
@@ -368,7 +368,7 @@ def valid_resource_data(space):
 
 @pytest.fixture
 def valid_reservation_unit_data(unit, equipment_hammer):
-    """ Valid JSON data for creating a new ReservationUnit """
+    """Valid JSON data for creating a new ReservationUnit"""
     return {
         "name": {
             "fi": "Uusi varausyksikkö",
@@ -626,7 +626,7 @@ def valid_application_event_data(
     valid_application_event_schedule_data,
     valid_event_reservation_unit_data,
 ):
-    """ Valid JSON data for creating a new ApplicationEvent """
+    """Valid JSON data for creating a new ApplicationEvent"""
     return {
         "name": "Football event",
         "num_persons": 12,

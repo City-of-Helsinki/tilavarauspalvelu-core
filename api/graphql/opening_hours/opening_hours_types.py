@@ -1,17 +1,16 @@
 import datetime
 
 import graphene
-import pytz
 from django.conf import settings
-from django.utils.timezone import get_default_timezone
+from django.utils import timezone
 
 from opening_hours.enums import State as ResourceState
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 
-DEFAULT_TIMEZONE = get_default_timezone()
+DEFAULT_TIMEZONE = timezone.get_default_timezone()
 
 
-def get_time_as_utc(time: datetime.time, date: datetime.date, tz_info: pytz.timezone):
+def get_time_as_utc(time: datetime.time, date: datetime.date, tz_info: timezone):
     """Gets utc time from given time, date and timezone information.
     Graphene seems to render time with offset info (e.g 10:00:00+00:00) for localized to UTC only.
     So with e.g time zone being 'Europe/Helsinki' just don't work for some reason not yet known.
@@ -19,7 +18,7 @@ def get_time_as_utc(time: datetime.time, date: datetime.date, tz_info: pytz.time
     """
     start_dt = datetime.datetime.combine(date, time)
     start_dt = tz_info.localize(start_dt)
-    start_dt = start_dt.astimezone(pytz.UTC)
+    start_dt = start_dt.astimezone(timezone.utc)
     return start_dt.timetz()
 
 
