@@ -39,7 +39,7 @@ RUN subscription-manager repos --enable codeready-builder-for-rhel-9-x86_64-rpms
 RUN yum -y update
 
 # If needed, add additional packets
-RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 
 # Install what you need
 RUN yum install -y gdal
