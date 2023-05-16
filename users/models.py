@@ -43,7 +43,11 @@ class User(AbstractUser):
 
     def __str__(self):
         default = super().__str__()
-        return f"{default} - {self.last_login.astimezone(DEFAULT_TIMEZONE).strftime('%d.%m.%Y %H:%M')}"
+
+        if self.last_login:
+            return f"{default} - {self.last_login.astimezone(DEFAULT_TIMEZONE).strftime('%d.%m.%Y %H:%M')}"
+
+        return default
 
     def get_display_name(self):
         return "{0} {1}".format(self.first_name, self.last_name).strip()
