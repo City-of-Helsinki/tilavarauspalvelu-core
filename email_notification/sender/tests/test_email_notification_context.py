@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 
 from assertpy import assert_that
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
@@ -20,7 +21,9 @@ from spaces.tests.factories import LocationFactory, UnitFactory
 
 class EmailNotificationContextTestCase(TestCase):
     def setUp(self) -> None:
-        self.unit = UnitFactory.create(name="Test unit")
+        self.unit = UnitFactory.create(
+            name="Test unit", name_sv="Svensk test namn", name_en="English test name"
+        )
         self.location = LocationFactory.create(
             unit=self.unit,
             address_street="Street",
@@ -174,3 +177,51 @@ class EmailNotificationContextTestCase(TestCase):
         self.location.delete()
         context = EmailNotificationContext.from_reservation(self.reservation)
         assert_that(context.unit_location).is_none()
+
+    def test_from_reservation_unit_name_is_reservee_langauge(self):
+        self.reservation.reservee_language = "sv"
+        self.reservation.save()
+
+        context = EmailNotificationContext.from_reservation(self.reservation)
+        assert_that(context.unit_name).is_equal_to(self.unit.name_sv)
+
+    def test_from_reservation_unit_name_uses_reservation_user_preferred_language(self):
+        user = get_user_model().objects.create(
+            username="test",
+            first_name="test",
+            last_name="user",
+            email="test.user@localhost",
+            preferred_language="sv",
+        )
+        self.reservation.user = user
+        self.reservation.save()
+
+        context = EmailNotificationContext.from_reservation(self.reservation)
+        assert_that(context.unit_name).is_equal_to(self.unit.name_sv)
+
+    def test_from_reservation_reservation_unit_name_is_reservee_langauge(self):
+        self.reservation.reservee_language = "sv"
+        self.reservation.save()
+
+        context = EmailNotificationContext.from_reservation(self.reservation)
+        assert_that(context.reservation_unit_name).is_equal_to(
+            self.reservation_unit.name_sv
+        )
+
+    def test_from_reservation_reservation_unit_name_uses_reservation_user_preferred_language(
+        self,
+    ):
+        user = get_user_model().objects.create(
+            username="test",
+            first_name="test",
+            last_name="user",
+            email="test.user@localhost",
+            preferred_language="sv",
+        )
+        self.reservation.user = user
+        self.reservation.save()
+
+        context = EmailNotificationContext.from_reservation(self.reservation)
+        assert_that(context.reservation_unit_name).is_equal_to(
+            self.reservation_unit.name_sv
+        )

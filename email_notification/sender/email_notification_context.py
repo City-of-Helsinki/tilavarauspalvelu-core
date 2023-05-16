@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 from typing import Dict
 
+from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from applications.models import CUSTOMER_TYPES
@@ -108,17 +109,28 @@ class EmailNotificationContext:
         else:
             context.unit_location = None
 
+        language = reservation.reservee_language or getattr(
+            reservation.user, "preferred_language", settings.LANGUAGE_CODE
+        )
+
         if res_unit:
-            context.unit_name = res_unit.unit.name
+            context.unit_name = getattr(
+                res_unit.unit,
+                f"name_{language}",
+                res_unit.unit.name,
+            )
 
         context.reservation_name = reservation.name
 
         if reservation.reservation_unit.count() > 1:
             context.reservation_unit_name = ", ".join(
-                reservation.reservation_unit.values_list("name", flat=True)
+                reservation.reservation_unit.values_list(f"name_{language}", flat=True)
             )
         else:
-            context.reservation_unit_name = reservation.reservation_unit.first().name
+            res_unit = reservation.reservation_unit.first()
+            context.reservation_unit_name = getattr(
+                res_unit, f"name_{language}", res_unit.name
+            )
 
         context.price = reservation.price
         context.non_subsidised_price = reservation.non_subsidised_price
