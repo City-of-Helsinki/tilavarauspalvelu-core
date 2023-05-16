@@ -33,7 +33,7 @@ RUN if [ "x$BUILD_MODE" = "xlocal" ]; \
     fi;
 
 # Enable the repos you need
-RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+RUN subscription-manager repos --enable codeready-builder-for-rhel-9-x86_64-rpms
 #RUN subscription-manager repos --disable rhel-8-for-x86_64-baseos-beta-rpms
 #RUN subscription-manager repos --disable rhel-8-for-x86_64-appstream-beta-rpms
 RUN yum -y update
@@ -57,8 +57,8 @@ RUN useradd -ms /bin/bash -d /tvp tvp
 RUN mkdir -p /srv/static && chown tvp /srv/static && chown tvp /opt/app-root/bin
 
 
-RUN chown tvp /opt/app-root/lib/python3.8/site-packages
-RUN chown tvp /opt/app-root/lib/python3.8/site-packages/*
+RUN chown tvp /opt/app-root/lib/python3.11/site-packages
+RUN chown tvp /opt/app-root/lib/python3.11/site-packages/*
 RUN pip install --upgrade pip
 
 ENV APP_NAME tilavarauspalvelu
