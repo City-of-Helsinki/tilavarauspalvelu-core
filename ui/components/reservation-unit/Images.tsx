@@ -34,6 +34,7 @@ const CarouselImage = styled.img`
   width: 100%;
   height: 300px;
   object-fit: cover;
+  cursor: pointer;
 
   @media (max-width: ${breakpoints.l}) {
     width: 100%;

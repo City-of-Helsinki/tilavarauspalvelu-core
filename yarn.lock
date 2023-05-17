@@ -13185,9 +13185,9 @@ nth-check@^2.0.1:
     boolbase "^1.0.0"
 
 nuka-carousel@^5.4.1:
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/nuka-carousel/-/nuka-carousel-5.4.1.tgz#a25044131e34d5b3db881c7c98a55b5e4cc49d60"
-  integrity sha512-pdF8FrlUxmHrv5luEK5lGTnpxTzIX34hVKJ/S/Ywi1YOtCDhjL1dFJnuBmJ6yHn29jU/xwnsWszKVluZbstaaQ==
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/nuka-carousel/-/nuka-carousel-5.5.1.tgz#f9e0aa5c5519f6437ad63816a02513878aecadaf"
+  integrity sha512-igZOVoalYsgZLI1fony2LqUeBiga8TWRD0qb/J7Mb69ijBvRokoir2yHBxB3IoBzCzAxtgKW0T1bQDj7FZvcmQ==
 
 nullthrows@^1.1.1:
   version "1.1.1"

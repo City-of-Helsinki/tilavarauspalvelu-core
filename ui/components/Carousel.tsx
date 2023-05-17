@@ -54,7 +54,7 @@ const SmallArrowButton = styled(Button).attrs({
     --color-bus-dark: transparent;
     --min-size: 0;
 
-    background-color: var(--color-gold-light);
+    background-color: transparent;
     margin: 0;
     padding: 0;
 
@@ -140,12 +140,12 @@ const Carousel = ({
   ...rest
 }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const ButtonVarians = {
+  const ButtonVariants = {
     medium: MediumArrowButton,
     small: SmallArrowButton,
   };
 
-  const ButtonComponent = ButtonVarians[buttonVariant];
+  const ButtonComponent = ButtonVariants[buttonVariant];
 
   return (
     <StyledCarousel
@@ -173,7 +173,11 @@ const Carousel = ({
       slidesToShow={slidesToShow}
       slidesToScroll={slidesToScroll}
       cellSpacing={cellSpacing}
-      withoutControls={hideCenterControls || children?.length < slidesToShow}
+      withoutControls={children?.length <= slidesToShow}
+      {...(hideCenterControls && {
+        renderBottomCenterControls: () => null,
+      })}
+      dragging={children?.length > slidesToShow}
       {...rest}
     >
       {children}
