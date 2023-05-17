@@ -87,6 +87,13 @@ class ReservationPriceMixin:
             PriceUnit.PRICE_UNIT_PER_WEEK: 10080,
         }
 
+        fixed_price_units = [
+            PriceUnit.PRICE_UNIT_FIXED,
+            PriceUnit.PRICE_UNIT_PER_HALF_DAY,
+            PriceUnit.PRICE_UNIT_PER_DAY,
+            PriceUnit.PRICE_UNIT_PER_WEEK,
+        ]
+
         total_reservation_price: Decimal = Decimal("0")
         total_reservation_price_net: Decimal = Decimal("0")
 
@@ -122,17 +129,25 @@ class ReservationPriceMixin:
 
             # Time-based calculation is needed only if price unit is not fixed.
             # Otherwise, we can just use the price defined in the reservation unit
-            if pricing.price_unit != PriceUnit.PRICE_UNIT_FIXED:
+            if pricing.price_unit not in fixed_price_units:
                 reservation_duration_in_minutes = (end - begin).seconds / Decimal("60")
+
+                # Prices are calculated based on the 15 minutes intervals rounded up
+                reservation_duration_in_15mins = math.ceil(
+                    reservation_duration_in_minutes / Decimal("15")
+                )
+
                 reservation_unit_price_unit_minutes = price_unit_to_minutes.get(
                     pricing.price_unit
                 )
+                reservation_unit_price_per_15min = (
+                    reservation_unit_price_net
+                    / reservation_unit_price_unit_minutes
+                    * Decimal("15")
+                )
+
                 reservation_unit_price_net = Decimal(
-                    math.ceil(
-                        reservation_duration_in_minutes
-                        / reservation_unit_price_unit_minutes
-                    )
-                    * reservation_unit_price_net
+                    reservation_duration_in_15mins * reservation_unit_price_per_15min
                 )
 
                 reservation_unit_price = reservation_unit_price_net * (
@@ -140,11 +155,7 @@ class ReservationPriceMixin:
                 )
 
                 reservation_unit_subsidised_price_net = Decimal(
-                    math.ceil(
-                        reservation_duration_in_minutes
-                        / reservation_unit_price_unit_minutes
-                    )
-                    * reservation_unit_subsidised_price_net
+                    reservation_duration_in_15mins * reservation_unit_price_per_15min
                 )
 
                 reservation_unit_subsidised_price = (
