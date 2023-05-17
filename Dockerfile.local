@@ -5,9 +5,11 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . /tvp
+RUN chmod +x /tvp/docker/entrypoint.sh
+
 WORKDIR /tvp
 
 RUN apt-get update && apt-get -y install libgdal-dev
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["./docker/entrypoint.sh"]
