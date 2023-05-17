@@ -35,6 +35,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationDenyPermission,
     ReservationHandlingPermission,
     ReservationPermission,
+    ReservationRefundPermission,
     ReservationStaffCreatePermission,
     StaffAdjustTimePermission,
 )
@@ -101,7 +102,7 @@ class ReservationDenyMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class ReservationRefundMutation(AuthSerializerMutation, SerializerMutation):
-    permission_classes = (ReservationHandlingPermission,)
+    permission_classes = (ReservationRefundPermission,)
 
     class Meta:
         lookup_field = "pk"

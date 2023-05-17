@@ -4,6 +4,7 @@ from decimal import Decimal
 
 import freezegun
 from assertpy import assert_that
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
@@ -11,6 +12,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
+from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import (
     ReservationFactory,
@@ -255,3 +257,82 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("approved")
         assert_that(mail.outbox[1].subject).is_equal_to("staff reservation made")
+
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_unit_reserver_can_approve_own_reservation(self):
+        reserver_staff_user = get_user_model().objects.create(
+            username="res",
+            first_name="res",
+            last_name="erver",
+            email="res.erver@foo.com",
+        )
+        UnitRoleChoice.objects.create(
+            code="staff",
+            verbose_name="staff reserver person",
+        )
+        unit_role = UnitRole.objects.create(
+            user=reserver_staff_user,
+            role=UnitRoleChoice.objects.get(code="staff"),
+        )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="staff"),
+            permission="can_create_staff_reservations",
+        )
+
+        unit_role.unit.add(self.unit)
+
+        self.reservation.user = reserver_staff_user
+        self.reservation.save()
+
+        self.client.force_login(reserver_staff_user)
+
+        input_data = self.get_valid_approve_data()
+        input_data["handlingDetails"] = ""
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        approve_data = content.get("data").get("approveReservation")
+        assert_that(approve_data.get("errors")).is_none()
+        assert_that(approve_data.get("state")).is_equal_to(
+            STATE_CHOICES.CONFIRMED.upper()
+        )
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+    def test_unit_reserver_cant_approve_other_reservation(self):
+        reserver_staff_user = get_user_model().objects.create(
+            username="res",
+            first_name="res",
+            last_name="erver",
+            email="res.erver@foo.com",
+        )
+        UnitRoleChoice.objects.create(
+            code="staff",
+            verbose_name="staff reserver person",
+        )
+        unit_role = UnitRole.objects.create(
+            user=reserver_staff_user,
+            role=UnitRoleChoice.objects.get(code="staff"),
+        )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="staff"),
+            permission="can_create_staff_reservations",
+        )
+
+        unit_role.unit.add(self.unit)
+
+        self.client.force_login(reserver_staff_user)
+
+        input_data = self.get_valid_approve_data()
+        input_data["handlingDetails"] = ""
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
+            "No permission to mutate"
+        )

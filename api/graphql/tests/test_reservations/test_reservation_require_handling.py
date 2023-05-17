@@ -3,6 +3,7 @@ import json
 
 import freezegun
 from assertpy import assert_that
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
@@ -10,6 +11,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
+from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import (
@@ -138,3 +140,84 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         assert_that(deny_data).is_none()
         self.denied_reservation.refresh_from_db()
         assert_that(self.denied_reservation.state).is_equal_to(STATE_CHOICES.DENIED)
+
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+    def test_unit_reserver_can_approve_own_reservation(self):
+        reserver_staff_user = get_user_model().objects.create(
+            username="res",
+            first_name="res",
+            last_name="erver",
+            email="res.erver@foo.com",
+        )
+        UnitRoleChoice.objects.create(
+            code="staff",
+            verbose_name="staff reserver person",
+        )
+        unit_role = UnitRole.objects.create(
+            user=reserver_staff_user,
+            role=UnitRoleChoice.objects.get(code="staff"),
+        )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="staff"),
+            permission="can_create_staff_reservations",
+        )
+
+        unit_role.unit.add(self.unit)
+
+        self.confirmed_reservation.user = reserver_staff_user
+        self.confirmed_reservation.save()
+
+        self.client.force_login(reserver_staff_user)
+
+        input_data = {"pk": self.confirmed_reservation.id}
+        assert_that(self.confirmed_reservation.state).is_equal_to(
+            STATE_CHOICES.CONFIRMED
+        )
+        response = self.query(self.get_require_handling_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        approve_data = content.get("data").get("requireHandlingForReservation")
+        assert_that(approve_data.get("errors")).is_none()
+        assert_that(approve_data.get("state")).is_equal_to(
+            STATE_CHOICES.REQUIRES_HANDLING.upper()
+        )
+        self.confirmed_reservation.refresh_from_db()
+        assert_that(self.confirmed_reservation.state).is_equal_to(
+            STATE_CHOICES.REQUIRES_HANDLING
+        )
+
+    def test_unit_reserver_cant_require_handling_other_reservation(self):
+        reserver_staff_user = get_user_model().objects.create(
+            username="res",
+            first_name="res",
+            last_name="erver",
+            email="res.erver@foo.com",
+        )
+        UnitRoleChoice.objects.create(
+            code="staff",
+            verbose_name="staff reserver person",
+        )
+        unit_role = UnitRole.objects.create(
+            user=reserver_staff_user,
+            role=UnitRoleChoice.objects.get(code="staff"),
+        )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="staff"),
+            permission="can_create_staff_reservations",
+        )
+
+        unit_role.unit.add(self.unit)
+
+        self.client.force_login(reserver_staff_user)
+
+        input_data = {"pk": self.denied_reservation.id}
+        assert_that(self.denied_reservation.state).is_equal_to(STATE_CHOICES.DENIED)
+        response = self.query(self.get_require_handling_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")[0].get("message")).is_equal_to(
+            "No permission to mutate"
+        )
