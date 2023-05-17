@@ -105,7 +105,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self.assertMatchSnapshot(content)
 
     @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
-    def test_checkout_url_no_visible_when_expired(self):
+    def test_checkout_url_not_visible_when_expired(self):
         self.order.checkout_url = "https://example.url/checkout"
         self.order.save()
 
@@ -126,6 +126,21 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
             assert_that(content.get("data").get("order").get("checkoutUrl")).is_none()
+
+    @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
+    def test_checkout_url_not_visible_when_not_draft(self):
+        self.order.checkout_url = "https://example.url/checkout"
+        self.order.status = OrderStatus.CANCELLED
+        self.order.save()
+
+        self.client.force_login(self.general_admin)
+
+        response = self.query(self.get_order_query())
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("order").get("checkoutUrl")).is_none()
 
 
 class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):

@@ -8,7 +8,7 @@ from graphene_permissions.mixins import AuthNode
 
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
-from merchants.models import PaymentMerchant, PaymentOrder, PaymentProduct
+from merchants.models import OrderStatus, PaymentMerchant, PaymentOrder, PaymentProduct
 from permissions.api_permissions.graphene_permissions import PaymentOrderPermission
 
 
@@ -75,6 +75,9 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
         return self.reservation.pk
 
     def resolve_checkout_url(self, info) -> Optional[str]:
+        if self.status != OrderStatus.DRAFT:
+            return None
+
         now = datetime.now(tz=timezone.utc).astimezone(get_default_timezone())
         expired = now - timedelta(
             minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
