@@ -120,7 +120,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
           {items.map((item) => (
             <Link
               key={item.pk}
-              href={`${singleSearchPrefix}?purposes=${item.pk}`}
+              href={`${singleSearchPrefix}?purposes=${item.pk}#content`}
             >
               <PurposeItem data-testid="front-page__purposes--purpose">
                 <Image src={item.smallUrl} alt="" aria-hidden />

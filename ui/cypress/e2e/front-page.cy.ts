@@ -48,7 +48,7 @@ describe("Tilavaraus ui front page", () => {
       });
 
     purposeLinks().eq(3).click();
-    cy.url().should("match", /purposes=4$/);
+    cy.url().should("match", /purposes=4#content$/);
   });
 
   it("displays unit links", () => {

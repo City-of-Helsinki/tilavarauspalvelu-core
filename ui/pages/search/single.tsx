@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "next-i18next";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
@@ -6,7 +6,7 @@ import styled from "styled-components";
 import queryString from "query-string";
 import { useRouter } from "next/router";
 import { Notification } from "hds-react";
-import { useLocalStorage } from "react-use";
+import { useLocalStorage, useMedia } from "react-use";
 import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
@@ -156,6 +156,11 @@ const SearchSingle = (): JSX.Element => {
 
   const pageInfo: PageInfo = data?.reservationUnits?.pageInfo;
 
+  const content = useRef(null);
+  const router = useRouter();
+
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
+
   const searchParams = isBrowser ? window.location.search : "";
   const parsedParams = queryString.parse(searchParams);
 
@@ -186,16 +191,30 @@ const SearchSingle = (): JSX.Element => {
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
 
-  const loadingMore = networkStatus === NetworkStatus.fetchMore;
+  useEffect(() => {
+    if (
+      window.location.hash === "#content" &&
+      isBrowser &&
+      isMobile &&
+      data?.reservationUnits != null &&
+      content?.current?.offsetTop != null
+    ) {
+      window.scroll({
+        top: content.current.offsetTop,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [content?.current?.offsetTop, data?.reservationUnits, isMobile]);
 
-  const history = useRouter();
+  const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
   const onSearch = async (criteria: QueryReservationUnitsArgs) => {
     const sortingCriteria = pick(queryString.parse(searchParams), [
       "sort",
       "order",
     ]);
-    history.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
+    router.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 
   const onRemove = (key: string[], subItemKey?: string) => {
@@ -216,7 +235,7 @@ const SearchSingle = (): JSX.Element => {
       "sort",
       "order",
     ]);
-    history.replace(
+    router.replace(
       singleSearchUrl({
         ...newValues,
         ...sortingCriteria,
@@ -247,50 +266,52 @@ const SearchSingle = (): JSX.Element => {
           />
         </StyledContainer>
       </HeadContainer>
-      <ClientOnly>
-        <BottomWrapper>
-          <ListWithPagination
-            id="searchResultList"
-            items={reservationUnits?.map((ru) => (
-              <ReservationUnitCard reservationUnit={ru} key={ru.id} />
-            ))}
-            loading={loading}
-            loadingMore={loadingMore}
-            pageInfo={pageInfo}
-            totalCount={totalCount}
-            fetchMore={(cursor) => {
-              const variables = {
-                ...values,
-                after: cursor,
-              };
-              fetchMore({
-                variables: processVariables(variables, i18n.language),
-              });
-            }}
-            sortingComponent={
-              <StyledSorting
-                value={values.sort}
-                sortingOptions={sortingOptions}
-                setSorting={(val: OptionType) => {
-                  const params = {
-                    ...values,
-                    sort: String(val.value),
-                  };
-                  history.replace(singleSearchUrl(params));
-                }}
-                isOrderingAsc={isOrderingAsc}
-                setIsOrderingAsc={(isAsc: boolean) => {
-                  const params = {
-                    ...values,
-                    order: isAsc ? "asc" : "desc",
-                  };
-                  history.replace(singleSearchUrl(params));
-                }}
-              />
-            }
-          />
-        </BottomWrapper>
-      </ClientOnly>
+      <section ref={content}>
+        <ClientOnly>
+          <BottomWrapper>
+            <ListWithPagination
+              id="searchResultList"
+              items={reservationUnits?.map((ru) => (
+                <ReservationUnitCard reservationUnit={ru} key={ru.id} />
+              ))}
+              loading={loading}
+              loadingMore={loadingMore}
+              pageInfo={pageInfo}
+              totalCount={totalCount}
+              fetchMore={(cursor) => {
+                const variables = {
+                  ...values,
+                  after: cursor,
+                };
+                fetchMore({
+                  variables: processVariables(variables, i18n.language),
+                });
+              }}
+              sortingComponent={
+                <StyledSorting
+                  value={values.sort}
+                  sortingOptions={sortingOptions}
+                  setSorting={(val: OptionType) => {
+                    const params = {
+                      ...values,
+                      sort: String(val.value),
+                    };
+                    router.replace(singleSearchUrl(params));
+                  }}
+                  isOrderingAsc={isOrderingAsc}
+                  setIsOrderingAsc={(isAsc: boolean) => {
+                    const params = {
+                      ...values,
+                      order: isAsc ? "asc" : "desc",
+                    };
+                    router.replace(singleSearchUrl(params));
+                  }}
+                />
+              }
+            />
+          </BottomWrapper>
+        </ClientOnly>
+      </section>
     </Wrapper>
   );
 };

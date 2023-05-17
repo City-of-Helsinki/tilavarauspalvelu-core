@@ -85,7 +85,7 @@ const Units = ({ units }: Props): JSX.Element => {
             {units.slice(0, itemLimit).map((unit) => (
               <UnitItemLink
                 key={unit.pk}
-                href={`${singleSearchPrefix}?unit=${unit.pk}`}
+                href={`${singleSearchPrefix}?unit=${unit.pk}#content`}
                 data-testid="front-page__units--unit"
               >
                 {getTranslation(unit, "name")}
