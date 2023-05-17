@@ -11,14 +11,35 @@ To run tilavarauspalvelu locally you need to have DEBUG=True in your .env file.
 Easiest way is to copy and rename .env.example to .env and make sure DEBUG=True is set. 
  
 ## Installation with docker
-To run the service locally in Docker, you can run the following command:
+Because database takes some time to start, it is recommended to start it first and run on the background:
+```
+docker-compose up db redis -d
+```
+
+Then, you can start the service with the following command:
 
 ```
-docker-compose up backend
+docker-compose up backend [-d]
+```
+
+This will start the service, run database migrations and crete the initial admin user if it does not exist. The default username and password is `admin`. With the optional `-d` flag the service is left running on the background.
+
+
+When you fetch the latest code, it is recommended to rebuild and recreate the container
+```
+docker-compose up backend --build --force-recreate
 ```
 
 
-This will start the service and also runs the database and Redis cache in a separate docker containers.
+You can stop the service with
+```
+docker-compose stop backend
+```
+
+If you want to stop database and redis containers too, run
+```
+docker-compose stop
+```
 ## Requirements
 
 Workflow with requirements is as follows.
