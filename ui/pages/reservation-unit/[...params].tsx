@@ -394,7 +394,7 @@ const ReservationUnitReservationWithReservationProp = ({
         value: ageGroup.pk,
       })),
       homeCity: cities.map((city) => ({
-        label: city.name,
+        label: getTranslation(city, "name"),
         value: city.pk,
       })),
     }),

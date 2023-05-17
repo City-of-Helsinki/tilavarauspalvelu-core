@@ -746,7 +746,7 @@ describe("with metadataset", () => {
     cy.get("#reserveeAddressStreet").should("have.value", "Katu 13");
     cy.get("#reserveeAddressCity").should("have.value", "Helsinki");
     cy.get("#reserveeAddressZip").should("have.value", "00100");
-    cy.get("#homeCity-toggle-button > span").should("contain", "Lande");
+    cy.get("#homeCity-toggle-button > span").should("contain", "Lande FI");
   });
 });
 

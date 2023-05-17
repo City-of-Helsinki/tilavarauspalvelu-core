@@ -347,6 +347,9 @@ export const GET_CITIES = gql`
         node {
           pk
           name
+          nameFi
+          nameEn
+          nameSv
         }
       }
     }

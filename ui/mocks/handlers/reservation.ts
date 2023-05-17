@@ -355,20 +355,32 @@ const cities = graphql.query<Query, QueryCitiesArgs>(
           edges: [
             {
               node: {
+                id: "Q2l0eTof",
                 pk: 1,
                 name: "Helsinki",
+                nameFi: "Helsinki FI",
+                nameEn: "Helsinki EN",
+                nameSv: "Helsinki Sv",
               },
             },
             {
               node: {
+                id: "Q2l0eTod",
                 pk: 2,
                 name: "Lande",
+                nameFi: "Lande FI",
+                nameEn: "Lande EN",
+                nameSv: "Lande SV",
               },
             },
             {
               node: {
+                id: "Q2l0eToz",
                 pk: 3,
                 name: "Muu",
+                nameFi: "Muu FI",
+                nameEn: "Muu EN",
+                nameSv: "Muu SV",
               },
             },
           ],
@@ -656,7 +668,14 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       data.reserveeAddressStreet = "Katu 13";
       data.reserveeAddressCity = "Helsinki";
       data.reserveeAddressZip = "00100";
-      data.homeCity = { id: "123", name: "Lande", pk: 2 };
+      data.homeCity = {
+        id: "123",
+        name: "Lande",
+        nameFi: "Lande FI",
+        nameEn: "Lande En",
+        nameSv: "Lande Sv",
+        pk: 2,
+      };
     }
 
     if (pk === 702) {
