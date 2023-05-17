@@ -60,26 +60,14 @@ class OpeningHours:
             if full_day or not time_element.end_time
             else time_element.end_time
         )
-        start_time = timezone.localize(
-            datetime.datetime(
-                date.year,
-                date.month,
-                date.day,
-                start.hour,
-                start.minute,
-            )
+        start_time = datetime.datetime(
+            date.year, date.month, date.day, start.hour, start.minute, tzinfo=timezone
         )
 
         if end_time_on_next_day:
             date += datetime.timedelta(days=1)
-        end_time = timezone.localize(
-            datetime.datetime(
-                date.year,
-                date.month,
-                date.day,
-                end.hour,
-                end.minute,
-            )
+        end_time = datetime.datetime(
+            date.year, date.month, date.day, end.hour, end.minute, tzinfo=timezone
         )
 
         # If the length of opening is zero, return None for helping the UI.

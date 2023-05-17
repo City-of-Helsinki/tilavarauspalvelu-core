@@ -17,7 +17,7 @@ def get_time_as_utc(time: datetime.time, date: datetime.date, tz_info: timezone)
     So for now we render all as UTC using this little helper.
     """
     start_dt = datetime.datetime.combine(date, time)
-    start_dt = tz_info.localize(start_dt)
+    start_dt = start_dt.astimezone(tz_info)
     start_dt = start_dt.astimezone(timezone.utc)
     return start_dt.timetz()
 

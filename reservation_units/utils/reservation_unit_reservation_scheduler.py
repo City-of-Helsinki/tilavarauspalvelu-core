@@ -72,14 +72,13 @@ class ReservationUnitReservationScheduler:
                     open_application_round.reservation_period_end
                     + datetime.timedelta(days=1)
                 )
-                self.start_time = DEFAULT_TIMEZONE.localize(
-                    datetime.datetime(
-                        self.start_time.year,
-                        self.start_time.month,
-                        self.start_time.day,
-                        0,
-                        0,
-                    )
+                self.start_time = datetime.datetime(
+                    self.start_time.year,
+                    self.start_time.month,
+                    self.start_time.day,
+                    0,
+                    0,
+                    tzinfo=DEFAULT_TIMEZONE,
                 )
 
             else:
@@ -134,7 +133,7 @@ class ReservationUnitReservationScheduler:
                 days=self.reservation_unit.reservations_min_days_before
             )
 
-        return DEFAULT_TIMEZONE.localize(datetime.datetime.now() + delta)
+        return (datetime.datetime.now() + delta).astimezone(DEFAULT_TIMEZONE)
 
     def _get_reservation_period_end(self, start: datetime.datetime) -> datetime.date:
         if (
@@ -150,8 +149,8 @@ class ReservationUnitReservationScheduler:
         if self.reservation_unit.reservations_max_days_before:
             delta = self.reservation_unit.reservations_max_days_before
 
-        end = DEFAULT_TIMEZONE.localize(
-            datetime.datetime.now() + datetime.timedelta(days=delta)
+        end = (datetime.datetime.now() + datetime.timedelta(days=delta)).astimezone(
+            DEFAULT_TIMEZONE
         )
 
         return end.date()
