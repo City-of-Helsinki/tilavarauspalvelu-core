@@ -54,7 +54,7 @@ class PaymentMerchantForm(forms.ModelForm):
             self.fields["business_id"].initial = merchant_info.business_id
 
     def save(self, commit=True):
-        if self.instance is None or self.instance.id is None:
+        if self.instance and self.instance.id is None:
             params = CreateMerchantParams(
                 name=self.cleaned_data.get("name", ""),
                 street=self.cleaned_data.get("street", ""),
@@ -69,7 +69,7 @@ class PaymentMerchantForm(forms.ModelForm):
             )
             created_merchant = create_merchant(params)
             self.instance.id = created_merchant.id
-        else:
+        elif self.instance:
             params = UpdateMerchantParams(
                 name=self.cleaned_data.get("name", ""),
                 street=self.cleaned_data.get("street", ""),
