@@ -28,10 +28,12 @@ services:
             context: ./
             dockerfile: ./Dockerfile.local
         environment:
+            - REDIS_URL=redis://redis:6379/0
             - DATABASE_URL=postgis://tvp:tvp@db/tvp
             - CELERY_ENABLED=false
         ports:
             - "8000:8000"
+        entrypoint: ./docker/entrypoint.sh
 
     dev:
         image: tilavarauspalvelu_dev
