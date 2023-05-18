@@ -76,9 +76,7 @@ def get_opening_hours(
     hauki_origin_id=None,
 ) -> List[dict]:
     """Get opening hours for Hauki resource"""
-    if hauki_origin_id:
-        hauki_origin_id = hauki_origin_id
-    else:
+    if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
 
     resource_prefix = f"{hauki_origin_id}"
@@ -148,9 +146,7 @@ def get_periods_for_resource(
     resource_id: Union[str, int, list], hauki_origin_id=None
 ) -> List[Period]:
     """Get periods for Hauki resource"""
-    if hauki_origin_id:
-        hauki_origin_id = hauki_origin_id
-    else:
+    if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
 
     resource_prefix = f"{hauki_origin_id}"
