@@ -580,7 +580,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
             request_user = (
                 request.user if request and request.user.is_authenticated else None
             )
-            if not can_handle_application(request_user, self.instance):
+            if not request_user or not can_handle_application(
+                request_user, self.instance
+            ):
                 raise serializers.ValidationError("No permission for status change.")
 
         return data
