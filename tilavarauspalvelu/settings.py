@@ -640,13 +640,6 @@ elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER"):
         }
     }
 
-# Python 3.9 added pytz features to the standard library so using
-# pytz is not recommended anymore. However, we have some issues
-# I couldn't figure out and this flag solves them. The flag will be
-# removed in Django 5.0 so this is not a proper fix and we should
-# figure out how to fix the issues properly.
-USE_DEPRECATED_PYTZ = True
-
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
 local_settings_path = os.path.join(BASE_DIR, "local_settings.py")
