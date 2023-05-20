@@ -159,8 +159,11 @@ class ApplicationEventFilterSet(filters.FilterSet):
     )
 
     class Meta:
-        model = Application
-        fields = ("application_round", "status", "unit", "user")
+        model = ApplicationEvent
+        fields = (
+            "pk",
+            "status",
+        )
 
     def filter_queryset(self, queryset):
         queryset = queryset.alias(
