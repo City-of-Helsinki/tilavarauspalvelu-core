@@ -39,7 +39,7 @@
   "cancelReason": "Reason for the cancellation",
   "cancelDescription": "Description of the cancellation",
   "cancelDescriptionPlaceHolder": "Please explain briefly why you are cancelling the booking.",
-  "reservationCancelledTitle": "Your booking has been cancelled.",
+  "reservationCancelledTitle": "Your booking has been cancelled!",
   "reservationCancelledBody": "You will receive a booking confirmation by email in a moment.",
   "reservationCancellationFailed": "Failed to cancel the booking",
   "makeNewReservation": "Please make a new booking for the same item.",
