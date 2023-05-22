@@ -1,172 +1,203 @@
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=coverage)](https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 
-Tilavarauspalvelu-core
-===================
-This repository contains core of the new reservation platform for city of Helsinki.
+# Tilavarauspalvelu Core
 
-# Installation
-To run tilavarauspalvelu locally you need to have DEBUG=True in your .env file. 
+This repository contains the backend API of the new [reservation platform](https://tilavaraus.hel.fi/) for city of Helsinki.
 
-Easiest way is to copy and rename .env.example to .env and make sure DEBUG=True is set. 
- 
-## Installation with docker
-Because database takes some time to start, it is recommended to start it first and run on the background:
+## Table of Contents
+- [Overview](#overview)
+- [Dependencies](#dependencies)
+- [Setup](#setup)
+- [How to run](#how-to-run)
+- [Deployment](#deployment)
+- [Environments](#environments)
+- [Development tips and tricks](#development-tips-and-tricks)
+## Overview
+
+The main purpose of the service is to act as a backend for [tilavarauspalvelu-ui](https://github.com/City-of-Helsinki/tilavarauspalvelu-ui) and [tilavarauspalvelu-admin-ui](https://github.com/City-of-Helsinki/tilavarauspalvelu-admin-ui) through the GraphQL API.
+
+In addition to the API, the core also handles scheduled tasks and serves as a webhook endpoint for [Helsinki city web shop](https://github.com/City-of-Helsinki/verkkokauppa-experience-api).
+
+Project is built on the [Django](https://www.djangoproject.com/) framework, and scheduling is done with [Celery](https://github.com/celery/celery).
+
+For more information, please refer to the [Tilavarauspalvelu](https://helsinkisolutionoffice.atlassian.net/wiki/spaces/KAN/pages/887029864/Tilavarauspalvelu+Varaamo) page in Confluence. This is also where you can find the list of [members of the project](https://helsinkisolutionoffice.atlassian.net/wiki/spaces/KAN/pages/1138065426/Tiimin+j+senet+ja+roolit). The preferred contact method is Slack.
+
+
+## Dependencies
+Core retrieves opening hours from [Hauki](https://github.com/City-of-Helsinki/hauki) and unit information from [Toimipaikkarekisteri](https://www.hel.fi/palvelukarttaws/restpages/ver4.html#_unit). Payments are
+handled by [Helsinki Web Shop](https://github.com/City-of-Helsinki/verkkokauppa-experience-api).
+
+From a technical standpoint, there are three main dependencies:
+- [PostgreSQL 13](https://www.postgresql.org/) database with the [PostGIS](https://postgis.net/) extension for storing the data
+- [Redis](https://redis.io/) for in-memory cache
+- [Celery](https://github.com/celery/celery) for scheduling and background task handling
+
+All Python dependencies can be found in [requirements.txt](requirements.txt). Separate development dependencies are listed in [requirements_dev.txt](requirements_dev.txt).
+
+## Setup
+Copy `.env.example` to `.env`:
+```
+cp .env.example .env
+```
+
+Make a symbolic link under `tilavarauspalvelu` directory:
+```
+ln -s .env tilavarauspalvelu/.env
+```
+
+Make sure that `DEBUG=True` in your `.env` file.
+
+Create a virtual environment:
+```
+python -m venv venv
+```
+
+Activate the virtual environment
+```
+source venv/bin/activate
+```
+
+Install pip-tools:
+```
+pip install pip-tools
+```
+
+Install packages. This step might have issues depending on your operating system and what is
+installed in it.
+```
+pip-sync requirements.txt requirements_dev.txt
+```
+
+You can use local instances of PostgreSQL and Redis, but the easiest way to use Docker containers:
 ```
 docker-compose up db redis -d
 ```
 
-Then, you can start the service with the following command:
+Finally, you have to make sure settings are configured properly in `.env` file.
+
+## How to run
+
+### Running locally
+Run migrations:
+```
+python manage.py migrate
+```
+
+Create an admin user if it does not exist:
+```
+python manage.py createsuperuser
+```
+
+Finally, start the development server:
+```
+python manage.py runserver 0.0.0.0:8000
+```
+
+### Running in docker (for UI devs)
+Since the database takes some time to start, it is recommended to start it first and run it in the background:
+```
+docker-compose up db redis -d
+```
+
+Then, start the service with the following command:
 
 ```
 docker-compose up backend [-d]
 ```
 
-This will start the service, run database migrations and crete the initial admin user if it does not exist. The default username and password is `admin`. With the optional `-d` flag the service is left running on the background.
+This will start the service, run database migrations, and create the initial admin user if it does not exist. The default username and password are both `admin`. using the optional `-d` flag will leave the service running in the background.
 
 
-When you fetch the latest code, it is recommended to rebuild and recreate the container
+When you fetch the latest code, it is recommended to rebuild and recreate the container:
 ```
 docker-compose up backend --build --force-recreate
 ```
 
 
-You can stop the service with
+To stop the service, use the command:
 ```
 docker-compose stop backend
 ```
 
-If you want to stop database and redis containers too, run
+If you want to stop database and Redis containers as well, run:
 ```
 docker-compose stop
 ```
-## Requirements
 
-Workflow with requirements is as follows.
+## Deployment
+CI pipelines are defined in [Azure DevOps](https://dev.azure.com/City-of-Helsinki/tilavarauspalvelu). There are two pipelines:
 
-Requirements are defined in two files. `requirements.txt` contains the production requirements that are needed to run the app. `requirements_dev.txt` contains requirements needed in development.
+1. [tilavarauspalvelu-core-devtest](https://dev.azure.com/City-of-Helsinki/tilavarauspalvelu/_build?definitionId=1230) deploys the service to `development` and `test` environments every time a pull request is merged into the main branch. Deployment to `test` environment requires manual approval.
 
-`requirements*.txt` files are not edited manually, but are generated with `pip-compile` (part of the `pip-tools` package). Note, that on the first line of `requirements_dev.in` there is the following line: `-c requirements.txt`. This constrains the development requirements to packages already selected for production.
+2. [tilavarauspalvelu-core-stageprod](https://dev.azure.com/City-of-Helsinki/tilavarauspalvelu/_build?definitionId=1231) deploys the service to `staging` and `production` environments. Manual approval is required for both.
 
-To generate `.txt` files:
+For `staging` and `production` releases:
+1. Bump the `__version__` in [tilavarauspalvelu/__init__.py](tilavarauspalvelu/__init__.py)
+2. Create a new [tag](https://github.com/City-of-Helsinki/tilavarauspalvelu-core/tags) that matches the version, for example, `release-0.21.0`.
+
+Environment configurations for each environment are defined in the [library](https://dev.azure.com/City-of-Helsinki/tilavarauspalvelu/_library?itemType=VariableGroups).
+
+## Environments
+The service is managed via Red Hat OpenShift. Management UIs:
+- [Development and Test environment](https://console-openshift-console.apps.arodevtest.hel.fi/topology/ns/hki-kanslia-aok-tilavarauspalvelu-test)
+- [Staging and Production environment](https://console-openshift-console.apps.platta.hel.fi/add/all-namespaces) (requires [Helsinki VPN](https://huolto.hel.fi/))
+
+The four environments are the following:
+- `dev`: runs the latests merged code
+- `test`: used for approval testing
+- `staging`: used to verify the release
+- `production`: final product for the end users
+
+## Development tips and tricks
+
+
+### Running tests, linters and formatting
+Running tests locally requires that the PostgreSQL database and Redis cache are up and running. You can start them with
+`docker-compose up -d db redis`.
+
+To run all tests with verbose output, you can simply run `pytest`. To ignore third-party warnings, you can run `pytest -W default`. Not that some unit tests may take longer to run. If you want to ignore the slow tests, run `SKIP_LONG_RUNNING=1 pytest -W default`.
+
+Linters and auto-formatting can be run with the `./format.sh` script found in the project root. It runs [black](https://github.com/psf/black), [isort](https://pycqa.github.io/isort/), and [flake8](https://github.com/pycqa/flake8).
+
+### Running background processing (Celery)
+
+Background processes are run with [Celery](https://docs.celeryproject.org/).
+
+If you want to run background processes synchronously without Celery, 
+set the environment variable `CELERY_ENABLED` to `false`.
+
+When developing locally without Docker, you need to manually run the Celery worker
+by executing `celery -A tilavarauspalvelu worker --beat --loglevel info --scheduler django` in the project root if you want to run background jobs with Celery.
+
+In development environments, the file system backend is easiest to use (the current default).
+You need to create a queue and processed folders and update the environment variables 
+CELERY_QUEUE_FOLDER_OUT, CELERY_QUEUE_FOLDER_IN, CELERY_PROCESSED_FOLDER to match.
+The default values are ./broker/queue/ for in and out, and ./broker/processed/ for processed. 
+
+
+### Upgrading Python packages
+[pip-tools](https://github.com/jazzband/pip-tools) is used to manage packages. To make changes to packages or versions, edit [requirements.in](requirements.in) and [requirements_dev.in](requirements_dev.in) files. Avoid pinning the versions unless it is absolutely necessary.
+
+After making the changes, you can generate the `.txt` files:
 ```
 pip-compile requirements.in
 pip-compile requirements_dev.in
 ```
 
-`requirements.txt` contains fully tested, pinned versions of the requirements. `requirements.in` contains the primary, requirements of the project without their dependencies. Same applies to `requirements_dev` files.
+The generated `requirements.txt` and `requirements_dev.txt` files contain fully tested, pinned versions of the requirements.
 
-In production, deployments should always use `requirements.txt` and the versions pinned therein. In development, new virtualenvs and development environments should be initialised using both `requirements.txt` and `requirements_dev.txt`.pip-sync will synchronize the active virtualenv to match exactly the packages in requirements.txt.
-
-In production:
-```
-pip-sync requirements.txt
-```
-
-In development:
+To update your virtual environment, you can use `pip-sync` command:
 ```
 pip-sync requirements.txt requirements_dev.txt
 ```
 
-In development and testing, to update a package update it in `requirements.in` (or in `requirements_dev.in`) and use the command `pip-compile`.
-
-To remove a dependency, remove it from requirements.in, run pip-compile and then pip-sync. If everything works as expected, commit the changes.
-
-### Database requirements
-
-Postgresql 11 database with postgis extension. Find postgis installation instructions [here](https://postgis.net/install/).
-
-### Cache requirements
-
-Redis 7 is required to run the service. The easiest way to run it locally is to use docker-compose with `docker-compose up backend`. You can also start Redis separately and let in run in the backround with `docker-compose up -d redis`.
-
-For local installation and command line tools check
-[Installing Redis](https://redis.io/docs/getting-started/installation/).
-
-### Installation issues on Mac
-
-#### Psycopg2 issue
-You might get an error when installing psycopg2. To fix the issue, you need to install OpenSSL and then update the LIBRARY_PATH env:
+If you need to upgrade individual packages, you can use `--upgrade-package` argument:
 ```
-brew install openssl
-export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
+pip-compile requirements.in --upgrade-package [PACKAGE_NAME]
 ```
 
-#### OR-Tools issue
-At the time of writing this, OR-Tools only supports x86_64/amd64 architecture so it does not work on M1 Macs. On M1 Macs you'll get an error when you try install `requirements.txt`.
-
-To solve the issues, follow [this guide](https://dev.to/yulin/how-to-install-google-or-tools-on-apple-m1-arm64-346b). Just remember to install Python 3.8 instead of the latest version available:
-
-```
-brew86 install python@3.8
-```
-
-### Potential build problems
-
-Docker compose might fail building with an error about missing source files. This is fixed by creating hte following directories (empty dirs are fine).
-
-```sh
-$ mkdir ./etc-pki-entitlement && mkdir ./rhsm-conf && mkdir ./rhsm-ca
-```
-
-Some RHEL repos can cause build to fail. These can be added or removed with these lines in the `Dockerfile` before `RUN yum -y update` line.
-
-```docker
-RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-RUN subscription-manager repos --disable rhel-8-for-x86_64-baseos-beta-rpms
-RUN subscription-manager repos --disable rhel-8-for-x86_64-appstream-beta-rpms
-```
-
-If a build fails, remove the failed `dev` docker container and all intermediary related containers. When docker containers has been cleaned, try the build again with one of the repo enabled/disabled (depending on what settings you had when first building the project).
-
-# Running tests and formatting
-
-Tests are run with pytest. Use `pytest` to run all tests. Use `pytest -W default` to show third party warnings ignored in `pytest.ini`.
-
-Running tests locally requires that database and Redis cache are up and running. You can start them with
-`docker-compose up -d db redis`.
-
-To run static code checks and tests with coverage:
-
-In docker
-
-`docker-compose run dev test`
-
-Locally:
-
-`deploy/entrypoint.sh test`
-
-Some tests take longer to run. If you want to skip these long running tests, you can define `SKIP_LONG_RUNNING` env:
-`SKIP_LONG_RUNNING=1 pytest`
-
-# Background processing
-
-Background processes are run with [Celery](https://docs.celeryproject.org/).
-
-If you want to run background processes synchronously without celery, 
-set environment variable CELERY_ENABLED to false.
-
-When developing locally without docker, you need to run celery worker manually
-by executing in the project root `celery -A tilavarauspalvelu worker --beat --loglevel info --scheduler django` if you want to run background jobs with celery.
-
-In development environments it's easiest to use file system backend (the current default),
-you need to create a queue and processed folders and update env variables 
-CELERY_QUEUE_FOLDER_OUT, CELERY_QUEUE_FOLDER_IN, CELERY_PROCESSED_FOLDER to match.
-Default value is ./broker/queue/ for in and out and ./broker/processed/ for processed. 
-
-# Environments
-
-## Environmental variables
-
-For detailed documentation about specific environment variables, see [.env.example](.env.example).
-
-For this project, `.env.example` must be copied both to the root directory as `.env` and to the `tilavarauspalvelu` directory (as `.env` as well). To reduce confusion and potential misconfiguration, it is advisable to only have `.env` as a file in the root directory. The `.env` file can then be symlinked to `tilavarauspalvelu` directory with the commands:
-```sh
-$ cd tilavarauspalvelu
-$ ln -s ../.env .env
-```
- 
-# Authentication
+### Authentication
 
 We use Tunnistamo and JWT tokens for API authentication. Support for Tunnistamo authentication is implemented by django-helusers library. Following env variables must be set for authentication to work properly:
 
@@ -180,13 +211,9 @@ Each UI has implemented Tunnistamo login which will provide UI with JWT token fo
 
 In debug mode basic and session authentication are also enabled.
 
-## Known issue
-For unknown reason separate user objects are created for JWT and Django Admin authentications. This is not intended and will probably be fixed at some point.
+There is a **known issue**, where separate user objects are created for JWT and Django Admin authentications. This is not intended and will probably be fixed at some point.
 
-
-![Data model visualization](tilavarauspalvelu_visualized.svg)
-
-## Deployed application settings & static files
+### Static files
 
 Contrary to more common set-ups, this application does not have a reverse proxy serving static files. Instead, static files are served by both Django and uwsgi.
 
@@ -194,11 +221,11 @@ Static files are served by the [Whitenoise](https://whitenoise.evans.io/en/stabl
 
 Media files are served by the [uwsgi static files implementation](https://uwsgi-docs.readthedocs.io/en/latest/StaticFiles.html) offloaded to threads. These are all files uploaded by users in Django Admin pages. If there are performance issues (I.E. 502 errors from the Application Gateway) it is very likely process count and or process scale-up must be tweaked higher.
 
-# Performance testing and optimization
+### Performance testing and optimization
 
 To debug REST API endpoints, the [Django debug toolbar](https://django-debug-toolbar.readthedocs.io/en/latest/) package can be used. The debug toolbar will gather information of code execution and database interactions with which it is possible to optimize both code and query usage. A similar package is available for GraphQL endpoint optimization, the [Django GraphQL Debug Toolbar](https://github.com/flavors/django-graphiql-debug-toolbar). These are not currently installed in the project. When optimization is done, these must be installed first before proceeding to the next steps.
 
-### Django Debug Toolbar
+#### Django Debug Toolbar
 To set-up django debug toolbar, these settings are needed.
 
 ```py
@@ -216,10 +243,10 @@ Also, add the following line to the end of the tilavarauspalvelu [urls.py](./api
 urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
 ```
 
-When the lines above are added to the bottom of [settings.py](./tilavarauspalvelu/settings.py), the debug toolbar will be visible when a REST API endpoint is loaded in any browser.
+Do not add these changes to [settings.py](./tilavarauspalvelu/settings.py). Use `local_settings.py` instead so that the changes are applied to your dev environment only. When above lines are added bottom of the file, the debug toolbar will be visible when a REST API endpoint is loaded in any browser.
 
-### GraphQL Debug Toolbar
-To set-up Django GraphQL debug toolbar, copy the following lines of code to the end of [settings.py](./tilavarauspalvelu/settings.py). Please make sure to remove all "debug toolbar" related lines first as they do not work together! Yes, the lines below are correct, debug_toolbar must be in installed apps but its middleware cannot be added.
+#### GraphQL Debug Toolbar
+To set-up Django GraphQL debug toolbar, copy the following lines of code to the end of `local_settings.py`. Please make sure to remove all "debug toolbar" related lines first as they do not work together! Yes, the lines below are correct, debug_toolbar must be in installed apps but its middleware cannot be added.
 
 ```py
 # Hardcode to internal IPs as debug toolbar will expose internal information
@@ -242,3 +269,24 @@ urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
 ```
 
 When the lines above have been added and the server has been re-/started, the django debug toolbar will load in `/graphql/` endpoint.
+
+### Data model visualization
+![Data model visualization](tilavarauspalvelu_visualized.svg)
+
+### Known setup issues
+
+#### Psycopg2 issue
+You might get an error when installing psycopg2. To fix the issue, you need to install OpenSSL and then update the LIBRARY_PATH env:
+```
+brew install openssl
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
+```
+
+#### OR-Tools issue
+At the time of writing this, OR-Tools only supports x86_64/amd64 architecture so it does not work on M1 Macs. On M1 Macs you'll get an error when you try install `requirements.txt`.
+
+To solve the issues, follow [this guide](https://dev.to/yulin/how-to-install-google-or-tools-on-apple-m1-arm64-346b). Just remember to install Python 3.8 instead of the latest version available:
+
+```
+brew86 install python@3.8
+```
