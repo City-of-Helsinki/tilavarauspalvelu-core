@@ -142,6 +142,7 @@ export const LIST_RESERVATIONS = gql`
           price
           bufferTimeBefore
           bufferTimeAfter
+          orderUuid
           reservationUnits {
             pk
             nameFi
@@ -378,6 +379,7 @@ export const GET_ORDER = gql`
       status
       paymentType
       receiptUrl
+      checkoutUrl
     }
   }
 `;

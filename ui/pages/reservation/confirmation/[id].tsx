@@ -87,7 +87,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
     order,
     error: orderError,
     loading: orderLoading,
-  } = useOrder(reservation?.orderUuid);
+  } = useOrder({ orderUuid: reservation?.orderUuid });
 
   const isOrderUuidMissing = reservation && !reservation.orderUuid;
 

@@ -27,6 +27,7 @@
   "pastReservations": "Past",
   "cancelledReservations": "Cancelled",
   "upcomingSlug": "Coming",
+  "payReservation": "Pay",
   "pastSlug": "Past",
   "modifyReservationTime": "Change the time",
   "modifyApplication": "Edit the application",

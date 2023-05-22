@@ -1,6 +1,7 @@
 import { get as mockGet } from "lodash";
 import { addDays, addHours, addMinutes, format, startOfToday } from "date-fns";
 import {
+  PaymentOrderType,
   ReservationsReservationReserveeTypeChoices,
   ReservationsReservationStateChoices,
   ReservationType,
@@ -10,6 +11,7 @@ import {
   CanReservationBeChangedProps,
   canReservationTimeBeChanged,
   canUserCancelReservation,
+  getCheckoutUrl,
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   getReservationApplicationMutationValues,
@@ -17,6 +19,7 @@ import {
   isReservationInThePast,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
+import { Language } from "common";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -680,5 +683,50 @@ describe("canReservationBeChanged", () => {
         } as CanReservationBeChangedProps)
       ).toStrictEqual([true]);
     });
+  });
+});
+
+describe("getCheckoutUrl", () => {
+  const order: PaymentOrderType = {
+    id: "order-id",
+    checkoutUrl: "https://checkout.url/path?user=1111-2222-3333-4444",
+  };
+
+  test("returns checkout url", () => {
+    expect(getCheckoutUrl(order, "sv")).toBe(
+      "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=sv"
+    );
+
+    expect(getCheckoutUrl(order, "fi")).toBe(
+      "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
+    );
+  });
+
+  test("returns null with falsy input", () => {
+    expect(getCheckoutUrl(order, null as unknown as Language)).toBe(null);
+
+    expect(getCheckoutUrl({ ...order, checkoutUrl: undefined }, "fi")).toBe(
+      null
+    );
+
+    expect(
+      getCheckoutUrl(
+        {
+          ...order,
+          checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
+        },
+        "fi"
+      )
+    ).toBe(null);
+
+    expect(
+      getCheckoutUrl(
+        {
+          ...order,
+          checkoutUrl: "https://checkout.url/path",
+        },
+        "fi"
+      )
+    ).toBe(null);
   });
 });

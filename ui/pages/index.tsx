@@ -76,6 +76,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "home",
         "navigation",
         "footer",
+        "notification",
+        "errors",
       ])),
     },
   };

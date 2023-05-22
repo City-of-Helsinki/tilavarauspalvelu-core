@@ -60,13 +60,17 @@ const ReservationSuccess = () => {
     loading: orderLoading,
     refresh,
     called: orderCalled,
-  } = useOrder(orderId);
+  } = useOrder({ orderUuid: orderId });
 
   const {
     reservation,
     error: reservationError,
     loading: reservationLoading,
-  } = useReservation(parseInt(order?.reservationPk, 10));
+  } = useReservation({
+    reservationPk: order?.reservationPk
+      ? parseInt(order?.reservationPk, 10)
+      : null,
+  });
 
   useEffect(() => {
     if (order && !orderLoading) {

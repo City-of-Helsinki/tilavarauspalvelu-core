@@ -1,0 +1,9 @@
+{
+  "waitingForPayment": {
+    "title": "Din bokning väntar på betalning",
+    "body": "Din bokning annulleras automatiskt om betalning inte görs inom 20 minuter.",
+    "cancelReservation": "Avboka bokningen",
+    "payReservation": "Betala",
+    "reservationCancelledTitle": "Din bokning har avbokats!"
+  }
+}

@@ -8,6 +8,7 @@ import {
 } from "common/types/common";
 import {
   ApplicationRoundType,
+  PaymentOrderType,
   ReservationsReservationReserveeTypeChoices,
   ReservationsReservationStateChoices,
   ReservationType,
@@ -357,5 +358,28 @@ export const getReservationValue = (
       );
     default:
       return reservation[key] ?? null;
+  }
+};
+
+export const getCheckoutUrl = (
+  order: PaymentOrderType,
+  lang: string
+): string | null => {
+  const { checkoutUrl } = order ?? {};
+
+  if (!checkoutUrl) return null;
+
+  try {
+    const { origin, pathname, searchParams } = new URL(checkoutUrl) || {};
+    const userId = searchParams?.get("user");
+
+    if (checkoutUrl && userId && origin && pathname && lang) {
+      const baseUrl = `${origin}${pathname}`;
+      return `${baseUrl}/paymentmethod?user=${userId}&lang=${lang}`;
+    }
+
+    return null;
+  } catch (e) {
+    return null;
   }
 };

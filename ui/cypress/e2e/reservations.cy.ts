@@ -16,6 +16,10 @@ import {
   reservationEditActionBack,
   reservationEditActionSubmit,
   durationSelectorToggle,
+  checkoutButton,
+  notificationCheckoutButton,
+  notificationDeleteButton,
+  notificationContainer,
 } from "../model/reservation-creation";
 import {
   cancelButton,
@@ -354,6 +358,54 @@ describe("Tilavaraus user reservations", () => {
 
     cy.url().should("match", /\/reservations\/4$/);
   });
+
+  it("should go from unpaid order to checkout url", () => {
+    detailButton().eq(0).click();
+    cy.url().should("match", /\/reservations\/22$/);
+
+    checkoutButton()
+      .click()
+      .then(() => {
+        cy.url().should(
+          "equal",
+          "https://www.google.com/search/paymentmethod?user=123&lang=fi"
+        );
+      });
+  });
+});
+
+describe("Unpaid reservation notification", () => {
+  beforeEach(() => {
+    Cypress.config("defaultCommandTimeout", 20000);
+
+    cy.window().then((win) => {
+      win.sessionStorage.clear();
+      cy.visit("/search/single");
+      cy.injectAxe();
+    });
+  });
+
+  it("should checkout from notification button", () => {
+    notificationCheckoutButton()
+      .click()
+      .then(() => {
+        cy.url().should(
+          "equal",
+          "https://www.google.com/search/paymentmethod?user=123&lang=fi"
+        );
+      });
+  });
+
+  it("should delete reservation from notification button", () => {
+    notificationDeleteButton()
+      .click()
+      .then(() => {
+        notificationContainer().should(
+          "contain.text",
+          "Varauksesi on peruttu!"
+        );
+      });
+  });
 });
 
 describe("Returning reservation", () => {
@@ -406,7 +458,7 @@ describe("Returning reservation", () => {
   });
 });
 
-describe.only("Reservation cancellation callback", () => {
+describe("Reservation cancellation callback", () => {
   beforeEach(() => {
     Cypress.config("defaultCommandTimeout", 20000);
   });

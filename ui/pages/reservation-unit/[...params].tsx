@@ -60,6 +60,7 @@ import {
 import Sanitize from "../../components/common/Sanitize";
 import { getReservationUnitPrice } from "../../modules/reservationUnit";
 import {
+  getCheckoutUrl,
   getReservationApplicationMutationValues,
   profileUserFields,
 } from "../../modules/reservation";
@@ -359,15 +360,10 @@ const ReservationUnitReservationWithReservationProp = ({
         reservationConfirmSuccess();
       } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
-        const { checkoutUrl } = order ?? {};
-        const { origin, pathname, searchParams } = new URL(checkoutUrl) || {};
-        const userId = searchParams?.get("user");
+        const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
-        if (checkoutUrl && userId && origin && pathname) {
-          const baseUrl = `${origin}${pathname}`;
-          router.push(
-            `${baseUrl}/paymentmethod?user=${userId}&lang=${i18n.language}`
-          );
+        if (checkoutUrl) {
+          router.push(checkoutUrl);
         } else {
           setErrorMsg(t("errors:general_error"));
         }

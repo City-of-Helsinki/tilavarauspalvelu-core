@@ -7,7 +7,7 @@ import { breakpoints } from "common/src/common/style";
 import { LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { authEnabled, authenticationIssuer } from "../../modules/const";
-import { useOrder } from "../../hooks/reservation";
+import { useOrder, useReservation } from "../../hooks/reservation";
 import Container from "../../components/common/Container";
 import DeleteCancelled from "../../components/reservation/DeleteCancelled";
 import ReservationFail from "../../components/reservation/ReservationFail";
@@ -46,15 +46,14 @@ const Cancel = () => {
     }
   }, [isLoggedOut]);
 
-  const {
-    order,
-    loading,
-    called,
-    deleteReservation,
-    deleteError,
-    deleteLoading,
-    deleted,
-  } = useOrder(orderId);
+  const { order, loading, called } = useOrder({ orderUuid: orderId });
+
+  const { deleteReservation, deleteError, deleteLoading, deleted } =
+    useReservation({
+      reservationPk: order?.reservationPk
+        ? parseInt(order?.reservationPk, 10)
+        : null,
+    });
 
   useEffect(() => {
     const { reservationPk } = order || {};

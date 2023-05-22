@@ -1,0 +1,9 @@
+{
+  "waitingForPayment": {
+    "title": "Your booking is waiting for payment",
+    "body": "Your booking will be cancelled automatically, if the booking won’t be paid within 20 minutes.",
+    "cancelReservation": "Cancel booking",
+    "payReservation": "Pay",
+    "reservationCancelledTitle": "Your booking has been cancelled."
+  }
+}

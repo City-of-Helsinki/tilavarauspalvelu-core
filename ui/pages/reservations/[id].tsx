@@ -1,31 +1,30 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
 import { camelCase, capitalize, get, isFinite, trim } from "lodash";
-import { IconCalendar, IconCross, IconLinkExternal } from "hds-react";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import {
+  IconArrowRight,
+  IconCalendar,
+  IconCross,
+  IconLinkExternal,
+} from "hds-react";
 import { useTranslation } from "next-i18next";
 import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { signIn, useSession } from "next-auth/react";
 import {
   Query,
-  QueryReservationByPkArgs,
   QueryTermsOfUseArgs,
   ReservationsReservationReserveeTypeChoices,
-  ReservationType,
   TermsOfUseType,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationsReservationStateChoices,
-  QueryOrderArgs,
-  PaymentOrderType,
 } from "common/types/gql-types";
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import apolloClient from "../../modules/apolloClient";
-import { GET_ORDER, GET_RESERVATION } from "../../modules/queries/reservation";
 import {
   JustForDesktop,
   JustForMobile,
@@ -39,6 +38,7 @@ import { AccordionWithState as Accordion } from "../../components/common/Accordi
 import {
   canReservationTimeBeChanged,
   canUserCancelReservation,
+  getCheckoutUrl,
   getNormalizedReservationOrderStatus,
   getReservationCancellationReason,
   getReservationValue,
@@ -59,6 +59,7 @@ import {
   authEnabled,
   authenticationIssuer,
 } from "../../modules/const";
+import { useReservation, useOrder } from "../../hooks/reservation";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -283,47 +284,10 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     }
   }, [isUserUnauthenticated]);
 
-  const [reservation, setReservation] = useState<ReservationType>(null);
-  const [order, setOrder] = useState<PaymentOrderType>(null);
-
-  const {
-    data: reservationData,
-    loading,
-    error,
-  } = useQuery<Query, QueryReservationByPkArgs>(GET_RESERVATION, {
-    fetchPolicy: "no-cache",
-    variables: {
-      pk: id,
-    },
+  const { reservation, loading, error } = useReservation({ reservationPk: id });
+  const { order, loading: orderLoading } = useOrder({
+    orderUuid: reservation?.orderUuid,
   });
-
-  const [getOrder, { loading: orderLoading }] = useLazyQuery<
-    Query,
-    QueryOrderArgs
-  >(GET_ORDER, {
-    fetchPolicy: "no-cache",
-    onCompleted: (data) => {
-      if (!data.order) {
-        return;
-      }
-      setOrder(data.order);
-    },
-    onError: () => {},
-  });
-
-  useEffect(() => {
-    if (reservationData?.reservationByPk) {
-      setReservation(reservationData.reservationByPk);
-
-      if (reservationData.reservationByPk.orderUuid) {
-        getOrder({
-          variables: {
-            orderUuid: reservationData.reservationByPk.orderUuid,
-          },
-        });
-      }
-    }
-  }, [reservationData, getOrder]);
 
   const reservationUnit = get(reservation?.reservationUnits, "0");
 
@@ -576,6 +540,12 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     !isReservationCancelled &&
     !isBeingHandled;
 
+  const checkoutUrl = getCheckoutUrl(order, i18n.language);
+
+  const isWaitingForPayment =
+    reservation.state ===
+      ReservationsReservationStateChoices.WaitingForPayment && checkoutUrl;
+
   return (
     <Wrapper>
       <Container>
@@ -613,6 +583,19 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
             </StatusContainer>
             <JustForMobile>{bylineContent}</JustForMobile>
             <Actions>
+              {isWaitingForPayment && (
+                <BlackButton
+                  variant="secondary"
+                  iconRight={<IconArrowRight aria-hidden />}
+                  onClick={() => {
+                    const url = getCheckoutUrl(order, i18n.language);
+                    if (url) router.push(url);
+                  }}
+                  data-testid="reservation-detail__button--checkout"
+                >
+                  {t("reservations:payReservation")}
+                </BlackButton>
+              )}
               {canTimeBeModified && (
                 <BlackButton
                   variant="secondary"

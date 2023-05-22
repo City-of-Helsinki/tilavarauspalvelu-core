@@ -104,6 +104,12 @@ export function notificationTitle(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("section[aria-label='Notification'] div[role='heading']");
 }
 
+export function notificationErrorTitle(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get("section[role='alert']");
+}
+
 export function fillAsIndividual() {
   cy.get('[for="individual"]').click();
   cy.get("#contactPerson\\.firstName").type("Vuoron");
