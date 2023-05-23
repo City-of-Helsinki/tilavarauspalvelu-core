@@ -26,7 +26,6 @@ from api.graphql.reservations.reservation_serializers.staff_adjust_time_serializ
     StaffReservationAdjustTimeSerializer,
 )
 from api.graphql.reservations.reservation_types import ReservationType
-from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.order.requests import cancel_order
@@ -166,7 +165,11 @@ class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
             )
 
         payment_order: PaymentOrder = reservation.payment_order.first()
-        if payment_order and payment_order.remote_id:
+        if (
+            payment_order
+            and payment_order.remote_id
+            and payment_order.status != OrderStatus.CANCELLED.value
+        ):
             try:
                 webshop_order = cancel_order(
                     payment_order.remote_id, payment_order.reservation_user_uuid
@@ -180,10 +183,9 @@ class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
                     scope.set_extra("details", "Order cancellation failed")
                     scope.set_extra("remote-id", payment_order.remote_id)
                     capture_exception(err)
-                raise ValidationErrorWithCode(
-                    "Unable to cancel the order: problem with external service",
-                    ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,
-                ) from err
+
+                payment_order.status = OrderStatus.CANCELLED
+                payment_order.save()
 
         return None
 
