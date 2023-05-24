@@ -342,8 +342,15 @@ def can_handle_reservation(user: User, reservation: Reservation) -> bool:
 
 
 def can_comment_reservation(user: User, reservation: Reservation) -> bool:
+    permission = "can_comment_reservations"
+    units = Unit.objects.filter(reservationunit__in=reservation.reservation_unit.all())
+    service_sectors = ServiceSector.objects.filter(units__in=units)
+
     return (
-        has_general_permission(user, "can_comment_reservations")
+        is_superuser(user)
+        or has_general_permission(user, permission)
+        or has_service_sector_permission(user, service_sectors, permission)
+        or has_unit_permission(user, units, permission)
         or can_handle_reservation(user, reservation)
         or (user.has_staff_permissions and reservation.user == user)
     )
