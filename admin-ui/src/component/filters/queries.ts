@@ -1,14 +1,15 @@
 import { gql } from "@apollo/client";
 
 export const RESERVATION_UNIT_TYPES_QUERY = gql`
-  query reservationUnitTypes {
-    reservationUnitTypes {
+  query reservationUnitTypes($offset: Int, $first: Int) {
+    reservationUnitTypes(offset: $offset, first: $first) {
       edges {
         node {
           pk
           nameFi
         }
       }
+      totalCount
     }
   }
 `;

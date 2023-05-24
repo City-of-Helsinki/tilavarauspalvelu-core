@@ -1,5 +1,6 @@
 import React from "react";
 import { H1 } from "common/src/common/typography";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { LocationType } from "common/types/gql-types";
@@ -18,6 +19,12 @@ type Params = {
   unitId: string;
   reservationUnitId: string;
 };
+
+// HDS tabs aren't responsive inside a grid container
+// flex and block cause problems on other pages (tables overflowing).
+const ContainerHack = styled(Container)`
+  display: block;
+`;
 
 const MyUnitView = () => {
   const { unitId } = useParams<Params>();
@@ -43,7 +50,7 @@ const MyUnitView = () => {
         route={[`${publicUrl}/my-units`, "unit"]}
         aliases={[{ slug: "unit", title: unit?.node?.nameFi as string }]}
       />
-      <Container>
+      <ContainerHack>
         <div>
           <H1 $legacy>{unit?.node?.nameFi}</H1>
           <p>{parseAddress(unit?.node?.location as LocationType)}</p>
@@ -56,7 +63,7 @@ const MyUnitView = () => {
             <ReservationUnitCalendarView />
           </TabPanel>
         </Tabs>
-      </Container>
+      </ContainerHack>
     </>
   );
 };

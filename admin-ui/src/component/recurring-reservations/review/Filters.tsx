@@ -1,7 +1,5 @@
 import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
-import { gql, useQuery } from "@apollo/client";
-import { Query, UnitType } from "common/types/gql-types";
 import { OptionType } from "../../../common/types";
 import Tags, { getReducer, toTags } from "../../lists/Tags";
 import { AutoGrid, FullRow } from "../../../styles/layout";
@@ -15,46 +13,29 @@ export const emptyFilterState = { unit: [] };
 
 const multivaledFields = ["unit"];
 
-const APPLICATION_UNITS_QUERY = gql`
-  query units($pks: [ID]) {
-    units(onlyWithPermission: true, pk: $pks, orderBy: "nameFI") {
-      edges {
-        node {
-          nameFi
-          pk
-        }
-      }
-    }
-  }
-`;
+export type UnitPkName = {
+  pk: number;
+  nameFi: string;
+};
 
 const ReviewUnitFilter = ({
-  unitPks,
+  units,
   value,
   onChange,
 }: {
-  unitPks: number[];
+  units: UnitPkName[];
   onChange: (units: OptionType[]) => void;
   value: OptionType[];
 }) => {
   const { t } = useTranslation();
-  const { data, loading } = useQuery<Query>(APPLICATION_UNITS_QUERY, {
-    variables: {
-      pks: unitPks,
-    },
-  });
 
-  const opts: OptionType[] = (data?.units?.edges || [])
-    .map((e) => e?.node)
-    .filter((e): e is UnitType => e != null)
-    .map((unit) => ({
-      label: unit?.nameFi ?? "",
-      value: unit?.pk ?? "",
-    }));
+  const opts: OptionType[] = units.map((unit) => ({
+    label: unit?.nameFi ?? "",
+    value: unit?.pk ?? "",
+  }));
 
   return (
     <SortedSelect
-      disabled={loading}
       label={t("ReservationUnitsSearch.unitLabel")}
       multiselect
       placeholder={t("ReservationUnitsSearch.unitPlaceHolder")}
@@ -68,10 +49,10 @@ const ReviewUnitFilter = ({
 
 type Props = {
   onSearch: (args: FilterArguments) => void;
-  unitPks: number[];
+  units: UnitPkName[];
 };
 
-const Filters = ({ onSearch, unitPks }: Props): JSX.Element => {
+const Filters = ({ onSearch, units }: Props): JSX.Element => {
   const { t } = useTranslation();
   const [state, dispatch] = useReducer(
     getReducer<FilterArguments>(emptyFilterState),
@@ -89,7 +70,7 @@ const Filters = ({ onSearch, unitPks }: Props): JSX.Element => {
     <AutoGrid>
       <div>
         <ReviewUnitFilter
-          unitPks={unitPks}
+          units={units}
           onChange={(e) => dispatch({ type: "set", value: { unit: e } })}
           value={state.unit}
         />

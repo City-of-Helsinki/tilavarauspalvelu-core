@@ -115,6 +115,7 @@ function ApplicationRoundAllocation(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationRoundId, t]);
 
+  // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
   const {
     loading: loadingApplications,
     data: applicationsData,

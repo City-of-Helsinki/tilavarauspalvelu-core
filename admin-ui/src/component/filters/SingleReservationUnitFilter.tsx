@@ -27,14 +27,14 @@ const SingleReservationUnitFilter = ({
   const options = (data?.reservationUnits?.edges || [])
     .map((e) => e?.node)
     .map((reservationUnit) => ({
-      label: reservationUnit?.nameFi as string,
-      value: String(reservationUnit?.pk as number),
+      label: reservationUnit?.nameFi ?? "",
+      value: reservationUnit?.pk ?? "",
     }));
   const valueOption = options.find((o) => o.value === value?.value);
 
   return (
     <SortedSelect
-      style={{ zIndex: "101" }}
+      style={{ zIndex: 11 }}
       disabled={loading}
       sort
       label={t("ReservationUnitsFilter.label")}

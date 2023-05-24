@@ -73,6 +73,7 @@ function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
+  // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
   const { loading } = useQuery<Query, QueryApplicationRoundsArgs>(
     APPLICATION_ROUNDS_QUERY,
     {

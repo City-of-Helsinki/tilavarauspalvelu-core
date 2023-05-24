@@ -55,6 +55,8 @@ function ApplicationRounds(): JSX.Element {
   const [applicationRounds, setApplicationRounds] = useState<
     ApplicationRoundType[]
   >([]);
+  // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
+  // TODO include the filter (below) into the query (state); requires backend changes
   const { loading } = useQuery<Query, QueryApplicationRoundsArgs>(
     APPLICATION_ROUNDS_QUERY,
     {

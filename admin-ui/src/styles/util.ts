@@ -147,6 +147,7 @@ export const InlineRowLink = styled(BasicLink).attrs({
 
 export const StyledHDSNavigation = styled(Navigation)`
   --breakpoint-xl: 9000px;
+  z-index: var(--tilavaraus-admin-stack-main-menu);
   .btn-logout {
     span {
       margin: 0;
