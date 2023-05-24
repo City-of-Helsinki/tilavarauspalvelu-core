@@ -354,7 +354,11 @@ class ReservationHandlingPermission(BasePermission):
         pk = input.get("pk")
         if pk:
             reservation = get_object_or_404(Reservation, pk=pk)
-            return can_handle_reservation(info.context.user, reservation)
+            user = info.context.user
+            return can_handle_reservation(user, reservation) or (
+                can_create_staff_reservation(user, reservation.reservation_unit.all())
+                and reservation.user == user
+            )
         return False
 
 
@@ -369,6 +373,16 @@ class ReservationDenyPermission(BasePermission):
                 can_create_staff_reservation(user, reservation.reservation_unit.all())
                 and reservation.user == user
             )
+        return False
+
+
+class ReservationRefundPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk")
+        if pk:
+            reservation = get_object_or_404(Reservation, pk=pk)
+            return can_handle_reservation(info.context.user, reservation)
         return False
 
 
