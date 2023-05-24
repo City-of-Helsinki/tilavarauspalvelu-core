@@ -112,3 +112,42 @@ class ReservationWorkingMemoWriteTestCase(ReservationTestCaseBase):
         assert_that(deny_data).is_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.working_memo).is_empty()
+
+    def test_working_memo_saves_when_staff_and_own_reservation(self):
+        staff_reserver = self.create_staff_reserver_for_unit(self.unit)
+        res = ReservationFactory(
+            user=staff_reserver, reservation_unit=[self.reservation_unit]
+        )
+
+        input_data = self.get_valid_update_data()
+        input_data["pk"] = res.id
+
+        self.client.force_login(staff_reserver)
+        response = self.query(self.get_update_memo_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+
+        confirm_data = content.get("data").get("updateReservationWorkingMemo")
+        assert_that(confirm_data.get("errors")).is_none()
+        assert_that(confirm_data.get("workingMemo")).is_equal_to(
+            input_data["workingMemo"]
+        )
+        res.refresh_from_db()
+        assert_that(res.working_memo).is_equal_to(input_data["workingMemo"])
+
+    def test_working_memo_does_not_save_when_reserver_staff_user_and_not_own_reservation(
+        self,
+    ):
+        staff_reserver = self.create_staff_reserver_for_unit(self.unit)
+        self.client.force_login(staff_reserver)
+
+        response = self.query(
+            self.get_update_memo_query(), input_data=self.get_valid_update_data()
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        deny_data = content.get("data").get("updateReservationWorkingMemo")
+        assert_that(deny_data).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.working_memo).is_empty()

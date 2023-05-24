@@ -11,6 +11,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
+from spaces.models import Unit
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 
 
@@ -113,3 +114,30 @@ class GrapheneTestCaseBase(GraphQLTestCase):
         unit_role.unit_group.add(unit_group)
 
         return unit_group_admin
+
+    def create_staff_reserver_for_unit(self, unit: Unit = None):
+        reserver_staff_user = get_user_model().objects.create(
+            username="res",
+            first_name="res",
+            last_name="erver",
+            email="res.erver@foo.com",
+        )
+        UnitRoleChoice.objects.create(
+            code="staff",
+            verbose_name="staff reserver person",
+        )
+        unit_role = UnitRole.objects.create(
+            user=reserver_staff_user,
+            role=UnitRoleChoice.objects.get(code="staff"),
+        )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="staff"),
+            permission="can_create_staff_reservations",
+        )
+
+        if not unit:
+            unit = UnitFactory()
+
+        unit_role.unit.add(unit)
+
+        return reserver_staff_user
