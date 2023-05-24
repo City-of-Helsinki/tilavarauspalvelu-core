@@ -175,9 +175,12 @@ const ApplicationData = ({
 const ButtonsWithPermChecks = ({
   reservation,
   isFree,
+  onReservationUpdated,
 }: {
   reservation: ReservationType;
   isFree: boolean;
+  // Hack to deal with reservation query not being cached so we need to refetch
+  onReservationUpdated: () => void;
 }) => {
   const { setModalContent } = useModal();
 
@@ -217,7 +220,10 @@ const ButtonsWithPermChecks = ({
       <ApprovalButtonsRecurring
         recurringReservation={reservation.recurringReservation}
         handleClose={closeDialog}
-        handleAccept={closeDialog}
+        handleAccept={() => {
+          onReservationUpdated();
+          closeDialog();
+        }}
       />
     );
   }
@@ -228,7 +234,10 @@ const ButtonsWithPermChecks = ({
       isFree={isFree}
       reservation={reservation}
       handleClose={closeDialog}
-      handleAccept={closeDialog}
+      handleAccept={() => {
+        onReservationUpdated();
+        closeDialog();
+      }}
     />
   );
 };
@@ -344,7 +353,13 @@ const maybeStringToDate: (s?: string) => Date | undefined = (str) =>
 const onlyFutureDates: (d?: Date) => Date | undefined = (d) =>
   d && d > new Date() ? d : undefined;
 
-const TimeBlock = ({ reservation }: { reservation: ReservationType }) => {
+const TimeBlock = ({
+  reservation,
+  onReservationUpdated,
+}: {
+  reservation: ReservationType;
+  onReservationUpdated: () => void;
+}) => {
   const [selected, setSelected] = useState<ReservationType | undefined>(
     undefined
   );
@@ -381,6 +396,7 @@ const TimeBlock = ({ reservation }: { reservation: ReservationType }) => {
           <RecurringReservationsView
             reservation={reservation}
             onSelect={setSelected}
+            onReservationUpdated={onReservationUpdated}
           />
         </Accordion>
       )}
@@ -482,6 +498,7 @@ const RequestedReservation = (): JSX.Element | null => {
             <ButtonsWithPermChecks
               reservation={reservation}
               isFree={!isNonFree}
+              onReservationUpdated={refetch}
             />
           }
         />
@@ -519,6 +536,7 @@ const RequestedReservation = (): JSX.Element | null => {
           <ButtonsWithPermChecks
             reservation={reservation}
             isFree={!isNonFree}
+            onReservationUpdated={refetch}
           />
         </HorisontalFlex>
         <ReservationSummary reservation={reservation} isFree={!isNonFree} />
@@ -591,7 +609,7 @@ const RequestedReservation = (): JSX.Element | null => {
               </VisibleIfPermission>
             </VerticalFlex>
           </Accordion>
-          <TimeBlock reservation={reservation} />
+          <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
           <Accordion heading={t("RequestedReservation.reservationDetails")}>
             <ApplicationDatas>
               <ApplicationData

@@ -2189,6 +2189,7 @@ export type RefreshOrderMutationPayload = {
   __typename?: "RefreshOrderMutationPayload";
   clientMutationId?: Maybe<Scalars["String"]>;
   orderUuid?: Maybe<Scalars["UUID"]>;
+  reservationPk?: Maybe<Scalars["Int"]>;
   status?: Maybe<Scalars["String"]>;
 };
 
@@ -2747,6 +2748,7 @@ export type ReservationType = Node & {
   priority: ReservationsReservationPriorityChoices;
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
+  refundUuid?: Maybe<Scalars["String"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
   reserveeAddressCity?: Maybe<Scalars["String"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]>;

@@ -16,9 +16,11 @@ import { useModal } from "../../../context/ModalContext";
 const RecurringReservationsView = ({
   reservation,
   onSelect,
+  onReservationUpdated,
 }: {
   reservation: ReservationType;
   onSelect: (selected: ReservationType) => void;
+  onReservationUpdated: () => void;
 }) => {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
@@ -47,7 +49,10 @@ const RecurringReservationsView = ({
     setModalContent(
       <DenyDialog
         reservations={[res]}
-        onReject={handleCloseRemoveDialog}
+        onReject={() => {
+          onReservationUpdated();
+          handleCloseRemoveDialog();
+        }}
         onClose={handleCloseRemoveDialog}
       />,
       true

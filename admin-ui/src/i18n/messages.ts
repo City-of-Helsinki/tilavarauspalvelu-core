@@ -1973,6 +1973,17 @@ const translations: ITranslations = {
       handlingDetails: ["Kommentti"],
       handlingDetailsHelper: ["Näytetään vain henkilökunnalle"],
       errorSaving: ["Hylkäys epäonnistui"],
+      refund: {
+        notAllowed: ["Palautus ei mahdollinen"],
+        alreadyRefunded: ["Jo palautettu"],
+        radioLabel: ["Palauta rahat"],
+        returnChoice: ["Palauta maksu {{ price }} €"],
+        noReturnChoice: ["Ei palautusta"],
+        mutationSuccess: ["Varaus peruttu ja rahat palautettu."],
+        mutationFailure: [
+          "Varaus peruttu, mutta rahojen palautus epäonnistui.",
+        ],
+      },
     },
     ApproveDialog: {
       title: ["Hyväksy varaus ja määritä subventoitu hinta"],

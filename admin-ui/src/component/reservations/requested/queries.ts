@@ -56,7 +56,6 @@ export const RESERVATION_QUERY = gql`
         endDate
         weekdays
       }
-      orderStatus
       ageGroup {
         minimum
         maximum
@@ -103,6 +102,9 @@ export const RESERVATION_QUERY = gql`
       billingAddressZip
       freeOfChargeReason
       applyingForFreeOfCharge
+      orderUuid
+      orderStatus
+      refundUuid
     }
   }
 `;
@@ -125,6 +127,17 @@ export const DENY_RESERVATION = gql`
     denyReservation(input: $input) {
       pk
       state
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const REFUND_RESERVATION = gql`
+  mutation refundReservation($input: ReservationRefundMutationInput!) {
+    refundReservation(input: $input) {
       errors {
         field
         messages
