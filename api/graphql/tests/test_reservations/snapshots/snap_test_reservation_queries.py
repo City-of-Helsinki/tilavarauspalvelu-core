@@ -567,6 +567,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'homeCity': {
                             'name': 'Test'
                         },
+                        'isHandled': False,
                         'name': 'movies',
                         'numPersons': None,
                         'orderStatus': None,
@@ -629,6 +630,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'homeCity': {
                             'name': 'Test'
                         },
+                        'isHandled': False,
                         'name': 'admin movies',
                         'numPersons': None,
                         'orderStatus': None,
@@ -681,6 +683,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'homeCity': {
                             'name': 'Test'
                         },
+                        'isHandled': False,
                         'name': 'movies',
                         'numPersons': None,
                         'orderStatus': None,
@@ -743,6 +746,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'homeCity': {
                             'name': 'Test'
                         },
+                        'isHandled': False,
                         'name': 'admin movies',
                         'numPersons': None,
                         'orderStatus': None,
@@ -795,6 +799,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'homeCity': {
                             'name': 'Test'
                         },
+                        'isHandled': False,
                         'name': 'movies',
                         'numPersons': None,
                         'orderStatus': None,
@@ -994,6 +999,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': None,
                         'homeCity': None,
+                        'isHandled': None,
                         'name': None,
                         'numPersons': None,
                         'orderStatus': None,
@@ -1042,6 +1048,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'homeCity': {
                             'name': 'Test'
                         },
+                        'isHandled': False,
                         'name': 'movies',
                         'numPersons': None,
                         'orderStatus': None,
