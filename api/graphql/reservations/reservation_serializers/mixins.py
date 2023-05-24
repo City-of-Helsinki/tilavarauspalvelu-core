@@ -293,6 +293,18 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED,
             )
 
+        interval_minutes = int(
+            reservation_unit.reservation_start_interval.replace(
+                "interval_", ""
+            ).replace("_mins", "")
+        )
+        duration_minutes = duration.total_seconds() / 60
+        if duration_minutes % interval_minutes > 0:
+            raise ValidationErrorWithCode(
+                f"Reservation duration is not a multiple of the allowed interval of {interval_minutes} minutes.",
+                ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
+            )
+
     def check_buffer_times(self, reservation_unit, begin, end):
         reservation_after = reservation_unit.get_next_reservation(end, self.instance)
         reservation_before = reservation_unit.get_previous_reservation(

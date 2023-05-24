@@ -12,6 +12,7 @@ from api.graphql.tests.test_reservations.base import (
     DEFAULT_TIMEZONE,
     ReservationTestCaseBase,
 )
+from api.graphql.validation_errors import ValidationErrorCodes
 from applications.models import PRIORITY_CONST, City
 from applications.tests.factories import ApplicationRoundFactory, CityFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
@@ -715,6 +716,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
                 minutes=interval_minutes
             )
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+            input_data["end"] = (
+                begin + datetime.timedelta(minutes=interval_minutes)
+            ).strftime("%Y%m%dT%H%M%SZ")
             response = self.query(self.get_create_query(), input_data=input_data)
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -737,7 +741,10 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             begin = datetime.datetime.now() + datetime.timedelta(
                 minutes=interval_minutes + 1
             )
+            end = begin + datetime.timedelta(minutes=interval_minutes)
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+            input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
+
             response = self.query(self.get_create_query(), input_data=input_data)
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_not_none()
@@ -767,6 +774,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
                 minutes=interval_minutes + 1
             )
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+            input_data["end"] = (
+                begin + datetime.timedelta(minutes=interval_minutes)
+            ).strftime("%Y%m%dT%H%M%SZ")
             response = self.query(self.get_create_query(), input_data=input_data)
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -1466,57 +1476,6 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )  # 1h reservation = 4 x 15 min = 4 x 3 €
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
-    def test_create_price_calculation_rounding(self, mock_periods, mock_opening_hours):
-        tax_percentage = TaxPercentageFactory()
-
-        ReservationUnitPricingFactory(
-            begins=datetime.date.today(),
-            pricing_type=PricingType.PAID,
-            price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
-            lowest_price=1.0,
-            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
-            highest_price=3.0,
-            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
-            tax_percentage=tax_percentage,
-            status=PricingStatus.PRICING_STATUS_ACTIVE,
-            reservation_unit=self.reservation_unit,
-        )
-
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.client.force_login(self.regular_joe)
-
-        # 46 minutes reservation should be rounded up to 60 minutes
-        input_data = self.get_valid_input_data()
-        input_data["begin"] = datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ")
-        input_data["end"] = (
-            datetime.datetime.now() + datetime.timedelta(minutes=46)
-        ).strftime("%Y%m%dT%H%M%SZ")
-
-        response = self.query(self.get_create_query(), input_data=input_data)
-        content = json.loads(response.content)
-
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
-        pk = content.get("data").get("createReservation").get("reservation").get("pk")
-        reservation = Reservation.objects.get(id=pk)
-        assert_that(reservation).is_not_none()
-        assert_that(reservation.price).is_equal_to(
-            3.0 * 4
-        )  # 46 min reservation = 4 x 15 min = 4 x 3 €
-        assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 3)
-        assert_that(reservation.price_net).is_close_to(
-            Decimal(3.0 * 4) / (1 + tax_percentage.decimal), 6
-        )
-        assert_that(reservation.non_subsidised_price_net).is_equal_to(
-            reservation.price_net
-        )
-        assert_that(reservation.unit_price).is_equal_to(
-            3.0
-        )  # Unit price is the price of the reservation unit.
-        assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
-
     @patch(
         "reservation_units.utils.reservation_unit_reservation_scheduler"
         + ".ReservationUnitReservationScheduler.is_reservation_unit_open"
@@ -1722,4 +1681,58 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         assert_that(reservation.non_subsidised_price_net).is_equal_to(
             reservation.price_net
+        )
+
+    def test_reservation_duration_is_multiple_of_interval(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        tax_percentage = TaxPercentageFactory()
+        ReservationUnitPricingFactory(
+            begins=datetime.date.today(),
+            pricing_type=PricingType.PAID,
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=1.0,
+            highest_price=3.0,
+            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
+            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
+            tax_percentage=tax_percentage,
+            status=PricingStatus.PRICING_STATUS_ACTIVE,
+            reservation_unit=self.reservation_unit,
+        )
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+
+        today = datetime.date.today()
+        begin = datetime.datetime(
+            today.year, today.month, today.day, 12, 0, tzinfo=get_default_timezone()
+        )
+        end = begin + datetime.timedelta(minutes=15)  # Is multiple. Should be OK.
+
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+
+        begin = datetime.datetime(
+            today.year, today.month, today.day, 13, 0, tzinfo=get_default_timezone()
+        )
+        end = begin + datetime.timedelta(minutes=16)  # Is not multiple. Should fail.
+
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation duration is not a multiple of the allowed interval of 15 minutes."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL.value
         )
