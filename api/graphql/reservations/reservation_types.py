@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Optional
 
 import graphene
@@ -166,6 +167,9 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     order_status = graphene.String()
     handled_at = graphene.DateTime()
     refund_uuid = graphene.String()
+    reservee_is_unregistered_association = graphene.Boolean()
+    applying_for_free_of_charge = graphene.Boolean()
+    price_net = graphene.Decimal()
 
     class Meta:
         model = Reservation
@@ -379,6 +383,56 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     def resolve_refund_uuid(self, info: ResolveInfo) -> Optional[str]:
         payment_order = self.payment_order.first()
         return getattr(payment_order, "refund_id", None)
+
+    @reservation_non_public_field
+    def resolve_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.name
+
+    @reservation_non_public_field
+    def resolve_home_city(self, info: ResolveInfo) -> Optional[str]:
+        return self.home_city
+
+    @reservation_non_public_field
+    def resolve_reservee_type(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_type
+
+    @reservation_non_public_field
+    def resolve_reservee_is_unregistered_association(
+        self, info: ResolveInfo
+    ) -> Optional[bool]:
+        return self.reservee_is_unregistered_association
+
+    @reservation_non_public_field
+    def resolve_applying_for_free_of_charge(self, info: ResolveInfo) -> Optional[bool]:
+        return self.applying_for_free_of_charge
+
+    @reservation_non_public_field
+    def resolve_num_persons(self, info: ResolveInfo) -> Optional[int]:
+        return self.num_persons
+
+    @reservation_non_public_field
+    def resolve_age_group(self, info: ResolveInfo) -> Optional[AgeGroupType]:
+        return self.age_group
+
+    @reservation_non_public_field
+    def resolve_purpose(self, info: ResolveInfo) -> Optional[ReservationPurposeType]:
+        return self.purpose
+
+    @reservation_non_public_field
+    def resolve_unit_price(self, info: ResolveInfo) -> Optional[Decimal]:
+        return self.unit_price
+
+    @reservation_non_public_field
+    def resolve_price(self, info: ResolveInfo) -> Optional[Decimal]:
+        return self.price
+
+    @reservation_non_public_field
+    def resolve_price_net(self, info: ResolveInfo) -> Optional[Decimal]:
+        return self.price_net
+
+    @reservation_non_public_field
+    def resolve_tax_percentage_value(self, info: ResolveInfo) -> Optional[Decimal]:
+        return self.tax_percentage_value
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):

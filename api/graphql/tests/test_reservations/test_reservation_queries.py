@@ -109,6 +109,17 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             orderUuid
                             orderStatus
                             refundUuid
+                            homeCity { name }
+                            reserveeType
+                            reserveeIsUnregisteredAssociation
+                            applyingForFreeOfCharge
+                            numPersons
+                            ageGroup { minimum, maximum }
+                            purpose { nameFi }
+                            unitPrice
+                            price
+                            priceNet
+                            taxPercentageValue
                         }
                     }
                 }
