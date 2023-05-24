@@ -120,6 +120,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             price
                             priceNet
                             taxPercentageValue
+                            isHandled
                         }
                     }
                 }
@@ -1575,6 +1576,28 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_is_handled(self):
+        self.client.force_login(self.general_admin)
+
+        response = self.query(
+            self.get_query_with_personal_fields("""reservations(orderBy:"name")""")
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        reservations = content.get("data").get("reservations").get("edges")
+        assert_that(reservations[0].get("node").get("isHandled")).is_equal_to(False)
+
+        self.reservation.handled_at = datetime.datetime.now()
+        self.reservation.save()
+
+        response = self.query(
+            self.get_query_with_personal_fields("""reservations(orderBy:"name")""")
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        reservations = content.get("data").get("reservations").get("edges")
+        assert_that(reservations[0].get("node").get("isHandled")).is_equal_to(True)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

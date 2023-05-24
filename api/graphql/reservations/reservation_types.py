@@ -170,6 +170,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     reservee_is_unregistered_association = graphene.Boolean()
     applying_for_free_of_charge = graphene.Boolean()
     price_net = graphene.Decimal()
+    is_handled = graphene.Boolean()
 
     class Meta:
         model = Reservation
@@ -222,6 +223,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "order_status",
             "handled_at",
             "refund_uuid",
+            "is_handled",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -433,6 +435,10 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_tax_percentage_value(self, info: ResolveInfo) -> Optional[Decimal]:
         return self.tax_percentage_value
+
+    @reservation_non_public_field
+    def resolve_is_handled(self, info: ResolveInfo) -> Optional[bool]:
+        return self.handled_at is not None
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
