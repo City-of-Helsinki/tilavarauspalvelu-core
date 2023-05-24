@@ -517,11 +517,11 @@ const selectedReservationUnitQuery = graphql.query<
       {
         begins: toUIDate(addDays(new Date(), 2), "yyyy-MM-dd"),
         lowestPrice: 10,
-        lowestPriceNet: 10 / 1.24,
+        lowestPriceNet: 10 / 1.2,
         highestPrice: 30,
-        highestPriceNet: 30 / 1.24,
+        highestPriceNet: 30 / 1.2,
         priceUnit:
-          ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
+          ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
         taxPercentage: {
@@ -533,15 +533,15 @@ const selectedReservationUnitQuery = graphql.query<
       {
         begins: toUIDate(new Date(), "yyyy-MM-dd"),
         lowestPrice: 20,
-        lowestPriceNet: 20 / 1.24,
+        lowestPriceNet: 20 / 1.2,
         highestPrice: 20,
-        highestPriceNet: 20 / 1.24,
+        highestPriceNet: 20 / 1.2,
         priceUnit:
-          ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
+          ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
         taxPercentage: {
-          id: "goier1",
+          id: "goier2",
           value: 20,
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
@@ -557,7 +557,7 @@ const selectedReservationUnitQuery = graphql.query<
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
         taxPercentage: {
-          id: "goier1",
+          id: "goier3",
           value: 24,
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
@@ -1046,13 +1046,13 @@ const openingHoursQuery = graphql.query<
             pk: 5,
             state: "CREATED",
             priority: "A_200",
-            begin: set(endOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 }), {
+            begin: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 5), {
               hours: 13,
               minutes: 30,
               seconds: 0,
               milliseconds: 0,
             }).toISOString(),
-            end: set(endOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 }), {
+            end: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 5), {
               hours: 15,
               minutes: 0,
               seconds: 0,
@@ -1069,13 +1069,13 @@ const openingHoursQuery = graphql.query<
             pk: 6,
             state: "CREATED",
             priority: "A_200",
-            begin: set(endOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 }), {
+            begin: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 5), {
               hours: 18,
               minutes: 0,
               seconds: 0,
               milliseconds: 0,
             }),
-            end: set(endOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 }), {
+            end: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 5), {
               hours: 19,
               minutes: 30,
               seconds: 0,

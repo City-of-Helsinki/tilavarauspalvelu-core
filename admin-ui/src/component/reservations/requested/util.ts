@@ -119,10 +119,7 @@ export const getReservationPriceDetails = (
   if (pricing === null) return "???";
 
   const { priceUnit } = pricing;
-  const volume = getUnRoundedReservationVolume(
-    durationMinutes,
-    priceUnit as string
-  );
+  const volume = getUnRoundedReservationVolume(durationMinutes, priceUnit);
 
   const maxPrice =
     pricing.pricingType ===

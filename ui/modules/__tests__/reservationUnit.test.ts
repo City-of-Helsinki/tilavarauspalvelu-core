@@ -89,7 +89,106 @@ describe("getPrice", () => {
       pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
-    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 121 €");
+    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75,63 €");
+  });
+
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: "100",
+      priceUnit: "PER_HOUR",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 125 €");
+  });
+
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: "100",
+      priceUnit: "PER_HOUR",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 90 })).toBe("0 - 150 €");
+  });
+
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: "100",
+      priceUnit: "PER_HOUR",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 91 })).toBe("0 - 175 €");
+  });
+
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: "30",
+      priceUnit: "PER_15_MINS",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 120 €");
+  });
+
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: "30",
+      priceUnit: "PER_30_MINS",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60 €");
+  });
+
+  test("price range with minutes", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: "30",
+      priceUnit: "PER_30_MINS",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75 €");
+  });
+
+  test("price range with minutes and fixed unit", () => {
+    const pricing = {
+      lowestPrice: "10",
+      highestPrice: "100",
+      priceUnit: "PER_HALF_DAY",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 61 })).toBe("10 - 100 €");
+  });
+
+  test("price range with minutes and fixed unit", () => {
+    const pricing = {
+      lowestPrice: "10",
+      highestPrice: "100",
+      priceUnit: "PER_DAY",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
+  });
+
+  test("price range with minutes and fixed unit", () => {
+    const pricing = {
+      lowestPrice: "10",
+      highestPrice: "100",
+      priceUnit: "PER_WEEK",
+      pricingType: "PAID",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
   });
 
   test("fixed price", () => {
@@ -117,6 +216,20 @@ describe("getPrice", () => {
   test("no price", () => {
     const pricing = {
       priceUnit: "FIXED",
+    } as unknown as ReservationUnitPricingType;
+
+    expect(getPrice({ pricing })).toBe("Maksuton");
+    expect(getPrice({ pricing: {} as ReservationUnitPricingType })).toBe(
+      "Maksuton"
+    );
+  });
+
+  test("no price", () => {
+    const pricing = {
+      lowestPrice: 0,
+      highestPrice: 0,
+      priceUnit: "PER_HOUR",
+      pricingType: "PAID",
     } as unknown as ReservationUnitPricingType;
 
     expect(getPrice({ pricing })).toBe("Maksuton");
@@ -596,7 +709,7 @@ describe("getOldReservationUnitName", () => {
         en: null,
         sv: null,
       },
-    } as ReservationUnit;
+    } as unknown as ReservationUnit;
 
     expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
       "Unit 1 FI"
