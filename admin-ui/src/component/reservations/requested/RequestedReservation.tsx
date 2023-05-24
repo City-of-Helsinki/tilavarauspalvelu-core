@@ -155,22 +155,19 @@ const ApplicationData = ({
   label: string;
   data?: Maybe<string> | number | JSX.Element;
   wide?: boolean;
-}) =>
-  data ? (
+}) => (
+  <div style={{ fontWeight: "400", gridColumn: wide ? "1 / span 2" : "auto" }}>
     <div
-      style={{ fontWeight: "400", gridColumn: wide ? "1 / span 2" : "auto" }}
+      style={{
+        paddingBottom: "var(--spacing-xs)",
+        color: "var(--color-black-70)",
+      }}
     >
-      <div
-        style={{
-          paddingBottom: "var(--spacing-xs)",
-          color: "var(--color-black-70)",
-        }}
-      >
-        <span>{label}</span>
-      </div>
-      <span style={{ fontSize: "var(--fontsize-body-l)" }}>{data}</span>
+      <span>{label}</span>
     </div>
-  ) : null;
+    <span style={{ fontSize: "var(--fontsize-body-l)" }}>{data}</span>
+  </div>
+);
 
 const ButtonsWithPermChecks = ({
   reservation,
@@ -668,7 +665,10 @@ const RequestedReservation = (): JSX.Element | null => {
               />
               <ApplicationData
                 label={t("RequestedReservation.reserveeId")}
-                data={reservation.reserveeId}
+                data={
+                  reservation.reserveeId ||
+                  t("RequestedReservation.noReserveeId")
+                }
               />
               <ApplicationData
                 label={t("RequestedReservation.reserveeFirstName")}
@@ -685,19 +685,6 @@ const RequestedReservation = (): JSX.Element | null => {
               <ApplicationData
                 label={t("RequestedReservation.reserveeEmail")}
                 data={reservation.reserveeEmail}
-              />
-              <ApplicationData
-                label={t("RequestedReservation.addressStreet")}
-                data={reservation.reserveeAddressStreet}
-              />
-              <ApplicationData
-                label={t("RequestedReservation.addressZipCity")}
-                data={
-                  reservation.reserveeAddressZip ||
-                  reservation.reserveeAddressCity
-                    ? `${reservation.reserveeAddressZip} ${reservation.reserveeAddressCity}`
-                    : undefined
-                }
               />
             </ApplicationDatas>
           </Accordion>
@@ -757,6 +744,25 @@ const RequestedReservation = (): JSX.Element | null => {
                     hideLabel={t("RequestedReservation.hideBirthDate")}
                   />
                 }
+              />
+              <ApplicationData
+                label={t("RequestedReservation.addressStreet")}
+                data={
+                  <>
+                    <span>{reservation.reserveeAddressStreet || "-"}</span>
+                    <br />
+                    <span>
+                      {reservation.reserveeAddressZip ||
+                      reservation.reserveeAddressCity
+                        ? `${reservation.reserveeAddressZip} ${reservation.reserveeAddressCity}`
+                        : ""}
+                    </span>
+                  </>
+                }
+              />
+              <ApplicationData
+                label={t("RequestedReservation.addressCity")}
+                data={reservation.reserveeAddressCity || "-"}
               />
             </ApplicationDatas>
           </Accordion>
