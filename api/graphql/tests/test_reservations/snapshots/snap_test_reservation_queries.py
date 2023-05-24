@@ -29,7 +29,7 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_
 snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_pk_does_not_reveal_reservee_name 1'] = {
     'data': {
         'reservationByPk': {
-            'name': 'Test reservation',
+            'name': None,
             'reserveeFirstName': None,
             'reserveeLastName': None,
             'reserveePhone': None
@@ -546,6 +546,11 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
             'edges': [
                 {
                     'node': {
+                        'ageGroup': {
+                            'maximum': 30,
+                            'minimum': 18
+                        },
+                        'applyingForFreeOfCharge': True,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Turku',
                         'billingAddressStreet': 'Aurakatu 12B',
@@ -559,9 +564,18 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'description': 'movies&popcorn',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
+                        'homeCity': {
+                            'name': 'Test'
+                        },
                         'name': 'movies',
+                        'numPersons': None,
                         'orderStatus': None,
                         'orderUuid': None,
+                        'price': 10.0,
+                        'priceNet': '0.000000',
+                        'purpose': {
+                            'nameFi': 'purpose'
+                        },
                         'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
@@ -569,10 +583,14 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'reserveeEmail': 'reservee@example.com',
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
+                        'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Vee',
                         'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
+                        'reserveeType': 'INDIVIDUAL',
+                        'taxPercentageValue': '24.00',
+                        'unitPrice': 10.0,
                         'user': {
                             'email': 'joe.regularl@foo.com'
                         }
@@ -590,6 +608,11 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
             'edges': [
                 {
                     'node': {
+                        'ageGroup': {
+                            'maximum': 30,
+                            'minimum': 18
+                        },
+                        'applyingForFreeOfCharge': True,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Hidden',
                         'billingAddressStreet': 'Privacy 12B',
@@ -603,9 +626,18 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'description': 'something super secret',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'Only admins can see me.',
+                        'homeCity': {
+                            'name': 'Test'
+                        },
                         'name': 'admin movies',
+                        'numPersons': None,
                         'orderStatus': None,
                         'orderUuid': None,
+                        'price': 10.0,
+                        'priceNet': '0.000000',
+                        'purpose': {
+                            'nameFi': 'purpose'
+                        },
                         'refundUuid': None,
                         'reserveeAddressCity': 'Nowhere',
                         'reserveeAddressStreet': 'Mystery street 2',
@@ -613,10 +645,14 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeEmail': 'shouldbe.hidden@example.com',
                         'reserveeFirstName': 'Shouldbe',
                         'reserveeId': '5727586-5',
+                        'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Hidden',
                         'reserveeName': 'Shouldbe Hidden',
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
+                        'reserveeType': 'INDIVIDUAL',
+                        'taxPercentageValue': '24.00',
+                        'unitPrice': 10.0,
                         'user': {
                             'email': 'amin.general@foo.com'
                         }
@@ -624,6 +660,11 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                 },
                 {
                     'node': {
+                        'ageGroup': {
+                            'maximum': 30,
+                            'minimum': 18
+                        },
+                        'applyingForFreeOfCharge': True,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Turku',
                         'billingAddressStreet': 'Aurakatu 12B',
@@ -637,9 +678,18 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'description': 'movies&popcorn',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
+                        'homeCity': {
+                            'name': 'Test'
+                        },
                         'name': 'movies',
+                        'numPersons': None,
                         'orderStatus': None,
                         'orderUuid': None,
+                        'price': 10.0,
+                        'priceNet': '0.000000',
+                        'purpose': {
+                            'nameFi': 'purpose'
+                        },
                         'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
@@ -647,10 +697,14 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeEmail': 'reservee@example.com',
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
+                        'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Vee',
                         'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
+                        'reserveeType': 'INDIVIDUAL',
+                        'taxPercentageValue': '24.00',
+                        'unitPrice': 10.0,
                         'user': {
                             'email': 'joe.regularl@foo.com'
                         }
@@ -668,6 +722,11 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
             'edges': [
                 {
                     'node': {
+                        'ageGroup': {
+                            'maximum': 30,
+                            'minimum': 18
+                        },
+                        'applyingForFreeOfCharge': True,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Hidden',
                         'billingAddressStreet': 'Privacy 12B',
@@ -681,9 +740,18 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'description': 'something super secret',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'Only admins can see me.',
+                        'homeCity': {
+                            'name': 'Test'
+                        },
                         'name': 'admin movies',
+                        'numPersons': None,
                         'orderStatus': None,
                         'orderUuid': None,
+                        'price': 10.0,
+                        'priceNet': '0.000000',
+                        'purpose': {
+                            'nameFi': 'purpose'
+                        },
                         'refundUuid': None,
                         'reserveeAddressCity': 'Nowhere',
                         'reserveeAddressStreet': 'Mystery street 2',
@@ -691,10 +759,14 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'reserveeEmail': 'shouldbe.hidden@example.com',
                         'reserveeFirstName': 'Shouldbe',
                         'reserveeId': '5727586-5',
+                        'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Hidden',
                         'reserveeName': 'Shouldbe Hidden',
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
+                        'reserveeType': 'INDIVIDUAL',
+                        'taxPercentageValue': '24.00',
+                        'unitPrice': 10.0,
                         'user': {
                             'email': 'amin.general@foo.com'
                         }
@@ -702,6 +774,11 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                 },
                 {
                     'node': {
+                        'ageGroup': {
+                            'maximum': 30,
+                            'minimum': 18
+                        },
+                        'applyingForFreeOfCharge': True,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Turku',
                         'billingAddressStreet': 'Aurakatu 12B',
@@ -715,9 +792,18 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'description': 'movies&popcorn',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
+                        'homeCity': {
+                            'name': 'Test'
+                        },
                         'name': 'movies',
+                        'numPersons': None,
                         'orderStatus': None,
                         'orderUuid': None,
+                        'price': 10.0,
+                        'priceNet': '0.000000',
+                        'purpose': {
+                            'nameFi': 'purpose'
+                        },
                         'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
@@ -725,10 +811,14 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_unit_group
                         'reserveeEmail': 'reservee@example.com',
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
+                        'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Vee',
                         'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
+                        'reserveeType': 'INDIVIDUAL',
+                        'taxPercentageValue': '24.00',
+                        'unitPrice': 10.0,
                         'user': {
                             'email': 'joe.regularl@foo.com'
                         }
@@ -857,7 +947,7 @@ snapshots['ReservationQueryTestCase::test_handled_at_not_visible_without_permiss
                 {
                     'node': {
                         'handledAt': None,
-                        'name': 'movies'
+                        'name': None
                     }
                 }
             ],
@@ -888,6 +978,8 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
             'edges': [
                 {
                     'node': {
+                        'ageGroup': None,
+                        'applyingForFreeOfCharge': None,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': None,
                         'billingAddressStreet': None,
@@ -901,9 +993,14 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'description': None,
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': None,
-                        'name': 'admin movies',
+                        'homeCity': None,
+                        'name': None,
+                        'numPersons': None,
                         'orderStatus': None,
                         'orderUuid': None,
+                        'price': None,
+                        'priceNet': None,
+                        'purpose': None,
                         'refundUuid': None,
                         'reserveeAddressCity': None,
                         'reserveeAddressStreet': None,
@@ -911,15 +1008,24 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'reserveeEmail': None,
                         'reserveeFirstName': None,
                         'reserveeId': None,
+                        'reserveeIsUnregisteredAssociation': None,
                         'reserveeLastName': None,
                         'reserveeName': None,
                         'reserveeOrganisationName': None,
                         'reserveePhone': None,
+                        'reserveeType': None,
+                        'taxPercentageValue': None,
+                        'unitPrice': None,
                         'user': None
                     }
                 },
                 {
                     'node': {
+                        'ageGroup': {
+                            'maximum': 30,
+                            'minimum': 18
+                        },
+                        'applyingForFreeOfCharge': True,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Turku',
                         'billingAddressStreet': 'Aurakatu 12B',
@@ -933,9 +1039,18 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'description': 'movies&popcorn',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
+                        'homeCity': {
+                            'name': 'Test'
+                        },
                         'name': 'movies',
+                        'numPersons': None,
                         'orderStatus': None,
                         'orderUuid': None,
+                        'price': 10.0,
+                        'priceNet': '0.000000',
+                        'purpose': {
+                            'nameFi': 'purpose'
+                        },
                         'refundUuid': None,
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
@@ -943,10 +1058,14 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'reserveeEmail': 'reservee@example.com',
                         'reserveeFirstName': 'Reser',
                         'reserveeId': '5727586-5',
+                        'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Vee',
                         'reserveeName': 'Reser Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
+                        'reserveeType': 'INDIVIDUAL',
+                        'taxPercentageValue': '24.00',
+                        'unitPrice': 10.0,
                         'user': {
                             'email': 'joe.regularl@foo.com'
                         }
