@@ -400,6 +400,27 @@ class StaffAdjustTimePermission(BasePermission):
         return False
 
 
+class StaffReservationModifyPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk")
+        if pk:
+            reservation = get_object_or_404(Reservation, pk=pk)
+            user = info.context.user
+
+            return (
+                user.has_staff_permissions
+                and can_modify_reservation(user, reservation)
+                or (
+                    can_create_staff_reservation(
+                        user, reservation.reservation_unit.all()
+                    )
+                    and reservation.user == user
+                )
+            )
+        return False
+
+
 class ReservationCommentPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
