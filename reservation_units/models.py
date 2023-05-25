@@ -604,8 +604,13 @@ class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Mod
 
         return qs.exists()
 
-    def get_next_reservation(self, end_time: datetime.datetime, reservation=None):
-        from reservations.models import STATE_CHOICES, Reservation
+    def get_next_reservation(
+        self,
+        end_time: datetime.datetime,
+        reservation=None,
+        exclude_blocked: bool = False,
+    ):
+        from reservations.models import STATE_CHOICES, Reservation, ReservationType
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_same_components,
@@ -615,10 +620,18 @@ class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Mod
         if reservation:
             qs = qs.exclude(id=reservation.id)
 
-        return qs.order_by("-begin").first()
+        if exclude_blocked:
+            qs = qs.exclude(type=ReservationType.BLOCKED)
 
-    def get_previous_reservation(self, start_time: datetime.datetime, reservation=None):
-        from reservations.models import STATE_CHOICES, Reservation
+        return qs.order_by("begin").first()
+
+    def get_previous_reservation(
+        self,
+        start_time: datetime.datetime,
+        reservation=None,
+        exclude_blocked: bool = False,
+    ):
+        from reservations.models import STATE_CHOICES, Reservation, ReservationType
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_same_components,
@@ -627,6 +640,9 @@ class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Mod
 
         if reservation:
             qs = qs.exclude(id=reservation.id)
+
+        if exclude_blocked:
+            qs = qs.exclude(type=ReservationType.BLOCKED)
 
         return qs.order_by("-end").first()
 
