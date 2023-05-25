@@ -1,7 +1,7 @@
 import datetime
 import math
 from decimal import Decimal
-from typing import Iterable
+from typing import Iterable, Optional
 
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
@@ -12,6 +12,7 @@ from reservation_units.models import PriceUnit, PricingType, ReservationUnit
 from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
 )
+from reservations.models import ReservationType
 
 
 class PriceCalculationResult:
@@ -305,10 +306,23 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
             )
 
-    def check_buffer_times(self, reservation_unit, begin, end):
-        reservation_after = reservation_unit.get_next_reservation(end, self.instance)
+    def check_buffer_times(
+        self,
+        reservation_unit,
+        begin,
+        end,
+        reservation_type: Optional[ReservationType] = None,
+    ):
+
+        current_type = getattr(self.instance, "type", reservation_type)
+        if current_type == ReservationType.BLOCKED:
+            return
+
+        reservation_after = reservation_unit.get_next_reservation(
+            end, self.instance, exclude_blocked=True
+        )
         reservation_before = reservation_unit.get_previous_reservation(
-            begin, self.instance
+            begin, self.instance, exclude_blocked=True
         )
 
         buffer_before = max(
