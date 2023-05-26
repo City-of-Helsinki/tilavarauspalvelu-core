@@ -3,6 +3,7 @@ from typing import List, Optional
 
 import graphene
 from django.db.models import Q, QuerySet, Sum
+from django.utils.timezone import get_default_timezone
 from easy_thumbnails.files import get_thumbnailer
 from graphene import ResolveInfo
 from graphene_django import DjangoObjectType
@@ -66,6 +67,8 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
 from reservations.models import Reservation
 from spaces.models import Space
 from utils.query_performance import QueryPerformanceOptimizerMixin
+
+TIMEZONE = get_default_timezone()
 
 
 def get_payment_type_codes() -> List[str]:
@@ -386,15 +389,21 @@ class ReservationUnitWithReservationsMixin:
             reservations = self.reservation_set.all()
 
             if from_ is not None:
+                from_ = datetime.datetime(
+                    from_.year, from_.month, from_.day, 0, 0, 0, tzinfo=TIMEZONE
+                )
                 reservations = reservations.filter(begin__gte=from_)
             if to is not None:
+                to = datetime.datetime(
+                    to.year, to.month, to.day, 23, 59, 59, tzinfo=TIMEZONE
+                )
                 reservations = reservations.filter(end__lte=to)
 
         if state is not None:
             states = [s.lower() for s in state]
             reservations = reservations.filter(state__in=states)
 
-        return reservations
+        return reservations.order_by("begin")
 
 
 class ReservationUnitType(

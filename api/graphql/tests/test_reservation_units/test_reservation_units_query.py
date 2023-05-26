@@ -432,6 +432,55 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             .get("openingTimes")[0]["isReservable"]
         ).is_false()
 
+    def test_reservations_date_filter(self):
+        ReservationFactory(
+            name="Hide me",
+            reservation_unit=[self.reservation_unit],
+            begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=TIMEZONE),
+            end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=TIMEZONE),
+        )
+        ReservationFactory(
+            name="Show me",
+            reservation_unit=[self.reservation_unit],
+            begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=TIMEZONE),
+            end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=TIMEZONE),
+        )
+        ReservationFactory(
+            name="Show me too",
+            reservation_unit=[self.reservation_unit],
+            begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=TIMEZONE),
+            end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=TIMEZONE),
+        )
+        ReservationFactory(
+            name="Hide me too",
+            reservation_unit=[self.reservation_unit],
+            begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=TIMEZONE),
+            end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=TIMEZONE),
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            f"""
+            {{
+                reservationUnitByPk(pk: {self.reservation_unit.id}) {{
+                    reservations(from: "2023-01-02", to: "2023-01-03") {{
+                        begin
+                        end
+                        name
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        reservations = (
+            content.get("data").get("reservationUnitByPk").get("reservations")
+        )
+        assert_that(len(reservations)).is_equal_to(2)
+        assert_that(reservations[0]["name"]).contains("Show me")
+        assert_that(reservations[1]["name"]).contains("Show me too")
+
     def test_filtering_by_unit(self):
         ReservationUnitFactory(unit=UnitFactory())  # should be excluded
         response = self.query(
