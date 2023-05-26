@@ -201,6 +201,11 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
             application=self.application, name="Only I should be listed"
         )
         event.set_status(ApplicationEventStatus.APPROVED)
+        another = ApplicationEventFactory(
+            application=self.application, name="Do not show me ever never ikinä"
+        )
+        another.set_status(ApplicationEventStatus.RESERVED)
+
         filter_clause = f'status: "{ApplicationEventStatus.APPROVED}"'
 
         response = self.query(self.get_query(filter_section=filter_clause))
