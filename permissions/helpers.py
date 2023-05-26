@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Iterable, List, Optional, Union
 
-from django.contrib.auth.models import User
 from django.db.models import Q, QuerySet
 from django.utils import timezone
 
@@ -10,6 +9,7 @@ from merchants.models import PaymentOrder
 from reservation_units.models import ReservationUnit
 from reservations.models import RecurringReservation, Reservation
 from spaces.models import ServiceSector, Unit, UnitGroup
+from users.models import User
 
 
 def is_superuser(user: User) -> bool:
@@ -342,9 +342,18 @@ def can_handle_reservation(user: User, reservation: Reservation) -> bool:
 
 
 def can_comment_reservation(user: User, reservation: Reservation) -> bool:
-    return has_general_permission(
-        user, "can_comment_reservations"
-    ) or can_handle_reservation(user, reservation)
+    permission = "can_comment_reservations"
+    units = Unit.objects.filter(reservationunit__in=reservation.reservation_unit.all())
+    service_sectors = ServiceSector.objects.filter(units__in=units)
+
+    return (
+        is_superuser(user)
+        or has_general_permission(user, permission)
+        or has_service_sector_permission(user, service_sectors, permission)
+        or has_unit_permission(user, units, permission)
+        or can_handle_reservation(user, reservation)
+        or (user.has_staff_permissions and reservation.user == user)
+    )
 
 
 def can_handle_reservation_with_units(
