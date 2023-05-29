@@ -78,6 +78,7 @@ type Props<T> = {
   timeslots?: number;
   culture?: string;
   longPressThreshold?: number;
+  underlineEvents?: boolean;
 };
 
 const StyledCalendar = styled(BigCalendar)<{
@@ -85,6 +86,7 @@ const StyledCalendar = styled(BigCalendar)<{
   step: number;
   timeslots: number;
   $isDraggable: boolean;
+  $underlineEvents?: boolean;
 }>`
   ${({ timeslots }) => {
     switch (timeslots) {
@@ -132,7 +134,8 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 
   .rbc-time-gutter {
-    z-index: 100;
+    z-index: var(--tilavaraus-stack-order-calendar-gutter);
+
     position: sticky;
     left: 0;
     margin-top: -1px;
@@ -418,6 +421,8 @@ const StyledCalendar = styled(BigCalendar)<{
   .rbc-event-content {
     font-size: 80%;
     margin-top: var(--spacing-3-xs);
+    text-decoration: ${({ $underlineEvents }) =>
+      $underlineEvents ? "underline" : "none"};
   }
 
   .isSmall .rbc-event-label {
@@ -482,6 +487,7 @@ const Calendar = <T extends Record<string, unknown>>({
   timeslots = 2,
   culture = "fi",
   longPressThreshold = 250,
+  underlineEvents = false,
 }: Props<T>): JSX.Element => {
   const Component: React.ElementType = draggable
     ? StyledCalendarDND
@@ -529,6 +535,7 @@ const Calendar = <T extends Record<string, unknown>>({
       longPressThreshold={longPressThreshold}
       showMultiDayTimes
       $isDraggable={draggable}
+      $underlineEvents={underlineEvents}
     />
   );
 };

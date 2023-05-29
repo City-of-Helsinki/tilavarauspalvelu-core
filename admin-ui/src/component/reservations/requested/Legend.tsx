@@ -7,7 +7,7 @@ type Props = {
 };
 
 const Container = styled.div`
-  width: 11em;
+  max-width: 14em;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);

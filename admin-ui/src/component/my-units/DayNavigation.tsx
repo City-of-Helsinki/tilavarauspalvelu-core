@@ -4,7 +4,6 @@ import { addDays, parse, subDays } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Button, IconAngleLeft, IconAngleRight, DateInput } from "hds-react";
 import { toUIDate } from "common/src/common/util";
-import { HorisontalFlex } from "../../styles/layout";
 
 type Props = {
   date: string;
@@ -13,9 +12,11 @@ type Props = {
 
 const Wrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-  padding: 1em 0.5em;
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+  gap: 0;
+  padding: 0 0.5em;
   color: black;
   text-decoration: none !important;
   svg {
@@ -45,42 +46,35 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
 
   return (
     <Wrapper>
-      <HorisontalFlex
-        style={{
-          alignItems: "center",
-          justifyItems: "center",
-        }}
+      <Button
+        aria-label={t("common.prev")}
+        size="small"
+        variant="supplementary"
+        onClick={onPreviousDay}
+        iconLeft={<IconAngleLeft />}
       >
-        <Button
-          aria-label={t("common.prev")}
-          size="small"
-          variant="supplementary"
-          onClick={onPreviousDay}
-          iconLeft={<IconAngleLeft />}
-        >
-          {" "}
-        </Button>
-        <SimpleDatePicker
-          disableConfirmation
-          id="date-input"
-          initialMonth={d}
-          language="fi"
-          required
-          onChange={(value) =>
-            onDateChange({ date: parse(value, "d.M.yyyy", new Date()) })
-          }
-          value={toUIDate(d)}
-        />
-        <Button
-          aria-label={t("common.next")}
-          size="small"
-          variant="supplementary"
-          onClick={onNextDay}
-          iconLeft={<IconAngleRight />}
-        >
-          {" "}
-        </Button>
-      </HorisontalFlex>
+        {" "}
+      </Button>
+      <SimpleDatePicker
+        disableConfirmation
+        id="date-input"
+        initialMonth={d}
+        language="fi"
+        required
+        onChange={(value) =>
+          onDateChange({ date: parse(value, "d.M.yyyy", new Date()) })
+        }
+        value={toUIDate(d)}
+      />
+      <Button
+        aria-label={t("common.next")}
+        size="small"
+        variant="supplementary"
+        onClick={onNextDay}
+        iconLeft={<IconAngleRight />}
+      >
+        {" "}
+      </Button>
     </Wrapper>
   );
 };

@@ -28,4 +28,5 @@
   --tilavaraus-stack-order-sticky-container: 150;
   --tilavaraus-stack-order-tooltip: 100;
   --tilavaraus-stack-order-navigation: 100;
+  --tilavaraus-stack-order-calendar-gutter: 101;
 }

@@ -14,7 +14,7 @@ export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
       first: $first
       offset: $offset
       reservationUnit: $reservationUnit
-      state: ["DENIED", "CONFIRMED", "REQUIRES_HANDLING"]
+      state: ["DENIED", "CONFIRMED", "REQUIRES_HANDLING", "WAITING_FOR_PAYMENT"]
     ) {
       edges {
         node {

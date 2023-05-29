@@ -8,17 +8,15 @@ import { useLocation } from "react-use";
 import styled from "styled-components";
 import { useQueryParams } from "../../common/hooks";
 import { OptionType } from "../../common/types";
-import { myUnitUrl } from "../../common/urls";
-import { Grid, Span4, VerticalFlex } from "../../styles/layout";
-import { BasicLink } from "../../styles/util";
+import { AutoGrid, VerticalFlex } from "../../styles/layout";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import Tags, { getReducer, toTags } from "../lists/Tags";
 import DayNavigation from "./DayNavigation";
 import UnitReservations from "./UnitReservations";
+import { HR } from "../lists/components";
 
 const HorisontalFlexWrapper = styled.div`
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -66,30 +64,27 @@ const UnitReservationsView = (): JSX.Element => {
     "UnitReservationsView"
   );
 
-  // NOTE This should never happen but the code should be restructured so it can't happen
-  const recurringReservationUrl =
-    unitId != null
-      ? `${myUnitUrl(parseInt(unitId, 10))}/recurring-reservation`
-      : null;
-
   return (
     <VerticalFlex>
-      <Grid>
-        <Span4>
-          <ReservationUnitTypeFilter
-            style={{ zIndex: 11 }}
-            value={state.reservationUnitType}
-            onChange={(reservationUnitType) => {
-              dispatch({ type: "set", value: { reservationUnitType } });
-            }}
-          />
-        </Span4>
-      </Grid>
+      <AutoGrid>
+        <ReservationUnitTypeFilter
+          style={{
+            zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)",
+          }}
+          value={state.reservationUnitType}
+          onChange={(reservationUnitType) => {
+            dispatch({ type: "set", value: { reservationUnitType } });
+          }}
+        />
+      </AutoGrid>
       <Tags tags={tags} dispatch={dispatch} t={t} />
+      <HR />
       <HorisontalFlexWrapper>
         <Button
           disabled={false}
           variant="secondary"
+          theme="black"
+          size="small"
           onClick={() => {
             onDateChange({ date: new Date() });
           }}
@@ -97,15 +92,7 @@ const UnitReservationsView = (): JSX.Element => {
           {t("common.today")}
         </Button>
         <DayNavigation date={begin} onDateChange={onDateChange} />
-        <BasicLink to={recurringReservationUrl ?? ""}>
-          <Button
-            disabled={false}
-            variant="secondary"
-            style={{ width: "100%" }}
-          >
-            {t("MyUnits.Calendar.header.recurringReservation")}
-          </Button>
-        </BasicLink>
+        <div />
       </HorisontalFlexWrapper>
       {unitId ? (
         <UnitReservations

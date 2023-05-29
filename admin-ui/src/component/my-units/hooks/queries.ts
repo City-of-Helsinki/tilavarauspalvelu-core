@@ -89,6 +89,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
           ) {
             pk
             name
+            type
             priority
             begin
             end

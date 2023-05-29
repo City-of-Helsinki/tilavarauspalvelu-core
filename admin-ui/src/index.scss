@@ -11,6 +11,13 @@ body,
   margin: 0;
 }
 
+/* hack to deal with iPhone user agent overriding inherited colours with apple-system-blue */
+input:is([type="button"], [type="submit"], [type="reset"]),
+input[type="file"]::file-selector-button,
+button {
+  color: black;
+}
+
 body {
   &.noScroll {
     &.scrollbarActive {

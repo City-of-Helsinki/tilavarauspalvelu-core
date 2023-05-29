@@ -292,6 +292,7 @@ function MainMenu({
             <Heading
               to={menuItem.route || ""}
               className={isActive ? "active" : ""}
+              onClick={onItemSelection}
             >
               {t(menuItem.title)}
             </Heading>

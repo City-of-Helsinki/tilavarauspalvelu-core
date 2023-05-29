@@ -24,6 +24,9 @@ const Legends = styled.div`
 `;
 
 const Container = styled.div`
+  .rbc-calendar {
+    display: grid;
+  }
   .rbc-event-label {
     font-weight: 700;
   }

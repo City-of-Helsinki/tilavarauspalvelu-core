@@ -29,7 +29,10 @@ export const Regular = styled.span`
 `;
 
 export const H1 = styled.h1<{ $legacy?: boolean }>`
-  font-size: var(--fontsize-heading-xl-mobile);
+  font-size: ${({ $legacy }) =>
+    $legacy
+      ? "var(--fontsize-heading-l)"
+      : " var(--fontsize-heading-xl-mobile)"};
   ${fontRegular}
   line-height: var(--lineheight-s);
   margin: var(--spacing-s) 0 var(--spacing-m);

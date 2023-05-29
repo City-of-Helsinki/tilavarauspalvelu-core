@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 
 import SingleReservationUnitFilter from "../filters/SingleReservationUnitFilter";
-import { Grid, HorisontalFlex, Span6 } from "../../styles/layout";
+import { AutoGrid, HorisontalFlex } from "../../styles/layout";
 import ReservationUnitCalendar from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
 
@@ -11,7 +11,6 @@ type Params = {
   unitId: string;
   reservationUnitId: string;
 };
-
 const ReservationUnitCalendarView = (): JSX.Element => {
   const today = formatISO(startOfDay(new Date()));
 
@@ -23,17 +22,15 @@ const ReservationUnitCalendarView = (): JSX.Element => {
 
   return (
     <>
-      <Grid>
-        <Span6>
-          <SingleReservationUnitFilter
-            unitPk={unitId}
-            value={{ value: reservationUnitId, label: "x" }}
-            onChange={(ru) => {
-              setReservationUnitId(Number(ru.value));
-            }}
-          />
-        </Span6>
-      </Grid>
+      <AutoGrid>
+        <SingleReservationUnitFilter
+          unitPk={unitId}
+          value={{ value: reservationUnitId, label: "x" }}
+          onChange={(ru) => {
+            setReservationUnitId(Number(ru.value));
+          }}
+        />
+      </AutoGrid>
       {hasReservationUnitId && (
         <>
           <HorisontalFlex style={{ justifyContent: "center" }}>

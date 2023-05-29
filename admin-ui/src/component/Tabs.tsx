@@ -18,7 +18,7 @@ type TabHeader = {
 
 type Props = {
   headers: TabHeader[];
-  children: React.ReactChild[];
+  children: React.ReactNode[];
 };
 
 const Tabs: React.FC<Props> = ({ headers, children: panels }: Props) => {

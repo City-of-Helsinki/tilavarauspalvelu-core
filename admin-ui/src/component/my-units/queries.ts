@@ -35,6 +35,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
         reserveeFirstName
         reserveeLastName
         reserveeOrganisationName
+        type
         reservationUnits {
           pk
           nameFi

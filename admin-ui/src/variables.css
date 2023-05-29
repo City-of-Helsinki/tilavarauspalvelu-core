@@ -26,7 +26,10 @@
   --tilavaraus-admin-stack-notification: 801;
   --tilavaraus-admin-stack-sticky-header: 700;
   --tilavaraus-admin-stack-main-menu: 500;
-  --tilavaraus-admin-stack-calendar-buffer: 101;
+  --tilavaraus-admin-stack-calendar-buffer: 9;
+  --tilavaraus-admin-stack-select-over-calendar: 11;
+  --tilavaraus-admin-stack-calendar-title-cells: 10;
+  --tilavaraus-stack-order-calendar-gutter: 9;
   --tilavaraus-calendar-selected: var(--color-bus);
   --tilavaraus-calendar-selected-secondary: #ffe977;
   --font-regular: HelsinkiGrotesk, var(--font-default);
@@ -36,21 +39,22 @@
 
   --helper-color-invalid: #b01038;
 
-  /*
-  calendar
-  */
-  --tilavaraus-event-current-requires_handling-border-color: var(--color-bus);
-  --tilavaraus-event-current-requires_handling-background: #e5e5f9;
-
-  --tilavaraus-event-current-denied-border-color: var(--color-error);
-  --tilavaraus-event-current-denied-background: #f7e6eb;
-
-  --tilavaraus-event-current-confirmed-border-color: var(--color-success);
-  --tilavaraus-event-current-confirmed-background: #e6f2f0;
-
-  --tilavaraus-event-other-requires_handling-border-color: var(--color-bus);
-  --tilavaraus-event-other-requires_handling-background: rgba(0, 0, 191, 0.1);
-
+  /* still used in reservation calendar, not my-units */
   --tilavaraus-event-rest-border-color: #1a1a1a;
   --tilavaraus-event-rest-background: rgba(26, 26, 26, 0.1);
+
+  /* new calendar colours for calendars in my-units page */
+  --tilavaraus-event-booking-success: rgba(223, 247, 235, 0.5);
+  --tilavaraus-event-booking-wish: rgba(247, 242, 228, 0.8);
+  --tilavaraus-event-booking-internal: rgba(0, 0, 191, 0.1);
+  --tilavaraus-event-booking-closed: rgba(76, 76, 76, 0.3);
+  --tilavaraus-event-booking-break: rgba(176, 184, 191, 0.2);
+  --tilavaraus-event-calendar-closed: rgba(176, 184, 191, 0.15);
+  --tilavaraus-event-booking-others: rgba(176, 184, 191, 0.1);
+  --tilavaraus-event-booking-past-date: rgba(176, 184, 191, 0.3);
+
+  --tilavaraus-event-booking-success-border: var(--color-copper-dark);
+  --tilavaraus-event-booking-wish-border: var(--color-gold-dark);
+  --tilavaraus-event-booking-internal-border: var(--color-bus-dark);
+  --tilavaraus-event-booking-closed-border: var(--color-black);
 }

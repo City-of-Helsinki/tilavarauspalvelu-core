@@ -26,8 +26,15 @@ import { Grid, Element } from "../MyUnitRecurringReservation/commonStyling";
 import ControlledTimeInput from "../components/ControlledTimeInput";
 import ControlledDateInput from "../components/ControlledDateInput";
 
+// NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
+  display: flex;
   justify-content: end;
+  align-items: center;
+  gap: 1rem;
+  > button {
+    margin: 0;
+  }
 `;
 
 const GridInsideTheModal = styled(Grid)`

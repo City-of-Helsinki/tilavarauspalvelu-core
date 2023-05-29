@@ -177,29 +177,27 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
               value={state.reservationUnit}
             />
           </div>
+          <div>
+            <DateInput
+              language="fi"
+              id="begin"
+              label={t("ReservationsSearch.begin")}
+              onChange={(begin) => dispatch({ type: "set", value: { begin } })}
+              value={state.begin}
+            />
+          </div>
+          <div>
+            <DateInput
+              id="end"
+              language="fi"
+              label={t("ReservationsSearch.end")}
+              onChange={(end) => dispatch({ type: "set", value: { end } })}
+              value={state.end}
+            />
+          </div>
         </AutoGrid>
         {more && (
           <AutoGrid>
-            <div>
-              <DateInput
-                language="fi"
-                id="begin"
-                label={t("ReservationsSearch.begin")}
-                onChange={(begin) =>
-                  dispatch({ type: "set", value: { begin } })
-                }
-                value={state.begin}
-              />
-            </div>
-            <div>
-              <DateInput
-                id="end"
-                language="fi"
-                label={t("ReservationsSearch.end")}
-                onChange={(end) => dispatch({ type: "set", value: { end } })}
-                value={state.end}
-              />
-            </div>
             <div>
               <NumberInput
                 type="number"

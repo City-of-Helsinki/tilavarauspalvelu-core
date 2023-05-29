@@ -1,6 +1,12 @@
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { breakpoints } from "common/src/common/style";
-import { addMinutes, differenceInMinutes, startOfDay } from "date-fns";
+import {
+  addMinutes,
+  differenceInMinutes,
+  isToday,
+  setHours,
+  startOfDay,
+} from "date-fns";
 import React, {
   CSSProperties,
   Fragment,
@@ -12,12 +18,11 @@ import Popup from "reactjs-popup";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import ReservationPopupContent from "./ReservationPopupContent";
-import resourceEventStyleGetter, {
-  POST_PAUSE,
-  PRE_PAUSE,
-} from "./eventStyleGetter";
+import resourceEventStyleGetter from "./eventStyleGetter";
+import { POST_PAUSE, PRE_PAUSE } from "../../common/calendarStyling";
 import { getReserveeName } from "../reservations/requested/util";
 import { sortByName } from "../../common/util";
 import CreateReservationModal from "./create-reservation/CreateReservationModal";
@@ -31,9 +36,12 @@ export type Resource = {
   events: CalendarEvent<ReservationType>[];
 };
 
+const CELL_HEIGHT = 50;
+const TITLE_CELL_WIDTH_CH = 11;
+
 const TemplateProps: CSSProperties = {
   zIndex: "var(--tilavaraus-admin-stack-calendar-buffer)",
-  height: "41px",
+  height: `${CELL_HEIGHT}px`,
   position: "absolute",
 };
 
@@ -60,24 +68,23 @@ const FlexContainer = styled.div<{ $numCols: number }>`
 `;
 
 const ResourceNameContainer = styled.div<{ $isDraft: boolean }>`
-  display: flex;
-  align-items: center;
+  padding: var(--spacing-2-xs) var(--spacing-4-xs);
   border-top: ${CELL_BORDER};
   border-right: ${CELL_BORDER};
   border-left: ${({ $isDraft }) =>
     $isDraft ? CELL_BORDER_LEFT_ALERT : CELL_BORDER_LEFT};
   font-size: var(--fontsize-body-s);
-  padding-inline: var(--spacing-4-xs);
+  line-height: var(--lineheight-m);
   position: sticky;
   left: 0;
-  z-index: 10;
+  z-index: var(--tilavaraus-admin-stack-calendar-title-cells);
   background: var(--color-white);
 `;
 
 const HeadingRow = styled.div`
-  height: 44px;
+  height: ${CELL_HEIGHT}px;
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: ${TITLE_CELL_WIDTH_CH}ch 1fr;
   border-right: 1px solid transparent;
   border-left: 2px solid transparent;
 `;
@@ -104,7 +111,9 @@ const CellContent = styled.div<{ $numCols: number }>`
   position: relative;
 `;
 
-const Cell = styled.div`
+const Cell = styled.div<{ $isPast?: boolean }>`
+  ${({ $isPast }) =>
+    $isPast ? "background: var(--tilavaraus-event-booking-past-date);" : ""}
   height: 100%;
   width: 100%;
   border-left: ${CELL_BORDER};
@@ -135,6 +144,22 @@ const EventContent = styled.div`
   }
 `;
 
+const TitleCell = styled.div`
+  /* stylelint-disable value-no-vendor-prefix */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
+const HideTimesOverTitles = styled.div`
+  position: absolute;
+  width: ${TITLE_CELL_WIDTH_CH}ch;
+  height: ${CELL_HEIGHT}px;
+  background-color: white;
+  z-index: var(--tilavaraus-admin-stack-calendar-title-cells);
+`;
+
 const Cells = ({
   cols,
   reservationUnitPk,
@@ -148,6 +173,12 @@ const Cells = ({
   setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
   onComplete: () => void;
 }) => {
+  const now = new Date();
+
+  const isPast = (index: number) => {
+    return setHours(date, Math.round(index / 2)) < now;
+  };
+
   const onClick =
     (offset: number) => (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.preventDefault();
@@ -163,10 +194,11 @@ const Cells = ({
         true
       );
     };
+
   return (
     <CellContent $numCols={cols}>
       {Array.from(Array(cols).keys()).map((i) => (
-        <Cell key={i} onClick={onClick(i)} />
+        <Cell key={i} onClick={onClick(i)} $isPast={isPast(i)} />
       ))}
     </CellContent>
   );
@@ -237,9 +269,15 @@ const PostBuffer = ({
 
 const getEventTitle = ({
   reservation: { title, event },
+  t,
 }: {
   reservation: CalendarEvent<ReservationType>;
+  t: TFunction;
 }) => {
+  if (event?.type === "blocked") {
+    return t("MyUnits.Calendar.legend.closed");
+  }
+
   return event && event?.pk !== event?.reservationUnits?.[0]?.pk
     ? getReserveeName(event)
     : title;
@@ -277,73 +315,78 @@ const Events = ({
   events: CalendarEvent<ReservationType>[];
   eventStyleGetter: EventStyleGetter;
   numHours: number;
-}) => (
-  <EventContainer>
-    {events.map((e) => {
-      const title = getEventTitle({ reservation: e });
-      const startDate = new Date(e.start);
-      const endDate = new Date(e.end);
-      const dayStartDate = new Date(e.start);
-      dayStartDate.setHours(firstHour);
-      dayStartDate.setMinutes(0);
-      dayStartDate.setSeconds(0);
+}) => {
+  const { t } = useTranslation();
+  return (
+    <EventContainer>
+      {events.map((e) => {
+        const title = getEventTitle({ reservation: e, t });
+        const startDate = new Date(e.start);
+        const endDate = new Date(e.end);
+        const dayStartDate = new Date(e.start);
+        dayStartDate.setHours(firstHour);
+        dayStartDate.setMinutes(0);
+        dayStartDate.setSeconds(0);
 
-      const startMinutes = differenceInMinutes(startDate, dayStartDate);
+        const startMinutes = differenceInMinutes(startDate, dayStartDate);
 
-      const hourPercent = 100 / numHours;
-      const hours = startMinutes / 60;
-      const left = `${hourPercent * hours}%`;
+        const hourPercent = 100 / numHours;
+        const hours = startMinutes / 60;
+        const left = `${hourPercent * hours}%`;
 
-      const durationMinutes = differenceInMinutes(endDate, startDate);
+        const durationMinutes = differenceInMinutes(endDate, startDate);
 
-      const isEventInCurrentReservationUnit =
-        currentReservationUnit === e.event?.reservationUnits?.[0]?.pk;
+        const isEventInCurrentReservationUnit =
+          currentReservationUnit === e.event?.reservationUnits?.[0]?.pk;
 
-      const right = `calc(${left} + ${durationMinutes / 60} * ${
-        100 / numHours
-      }% + 1px)`;
+        const right = `calc(${left} + ${durationMinutes / 60} * ${
+          100 / numHours
+        }% + 1px)`;
 
-      return (
-        <Fragment key={`${title}-${startDate.toISOString()}`}>
-          {isEventInCurrentReservationUnit && (
-            <PreBuffer
-              event={e}
-              hourPercent={hourPercent}
-              left={left}
-              style={TemplateProps}
-            />
-          )}
-          <div
-            style={{
-              left,
-              ...TemplateProps,
-              width: `calc(${durationMinutes / 60} * ${100 / numHours}% + 1px)`,
-              zIndex: 5,
-            }}
-          >
-            <EventContent style={{ ...eventStyleGetter(e).style }}>
-              <p>{title}</p>
-              <Popup
-                position={["right center", "left center"]}
-                trigger={EventTriggerButton}
-              >
-                {e.event && <ReservationPopupContent reservation={e.event} />}
-              </Popup>
-            </EventContent>
-          </div>
-          {isEventInCurrentReservationUnit && (
-            <PostBuffer
-              event={e}
-              hourPercent={hourPercent}
-              right={right}
-              style={TemplateProps}
-            />
-          )}
-        </Fragment>
-      );
-    })}
-  </EventContainer>
-);
+        return (
+          <Fragment key={`${title}-${startDate.toISOString()}`}>
+            {isEventInCurrentReservationUnit && (
+              <PreBuffer
+                event={e}
+                hourPercent={hourPercent}
+                left={left}
+                style={TemplateProps}
+              />
+            )}
+            <div
+              style={{
+                left,
+                ...TemplateProps,
+                width: `calc(${durationMinutes / 60} * ${
+                  100 / numHours
+                }% - 2px)`,
+                zIndex: 5,
+              }}
+            >
+              <EventContent style={{ ...eventStyleGetter(e).style }}>
+                <p>{title}</p>
+                <Popup
+                  position={["right center", "left center"]}
+                  trigger={EventTriggerButton}
+                >
+                  {e.event && <ReservationPopupContent reservation={e.event} />}
+                </Popup>
+              </EventContent>
+            </div>
+            {isEventInCurrentReservationUnit && (
+              <PostBuffer
+                event={e}
+                hourPercent={hourPercent}
+                right={right}
+                style={TemplateProps}
+              />
+            )}
+          </Fragment>
+        );
+      })}
+    </EventContainer>
+  );
+};
 
 const sortByDraftStatusAndTitle = (resources: Resource[]) => {
   return resources.sort((a, b) => {
@@ -370,67 +413,76 @@ const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
 
     if (!ref) return;
 
+    // NOTE on mobile only for today move the scroll position to this hour
+    // TODO improve the calculations (less magic numbers), add desktop version (sidebars, margins)
+    const LAST_HOUR = 17;
+    const FIRST_HOUR = 9;
+    const HOUR_CELL_WIDTH = 82;
+    const PAGE_MARGIN = 30;
+    const TITLE_CELL_WIDTH = 105;
+    const calendarSectionSize =
+      window.innerWidth - PAGE_MARGIN - TITLE_CELL_WIDTH;
+    const nCells = Math.round(calendarSectionSize / HOUR_CELL_WIDTH);
+    const now = new Date();
+    const mobileCell = isToday(date)
+      ? now.getHours() + nCells
+      : FIRST_HOUR + nCells;
+    const isMobile = window.innerWidth < 768;
+    const cellToScroll = isMobile ? mobileCell : LAST_HOUR;
     const lastElementOfHeader = ref.querySelector(
-      ".calendar-header > div:nth-of-type(17)"
+      `.calendar-header > div:nth-of-type(${cellToScroll})`
     );
-
     if (lastElementOfHeader) {
       lastElementOfHeader.scrollIntoView();
     }
-  }, [calendarRef]);
+  }, [date]);
 
   useEffect(() => {
     scrollCalendar();
   }, [scrollCalendar]);
 
   return (
-    <FlexContainer $numCols={numHours * 2} ref={calendarRef}>
-      <HeadingRow>
-        <div />
-        <CellContent
-          $numCols={numHours}
-          key="header"
-          className="calendar-header"
-        >
-          {Array.from(Array(numHours).keys()).map((i, index) => (
-            <Time key={i}>{beginHour + index}</Time>
-          ))}
-        </CellContent>
-      </HeadingRow>
+    <>
+      <HideTimesOverTitles />
+      <FlexContainer $numCols={numHours * 2} ref={calendarRef}>
+        <HeadingRow>
+          <div />
+          <CellContent
+            $numCols={numHours}
+            key="header"
+            className="calendar-header"
+          >
+            {Array.from(Array(numHours).keys()).map((i, index) => (
+              <Time key={i}>{beginHour + index}</Time>
+            ))}
+          </CellContent>
+        </HeadingRow>
 
-      {orderedResources.map((row) => (
-        <Row key={row.url}>
-          <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
-            <div
-              style={{
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                padding: "var(--spacing-xs)",
-              }}
-            >
-              {row.title}
-            </div>
-          </ResourceNameContainer>
-          <RowCalendarArea>
-            <Cells
-              cols={numHours * 2}
-              date={startDate}
-              reservationUnitPk={row.pk}
-              setModalContent={setModalContent}
-              onComplete={refetch}
-            />
-            <Events
-              currentReservationUnit={row.pk}
-              firstHour={beginHour}
-              numHours={numHours}
-              events={row.events}
-              eventStyleGetter={resourceEventStyleGetter(row.pk)}
-            />
-          </RowCalendarArea>
-        </Row>
-      ))}
-    </FlexContainer>
+        {orderedResources.map((row) => (
+          <Row key={row.url}>
+            <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
+              <TitleCell>{row.title}</TitleCell>
+            </ResourceNameContainer>
+            <RowCalendarArea>
+              <Cells
+                cols={numHours * 2}
+                date={startDate}
+                reservationUnitPk={row.pk}
+                setModalContent={setModalContent}
+                onComplete={refetch}
+              />
+              <Events
+                currentReservationUnit={row.pk}
+                firstHour={beginHour}
+                numHours={numHours}
+                events={row.events}
+                eventStyleGetter={resourceEventStyleGetter(row.pk)}
+              />
+            </RowCalendarArea>
+          </Row>
+        ))}
+      </FlexContainer>
+    </>
   );
 };
 

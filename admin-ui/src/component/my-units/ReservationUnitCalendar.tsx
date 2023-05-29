@@ -61,21 +61,32 @@ const getEventTitle = ({
   const reservationUnit = reservation.reservationUnits?.[0];
   const isOtherReservationUnit = reservationUnitPk !== reservationUnit?.pk;
 
+  const reserveeName = getReserveeName(reservation);
   if (isOtherReservationUnit) {
-    const reserveeName = getReserveeName(reservation);
     const reservationUnitName = reservationUnit?.nameFi ?? "";
 
     return [reserveeName, reservationUnitName];
   }
 
-  return null;
+  return [reserveeName, ""];
+};
+
+const constructEventTitle = (res: ReservationType, resUnitPk: number) => {
+  const [reservee, unit] = getEventTitle({
+    reservationUnitPk: resUnitPk,
+    reservation: res,
+  });
+  if (unit.length > 0) {
+    return `${reservee} (${unit})`;
+  }
+  return reservee;
 };
 
 const ReservationUnitCalendar = ({
   begin,
   reservationUnitPk,
 }: Props): JSX.Element => {
-  const [events, setEvents] = useState([] as CalendarEvent<ReservationType>[]);
+  const [events, setEvents] = useState<CalendarEvent<ReservationType>[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const { notifyError } = useNotification();
   const { t } = useTranslation();
@@ -96,38 +107,31 @@ const ReservationUnitCalendar = ({
       to: toApiDate(addDays(endOfISOWeek(new Date(begin)), 1)),
     },
     onCompleted: ({ reservationUnitByPk }) => {
-      const reservations =
+      const reservations: ReservationType[] =
         reservationUnitByPk?.reservations?.filter(
           (item): item is ReservationType => !!item
         ) || [];
 
-      if (reservations) {
-        setEvents(
-          reservations.map((reservation) => {
-            const titleParts = getEventTitle({
-              reservationUnitPk,
-              reservation,
-            });
-            const title = titleParts
-              ? `${titleParts[0]} / ${t("common.reservationUnit")} ${
-                  titleParts[1]
-                }`
-              : "";
-
-            return {
-              title,
-              event: reservation as ReservationType,
-              start: new Date(get(reservation, "begin")),
-              end: new Date(get(reservation, "end")),
-            };
-          })
-        );
-      }
+      setEvents(
+        reservations.map((reservation) => {
+          const title =
+            reservation.type !== "blocked"
+              ? constructEventTitle(reservation, reservationUnitPk)
+              : t("MyUnits.Calendar.legend.closed");
+          return {
+            title,
+            event: reservation,
+            start: new Date(get(reservation, "begin")),
+            end: new Date(get(reservation, "end")),
+          };
+        })
+      );
     },
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
     },
   });
+
   useEffect(() => {
     if (hasMore) {
       setHasMore(false);
@@ -155,6 +159,7 @@ const ReservationUnitCalendar = ({
             "_blank"
           );
         }}
+        underlineEvents
       />
       <Legends>
         {legend
