@@ -14,6 +14,7 @@ from tilavarauspalvelu.utils.anonymisation import (
     anonymize_user_applications,
     anonymize_user_reservations,
 )
+from users.models import ReservationNotification
 
 
 class AnonymizationTestCase(TestCase):
@@ -24,6 +25,10 @@ class AnonymizationTestCase(TestCase):
             first_name="anony",
             last_name="mous",
             email="anony.mous@foo.com",
+            reservation_notification=ReservationNotification.ALL,
+            is_active=True,
+            is_superuser=True,
+            is_staff=True,
         )
         cls.reservation = ReservationFactory.create(
             user=cls.mr_anonymous,
@@ -58,6 +63,12 @@ class AnonymizationTestCase(TestCase):
             f"{self.mr_anonymous.first_name}.{self.mr_anonymous.last_name}@anonymized.net"
         )
         assert_that(self.mr_anonymous.uuid).is_not_equal_to(user_data["uuid"])
+        assert_that(self.mr_anonymous.reservation_notification).is_equal_to(
+            ReservationNotification.NONE
+        )
+        assert_that(self.mr_anonymous.is_active).is_false()
+        assert_that(self.mr_anonymous.is_superuser).is_false()
+        assert_that(self.mr_anonymous.is_staff).is_false()
 
     def test_application_anonymization(self):
         anonymize_user_applications(self.mr_anonymous)

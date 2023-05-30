@@ -6,6 +6,7 @@ from auditlog.models import LogEntry
 
 from applications.models import Address, Application, ApplicationEvent, Person
 from reservations.models import Reservation, ReservationType
+from users.models import ReservationNotification
 
 FIRST_NAMES = [
     "Patrick",
@@ -77,6 +78,10 @@ def anonymize_user(user):
     user.uuid = uuid.uuid4()
     user.username = f"anonymized-{user.uuid}"
     user.date_of_birth = None
+    user.reservation_notification = ReservationNotification.NONE
+    user.is_active = False
+    user.is_superuser = False
+    user.is_staff = False
     user.save()
 
 
