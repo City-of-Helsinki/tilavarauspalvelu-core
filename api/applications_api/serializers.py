@@ -667,6 +667,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
             request.user if request and request.user.is_authenticated else None
         )
 
+        validated_data["user"] = request_user
+
         billing_address_data = validated_data.pop("billing_address")
         if billing_address_data:
             billing_address = Address.objects.create(**billing_address_data)
@@ -699,6 +701,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         request_user = (
             request.user if request and request.user.is_authenticated else None
         )
+
+        validated_data["user"] = instance.user
 
         billing_address_data = validated_data.pop("billing_address", None)
         if billing_address_data:
