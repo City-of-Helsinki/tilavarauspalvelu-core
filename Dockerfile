@@ -69,8 +69,8 @@ COPY deploy/* ./deploy/
 
 RUN subscription-manager remove --all
 
-RUN npm install -g npm@9.6.6
-RUN npm install @sentry/cli
+RUN npm install -g --ignore-scripts npm@9.6.6
+RUN npm install --ignore-scripts @sentry/cli
 
 # Can be used to inquire about running app
 # eg. by running `echo $APP_NAME`

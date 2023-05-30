@@ -25,10 +25,6 @@ def time_delta_to_integer_with_precision(delta: datetime.timedelta):
     return math.ceil(delta.total_seconds() / 60 / ALLOCATION_PRECISION)
 
 
-def integer_to_time_from_precision(integer_time: int):
-    return datetime.time.min() + integer_time * ALLOCATION_PRECISION
-
-
 class AllocationSpace(object):
     """Would like to have some proper definition here"""
 
