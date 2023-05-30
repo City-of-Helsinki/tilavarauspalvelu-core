@@ -5,6 +5,7 @@ from typing import Optional
 from auditlog.models import LogEntry
 
 from applications.models import Address, Application, ApplicationEvent, Person
+from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from reservations.models import Reservation, ReservationType
 from users.models import ReservationNotification
 
@@ -83,6 +84,10 @@ def anonymize_user(user):
     user.is_superuser = False
     user.is_staff = False
     user.save()
+
+    GeneralRole.objects.filter(user=user).delete()
+    ServiceSectorRole.objects.filter(user=user).delete()
+    UnitRole.objects.filter(user=user).delete()
 
 
 def anonymize_user_reservations(user):
