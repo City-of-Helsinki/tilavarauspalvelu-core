@@ -8,12 +8,22 @@ from applications.tests.factories import (
     ApplicationEventFactory,
     ApplicationFactory,
 )
+from permissions.models import (
+    GeneralRole,
+    GeneralRoleChoice,
+    ServiceSectorRole,
+    ServiceSectorRoleChoice,
+    UnitRole,
+    UnitRoleChoice,
+)
 from reservations.tests.factories import ReservationFactory
+from spaces.tests.factories import ServiceSectorFactory, UnitFactory
 from tilavarauspalvelu.utils.anonymisation import (
     anonymize_user,
     anonymize_user_applications,
     anonymize_user_reservations,
 )
+from users.models import ReservationNotification
 
 
 class AnonymizationTestCase(TestCase):
@@ -24,7 +34,32 @@ class AnonymizationTestCase(TestCase):
             first_name="anony",
             last_name="mous",
             email="anony.mous@foo.com",
+            reservation_notification=ReservationNotification.ALL,
+            is_active=True,
+            is_superuser=True,
+            is_staff=True,
         )
+
+        general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
+        GeneralRole.objects.create(role=general_role_choice, user=cls.mr_anonymous)
+
+        service_sector = ServiceSectorFactory(name="Role testing sector")
+        service_sector_role_choice = ServiceSectorRoleChoice.objects.create(
+            code="service_sector_role"
+        )
+        ServiceSectorRole.objects.create(
+            role=service_sector_role_choice,
+            service_sector=service_sector,
+            user=cls.mr_anonymous,
+        )
+
+        unit = UnitFactory(name="Role testing unit")
+        unit_role_choice = UnitRoleChoice.objects.create(code="unit_role")
+        unit_role = UnitRole.objects.create(
+            role=unit_role_choice, user=cls.mr_anonymous
+        )
+        unit_role.unit.add(unit)
+
         cls.reservation = ReservationFactory.create(
             user=cls.mr_anonymous,
             reservee_address_zip="0100",
@@ -58,6 +93,20 @@ class AnonymizationTestCase(TestCase):
             f"{self.mr_anonymous.first_name}.{self.mr_anonymous.last_name}@anonymized.net"
         )
         assert_that(self.mr_anonymous.uuid).is_not_equal_to(user_data["uuid"])
+        assert_that(self.mr_anonymous.reservation_notification).is_equal_to(
+            ReservationNotification.NONE
+        )
+        assert_that(self.mr_anonymous.is_active).is_false()
+        assert_that(self.mr_anonymous.is_superuser).is_false()
+        assert_that(self.mr_anonymous.is_staff).is_false()
+
+        assert_that(
+            GeneralRole.objects.filter(user=self.mr_anonymous).count()
+        ).is_zero()
+        assert_that(
+            ServiceSectorRole.objects.filter(user=self.mr_anonymous).count()
+        ).is_zero()
+        assert_that(UnitRole.objects.filter(user=self.mr_anonymous).count()).is_zero()
 
     def test_application_anonymization(self):
         anonymize_user_applications(self.mr_anonymous)
