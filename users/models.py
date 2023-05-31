@@ -61,7 +61,8 @@ class User(AbstractUser):
     @property
     def has_staff_permissions(self):
         return (
-            self.general_roles.exists()
+            self.is_superuser
+            or self.general_roles.exists()
             or self.service_sector_roles.exists()
             or self.unit_roles.exists()
         )
