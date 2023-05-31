@@ -96,8 +96,8 @@ class UserQueryTestCase(UserTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_hide_reservation_notification_when_user_is_not_staff(self):
-        assert_that(self.non_staff_user.is_staff).is_false()
-        self.client.force_login(self.non_staff_user)
+        assert_that(self.regular_joe.has_staff_permissions).is_false()
+        self.client.force_login(self.regular_joe)
         response = self.make_user_query()
 
         assert_that(response.status_code).is_equal_to(200)

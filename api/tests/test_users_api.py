@@ -73,16 +73,6 @@ def test_normal_user_does_not_see_notification_field(user_api_client):
     assert response.data[0]["reservation_notification"] is None
 
 
-def test_non_staff_admin_does_not_see_notification_field(general_admin_api_client):
-    response = general_admin_api_client.get(
-        reverse("user-list"),
-        format="json",
-    )
-
-    assert response.status_code == 200
-    assert response.data[0]["reservation_notification"] is None
-
-
 def test_staff_user_sees_notification_field(staff_user_api_client):
     response = staff_user_api_client.get(
         reverse("user-list"),

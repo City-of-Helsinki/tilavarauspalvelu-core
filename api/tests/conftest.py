@@ -935,6 +935,9 @@ def staff_user():
         reservation_notification=ReservationNotification.ALL,
     )
 
+    general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
+    GeneralRole.objects.create(role=general_role_choice, user=user)
+
     return user
 
 

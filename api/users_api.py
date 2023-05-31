@@ -73,7 +73,7 @@ class UserSerializer(TranslatedModelSerializer):
         }
 
     def get_reservation_notification(self, user) -> Optional[str]:
-        if user.is_staff:
+        if user.has_staff_permissions:
             return user.reservation_notification
         return None
 
