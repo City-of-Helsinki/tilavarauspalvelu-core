@@ -936,7 +936,7 @@ snapshots['ReservationQueryTestCase::test_getting_reservation_with_fields_requir
                     'node': {
                         'name': 'movies',
                         'staffEvent': False,
-                        'type': 'normal'
+                        'type': 'NORMAL'
                     }
                 }
             ],

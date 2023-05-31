@@ -162,7 +162,6 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     buffer_time_before = Duration()
     buffer_time_after = Duration()
     staff_event = graphene.Boolean(deprecation_reason="Please refer to type.")
-    type = graphene.String()
     order_uuid = graphene.String()
     order_status = graphene.String()
     handled_at = graphene.DateTime()

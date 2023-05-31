@@ -182,10 +182,13 @@ class ReservationCreateSerializer(
 
         sku = None
         for reservation_unit in reservation_units:
+            reservation_type = data.get("type", getattr(self.instance, "type", None))
             self.check_reservation_time(reservation_unit)
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_reservation_duration(reservation_unit, begin, end)
-            self.check_buffer_times(reservation_unit, begin, end)
+            self.check_buffer_times(
+                reservation_unit, begin, end, reservation_type=reservation_type
+            )
             self.check_reservation_days_before(begin, reservation_unit)
             self.check_max_reservations_per_user(
                 self.context.get("request").user, reservation_unit

@@ -488,6 +488,29 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "RESERVATION_OVERLAP"
         )
 
+    def test_create_succeed_when_buffer_time_overlaps_blocked_reservation_before(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
+        end = begin + datetime.timedelta(hours=1)
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=begin,
+            end=end,
+            buffer_time_after=datetime.timedelta(hours=1, minutes=1),
+            state=STATE_CHOICES.CONFIRMED,
+            type=ReservationType.BLOCKED,
+        )
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+
     def test_create_fails_when_buffer_time_overlaps_reservation_after(
         self, mock_periods, mock_opening_hours
     ):
@@ -515,6 +538,29 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
             "RESERVATION_OVERLAP"
         )
+
+    def test_create_succeed_when_buffer_time_overlaps_block_reservation_after(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2)
+        end = begin + datetime.timedelta(hours=1)
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=begin,
+            end=end,
+            buffer_time_before=datetime.timedelta(hours=1, minutes=1),
+            state=STATE_CHOICES.CONFIRMED,
+            type=ReservationType.BLOCKED,
+        )
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_before(
         self, mock_periods, mock_opening_hours
