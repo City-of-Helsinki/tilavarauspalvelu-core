@@ -25,7 +25,18 @@ class AnonymizationTestCase(TestCase):
             last_name="mous",
             email="anony.mous@foo.com",
         )
-        cls.reservation = ReservationFactory.create(user=cls.mr_anonymous)
+        cls.reservation = ReservationFactory.create(
+            user=cls.mr_anonymous,
+            reservee_address_zip="0100",
+            reservee_address_city="Helsinki",
+            reservee_address_street="Test Address 1",
+            billing_address_zip="01000",
+            billing_address_city="Helsinki",
+            billing_address_street="Test Address 1",
+            free_of_charge_reason="Test reason",
+            cancel_details="Test cancel details",
+            handling_details="Test handling details",
+        )
         billing_address = AddressFactory()
         cls.application = ApplicationFactory.create(
             user=cls.mr_anonymous, billing_address=billing_address
@@ -203,3 +214,17 @@ class AnonymizationTestCase(TestCase):
 
         # Test that auditlog entries are wiped.
         assert_that(LogEntry.objects.get_for_object(self.reservation).count()).is_zero()
+
+    def test_reservation_anonymization_does_change_empty_values(self):
+        """Test also that the audit logger instances gets anonymized"""
+        self.reservation.name = ""
+        self.reservation.description = ""
+        self.reservation.free_of_charge_reason = None
+        self.reservation.save()
+
+        anonymize_user_reservations(self.mr_anonymous)
+        self.reservation.refresh_from_db()
+
+        assert_that(self.reservation.name).is_equal_to("")
+        assert_that(self.reservation.description).is_equal_to("")
+        assert_that(self.reservation.free_of_charge_reason).is_none()
