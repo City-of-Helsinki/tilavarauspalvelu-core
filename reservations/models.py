@@ -571,8 +571,6 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
             update_fields=update_fields,
         )
 
-        self.__create_or_update_reservation_statistics()
-
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
@@ -624,91 +622,6 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
             f"{', '.join(unit_names)}\n"
             f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
         )
-
-    def __create_or_update_reservation_statistics(self):
-        recurring = getattr(self, "recurring_reservation", None)
-        stat, created = ReservationStatistic.objects.update_or_create(
-            reservation=self,
-            defaults={
-                "reservation": self,
-                "reservation_created_at": self.created_at,
-                "reservation_handled_at": self.handled_at,
-                "reservation_confirmed_at": self.confirmed_at,
-                "reservee_type": self.reservee_type,
-                "applying_for_free_of_charge": self.applying_for_free_of_charge,
-                "buffer_time_before": self.buffer_time_before,
-                "buffer_time_after": self.buffer_time_after,
-                "reservee_language": self.reservee_language,
-                "num_persons": self.num_persons,
-                "priority": self.priority,
-                "priority_name": PRIORITIES.get_priority_name_from_constant(
-                    self.priority
-                ),
-                "home_city": self.home_city,
-                "home_city_name": self.home_city.name if self.home_city else "",
-                "home_city_municipality_code": self.home_city.municipality_code
-                if self.home_city
-                else "",
-                "purpose": self.purpose,
-                "purpose_name": self.purpose.name if self.purpose else "",
-                "age_group": self.age_group,
-                "age_group_name": str(self.age_group),
-                "is_applied": getattr(recurring, "application", None) is not None,
-                "ability_group": getattr(
-                    self.recurring_reservation, "ability_group", None
-                ),
-                "begin": self.begin,
-                "end": self.end,
-                "duration_minutes": (self.end - self.begin).total_seconds() / 60,
-                "reservation_type": self.type,
-                "state": self.state,
-                "cancel_reason": self.cancel_reason,
-                "cancel_reason_text": getattr(self.cancel_reason, "reason", ""),
-                "deny_reason": self.deny_reason,
-                "deny_reason_text": getattr(self.deny_reason, "reason", ""),
-                "price": self.price,
-                "price_net": self.price_net,
-                "tax_percentage_value": self.tax_percentage_value,
-                "non_subsidised_price": self.non_subsidised_price,
-                "non_subsidised_price_net": self.non_subsidised_price_net,
-                "is_subsidised": self.price < self.non_subsidised_price,
-                "is_recurring": recurring is not None,
-                "recurrence_begin_date": getattr(recurring, "begin_date", None),
-                "recurrence_end_date": getattr(recurring, "end_date", None),
-                "recurrence_uuid": getattr(recurring, "uuid", ""),
-                "reservee_is_unregistered_association": self.reservee_is_unregistered_association,
-                "reservee_uuid": str(self.user.tvp_uuid) if self.user else "",
-            },
-        )
-
-        for res_unit in self.reservation_unit.all():
-            ReservationStatisticsReservationUnit.objects.get_or_create(
-                reservation_statistics=stat,
-                reservation_unit=res_unit,
-                defaults={
-                    "reservation_statistics": stat,
-                    "reservation_unit": res_unit,
-                    "unit_tprek_id": res_unit.unit.tprek_id,
-                    "name": res_unit.name,
-                    "unit_name": res_unit.unit.name,
-                },
-            )
-
-        stat.reservation_stats_reservation_units.exclude(
-            reservation_unit__in=self.reservation_unit.all()
-        ).delete()
-
-        res_unit = self.reservation_unit.first()
-        if res_unit:
-            stat.primary_reservation_unit = res_unit
-            stat.primary_reservation_unit_name = res_unit.name
-            stat.primary_unit_name = res_unit.unit.name
-            stat.primary_unit_tprek_id = res_unit.unit.tprek_id
-
-        if stat.is_applied and self.recurring_reservation.ability_group:
-            stat.ability_group_name = self.recurring_reservation.ability_group.name
-
-        stat.save()
 
 
 class ReservationPurpose(models.Model):
