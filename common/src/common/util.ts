@@ -75,8 +75,19 @@ export const formatSecondDuration = (
   return formatDuration(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
 };
 
-export const toApiDate = (date: Date, formatStr = "yyyy-MM-dd"): string => {
-  return format(date, formatStr);
+// Don't crash on invalid dates
+export const toApiDate = (
+  date: Date,
+  formatStr = "yyyy-MM-dd"
+): string | undefined => {
+  if (!date || Number.isNaN(date.getTime())) {
+    return undefined;
+  }
+  try {
+    return format(date, formatStr);
+  } catch (e) {
+    return undefined;
+  }
 };
 
 export const isValidDate = (date: Date): boolean =>

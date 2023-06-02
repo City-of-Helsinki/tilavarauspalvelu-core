@@ -11,6 +11,7 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  testId?: string;
 }
 
 const ControlledTimeInput = <T extends FieldValues>({
@@ -19,6 +20,7 @@ const ControlledTimeInput = <T extends FieldValues>({
   error,
   required,
   disabled,
+  testId,
 }: ControllerProps<T>) => {
   const { t } = useTranslation();
   const { field } = useController({ control, name, rules: { required } });
@@ -34,6 +36,7 @@ const ControlledTimeInput = <T extends FieldValues>({
       errorText={error}
       onChange={field.onChange}
       value={field.value}
+      data-testid={testId}
     />
   );
 };

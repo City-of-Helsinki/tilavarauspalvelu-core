@@ -12,6 +12,7 @@ type NewReservationListItem = {
   reservationPk?: number;
   buttons?: React.ReactNode;
   isRemoved?: boolean;
+  isOverlapping?: boolean;
 };
 
 type Props = {
@@ -45,24 +46,27 @@ const StyledListItem = styled.li`
   white-space: nowrap;
 `;
 
-const TextWrapper = styled.span<{ $failed: boolean }>`
+const TextWrapper = styled.div<{ $failed: boolean }>`
+  display: flex;
   padding: var(--spacing-xs) 0;
   flex-grow: 1;
   gap: 0.5rem 2rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   ${({ $failed }) => ($failed ? "color: var(--color-black-60)" : "")};
 `;
 
+// min-width because some dates have less characters and font-width varries
+// magic number 19 works for longer dates while not adding too much white-space on mobile
 const DateElement = styled.div<{ $isRemoved: boolean }>`
+  min-width: 19ch;
   text-transform: capitalize;
   ${({ $isRemoved }) => ($isRemoved ? "color: var(--color-black-50)" : "")};
 `;
 
-const ErrorLabel = styled.div`
+const ErrorLabel = styled.div<{ $isError: boolean }>`
   & > span {
     color: var(--color-black);
-    background: var(--color-metro-medium-light);
+    background: ${({ $isError }) =>
+      $isError ? "var(--color-metro-medium-light)" : "var(--color-black-10)"};
     padding: 0.5rem 0.5rem;
   }
 `;
@@ -76,6 +80,45 @@ const CenterContent = styled.div`
 const stripTimeZeros = (time: string) =>
   time.substring(0, 1) === "0" ? time.substring(1) : time;
 
+const StatusElement = ({ item }: { item: NewReservationListItem }) => {
+  const { t } = useTranslation();
+
+  const getStatus = (x: NewReservationListItem) => {
+    if (x.isOverlapping) {
+      return {
+        isError: true,
+        msg: "MyUnits.RecurringReservation.Confirmation.overlapping",
+      };
+    }
+    if (x.isRemoved) {
+      return {
+        isError: false,
+        msg: "MyUnits.RecurringReservation.Confirmation.removed",
+      };
+    }
+    if (x.error) {
+      return {
+        isError: true,
+        msg: `MyUnits.RecurringReservation.Confirmation.failureMessages.${item.error}`,
+      };
+    }
+    return undefined;
+  };
+
+  const status = getStatus(item);
+  if (!status) {
+    return null;
+  }
+
+  const { isError, msg } = status;
+
+  return (
+    <ErrorLabel $isError={isError}>
+      <span>{t(msg)}</span>
+    </ErrorLabel>
+  );
+};
+
 const ReservationList = ({
   header,
   items,
@@ -88,7 +131,7 @@ const ReservationList = ({
   if (!items.length) return null;
 
   return (
-    <ListWrapper>
+    <ListWrapper data-testid="reservations-list">
       {header}
       <StyledList $hasPadding={hasPadding ?? false}>
         {items.map((item) => (
@@ -96,29 +139,16 @@ const ReservationList = ({
             key={`${item.date}-${item.startTime}-${item.endTime}`}
           >
             <TextWrapper $failed={!!item.error}>
-              <DateElement $isRemoved={item.isRemoved ?? false}>
+              <DateElement
+                $isRemoved={(item.isRemoved || item.isOverlapping) ?? false}
+              >
                 {`${toUIDate(item.date, "cccccc d.M.yyyy")}, ${stripTimeZeros(
                   item.startTime
                 )}-${stripTimeZeros(item.endTime)}`}
               </DateElement>
-              {item.isRemoved && (
-                <ErrorLabel>
-                  <span>
-                    {t("MyUnits.RecurringReservation.Confirmation.removed")}
-                  </span>
-                </ErrorLabel>
-              )}
-              {item.error && (
-                <ErrorLabel>
-                  <span>
-                    {t(
-                      `MyUnits.RecurringReservation.Confirmation.failureMessages.${item.error}`
-                    )}
-                  </span>
-                </ErrorLabel>
-              )}
+              <StatusElement item={item} />
             </TextWrapper>
-            {item.buttons}
+            <div>{item.buttons}</div>
           </StyledListItem>
         ))}
         {hasMore && onLoadMore && (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   ErrorType,
@@ -16,12 +16,15 @@ import { format } from "date-fns";
 import { Button, TextInput } from "hds-react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { toApiDate } from "common/src/common/util";
 import { removeRefParam } from "common/src/reservation-form/util";
 import { RecurringReservationFormSchema } from "./RecurringReservationSchema";
 import type { RecurringReservationForm } from "./RecurringReservationSchema";
 import SortedSelect from "../../ReservationUnits/ReservationUnitEditor/SortedSelect";
 import { WeekdaysSelector } from "./WeekdaysSelector";
-import ReservationList from "../../ReservationsList";
+import ReservationList, {
+  NewReservationListItem,
+} from "../../ReservationsList";
 import { CREATE_RECURRING_RESERVATION } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
@@ -29,11 +32,12 @@ import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
 import { ActionsWrapper, Grid as BaseGrid, Element } from "./commonStyling";
 import { flattenMetadata } from "../create-reservation/utils";
-import { useMultipleReservation } from "./hooks";
+import { useFilteredReservationList, useMultipleReservation } from "./hooks";
 import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
 import ControlledTimeInput from "../components/ControlledTimeInput";
 import ControlledDateInput from "../components/ControlledDateInput";
+import ReservationListButton from "../../ReservationListButton";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -51,6 +55,79 @@ const Grid = styled(BaseGrid)`
 `;
 
 const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
+
+const isReservationEq = (
+  a: NewReservationListItem,
+  b: NewReservationListItem
+) =>
+  a.date.getTime() === b.date.getTime() &&
+  a.endTime === b.endTime &&
+  a.startTime === b.startTime;
+
+const filterOutRemovedReservations = (
+  items: NewReservationListItem[],
+  removedReservations: NewReservationListItem[]
+) =>
+  items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
+
+/// @param items the checked list of all new reservations to make
+/// @param removedReservations the events the user wanted to remove
+/// @param setRemovedReservations update the user's list
+/// Using two arrays because modifiying a single array causes the hooks to rerun
+/// flow: user makes a time selection => do a query => allow user to disable dates.
+const ReservationListEditor = ({
+  items,
+  removedReservations,
+  setRemovedReservations,
+}: {
+  items: { reservations: NewReservationListItem[]; refetch: () => void };
+  removedReservations: NewReservationListItem[];
+  setRemovedReservations: (items: NewReservationListItem[]) => void;
+}) => {
+  const { t } = useTranslation();
+
+  const handleRemove = (item: NewReservationListItem) => {
+    const fid = removedReservations.findIndex((x) => isReservationEq(item, x));
+    if (fid === -1) {
+      setRemovedReservations([...removedReservations, item]);
+    }
+  };
+
+  const handleRestore = (item: NewReservationListItem) => {
+    items.refetch();
+    const fid = removedReservations.findIndex((x) => isReservationEq(item, x));
+    if (fid !== -1) {
+      setRemovedReservations([
+        ...removedReservations.slice(0, fid),
+        ...removedReservations.slice(fid + 1),
+      ]);
+    }
+  };
+
+  const itemsWithButtons = items.reservations.map((x) => {
+    if (x.isOverlapping) {
+      return x;
+    }
+    const elem = removedReservations.find((y) => isReservationEq(x, y));
+    const isRemoved = elem !== undefined;
+
+    return {
+      ...x,
+      isRemoved,
+      buttons: [
+        ReservationListButton({
+          callback: isRemoved ? () => handleRestore(x) : () => handleRemove(x),
+          type: isRemoved ? "restore" : "remove",
+          t,
+        }),
+      ],
+    };
+  });
+
+  return (
+    <ReservationList key="list-editor" items={itemsWithButtons} hasPadding />
+  );
+};
 
 type Props = {
   reservationUnits: ReservationUnitType[];
@@ -73,10 +150,9 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     control,
     register,
     watch,
+    getValues,
     formState: { errors, isSubmitting, dirtyFields, isSubmitted },
   } = form;
-
-  const selectedReservationUnit = watch("reservationUnit");
 
   const reservationUnitOptions =
     reservationUnits.map((unit) => ({
@@ -106,11 +182,23 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
     createReservationMutation[0]({ variables: { input } });
 
+  const [removedReservations, setRemovedReservations] = useState<
+    NewReservationListItem[]
+  >([]);
+
+  const selectedReservationUnit = watch("reservationUnit");
+
   const unit = selectedReservationUnit?.value;
 
   const { reservationUnit } = useReservationUnitQuery(
     unit ? Number(unit) : undefined
   );
+
+  // Reset removed when time change (infi loop if array is unwrapped)
+  const [startTime, endTime] = watch(["startTime", "endTime"]);
+  useEffect(() => {
+    setRemovedReservations([]);
+  }, [startTime, endTime, reservationUnit]);
 
   // TODO these are problematic since there is no test case for them
   // they are the same in the single reservation but the use case and design isn't clear.
@@ -127,6 +215,13 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     reservationUnit?.reservationStartInterval
   );
 
+  const checkedReservations = useFilteredReservationList({
+    items: newReservations.reservations,
+    reservationUnitPk: reservationUnit?.pk ?? undefined,
+    begin: getValues("startingDate"),
+    end: getValues("endingDate"),
+  });
+
   const navigate = useNavigate();
 
   const onSubmit = async (data: RecurringReservationForm) => {
@@ -135,7 +230,12 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
       notifyError(t(translateError("formNotValid")));
       return;
     }
-    if (newReservations.reservations.length === 0) {
+    const reservationsToMake = filterOutRemovedReservations(
+      checkedReservations.reservations,
+      removedReservations
+    ).filter((x) => !x.isOverlapping);
+
+    if (reservationsToMake.length === 0) {
       notifyError(t(translateError("noReservations")));
       return;
     }
@@ -194,11 +294,13 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
         );
       } else {
         // TODO this is common with the ReservationForm combine them
-        const myDateTime = (date: Date, time: string) =>
-          dateTime(format(date, "dd.MM.yyyy"), time);
+        const myDateTime = (date: Date, time: string) => {
+          const maybeDateString = toApiDate(date, "dd.MM.yyyy");
+          return maybeDateString ? dateTime(maybeDateString, time) : undefined;
+        };
 
-        // TODO see if this can be combined with ReservationDialog (it's very similar)
-        const rets = newReservations.reservations.map(async (x) => {
+        // TODO see if parts of this can be combined with ReservationDialog (it's very similar)
+        const rets = reservationsToMake.map(async (x) => {
           const common = {
             startTime: x.startTime,
             endTime: x.endTime,
@@ -206,13 +308,20 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
           };
 
           try {
+            const begin = myDateTime(x.date, x.startTime);
+            const end = myDateTime(x.date, x.endTime);
+
+            if (!begin || !end) {
+              throw new Error("Invalid date selected");
+            }
+
             const staffInput: ReservationStaffCreateMutationInput = {
               reservationUnitPks: [unitPk],
               recurringReservationPk:
                 createResponse.createRecurringReservation.pk,
               type: data.type,
-              begin: myDateTime(x.date, x.startTime),
-              end: myDateTime(x.date, x.endTime),
+              begin,
+              end,
               bufferTimeBefore: bufferTimeBefore
                 ? String(bufferTimeBefore)
                 : undefined,
@@ -297,6 +406,11 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
         )
       : "";
 
+  const newReservationsToMake = filterOutRemovedReservations(
+    checkedReservations.reservations,
+    removedReservations
+  ).filter((x) => !x.isOverlapping);
+
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -370,6 +484,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
               error={getZodError("startTime")}
               disabled={reservationUnit == null}
               required
+              testId="recurring-reservation-start-time"
             />
           </Element>
           <Element>
@@ -379,6 +494,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
               error={getZodError("endTime")}
               disabled={reservationUnit == null}
               required
+              testId="recurring-reservation-end-time"
             />
           </Element>
 
@@ -398,16 +514,17 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
             />
           </Element>
 
-          {reservationUnit != null && (
+          {reservationUnit?.pk != null && (
             <Element $wide>
               <Label $bold>
                 {t(`${TRANS_PREFIX}.reservationsList`, {
-                  count: newReservations.reservations.length,
+                  count: newReservationsToMake.length,
                 })}
               </Label>
-              <ReservationList
-                items={newReservations.reservations}
-                hasPadding
+              <ReservationListEditor
+                setRemovedReservations={setRemovedReservations}
+                removedReservations={removedReservations}
+                items={checkedReservations}
               />
             </Element>
           )}
@@ -435,7 +552,12 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
             >
               {t("common.cancel")}
             </Button>
-            <Button variant="primary" type="submit" isLoading={isSubmitting}>
+            <Button
+              variant="primary"
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={newReservationsToMake.length === 0}
+            >
               {t("common.reserve")}
             </Button>
           </ActionsWrapper>

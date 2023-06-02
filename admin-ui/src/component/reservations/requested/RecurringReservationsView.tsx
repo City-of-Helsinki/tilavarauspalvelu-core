@@ -71,6 +71,7 @@ const RecurringReservationsView = ({
             key="change"
             callback={() => handleChange(x)}
             type="change"
+            t={t}
           />
         );
       }
@@ -80,6 +81,7 @@ const RecurringReservationsView = ({
           key="show"
           callback={() => onSelect(x)}
           type="show"
+          t={t}
         />
       );
       if (startDate > now) {
@@ -88,6 +90,7 @@ const RecurringReservationsView = ({
             key="deny"
             callback={() => handleRemove(x)}
             type="deny"
+            t={t}
           />
         );
       }

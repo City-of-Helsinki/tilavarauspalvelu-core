@@ -6,21 +6,24 @@ import {
   IconCross,
   IconPen,
 } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
+/// NOTE don't use hooks here; buttons are dynamically added to arrays (so the amount of hooks can change)
 const ReservationListButton = ({
   type,
   callback,
+  t,
 }: {
   type: "remove" | "deny" | "restore" | "change" | "show";
   callback: () => void;
+  // Pass the TFunc because the amount of buttons change and hooks break
+  t: TFunction;
 }) => {
-  const { t } = useTranslation();
-
   const btnCommon = {
     variant: "supplementary",
     onClick: callback,
     size: "small",
+    key: type,
   } as const;
 
   switch (type) {
