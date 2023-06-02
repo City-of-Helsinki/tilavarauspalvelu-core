@@ -17,6 +17,7 @@ export type Props = {
   acceptLabel?: string;
   accepted?: boolean;
   setAccepted?: (accepted: boolean) => void;
+  errorText?: string;
 };
 
 const Wrapper = styled.div`
@@ -99,16 +100,17 @@ const TermsBox = ({
   acceptLabel,
   accepted,
   setAccepted,
+  errorText,
   ...rest
 }: Props): JSX.Element => {
   const canAccept = Boolean(acceptLabel) && Boolean(setAccepted);
 
   return (
-    <Wrapper {...rest}>
+    <Wrapper {...rest} id={id}>
       <Content>
         <Heading>{heading}</Heading>
         <p>{body}</p>
-        {links?.length > 0 && (
+        {links && links?.length > 0 && (
           <Links>
             {links.map((link) => (
               <Link key={link.href}>
@@ -133,7 +135,8 @@ const TermsBox = ({
             data-testid="terms-box__checkbox--accept-terms"
             label={acceptLabel}
             checked={accepted}
-            onChange={() => setAccepted(!accepted)}
+            onChange={() => setAccepted && setAccepted(!accepted)}
+            errorText={errorText}
           />
         </Actions>
       )}

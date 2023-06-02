@@ -143,3 +143,22 @@ export const PinkBox = styled.div`
     margin-top: var(--spacing-m);
   }
 `;
+
+export const ErrorBox = styled(Notification)`
+  max-width: 360px;
+  align-self: flex-end;
+  margin-bottom: var(--spacing-m);
+`;
+
+export const ErrorList = styled.ul`
+  margin-top: var(--spacing-2-xs);
+`;
+
+export const ErrorAnchor = styled.a`
+  &,
+  &:visited {
+    color: var(--color-black) !important;
+    text-decoration: underline;
+    line-height: var(--lineheight-xl);
+  }
+`;

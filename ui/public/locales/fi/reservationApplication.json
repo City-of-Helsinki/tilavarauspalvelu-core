@@ -20,7 +20,8 @@
       "ageGroup": "Ikäryhmä",
       "applyingForFreeOfChargeButton": "Tarkista alennusryhmät <button>tästä</button>.",
       "applyingForFreeOfCharge": "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut alennusryhmiin.",
-      "freeOfChargeReason": "Perustelut maksuttomaan varaukseen"
+      "freeOfChargeReason": "Perustelut maksuttomaan varaukseen",
+      "reserveeType": "Hakijan tyyppi"
     },
     "nonprofit": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",
@@ -92,8 +93,5 @@
   },
   "processLabels": {
     "handlingRequired": "Varaus käsittelyssä"
-  },
-  "errors": {
-    "noFormType": "Valitse hakijan tyyppi"
   }
 }

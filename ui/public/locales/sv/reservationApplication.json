@@ -20,7 +20,8 @@
       "ageGroup": "Åldersgrupp",
       "applyingForFreeOfChargeButton": "Kolla rabattgrupper <button>här</button>",
       "applyingForFreeOfCharge": "Jag ansöker om avgiftsfri användning eller rabatt och jag har bekantat mig med rabattgrupperna.",
-      "freeOfChargeReason": "Motiveringar"
+      "freeOfChargeReason": "Motiveringar",
+      "reserveeType": "Typ av sökande"
     },
     "nonprofit": {
       "reserveeFirstName": "Kontaktpersonens förnamn",
@@ -92,8 +93,5 @@
   },
   "processLabels": {
     "handlingRequired": "Bokningen behandlas"
-  },
-  "errors": {
-    "noFormType": "Välj typ av sökande"
   }
 }

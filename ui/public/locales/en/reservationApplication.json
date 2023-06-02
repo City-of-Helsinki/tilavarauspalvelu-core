@@ -20,7 +20,8 @@
       "ageGroup": "Age group",
       "applyingForFreeOfChargeButton": "Check discount groups <button>here</button>.",
       "applyingForFreeOfCharge": "I apply for a reduced fee and I have familiarised myself with the discount groups.",
-      "freeOfChargeReason": "Justification"
+      "freeOfChargeReason": "Justification",
+      "reserveeType": "Applicant type"
     },
     "nonprofit": {
       "reserveeFirstName": "Contact person’s first name",
@@ -92,8 +93,5 @@
   },
   "processLabels": {
     "handlingRequired": "Booking is being processed"
-  },
-  "errors": {
-    "noFormType": "Select applicant type"
   }
 }

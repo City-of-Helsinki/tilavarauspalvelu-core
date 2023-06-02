@@ -2,8 +2,23 @@
   "clearSelection": "Clear selection",
   "selectAll": "Select all",
   "inputPlaceholder": "Search",
-  "invalidEmail": "Invalid e-mail",
-  "requiredField": "Required field",
+  "invalidEmail": "Email must be in right format (including @ symbol)",
+  "invalidReserveeId": "Business ID must have at least three digits",
+  "required": "Required field",
+  "requiredField": "{{prefix}} {{fieldName}}",
   "min": "Value is too small",
-  "max": "Value is too big"
+  "max": "Value is too big",
+  "minNumPersons": "Number of participants must be minimum {{minValue}} persons",
+  "maxNumPersons": "Number of participants can be maximum {{maxValue}} persons",
+  "minLength": "Value is too short",
+  "maxLength": "Value is too long",
+  "prefix": {
+    "text": "Enter",
+    "select": "Select",
+    "approve": "Accept"
+  },
+  "heading": {
+    "errorsTitle": "Fill in the missing information",
+    "errorsSubtitle": "Fill in the following fields to make the booking:"
+  }
 }

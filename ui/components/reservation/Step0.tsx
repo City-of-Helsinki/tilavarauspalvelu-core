@@ -4,6 +4,7 @@
  */
 import { OptionType } from "common/types/common";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
+import { useFormContext } from "react-hook-form";
 import React from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -18,7 +19,13 @@ import { ActionContainer } from "./styles";
 import { getTranslation } from "../../modules/util";
 import InfoDialog from "../common/InfoDialog";
 import { JustForMobile } from "../../modules/style/layout";
-import { PinkBox, Subheading } from "../reservation-unit/ReservationUnitStyles";
+import {
+  ErrorAnchor,
+  ErrorBox,
+  ErrorList,
+  PinkBox,
+  Subheading,
+} from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
 
 type Props = {
@@ -35,6 +42,9 @@ type Props = {
 };
 
 const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+
   label {
     ${fontMedium};
 
@@ -50,10 +60,6 @@ const Form = styled.form`
   input[type="radio"] + label {
     ${fontRegular};
   }
-`;
-
-const StyledActionContainer = styled(ActionContainer)`
-  padding-top: var(--spacing-xl);
 `;
 
 const LinkLikeButton = styled.button`
@@ -79,6 +85,23 @@ const Step0 = ({
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
+
+  const {
+    formState: { errors, isSubmitted },
+  } = useFormContext();
+
+  const errorKeys =
+    Object.keys(errors).sort((a, b) => {
+      const fields = [...generalFields, ...reservationApplicationFields];
+      return fields.indexOf(a) - fields.indexOf(b);
+    }) || [];
+
+  if (
+    reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type") &&
+    isSubmitted &&
+    !reserveeType
+  )
+    errorKeys.push("reserveeType");
 
   return (
     <Form
@@ -130,7 +153,48 @@ const Step0 = ({
           </PinkBox>
         </JustForMobile>
       )}
-      <StyledActionContainer>
+      {errorKeys?.length > 0 && (
+        <ErrorBox
+          label={t("forms:heading.errorsTitle")}
+          type="error"
+          position="inline"
+        >
+          <div>{t("forms:heading.errorsSubtitle")}</div>
+          <ErrorList>
+            {errorKeys.map((key: string) => {
+              const isGeneralField =
+                generalFields.includes(key) || key === "reserveeType";
+              const fieldType = isGeneralField
+                ? "common"
+                : reserveeType?.toLocaleLowerCase() || "individual";
+              return (
+                <li>
+                  <ErrorAnchor
+                    href="javascript:void(0);"
+                    onClick={() => {
+                      const element =
+                        document.getElementById(key) ||
+                        document.getElementById(`${key}-label`);
+                      const top = element.getBoundingClientRect()?.y || 0;
+                      window.scroll({
+                        top: window.scrollY + top - 28,
+                        left: 0,
+                        behavior: "smooth",
+                      });
+                      setTimeout(() => {
+                        element?.focus();
+                      }, 500);
+                    }}
+                  >
+                    {t(`reservationApplication:label.${fieldType}.${key}`)}
+                  </ErrorAnchor>
+                </li>
+              );
+            })}
+          </ErrorList>
+        </ErrorBox>
+      )}
+      <ActionContainer>
         <MediumButton
           variant="primary"
           type="submit"
@@ -149,7 +213,7 @@ const Step0 = ({
         >
           {t("common:cancel")}
         </MediumButton>
-      </StyledActionContainer>
+      </ActionContainer>
     </Form>
   );
 };

@@ -30,7 +30,10 @@ import IconPremises from "../icons/IconPremises";
 
 type CommonProps = {
   options: Record<string, OptionType[]>;
-  t: (key: string) => string;
+  t: (
+    key: string,
+    options?: Record<string, string | number | undefined>
+  ) => string;
   // TODO this should be refactored out to be the translation key
   reserveeType?: ReservationsReservationReserveeTypeChoices | "COMMON";
   data?: {
@@ -49,6 +52,8 @@ type Props = CommonProps & {
 };
 
 const Container = styled.div`
+  margin-bottom: var(--spacing-m);
+
   label {
     ${fontMedium};
 
@@ -293,7 +298,9 @@ export const ReserverMetaFields = ({
       </ReserverInfoHeading>
       {isTypeSelectable && (
         <>
-          <p>{t("reservationApplication:reserveeTypePrefix")}</p>
+          <p id="reserveeType-label">
+            {t("reservationApplication:reserveeTypePrefix")}
+          </p>
           <ReserveeTypeContainer data-testid="reservation__checkbox--reservee-type">
             {reserveeOptions.map(({ id, icon }) => (
               <RadioButtonWithImage

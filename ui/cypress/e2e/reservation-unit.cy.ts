@@ -694,7 +694,7 @@ describe("with metadataset", () => {
     cy.get('button[type="submit"]').click();
     cy.get("#reserveeEmail-error").should(
       "contain.text",
-      "Virheellinen sähköpostiosoite"
+      "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)"
     );
 
     cy.get("#reserveeFirstName").clear().type("Forename");
@@ -723,29 +723,21 @@ describe("with metadataset", () => {
 
     cy.get('button[type="submit"]').click();
 
-    errorNotificationTitle().should(
-      "contain.text",
-      "Varauksen päivitys epäonnistui"
-    );
+    errorNotificationTitle().should("contain.text", "Täytä puuttuvat tiedot");
     errorNotificationBody().should(
       "contain.text",
-      "Hyväksy sopimusehdot jatkaaksesi varausta."
+      "Täytä seuraavat kohdat tehdäksesi varauksen:PeruutusehdotSopimusehdot"
     );
-    errorNotificationCloseButton().click();
 
     cy.get("#generic-and-service-specific-terms-terms-accepted").click();
 
     cy.get('button[type="submit"]').click();
 
-    errorNotificationTitle().should(
-      "contain.text",
-      "Varauksen päivitys epäonnistui"
-    );
+    errorNotificationTitle().should("contain.text", "Täytä puuttuvat tiedot");
     errorNotificationBody().should(
       "contain.text",
-      "Hyväksy sopimusehdot jatkaaksesi varausta."
+      "Täytä seuraavat kohdat tehdäksesi varauksen:Peruutusehdot"
     );
-    errorNotificationCloseButton().click();
 
     cy.get("#cancellation-and-payment-terms-terms-accepted").click();
 

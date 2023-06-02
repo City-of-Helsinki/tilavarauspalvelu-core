@@ -21,7 +21,12 @@ import { ActionContainer } from "./styles";
 import Sanitize from "../common/Sanitize";
 import { MediumButton } from "../../styles/util";
 import { JustForMobile } from "../../modules/style/layout";
-import { PinkBox } from "../reservation-unit/ReservationUnitStyles";
+import {
+  ErrorAnchor,
+  ErrorBox,
+  ErrorList,
+  PinkBox,
+} from "../reservation-unit/ReservationUnitStyles";
 
 type Props = {
   reservation: Reservation;
@@ -34,8 +39,12 @@ type Props = {
   steps: ReservationStep[];
   setStep: React.Dispatch<React.SetStateAction<number>>;
   termsOfUse: Record<string, TermsOfUseType>;
-  setErrorMsg: React.Dispatch<React.SetStateAction<string>>;
 };
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
 
 const ParagraphAlt = styled.div<{ $isWide?: boolean }>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1;"}
@@ -56,6 +65,19 @@ const PreviewValue = styled.span`
   font-size: var(--fontsize-body-l);
 `;
 
+const scrollToBox = (id: string): void => {
+  const element = document.getElementById(id);
+  const checkbox = document.getElementById(`${id}-terms-accepted`);
+
+  const top = element?.getBoundingClientRect()?.y || 0;
+  window.scroll({
+    top: window.scrollY + top - 28,
+    left: 0,
+    behavior: "smooth",
+  });
+  checkbox?.focus();
+};
+
 const Step1 = ({
   reservation,
   reservationUnit,
@@ -67,26 +89,61 @@ const Step1 = ({
   steps,
   setStep,
   termsOfUse,
-  setErrorMsg,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [areTermsSpaceAccepted, setAreTermsSpaceAccepted] = useState(false);
   const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
 
   const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
 
+  const box = [
+    {
+      heading: t(
+        `reservationCalendar:heading.${
+          reservationUnit.cancellationTerms && reservationUnit.paymentTerms
+            ? "cancellationPaymentTerms"
+            : reservationUnit.cancellationTerms
+            ? "cancellationTerms"
+            : "paymentTerms"
+        }`
+      ),
+      id: "cancellation-and-payment-terms",
+      acceptLabel: t(
+        `reservationCalendar:label.${
+          reservationUnit.cancellationTerms && reservationUnit.paymentTerms
+            ? "termsCancellationPayment"
+            : reservationUnit.cancellationTerms
+            ? "termsCancellation"
+            : "termsPayment"
+        }`
+      ),
+    },
+    {
+      heading: t("reservationCalendar:heading.termsOfUse"),
+      id: "generic-and-service-specific-terms",
+      acceptLabel: t(
+        `reservationCalendar:label.${
+          reservationUnit.serviceSpecificTerms
+            ? "termsGeneralSpecific"
+            : "termsGeneral"
+        }`
+      ),
+    },
+  ];
+
   return (
-    <form
+    <Form
       onSubmit={(e) => {
         e.preventDefault();
-        if (!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted) {
-          setErrorMsg(t("reservationCalendar:errors.termsNotAccepted"));
-        } else {
+        setIsSubmitted(true);
+        if (areTermsSpaceAccepted && areServiceSpecificTermsAccepted) {
           handleSubmit();
         }
       }}
+      noValidate
     >
       {generalFields?.length > 0 && (
         <>
@@ -175,16 +232,8 @@ const Step1 = ({
         </>
       </TwoColumnContainer>
       <TermsBox
-        id="cancellation-and-payment-terms"
-        heading={t(
-          `reservationCalendar:heading.${
-            reservationUnit.cancellationTerms && reservationUnit.paymentTerms
-              ? "cancellationPaymentTerms"
-              : reservationUnit.cancellationTerms
-              ? "cancellationTerms"
-              : "paymentTerms"
-          }`
-        )}
+        id={box[0].id}
+        heading={box[0].heading}
         body={
           <>
             <Sanitize
@@ -196,21 +245,18 @@ const Step1 = ({
             />
           </>
         }
-        acceptLabel={t(
-          `reservationCalendar:label.${
-            reservationUnit.cancellationTerms && reservationUnit.paymentTerms
-              ? "termsCancellationPayment"
-              : reservationUnit.cancellationTerms
-              ? "termsCancellation"
-              : "termsPayment"
-          }`
-        )}
+        acceptLabel={box[0].acceptLabel}
         accepted={areServiceSpecificTermsAccepted}
         setAccepted={setAreServiceSpecificTermsAccepted}
+        errorText={
+          isSubmitted &&
+          !areServiceSpecificTermsAccepted &&
+          `${t("forms:prefix.approve")} ${box[0].heading.toLocaleLowerCase()}`
+        }
       />
       <TermsBox
-        id="generic-and-service-specific-terms"
-        heading={t("reservationCalendar:heading.termsOfUse")}
+        id={box[1].id}
+        heading={box[1].heading}
         body={
           <Sanitize
             html={getTranslation(reservationUnit.serviceSpecificTerms, "text")}
@@ -224,15 +270,14 @@ const Step1 = ({
             },
           ]
         }
-        acceptLabel={t(
-          `reservationCalendar:label.${
-            reservationUnit.serviceSpecificTerms
-              ? "termsGeneralSpecific"
-              : "termsGeneral"
-          }`
-        )}
+        acceptLabel={box[1].acceptLabel}
         accepted={areTermsSpaceAccepted}
         setAccepted={setAreTermsSpaceAccepted}
+        errorText={
+          isSubmitted &&
+          !areTermsSpaceAccepted &&
+          `${t("forms:prefix.approve")} ${box[1].heading.toLocaleLowerCase()}`
+        }
       />
       {termsOfUseContent && (
         <JustForMobile style={{ marginBottom: "var(--spacing-layout-m)" }}>
@@ -244,6 +289,38 @@ const Step1 = ({
           </PinkBox>
         </JustForMobile>
       )}
+      {isSubmitted &&
+        (!areServiceSpecificTermsAccepted || !areTermsSpaceAccepted) && (
+          <ErrorBox
+            label={t("forms:heading.errorsTitle")}
+            type="error"
+            position="inline"
+          >
+            <div>{t("forms:heading.errorsSubtitle")}</div>
+            <ErrorList>
+              {!areServiceSpecificTermsAccepted && (
+                <li>
+                  <ErrorAnchor
+                    href="javascript:void(0);"
+                    onClick={() => scrollToBox(box[0].id)}
+                  >
+                    {box[0].heading}
+                  </ErrorAnchor>
+                </li>
+              )}
+              {!areTermsSpaceAccepted && (
+                <li>
+                  <ErrorAnchor
+                    href="javascript:void(0);"
+                    onClick={() => scrollToBox(box[1].id)}
+                  >
+                    {box[1].heading}
+                  </ErrorAnchor>
+                </li>
+              )}
+            </ErrorList>
+          </ErrorBox>
+        )}
       <ActionContainer>
         <MediumButton
           variant="primary"
@@ -266,7 +343,7 @@ const Step1 = ({
           {t("common:prev")}
         </MediumButton>
       </ActionContainer>
-    </form>
+    </Form>
   );
 };
 
