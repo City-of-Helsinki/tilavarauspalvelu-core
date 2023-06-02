@@ -1,5 +1,5 @@
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
-import { timeSelectionSchema } from "./RecurringReservationSchema";
+import { timeSelectionSchema } from "app/schemas";
 import { toMondayFirst } from "../../../common/util";
 
 // NOTE Custom UTC date code because taking only the date part of Date results

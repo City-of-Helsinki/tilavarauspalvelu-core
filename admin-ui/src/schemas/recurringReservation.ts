@@ -6,8 +6,9 @@ import {
   checkReservationInterval,
   checkStartEndTime,
   checkTimeStringFormat,
-} from "../create-reservation/validator";
-import { intervalToNumber } from "../create-reservation/utils";
+} from "./reservation";
+import { intervalToNumber } from "./utils";
+import { OptionSchema } from "./schemaCommon";
 
 // TODO handle metadata (variable form fields) instead of using .passthrough
 // It should be it's own schema object that is included in both forms
@@ -20,10 +21,6 @@ import { intervalToNumber } from "../create-reservation/utils";
 // NOTE zod doesn't run refinements if part of the required data is missing
 // i.e. the core zod schema is run first if it passes then refinements are run
 // solutions to that are either use partial schemas or split schemas and check the parts.
-const Option = z.object({
-  label: z.string(),
-  value: z.string(),
-});
 
 const timeSelectionSchemaBase = z.object({
   startingDate: z.coerce.date(),
@@ -39,7 +36,7 @@ const timeSelectionSchemaBase = z.object({
 
 export const RecurringReservationFormSchema = z
   .object({
-    reservationUnit: Option,
+    reservationUnit: OptionSchema,
     type: ReservationTypeSchema,
     seriesName: z.string().optional(),
     comments: z.string().max(500).optional(),

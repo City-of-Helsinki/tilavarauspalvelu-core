@@ -1,0 +1,23 @@
+{
+  "errors": {
+    "formNotValid": "Lomakkeessa vikaa.",
+    "noReservations": "Valittujen viikonpäivien tulee vastata valittuja päivämääriä.",
+    "Invalid date": "Virheellinen päivämäärä.",
+    "endTime can't be more than 24 hours.": "Lopetusaika ei voi olla yli 24 tuntia.",
+    "startTime can't be more than 24 hours.": "Aloitusaika ei voi olla yli 24 tuntia.",
+    "startTime has to be in 15 minutes increments.": "Aloitusajan pitää olla 15 minuutin välein.",
+    "startTime has to be in 30 minutes increments.": "Aloitusajan pitää olla 30 minuutin välein.",
+    "startTime has to be in 60 minutes increments.": "Aloitusajan pitää olla 60 minuutin välein.",
+    "startTime has to be in 90 minutes increments.": "Aloitusajan pitää olla 90 minuutin välein.",
+    "endTime has to be in 15 minutes increments.": "Lopetusaika pitää olla 15 minuutin välein.",
+    "startTime is not in time format.": "Aloitusaika tulee olla muodossa tt:mm",
+    "endTime is not in time format.": "Lopetusaika tulee olla muodossa tt:mm",
+    "Date can't be in the past": "Päivä ei voi olla menneisyydessä.",
+    "Date needs to be within three years.": "Päivän pitää olla kolmen vuoden sisällä.",
+    "End time needs to be after start time.": "Lopetusaika pitää olla aloitusajan jälkeen.",
+    "Start date can't be after end date.": "Aloituspäivän tulee olla ennen päättymispäivää",
+    "Array must contain at least 1 element(s)": "Valitse vähintään yksi päivä.",
+    "Start and end time needs to be within a decade.": "Aikaväli pitää olla alle kymmenen vuotta.",
+    "Required": "Pakollinen"
+  }
+}

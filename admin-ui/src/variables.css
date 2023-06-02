@@ -39,6 +39,11 @@
 
   --helper-color-invalid: #b01038;
 
+  /* button like links */
+  --background-color-hover: var(--color-black-5);
+  --background-color-focus: var(--color-black-5);
+  --focus-outline-color: var(--color-black-80);
+
   /* still used in reservation calendar, not my-units */
   --tilavaraus-event-rest-border-color: #1a1a1a;
   --tilavaraus-event-rest-background: rgba(26, 26, 26, 0.1);

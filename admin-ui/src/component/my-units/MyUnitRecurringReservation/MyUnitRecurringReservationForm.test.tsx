@@ -8,8 +8,6 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { expect, test, jest } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { getYear, nextMonday, set } from "date-fns";
@@ -21,10 +19,8 @@ import {
 } from "common/types/gql-types";
 import { BrowserRouter } from "react-router-dom";
 import MyUnitRecurringReservationForm from "./MyUnitRecurringReservationForm";
-import {
-  CREATE_STAFF_RESERVATION,
-  RESERVATION_UNIT_QUERY,
-} from "../create-reservation/queries";
+import { RESERVATION_UNIT_QUERY } from "../hooks/queries";
+import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import {
   CREATE_RECURRING_RESERVATION,
   GET_RESERVATIONS_IN_INTERVAL,
@@ -55,11 +51,13 @@ const units: ReservationUnitType[] = [
     ...unitCommon,
     pk: 1,
     nameFi: "Unit",
+    images: [],
   },
   {
     ...unitCommon,
     pk: 2,
     nameFi: "Absolute",
+    images: [],
   },
 ];
 
@@ -86,6 +84,10 @@ const unitResponse = [
       cancellationTerms: emptyTerms,
       serviceSpecificTerms: emptyTerms,
       termsOfUseFi: "",
+      unit: {
+        pk: 1,
+        nameFi: "unit name",
+      },
       metadataSet: {
         name: "full_meta",
         supportedFields: [

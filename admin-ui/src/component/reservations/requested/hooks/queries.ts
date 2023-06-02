@@ -1,5 +1,11 @@
 import { gql } from "@apollo/client";
 
+import {
+  RESERVATION_COMMON_FRAGMENT,
+  RESERVATION_META_FRAGMENT,
+  RESERVATION_UNIT_FRAGMENT,
+} from "../../fragments";
+
 export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
   query reservationsByReservationUnit(
     $reservationUnit: [ID]
@@ -38,6 +44,30 @@ export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
       pageInfo {
         hasNextPage
       }
+    }
+  }
+`;
+
+// TODO do we need user / orderStatus?
+export const SINGLE_RESERVATION_QUERY = gql`
+  ${RESERVATION_META_FRAGMENT}
+  ${RESERVATION_UNIT_FRAGMENT}
+  ${RESERVATION_COMMON_FRAGMENT}
+  query reservationByPk($pk: Int!) {
+    reservationByPk(pk: $pk) {
+      ...ReservationCommon
+      type
+      workingMemo
+      reservationUnits {
+        ...ReservationUnit
+      }
+      user {
+        firstName
+        lastName
+        email
+        pk
+      }
+      ...ReservationMetaFields
     }
   }
 `;

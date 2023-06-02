@@ -12,13 +12,16 @@ import styled from "styled-components";
 import { camelCase, get } from "lodash";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ReservationFormSchema,
+  type ReservationFormType,
+  type ReservationFormMeta,
+} from "app/schemas";
 import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import { useModal } from "../../../context/ModalContext";
 import { CREATE_STAFF_RESERVATION } from "./queries";
 import Loader from "../../Loader";
 import { useNotification } from "../../../context/NotificationContext";
-import { ReservationFormSchema } from "./validator";
-import type { ReservationFormType } from "./validator";
 import { flattenMetadata } from "./utils";
 import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
@@ -51,6 +54,8 @@ const FixedDialog = styled(Dialog)`
   }
 `;
 
+type FormValueType = ReservationFormType & ReservationFormMeta;
+
 const DialogContent = ({
   onClose,
   reservationUnit,
@@ -61,7 +66,7 @@ const DialogContent = ({
   start: Date;
 }) => {
   const { t } = useTranslation();
-  const form = useForm<ReservationFormType>({
+  const form = useForm<FormValueType>({
     resolver: zodResolver(
       ReservationFormSchema(reservationUnit.reservationStartInterval)
     ),
@@ -97,7 +102,7 @@ const DialogContent = ({
   const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
     create({ variables: { input } });
 
-  const onSubmit = async (values: ReservationFormType) => {
+  const onSubmit = async (values: FormValueType) => {
     try {
       if (!reservationUnit.pk) {
         throw new Error("Missing reservation unit");
@@ -128,6 +133,7 @@ const DialogContent = ({
             : undefined,
         workingMemo: values.comments,
         ...flattenedMetadataSetValues,
+        reserveeType: values.reserveeType,
       };
 
       const { data: createResponse } = await createStaffReservation(input);
@@ -157,9 +163,8 @@ const DialogContent = ({
     }
   };
 
-  const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
   const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`${TRANS_PREFIX}.errors.${errorMsg}`) : "";
+    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
   // TODO refactor the form part of this outside the dialog
   return (

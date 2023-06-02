@@ -20,7 +20,7 @@ const BufferController = ({ name, seconds }: BufferControllerProps) => {
         <Checkbox
           id={name}
           checked={String(field.value) === "true"}
-          label={t(`ReservationDialog.${name}`, {
+          label={t(`reservationApplication:${name}`, {
             minutes: seconds / 60,
           })}
           {...field}

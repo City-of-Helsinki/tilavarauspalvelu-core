@@ -7,6 +7,7 @@ import {
   FieldValues,
   useFormContext,
 } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular, Strongish } from "../common/typography";
 import { ReservationsReservationReserveeTypeChoices } from "../../types/gql-types";
@@ -18,13 +19,9 @@ import { removeRefParam } from "./util";
 type Props = {
   field: keyof Inputs;
   options: Record<string, OptionType[]>;
-  reserveeType?: ReservationsReservationReserveeTypeChoices | "COMMON";
+  translationKey?: ReservationsReservationReserveeTypeChoices | "COMMON";
   reservation: Reservation;
   required: boolean;
-  t: (
-    key: string,
-    options?: Record<string, string | number | undefined>
-  ) => string;
   params?: Record<string, Record<string, string | number>>;
   data?: {
     termsForDiscount?: JSX.Element | string;
@@ -124,15 +121,16 @@ const ControlledCheckbox = (props: {
 const ReservationFormField = ({
   field,
   options,
-  reserveeType,
+  translationKey,
   required,
   reservation,
-  t,
   params = {},
   data = {},
 }: Props) => {
-  const normalizedReserveeType =
-    reserveeType?.toLocaleLowerCase() || "individual";
+  const { t } = useTranslation();
+
+  const lowerCaseTranslationKey =
+    translationKey?.toLocaleLowerCase() || "individual";
 
   const isWideRow = useMemo(
     (): boolean =>
@@ -194,7 +192,7 @@ const ReservationFormField = ({
     field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
 
   const label = `${t(
-    `reservationApplication:label.${normalizedReserveeType}.${field}`
+    `reservationApplication:label.${lowerCaseTranslationKey}.${field}`
   )}`;
 
   const minValue =

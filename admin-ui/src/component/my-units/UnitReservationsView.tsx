@@ -81,7 +81,6 @@ const UnitReservationsView = (): JSX.Element => {
       <HR />
       <HorisontalFlexWrapper>
         <Button
-          disabled={false}
           variant="secondary"
           theme="black"
           size="small"

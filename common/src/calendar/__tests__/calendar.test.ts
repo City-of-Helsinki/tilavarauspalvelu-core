@@ -826,6 +826,7 @@ describe("isReservationUnitReservable", () => {
     reservationStartInterval:
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
     uuid: "1234",
+    images: [],
     openingHours: {
       openingTimes: [
         {

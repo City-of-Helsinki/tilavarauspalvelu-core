@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { test, expect } from "@jest/globals";
 import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";

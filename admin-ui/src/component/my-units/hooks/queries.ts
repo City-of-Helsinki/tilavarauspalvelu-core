@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { RESERVATION_UNIT_FRAGMENT } from "../../reservations/fragments";
 
 export const OPTIONS_QUERY = gql`
   query options {
@@ -114,6 +115,19 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
               email
             }
           }
+        }
+      }
+    }
+  }
+`;
+
+export const RESERVATION_UNIT_QUERY = gql`
+  ${RESERVATION_UNIT_FRAGMENT}
+  query reservationUnits($pk: [ID]) {
+    reservationUnits(onlyWithPermission: true, pk: $pk) {
+      edges {
+        node {
+          ...ReservationUnit
         }
       }
     }

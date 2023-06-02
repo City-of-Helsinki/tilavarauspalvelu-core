@@ -6,7 +6,12 @@ import { intervalToNumber } from "./utils";
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 const TIME_PATTERN = /^[0-2][0-9]:[0-5][0-9]$/;
 
-export const ReservationTypes = ["STAFF", "BEHALF", "BLOCKED"] as const;
+export const ReservationTypes = [
+  "STAFF",
+  "BEHALF",
+  "BLOCKED",
+  "NORMAL",
+] as const;
 export const ReservationTypeSchema = z.enum(ReservationTypes);
 
 export type ReservationType = z.infer<typeof ReservationTypeSchema>;
@@ -150,3 +155,18 @@ const ReservationFormSchemaRefined = (
 export { ReservationFormSchemaRefined as ReservationFormSchema };
 
 export type ReservationFormType = z.infer<typeof ReservationFormSchema>;
+
+export const ReservationChangeFormSchema = z
+  .object({
+    type: ReservationTypeSchema,
+    comments: z.string().optional(),
+    bufferTimeAfter: z.boolean().optional(),
+    bufferTimeBefore: z.boolean().optional(),
+    showBillingAddress: z.boolean().optional(),
+  })
+  // passthrough since this is combined to the metafields
+  .passthrough();
+
+export type ReservationChangeFormType = z.infer<
+  typeof ReservationChangeFormSchema
+>;

@@ -1,7 +1,5 @@
 import React from "react";
 import "@testing-library/jest-dom";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, expect, test } from "@jest/globals";
 import { render } from "@testing-library/react";
 import { addDays, nextMonday } from "date-fns";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";

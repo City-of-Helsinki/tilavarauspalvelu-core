@@ -351,72 +351,15 @@ const translations: ITranslations = {
     ReservationForm: {
       showReserver: ["Näytä varaajan tiedot ja ehdot"],
     },
-    // TODO these are duplicates from ReservationDialog ex. reservationType
     RecurringReservationForm: {
+      // these are unique form elements only for this form
       reservationUnit: ["Varausyksikkö"],
       repeatPattern: ["Varauksen toisto"],
-      startingTime: ["Aloitusaika"],
-      endingTime: ["Lopetusaika"],
       repeatOnDays: ["Toistoviikonpäivät"],
       reservationsList_zero: ["Ei yhtään varausta aikavälille"],
       reservationsList_one: ["Olet tekemässä yhden varauksen"],
       reservationsList_other: ["Olet tekemässä {{count}} varausta"],
-      typeOfReservation: ["Varauksen tyyppi"],
       name: ["Varaussarjan nimi"],
-      comments: ["Kommentit"],
-      bufferTimeBefore: ["Ennen vuoroa ({{minutes}} min)"],
-      bufferTimeAfter: ["Vuoron jälkeen ({{minutes}} min)"],
-      errors: {
-        formNotValid: ["Lomakkeessa vikaa."],
-        noReservations: [
-          "Valittujen viikonpäivien tulee vastata valittuja päivämääriä.",
-        ],
-        "Invalid date": ["Virheellinen päivämäärä."],
-        "endTime can't be more than 24 hours.": [
-          "Lopetusaika ei voi olla yli 24 tuntia.",
-        ],
-        "startTime can't be more than 24 hours.": [
-          "Aloitusaika ei voi olla yli 24 tuntia.",
-        ],
-        "startTime has to be in 15 minutes increments.": [
-          "Aloitusajan pitää olla 15 minuutin välein.",
-        ],
-        "startTime has to be in 30 minutes increments.": [
-          "Aloitusajan pitää olla 30 minuutin välein.",
-        ],
-        "startTime has to be in 60 minutes increments.": [
-          "Aloitusajan pitää olla 60 minuutin välein.",
-        ],
-        "startTime has to be in 90 minutes increments.": [
-          "Aloitusajan pitää olla 90 minuutin välein.",
-        ],
-        "endTime has to be in 15 minutes increments.": [
-          "Lopetusaika pitää olla 15 minuutin välein.",
-        ],
-        "startTime is not in time format.": [
-          "Aloitusaika tulee olla muodossa tt:mm",
-        ],
-        "endTime is not in time format.": [
-          "Lopetusaika tulee olla muodossa tt:mm",
-        ],
-        "Date can't be in the past": ["Päivä ei voi olla menneisyydessä."],
-        "Date needs to be within three years.": [
-          "Päivän pitää olla kolmen vuoden sisällä.",
-        ],
-        "End time needs to be after start time.": [
-          "Lopetusaika pitää olla aloitusajan jälkeen.",
-        ],
-        "Start date can't be after end date.": [
-          "Aloituspäivän tulee olla ennen päättymispäivää",
-        ],
-        "Array must contain at least 1 element(s)": [
-          "Valitse vähintään yksi päivä.",
-        ],
-        "Start and end time needs to be within a decade.": [
-          "Aikaväli pitää olla alle kymmenen vuotta.",
-        ],
-        Required: ["Pakollinen"],
-      },
     },
   },
   Application: {
@@ -865,6 +808,18 @@ const translations: ITranslations = {
     noReservations: ["Ei varauksia"],
     generatingDocument: ["Dokumenttia luodaan"],
     errorGeneratingDocument: ["Dokumenttia ei pystytty luomaan"],
+    EditTime: {
+      title: ["Muokkaa varauksen aikaa"],
+    },
+    EditPage: {
+      title: ["Muokkaa varauksen tietoja"],
+      "Reservation failed to load": ["Varausta {{ pk }} ei pystytty latamaan"],
+      "Reservation unit failed to load": ["Varausyksikköä ei löytynyt"],
+      save: ["Tallenna"],
+      saveSuccess: ["Varauksen muutokset tallennettu"],
+      saveError: ["Varauksen muutos epäonnistui"],
+      pageThrewError: ["Virhe: varausta ei voi muokata"],
+    },
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],
@@ -1144,120 +1099,14 @@ const translations: ITranslations = {
     removeFailed: ["Tilan poistaminen ei onnistunut."],
   },
   ReservationDialog: {
-    title: ["Varaa {{reservationUnit}}"],
+    // field names (for input controls) => should be moved (not dialog specific)
     date: ["Päivämäärä"],
     startingDate: ["Aloituspäivä"],
     endingDate: ["Päättymispäivä"],
     startTime: ["Aloitusaika"],
     endTime: ["Lopetusaika"],
-    type: ["Varauksen tyyppi"],
-    typeInfo: ["Lorem ipsum dolor sit amet, consectetur adipisicing elit."],
-    increase: ["lisää"],
-    decrease: ["vähennä"],
-    reservationType: {
-      STAFF: [
-        "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
-      ],
-      BEHALF: ["Asiakkaan puolesta"],
-      BLOCKED: ["Suljettu"],
-    },
-    buffers: ["Varauksen tauko"],
-    bufferTimeBefore: ["Ennen vuoroa ({{minutes}} min)"],
-    bufferTimeAfter: ["Vuoron jälkeen ({{minutes}} min)"],
-    comment: ["Kommentit"],
-    reservationInfo: ["Varauksen tiedot"],
-    reserverInfo: ["Varaajan tiedot"],
-    reserveeTypePrefix: ["Varaan"],
-    reserveeTypes: {
-      labels: {
-        nonprofit: ["järjestön, ryhmän tai yhteisön puolesta"],
-        business: ["yrityksen puolesta"],
-        individual: ["yksityishenkilönä"],
-      },
-    },
-    label: {
-      headings: {
-        companyInfo: ["Yrityksen tiedot"],
-        nonprofitInfo: ["Yhdistyksen tiedot"],
-        contactInfo: ["Yhteyshenkilön tiedot"],
-      },
-      subHeadings: {
-        subvention: ["Hinnan alennuksen hakeminen"],
-      },
-      common: {
-        name: ["Varauksen nimi (julkinen)"],
-        description: ["Varauksen kuvaus"],
-        purpose: ["Varauksen käyttötarkoitus"],
-        numPersons: ["Osallistujamäärä"],
-        ageGroup: ["Ikäryhmä"],
-        applyingForFreeOfChargeButton: [
-          "Lue lisää <button>alennusperusteista</button>.",
-        ],
-        applyingForFreeOfCharge: [
-          "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin",
-        ],
-        freeOfChargeReason: ["Perustelut maksuttomaan varaukseen"],
-      },
-      nonprofit: {
-        reserveeFirstName: ["Yhteyshenkilön etunimi"],
-        reserveeLastName: ["Yhteyshenkilön sukunimi"],
-        reserveeAddressStreet: ["Katuosoite"],
-        reserveeAddressZip: ["Postinumero"],
-        reserveeAddressCity: ["Postitoimipaikka"],
-        reserveeEmail: ["Yhteyshenkilön sähköpostiosoite"],
-        reserveePhone: ["Yhteyshenkilön puhelinnumero"],
-        reserveeOrganisationName: ["Virallinen nimi"],
-        reserveeId: ["Y-tunnus"],
-        reserveeIsUnregisteredAssociation: ["Yhdistystä ei ole rekisteröity"],
-        homeCity: ["Kotipaikka"],
-        showBillingAddress: ["Erillinen laskutusosoite"],
-        billingFirstName: ["Varaajan etunimi"],
-        billingLastName: ["Varaajan sukunimi"],
-        billingPhone: ["Puhelinnumero"],
-        billingEmail: ["Sähköpostiosoite"],
-        billingAddressStreet: ["Katuosoite"],
-        billingAddressZip: ["Postinumero"],
-        billingAddressCity: ["Postitoimipaikka"],
-      },
-      individual: {
-        reserveeFirstName: ["Etunimi"],
-        reserveeLastName: ["Sukunimi"],
-        reserveeAddressStreet: ["Katuosoite"],
-        reserveeAddressZip: ["Postinumero"],
-        reserveeAddressCity: ["Postitoimipaikka"],
-        reserveeEmail: ["Sähköpostiosoite"],
-        reserveePhone: ["Puhelinnumero"],
-        homeCity: ["Kotipaikka"],
-        showBillingAddress: ["Erillinen laskutusosoite"],
-        billingFirstName: ["Varaajan etunimi"],
-        billingLastName: ["Varaajan sukunimi"],
-        billingPhone: ["Puhelinnumero"],
-        billingEmail: ["Sähköpostiosoite"],
-        billingAddressStreet: ["Katuosoite"],
-        billingAddressZip: ["Postinumero"],
-        billingAddressCity: ["Postitoimipaikka"],
-      },
-      business: {
-        reserveeFirstName: ["Yhteyshenkilön etunimi"],
-        reserveeLastName: ["Yhteyshenkilön sukunimi"],
-        reserveeAddressStreet: ["Katuosoite"],
-        reserveeAddressZip: ["Postinumero"],
-        reserveeAddressCity: ["Postitoimipaikka"],
-        reserveeEmail: ["Yhteyshenkilön sähköpostiosoite"],
-        reserveePhone: ["Yhteyshenkilön puhelinnumero"],
-        reserveeOrganisationName: ["Virallinen nimi"],
-        reserveeId: ["Y-tunnus"],
-        homeCity: ["Kotipaikka"],
-        showBillingAddress: ["Erillinen laskutusosoite"],
-        billingFirstName: ["Varaajan etunimi"],
-        billingLastName: ["Varaajan sukunimi"],
-        billingPhone: ["Puhelinnumero"],
-        billingEmail: ["Sähköpostiosoite"],
-        billingAddressStreet: ["Katuosoite"],
-        billingAddressZip: ["Postinumero"],
-        billingAddressCity: ["Postitoimipaikka"],
-      },
-    },
+    // dialog specific
+    title: ["Varaa {{reservationUnit}}"],
     accept: ["Varaa"],
     saveFailed: ["Tallennus ei onnistunut: {{error}}"],
     saveSuccess: ["Varaus tehty kohteeseen {{reservationUnit}}"],
@@ -1888,6 +1737,8 @@ const translations: ITranslations = {
   },
 
   ApprovalButtons: {
+    edit: ["Muuta tietoja"],
+    editTime: ["Muuta aikaa"],
     recurring: {
       rejectAllButton: ["Hylkää kaikki"],
       DenyDialog: {

@@ -1,9 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { IconClock } from "hds-react";
-import isPast from "date-fns/isPast";
-import isFuture from "date-fns/isFuture";
-import isToday from "date-fns/isToday";
+import { isPast, isFuture, isToday } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../common/util";
 

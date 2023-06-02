@@ -1,9 +1,7 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { expect, test } from "@jest/globals";
 import { addDays } from "date-fns";
 
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
-import { timeSelectionSchema } from "./RecurringReservationSchema";
+import { timeSelectionSchema } from "./recurringReservation";
 
 const tomorrow = addDays(new Date(), 1);
 const reservation = {

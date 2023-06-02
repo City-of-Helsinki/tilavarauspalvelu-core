@@ -23,7 +23,8 @@ const StickyContent = styled.div`
   justify-content: space-between;
   gap: var(--spacing-s);
   line-height: 1.5;
-  button {
+  button,
+  a {
     border-color: var(--color-white) !important;
     color: var(--color-white) !important;
   }

@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { sortBy } from "lodash";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { useQuery } from "@apollo/client";
-import { useTranslation } from "react-i18next";
 import type {
   Query,
   QueryReservationUnitsArgs,
@@ -14,27 +13,14 @@ import type {
 import { ReservationsReservationReserveeTypeChoices } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { useNotification } from "../../../context/NotificationContext";
-import { RESERVATION_UNIT_QUERY } from "../create-reservation/queries";
 import {
   OPTIONS_QUERY,
   UNIT_QUERY,
   RESERVATION_UNITS_BY_UNIT,
+  RESERVATION_UNIT_QUERY,
 } from "./queries";
 
-// Custom hook to fix admin-ui lacking translation namespaces
-export const useReservationTranslation = () => {
-  const { t: originalT, ...rest } = useTranslation();
-
-  /** 'til namespaces are used in admin-ui, strip away napespace, add prefix */
-  const t = (key: string) =>
-    key.indexOf(":") !== -1
-      ? originalT(`ReservationDialog.${key.substring(key.indexOf(":") + 1)}`)
-      : originalT(key);
-
-  return { t, ...rest };
-};
-
-export const useApplicatioonFields = (
+export const useApplicationFields = (
   reservationUnit: ReservationUnitType,
   reserveeType?: ReservationsReservationReserveeTypeChoices
 ) => {

@@ -1,9 +1,7 @@
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import { addDays, addHours, format, setMinutes, subDays } from "date-fns";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { expect, test, describe } from "@jest/globals";
-import { formatDate } from "../../../common/util";
-import { ReservationFormSchema } from "./validator";
+import { ReservationFormSchema } from "./reservation";
+import { formatDate } from "../common/util";
 
 const TIME_FORMAT = "HH:mm";
 

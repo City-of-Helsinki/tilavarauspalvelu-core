@@ -1,64 +1,8 @@
 import { gql } from "@apollo/client";
-
-export const UPDATE_WORKING_MEMO = gql`
-  mutation updateWorkingMemo($input: ReservationWorkingMemoMutationInput!) {
-    updateReservationWorkingMemo(input: $input) {
-      workingMemo
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
-export const APPROVE_RESERVATION = gql`
-  mutation approveReservation($input: ReservationApproveMutationInput!) {
-    approveReservation(input: $input) {
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
-export const DENY_RESERVATION = gql`
-  mutation denyReservation($input: ReservationDenyMutationInput!) {
-    denyReservation(input: $input) {
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
-export const REQUIRE_HANDLING_RESERVATION = gql`
-  mutation requireHandling($input: ReservationRequiresHandlingMutationInput!) {
-    requireHandlingForReservation(input: $input) {
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
-export const RESERVATION_DENY_REASONS = gql`
-  query reservationDenyReasons {
-    reservationDenyReasons {
-      edges {
-        node {
-          pk
-          reasonFi
-        }
-      }
-    }
-  }
-`;
+import { RESERVATION_COMMON_FRAGMENT } from "./fragments";
 
 export const RESERVATIONS_QUERY = gql`
+  ${RESERVATION_COMMON_FRAGMENT}
   query reservations(
     $after: String
     $unit: [ID]
@@ -94,21 +38,16 @@ export const RESERVATIONS_QUERY = gql`
     ) {
       edges {
         node {
-          pk
-          state
+          ...ReservationCommon
           reservationUnits {
             nameFi
             unit {
               nameFi
             }
           }
-          begin
-          end
           reserveeFirstName
           reserveeLastName
           name
-          orderStatus
-          createdAt
         }
       }
       pageInfo {
@@ -117,6 +56,28 @@ export const RESERVATIONS_QUERY = gql`
         hasNextPage
       }
       totalCount
+    }
+  }
+`;
+
+export const CHANGE_STAFF_RESERVATION = gql`
+  mutation staffReservationModify(
+    $input: ReservationStaffModifyMutationInput!
+    $workingMemo: ReservationWorkingMemoMutationInput!
+  ) {
+    staffReservationModify(input: $input) {
+      pk
+      errors {
+        field
+        messages
+      }
+    }
+    updateReservationWorkingMemo(input: $workingMemo) {
+      workingMemo
+      errors {
+        field
+        messages
+      }
     }
   }
 `;

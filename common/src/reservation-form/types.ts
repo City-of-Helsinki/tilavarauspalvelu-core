@@ -1,4 +1,4 @@
-/// FIXME Test this before applying
+import { type ReservationsReservationReserveeTypeChoices } from "../../types/gql-types";
 
 type Billing = {
   billingFirstName: string;
@@ -22,7 +22,7 @@ type Reservee = {
 };
 
 type CommonInputs = {
-  // Whose name?
+  // reservations name
   name: string;
   description: string;
   homeCity: number;
@@ -31,6 +31,7 @@ type CommonInputs = {
   purpose: number;
   numPersons: number;
   ageGroup: number;
+  reserveeType: ReservationsReservationReserveeTypeChoices;
   freeOfChargeReason: string;
   applyingForFreeOfCharge: boolean;
 };

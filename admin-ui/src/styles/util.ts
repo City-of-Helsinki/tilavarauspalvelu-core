@@ -121,6 +121,38 @@ export const InlineErrorSummary = styled(ErrorSummary)`
   width: 40%;
 `;
 
+// HDS doesn't have button looking link and their CSS is not resusable
+export const ButtonLikeLink = styled(Link)`
+  text-decoration: none;
+  border-style: solid;
+  border-width: ${(props) => props.theme.border ?? "2px"};
+  border-color: ${(props) => props.theme.fg ?? "var(--color-black)"};
+  color: ${(props) => props.theme.fg ?? "var(--color-black)"};
+  display: inline-flex;
+  align-items: center;
+  min-width: 80px;
+  height: 44px;
+  padding: 0 20px;
+  line-height: 1;
+  text-align: center;
+  &:hover,
+  &:focus-visible {
+    transition-property: background-color, border-color, color;
+    transition-duration: 85ms;
+    transition-timing-function: ease-out;
+  }
+  &:hover {
+    background-color: var(--background-color-hover);
+    color: var(--color-hover);
+  }
+  &:focus-visible {
+    background-color: var(--background-color-focus, transparent);
+    color: var(--color-focus);
+    outline-offset: 3px;
+    outline: 2px solid var(--focus-outline-color);
+  }
+`;
+
 export const BasicLink = styled(Link)`
   color: var(--tilavaraus-admin-content-text-color);
   text-decoration: none;

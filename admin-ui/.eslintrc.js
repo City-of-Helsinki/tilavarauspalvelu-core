@@ -2,9 +2,14 @@ module.exports = {
   extends: ["airbnb-typescript-prettier", "plugin:jsx-a11y/recommended"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: "./tsconfig.eslint.json",
+    project: "./tsconfig.json",
     tsconfigRootDir: __dirname,
     sourceType: "module",
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {},
+    },
   },
   overrides: [
     {
@@ -25,6 +30,7 @@ module.exports = {
         devDependencies: true,
       },
     ],
+    "import/no-unresolved": "off",
     "import/prefer-default-export": 0,
     "jsx-a11y/alt-text": 1,
     "jsx-a11y/label-has-associated-control": [
@@ -50,7 +56,8 @@ module.exports = {
         unnamedComponents: ["function-expression", "arrow-function"],
       },
     ],
-    "@typescript-eslint/camelcase": ["off"], // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
+    // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
+    "@typescript-eslint/camelcase": ["off"],
     "@typescript-eslint/no-empty-function": 0,
     "react/no-unstable-nested-components": [
       "warn",

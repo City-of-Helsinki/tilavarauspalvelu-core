@@ -1,5 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { test, expect } from "@jest/globals";
 import {
   ServiceSectorRoleType,
   UnitRoleType,

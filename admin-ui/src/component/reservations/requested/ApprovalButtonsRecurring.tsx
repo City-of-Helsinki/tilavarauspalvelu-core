@@ -80,9 +80,11 @@ const ApprovalButtonsRecurring = ({
   }
 
   return (
-    <Button {...btnCommon} onClick={handleDenyClick}>
-      {t("ApprovalButtons.recurring.rejectAllButton")}
-    </Button>
+    <div>
+      <Button {...btnCommon} onClick={handleDenyClick}>
+        {t("ApprovalButtons.recurring.rejectAllButton")}
+      </Button>
+    </div>
   );
 };
 

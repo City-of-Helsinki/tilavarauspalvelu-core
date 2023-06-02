@@ -18,8 +18,10 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { toApiDate } from "common/src/common/util";
 import { removeRefParam } from "common/src/reservation-form/util";
-import { RecurringReservationFormSchema } from "./RecurringReservationSchema";
-import type { RecurringReservationForm } from "./RecurringReservationSchema";
+import {
+  RecurringReservationFormSchema,
+  type RecurringReservationForm,
+} from "app/schemas";
 import SortedSelect from "../../ReservationUnits/ReservationUnitEditor/SortedSelect";
 import { WeekdaysSelector } from "./WeekdaysSelector";
 import ReservationList, {
@@ -157,7 +159,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const reservationUnitOptions =
     reservationUnits.map((unit) => ({
       label: unit?.nameFi ?? "",
-      value: String(unit?.pk),
+      value: unit?.pk ?? 0,
     })) || [];
 
   const repeatPatternOptions = [
@@ -203,7 +205,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const { notifyError } = useNotification();
 
   const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`${TRANS_PREFIX}.errors.${errorMsg}`) : "";
+    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
   const newReservations = useMultipleReservation(
     form,
@@ -416,9 +418,9 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
             <Controller
               name="reservationUnit"
               control={control}
-              defaultValue={{ label: "", value: "" }}
+              defaultValue={{ label: "", value: 0 }}
               render={({ field }) => (
-                <SortedSelect
+                <SortedSelect<number>
                   {...removeRefParam(field)}
                   sort
                   label={t(`${TRANS_PREFIX}.reservationUnit`)}

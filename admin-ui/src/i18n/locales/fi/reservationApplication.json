@@ -1,0 +1,100 @@
+{
+  "reserveeTypePrefix": "Varaan",
+  "type": "Varauksen tyyppi",
+  "buffers": "Varauksen tauko",
+  "bufferTimeBefore": "Ennen vuoroa ({{minutes}} min)",
+  "bufferTimeAfter": "Vuoron jälkeen ({{minutes}} min)",
+  "comment": "Kommentit",
+  "reservationType": {
+    "STAFF": "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
+    "BEHALF": "Asiakkaan puolesta",
+    "BLOCKED": "Suljettu"
+  },
+  "clientReservationCantBeChanged": "Asiakkaan tekemä varaus",
+  "reserveeTypes": {
+    "labels": {
+      "nonprofit": "järjestön, ryhmän tai yhteisön puolesta",
+      "business": "yrityksen puolesta",
+      "individual": "yksityishenkilönä"
+    }
+  },
+  "label": {
+    "headings": {
+      "companyInfo": "Yrityksen tiedot",
+      "nonprofitInfo": "Yhdistyksen tiedot",
+      "contactInfo": "Yhteyshenkilön tiedot"
+    },
+    "subHeadings": {
+      "subvention": "Hinnan alennuksen hakeminen"
+    },
+    "common": {
+      "name": "Varauksen nimi (julkinen)",
+      "description": "Varauksen kuvaus",
+      "purpose": "Varauksen käyttötarkoitus",
+      "numPersons": "Osallistujamäärä",
+      "ageGroup": "Ikäryhmä",
+      "applyingForFreeOfChargeButton": "Lue lisää <button>alennusperusteista</button>.",
+      "applyingForFreeOfCharge": "Haen maksuttomuutta tai hinnan alennusta ja olen tutustunut alennusperusteisiin",
+      "freeOfChargeReason": "Perustelut maksuttomaan varaukseen"
+    },
+    "nonprofit": {
+      "reserveeFirstName": "Yhteyshenkilön etunimi",
+      "reserveeLastName": "Yhteyshenkilön sukunimi",
+      "reserveeAddressStreet": "Katuosoite",
+      "reserveeAddressZip": "Postinumero",
+      "reserveeAddressCity": "Postitoimipaikka",
+      "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
+      "reserveePhone": "Yhteyshenkilön puhelinnumero",
+      "reserveeOrganisationName": "Virallinen nimi",
+      "reserveeId": "Y-tunnus",
+      "reserveeIsUnregisteredAssociation": "Yhdistystä ei ole rekisteröity",
+      "homeCity": "Kotipaikka",
+      "showBillingAddress": "Erillinen laskutusosoite",
+      "billingFirstName": "Varaajan etunimi",
+      "billingLastName": "Varaajan sukunimi",
+      "billingPhone": "Puhelinnumero",
+      "billingEmail": "Sähköpostiosoite",
+      "billingAddressStreet": "Katuosoite",
+      "billingAddressZip": "Postinumero",
+      "billingAddressCity": "Postitoimipaikka"
+    },
+    "individual": {
+      "reserveeFirstName": "Etunimi",
+      "reserveeLastName": "Sukunimi",
+      "reserveeAddressStreet": "Katuosoite",
+      "reserveeAddressZip": "Postinumero",
+      "reserveeAddressCity": "Postitoimipaikka",
+      "reserveeEmail": "Sähköpostiosoite",
+      "reserveePhone": "Puhelinnumero",
+      "homeCity": "Kotipaikka",
+      "showBillingAddress": "Erillinen laskutusosoite",
+      "billingFirstName": "Varaajan etunimi",
+      "billingLastName": "Varaajan sukunimi",
+      "billingPhone": "Puhelinnumero",
+      "billingEmail": "Sähköpostiosoite",
+      "billingAddressStreet": "Katuosoite",
+      "billingAddressZip": "Postinumero",
+      "billingAddressCity": "Postitoimipaikka"
+    },
+    "business": {
+      "reserveeFirstName": "Yhteyshenkilön etunimi",
+      "reserveeLastName": "Yhteyshenkilön sukunimi",
+      "reserveeAddressStreet": "Katuosoite",
+      "reserveeAddressZip": "Postinumero",
+      "reserveeAddressCity": "Postitoimipaikka",
+      "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
+      "reserveePhone": "Yhteyshenkilön puhelinnumero",
+      "reserveeOrganisationName": "Virallinen nimi",
+      "reserveeId": "Y-tunnus",
+      "homeCity": "Kotipaikka",
+      "showBillingAddress": "Erillinen laskutusosoite",
+      "billingFirstName": "Varaajan etunimi",
+      "billingLastName": "Varaajan sukunimi",
+      "billingPhone": "Puhelinnumero",
+      "billingEmail": "Sähköpostiosoite",
+      "billingAddressStreet": "Katuosoite",
+      "billingAddressZip": "Postinumero",
+      "billingAddressCity": "Postitoimipaikka"
+    }
+  }
+}

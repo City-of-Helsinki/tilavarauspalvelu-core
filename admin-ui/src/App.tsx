@@ -29,12 +29,12 @@ import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnits from "./component/reservation-units/ReservationUnits";
 import { withGlobalContext } from "./context/GlobalContexts";
 
-import Reservations from "./component/reservations";
 import { prefixes } from "./common/urls";
 import ExternalScripts from "./common/ExternalScripts";
 import ApplicationRoundAllocation from "./component/recurring-reservations/allocation/ApplicationRoundAllocation";
 import { PrivateRoute } from "./common/PrivateRoutes";
 import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
+import ReservationsRouter from "./component/reservations/ReservationRouter";
 
 const App = () => {
   return (
@@ -251,10 +251,10 @@ const App = () => {
             }
           />
           <Route
-            path="/reservations/:id"
+            path="/reservations/*"
             element={
               <PrivateRoute>
-                <Reservations />
+                <ReservationsRouter />
               </PrivateRoute>
             }
           />

@@ -254,12 +254,11 @@ const ReservationUnitReservationWithReservationProp = ({
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [reserveeType, setReserveeType] =
-    useState<ReservationsReservationReserveeTypeChoices>(null);
-
   const defaultValues = pick(reservation || {}, profileUserFields);
   const form = useForm<Inputs>({ defaultValues, mode: "onBlur" });
   const { handleSubmit, watch } = form;
+
+  const reserveeType = watch("reserveeType");
 
   const requireHandling =
     reservationUnit.requireReservationHandling ||
@@ -591,8 +590,6 @@ const ReservationUnitReservationWithReservationProp = ({
                   handleSubmit={handleSubmit(onSubmitStep0)}
                   generalFields={generalFields}
                   reservationApplicationFields={reservationApplicationFields}
-                  reserveeType={reserveeType}
-                  setReserveeType={setReserveeType}
                   cancelReservation={cancelReservation}
                   options={options}
                 />

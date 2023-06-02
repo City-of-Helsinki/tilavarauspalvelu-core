@@ -5,10 +5,7 @@ import type { ReservationUnitType } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 
-import {
-  type ReservationFormType,
-  ReservationTypes,
-} from "./create-reservation/validator";
+import { type ReservationFormType, ReservationTypes } from "app/schemas";
 import {
   ReservationMetadataSetForm,
   ReserverMetadataSetForm,
@@ -42,6 +39,54 @@ const ButtonLikeAccordion = styled(Accordion)`
   }
 `;
 
+const TypeSelect = ({
+  reservationUnit,
+}: {
+  reservationUnit: ReservationUnitType;
+}) => {
+  const {
+    watch,
+    control,
+    formState: { errors },
+  } = useFormContext<ReservationFormType>();
+  const { t } = useTranslation();
+
+  const type = watch("type");
+
+  if (type === "NORMAL") {
+    return <p>{t("reservationApplication:clientReservationCantBeChanged")}</p>;
+  }
+
+  return (
+    <Controller
+      name="type"
+      control={control}
+      render={({ field }) => (
+        <SelectionGroup
+          required
+          disabled={reservationUnit == null}
+          label={t("reservationApplication:type")}
+          errorText={
+            errors.type?.message != null
+              ? t(`reservationForm:errors.${errors.type?.message}`)
+              : ""
+          }
+        >
+          {ReservationTypes.filter((x) => x !== "NORMAL").map((v) => (
+            <RadioButton
+              key={v}
+              id={v}
+              checked={v === field.value}
+              label={t(`reservationApplication:reservationType.${v}`)}
+              onChange={() => field.onChange(v)}
+            />
+          ))}
+        </SelectionGroup>
+      )}
+    />
+  );
+};
+
 // TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
 const ReservationTypeForm = ({
   reservationUnit,
@@ -52,55 +97,23 @@ const ReservationTypeForm = ({
 }) => {
   const { t } = useTranslation();
 
-  const {
-    watch,
-    control,
-    register,
-    formState: { errors },
-  } = useFormContext<ReservationFormType>();
+  const { watch, register } = useFormContext<ReservationFormType>();
 
   const type = watch("type");
 
   return (
     <>
       <Element $wide>
-        <Controller
-          name="type"
-          control={control}
-          render={({ field }) => (
-            <SelectionGroup
-              required
-              disabled={reservationUnit == null}
-              label={t("ReservationDialog.type")}
-              errorText={
-                errors.type?.message != null
-                  ? t(
-                      `MyUnits.RecurringReservationForm.errors.${errors.type?.message}`
-                    )
-                  : ""
-              }
-            >
-              {ReservationTypes.map((v) => (
-                <RadioButton
-                  key={v}
-                  id={v}
-                  checked={v === field.value}
-                  label={t(`ReservationDialog.reservationType.${v}`)}
-                  onChange={() => field.onChange(v)}
-                />
-              ))}
-            </SelectionGroup>
-          )}
-        />
+        <TypeSelect reservationUnit={reservationUnit} />
       </Element>
       {type === "BLOCKED" && (
         <CommentsTextArea
-          label={t("ReservationDialog.comment")}
-          id="ReservationDialog.comment"
+          label={t("reservationApplication:comment")}
+          id="reservationApplication:comment"
           {...register("comments")}
         />
       )}
-      {(type === "STAFF" || type === "BEHALF") && (
+      {type !== undefined && type !== "BLOCKED" && (
         <>
           {reservationUnit.bufferTimeBefore ||
             (reservationUnit.bufferTimeAfter && (
@@ -111,8 +124,8 @@ const ReservationTypeForm = ({
             ))}
           {children}
           <CommentsTextArea
-            id="ReservationDialog.comment"
-            label={t("ReservationDialog.comment")}
+            id="reservationApplication:comment"
+            label={t("reservationApplication:comment")}
             {...register("comments")}
           />
           <HR style={{ gridColumn: "1 / -1" }} />

@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { RESERVATION_META_FRAGMENT } from "../fragments";
 
 export const UPDATE_WORKING_MEMO = gql`
   mutation updateWorkingMemo($input: ReservationWorkingMemoMutationInput!) {
@@ -23,11 +24,22 @@ export const GET_BIRTHDATE_BY_RESERVATION_PK = gql`
 `;
 
 export const RESERVATION_QUERY = gql`
+  ${RESERVATION_META_FRAGMENT}
   query reservationByPk($pk: Int!) {
     reservationByPk(pk: $pk) {
       pk
       createdAt
       workingMemo
+      begin
+      end
+      calendarUrl
+      user {
+        firstName
+        lastName
+        email
+        pk
+      }
+      state
       reservationUnits {
         pk
         nameFi
@@ -56,55 +68,12 @@ export const RESERVATION_QUERY = gql`
         endDate
         weekdays
       }
-      ageGroup {
-        minimum
-        maximum
-      }
-      purpose {
-        nameFi
-      }
-      homeCity {
-        nameFi
-      }
       price
       taxPercentageValue
-      numPersons
-      reserveeType
-      reserveeIsUnregisteredAssociation
-      name
-      description
-      reserveeFirstName
-      reserveeLastName
-      reserveePhone
-      begin
-      end
-      calendarUrl
-      user {
-        firstName
-        lastName
-        email
-        pk
-      }
-      state
-      reserveeOrganisationName
-      reserveeEmail
-      reserveeId
-      reserveeIsUnregisteredAssociation
-      reserveeAddressStreet
-      reserveeAddressCity
-      reserveeAddressZip
-      billingFirstName
-      billingLastName
-      billingPhone
-      billingEmail
-      billingAddressStreet
-      billingAddressCity
-      billingAddressZip
-      freeOfChargeReason
-      applyingForFreeOfCharge
-      orderUuid
       orderStatus
+      orderUuid
       refundUuid
+      ...ReservationMetaFields
     }
   }
 `;

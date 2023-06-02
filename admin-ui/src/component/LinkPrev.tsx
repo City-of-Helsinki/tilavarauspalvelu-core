@@ -14,7 +14,7 @@ const StyledLink = styled(BasicLink)`
   align-items: center;
   font-size: var(--fontsize-body-m);
   padding-right: var(--spacing-s);
-  text-decoration: underline;
+  text-decoration: none;
   gap: var(--spacing-2-xs);
 `;
 

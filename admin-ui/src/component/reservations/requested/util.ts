@@ -185,3 +185,63 @@ export const getReserveeName = (
 
     { length, omission: "…" }
   );
+
+export const getName = (reservation: ReservationType, t: TFunction) => {
+  if (reservation.name) {
+    return trim(`${reservation.pk}, ${reservation.name}`);
+  }
+
+  return trim(
+    `${reservation.pk}, ${
+      getReserveeName(reservation) || t("RequestedReservation.noName")
+    }`.trim()
+  );
+};
+
+// recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
+// single format   : {weekday} {date} {time}, {duration} | {unit}
+export const createTagString = (reservation: ReservationType, t: TFunction) => {
+  const createRecurringTag = (begin?: string, end?: string) =>
+    begin && end ? `${formatDate(begin)}-${formatDate(end)}` : "";
+
+  const recurringTag = createRecurringTag(
+    reservation.recurringReservation?.beginDate ?? undefined,
+    reservation.recurringReservation?.endDate ?? undefined
+  );
+
+  const unitTag = reservation?.reservationUnits
+    ?.map(reservationUnitName)
+    .join(", ");
+
+  const singleDateTimeTag = `${reservationDateTime(
+    reservation.begin,
+    reservation.end,
+    t
+  )}`;
+
+  const weekDayTag = reservation.recurringReservation?.weekdays
+    ?.sort()
+    ?.map((x) => t(`dayShort.${x}`))
+    ?.reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, "");
+
+  const recurringDateTag =
+    reservation.begin && reservation.end
+      ? `${weekDayTag} ${formatTime(reservation.begin, "HH:mm")}-${formatTime(
+          reservation.end,
+          "HH:mm"
+        )}`
+      : "";
+
+  const durationTag = `${reservationDuration(
+    reservation.begin,
+    reservation.end
+  )}`;
+
+  const reservationTagline = `${
+    reservation.recurringReservation ? recurringDateTag : singleDateTimeTag
+  }, ${durationTag}t ${
+    recurringTag.length > 0 ? " | " : ""
+  } ${recurringTag} | ${unitTag}`;
+
+  return reservationTagline;
+};

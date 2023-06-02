@@ -1,19 +1,17 @@
 import { H1 } from "common/src/common/typography";
-import { Button, IconAngleLeft } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { myUnitUrl } from "../../../common/urls";
 import { Container } from "../../../styles/layout";
-import { BasicLink } from "../../../styles/util";
 import Loader from "../../Loader";
 import withMainMenu from "../../withMainMenu";
 import MyUnitRecurringReservationForm from "./MyUnitRecurringReservationForm";
 import { useRecurringReservationsUnits } from "./hooks";
+import LinkPrev from "../../LinkPrev";
 
 const PreviousLinkWrapper = styled.div`
-  padding: var(--spacing-xs);
+  padding: var(--spacing-s);
 `;
 
 type Params = {
@@ -21,22 +19,10 @@ type Params = {
   reservationUnitId: string;
 };
 
-const BackLinkHeader = ({ unitId }: { unitId: number }) => {
-  const { t } = useTranslation();
-  const previousUrl = myUnitUrl(unitId);
-
+const BackLinkHeader = () => {
   return (
     <PreviousLinkWrapper>
-      <BasicLink to={previousUrl}>
-        <Button
-          aria-label={t("common.prev")}
-          size="small"
-          variant="supplementary"
-          iconLeft={<IconAngleLeft />}
-        >
-          {t("common.prev")}
-        </Button>
-      </BasicLink>
+      <LinkPrev />
     </PreviousLinkWrapper>
   );
 };
@@ -50,7 +36,7 @@ const MyUnitRecurringReservation = ({ unitId }: { unitId: number }) => {
 
   return (
     <>
-      <BackLinkHeader unitId={unitId} />
+      <BackLinkHeader />
       <Container>
         <H1 $legacy>{t("MyUnits.RecurringReservation.pageTitle")}</H1>
         {reservationUnits !== undefined && reservationUnits?.length > 0 ? (
@@ -73,7 +59,7 @@ const MyUnitRecurringReservationRouteWrapper = () => {
   if (unitId === undefined || Number.isNaN(parseInt(unitId, 10))) {
     return (
       <>
-        <BackLinkHeader unitId={0} />
+        <BackLinkHeader />
         <Container>
           <div>{t("MyUnits.RecurringReservation.error.invalidUnitId")}</div>
         </Container>

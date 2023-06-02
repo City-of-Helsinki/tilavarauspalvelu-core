@@ -11,7 +11,7 @@
     "start": "DISABLE_ESLINT_PLUGIN=true HOST=local-tilavaraus.hel.fi HTTPS=true SSL_CRT_FILE=../common/certificates/local-tilavaraus.crt SSL_KEY_FILE=../common/certificates/local-tilavaraus.key react-app-rewired start",
     "test": "TZ=Europe/Helsinki react-app-rewired test",
     "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
-    "ts-check": "tsc --noEmit --project tsconfig.json"
+    "ts-check": "tsc --noEmit --project tsconfig.tscheck.json"
   },
   "husky": {
     "hooks": {
@@ -43,7 +43,8 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "axios": "axios/dist/node/axios.cjs"
+      "axios": "axios/dist/node/axios.cjs",
+      "^app(.*)$": "<rootDir>/src/$1"
     }
   },
   "dependencies": {
@@ -111,6 +112,7 @@
     "@types/styled-components": "^5.1.26",
     "customize-cra": "^1.0.0",
     "eslint-config-airbnb-typescript-prettier": "^5.0.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-testcafe": "^0.2.1",
     "husky": "^8.0.3",
