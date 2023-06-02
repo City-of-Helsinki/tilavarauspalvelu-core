@@ -80,6 +80,7 @@ const Navigation = () => {
   return (
     <StyledNavigation
       title={t("common:applicationName")}
+      titleUrl="/"
       titleAriaLabel={t("common:applicationName")}
       onTitleClick={handleNavigationTitleClick}
       menuToggleAriaLabel="Menu"
