@@ -520,7 +520,7 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       numPersons: 18,
     } as ReservationType;
 
-    if (pk === 4) {
+    if (pk === 4 || pk === 44) {
       data.price = 0;
       data.begin = addDays(new Date(), 11).toISOString();
       data.end = addHours(addDays(new Date(), 11), 2).toISOString();
@@ -581,6 +581,10 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
           "numPersons",
         ],
       };
+    }
+
+    if (pk === 44) {
+      data.isHandled = true;
     }
 
     if (pk === 11) {

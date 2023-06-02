@@ -543,7 +543,7 @@ describe("canReservationBeChanged", () => {
   test("handles situation when reservation has been handled", () => {
     expect(
       canReservationTimeBeChanged({
-        reservation: { ...reservation, handledAt: new Date().toISOString() },
+        reservation: { ...reservation, isHandled: true },
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
   });

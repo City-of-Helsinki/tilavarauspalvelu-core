@@ -372,6 +372,16 @@ describe("Tilavaraus user reservations", () => {
         );
       });
   });
+
+  it("should not be able to do time modification", () => {
+    cy.visit("/reservations/44");
+
+    cy.url().should("match", /\/reservations\/44$/);
+    cy.get("h1").should("have.text", "Varaus 44");
+
+    modifyButton().should("not.exist");
+    detailCancelButton().should("exist");
+  });
 });
 
 describe("Unpaid reservation notification", () => {

@@ -700,7 +700,6 @@ export type ApplicationUpdateMutationPayload = {
   status?: Maybe<Scalars["String"]>;
 };
 
-/** An enumeration. */
 export enum ApplicationsApplicationApplicantTypeChoices {
   /** Association */
   Association = "ASSOCIATION",
@@ -712,7 +711,6 @@ export enum ApplicationsApplicationApplicantTypeChoices {
   Individual = "INDIVIDUAL",
 }
 
-/** An enumeration. */
 export enum ApplicationsApplicationRoundTargetGroupChoices {
   /** Kaikki */
   All = "ALL",
@@ -722,7 +720,6 @@ export enum ApplicationsApplicationRoundTargetGroupChoices {
   Public = "PUBLIC",
 }
 
-/** An enumeration. */
 export enum ApplicationsOrganisationOrganisationTypeChoices {
   /** Company */
   Company = "COMPANY",
@@ -1126,6 +1123,8 @@ export type Mutation = {
   refreshOrder?: Maybe<RefreshOrderMutationPayload>;
   refundReservation?: Maybe<ReservationRefundMutationPayload>;
   requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
+  staffAdjustReservationTime?: Maybe<ReservationStaffAdjustTimeMutationPayload>;
+  staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
   updateApplicationEvent?: Maybe<ApplicationEventUpdateMutationPayload>;
   updateApplicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultUpdateMutationPayload>;
@@ -1269,6 +1268,14 @@ export type MutationRefundReservationArgs = {
 
 export type MutationRequireHandlingForReservationArgs = {
   input: ReservationRequiresHandlingMutationInput;
+};
+
+export type MutationStaffAdjustReservationTimeArgs = {
+  input: ReservationStaffAdjustTimeMutationInput;
+};
+
+export type MutationStaffReservationModifyArgs = {
+  input: ReservationStaffModifyMutationInput;
 };
 
 export type MutationUpdateApplicationArgs = {
@@ -2604,6 +2611,25 @@ export type ReservationRequiresHandlingMutationPayload = {
   state?: Maybe<State>;
 };
 
+export type ReservationStaffAdjustTimeMutationInput = {
+  begin: Scalars["DateTime"];
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  end: Scalars["DateTime"];
+  pk: Scalars["Int"];
+  state?: InputMaybe<State>;
+};
+
+export type ReservationStaffAdjustTimeMutationPayload = {
+  __typename?: "ReservationStaffAdjustTimeMutationPayload";
+  begin?: Maybe<Scalars["DateTime"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  end?: Maybe<Scalars["DateTime"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]>;
+  state?: Maybe<State>;
+};
+
 export type ReservationStaffCreateMutationInput = {
   ageGroupPk?: InputMaybe<Scalars["Int"]>;
   applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
@@ -2703,7 +2729,113 @@ export type ReservationStaffCreateMutationPayload = {
   workingMemo?: Maybe<Scalars["String"]>;
 };
 
-/** An enumeration. */
+export type ReservationStaffModifyMutationInput = {
+  ageGroupPk?: InputMaybe<Scalars["Int"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
+  billingAddressCity?: InputMaybe<Scalars["String"]>;
+  billingAddressStreet?: InputMaybe<Scalars["String"]>;
+  billingAddressZip?: InputMaybe<Scalars["String"]>;
+  billingEmail?: InputMaybe<Scalars["String"]>;
+  billingFirstName?: InputMaybe<Scalars["String"]>;
+  billingLastName?: InputMaybe<Scalars["String"]>;
+  billingPhone?: InputMaybe<Scalars["String"]>;
+  bufferTimeAfter?: InputMaybe<Scalars["Int"]>;
+  bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  freeOfChargeReason?: InputMaybe<Scalars["String"]>;
+  homeCityPk?: InputMaybe<Scalars["Int"]>;
+  name?: InputMaybe<Scalars["String"]>;
+  numPersons?: InputMaybe<Scalars["Int"]>;
+  pk: Scalars["Int"];
+  priority?: InputMaybe<Scalars["Int"]>;
+  purposePk?: InputMaybe<Scalars["Int"]>;
+  reservationUnitPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
+  reserveeAddressCity?: InputMaybe<Scalars["String"]>;
+  reserveeAddressStreet?: InputMaybe<Scalars["String"]>;
+  reserveeAddressZip?: InputMaybe<Scalars["String"]>;
+  reserveeEmail?: InputMaybe<Scalars["String"]>;
+  reserveeFirstName?: InputMaybe<Scalars["String"]>;
+  /** Reservee's business or association identity code */
+  reserveeId?: InputMaybe<Scalars["String"]>;
+  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]>;
+  reserveeLanguage?: InputMaybe<Scalars["String"]>;
+  reserveeLastName?: InputMaybe<Scalars["String"]>;
+  reserveeOrganisationName?: InputMaybe<Scalars["String"]>;
+  reserveePhone?: InputMaybe<Scalars["String"]>;
+  /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
+  reserveeType?: InputMaybe<Scalars["String"]>;
+  /**
+   * String value for ReservationType's ReservationState enum. Possible values are
+   * CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
+   */
+  state?: InputMaybe<Scalars["String"]>;
+  /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF. */
+  type?: InputMaybe<Scalars["String"]>;
+};
+
+export type ReservationStaffModifyMutationPayload = {
+  __typename?: "ReservationStaffModifyMutationPayload";
+  ageGroupPk?: Maybe<Scalars["Int"]>;
+  applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]>;
+  begin?: Maybe<Scalars["DateTime"]>;
+  billingAddressCity?: Maybe<Scalars["String"]>;
+  billingAddressStreet?: Maybe<Scalars["String"]>;
+  billingAddressZip?: Maybe<Scalars["String"]>;
+  billingEmail?: Maybe<Scalars["String"]>;
+  billingFirstName?: Maybe<Scalars["String"]>;
+  billingLastName?: Maybe<Scalars["String"]>;
+  billingPhone?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  confirmedAt?: Maybe<Scalars["DateTime"]>;
+  description?: Maybe<Scalars["String"]>;
+  end?: Maybe<Scalars["DateTime"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  freeOfChargeReason?: Maybe<Scalars["String"]>;
+  homeCityPk?: Maybe<Scalars["Int"]>;
+  name?: Maybe<Scalars["String"]>;
+  /** The non subsidised price of this reservation including VAT */
+  nonSubsidisedPrice?: Maybe<Scalars["Decimal"]>;
+  /** The non subsidised price of this reservation excluding VAT */
+  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]>;
+  numPersons?: Maybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  /** The price of this particular reservation including VAT */
+  price?: Maybe<Scalars["Decimal"]>;
+  /** The price of this particular reservation excluding VAT */
+  priceNet?: Maybe<Scalars["Decimal"]>;
+  priority?: Maybe<Scalars["Int"]>;
+  purposePk?: Maybe<Scalars["Int"]>;
+  reserveeAddressCity?: Maybe<Scalars["String"]>;
+  reserveeAddressStreet?: Maybe<Scalars["String"]>;
+  reserveeAddressZip?: Maybe<Scalars["String"]>;
+  reserveeEmail?: Maybe<Scalars["String"]>;
+  reserveeFirstName?: Maybe<Scalars["String"]>;
+  /** Reservee's business or association identity code */
+  reserveeId?: Maybe<Scalars["String"]>;
+  reserveeIsUnregisteredAssociation?: Maybe<Scalars["Boolean"]>;
+  reserveeLanguage?: Maybe<Scalars["String"]>;
+  reserveeLastName?: Maybe<Scalars["String"]>;
+  reserveeOrganisationName?: Maybe<Scalars["String"]>;
+  reserveePhone?: Maybe<Scalars["String"]>;
+  /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
+  reserveeType?: Maybe<Scalars["String"]>;
+  /**
+   * String value for ReservationType's ReservationState enum. Possible values are
+   * CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
+   */
+  state?: Maybe<Scalars["String"]>;
+  /** The value of the tax percentage for this particular reservation */
+  taxPercentageValue?: Maybe<Scalars["Decimal"]>;
+  /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF. */
+  type?: Maybe<Scalars["String"]>;
+  /** The unit price of this particular reservation */
+  unitPrice?: Maybe<Scalars["Decimal"]>;
+};
+
 export enum ReservationState {
   Reservable = "RESERVABLE",
   ReservationClosed = "RESERVATION_CLOSED",
@@ -2715,7 +2847,7 @@ export enum ReservationState {
 export type ReservationType = Node & {
   __typename?: "ReservationType";
   ageGroup?: Maybe<AgeGroupType>;
-  applyingForFreeOfCharge: Scalars["Boolean"];
+  applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]>;
   begin: Scalars["DateTime"];
   billingAddressCity?: Maybe<Scalars["String"]>;
   billingAddressStreet?: Maybe<Scalars["String"]>;
@@ -2737,14 +2869,14 @@ export type ReservationType = Node & {
   homeCity?: Maybe<CityType>;
   /** The ID of the object */
   id: Scalars["ID"];
+  isHandled?: Maybe<Scalars["Boolean"]>;
   name?: Maybe<Scalars["String"]>;
   numPersons?: Maybe<Scalars["Int"]>;
   orderStatus?: Maybe<Scalars["String"]>;
   orderUuid?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   price?: Maybe<Scalars["Float"]>;
-  /** The price of this particular reservation excluding VAT */
-  priceNet: Scalars["Decimal"];
+  priceNet?: Maybe<Scalars["Decimal"]>;
   priority: ReservationsReservationPriorityChoices;
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
@@ -2756,8 +2888,9 @@ export type ReservationType = Node & {
   reserveeEmail?: Maybe<Scalars["String"]>;
   reserveeFirstName?: Maybe<Scalars["String"]>;
   reserveeId?: Maybe<Scalars["String"]>;
-  reserveeIsUnregisteredAssociation: Scalars["Boolean"];
+  reserveeIsUnregisteredAssociation?: Maybe<Scalars["Boolean"]>;
   reserveeLastName?: Maybe<Scalars["String"]>;
+  reserveeName?: Maybe<Scalars["String"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]>;
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of reservee */
@@ -3248,7 +3381,6 @@ export type ReservationUnitPricingUpdateSerializerInput = {
   taxPercentagePk?: InputMaybe<Scalars["Int"]>;
 };
 
-/** An enumeration. */
 export enum ReservationUnitState {
   Archived = "ARCHIVED",
   Draft = "DRAFT",
@@ -3590,7 +3722,6 @@ export type ReservationUnitUpdateMutationPayload = {
   uuid?: Maybe<Scalars["String"]>;
 };
 
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitAuthenticationChoices {
   /** Strong */
   Strong = "STRONG",
@@ -3598,7 +3729,6 @@ export enum ReservationUnitsReservationUnitAuthenticationChoices {
   Weak = "WEAK",
 }
 
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitImageImageTypeChoices {
   /** Ground plan */
   GroundPlan = "GROUND_PLAN",
@@ -3610,7 +3740,6 @@ export enum ReservationUnitsReservationUnitImageImageTypeChoices {
   Other = "OTHER",
 }
 
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
   /** fixed */
   Fixed = "FIXED",
@@ -3628,7 +3757,6 @@ export enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
   PerWeek = "PER_WEEK",
 }
 
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitPricingPricingTypeChoices {
   /** Free */
   Free = "FREE",
@@ -3636,7 +3764,6 @@ export enum ReservationUnitsReservationUnitPricingPricingTypeChoices {
   Paid = "PAID",
 }
 
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitPricingStatusChoices {
   /** voimassa */
   Active = "ACTIVE",
@@ -3646,7 +3773,6 @@ export enum ReservationUnitsReservationUnitPricingStatusChoices {
   Past = "PAST",
 }
 
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitReservationKindChoices {
   /** Direct */
   Direct = "DIRECT",
@@ -3656,7 +3782,6 @@ export enum ReservationUnitsReservationUnitReservationKindChoices {
   Season = "SEASON",
 }
 
-/** An enumeration. */
 export enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
   /** 15 minutes */
   Interval_15Mins = "INTERVAL_15_MINS",
@@ -3797,7 +3922,6 @@ export type ReservationWorkingMemoMutationPayload = {
   workingMemo?: Maybe<Scalars["String"]>;
 };
 
-/** An enumeration. */
 export enum ReservationsReservationPriorityChoices {
   /** Low */
   A_100 = "A_100",
@@ -3807,7 +3931,6 @@ export enum ReservationsReservationPriorityChoices {
   A_300 = "A_300",
 }
 
-/** An enumeration. */
 export enum ReservationsReservationReserveeTypeChoices {
   /** Business */
   Business = "BUSINESS",
@@ -3817,7 +3940,6 @@ export enum ReservationsReservationReserveeTypeChoices {
   Nonprofit = "NONPROFIT",
 }
 
-/** An enumeration. */
 export enum ReservationsReservationStateChoices {
   /** cancelled */
   Cancelled = "CANCELLED",
@@ -3969,7 +4091,6 @@ export type ResourceUpdateMutationPayload = {
   spacePk?: Maybe<Scalars["Int"]>;
 };
 
-/** An enumeration. */
 export enum ResourcesResourceLocationTypeChoices {
   /** Fixed */
   Fixed = "FIXED",
@@ -4042,7 +4163,6 @@ export type ServiceType = Node & {
   serviceType: ServicesServiceServiceTypeChoices;
 };
 
-/** An enumeration. */
 export enum ServicesServiceServiceTypeChoices {
   /** Catering */
   Catering = "CATERING",
@@ -4198,7 +4318,6 @@ export type TaxPercentageTypeEdge = {
   node?: Maybe<TaxPercentageType>;
 };
 
-/** An enumeration. */
 export enum TermsOfUseTermsOfUseTermsTypeChoices {
   /** Cancellation terms */
   CancellationTerms = "CANCELLATION_TERMS",
@@ -4440,7 +4559,6 @@ export type UserUpdateMutationPayload = {
   user?: Maybe<UserType>;
 };
 
-/** An enumeration. */
 export enum ApplicationEventStatus {
   Approved = "approved",
   Created = "created",
@@ -4449,7 +4567,6 @@ export enum ApplicationEventStatus {
   Reserved = "reserved",
 }
 
-/** An enumeration. */
 export enum ApplicationRoundStatus {
   Allocated = "allocated",
   Archived = "archived",
@@ -4462,7 +4579,6 @@ export enum ApplicationRoundStatus {
   Sent = "sent",
 }
 
-/** An enumeration. */
 export enum ApplicationStatus {
   Allocated = "allocated",
   Cancelled = "cancelled",
@@ -4475,7 +4591,6 @@ export enum ApplicationStatus {
   Sent = "sent",
 }
 
-/** An enumeration. */
 export enum Organisation_Type {
   /** Company */
   Company = "COMPANY",
@@ -4491,7 +4606,6 @@ export enum Organisation_Type {
   UnregisteredAssociation = "UNREGISTERED_ASSOCIATION",
 }
 
-/** An enumeration. */
 export enum Priority {
   /** Low */
   A_100 = "A_100",
@@ -4501,7 +4615,6 @@ export enum Priority {
   A_300 = "A_300",
 }
 
-/** An enumeration. */
 export enum State {
   /** cancelled */
   Cancelled = "CANCELLED",

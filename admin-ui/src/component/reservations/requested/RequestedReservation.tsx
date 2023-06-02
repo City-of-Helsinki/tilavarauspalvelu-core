@@ -257,7 +257,7 @@ const ReservationSummary = ({
             ? t(
                 getTranslationKeyForType(
                   reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
-                  reservation.reserveeIsUnregisteredAssociation
+                  Boolean(reservation.reserveeIsUnregisteredAssociation)
                 )
               )
             : undefined,
@@ -642,7 +642,7 @@ const RequestedReservation = (): JSX.Element | null => {
                 data={t(
                   getTranslationKeyForType(
                     reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
-                    reservation.reserveeIsUnregisteredAssociation
+                    Boolean(reservation.reserveeIsUnregisteredAssociation)
                   )
                 )}
                 wide={
