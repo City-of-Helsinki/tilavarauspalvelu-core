@@ -1,6 +1,6 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { Checkbox, SelectionGroup } from "hds-react";
+import { Checkbox } from "hds-react";
 import { useTranslation } from "react-i18next";
 
 type BufferControllerProps = {
@@ -41,13 +41,11 @@ const BufferToggles = ({
   before?: number;
   after?: number;
 }) => {
-  const { t } = useTranslation();
-
   return (
-    <SelectionGroup label={t("ReservationDialog.buffers")}>
+    <>
       {before && <BufferController name="bufferTimeBefore" seconds={before} />}
       {after && <BufferController name="bufferTimeAfter" seconds={after} />}
-    </SelectionGroup>
+    </>
   );
 };
 

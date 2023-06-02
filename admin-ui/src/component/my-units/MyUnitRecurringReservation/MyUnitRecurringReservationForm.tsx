@@ -200,11 +200,6 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     setRemovedReservations([]);
   }, [startTime, endTime, reservationUnit]);
 
-  // TODO these are problematic since there is no test case for them
-  // they are the same in the single reservation but the use case and design isn't clear.
-  const bufferTimeBefore = reservationUnit?.bufferTimeBefore ?? undefined;
-  const bufferTimeAfter = reservationUnit?.bufferTimeAfter ?? undefined;
-
   const { notifyError } = useNotification();
 
   const translateError = (errorMsg?: string) =>
@@ -322,12 +317,14 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
               type: data.type,
               begin,
               end,
-              bufferTimeBefore: bufferTimeBefore
-                ? String(bufferTimeBefore)
-                : undefined,
-              bufferTimeAfter: bufferTimeAfter
-                ? String(bufferTimeBefore)
-                : undefined,
+              bufferTimeBefore:
+                data.bufferTimeBefore && reservationUnit?.bufferTimeBefore
+                  ? String(reservationUnit.bufferTimeBefore)
+                  : undefined,
+              bufferTimeAfter:
+                data.bufferTimeAfter && reservationUnit?.bufferTimeAfter
+                  ? String(reservationUnit.bufferTimeAfter)
+                  : undefined,
               workingMemo: data.comments,
               ...flattenedMetadataSetValues,
             };

@@ -118,12 +118,14 @@ const DialogContent = ({
         type: values.type ?? "",
         begin: myDateTime(new Date(values.date), values.startTime),
         end: myDateTime(new Date(values.date), values.endTime),
-        bufferTimeBefore: values.bufferTimeBefore
-          ? String(reservationUnit.bufferTimeBefore)
-          : undefined,
-        bufferTimeAfter: values.bufferTimeAfter
-          ? String(reservationUnit.bufferTimeAfter)
-          : undefined,
+        bufferTimeBefore:
+          values.bufferTimeBefore && reservationUnit.bufferTimeBefore
+            ? String(reservationUnit.bufferTimeBefore)
+            : undefined,
+        bufferTimeAfter:
+          values.bufferTimeAfter && reservationUnit.bufferTimeAfter
+            ? String(reservationUnit.bufferTimeAfter)
+            : undefined,
         workingMemo: values.comments,
         ...flattenedMetadataSetValues,
       };
