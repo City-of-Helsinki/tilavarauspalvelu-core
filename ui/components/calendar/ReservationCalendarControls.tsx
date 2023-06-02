@@ -646,7 +646,6 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               }
             />
             <StyledSelect
-              key={`startTime-${startTime}`}
               id="reservation__input--start-time"
               label={t("reservationCalendar:startTime")}
               onChange={(val: OptionType) => setStartTime(val.value as string)}

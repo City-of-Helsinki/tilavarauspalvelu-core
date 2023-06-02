@@ -119,7 +119,7 @@ import {
   Wrapper,
 } from "../../components/reservation-unit/ReservationUnitStyles";
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
-import { Toast } from "../../styles/util";
+import { Toast } from "../../components/common/Toast";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -290,6 +290,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   };
 };
+
+const Columns = styled(TwoColumnLayout)`
+  > div:first-of-type {
+    order: 1;
+  }
+`;
 
 const eventStyleGetter = (
   { event }: CalendarEvent<Reservation | ReservationType>,
@@ -842,7 +848,13 @@ const ReservationUnit = ({
         subventionSuffix={subventionSuffix}
       />
       <Container>
-        <TwoColumnLayout>
+        <Columns>
+          <div>
+            <JustForDesktop customBreakpoint={breakpoints.l}>
+              {quickReservationComponent(calendarRef, "desktop")}
+            </JustForDesktop>
+            <Address reservationUnit={reservationUnit} />
+          </div>
           <Left>
             <JustForMobile customBreakpoint={breakpoints.l}>
               {quickReservationComponent(calendarRef, "mobile")}
@@ -1086,13 +1098,7 @@ const ReservationUnit = ({
               </PaddedContent>
             </Accordion>
           </Left>
-          <div>
-            <JustForDesktop customBreakpoint={breakpoints.l}>
-              {quickReservationComponent(calendarRef, "desktop")}
-            </JustForDesktop>
-            <Address reservationUnit={reservationUnit} />
-          </div>
-        </TwoColumnLayout>
+        </Columns>
         <InfoDialog
           id="pricing-terms"
           heading={t("reservationUnit:pricingTerms")}
@@ -1121,6 +1127,7 @@ const ReservationUnit = ({
           onClose={() => setErrorMsg(null)}
           dismissible
           closeButtonLabelText={t("common:error.closeErrorMsg")}
+          trapFocus
         >
           {errorMsg}
         </Toast>
