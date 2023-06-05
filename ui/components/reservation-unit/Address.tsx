@@ -41,22 +41,33 @@ const hslUrl = (locale: string, location: LocationType): string | null => {
     return null;
   }
 
-  return `https://www.reittiopas.fi/${locale}/?to=${encodeURI(
-    `${getTranslation(location, "addressStreet")},${getTranslation(
-      location,
-      "addressCity"
-    )}`
-  )}`;
+  const addressStreet =
+    getTranslation(location, "addressStreet") || location.addressStreetFi;
+  const addressCity =
+    getTranslation(location, "addressCity") || location.addressCityFi;
+
+  const destination = addressStreet
+    ? encodeURI(`${addressStreet},${addressCity}`)
+    : "-";
+
+  return `https://reittiopas.hsl.fi/reitti/-/${destination}/?locale=${locale}`;
 };
 
 const googleUrl = (locale: string, location: LocationType): string | null => {
   if (!location) {
     return null;
   }
-  return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${getTranslation(
-    location,
-    "addressStreet"
-  )},${getTranslation(location, "addressCity")}`;
+
+  const addressStreet =
+    getTranslation(location, "addressStreet") || location.addressStreetFi;
+  const addressCity =
+    getTranslation(location, "addressCity") || location.addressCityFi;
+
+  const destination = addressStreet
+    ? encodeURI(`${addressStreet},${addressCity}`)
+    : "";
+
+  return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${destination}`;
 };
 
 const mapUrl = (locale: string, unit: UnitType): string | null => {
