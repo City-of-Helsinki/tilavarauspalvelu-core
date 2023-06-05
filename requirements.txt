@@ -30,6 +30,7 @@ celery==5.3.0b2
 certifi==2022.12.7
     # via
     #   -r requirements.in
+    #   elastic-transport
     #   requests
     #   sentry-sdk
 cffi==1.15.1
@@ -88,6 +89,7 @@ django==4.2.1
     #   drf-oidc-auth
     #   drf-spectacular
     #   easy-thumbnails
+    #   elasticsearch-django
     #   graphene-django
     #   helsinki-profile-gdpr-api
 django-admin-extra-buttons==1.5.6
@@ -157,6 +159,12 @@ easy-thumbnails==2.8.3
     # via -r requirements.in
 ecdsa==0.14.1
     # via python-jose
+elastic-transport==8.4.0
+    # via elasticsearch
+elasticsearch==8.8.0
+    # via elasticsearch-django
+elasticsearch-django==8.4
+    # via -r requirements.in
 et-xmlfile==1.1.0
     # via openpyxl
 flake8==3.8.4
@@ -290,6 +298,8 @@ rsa==4.7.2
     # via python-jose
 sentry-sdk==1.17.0
     # via -r requirements.in
+simplejson==3.19.1
+    # via elasticsearch-django
 six==1.15.0
     # via
     #   click-repl
@@ -317,6 +327,7 @@ uritemplate==3.0.1
     # via drf-spectacular
 urllib3==1.26.15
     # via
+    #   elastic-transport
     #   requests
     #   sentry-sdk
 uwsgi==2.0.21

@@ -1,11 +1,11 @@
 import datetime
-from json import JSONDecodeError
 
 import requests
 from django.conf import settings
 from helusers.user_utils import get_or_create_user
 from requests import RequestException
 from sentry_sdk import capture_exception, capture_message
+from simplejson.errors import JSONDecodeError
 
 from users.utils.open_city_profile.basic_info_resolver import (
     ProfileNodeIdReader,
