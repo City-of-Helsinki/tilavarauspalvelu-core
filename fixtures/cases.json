@@ -1366,7 +1366,7 @@
         "pk": 1,
         "fields": {
             "user": null,
-            "application": 1,
+            "application": null,
             "application_event": 1,
             "age_group": 1,
             "ability_group": 1,
