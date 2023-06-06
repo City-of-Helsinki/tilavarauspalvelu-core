@@ -66,6 +66,7 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
 )
 from reservations.models import Reservation
 from spaces.models import Space
+from tilavarauspalvelu.utils.date_util import end_of_day, start_of_day
 from utils.query_performance import QueryPerformanceOptimizerMixin
 
 TIMEZONE = get_default_timezone()
@@ -383,20 +384,17 @@ class ReservationUnitWithReservationsMixin:
         state: Optional[List[str]] = None,
         include_with_same_components: Optional[bool] = None,
     ) -> QuerySet:
+        from_ = start_of_day(from_)
+        to = end_of_day(to)
+
         if include_with_same_components:
             reservations = Reservation.objects.with_same_components(self, from_, to)
         else:
             reservations = self.reservation_set.all()
 
             if from_ is not None:
-                from_ = datetime.datetime(
-                    from_.year, from_.month, from_.day, 0, 0, 0, tzinfo=TIMEZONE
-                )
                 reservations = reservations.filter(begin__gte=from_)
             if to is not None:
-                to = datetime.datetime(
-                    to.year, to.month, to.day, 23, 59, 59, tzinfo=TIMEZONE
-                )
                 reservations = reservations.filter(end__lte=to)
 
         if state is not None:
