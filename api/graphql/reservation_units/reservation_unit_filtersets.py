@@ -5,8 +5,12 @@ from typing import List
 import django_filters
 from django.db.models import F, Q
 from django.utils import timezone
+from elasticsearch_django.models import SearchQuery
 
 from applications.models import ApplicationRound
+from elastic_django.reservation_units.query_builder import (
+    ReservationUnitQueryBuilderMixin,
+)
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import (
     Equipment,
@@ -26,7 +30,9 @@ from reservation_units.utils.reservation_unit_state_helper import (
 from spaces.models import Unit
 
 
-class ReservationUnitsFilterSet(django_filters.FilterSet):
+class ReservationUnitsFilterSet(
+    django_filters.FilterSet, ReservationUnitQueryBuilderMixin
+):
     pk = django_filters.ModelMultipleChoiceFilter(
         field_name="pk", method="filter_by_pk", queryset=ReservationUnit.objects.all()
     )
@@ -145,45 +151,13 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         fields = ["pk", "unit", "keyword_groups"]
 
     def get_text_search(self, qs, property, value: str):
+        query_str = self.build_elastic_query_str(value)
 
-        words = value.split(",")
-        queries = []
-        for word in words:
-            queries.append(
-                Q(name_fi__icontains=word)
-                | Q(name_en__icontains=word)
-                | Q(name_sv__icontains=word)
-                | Q(description_fi__icontains=word)
-                | Q(description_en__icontains=word)
-                | Q(description_sv__icontains=word)
-                | Q(spaces__name_fi__icontains=word)
-                | Q(spaces__name_en__icontains=word)
-                | Q(spaces__name_sv__icontains=word)
-                | Q(keyword_groups__name_fi__icontains=word)
-                | Q(keyword_groups__name_en__icontains=word)
-                | Q(keyword_groups__name_sv__icontains=word)
-                | Q(resources__name_fi__icontains=word)
-                | Q(resources__name_en__icontains=word)
-                | Q(resources__name_sv__icontains=word)
-                | Q(services__name_fi__icontains=word)
-                | Q(services__name_en__icontains=word)
-                | Q(services__name_sv__icontains=word)
-                | Q(purposes__name_fi__icontains=word)
-                | Q(purposes__name_en__icontains=word)
-                | Q(purposes__name_sv__icontains=word)
-                | Q(reservation_unit_type__name_fi__icontains=word)
-                | Q(reservation_unit_type__name_en__icontains=word)
-                | Q(reservation_unit_type__name_sv__icontains=word)
-                | Q(equipments__name_fi__icontains=word)
-                | Q(equipments__name_en__icontains=word)
-                | Q(equipments__name_sv__icontains=word)
-                | Q(unit__name_fi__icontains=word)
-                | Q(unit__name_en__icontains=word)
-                | Q(unit__name_sv__icontains=word)
-            )
-        query = reduce(operator.or_, (query for query in queries))
+        sq = SearchQuery.do_search(
+            "reservation_units", {"query_string": {"query": query_str}}
+        )
 
-        return qs.filter(query).distinct()
+        return ReservationUnit.objects.from_search_results(sq)
 
     def filter_by_pk(self, qs, property, value):
         if value:
