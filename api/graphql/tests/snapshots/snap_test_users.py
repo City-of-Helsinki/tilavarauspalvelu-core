@@ -10,12 +10,12 @@ snapshots = Snapshot()
 snapshots['UserQueryTestCase::test_hide_reservation_notification_when_user_is_not_staff 1'] = {
     'data': {
         'currentUser': {
-            'email': 'non-staff.admin@foo.com',
-            'firstName': 'Non-Staff',
+            'email': 'joe.regularl@foo.com',
+            'firstName': 'joe',
             'isSuperuser': False,
-            'lastName': 'Admin',
+            'lastName': 'regular',
             'reservationNotification': None,
-            'username': 'non_staff_admin'
+            'username': 'regjoe'
         }
     }
 }
@@ -141,7 +141,7 @@ snapshots['UsersQueryTestCase::test_general_admin_can_read_other 1'] = {
             'firstName': 'Non-Staff',
             'isSuperuser': False,
             'lastName': 'Admin',
-            'reservationNotification': None,
+            'reservationNotification': 'only_handling_required',
             'username': 'non_staff_admin'
         }
     }
@@ -194,7 +194,7 @@ snapshots['UsersQueryTestCase::test_service_sector_admin_can_read_other 1'] = {
             'firstName': 'Non-Staff',
             'isSuperuser': False,
             'lastName': 'Admin',
-            'reservationNotification': None,
+            'reservationNotification': 'only_handling_required',
             'username': 'non_staff_admin'
         }
     }
@@ -207,7 +207,7 @@ snapshots['UsersQueryTestCase::test_unit_admin_can_read_other 1'] = {
             'firstName': 'Non-Staff',
             'isSuperuser': False,
             'lastName': 'Admin',
-            'reservationNotification': None,
+            'reservationNotification': 'only_handling_required',
             'username': 'non_staff_admin'
         }
     }

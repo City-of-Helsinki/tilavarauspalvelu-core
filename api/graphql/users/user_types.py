@@ -43,7 +43,7 @@ class UserType(AuthNode, PrimaryKeyObjectType):
         connection_class = TilavarausBaseConnection
 
     def resolve_reservation_notification(self, info: graphene.ResolveInfo):
-        if self.is_staff:
+        if self.has_staff_permissions:
             return self.reservation_notification
         return None
 
