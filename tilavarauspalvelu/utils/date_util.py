@@ -1,4 +1,7 @@
 import datetime
+from typing import Optional
+
+from django.utils.timezone import get_default_timezone
 
 
 class InvalidWeekdayException(Exception):
@@ -42,3 +45,19 @@ def localized_short_weekday(weekday: int, lang_code: str) -> str:
         lang_code = "fi"
 
     return weekdays[lang_code][weekday]
+
+
+def start_of_day(date: Optional[datetime.date]) -> datetime.datetime:
+    if date:
+        return datetime.datetime.combine(
+            date, datetime.time.min, tzinfo=get_default_timezone()
+        )
+    return None
+
+
+def end_of_day(date: Optional[datetime.date]) -> datetime.datetime:
+    if date:
+        return datetime.datetime.combine(
+            date, datetime.time.max, tzinfo=get_default_timezone()
+        )
+    return None
