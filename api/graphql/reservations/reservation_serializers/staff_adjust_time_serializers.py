@@ -24,6 +24,8 @@ class StaffReservationAdjustTimeSerializer(
             "begin",
             "end",
             "state",
+            "buffer_time_before",
+            "buffer_time_after",
         ]
 
     def __init__(self, *args, **kwargs):

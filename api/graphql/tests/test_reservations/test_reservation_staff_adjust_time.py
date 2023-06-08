@@ -63,6 +63,8 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
                     begin
                     end
                     state
+                    bufferTimeBefore
+                    bufferTimeAfter
                     errors {
                         field
                         messages
@@ -108,6 +110,27 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         )
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")
+
+    def test_buffer_change_success(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_adjust_data()
+        input_data["bufferTimeBefore"] = "00:15:00"
+        input_data["bufferTimeAfter"] = "00:30:00"
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        payload = content.get("data").get("staffAdjustReservationTime")
+        assert_that(payload.get("errors")).is_none()
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.buffer_time_before).is_equal_to(
+            datetime.timedelta(minutes=15)
+        )
+        assert_that(self.reservation.buffer_time_after).is_equal_to(
+            datetime.timedelta(minutes=30)
+        )
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
