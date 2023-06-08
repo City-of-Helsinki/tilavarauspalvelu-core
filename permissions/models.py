@@ -71,6 +71,8 @@ GENERAL_PERMISSIONS = (
         _("Can create, edit and delete spaces in the whole system"),
     ),
     ("can_handle_applications", _("Can handle applications in the whole system")),
+    ("can_validate_applications", _("Can validate applications in the whole system")),
+    ("can_allocate_applications", _("Can allocate applications in the whole system")),
     (
         "can_manage_application_rounds",
         _("Can create, edit and delete application rounds in the whole system"),
@@ -113,7 +115,9 @@ UNIT_PERMISSIONS = (
         "can_allocate_applications",
         _("Can allocate applications"),
     ),
-    ("can_validate_applications", _("Can validate applications")),
+    ("can_validate_applications", _("Can validate applications in the unit")),
+    ("can_allocate_applications", _("Can allocate application in the unit")),
+    ("can_handle_applications", _("Can handle application in the unit")),
     ("can_manage_units", _("Can edit unit information")),
     (
         "can_manage_spaces",
@@ -149,6 +153,7 @@ SERVICE_SECTOR_PERMISSIONS = (
         "can_manage_reservations",
         _("Can create, edit and cancel reservations in the service sector"),
     ),
+    ("can_validate_applications", _("Can validate application in the service sector")),
     (
         "can_view_reservations",
         _("Can view details of all reservations in the service sector"),
