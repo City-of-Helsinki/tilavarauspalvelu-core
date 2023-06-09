@@ -3,6 +3,7 @@ import uuid
 
 import requests_mock
 from assertpy import assert_that
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
@@ -31,9 +32,7 @@ User = get_user_model()
 @override_settings(
     OIDC_API_TOKEN_AUTH={
         "AUDIENCE": "test_audience",
-        "API_SCOPE_PREFIX": "testprefix",
         "ISSUER": "http://localhost/openid",
-        "TOKEN_AUTH_REQUIRE_SCOPE_PREFIX": True,
     },
     GDPR_API_QUERY_SCOPE="testprefix.gdprquery",
     GDPR_API_DELETE_SCOPE="testprefix.gdprdelete",
@@ -170,6 +169,30 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
         end = begin + datetime.timedelta(hours=2)
         ReservationFactory(
             user=self.user, begin=begin, end=end, state=ReservationState.CREATED
+        )
+
+        auth_header = self.get_auth_header(
+            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
+        )
+        old_uuid = self.user.uuid
+        self.client.credentials(HTTP_AUTHORIZATION=auth_header)
+        response = self.client.delete(self.url)
+
+        assert_that(response.status_code).is_equal_to(403)
+
+        self.user.refresh_from_db()
+        assert_that(self.user.uuid).is_equal_to(old_uuid)
+        assert_that(self.user.username).does_not_contain("anonymized")
+        assert_that(self.user.pk).is_not_none()
+
+    @requests_mock.Mocker()
+    def test_delete_user_does_not_anonymize_data_when_reservation_under_month_ago(
+        self, req_mock
+    ):
+        begin = timezone.now() - relativedelta(months=1)
+        end = begin + datetime.timedelta(hours=2)
+        ReservationFactory(
+            user=self.user, begin=begin, end=end, state=ReservationState.CONFIRMED
         )
 
         auth_header = self.get_auth_header(

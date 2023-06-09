@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -34,10 +35,10 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
         anonymize_user_data(profile_user.user)
 
     def _check_user_can_be_anonymized(self, user):
-        now = timezone.now()
+        month_ago = timezone.now() - relativedelta(months=1)
 
         has_open_reservations = (
-            user.reservation_set.filter(end__gte=now)
+            user.reservation_set.filter(end__gte=month_ago)
             .exclude(state__in=[ReservationState.CANCELLED, ReservationState.DENIED])
             .exists()
         )
