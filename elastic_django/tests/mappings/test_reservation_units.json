@@ -1,0 +1,96 @@
+{
+  "mappings": {
+    "properties": {
+      "name_fi": {
+        "type": "text"
+      },
+      "name_en": {
+        "type": "text"
+      },
+      "name_sv": {
+        "type": "text"
+      },
+      "description_fi": {
+        "type": "text"
+      },
+      "description_en": {
+        "type": "text"
+      },
+      "description_sv": {
+        "type": "text"
+      },
+      "space_name_fi": {
+        "type": "text"
+      },
+      "space_name_en": {
+        "type": "text"
+      },
+      "space_name_sv": {
+        "type": "text"
+      },
+      "keyword_groups_name_fi": {
+        "type": "text"
+      },
+      "keyword_groups_name_en": {
+        "type": "text"
+      },
+      "keyword_groups_name_sv": {
+        "type": "text"
+      },
+      "resources_name_fi": {
+        "type": "text"
+      },
+      "resources_name_en": {
+        "type": "text"
+      },
+      "resources_name_sv": {
+        "type": "text"
+      },
+      "services_name_fi": {
+        "type": "text"
+      },
+      "services_name_en": {
+        "type": "text"
+      },
+      "services_name_sv": {
+        "type": "text"
+      },
+      "purposes_name_fi": {
+        "type": "text"
+      },
+      "purposes_name_en": {
+        "type": "text"
+      },
+      "purposes_name_sv": {
+        "type": "text"
+      },
+      "reservation_unit_type_name_fi": {
+        "type": "text"
+      },
+      "reservation_unit_type_name_en": {
+        "type": "text"
+      },
+      "reservation_unit_type_name_sv": {
+        "type": "text"
+      },
+      "equipments_name_fi": {
+        "type": "text"
+      },
+      "equipments_name_en": {
+        "type": "text"
+      },
+      "equipments_name_sv": {
+        "type": "text"
+      },
+      "unit_name_fi": {
+        "type": "text"
+      },
+      "unit_name_en": {
+        "type": "text"
+      },
+      "unit_name_sv": {
+        "type": "text"
+      }
+    }
+  }
+}
