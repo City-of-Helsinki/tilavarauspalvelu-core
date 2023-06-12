@@ -337,6 +337,58 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
+    @override_settings(UPDATE_PRODUCT_MAPPING=False)
+    def test_overlaps_with_modified_buffer_time_before_fails(self):
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.reservation_begin - datetime.timedelta(hours=3),
+            end=self.reservation_end - datetime.timedelta(hours=2),
+            state=STATE_CHOICES.CONFIRMED,
+        )
+
+        data = self.get_valid_adjust_data()
+        data["begin"] = (self.reservation_begin).strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = (self.reservation_end).strftime("%Y%m%dT%H%M%S%zZ")
+        data["bufferTimeBefore"] = "01:01:00"
+
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        error = content.get("errors")[0].get("extensions").get("error_code")
+        assert_that(error).is_equal_to("RESERVATION_OVERLAP")
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end)
+
+    @override_settings(UPDATE_PRODUCT_MAPPING=False)
+    def test_overlaps_with_modified_buffer_time_after_fails(self):
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.reservation_begin + datetime.timedelta(hours=2),
+            end=self.reservation_end + datetime.timedelta(hours=3),
+            state=STATE_CHOICES.CONFIRMED,
+        )
+
+        data = self.get_valid_adjust_data()
+        data["begin"] = (self.reservation_begin).strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = (self.reservation_end).strftime("%Y%m%dT%H%M%S%zZ")
+        data["bufferTimeAfter"] = "01:01:00"
+
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        error = content.get("errors")[0].get("extensions").get("error_code")
+        assert_that(error).is_equal_to("RESERVATION_OVERLAP")
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end)
+
     def test_reservation_start_time_not_within_the_interval_fails(self):
         self.reservation_unit.reservation_start_interval = (
             ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
