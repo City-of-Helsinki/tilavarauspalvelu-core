@@ -286,7 +286,9 @@ def get_service_sectors_where_can_view_reservations(user: User) -> list:
     ).values_list("service_sector", flat=True)
 
 
-def can_view_reservation(user: User, reservation: Reservation) -> bool:
+def can_view_reservation(
+    user: User, reservation: Reservation, needs_staff_permissions: bool = False
+) -> bool:
     permission = "can_view_reservations"
     reservation_units = reservation.reservation_unit.all()
 
@@ -296,9 +298,14 @@ def can_view_reservation(user: User, reservation: Reservation) -> bool:
     units = Unit.objects.filter(reservationunit__in=reservation_units)
     service_sectors = ServiceSector.objects.filter(units__in=units)
 
+    own_reservation = reservation.user == user
+
+    if needs_staff_permissions:
+        own_reservation = own_reservation and user.has_staff_permissions
+
     return (
         is_superuser(user)
-        or reservation.user == user
+        or own_reservation
         or has_unit_permission(user, units, permission)
         or has_general_permission(user, permission)
         or has_service_sector_permission(user, service_sectors, permission)
