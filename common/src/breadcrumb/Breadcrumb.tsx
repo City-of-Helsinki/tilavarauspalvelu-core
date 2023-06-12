@@ -132,7 +132,6 @@ const Breadcrumb = ({
             >
               <Anchor
                 {...(!linkComponent && { href: lastRouteWithSlug?.slug })}
-                title={lastRouteWithSlug.title}
                 $isMobile
               >
                 {lastRouteWithSlug.title}
@@ -150,7 +149,6 @@ const Breadcrumb = ({
               <Link {...(linkComponent && { href: item.slug, passHref: true })}>
                 <Anchor
                   {...(!linkComponent && { href: item.slug })}
-                  title={item.title}
                   $current={index === routes.length - 1}
                 >
                   {index === routes.length - 1
@@ -163,7 +161,7 @@ const Breadcrumb = ({
                 </Anchor>
               </Link>
             ) : (
-              <Slug $current={index === routes.length - 1} title={item.title}>
+              <Slug $current={index === routes.length - 1}>
                 {index === routes.length - 1
                   ? item.title.length > limits.current
                     ? `${item.title.slice(0, limits.current)}...`

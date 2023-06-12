@@ -36,7 +36,6 @@ export const checkBreadcrumbs = ({
               ? cy.wrap(el).find("span[class^='Breadcrumb__Slug']")
               : cy.wrap(el).find("a[class^='Breadcrumb__Anchor']");
             wrappedEl.should("contain.text", value[index].title);
-            wrappedEl.should("have.attr", "title", value[index].title);
 
             if (value[index]?.url) {
               wrappedEl.should("have.attr", "href", value[index].url);
