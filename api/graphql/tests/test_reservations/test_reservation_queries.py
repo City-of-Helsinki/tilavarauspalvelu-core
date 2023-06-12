@@ -489,6 +489,53 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_staff_user_without_create__permissions_can_read_working_memo_for_own(self):
+        self.maxDiff = None
+        reserver = self.create_staff_reserver_for_unit()
+        self.client.force_login(reserver)
+        ReservationFactory(
+            user=reserver, working_memo="Read me.", state=STATE_CHOICES.CONFIRMED
+        )
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            workingMemo
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_staff_user_with_read_permissions_cant_read_working_memo_for_other(self):
+        self.maxDiff = None
+        reserver = self.create_staff_reserver_for_unit()
+        self.client.force_login(reserver)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            workingMemo
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_regular_user_cant_read_working_memo(self):
         self.maxDiff = None
         self.client.force_login(self.regular_joe)

@@ -1748,3 +1748,37 @@ snapshots['ReservationQueryTestCase::test_show_refund_uuid_when_it_is_available 
         }
     }
 }
+
+snapshots['ReservationQueryTestCase::test_staff_user_with_read_permissions_cant_read_working_memo_for_other 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'workingMemo': None
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_staff_user_without_create__permissions_can_read_working_memo_for_own 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'workingMemo': 'Read me.'
+                    }
+                },
+                {
+                    'node': {
+                        'workingMemo': None
+                    }
+                }
+            ]
+        }
+    }
+}
+

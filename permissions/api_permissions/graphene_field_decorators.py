@@ -14,6 +14,18 @@ def reservation_non_public_field(func: callable):
     return permission_check
 
 
+def reservation_staff_field(func: callable):
+    def permission_check(*args, **kwargs):
+        if can_view_reservation(
+            args[1].context.user, args[0], needs_staff_permissions=True
+        ):
+            return func(*args, **kwargs)
+
+        return None
+
+    return permission_check
+
+
 def recurring_reservation_non_public_field(func: callable):
     def permission_check(*args, **kwargs):
         if can_view_recurring_reservation(args[1].context.user, args[0]):

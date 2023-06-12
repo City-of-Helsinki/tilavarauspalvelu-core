@@ -18,6 +18,7 @@ from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
     recurring_reservation_non_public_field,
     reservation_non_public_field,
+    reservation_staff_field,
 )
 from permissions.api_permissions.graphene_permissions import (
     AbilityGroupPermission,
@@ -27,7 +28,6 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationPurposePermission,
     ReservationUnitPermission,
 )
-from permissions.helpers import can_handle_reservation
 from reservations.models import (
     AbilityGroup,
     AgeGroup,
@@ -285,25 +285,21 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     def resolve_reservee_phone(self, info: ResolveInfo) -> Optional[str]:
         return self.reservee_phone
 
+    @reservation_staff_field
     def resolve_working_memo(self, info: ResolveInfo) -> Optional[str]:
-        if can_handle_reservation(info.context.user, self):
-            return self.working_memo
-        return None
+        return self.working_memo
 
+    @reservation_staff_field
     def resolve_staff_event(self, info: ResolveInfo) -> Optional[bool]:
-        if can_handle_reservation(info.context.user, self):
-            return self.type == ReservationTypeField.STAFF
-        return None
+        return self.type == ReservationTypeField.STAFF
 
+    @reservation_staff_field
     def resolve_type(self, info: ResolveInfo) -> Optional[str]:
-        if can_handle_reservation(info.context.user, self):
-            return self.type
-        return None
+        return self.type
 
+    @reservation_staff_field
     def resolve_handled_at(self, info: ResolveInfo) -> Optional[str]:
-        if can_handle_reservation(info.context.user, self):
-            return self.handled_at
-        return None
+        return self.handled_at
 
     @reservation_non_public_field
     def resolve_reservee_email(self, info: ResolveInfo) -> Optional[str]:
