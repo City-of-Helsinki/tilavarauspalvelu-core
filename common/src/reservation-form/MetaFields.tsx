@@ -9,7 +9,7 @@
  * TODO when admin-ui uses translation namespaces remove passing the t function
  */
 import { IconGroup, IconUser } from "hds-react";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import styled from "styled-components";
 import camelCase from "lodash/camelCase";
 import { Controller, useFormContext } from "react-hook-form";
@@ -293,19 +293,22 @@ export const ReserverMetaFields = ({
     termsForDiscount?: JSX.Element | string;
   };
 }) => {
-  const { watch } = useFormContext<Reservation>();
+  const { watch, setValue } = useFormContext<Reservation & Partial<Inputs>>();
   const { t } = useTranslation();
 
   const isTypeSelectable =
     reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type") ??
     false;
 
+  const reserveeType = watch("reserveeType");
+
+  useEffect(() => {
+    setValue("reserveeIsUnregisteredAssociation", false);
+  }, [reserveeType, setValue]);
+
   if (!reservationUnit.metadataSet) {
     return null;
   }
-
-  const reserveeType = watch("reserveeType");
-
   return (
     <>
       <ReserverInfoHeading>

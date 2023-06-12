@@ -699,6 +699,7 @@ describe("with metadataset", () => {
 
     cy.get("#reserveeFirstName").clear().type("Forename");
     cy.get("#reserveeEmail").type("@bar.baz");
+    cy.get("#reserveeId").type("123456-7");
 
     cy.checkA11y(undefined, undefined, undefined, true);
 
@@ -714,6 +715,8 @@ describe("with metadataset", () => {
       "contain.text",
       "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut alennusryhmiin."
     );
+    cy.get("main#main").should("contain.text", "Y-tunnus");
+    cy.get("main#main").should("contain.text", "123456-7");
 
     cancelButton().click();
     cy.get("#applyingForFreeOfCharge").click();
