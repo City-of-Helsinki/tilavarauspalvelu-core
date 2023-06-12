@@ -88,7 +88,7 @@ const Units = ({ units }: Props): JSX.Element => {
                 href={`${singleSearchPrefix}?unit=${unit.pk}#content`}
                 data-testid="front-page__units--unit"
               >
-                {getTranslation(unit, "name")}
+                {getTranslation(unit, "name") || unit.nameFi}
                 <IconArrowRight size="l" aria-hidden />
               </UnitItemLink>
             ))}
