@@ -3,6 +3,7 @@ import uuid
 
 import requests_mock
 from assertpy import assert_that
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
@@ -17,8 +18,11 @@ from api.tests.test_gdpr.gdpr_key import rsa_key
 from applications.models import ApplicationStatus
 from applications.tests.factories import (
     AddressFactory,
+    ApplicationEventFactory,
     ApplicationFactory,
     ApplicationStatusFactory,
+    OrganisationFactory,
+    PersonFactory,
 )
 from merchants.models import OrderStatus
 from merchants.tests.factories import PaymentOrderFactory
@@ -31,9 +35,7 @@ User = get_user_model()
 @override_settings(
     OIDC_API_TOKEN_AUTH={
         "AUDIENCE": "test_audience",
-        "API_SCOPE_PREFIX": "testprefix",
         "ISSUER": "http://localhost/openid",
-        "TOKEN_AUTH_REQUIRE_SCOPE_PREFIX": True,
     },
     GDPR_API_QUERY_SCOPE="testprefix.gdprquery",
     GDPR_API_DELETE_SCOPE="testprefix.gdprdelete",
@@ -48,9 +50,53 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
             last_name="regular",
             email="joe.regular@foo.com",
         )
-        ReservationFactory(user=cls.user)
-        billing_address = AddressFactory()
-        ApplicationFactory(user=cls.user, billing_address=billing_address)
+        begin = datetime.datetime.now(get_default_timezone()) - relativedelta(months=2)
+        end = begin + relativedelta(hours=2)
+        cls.reservation = ReservationFactory(
+            user=cls.user,
+            name="anonymizable reservation",
+            description="anonymizable reservation description",
+            begin=begin,
+            end=end,
+            reservee_first_name="Test",
+            reservee_last_name="Person",
+            reservee_email="test.person@localhost",
+            reservee_phone="123445",
+            reservee_address_zip="00020",
+            reservee_address_city="TheCity",
+            reservee_address_street="test street 1",
+            billing_first_name="Test",
+            billing_last_name="person",
+            billing_email="test.person@localhost",
+            billing_phone="123445",
+            billing_address_zip="00020",
+            billing_address_city="TheCity",
+            billing_address_street="billing street 2",
+            reservee_id="65432",
+            reservee_organisation_name="Organisation name",
+            free_of_charge_reason="I'm obliged",
+            cancel_details="I don't need the space",
+        )
+        cls.application = ApplicationFactory(
+            user=cls.user,
+            additional_information="something to take into consideration",
+            billing_address=AddressFactory(),
+            contact_person=PersonFactory(
+                first_name="Test",
+                last_name="Person",
+                email="contact.person@localhost",
+                phone_number="12434",
+            ),
+            organisation=OrganisationFactory(address=AddressFactory()),
+        )
+        cls.application_event = ApplicationEventFactory(
+            application=cls.application,
+            name="app event name",
+            name_fi="app event name fi",
+            name_en="app event name en",
+            name_sv="app event name sv",
+        )
+
         cls.url = reverse("gdpr_v1", kwargs={"uuid": cls.user.uuid})
 
     def setUp(self) -> None:
@@ -108,6 +154,116 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
         response = self.client.get(self.url)
         assert_that(response.status_code).is_equal_to(200)
         assert_that(response.data["children"][0]["value"]).is_not_empty()
+
+    @requests_mock.Mocker()
+    def test_get_user_data_returns_reservations(self, req_mock):
+        auth_header = self.get_auth_header(
+            self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock
+        )
+
+        self.client.credentials(HTTP_AUTHORIZATION=auth_header)
+        response = self.client.get(self.url)
+        assert_that(response.status_code).is_equal_to(200)
+        for r in [
+            d for d in response.data["children"] if d.get("key") == "RESERVATIONS"
+        ]:
+            res_data = r["value"][0]
+            expected = [
+                self.reservation.name,
+                self.reservation.description,
+                self.reservation.begin,
+                self.reservation.end,
+                self.reservation.reservee_first_name,
+                self.reservation.reservee_last_name,
+                self.reservation.reservee_email,
+                self.reservation.reservee_phone,
+                self.reservation.reservee_address_zip,
+                self.reservation.reservee_address_city,
+                self.reservation.reservee_address_street,
+                self.reservation.billing_first_name,
+                self.reservation.billing_last_name,
+                self.reservation.billing_email,
+                self.reservation.billing_phone,
+                self.reservation.billing_address_zip,
+                self.reservation.billing_address_city,
+                self.reservation.billing_address_street,
+                self.reservation.reservee_id,
+                self.reservation.reservee_organisation_name,
+                self.reservation.free_of_charge_reason,
+                self.reservation.cancel_details,
+            ]
+            assert_that(res_data).is_equal_to(expected)
+
+    @requests_mock.Mocker()
+    def test_get_user_data_returns_applications(self, req_mock):
+        auth_header = self.get_auth_header(
+            self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock
+        )
+
+        self.client.credentials(HTTP_AUTHORIZATION=auth_header)
+        response = self.client.get(self.url)
+        assert_that(response.status_code).is_equal_to(200)
+        for a in [
+            d for d in response.data["children"] if d.get("key") == "APPLICATIONS"
+        ]:
+            app_data = a["value"][0]
+            expected = [
+                self.application.additional_information,
+                {
+                    "events": [
+                        self.application_event.name,
+                        self.application_event.name_fi,
+                        self.application_event.name_en,
+                        self.application_event.name_sv,
+                    ]
+                },
+                {
+                    "contact_person": [
+                        self.application.contact_person.first_name,
+                        self.application.contact_person.last_name,
+                        self.application.contact_person.email,
+                        self.application.contact_person.phone_number,
+                    ]
+                },
+                {
+                    "organisation": [
+                        self.application.organisation.name,
+                        self.application.organisation.identifier,
+                        self.application.organisation.email,
+                        self.application.organisation.core_business,
+                        self.application.organisation.core_business_fi,
+                        self.application.organisation.core_business_en,
+                        self.application.organisation.core_business_sv,
+                    ]
+                },
+                {
+                    "organisation_address": [
+                        self.application.organisation.address.post_code,
+                        self.application.organisation.address.street_address,
+                        self.application.organisation.address.street_address_fi,
+                        self.application.organisation.address.street_address_en,
+                        self.application.organisation.address.street_address_sv,
+                        self.application.organisation.address.city,
+                        self.application.organisation.address.city_fi,
+                        self.application.organisation.address.city_en,
+                        self.application.organisation.address.city_sv,
+                    ]
+                },
+                {
+                    "billing_address": [
+                        self.application.billing_address.post_code,
+                        self.application.billing_address.street_address,
+                        self.application.billing_address.street_address_fi,
+                        self.application.billing_address.street_address_en,
+                        self.application.billing_address.street_address_sv,
+                        self.application.billing_address.city,
+                        self.application.billing_address.city_fi,
+                        self.application.billing_address.city_en,
+                        self.application.billing_address.city_sv,
+                    ]
+                },
+            ]
+            assert_that(app_data).is_equal_to(expected)
 
     @requests_mock.Mocker()
     def test_get_user_data_should_not_returns_not_found(self, req_mock):
@@ -170,6 +326,30 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
         end = begin + datetime.timedelta(hours=2)
         ReservationFactory(
             user=self.user, begin=begin, end=end, state=ReservationState.CREATED
+        )
+
+        auth_header = self.get_auth_header(
+            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
+        )
+        old_uuid = self.user.uuid
+        self.client.credentials(HTTP_AUTHORIZATION=auth_header)
+        response = self.client.delete(self.url)
+
+        assert_that(response.status_code).is_equal_to(403)
+
+        self.user.refresh_from_db()
+        assert_that(self.user.uuid).is_equal_to(old_uuid)
+        assert_that(self.user.username).does_not_contain("anonymized")
+        assert_that(self.user.pk).is_not_none()
+
+    @requests_mock.Mocker()
+    def test_delete_user_does_not_anonymize_data_when_reservation_under_month_ago(
+        self, req_mock
+    ):
+        begin = timezone.now() - relativedelta(months=1)
+        end = begin + datetime.timedelta(hours=2)
+        ReservationFactory(
+            user=self.user, begin=begin, end=end, state=ReservationState.CONFIRMED
         )
 
         auth_header = self.get_auth_header(

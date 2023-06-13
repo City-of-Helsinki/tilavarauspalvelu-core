@@ -28,6 +28,8 @@ class ProfileUser(SerializableMixin):
                 [
                     res.name,
                     res.description,
+                    res.begin,
+                    res.end,
                     res.reservee_first_name,
                     res.reservee_last_name,
                     res.reservee_email,
@@ -56,7 +58,8 @@ class ProfileUser(SerializableMixin):
         applications = []
 
         for app in self.user.application_set.all():
-            applications.append(app.additional_information)
+            app_data = []
+            app_data.append(app.additional_information)
 
             events = []
             for e in app.application_events.all():
@@ -64,10 +67,10 @@ class ProfileUser(SerializableMixin):
                 events.append(e.name_fi)
                 events.append(e.name_en)
                 events.append(e.name_sv)
-            applications.append({"events": events})
+            app_data.append({"events": events})
 
             if app.contact_person:
-                applications.append(
+                app_data.append(
                     {
                         "contact_person": [
                             app.contact_person.first_name,
@@ -79,7 +82,7 @@ class ProfileUser(SerializableMixin):
                 )
 
             if app.organisation:
-                applications.append(
+                app_data.append(
                     {
                         "organisation": [
                             app.organisation.name,
@@ -94,7 +97,7 @@ class ProfileUser(SerializableMixin):
                 )
 
             if app.organisation and app.organisation.address:
-                applications.append(
+                app_data.append(
                     {
                         "organisation_address": [
                             app.organisation.address.post_code,
@@ -111,7 +114,7 @@ class ProfileUser(SerializableMixin):
                 )
 
             if app.billing_address:
-                applications.append(
+                app_data.append(
                     {
                         "billing_address": [
                             app.billing_address.post_code,
@@ -126,6 +129,7 @@ class ProfileUser(SerializableMixin):
                         ]
                     }
                 )
+            applications.append(app_data)
 
         return applications
 
