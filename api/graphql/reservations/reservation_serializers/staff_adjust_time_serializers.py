@@ -24,6 +24,8 @@ class StaffReservationAdjustTimeSerializer(
             "begin",
             "end",
             "state",
+            "buffer_time_before",
+            "buffer_time_after",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -51,9 +53,18 @@ class StaffReservationAdjustTimeSerializer(
         begin = data["begin"]
         end = data["end"]
 
+        new_buffer_before = data.get("buffer_time_before", None)
+        new_buffer_after = data.get("buffer_time_after", None)
+
         for reservation_unit in self.instance.reservation_unit.all():
             self.check_reservation_overlap(reservation_unit, begin, end)
-            self.check_buffer_times(reservation_unit, begin, end)
+            self.check_buffer_times(
+                reservation_unit,
+                begin,
+                end,
+                buffer_before=new_buffer_before,
+                buffer_after=new_buffer_after,
+            )
             self.check_reservation_intervals_for_staff_reservation(
                 reservation_unit, begin
             )

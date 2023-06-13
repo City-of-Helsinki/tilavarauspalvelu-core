@@ -308,10 +308,12 @@ class ReservationSchedulingMixin:
 
     def check_buffer_times(
         self,
-        reservation_unit,
+        reservation_unit: ReservationUnit,
         begin,
         end,
         reservation_type: Optional[ReservationType] = None,
+        buffer_before: Optional[datetime.timedelta] = None,
+        buffer_after: Optional[datetime.timedelta] = None,
     ):
 
         current_type = getattr(self.instance, "type", reservation_type)
@@ -325,29 +327,31 @@ class ReservationSchedulingMixin:
             begin, self.instance, exclude_blocked=True
         )
 
-        buffer_before = max(
-            [
-                buffer
-                for buffer in (
-                    getattr(reservation_before, "buffer_time_after", None),
-                    reservation_unit.buffer_time_before,
-                )
-                if buffer
-            ],
-            default=None,
-        )
+        if not buffer_before:
+            buffer_before = max(
+                [
+                    buffer
+                    for buffer in (
+                        getattr(reservation_before, "buffer_time_after", None),
+                        reservation_unit.buffer_time_before,
+                    )
+                    if buffer
+                ],
+                default=None,
+            )
 
-        buffer_after = max(
-            [
-                buffer
-                for buffer in (
-                    getattr(reservation_after, "buffer_time_before", None),
-                    reservation_unit.buffer_time_after,
-                )
-                if buffer
-            ],
-            default=None,
-        )
+        if not buffer_after:
+            buffer_after = max(
+                [
+                    buffer
+                    for buffer in (
+                        getattr(reservation_after, "buffer_time_before", None),
+                        reservation_unit.buffer_time_after,
+                    )
+                    if buffer
+                ],
+                default=None,
+            )
 
         if (
             reservation_before

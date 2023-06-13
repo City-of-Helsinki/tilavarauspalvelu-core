@@ -63,6 +63,8 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
                     begin
                     end
                     state
+                    bufferTimeBefore
+                    bufferTimeAfter
                     errors {
                         field
                         messages
@@ -108,6 +110,27 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         )
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")
+
+    def test_buffer_change_success(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_adjust_data()
+        input_data["bufferTimeBefore"] = "00:15:00"
+        input_data["bufferTimeAfter"] = "00:30:00"
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        payload = content.get("data").get("staffAdjustReservationTime")
+        assert_that(payload.get("errors")).is_none()
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.buffer_time_before).is_equal_to(
+            datetime.timedelta(minutes=15)
+        )
+        assert_that(self.reservation.buffer_time_after).is_equal_to(
+            datetime.timedelta(minutes=30)
+        )
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
@@ -301,6 +324,58 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         data["end"] = (self.reservation_end + datetime.timedelta(hours=3)).strftime(
             "%Y%m%dT%H%M%S%zZ"
         )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        error = content.get("errors")[0].get("extensions").get("error_code")
+        assert_that(error).is_equal_to("RESERVATION_OVERLAP")
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end)
+
+    @override_settings(UPDATE_PRODUCT_MAPPING=False)
+    def test_overlaps_with_modified_buffer_time_before_fails(self):
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.reservation_begin - datetime.timedelta(hours=3),
+            end=self.reservation_end - datetime.timedelta(hours=2),
+            state=STATE_CHOICES.CONFIRMED,
+        )
+
+        data = self.get_valid_adjust_data()
+        data["begin"] = (self.reservation_begin).strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = (self.reservation_end).strftime("%Y%m%dT%H%M%S%zZ")
+        data["bufferTimeBefore"] = "01:01:00"
+
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        error = content.get("errors")[0].get("extensions").get("error_code")
+        assert_that(error).is_equal_to("RESERVATION_OVERLAP")
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end)
+
+    @override_settings(UPDATE_PRODUCT_MAPPING=False)
+    def test_overlaps_with_modified_buffer_time_after_fails(self):
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.reservation_begin + datetime.timedelta(hours=2),
+            end=self.reservation_end + datetime.timedelta(hours=3),
+            state=STATE_CHOICES.CONFIRMED,
+        )
+
+        data = self.get_valid_adjust_data()
+        data["begin"] = (self.reservation_begin).strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = (self.reservation_end).strftime("%Y%m%dT%H%M%S%zZ")
+        data["bufferTimeAfter"] = "01:01:00"
 
         self.client.force_login(self.general_admin)
         response = self.query(self.get_update_query(), input_data=data)
