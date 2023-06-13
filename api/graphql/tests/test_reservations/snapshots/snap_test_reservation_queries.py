@@ -1577,6 +1577,39 @@ snapshots['ReservationQueryTestCase::test_regular_user_cant_read_working_memo 1'
     }
 }
 
+snapshots['ReservationQueryTestCase::test_reservation_is_blocked_when_supposed_to_be_false 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'isBlocked': False
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_reservation_is_blocked_when_supposed_to_be_true 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'isBlocked': True
+                    }
+                },
+                {
+                    'node': {
+                        'isBlocked': False
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
     'data': {
         'reservations': {
@@ -1781,4 +1814,3 @@ snapshots['ReservationQueryTestCase::test_staff_user_without_create__permissions
         }
     }
 }
-

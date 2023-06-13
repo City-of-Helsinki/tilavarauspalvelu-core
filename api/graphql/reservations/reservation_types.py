@@ -144,6 +144,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     cancel_details = graphene.String()
     description = graphene.String()
     handled_at = graphene.DateTime()
+    is_blocked = graphene.Boolean()
     is_handled = graphene.Boolean()
     name = graphene.String()
     order_uuid = graphene.String()
@@ -192,6 +193,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "free_of_charge_reason",
             "handled_at",
             "home_city",
+            "is_blocked",
             "is_handled",
             "name",
             "num_persons",
@@ -307,6 +309,9 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_home_city(self, info: ResolveInfo) -> Optional[str]:
         return self.home_city
+
+    def resolve_is_blocked(self, info: ResolveInfo) -> Optional[bool]:
+        return self.type == ReservationTypeField.BLOCKED
 
     @reservation_non_public_field
     def resolve_is_handled(self, info: ResolveInfo) -> Optional[bool]:

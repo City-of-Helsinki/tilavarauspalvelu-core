@@ -17,7 +17,7 @@ from reservation_units.tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
 )
-from reservations.models import STATE_CHOICES, AgeGroup
+from reservations.models import STATE_CHOICES, AgeGroup, ReservationType
 from reservations.tests.factories import (
     RecurringReservationFactory,
     ReservationFactory,
@@ -1645,6 +1645,48 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         reservations = content.get("data").get("reservations").get("edges")
         assert_that(reservations[0].get("node").get("isHandled")).is_equal_to(True)
+
+    def test_reservation_is_blocked_when_supposed_to_be_false(self):
+        self.client.force_login(self.regular_joe)
+
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            isBlocked
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_reservation_is_blocked_when_supposed_to_be_true(self):
+        self.client.force_login(self.regular_joe)
+        ReservationFactory(type=ReservationType.BLOCKED)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            isBlocked
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
