@@ -272,6 +272,31 @@ def get_units_where_can_view_reservations(user: User) -> QuerySet:
     return units
 
 
+def get_units_with_permission(user: User, permission: str) -> QuerySet:
+    "Given a permission, returns units that match to that permission on different levels"
+    service_sector_ids = user.service_sector_roles.filter(
+        role__permissions__permission=permission
+    ).values_list("service_sector", flat=True)
+
+    unit_ids_from_unit_roles = user.unit_roles.filter(
+        role__permissions__permission=permission
+    ).values_list("unit", flat=True)
+
+    unit_group_ids = user.unit_roles.filter(
+        role__permissions__permission=permission
+    ).values_list("unit_group", flat=True)
+
+    unit_ids_from_unit_groups = UnitGroup.objects.filter(
+        id__in=unit_group_ids
+    ).values_list("units", flat=True)
+
+    return (
+        ServiceSector.objects.filter(id__in=service_sector_ids)
+        .values_list("units", flat=True)
+        .union(unit_ids_from_unit_roles, unit_ids_from_unit_groups)
+    )
+
+
 def get_service_sectors_where_can_view_reservations(user: User) -> list:
     permission = "can_view_reservations"
 

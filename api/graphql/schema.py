@@ -85,6 +85,7 @@ from api.graphql.resources.resource_mutations import (
     ResourceUpdateMutation,
 )
 from api.graphql.resources.resource_types import ResourceType
+from api.graphql.spaces.space_filtersets import SpaceFilterSet
 from api.graphql.spaces.space_mutations import (
     SpaceCreateMutation,
     SpaceDeleteMutation,
@@ -427,7 +428,7 @@ class Query(graphene.ObjectType):
     equipment_category = relay.Node.Field((EquipmentCategoryType))
     equipment_category_by_pk = Field(EquipmentCategoryType, pk=graphene.Int())
 
-    spaces = SpacesFilter(SpaceType)
+    spaces = SpacesFilter(SpaceType, filterset_class=SpaceFilterSet)
     space = relay.Node.Field(SpaceType)
     space_by_pk = Field(SpaceType, pk=graphene.Int())
     service_sectors = ServiceSectorFilter(ServiceSectorType)
