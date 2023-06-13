@@ -74,7 +74,7 @@ def create_reservation_from_schedule_result(result, application_event):
             reservation = Reservation.objects.create(
                 state=STATE_CHOICES.DENIED
                 if is_overlapping or is_unit_closed
-                else STATE_CHOICES.CREATED,
+                else STATE_CHOICES.CONFIRMED,
                 priority=result.application_event_schedule.priority,
                 user=application_event.application.user,
                 begin=start if not is_unit_closed else res_start,
