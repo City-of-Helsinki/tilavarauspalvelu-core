@@ -79,6 +79,7 @@ from api.graphql.reservations.reservation_types import (
     ReservationPurposeType,
     ReservationType,
 )
+from api.graphql.resources.resource_filtersets import ResourceFilterSet
 from api.graphql.resources.resource_mutations import (
     ResourceCreateMutation,
     ResourceDeleteMutation,
@@ -416,7 +417,7 @@ class Query(graphene.ObjectType):
         ReservationUnitTypeType, filterset_class=ReservationUnitTypeFilterSet
     )
 
-    resources = ResourcesFilter(ResourceType)
+    resources = ResourcesFilter(ResourceType, filterset_class=ResourceFilterSet)
     resource = relay.Node.Field(ResourceType)
     resource_by_pk = Field(ResourceType, pk=graphene.Int())
 
