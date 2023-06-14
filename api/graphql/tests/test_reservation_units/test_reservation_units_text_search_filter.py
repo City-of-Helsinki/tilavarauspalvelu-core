@@ -1,17 +1,31 @@
 import json
 
-import pytest
 from assertpy import assert_that
 
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
 )
 from spaces.tests.factories import SpaceFactory
-from utils.test_utils import skip_long_running
 
 
-@pytest.mark.skipif(skip_long_running(), reason="Slow test")
 class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.reservation_unit.description_fi = "Lorem ipsum fi"
+        cls.reservation_unit.description_sv = "Lorem ipsum sv"
+        cls.reservation_unit.description_en = "Lorem ipsum en"
+
+        space = SpaceFactory(name_en="space name en")
+        cls.reservation_unit.spaces.set([space])
+
+        cls.reservation_unit.save()
+
+        # Bit of a hack to wait some time to get the search indexes updated.
+        cls.reservation_unit.index_search_document(
+            index=cls.reservation_unit.search_indexes[0]
+        )
+
     def test_filtering_by_type_fi(self):
         response = self.query(
             """
@@ -176,8 +190,6 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_unit_description_fi(self):
-        self.reservation_unit.description_fi = "Lorem ipsum fi"
-        self.reservation_unit.save()
         response = self.query(
             """
             query {
@@ -216,8 +228,6 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         assert_that(self.content_is_empty(content)).is_true()
 
     def test_filtering_by_reservation_unit_description_en(self):
-        self.reservation_unit.description_en = "Lorem ipsum en"
-        self.reservation_unit.save()
         response = self.query(
             """
             query {
@@ -239,8 +249,6 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_unit_description_sv(self):
-        self.reservation_unit.description_sv = "Lorem ipsum sv"
-        self.reservation_unit.save()
         response = self.query(
             """
             query {
@@ -304,10 +312,6 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         assert_that(self.content_is_empty(content)).is_true()
 
     def test_filtering_by_space_name_en(self):
-        space = SpaceFactory(name_en="space name en")
-        self.reservation_unit.spaces.set([space])
-        self.reservation_unit.save()
-
         response = self.query(
             """
             query {

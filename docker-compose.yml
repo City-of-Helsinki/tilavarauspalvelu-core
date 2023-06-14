@@ -12,6 +12,22 @@ services:
             - "127.0.0.1:5555:5432"
         volumes:
             - postgres-data-volume:/var/lib/postgresql/data
+    elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+        environment:
+            - xpack.security.enabled=false
+            - discovery.type=single-node
+        volumes:
+            - elastic_data:/usr/share/elasticsearch/data
+        ulimits:
+          memlock:
+              soft: -1
+              hard: -1
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        networks:
+            - default
 
     redis:
         image: "redis:7-alpine"
@@ -73,6 +89,8 @@ services:
 
 volumes:
         postgres-data-volume:
+        elastic_data:
+            driver: local
 
 networks:
     default:

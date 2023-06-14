@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "admin_extra_buttons",
     "import_export",
     "rangefilter",
+    "elasticsearch_django",
 ]
 
 MIDDLEWARE = [
@@ -245,6 +246,8 @@ env = environ.Env(
     REDIS_SENTINEL_SERVICE=(str, None),
     REDIS_URL=(str, None),
     REDIS_PASSWORD=(str, None),
+    # Elasticsearch
+    ELASTICSEARCH_URL=(str, "http://localhost:9200"),
 )
 
 environ.Env.read_env()
@@ -463,6 +466,8 @@ OIDC_API_TOKEN_AUTH = {
     "ISSUER": env("TUNNISTAMO_JWT_ISSUER"),
     # Use a custom resolve user for fetching date of birth.
     "USER_RESOLVER": "users.utils.open_city_profile.resolve_user",
+    "API_SCOPE_PREFIX": "",
+    "TOKEN_AUTH_REQUIRE_SCOPE_PREFIX": True,
 }
 
 OIDC_AUTH = {"OIDC_LEEWAY": env("OIDC_LEEWAY")}
@@ -639,6 +644,34 @@ elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER"):
             },
         }
     }
+
+
+SEARCH_SETTINGS = {
+    "connections": {
+        "default": env("ELASTICSEARCH_URL"),
+    },
+    "indexes": {
+        "reservation_units": {
+            "models": [
+                "reservation_units.ReservationUnit",
+            ]
+        }
+    },
+    "settings": {
+        # batch size for ES bulk api operations
+        "chunk_size": 500,
+        # default page size for search results
+        "page_size": 10000,
+        # set to True to connect post_save/delete signals
+        "auto_sync": True,
+        # List of models which will never auto_sync even if auto_sync is True
+        "never_auto_sync": [],
+        # if true, then indexes must have mapping files
+        "strict_validation": False,
+        "mappings_dir": "elastic_django",
+    },
+}
+
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.

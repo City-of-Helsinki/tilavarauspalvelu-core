@@ -153,10 +153,40 @@ The four environments are the following:
 
 
 ### Running tests, linters and formatting
-Running tests locally requires that the PostgreSQL database and Redis cache are up and running. You can start them with
-`docker-compose up -d db redis`.
+Running tests locally requires that the PostgreSQL database, Redis cache and ElasticSearch are up and running. You can start them with
+`docker-compose up -d db redis elastic`.
 
 To run all tests with verbose output, you can simply run `pytest`. To ignore third-party warnings, you can run `pytest -W default`. Not that some unit tests may take longer to run. If you want to ignore the slow tests, run `SKIP_LONG_RUNNING=1 pytest -W default`.
+
+If you'd like the unittests not to mess up your development environment use local_settings to make own search index for test database. Like:
+```
+env = Env(TEST=(bool, False))
+
+if env("TEST"):
+    settings.DATABASES["default"]["NAME"] = "test_tvp"
+    SEARCH_SETTINGS = {
+        "connections": {
+            "default": env("ELASTICSEARCH_URL"),
+        },
+        "indexes": {
+            "test_reservation_units": {
+                "models": [
+                    "reservation_units.ReservationUnit",
+                ]
+            }
+        },
+        "settings": {
+            "chunk_size": 500,
+            "page_size": 10000,
+            "auto_sync": True,
+            "never_auto_sync": [],
+            "strict_validation": False,
+            "mappings_dir": "elastic_django/tests/mappings",
+        },
+    }
+```
+So the above settings expects that there would be environment variable  TEST present and the mappings files has then the test_reservation_units.json.
+You could then run the tests like: `TEST=True pytest`.
 
 Linters and auto-formatting can be run with the `./format.sh` script found in the project root. It runs [black](https://github.com/psf/black), [isort](https://pycqa.github.io/isort/), and [flake8](https://github.com/pycqa/flake8).
 

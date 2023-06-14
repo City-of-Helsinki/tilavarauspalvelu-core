@@ -1,6 +1,7 @@
+import json
+
 import requests
 from django.conf import settings
-from kombu.utils import json
 
 import tilavarauspalvelu.utils.logging as logging
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
@@ -16,11 +17,13 @@ def make_hauki_get_request(url, params):
     except Exception as e:
         logger.error(f"Request to Hauki API failed: {e}")
         raise HaukiRequestError("Resource opening hours request failed")
+
     try:
         response_data = response.json()
     except ValueError as e:
         logger.error(f"Could not read Hauki response as json: {e}")
         raise HaukiRequestError("Resource opening hours response parsing failed")
+
     if not response.ok:
         if "detail" in response_data:
             logger.error(f"Hauki API returned an error: {response_data['detail']}")
@@ -44,17 +47,20 @@ def make_hauki_post_request(url: str, data: dict):
     except Exception as e:
         logger.error(f"Post request to Hauki API failed: {e}")
         raise HaukiRequestError(f"Post request to Hauki url: {url} failed.")
+
     try:
         return_data = response.json()
     except ValueError as e:
         logger.error(f"Could not read Hauki response as json: {e}")
         raise HaukiRequestError("Parsing post return data failed")
+
     if not response.ok:
         if "detail" in return_data:
             logger.error(f"Hauki API returned an error: {return_data['detail']}")
         else:
             logger.error("Hauki API returned an error")
         raise HaukiAPIError("Hauki API returned an error")
+
     return return_data
 
 
@@ -72,15 +78,18 @@ def make_hauki_put_request(url: str, data: dict):
     except Exception as e:
         logger.error(f"Put request to Hauki API failed: {e}")
         raise HaukiRequestError(f"Post request to Hauki url: {url} failed.")
+
     try:
         return_data = response.json()
     except ValueError as e:
         logger.error(f"Could not read Hauki response as json: {e}")
         raise HaukiRequestError("Parsing post return data failed")
+
     if not response.ok:
         if "detail" in return_data:
             logger.error(f"Hauki API returned an error: {return_data['detail']}")
         else:
             logger.error("Hauki API returned an error")
         raise HaukiAPIError("Hauki API returned an error")
+
     return return_data

@@ -1,8 +1,8 @@
-from json import JSONDecodeError
 from typing import Dict, Optional
 
 import requests
 from django.conf import settings
+from simplejson.errors import JSONDecodeError
 
 from applications.models import City
 from users.utils.open_city_profile.mixins import ProfileReaderTokenMixin

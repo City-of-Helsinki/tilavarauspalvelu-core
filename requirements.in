@@ -20,6 +20,7 @@ djangorestframework
 drf-oidc-auth
 drf-spectacular
 easy-thumbnails
+elasticsearch-django
 flake8==3.8.4
 graphene-django
 graphene_permissions

@@ -1,14 +1,21 @@
 import datetime
 import uuid as uuid
 from decimal import Decimal
+from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import QuerySet
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from easy_thumbnails.fields import ThumbnailerImageField
+from elasticsearch_django.models import (
+    SearchDocumentManagerMixin,
+    SearchDocumentMixin,
+    SearchResultsQuerySet,
+)
 
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from reservation_units.enums import ReservationState, ReservationUnitState
@@ -193,7 +200,7 @@ class ReservationUnitPaymentType(models.Model):
         return self.code
 
 
-class ReservationUnitQuerySet(models.QuerySet):
+class ReservationUnitQuerySet(SearchResultsQuerySet):
     def scheduled_for_publishing(self):
         now = datetime.datetime.now(tz=get_default_timezone())
         return self.filter(
@@ -205,8 +212,15 @@ class ReservationUnitQuerySet(models.QuerySet):
         )
 
 
-class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Model):
-    objects = ReservationUnitQuerySet.as_manager()
+class ReservationUnitManager(SearchDocumentManagerMixin):
+    def get_search_queryset(self, index: str = "_all") -> QuerySet:
+        return self.get_queryset()
+
+
+class ReservationUnit(
+    SearchDocumentMixin, ExportModelOperationsMixin("reservation_unit"), models.Model
+):
+    objects = ReservationUnitManager.from_queryset(ReservationUnitQuerySet)()
 
     sku = models.CharField(
         verbose_name=_("SKU"), max_length=255, blank=True, default=""
@@ -684,6 +698,81 @@ class ReservationUnit(ExportModelOperationsMixin("reservation_unit"), models.Mod
         super(ReservationUnit, self).save(*args, **kwargs)
         if settings.UPDATE_PRODUCT_MAPPING:
             refresh_reservation_unit_product_mapping.delay(self.pk)
+
+    # ElasticSearch
+    def as_search_document(self, *, index: str) -> Optional[dict]:
+        if index == "reservation_units":
+            return {
+                "pk": self.pk,
+                "name_fi": self.name_fi,
+                "name_en": self.name_en,
+                "name_sv": self.name_sv,
+                "description_fi": self.description_fi,
+                "description_en": self.description_en,
+                "description_sv": self.description_sv,
+                "space_name_fi": ",".join([s.name_fi or "" for s in self.spaces.all()]),
+                "space_name_en": ",".join([s.name_en or "" for s in self.spaces.all()]),
+                "space_name_sv": ",".join([s.name_sv or "" for s in self.spaces.all()]),
+                "keyword_groups_name_fi": ",".join(
+                    [k.name_fi or "" for k in self.keyword_groups.all()]
+                ),
+                "keyword_groups_en": ",".join(
+                    [k.name_e or "" for k in self.keyword_groups.all()]
+                ),
+                "keyword_groups_sv": ",".join(
+                    [k.name_sv or "" for k in self.keyword_groups.all()]
+                ),
+                "resources_name_fi": ",".join(
+                    [r.name_fi for r in self.resources.all()]
+                ),
+                "resources_name_en": ",".join(
+                    [r.name_en or "" for r in self.resources.all()]
+                ),
+                "resources_name_sv": ",".join(
+                    [r.name_sv or "" for r in self.resources.all()]
+                ),
+                "services_name_fi": ",".join(
+                    [s.name_fi or "" for s in self.services.all()]
+                ),
+                "services_name_en": ",".join(
+                    [s.name_en or "" for s in self.services.all()]
+                ),
+                "services_name_sv": ",".join(
+                    [s.name_sv or "" for s in self.services.all()]
+                ),
+                "purposes_name_fi": ",".join(
+                    [p.name_fi or "" for p in self.purposes.all()]
+                ),
+                "purposes_name_en": ",".join(
+                    [p.name_en or "" for p in self.purposes.all()]
+                ),
+                "purposes_name_sv": ",".join(
+                    [p.name_sv or "" for p in self.purposes.all()]
+                ),
+                "reservation_unit_type_name_fi": getattr(
+                    self.reservation_unit_type, "name_fi", ""
+                ),
+                "reservation_unit_type_name_en": getattr(
+                    self.reservation_unit_type, "name_en", ""
+                ),
+                "reservation_unit_type_name_sv": getattr(
+                    self.reservation_unit_type, "name_sv", ""
+                ),
+                "equipments_name_fi": ",".join(
+                    [e.name_fi or "" for e in self.equipments.all()]
+                ),
+                "equipments_name_en": ",".join(
+                    [e.name_en or "" for e in self.equipments.all()]
+                ),
+                "equipments_name_sv": ",".join(
+                    [e.name_sv or "" for e in self.equipments.all()]
+                ),
+                "unit_name_fi": getattr(self.unit, "name_fi", ""),
+                "unit_name_en": getattr(self.unit, "name_en", ""),
+                "unit_name_sv": getattr(self.unit, "name_sv", ""),
+            }
+
+        return None
 
 
 class ReservationUnitPricingManager(models.QuerySet):
