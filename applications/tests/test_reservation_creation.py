@@ -22,7 +22,7 @@ from applications.utils.reservation_creation import (
 )
 from opening_hours.hours import TimeElement
 from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.models import Reservation
+from reservations.models import STATE_CHOICES, Reservation
 from spaces.tests.factories import SpaceFactory
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
@@ -251,6 +251,9 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
     def test_creating_reservations(self, mock):
         create_reservations_from_allocation_results(self.application_event)
         assert_that(Reservation.objects.count()).is_equal_to(4)
+        assert_that(
+            list(Reservation.objects.values_list("state", flat=True))
+        ).is_equal_to([STATE_CHOICES.CONFIRMED for _ in range(4)])
 
     def test_creating_reservations_without_result(self, mock):
         self.result.delete()

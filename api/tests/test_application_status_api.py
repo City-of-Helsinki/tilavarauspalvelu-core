@@ -321,7 +321,7 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         ).order_by("begin")
         assert_that(reservations[0].state).is_equal_to(STATE_CHOICES.DENIED)
         for reservation in reservations[1:4]:
-            assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+            assert_that(reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 
     def test_reservation_gets_denied_status_if_unit_not_open(self, mock):
         mock.return_value.get_reservation_times_based_on_opening_hours.return_value = (
