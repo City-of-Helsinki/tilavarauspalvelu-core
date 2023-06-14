@@ -18,6 +18,7 @@ from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
     recurring_reservation_non_public_field,
     reservation_non_public_field,
+    reservation_staff_field,
 )
 from permissions.api_permissions.graphene_permissions import (
     AbilityGroupPermission,
@@ -27,7 +28,6 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationPurposePermission,
     ReservationUnitPermission,
 )
-from permissions.helpers import can_handle_reservation
 from reservations.models import (
     AbilityGroup,
     AgeGroup,
@@ -129,13 +129,33 @@ class ReservationPurposeType(AuthNode, PrimaryKeyObjectType):
 
 class ReservationType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (ReservationPermission,)
+
+    age_group = graphene.Field(AgeGroupType)
+    applying_for_free_of_charge = graphene.Boolean()
+    buffer_time_before = Duration()
+    buffer_time_after = Duration()
+    billing_first_name = graphene.String()
+    billing_last_name = graphene.String()
+    billing_address_street = graphene.String()
+    billing_address_city = graphene.String()
+    billing_address_zip = graphene.String()
+    billing_phone = graphene.String()
     created_at = graphene.String()
-    user = graphene.Field("api.graphql.users.user_types.UserType")
+    cancel_details = graphene.String()
+    description = graphene.String()
+    handled_at = graphene.DateTime()
+    is_blocked = graphene.Boolean()
+    is_handled = graphene.Boolean()
+    name = graphene.String()
+    order_uuid = graphene.String()
+    order_status = graphene.String()
+    price = graphene.Float()
+    price_net = graphene.Decimal()
     reservation_units = graphene.List(
         "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
     )
-
     recurring_reservation = graphene.Field(RecurringReservationType)
+    refund_uuid = graphene.String()
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()
     reservee_address_street = graphene.String()
@@ -144,62 +164,19 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     reservee_phone = graphene.String()
     reservee_organisation_name = graphene.String()
     reservee_name = graphene.String()
-    billing_first_name = graphene.String()
-    billing_last_name = graphene.String()
-    billing_address_street = graphene.String()
-    billing_address_city = graphene.String()
-    billing_address_zip = graphene.String()
-    billing_phone = graphene.String()
-    description = graphene.String()
-    reservee_id = graphene.String()
-    cancel_details = graphene.String()
-    name = graphene.String()
-    description = graphene.String()
-    unit_price = graphene.Float()
-    tax_percentage_value = graphene.Decimal()
-    price = graphene.Float()
-    age_group = graphene.Field(AgeGroupType)
-    buffer_time_before = Duration()
-    buffer_time_after = Duration()
-    staff_event = graphene.Boolean(deprecation_reason="Please refer to type.")
-    order_uuid = graphene.String()
-    order_status = graphene.String()
-    handled_at = graphene.DateTime()
-    refund_uuid = graphene.String()
     reservee_is_unregistered_association = graphene.Boolean()
-    applying_for_free_of_charge = graphene.Boolean()
-    price_net = graphene.Decimal()
-    is_handled = graphene.Boolean()
+    reservee_id = graphene.String()
+    staff_event = graphene.Boolean(deprecation_reason="Please refer to type.")
+    tax_percentage_value = graphene.Decimal()
+    unit_price = graphene.Float()
+    user = graphene.Field("api.graphql.users.user_types.UserType")
 
     class Meta:
         model = Reservation
         fields = [
-            "created_at",
-            "state",
-            "priority",
-            "user",
-            "begin",
-            "end",
-            "buffer_time_before",
-            "buffer_time_after",
-            "reservation_units",
-            "recurring_reservation",
-            "num_persons",
-            "reservee_first_name",
-            "reservee_last_name",
-            "reservee_phone",
-            "reservee_organisation_name",
-            "reservee_address_street",
-            "reservee_address_city",
-            "reservee_address_zip",
-            "reservee_email",
-            "reservee_type",
-            "reservee_id",
-            "reservee_is_unregistered_association",
-            "home_city",
-            "applying_for_free_of_charge",
-            "free_of_charge_reason",
             "age_group",
+            "applying_for_free_of_charge",
+            "begin",
             "billing_first_name",
             "billing_last_name",
             "billing_address_street",
@@ -207,22 +184,46 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "billing_address_zip",
             "billing_phone",
             "billing_email",
-            "name",
-            "description",
-            "purpose",
-            "unit_price",
-            "tax_percentage_value",
-            "price",
-            "price_net",
-            "working_memo",
+            "buffer_time_before",
+            "buffer_time_after",
+            "created_at",
             "cancel_details",
-            "staff_event",
-            "type",
+            "description",
+            "end",
+            "free_of_charge_reason",
+            "handled_at",
+            "home_city",
+            "is_blocked",
+            "is_handled",
+            "name",
+            "num_persons",
             "order_uuid",
             "order_status",
-            "handled_at",
+            "priority",
+            "purpose",
+            "price",
+            "price_net",
+            "recurring_reservation",
             "refund_uuid",
-            "is_handled",
+            "reservee_address_street",
+            "reservee_address_city",
+            "reservee_address_zip",
+            "reservee_email",
+            "reservee_first_name",
+            "reservee_last_name",
+            "reservee_phone",
+            "reservee_organisation_name",
+            "reservee_type",
+            "reservee_id",
+            "reservee_is_unregistered_association",
+            "reservation_units",
+            "state",
+            "staff_event",
+            "tax_percentage_value",
+            "type",
+            "unit_price",
+            "user",
+            "working_memo",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -238,96 +239,13 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
 
     calendar_url = graphene.String()
 
-    def resolve_created_at(self, info: ResolveInfo) -> str:
-        if self is None:
-            return ""
-        return self.created_at.strftime("%Y-%m-%dT%H:%M:%S%z")
+    @reservation_non_public_field
+    def resolve_age_group(self, info: ResolveInfo) -> Optional[AgeGroupType]:
+        return self.age_group
 
     @reservation_non_public_field
-    def resolve_calendar_url(self, info: ResolveInfo) -> str:
-        if self is None:
-            return ""
-        scheme = info.context.scheme
-        host = info.context.get_host()
-        calendar_url = reverse("reservation_calendar-detail", kwargs={"pk": self.pk})
-        signature = hmac_signature(f"reservation-{self.pk}")
-        return f"{scheme}://{host}{calendar_url}?hash={signature}"
-
-    @reservation_non_public_field
-    def resolve_user(self, info: ResolveInfo) -> Optional[UserType]:
-        if not self.user:
-            return None
-        return self.user
-
-    @check_resolver_permission(ReservationUnitPermission)
-    def resolve_reservation_units(self, info: ResolveInfo):
-        return self.reservation_unit.all()
-
-    @reservation_non_public_field
-    def resolve_reservee_first_name(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_first_name
-
-    @reservation_non_public_field
-    def resolve_reservee_last_name(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_last_name
-
-    @reservation_non_public_field
-    def resolve_reservee_name(self, info: ResolveInfo) -> Optional[str]:
-        if self.reservee_type in [
-            CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
-            CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
-        ]:
-            return self.reservee_organisation_name
-        else:
-            return f"{self.reservee_first_name} {self.reservee_last_name}"
-
-    @reservation_non_public_field
-    def resolve_reservee_phone(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_phone
-
-    def resolve_working_memo(self, info: ResolveInfo) -> Optional[str]:
-        if can_handle_reservation(info.context.user, self):
-            return self.working_memo
-        return None
-
-    def resolve_staff_event(self, info: ResolveInfo) -> Optional[bool]:
-        if can_handle_reservation(info.context.user, self):
-            return self.type == ReservationTypeField.STAFF
-        return None
-
-    def resolve_type(self, info: ResolveInfo) -> Optional[str]:
-        if can_handle_reservation(info.context.user, self):
-            return self.type
-        return None
-
-    def resolve_handled_at(self, info: ResolveInfo) -> Optional[str]:
-        if can_handle_reservation(info.context.user, self):
-            return self.handled_at
-        return None
-
-    @reservation_non_public_field
-    def resolve_reservee_email(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_email
-
-    @reservation_non_public_field
-    def resolve_reservee_address_street(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_address_street
-
-    @reservation_non_public_field
-    def resolve_reservee_address_city(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_address_city
-
-    @reservation_non_public_field
-    def resolve_reservee_address_zip(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_address_zip
-
-    @reservation_non_public_field
-    def resolve_reservee_organisation_name(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_organisation_name
-
-    @reservation_non_public_field
-    def resolve_free_of_charge_reason(self, info: ResolveInfo) -> Optional[str]:
-        return self.free_of_charge_reason
+    def resolve_applying_for_free_of_charge(self, info: ResolveInfo) -> Optional[bool]:
+        return self.applying_for_free_of_charge
 
     @reservation_non_public_field
     def resolve_billing_first_name(self, info: ResolveInfo) -> Optional[str]:
@@ -357,17 +275,55 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     def resolve_billing_email(self, info: ResolveInfo) -> Optional[str]:
         return self.billing_email
 
+    def resolve_created_at(self, info: ResolveInfo) -> str:
+        if self is None:
+            return ""
+        return self.created_at.strftime("%Y-%m-%dT%H:%M:%S%z")
+
+    @reservation_non_public_field
+    def resolve_cancel_details(self, info: ResolveInfo) -> Optional[str]:
+        return self.cancel_details
+
+    @reservation_non_public_field
+    def resolve_calendar_url(self, info: ResolveInfo) -> str:
+        if self is None:
+            return ""
+        scheme = info.context.scheme
+        host = info.context.get_host()
+        calendar_url = reverse("reservation_calendar-detail", kwargs={"pk": self.pk})
+        signature = hmac_signature(f"reservation-{self.pk}")
+        return f"{scheme}://{host}{calendar_url}?hash={signature}"
+
     @reservation_non_public_field
     def resolve_description(self, info: ResolveInfo) -> Optional[str]:
         return self.description
 
     @reservation_non_public_field
-    def resolve_reservee_id(self, info: ResolveInfo) -> Optional[str]:
-        return self.reservee_id
+    def resolve_free_of_charge_reason(self, info: ResolveInfo) -> Optional[str]:
+        return self.free_of_charge_reason
+
+    @reservation_staff_field
+    def resolve_handled_at(self, info: ResolveInfo) -> Optional[str]:
+        return self.handled_at
 
     @reservation_non_public_field
-    def resolve_cancel_details(self, info: ResolveInfo) -> Optional[str]:
-        return self.cancel_details
+    def resolve_home_city(self, info: ResolveInfo) -> Optional[str]:
+        return self.home_city
+
+    def resolve_is_blocked(self, info: ResolveInfo) -> Optional[bool]:
+        return self.type == ReservationTypeField.BLOCKED
+
+    @reservation_non_public_field
+    def resolve_is_handled(self, info: ResolveInfo) -> Optional[bool]:
+        return self.handled_at is not None
+
+    @reservation_non_public_field
+    def resolve_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.name
+
+    @reservation_non_public_field
+    def resolve_num_persons(self, info: ResolveInfo) -> Optional[int]:
+        return self.num_persons
 
     @reservation_non_public_field
     def resolve_order_uuid(self, info: ResolveInfo) -> Optional[str]:
@@ -381,17 +337,67 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         return payment_order.status if payment_order else None
 
     @reservation_non_public_field
+    def resolve_purpose(self, info: ResolveInfo) -> Optional[ReservationPurposeType]:
+        return self.purpose
+
+    @reservation_non_public_field
+    def resolve_price(self, info: ResolveInfo) -> Optional[Decimal]:
+        return self.price
+
+    @reservation_non_public_field
+    def resolve_price_net(self, info: ResolveInfo) -> Optional[Decimal]:
+        return self.price_net
+
+    @reservation_non_public_field
     def resolve_refund_uuid(self, info: ResolveInfo) -> Optional[str]:
         payment_order = self.payment_order.first()
         return getattr(payment_order, "refund_id", None)
 
     @reservation_non_public_field
-    def resolve_name(self, info: ResolveInfo) -> Optional[str]:
-        return self.name
+    def resolve_reservee_first_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_first_name
 
     @reservation_non_public_field
-    def resolve_home_city(self, info: ResolveInfo) -> Optional[str]:
-        return self.home_city
+    def resolve_reservee_last_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_last_name
+
+    @reservation_non_public_field
+    def resolve_reservee_name(self, info: ResolveInfo) -> Optional[str]:
+        if self.reservee_type in [
+            CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+        ]:
+            return self.reservee_organisation_name
+        else:
+            return f"{self.reservee_first_name} {self.reservee_last_name}"
+
+    @reservation_non_public_field
+    def resolve_reservee_phone(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_phone
+
+    @reservation_non_public_field
+    def resolve_reservee_email(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_email
+
+    @reservation_non_public_field
+    def resolve_reservee_address_street(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_address_street
+
+    @reservation_non_public_field
+    def resolve_reservee_address_city(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_address_city
+
+    @reservation_non_public_field
+    def resolve_reservee_address_zip(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_address_zip
+
+    @reservation_non_public_field
+    def resolve_reservee_organisation_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_organisation_name
+
+    @reservation_non_public_field
+    def resolve_reservee_id(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_id
 
     @reservation_non_public_field
     def resolve_reservee_type(self, info: ResolveInfo) -> Optional[str]:
@@ -403,41 +409,35 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     ) -> Optional[bool]:
         return self.reservee_is_unregistered_association
 
-    @reservation_non_public_field
-    def resolve_applying_for_free_of_charge(self, info: ResolveInfo) -> Optional[bool]:
-        return self.applying_for_free_of_charge
+    @check_resolver_permission(ReservationUnitPermission)
+    def resolve_reservation_units(self, info: ResolveInfo):
+        return self.reservation_unit.all()
+
+    @reservation_staff_field
+    def resolve_staff_event(self, info: ResolveInfo) -> Optional[bool]:
+        return self.type == ReservationTypeField.STAFF
 
     @reservation_non_public_field
-    def resolve_num_persons(self, info: ResolveInfo) -> Optional[int]:
-        return self.num_persons
+    def resolve_tax_percentage_value(self, info: ResolveInfo) -> Optional[Decimal]:
+        return self.tax_percentage_value
 
-    @reservation_non_public_field
-    def resolve_age_group(self, info: ResolveInfo) -> Optional[AgeGroupType]:
-        return self.age_group
-
-    @reservation_non_public_field
-    def resolve_purpose(self, info: ResolveInfo) -> Optional[ReservationPurposeType]:
-        return self.purpose
+    @reservation_staff_field
+    def resolve_type(self, info: ResolveInfo) -> Optional[str]:
+        return self.type
 
     @reservation_non_public_field
     def resolve_unit_price(self, info: ResolveInfo) -> Optional[Decimal]:
         return self.unit_price
 
     @reservation_non_public_field
-    def resolve_price(self, info: ResolveInfo) -> Optional[Decimal]:
-        return self.price
+    def resolve_user(self, info: ResolveInfo) -> Optional[UserType]:
+        if not self.user:
+            return None
+        return self.user
 
-    @reservation_non_public_field
-    def resolve_price_net(self, info: ResolveInfo) -> Optional[Decimal]:
-        return self.price_net
-
-    @reservation_non_public_field
-    def resolve_tax_percentage_value(self, info: ResolveInfo) -> Optional[Decimal]:
-        return self.tax_percentage_value
-
-    @reservation_non_public_field
-    def resolve_is_handled(self, info: ResolveInfo) -> Optional[bool]:
-        return self.handled_at is not None
+    @reservation_staff_field
+    def resolve_working_memo(self, info: ResolveInfo) -> Optional[str]:
+        return self.working_memo
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):

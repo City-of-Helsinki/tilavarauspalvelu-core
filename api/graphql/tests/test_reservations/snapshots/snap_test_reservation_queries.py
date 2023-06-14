@@ -1577,6 +1577,39 @@ snapshots['ReservationQueryTestCase::test_regular_user_cant_read_working_memo 1'
     }
 }
 
+snapshots['ReservationQueryTestCase::test_reservation_is_blocked_when_supposed_to_be_false 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'isBlocked': False
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_reservation_is_blocked_when_supposed_to_be_true 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'isBlocked': True
+                    }
+                },
+                {
+                    'node': {
+                        'isBlocked': False
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
     'data': {
         'reservations': {
@@ -1742,6 +1775,39 @@ snapshots['ReservationQueryTestCase::test_show_refund_uuid_when_it_is_available 
                     'node': {
                         'name': 'show me',
                         'refundUuid': 'e521e259-af10-40dc-84ce-308fe66f77d5'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_staff_user_with_read_permissions_cant_read_working_memo_for_other 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'workingMemo': None
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_staff_user_without_create__permissions_can_read_working_memo_for_own 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'workingMemo': 'Read me.'
+                    }
+                },
+                {
+                    'node': {
+                        'workingMemo': None
                     }
                 }
             ]

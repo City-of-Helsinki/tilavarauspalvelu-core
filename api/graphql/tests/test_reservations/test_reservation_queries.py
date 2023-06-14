@@ -17,7 +17,7 @@ from reservation_units.tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
 )
-from reservations.models import STATE_CHOICES, AgeGroup
+from reservations.models import STATE_CHOICES, AgeGroup, ReservationType
 from reservations.tests.factories import (
     RecurringReservationFactory,
     ReservationFactory,
@@ -471,6 +471,53 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_admin_can_read_working_memo(self):
         self.maxDiff = None
         self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            workingMemo
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_staff_user_without_create__permissions_can_read_working_memo_for_own(self):
+        self.maxDiff = None
+        reserver = self.create_staff_reserver_for_unit()
+        self.client.force_login(reserver)
+        ReservationFactory(
+            user=reserver, working_memo="Read me.", state=STATE_CHOICES.CONFIRMED
+        )
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            workingMemo
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_staff_user_with_read_permissions_cant_read_working_memo_for_other(self):
+        self.maxDiff = None
+        reserver = self.create_staff_reserver_for_unit()
+        self.client.force_login(reserver)
         response = self.query(
             """
             query {
@@ -1598,6 +1645,48 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         reservations = content.get("data").get("reservations").get("edges")
         assert_that(reservations[0].get("node").get("isHandled")).is_equal_to(True)
+
+    def test_reservation_is_blocked_when_supposed_to_be_false(self):
+        self.client.force_login(self.regular_joe)
+
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            isBlocked
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_reservation_is_blocked_when_supposed_to_be_true(self):
+        self.client.force_login(self.regular_joe)
+        ReservationFactory(type=ReservationType.BLOCKED)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            isBlocked
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
