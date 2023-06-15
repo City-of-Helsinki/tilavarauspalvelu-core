@@ -11,7 +11,6 @@ export const ActionsWrapper = styled.div`
 
 // Three column grid on desktop and one on small screens.
 export const Grid = styled.div`
-  max-width: var(--container-width-small);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   gap: 1rem 2rem;

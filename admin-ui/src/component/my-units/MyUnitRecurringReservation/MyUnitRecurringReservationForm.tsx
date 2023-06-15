@@ -32,7 +32,7 @@ import { useNotification } from "../../../context/NotificationContext";
 import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
-import { ActionsWrapper, Grid as BaseGrid, Element } from "./commonStyling";
+import { ActionsWrapper, Grid, Element } from "./commonStyling";
 import { flattenMetadata } from "../create-reservation/utils";
 import { useFilteredReservationList, useMultipleReservation } from "./hooks";
 import { useReservationUnitQuery } from "../hooks";
@@ -49,11 +49,6 @@ const Label = styled.p<{ $bold?: boolean }>`
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
   max-width: var(--prose-width);
-`;
-
-// max-width causes grids to overflow (forms should not overflow)
-const Grid = styled(BaseGrid)`
-  max-width: unset;
 `;
 
 const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
