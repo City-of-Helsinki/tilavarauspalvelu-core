@@ -142,6 +142,15 @@ export const VerticalFlexNoGap = styled.div`
 
 VerticalFlexNoGap.displayName = "VerticalFlexNoGap";
 
+export const ButtonContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2-xs);
+  width: 100%;
+  margin-bottom: var(--spacing-s);
+`;
+ButtonContainer.displayName = "ButtonContainer";
+
 // grid because flex causes overflow problems in children
 export const Container = styled.div`
   display: grid;

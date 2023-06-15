@@ -75,26 +75,6 @@ export const useReservationData = (
   return { ...rest, events };
 };
 
-export const useReservationEditData = (id?: string) => {
-  const { data, loading, refetch } = useQuery<Query, QueryReservationByPkArgs>(
-    SINGLE_RESERVATION_QUERY,
-    {
-      skip: !id,
-      fetchPolicy: "no-cache",
-      variables: {
-        pk: Number(id),
-      },
-    }
-  );
-
-  const reservation = data?.reservationByPk ?? undefined;
-  const reservationUnit =
-    data?.reservationByPk?.reservationUnits?.find((x) => x != null) ??
-    undefined;
-
-  return { reservation, reservationUnit, loading, refetch };
-};
-
 type OptionsType = {
   limit: number;
 };
@@ -127,10 +107,6 @@ export const useRecurringReservations = (
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const states = [
-    ReservationsReservationStateChoices.Confirmed,
-    ReservationsReservationStateChoices.Denied,
-  ];
   const { limit } = { ...defaultOptions, ...options };
   const { data, loading, fetchMore } = useQuery<Query, CustomQueryParams>(
     RECURRING_RESERVATION_QUERY,
@@ -143,7 +119,10 @@ export const useRecurringReservations = (
         pk: recurringPk ?? 0,
         offset: 0,
         count: Math.min(limit, defaultOptions.limit),
-        state: states,
+        state: [
+          ReservationsReservationStateChoices.Confirmed,
+          ReservationsReservationStateChoices.Denied,
+        ],
       },
       // do automatic fetching and let the cache manage merging
       onCompleted: (d: Query) => {
@@ -215,4 +194,59 @@ export const useDenyReasonOptions = () => {
   );
 
   return { options: denyReasonOptions, loading };
+};
+
+/// @param id fetch reservation related to this pk
+/// Overly complex because editing DENIED or past reservations is not allowed
+/// but the UI makes no distinction between past and present instances of a recurrance.
+/// If we don't get the next valid reservation for edits: the mutations work,
+/// but the UI is not updated to show the changes (since it's looking at a past instance).
+export const useReservationEditData = (id?: string) => {
+  const { data, loading, refetch } = useQuery<Query, QueryReservationByPkArgs>(
+    SINGLE_RESERVATION_QUERY,
+    {
+      skip: !id,
+      fetchPolicy: "no-cache",
+      variables: {
+        pk: Number(id),
+      },
+    }
+  );
+
+  const recurringPk =
+    data?.reservationByPk?.recurringReservation?.pk ?? undefined;
+  const { reservations: recurringReservations } =
+    useRecurringReservations(recurringPk);
+
+  // NOTE have to be done like this instead of query params because of cache
+  // real solution is to fix the cache, but without fixing passing query params
+  // into it will break the reservation queries elsewhere.
+  const possibleReservations = recurringReservations
+    .filter((x) => new Date(x.begin) > new Date())
+    .filter((x) => x.state === ReservationsReservationStateChoices.Confirmed);
+
+  const { data: nextRecurrance } = useQuery<Query, QueryReservationByPkArgs>(
+    SINGLE_RESERVATION_QUERY,
+    {
+      skip: !possibleReservations?.at(0)?.pk,
+      fetchPolicy: "no-cache",
+      variables: {
+        pk: possibleReservations?.at(0)?.pk ?? 0,
+      },
+    }
+  );
+
+  const reservation = recurringPk
+    ? nextRecurrance?.reservationByPk
+    : data?.reservationByPk;
+  const reservationUnit =
+    data?.reservationByPk?.reservationUnits?.find((x) => x != null) ??
+    undefined;
+
+  return {
+    reservation: reservation ?? undefined,
+    reservationUnit,
+    loading,
+    refetch,
+  };
 };

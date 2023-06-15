@@ -49,4 +49,12 @@ i18n.addResourceBundle(
 );
 i18n.addResourceBundle("fi", "reservationForm", reservationFormFi);
 
+i18n.addResourceBundle("fi", "forms", {
+  prefix: {
+    text: "Syötä",
+    select: "Valitse",
+    approve: "Hyväksy",
+  },
+});
+
 export default i18n;

@@ -1,17 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ReservationStaffModifyMutationInput,
-  ReservationStaffModifyMutationPayload,
-  ReservationType,
-  ReservationUnitType,
-  ReservationWorkingMemoMutationInput,
+  type ReservationType,
+  type ReservationUnitType,
 } from "common/types/gql-types";
 import camelCase from "lodash/camelCase";
-import { Button } from "hds-react";
+import { Button, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
@@ -21,20 +17,15 @@ import {
   type ReservationChangeFormType,
   ReservationChangeFormSchema,
 } from "app/schemas";
-import withMainMenu from "../withMainMenu";
 import { useNotification } from "../../context/NotificationContext";
 import { flattenMetadata } from "../my-units/create-reservation/utils";
-import {
-  Grid,
-  Element,
-} from "../my-units/MyUnitRecurringReservation/commonStyling";
 import ReservationTypeForm from "../my-units/ReservationTypeForm";
 import Loader from "../Loader";
 import { HR } from "../lists/components";
 import { useOptions } from "../my-units/hooks";
 import EditPageWrapper from "./EditPageWrapper";
 import { useReservationEditData } from "./requested/hooks";
-import { CHANGE_STAFF_RESERVATION } from "./queries";
+import { useStaffReservationMutation } from "./hooks";
 
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
@@ -44,15 +35,11 @@ type PossibleOptions = {
   homeCity: Array<{ label: string; value: number }>;
 };
 
-const ButtonContainer = styled(Element)`
-  grid-column-end: -1;
+const ButtonContainer = styled.div`
   gap: 1rem;
   display: flex;
+  justify-content: flex-end;
   border-top-width: 2px;
-`;
-
-const GridHR = styled(HR)`
-  grid-column: 1 / -1;
 `;
 
 const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
@@ -63,6 +50,17 @@ const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
   !reservation.billingFirstName &&
   !reservation.billingLastName &&
   !reservation.billingPhone;
+
+const InnerTextInput = styled(TextInput)`
+  grid-column: 1 / -1;
+  max-width: var(--prose-width);
+`;
+
+const Form = styled.form`
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+`;
 
 const EditReservation = ({
   onCancel,
@@ -79,12 +77,22 @@ const EditReservation = ({
 }) => {
   const { t } = useTranslation();
 
+  // TODO recurring requires a description and a name box
   const form = useForm<FormValueType>({
-    resolver: zodResolver(ReservationChangeFormSchema),
+    resolver: zodResolver(
+      ReservationChangeFormSchema.refine(
+        (x) => x.seriesName || !reservation.recurringReservation,
+        {
+          path: ["seriesName"],
+          message: "Required",
+        }
+      )
+    ),
     mode: "onChange",
     defaultValues: {
       bufferTimeBefore: false,
       bufferTimeAfter: false,
+      seriesName: reservation.recurringReservation?.name ?? "",
       comments: reservation.workingMemo ?? undefined,
       type: ReservationTypeSchema.optional().parse(
         reservation.type?.toUpperCase()
@@ -124,36 +132,12 @@ const EditReservation = ({
     },
   });
 
-  const { notifyError, notifySuccess } = useNotification();
+  const { notifyError } = useNotification();
 
-  const [mutation] = useMutation<
-    { staffReservationModify: ReservationStaffModifyMutationPayload },
-    {
-      input: ReservationStaffModifyMutationInput;
-      workingMemo: ReservationWorkingMemoMutationInput;
-    }
-  >(CHANGE_STAFF_RESERVATION);
-
-  const changeStaffReservation = (
-    input: ReservationStaffModifyMutationInput,
-    workingMemo?: string
-  ) =>
-    mutation({
-      variables: {
-        input,
-        workingMemo: {
-          pk: input.pk,
-          workingMemo,
-        },
-      },
-      onCompleted: () => {
-        notifySuccess(t("Reservation.EditPage.saveSuccess"));
-        onSuccess();
-      },
-      onError: () => {
-        notifyError(t("Reservation.EditPage.saveError"));
-      },
-    });
+  const changeStaffReservation = useStaffReservationMutation({
+    reservation,
+    onSuccess,
+  });
 
   const onSubmit = async (values: FormValueType) => {
     if (!reservationUnit.pk) {
@@ -178,6 +162,8 @@ const EditReservation = ({
     const toSubmit = {
       pk: reservation.pk,
       reservationUnitPks: [reservationUnit.pk],
+      seriesName: values.seriesName !== "" ? values.seriesName : undefined,
+      workingMemo: values.comments,
       type: values.type ?? "",
       bufferTimeBefore: values.bufferTimeBefore
         ? reservationUnit.bufferTimeBefore
@@ -188,30 +174,50 @@ const EditReservation = ({
       ...flattenedMetadataSetValues,
     };
 
-    changeStaffReservation(toSubmit, values.comments);
+    // eslint-disable-next-line consistent-return
+    return changeStaffReservation(toSubmit);
   };
 
   const {
     handleSubmit,
-    formState: { isDirty },
+    register,
+    formState: { errors, isDirty, isSubmitting },
   } = form;
+
+  const translateError = (errorMsg?: string) =>
+    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Grid>
-          <ReservationTypeForm reservationUnit={reservationUnit} />
-          <GridHR />
-          <ButtonContainer>
-            <Button variant="secondary" onClick={onCancel} theme="black">
-              {t("common.cancel")}
-            </Button>
-            <Button type="submit" disabled={!isDirty}>
-              {t("Reservation.EditPage.save")}
-            </Button>
-          </ButtonContainer>
-        </Grid>
-      </form>
+      <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <ReservationTypeForm reservationUnit={reservationUnit}>
+          {reservation.recurringReservation?.pk && (
+            <InnerTextInput
+              id="seriesName"
+              disabled={reservationUnit == null}
+              label={t(`MyUnits.RecurringReservationForm.name`)}
+              required
+              {...register("seriesName")}
+              invalid={errors.seriesName != null}
+              errorText={translateError(errors.seriesName?.message)}
+            />
+          )}
+        </ReservationTypeForm>
+        <HR />
+        <ButtonContainer>
+          <Button
+            variant="secondary"
+            onClick={onCancel}
+            theme="black"
+            disabled={isSubmitting}
+          >
+            {t("common.cancel")}
+          </Button>
+          <Button type="submit" disabled={!isDirty} isLoading={isSubmitting}>
+            {t("Reservation.EditPage.save")}
+          </Button>
+        </ButtonContainer>
+      </Form>
     </FormProvider>
   );
 };
@@ -262,4 +268,4 @@ const EditPage = () => {
   );
 };
 
-export default withMainMenu(EditPage);
+export default EditPage;

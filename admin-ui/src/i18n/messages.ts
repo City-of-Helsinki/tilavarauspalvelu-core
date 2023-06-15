@@ -835,6 +835,7 @@ const translations: ITranslations = {
       "Reservation unit failed to load": ["Varausyksikköä ei löytynyt"],
       save: ["Tallenna"],
       saveSuccess: ["Varauksen muutokset tallennettu"],
+      saveSuccessRecurring: ["Muutokset tallennettu tuleviin varauksiin!"],
       saveError: ["Varauksen muutos epäonnistui"],
       pageThrewError: ["Virhe: varausta ei voi muokata"],
     },
@@ -1755,7 +1756,7 @@ const translations: ITranslations = {
   },
 
   ApprovalButtons: {
-    edit: ["Muuta tietoja"],
+    edit: ["Muokkaa"],
     editTime: ["Muuta aikaa"],
     recurring: {
       rejectAllButton: ["Hylkää kaikki"],

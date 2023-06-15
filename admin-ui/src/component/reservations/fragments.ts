@@ -42,17 +42,36 @@ export const RESERVATION_META_FRAGMENT = gql`
   }
 `;
 
+export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
+  fragment ReservationUnitPricing on ReservationUnitType {
+    pricings {
+      begins
+      pricingType
+      priceUnit
+      lowestPrice
+      highestPrice
+      taxPercentage {
+        value
+      }
+      status
+    }
+  }
+`;
+
 export const RESERVATION_UNIT_FRAGMENT = gql`
   fragment ReservationUnit on ReservationUnitType {
+    pk
     nameFi
     maxPersons
-    pk
     bufferTimeBefore
     bufferTimeAfter
     reservationStartInterval
     unit {
       pk
       nameFi
+      serviceSectors {
+        pk
+      }
     }
     metadataSet {
       name
@@ -79,13 +98,28 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
   }
 `;
 
+export const RESERVATION_RECURRING_FRAGMENT = gql`
+  fragment ReservationRecurring on ReservationType {
+    recurringReservation {
+      pk
+      beginDate
+      endDate
+      weekdays
+      name
+      description
+    }
+  }
+`;
+
 export const RESERVATION_COMMON_FRAGMENT = gql`
   fragment ReservationCommon on ReservationType {
     pk
-    createdAt
-    state
     begin
     end
+    createdAt
+    state
+    type
+    workingMemo
     reserveeName
     orderStatus
   }

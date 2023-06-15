@@ -87,6 +87,11 @@ const unitResponse = [
       unit: {
         pk: 1,
         nameFi: "unit name",
+        serviceSectors: [
+          {
+            pk: 1,
+          },
+        ],
       },
       metadataSet: {
         name: "full_meta",
