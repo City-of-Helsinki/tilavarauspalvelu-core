@@ -149,20 +149,42 @@ export const ageGroup = (
   group: Maybe<AgeGroupType> | undefined
 ): string | null => (group ? `${group.minimum}-${group.maximum || ""}` : null);
 
-export const getTranslationKeyForType = (
-  type: ReservationsReservationReserveeTypeChoices,
+const reserveeTypeToTranslationKey = (
+  reserveeType: ReservationsReservationReserveeTypeChoices,
   isUnregisteredAssociation: boolean
-): string => {
-  switch (type) {
+) => {
+  switch (reserveeType) {
     case ReservationsReservationReserveeTypeChoices.Business:
-    case ReservationsReservationReserveeTypeChoices.Individual: {
-      return `ReserveeType.${type}`;
-    }
-    default:
-      return `ReserveeType.${type}.${
+    case ReservationsReservationReserveeTypeChoices.Individual:
+      return `ReserveeType.${reserveeType}`;
+    case ReservationsReservationReserveeTypeChoices.Nonprofit:
+      return `ReserveeType.${reserveeType}.${
         isUnregisteredAssociation ? "UNREGISTERED" : "REGISTERED"
       }`;
+    default:
+      return "";
   }
+};
+
+export const getTranslationKeyForReserveeType = (
+  reservationType?: "NORMAL" | "BLOCKED" | "STAFF" | "BEHALF",
+  reserveeType?: ReservationsReservationReserveeTypeChoices,
+  isUnregisteredAssociation?: boolean
+): string[] => {
+  if (!reservationType) {
+    return ["error.missingReservationType"];
+  }
+  if (reservationType === "BLOCKED") {
+    return ["ReservationType.BLOCKED"];
+  }
+
+  const reserveeTypeTranslationKey = reserveeType
+    ? reserveeTypeToTranslationKey(
+        reserveeType,
+        isUnregisteredAssociation ?? false
+      )
+    : "";
+  return [`ReservationType.${reservationType}`, reserveeTypeTranslationKey];
 };
 
 export const getReserveeName = (

@@ -52,12 +52,18 @@ const translations: ITranslations = {
   },
   AuthState: { initializing: ["Alustetaan..."] },
   ReserveeType: {
-    INDIVIDUAL: ["Yksityishenkilö"],
-    BUSINESS: ["Yritys"],
+    INDIVIDUAL: ["yksityishenkilö"],
+    BUSINESS: ["yritys"],
     NONPROFIT: {
-      REGISTERED: ["Yhdistys, rekisteröity"],
-      UNREGISTERED: ["Yhdistys, rekisteröimätön"],
+      REGISTERED: ["yhdistys, rekisteröity"],
+      UNREGISTERED: ["yhdistys, rekisteröimätön"],
     },
+  },
+  ReservationType: {
+    NORMAL: [""],
+    BLOCKED: ["Suljettu"],
+    BEHALF: ["Asiakkaan puolesta"],
+    STAFF: ["Sisäinen varaus"],
   },
   paymentType: {
     INVOICE: ["Laskutus"],
