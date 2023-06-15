@@ -531,7 +531,7 @@ test("Form submission without any blocking reservations", async () => {
 
   const elems = within(list).getAllByText(/ti (?:\d+\.\d+\.\d+), 10:00-11:00/);
   expect(elems).toHaveLength(4);
-  const overlaps = within(list).queryAllByText(/Confirmation.overlapping/);
+  const overlaps = within(list).queryAllByText(/overlapping/);
   expect(overlaps).toHaveLength(0);
 
   const submit = screen.getByText(/common.reserve/);
@@ -587,7 +587,7 @@ test("Form submission with a lot of blocking reservations", async () => {
   );
   expect(listCountLabel).toBeInTheDocument();
 
-  const overlaps = within(list).queryAllByText(/Confirmation.overlapping/);
+  const overlaps = within(list).queryAllByText(/overlapping/);
   expect(overlaps).toHaveLength(mondayMorningReservations.length);
 
   // TODO test submit, but it doesn't work without extra context
@@ -612,7 +612,7 @@ test("Reservations can be removed and restored", async () => {
 
   const elems = within(list).getAllByText(/ti (?:\d+\.\d+\.\d+), 10:00-11:00/);
   expect(elems).toHaveLength(4);
-  const overlaps = within(list).queryAllByText(/Confirmation.overlapping/);
+  const overlaps = within(list).queryAllByText(/overlapping/);
   expect(overlaps).toHaveLength(0);
 
   const removeButtons = within(list).queryAllByRole("button");

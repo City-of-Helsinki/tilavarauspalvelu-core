@@ -81,25 +81,31 @@ const stripTimeZeros = (time: string) =>
   time.substring(0, 1) === "0" ? time.substring(1) : time;
 
 const StatusElement = ({ item }: { item: NewReservationListItem }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation("translation", {
+    keyPrefix: "MyUnits.RecurringReservation.Confirmation",
+  });
 
   const getStatus = (x: NewReservationListItem) => {
     if (x.isOverlapping) {
       return {
         isError: true,
-        msg: "MyUnits.RecurringReservation.Confirmation.overlapping",
+        msg: "overlapping",
       };
     }
     if (x.isRemoved) {
       return {
         isError: false,
-        msg: "MyUnits.RecurringReservation.Confirmation.removed",
+        msg: "removed",
       };
     }
     if (x.error) {
+      const hasTranslatedErrorMsg = i18n.exists(`failureMessages.${x.error}`);
+      const errorTranslated = hasTranslatedErrorMsg
+        ? `failureMessages.${x.error}`
+        : `failureMessages.default`;
       return {
         isError: true,
-        msg: `MyUnits.RecurringReservation.Confirmation.failureMessages.${item.error}`,
+        msg: errorTranslated,
       };
     }
     return undefined;

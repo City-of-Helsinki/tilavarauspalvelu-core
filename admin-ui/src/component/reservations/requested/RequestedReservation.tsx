@@ -283,10 +283,10 @@ const TimeBlock = ({
 
   return (
     <>
-      {reservation.recurringReservation && (
+      {reservation.recurringReservation?.pk && (
         <Accordion heading={t("RequestedReservation.recurring")}>
           <RecurringReservationsView
-            reservation={reservation}
+            recurringPk={reservation.recurringReservation.pk}
             onSelect={setSelected}
             onReservationUpdated={onReservationUpdated}
           />

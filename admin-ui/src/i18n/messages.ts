@@ -202,7 +202,9 @@ const translations: ITranslations = {
     authorizationNeeded: ["Oikeudet vaaditaan"],
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
     errorSavingData: ["Virhe tallennettaessa tietoja"],
-
+    errorRecurringReservationsDoneDisplay: [
+      "Virhe varaus tehty, mutta sen näyttäminen epäonnistui.",
+    ],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
     descriptive: {
       "Overlapping reservations are not allowed.": [
@@ -338,8 +340,9 @@ const translations: ITranslations = {
         removed: ["Poistettu"],
         overlapping: ["Ei saatavilla"],
         title: ["Toistuva varaus tehty"],
-        failedTitle: ["Epäonnistuneet varaukset"],
-        successTitle: ["Varaukset"],
+        allFailedTitle: ["Toistuvaa varausta ei voitu tehdä"],
+        failedSubtitle: ["Epäonnistuneet varaukset"],
+        successSubtitle: ["Varaukset"],
         successInfo: ["Kaikki varaukset tehtiin onnistuneesti."],
         failureInfo: [
           "{{conflicts}} / {{total}} epäonnistui päällekkäisyyksien takia.",
@@ -357,6 +360,7 @@ const translations: ITranslations = {
           "ApolloError: Overlapping reservations are not allowed.": [
             "Aika ei saatavilla",
           ],
+          default: ["Aika ei saatavilla"],
         },
         buttonToUnit: ["Palaa toimipisteen sivulle"],
         buttonToReservation: ["Siirry varauksen sivulle"],

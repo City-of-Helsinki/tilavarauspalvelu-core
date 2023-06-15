@@ -185,4 +185,36 @@ describe("ReservationsList", () => {
     expect(await screen.findAllByText(/20:00/)).toHaveLength(N_DAYS);
     expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();
   });
+
+  test("Error message is translated correctly", async () => {
+    const items = [
+      {
+        date: new Date(),
+        error: "ApolloError: Overlapping reservations are not allowed.",
+        startTime: "19:00",
+        endTime: "20:00",
+      },
+    ];
+
+    const screen = render(<ReservationList items={items} />);
+    expect(await screen.findAllByText(/19:00/)).toHaveLength(1);
+    expect(
+      screen.getByText(/Overlapping reservations are not allowed./)
+    ).toBeInTheDocument();
+  });
+
+  test("Error message that has no translation has a default message", async () => {
+    const items = [
+      {
+        date: new Date(),
+        error: "failExistsOnPurpose",
+        startTime: "19:00",
+        endTime: "20:00",
+      },
+    ];
+
+    const screen = render(<ReservationList items={items} />);
+    expect(await screen.findAllByText(/19:00/)).toHaveLength(1);
+    expect(screen.getByText(/default/)).toBeInTheDocument();
+  });
 });

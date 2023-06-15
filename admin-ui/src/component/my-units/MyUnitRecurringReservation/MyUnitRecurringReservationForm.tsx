@@ -365,7 +365,12 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
         const result: ReservationMade[] = await Promise.all(rets).then(
           (y) => y
         );
-        navigate("completed", { state: result });
+        navigate("completed", {
+          state: {
+            reservations: result,
+            recurringPk: createResponse.createRecurringReservation.pk,
+          },
+        });
       }
     } catch (e) {
       notifyError(

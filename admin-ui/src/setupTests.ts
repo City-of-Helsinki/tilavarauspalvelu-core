@@ -16,6 +16,12 @@ jest.mock("react-i18next", () => ({
       t: (str: string) => str,
       i18n: {
         changeLanguage: () => new Promise(() => {}),
+        exists: (str: string) => {
+          if (str.match(/failExistsOnPurpose/i)) {
+            return false;
+          }
+          return true;
+        },
       },
     };
   },

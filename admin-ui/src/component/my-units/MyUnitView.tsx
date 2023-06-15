@@ -3,7 +3,7 @@ import { H1 } from "common/src/common/typography";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Button, LoadingSpinner, Tabs as HDSTabs } from "hds-react";
+import { Button, Tabs as HDSTabs } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { publicUrl } from "../../common/const";
 import { parseAddress } from "../../common/util";
@@ -16,6 +16,7 @@ import ReservationUnitCalendarView from "./ReservationUnitCalendarView";
 import UnitReservationsView from "./UnitReservationsView";
 import { TabHeader, Tabs } from "../Tabs";
 import { useUnitQuery } from "./hooks";
+import Loader from "../Loader";
 
 type Params = {
   unitId: string;
@@ -72,7 +73,7 @@ const MyUnitView = () => {
   const unit = unitData?.units?.edges.find(() => true)?.node ?? undefined;
 
   if (loading || !unit || !unitId) {
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   const recurringReservationUrl = `${myUnitUrl(
