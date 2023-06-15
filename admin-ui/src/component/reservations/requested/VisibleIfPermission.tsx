@@ -1,49 +1,26 @@
 import React from "react";
-import { useAuthState } from "../../../context/AuthStateContext";
-
-type Props = {
-  unitPk: number;
-  serviceSectorPks: number[];
-  permissionName: string;
-  children: React.ReactNode;
-  otherwise?: React.ReactNode;
-};
+import { type ReservationType } from "common/types/gql-types";
+import { Permission } from "app/context/authStateReducer";
+import { usePermission } from "./hooks";
 
 const VisibleIfPermission = ({
-  unitPk,
-  serviceSectorPks,
-  permissionName,
+  reservation,
+  permission,
   children,
   otherwise,
-}: Props): JSX.Element => {
-  const { hasPermission } = useAuthState().authState;
-  const permission = hasPermission(permissionName, unitPk, serviceSectorPks);
-
-  return (
-    <>
-      {permission && children}
-      {!permission && otherwise}
-    </>
-  );
-};
-
-const VisibleIfPermissionWrapper = (props: {
-  unitPk?: number;
-  serviceSectorPks: number[];
-  permissionName: string;
+}: {
+  reservation: ReservationType;
+  permission: Permission;
   children: React.ReactNode;
   otherwise?: React.ReactNode;
 }) => {
-  const { unitPk } = props;
+  const { hasPermission } = usePermission();
 
-  if (!unitPk) {
-    return null;
-  }
-  if (props.serviceSectorPks.length === 0) {
-    return null;
+  if (!hasPermission(reservation, permission)) {
+    return otherwise ? <>{otherwise}</> : null;
   }
 
-  return <VisibleIfPermission {...props} unitPk={unitPk} />;
+  return <>{children}</>;
 };
 
-export default VisibleIfPermissionWrapper;
+export default VisibleIfPermission;

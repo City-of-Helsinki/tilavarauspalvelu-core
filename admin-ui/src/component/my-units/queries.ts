@@ -30,6 +30,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
           firstName
           lastName
           email
+          pk
         }
         name
         reserveeName
@@ -37,6 +38,12 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
         reservationUnits {
           pk
           nameFi
+          unit {
+            pk
+            serviceSectors {
+              pk
+            }
+          }
         }
         pk
         begin

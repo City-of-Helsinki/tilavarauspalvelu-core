@@ -20,6 +20,8 @@ import { RESERVATION_DENY_REASONS } from "../queries";
 import { OptionType } from "../../../../common/types";
 import { GQL_MAX_RESULTS_PER_QUERY } from "../../../../common/const";
 
+export { default as usePermission } from "./usePermission";
+
 /// NOTE only fetches 100 reservations => use pageInfo and fetchMore
 export const useReservationData = (
   begin: Date,

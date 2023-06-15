@@ -44,6 +44,12 @@ module.exports = {
       },
     ],
     "no-nested-ternary": 0,
+    "react/jsx-no-useless-fragment": [
+      "error",
+      {
+        allowExpressions: true,
+      },
+    ],
     "react/destructuring-assignment": 0,
     "react/jsx-props-no-spreading": 0,
     "react/prop-types": 0,

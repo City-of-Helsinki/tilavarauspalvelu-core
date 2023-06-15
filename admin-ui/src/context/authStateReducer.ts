@@ -13,6 +13,13 @@ export type AuthState =
   | "NotAutenticated"
   | "Error";
 
+export enum Permission {
+  CAN_COMMENT_RESERVATIONS = "can_comment_reservations",
+  CAN_CREATE_STAFF_RESERVATIONS = "can_create_staff_reservations",
+  CAN_MANAGE_RESERVATIONS = "can_manage_reservations",
+  CAN_VIEW_RESERVATIONS = "can_view_reservations",
+}
+
 export type Auth = {
   state: AuthState;
   user?: UserType;
@@ -20,7 +27,7 @@ export type Auth = {
   login?: () => void;
   logout?: () => void;
   hasPermission: (
-    permissionName: string,
+    permission: Permission,
     unitPk?: number,
     serviceSectorPks?: number[]
   ) => boolean;

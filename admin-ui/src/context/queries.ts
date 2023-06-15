@@ -19,6 +19,12 @@ export const CURRENT_USER = gql`
           pk
           nameFi
         }
+        unitGroups {
+          units {
+            pk
+            nameFi
+          }
+        }
         permissions {
           permission
         }

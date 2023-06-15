@@ -3,6 +3,8 @@ import {
   type ServiceSectorRolePermissionType,
   type ServiceSectorRoleType,
   type UserType,
+  Maybe,
+  UnitType,
 } from "common/types/gql-types";
 
 const hasUnitPermission = (
@@ -10,26 +12,37 @@ const hasUnitPermission = (
   unitPk: number,
   user: UserType
 ) => {
-  const unitPermissions = (
-    user.unitRoles?.filter((x): x is UnitRoleType => x != null) || []
-  )
-    .flatMap((ur) =>
-      (ur.units || []).flatMap((unit) =>
-        (ur.permissions || []).map((permission) => ({
-          permission: permission?.permission,
-          unit: unit?.pk,
-        }))
+  const unitRoles =
+    user.unitRoles?.filter((x): x is UnitRoleType => x != null) || [];
+
+  const unitGroups =
+    unitRoles
+      .map((x) =>
+        x.unitGroups?.reduce<Array<UnitType | undefined>>(
+          (agv, y) => y?.units?.map((z) => z ?? undefined, agv) ?? [...agv],
+          []
+        )
       )
-    )
-    .filter(
-      (up): up is { permission: string; unit: number } =>
-        up.permission != null && up.unit != null
-    );
+      .reduce((agv, x) => [...(agv ?? []), ...(x ?? [])], [])
+      ?.map((x) => x?.pk)
+      ?.filter((x): x is number => x != null) ?? [];
+
+  const units =
+    unitRoles
+      .reduce<Maybe<UnitType>[]>((agv, x) => [...agv, ...(x.units ?? [])], [])
+      ?.map((x) => x?.pk)
+      ?.filter((x): x is number => x != null) ?? [];
+
+  const permissions =
+    unitRoles
+      .map((x) => x.permissions)
+      .reduce((agv, x) => [...(agv ?? []), ...(x ?? [])], [])
+      ?.map((x) => x?.permission)
+      ?.filter((x) => x != null) ?? [];
 
   return (
-    unitPermissions.filter(
-      (up) => up.permission === permissionName && up.unit === unitPk
-    ).length > 0
+    permissions.includes(permissionName) &&
+    (units.includes(unitPk) || unitGroups.includes(unitPk))
   );
 };
 
