@@ -169,22 +169,7 @@ export const getReserveeName = (
   reservation: ReservationType,
   length = 50
 ): string =>
-  truncate(
-    reservation.reserveeOrganisationName
-      ? reservation.reserveeOrganisationName
-      : trim(
-          `${reservation.reserveeFirstName || ""} ${
-            reservation.reserveeLastName || ""
-          }`
-        ) ||
-          trim(
-            `${reservation.user?.firstName || ""} ${
-              reservation.user?.lastName || ""
-            }`
-          ),
-
-    { length, omission: "…" }
-  );
+  truncate(reservation.reserveeName?.trim() ?? "", { length, omission: "…" });
 
 export const getName = (reservation: ReservationType, t: TFunction) => {
   if (reservation.name) {

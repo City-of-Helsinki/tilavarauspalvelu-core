@@ -45,8 +45,6 @@ export const RESERVATIONS_QUERY = gql`
               nameFi
             }
           }
-          reserveeFirstName
-          reserveeLastName
           name
         }
       }

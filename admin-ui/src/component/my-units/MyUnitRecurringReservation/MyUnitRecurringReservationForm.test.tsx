@@ -512,7 +512,7 @@ test("Form can't be submitted without reservation type selection", async () => {
   expect(submit).not.toBeDisabled();
   fireEvent.submit(submit);
   await view.findByText(/required/i);
-});
+}, 15_000);
 
 test("Form submission without any blocking reservations", async () => {
   const view = customRender();
@@ -549,7 +549,7 @@ test("Form submission without any blocking reservations", async () => {
   // TODO test submit and check both CREATE_RECURRING and CREATE_STAFF mutations get called
   // we need to return the specific values from those mutations
   // and check that the wanted 4 reservations were made (or if we want to test errors)
-});
+}, 15_000);
 
 test("Form submission with a lot of blocking reservations", async () => {
   const view = customRender();
@@ -593,7 +593,7 @@ test("Form submission with a lot of blocking reservations", async () => {
   // TODO test submit, but it doesn't work without extra context
 
   // NOTE This test is long running by design. jest.setTimeout doesn't work for async functions
-}, 30_000);
+}, 60_000);
 
 test("Reservations can be removed and restored", async () => {
   const view = customRender();

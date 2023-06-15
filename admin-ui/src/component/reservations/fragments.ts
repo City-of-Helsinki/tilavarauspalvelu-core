@@ -86,6 +86,7 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     state
     begin
     end
+    reserveeName
     orderStatus
   }
 `;

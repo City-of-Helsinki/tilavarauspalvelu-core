@@ -100,9 +100,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
             bufferTimeBefore
             bufferTimeAfter
             workingMemo
-            reserveeFirstName
-            reserveeLastName
-            reserveeOrganisationName
+            reserveeName
             reservationUnits {
               pk
               nameFi
