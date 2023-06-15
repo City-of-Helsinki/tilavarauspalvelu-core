@@ -65,7 +65,7 @@ const DialogContent = ({
   reservationUnit: ReservationUnitType;
   start: Date;
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const form = useForm<FormValueType>({
     resolver: zodResolver(
       ReservationFormSchema(reservationUnit.reservationStartInterval)
@@ -101,6 +101,13 @@ const DialogContent = ({
 
   const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
     create({ variables: { input } });
+
+  const errorHandler = (errorMsg?: string) => {
+    const translatedError = i18n.exists(`errors.descriptive.${errorMsg}`)
+      ? t(`errors.descriptive.${errorMsg}`)
+      : t("errors.descriptive.genericError");
+    notifyError(t("ReservationDialog.saveFailed", { error: translatedError }));
+  };
 
   const onSubmit = async (values: FormValueType) => {
     try {
@@ -143,11 +150,8 @@ const DialogContent = ({
       ).find(() => true);
 
       if (firstError) {
-        notifyError(
-          t("ReservationDialog.saveFailed", {
-            error: get(firstError, "messages[0]"),
-          })
-        );
+        const error = get(firstError, "messages[0]");
+        errorHandler(error);
       } else {
         notifySuccess(
           t("ReservationDialog.saveSuccess", {
@@ -157,9 +161,7 @@ const DialogContent = ({
         onClose();
       }
     } catch (e) {
-      notifyError(
-        t("ReservationDialog.saveFailed", { error: get(e, "message") })
-      );
+      errorHandler(get(e, "message"));
     }
   };
 

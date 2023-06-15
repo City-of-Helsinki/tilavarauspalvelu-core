@@ -196,6 +196,12 @@ const translations: ITranslations = {
     authorizationNeeded: ["Oikeudet vaaditaan"],
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
     errorSavingData: ["Virhe tallennettaessa tietoja"],
+    descriptive: {
+      "Overlapping reservations are not allowed.": [
+        "Ajankohdalle on jo varaus toisen varausyksikön kautta.",
+      ],
+      genericError: [""],
+    },
   },
   breadcrumb: {
     frontpage: ["Etusivu"],
@@ -1108,7 +1114,7 @@ const translations: ITranslations = {
     // dialog specific
     title: ["Varaa {{reservationUnit}}"],
     accept: ["Varaa"],
-    saveFailed: ["Tallennus ei onnistunut: {{error}}"],
+    saveFailed: ["Tallennus ei onnistunut. {{error}}"],
     saveSuccess: ["Varaus tehty kohteeseen {{reservationUnit}}"],
   },
   ReservationUnits: {
