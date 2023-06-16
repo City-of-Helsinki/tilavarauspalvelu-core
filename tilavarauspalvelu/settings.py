@@ -246,6 +246,7 @@ env = environ.Env(
     REDIS_SENTINEL_SERVICE=(str, None),
     REDIS_URL=(str, None),
     REDIS_PASSWORD=(str, None),
+    SESSION_COOKIE_DOMAIN=(str, None),
     # Elasticsearch
     ELASTICSEARCH_URL=(str, "http://localhost:9200"),
     # Image cache
@@ -465,6 +466,7 @@ LOGOUT_REDIRECT_URL = "/admin/"
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
 SESSION_COOKIE_AGE = 12 * 60 * 60  # 12 hours in seconds
 SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_DOMAIN = env("SESSION_COOKIE_DOMAIN")
 
 OIDC_API_TOKEN_AUTH = {
     "AUDIENCE": env("TUNNISTAMO_JWT_AUDIENCE"),
