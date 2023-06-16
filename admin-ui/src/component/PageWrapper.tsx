@@ -24,6 +24,7 @@ const FallbackComponent = (err: unknown) => {
 };
 
 export default function PageWrapper({ children }: Props): JSX.Element {
+  console.log("PageWrapper");
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <Navigation />

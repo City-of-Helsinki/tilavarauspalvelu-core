@@ -9,6 +9,7 @@ import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
 // import { useAuthState } from "../context/AuthStateContext";
 import { StyledHDSNavigation } from "../styles/util";
+import { useSession } from "next-auth/react";
 
 const MobileNavigation = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -36,15 +37,14 @@ const UserMenu = styled(HDSNavigation.User)`
 
 const Navigation = (): JSX.Element => {
   const { t } = useTranslation();
-  // const { authState } = useAuthState();
-
-  const [loggingIn, setLoggingIn] = useState(false);
 
   const [isMenuOpen, setMenuState] = useState(false);
   const history = useNavigate();
 
-  // const { state, user, login, logout } = authState;
+  const { data: session } = useSession();
+  const { user } = session || {};
 
+  console.log("Navigation: session", session);
   return (
     <StyledHDSNavigation
       theme={{
@@ -64,12 +64,13 @@ const Navigation = (): JSX.Element => {
         <MobileNavigation>
           <MainMenu onItemSelection={() => setMenuState(false)} />
         </MobileNavigation>
-        {/* state !== "Unknown" && state !== "NoPermissions" && (
+        {session?.user && (
           <UserMenu
-            userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
-            authenticated={state === "HasPermissions"}
-            label={t(loggingIn ? "Navigation.logging" : "Navigation.login")}
+            userName={`${user?.name?.trim()}`}
+            authenticated={user != null}
+            label={t(user != null ? "Navigation.logging" : "Navigation.login")}
             onSignIn={() => {
+              /*
               setLoggingIn(true);
               if (login) {
                 setLoggingIn(true);
@@ -77,26 +78,24 @@ const Navigation = (): JSX.Element => {
               } else {
                 throw Error("cannot log in");
               }
+              */
             }}
           >
             {user && (
               <UserInfo
-                name={
-                  `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-                  t("Navigation.noName")
-                }
-                email={user.email}
+                name={`${user?.name?.trim()}` || t("Navigation.noName")}
+                email={user?.email ?? t("Navigation.noEmail")}
               />
             )}
 
             <HDSNavigation.Item
               className="btn-logout"
               label={t("Navigation.logout")}
-              onClick={() => logout && logout()}
+              // onClick={() => logout && logout()}
               variant="primary"
             />
           </UserMenu>
-              ) */}
+        )}
       </HDSNavigation.Actions>
     </StyledHDSNavigation>
   );

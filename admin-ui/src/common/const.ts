@@ -23,6 +23,9 @@ export const publicUrl = process.env.PUBLIC_URL;
 export const previewUrlPrefix =
   process.env.REACT_APP_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
 
+export const PROFILE_TOKEN_HEADER = "X-Authorization";
+export const SESSION_EXPIRED_ERROR = "JWT too old";
+
 export const LIST_PAGE_SIZE = 50;
 export const LARGE_LIST_PAGE_SIZE = 100;
 

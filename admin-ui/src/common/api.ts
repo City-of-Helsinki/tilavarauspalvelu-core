@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosRequestConfig, AxiosResponse } from "axios";
+import axiosClient from "app/modules/auth/axiosClient";
 import omit from "lodash/omit";
 import {
   Application,
@@ -55,10 +56,6 @@ interface ApiParameters extends QueryParameters {
 }
 
 // TODO JWT token
-const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_TILAVARAUS_API_URL,
-  timeout: 10000,
-});
 
 async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   const config: AxiosRequestConfig = requestConfig;

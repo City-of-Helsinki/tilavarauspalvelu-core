@@ -1,18 +1,20 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  fromPromise,
-  InMemoryCache,
-} from "@apollo/client";
+import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { set, uniqBy } from "lodash";
 import { ReservationTypeConnection } from "common/types/gql-types";
+import { ExtendedSession } from "../pages/api/auth/[...nextauth]";
 
 // import { getApiAccessToken, updateApiAccessToken } from "./auth/util";
-import { apiBaseUrl } from "./const";
+import {
+  PROFILE_TOKEN_HEADER,
+  SESSION_EXPIRED_ERROR,
+  apiBaseUrl,
+} from "./const";
 import { CustomFormData } from "./CustomFormData";
+import { getSession } from "next-auth/react";
+import { GraphQLError } from "graphql/error/GraphQLError";
 
 // const getNewToken = () => updateApiAccessToken();
 
@@ -24,54 +26,43 @@ set(uploadLinkOptions, "FormData", CustomFormData);
 
 const terminatingLink = createUploadLink(uploadLinkOptions);
 
-const authLink = setContext((ignore, { headers }) => {
-  // const token = getApiAccessToken();
-  return {
-    headers: {
-      ...headers,
-      // authorization: token ? `Bearer ${token}` : "",
-    },
-  };
-});
+const authLink = setContext(
+  async (notUsed, { headers }: { headers: Headers }) => {
+    const session = (await getSession()) as ExtendedSession;
+
+    const modifiedHeader = {
+      headers: {
+        ...headers,
+        authorization: session?.apiTokens?.tilavaraus
+          ? `Bearer ${session.apiTokens.tilavaraus}`
+          : "",
+        [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
+      },
+    };
+    return modifiedHeader;
+  }
+);
 
 // eslint-disable-next-line consistent-return
-const errorLink = onError(({ graphQLErrors, operation, forward }) => {
-  /*
+const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    const autherror = graphQLErrors.find((e) => {
-      return (
-        e.message !== null &&
-        (e.message.indexOf("AnonymousUser") !== -1 ||
-          e.message.indexOf("has expired") !== -1 ||
-          e.message.indexOf("too old") !== -1 ||
-          e.message.indexOf("No permission to mutate") !== -1)
-      );
-    });
+    const isSessionExpired = graphQLErrors.some((error) =>
+      error.message.includes(SESSION_EXPIRED_ERROR)
+    );
 
-    const hasAuthError = Boolean(autherror !== undefined);
-
-    if (hasAuthError) {
-      return fromPromise(
-        getNewToken().catch(() => {
-          // TODO Handle token refresh error
-          return null;
-        })
-      )
-        .filter((value) => Boolean(value))
-        .flatMap((accessToken) => {
-          const oldHeaders = operation.getContext().headers;
-          operation.setContext({
-            headers: {
-              ...oldHeaders,
-              authorization: `Bearer ${accessToken}`,
-            },
-          });
-
-          return forward(operation);
-        });
+    if (isSessionExpired) {
+      console.warn("Should sign out here");
+      // handleSignOut();
     }
+
+    graphQLErrors.forEach(async (error: GraphQLError) => {
+      console.error(`GQL_ERROR: ${error.message}`);
+    });
   }
-        */
+
+  if (networkError) {
+    console.error(`NETWORK_ERROR: ${networkError.message}`);
+  }
 });
 
 const client = new ApolloClient({

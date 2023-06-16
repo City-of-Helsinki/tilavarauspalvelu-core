@@ -200,7 +200,7 @@ const getFilteredMenu = (
 ): IMenuChild[] => [
   {
     title: "MainMenu.home",
-    icon: <IconPremises aria-hidden />,
+    // icon: <IconPremises aria-hidden />,
     route: "/",
     exact: true,
   },
@@ -208,7 +208,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.myUnits",
-          icon: <IconStar aria-hidden />,
+          /// icon: <IconStar aria-hidden />,
           route: "/my-units",
         },
       ]
@@ -219,7 +219,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.reservations",
-          icon: <IconIndividualReservation aria-hidden />,
+          // icon: <IconIndividualReservation aria-hidden />,
           route: "/reservations",
           items: [
             {
@@ -239,7 +239,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.recurringReservations",
-          icon: <IconCalendar aria-hidden />,
+          // icon: <IconCalendar aria-hidden />,
           route: "/recurring-reservations",
           items: [
             {
@@ -252,7 +252,7 @@ const getFilteredMenu = (
     : []),
   {
     title: "MainMenu.premisesAndSettings",
-    icon: <IconLocation aria-hidden />,
+    // icon: <IconLocation aria-hidden />,
     route: "/premises-and-settings",
     items: [
       {
