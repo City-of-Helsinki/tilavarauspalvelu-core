@@ -248,6 +248,10 @@ env = environ.Env(
     REDIS_PASSWORD=(str, None),
     # Elasticsearch
     ELASTICSEARCH_URL=(str, "http://localhost:9200"),
+    # Image cache
+    IMAGE_CACHE_ENABLED=(bool, False),
+    IMAGE_CACHE_ROOT_URL=(str, ""),
+    IMAGE_CACHE_PURGE_KEY=(str, ""),
 )
 
 environ.Env.read_env()
@@ -553,6 +557,9 @@ THUMBNAIL_ALIASES = {
         "purpose_image": {"size": (390, 245), "crop": True},
     },
 }
+IMAGE_CACHE_ENABLED = env("IMAGE_CACHE_ENABLED")
+IMAGE_CACHE_ROOT_URL = env("IMAGE_CACHE_ROOT_URL")
+IMAGE_CACHE_PURGE_KEY = env("IMAGE_CACHE_PURGE_KEY")
 
 # Do not try to chmod when uploading images.
 # Our environments use persistent storage for media and operation will not be permitted.
