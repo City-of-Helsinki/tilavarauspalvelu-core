@@ -16,6 +16,7 @@ from merchants.verkkokauppa.product.types import (
     CreateProductParams,
 )
 from tilavarauspalvelu.celery import app
+from utils.image_cache import purge
 
 from .pricing_updates import update_reservation_unit_pricings
 from .utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
@@ -136,3 +137,8 @@ def update_urls(pk: int = None):
 
         except InvalidImageFormatError as err:
             capture_exception(err)
+
+
+@app.task(name="purge_image_cache")
+def purge_image_cache(image_path: str):
+    purge(image_path)
