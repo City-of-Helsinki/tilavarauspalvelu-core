@@ -1,6 +1,8 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.forms.fields import CharField
 from django.forms.models import ModelForm
+from django.http import FileResponse
+from sentry_sdk import capture_exception
 from tinymce.widgets import TinyMCE
 
 from .models import (
@@ -19,6 +21,7 @@ from .models import (
     Person,
     Recurrence,
 )
+from .utils.export_data import ApplicationDataExporter
 
 
 class ApplicationStatusInline(admin.TabularInline):
@@ -93,12 +96,39 @@ class ApplicationRoundAdminForm(ModelForm):
 
 @admin.register(ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
+    actions = ["export_to_csv"]
     form = ApplicationRoundAdminForm
     model = ApplicationRound
     inlines = [ApplicationRoundStatusInline, ApplicationRoundBasketInline]
     autocomplete_fields = [
         "reservation_units",
     ]
+
+    @admin.action(description="Export first selected reservation unit to CSV")
+    def export_to_csv(self, request, queryset):
+        try:
+            app_round = queryset.first()
+            path = ApplicationDataExporter.export_application_data(
+                application_round=app_round
+            )
+
+        except Exception as e:
+            self.message_user(
+                request,
+                f"Error while exporting applications: {e}",
+                level=messages.ERROR,
+            )
+
+            capture_exception(e)
+        else:
+            if path:
+                return FileResponse(open(path, "rb"))
+
+            self.message_user(
+                request,
+                "No export data in selected application round.",
+                level=messages.INFO,
+            )
 
 
 @admin.register(City)
