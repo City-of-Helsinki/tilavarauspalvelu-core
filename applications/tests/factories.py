@@ -66,6 +66,7 @@ class PersonFactory(DjangoModelFactory):
     email = LazyAttribute(
         lambda o: f"{o.first_name.lower()}.{o.last_name.lower()}@example.com"
     )
+    phone_number = FuzzyText(length=7, chars=[str(c) for c in range(10)])
 
     class Meta:
         model = "applications.Person"

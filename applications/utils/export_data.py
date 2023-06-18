@@ -20,7 +20,7 @@ from ..models import (
 
 class ApplicationDataExporter:
     @classmethod
-    def export_application_data(cls, application_round: int) -> None:
+    def export_application_data(cls, application_round: int) -> Path:
         now = timezone.now()
         root = Path(settings.BASE_DIR)
         path = root / "exports" / "applications"
@@ -131,7 +131,11 @@ class ApplicationDataExporter:
                     contact_person_first_name = ""
                     contact_person_last_name = ""
                     contact_person_email = ""
+                    contact_person_phone = ""
                     applicant = getattr(application.organisation, "name", "")
+                    organisation_id = getattr(
+                        application.organisation, "identifier", ""
+                    )
                     event_begin = (
                         f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
                         if event.begin
@@ -150,6 +154,9 @@ class ApplicationDataExporter:
                         contact_person_last_name = application.contact_person.last_name
                         contact_person_email = getattr(
                             application.contact_person, "email", ""
+                        )
+                        contact_person_phone = getattr(
+                            application.contact_person, "phone_number", ""
                         )
 
                     if not applicant and application.contact_person:
@@ -193,15 +200,18 @@ class ApplicationDataExporter:
                         application.id,
                         ApplicationStatus.get_verbose_status(event.current_status),
                         applicant,
+                        organisation_id,
                         contact_person_first_name,
                         contact_person_last_name,
                         contact_person_email,
+                        contact_person_phone,
                         event.id,
                         event.name,
                         cls._get_time_range_string(event_begin, event_end),
                         getattr(application.home_city, "name", "muu"),
                         getattr(event.purpose, "name", ""),
                         event.age_group,
+                        getattr(event, "num_persons", ""),
                         application.applicant_type,
                         event.events_per_week,
                         duration_range_string,
@@ -241,6 +251,8 @@ class ApplicationDataExporter:
                         ]
                     )
                     applications_writer.writerow(row)
+
+                return path / file_name
 
     @staticmethod
     def _write_header_row(writer, spaces_count):
@@ -322,15 +334,18 @@ class ApplicationDataExporter:
                 "hakemuksen numero",
                 "hakemuksen tila",
                 "hakija",
+                "y-tunnus",
                 "yhteyshenkilö etunimi",
                 "yhteyshenkilö sukunimi",
                 "sähköpostiosoite",
+                "yhteyshenkilön puh",
                 "hakemusosan numero",
                 "varauksen nimi",
                 "hakijan ilmoittama kausi",
                 "kotikunta",
                 "vuoronkäyttötarkoitus",
                 "ikäryhmä",
+                "osallistujamäärä",
                 "hakijan tyyppi",
                 "vuoroja, kpl / vko",
                 "aika",
