@@ -124,3 +124,54 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     orderStatus
   }
 `;
+
+// NOTE can't reuse the fragment on a different types without an interface
+// and our schema is borked: having both ReservationUnitType and ReservationUnitByPkType
+// so use only the plural reservationUnits version of the query with this.
+export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
+  fragment ReservationUnitReservations on ReservationUnitType {
+    reservations(
+      from: $from
+      to: $to
+      includeWithSameComponents: $includeWithSameComponents
+      state: [
+        "CREATED"
+        "CONFIRMED"
+        "REQUIRES_HANDLING"
+        "WAITING_FOR_PAYMENT"
+      ]
+    ) {
+      pk
+      name
+      type
+      priority
+      begin
+      end
+      state
+      numPersons
+      calendarUrl
+      bufferTimeBefore
+      bufferTimeAfter
+      workingMemo
+      reserveeName
+      reservationUnits {
+        pk
+        nameFi
+        bufferTimeBefore
+        bufferTimeAfter
+        unit {
+          pk
+          serviceSectors {
+            pk
+          }
+        }
+      }
+      user {
+        firstName
+        lastName
+        email
+        pk
+      }
+    }
+  }
+`;

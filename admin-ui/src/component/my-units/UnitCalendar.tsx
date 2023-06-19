@@ -217,7 +217,7 @@ const PreBuffer = ({
   left: string;
   style?: CSSProperties;
 }): JSX.Element | null => {
-  const buffer = event.event?.reservationUnits?.[0]?.bufferTimeBefore;
+  const buffer = event.event?.bufferTimeBefore;
   const { t } = useTranslation();
 
   if (buffer) {
@@ -249,7 +249,7 @@ const PostBuffer = ({
   right: string;
   style?: CSSProperties;
 }): JSX.Element | null => {
-  const buffer = event.event?.reservationUnits?.[0]?.bufferTimeAfter;
+  const buffer = event.event?.bufferTimeAfter;
   const { t } = useTranslation();
 
   if (buffer) {

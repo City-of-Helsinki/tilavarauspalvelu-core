@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { RESERVATIONUNIT_RESERVATIONS_FRAGMENT } from "../reservations/fragments";
 
 export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   query units($pk: [ID]) {
@@ -21,34 +22,19 @@ export const RECURRING_RESERVATION_UNIT_QUERY = gql`
 `;
 
 export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
-  query ReservationUnit($pk: Int, $from: Date, $to: Date) {
-    reservationUnitByPk(pk: $pk) {
-      pk
-      reservations(from: $from, to: $to, includeWithSameComponents: true) {
-        id
-        user {
-          firstName
-          lastName
-          email
+  ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
+  query ReservationUnits(
+    $pk: ID
+    $from: Date
+    $to: Date
+    $includeWithSameComponents: Boolean
+  ) {
+    reservationUnits(pk: [$pk]) {
+      edges {
+        node {
           pk
+          ...ReservationUnitReservations
         }
-        name
-        reserveeName
-        type
-        reservationUnits {
-          pk
-          nameFi
-          unit {
-            pk
-            serviceSectors {
-              pk
-            }
-          }
-        }
-        pk
-        begin
-        end
-        state
       }
     }
   }

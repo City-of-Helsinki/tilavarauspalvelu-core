@@ -1,5 +1,8 @@
 import { gql } from "@apollo/client";
-import { RESERVATION_UNIT_FRAGMENT } from "../../reservations/fragments";
+import {
+  RESERVATIONUNIT_RESERVATIONS_FRAGMENT,
+  RESERVATION_UNIT_FRAGMENT,
+} from "../../reservations/fragments";
 
 export const OPTIONS_QUERY = gql`
   query options {
@@ -59,6 +62,7 @@ export const UNIT_QUERY = gql`
 `;
 
 export const RESERVATION_UNITS_BY_UNIT = gql`
+  ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
   query reservationUnitsByUnit(
     $unit: [ID]
     $from: Date
@@ -77,49 +81,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
             pk
           }
           isDraft
-          reservations(
-            from: $from
-            to: $to
-            includeWithSameComponents: $includeWithSameComponents
-            state: [
-              "CREATED"
-              "CONFIRMED"
-              "REQUIRES_HANDLING"
-              "WAITING_FOR_PAYMENT"
-            ]
-          ) {
-            pk
-            name
-            type
-            priority
-            begin
-            end
-            state
-            numPersons
-            calendarUrl
-            bufferTimeBefore
-            bufferTimeAfter
-            workingMemo
-            reserveeName
-            reservationUnits {
-              pk
-              nameFi
-              bufferTimeBefore
-              bufferTimeAfter
-              unit {
-                pk
-                serviceSectors {
-                  pk
-                }
-              }
-            }
-            user {
-              firstName
-              lastName
-              email
-              pk
-            }
-          }
+          ...ReservationUnitReservations
         }
       }
     }
