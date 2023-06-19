@@ -7,7 +7,7 @@ from rest_framework import mixins, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializer
+from api.base import TranslatedModelSerializer
 from api.common_filters import NumberInFilter
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
@@ -33,7 +33,7 @@ from reservation_units.models import (
 )
 from reservations.models import Reservation, ReservationPurpose
 from resources.models import Resource
-from spaces.models import District, Space, Unit
+from spaces.models import Space, Unit
 
 
 class ReservationUnitFilter(filters.FilterSet):
@@ -43,9 +43,6 @@ class ReservationUnitFilter(filters.FilterSet):
     application_round = filters.ModelMultipleChoiceFilter(
         field_name="application_rounds",
         queryset=ApplicationRound.objects.all(),
-    )
-    district = HierarchyModelMultipleChoiceFilter(
-        field_name="spaces__district", queryset=District.objects.all()
     )
     max_persons = filters.NumberFilter(
         field_name="spaces__max_persons",

@@ -3,13 +3,6 @@ from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
 
 
-class DistrictFactory(DjangoModelFactory):
-    class Meta:
-        model = "spaces.District"
-
-    name = FuzzyText()
-
-
 class RealEstateFactory(DjangoModelFactory):
     class Meta:
         model = "spaces.RealEstate"
@@ -44,7 +37,6 @@ class SpaceFactory(DjangoModelFactory):
 
     name = FuzzyText()
     parent = None
-    district = SubFactory(DistrictFactory)
     building = SubFactory(BuildingFactory)
     unit = SubFactory(UnitFactory)
 

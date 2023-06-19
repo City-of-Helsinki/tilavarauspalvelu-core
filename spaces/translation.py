@@ -2,7 +2,6 @@ from modeltranslation.translator import TranslationOptions, translator
 
 from .models import (
     Building,
-    District,
     Location,
     RealEstate,
     ServiceSector,
@@ -36,10 +35,6 @@ class ServiceSectorTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-class DistrictTranslationoptions(TranslationOptions):
-    fields = ["name"]
-
-
 class LocationTranslationOptions(TranslationOptions):
     fields = ["address_street", "address_city"]
 
@@ -50,5 +45,4 @@ translator.register(Unit, UnitTranslationOptions)
 translator.register(RealEstate, RealEstateTranslationOptions)
 translator.register(Building, BuildingTranslationOptions)
 translator.register(ServiceSector, ServiceSectorTranslationOptions)
-translator.register(District, DistrictTranslationoptions)
 translator.register(Location, LocationTranslationOptions)

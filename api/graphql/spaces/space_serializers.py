@@ -8,7 +8,7 @@ from api.graphql.decimal_field import DecimalField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.space_api import SpaceSerializer
-from spaces.models import Building, District, Space, Unit
+from spaces.models import Building, Space, Unit
 
 
 class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
@@ -24,12 +24,7 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
         help_text="PK of the building for this space.",
         allow_null=True,
     )
-    district_pk = IntegerPrimaryKeyField(
-        queryset=District.objects.all(),
-        source="district",
-        help_text="PK of the district for this space.",
-        allow_null=True,
-    )
+
     max_persons = serializers.IntegerField(required=False)
     code = serializers.CharField(required=False)
     unit_pk = IntegerPrimaryKeyField(
@@ -39,7 +34,6 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["district_pk"].required = False
         self.fields["parent_pk"].required = False
         self.fields.pop("building_pk")
         self.fields["name_fi"].required = True
@@ -50,7 +44,6 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
             "parent_pk",
             "building_pk",
             "surface_area",
-            "district_pk",
             "max_persons",
             "code",
             "unit_pk",

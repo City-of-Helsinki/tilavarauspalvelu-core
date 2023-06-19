@@ -49,7 +49,6 @@ from .reservations_api import (
     ReservationViewSet,
 )
 from .resources_api import ResourceViewSet
-from .space_api import DistrictViewSet
 from .users_api import UserViewSet
 
 router = routers.DefaultRouter()
@@ -108,7 +107,6 @@ router.register(
 
 
 router.register(r"opening_hour", OpeningHoursViewSet, "opening_hour")
-router.register(r"parameters/district", DistrictViewSet, "district")
 router.register(r"parameters/purpose", ReservationPurposeViewSet, "purpose")
 router.register(r"parameters/age_group", AgeGroupViewSet, "age_group")
 router.register(r"parameters/ability_group", AbilityGroupViewSet, "ability_group")

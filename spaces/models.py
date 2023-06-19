@@ -19,39 +19,6 @@ from reservation_units.tasks import refresh_reservation_unit_product_mapping
 COORDINATE_SYSTEM_ID = 4326
 
 
-class District(MPTTModel):
-    TYPE_MAJOR_DISTRICT = "major_district"
-    TYPE_DISTRICT = "district"
-    TYPE_SUB_DISTRICT = "sub_district"
-    TYPE_NEIGHBORHOOD = "neighborhood"
-
-    TYPE_CHOICES = (
-        (TYPE_MAJOR_DISTRICT, _("Major district")),
-        (TYPE_DISTRICT, _("District")),
-        (TYPE_SUB_DISTRICT, _("Sub district")),
-        (TYPE_NEIGHBORHOOD, _("Neighborhood")),
-    )
-
-    district_type = models.CharField(
-        verbose_name=_("Type"),
-        max_length=30,
-        choices=TYPE_CHOICES,
-        default=TYPE_DISTRICT,
-    )
-    name = models.CharField(verbose_name=_("Name"), max_length=255)
-    parent = TreeForeignKey(
-        "self",
-        verbose_name=_("Parent"),
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="children",
-    )
-
-    def __str__(self):
-        return "{} ({})".format(self.name, self.parent.name if self.parent else "")
-
-
 class ServiceSector(models.Model):
     """
     Model representation of Service Sector that contains and manages
@@ -173,14 +140,6 @@ class Unit(models.Model):
 
 class RealEstate(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    district = models.ForeignKey(
-        District,
-        verbose_name=_("District"),
-        related_name="real_estates",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
 
     surface_area = models.DecimalField(
         verbose_name=_("Surface area"),
@@ -196,14 +155,6 @@ class RealEstate(models.Model):
 
 class Building(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    district = models.ForeignKey(
-        District,
-        verbose_name=_("District"),
-        related_name="buildings",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
 
     real_estate = models.ForeignKey(
         RealEstate,
@@ -232,14 +183,6 @@ class Space(MPTTModel):
         "self",
         verbose_name=_("Parent space"),
         related_name="children",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    district = models.ForeignKey(
-        District,
-        verbose_name=_("District"),
-        related_name="spaces",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

@@ -1,13 +1,13 @@
-from rest_framework import mixins, serializers, viewsets
+from rest_framework import serializers
 
 from api.base import TranslatedModelSerializer
-from spaces.models import Building, District, Location, Space
+from spaces.models import Building, Location, Space
 
 
 class BuildingSerializer(TranslatedModelSerializer):
     class Meta:
         model = Building
-        fields = ["id", "name", "district", "real_estate", "surface_area"]
+        fields = ["id", "name", "real_estate", "surface_area"]
 
 
 class LocationSerializer(TranslatedModelSerializer):
@@ -45,12 +45,6 @@ class SpaceSerializer(TranslatedModelSerializer):
         help_text="Id of building for this space.",
         allow_null=True,
     )
-    district_id = serializers.PrimaryKeyRelatedField(
-        queryset=District.objects.all(),
-        source="district",
-        help_text="Id of district for this space.",
-        allow_null=True,
-    )
     name = serializers.CharField()
 
     class Meta:
@@ -61,7 +55,6 @@ class SpaceSerializer(TranslatedModelSerializer):
             "parent_id",
             "building_id",
             "surface_area",
-            "district_id",
         ]
         extra_kwargs = {
             "name": {
@@ -71,22 +64,3 @@ class SpaceSerializer(TranslatedModelSerializer):
                 "help_text": "Surface area of the space as square meters",
             },
         }
-
-
-class DistrictSerializer(TranslatedModelSerializer):
-    parent_id = serializers.PrimaryKeyRelatedField(
-        queryset=District.objects.all(),
-        source="parent",
-        help_text="Id of parent district for this district.",
-    )
-
-    class Meta:
-        model = District
-        fields = ["id", "district_type", "name", "parent_id"]
-
-
-class DistrictViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
-    serializer_class = DistrictSerializer
-    queryset = District.objects.all().select_related("parent")
