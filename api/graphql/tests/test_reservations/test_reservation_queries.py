@@ -494,7 +494,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         reserver = self.create_staff_reserver_for_unit()
         self.client.force_login(reserver)
         ReservationFactory(
-            user=reserver, working_memo="Read me.", state=STATE_CHOICES.CONFIRMED
+            begin=self.reservation.begin - datetime.timedelta(hours=2),
+            user=reserver,
+            working_memo="Read me.",
+            state=STATE_CHOICES.CONFIRMED,
         )
         response = self.query(
             """
@@ -1453,6 +1456,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservee_first_name="First",
             reservee_last_name="Name",
             reservation_unit=[self.reservation_unit],
+            begin=self.reservation.begin - datetime.timedelta(hours=3),
         )
         self.client.force_login(self.general_admin)
         response = self.query(
@@ -1669,7 +1673,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     def test_reservation_is_blocked_when_supposed_to_be_true(self):
         self.client.force_login(self.regular_joe)
-        ReservationFactory(type=ReservationType.BLOCKED)
+        ReservationFactory(
+            begin=self.reservation.begin - datetime.timedelta(hours=3),
+            type=ReservationType.BLOCKED,
+        )
         response = self.query(
             """
             query {

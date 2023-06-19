@@ -8,9 +8,12 @@ import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.core.management import call_command
+from django.http import FileResponse
+from django.test import RequestFactory
 from django.test.testcases import TestCase
 from factory.fuzzy import FuzzyChoice, FuzzyInteger
 
+from ..admin import ApplicationRoundAdmin
 from ..models import (
     PRIORITIES,
     Application,
@@ -26,15 +29,13 @@ from .factories import (
 )
 
 
-class ApplicationDataExporterTestCase(TestCase):
-    export_dir = Path(settings.BASE_DIR) / "exports" / "applications"
-    application_round_id = None
-    random_empty_application_round_id = None
-
+class ApplicationDataExportTestCaseBase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.application_event = ApplicationEventFactory(
-            min_duration=timedelta(hours=1), max_duration=timedelta(hours=2)
+            min_duration=timedelta(hours=1),
+            max_duration=timedelta(hours=2),
+            num_persons=10,
         )
         cls.event_reservation_unit_1 = EventReservationUnitFactory(
             application_event=cls.application_event, priority=PRIORITIES.PRIORITY_HIGH
@@ -95,6 +96,12 @@ class ApplicationDataExporterTestCase(TestCase):
 
                 break
 
+
+class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
+    export_dir = Path(settings.BASE_DIR) / "exports" / "applications"
+    application_round_id = None
+    random_empty_application_round_id = None
+
     @staticmethod
     def _get_filename_for_round(round: int):
         return (
@@ -130,9 +137,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -142,6 +151,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -187,9 +197,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -199,6 +211,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h",
@@ -244,9 +257,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -256,6 +271,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h",
@@ -301,9 +317,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -313,6 +331,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 1 h 30 min",
@@ -358,9 +377,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -370,6 +391,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "30 min - 2 h",
@@ -420,9 +442,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -432,6 +456,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -482,9 +507,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -494,6 +521,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -539,9 +567,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -551,6 +581,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "2 h",
@@ -596,9 +627,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -608,6 +641,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h",
@@ -653,9 +687,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             "",
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -665,6 +701,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -710,6 +747,8 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
+            "",
             "",
             "",
             "",
@@ -722,6 +761,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -767,9 +807,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             f"{application.contact_person.first_name} {application.contact_person.last_name}",
+            "",
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -779,6 +821,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -828,6 +871,8 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
             str(event.id),
             event.name,
             (
@@ -837,6 +882,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -882,9 +928,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -894,6 +942,7 @@ class ApplicationDataExporterTestCase(TestCase):
             "muu",
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -939,9 +988,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -951,6 +1002,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             "",
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -996,15 +1048,18 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             f"{event.end.day}.{event.end.month}.{event.end.year}",
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -1050,15 +1105,18 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             f"{event.begin.day}.{event.begin.month}.{event.begin.year}",
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -1105,15 +1163,18 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             "",
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -1162,9 +1223,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -1174,6 +1237,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -1222,9 +1286,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -1234,6 +1300,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -1323,9 +1390,11 @@ class ApplicationDataExporterTestCase(TestCase):
             str(application.id),
             ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
+            application.organisation.identifier,
             application.contact_person.first_name,
             application.contact_person.last_name,
             application.contact_person.email,
+            application.contact_person.phone_number,
             str(event.id),
             event.name,
             (
@@ -1335,6 +1404,7 @@ class ApplicationDataExporterTestCase(TestCase):
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
+            str(event.num_persons),
             application.applicant_type,
             str(event.events_per_week),
             "1 h - 2 h",
@@ -1367,3 +1437,13 @@ class ApplicationDataExporterTestCase(TestCase):
 
         file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
+
+
+class TestReservationUnitExportFromAdmin(ApplicationDataExportTestCaseBase):
+    def test_admin_action_results_file_response(self):
+        view = ApplicationRoundAdmin(ApplicationRound, None)
+        request = RequestFactory().get("/admin/applications/applicationround/")
+
+        response = view.export_to_csv(request, ApplicationRound.objects.all())
+
+        assert_that(response).is_instance_of(FileResponse)
