@@ -13,18 +13,19 @@ def purge(path: str) -> None:
     if not settings.IMAGE_CACHE_ENABLED:
         return
 
-    if not settings.IMAGE_CACHE_ROOT_URL or not settings.IMAGE_CACHE_PURGE_KEY:
+    if not settings.IMAGE_CACHE_VARNISH_HOST or not settings.IMAGE_CACHE_PURGE_KEY:
         raise ImageCacheConfigurationError(
-            "IMAGE_CACHE_ROOT_URL or IMAGE_CACHE_PURGE_KEY setting is not configured"
+            "IMAGE_CACHE_VARNISH_HOST or IMAGE_CACHE_PURGE_KEY setting is not configured"
         )
 
-    full_url = urljoin(settings.IMAGE_CACHE_ROOT_URL, path)
+    full_url = urljoin(settings.IMAGE_CACHE_VARNISH_HOST, path)
 
     response = request(
         "PURGE",
         full_url,
         headers={
             "X-VC-Purge-Key": settings.IMAGE_CACHE_PURGE_KEY,
+            "Host": settings.IMAGE_CACHE_HOST_HEADER,
         },
     )
 
