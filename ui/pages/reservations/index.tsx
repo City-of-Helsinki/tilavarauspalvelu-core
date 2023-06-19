@@ -60,7 +60,8 @@ const StyledTab = styled(Tab)`
       z-index: 1 !important;
     }
 
-    padding: 0 var(--spacing-xs) !important;
+    min-width: unset;
+    padding: 0 var(--spacing-s) !important;
 
     @media (min-width: ${breakpoints.s}) {
       padding: 0 var(--spacing-xl) !important;
