@@ -6,6 +6,7 @@ import {
   type ReservationDenyReasonType,
   type QueryReservationDenyReasonsArgs,
   type QueryReservationByPkArgs,
+  ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
@@ -65,7 +66,10 @@ export const useReservationData = (
       }))
       .map((x) => ({
         ...x,
-        title: x.event.type === "blocked" ? "Suljettu" : x.title.trim(),
+        title:
+          x.event.type === ReservationsReservationTypeChoices.Blocked
+            ? "Suljettu"
+            : x.title.trim(),
         event: {
           ...x.event,
           name: x.event.name?.trim() !== "" ? x.event.name : "No name",

@@ -38,6 +38,8 @@ import {
   PaymentOrderType,
   RefreshOrderMutationPayload,
   RefreshOrderMutationInput,
+  ReservationsReservationPriorityChoices,
+  ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import { toUIDate } from "common/src/common/util";
 
@@ -394,9 +396,9 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
   "reservationByPk",
   (req, res, ctx) => {
     const { pk } = req.variables;
-    const data = {
+    const data: ReservationType = {
       pk,
-      type: ReservationsReservationReserveeTypeChoices.Individual,
+      type: ReservationsReservationTypeChoices.Normal,
       id: "UmVzZXJ2YXRpb246Mg==",
       name: "Reservation name",
       description:
@@ -408,7 +410,15 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       begin: "2021-04-28T04:23:20+00:00",
       end: "2021-04-28T08:23:20+00:00",
       calendarUrl: `http://localhost:8000/v1/reservation_calendar/${pk}/?hash=12c580bc07340b05441feb8f261786a7ceabb5423a1966c7c13241f39916233c`,
-      user: { email: "user@gmail.com" },
+      user: {
+        email: "user@gmail.com",
+        isSuperuser: false,
+        username: "",
+        id: "",
+        firstName: "",
+        lastName: "",
+        uuid: "",
+      },
       state: ReservationsReservationStateChoices.Confirmed,
       bufferTimeBefore: 3600,
       bufferTimeAfter: 1800,
@@ -518,7 +528,8 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
         maximum: 8,
       },
       numPersons: 18,
-    } as ReservationType;
+      priority: ReservationsReservationPriorityChoices.A_200,
+    };
 
     if (pk === 4 || pk === 44) {
       data.price = 0;
