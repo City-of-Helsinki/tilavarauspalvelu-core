@@ -13,6 +13,7 @@ import {
   ReservationUnitPricingCreateSerializerInput,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
 } from "common/types/gql-types";
+import { fromUIDate, toApiDate } from "common/src/common/util";
 import {
   Grid,
   Span3,
@@ -121,10 +122,7 @@ const PricingType = ({
                 value={hdsDate(pricing.begins)}
                 onChange={(e) =>
                   setPricingTypeValue({
-                    begins: format(
-                      parse(e, "dd.MM.yyyy", new Date()),
-                      "yyyy-MM-dd"
-                    ),
+                    begins: toApiDate(fromUIDate(e)),
                   })
                 }
               />

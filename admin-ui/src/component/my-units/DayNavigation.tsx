@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { addDays, parse, subDays } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Button, IconAngleLeft, IconAngleRight, DateInput } from "hds-react";
-import { toUIDate } from "common/src/common/util";
+import { fromUIDate, toUIDate } from "common/src/common/util";
 
 type Props = {
   date: string;
@@ -61,9 +61,7 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
         initialMonth={d}
         language="fi"
         required
-        onChange={(value) =>
-          onDateChange({ date: parse(value, "d.M.yyyy", new Date()) })
-        }
+        onChange={(value) => onDateChange({ date: fromUIDate(value) })}
         value={toUIDate(d)}
       />
       <Button

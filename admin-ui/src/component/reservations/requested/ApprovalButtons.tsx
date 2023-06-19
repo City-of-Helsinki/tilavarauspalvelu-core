@@ -5,8 +5,8 @@ import {
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { addHours, isToday } from "date-fns";
-import { ButtonContainer } from "app/styles/layout";
 import { Button } from "hds-react";
+import { ButtonContainer } from "app/styles/layout";
 import DenyDialog from "./DenyDialog";
 import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
@@ -141,12 +141,7 @@ const ApprovalButtons = ({
         </Button>
       )}
       {isAllowedToModify && (
-        <>
-          <ButtonLikeLink to="edit_time">
-            {t("ApprovalButtons.editTime")}
-          </ButtonLikeLink>
-          <ButtonLikeLink to="edit">{t("ApprovalButtons.edit")}</ButtonLikeLink>
-        </>
+        <ButtonLikeLink to="edit">{t("ApprovalButtons.edit")}</ButtonLikeLink>
       )}
     </ButtonContainer>
   );

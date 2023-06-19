@@ -13,20 +13,20 @@ import {
 } from "date-fns";
 import { TFunction } from "next-i18next";
 import {
-  ApplicationRoundType,
-  OpeningTimesType,
-  ReservationType,
-  ReservationUnitByPkType,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  ReservationUnitType,
+  type ApplicationRoundType,
+  type OpeningTimesType,
+  type ReservationType,
+  type ReservationUnitByPkType,
+  type ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  type ReservationUnitType,
 } from "../../types/gql-types";
 import {
-  CalendarEventBuffer,
-  SlotProps,
-  ApplicationEvent,
-  OptionType,
-  PendingReservation,
-  ApplicationRound,
+  type CalendarEventBuffer,
+  type SlotProps,
+  type ApplicationEvent,
+  type OptionType,
+  type PendingReservation,
+  type ApplicationRound,
 } from "../../types/common";
 import {
   convertHMSToSeconds,
@@ -314,18 +314,12 @@ export const getSlotPropGetter =
     }
   };
 
-export const getTimeslots = (
-  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
-): number => {
-  switch (interval) {
-    case "INTERVAL_90_MINS":
-    case "INTERVAL_60_MINS":
-    case "INTERVAL_30_MINS":
-    case "INTERVAL_15_MINS":
-    default:
-      return 2;
-  }
-};
+// TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
+// we use every hour only => 2
+// TODO migrate users to constant over a function call
+export const SLOTS_EVERY_HOUR = 2;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getTimeslots = (interval?: unknown): number => SLOTS_EVERY_HOUR;
 
 export const getBufferedEventTimes = (
   start: Date,

@@ -12,6 +12,7 @@ export type ToolbarProps = {
   onView: (n: View) => void;
   view: string;
   date: Date;
+  children?: React.ReactNode;
 };
 
 const Wrapper = styled.div`
@@ -141,7 +142,13 @@ const ButtonWrapper = styled.div`
   }
 `;
 
-const Toolbar = ({ onNavigate, onView, view, date }: ToolbarProps) => {
+const Toolbar = ({
+  onNavigate,
+  onView,
+  view,
+  date,
+  children,
+}: ToolbarProps) => {
   const culture = { locale: fi };
   const { t } = useTranslation();
 
@@ -186,6 +193,7 @@ const Toolbar = ({ onNavigate, onView, view, date }: ToolbarProps) => {
         >
           {t("common:today")}
         </button>
+        {children}
       </ButtonWrapper>
       <div className="rbc-toolbar-navigation-hz">
         <button

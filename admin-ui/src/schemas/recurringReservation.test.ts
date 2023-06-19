@@ -1,7 +1,9 @@
-import { addDays } from "date-fns";
+import { addDays, format } from "date-fns";
 
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import { timeSelectionSchema } from "./recurringReservation";
+
+const DATE_FORMAT = "dd.MM.yyyy";
 
 const tomorrow = addDays(new Date(), 1);
 const reservation = {
@@ -10,8 +12,8 @@ const reservation = {
     label: "unit",
     value: "1",
   },
-  startingDate: tomorrow,
-  endingDate: addDays(tomorrow, 6),
+  startingDate: format(tomorrow, DATE_FORMAT),
+  endingDate: format(addDays(tomorrow, 6), DATE_FORMAT),
   repeatOnDays: [1],
   repeatPattern: {
     label: "weekly",

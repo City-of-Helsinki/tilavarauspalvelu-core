@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { fromUIDate } from "common/src/common/util";
 import { subDays } from "date-fns";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import { intervalToNumber } from "./utils";
@@ -16,16 +17,21 @@ export const ReservationTypeSchema = z.enum(ReservationTypes);
 
 export type ReservationType = z.infer<typeof ReservationTypeSchema>;
 
+export const TimeFormSchema = z.object({
+  // NOTE date needs to be string that is not coerced because it uses FI format
+  date: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
+});
+
 const ReservationFormSchema = z
   .object({
-    date: z.date(),
-    startTime: z.string(),
-    endTime: z.string(),
     comments: z.string().optional(),
     type: ReservationTypeSchema,
     bufferTimeAfter: z.boolean().optional(),
     bufferTimeBefore: z.boolean().optional(),
   })
+  .merge(TimeFormSchema)
   // passthrough since this is combined to the metafields
   .passthrough();
 
@@ -128,7 +134,9 @@ const ReservationFormSchemaRefined = (
   interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ) =>
   ReservationFormSchema.partial()
-    .superRefine((val, ctx) => checkDate(val.date, ctx, "date"))
+    .superRefine(
+      (val, ctx) => val.date && checkDate(fromUIDate(val.date), ctx, "date")
+    )
     .superRefine((val, ctx) =>
       checkTimeStringFormat(val.startTime, ctx, "startTime")
     )
@@ -151,6 +159,33 @@ const ReservationFormSchemaRefined = (
       path: ["type"],
       message: "Required",
     });
+
+// NOTE duplicated schema because schemas need to be refined after merge (only times in this case)
+export const TimeChangeFormSchemaRefined = (
+  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+) =>
+  TimeFormSchema.partial()
+    .superRefine(
+      (val, ctx) => val.date && checkDate(fromUIDate(val.date), ctx, "date")
+    )
+    .superRefine((val, ctx) =>
+      checkTimeStringFormat(val.startTime, ctx, "startTime")
+    )
+    .superRefine((val, ctx) =>
+      checkTimeStringFormat(val.endTime, ctx, "endTime")
+    )
+    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
+    .superRefine((val, ctx) =>
+      checkReservationInterval(
+        val.startTime,
+        ctx,
+        "startTime",
+        intervalToNumber(interval)
+      )
+    )
+    .superRefine((val, ctx) =>
+      checkReservationInterval(val.endTime, ctx, "endTime", 15)
+    );
 
 export { ReservationFormSchemaRefined as ReservationFormSchema };
 

@@ -9,40 +9,32 @@ import {
 } from "../../fragments";
 
 export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
-  query reservationsByReservationUnit(
-    $reservationUnit: [ID]
-    $offset: Int
-    $first: Int
-    $begin: DateTime
-    $end: DateTime
-  ) {
-    reservations(
-      begin: $begin
-      end: $end
-      first: $first
-      offset: $offset
-      reservationUnit: $reservationUnit
-      state: ["DENIED", "CONFIRMED", "REQUIRES_HANDLING", "WAITING_FOR_PAYMENT"]
-    ) {
-      edges {
-        node {
-          user {
-            email
-          }
-          name
-          reserveeName
-          pk
-          begin
-          end
-          state
-          type
-          recurringReservation {
-            pk
-          }
+  query reservationUnitByPk($pk: Int, $from: Date, $to: Date) {
+    reservationUnitByPk(pk: $pk) {
+      reservations(
+        from: $from
+        to: $to
+        state: [
+          "DENIED"
+          "CONFIRMED"
+          "REQUIRES_HANDLING"
+          "WAITING_FOR_PAYMENT"
+        ]
+        includeWithSameComponents: true
+      ) {
+        user {
+          email
         }
-      }
-      pageInfo {
-        hasNextPage
+        name
+        reserveeName
+        pk
+        begin
+        end
+        state
+        type
+        recurringReservation {
+          pk
+        }
       }
     }
   }

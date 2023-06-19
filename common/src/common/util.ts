@@ -5,6 +5,7 @@ import {
   format,
   isValid,
   isAfter,
+  parse,
 } from "date-fns";
 import { fi } from "date-fns/locale";
 import { isNumber } from "lodash";
@@ -89,6 +90,15 @@ export const toApiDate = (
     return undefined;
   }
 };
+
+export const toApiDateUnsafe = (date: Date, formatStr = "yyyy-MM-dd") =>
+  format(date, formatStr);
+
+export const fromApiDate = (date: string): Date =>
+  parse(date, "yyyy-MM-dd", new Date());
+
+export const fromUIDate = (date: string): Date =>
+  parse(date, "d.M.yyyy", new Date());
 
 export const isValidDate = (date: Date): boolean =>
   isValid(date) && isAfter(date, new Date("1000-01-01"));

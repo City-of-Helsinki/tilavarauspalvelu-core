@@ -1,8 +1,9 @@
+import { useState } from "react";
 import {
   type Query,
   type ReservationType,
-  type QueryReservationsArgs,
   ReservationsReservationStateChoices,
+  type QueryReservationUnitByPkArgs,
   type ReservationDenyReasonType,
   type QueryReservationDenyReasonsArgs,
   type QueryReservationByPkArgs,
@@ -10,7 +11,7 @@ import {
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
-import { useState } from "react";
+import { toApiDateUnsafe } from "common/src/common/util";
 import {
   RECURRING_RESERVATION_QUERY,
   RESERVATIONS_BY_RESERVATIONUNIT,
@@ -23,6 +24,38 @@ import { GQL_MAX_RESULTS_PER_QUERY } from "../../../../common/const";
 
 export { default as usePermission } from "./usePermission";
 
+const getEventName = (
+  eventType?: ReservationsReservationTypeChoices,
+  title?: string,
+  blockedName?: string
+) =>
+  eventType === ReservationsReservationTypeChoices.Blocked
+    ? blockedName
+    : title?.trim();
+
+const getReservationTitle = (r: ReservationType) => r.reserveeName ?? "";
+
+const convertReservationToCalendarEvent = (
+  r: ReservationType,
+  blockedName: string
+) => ({
+  title: getEventName(r.type ?? undefined, getReservationTitle(r), blockedName),
+  event: {
+    ...r,
+    name: r.name?.trim() !== "" ? r.name : "No name",
+  },
+  // TODO use zod for datetime conversions
+  start: new Date(r.begin),
+  end: new Date(r.end),
+});
+
+// TODO This would be better if we combined two GQL queries, one for the reservation itself
+// and other that includes the states (now we are fetching a lot of things we don't need)
+const shouldBeShownInTheCalendar = (r: ReservationType, ownPk?: number) =>
+  r.state === ReservationsReservationStateChoices.Confirmed ||
+  r.state === ReservationsReservationStateChoices.RequiresHandling ||
+  r.pk === ownPk;
+
 /// NOTE only fetches 100 reservations => use pageInfo and fetchMore
 export const useReservationData = (
   begin: Date,
@@ -31,50 +64,30 @@ export const useReservationData = (
   reservationPk?: number
 ) => {
   const { notifyError } = useNotification();
+  const { t } = useTranslation();
 
-  const { data, ...rest } = useQuery<Query, QueryReservationsArgs>(
-    RESERVATIONS_BY_RESERVATIONUNIT,
-    {
-      variables: {
-        reservationUnit: [reservationUnitPk],
-        begin: begin.toISOString(),
-        end: end.toISOString(),
-      },
-      onError: () => {
-        notifyError("Varauksia ei voitu hakea");
-      },
-    }
-  );
+  const { data, ...rest } = useQuery<
+    Query,
+    QueryReservationUnitByPkArgs & { from: string; to: string }
+  >(RESERVATIONS_BY_RESERVATIONUNIT, {
+    fetchPolicy: "no-cache",
+    variables: {
+      pk: Number(reservationUnitPk),
+      from: toApiDateUnsafe(begin, "yyyy-MM-dd"),
+      to: toApiDateUnsafe(end, "yyyy-MM-dd"),
+    },
+    onError: () => {
+      notifyError("Varauksia ei voitu hakea");
+    },
+  });
+
+  const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
 
   const events =
-    data?.reservations?.edges
-      .map((e) => e?.node)
-      .filter((r): r is ReservationType => r != null)
-      .filter(
-        (r) =>
-          [
-            ReservationsReservationStateChoices.Confirmed,
-            ReservationsReservationStateChoices.RequiresHandling,
-          ].includes(r.state) || r.pk === reservationPk
-      )
-      .map((r) => ({
-        title: r.reserveeName ?? "",
-        event: r,
-        // TODO use zod for datetime conversions
-        start: new Date(r.begin),
-        end: new Date(r.end),
-      }))
-      .map((x) => ({
-        ...x,
-        title:
-          x.event.type === ReservationsReservationTypeChoices.Blocked
-            ? "Suljettu"
-            : x.title.trim(),
-        event: {
-          ...x.event,
-          name: x.event.name?.trim() !== "" ? x.event.name : "No name",
-        },
-      })) ?? [];
+    data?.reservationUnitByPk?.reservations
+      ?.filter((r): r is ReservationType => r != null)
+      ?.filter((r) => shouldBeShownInTheCalendar(r, reservationPk))
+      ?.map((r) => convertReservationToCalendarEvent(r, blockedName)) ?? [];
 
   return { ...rest, events };
 };

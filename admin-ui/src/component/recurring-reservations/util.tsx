@@ -3,12 +3,12 @@ import styled from "styled-components";
 import { orderBy, trim, uniqBy } from "lodash";
 import { TFunction } from "i18next";
 import { formatters as getFormatters } from "common";
-import { parse } from "date-fns";
 import {
   ApplicationEventType,
   ApplicationType,
   UnitType,
 } from "common/types/gql-types";
+import { fromApiDate } from "common/src/common/util";
 import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
@@ -144,9 +144,6 @@ export const appEventMapper = (
     applicationStatusView
   );
 
-  const fromAPIDate = (date: string): Date =>
-    parse(date, "yyyy-MM-dd", new Date());
-
   const units = orderBy(
     uniqBy(
       appEvent.eventReservationUnits?.flatMap((eru) => ({
@@ -176,8 +173,8 @@ export const appEventMapper = (
   const totalHours =
     appEvent.begin && appEvent.end
       ? appEventHours(
-          fromAPIDate(appEvent.begin).toISOString(),
-          fromAPIDate(appEvent.end).toISOString(),
+          fromApiDate(appEvent.begin).toISOString(),
+          fromApiDate(appEvent.end).toISOString(),
           appEvent.biweekly,
           appEvent.eventsPerWeek as number,
           appEvent.minDuration as number

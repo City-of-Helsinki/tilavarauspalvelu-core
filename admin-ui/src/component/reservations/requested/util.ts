@@ -7,9 +7,9 @@ import {
 import {
   differenceInHours,
   differenceInMinutes,
+  format,
   getDay,
   isSameDay,
-  parse,
 } from "date-fns";
 import { TFunction } from "i18next";
 import { trim, truncate } from "lodash";
@@ -23,9 +23,35 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
 } from "common/types/gql-types";
-import { formatDate, formatTime, toMondayFirst } from "../../../common/util";
+import { fromApiDate } from "common/src/common/util";
+import {
+  DATE_FORMAT,
+  formatDate,
+  formatTime,
+  toMondayFirst,
+} from "../../../common/util";
 
 export const reservationDateTime = (
+  start: Date,
+  end: Date,
+  t: TFunction
+): string => {
+  const startDay = t(`dayShort.${toMondayFirst(getDay(start))}`);
+
+  if (isSameDay(start, end)) {
+    return `${startDay} ${format(start, DATE_FORMAT)} ${format(
+      start,
+      "HH:mm"
+    )}-${format(end, "HH:mm")}`;
+  }
+
+  return `${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}-${format(
+    end,
+    "HH:mm"
+  )} ${format(end, "HH:mm")}`;
+};
+
+export const reservationDateTimeString = (
   start: string,
   end: string,
   t: TFunction
@@ -33,21 +59,14 @@ export const reservationDateTime = (
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  const startDay = t(`dayShort.${toMondayFirst(getDay(startDate))}`);
-
-  if (isSameDay(startDate, endDate)) {
-    return `${startDay} ${formatDate(start)} ${formatTime(
-      start,
-      "HH:mm"
-    )}-${formatTime(end, "HH:mm")}`;
-  }
-  return `${formatDate(start)} ${formatTime(start, "HH:mm")}-${formatDate(
-    end,
-    "HH:mm"
-  )} ${formatTime(end, "HH:mm")}`;
+  return reservationDateTime(startDate, endDate, t);
 };
 
-export const reservationDuration = (start: string, end: string): string => {
+export const reservationDuration = (start: Date, end: Date): string => {
+  return `${differenceInHours(end, start)}`;
+};
+
+const reservationDurationString = (start: string, end: string): string => {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
@@ -73,8 +92,6 @@ export const reservationPrice = (
   );
 };
 
-const parseDate = (date: string) => parse(date, "yyyy-MM-dd", new Date());
-
 /** returns reservation unit pricing at given date */
 export const getReservatinUnitPricing = (
   reservationUnit: ReservationUnitType,
@@ -88,14 +105,14 @@ export const getReservatinUnitPricing = (
 
   reservationUnit.pricings.sort((a, b) =>
     a?.begins && b?.begins
-      ? parseDate(a.begins).getTime() - parseDate(b.begins).getTime()
+      ? fromApiDate(a.begins).getTime() - fromApiDate(b.begins).getTime()
       : 1
   );
 
   return (
     (reservationUnit.pricings || []) as ReservationUnitPricingType[]
   ).reduce((prev, current) => {
-    if (parseDate(current?.begins) < reservationDate) {
+    if (fromApiDate(current?.begins) < reservationDate) {
       return current;
     }
     return prev;
@@ -220,7 +237,7 @@ export const createTagString = (reservation: ReservationType, t: TFunction) => {
     ?.map(reservationUnitName)
     .join(", ");
 
-  const singleDateTimeTag = `${reservationDateTime(
+  const singleDateTimeTag = `${reservationDateTimeString(
     reservation.begin,
     reservation.end,
     t
@@ -239,7 +256,7 @@ export const createTagString = (reservation: ReservationType, t: TFunction) => {
         )}`
       : "";
 
-  const durationTag = `${reservationDuration(
+  const durationTag = `${reservationDurationString(
     reservation.begin,
     reservation.end
   )}`;

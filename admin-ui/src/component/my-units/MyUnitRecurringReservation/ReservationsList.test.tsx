@@ -1,18 +1,19 @@
 import React from "react";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
-import { addDays, nextMonday } from "date-fns";
+import { addDays, format, nextMonday } from "date-fns";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import { toUIDate } from "common/src/common/util";
 import { generateReservations } from "./generateReservations";
 import ReservationList from "../../ReservationsList";
 
+const DATE_FORMAT = "dd.MM.yyyy";
 const today = new Date();
 const dtoday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
 const twoWeeksOnceAWeek = {
-  startingDate: today,
+  startingDate: format(today, DATE_FORMAT),
   // two weeks is 13 days since the last day is inclusive
-  endingDate: addDays(dtoday, 13),
+  endingDate: format(addDays(dtoday, 13), DATE_FORMAT),
   startTime: "00:00",
   endTime: "01:00",
   repeatOnDays: [1],
@@ -58,8 +59,8 @@ describe("generate reservations", () => {
     const res = generateReservations(
       {
         ...twoWeeksOnceAWeek,
-        startingDate: start,
-        endingDate: addDays(start, 7),
+        startingDate: format(start, DATE_FORMAT),
+        endingDate: format(addDays(start, 7), DATE_FORMAT),
         repeatOnDays: [0],
       },
       interval15mins
@@ -72,8 +73,8 @@ describe("generate reservations", () => {
     const res = generateReservations(
       {
         ...twoWeeksOnceAWeek,
-        startingDate: start,
-        endingDate: addDays(start, 1),
+        startingDate: format(start, DATE_FORMAT),
+        endingDate: format(addDays(start, 1), DATE_FORMAT),
         repeatOnDays: [0, 1],
       },
       interval15mins
@@ -86,8 +87,8 @@ describe("generate reservations", () => {
     const res = generateReservations(
       {
         ...twoWeeksOnceAWeek,
-        startingDate: addDays(start, 1),
-        endingDate: addDays(start, 6),
+        startingDate: format(addDays(start, 1), DATE_FORMAT),
+        endingDate: format(addDays(start, 6), DATE_FORMAT),
         repeatOnDays: [0],
       },
       interval15mins
@@ -100,7 +101,7 @@ describe("generate reservations", () => {
     const res = generateReservations(
       {
         ...twoWeeksOnceAWeek,
-        endingDate: addDays(dtoday, 27),
+        endingDate: format(addDays(dtoday, 27), DATE_FORMAT),
         repeatOnDays: [0],
       },
       interval15mins
@@ -112,7 +113,7 @@ describe("generate reservations", () => {
     const res = generateReservations(
       {
         ...twoWeeksOnceAWeek,
-        endingDate: addDays(dtoday, 27),
+        endingDate: format(addDays(dtoday, 27), DATE_FORMAT),
         repeatOnDays: [0],
         repeatPattern: {
           label: "",
@@ -128,8 +129,8 @@ describe("generate reservations", () => {
     const res = generateReservations(
       {
         ...twoWeeksOnceAWeek,
-        startingDate: addDays(dtoday, 28),
-        endingDate: addDays(dtoday, 20),
+        startingDate: format(addDays(dtoday, 28), DATE_FORMAT),
+        endingDate: format(addDays(dtoday, 20), DATE_FORMAT),
         repeatOnDays: [0],
       },
       interval15mins
@@ -142,8 +143,8 @@ describe("generate reservations", () => {
     const res = generateReservations(
       {
         ...twoWeeksOnceAWeek,
-        endingDate: addDays(dtoday, 28),
-        startingDate: addDays(dtoday, 28),
+        endingDate: format(addDays(dtoday, 28), DATE_FORMAT),
+        startingDate: format(addDays(dtoday, 28), DATE_FORMAT),
         repeatOnDays: [0, 1, 2, 3, 4, 5, 6],
       },
       interval15mins

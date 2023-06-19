@@ -57,3 +57,38 @@ export const RESERVATIONS_QUERY = gql`
     }
   }
 `;
+
+export const CHANGE_STAFF_RESERVATION = gql`
+  mutation staffReservationModify(
+    $input: ReservationStaffModifyMutationInput!
+    $workingMemo: ReservationWorkingMemoMutationInput!
+  ) {
+    staffReservationModify(input: $input) {
+      pk
+      errors {
+        field
+        messages
+      }
+    }
+    updateReservationWorkingMemo(input: $workingMemo) {
+      workingMemo
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const CHANGE_RESERVATION_TIME = gql`
+  mutation staffAdjustReservationTime(
+    $input: ReservationStaffAdjustTimeMutationInput!
+  ) {
+    staffAdjustReservationTime(input: $input) {
+      pk
+      begin
+      end
+      state
+    }
+  }
+`;

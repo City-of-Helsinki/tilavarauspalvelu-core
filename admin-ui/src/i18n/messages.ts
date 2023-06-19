@@ -202,6 +202,7 @@ const translations: ITranslations = {
     authorizationNeeded: ["Oikeudet vaaditaan"],
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
     errorSavingData: ["Virhe tallennettaessa tietoja"],
+    uncaught: ["Odottamaton virhe"],
     errorRecurringReservationsDoneDisplay: [
       "Virhe varaus tehty, mutta sen näyttäminen epäonnistui.",
     ],
@@ -827,7 +828,20 @@ const translations: ITranslations = {
     generatingDocument: ["Dokumenttia luodaan"],
     errorGeneratingDocument: ["Dokumenttia ei pystytty luomaan"],
     EditTime: {
-      title: ["Muokkaa varauksen aikaa"],
+      buttonName: ["Muuta aikaa"],
+      title: ["Muuta varauksen aikaa"],
+      newTime: ["Uusi aika"],
+      originalTime: ["Muutettava aika"],
+      accept: ["Muuta aikaa"],
+      successToast: ["Uusi aika tallennettu"],
+      form: {
+        startTime: ["Aloitusaika"],
+        length: ["Kesto"],
+      },
+      error: {
+        mutation: ["Ajan muutos epäonnistui."],
+        reservationCollides: ["Toivomasi aika ei ole saatavilla"],
+      },
     },
     EditPage: {
       title: ["Muokkaa varauksen tietoja"],

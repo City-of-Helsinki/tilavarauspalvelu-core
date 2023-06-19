@@ -5,7 +5,7 @@ import { memoize, truncate } from "lodash";
 import { ReservationType } from "common/types/gql-types";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 import { reservationUrl } from "../../common/urls";
-import { getReserveeName, reservationDateTime } from "./requested/util";
+import { getReserveeName, reservationDateTimeString } from "./requested/util";
 import { formatDateTime } from "../../common/util";
 
 export type Sort = {
@@ -67,7 +67,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "begin",
     isSortable: true,
     transform: ({ begin, end }: ReservationType) =>
-      reservationDateTime(begin, end, t),
+      reservationDateTimeString(begin, end, t),
   },
   {
     headerName: t("Reservations.headings.createdAt"),

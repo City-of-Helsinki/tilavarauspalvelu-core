@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import { fromUIDate } from "common/src/common/util";
 import {
   ReservationTypeSchema,
   checkDate,
@@ -23,8 +24,8 @@ import { OptionSchema } from "./schemaCommon";
 // solutions to that are either use partial schemas or split schemas and check the parts.
 
 const timeSelectionSchemaBase = z.object({
-  startingDate: z.coerce.date(),
-  endingDate: z.coerce.date(),
+  startingDate: z.string(),
+  endingDate: z.string(),
   startTime: z.string(),
   endTime: z.string(),
   repeatOnDays: z.array(z.number()).min(1).max(7),
@@ -57,18 +58,29 @@ export const RecurringReservationFormSchema = z
     }
   );
 
+const convertToDate = (date?: string): Date | undefined =>
+  date ? fromUIDate(date) : undefined;
+
+const dateIsBefore = (date?: Date, other?: Date) =>
+  date && other && date.getTime() < other.getTime();
+
 export const timeSelectionSchema = (
   interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ) =>
   timeSelectionSchemaBase
     .partial()
-    .superRefine((val, ctx) => checkDate(val.startingDate, ctx, "startingDate"))
-    .superRefine((val, ctx) => checkDate(val.endingDate, ctx, "endingDate"))
+    .superRefine((val, ctx) =>
+      checkDate(convertToDate(val.startingDate), ctx, "startingDate")
+    )
+    .superRefine((val, ctx) =>
+      checkDate(convertToDate(val.endingDate), ctx, "endingDate")
+    )
     .refine(
       (s) =>
-        s.startingDate &&
-        s.endingDate &&
-        s.startingDate.getTime() < s.endingDate.getTime(),
+        dateIsBefore(
+          convertToDate(s.startingDate),
+          convertToDate(s.endingDate)
+        ),
       {
         path: ["endingDate"],
         message: "Start date can't be after end date.",

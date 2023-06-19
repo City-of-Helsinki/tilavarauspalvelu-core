@@ -132,6 +132,8 @@ export const ButtonLikeLink = styled(Link)`
   align-items: center;
   justify-content: center;
   min-width: 80px;
+  line-height: 1;
+  text-align: center;
   height: 44px;
   padding: 0 20px;
   line-height: 1;

@@ -32,7 +32,6 @@ describe("State change rules", () => {
 
     const view = wrappedRender(res);
 
-    expect(view.queryAllByRole("button")).toHaveLength(2);
     expect(
       view.getByRole("button", { name: "RequestedReservation.reject" })
     ).toBeInTheDocument();
@@ -52,7 +51,6 @@ describe("State change rules", () => {
 
     const view = wrappedRender(res);
 
-    expect(view.queryAllByRole("button")).toHaveLength(2);
     expect(
       view.getByRole("button", { name: "RequestedReservation.reject" })
     ).toBeInTheDocument();
@@ -124,10 +122,6 @@ describe("Editing allowed", () => {
 
     const view = wrappedRender(res);
 
-    expect(view.queryAllByRole("link")).toHaveLength(2);
-    expect(
-      view.getByRole("link", { name: "ApprovalButtons.editTime" })
-    ).toBeInTheDocument();
     expect(
       view.getByRole("link", { name: "ApprovalButtons.edit" })
     ).toBeInTheDocument();
@@ -175,7 +169,8 @@ describe("Editing allowed", () => {
       recurringReservation: undefined,
     } as ReservationType;
     const view = wrappedRender(res);
-    expect(view.queryAllByRole("button")).toHaveLength(0);
-    expect(view.queryAllByRole("link")).toHaveLength(2);
+    expect(
+      view.getByRole("link", { name: "ApprovalButtons.edit" })
+    ).toBeInTheDocument();
   });
 });

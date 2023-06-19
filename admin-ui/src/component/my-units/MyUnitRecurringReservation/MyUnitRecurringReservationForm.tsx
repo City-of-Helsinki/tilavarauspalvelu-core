@@ -12,11 +12,10 @@ import { camelCase, get } from "lodash";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@apollo/client";
-import { format } from "date-fns";
 import { Button, TextInput } from "hds-react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate, fromUIDate, toApiDateUnsafe } from "common/src/common/util";
 import { removeRefParam } from "common/src/reservation-form/util";
 import {
   RecurringReservationFormSchema,
@@ -38,8 +37,8 @@ import { useFilteredReservationList, useMultipleReservation } from "./hooks";
 import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
 import ControlledTimeInput from "../components/ControlledTimeInput";
-import ControlledDateInput from "../components/ControlledDateInput";
 import ReservationListButton from "../../ReservationListButton";
+import ControlledDateInput from "../components/ControlledDateInput";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -210,8 +209,8 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,
     reservationUnitPk: reservationUnit?.pk ?? undefined,
-    begin: getValues("startingDate"),
-    end: getValues("endingDate"),
+    begin: fromUIDate(getValues("startingDate")),
+    end: fromUIDate(getValues("endingDate")),
   });
 
   const navigate = useNavigate();
@@ -248,11 +247,12 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
       );
 
       const name = data.type === "BLOCKED" ? "BLOCKED" : data.seriesName ?? "";
+
       const input: RecurringReservationCreateMutationInput = {
         reservationUnitPk: unitPk,
-        beginDate: format(data.startingDate, "yyyy-MM-dd"),
+        beginDate: toApiDateUnsafe(fromUIDate(data.startingDate)),
         beginTime: data.startTime,
-        endDate: format(data.endingDate, "yyyy-MM-dd"),
+        endDate: toApiDateUnsafe(fromUIDate(data.endingDate)),
         endTime: data.endTime,
         weekdays: data.repeatOnDays,
         recurrenceInDays: data.repeatPattern.value === "weekly" ? 7 : 14,
