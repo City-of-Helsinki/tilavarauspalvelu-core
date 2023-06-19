@@ -1736,7 +1736,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         response = self.query(
             """
             query {
-                reservationUnits(orderBy: "maxPersons") {
+                reservationUnits(orderBy: "surfaceArea") {
                     edges {
                         node {
                             surfaceArea
@@ -1761,7 +1761,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         response = self.query(
             """
             query {
-                reservationUnits(orderBy: "-maxPersons") {
+                reservationUnits(orderBy: "-surfaceArea") {
                     edges {
                         node {
                             surfaceArea

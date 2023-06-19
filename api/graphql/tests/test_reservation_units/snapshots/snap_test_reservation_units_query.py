@@ -1387,11 +1387,6 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area 1'] = {
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': '150.00'
-                    }
-                },
-                {
-                    'node': {
                         'surfaceArea': '1.00'
                     }
                 },
@@ -1413,6 +1408,11 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area 1'] = {
                 {
                     'node': {
                         'surfaceArea': '5.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '150.00'
                     }
                 }
             ]
@@ -1426,22 +1426,7 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area_reverse_orde
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': '1.00'
-                    }
-                },
-                {
-                    'node': {
-                        'surfaceArea': '2.00'
-                    }
-                },
-                {
-                    'node': {
-                        'surfaceArea': '3.00'
-                    }
-                },
-                {
-                    'node': {
-                        'surfaceArea': '4.00'
+                        'surfaceArea': '150.00'
                     }
                 },
                 {
@@ -1451,7 +1436,22 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area_reverse_orde
                 },
                 {
                     'node': {
-                        'surfaceArea': '150.00'
+                        'surfaceArea': '4.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '3.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '2.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '1.00'
                     }
                 }
             ]
