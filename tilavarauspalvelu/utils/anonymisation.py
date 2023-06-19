@@ -1,4 +1,3 @@
-import random
 import uuid
 from typing import Optional
 
@@ -9,63 +8,13 @@ from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from reservations.models import Reservation, ReservationType
 from users.models import ReservationNotification
 
-FIRST_NAMES = [
-    "Patrick",
-    "Julia",
-    "Andrew",
-    "Paige",
-    "Ewan",
-    "Elsie",
-    "Toby",
-    "Holly",
-    "Dominic",
-    "Isla",
-    "Edison",
-    "Luna",
-    "Ronald",
-    "Bryanna",
-    "Augustus",
-    "Laurel",
-    "Miles",
-    "Patricia",
-    "Beckett",
-    "Elle",
-]
-
-LAST_NAMES = [
-    "Ward",
-    "Robertson",
-    "Nicholson",
-    "Armstrong",
-    "White",
-    "Trevino",
-    "James",
-    "Hines",
-    "Clark",
-    "Castro",
-    "Read",
-    "Brown",
-    "Griffiths",
-    "Taylor",
-    "Cole",
-    "Leach",
-    "Chavez",
-    "Stout",
-    "Mccullough",
-    "Richards",
-]
-
 
 def get_first_name():
-    # Random library isn't safe for security / cryptography thus the nosec line to skip the bandit check.
-    # We anonymize data and clean traces so getting random string from a list is not back traceable.
-    return random.choice(FIRST_NAMES)  # nosec
+    return "ANON"
 
 
 def get_last_name():
-    # Random library isn't safe for security / cryptography thus the nosec line to skip the bandit check.
-    # We anonymize data and clean traces so getting random string from a list is not back traceable.
-    return random.choice(LAST_NAMES)  # nosec
+    return "ANONYMIZED"
 
 
 def anonymize_string(s: Optional[str], replacement: str = "Anonymized"):

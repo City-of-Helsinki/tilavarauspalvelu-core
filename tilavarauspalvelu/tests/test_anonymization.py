@@ -85,10 +85,8 @@ class AnonymizationTestCase(TestCase):
         assert_that(self.mr_anonymous.username).is_equal_to(
             f"anonymized-{self.mr_anonymous.uuid}"
         )
-        assert_that(self.mr_anonymous.first_name).is_not_equal_to(
-            user_data["first_name"]
-        )
-        assert_that(self.mr_anonymous.last_name).is_not_equal_to(user_data["last_name"])
+        assert_that(self.mr_anonymous.first_name).is_equal_to("ANON")
+        assert_that(self.mr_anonymous.last_name).is_equal_to("ANONYMIZED")
         assert_that(self.mr_anonymous.email).is_equal_to(
             f"{self.mr_anonymous.first_name}.{self.mr_anonymous.last_name}@anonymized.net"
         )
