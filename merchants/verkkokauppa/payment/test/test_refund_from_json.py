@@ -3,6 +3,7 @@ from unittest import mock
 from uuid import UUID
 
 from assertpy import assert_that
+from django.conf import settings
 from django.test import TestCase
 from pytest import raises
 
@@ -37,7 +38,9 @@ class RefundFromJsonTestCase(TestCase):
         )
         assert_that(refund.namespace).is_equal_to("tilavaraus")
         assert_that(refund.user).is_equal_to("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        assert_that(refund.created_at).is_equal_to(datetime(2021, 2, 25, 10, 22, 59))
+        assert_that(refund.created_at).is_equal_to(
+            datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+        )
         assert_that(refund.status).is_equal_to("confirmed")
         assert_that(refund.customer_first_name).is_equal_to("First")
         assert_that(refund.customer_last_name).is_equal_to("Last")
@@ -56,7 +59,9 @@ class RefundFromJsonTestCase(TestCase):
 
         assert_that(refund.namespace).is_equal_to("tilavaraus")
         assert_that(refund.user).is_equal_to("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        assert_that(refund.created_at).is_equal_to(datetime(2021, 2, 25, 10, 22, 59))
+        assert_that(refund.created_at).is_equal_to(
+            datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+        )
         assert_that(refund.status).is_equal_to("confirmed")
         assert_that(refund.customer_first_name).is_none()
         assert_that(refund.customer_last_name).is_none()

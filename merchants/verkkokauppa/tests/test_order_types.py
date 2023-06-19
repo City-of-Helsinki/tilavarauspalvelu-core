@@ -4,6 +4,7 @@ from typing import Any, Dict
 from uuid import UUID
 
 from assertpy import assert_that
+from django.conf import settings
 from django.test.testcases import TestCase
 from django.utils.timezone import utc
 from pytest import raises
@@ -181,7 +182,16 @@ class OrderTypesTestCase(TestCase):
                 order_id=UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
                 namespace="test-namespace",
                 user="test-user",
-                created_at=datetime(2021, 11, 12, 12, 40, 41, 873597),
+                created_at=datetime(
+                    2021,
+                    11,
+                    12,
+                    12,
+                    40,
+                    41,
+                    873597,
+                    tzinfo=settings.VERKKOKAUPPA_TIMEZONE,
+                ),
                 items=[
                     OrderItem(
                         order_item_id=UUID("10e64522-bc1b-4758-b8c0-14d42e0719d4"),

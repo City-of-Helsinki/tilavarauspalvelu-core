@@ -3,6 +3,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from assertpy import assert_that
+from django.conf import settings
 from django.test import TestCase
 
 from merchants.verkkokauppa.order.types import Order
@@ -66,7 +67,9 @@ class OrderFromJsonTestCase(TestCase):
         )
         assert_that(order.namespace).is_equal_to("tilavaraus")
         assert_that(order.user).is_equal_to("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        assert_that(order.created_at).is_equal_to(datetime(2021, 2, 25, 10, 22, 59))
+        assert_that(order.created_at).is_equal_to(
+            datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+        )
         assert_that(order.items[0].order_item_id).is_equal_to(
             UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
         )

@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Any, Dict, Optional
 from uuid import UUID
 
+from django.conf import settings
 from sentry_sdk import capture_exception, push_scope
 
 from ..payment.exceptions import (
@@ -76,7 +77,9 @@ class Payment:
 
     @classmethod
     def _parse_datetime(cls, string: str) -> datetime:
-        return datetime.strptime(string, "%Y%m%d-%H%M%S")
+        return datetime.strptime(string, "%Y%m%d-%H%M%S").astimezone(
+            settings.VERKKOKAUPPA_TIMEZONE
+        )
 
 
 @dataclass(frozen=True)
