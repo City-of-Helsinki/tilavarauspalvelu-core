@@ -187,8 +187,7 @@ class ApplicationDataExporter:
                     for i, event_reservation_unit in enumerate(
                         event.event_reservation_units.all()
                         .select_related("reservation_unit")
-                        .order_by("priority")
-                        .only("reservation_unit__name")
+                        .order_by("priority", "pk")
                     ):
                         reservation_units.append(
                             f"{event_reservation_unit.reservation_unit.name}, "
