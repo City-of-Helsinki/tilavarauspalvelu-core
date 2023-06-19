@@ -10,8 +10,9 @@ from utils import image_cache
 
 @override_settings(
     IMAGE_CACHE_ENABLED=True,
-    IMAGE_CACHE_ROOT_URL="https://test.url",
+    IMAGE_CACHE_VARNISH_HOST="https://test.url",
     IMAGE_CACHE_PURGE_KEY="test-purge-key",
+    IMAGE_CACHE_HOST_HEADER="test.tilavaraus.url",
 )
 class ImageCacheTestCase(TestCase):
     @override_settings(IMAGE_CACHE_ENABLED=False)
@@ -20,13 +21,13 @@ class ImageCacheTestCase(TestCase):
         image_cache.purge("foo/bar.jpg")
         assert_that(urljoin.called).is_false()
 
-    @override_settings(IMAGE_CACHE_ROOT_URL=None)
+    @override_settings(IMAGE_CACHE_VARNISH_HOST=None)
     def test_purge_error_if_cache_root_url_missing(self):
         with raises(image_cache.ImageCacheConfigurationError) as err:
             image_cache.purge("foo/bar.jpg")
 
         assert_that(str(err.value)).is_equal_to(
-            "IMAGE_CACHE_ROOT_URL or IMAGE_CACHE_PURGE_KEY setting is not configured"
+            "IMAGE_CACHE_VARNISH_HOST or IMAGE_CACHE_PURGE_KEY setting is not configured"
         )
 
     @override_settings(IMAGE_CACHE_PURGE_KEY=None)
@@ -35,7 +36,7 @@ class ImageCacheTestCase(TestCase):
             image_cache.purge("foo/bar.jpg")
 
         assert_that(str(err.value)).is_equal_to(
-            "IMAGE_CACHE_ROOT_URL or IMAGE_CACHE_PURGE_KEY setting is not configured"
+            "IMAGE_CACHE_VARNISH_HOST or IMAGE_CACHE_PURGE_KEY setting is not configured"
         )
 
     @mock.patch("utils.image_cache.capture_message")
@@ -46,7 +47,7 @@ class ImageCacheTestCase(TestCase):
         request.assert_called_with(
             "PURGE",
             "https://test.url/foo/bar.jpg",
-            headers={"X-VC-Purge-Key": "test-purge-key"},
+            headers={"X-VC-Purge-Key": "test-purge-key", "Host": "test.tilavaraus.url"},
         )
         assert_that(capture_message.called).is_false()
 
