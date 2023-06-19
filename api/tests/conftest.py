@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
 
-from allocation.models import AllocationRequest
 from applications.models import (
     Address,
     Application,
@@ -221,16 +220,6 @@ def application_round(reservation_unit, purpose, service_sector) -> ApplicationR
 
 
 @pytest.fixture
-def allocation_request_in_progress(application_round) -> AllocationRequest:
-    return AllocationRequest.objects.create(
-        application_round=application_round,
-        start_date=datetime.datetime.now(tz=get_default_timezone()),
-        end_date=None,
-        completed=False,
-    )
-
-
-@pytest.fixture
 def application_round_2(
     reservation_unit, purpose, service_sector_2
 ) -> ApplicationRound:
@@ -287,15 +276,6 @@ def reservation_in_second_unit(reservation_unit2, user) -> Reservation:
     )
     reservation.reservation_unit.set([reservation_unit2])
     return reservation
-
-
-@pytest.fixture
-def valid_allocation_request_data(application_round):
-    """Valid JSON data for creating a new Reservation"""
-    return {
-        "application_round_id": application_round.id,
-        "application_round_basket_ids": [],
-    }
 
 
 @pytest.fixture

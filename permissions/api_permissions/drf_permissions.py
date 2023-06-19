@@ -9,7 +9,6 @@ from applications.models import (
     ApplicationRound,
 )
 from permissions.helpers import (
-    can_allocate_allocation_request,
     can_allocate_service_sector_allocations,
     can_manage_ability_groups,
     can_manage_age_groups,
@@ -296,26 +295,6 @@ class ApplicationPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return request.user.is_authenticated
-
-
-class AllocationRequestPermission(permissions.BasePermission):
-    def has_object_permission(self, request, view, allocation_request):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        return can_allocate_allocation_request(request.user, allocation_request)
-
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        application_round_id = request.data.get("application_round_id")
-        try:
-            application_round = ApplicationRound.objects.get(pk=application_round_id)
-            service_sector = application_round.service_sector
-            return can_allocate_service_sector_allocations(request.user, service_sector)
-        except (ServiceSector.DoesNotExist, ApplicationRound.DoesNotExist):
-            return False
 
 
 class AllocationResultsPermission(permissions.BasePermission):

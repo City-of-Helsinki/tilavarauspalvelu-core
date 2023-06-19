@@ -177,15 +177,6 @@ def can_allocate_service_sector_allocations(
     )
 
 
-def can_allocate_allocation_request(user: User, service_sector: ServiceSector) -> bool:
-    permission = "can_allocate_applications"
-    return (
-        is_superuser(user)
-        or has_service_sector_permission(user, [service_sector.id], permission)
-        or has_general_permission(user, permission)
-    )
-
-
 def can_manage_service_sectors_applications(
     user: User, service_sector: ServiceSector
 ) -> bool:
