@@ -4,8 +4,8 @@ export const ActionsWrapper = styled.div`
   display: flex;
   grid-column: 1 / -1;
   gap: var(--spacing-m);
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: var(--spacing-l);
+  margin-bottom: var(--spacing-l);
   justify-content: end;
 `;
 
@@ -13,7 +13,7 @@ export const ActionsWrapper = styled.div`
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: 1rem 2rem;
+  gap: var(--spacing-l);
 `;
 
 export const Element = styled.div<{ $wide?: boolean; $start?: boolean }>`

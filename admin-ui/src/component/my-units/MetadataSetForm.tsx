@@ -25,6 +25,7 @@ export const ReservationMetadataSetForm = ({
       fields={generalFields}
       reservationUnit={reservationUnit}
       options={options}
+      noHeadingMarginal
     />
   );
 };

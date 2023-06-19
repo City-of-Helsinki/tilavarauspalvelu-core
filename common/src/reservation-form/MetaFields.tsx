@@ -71,8 +71,9 @@ const ReserveeTypeContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const InfoHeading = styled(Subheading)`
-  margin: "var(--spacing-layout-m) 0 var(--spacing-xs)";
+const InfoHeading = styled(Subheading)<{ $zeroMargin?: boolean }>`
+  margin: ${({ $zeroMargin }) =>
+    $zeroMargin ? 0 : "var(--spacing-layout-m) 0 var(--spacing-xs)"};
 `;
 
 const ReserverInfoHeading = styled(Subheading)`
@@ -207,6 +208,7 @@ export const ReservationMetaFields = ({
   reservationUnit,
   options,
   data,
+  noHeadingMarginal,
 }: {
   fields: string[];
   reservationUnit: ReservationUnitType;
@@ -214,6 +216,7 @@ export const ReservationMetaFields = ({
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
+  noHeadingMarginal?: boolean;
 }) => {
   const { t } = useTranslation();
 
@@ -226,7 +229,9 @@ export const ReservationMetaFields = ({
 
   return (
     <>
-      <InfoHeading>{t("reservationCalendar:reservationInfo")}</InfoHeading>
+      <InfoHeading $zeroMargin={noHeadingMarginal}>
+        {t("reservationCalendar:reservationInfo")}
+      </InfoHeading>
       <TwoColumnContainer>
         <ReservationFormFields
           options={options}

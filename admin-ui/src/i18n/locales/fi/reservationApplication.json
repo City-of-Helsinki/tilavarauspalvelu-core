@@ -1,9 +1,12 @@
 {
   "reserveeTypePrefix": "Varaan",
   "type": "Varauksen tyyppi",
-  "buffers": "Varauksen tauko",
-  "bufferTimeBefore": "Ennen vuoroa ({{minutes}} min)",
-  "bufferTimeAfter": "Vuoron jälkeen ({{minutes}} min)",
+
+  "buffers": {
+    "label": "Varauksen tauko",
+    "bufferTimeBefore": "Ennen vuoroa ({{minutes}} min)",
+    "bufferTimeAfter": "Vuoron jälkeen ({{minutes}} min)"
+  },
   "comment": "Kommentit",
   "reservationType": {
     "STAFF": "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",

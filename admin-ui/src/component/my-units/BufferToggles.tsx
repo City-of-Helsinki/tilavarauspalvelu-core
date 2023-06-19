@@ -2,11 +2,13 @@ import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 
 type BufferControllerProps = {
   name: "bufferTimeBefore" | "bufferTimeAfter";
   seconds: number;
 };
+
 const BufferController = ({ name, seconds }: BufferControllerProps) => {
   const { t } = useTranslation();
 
@@ -20,7 +22,7 @@ const BufferController = ({ name, seconds }: BufferControllerProps) => {
         <Checkbox
           id={name}
           checked={String(field.value) === "true"}
-          label={t(`reservationApplication:${name}`, {
+          label={t(`reservationApplication:buffers.${name}`, {
             minutes: seconds / 60,
           })}
           {...field}
@@ -28,11 +30,18 @@ const BufferController = ({ name, seconds }: BufferControllerProps) => {
           onChange={() => {
             setValue(name, !field.value);
           }}
+          style={{ marginTop: 0 }}
         />
       )}
     />
   );
 };
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+`;
 
 const BufferToggles = ({
   before,
@@ -41,11 +50,13 @@ const BufferToggles = ({
   before?: number;
   after?: number;
 }) => {
+  const { t } = useTranslation();
   return (
-    <>
+    <Wrapper>
+      <div>{t("reservationApplication:buffers.label")}</div>
       {before && <BufferController name="bufferTimeBefore" seconds={before} />}
       {after && <BufferController name="bufferTimeAfter" seconds={after} />}
-    </>
+    </Wrapper>
   );
 };
 

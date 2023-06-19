@@ -115,13 +115,13 @@ const ReservationTypeForm = ({
       )}
       {type !== undefined && type !== "BLOCKED" && (
         <>
-          {reservationUnit.bufferTimeBefore ||
-            (reservationUnit.bufferTimeAfter && (
-              <BufferToggles
-                before={reservationUnit.bufferTimeBefore ?? undefined}
-                after={reservationUnit.bufferTimeAfter ?? undefined}
-              />
-            ))}
+          {(reservationUnit.bufferTimeBefore ||
+            reservationUnit.bufferTimeAfter) && (
+            <BufferToggles
+              before={reservationUnit.bufferTimeBefore ?? undefined}
+              after={reservationUnit.bufferTimeAfter ?? undefined}
+            />
+          )}
           {children}
           <CommentsTextArea
             id="reservationApplication:comment"
