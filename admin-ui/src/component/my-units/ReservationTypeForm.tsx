@@ -91,9 +91,11 @@ const TypeSelect = ({
 const ReservationTypeForm = ({
   reservationUnit,
   children,
+  disableBufferToggle,
 }: {
   reservationUnit: ReservationUnitType;
   children?: React.ReactNode;
+  disableBufferToggle?: boolean;
 }) => {
   const { t } = useTranslation();
 
@@ -115,13 +117,14 @@ const ReservationTypeForm = ({
       )}
       {type !== undefined && type !== "BLOCKED" && (
         <>
-          {(reservationUnit.bufferTimeBefore ||
-            reservationUnit.bufferTimeAfter) && (
-            <BufferToggles
-              before={reservationUnit.bufferTimeBefore ?? undefined}
-              after={reservationUnit.bufferTimeAfter ?? undefined}
-            />
-          )}
+          {!disableBufferToggle &&
+            (reservationUnit.bufferTimeBefore ||
+              reservationUnit.bufferTimeAfter) && (
+              <BufferToggles
+                before={reservationUnit.bufferTimeBefore ?? undefined}
+                after={reservationUnit.bufferTimeAfter ?? undefined}
+              />
+            )}
           {children}
           <CommentsTextArea
             id="reservationApplication:comment"

@@ -190,7 +190,10 @@ const EditReservation = ({
   return (
     <FormProvider {...form}>
       <Form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <ReservationTypeForm reservationUnit={reservationUnit}>
+        <ReservationTypeForm
+          reservationUnit={reservationUnit}
+          disableBufferToggle
+        >
           {reservation.recurringReservation?.pk && (
             <InnerTextInput
               id="seriesName"
