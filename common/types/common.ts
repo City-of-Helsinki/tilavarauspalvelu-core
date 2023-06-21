@@ -80,7 +80,6 @@ export type Space = {
   name: TranslationObject;
   parentId: number;
   surfaceArea: null;
-  districtId: number;
   termsOfUse: string;
 };
 

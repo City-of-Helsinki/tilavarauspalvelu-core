@@ -85,7 +85,6 @@ function ApplicationRound(): JSX.Element | null {
       return (
         <Handling
           applicationRound={applicationRound}
-          setApplicationRound={setApplicationRound}
           setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
             setApplicationRoundStatus(Number(applicationRoundId), status)
           }

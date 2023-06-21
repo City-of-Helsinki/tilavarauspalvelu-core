@@ -1,13 +1,8 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
-import {
-  Button,
-  IconArrowRedo,
-  IconCheckCircle,
-  Notification,
-} from "hds-react";
+import { Button, IconCheckCircle, Notification } from "hds-react";
 import { H3 } from "common/src/common/typography";
 import uniq from "lodash/uniq";
 import uniqBy from "lodash/uniqBy";
@@ -33,7 +28,6 @@ import KorosHeading, {
   SubHeading,
 } from "../KorosHeading";
 import StatusCircle from "../StatusCircle";
-import AllocatingDialogContent from "./AllocatingDialogContent";
 import DataTable, { CellConfig } from "../DataTable";
 import {
   formatNumber,
@@ -48,11 +42,7 @@ import {
   getAllocationCapacity,
 } from "../../common/AllocationResult";
 import StatusCell from "../StatusCell";
-import {
-  getAllocationResults,
-  getApplicationRound,
-  triggerAllocation,
-} from "../../common/api";
+import { getAllocationResults } from "../../common/api";
 import SelectionActionBar from "../SelectionActionBar";
 import RecommendationDataTableGroup from "./RecommendationDataTableGroup";
 import {
@@ -64,7 +54,6 @@ import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  setApplicationRound: Dispatch<SetStateAction<ApplicationRoundType | null>>;
   setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
 }
 
@@ -360,7 +349,6 @@ const renderGroup = (
 
 function Handling({
   applicationRound,
-  setApplicationRound,
   setApplicationRoundStatus,
 }: IProps): JSX.Element {
   const isApplicationRoundApproved = ["approved"].includes(
@@ -369,7 +357,6 @@ function Handling({
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isAllocating, setIsAllocating] = useState(applicationRound.allocating);
   const [recommendations, setRecommendations] = useState<AllocationResult[]>(
     []
   );
@@ -400,44 +387,11 @@ function Handling({
     }
   };
 
-  const startAllocation = async () => {
-    if (!applicationRound) return;
-
-    try {
-      const allocation = await triggerAllocation({
-        applicationRoundId: applicationRound.id,
-        applicationRoundBasketIds: applicationRound.applicationRoundBaskets.map(
-          (n) => n.id
-        ),
-      });
-      setIsAllocating(!!allocation?.id);
-    } catch (error) {
-      const msg = "errors.errorStartingAllocation";
-      notifyError(t(msg));
-    }
-  };
-
   useEffect(() => {
     if (typeof applicationRound?.id === "number") {
       fetchRecommendations();
     }
   }, [applicationRound, t]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const poller = setInterval(async () => {
-      if (isAllocating) {
-        const result = await getApplicationRound({ id: applicationRound.id });
-        if (result.allocating === false) {
-          setApplicationRound(result);
-          setIsAllocating(false);
-        }
-      }
-    }, 2000);
-
-    return () => {
-      clearInterval(poller);
-    };
-  }, [isAllocating, applicationRound, setApplicationRound]);
 
   const unhandledRecommendationCount: number = recommendations
     .flatMap((recommendation) => recommendation.applicationEvent)
@@ -531,15 +485,6 @@ function Handling({
                   >
                     {t("ApplicationRound.navigateToApprovalPreparation")}
                   </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    onClick={() => startAllocation()}
-                    iconLeft={<IconArrowRedo />}
-                    disabled={isSaving}
-                  >
-                    {t("ApplicationRound.allocateAction")}
-                  </Button>
                 </ActionContainer>
               </>
             )}
@@ -600,7 +545,6 @@ function Handling({
           )}
         </>
       )}
-      {isAllocating && <AllocatingDialogContent />}
       {selections?.length > 0 && (
         <SelectionActionBar
           selections={selections}
