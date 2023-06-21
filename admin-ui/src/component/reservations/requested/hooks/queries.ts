@@ -56,6 +56,8 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
       email
       pk
     }
+    bufferTimeBefore
+    bufferTimeAfter
   }
 `;
 

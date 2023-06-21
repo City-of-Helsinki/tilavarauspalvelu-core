@@ -22,14 +22,14 @@ export const TimeFormSchema = z.object({
   date: z.string(),
   startTime: z.string(),
   endTime: z.string(),
+  bufferTimeAfter: z.boolean(),
+  bufferTimeBefore: z.boolean(),
 });
 
 const ReservationFormSchema = z
   .object({
     comments: z.string().optional(),
     type: ReservationTypeSchema,
-    bufferTimeAfter: z.boolean().optional(),
-    bufferTimeBefore: z.boolean().optional(),
   })
   .merge(TimeFormSchema)
   // passthrough since this is combined to the metafields

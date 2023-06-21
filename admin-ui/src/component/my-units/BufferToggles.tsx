@@ -12,23 +12,22 @@ type BufferControllerProps = {
 const BufferController = ({ name, seconds }: BufferControllerProps) => {
   const { t } = useTranslation();
 
-  const { control, setValue } = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
+      render={({ field: { value, onChange } }) => (
         <Checkbox
           id={name}
-          checked={String(field.value) === "true"}
+          checked={String(value) === "true"}
           label={t(`reservationApplication:buffers.${name}`, {
             minutes: seconds / 60,
           })}
-          {...field}
-          value={String(field.value)}
+          value={String(value)}
           onChange={() => {
-            setValue(name, !field.value);
+            onChange(!value);
           }}
           style={{ marginTop: 0 }}
         />

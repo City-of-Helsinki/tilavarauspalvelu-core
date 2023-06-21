@@ -10,7 +10,7 @@ import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +24,7 @@ import { setTimeOnDate } from "./utils";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 import { reservationDateTime, reservationDuration } from "./requested/util";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
+import BufferToggles from "../my-units/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
 
 const StyledForm = styled.form`
@@ -101,6 +102,8 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
       date: format(startDateTime, "dd.MM.yyyy"),
       startTime: format(startDateTime, "HH:mm"),
       endTime: format(endDateTime, "HH:mm"),
+      bufferTimeAfter: !!reservation.bufferTimeAfter,
+      bufferTimeBefore: !!reservation.bufferTimeBefore,
     },
   });
   const {
@@ -115,25 +118,36 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     end: end.toISOString(),
   });
 
-  const changeTime = async (begin: Date, end: Date) => {
+  const changeTime = async (
+    begin: Date,
+    end: Date,
+    buffers: { before?: number; after?: number }
+  ) => {
     return changeTimeMutation({
       variables: {
         input: {
           ...convertToApiFormat(begin, end),
           pk: reservation.pk ?? 0,
+          bufferTimeAfter:
+            buffers.after != null ? String(buffers.after) : undefined,
+          bufferTimeBefore:
+            buffers.before != null ? String(buffers.before) : undefined,
         },
       },
     });
   };
 
+  const reservationUnit = reservation.reservationUnits?.find(() => true);
+
   const formDate = watch("date");
   const formEndTime = watch("endTime");
   const formStartTime = watch("startTime");
+
   const newStartTime = setTimeOnDate(fromUIDate(formDate), formStartTime);
   const newEndTime = setTimeOnDate(fromUIDate(formDate), formEndTime);
   const { hasCollisions, isLoading } = useCheckCollisions({
     reservationPk: reservation.pk ?? 0,
-    reservationUnitPk: reservation.reservationUnits?.find(() => true)?.pk ?? 0,
+    reservationUnitPk: reservationUnit?.pk ?? 0,
     start: newStartTime,
     end: newEndTime,
     buffers: {
@@ -150,11 +164,22 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     },
   });
 
+  // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
+  const bufferBefore =
+    (reservation.bufferTimeBefore || reservationUnit?.bufferTimeBefore) ??
+    undefined;
+  const bufferAfter =
+    (reservation.bufferTimeAfter || reservationUnit?.bufferTimeAfter) ??
+    undefined;
+
   const onSubmit = (values: FormValueType) => {
     if (values.date && values.startTime && values.endTime) {
       const start = setTimeOnDate(fromUIDate(values.date), values.startTime);
       const end = setTimeOnDate(fromUIDate(values.date), values.endTime);
-      changeTime(start, end);
+      changeTime(start, end, {
+        before: values.bufferTimeBefore ? bufferBefore : 0,
+        after: values.bufferTimeAfter ? bufferAfter : 0,
+      });
     }
   };
 
@@ -196,6 +221,11 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
           error={translateError(errors.endTime?.message)}
           required
         />
+        {(bufferAfter || bufferBefore) && (
+          <FormProvider {...form}>
+            <BufferToggles before={bufferBefore} after={bufferAfter} />
+          </FormProvider>
+        )}
         <TimeInfoBox $isDisabled={!isDirty || !isValid}>
           {t("Reservation.EditTime.newTime")}: <Bold>{newTime}</Bold>
         </TimeInfoBox>
