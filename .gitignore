@@ -31,3 +31,4 @@ celerybeat-schedule
 .tox
 coverage.xml
 celery.exchange
+celery.pidbox.exchange
