@@ -11,33 +11,24 @@ from permissions.api_permissions.graphene_permissions import (
     ResourcePermission,
     SpacePermission,
 )
-from spaces.models import Building, District, Location, RealEstate, ServiceSector, Space
-
-
-class DistrictType(PrimaryKeyObjectType):
-    class Meta:
-        model = District
-        fields = ["pk"] + get_all_translatable_fields(model)
-        interfaces = (graphene.relay.Node,)
+from spaces.models import Building, Location, RealEstate, ServiceSector, Space
 
 
 class RealEstateType(PrimaryKeyObjectType):
     class Meta:
         model = RealEstate
-        fields = ["pk", "district", "surface_area"] + get_all_translatable_fields(model)
+        fields = ["pk", "surface_area"] + get_all_translatable_fields(model)
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
 
 
 class BuildingType(PrimaryKeyObjectType):
-    district = DistrictType()
     real_estate = RealEstateType()
 
     class Meta:
         model = Building
         fields = [
             "pk",
-            "district",
             "real_estate",
             "surface_area",
         ] + get_all_translatable_fields(model)

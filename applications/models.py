@@ -22,7 +22,7 @@ from applications.utils.aggregate_data import (
     ApplicationRoundAggregateDataCreator,
 )
 from reservation_units.models import ReservationUnit
-from spaces.models import District, Unit
+from spaces.models import Unit
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 from tilavarauspalvelu.utils.date_util import (
     next_or_current_matching_weekday,
@@ -990,10 +990,6 @@ class ApplicationEvent(models.Model):
         on_delete=models.CASCADE,
         null=False,
         related_name="application_events",
-    )
-
-    district = models.ForeignKey(
-        District, verbose_name="Area", on_delete=models.SET_NULL, null=True, blank=True
     )
 
     purpose = models.ForeignKey(

@@ -35,10 +35,6 @@ GENERAL_PERMISSIONS = (
         _("Can create, edit and delete age groups in the whole system"),
     ),
     (
-        "can_manage_districts",
-        _("Can create, edit and delete districts in the whole system"),
-    ),
-    (
         "can_manage_ability_groups",
         _("Can create, edit and delete ability groups in the whole system"),
     ),

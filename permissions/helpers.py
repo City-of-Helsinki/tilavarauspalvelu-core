@@ -485,11 +485,6 @@ def can_manage_equipment(user: User):
     return is_superuser(user) or has_general_permission(user, permission)
 
 
-def can_manage_districts(user: User):
-    permission = "can_manage_districts"
-    return is_superuser(user) or has_general_permission(user, permission)
-
-
 def can_manage_resources(user: User, space=None):
     permission = "can_manage_resources"
     return (

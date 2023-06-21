@@ -13,7 +13,6 @@ from permissions.helpers import (
     can_allocate_service_sector_allocations,
     can_manage_ability_groups,
     can_manage_age_groups,
-    can_manage_districts,
     can_manage_equipment,
     can_manage_equipment_categories,
     can_manage_general_roles,
@@ -454,14 +453,6 @@ class EquipmentPermission(permissions.BasePermission):
             return True
 
         return can_manage_equipment(request.user)
-
-
-class DistrictPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        return can_manage_districts(request.user)
 
 
 class UserPermission(permissions.BasePermission):

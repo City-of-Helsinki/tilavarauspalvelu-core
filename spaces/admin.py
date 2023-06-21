@@ -6,7 +6,6 @@ from mptt.admin import MPTTModelAdmin
 
 from .models import (
     Building,
-    District,
     Location,
     RealEstate,
     ServiceSector,
@@ -21,18 +20,8 @@ class LocationInline(admin.TabularInline):
     fields = ["address_street", "address_zip", "address_city", "coordinates"]
 
 
-class DistrictInline(admin.TabularInline):
-    model = District
-
-
 class SpaceInline(admin.TabularInline):
     model = Space
-
-
-@admin.register(District)
-class DistrictAdmin(MPTTModelAdmin):
-    model = District
-    inlines = [DistrictInline]
 
 
 @admin.register(RealEstate)

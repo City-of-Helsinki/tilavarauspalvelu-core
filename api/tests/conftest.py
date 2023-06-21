@@ -36,7 +36,7 @@ from permissions.models import (
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
 from resources.models import Resource
-from spaces.models import District, Location, ServiceSector, Space, Unit, UnitGroup
+from spaces.models import Location, ServiceSector, Space, Unit, UnitGroup
 from users.models import ReservationNotification
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -390,16 +390,6 @@ def valid_reservation_unit_data(unit, equipment_hammer):
         "unit_id": unit.pk,
         "contact_information": "",
     }
-
-
-@pytest.fixture
-def district():
-    return District.objects.create(name="Tapaninkylä")
-
-
-@pytest.fixture
-def sub_district(district):
-    return District.objects.create(name="Tapanila", parent=district)
 
 
 @pytest.fixture

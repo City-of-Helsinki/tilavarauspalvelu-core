@@ -110,102 +110,6 @@
         }
     },
     {
-        "model": "spaces.district",
-        "pk": 1,
-        "fields": {
-            "district_type": "district",
-            "name": "Töölö",
-            "name_fi": "Töölö",
-            "name_en": null,
-            "name_sv": null,
-            "parent": null,
-            "lft": 1,
-            "rght": 2,
-            "tree_id": 1,
-            "level": 0
-        }
-    },
-    {
-        "model": "spaces.district",
-        "pk": 2,
-        "fields": {
-            "district_type": "district",
-            "name": "Keskusta",
-            "name_fi": "Keskusta",
-            "name_en": null,
-            "name_sv": null,
-            "parent": null,
-            "lft": 1,
-            "rght": 2,
-            "tree_id": 2,
-            "level": 0
-        }
-    },
-    {
-        "model": "spaces.district",
-        "pk": 3,
-        "fields": {
-            "district_type": "district",
-            "name": "Leppävaara",
-            "name_fi": "Leppävaara",
-            "name_en": null,
-            "name_sv": null,
-            "parent": null,
-            "lft": 1,
-            "rght": 6,
-            "tree_id": 3,
-            "level": 0
-        }
-    },
-    {
-        "model": "spaces.district",
-        "pk": 4,
-        "fields": {
-            "district_type": "sub_district",
-            "name": "Perkkaa",
-            "name_fi": "Perkkaa",
-            "name_en": null,
-            "name_sv": null,
-            "parent": 3,
-            "lft": 2,
-            "rght": 3,
-            "tree_id": 3,
-            "level": 1
-        }
-    },
-    {
-        "model": "spaces.district",
-        "pk": 5,
-        "fields": {
-            "district_type": "sub_district",
-            "name": "Vermonniitty",
-            "name_fi": "Vermonniitty",
-            "name_en": null,
-            "name_sv": null,
-            "parent": 3,
-            "lft": 4,
-            "rght": 5,
-            "tree_id": 3,
-            "level": 1
-        }
-    },
-    {
-        "model": "spaces.district",
-        "pk": 8,
-        "fields": {
-            "district_type": "district",
-            "name": "Hakaniemi",
-            "name_fi": "Hakaniemi",
-            "name_en": null,
-            "name_sv": null,
-            "parent": null,
-            "lft": 1,
-            "rght": 2,
-            "tree_id": 4,
-            "level": 0
-        }
-    },
-    {
         "model": "spaces.servicesector",
         "pk": 1,
         "fields": {
@@ -337,7 +241,6 @@
             "name_fi": "Fredriksbergin 2-talo",
             "name_en": null,
             "name_sv": null,
-            "district": null,
             "real_estate": null,
             "surface_area": null
         }
@@ -350,7 +253,6 @@
             "name_fi": "Töölön kirjasto",
             "name_en": null,
             "name_sv": null,
-            "district": 1,
             "real_estate": null,
             "surface_area": null
         }
@@ -363,7 +265,6 @@
             "name_fi": "Oodin kirjasto",
             "name_en": null,
             "name_sv": null,
-            "district": 2,
             "real_estate": null,
             "surface_area": null
         }
@@ -376,7 +277,6 @@
             "name_fi": "Ympyrätalo",
             "name_en": null,
             "name_sv": null,
-            "district": 8,
             "real_estate": null,
             "surface_area": "2000.00"
         }
@@ -390,7 +290,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": null,
-            "district": 2,
             "building": 3,
             "unit": null,
             "surface_area": null,
@@ -411,7 +310,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": null,
-            "district": null,
             "building": 2,
             "unit": null,
             "surface_area": null,
@@ -432,7 +330,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": null,
-            "district": null,
             "building": 1,
             "unit": null,
             "surface_area": null,
@@ -453,7 +350,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 1,
-            "district": null,
             "building": 3,
             "unit": null,
             "surface_area": null,
@@ -474,7 +370,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 1,
-            "district": null,
             "building": 3,
             "unit": null,
             "surface_area": null,
@@ -495,7 +390,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 1,
-            "district": null,
             "building": 3,
             "unit": null,
             "surface_area": null,
@@ -516,7 +410,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 2,
-            "district": null,
             "building": 2,
             "unit": null,
             "surface_area": null,
@@ -537,7 +430,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 2,
-            "district": null,
             "building": 2,
             "unit": null,
             "surface_area": null,
@@ -558,7 +450,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 2,
-            "district": null,
             "building": 2,
             "unit": null,
             "surface_area": null,
@@ -579,7 +470,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 3,
-            "district": null,
             "building": 1,
             "unit": null,
             "surface_area": null,
@@ -600,7 +490,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": 1,
-            "district": null,
             "building": 3,
             "unit": null,
             "surface_area": null,
@@ -621,7 +510,6 @@
             "name_en": null,
             "name_sv": null,
             "parent": null,
-            "district": 8,
             "building": 18,
             "unit": null,
             "surface_area": "50.00",
@@ -1831,7 +1719,6 @@
             "begin": "2021-01-01",
             "end": "2021-06-01",
             "application": 1,
-            "district": 1,
             "purpose": 1,
             "uuid": "27731c95-a6ab-4af1-bec2-aacbced6c78b",
             "declined_reservation_units": []
@@ -1855,7 +1742,6 @@
             "begin": "2021-01-01",
             "end": "2021-06-01",
             "application": 2,
-            "district": 1,
             "purpose": 1,
             "uuid": "983cb0d8-7fce-449c-aebf-2a25a12d1c2b",
             "declined_reservation_units": []
@@ -1879,7 +1765,6 @@
             "begin": "2021-01-01",
             "end": "2021-06-01",
             "application": 3,
-            "district": 1,
             "purpose": 1,
             "uuid": "e665f8b1-ec52-4c60-95cb-821852e6dfe2",
             "declined_reservation_units": []
