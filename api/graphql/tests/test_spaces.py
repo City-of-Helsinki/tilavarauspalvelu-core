@@ -11,16 +11,24 @@ from applications.tests.factories import (
     ApplicationRoundStatusFactory,
 )
 from permissions.models import (
+    GeneralRole,
     GeneralRoleChoice,
     GeneralRolePermission,
+    ServiceSectorRole,
     ServiceSectorRoleChoice,
     ServiceSectorRolePermission,
+    UnitRole,
     UnitRoleChoice,
     UnitRolePermission,
 )
 from reservation_units.tests.factories import ReservationUnitFactory
 from spaces.models import Space
-from spaces.tests.factories import ServiceSectorFactory, SpaceFactory, UnitFactory
+from spaces.tests.factories import (
+    ServiceSectorFactory,
+    SpaceFactory,
+    UnitFactory,
+    UnitGroupFactory,
+)
 
 
 class DeleteSpaceTestCase(GrapheneTestCaseBase):
@@ -505,6 +513,145 @@ class SpacesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                             surfaceArea
                             code
                             maxPersons
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_without_permissions(self):
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                spaces(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_with_general_role(self):
+        spaces_role_choice = GeneralRoleChoice.objects.create(code="space_manager")
+        GeneralRolePermission.objects.create(
+            role=spaces_role_choice, permission="can_manage_spaces"
+        )
+        GeneralRole.objects.create(
+            user=self.regular_joe,
+            role=spaces_role_choice,
+        )
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                spaces(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_with_service_sector_role(self):
+        unit = UnitFactory(name="test unit")
+        service_sector = ServiceSectorFactory(name="test service sector", units=[unit])
+        SpaceFactory(name_fi="i am from the sector!", unit=unit)
+
+        spaces_role_choice = ServiceSectorRoleChoice.objects.create(
+            code="space_manager"
+        )
+        ServiceSectorRolePermission.objects.create(
+            role=spaces_role_choice, permission="can_manage_spaces"
+        )
+        ServiceSectorRole.objects.create(
+            user=self.regular_joe,
+            role=spaces_role_choice,
+            service_sector=service_sector,
+        )
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                spaces(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_with_unit_role(self):
+        unit = UnitFactory(name="test unit")
+        SpaceFactory(name_fi="i am from the unit!", unit=unit)
+
+        spaces_role_choice = UnitRoleChoice.objects.create(code="space_manager")
+        UnitRolePermission.objects.create(
+            role=spaces_role_choice, permission="can_manage_spaces"
+        )
+        role = UnitRole.objects.create(user=self.regular_joe, role=spaces_role_choice)
+        role.unit.set([unit])
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                spaces(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_with_unit_group_role(self):
+        unit = UnitFactory(name="test unit")
+        unit_group = UnitGroupFactory(name="test group", units=[unit])
+        SpaceFactory(name_fi="i am from the unit group!", unit=unit)
+
+        spaces_role_choice = UnitRoleChoice.objects.create(code="space_manager")
+        UnitRolePermission.objects.create(
+            role=spaces_role_choice, permission="can_manage_spaces"
+        )
+        role = UnitRole.objects.create(user=self.regular_joe, role=spaces_role_choice)
+        role.unit_group.set([unit_group])
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                spaces(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
                           }
                         }
                     }

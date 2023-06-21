@@ -9,6 +9,7 @@ from graphene_django.utils import GraphQLTestCase
 from permissions.models import (
     GeneralRole,
     GeneralRoleChoice,
+    GeneralRolePermission,
     ServiceSectorRole,
     ServiceSectorRoleChoice,
     ServiceSectorRolePermission,
@@ -184,6 +185,159 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
         assert_that(errors[0].get("message")).is_equal_to(
             "No Resource matches the given query."
         )
+
+    def test_only_with_permissions_with_no_permissions(self):
+        response = self.query(
+            """
+            query {
+              resources(onlyWithPermission:true) {
+                edges {
+                  node {
+                    nameFi
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permissions_with_general_role(self):
+        role_choice = GeneralRoleChoice.objects.create(code="resource_manager")
+        GeneralRolePermission.objects.create(
+            role=role_choice, permission="can_manage_resources"
+        )
+        GeneralRole.objects.create(
+            user=self.regular_joe,
+            role=role_choice,
+        )
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+              resources(onlyWithPermission:true) {
+                edges {
+                  node {
+                    nameFi
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_with_service_sector_role(self):
+        unit = UnitFactory(name="test unit")
+        service_sector = ServiceSectorFactory(name="test service sector", units=[unit])
+        space = SpaceFactory(name_fi="test space", unit=unit)
+        another_space = SpaceFactory(name_fi="another_space")
+
+        ResourceFactory(name_fi="i am from the sector!", space=space)
+        ResourceFactory(name_fi="hide me", space=another_space)
+
+        spaces_role_choice = ServiceSectorRoleChoice.objects.create(
+            code="resource_manager"
+        )
+        ServiceSectorRolePermission.objects.create(
+            role=spaces_role_choice, permission="can_manage_resources"
+        )
+        ServiceSectorRole.objects.create(
+            user=self.regular_joe,
+            role=spaces_role_choice,
+            service_sector=service_sector,
+        )
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                resources(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_with_unit_role(self):
+        unit = UnitFactory(name="test unit")
+        space = SpaceFactory(name_fi="test space", unit=unit)
+        another_space = SpaceFactory(name_fi="another space")
+        ResourceFactory(name_fi="i'm from the unit!", space=space)
+        ResourceFactory(name_fi="hide me", space=another_space)
+
+        role_choice = UnitRoleChoice.objects.create(code="resource_manager")
+        UnitRolePermission.objects.create(
+            role=role_choice, permission="can_manage_resources"
+        )
+        role = UnitRole.objects.create(user=self.regular_joe, role=role_choice)
+        role.unit.set([unit])
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                resources(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_only_with_permission_with_unit_group_role(self):
+        unit = UnitFactory(name="test unit")
+        unit_group = UnitGroupFactory(name="test group", units=[unit])
+        space = SpaceFactory(name_fi="test_space", unit=unit)
+        another_space = SpaceFactory(name_fi="another space")
+
+        ResourceFactory(name_fi="i'm from the unit group!", space=space)
+        ResourceFactory(name_fi="hide me", space=another_space)
+
+        role_choice = UnitRoleChoice.objects.create(code="resource_manager")
+        UnitRolePermission.objects.create(
+            role=role_choice, permission="can_manage_resources"
+        )
+        role = UnitRole.objects.create(user=self.regular_joe, role=role_choice)
+        role.unit_group.set([unit_group])
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                resources(onlyWithPermission:true) {
+                    edges {
+                        node {
+                            nameFi
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):

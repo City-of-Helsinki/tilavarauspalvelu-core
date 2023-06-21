@@ -79,12 +79,14 @@ from api.graphql.reservations.reservation_types import (
     ReservationPurposeType,
     ReservationType,
 )
+from api.graphql.resources.resource_filtersets import ResourceFilterSet
 from api.graphql.resources.resource_mutations import (
     ResourceCreateMutation,
     ResourceDeleteMutation,
     ResourceUpdateMutation,
 )
 from api.graphql.resources.resource_types import ResourceType
+from api.graphql.spaces.space_filtersets import SpaceFilterSet
 from api.graphql.spaces.space_mutations import (
     SpaceCreateMutation,
     SpaceDeleteMutation,
@@ -415,7 +417,7 @@ class Query(graphene.ObjectType):
         ReservationUnitTypeType, filterset_class=ReservationUnitTypeFilterSet
     )
 
-    resources = ResourcesFilter(ResourceType)
+    resources = ResourcesFilter(ResourceType, filterset_class=ResourceFilterSet)
     resource = relay.Node.Field(ResourceType)
     resource_by_pk = Field(ResourceType, pk=graphene.Int())
 
@@ -427,7 +429,7 @@ class Query(graphene.ObjectType):
     equipment_category = relay.Node.Field((EquipmentCategoryType))
     equipment_category_by_pk = Field(EquipmentCategoryType, pk=graphene.Int())
 
-    spaces = SpacesFilter(SpaceType)
+    spaces = SpacesFilter(SpaceType, filterset_class=SpaceFilterSet)
     space = relay.Node.Field(SpaceType)
     space_by_pk = Field(SpaceType, pk=graphene.Int())
     service_sectors = ServiceSectorFilter(ServiceSectorType)
