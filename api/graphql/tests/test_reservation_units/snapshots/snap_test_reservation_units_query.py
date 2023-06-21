@@ -757,17 +757,17 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_surface_area 1'] = {
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': '120.00'
+                        'surfaceArea': 120
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '90.00'
+                        'surfaceArea': 90
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '60.00'
+                        'surfaceArea': 60
                     }
                 }
             ]
@@ -859,7 +859,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_manually_given_surface_are
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': '500.00'
+                        'surfaceArea': 500
                     }
                 }
             ]
@@ -977,7 +977,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             }
                         ],
                         'state': 'SCHEDULED_HIDING',
-                        'surfaceArea': '150.00',
+                        'surfaceArea': 150,
                         'termsOfUseFi': None
                     }
                 }
@@ -1387,32 +1387,32 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area 1'] = {
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': '1.00'
+                        'surfaceArea': 1
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '2.00'
+                        'surfaceArea': 2
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '3.00'
+                        'surfaceArea': 3
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '4.00'
+                        'surfaceArea': 4
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '5.00'
+                        'surfaceArea': 5
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '150.00'
+                        'surfaceArea': 150.00
                     }
                 }
             ]
@@ -1426,32 +1426,32 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area_reverse_orde
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': '150.00'
+                        'surfaceArea': 150
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '5.00'
+                        'surfaceArea': 5
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '4.00'
+                        'surfaceArea': 4
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '3.00'
+                        'surfaceArea': 3
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '2.00'
+                        'surfaceArea': 2
                     }
                 },
                 {
                     'node': {
-                        'surfaceArea': '1.00'
+                        'surfaceArea': 1
                     }
                 }
             ]
@@ -1968,21 +1968,6 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_publishing
                     'node': {
                         'nameFi': 'This should be scheduled publishing',
                         'state': 'SCHEDULED_PUBLISHING'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_reservation 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'This should be scheduled reservation',
-                        'state': 'SCHEDULED_RESERVATION'
                     }
                 }
             ]

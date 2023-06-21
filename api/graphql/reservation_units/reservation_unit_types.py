@@ -417,7 +417,7 @@ class ReservationUnitType(
     equipment = graphene.List(EquipmentType)
     unit = graphene.Field(UnitType)
     max_persons = graphene.Int()
-    surface_area = graphene.Decimal()
+    surface_area = graphene.Int()
     max_reservation_duration = Duration()
     min_reservation_duration = Duration()
     keyword_groups = graphene.List(KeywordGroupType)

@@ -498,7 +498,7 @@ class SpacesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.space = SpaceFactory(name_fi="outerspace", surface_area=40.5)
+        cls.space = SpaceFactory(name_fi="outerspace", surface_area=40)
 
     def test_spaces_query(self):
         self.maxDiff = None

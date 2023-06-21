@@ -157,7 +157,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     def test_update_surface_area(self):
-        expected_surface_area = "150"
+        expected_surface_area = 150
         data = self.get_valid_update_data()
         data["surfaceArea"] = expected_surface_area
         update_query = """
