@@ -995,6 +995,7 @@ type BuildingType implements Node {
   nameFi: String
   nameEn: String
   nameSv: String
+  district: DistrictType
   realEstate: RealEstateType
   surfaceArea: Decimal
 
@@ -1064,6 +1065,18 @@ scalar DateTime
 The `Decimal` scalar type represents a python Decimal.
 """
 scalar Decimal
+
+type DistrictType implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+}
 
 """
 The `Duration` scalar type represents a duration value as an integer in seconds.
@@ -2346,6 +2359,7 @@ type RealEstateType implements Node {
   nameFi: String
   nameEn: String
   nameSv: String
+  district: DistrictType
   surfaceArea: Decimal
 
   """
@@ -3629,14 +3643,13 @@ type ReservationType implements Node {
   """
   id: ID!
   pk: Int
-  isBlocked: Boolean
-  isHandled: Boolean
-  orderUuid: String
-  orderStatus: String
   reservationUnits: [ReservationUnitType]
-  refundUuid: String
   reserveeName: String
   staffEvent: Boolean @deprecated(reason: "Please refer to type.")
+  orderUuid: String
+  orderStatus: String
+  refundUuid: String
+  isHandled: Boolean
   calendarUrl: String
 }
 
@@ -3953,24 +3966,24 @@ input ReservationUnitCreateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -4097,24 +4110,24 @@ type ReservationUnitCreateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """
   May contain more than one error for same field.
@@ -4775,24 +4788,24 @@ input ReservationUnitUpdateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -4918,24 +4931,24 @@ type ReservationUnitUpdateMutationPayload {
   state: String
   pricingTerms: String
   paymentTypes: [String]
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """
   May contain more than one error for same field.
@@ -5410,6 +5423,11 @@ input SpaceCreateMutationInput {
   """
   parentPk: Int
   surfaceArea: Float
+
+  """
+  PK of the district for this space.
+  """
+  districtPk: Int
   maxPersons: Int
   code: String
   unitPk: Int
@@ -5427,6 +5445,11 @@ type SpaceCreateMutationPayload {
   """
   parentPk: Int
   surfaceArea: Float
+
+  """
+  PK of the district for this space.
+  """
+  districtPk: Int
   maxPersons: Int
   code: String
   unitPk: Int
@@ -5509,6 +5532,11 @@ input SpaceUpdateMutationInput {
   """
   parentPk: Int
   surfaceArea: Float
+
+  """
+  PK of the district for this space.
+  """
+  districtPk: Int
   maxPersons: Int
   code: String
   unitPk: Int
@@ -5526,6 +5554,11 @@ type SpaceUpdateMutationPayload {
   """
   parentPk: Int
   surfaceArea: Float
+
+  """
+  PK of the district for this space.
+  """
+  districtPk: Int
   maxPersons: Int
   code: String
   unitPk: Int
@@ -5833,15 +5866,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -5851,15 +5884,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """
   May contain more than one error for same field.

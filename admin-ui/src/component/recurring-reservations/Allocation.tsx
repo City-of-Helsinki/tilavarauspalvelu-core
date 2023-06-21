@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Button } from "hds-react";
+import { Button, IconArrowRedo } from "hds-react";
 import { Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { getApplicationRound, triggerAllocation } from "../../common/api";
 import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
@@ -19,7 +20,9 @@ import StatusRecommendation from "../applications/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
+import AllocatingDialogContent from "./AllocatingDialogContent";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { useNotification } from "../../context/NotificationContext";
 
 type IProps = {
   applicationRound: ApplicationRoundType;
@@ -108,7 +111,47 @@ const Allocation = ({
   applicationRound,
   setApplicationRoundStatus,
 }: IProps) => {
+  const { notifyError } = useNotification();
+  const [isAllocating, setIsAllocating] = useState<boolean>(false);
+  const [isAllocated, setIsAllocated] = useState(false);
+
   const { t } = useTranslation();
+
+  const startAllocation = async () => {
+    if (!applicationRound) return;
+
+    try {
+      const allocation = await triggerAllocation({
+        applicationRoundId: applicationRound.id,
+        applicationRoundBasketIds: applicationRound.applicationRoundBaskets.map(
+          (n) => n.id
+        ),
+      });
+      setIsAllocating(!!allocation?.id);
+    } catch (error) {
+      const msg = "errors.errorStartingAllocation";
+      notifyError(t(msg));
+    }
+  };
+
+  useEffect(() => {
+    if (isAllocated) {
+      setApplicationRoundStatus("allocated");
+    }
+  }, [isAllocated, setApplicationRoundStatus]);
+
+  useEffect(() => {
+    const poller = setInterval(async () => {
+      if (isAllocating) {
+        const result = await getApplicationRound({ id: applicationRound.id });
+        setIsAllocated(!result.allocating);
+      }
+    }, 2000);
+
+    return () => {
+      clearInterval(poller);
+    };
+  }, [isAllocating, applicationRound]);
 
   return (
     <Wrapper>
@@ -165,10 +208,19 @@ const Allocation = ({
             </Button>
           </div>
           <div className="box">
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={() => startAllocation()}
+              iconLeft={<IconArrowRedo />}
+            >
+              {t("ApplicationRound.allocateAction")}
+            </Button>
             <div className="label">{t("ApplicationRound.allocateLabel")}</div>
           </div>
         </ActionContainer>
       </NarrowContainer>
+      {isAllocating && <AllocatingDialogContent />}
     </Wrapper>
   );
 };

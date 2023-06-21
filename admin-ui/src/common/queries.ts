@@ -15,6 +15,9 @@ export const SPACES_QUERY = gql`
             nameFi
             building {
               nameFi
+              district {
+                nameFi
+              }
             }
           }
           surfaceArea

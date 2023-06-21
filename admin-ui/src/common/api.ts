@@ -6,6 +6,7 @@ import {
   ApplicationRound,
   ReservationUnit,
   Parameter,
+  AllocationRequest,
   AllocationResult,
   ApplicationEventStatus,
   ApplicationEventsDeclinedReservationUnits,
@@ -25,6 +26,7 @@ const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
+const allocationRequestBasePath = "allocation_request";
 const allocationResultBasePath = "allocation_results";
 const applicationEventStatusBasePath = "application_event_status";
 const declinedApplicationEventReservationUnitsBasePath =
@@ -232,6 +234,26 @@ export function setApplicationStatus(
   return apiPost<Application>({
     data: { applicationId, status },
     path: `v1/${applicationStatusBasePath}/`,
+  });
+}
+
+interface AllocationRequestParams {
+  applicationRoundId: number;
+  applicationRoundBasketIds: number[];
+}
+
+export function triggerAllocation(
+  params: AllocationRequestParams
+): Promise<AllocationRequest> {
+  return apiPost({
+    data: params,
+    path: `v1/${allocationRequestBasePath}/`,
+  });
+}
+
+export function getAllocationStatus(id: number): Promise<AllocationRequest> {
+  return apiGet({
+    path: `v1/${allocationRequestBasePath}/${id}`,
   });
 }
 

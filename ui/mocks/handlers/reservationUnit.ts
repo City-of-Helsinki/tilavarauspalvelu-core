@@ -42,6 +42,7 @@ const getJSONResponse = [
         parent_id: 2,
         building_id: 2,
         surface_area: null,
+        district_id: null,
       },
     ],
     resources: [],
@@ -66,6 +67,7 @@ const getJSONResponse = [
     building: {
       id: 2,
       name: "Töölön kirjasto",
+      district: 1,
       real_estate: null,
       surface_area: null,
     },
@@ -87,6 +89,7 @@ const getJSONResponse = [
         parent_id: null,
         building_id: 18,
         surface_area: "50.00",
+        district_id: 8,
       },
     ],
     resources: [],
@@ -105,6 +108,7 @@ const getJSONResponse = [
     building: {
       id: 18,
       name: "Ympyrätalo",
+      district: 8,
       real_estate: null,
       surface_area: "2000.00",
     },
@@ -126,6 +130,7 @@ const getJSONResponse = [
         parent_id: 3,
         building_id: 1,
         surface_area: null,
+        district_id: null,
       },
     ],
     resources: [],
@@ -147,6 +152,7 @@ const getJSONResponse = [
     building: {
       id: 1,
       name: "Fredriksbergin 2-talo",
+      district: null,
       real_estate: null,
       surface_area: null,
     },
@@ -168,6 +174,7 @@ const getJSONResponse = [
         parent_id: null,
         building_id: 2,
         surface_area: null,
+        district_id: null,
       },
     ],
     resources: [],
@@ -189,6 +196,7 @@ const getJSONResponse = [
     building: {
       id: 2,
       name: "Töölön kirjasto",
+      district: 1,
       real_estate: null,
       surface_area: null,
     },
@@ -211,6 +219,7 @@ const getJSONResponse = [
         parent_id: 2,
         building_id: 2,
         surface_area: null,
+        district_id: null,
       },
     ],
     resources: [],
@@ -235,6 +244,7 @@ const getJSONResponse = [
     building: {
       id: 2,
       name: "Töölön kirjasto",
+      district: 1,
       real_estate: null,
       surface_area: null,
     },
@@ -257,6 +267,7 @@ const getJSONResponse = [
         parent_id: 1,
         building_id: 3,
         surface_area: null,
+        district_id: null,
       },
     ],
     resources: [
@@ -299,6 +310,7 @@ const getJSONResponse = [
     building: {
       id: 3,
       name: "Oodin kirjasto",
+      district: 2,
       real_estate: null,
       surface_area: null,
     },
@@ -321,6 +333,7 @@ const getJSONResponse = [
         parent_id: 2,
         building_id: 2,
         surface_area: null,
+        district_id: null,
       },
     ],
     resources: [],
@@ -342,6 +355,7 @@ const getJSONResponse = [
     building: {
       id: 2,
       name: "Töölön kirjasto",
+      district: 1,
       real_estate: null,
       surface_area: null,
     },
@@ -364,6 +378,7 @@ const getJSONResponse = [
         parent_id: null,
         building_id: 3,
         surface_area: null,
+        district_id: 2,
       },
     ],
     resources: [],
@@ -394,6 +409,7 @@ const getJSONResponse = [
     building: {
       id: 3,
       name: "Oodin kirjasto",
+      district: 2,
       real_estate: null,
       surface_area: null,
     },

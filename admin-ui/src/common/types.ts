@@ -87,9 +87,15 @@ export type Image = {
 
 export type ReservationUnitBuilding = {
   id: number;
+  district: District;
   name: TranslationObject;
   realEstate: string | null;
   surfaceArea: string | null;
+};
+
+export type District = {
+  id: number;
+  name: string;
 };
 
 export type ReservationUnit = {
@@ -319,6 +325,15 @@ export interface AllocationResult {
 export interface AllocationResultAggregatedData {
   durationTotal: number;
   reservationsTotal: number;
+}
+
+export interface AllocationRequest {
+  id: number;
+  applicationRoundBasketIds: number[];
+  applicationRoundId: number;
+  completed: boolean;
+  startDate: string | null;
+  endDate: string | null;
 }
 
 export interface AllocatedSpace {

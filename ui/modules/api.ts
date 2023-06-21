@@ -154,6 +154,7 @@ export function getParameters(
     | "age_group"
     | "ability_group"
     | "reservation_unit_type"
+    | "district"
     | "city"
 ): Promise<Parameter[]> {
   return apiGet<Parameter[]>({
