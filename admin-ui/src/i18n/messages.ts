@@ -209,9 +209,19 @@ const translations: ITranslations = {
     ],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
     descriptive: {
+      "Reservation overlaps with reservation before due to buffer time.": [
+        "Varaus menee päällekkäin edellisen varauksen kanssa tauon takia.",
+      ],
+      "Reservation overlaps with reservation after due to buffer time.": [
+        "Varaus menee päällekkäin seuraavan varauksen kanssa tauon takia.",
+      ],
+      collision: [
+        "Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika.",
+      ],
       "Overlapping reservations are not allowed.": [
         "Ajankohdalle on jo varaus toisen varausyksikön kautta.",
       ],
+      unkown: ["Tuntematon virhe"],
       genericError: [""],
     },
   },

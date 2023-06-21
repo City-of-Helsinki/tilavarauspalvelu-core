@@ -6,16 +6,15 @@ import { z } from "zod";
 import {
   Mutation,
   MutationStaffAdjustReservationTimeArgs,
-  Query,
-  QueryReservationUnitByPkArgs,
   ReservationType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { fromUIDate } from "common/src/common/util";
 import { useNotification } from "app/context/NotificationContext";
 import { useModal } from "app/context/ModalContext";
@@ -24,8 +23,8 @@ import { CHANGE_RESERVATION_TIME } from "./queries";
 import { setTimeOnDate } from "./utils";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 import { reservationDateTime, reservationDuration } from "./requested/util";
-import { RESERVATIONS_BY_RESERVATIONUNIT } from "./requested/hooks/queries";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
+import { useCheckCollisions } from "./requested/hooks";
 
 const StyledForm = styled.form`
   display: grid;
@@ -64,60 +63,8 @@ const btnCommon = {
 
 type FormValueType = z.infer<typeof TimeFormSchema>;
 
-const useCheckCollision = ({
-  reservationPk,
-  reservationUnitPk,
-  start,
-  end,
-}: {
-  reservationPk: number;
-  reservationUnitPk: number;
-  start: Date;
-  end: Date;
-}) => {
-  const { notifyError } = useNotification();
-
-  const { data, loading } = useQuery<
-    Query,
-    QueryReservationUnitByPkArgs & { from: string; to: string }
-  >(RESERVATIONS_BY_RESERVATIONUNIT, {
-    fetchPolicy: "no-cache",
-    skip: !reservationUnitPk,
-    variables: {
-      pk: reservationUnitPk,
-      from: format(start, "yyyy-MM-dd"),
-      to: format(end, "yyyy-MM-dd"),
-    },
-    onError: () => {
-      notifyError("Varauksia ei voitu hakea");
-    },
-  });
-
-  type Interval = { start: Date; end: Date };
-  const collides = (a: Interval, b: Interval): boolean => {
-    if (a.start < b.start && a.end <= b.start) return false;
-    if (a.start >= b.end && a.end > b.end) return false;
-    return true;
-  };
-
-  const reservations = data?.reservationUnitByPk?.reservations ?? [];
-  const collisions = reservations
-    .filter((x) => x?.pk !== reservationPk)
-    .filter(
-      (x) =>
-        x?.begin &&
-        x?.end &&
-        collides(
-          { start, end },
-          { start: new Date(x.begin), end: new Date(x.end) }
-        )
-    );
-
-  return { isLoading: loading, collides: collisions.length > 0 };
-};
-
 const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
 
   const [changeTimeMutation] = useMutation<
@@ -129,9 +76,14 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
       onAccept();
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
-      console.error("Change time mutation failed: ", error);
-      notifyError(t("Reservation.EditTime.error.mutation"));
+      const { message } = error;
+
+      const translatedError = i18n.exists(`errors.descriptive.${message}`)
+        ? t(`errors.descriptive.${message}`)
+        : t("errors.descriptive.genericError");
+      notifyError(
+        t("ReservationDialog.saveFailed", { error: translatedError })
+      );
     },
   });
 
@@ -179,11 +131,23 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const formStartTime = watch("startTime");
   const newStartTime = setTimeOnDate(fromUIDate(formDate), formStartTime);
   const newEndTime = setTimeOnDate(fromUIDate(formDate), formEndTime);
-  const { collides, isLoading } = useCheckCollision({
+  const { hasCollisions, isLoading } = useCheckCollisions({
     reservationPk: reservation.pk ?? 0,
     reservationUnitPk: reservation.reservationUnits?.find(() => true)?.pk ?? 0,
     start: newStartTime,
     end: newEndTime,
+    buffers: {
+      before:
+        reservation.type !== ReservationsReservationTypeChoices.Blocked &&
+        reservation.bufferTimeBefore
+          ? reservation.bufferTimeBefore
+          : 0,
+      after:
+        reservation.type !== ReservationsReservationTypeChoices.Blocked &&
+        reservation.bufferTimeAfter
+          ? reservation.bufferTimeAfter
+          : 0,
+    },
   });
 
   const onSubmit = (values: FormValueType) => {
@@ -235,7 +199,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
         <TimeInfoBox $isDisabled={!isDirty || !isValid}>
           {t("Reservation.EditTime.newTime")}: <Bold>{newTime}</Bold>
         </TimeInfoBox>
-        {collides && (
+        {hasCollisions && (
           <Notification
             size="small"
             label={t("Reservation.EditTime.error.reservationCollides")}
@@ -250,7 +214,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
             {t("common.cancel")}
           </Button>
           <Button
-            disabled={((!isDirty || !isValid) && !isLoading) || collides}
+            disabled={((!isDirty || !isValid) && !isLoading) || hasCollisions}
             type="submit"
           >
             {t("Reservation.EditTime.accept")}

@@ -32,6 +32,8 @@ export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
         end
         state
         type
+        bufferTimeBefore
+        bufferTimeAfter
         recurringReservation {
           pk
         }

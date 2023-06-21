@@ -122,6 +122,8 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     workingMemo
     reserveeName
     orderStatus
+    bufferTimeBefore
+    bufferTimeAfter
   }
 `;
 
