@@ -26,7 +26,9 @@ from utils.decimal_utils import round_decimal
 def parse_datetime(string: Optional[str]) -> Optional[datetime]:
     if string is None:
         return None
-    return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%f")
+    return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%f").astimezone(
+        settings.VERKKOKAUPPA_TIMEZONE
+    )
 
 
 def get_formatted_reservation_time(reservation: Reservation) -> str:

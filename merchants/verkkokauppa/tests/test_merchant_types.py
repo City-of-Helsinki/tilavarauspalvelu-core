@@ -3,6 +3,7 @@ from typing import Any, Dict
 from uuid import UUID
 
 from assertpy import assert_that
+from django.conf import settings
 from django.test.testcases import TestCase
 
 from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError
@@ -85,8 +86,12 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
         expected = Merchant(
             id=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
             namespace="tilanvaraus",
-            created_at=datetime(2022, 9, 26, 10, 11, 12),
-            updated_at=datetime(2022, 9, 27, 10, 11, 12),
+            created_at=datetime(
+                2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
+            ),
+            updated_at=datetime(
+                2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
+            ),
             name="Test Merchant",
             street="Test Street 1",
             zip="00112",
@@ -105,8 +110,12 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
         expected = Merchant(
             id=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
             namespace="tilanvaraus",
-            created_at=datetime(2022, 9, 26, 10, 11, 12),
-            updated_at=datetime(2022, 9, 27, 10, 11, 12),
+            created_at=datetime(
+                2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
+            ),
+            updated_at=datetime(
+                2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
+            ),
             name="",
             street="",
             zip="",

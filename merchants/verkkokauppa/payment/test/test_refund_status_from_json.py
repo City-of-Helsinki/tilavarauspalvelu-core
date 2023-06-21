@@ -3,6 +3,7 @@ from unittest import mock
 from uuid import UUID
 
 from assertpy import assert_that
+from django.conf import settings
 from django.test import TestCase
 from pytest import raises
 
@@ -45,7 +46,9 @@ class RefundStatusFromJsonTestCase(TestCase):
         assert_that(refund_status.namespace).is_equal_to("tilanvaraus")
         assert_that(refund_status.status).is_equal_to("refund_paid_online")
         assert_that(refund_status.created_at).is_equal_to(
-            datetime(2023, 3, 29, 7, 36, 13, 576000)
+            datetime(
+                2023, 3, 29, 7, 36, 13, 576000, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
+            )
         )
 
     @mock.patch("merchants.verkkokauppa.payment.types.capture_exception")
