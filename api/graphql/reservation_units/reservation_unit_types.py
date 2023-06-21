@@ -61,9 +61,6 @@ from reservation_units.models import (
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
 from reservation_units.models import TaxPercentage
-from reservation_units.utils.reservation_unit_reservation_scheduler import (
-    ReservationUnitReservationScheduler,
-)
 from reservations.models import Reservation
 from spaces.models import Space
 from tilavarauspalvelu.utils.date_util import end_of_day, start_of_day
@@ -656,7 +653,9 @@ class ReservationUnitType(
 class ReservationUnitByPkType(
     ReservationUnitType, OpeningHoursMixin, ReservationUnitWithReservationsMixin
 ):
-    next_available_slot = graphene.DateTime()
+    next_available_slot = graphene.DateTime(
+        deprecation_reason="Old deprecated scalar. Does not yield any return."
+    )
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
 
     class Meta:
@@ -716,9 +715,7 @@ class ReservationUnitByPkType(
         connection_class = TilavarausBaseConnection
 
     def resolve_next_available_slot(self, info):
-        scheduler = ReservationUnitReservationScheduler(self)
-        start, end = scheduler.get_next_available_reservation_time()
-        return start
+        return None
 
     def resolve_hauki_url(self, info):
         return self
