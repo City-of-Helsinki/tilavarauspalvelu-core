@@ -23,7 +23,11 @@ export type AuthStateProps = {
 };
 
 export const AuthStateContext = React.createContext<AuthStateProps>({
-  authState: { state: "Unknown", hasPermission: () => false },
+  authState: {
+    state: "Unknown",
+    hasPermission: () => false,
+    hasSomePermission: () => false,
+  },
 });
 
 export const useAuthState = (): AuthStateProps => useContext(AuthStateContext);

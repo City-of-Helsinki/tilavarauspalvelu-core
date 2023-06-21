@@ -3,6 +3,7 @@ import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { isValidAuthState } from "app/context/authStateReducer";
 import { UserInfo } from "common";
 import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
@@ -60,44 +61,44 @@ const Navigation = (): JSX.Element => {
     >
       <HDSNavigation.Actions>
         <MobileNavigation>
-          <MainMenu
-            placement="navigation"
-            onItemSelection={() => setMenuState(false)}
-          />
-        </MobileNavigation>
-        {state !== "Unknown" && state !== "NoPermissions" && (
-          <UserMenu
-            userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
-            authenticated={state === "HasPermissions"}
-            label={t(loggingIn ? "Navigation.logging" : "Navigation.login")}
-            onSignIn={() => {
-              setLoggingIn(true);
-              if (login) {
-                setLoggingIn(true);
-                login();
-              } else {
-                throw Error("cannot log in");
-              }
-            }}
-          >
-            {user && (
-              <UserInfo
-                name={
-                  `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-                  t("Navigation.noName")
-                }
-                email={user.email}
-              />
-            )}
-
-            <HDSNavigation.Item
-              className="btn-logout"
-              label={t("Navigation.logout")}
-              onClick={() => logout && logout()}
-              variant="primary"
+          {user && isValidAuthState(state) && (
+            <MainMenu
+              placement="navigation"
+              onItemSelection={() => setMenuState(false)}
             />
-          </UserMenu>
-        )}
+          )}
+        </MobileNavigation>
+        <UserMenu
+          userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
+          authenticated={state === "HasPermissions"}
+          label={t(loggingIn ? "Navigation.logging" : "Navigation.login")}
+          onSignIn={() => {
+            setLoggingIn(true);
+            if (login) {
+              setLoggingIn(true);
+              login();
+            } else {
+              throw Error("cannot log in");
+            }
+          }}
+        >
+          {user && (
+            <UserInfo
+              name={
+                `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+                t("Navigation.noName")
+              }
+              email={user.email}
+            />
+          )}
+
+          <HDSNavigation.Item
+            className="btn-logout"
+            label={t("Navigation.logout")}
+            onClick={() => logout && logout()}
+            variant="primary"
+          />
+        </UserMenu>
       </HDSNavigation.Actions>
     </StyledHDSNavigation>
   );

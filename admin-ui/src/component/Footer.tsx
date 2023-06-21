@@ -11,11 +11,6 @@ const StyledFooter = styled(HDSFooter)`
 
     max-width: unset !important;
   }
-
-  max-width: 100vw;
-  display: block;
-  position: fixed;
-  bottom: 0;
 `;
 
 function Footer(): JSX.Element {

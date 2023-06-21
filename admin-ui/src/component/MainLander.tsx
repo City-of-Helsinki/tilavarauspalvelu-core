@@ -17,8 +17,6 @@ interface IProps {
   withSiteWrapper?: boolean;
 }
 
-const Wrapper = styled.div``;
-
 const LoginBtn = styled(Button).attrs({
   iconLeft: <IconGroup className="icon-group" />,
   iconRight: <IconArrowRight className="icon-arrow" />,
@@ -54,12 +52,14 @@ const LoginBtn = styled(Button).attrs({
 `;
 
 const Content = styled.div`
+  flex-grow: 1;
   max-width: 44rem;
-  min-height: 30rem;
-  margin: var(--spacing-3-xl) auto var(--spacing-2-xl);
-  padding: 0 var(--spacing-xl);
+  padding: 0 var(--spacing-l);
 
+  margin: var(--spacing-s) auto var(--spacing-s);
   @media (min-width: ${breakpoints.m}) {
+    margin: var(--spacing-3-xl) auto var(--spacing-2-xl);
+    padding: 0 var(--spacing-xl);
     text-align: center;
   }
 `;
@@ -84,7 +84,7 @@ function MainLander({ withSiteWrapper = false }: IProps) {
     }
   }, [authState]);
   const Lander = (
-    <Wrapper>
+    <>
       <KorosHeading heroImage={HeroImage}>
         <Heading>{t("common.applicationName")}</Heading>
         <LoginBtn
@@ -102,7 +102,7 @@ function MainLander({ withSiteWrapper = false }: IProps) {
         <Ingress>{t("MainLander.ingress")}</Ingress>
       </Content>
       <Footer />
-    </Wrapper>
+    </>
   );
 
   return withSiteWrapper ? (

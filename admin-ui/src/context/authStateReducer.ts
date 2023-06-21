@@ -18,6 +18,11 @@ export enum Permission {
   CAN_CREATE_STAFF_RESERVATIONS = "can_create_staff_reservations",
   CAN_MANAGE_RESERVATIONS = "can_manage_reservations",
   CAN_VIEW_RESERVATIONS = "can_view_reservations",
+  CAN_MANAGE_RESERVATION_UNITS = "can_manage_reservation_units",
+  CAN_MANAGE_SPACES = "can_manage_spaces",
+  CAN_MANAGE_RESOURCES = "can_manage_resources",
+  CAN_MANAGE_UNITS = "can_manage_units",
+  CAN_VALIDATE_APPLICATIONS = "can_validate_applications",
 }
 
 export type Auth = {
@@ -26,6 +31,7 @@ export type Auth = {
   sid?: string;
   login?: () => void;
   logout?: () => void;
+  hasSomePermission: (permission: Permission) => boolean;
   hasPermission: (
     permission: Permission,
     unitPk?: number,
@@ -35,6 +41,21 @@ export type Auth = {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type YesItsAFunction = Function;
+
+export const isValidAuthState = (state: AuthState): boolean => {
+  switch (state) {
+    case "Unknown":
+    case "Authenticated":
+    case "ApiKeyAvailable":
+    case "NoPermissions":
+    case "NotAutenticated":
+    case "Error":
+      return false;
+    case "HasPermissions":
+      return true;
+  }
+  return false;
+};
 
 export type Action =
   | {
@@ -50,7 +71,31 @@ export type Action =
 export const getInitialState = (): Auth => ({
   state: "Unknown",
   hasPermission: () => false,
+  hasSomePermission: () => false,
 });
+
+const somePermissions = (user: UserType, permission: Permission) => {
+  if (user.isSuperuser) {
+    return true;
+  }
+
+  const someUnitRoles =
+    user?.unitRoles?.some((role) =>
+      role?.permissions?.some((p) => p?.permission === permission)
+    ) ?? false;
+
+  const someSectorRoles =
+    user?.serviceSectorRoles?.some((role) =>
+      role?.permissions?.some((p) => p?.permission === permission)
+    ) ?? false;
+
+  const someGeneralRoles =
+    user?.generalRoles?.some((role) =>
+      role?.permissions?.some((p) => p?.permission === permission)
+    ) ?? false;
+
+  return someUnitRoles || someSectorRoles || someGeneralRoles;
+};
 
 export const authStateReducer = (state: Auth, action: Action): Auth => {
   switch (action.type) {
@@ -111,6 +156,8 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
       return {
         ...state,
         hasPermission: permissionHelper(currentUser),
+        hasSomePermission: (perm: Permission) =>
+          somePermissions(currentUser, perm),
         user: currentUser,
         state: hasSomePermissions ? "HasPermissions" : "NoPermissions",
       };

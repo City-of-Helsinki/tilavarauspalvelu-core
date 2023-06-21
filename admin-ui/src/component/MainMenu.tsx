@@ -5,6 +5,8 @@ import { NavLink, RouteProps, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import IconPremises from "common/src/icons/IconPremises";
+import { Permission } from "app/context/authStateReducer";
+import { useAuthState } from "app/context/AuthStateContext";
 import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
 import { ReactComponent as IconIndividualReservation } from "../images/icon_individual-reservation.svg";
 import { truncatedText } from "../styles/typography";
@@ -128,6 +130,7 @@ interface IMenuChild {
   routeParams?: RouteProps;
   items?: SubItemChild[];
   exact?: boolean;
+  permission?: Permission;
 }
 
 interface SubItemChild {
@@ -136,6 +139,7 @@ interface SubItemChild {
   route: string;
   routeParams?: RouteProps;
   items?: SubItemChild[];
+  permission?: Permission;
   postFix?: JSX.Element;
 }
 
@@ -190,74 +194,91 @@ const SubItems = ({
   ) : null;
 };
 
-const getFilteredMenuTree = (hasOwnUnits: boolean): IMenuChild[] =>
-  [
-    {
-      title: "MainMenu.home",
-      icon: <IconPremises aria-hidden />,
-      route: "/",
-      exact: true,
-    },
+const getFilteredMenu = (
+  hasOwnUnits: boolean,
+  hasPermission: (perm: Permission) => boolean
+): IMenuChild[] => [
+  {
+    title: "MainMenu.home",
+    icon: <IconPremises aria-hidden />,
+    route: "/",
+    exact: true,
+  },
 
-    hasOwnUnits
-      ? {
+  ...(hasOwnUnits
+    ? [
+        {
           title: "MainMenu.myUnits",
           icon: <IconStar aria-hidden />,
           route: "/my-units",
-        }
-      : undefined,
+        },
+      ]
+    : []),
 
-    {
-      title: "MainMenu.reservations",
-      icon: <IconIndividualReservation aria-hidden />,
-      route: "/reservations",
-      items: [
+  ...(hasPermission(Permission.CAN_VIEW_RESERVATIONS) ||
+  hasPermission(Permission.CAN_CREATE_STAFF_RESERVATIONS)
+    ? [
         {
-          title: "MainMenu.requestedReservations",
-          route: "/reservations/requested",
+          title: "MainMenu.reservations",
+          icon: <IconIndividualReservation aria-hidden />,
+          route: "/reservations",
+          items: [
+            {
+              title: "MainMenu.requestedReservations",
+              route: "/reservations/requested",
+            },
+            {
+              title: "MainMenu.allReservations",
+              route: "/reservations/all",
+            },
+          ],
         },
-        {
-          title: "MainMenu.allReservations",
-          route: "/reservations/all",
-        },
-      ],
-    },
+      ]
+    : []),
 
-    {
-      title: "MainMenu.recurringReservations",
-      icon: <IconCalendar aria-hidden />,
-      route: "/recurring-reservations",
-      items: [
+  ...(hasPermission(Permission.CAN_VALIDATE_APPLICATIONS)
+    ? [
         {
-          title: "MainMenu.applicationRounds",
-          route: "/recurring-reservations/application-rounds",
+          title: "MainMenu.recurringReservations",
+          icon: <IconCalendar aria-hidden />,
+          route: "/recurring-reservations",
+          items: [
+            {
+              title: "MainMenu.applicationRounds",
+              route: "/recurring-reservations/application-rounds",
+            },
+          ],
         },
-      ],
-    },
-    {
-      title: "MainMenu.premisesAndSettings",
-      icon: <IconLocation aria-hidden />,
-      route: "/premises-and-settings",
-      items: [
-        {
-          title: "MainMenu.reservationUnits",
-          route: `/premises-and-settings/${prefixes.reservationUnits}`,
-        },
-        {
-          title: "MainMenu.spaces",
-          route: "/premises-and-settings/spaces",
-        },
-        {
-          title: "MainMenu.resources",
-          route: "/premises-and-settings/resources",
-        },
-        {
-          title: "MainMenu.units",
-          route: "/premises-and-settings/units",
-        },
-      ],
-    },
-  ].filter((i) => Boolean(i)) as IMenuChild[];
+      ]
+    : []),
+  {
+    title: "MainMenu.premisesAndSettings",
+    icon: <IconLocation aria-hidden />,
+    route: "/premises-and-settings",
+    items: [
+      {
+        permission: Permission.CAN_MANAGE_RESERVATION_UNITS,
+        title: "MainMenu.reservationUnits",
+        route: `/premises-and-settings/${prefixes.reservationUnits}`,
+      },
+      {
+        permission: Permission.CAN_MANAGE_SPACES,
+        title: "MainMenu.spaces",
+        route: "/premises-and-settings/spaces",
+      },
+      {
+        permission: Permission.CAN_MANAGE_RESOURCES,
+        title: "MainMenu.resources",
+        route: "/premises-and-settings/resources",
+      },
+      {
+        permission: Permission.CAN_MANAGE_UNITS,
+        title: "MainMenu.units",
+        route: "/premises-and-settings/units",
+      },
+    ].filter((item) => hasPermission(item.permission)),
+  },
+];
 
 interface MainMenuProps {
   placement: string;
@@ -273,15 +294,20 @@ function MainMenu({
 
   const { handlingCount, hasOwnUnits } = useData();
 
+  const { authState } = useAuthState();
+  const { hasSomePermission } = authState;
+
   const count = handlingCount ? (
     <HandlingCount>{handlingCount}</HandlingCount>
   ) : undefined;
 
-  const filteredMenuTree = getFilteredMenuTree(hasOwnUnits);
+  const menuItems = getFilteredMenu(hasOwnUnits, hasSomePermission).filter(
+    (item) => item.items == null || item.items.length > 0
+  );
 
   return (
     <Wrapper placement={placement}>
-      {filteredMenuTree.map((menuItem: IMenuChild) => {
+      {menuItems.map((menuItem: IMenuChild) => {
         const isActive = menuItem?.route
           ? pathname.startsWith(menuItem?.route)
           : false;

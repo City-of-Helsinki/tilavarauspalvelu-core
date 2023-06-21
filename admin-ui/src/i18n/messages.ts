@@ -203,6 +203,7 @@ const translations: ITranslations = {
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
     errorSavingData: ["Virhe tallennettaessa tietoja"],
     uncaught: ["Odottamaton virhe"],
+    missingReservationType: ["Varaustyyppi puuttuu"],
     errorRecurringReservationsDoneDisplay: [
       "Virhe varaus tehty, mutta sen näyttäminen epäonnistui.",
     ],
@@ -238,6 +239,17 @@ const translations: ITranslations = {
     generalTermsTitle: [
       "Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot",
     ],
+  },
+
+  errorPages: {
+    accessForbidden: {
+      title: ["Sinulla ei ole käyttöoikeuksia tälle sivulle"],
+      description: [
+        "Sivu on nähtävillä vain kirjautuneille käyttäjille. Voit nähdä sivun sisällön, jos kirjaudut sisään ja sinulla on riittävän laajat käyttöoikeudet.",
+      ],
+      linkToVaraamo: ["Siirry Varaamon etusivulle"],
+      giveFeedback: ["Anna palautetta"],
+    },
   },
 
   ArchiveReservationUnitDialog: {

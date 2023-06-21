@@ -32,9 +32,116 @@ import { withGlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
 import ExternalScripts from "./common/ExternalScripts";
 import ApplicationRoundAllocation from "./component/recurring-reservations/allocation/ApplicationRoundAllocation";
-import { PrivateRoute } from "./common/PrivateRoutes";
 import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
+import AuthorizationChecker from "./common/AuthorizationChecker";
+import { Permission } from "./context/authStateReducer";
+
+const UnitsRouter = () => (
+  <Routes>
+    <Route path=":unitPk/map" element={<UnitMap />} />
+    <Route path=":unitPk/spacesResources" element={<SpacesResources />} />
+    <Route path=":unitPk/space/edit/:spacePk" element={<SpaceEditorView />} />
+    <Route
+      path=":unitPk/resource/edit/:resourcePk"
+      element={<ResourceEditorView />}
+    />
+    <Route
+      path=":unitPk/reservationUnit/edit/:reservationUnitPk"
+      element={<ReservationUnitEditor />}
+    />
+    <Route path=":unitPk" element={<Unit />} />
+  </Routes>
+);
+
+const ApplicationRouter = () => (
+  <Routes>
+    <Route path=":applicationId" element={<Application />} />
+    <Route path=":applicationId/details" element={<ApplicationDetails />} />
+    <Route
+      path=":applicationId/recurringReservation/:recurringReservationId"
+      element={<ReservationByApplicationEvent />}
+    />
+  </Routes>
+);
+
+const ApplicationRoundsRouter = () => (
+  <Routes>
+    <Route index element={<AllApplicationRounds />} />
+    <Route path=":applicationRoundId/applications" element={<Applications />} />
+    <Route
+      path=":applicationRoundId/resolution"
+      element={<ResolutionReport />}
+    />
+    <Route path=":applicationRoundId/criteria" element={<Criteria />} />
+    <Route
+      path=":applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
+      element={<ReservationSummariesByReservationUnit />}
+    />
+    <Route
+      path=":applicationRoundId/reservationUnit/:reservationUnitId/reservations"
+      element={<ReservationsByReservationUnit />}
+    />
+    <Route
+      path=":applicationRoundId/reservationUnit/:reservationUnitId"
+      element={<RecommendationsByReservationUnit />}
+    />
+    <Route
+      path=":applicationRoundId/applicant/:applicantId"
+      element={<RecommendationsByApplicant />}
+    />
+    <Route
+      path=":applicationRoundId/organisation/:organisationId"
+      element={<RecommendationsByApplicant />}
+    />
+    <Route
+      path=":applicationRoundId/recommendation/:applicationEventScheduleId"
+      element={<Recommendation />}
+    />
+    <Route
+      path=":applicationRoundId/allocation"
+      element={<ApplicationRoundAllocation />}
+    />
+    <Route path=":applicationRoundId" element={<ApplicationRound />} />
+  </Routes>
+);
+
+const PremisesRouter = () => (
+  <Routes>
+    <Route
+      path="spaces"
+      element={
+        <AuthorizationChecker permission={Permission.CAN_MANAGE_SPACES}>
+          <SpacesList />
+        </AuthorizationChecker>
+      }
+    />
+    <Route
+      path={`${prefixes.reservationUnits}`}
+      element={
+        <AuthorizationChecker permission={Permission.CAN_MANAGE_UNITS}>
+          <ReservationUnits />
+        </AuthorizationChecker>
+      }
+    />
+    <Route
+      path="resources"
+      element={
+        <AuthorizationChecker permission={Permission.CAN_MANAGE_RESOURCES}>
+          <ResourcesList />
+        </AuthorizationChecker>
+      }
+    />
+    <Route
+      path="units"
+      element={
+        <AuthorizationChecker permission={Permission.CAN_MANAGE_UNITS}>
+          <Units />
+        </AuthorizationChecker>
+      }
+    />
+  </Routes>
+);
 
 const App = () => {
   return (
@@ -44,226 +151,65 @@ const App = () => {
           <Route
             path="/"
             element={
-              <PrivateRoute>
+              <AuthorizationChecker>
                 <ApplicationRounds />
-              </PrivateRoute>
+              </AuthorizationChecker>
             }
           />
 
           <Route
-            path={`${prefixes.applications}/:applicationId`}
+            path={`${prefixes.applications}/*`}
             element={
-              <PrivateRoute>
-                <Application />
-              </PrivateRoute>
+              <AuthorizationChecker
+                permission={Permission.CAN_VALIDATE_APPLICATIONS}
+              >
+                <ApplicationRouter />
+              </AuthorizationChecker>
             }
           />
+
           <Route
-            path={`${prefixes.applications}/:applicationId/details`}
+            path={`${prefixes.recurringReservations}/application-rounds/*`}
             element={
-              <PrivateRoute>
-                <ApplicationDetails />
-              </PrivateRoute>
+              <AuthorizationChecker
+                permission={Permission.CAN_VALIDATE_APPLICATIONS}
+              >
+                <ApplicationRoundsRouter />
+              </AuthorizationChecker>
             }
           />
+
           <Route
-            path={`${prefixes.applications}/:applicationId/recurringReservation/:recurringReservationId`}
+            path="/premises-and-settings/*"
             element={
-              <PrivateRoute>
-                <ReservationByApplicationEvent />
-              </PrivateRoute>
+              <AuthorizationChecker>
+                <PremisesRouter />
+              </AuthorizationChecker>
             }
           />
+
           <Route
-            path={`${prefixes.recurringReservations}/application-rounds`}
+            path="/unit/*"
             element={
-              <PrivateRoute>
-                <AllApplicationRounds />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/applications`}
-            element={
-              <PrivateRoute>
-                <Applications />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/resolution`}
-            element={
-              <PrivateRoute>
-                <ResolutionReport />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/criteria`}
-            element={
-              <PrivateRoute>
-                <Criteria />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary`}
-            element={
-              <PrivateRoute>
-                <ReservationSummariesByReservationUnit />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/reservationUnit/:reservationUnitId/reservations`}
-            element={
-              <PrivateRoute>
-                <ReservationsByReservationUnit />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/reservationUnit/:reservationUnitId`}
-            element={
-              <PrivateRoute>
-                <RecommendationsByReservationUnit />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/applicant/:applicantId`}
-            element={
-              <PrivateRoute>
-                <RecommendationsByApplicant />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/organisation/:organisationId`}
-            element={
-              <PrivateRoute>
-                <RecommendationsByApplicant />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/recommendation/:applicationEventScheduleId`}
-            element={
-              <PrivateRoute>
-                <Recommendation />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/allocation`}
-            element={
-              <PrivateRoute>
-                <ApplicationRoundAllocation />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId`}
-            element={
-              <PrivateRoute>
-                <ApplicationRound />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/premises-and-settings/spaces"
-            element={
-              <PrivateRoute>
-                <SpacesList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={`/premises-and-settings${prefixes.reservationUnits}`}
-            element={
-              <PrivateRoute>
-                <ReservationUnits />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/premises-and-settings/resources"
-            element={
-              <PrivateRoute>
-                <ResourcesList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/premises-and-settings/units"
-            element={
-              <PrivateRoute>
-                <Units />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/unit/:unitPk/map"
-            element={
-              <PrivateRoute>
-                <UnitMap />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/unit/:unitPk/spacesResources"
-            element={
-              <PrivateRoute>
-                <SpacesResources />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/unit/:unitPk/space/edit/:spacePk"
-            element={
-              <PrivateRoute>
-                <SpaceEditorView />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/unit/:unitPk/resource/edit/:resourcePk"
-            element={
-              <PrivateRoute>
-                <ResourceEditorView />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/unit/:unitPk/reservationUnit/edit/:reservationUnitPk?"
-            element={
-              <PrivateRoute>
-                <ReservationUnitEditor />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/unit/:unitPk"
-            element={
-              <PrivateRoute>
-                <Unit />
-              </PrivateRoute>
+              <AuthorizationChecker>
+                <UnitsRouter />
+              </AuthorizationChecker>
             }
           />
           <Route
             path="/reservations/*"
             element={
-              <PrivateRoute>
+              <AuthorizationChecker>
                 <ReservationsRouter />
-              </PrivateRoute>
+              </AuthorizationChecker>
             }
           />
           <Route
             path="/my-units/*"
             element={
-              <PrivateRoute>
+              <AuthorizationChecker>
                 <MyUnitsRouter />
-              </PrivateRoute>
+              </AuthorizationChecker>
             }
           />
         </Routes>

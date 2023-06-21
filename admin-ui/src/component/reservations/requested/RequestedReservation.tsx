@@ -19,7 +19,6 @@ import {
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
 import { Permission } from "app/context/authStateReducer";
-import { ReservationTypeSchema } from "app/schemas";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import withMainMenu from "../../withMainMenu";
@@ -152,10 +151,8 @@ const ButtonsWithPermChecks = ({
 };
 
 const translateType = (res: ReservationType, t: TFunction) => {
-  const reservationType = ReservationTypeSchema.optional().parse(res.type);
-
   const [part1, part2] = getTranslationKeyForReserveeType(
-    reservationType,
+    res.type ?? undefined,
     res.reserveeType ?? undefined,
     res.reserveeIsUnregisteredAssociation ?? false
   );

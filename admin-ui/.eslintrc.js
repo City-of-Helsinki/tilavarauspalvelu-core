@@ -24,6 +24,9 @@ module.exports = {
     node: true,
   },
   rules: {
+    // prefer explicit cases over defaults
+    "default-case": 0,
+    "@typescript-eslint/switch-exhaustiveness-check": "error",
     "import/no-extraneous-dependencies": [
       "error",
       {

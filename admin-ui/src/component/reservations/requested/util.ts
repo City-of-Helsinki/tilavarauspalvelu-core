@@ -22,6 +22,7 @@ import {
   ReservationUnitPricingType,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
+  ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import { fromApiDate } from "common/src/common/util";
 import {
@@ -184,14 +185,14 @@ const reserveeTypeToTranslationKey = (
 };
 
 export const getTranslationKeyForReserveeType = (
-  reservationType?: "NORMAL" | "BLOCKED" | "STAFF" | "BEHALF",
+  reservationType?: ReservationsReservationTypeChoices,
   reserveeType?: ReservationsReservationReserveeTypeChoices,
   isUnregisteredAssociation?: boolean
 ): string[] => {
   if (!reservationType) {
-    return ["error.missingReservationType"];
+    return ["errors.missingReservationType"];
   }
-  if (reservationType === "BLOCKED") {
+  if (reservationType === ReservationsReservationTypeChoices.Blocked) {
     return ["ReservationType.BLOCKED"];
   }
 
