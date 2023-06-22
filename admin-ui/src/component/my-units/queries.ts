@@ -3,7 +3,7 @@ import { RESERVATIONUNIT_RESERVATIONS_FRAGMENT } from "../reservations/fragments
 
 export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   query units($pk: [ID]) {
-    units(pk: $pk) {
+    units(pk: $pk, onlyWithPermission: true) {
       edges {
         node {
           nameFi

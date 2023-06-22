@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const SPACES_QUERY = gql`
   query getSpaces {
-    spaces {
+    spaces(onlyWithPermission: true) {
       edges {
         node {
           pk
@@ -27,7 +27,7 @@ export const SPACES_QUERY = gql`
 
 export const RESOURCES_QUERY = gql`
   query getResources {
-    resources {
+    resources(onlyWithPermission: true) {
       edges {
         node {
           pk
@@ -52,7 +52,7 @@ export const RESOURCES_QUERY = gql`
 
 export const RESERVATION_UNITS_QUERY = gql`
   query reservationUnits {
-    reservationUnits {
+    reservationUnits(onlyWithPermission: true) {
       edges {
         node {
           pk

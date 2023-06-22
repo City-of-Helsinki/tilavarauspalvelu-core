@@ -36,7 +36,7 @@ export const OPTIONS_QUERY = gql`
 
 export const UNIT_QUERY = gql`
   query units($pk: [ID]) {
-    units(pk: $pk) {
+    units(pk: $pk, onlyWithPermission: true) {
       edges {
         node {
           location {
