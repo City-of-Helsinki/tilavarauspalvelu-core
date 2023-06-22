@@ -1,9 +1,13 @@
 {
   "reserveeTypePrefix": "Varaan",
   "type": "Varauksen tyyppi",
+  "typeSelection": {
+    "tooltip": "Sisäisissä varauksissa vastuu tilaisuudesta on aina kaupungilla. Ulkoisissa varauksissa vastuu tilaisuudesta on asiakkaalla. Vastuuhenkilö on nimettävä varauksella."
+  },
 
   "buffers": {
     "label": "Varauksen tauko",
+    "tooltip": "Asiakaspuolella varauksiin lisätään aina automaattinen tauko. Voit lisätä varauksesi alkuun tai loppuun tauon tässä.",
     "bufferTimeBefore": "Ennen vuoroa ({{minutes}} min)",
     "bufferTimeAfter": "Vuoron jälkeen ({{minutes}} min)"
   },

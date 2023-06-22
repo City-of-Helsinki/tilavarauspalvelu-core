@@ -71,6 +71,7 @@ const TypeSelect = ({
               ? t(`reservationForm:errors.${errors.type?.message}`)
               : ""
           }
+          tooltipText={t("reservationApplication:typeSelection.tooltip")}
         >
           {ReservationTypes.filter((x) => x !== "NORMAL").map((v) => (
             <RadioButton

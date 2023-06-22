@@ -1,6 +1,6 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { Checkbox } from "hds-react";
+import { Checkbox, Tooltip } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 
@@ -42,6 +42,12 @@ const Wrapper = styled.div`
   gap: var(--spacing-s);
 `;
 
+const LabelWithTooltip = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-xs);
+`;
+
 const BufferToggles = ({
   before,
   after,
@@ -52,7 +58,10 @@ const BufferToggles = ({
   const { t } = useTranslation();
   return (
     <Wrapper>
-      <div>{t("reservationApplication:buffers.label")}</div>
+      <LabelWithTooltip>
+        {t("reservationApplication:buffers.label")}
+        <Tooltip>{t("reservationApplication:buffers.tooltip")}</Tooltip>
+      </LabelWithTooltip>
       {before && <BufferController name="bufferTimeBefore" seconds={before} />}
       {after && <BufferController name="bufferTimeAfter" seconds={after} />}
     </Wrapper>
