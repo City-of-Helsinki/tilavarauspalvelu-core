@@ -6,7 +6,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { addHours, isToday } from "date-fns";
 import { Button } from "hds-react";
-import { ButtonContainer } from "app/styles/layout";
 import DenyDialog from "./DenyDialog";
 import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
@@ -66,12 +65,14 @@ const ApprovalButtons = ({
   reservation,
   handleClose,
   handleAccept,
+  disableNonEssentialButtons,
 }: {
   state: ReservationsReservationStateChoices;
   isFree: boolean;
   reservation: ReservationType;
   handleClose: () => void;
   handleAccept: () => void;
+  disableNonEssentialButtons?: boolean;
 }) => {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
@@ -124,7 +125,7 @@ const ApprovalButtons = ({
     !reservation.recurringReservation && isPossibleToEdit(state, endTime);
 
   return (
-    <ButtonContainer>
+    <>
       {endTime > new Date() && isPossibleToApprove(state, endTime) && (
         <Button {...btnCommon} onClick={handleApproveClick}>
           {t("RequestedReservation.approve")}
@@ -140,10 +141,10 @@ const ApprovalButtons = ({
           {t("RequestedReservation.returnToHandling")}
         </Button>
       )}
-      {isAllowedToModify && (
+      {!disableNonEssentialButtons && isAllowedToModify && (
         <ButtonLikeLink to="edit">{t("ApprovalButtons.edit")}</ButtonLikeLink>
       )}
-    </ButtonContainer>
+    </>
   );
 };
 

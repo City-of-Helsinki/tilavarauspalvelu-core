@@ -54,8 +54,32 @@ const DialogContent = ({
   onClose: () => void;
   onAccept: () => void;
 }) => {
-  const [approveReservationMutation] =
-    useMutation<Mutation>(APPROVE_RESERVATION);
+  const { notifyError, notifySuccess } = useNotification();
+  const { t, i18n } = useTranslation();
+
+  const [approveReservationMutation] = useMutation<Mutation>(
+    APPROVE_RESERVATION,
+    {
+      onCompleted: () => {
+        notifySuccess(t("RequestedReservation.ApproveDialog.approved"));
+        onAccept();
+      },
+      onError: (err) => {
+        const { message } = err;
+        const hasTranslatedErrorMsg = i18n.exists(
+          `errors.descriptive.${message}`
+        );
+        const errorTranslated = hasTranslatedErrorMsg
+          ? `errors.descriptive.${message}`
+          : `errors.descriptive.genericError`;
+        notifyError(
+          t("RequestedReservation.ApproveDialog.errorSaving", {
+            error: t(errorTranslated),
+          })
+        );
+      },
+    }
+  );
 
   const approveReservation = (input: ReservationApproveMutationInput) =>
     approveReservationMutation({ variables: { input } });
@@ -64,36 +88,16 @@ const DialogContent = ({
   const [handlingDetails, setHandlingDetails] = useState<string>(
     reservation.workingMemo || ""
   );
-  const { notifyError, notifySuccess } = useNotification();
-  const { t } = useTranslation();
-
   const hasPrice = Boolean(reservation.price !== undefined);
   const priceIsValid = !hasPrice || !Number.isNaN(parseNumber(price));
 
-  const handleApprove = async () => {
-    try {
-      const res = await approveReservation({
-        pk: reservation.pk,
-        price: parseNumber(price),
-        priceNet: calcPriceNet(price, reservation.taxPercentageValue),
-        handlingDetails,
-      });
-
-      if (res.data?.approveReservation?.errors) {
-        notifyError(
-          t("RequestedReservation.ApproveDialog.errorSaving", {
-            error: res.data?.approveReservation?.errors
-              .map((e) => `${e?.field}: ${e?.messages}`)
-              .join(", "),
-          })
-        );
-      } else {
-        notifySuccess(t("RequestedReservation.ApproveDialog.approved"));
-        onAccept();
-      }
-    } catch (e) {
-      notifyError(t("RequestedReservation.ApproveDialog.errorSaving"));
-    }
+  const handleApprove = () => {
+    approveReservation({
+      pk: reservation.pk,
+      price: parseNumber(price),
+      priceNet: calcPriceNet(price, reservation.taxPercentageValue),
+      handlingDetails,
+    });
   };
 
   return (

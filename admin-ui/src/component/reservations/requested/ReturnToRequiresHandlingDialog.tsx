@@ -20,16 +20,42 @@ const DialogContent = ({
   onClose: () => void;
   onAccept: () => void;
 }) => {
+  const { notifyError, notifySuccess } = useNotification();
+  const { t, i18n } = useTranslation();
+
   const [backToRequireHandlingMutation] = useMutation<Mutation>(
-    REQUIRE_HANDLING_RESERVATION
+    REQUIRE_HANDLING_RESERVATION,
+    {
+      onCompleted: () => {
+        notifySuccess(
+          t("RequestedReservation.ReturnToRequiresHandlingDialog.returned")
+        );
+        onAccept();
+      },
+      onError: (err) => {
+        const { message } = err;
+        const hasTranslatedErrorMsg = i18n.exists(
+          `errors.descriptive.${message}`
+        );
+        const errorTranslated = hasTranslatedErrorMsg
+          ? `errors.descriptive.${message}`
+          : `errors.descriptive.genericError`;
+        notifyError(
+          t("RequestedReservation.ReturnToRequiresHandlingDialog.errorSaving", {
+            error: t(errorTranslated),
+          })
+        );
+      },
+    }
   );
 
   const backToRequireHandling = (
     input: ReservationRequiresHandlingMutationInput
   ) => backToRequireHandlingMutation({ variables: { input } });
 
-  const { notifyError, notifySuccess } = useNotification();
-  const { t } = useTranslation();
+  const handleClick = () => {
+    backToRequireHandling({ pk: reservation.pk });
+  };
 
   return (
     <>
@@ -40,33 +66,7 @@ const DialogContent = ({
         <Button variant="secondary" onClick={onClose} theme="black">
           {t("common.prev")}
         </Button>
-
-        <Button
-          onClick={async () => {
-            try {
-              const res = await backToRequireHandling({
-                pk: reservation.pk,
-              });
-
-              if (!res.errors) {
-                notifySuccess(
-                  t(
-                    "RequestedReservation.ReturnToRequiresHandlingDialog.returned"
-                  )
-                );
-                onAccept();
-                return;
-              }
-            } catch (e) {
-              // noop
-            }
-            notifyError(
-              t(
-                "RequestedReservation.ReturnToRequiresHandlingDialog.errorSaving"
-              )
-            );
-          }}
-        >
+        <Button onClick={handleClick}>
           {t("RequestedReservation.ReturnToRequiresHandlingDialog.accept")}
         </Button>
       </Dialog.ActionButtons>

@@ -6,7 +6,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "app/styles/util";
-import { ButtonContainer } from "app/styles/layout";
 import DenyDialog from "./DenyDialog";
 import { useModal } from "../../../context/ModalContext";
 import { useRecurringReservations } from "./hooks";
@@ -17,10 +16,12 @@ const ApprovalButtonsRecurring = ({
   recurringReservation,
   handleClose,
   handleAccept,
+  disableNonEssentialButtons,
 }: {
   recurringReservation: RecurringReservationType;
   handleClose: () => void;
   handleAccept: () => void;
+  disableNonEssentialButtons?: boolean;
 }) => {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
@@ -82,12 +83,14 @@ const ApprovalButtonsRecurring = ({
   }
 
   return (
-    <ButtonContainer>
+    <>
       <Button {...btnCommon} onClick={handleDenyClick}>
         {t("ApprovalButtons.recurring.rejectAllButton")}
       </Button>
-      <ButtonLikeLink to="edit">{t("ApprovalButtons.edit")}</ButtonLikeLink>
-    </ButtonContainer>
+      {!disableNonEssentialButtons && (
+        <ButtonLikeLink to="edit">{t("ApprovalButtons.edit")}</ButtonLikeLink>
+      )}
+    </>
   );
 };
 

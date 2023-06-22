@@ -34,7 +34,11 @@ import {
 import { useModal } from "../../../context/ModalContext";
 import { UPDATE_WORKING_MEMO } from "./queries";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
-import { Container, HorisontalFlex } from "../../../styles/layout";
+import {
+  ButtonContainer,
+  Container,
+  HorisontalFlex,
+} from "../../../styles/layout";
 import { publicUrl } from "../../../common/const";
 import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
 import StickyHeader from "../../StickyHeader";
@@ -109,11 +113,13 @@ const ButtonsWithPermChecks = ({
   reservation,
   isFree,
   onReservationUpdated,
+  disableNonEssentialButtons,
 }: {
   reservation: ReservationType;
   isFree: boolean;
   // Hack to deal with reservation query not being cached so we need to refetch
   onReservationUpdated: () => void;
+  disableNonEssentialButtons?: boolean;
 }) => {
   const { setModalContent } = useModal();
 
@@ -134,6 +140,7 @@ const ButtonsWithPermChecks = ({
             onReservationUpdated();
             closeDialog();
           }}
+          disableNonEssentialButtons={disableNonEssentialButtons}
         />
       ) : (
         <ApprovalButtons
@@ -145,6 +152,7 @@ const ButtonsWithPermChecks = ({
             onReservationUpdated();
             closeDialog();
           }}
+          disableNonEssentialButtons={disableNonEssentialButtons}
         />
       )}
     </VisibleIfPermission>
@@ -447,6 +455,7 @@ const RequestedReservation = ({
               reservation={reservation}
               isFree={!isNonFree}
               onReservationUpdated={refetch}
+              disableNonEssentialButtons
             />
           }
         />
@@ -457,11 +466,13 @@ const RequestedReservation = ({
           reservation={reservation}
           tagline={reservationTagline}
         />
-        <ButtonsWithPermChecks
-          reservation={reservation}
-          onReservationUpdated={refetch}
-          isFree={!isNonFree}
-        />
+        <ButtonContainer>
+          <ButtonsWithPermChecks
+            reservation={reservation}
+            onReservationUpdated={refetch}
+            isFree={!isNonFree}
+          />
+        </ButtonContainer>
         <ReservationSummary reservation={reservation} isFree={!isNonFree} />
         <div>
           <VisibleIfPermission

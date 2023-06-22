@@ -223,6 +223,10 @@ const translations: ITranslations = {
       ],
       unkown: ["Tuntematon virhe"],
       genericError: [""],
+      "Only reservations with states DENIED and CONFIRMED can be reverted to requires handling.":
+        [
+          "Vain hylätyt ja vahvistetut varaukset voidaan palauttaa käsiteltäväksi.",
+        ],
     },
   },
   breadcrumb: {
@@ -1928,7 +1932,7 @@ const translations: ITranslations = {
       title: ["Palauta käsiteltäväksi"],
       accept: ["Palauta käsiteltäväksi"],
       returned: ["Varaus palautettu käsiteltäväksi"],
-      errorSaving: ["Palauttaminen ei onnistunut"],
+      errorSaving: ["Palauttaminen ei onnistunut {{error}}"],
     },
     noName: ["-"],
   },
