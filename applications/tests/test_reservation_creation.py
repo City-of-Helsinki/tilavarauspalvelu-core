@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
 from applications.tests.factories import (
+    AddressFactory,
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
     ApplicationEventScheduleResultFactory,
@@ -23,6 +24,7 @@ from applications.utils.reservation_creation import (
 from opening_hours.hours import TimeElement
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES, Reservation
+from reservations.tests.factories import AbilityGroupFactory
 from spaces.tests.factories import SpaceFactory
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
@@ -105,17 +107,27 @@ def get_opening_hour_data_for_multiple_days(*args, **kwargs):
 class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
     @classmethod
     def setUpTestData(cls) -> None:
+        user = get_user_model().objects.create(
+            username="testu",
+            first_name="first",
+            last_name="last",
+            email="first.last@localhost",
+        )
         date = datetime.date.today()
         cls.round = ApplicationRoundFactory(
             reservation_period_begin=date,
             reservation_period_end=date + datetime.timedelta(weeks=4),
         )
-        cls.application = ApplicationFactory(application_round=cls.round)
+        cls.application = ApplicationFactory(
+            application_round=cls.round, user=user, billing_address=AddressFactory()
+        )
         cls.application_event = ApplicationEventFactory(
             application=cls.application,
             events_per_week=1,
             begin=date,
             end=date + datetime.timedelta(weeks=4),
+            ability_group=AbilityGroupFactory(),
+            num_persons=20,
         )
         cls.res_unit = ReservationUnitFactory(spaces=[SpaceFactory()])
         EventReservationUnitFactory(
@@ -251,9 +263,64 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
     def test_creating_reservations(self, mock):
         create_reservations_from_allocation_results(self.application_event)
         assert_that(Reservation.objects.count()).is_equal_to(4)
-        assert_that(
-            list(Reservation.objects.values_list("state", flat=True))
-        ).is_equal_to([STATE_CHOICES.CONFIRMED for _ in range(4)])
+
+        for res in Reservation.objects.all().order_by("name"):
+            assert_that(res.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+            assert_that(res.priority).is_equal_to(self.schedule.priority)
+            assert_that(res.user).is_equal_to(self.application.user)
+            assert_that(res.begin.weekday()).is_equal_to(self.result.allocated_day)
+            assert_that(res.end.weekday()).is_equal_to(self.result.allocated_day)
+            assert_that(res.num_persons).is_equal_to(self.application_event.num_persons)
+            assert_that(res.purpose).is_equal_to(self.application_event.purpose)
+            assert_that(res.age_group).is_equal_to(self.application_event.age_group)
+            assert_that(res.name).is_equal_to(self.application_event.name)
+            assert_that(res.home_city).is_equal_to(self.application.home_city)
+
+            organisation = self.application.organisation
+            assert_that(res.reservee_organisation_name).is_equal_to(organisation.name)
+            assert_that(res.reservee_id).is_equal_to(organisation.identifier)
+            assert_that(res.reservee_address_zip).is_equal_to(
+                organisation.address.post_code
+            )
+            assert_that(res.reservee_address_street).is_equal_to(
+                organisation.address.street_address
+            )
+            assert_that(res.reservee_address_city).is_equal_to(
+                organisation.address.city
+            )
+
+            assert_that(res.billing_address_street).is_equal_to(
+                self.application.billing_address.street_address
+            )
+            assert_that(res.billing_address_city).is_equal_to(
+                self.application.billing_address.city
+            )
+            assert_that(res.billing_address_zip).is_equal_to(
+                self.application.billing_address.post_code
+            )
+
+            contact_person = self.application.contact_person
+            assert_that(res.reservee_first_name).is_equal_to(contact_person.first_name)
+            assert_that(res.reservee_last_name).is_equal_to(contact_person.last_name)
+            assert_that(res.reservee_email).is_equal_to(contact_person.email)
+            assert_that(res.reservee_phone).is_equal_to(contact_person.phone_number)
+
+            assert_that(res.recurring_reservation).is_not_none()
+            recurring_res = res.recurring_reservation
+            assert_that(recurring_res.user).is_equal_to(self.application.user)
+            assert_that(recurring_res.application).is_equal_to(self.application)
+            assert_that(recurring_res.application_event).is_equal_to(
+                self.application_event
+            )
+            assert_that(recurring_res.age_group).is_equal_to(
+                self.application_event.age_group
+            )
+            assert_that(recurring_res.ability_group).is_equal_to(
+                self.application_event.ability_group
+            )
+            assert_that(recurring_res.reservation_unit).is_equal_to(
+                self.result.allocated_reservation_unit
+            )
 
     def test_creating_reservations_without_result(self, mock):
         self.result.delete()
