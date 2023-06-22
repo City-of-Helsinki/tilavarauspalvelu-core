@@ -41,6 +41,8 @@ export const RESERVATION_UNIT = gql`
       reservationBegins
       reservationEnds
       canApplyFreeOfCharge
+      state
+      reservationState
       serviceSpecificTerms {
         textFi
         textEn

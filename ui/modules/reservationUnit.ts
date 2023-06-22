@@ -16,6 +16,7 @@ import {
   ReservationUnitPricingType,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
+  ReservationUnitState,
   ReservationUnitType,
   UnitType,
 } from "common/types/gql-types";
@@ -24,19 +25,15 @@ import { capitalize, getTranslation, localizedValue } from "./util";
 export const isReservationUnitPublished = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType
 ): boolean => {
-  const now = new Date();
-  let beginOK = true;
-  let endOK = true;
+  const { state } = reservationUnit;
 
-  if (reservationUnit?.publishBegins) {
-    beginOK = new Date(reservationUnit.publishBegins) <= now;
+  switch (state) {
+    case ReservationUnitState.Published:
+    case ReservationUnitState.ScheduledHiding:
+      return true;
+    default:
+      return false;
   }
-
-  if (reservationUnit?.publishEnds) {
-    endOK = new Date(reservationUnit.publishEnds) >= now;
-  }
-
-  return beginOK && endOK;
 };
 
 const equipmentCategoryOrder = [

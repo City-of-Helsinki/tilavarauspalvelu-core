@@ -9,7 +9,6 @@ import {
 import { error404Body, error404Title } from "../model/error";
 import {
   errorNotificationBody,
-  errorNotificationCloseButton,
   errorNotificationTitle,
 } from "../model/notification";
 import {
@@ -31,9 +30,6 @@ import {
   reservationQuotaNotification,
   reserveeTypeSelector,
   datePickerModal,
-  notificationContainer,
-  notificationCloseButton,
-  reservationInfoPrice,
 } from "../model/reservation-creation";
 import { reservationInfoCard } from "../model/reservation-detail";
 import {

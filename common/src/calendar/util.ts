@@ -19,6 +19,7 @@ import {
   type ReservationUnitByPkType,
   type ReservationUnitsReservationUnitReservationStartIntervalChoices,
   type ReservationUnitType,
+  ReservationState,
 } from "../../types/gql-types";
 import {
   type CalendarEventBuffer,
@@ -419,23 +420,28 @@ export const getEventBuffers = (
 };
 
 export const isReservationUnitReservable = (
-  reservationUnit: ReservationUnitByPkType,
-  now = new Date()
+  reservationUnit: ReservationUnitByPkType
 ): boolean => {
-  const isAfterReservationStart =
-    now >= new Date(reservationUnit.reservationBegins as string);
-  const isBeforeReservationEnd =
-    now <= new Date(reservationUnit.reservationEnds as string);
+  const { reservationState, minReservationDuration, maxReservationDuration } =
+    reservationUnit;
 
-  return (
-    !!reservationUnit.metadataSet?.supportedFields?.length &&
-    !!reservationUnit.openingHours?.openingTimes?.length &&
-    reservationUnit.openingHours?.openingTimes?.length > 0 &&
-    !!reservationUnit.minReservationDuration &&
-    !!reservationUnit.maxReservationDuration &&
-    (isAfterReservationStart || !reservationUnit.reservationBegins) &&
-    (isBeforeReservationEnd || !reservationUnit.reservationEnds)
-  );
+  switch (reservationState) {
+    case ReservationState.Reservable:
+    case ReservationState.ScheduledClosing: {
+      const hasSupportedFields =
+        (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
+      const hasOpeningTimes =
+        (reservationUnit.openingHours?.openingTimes?.length ?? 0) > 0;
+      return (
+        hasSupportedFields &&
+        hasOpeningTimes &&
+        !!minReservationDuration &&
+        !!maxReservationDuration
+      );
+    }
+    default:
+      return false;
+  }
 };
 
 export const isReservationStartInFuture = (

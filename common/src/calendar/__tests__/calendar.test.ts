@@ -27,6 +27,7 @@ import {
   ReservationUnitType,
   ReservationUnitsReservationUnitAuthenticationChoices,
   ReservationUnitsReservationUnitReservationKindChoices,
+  ReservationState,
 } from "../../../types/gql-types";
 import { ApplicationRound } from "../../../types/common";
 
@@ -847,41 +848,12 @@ describe("isReservationUnitReservable", () => {
         ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-        reservationBegins: addMinutes(new Date(), -10).toISOString(),
         metadataSet: {
           id: "1234",
           name: "Test",
           supportedFields: ["name"],
         },
-      })
-    ).toBe(true);
-
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        reservationEnds: addMinutes(new Date(), 10).toISOString(),
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-      })
-    ).toBe(true);
-
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        reservationBegins: addMinutes(new Date(), -10).toISOString(),
-        reservationEnds: addMinutes(new Date(), 10).toISOString(),
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
+        reservationState: ReservationState.Reservable,
       })
     ).toBe(true);
 
@@ -895,6 +867,7 @@ describe("isReservationUnitReservable", () => {
           name: "Test",
           supportedFields: ["name"],
         },
+        reservationState: ReservationState.ScheduledClosing,
       })
     ).toBe(true);
   });
@@ -911,46 +884,73 @@ describe("isReservationUnitReservable", () => {
           name: "Test",
           supportedFields: ["name"],
         },
+        reservationState: ReservationState.ReservationClosed,
       })
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
         ...reservationUnit,
-        reservationBegins: addMinutes(new Date(), 10).toISOString(),
-        openingHours: undefined,
         metadataSet: {
           id: "1234",
           name: "Test",
           supportedFields: ["name"],
         },
+        reservationState: ReservationState.ReservationClosed,
       })
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
         ...reservationUnit,
-        reservationEnds: addMinutes(new Date(), -10).toISOString(),
-        openingHours: undefined,
+        minReservationDuration: 3600,
         metadataSet: {
           id: "1234",
           name: "Test",
           supportedFields: ["name"],
         },
+        reservationState: ReservationState.Reservable,
       })
     ).toBe(false);
 
     expect(
       isReservationUnitReservable({
         ...reservationUnit,
-        reservationBegins: addMinutes(new Date(), -10).toISOString(),
-        reservationEnds: addMinutes(new Date(), -1).toISOString(),
-        openingHours: undefined,
+        maxReservationDuration: 3600,
         metadataSet: {
           id: "1234",
           name: "Test",
           supportedFields: ["name"],
         },
+        reservationState: ReservationState.Reservable,
+      })
+    ).toBe(false);
+
+    expect(
+      isReservationUnitReservable({
+        ...reservationUnit,
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
+        metadataSet: {
+          id: "1234",
+          name: "Test",
+          supportedFields: ["name"],
+        },
+        reservationState: ReservationState.ScheduledReservation,
+      })
+    ).toBe(false);
+
+    expect(
+      isReservationUnitReservable({
+        ...reservationUnit,
+        minReservationDuration: 3600,
+        maxReservationDuration: 3600,
+        metadataSet: {
+          id: "1234",
+          name: "Test",
+          supportedFields: ["name"],
+        },
+        reservationState: ReservationState.ScheduledPeriod,
       })
     ).toBe(false);
   });

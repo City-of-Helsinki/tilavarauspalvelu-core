@@ -14,6 +14,7 @@ import {
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
+  ReservationUnitState,
   ReservationUnitType,
   UnitType,
 } from "common/types/gql-types";
@@ -274,84 +275,57 @@ describe("getPrice", () => {
   });
 });
 
-describe("isReservationPublished", () => {
-  expect(isReservationUnitPublished({} as ReservationUnitByPkType)).toBe(true);
+describe("isReservationUnitPublished", () => {
+  test("without state", () => {
+    expect(isReservationUnitPublished({} as ReservationUnitByPkType)).toBe(
+      false
+    );
+  });
 
-  test("with just publishBegins", () => {
+  test("with valid states", () => {
     expect(
       isReservationUnitPublished({
-        publishBegins: addMinutes(new Date(), -1),
+        state: ReservationUnitState.Published,
       } as unknown as ReservationUnitByPkType)
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
-        publishBegins: addMinutes(new Date(), 1),
-      } as unknown as ReservationUnitByPkType)
-    ).toBe(false);
-
-    expect(
-      isReservationUnitPublished({
-        publishBegins: new Date(),
+        state: ReservationUnitState.ScheduledHiding,
       } as unknown as ReservationUnitByPkType)
     ).toBe(true);
   });
 
-  test("with just publishEnds", () => {
+  test("with invalid states", () => {
     expect(
       isReservationUnitPublished({
-        publishEnds: addMinutes(new Date(), -1),
+        state: ReservationUnitState.Archived,
       } as unknown as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
-        publishEnds: addMinutes(new Date(), 1),
-      } as unknown as ReservationUnitByPkType)
-    ).toBe(true);
-
-    expect(
-      isReservationUnitPublished({
-        publishEnds: new Date(),
-      } as unknown as ReservationUnitByPkType)
-    ).toBe(true);
-  });
-
-  test("with both dates", () => {
-    expect(
-      isReservationUnitPublished({
-        publishBegins: new Date(),
-        publishEnds: new Date(),
-      } as unknown as ReservationUnitByPkType)
-    ).toBe(true);
-
-    expect(
-      isReservationUnitPublished({
-        publishBegins: addMinutes(new Date(), -1),
-        publishEnds: new Date(),
-      } as unknown as ReservationUnitByPkType)
-    ).toBe(true);
-
-    expect(
-      isReservationUnitPublished({
-        publishBegins: addMinutes(new Date(), 1),
-        publishEnds: new Date(),
+        state: ReservationUnitState.Draft,
       } as unknown as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
-        publishBegins: new Date(),
-        publishEnds: addMinutes(new Date(), -1),
+        state: ReservationUnitState.Hidden,
       } as unknown as ReservationUnitByPkType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
-        publishBegins: new Date(),
-        publishEnds: addMinutes(new Date(), 1),
+        state: ReservationUnitState.ScheduledPeriod,
       } as unknown as ReservationUnitByPkType)
-    ).toBe(true);
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        state: ReservationUnitState.ScheduledPublishing,
+      } as unknown as ReservationUnitByPkType)
+    ).toBe(false);
   });
 });
 
