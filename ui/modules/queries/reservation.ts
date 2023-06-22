@@ -143,6 +143,7 @@ export const LIST_RESERVATIONS = gql`
           bufferTimeBefore
           bufferTimeAfter
           orderUuid
+          isBlocked
           reservationUnits {
             pk
             nameFi

@@ -417,6 +417,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           {
             start: startDate,
             end: endDate,
+            isBlocked: false,
             bufferTimeBefore,
             bufferTimeAfter,
           },

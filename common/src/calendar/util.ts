@@ -470,10 +470,13 @@ export const doesBufferCollide = (
   newReservation: {
     start: Date;
     end: Date;
+    isBlocked?: boolean;
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
   }
 ): boolean => {
+  if (newReservation.isBlocked) return false;
+
   const newReservationStartBuffer =
     reservation.bufferTimeAfter &&
     reservation.bufferTimeAfter > (newReservation.bufferTimeBefore || 0)
@@ -497,21 +500,21 @@ export const doesBufferCollide = (
     end: new Date(reservation.end),
   };
 
-  const bufferedNewReservationInterval = {
-    start: bufferedNewReservation.start,
-    end: bufferedNewReservation.end,
-  };
+  const newReservationInterval = reservation.isBlocked
+    ? { start: newReservation.start, end: newReservation.end }
+    : {
+        start: bufferedNewReservation.start,
+        end: bufferedNewReservation.end,
+      };
 
-  return areIntervalsOverlapping(
-    reservationInterval,
-    bufferedNewReservationInterval
-  );
+  return areIntervalsOverlapping(reservationInterval, newReservationInterval);
 };
 
 export const doBuffersCollide = (
   newReservation: {
     start: Date;
     end: Date;
+    isBlocked?: boolean;
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
   },

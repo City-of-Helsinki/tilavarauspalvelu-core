@@ -119,6 +119,7 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     createdAt
     state
     type
+    isBlocked
     workingMemo
     reserveeName
     orderStatus
@@ -156,6 +157,7 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
       bufferTimeAfter
       workingMemo
       reserveeName
+      isBlocked
       reservationUnits {
         pk
         nameFi

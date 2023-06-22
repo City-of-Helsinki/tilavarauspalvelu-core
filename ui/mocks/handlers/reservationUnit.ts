@@ -1068,6 +1068,54 @@ const openingHoursQuery = graphql.query<
             bufferTimeBefore: null,
             bufferTimeAfter: 1800,
           },
+          {
+            id: "fajweoifmaw83rj3w90=",
+            pk: 7,
+            state: "CREATED",
+            isBlocked: true,
+            priority: "A_200",
+            begin: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 2), {
+              hours: 18,
+              minutes: 0,
+              seconds: 0,
+              milliseconds: 0,
+            }),
+            end: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 2), {
+              hours: 19,
+              minutes: 30,
+              seconds: 0,
+              milliseconds: 0,
+            }),
+            numPersons: 3,
+            calendarUrl:
+              "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
+            bufferTimeBefore: null,
+            bufferTimeAfter: null,
+          },
+          {
+            id: "aoweifjkiorng849=",
+            pk: 7,
+            state: "CREATED",
+            isBlocked: false,
+            priority: "A_200",
+            begin: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 3), {
+              hours: 18,
+              minutes: 0,
+              seconds: 0,
+              milliseconds: 0,
+            }),
+            end: set(addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 3), {
+              hours: 19,
+              minutes: 30,
+              seconds: 0,
+              milliseconds: 0,
+            }),
+            numPersons: 3,
+            calendarUrl:
+              "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
+            bufferTimeBefore: null,
+            bufferTimeAfter: null,
+          },
         ].map((n) => ({
           ...n,
           ageGroup: {
