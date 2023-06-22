@@ -77,7 +77,7 @@ const Props = styled.div`
   }
 `;
 
-const Prop = styled.div<{ $disabled: boolean }>`
+const Prop = styled.div<{ $disabled?: boolean }>`
   overflow: hidden;
   display: grid;
   grid-template-columns: 32px 1fr;
@@ -159,8 +159,13 @@ const ReservationUnitCard = ({
             {reservationUnit.maxPersons ||
               t("ReservationUnitCard.noMaxPersons")}
           </Prop>
-          <Prop $disabled={false}>
-            {reservationUnit.isDraft ? (
+          <Prop>
+            {reservationUnit.isArchived ? (
+              <>
+                <IconDraft />
+                {t("ReservationUnitCard.stateArchived")}
+              </>
+            ) : reservationUnit.isDraft ? (
               <>
                 <IconDraft />
                 {t("ReservationUnitCard.stateDraft")}

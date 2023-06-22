@@ -94,6 +94,7 @@ export const UNIT_QUERY = gql`
         maxPersons
         surfaceArea
         isDraft
+        isArchived
         purposes {
           pk
           nameFi

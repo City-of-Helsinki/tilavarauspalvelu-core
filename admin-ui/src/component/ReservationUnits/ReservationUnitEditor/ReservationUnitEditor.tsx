@@ -32,7 +32,6 @@ import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitImageCreateMutationInput,
   ReservationUnitsReservationUnitAuthenticationChoices,
-  ReservationUnitByPkType,
   UnitByPkType,
   ReservationState,
   ReservationUnitState,
@@ -251,21 +250,21 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     createReservationUnitMutation({ variables: { input } });
 
   const createOrUpdateReservationUnit = async (
-    publish: boolean,
-    archive = false
+    publish?: boolean,
+    archive?: boolean
   ): Promise<number | undefined> => {
     const input = pick(
       {
         ...omitBy(state.reservationUnitEdit, (v) => v === ""),
         surfaceArea: Number(state.reservationUnitEdit?.surfaceArea),
-        isDraft: !publish,
+        ...(publish != null ? { isDraft: !publish } : {}),
         reservationStartInterval:
           state.reservationUnitEdit?.reservationStartInterval?.toLocaleLowerCase(), /// due to api inconsistency
         maxReservationsPerUser: state.reservationUnitEdit
           ?.maxReservationsPerUser
           ? Number(state.reservationUnitEdit?.maxReservationsPerUser)
           : null,
-        isArchived: archive,
+        ...(archive != null ? { isArchived: archive } : {}),
         pricings: state.reservationUnitEdit.pricings?.map((pricing) =>
           omitBy(pricing, isNull)
         ),
@@ -510,10 +509,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return true;
   };
 
-  const saveReservationUnit = async (publish: boolean) => {
+  const publishReservationUnit = async (publish: boolean) => {
     setSaving(true);
     try {
-      const resUnitPk = await createOrUpdateReservationUnit(publish);
+      const resUnitPk = await createOrUpdateReservationUnit(publish, false);
       if (resUnitPk) {
         // res unit is saved, we can save changes to images
         const success = await reconcileImageChanges(resUnitPk);
@@ -623,9 +622,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   ); // default is 20 if no spaces selected
 
   const onlyForDirect =
-    ["DIRECT_AND_SEASON", "DIRECT"].includes(
-      state.reservationUnitEdit.reservationKind as string
-    ) || false;
+    state.reservationUnitEdit.reservationKind === "DIRECT" ||
+    state.reservationUnitEdit.reservationKind === "DIRECT_AND_SEASON";
 
   const handleSaveAsDraft = () => {
     const validationErrors = draftSchema.validate(state.reservationUnitEdit);
@@ -633,7 +631,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     if (validationErrors.error) {
       dispatch({ type: "setValidationErrors", validationErrors });
     } else {
-      saveReservationUnit(false);
+      publishReservationUnit(false);
       dispatch({
         type: "setValidationErrors",
         validationErrors: null,
@@ -647,11 +645,38 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     if (validationErrors.error) {
       dispatch({ type: "setValidationErrors", validationErrors });
     } else {
-      saveReservationUnit(true);
+      publishReservationUnit(true);
       dispatch({
         type: "setValidationErrors",
         validationErrors: null,
       });
+    }
+  };
+
+  const handleAcceptArchive = async () => {
+    try {
+      const r = await createOrUpdateReservationUnit(undefined, true);
+
+      if (r) {
+        setModalContent(null);
+        notifySuccess(t("ArchiveReservationUnitDialog.success"));
+        history(-1);
+      }
+    } catch (e) {
+      // noop
+    }
+  };
+
+  const handleArchiveButtonClick = async () => {
+    if (state.reservationUnit) {
+      setModalContent(
+        <ArchiveDialog
+          reservationUnit={state.reservationUnit}
+          onAccept={handleAcceptArchive}
+          onClose={() => setModalContent(null)}
+        />,
+        true
+      );
     }
   };
 
@@ -1907,35 +1932,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               )}
             </Accordion>
             <ArchiveButton
-              onClick={() =>
-                setModalContent(
-                  <ArchiveDialog
-                    reservationUnit={
-                      state.reservationUnit as ReservationUnitByPkType
-                    }
-                    onAccept={async () => {
-                      try {
-                        const r = await createOrUpdateReservationUnit(
-                          state.reservationUnit?.isDraft || false,
-                          true
-                        );
-
-                        if (r) {
-                          setModalContent(null);
-                          notifySuccess(
-                            t("ArchiveReservationUnitDialog.success")
-                          );
-                          history("/reservation-units");
-                        }
-                      } catch (e) {
-                        // noop
-                      }
-                    }}
-                    onClose={() => setModalContent(null)}
-                  />,
-                  true
-                )
-              }
+              onClick={handleArchiveButtonClick}
               variant="secondary"
             >
               {t("ReservationUnitEditor.archive")}

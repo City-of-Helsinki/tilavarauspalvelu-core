@@ -191,6 +191,11 @@ const Unit = (): JSX.Element | null => {
     return null;
   }
 
+  const reservationUnits =
+    unit?.reservationUnits
+      ?.filter((x): x is ReservationUnitType => x != null)
+      .filter((x) => !x.isArchived) ?? [];
+
   return (
     <Wrapper>
       <BreadcrumbWrapper
@@ -266,10 +271,10 @@ const Unit = (): JSX.Element | null => {
             >
               {t("Unit.reservationUnitReadMore")}
             </StyledButton>
-            {unit?.reservationUnits && unit?.reservationUnits.length > 0 ? (
+            {reservationUnits.length > 0 ? (
               <ResourceUnitCount>
                 {t("Unit.reservationUnits", {
-                  count: unit?.reservationUnits.length,
+                  count: reservationUnits.length,
                 })}
               </ResourceUnitCount>
             ) : null}
@@ -286,11 +291,9 @@ const Unit = (): JSX.Element | null => {
           </StyledBoldButton>
         </Info>
       </IngressContainer>
-      {unit?.reservationUnits && unit?.reservationUnits.length > 0 ? (
+      {reservationUnits.length > 0 ? (
         <ReservationUnitList
-          reservationUnits={
-            (unit?.reservationUnits as ReservationUnitType[]) || []
-          }
+          reservationUnits={reservationUnits}
           unitId={unitPk}
         />
       ) : (

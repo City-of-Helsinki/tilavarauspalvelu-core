@@ -1250,6 +1250,7 @@ const translations: ITranslations = {
     purpose_other: ["{{count}} käyttötarkoitusta"],
     statePublished: ["Julkaistu"],
     stateDraft: ["Luonnos"],
+    stateArchived: ["Arkistoitu"],
   },
   ReservationUnitList: {
     typeFilter: ["Tyyppi"],

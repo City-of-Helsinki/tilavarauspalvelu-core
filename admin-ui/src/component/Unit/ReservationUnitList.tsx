@@ -88,7 +88,7 @@ const ReservationUnitList = ({
         {filteredResults.map((resUnit) => (
           <ReservationUnitCard
             reservationUnit={resUnit}
-            unitId={unitId as number}
+            unitId={unitId}
             key={resUnit.pk}
           />
         ))}
