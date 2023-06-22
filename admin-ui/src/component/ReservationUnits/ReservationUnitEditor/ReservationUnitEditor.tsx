@@ -614,11 +614,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     (s) => state?.reservationUnitEdit?.spacePks?.indexOf(Number(s.pk)) !== -1
   );
 
-  const minSurfaceArea =
-    sumBy(selectedSpaces, (s) => Number(s.surfaceArea) || 0) || 1; // default is 1 if no spaces selected
+  const minSurfaceArea = Math.ceil(
+    sumBy(selectedSpaces, (s) => Number(s.surfaceArea) || 0) || 1
+  ); // default is 1 if no spaces selected
 
-  const maxPersons =
-    sumBy(selectedSpaces, (s) => Number(s.maxPersons) || 0) || 20; // default is 20 if no spaces selected
+  const maxPersons = Math.ceil(
+    sumBy(selectedSpaces, (s) => Number(s.maxPersons) || 0) || 20
+  ); // default is 20 if no spaces selected
 
   const onlyForDirect =
     ["DIRECT_AND_SEASON", "DIRECT"].includes(
@@ -815,7 +817,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 </Span6>
                 <Span4>
                   <NumberInput
-                    value={state.reservationUnitEdit.surfaceArea || 0}
+                    value={Math.ceil(
+                      state.reservationUnitEdit.surfaceArea || 0
+                    )}
                     id="surfaceArea"
                     label={t("ReservationUnitEditor.label.surfaceArea")}
                     helperText={t(
@@ -841,7 +845,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 </Span4>
                 <Span4>
                   <NumberInput
-                    value={state.reservationUnitEdit.maxPersons || 0}
+                    value={Math.ceil(state.reservationUnitEdit.maxPersons || 0)}
                     id="maxPersons"
                     label={t("ReservationUnitEditor.label.maxPersons")}
                     minusStepButtonAriaLabel={t(

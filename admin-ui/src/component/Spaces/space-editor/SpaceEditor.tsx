@@ -107,8 +107,8 @@ const reducer = (state: State, action: Action): State => {
             {
               ...space,
               pk: space.pk,
-              maxPersons: space.maxPersons || 0,
-              surfaceArea: space.surfaceArea || 0,
+              maxPersons: Math.ceil(space.maxPersons || 0),
+              surfaceArea: Math.ceil(space.surfaceArea || 0),
             },
             [
               "pk",
@@ -259,7 +259,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
           state.spaceEdit,
           (v) => v === ""
         ) as SpaceUpdateMutationInput),
-        surfaceArea: Number(state.spaceEdit?.surfaceArea),
+        surfaceArea: Math.ceil(state.spaceEdit?.surfaceArea ?? 0),
       });
       if (data?.data?.updateSpace.errors === null) {
         notifySuccess(

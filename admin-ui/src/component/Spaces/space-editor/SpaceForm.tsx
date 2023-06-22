@@ -80,13 +80,15 @@ const SpaceForm = ({
       </EditorRows>
       <EditorColumns>
         <NumberInput
-          value={data.surfaceArea || 0}
+          value={Math.ceil(data.surfaceArea || 0)}
           id="surfaceArea"
           label={t("SpaceEditor.label.surfaceArea")}
           helperText={t("SpaceModal.page2.surfaceAreaHelperText")}
           minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
           plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          onChange={(e) => setValue({ surfaceArea: Number(e.target.value) })}
+          onChange={(e) =>
+            setValue({ surfaceArea: Math.ceil(Number(e.target.value)) })
+          }
           step={1}
           type="number"
           min={1}
@@ -95,12 +97,14 @@ const SpaceForm = ({
           invalid={!!getValidationError("surfaceArea")}
         />
         <NumberInput
-          value={data.maxPersons || 0}
+          value={Math.ceil(data.maxPersons || 0)}
           id="maxPersons"
           label={t("SpaceEditor.label.maxPersons")}
           minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
           plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          onChange={(e) => setValue({ maxPersons: Number(e.target.value) })}
+          onChange={(e) =>
+            setValue({ maxPersons: Math.ceil(Number(e.target.value)) })
+          }
           step={1}
           type="number"
           min={1}
