@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { TFunction } from "i18next";
+import { add, startOfISOWeek } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
   Maybe,
@@ -43,7 +44,7 @@ import VisibleIfPermission from "./VisibleIfPermission";
 import { Accordion } from "../../../common/hds-fork/Accordion";
 import ApprovalButtons from "./ApprovalButtons";
 import RecurringReservationsView from "./RecurringReservationsView";
-import { useRecurringReservations } from "./hooks";
+import { useRecurringReservations, useReservationData } from "./hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { SINGLE_RESERVATION_QUERY } from "./hooks/queries";
@@ -274,10 +275,26 @@ const TimeBlock = ({
   const shownReservation =
     new Date(reservation.begin) > new Date() ? reservation : nextReservation;
 
-  const focusDate =
+  const [focusDate, setFocusDate] = useState<Date>(
     maybeStringToDate(selected?.begin) ??
-    onlyFutureDates(maybeStringToDate(shownReservation?.begin)) ??
-    new Date();
+      onlyFutureDates(maybeStringToDate(shownReservation?.begin)) ??
+      new Date()
+  );
+
+  // No month view so always query the whole week even if a single day is selected
+  // to avoid spamming queries and having to deal with start of day - end of day.
+  // focus day can be in the middle of the week.
+  const { events: eventsAll, refetch: calendarRefetch } = useReservationData(
+    startOfISOWeek(focusDate),
+    add(startOfISOWeek(focusDate), { days: 7 }),
+    String(reservation?.reservationUnits?.[0]?.pk),
+    reservation?.pk ?? undefined
+  );
+
+  const handleChanged = () => {
+    onReservationUpdated();
+    calendarRefetch();
+  };
 
   return (
     <>
@@ -286,7 +303,8 @@ const TimeBlock = ({
           <RecurringReservationsView
             recurringPk={reservation.recurringReservation.pk}
             onSelect={setSelected}
-            onReservationUpdated={onReservationUpdated}
+            onReservationUpdated={handleChanged}
+            onChange={handleChanged}
           />
         </Accordion>
       )}
@@ -296,11 +314,19 @@ const TimeBlock = ({
         id="reservation-calendar"
       >
         <Calendar
-          reservationUnitPk={String(reservation?.reservationUnits?.[0]?.pk)}
           reservation={reservation}
           selected={selected}
           focusDate={focusDate}
-          refetch={onReservationUpdated}
+          refetch={(d) => {
+            onReservationUpdated();
+            // NOTE setting focus date refetches calendar data, don't double refetch
+            if (!d || focusDate === d) {
+              calendarRefetch();
+            } else {
+              setFocusDate(d);
+            }
+          }}
+          events={eventsAll}
         />
       </Accordion>
     </>

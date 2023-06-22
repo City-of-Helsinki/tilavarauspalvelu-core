@@ -12,6 +12,7 @@ import ReservationList from "../../ReservationsList";
 import ReservationListButton from "../../ReservationListButton";
 import DenyDialog from "./DenyDialog";
 import { useModal } from "../../../context/ModalContext";
+import EditTimeModal from "../EditTimeModal";
 
 const RecurringReservationsView = ({
   recurringPk,
@@ -36,13 +37,22 @@ const RecurringReservationsView = ({
     return <div>Loading</div>;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleChange = (_x: ReservationType) => {
-    // eslint-disable-next-line no-console
-    console.warn("Change NOT Implemented.");
+  const handleChangeSuccess = () => {
+    setModalContent(null);
     if (onChange) {
       onChange();
     }
+  };
+
+  const handleChange = (res: ReservationType) => {
+    setModalContent(
+      <EditTimeModal
+        reservation={res}
+        onAccept={() => handleChangeSuccess()}
+        onClose={() => setModalContent(null)}
+      />,
+      true
+    );
   };
 
   const handleCloseRemoveDialog = () => {

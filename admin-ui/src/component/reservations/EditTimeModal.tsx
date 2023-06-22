@@ -7,6 +7,7 @@ import {
   Mutation,
   MutationStaffAdjustReservationTimeArgs,
   ReservationType,
+  ReservationTypeConnection,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
@@ -85,6 +86,60 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
       notifyError(
         t("ReservationDialog.saveFailed", { error: translatedError })
       );
+    },
+    update(cache, { data }) {
+      // NOTE: recurring uses a long list of reservations that is cached, manual update needed
+      cache.modify({
+        fields: {
+          // find the pk => slice the array => replace the state variable in the slice
+          reservations(existing: ReservationTypeConnection) {
+            const queryRes = data?.staffAdjustReservationTime;
+            if (queryRes?.errors) {
+              // eslint-disable-next-line no-console
+              console.error(
+                "NOT updating cache: mutation failed with: ",
+                queryRes?.errors
+              );
+            } else if (!queryRes?.errors && !queryRes?.pk) {
+              // eslint-disable-next-line no-console
+              console.error(
+                "NOT updating cache: mutation success but PK missing"
+              );
+            } else {
+              const { begin, end, pk } = queryRes;
+              const fid = existing.edges.findIndex((x) => x?.node?.pk === pk);
+              if (fid > -1 && begin && end) {
+                const cpy = structuredClone(existing.edges[fid]);
+                if (cpy?.node && begin && end) {
+                  cpy.node.begin = begin;
+                  cpy.node.end = end;
+                  return {
+                    ...existing,
+                    edges: [
+                      ...existing.edges.slice(0, fid),
+                      cpy,
+                      ...existing.edges.slice(fid + 1),
+                    ],
+                  };
+                }
+                if (!begin || !end) {
+                  // eslint-disable-next-line no-console
+                  console.error(
+                    "Cache update failed reservation found, but no begin or end time in the response"
+                  );
+                } else {
+                  // eslint-disable-next-line no-console
+                  console.error(
+                    "Cache update failed: No reservation found with pk: ",
+                    pk
+                  );
+                }
+              }
+            }
+            return existing;
+          },
+        },
+      });
     },
   });
 
