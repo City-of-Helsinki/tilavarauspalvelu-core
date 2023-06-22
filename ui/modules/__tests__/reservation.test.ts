@@ -6,6 +6,7 @@ import {
   ReservationsReservationStateChoices,
   ReservationType,
   ReservationUnitByPkType,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "common/types/gql-types";
 import {
   CanReservationBeChangedProps,
@@ -37,11 +38,32 @@ jest.mock("next/config", () => () => ({
 }));
 
 describe("getDurationOptions", () => {
-  test("works", () => {
-    expect(getDurationOptions(null, 5400)).toEqual([]);
-    expect(getDurationOptions(5400, null)).toEqual([]);
-    expect(getDurationOptions(null, null)).toEqual([]);
-    expect(getDurationOptions(1800, 5400)).toEqual([
+  test("empty inputs", () => {
+    expect(
+      getDurationOptions(
+        null,
+        5400,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
+      )
+    ).toEqual([]);
+    expect(getDurationOptions(5400, null, null)).toEqual([]);
+    expect(
+      getDurationOptions(
+        null,
+        null,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
+      )
+    ).toEqual([]);
+  });
+
+  test("with 15 min intervals", () => {
+    expect(
+      getDurationOptions(
+        1800,
+        5400,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      )
+    ).toEqual([
       {
         label: "0:30",
         value: "0:30",
@@ -63,26 +85,35 @@ describe("getDurationOptions", () => {
         value: "1:30",
       },
     ]);
-    expect(getDurationOptions(1800, 30600, "02:00:00")).toEqual([
+  });
+
+  test("with 90 min intervals", () => {
+    expect(
+      getDurationOptions(
+        1800,
+        30600,
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
+      )
+    ).toEqual([
       {
-        label: "0:30",
-        value: "0:30",
+        label: "1:30",
+        value: "1:30",
       },
       {
-        label: "2:30",
-        value: "2:30",
+        label: "3:00",
+        value: "3:00",
       },
       {
         label: "4:30",
         value: "4:30",
       },
       {
-        label: "6:30",
-        value: "6:30",
+        label: "6:00",
+        value: "6:00",
       },
       {
-        label: "8:30",
-        value: "8:30",
+        label: "7:30",
+        value: "7:30",
       },
     ]);
   });
@@ -592,7 +623,12 @@ describe("canReservationBeChanged", () => {
             begin: addHours(startOfToday(), 10).toString(),
             end: addHours(startOfToday(), 12).toString(),
           },
-          reservationUnit: { ...reservationUnit, openingHours: null },
+          reservationUnit: {
+            ...reservationUnit,
+            openingHours: {
+              openingTimes: [],
+            },
+          },
           activeApplicationRounds: [],
         } as CanReservationBeChangedProps)
       ).toStrictEqual([false, "RESERVATION_TIME_INVALID"]);

@@ -1,5 +1,15 @@
 import { Parameter } from "../../../types/common";
 import {
+  OpeningTimesType,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+} from "../../../types/gql-types";
+import {
+  areOpeningTimesAvailable,
+  getIntervalMinutes,
+  getMinReservation,
+  getValidEndingTime,
+} from "../../calendar/util";
+import {
   convertHMSToSeconds,
   formatDuration,
   secondsToHms,
@@ -54,4 +64,235 @@ test("sortAgeGroups", () => {
     { id: 3, minimum: 10, maximum: 20 },
     { id: 1, minimum: 1, maximum: 99 },
   ]);
+});
+
+test("getIntervalMinutes", () => {
+  expect(
+    getIntervalMinutes(
+      0 as unknown as ReservationUnitsReservationUnitReservationStartIntervalChoices
+    )
+  ).toBe(0);
+
+  expect(
+    getIntervalMinutes(
+      undefined as unknown as ReservationUnitsReservationUnitReservationStartIntervalChoices
+    )
+  ).toBe(0);
+
+  expect(
+    getIntervalMinutes(
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+    )
+  ).toBe(15);
+
+  expect(
+    getIntervalMinutes(
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins
+    )
+  ).toBe(30);
+
+  expect(
+    getIntervalMinutes(
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins
+    )
+  ).toBe(60);
+
+  expect(
+    getIntervalMinutes(
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
+    )
+  ).toBe(90);
+});
+
+describe("getMinReservation", () => {
+  test("should return correct times", () => {
+    const begin = new Date("2021-01-01T10:00:00.000Z");
+    const minReservationDuration = 3600;
+    const reservationStartInterval =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
+
+    expect(
+      getMinReservation({
+        begin,
+        minReservationDuration,
+        reservationStartInterval,
+      })
+    ).toEqual({
+      begin: new Date("2021-01-01T10:00:00.000Z"),
+      end: new Date("2021-01-01T11:30:00.000Z"),
+    });
+  });
+
+  test("should return correct times", () => {
+    const begin = new Date("2021-01-01T10:00:00.000Z");
+    const minReservationDuration = 3600;
+    const reservationStartInterval =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
+
+    expect(
+      getMinReservation({
+        begin,
+        minReservationDuration,
+        reservationStartInterval,
+      })
+    ).toEqual({
+      begin: new Date("2021-01-01T10:00:00.000Z"),
+      end: new Date("2021-01-01T11:00:00.000Z"),
+    });
+  });
+});
+
+describe("getValidEndingTime", () => {
+  test("should return original end time", () => {
+    const start = new Date("2021-01-01T10:00:00.000Z");
+    const end = new Date("2021-01-01T12:00:00.000Z");
+    const reservationStartInterval =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins;
+
+    expect(
+      getValidEndingTime({ start, end, reservationStartInterval })
+    ).toEqual(end);
+  });
+
+  test("should return previous fitting end time", () => {
+    const start = new Date("2021-01-01T10:00:00.000Z");
+    const end = new Date("2021-01-01T12:00:00.000Z");
+    const reservationStartInterval =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
+
+    expect(
+      getValidEndingTime({ start, end, reservationStartInterval })
+    ).toEqual(new Date("2021-01-01T11:30:00.000Z"));
+  });
+
+  test("should return previous fitting end time", () => {
+    const start = new Date("2021-01-01T10:00:00.000Z");
+    const end = new Date("2021-01-01T14:00:00.000Z");
+    const reservationStartInterval =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
+
+    expect(
+      getValidEndingTime({
+        start,
+        end,
+        reservationStartInterval,
+      })
+    ).toEqual(new Date("2021-01-01T13:00:00.000Z"));
+  });
+
+  test("should return previous fitting end time", () => {
+    const start = new Date("2021-01-01T10:00:00.000Z");
+    const end = new Date("2021-01-01T12:00:00.000Z");
+    const reservationStartInterval =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
+
+    expect(
+      getValidEndingTime({
+        start,
+        end,
+        reservationStartInterval,
+      })
+    ).toEqual(new Date("2021-01-01T11:30:00.000Z"));
+  });
+});
+
+describe("areOpeningTimesAvailable", () => {
+  test("should return true if opening times are available", () => {
+    const openingHours: OpeningTimesType[] = [
+      {
+        startTime: "2022-02-02T10:00:00+00:00",
+        endTime: "2022-02-02T12:00:00+00:00",
+        isReservable: true,
+      },
+    ];
+
+    expect(
+      areOpeningTimesAvailable(
+        openingHours,
+        new Date("2022-02-02T10:00:00+00:00")
+      )
+    ).toBe(true);
+  });
+
+  test("should return true if opening times are available", () => {
+    const openingHours: OpeningTimesType[] = [
+      {
+        startTime: "2022-02-02T10:00:00+00:00",
+        endTime: "2022-02-02T12:00:00+00:00",
+        isReservable: true,
+      },
+    ];
+
+    expect(
+      areOpeningTimesAvailable(
+        openingHours,
+        new Date("2022-02-02T12:00:00+00:00")
+      )
+    ).toBe(false);
+  });
+
+  test("should return true if opening times are available", () => {
+    const openingHours: OpeningTimesType[] = [
+      {
+        startTime: "2022-02-02T10:00:00+00:00",
+        endTime: "2022-02-02T12:00:00+00:00",
+        isReservable: true,
+      },
+    ];
+
+    expect(
+      areOpeningTimesAvailable(
+        openingHours,
+        new Date("2022-02-02T12:00:00+00:00"),
+        true
+      )
+    ).toBe(true);
+  });
+
+  test("should work for multiday ", () => {
+    const openingHours: OpeningTimesType[] = [
+      {
+        startTime: "2022-02-02T20:00:00+00:00",
+        endTime: "2022-02-02T22:00:00+00:00",
+        isReservable: true,
+      },
+      {
+        startTime: "2022-02-03T07:00:00+00:00",
+        endTime: "2022-02-03T22:00:00+00:00",
+        isReservable: true,
+      },
+    ];
+
+    expect(
+      areOpeningTimesAvailable(
+        openingHours,
+        new Date("2022-02-02T22:00:00+00:00"),
+        true
+      )
+    ).toBe(true);
+
+    expect(
+      areOpeningTimesAvailable(
+        openingHours,
+        new Date("2022-02-02T22:30:00+00:00"),
+        true
+      )
+    ).toBe(false);
+
+    expect(
+      areOpeningTimesAvailable(
+        openingHours,
+        new Date("2022-02-03T06:30:00+00:00"),
+        true
+      )
+    ).toBe(false);
+
+    expect(
+      areOpeningTimesAvailable(
+        openingHours,
+        new Date("2022-02-03T07:00:00+00:00"),
+        true
+      )
+    ).toBe(true);
+  });
 });

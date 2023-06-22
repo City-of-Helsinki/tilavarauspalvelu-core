@@ -1,10 +1,9 @@
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   getEventBuffers,
-  getMaxReservation,
+  getNewReservation,
   getSlotPropGetter,
   getTimeslots,
-  isReservationShortEnough,
 } from "common/src/calendar/util";
 import { breakpoints } from "common/src/common/style";
 import { parseDate } from "common/src/common/util";
@@ -18,7 +17,6 @@ import {
   addHours,
   addSeconds,
   differenceInMinutes,
-  roundToNearestMinutes,
   startOfDay,
 } from "date-fns";
 import classNames from "classnames";
@@ -263,19 +261,20 @@ const EditStep0 = ({
   const slotPropGetter = useMemo(
     () =>
       reservationUnit &&
-      getSlotPropGetter(
-        reservationUnit.openingHours?.openingTimes,
+      getSlotPropGetter({
+        openingHours: reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds,
-        reservationUnit.reservationBegins
+        reservationBegins: reservationUnit.reservationBegins
           ? new Date(reservationUnit.reservationBegins)
           : undefined,
-        reservationUnit.reservationEnds
+        reservationEnds: reservationUnit.reservationEnds
           ? new Date(reservationUnit.reservationEnds)
           : undefined,
-        reservationUnit.reservationsMinDaysBefore,
-        (date) => isSlotFree(date)
-      ),
-    [activeApplicationRounds, reservationUnit, isSlotFree]
+        reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore,
+        currentDate: focusDate,
+        customValidation: (date) => isSlotFree(date),
+      }),
+    [activeApplicationRounds, reservationUnit, isSlotFree, focusDate]
   );
 
   const TouchCellWrapper = ({ children, value, onSelectSlot }): JSX.Element => {
@@ -304,36 +303,16 @@ const EditStep0 = ({
 
   const handleEventChange = useCallback(
     (
-      { start, end }: CalendarEvent<ReservationType>,
+      { start, end }: CalendarEvent<Reservation | ReservationType>,
       skipLengthCheck = false
     ): boolean => {
-      const normalizedEnd = roundToNearestMinutes(end);
+      const newReservation = getNewReservation({ start, end, reservationUnit });
 
-      const newReservation = {
-        begin: start?.toISOString(),
-        end: normalizedEnd?.toISOString(),
-      } as PendingReservation;
-
-      if (
-        !isReservationShortEnough(
-          start,
-          end,
-          reservationUnit.maxReservationDuration
-        )
-      ) {
-        const { end: newEnd } = getMaxReservation(
-          start,
-          reservationUnit.maxReservationDuration
-        );
-        newReservation.end = newEnd?.toISOString();
-      } else if (!isSlotReservable(start, end, skipLengthCheck)) {
+      if (!isSlotReservable(start, end, skipLengthCheck)) {
         return false;
       }
 
-      setInitialReservation({
-        begin: newReservation.begin,
-        end: newReservation.end,
-      } as PendingReservation);
+      setInitialReservation(newReservation);
 
       if (isClientATouchDevice) {
         setShouldCalendarControlsBeVisible(true);
@@ -343,42 +322,43 @@ const EditStep0 = ({
     },
     [
       isClientATouchDevice,
+      setInitialReservation,
       isSlotReservable,
       reservationUnit,
-      setInitialReservation,
     ]
   );
 
   const handleSlotClick = useCallback(
-    (
-      { start: startTime, end: endTime, action },
-      skipLengthCheck = false
-    ): boolean => {
+    ({ start, end, action }, skipLengthCheck = false): boolean => {
       const isTouchClick = action === "select" && isClientATouchDevice;
 
       if (action === "select" && !isClientATouchDevice) {
         return false;
       }
 
-      const end =
+      const normalizedEnd =
         action === "click" ||
-        (isTouchClick && differenceInMinutes(endTime, startTime) <= 30)
+        (isTouchClick && differenceInMinutes(end, start) <= 30)
           ? addSeconds(
-              new Date(startTime),
+              new Date(start),
               reservationUnit.minReservationDuration || 0
             )
-          : new Date(endTime);
+          : new Date(end);
 
-      const normalizedEnd = roundToNearestMinutes(end);
+      const newReservation = getNewReservation({
+        start,
+        end: normalizedEnd,
+        reservationUnit,
+      });
 
-      if (!isSlotReservable(startTime, end, skipLengthCheck)) {
+      if (
+        !isSlotReservable(start, new Date(newReservation.end), skipLengthCheck)
+      ) {
         return false;
       }
 
-      setInitialReservation({
-        begin: startTime.toISOString(),
-        end: normalizedEnd.toISOString(),
-      } as PendingReservation);
+      setInitialReservation(newReservation);
+
       return true;
     },
     [
@@ -461,7 +441,6 @@ const EditStep0 = ({
             setShouldCalendarControlsBeVisible={
               setShouldCalendarControlsBeVisible
             }
-            minTime={dayStartTime}
             isAnimated={isMobile}
           />
         </CalendarFooter>

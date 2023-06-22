@@ -630,7 +630,7 @@ const selectedReservationUnitQuery = graphql.query<
       },
     },
     minReservationDuration: 3600,
-    maxReservationDuration: 5400,
+    maxReservationDuration: 10800,
     spaces: [
       {
         id: "U3BhY2VUeXBlOjQx",

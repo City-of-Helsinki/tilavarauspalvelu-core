@@ -1,6 +1,6 @@
 import { addMinutes, isAfter, isValid } from "date-fns";
 import camelCase from "lodash/camelCase";
-import { convertHMSToSeconds, secondsToHms } from "common/src/common/util";
+import { secondsToHms } from "common/src/common/util";
 import {
   ApplicationRound,
   OptionType,
@@ -13,11 +13,13 @@ import {
   ReservationsReservationStateChoices,
   ReservationType,
   ReservationUnitByPkType,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "common/types/gql-types";
 import {
-  areSlotsReservable,
   doBuffersCollide,
   doReservationsCollide,
+  getIntervalMinutes,
+  isRangeReservable,
   isReservationLongEnough,
   isReservationShortEnough,
   isStartTimeWithinInterval,
@@ -28,23 +30,25 @@ import { getTranslation } from "./util";
 export const getDurationOptions = (
   minReservationDuration: number,
   maxReservationDuration: number,
-  step = "00:15:00"
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): OptionType[] => {
-  // const minMinutes = convertHMSToSeconds(minReservationDuration);
-  // const maxMinutes = convertHMSToSeconds(maxReservationDuration);
-  const durationStep = convertHMSToSeconds(step);
+  const durationStep = getIntervalMinutes(reservationStartInterval) * 60;
 
   if (!minReservationDuration || !maxReservationDuration || !durationStep)
     return [];
 
   const durationSteps = [];
   for (
-    let i = minReservationDuration;
+    let i =
+      minReservationDuration > durationStep
+        ? minReservationDuration
+        : durationStep;
     i <= maxReservationDuration;
     i += durationStep
   ) {
     durationSteps.push(i);
   }
+
   const timeOptions = durationSteps.map((n) => {
     const hms = secondsToHms(n);
     const minute = String(hms.m).padEnd(2, "0");
@@ -178,24 +182,20 @@ export const getNormalizedReservationOrderStatus = (
   return null;
 };
 
-export type IsReservationReservableProps = {
+export const isReservationReservable = ({
+  reservationUnit,
+  activeApplicationRounds,
+  start,
+  end,
+  skipLengthCheck = false,
+}: {
   reservationUnit: ReservationUnitByPkType;
   activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
   start: Date;
   end: Date;
-  skipLengthCheck;
-};
-
-export const isReservationReservable = (
-  props: IsReservationReservableProps
-): boolean => {
-  const {
-    reservationUnit,
-    activeApplicationRounds,
-    start,
-    end,
-    skipLengthCheck = false,
-  } = props;
+  skipLengthCheck: boolean;
+}): boolean => {
+  if (!reservationUnit) return false;
 
   const normalizedEnd = addMinutes(end, -1);
 
@@ -229,15 +229,17 @@ export const isReservationReservable = (
       openingHours?.openingTimes,
       reservationStartInterval
     ) ||
-    !areSlotsReservable(
-      [new Date(start), normalizedEnd],
-      openingHours?.openingTimes,
-      reservationBegins ? new Date(reservationBegins) : undefined,
-      reservationEnds ? new Date(reservationEnds) : undefined,
+    !isRangeReservable({
+      range: [new Date(start), normalizedEnd],
+      openingHours: openingHours.openingTimes,
+      reservationBegins: reservationBegins
+        ? new Date(reservationBegins)
+        : undefined,
+      reservationEnds: reservationEnds ? new Date(reservationEnds) : undefined,
       reservationsMinDaysBefore,
       activeApplicationRounds,
-      false
-    ) ||
+      reservationStartInterval,
+    }) ||
     (!skipLengthCheck &&
       !isReservationLongEnough(start, end, minReservationDuration)) ||
     !isReservationShortEnough(start, end, maxReservationDuration) ||
@@ -264,18 +266,13 @@ export type CanReservationBeChangedProps = {
   activeApplicationRounds?: ApplicationRoundType[];
 };
 
-export const canReservationTimeBeChanged = (
-  props: CanReservationBeChangedProps
-): [boolean, string?] => {
-  const {
-    reservation,
-    newReservation,
-    reservationUnit,
-    activeApplicationRounds,
-  } = props;
-
+export const canReservationTimeBeChanged = ({
+  reservation,
+  newReservation,
+  reservationUnit,
+  activeApplicationRounds = [],
+}: CanReservationBeChangedProps): [boolean, string?] => {
   if (!reservation) return [false];
-
   // existing reservation state is not CONFIRMED
   if (!isReservationConfirmed(reservation)) {
     return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];

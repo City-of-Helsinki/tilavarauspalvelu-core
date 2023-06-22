@@ -3,12 +3,14 @@ import {
   addMinutes,
   addSeconds,
   areIntervalsOverlapping,
+  differenceInMinutes,
   differenceInSeconds,
   format,
   getISODay,
   isAfter,
   isBefore,
   isWithinInterval,
+  roundToNearestMinutes,
   startOfDay,
 } from "date-fns";
 import { TFunction } from "next-i18next";
@@ -105,7 +107,7 @@ export const isReservationLongEnough = (
   return reservationDuration >= minDuration;
 };
 
-const areOpeningTimesAvailable = (
+export const areOpeningTimesAvailable = (
   openingHours: OpeningTimesType[],
   slotDate: Date,
   validateEnding = false
@@ -165,6 +167,40 @@ const doesSlotCollideWithApplicationRounds = (
   );
 };
 
+export const getIntervalMinutes = (
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+): number => {
+  switch (reservationStartInterval) {
+    case "INTERVAL_15_MINS":
+      return 15;
+    case "INTERVAL_30_MINS":
+      return 30;
+    case "INTERVAL_60_MINS":
+      return 60;
+    case "INTERVAL_90_MINS":
+      return 90;
+    default:
+      return 0;
+  }
+};
+
+export const generateSlots = (
+  start: Date,
+  end: Date,
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+): Date[] => {
+  if (!start || !end || !reservationStartInterval) return [];
+
+  const slots = [];
+  const intervalMinutes = getIntervalMinutes(reservationStartInterval);
+
+  for (let i = new Date(start); i <= end; i = addMinutes(i, intervalMinutes)) {
+    slots.push(i);
+  }
+
+  return slots;
+};
+
 export const areSlotsReservable = (
   slots: Date[],
   openingHours: OpeningTimesType[],
@@ -188,6 +224,42 @@ export const areSlotsReservable = (
       !doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds)
     );
   });
+};
+
+export const isRangeReservable = ({
+  range,
+  openingHours,
+  reservationBegins,
+  reservationEnds,
+  reservationsMinDaysBefore = 0,
+  activeApplicationRounds = [],
+  reservationStartInterval,
+}: {
+  range: Date[];
+  openingHours: OpeningTimesType[];
+  reservationBegins?: Date;
+  reservationEnds?: Date;
+  reservationsMinDaysBefore: number;
+  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+}): boolean => {
+  const slots = generateSlots(range[0], range[1], reservationStartInterval);
+
+  return (
+    slots.every((slot) =>
+      areOpeningTimesAvailable(openingHours, slot, false)
+    ) &&
+    range.every(
+      (slot) =>
+        isSlotWithinTimeframe(
+          slot,
+          reservationBegins,
+          reservationEnds,
+          reservationsMinDaysBefore
+        ) &&
+        !doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds)
+    )
+  );
 };
 
 export const doReservationsCollide = (
@@ -284,20 +356,80 @@ export const isStartTimeWithinInterval = (
   );
 };
 
+export const getMinReservation = ({
+  begin,
+  reservationStartInterval,
+  minReservationDuration = 0,
+}: {
+  begin: Date;
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+  minReservationDuration?: number;
+}): { begin: Date; end: Date } => {
+  const minDurationMinutes = minReservationDuration / 60;
+  const intervalMinutes = getIntervalMinutes(reservationStartInterval);
+
+  const minutes =
+    minDurationMinutes < intervalMinutes ? intervalMinutes : minDurationMinutes;
+  return { begin, end: addMinutes(begin, minutes) };
+};
+
+export const getValidEndingTime = ({
+  start,
+  end,
+  reservationStartInterval,
+}: {
+  start: Date;
+  end: Date;
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+}): Date | null => {
+  if (!start || !end || !reservationStartInterval) return null;
+
+  const intervalMinutes = getIntervalMinutes(reservationStartInterval);
+
+  const durationMinutes = differenceInMinutes(end, start);
+  const remainder = durationMinutes % intervalMinutes;
+
+  if (remainder !== 0) {
+    const wholeIntervals = Math.abs(
+      Math.floor(durationMinutes / intervalMinutes)
+    );
+
+    return addMinutes(start, wholeIntervals * intervalMinutes);
+  }
+
+  return end;
+};
+
 export const getSlotPropGetter =
-  (
-    openingHours: OpeningTimesType[],
-    activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[],
-    reservationBegins: Date,
-    reservationEnds: Date,
-    reservationsMinDaysBefore?: number,
-    customValidation?: (arg: Date) => boolean
-  ) =>
+  ({
+    openingHours,
+    activeApplicationRounds,
+    reservationBegins,
+    reservationEnds,
+    reservationsMinDaysBefore,
+    currentDate,
+    customValidation,
+  }: {
+    openingHours: OpeningTimesType[];
+    activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
+    reservationBegins: Date;
+    reservationEnds: Date;
+    reservationsMinDaysBefore?: number;
+    currentDate: Date;
+    customValidation?: (arg: Date) => boolean;
+  }) =>
   (date: Date): SlotProps => {
+    const hours = openingHours.filter((n) => {
+      if (!n.date) return false;
+      const start = startOfWeek(currentDate);
+      const end = endOfWeek(currentDate);
+      const nDate = new Date(n.date);
+      return nDate >= start && nDate <= end;
+    });
     switch (
       areSlotsReservable(
         [date],
-        openingHours,
+        hours,
         reservationBegins,
         reservationEnds,
         reservationsMinDaysBefore,
@@ -476,15 +608,6 @@ export const parseTimeframeLength = (begin: string, end: string): string => {
   return formatSecondDuration(diff);
 };
 
-export const getMaxReservation = (
-  begin: Date,
-  duration: number
-): { begin: Date; end: Date } => {
-  const slots = duration / (30 * 60);
-  const end = addMinutes(begin, slots * 30);
-  return { begin, end };
-};
-
 export const getAvailableTimes = (
   reservationUnit: ReservationUnitByPkType,
   date: Date
@@ -532,4 +655,38 @@ export const getOpenDays = (
   });
 
   return openDays.sort((a, b) => a.getTime() - b.getTime());
+};
+
+export const getNewReservation = ({
+  start,
+  end,
+  reservationUnit,
+}: {
+  reservationUnit: ReservationUnitByPkType;
+  start: Date;
+  end: Date;
+}): PendingReservation => {
+  const { minReservationDuration, reservationStartInterval } = reservationUnit;
+
+  const { end: minEnd } = getMinReservation({
+    begin: start,
+    minReservationDuration: minReservationDuration || 0,
+    reservationStartInterval,
+  });
+
+  let normalizedEnd =
+    getValidEndingTime({
+      start,
+      end: roundToNearestMinutes(end),
+      reservationStartInterval,
+    }) || roundToNearestMinutes(end);
+
+  if (normalizedEnd < minEnd) {
+    normalizedEnd = minEnd;
+  }
+
+  return {
+    begin: start?.toISOString(),
+    end: normalizedEnd?.toISOString(),
+  };
 };

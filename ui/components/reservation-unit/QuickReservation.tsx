@@ -212,12 +212,20 @@ const QuickReservation = ({
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const { minReservationDuration, maxReservationDuration } =
-    reservationUnit || {};
+  const {
+    minReservationDuration,
+    maxReservationDuration,
+    reservationStartInterval,
+  } = reservationUnit || {};
 
   const durationOptions = useMemo(
-    () => getDurationOptions(minReservationDuration, maxReservationDuration),
-    [minReservationDuration, maxReservationDuration]
+    () =>
+      getDurationOptions(
+        minReservationDuration,
+        maxReservationDuration,
+        reservationStartInterval
+      ),
+    [minReservationDuration, maxReservationDuration, reservationStartInterval]
   );
 
   const nextHour: Date = useMemo(() => {
@@ -388,6 +396,8 @@ const QuickReservation = ({
     (n) => n.date
   );
 
+  const dayTimes = useMemo(() => availableTimes(date), [availableTimes, date]);
+
   if (
     !reservationUnit.openingHours ||
     !minReservationDuration ||
@@ -441,7 +451,7 @@ const QuickReservation = ({
           }}
         />
         <StyledSelect
-          key={`durationSelect-${duration.value}`}
+          key={`durationSelect-${duration?.value}`}
           id={`${idPrefix}-quick-reservation-duration`}
           label={t("reservationCalendar:quickReservation.duration")}
           options={durationOptions}
@@ -461,7 +471,7 @@ const QuickReservation = ({
         {t("reservationCalendar:quickReservation.subheading")}
       </Subheading>
       <Times>
-        {availableTimes(date).length > 0 ? (
+        {dayTimes.length > 0 ? (
           <Slots>
             <StyledCarousel
               hideCenterControls
@@ -481,7 +491,7 @@ const QuickReservation = ({
                       </SlotButton>
                     </Slot>
                   ))}
-                  {availableTimes(date).length > timeItems &&
+                  {dayTimes.length > timeItems &&
                     index + 1 === timeChunks.length && (
                       <CalendarLink
                         href="#"

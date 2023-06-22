@@ -30,10 +30,10 @@ import {
 import { useLocalStorage } from "react-use";
 import { Transition } from "react-transition-group";
 import {
-  areSlotsReservable,
   doBuffersCollide,
   doReservationsCollide,
   getDayIntervals,
+  isRangeReservable,
 } from "common/src/calendar/util";
 import {
   ApplicationRound,
@@ -74,7 +74,6 @@ type Props<T> = {
     skipLengthCheck?: boolean
   ) => boolean;
   mode: "create" | "edit";
-  minTime: Date;
   customAvailabilityValidation?: (start: Date) => boolean;
   shouldCalendarControlsBeVisible?: boolean;
   setShouldCalendarControlsBeVisible?: (value: boolean) => void;
@@ -180,24 +179,6 @@ const Content = styled.div<{ $isAnimated: boolean }>`
   }
 `;
 
-const StyledSelect = styled(Select)`
-  & > div:nth-of-type(2) {
-    line-height: var(--lineheight-l);
-  }
-
-  ul {
-    transform: unset;
-    bottom: 54px;
-    left: -2px;
-    border-top: var(--border-width) solid var(--dropdown-border-color-focus);
-    border-bottom: var(--divider-width) solid var(--menu-divider-color);
-
-    li {
-      white-space: nowrap;
-    }
-  }
-`;
-
 const PriceWrapper = styled.div`
   ${fontMedium};
   align-self: flex-end;
@@ -280,6 +261,28 @@ const SubmitButton = styled(MediumButton)`
   }
 `;
 
+const StyledSelect = styled(Select)`
+  & > div:nth-of-type(2) {
+    line-height: var(--lineheight-l);
+  }
+
+  button > span {
+    white-space: nowrap;
+  }
+
+  ul {
+    transform: unset;
+    bottom: 54px;
+    left: -2px;
+    border-top: var(--border-width) solid var(--dropdown-border-color-focus);
+    border-bottom: var(--divider-width) solid var(--menu-divider-color);
+
+    li {
+      white-space: nowrap;
+    }
+  }
+`;
+
 const ReservationCalendarControls = <T extends Record<string, unknown>>({
   reservationUnit,
   initialReservation,
@@ -292,7 +295,6 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   setErrorMsg,
   handleEventChange,
   mode,
-  minTime,
   customAvailabilityValidation,
   shouldCalendarControlsBeVisible,
   setShouldCalendarControlsBeVisible,
@@ -301,16 +303,23 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   const { t, i18n } = useTranslation();
 
   const { begin, end } = initialReservation || {};
+  const {
+    minReservationDuration,
+    maxReservationDuration,
+    reservationStartInterval,
+  } = reservationUnit;
 
   const durationOptions = useMemo(() => {
     const options = getDurationOptions(
-      reservationUnit.minReservationDuration,
-      reservationUnit.maxReservationDuration
+      minReservationDuration,
+      maxReservationDuration,
+      reservationStartInterval
     );
     return [{ value: "0:00", label: "" }, ...options];
   }, [
-    reservationUnit.minReservationDuration,
-    reservationUnit.maxReservationDuration,
+    minReservationDuration,
+    maxReservationDuration,
+    reservationStartInterval,
   ]);
 
   const [date, setDate] = useState<Date | null>(new Date());
@@ -364,6 +373,16 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
   useEffect(() => {
     if (isValid(date) && startTime && duration) {
+      const {
+        bufferTimeBefore,
+        bufferTimeAfter,
+        openingHours,
+        reservationsMinDaysBefore,
+        reservations,
+        reservationBegins,
+        reservationEnds,
+      } = reservationUnit;
+
       setErrorMsg(null);
       const startDate = new Date(date);
       const endDate = new Date(date);
@@ -398,10 +417,10 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           {
             start: startDate,
             end: endDate,
-            bufferTimeBefore: reservationUnit.bufferTimeBefore,
-            bufferTimeAfter: reservationUnit.bufferTimeAfter,
+            bufferTimeBefore,
+            bufferTimeAfter,
           },
-          reservationUnit.reservations
+          reservations
         )
       ) {
         setErrorMsg(t("reservationCalendar:errors.bufferCollision"));
@@ -413,24 +432,24 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
             start: startDate,
             end: endDate,
           },
-          reservationUnit.reservations
+          reservations
         )
       ) {
         setErrorMsg(t(`reservationCalendar:errors.collision`));
       } else if (
-        !areSlotsReservable(
-          [startDate, addMinutes(endDate, -1)],
-          reservationUnit.openingHours?.openingTimes,
-          reservationUnit.reservationBegins
-            ? new Date(reservationUnit.reservationBegins)
+        !isRangeReservable({
+          range: [startDate, addMinutes(endDate, -1)],
+          openingHours: openingHours.openingTimes,
+          reservationBegins: reservationBegins
+            ? new Date(reservationBegins)
             : undefined,
-          reservationUnit.reservationEnds
-            ? new Date(reservationUnit.reservationEnds)
+          reservationEnds: reservationEnds
+            ? new Date(reservationEnds)
             : undefined,
-          reservationUnit.reservationsMinDaysBefore,
+          reservationsMinDaysBefore,
           activeApplicationRounds,
-          true
-        ) ||
+          reservationStartInterval,
+        }) ||
         (customAvailabilityValidation &&
           !customAvailabilityValidation(startDate))
       ) {
@@ -438,7 +457,13 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, startTime, duration?.value, reservationUnit]);
+  }, [
+    date,
+    startTime,
+    duration?.value,
+    reservationUnit,
+    reservationStartInterval,
+  ]);
 
   useEffect(() => {
     setInitialReservation({
@@ -469,21 +494,40 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   }, [reservationUnit.openingHours?.openingTimes, date]);
 
   const startingTimesOptions: OptionType[] = useMemo(() => {
-    if (!dayStartTime || !dayEndTime) return [];
+    const durations = durationOptions
+      .filter((n) => n.label !== "")
+      .map((n) => n.value);
+    const durationValue = durations[0]?.toString();
+
+    if (!dayStartTime || !dayEndTime || !durationValue) return [];
+
+    const [endHours, endMinutes] = durationValue.split(":").map(Number);
 
     return getDayIntervals(
-      format(minTime, "HH:mm"),
+      format(new Date(dayStartTime), "HH:mm"),
       format(new Date(dayEndTime), "HH:mm"),
       reservationUnit.reservationStartInterval
-    ).map((n) => ({
-      label: trimStart(n.substring(0, 5).replace(":", "."), "0"),
-      value: trimStart(n.substring(0, 5), "0"),
-    }));
+    )
+      .filter((n) => {
+        const [hours, minutes] = n.split(":").map(Number);
+        if (hours == null || minutes == null) return false;
+
+        const d = new Date(date);
+        d.setHours(hours, minutes);
+        const e = addMinutes(d, endHours * 60 + endMinutes);
+        return isSlotReservable(d, e);
+      })
+      .map((n) => ({
+        label: trimStart(n.substring(0, 5).replace(":", "."), "0"),
+        value: trimStart(n.substring(0, 5), "0"),
+      }));
   }, [
     dayStartTime,
     dayEndTime,
     reservationUnit.reservationStartInterval,
-    minTime,
+    durationOptions,
+    isSlotReservable,
+    date,
   ]);
 
   const isReservable = useMemo(

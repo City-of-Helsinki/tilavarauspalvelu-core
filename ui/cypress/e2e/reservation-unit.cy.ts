@@ -370,7 +370,7 @@ describe("renders with basic data", () => {
     // textWithIcon(1).contains("Seuraava vapaa aika:");
     textWithIcon(0).should("have.text", "Nuorisopalvelut Fi");
     textWithIcon(1).should("have.text", "10 - 60 henkilöä");
-    textWithIcon(2).should("have.text", "1 t - 1 t 30 min varaus");
+    textWithIcon(2).should("have.text", "1 t - 3 t varaus");
     textWithIcon(3).should("have.text", "20 € / tunti");
 
     reservationInfo().contains(
@@ -380,7 +380,7 @@ describe("renders with basic data", () => {
       `Tämä kohde on varattavissa ${reservationEnds(new Date(), true)}`
     );
     reservationInfo().contains(
-      "Varauksen keston tulee olla välillä 1 tunti - 1 tunti 30 minuuttia."
+      "Varauksen keston tulee olla välillä 1 tunti - 3 tuntia."
     );
     reservationInfo().contains(
       "Sinulla voi olla samanaikaisesti enintään yksi varaus."
@@ -444,7 +444,10 @@ describe("quick reservation", () => {
       .children("li:nth-of-type(2)")
       .click();
 
-    price("desktop").should("contain.text", "Hinta: 12,50 - 37,50\u00a0€");
+    price("desktop").should(
+      "contain.text",
+      "Hinta: 20,00 - 60,00\u00a0€, Tarkista alennusryhmät"
+    );
 
     durationSelect()
       .click()
@@ -452,7 +455,7 @@ describe("quick reservation", () => {
       .children("li:nth-of-type(3)")
       .click();
 
-    price("desktop").should("contain.text", "Hinta: 15,00 - 45,00\u00a0€");
+    price("desktop").should("contain.text", "Hinta: 30,00 - 90,00\u00a0€");
     submitButton("desktop").should("not.be.disabled");
 
     timeSlots("desktop").first().click();
@@ -470,7 +473,10 @@ describe("quick reservation", () => {
     submitButton("desktop").should("be.disabled");
 
     timeSlots("desktop").first().click();
-    price("desktop").should("contain.text", "Hinta: 120,00 - 300,00\u00a0€");
+    price("desktop").should(
+      "contain.text",
+      "Hinta: 240,00 - 600,00\u00a0€, Tarkista alennusryhmät"
+    );
 
     pricingTermsLink("quick-reservation").click();
 
