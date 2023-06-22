@@ -201,10 +201,11 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
-  const newReservations = useMultipleReservation(
+  const newReservations = useMultipleReservation({
     form,
-    reservationUnit?.reservationStartInterval
-  );
+    reservationUnit,
+    interval: reservationUnit?.reservationStartInterval,
+  });
 
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,

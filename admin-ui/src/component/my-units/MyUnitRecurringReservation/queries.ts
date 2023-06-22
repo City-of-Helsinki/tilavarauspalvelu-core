@@ -31,6 +31,8 @@ export const GET_RESERVATIONS_IN_INTERVAL = gql`
       ) {
         begin
         end
+        bufferTimeBefore
+        bufferTimeAfter
       }
     }
   }

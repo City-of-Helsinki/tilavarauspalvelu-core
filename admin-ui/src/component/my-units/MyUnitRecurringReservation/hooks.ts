@@ -5,47 +5,63 @@ import type {
   Query,
   QueryReservationUnitByPkArgs,
   QueryUnitsArgs,
+  ReservationType,
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
-import { addDays } from "date-fns";
+import { addDays, addSeconds } from "date-fns";
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "../../../context/NotificationContext";
 import { RECURRING_RESERVATION_UNIT_QUERY } from "../queries";
 import { GET_RESERVATIONS_IN_INTERVAL } from "./queries";
 import { NewReservationListItem } from "../../ReservationsList";
-import { DateRange, convertToDate, isOverlapping } from "./utils";
+import { convertToDate, isOverlapping } from "./utils";
 
-export const useMultipleReservation = (
-  form: UseFormReturn<RecurringReservationForm>,
-  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices = ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-) => {
+export const useMultipleReservation = ({
+  form,
+  reservationUnit,
+  interval = ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+}: {
+  form: UseFormReturn<RecurringReservationForm>;
+  reservationUnit?: ReservationUnitType;
+  interval?: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+}) => {
   const { watch } = form;
 
-  const selectedReservationParams = watch([
-    "startingDate",
-    "endingDate",
-    "startTime",
-    "endTime",
-    "repeatPattern",
-    "repeatOnDays",
-  ]);
-
   // NOTE useMemo is useless here, watcher already filters out unnecessary runs
-  return generateReservations(
+  const result = generateReservations(
     {
-      startingDate: selectedReservationParams[0],
-      endingDate: selectedReservationParams[1],
-      startTime: selectedReservationParams[2],
-      endTime: selectedReservationParams[3],
-      repeatPattern: selectedReservationParams[4],
-      repeatOnDays: selectedReservationParams[5],
+      startingDate: watch("startingDate"),
+      endingDate: watch("endingDate"),
+      startTime: watch("startTime"),
+      endTime: watch("endTime"),
+      repeatPattern: watch("repeatPattern"),
+      repeatOnDays: watch("repeatOnDays"),
     },
     interval
   );
+
+  const isBlocked = watch("type") === "BLOCKED";
+
+  return {
+    ...result,
+    reservations: result.reservations.map((item) => ({
+      ...item,
+      buffers: {
+        before:
+          watch("bufferTimeBefore") && !isBlocked
+            ? reservationUnit?.bufferTimeBefore ?? 0
+            : 0,
+        after:
+          watch("bufferTimeAfter") && !isBlocked
+            ? reservationUnit?.bufferTimeAfter ?? 0
+            : 0,
+      },
+    })),
+  };
 };
 
 // NOTE pks are integers even though the query uses strings
@@ -72,6 +88,27 @@ export const useRecurringReservationsUnits = (unitId: number) => {
 
   return { loading, reservationUnits };
 };
+
+type TimeInterval = {
+  begin: Date;
+  end: Date;
+  buffers: {
+    before: number;
+    after: number;
+  };
+};
+
+const reservationToInterval = (x: ReservationType): TimeInterval | undefined =>
+  x.begin && x.end
+    ? {
+        begin: new Date(x.begin),
+        end: new Date(x.end),
+        buffers: {
+          before: x.bufferTimeBefore ?? 0,
+          after: x.bufferTimeAfter ?? 0,
+        },
+      }
+    : undefined;
 
 export const useReservationsInInterval = ({
   begin,
@@ -113,12 +150,8 @@ export const useReservationsInInterval = ({
   const reservations = useMemo(
     () =>
       data?.reservationUnitByPk?.reservations
-        ?.map((x) =>
-          x?.begin && x?.end
-            ? { begin: new Date(x.begin), end: new Date(x.end) }
-            : undefined
-        )
-        ?.filter((x): x is { begin: Date; end: Date } => x != null) ?? [],
+        ?.map((x) => (x ? reservationToInterval(x) : undefined))
+        ?.filter((x): x is TimeInterval => x != null) ?? [],
     [data]
   );
 
@@ -144,15 +177,20 @@ export const useFilteredReservationList = ({
 
   const isReservationInsideRange = (
     res: NewReservationListItem,
-    range: DateRange
+    range: TimeInterval
   ) => {
     const startDate = convertToDate(res.date, res.startTime);
     const endDate = convertToDate(res.date, res.endTime);
+    const bufferBefore = Math.max(
+      res.buffers?.before ?? 0,
+      range.buffers.before
+    );
+    const bufferAfter = Math.max(res.buffers?.after ?? 0, range.buffers.after);
     if (startDate && endDate) {
       return isOverlapping(
         {
-          begin: startDate,
-          end: endDate,
+          begin: addSeconds(startDate, -bufferBefore),
+          end: addSeconds(endDate, bufferAfter),
         },
         range
       );

@@ -13,6 +13,10 @@ type NewReservationListItem = {
   buttons?: React.ReactNode;
   isRemoved?: boolean;
   isOverlapping?: boolean;
+  buffers?: {
+    before?: number;
+    after?: number;
+  };
 };
 
 type Props = {
