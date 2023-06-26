@@ -33,11 +33,11 @@ const AuthorisationChecker = ({
   permission?: Permission;
 }) => {
   const { authState } = useAuthState();
-  const { hasPermission } = authState;
+  const { hasSomePermission } = authState;
   const error = AuthStateError(authState.state);
   if (error) return error;
 
-  if (permission && !hasPermission(permission)) {
+  if (permission && !hasSomePermission(permission)) {
     return (
       <MainMenuWrapper>
         <Error403 />

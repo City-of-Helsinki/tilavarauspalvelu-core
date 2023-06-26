@@ -7,6 +7,11 @@ import {
   UnitType,
 } from "common/types/gql-types";
 
+const hasGeneralPermission = (permissionName: string, user: UserType) =>
+  user.generalRoles?.find((x) =>
+    x?.permissions?.find((y) => y?.permission === permissionName)
+  ) != null;
+
 const hasUnitPermission = (
   permissionName: string,
   unitPk: number,
@@ -86,6 +91,9 @@ const permissionHelper =
     serviceSectorPk?: number[]
   ): boolean => {
     if (user.isSuperuser) {
+      return true;
+    }
+    if (hasGeneralPermission(permissionName, user)) {
       return true;
     }
 
