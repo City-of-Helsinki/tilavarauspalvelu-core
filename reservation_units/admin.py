@@ -1,9 +1,12 @@
 from admin_extra_buttons.api import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
-from django.forms import CharField, ModelForm
+from django.core.exceptions import ValidationError
+from django.forms import CharField, ModelChoiceField, ModelForm
 from django.http import FileResponse
 from tinymce.widgets import TinyMCE
+
+from terms_of_use.models import TermsOfUse
 
 from .models import (
     Day,
@@ -30,10 +33,64 @@ from .utils.export_data import ReservationUnitExporter
 class ReservationUnitAdminForm(ModelForm):
     description = CharField(widget=TinyMCE())
     terms_of_use = CharField(widget=TinyMCE(), required=False)
+    pricing_terms = ModelChoiceField(queryset=TermsOfUse.objects.none(), required=False)
+    payment_terms = ModelChoiceField(queryset=TermsOfUse.objects.none(), required=False)
+    cancellation_terms = ModelChoiceField(
+        queryset=TermsOfUse.objects.none(), required=False
+    )
+    service_specific_terms = ModelChoiceField(
+        queryset=TermsOfUse.objects.none(), required=False
+    )
 
     class Meta:
         model = ReservationUnit
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["pricing_terms"].queryset = TermsOfUse.objects.filter(
+            terms_type=TermsOfUse.TERMS_TYPE_PRICING
+        )
+        self.fields["payment_terms"].queryset = TermsOfUse.objects.filter(
+            terms_type=TermsOfUse.TERMS_TYPE_PAYMENT
+        )
+        self.fields["cancellation_terms"].queryset = TermsOfUse.objects.filter(
+            terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
+        )
+        self.fields["service_specific_terms"].queryset = TermsOfUse.objects.filter(
+            terms_type=TermsOfUse.TERMS_TYPE_SERVICE
+        )
+
+    def clean_pricing_terms(self):
+        terms = self.cleaned_data.get("pricing_terms")
+        if terms and terms.terms_type != TermsOfUse.TERMS_TYPE_PRICING:
+            raise ValidationError("Selected value for pricing terms is not valid.")
+
+        return terms
+
+    def clean_payment_terms(self):
+        terms = self.cleaned_data.get("payment_terms")
+        if terms and terms.terms_type != TermsOfUse.TERMS_TYPE_PAYMENT:
+            raise ValidationError("Selected value for payment terms is not valid.")
+
+        return terms
+
+    def clean_cancellation_terms(self):
+        terms = self.cleaned_data.get("cancellation_terms")
+        if terms and terms.terms_type != TermsOfUse.TERMS_TYPE_CANCELLATION:
+            raise ValidationError("Selected value for cancellation terms is not valid.")
+
+        return terms
+
+    def clean_service_specific_terms(self):
+        terms = self.cleaned_data.get("service_specific_terms")
+        if terms and terms.terms_type != TermsOfUse.TERMS_TYPE_SERVICE:
+            raise ValidationError(
+                "Selected value for service specific terms is not valid."
+            )
+
+        return terms
 
 
 class ReservationUnitImageInline(admin.TabularInline):
