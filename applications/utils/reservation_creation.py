@@ -4,6 +4,7 @@ from django.db import Error
 from django.utils.timezone import get_default_timezone
 
 import tilavarauspalvelu.utils.logging as logging
+from applications.models import ApplicationEvent
 from applications.utils.aggregate_data import (
     ApplicationAggregateDataCreator,
     ApplicationRoundAggregateDataCreator,
@@ -31,7 +32,9 @@ def create_reservations_from_allocation_results(application_event):
     ApplicationAggregateDataCreator(application_event.application).start()
 
 
-def create_reservation_from_schedule_result(result, application_event):
+def create_reservation_from_schedule_result(
+    result, application_event: ApplicationEvent
+):
     recurring_reservation = RecurringReservation.objects.create(
         user=application_event.application.user,
         application=application_event.application,
@@ -70,6 +73,9 @@ def create_reservation_from_schedule_result(result, application_event):
         ) = reservation_scheduler.get_reservation_times_based_on_opening_hours()
         is_unit_closed = start is None
 
+        application = application_event.application
+        organisation = application.organisation
+
         try:
             reservation = Reservation.objects.create(
                 state=STATE_CHOICES.DENIED
@@ -82,6 +88,29 @@ def create_reservation_from_schedule_result(result, application_event):
                 recurring_reservation=recurring_reservation,
                 num_persons=application_event.num_persons,
                 purpose=application_event.purpose,
+                age_group=application_event.age_group,
+                name=application_event.name,
+                reservee_organisation_name=getattr(organisation, "name", ""),
+                reservee_first_name=getattr(
+                    application.contact_person, "first_name", ""
+                ),
+                reservee_last_name=getattr(application.contact_person, "last_name", ""),
+                reservee_email=getattr(application.contact_person, "email", ""),
+                reservee_phone=getattr(application.contact_person, "phone_number", ""),
+                reservee_id=getattr(organisation, "identifier", ""),
+                reservee_address_zip=getattr(organisation.address, "post_code", ""),
+                reservee_address_street=getattr(
+                    organisation.address, "street_address", ""
+                ),
+                reservee_address_city=getattr(organisation.address, "city", ""),
+                billing_address_street=getattr(
+                    application.billing_address, "street_address", ""
+                ),
+                billing_address_city=getattr(application.billing_address, "city", ""),
+                billing_address_zip=getattr(
+                    application.billing_address, "post_code", ""
+                ),
+                home_city=application.home_city,
             )
             reservation.reservation_unit.add(result.allocated_reservation_unit)
         except Error:

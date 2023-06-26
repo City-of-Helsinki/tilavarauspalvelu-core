@@ -299,7 +299,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
     )
     reservee_id = models.CharField(
         verbose_name=_("Reservee ID"),
-        max_length=10,
+        max_length=255,
         blank=True,
         default="",
         help_text="Reservee's business or association identity code",
