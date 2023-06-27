@@ -327,31 +327,34 @@ class ReservationSchedulingMixin:
             begin, self.instance, exclude_blocked=True
         )
 
-        if not buffer_before:
-            buffer_before = max(
-                [
-                    buffer
-                    for buffer in (
-                        getattr(reservation_before, "buffer_time_after", None),
-                        reservation_unit.buffer_time_before,
-                    )
-                    if buffer
-                ],
-                default=None,
-            )
+        buffer_before = max(
+            [
+                buffer
+                for buffer in (
+                    buffer_before
+                    if buffer_before is not None
+                    else reservation_unit.buffer_time_before,
+                    getattr(reservation_before, "buffer_time_after", None),
+                )
+                if buffer
+            ],
+            default=None,
+        )
 
-        if not buffer_after:
-            buffer_after = max(
-                [
-                    buffer
-                    for buffer in (
-                        getattr(reservation_after, "buffer_time_before", None),
-                        reservation_unit.buffer_time_after,
-                    )
-                    if buffer
-                ],
-                default=None,
-            )
+        buffer_after = max(
+            [
+                buffer
+                for buffer in (
+                    buffer_after
+                    if buffer_after is not None
+                    else reservation_unit.buffer_time_after,
+                    getattr(reservation_after, "buffer_time_before", None),
+                    buffer_after,
+                )
+                if buffer
+            ],
+            default=None,
+        )
 
         if (
             reservation_before
