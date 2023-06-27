@@ -908,6 +908,12 @@ class ReservationUnitImage(models.Model):
         update_fields=None,
         update_urls=True,
     ):
+        previous_data = ReservationUnitImage.objects.filter(pk=self.pk).first()
+        if settings.IMAGE_CACHE_ENABLED and previous_data and previous_data.image:
+            aliases = settings.THUMBNAIL_ALIASES[""]
+            for conf_key in list(aliases.keys()):
+                image_path = get_thumbnailer(previous_data.image)[conf_key].url
+                purge_image_cache.delay(image_path)
         super().save(
             force_insert=force_insert,
             force_update=force_update,
