@@ -204,10 +204,8 @@ class Space(MPTTModel):
         null=True,
         blank=True,
     )
-    surface_area = models.DecimalField(
+    surface_area = models.IntegerField(
         verbose_name=_("Surface area"),
-        max_digits=10,
-        decimal_places=2,
         blank=True,
         null=True,
     )

@@ -81,7 +81,7 @@ snapshots['SpacesQueryTestCase::test_spaces_query 1'] = {
                         'code': '',
                         'maxPersons': None,
                         'nameFi': 'outerspace',
-                        'surfaceArea': 40.5
+                        'surfaceArea': 40
                     }
                 }
             ]

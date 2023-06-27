@@ -41,7 +41,7 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (SpacePermission,)
     children = graphene.List(lambda: SpaceType)
     resources = graphene.List("api.graphql.resources.resource_types.ResourceType")
-    surface_area = graphene.Float()
+    surface_area = graphene.Int
 
     class Meta:
         model = Space

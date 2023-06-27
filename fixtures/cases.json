@@ -512,7 +512,7 @@
             "parent": null,
             "building": 18,
             "unit": null,
-            "surface_area": "50.00",
+            "surface_area": 50,
             "max_persons": 10,
             "code": "",
             "lft": 1,
