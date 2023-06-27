@@ -163,11 +163,19 @@ class ReservationStaffCreateSerializer(
 
         self.check_begin(begin, end)
 
+        buffer_before = data.get("buffer_time_before", None)
+        buffer_after = data.get("buffer_time_after", None)
+
         for reservation_unit in reservation_units:
             reservation_type = data.get("type", getattr(self.instance, "type", None))
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_buffer_times(
-                reservation_unit, begin, end, reservation_type=reservation_type
+                reservation_unit,
+                begin,
+                end,
+                reservation_type=reservation_type,
+                buffer_before=buffer_before,
+                buffer_after=buffer_after,
             )
             self.check_reservation_intervals_for_staff_reservation(
                 reservation_unit, begin
