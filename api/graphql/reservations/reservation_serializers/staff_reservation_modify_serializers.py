@@ -31,8 +31,16 @@ class StaffReservationModifySerializer(
     age_group_pk = IntegerPrimaryKeyField(
         queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
     )
-    buffer_time_before = DurationField(required=False)
-    buffer_time_after = DurationField(required=False)
+
+    buffer_time_before = DurationField(
+        required=False,
+        help_text="Number of seconds. Null/undefined value means buffer from reservation unit is used.",
+    )
+    buffer_time_after = DurationField(
+        required=False,
+        help_text="Number of seconds. Null/undefined value means buffer from reservation unit is used.",
+    )
+
     home_city_pk = IntegerPrimaryKeyField(
         queryset=City.objects.all(), source="home_city", allow_null=True
     )

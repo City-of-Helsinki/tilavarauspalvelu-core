@@ -149,7 +149,15 @@ class ReservationStaffCreateSerializer(
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
         self.fields["buffer_time_after"].required = False
+        self.fields["buffer_time_after"].help_text = (
+            "Can be a number of seconds or timespan in format HH:MM:SS. "
+            "Null/undefined value means buffer from reservation unit is used."
+        )
         self.fields["buffer_time_before"].required = False
+        self.fields["buffer_time_before"].help_text = (
+            "Can be a number of seconds or timespan in format HH:MM:SS. "
+            "Null/undefined value means buffer from reservation unit is used."
+        )
 
     def validate(self, data):
         data = super().validate(data)
