@@ -10,7 +10,10 @@ import type {
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
-import { ReservationsReservationReserveeTypeChoices } from "common/types/gql-types";
+import {
+  ReservationsReservationReserveeTypeChoices,
+  ReservationsReservationTypeChoices,
+} from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { useNotification } from "../../../context/NotificationContext";
 import {
@@ -156,7 +159,17 @@ export const useUnitResources = (
         x.reservations
           ?.filter((y): y is ReservationType => y != null)
           .map((y) => ({
-            event: y,
+            event: {
+              ...y,
+              ...(y.type !== ReservationsReservationTypeChoices.Blocked
+                ? {
+                    bufferTimeBefore:
+                      y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,
+                    bufferTimeAfter:
+                      y.bufferTimeAfter ?? x.bufferTimeAfter ?? 0,
+                  }
+                : {}),
+            },
             title: y.name ?? "",
             start: new Date(y.begin),
             end: new Date(y.end),

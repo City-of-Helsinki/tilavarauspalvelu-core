@@ -253,19 +253,19 @@ const DialogContent = ({
         metadataSetFields
       );
 
+      const bufferBefore = values.bufferTimeBefore
+        ? reservationUnit.bufferTimeBefore ?? 0
+        : 0;
+      const bufferAfter = values.bufferTimeAfter
+        ? reservationUnit.bufferTimeAfter ?? 0
+        : 0;
       const input: ReservationStaffCreateMutationInput = {
         reservationUnitPks: [reservationUnit.pk],
         type: values.type ?? "",
         begin: dateTime(values.date, values.startTime),
         end: dateTime(values.date, values.endTime),
-        bufferTimeBefore:
-          values.bufferTimeBefore && reservationUnit.bufferTimeBefore
-            ? String(reservationUnit.bufferTimeBefore)
-            : undefined,
-        bufferTimeAfter:
-          values.bufferTimeAfter && reservationUnit.bufferTimeAfter
-            ? String(reservationUnit.bufferTimeAfter)
-            : undefined,
+        bufferTimeBefore: bufferBefore.toString(),
+        bufferTimeAfter: bufferAfter.toString(),
         workingMemo: values.comments,
         ...flattenedMetadataSetValues,
         reserveeType: values.reserveeType,

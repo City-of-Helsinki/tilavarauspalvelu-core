@@ -80,6 +80,8 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
           reservationUnitType {
             pk
           }
+          bufferTimeBefore
+          bufferTimeAfter
           isDraft
           ...ReservationUnitReservations
         }
