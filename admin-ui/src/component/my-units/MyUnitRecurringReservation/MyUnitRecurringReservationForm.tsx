@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  ErrorType,
-  RecurringReservationCreateMutationInput,
-  RecurringReservationCreateMutationPayload,
-  ReservationStaffCreateMutationInput,
-  ReservationStaffCreateMutationPayload,
-  ReservationUnitType,
-} from "common/types/gql-types";
+import type { ReservationUnitType } from "common/types/gql-types";
 import { camelCase, get } from "lodash";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useMutation } from "@apollo/client";
 import { Button, TextInput } from "hds-react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { toApiDate, fromUIDate, toApiDateUnsafe } from "common/src/common/util";
+import { fromUIDate } from "common/src/common/util";
 import { removeRefParam } from "common/src/reservation-form/util";
 import {
   RecurringReservationFormSchema,
@@ -26,14 +18,13 @@ import { WeekdaysSelector } from "./WeekdaysSelector";
 import ReservationList, {
   NewReservationListItem,
 } from "../../ReservationsList";
-import { CREATE_RECURRING_RESERVATION } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
-import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
-import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
-import { ReservationMade } from "./RecurringReservationDone";
 import { ActionsWrapper, Grid, Element } from "./commonStyling";
-import { flattenMetadata } from "../create-reservation/utils";
-import { useFilteredReservationList, useMultipleReservation } from "./hooks";
+import {
+  useCreateRecurringReservation,
+  useFilteredReservationList,
+  useMultipleReservation,
+} from "./hooks";
 import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
 import ControlledTimeInput from "../components/ControlledTimeInput";
@@ -161,22 +152,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     { value: "biweekly", label: t("common.biweekly") },
   ] as const;
 
-  const [create] = useMutation<
-    { createRecurringReservation: RecurringReservationCreateMutationPayload },
-    { input: RecurringReservationCreateMutationInput }
-  >(CREATE_RECURRING_RESERVATION);
-
-  const createRecurringReservation = (
-    input: RecurringReservationCreateMutationInput
-  ) => create({ variables: { input } });
-
-  const createReservationMutation = useMutation<
-    { createStaffReservation: ReservationStaffCreateMutationPayload },
-    { input: ReservationStaffCreateMutationInput }
-  >(CREATE_STAFF_RESERVATION);
-
-  const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
-    createReservationMutation[0]({ variables: { input } });
+  const [mutate] = useCreateRecurringReservation();
 
   const [removedReservations, setRemovedReservations] = useState<
     NewReservationListItem[]
@@ -197,7 +173,6 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   }, [startTime, endTime, reservationUnit]);
 
   const { notifyError } = useNotification();
-
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
@@ -216,6 +191,10 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
 
   const navigate = useNavigate();
 
+  const handleError = (error = "") => {
+    notifyError(t("ReservationDialog.saveFailed", { error }));
+  };
+
   const onSubmit = async (data: RecurringReservationForm) => {
     // TODO notifyError does a double translation somewhere
     if (!newReservations.success) {
@@ -231,150 +210,45 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
       notifyError(t(translateError("noReservations")));
       return;
     }
-    try {
-      const unitPk = reservationUnit?.pk;
-      if (unitPk == null) {
-        throw new Error("Reservation unit not selected");
-      }
+    const unitPk = reservationUnit?.pk;
+    if (unitPk == null) {
+      notifyError(t(translateError("formNotValid")));
+      return;
+    }
 
-      const metadataSetFields =
+    try {
+      const metaFields =
         reservationUnit?.metadataSet?.supportedFields
           ?.filter((x): x is string => x != null)
           .map(camelCase) ?? [];
 
-      const flattenedMetadataSetValues = flattenMetadata(
-        data,
-        metadataSetFields
-      );
-
-      const name = data.type === "BLOCKED" ? "BLOCKED" : data.seriesName ?? "";
-
-      const input: RecurringReservationCreateMutationInput = {
-        reservationUnitPk: unitPk,
-        beginDate: toApiDateUnsafe(fromUIDate(data.startingDate)),
-        beginTime: data.startTime,
-        endDate: toApiDateUnsafe(fromUIDate(data.endingDate)),
-        endTime: data.endTime,
-        weekdays: data.repeatOnDays,
-        recurrenceInDays: data.repeatPattern.value === "weekly" ? 7 : 14,
-        name,
-        description: data.comments,
-
-        // TODO missing fields
-        // abilityGroupPk?: InputMaybe<Scalars["Int"]>;
-        // ageGroupPk?: InputMaybe<Scalars["Int"]>;
-        // clientMutationId?: InputMaybe<Scalars["String"]>;
-        // user?: InputMaybe<Scalars["String"]>;
+      const buffers = {
+        before:
+          data.bufferTimeBefore && reservationUnit?.bufferTimeBefore
+            ? reservationUnit.bufferTimeBefore
+            : undefined,
+        end:
+          data.bufferTimeAfter && reservationUnit?.bufferTimeAfter
+            ? reservationUnit.bufferTimeAfter
+            : undefined,
       };
-
-      const { data: createResponse } = await createRecurringReservation(input);
-
-      if (
-        createResponse?.createRecurringReservation == null ||
-        createResponse?.createRecurringReservation.errors != null
-      ) {
-        // Why is this done like this (taken from single reservation)?
-        const firstError = (
-          createResponse?.createRecurringReservation?.errors || []
-        ).find(() => true);
-
-        notifyError(
-          t("ReservationDialog.saveFailed", {
-            error: get(firstError, "messages[0]"),
-          })
-        );
-      } else {
-        // TODO this is common with the ReservationForm combine them
-        const myDateTime = (date: Date, time: string) => {
-          const maybeDateString = toApiDate(date, "dd.MM.yyyy");
-          return maybeDateString ? dateTime(maybeDateString, time) : undefined;
-        };
-
-        // TODO see if parts of this can be combined with ReservationDialog (it's very similar)
-        const rets = reservationsToMake.map(async (x) => {
-          const common = {
-            startTime: x.startTime,
-            endTime: x.endTime,
-            date: x.date,
-          };
-
-          try {
-            const begin = myDateTime(x.date, x.startTime);
-            const end = myDateTime(x.date, x.endTime);
-
-            if (!begin || !end) {
-              throw new Error("Invalid date selected");
-            }
-
-            const staffInput: ReservationStaffCreateMutationInput = {
-              reservationUnitPks: [unitPk],
-              recurringReservationPk:
-                createResponse.createRecurringReservation.pk,
-              type: data.type,
-              begin,
-              end,
-              bufferTimeBefore:
-                data.bufferTimeBefore && reservationUnit?.bufferTimeBefore
-                  ? String(reservationUnit.bufferTimeBefore)
-                  : undefined,
-              bufferTimeAfter:
-                data.bufferTimeAfter && reservationUnit?.bufferTimeAfter
-                  ? String(reservationUnit.bufferTimeAfter)
-                  : undefined,
-              workingMemo: data.comments,
-              ...flattenedMetadataSetValues,
-            };
-            const { data: resData } = await createStaffReservation(staffInput);
-
-            if (resData == null) {
-              return {
-                ...common,
-                reservationPk: undefined,
-                error: "Null error",
-              };
-            }
-
-            // TODO When does the graphql send errors as data? oposed to exceptions
-            if (resData.createStaffReservation.errors != null) {
-              return {
-                ...common,
-                reservationPk: undefined,
-                error:
-                  resData.createStaffReservation.errors.filter(
-                    (y): y is ErrorType => y != null
-                  ) ?? "unkown error",
-              };
-            }
-            return {
-              ...common,
-              reservationPk: resData.createStaffReservation.pk ?? undefined,
-              error: undefined,
-            };
-          } catch (e) {
-            // This happens at least when the start time is in the past
-            // or if there is a another reservation on that time slot
-            return {
-              ...common,
-              reservationPk: undefined,
-              error: String(e),
-            };
-          }
-        });
-
-        const result: ReservationMade[] = await Promise.all(rets).then(
-          (y) => y
-        );
-        navigate("completed", {
-          state: {
-            reservations: result,
-            recurringPk: createResponse.createRecurringReservation.pk,
-          },
-        });
-      }
-    } catch (e) {
-      notifyError(
-        t("ReservationDialog.saveFailed", { error: get(e, "message") })
+      const [recurringPk, result] = await mutate(
+        data,
+        reservationsToMake,
+        unitPk,
+        metaFields,
+        buffers
       );
+
+      navigate("completed", {
+        state: {
+          reservations: result,
+          recurringPk,
+        },
+      });
+    } catch (e) {
+      const err = get(e, "message");
+      handleError(err);
       // on exception in RecurringReservation (because we are catching the individual errors)
       // We don't need to cleanup the RecurringReservation that has zero connections.
       // Based on documentation backend will do this for us.
