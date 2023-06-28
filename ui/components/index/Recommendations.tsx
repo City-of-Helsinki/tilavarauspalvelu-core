@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ReservationUnitType } from "common/types/gql-types";
-import Container from "../common/Container";
+import { Container } from "common";
+
 import RelatedUnits from "../reservation-unit/RelatedUnits";
 
 type Props = {

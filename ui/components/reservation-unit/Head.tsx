@@ -13,13 +13,14 @@ import {
 } from "common/types/gql-types";
 import { omit } from "lodash";
 import { useLocalStorage } from "react-use";
+import { Container } from "common";
+
 import {
   formatDate,
   getTranslation,
   orderImages,
   singleSearchUrl,
 } from "../../modules/util";
-import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
 import Images from "./Images";
 import {

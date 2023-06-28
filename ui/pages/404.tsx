@@ -3,7 +3,7 @@ import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { CenteredContainer } from "../components/common/Container";
+import { CenteredContainer } from "common/src/layout/Container";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

@@ -19,7 +19,8 @@ import {
   ReservationUnitsReservationUnitReservationKindChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
-import Container from "../../components/common/Container";
+import { Container } from "common";
+
 import SearchForm from "../../components/single-search/SearchForm";
 import { capitalize, singleSearchUrl } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
@@ -52,7 +53,7 @@ const HeadContainer = styled.div`
 
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
-const BottomWrapper = styled.div`
+const BottomWrapper = styled(Container)`
   padding-top: var(--spacing-l);
 `;
 

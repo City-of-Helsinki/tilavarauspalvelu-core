@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import Link from "next/link";
 import { IconArrowRight, IconSignout } from "hds-react";
-import Container from "../common/Container";
+import { Container } from "common";
 import { Paragraph } from "./styles";
 import { LinkButton } from "../../styles/util";
 import { useLogout } from "../../hooks/useLogout";
@@ -18,11 +18,10 @@ type Props = {
 
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
-const StyledContainer = styled(Container)`
+const StyledContainer = styled(Container).attrs({ size: "s" })`
   padding: var(--spacing-m) var(--spacing-m) var(--spacing-layout-m);
 
   @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
     margin-bottom: var(--spacing-layout-l);
   }
 `;

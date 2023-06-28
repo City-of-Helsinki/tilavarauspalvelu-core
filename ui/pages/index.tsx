@@ -10,6 +10,8 @@ import {
   QueryUnitsArgs,
   UnitType,
 } from "common/types/gql-types";
+import { Container } from "common";
+
 import Header from "../components/index/Header";
 import SearchGuides from "../components/index/SearchGuides";
 import Purposes from "../components/index/Purposes";
@@ -25,9 +27,7 @@ type Props = {
   units: UnitType[];
 };
 
-const Wrapper = styled.div`
-  background-color: var(--color-white);
-`;
+const Wrapper = styled(Container)``;
 
 const Home = ({ purposes, units }: Props): JSX.Element => {
   const { t } = useTranslation(["home", "common"]);

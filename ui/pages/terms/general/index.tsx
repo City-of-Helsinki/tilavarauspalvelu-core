@@ -10,11 +10,12 @@ import {
   TermsOfUseTermsOfUseTermsTypeChoices,
 } from "common/types/gql-types";
 import { H2 } from "common/src/common/typography";
+import { Container } from "common";
+
 import apolloClient from "../../../modules/apolloClient";
 import Sanitize from "../../../components/common/Sanitize";
 import { getTranslation } from "../../../modules/util";
 import { TERMS_OF_USE } from "../../../modules/queries/reservationUnit";
-import { ExtraNarrowCenteredContainer } from "../../../modules/style/layout";
 
 type Props = {
   genericTerms: TermsOfUseType;
@@ -43,9 +44,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const Wrapper = styled(ExtraNarrowCenteredContainer)`
-  margin-top: var(--spacing-l);
-  margin-bottom: var(--spacing-l);
+const Wrapper = styled(Container).attrs({ size: "s" })`
+  margin-bottom: var(--spacing-layout-l);
 `;
 
 const Heading = styled(H2).attrs({ as: "h1" })``;

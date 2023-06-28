@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { Button, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { PageInfo } from "common/types/gql-types";
-import Container from "./Container";
 import { CenterSpinner } from "./common";
 
 export type Props = {
@@ -125,7 +124,7 @@ const ListWithPagination = ({
   ) : null;
 
   return (
-    <Container className={className} id={id}>
+    <div className={className} id={id}>
       {loading && !loadingMore ? (
         <CenterSpinner
           style={{
@@ -149,7 +148,7 @@ const ListWithPagination = ({
           {items?.length > 0 && content}
         </>
       )}
-    </Container>
+    </div>
   );
 };
 

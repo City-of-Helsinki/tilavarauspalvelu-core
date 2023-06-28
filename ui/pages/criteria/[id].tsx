@@ -8,7 +8,8 @@ import {
   Query,
   QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
-import Container from "../../components/common/Container";
+import { Container } from "common";
+
 import apolloClient from "../../modules/apolloClient";
 import Sanitize from "../../components/common/Sanitize";
 import KorosDefault from "../../components/common/KorosDefault";

@@ -24,6 +24,8 @@ import styled from "styled-components";
 import { PendingReservation } from "common/types/common";
 import { toApiDate } from "common/src/common/util";
 import { Subheading } from "common/src/reservation-form/styles";
+import { Container } from "common";
+
 import {
   ADJUST_RESERVATION_TIME,
   GET_RESERVATION,
@@ -38,7 +40,6 @@ import {
   RESERVATION_UNIT,
   OPENING_HOURS,
 } from "../../modules/queries/reservationUnit";
-import Container from "../common/Container";
 import {
   mockOpeningTimePeriods,
   mockOpeningTimes,

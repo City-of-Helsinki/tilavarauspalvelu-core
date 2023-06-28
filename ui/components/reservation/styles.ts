@@ -12,6 +12,7 @@ export const Paragraph = styled.p`
 export const ActionContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
+  margin-top: var(--spacing-layout-m);
   margin-bottom: var(--spacing-layout-m);
 
   button {

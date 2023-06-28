@@ -24,12 +24,10 @@ import {
 } from "common/types/gql-types";
 import { parseISO } from "date-fns";
 import Link from "next/link";
+import { Container } from "common";
+
 import apolloClient from "../../modules/apolloClient";
-import {
-  JustForDesktop,
-  JustForMobile,
-  NarrowCenteredContainer,
-} from "../../modules/style/layout";
+import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { CenterSpinner } from "../../components/common/common";
 import { BlackButton, Toast } from "../../styles/util";
@@ -112,15 +110,6 @@ const StyledBreadcrumbWrapper = styled(BreadcrumbWrapper)`
 
 const Wrapper = styled.div`
   background-color: var(--color-white);
-`;
-
-const Container = styled(NarrowCenteredContainer)`
-  padding: 0 var(--spacing-m) var(--spacing-layout-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
-    margin-bottom: var(--spacing-layout-l);
-  }
 `;
 
 const Heading = styled(H2).attrs({ as: "h1" })`

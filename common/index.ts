@@ -7,6 +7,7 @@ import {
   getUnRoundedReservationVolume,
 } from "./src/reservation-pricing";
 import UserInfo from "./src/userinfo/UserInfo";
+import Container from "./src/layout/Container";
 
 export {
   Breadcrumb,
@@ -16,6 +17,7 @@ export {
   getPriceUnitMinutes,
   getReservationPrice,
   formatters,
+  Container,
 };
 
 export * from "./types/common";

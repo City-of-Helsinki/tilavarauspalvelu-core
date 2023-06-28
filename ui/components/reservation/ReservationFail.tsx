@@ -5,7 +5,8 @@ import Link from "next/link";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import Container from "../common/Container";
+import { Container } from "common";
+
 import { Paragraph } from "./styles";
 import { singleSearchUrl } from "../../modules/util";
 import { useLogout } from "../../hooks/useLogout";

@@ -9,7 +9,6 @@ import { fontMedium, H3 } from "common/src/common/typography";
 import { PurposeType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
-import Container from "../common/Container";
 import ReservationUnitSearch from "./ReservationUnitSearch";
 
 type Props = {
@@ -18,16 +17,17 @@ type Props = {
 
 const mobileBreakpoint = "450px";
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  margin-bottom: var(--spacing-layout-m);
+`;
 
 const Heading = styled(H3).attrs({ as: "h2" })`
   margin: 0;
 `;
 
-const Content = styled(Container)`
+const Content = styled.div`
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-m);
 `;
 
 const Top = styled.div`
@@ -37,7 +37,7 @@ const Top = styled.div`
   gap: var(--spacing-m);
   padding-bottom: var(--spacing-m);
 
-  @media (min-width: ${breakpoints.s}) {
+  @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
     align-items: flex-end;
   }
@@ -136,6 +136,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
           <MoreLink
             data-testid="front-page__purposes--more-link"
             onClick={() => setShowAll(!showAll)}
+            href="javascript:void(0);"
           >
             {t(`${showAll ? "common:showLess" : "common:showMore"}`)}{" "}
             {showAll ? (

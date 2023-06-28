@@ -21,7 +21,8 @@ import {
   ReservationUnitsReservationUnitReservationKindChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
-import Container from "../../components/common/Container";
+import { Container } from "common";
+
 import SearchForm from "../../components/search/SearchForm";
 import {
   applicationRoundState,
@@ -109,7 +110,7 @@ const Ingress = styled(HeroSubheading)`
   margin-bottom: var(--spacing-xs);
 `;
 
-const BottomWrapper = styled.div`
+const BottomWrapper = styled(Container)`
   padding-top: var(--spacing-l);
 `;
 

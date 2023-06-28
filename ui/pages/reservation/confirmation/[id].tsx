@@ -13,7 +13,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import Container from "../../../components/common/Container";
+import { Container } from "common";
+
 import ReservationConfirmation from "../../../components/reservation/ReservationConfirmation";
 import ReservationInfoCard from "../../../components/reservation/ReservationInfoCard";
 import { Paragraph } from "../../../components/reservation/styles";
@@ -42,10 +43,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const StyledContainer = styled(Container)`
-  padding: var(--spacing-m) var(--spacing-m) var(--spacing-layout-m);
-
   @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
     margin-bottom: var(--spacing-layout-l);
   }
 `;
@@ -93,7 +91,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
 
   if (error || orderError || isOrderUuidMissing) {
     return (
-      <StyledContainer>
+      <StyledContainer size="s">
         <Columns>
           <div>
             <Heading>{t("common:error.error")}</Heading>
@@ -106,7 +104,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
 
   if (!reservation || orderLoading) {
     return (
-      <StyledContainer>
+      <StyledContainer size="s">
         <Columns style={{ justifyItems: "center" }}>
           <LoadingSpinner />
         </Columns>
@@ -117,7 +115,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
   const reservationUnit = get(reservation, "reservationUnits.[0]");
 
   return (
-    <StyledContainer>
+    <StyledContainer size="s">
       <Columns>
         <div>
           <ReservationInfoCard

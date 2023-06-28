@@ -7,7 +7,6 @@ import Link from "next/link";
 import { fontMedium, H3 } from "common/src/common/typography";
 import { UnitType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
-import Container from "../common/Container";
 import { getTranslation } from "../../modules/util";
 
 type Props = {
@@ -16,14 +15,22 @@ type Props = {
 
 const itemLimit = 8;
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  margin-bottom: var(--spacing-layout-m);
+`;
 
-const Heading = styled(H3).attrs({ as: "h2" })``;
+const Heading = styled(H3).attrs({ as: "h2" })`
+  margin-top: 0;
+  margin-bottom: var(--spacing-hz);
+`;
 
-const Content = styled(Container)`
+const Content = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 var(--spacing-m) var(--spacing-layout-m);
+
+  @media (min-width: ${breakpoints.s}) {
+    padding-right: var(--spacing-layout-l);
+  }
 `;
 
 const UnitContainer = styled.div`
@@ -63,8 +70,7 @@ const UnitItemLink = styled(Link)`
 const SearchLink = styled(Link)`
   color: var(--color-bus) !important;
   display: flex;
-  align-self: flex-start;
-  align-items: center;
+  justify-content: flex-end;
   gap: var(--spacing-2-xs);
   ${fontMedium}
 
@@ -93,15 +99,15 @@ const Units = ({ units }: Props): JSX.Element => {
               </UnitItemLink>
             ))}
           </UnitContainer>
-          {units?.length > itemLimit && (
-            <SearchLink
-              href={`${singleSearchPrefix}`}
-              data-testid="front-page__units--more-link"
-            >
-              {t("common:showAll")} <IconAngleRight aria-hidden />
-            </SearchLink>
-          )}
         </Content>
+        {units?.length > itemLimit && (
+          <SearchLink
+            href={`${singleSearchPrefix}`}
+            data-testid="front-page__units--more-link"
+          >
+            {t("common:showAll")} <IconAngleRight aria-hidden />
+          </SearchLink>
+        )}
       </Wrapper>
     )
   );

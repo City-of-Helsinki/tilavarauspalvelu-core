@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Application } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
-import Container from "../common/Container";
+import { Container } from "common";
 import Head from "./Head";
 import Stepper from "./Stepper";
 
@@ -57,7 +57,7 @@ const ApplicationPage = ({
       <Head heading={t(`${translationKeyPrefix}.heading`)}>
         {headContent || overrideText || t(`${translationKeyPrefix}.text`)}
       </Head>
-      <StyledContainer main>
+      <StyledContainer>
         <InnerContainer $hideStepper={hideStepper}>
           {hideStepper ? <div /> : <Stepper application={application} />}
           <Main>{children}</Main>

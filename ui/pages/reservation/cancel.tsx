@@ -6,9 +6,10 @@ import React, { useEffect } from "react";
 import { breakpoints } from "common/src/common/style";
 import { LoadingSpinner } from "hds-react";
 import styled from "styled-components";
+import { Container } from "common";
+
 import { authEnabled, authenticationIssuer } from "../../modules/const";
 import { useOrder, useReservation } from "../../hooks/reservation";
-import Container from "../../components/common/Container";
 import DeleteCancelled from "../../components/reservation/DeleteCancelled";
 import ReservationFail from "../../components/reservation/ReservationFail";
 

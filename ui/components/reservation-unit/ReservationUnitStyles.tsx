@@ -2,7 +2,7 @@ import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
 import { Notification } from "hds-react";
 import styled from "styled-components";
-import Container from "../common/Container";
+import { Container } from "common";
 
 export const Wrapper = styled.div`
   padding-bottom: var(--spacing-layout-xl);
@@ -126,7 +126,7 @@ export const StyledNotification = styled(Notification)<{ $isSticky?: boolean }>`
 `;
 
 export const PinkBox = styled.div`
-  margin-top: var(--spacing-m);
+  margin: var(--spacing-m) 0;
   padding: 1px var(--spacing-m) var(--spacing-m);
   background-color: var(--color-suomenlinna-light);
   line-height: var(--lineheight-l);

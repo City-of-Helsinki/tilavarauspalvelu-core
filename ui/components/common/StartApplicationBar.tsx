@@ -17,6 +17,7 @@ const BackgroundContainer = styled.div`
   background-color: var(--color-bus);
   position: fixed;
   bottom: 0;
+  left: 0;
   width: 100%;
   z-index: 20;
   min-width: ${breakpoints.xs};

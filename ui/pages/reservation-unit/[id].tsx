@@ -28,7 +28,7 @@ import {
   isReservationStartInFuture,
   isReservationUnitReservable,
 } from "common/src/calendar/util";
-import { formatters as getFormatters } from "common";
+import { formatters as getFormatters, Container } from "common";
 import { useLocalStorage, useMedia, useSessionStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
@@ -58,7 +58,7 @@ import {
   TermsOfUseTermsOfUseTermsTypeChoices,
   TermsOfUseType,
 } from "common/types/gql-types";
-import Container from "../../components/common/Container";
+
 import Head from "../../components/reservation-unit/Head";
 import Address from "../../components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";

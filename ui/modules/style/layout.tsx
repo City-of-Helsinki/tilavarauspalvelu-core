@@ -1,19 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import Container from "../../components/common/Container";
-
-export const NarrowCenteredContainer = styled(Container)`
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 880px;
-    padding-right: 130px;
-  }
-`;
-export const ExtraNarrowCenteredContainer = styled(Container)`
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 720px;
-  }
-`;
 
 const MobileWrapper = styled.div<{ $breakpoint: string }>`
   @media (min-width: ${({ $breakpoint }) => $breakpoint}) {

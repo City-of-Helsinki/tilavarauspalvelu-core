@@ -39,6 +39,8 @@ import {
 import { Inputs, Reservation } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
+import { Container } from "common";
+
 import apolloClient from "../../modules/apolloClient";
 import {
   isBrowser,
@@ -66,7 +68,6 @@ import {
 } from "../../modules/reservation";
 import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import { ReservationProps } from "../../context/DataContext";
-import Container from "../../components/common/Container";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import ReservationConfirmation from "../../components/reservation/ReservationConfirmation";
 import Step0 from "../../components/reservation/Step0";
@@ -178,10 +179,9 @@ export const getServerSideProps: GetServerSideProps = async ({
 };
 
 const StyledContainer = styled(Container)`
-  padding: var(--spacing-m) var(--spacing-m) var(--spacing-layout-m);
+  padding-top: var(--spacing-m);
 
   @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
     margin-bottom: var(--spacing-layout-l);
   }
 `;
@@ -203,7 +203,6 @@ const Columns = styled.div`
 `;
 
 const Title = styled(H2).attrs({ as: "h1" })`
-  font-size: 2rem;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);

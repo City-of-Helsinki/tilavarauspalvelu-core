@@ -5,16 +5,17 @@ import { useTranslation } from "next-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { fontMedium, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import Container from "../common/Container";
 
-const Wrapper = styled(Container)`
+const Wrapper = styled.div`
   padding-top: var(--spacing-xl);
   padding-bottom: var(--spacing-xl);
+  padding-right: var(--spacing-l);
 
   @media (max-width: ${breakpoints.m}) {
     display: flex;
     flex-direction: column;
     gap: 46px;
+    padding-right: 0;
     padding-bottom: var(--spacing-layout-l);
   }
 `;

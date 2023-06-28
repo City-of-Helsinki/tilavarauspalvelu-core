@@ -4,8 +4,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
+import { Container } from "common";
+
 import { applicationsUrl } from "../../modules/util";
-import Container from "../common/Container";
 import Head from "./Head";
 
 const Paragraph = styled.p`
@@ -30,7 +31,7 @@ const Sent = (): JSX.Element => {
       <Head heading={t("application:sent.heading")}>
         <p>{t("application:sent.subHeading")}</p>
       </Head>
-      <Container main>
+      <Container>
         <Paragraph>{t("application:sent.body")}</Paragraph>
         <StyledButton
           onClick={() => router.push(applicationsUrl)}

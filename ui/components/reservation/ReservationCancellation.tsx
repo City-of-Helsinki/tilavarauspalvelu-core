@@ -24,17 +24,15 @@ import {
   ReservationCancellationMutationPayload,
   ReservationType,
 } from "common/types/gql-types";
+import { Container } from "common";
+
 import Sanitize from "../common/Sanitize";
 import {
   CANCEL_RESERVATION,
   GET_RESERVATION,
   GET_RESERVATION_CANCEL_REASONS,
 } from "../../modules/queries/reservation";
-import {
-  JustForDesktop,
-  JustForMobile,
-  NarrowCenteredContainer,
-} from "../../modules/style/layout";
+import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { getSelectedOption, getTranslation } from "../../modules/util";
 import { CenterSpinner } from "../common/common";
 import { BlackButton, MediumButton, Toast } from "../../styles/util";
@@ -52,15 +50,6 @@ const Spinner = styled(CenterSpinner)`
 
 const Wrapper = styled.div`
   background-color: var(--color-white);
-`;
-
-const Container = styled(NarrowCenteredContainer)`
-  padding: 0 var(--spacing-m) var(--spacing-layout-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
-    margin-bottom: var(--spacing-layout-l);
-  }
 `;
 
 const Title = styled(H2).attrs({ as: "h1" })``;
@@ -130,6 +119,10 @@ const Form = styled.form`
 
 const StyledSelect = styled(Select)`
   margin-bottom: var(--spacing-l);
+
+  @media (min-width: ${breakpoints.l}) {
+    width: 50%;
+  }
 `;
 
 const ButtonContainer = styled.div`

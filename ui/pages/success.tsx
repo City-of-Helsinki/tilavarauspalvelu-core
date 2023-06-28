@@ -7,7 +7,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Container from "../components/common/Container";
+import { Container } from "common";
+
 import ReservationFail from "../components/reservation/ReservationFail";
 import { authEnabled, authenticationIssuer } from "../modules/const";
 import { useOrder, useReservation } from "../hooks/reservation";

@@ -16,7 +16,8 @@ import {
   ReservationsReservationStateChoices,
   ReservationType,
 } from "common/types/gql-types";
-import Container from "../../components/common/Container";
+import { Container } from "common";
+
 import { LIST_RESERVATIONS } from "../../modules/queries/reservation";
 import ReservationCard from "../../components/reservation/ReservationCard";
 import Head from "../../components/reservations/Head";
