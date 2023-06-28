@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button, Dialog, Notification } from "hds-react";
 import { z } from "zod";
+import { TFunction } from "i18next";
 import {
   Mutation,
   MutationStaffAdjustReservationTimeArgs,
@@ -16,7 +17,7 @@ import { format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@apollo/client";
-import { fromUIDate } from "common/src/common/util";
+import { fromUIDate, toUIDate } from "common/src/common/util";
 import { useNotification } from "app/context/NotificationContext";
 import { useModal } from "app/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "app/schemas";
@@ -29,6 +30,7 @@ import BufferToggles from "../my-units/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
 
 const StyledForm = styled.form`
+  margin-top: var(--spacing-m);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   gap: var(--spacing-s);
@@ -49,6 +51,7 @@ const ActionButtons = styled(Dialog.ActionButtons)`
 
 const TimeInfoBox = styled.p<{ $isDisabled?: boolean }>`
   grid-column: 1 / -1;
+  margin: 0;
   color: ${({ $isDisabled }) => ($isDisabled ? "var(--color-black-40)" : "")};
 `;
 
@@ -62,6 +65,27 @@ const btnCommon = {
   variant: "secondary",
   disabled: false,
 } as const;
+
+const recurringReservationInfoText = ({
+  weekdays,
+  begin,
+  end,
+  t,
+}: {
+  weekdays: number[];
+  begin?: Date;
+  end?: Date;
+  t: TFunction;
+}) => {
+  return `${t("Reservation.EditTime.recurringInfoTimes", {
+    weekdays: weekdays
+      .sort((a, b) => a - b)
+      .map((weekday) => t(`dayShort.${weekday}`))
+      .join(", "),
+    begin: begin && toUIDate(begin),
+    end: end && toUIDate(end),
+  })}`;
+};
 
 type FormValueType = z.infer<typeof TimeFormSchema>;
 
@@ -253,9 +277,33 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     t
   )}, ${reservationDuration(startDateTime, endDateTime)} t`;
 
+  const recurringReservationInfo = reservation.recurringReservation ? (
+    <TimeInfoBox>
+      {t("Reservation.EditTime.recurringInfoLabel")}:{" "}
+      <Bold>
+        {recurringReservationInfoText({
+          weekdays:
+            reservation.recurringReservation.weekdays?.filter(
+              (x): x is number => x != null
+            ) ?? [],
+          // begin: reservation.recurringReservation.beginDate ?? undefined,
+          begin: ((x) => (x != null ? new Date(x) : undefined))(
+            reservation.recurringReservation.beginDate
+          ),
+          // end: reservation.recurringReservation.endDate ?? undefined,
+          end: ((x) => (x != null ? new Date(x) : undefined))(
+            reservation.recurringReservation.endDate
+          ),
+          t,
+        })}
+      </Bold>
+    </TimeInfoBox>
+  ) : null;
+
   return (
     <Dialog.Content>
       <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
+        {recurringReservationInfo}
         <TimeInfoBox>
           {t("Reservation.EditTime.originalTime")}: <Bold>{originalTime}</Bold>
         </TimeInfoBox>

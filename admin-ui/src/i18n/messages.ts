@@ -858,6 +858,8 @@ const translations: ITranslations = {
       title: ["Muuta varauksen aikaa"],
       newTime: ["Uusi aika"],
       originalTime: ["Muutettava aika"],
+      recurringInfoLabel: ["Toistuva varaus aikavälillä"],
+      recurringInfoTimes: ["{{ weekdays }} {{begin}} - {{end}}"],
       accept: ["Muuta aikaa"],
       successToast: ["Uusi aika tallennettu"],
       form: {

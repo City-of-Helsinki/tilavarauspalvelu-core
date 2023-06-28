@@ -104,6 +104,9 @@ export const RECURRING_RESERVATION_QUERY = gql`
           state
           recurringReservation {
             pk
+            weekdays
+            beginDate
+            endDate
           }
         }
       }
