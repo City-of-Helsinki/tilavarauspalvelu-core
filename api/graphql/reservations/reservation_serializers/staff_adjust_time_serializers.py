@@ -31,6 +31,14 @@ class StaffReservationAdjustTimeSerializer(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["state"].readonly = True
+        self.fields["buffer_time_before"].help_text = (
+            "Can be a number of seconds or timespan in format HH:MM:SS. "
+            "Null/undefined value means buffer from reservation unit is used."
+        )
+        self.fields["buffer_time_after"].help_text = (
+            "Can be a number of seconds or timespan in format HH:MM:SS. "
+            "Null/undefined value means buffer from reservation unit is used."
+        )
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)

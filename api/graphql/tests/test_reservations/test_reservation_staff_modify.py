@@ -333,3 +333,45 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.name).is_equal_to(data["name"])
         assert_that(self.reservation.description).is_equal_to(data["description"])
+
+    def test_buffer_check_fails_with_buffer_time_before(self):
+        self.client.force_login(self.general_admin)
+
+        data = self.get_valid_adjust_data()
+        data["bufferTimeBefore"] = 60 * 65
+
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.reservation.begin - datetime.timedelta(hours=2),
+            end=self.reservation.begin - datetime.timedelta(hours=1),
+            state=STATE_CHOICES.CONFIRMED,
+        )
+
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )
+
+    def test_buffer_check_fails_with_buffer_time_after(self):
+        self.client.force_login(self.general_admin)
+
+        data = self.get_valid_adjust_data()
+        data["bufferTimeAfter"] = 60 * 65
+
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.reservation.begin + datetime.timedelta(hours=1),
+            end=self.reservation.begin + datetime.timedelta(hours=2),
+            state=STATE_CHOICES.CONFIRMED,
+        )
+
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )

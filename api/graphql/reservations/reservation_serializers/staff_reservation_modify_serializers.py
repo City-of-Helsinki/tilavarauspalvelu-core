@@ -31,8 +31,16 @@ class StaffReservationModifySerializer(
     age_group_pk = IntegerPrimaryKeyField(
         queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
     )
-    buffer_time_before = DurationField(required=False)
-    buffer_time_after = DurationField(required=False)
+
+    buffer_time_before = DurationField(
+        required=False,
+        help_text="Number of seconds. Null/undefined value means buffer from reservation unit is used.",
+    )
+    buffer_time_after = DurationField(
+        required=False,
+        help_text="Number of seconds. Null/undefined value means buffer from reservation unit is used.",
+    )
+
     home_city_pk = IntegerPrimaryKeyField(
         queryset=City.objects.all(), source="home_city", allow_null=True
     )
@@ -176,11 +184,19 @@ class StaffReservationModifySerializer(
         begin = data.get("begin", self.instance.begin)
         end = data.get("end", self.instance.end)
 
+        new_buffer_before = data.get("buffer_time_before", None)
+        new_buffer_after = data.get("buffer_time_after", None)
+
         for reservation_unit in self.instance.reservation_unit.all():
             reservation_type = data.get("type", getattr(self.instance, "type", None))
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_buffer_times(
-                reservation_unit, begin, end, reservation_type=reservation_type
+                reservation_unit,
+                begin,
+                end,
+                reservation_type=reservation_type,
+                buffer_before=new_buffer_before,
+                buffer_after=new_buffer_after,
             )
             self.check_reservation_intervals_for_staff_reservation(
                 reservation_unit, begin

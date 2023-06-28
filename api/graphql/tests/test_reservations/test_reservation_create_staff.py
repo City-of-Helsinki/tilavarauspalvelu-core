@@ -363,6 +363,72 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         )
         assert_that(Reservation.objects.count()).is_equal_to(1)
 
+    def test_buffer_times_cause_overlap_fails_with_buffer_time_before(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_minimum_input_data()
+        input_data["bufferTimeBefore"] = "01:05:00"
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.res_begin - datetime.timedelta(hours=2),
+            end=self.res_begin - datetime.timedelta(hours=1),
+            state=ReservationState.CONFIRMED,
+        )
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )
+        assert_that(Reservation.objects.count()).is_equal_to(1)
+
+    def test_buffer_times_cause_overlap_fails_with_buffer_time_after(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_minimum_input_data()
+        input_data["bufferTimeAfter"] = "01:05:00"
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.res_begin + datetime.timedelta(hours=1),
+            end=self.res_begin + datetime.timedelta(hours=2),
+            state=ReservationState.CONFIRMED,
+        )
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )
+        assert_that(Reservation.objects.count()).is_equal_to(1)
+
+    def test_buffer_times_is_successful_with_zero_buffers(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_minimum_input_data()
+        input_data["bufferTimeBefore"] = "0"
+        input_data["bufferTimeAfter"] = "0"
+
+        self.reservation_unit.buffer_time_before = datetime.timedelta(hours=1)
+        self.reservation_unit.buffer_time_after = datetime.timedelta(hours=1)
+        self.reservation_unit.save()
+
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=self.res_begin - datetime.timedelta(hours=1),
+            end=self.res_begin,
+            state=ReservationState.CONFIRMED,
+            type=ReservationType.STAFF,
+            buffer_time_before=datetime.timedelta(0),
+            buffer_time_after=datetime.timedelta(0),
+        )
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(Reservation.objects.count()).is_equal_to(2)
+
     @patch("opening_hours.utils.opening_hours_client.get_opening_hours")
     def test_can_reserve_outside_opening_hours(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours(
