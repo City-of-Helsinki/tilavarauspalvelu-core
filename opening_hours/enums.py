@@ -36,12 +36,17 @@ class State(Enum):
     def open_states(cls):
         return [
             cls.OPEN,
+            cls.OPEN_AND_RESERVABLE,
             cls.SELF_SERVICE,
             cls.WITH_KEY,
             cls.WITH_RESERVATION,
             cls.WITH_KEY_AND_RESERVATION,
             cls.ENTER_ONLY,
         ]
+
+    @classmethod
+    def closed_states(cls):
+        return [None, cls.CLOSED, cls.UNDEFINED, cls.NOT_IN_USE, cls.MAINTENANCE]
 
     @classmethod
     def reservable_states(cls):

@@ -1,4 +1,5 @@
 import datetime
+from copy import deepcopy
 from datetime import timezone
 from typing import Any, Dict, List, Tuple, Union
 
@@ -154,7 +155,63 @@ class OpeningHoursClient:
                 if opening_times:
                     opening_hours.append(opening_times)
 
+            opening_hours = self._split_opening_hours_based_on_closed_states(
+                opening_hours
+            )
+
             self.opening_hours[res_id][date].extend(opening_hours)
+
+    def _split_opening_hours_based_on_closed_states(
+        self, opening_hours: List[OpeningHours]
+    ) -> List[OpeningHours]:
+        hours = []
+
+        closed_hours = [
+            hour
+            for hour in opening_hours
+            if ResourceState(hour.resource_state) in ResourceState.closed_states()
+        ]
+        open_hours = [
+            hour
+            for hour in opening_hours
+            if ResourceState(hour.resource_state) in ResourceState.open_states()
+        ]
+
+        for closed in sorted(closed_hours, key=lambda t: t.start_time):
+            new_open = None
+            for open in open_hours:
+                # If the closed time starts is before the open time starts.
+                if (
+                    closed.start_time <= open.start_time
+                    and closed.end_time > open.start_time
+                ):
+                    open.start_time = closed.end_time
+
+                # If the closed time starts before open time ends.
+                if (
+                    closed.start_time < open.end_time
+                    and closed.end_time > open.end_time
+                ):
+                    open.end_time = closed.start_time
+
+                if (
+                    closed.start_time > open.start_time
+                    and closed.end_time < open.end_time
+                ):
+                    open_kwargs = deepcopy(open.__dict__)
+                    open_kwargs["start_time"] = closed.end_time
+
+                    new_open = OpeningHours(**open_kwargs)
+
+                    open.end_time = closed.start_time
+
+            if new_open:
+                open_hours.append(new_open)
+
+        hours.extend(closed_hours)
+        hours.extend(open_hours)
+
+        return hours
 
     def refresh_opening_hours(self):
         self._init_opening_hours_structure()
