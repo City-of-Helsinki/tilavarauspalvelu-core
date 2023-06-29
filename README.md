@@ -32,6 +32,7 @@ From a technical standpoint, there are three main dependencies:
 - [PostgreSQL 13](https://www.postgresql.org/) database with the [PostGIS](https://postgis.net/) extension for storing the data
 - [Redis](https://redis.io/) for in-memory cache
 - [Celery](https://github.com/celery/celery) for scheduling and background task handling
+- [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html) you know, for search.
 
 All Python dependencies can be found in [requirements.txt](requirements.txt). Separate development dependencies are listed in [requirements_dev.txt](requirements_dev.txt).
 
@@ -69,9 +70,18 @@ installed in it.
 pip-sync requirements.txt requirements_dev.txt
 ```
 
-You can use local instances of PostgreSQL and Redis, but the easiest way to use Docker containers:
+You can use local instances of PostgreSQL, Redis and Elasticsearch, but the easiest way to use Docker containers:
 ```
-docker-compose up db redis -d
+docker-compose up db redis elastic -d
+```
+
+First time creating the elastic index is needed. That can be achieved by running:
+```
+python manage.py create_search_index reservation_units
+```
+Building or rebuilding the index (if you've got some data to build):
+```
+python manage.py rebuild_search_index reservation_units
 ```
 
 Finally, you have to make sure settings are configured properly in `.env` file.
@@ -97,7 +107,7 @@ python manage.py runserver 0.0.0.0:8000
 ### Running in docker (for UI devs)
 Since the database takes some time to start, it is recommended to start it first and run it in the background:
 ```
-docker-compose up db redis -d
+docker-compose up db redis elastic -d
 ```
 
 Then, start the service with the following command:
