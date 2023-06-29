@@ -14,6 +14,7 @@ const useCheckCollisions = ({
   start,
   end,
   buffers,
+  reservationType,
 }: {
   reservationPk?: number;
   reservationUnitPk: number;
@@ -23,6 +24,7 @@ const useCheckCollisions = ({
     before: number;
     after: number;
   };
+  reservationType: ReservationsReservationTypeChoices;
 }) => {
   const { notifyError } = useNotification();
 
@@ -69,11 +71,15 @@ const useCheckCollisions = ({
                   end: new Date(x.end),
                   buffers: {
                     before:
+                      reservationType !==
+                        ReservationsReservationTypeChoices.Blocked &&
                       x.type !== ReservationsReservationTypeChoices.Blocked &&
                       x.bufferTimeBefore
                         ? x.bufferTimeBefore
                         : 0,
                     after:
+                      reservationType !==
+                        ReservationsReservationTypeChoices.Blocked &&
                       x.type !== ReservationsReservationTypeChoices.Blocked &&
                       x.bufferTimeAfter
                         ? x.bufferTimeAfter

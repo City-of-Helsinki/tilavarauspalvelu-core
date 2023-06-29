@@ -241,6 +241,8 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
           ? reservation.bufferTimeAfter
           : 0,
     },
+    reservationType:
+      reservation.type ?? ReservationsReservationTypeChoices.Staff,
   });
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected

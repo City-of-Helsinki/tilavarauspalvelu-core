@@ -3,10 +3,11 @@ import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { Button, Dialog, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@apollo/client";
-import type {
-  ReservationStaffCreateMutationInput,
-  ReservationStaffCreateMutationPayload,
-  ReservationUnitType,
+import {
+  type ReservationStaffCreateMutationInput,
+  type ReservationStaffCreateMutationPayload,
+  type ReservationUnitType,
+  ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import styled from "styled-components";
 import { camelCase, get } from "lodash";
@@ -121,6 +122,10 @@ const useCheckFormCollisions = ({
       before: bufferBeforeSeconds,
       after: bufferAfterSeconds,
     },
+    reservationType:
+      ReservationsReservationTypeChoices[
+        type as keyof typeof ReservationsReservationTypeChoices
+      ],
   });
 
   return { hasCollisions };
