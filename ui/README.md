@@ -18,7 +18,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core and change current directory to backend project and start it:
 
 ```
-docker-compose up --build
+docker-compose up backend --build --force-recreate
 ```
 
 Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
@@ -112,6 +112,8 @@ Starts production version
 You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Can also be used for mocking browser data.
 
 ## Configurable environment variables
+
+See `.env.local.example` and Azure DevOps library for values.
 
 | Name                           | Description                                                     |
 | ------------------------------ | --------------------------------------------------------------- |
