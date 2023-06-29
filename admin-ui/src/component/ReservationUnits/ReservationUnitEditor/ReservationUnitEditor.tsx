@@ -253,16 +253,21 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     publish?: boolean,
     archive?: boolean
   ): Promise<number | undefined> => {
+    const surfaceArea =
+      state.reservationUnitEdit?.surfaceArea != null &&
+      state.reservationUnitEdit?.surfaceArea > 0
+        ? Math.ceil(state.reservationUnitEdit?.surfaceArea)
+        : null;
     const input = pick(
       {
         ...omitBy(state.reservationUnitEdit, (v) => v === ""),
-        surfaceArea: Number(state.reservationUnitEdit?.surfaceArea),
+        surfaceArea,
         ...(publish != null ? { isDraft: !publish } : {}),
         reservationStartInterval:
           state.reservationUnitEdit?.reservationStartInterval?.toLocaleLowerCase(), /// due to api inconsistency
         maxReservationsPerUser: state.reservationUnitEdit
           ?.maxReservationsPerUser
-          ? Number(state.reservationUnitEdit?.maxReservationsPerUser)
+          ? state.reservationUnitEdit?.maxReservationsPerUser
           : null,
         ...(archive != null ? { isArchived: archive } : {}),
         pricings: state.reservationUnitEdit.pricings?.map((pricing) =>
