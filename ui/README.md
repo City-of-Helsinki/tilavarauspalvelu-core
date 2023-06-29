@@ -15,11 +15,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Developing locally
 
-First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core and change current directory to backend project and start it:
-
-```
-docker-compose up backend --build --force-recreate
-```
+First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core and start it according to the instructions in the backend project README.md.
 
 Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
 
@@ -27,7 +23,7 @@ Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is 
 127.0.0.1       local-tilavaraus.hel.fi
 ```
 
-Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
+Create a self-signed certificate for SSL connection on development server by running the following command in the common directory
 
 ```
 yarn generate-certificate
