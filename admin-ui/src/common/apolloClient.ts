@@ -2,19 +2,19 @@ import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
-import { set, uniqBy } from "lodash";
+import { uniqBy } from "lodash";
+import { getSession } from "next-auth/react";
+import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
-import { ExtendedSession } from "../pages/api/auth/[...nextauth]";
 
+import { ExtendedSession } from "../pages/api/auth/[...nextauth]";
 // import { getApiAccessToken, updateApiAccessToken } from "./auth/util";
 import {
   PROFILE_TOKEN_HEADER,
   SESSION_EXPIRED_ERROR,
   apiBaseUrl,
 } from "./const";
-import { CustomFormData } from "./CustomFormData";
-import { getSession } from "next-auth/react";
-import { GraphQLError } from "graphql/error/GraphQLError";
+// import { CustomFormData } from "./CustomFormData";
 
 // const getNewToken = () => updateApiAccessToken();
 
@@ -22,7 +22,7 @@ const uploadLinkOptions = {
   uri: `${apiBaseUrl}/graphql/`,
 };
 
-set(uploadLinkOptions, "FormData", CustomFormData);
+// set(uploadLinkOptions, "FormData", CustomFormData);
 
 const terminatingLink = createUploadLink(uploadLinkOptions);
 

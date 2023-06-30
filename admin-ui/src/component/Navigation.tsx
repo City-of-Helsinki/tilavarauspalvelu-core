@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import { isValidAuthState } from "app/context/authStateReducer";
+// FIXME
+// import { useNavigate } from "react-router-dom";
+// import { isValidAuthState } from "app/context/authStateReducer";
 import { UserInfo } from "common";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
 // import { useAuthState } from "../context/AuthStateContext";
 import { StyledHDSNavigation } from "../styles/util";
-import { useSession } from "next-auth/react";
 
 const MobileNavigation = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -35,16 +36,15 @@ const UserMenu = styled(HDSNavigation.User)`
   }
 `;
 
-const Navigation = (): JSX.Element => {
+const Navigation = () => {
   const { t } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
-  const history = useNavigate();
+  // const history = useNavigate();
 
   const { data: session } = useSession();
   const { user } = session || {};
 
-  console.log("Navigation: session", session);
   return (
     <StyledHDSNavigation
       theme={{
@@ -56,46 +56,43 @@ const Navigation = (): JSX.Element => {
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t("Navigation.skipToMainContent")}
-      onTitleClick={() => history("/")}
+      // onTitleClick={() => history("/")}
       onMenuToggle={() => setMenuState(!isMenuOpen)}
       menuOpen={isMenuOpen}
     >
       <HDSNavigation.Actions>
         <MobileNavigation>
-          <MainMenu onItemSelection={() => setMenuState(false)} />
-        </MobileNavigation>
-        {session?.user && (
-          <UserMenu
-            userName={`${user?.name?.trim()}`}
-            authenticated={user != null}
-            label={t(user != null ? "Navigation.logging" : "Navigation.login")}
-            onSignIn={() => {
-              /*
-              setLoggingIn(true);
-              if (login) {
-                setLoggingIn(true);
-                login();
-              } else {
-                throw Error("cannot log in");
-              }
-              */
-            }}
-          >
-            {user && (
-              <UserInfo
-                name={`${user?.name?.trim()}` || t("Navigation.noName")}
-                email={user?.email ?? t("Navigation.noEmail")}
-              />
-            )}
-
-            <HDSNavigation.Item
-              className="btn-logout"
-              label={t("Navigation.logout")}
-              // onClick={() => logout && logout()}
-              variant="primary"
+          {user /* && isValidAuthState(state) */ && (
+            <MainMenu
+              placement="navigation"
+              onItemSelection={() => setMenuState(false)}
             />
-          </UserMenu>
-        )}
+          )}
+        </MobileNavigation>
+        <UserMenu
+          userName={`${user?.name?.trim()}`}
+          authenticated={user != null}
+          label={t(user != null ? "Navigation.logging" : "Navigation.login")}
+          onSignIn={() => {
+            signIn("tunnistamo", {
+              callbackUrl: window.location.href,
+            });
+          }}
+        >
+          {user && (
+            <UserInfo
+              name={`${user?.name?.trim()}` || t("Navigation.noName")}
+              email={user?.email ?? t("Navigation.noEmail")}
+            />
+          )}
+
+          <HDSNavigation.Item
+            className="btn-logout"
+            label={t("Navigation.logout")}
+            onClick={() => signOut()}
+            variant="primary"
+          />
+        </UserMenu>
       </HDSNavigation.Actions>
     </StyledHDSNavigation>
   );

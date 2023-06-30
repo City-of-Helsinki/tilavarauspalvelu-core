@@ -6,6 +6,7 @@ import Error5xx from "app/common/Error5xx";
 import ScrollToTop from "../common/ScrollToTop";
 import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
+import MainMenu from "./MainMenu";
 
 type Props = {
   children: React.ReactNode | React.ReactElement;
@@ -18,20 +19,25 @@ const Content = styled.main`
   flex-direction: column;
 `;
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
 const FallbackComponent = (err: unknown) => {
   Sentry.captureException(err);
   return <Error5xx />;
 };
 
 export default function PageWrapper({ children }: Props): JSX.Element {
-  console.log("PageWrapper");
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <Navigation />
-      <Content>
-        {children}
+      <Wrapper>
+        <MainMenu placement="default" />
+        <Content>{children}</Content>
         <ScrollToTop />
-      </Content>
+      </Wrapper>
       <GlobalElements />
     </ErrorBoundary>
   );

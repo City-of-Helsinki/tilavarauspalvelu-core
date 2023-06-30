@@ -4065,9 +4065,9 @@
   integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
 
 "@types/node@*":
-  version "16.18.40"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.40.tgz#968d64746d20cac747a18ca982c0f1fe518c031c"
-  integrity sha512-+yno3ItTEwGxXiS/75Q/aHaa5srkpnJaH+kdkTVJ3DtJEwv92itpKbxU+FjPoh2m/5G9zmUQfrL4A4C13c+iGA==
+  version "16.18.37"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.37.tgz#a1f8728e4dc30163deb41e9b7aba65d0c2d4eda1"
+  integrity sha512-ql+4dw4PlPFBP495k8JzUX/oMNRI2Ei4PrMHgj8oT4VhGlYUzF4EYr0qk2fW+XBVGIrq8Zzk13m4cvyXZuv4pA==
 
 "@types/node@^14.14.31":
   version "14.18.54"

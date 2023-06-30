@@ -5,10 +5,12 @@ import { NavLink, RouteProps, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import IconPremises from "common/src/icons/IconPremises";
+// FIXME
+// import { useAuthState } from "app/context/AuthStateContext";
 import { Permission } from "app/context/authStateReducer";
-import { useAuthState } from "app/context/AuthStateContext";
-import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
-import { ReactComponent as IconIndividualReservation } from "../images/icon_individual-reservation.svg";
+// FIXME move to common and convert to jsx
+// import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
+// import { ReactComponent as IconIndividualReservation } from "../images/icon_individual-reservation.svg";
 import { truncatedText } from "../styles/typography";
 import { useData } from "../context/DataContext";
 import { prefixes } from "../common/urls";
@@ -200,7 +202,7 @@ const getFilteredMenu = (
 ): IMenuChild[] => [
   {
     title: "MainMenu.home",
-    // icon: <IconPremises aria-hidden />,
+    icon: <IconPremises aria-hidden />,
     route: "/",
     exact: true,
   },
@@ -208,7 +210,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.myUnits",
-          /// icon: <IconStar aria-hidden />,
+          icon: <IconStar aria-hidden />,
           route: "/my-units",
         },
       ]
@@ -219,6 +221,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.reservations",
+          // FIXME breaks on nextjs
           // icon: <IconIndividualReservation aria-hidden />,
           route: "/reservations",
           items: [
@@ -239,6 +242,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.recurringReservations",
+          // FIXME breaks on nextjs
           // icon: <IconCalendar aria-hidden />,
           route: "/recurring-reservations",
           items: [
@@ -252,13 +256,13 @@ const getFilteredMenu = (
     : []),
   {
     title: "MainMenu.premisesAndSettings",
-    // icon: <IconLocation aria-hidden />,
+    icon: <IconLocation aria-hidden />,
     route: "/premises-and-settings",
     items: [
       {
         permission: Permission.CAN_MANAGE_RESERVATION_UNITS,
         title: "MainMenu.reservationUnits",
-        route: `/premises-and-settings/${prefixes.reservationUnits}`,
+        route: `/premises-and-settings${prefixes.reservationUnits}`,
       },
       {
         permission: Permission.CAN_MANAGE_SPACES,
@@ -281,16 +285,21 @@ const getFilteredMenu = (
 
 interface MainMenuProps {
   onItemSelection?: () => void;
+  placement?: "default" | "navigation";
 }
 
-function MainMenu({ onItemSelection }: MainMenuProps): JSX.Element {
+function MainMenu({
+  onItemSelection,
+  placement = "default",
+}: MainMenuProps): JSX.Element | null {
   const { t } = useTranslation();
   const { pathname } = useLocation();
 
   const { handlingCount, hasOwnUnits } = useData();
 
-  const { authState } = useAuthState();
-  const { hasSomePermission } = authState;
+  // FIXME
+  // const { authState } = useAuthState();
+  const hasSomePermission = () => true;
 
   const count = handlingCount ? (
     <HandlingCount>{handlingCount}</HandlingCount>
@@ -301,18 +310,14 @@ function MainMenu({ onItemSelection }: MainMenuProps): JSX.Element {
   );
 
   return (
-    <Wrapper placement="default">
+    <Wrapper placement={placement}>
       {menuItems.map((menuItem: IMenuChild) => {
         const isActive = menuItem?.route
           ? pathname.startsWith(menuItem?.route)
           : false;
-
         return (
           <MenuItem key={menuItem.title}>
-            {menuItem.title}
-            {/* TODO next breaks the SVG Icon
             <Icon>{menuItem.icon}</Icon>
-            */}
             <Heading
               to={menuItem.route || ""}
               className={isActive ? "active" : ""}

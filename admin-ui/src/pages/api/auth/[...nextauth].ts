@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable camelcase */
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -94,6 +95,25 @@ const {
   },
 } = getConfig();
 
+const logAxiosError = (error: any) => {
+  if (error.response) {
+    // The request was made and the server responded with a status code
+    // that falls out of the range of 2xx
+    console.log(error.response.data);
+    console.log(error.response.status);
+    console.log(error.response.headers);
+  } else if (error.request) {
+    // The request was made but no response was received
+    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+    // http.ClientRequest in node.js
+    console.log(error.request);
+  } else {
+    // Something happened in setting up the request that triggered an Error
+    console.log("Error", error.message);
+  }
+  console.log(error.config);
+};
+
 const getApiAccessTokens = async (accessToken: string | undefined) => {
   if (!accessToken) {
     throw new Error("Access token not available. Cannot update");
@@ -101,18 +121,22 @@ const getApiAccessTokens = async (accessToken: string | undefined) => {
   if (!oidcProfileApiUrl || !oidcTilavarausApiUrl) {
     throw new Error("Application configuration error, missing api urls.");
   }
-  const response = await axios.request({
-    responseType: "json",
-    method: "POST",
-    url: oidcAccessTokenUrl,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
-
-  const { data } = response;
+  const data = await axios
+    .request({
+      responseType: "json",
+      method: "POST",
+      url: oidcAccessTokenUrl,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+    .then((x) => x.data)
+    .catch((error) => {
+      logAxiosError(error);
+      throw new Error("Error getting api access tokens");
+    });
 
   if (!data) {
     throw new Error("No api-tokens present");
@@ -131,22 +155,27 @@ const EXP_MS = (10 / 2) * 60 * 1000;
 
 const refreshAccessToken = async (token: ExtendedJWT) => {
   try {
-    const response = await axios.request({
-      url: oidcTokenUrl,
-      method: "POST",
-      data: {
-        client_id: oidcClientId,
-        grant_type: "refresh_token",
-        refresh_token: token.refreshToken,
-      },
-      headers: {
-        /* eslint-disable @typescript-eslint/naming-convention */
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${token.accessToken}`,
-      },
-    });
-
-    const { data }: { data: unknown } = response;
+    const data = await axios
+      .request({
+        url: oidcTokenUrl,
+        method: "POST",
+        data: {
+          client_id: oidcClientId,
+          grant_type: "refresh_token",
+          refresh_token: token.refreshToken,
+        },
+        headers: {
+          /* eslint-disable @typescript-eslint/naming-convention */
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Bearer ${token.accessToken}`,
+        },
+      })
+      .then((x) => x.data)
+      .catch((error) => {
+        logAxiosError(error);
+        throw new Error("Error getting RefreshToken from Tunnistamo");
+      });
+    // const { data }: { data: unknown } = response;
 
     if (!data) {
       throw new Error("Unable to refresh tokens");
@@ -198,6 +227,14 @@ const refreshAccessToken = async (token: ExtendedJWT) => {
 const options = (): NextAuthOptions => {
   const wellKnownUrl = `${oidcIssuer}/.well-known/openid-configuration`;
 
+  const authorization = {
+    params: {
+      scope: oidcScope,
+      response_type: "code",
+      redirect_uri: oidcCallbackUrl,
+    },
+  };
+
   return {
     providers: [
       {
@@ -213,13 +250,7 @@ const options = (): NextAuthOptions => {
         accessTokenUrl: oidcAccessTokenUrl,
         token: oidcTokenUrl,
         profileUrl: oidcProfileApiUrl,
-        authorization: {
-          params: {
-            scope: oidcScope,
-            response_type: "code",
-            redirect_uri: oidcCallbackUrl,
-          },
-        },
+        authorization,
         profile(profile: TunnistamoProfile): Awaitable<TilavarauspalveluUser> {
           return {
             id: profile.sub,
@@ -232,7 +263,11 @@ const options = (): NextAuthOptions => {
       strategy: "jwt",
     },
     callbacks: {
-      async jwt({ token, user, account }: JwtParams): Promise<ExtendedJWT> {
+      async jwt({
+        token,
+        user,
+        account,
+      }: JwtParams): Promise<ExtendedJWT | undefined> {
         // Initial sign in
         if (account && user) {
           const [tilavarausAPIToken, profileAPIToken] =
@@ -250,6 +285,10 @@ const options = (): NextAuthOptions => {
           };
         }
 
+        if (!token) {
+          throw new Error("No token");
+        }
+
         if (Date.now() < token.accessTokenExpires) {
           return token;
         }
@@ -265,17 +304,20 @@ const options = (): NextAuthOptions => {
       async session({
         session,
         token,
-      }: SessionParams): Promise<ExtendedSession> {
-        if (!token) return undefined;
+      }: SessionParams): Promise<ExtendedSession | undefined> {
+        if (!token) {
+          return undefined;
+        }
 
         const { accessToken, accessTokenExpires, user, apiTokens } = token;
 
         return { ...session, accessToken, accessTokenExpires, user, apiTokens };
       },
       async redirect({ url, baseUrl }) {
-        return url.startsWith(baseUrl)
-          ? Promise.resolve(url)
-          : Promise.resolve(baseUrl);
+        if (url.startsWith(baseUrl)) {
+          return baseUrl;
+        }
+        return url;
       },
     },
     pages: {

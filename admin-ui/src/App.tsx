@@ -150,7 +150,6 @@ const PremisesRouter = () => (
 );
 
 const App = () => {
-  console.log("App: publicUrl", publicUrl);
   return (
     <BrowserRouter basename={publicUrl}>
       <PageWrapper>
