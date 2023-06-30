@@ -24,7 +24,7 @@ import {
   ReservationCancellationMutationPayload,
   ReservationType,
 } from "common/types/gql-types";
-import { Container } from "common";
+import { Container as CommonContainer } from "common";
 
 import Sanitize from "../common/Sanitize";
 import {
@@ -50,6 +50,12 @@ const Spinner = styled(CenterSpinner)`
 
 const Wrapper = styled.div`
   background-color: var(--color-white);
+`;
+
+const Container = styled(CommonContainer)`
+  @media (min-width: ${breakpoints.m}) {
+    margin-bottom: var(--spacing-layout-l);
+  }
 `;
 
 const Title = styled(H2).attrs({ as: "h1" })``;
