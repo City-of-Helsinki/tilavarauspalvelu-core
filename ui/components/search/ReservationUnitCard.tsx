@@ -170,9 +170,7 @@ const ReservationUnitCard = ({
   return (
     <Container>
       <Image
-        alt={t("common:imgAltForSpace", {
-          name,
-        })}
+        alt={name}
         src={getMainImage(reservationUnit)?.smallUrl || pixel}
       />
       <MainContent>
@@ -193,10 +191,10 @@ const ReservationUnitCard = ({
                 icon={
                   <NextImage
                     src="/icons/icon_premises.svg"
-                    alt={t("common:headAlt")}
+                    alt=""
                     width="24"
                     height="24"
-                    aria-label={t("reservationUnitCard:type")}
+                    aria-hidden="true"
                   />
                 }
                 text={reservationUnitTypeName}
