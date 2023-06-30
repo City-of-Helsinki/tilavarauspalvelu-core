@@ -310,6 +310,15 @@ urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
 
 When the lines above have been added and the server has been re-/started, the django debug toolbar will load in `/graphql/` endpoint.
 
+### Image cache
+In production environment [Varnish cache](https://varnish-cache.org/) is used for reservation unit and purpose images. When new image is uploaded, existing images are removed from the cache using [purge task](reservation_units/tasks.py#L143). For more details about how purge is done, check image cache [utility class](utils/image_cache.py).
+
+In settings there are four configurations:
+- IMAGE_CACHE_ENABLED = Toggle caching on/off
+- IMAGE_CACHE_VARNISH_HOST = Varnish hostname
+- IMAGE_CACHE_PURGE_KEY = Secret key for doing purge requests
+- IMAGE_CACHE_HOST_HEADER = `Host` header value in purge request
+
 ### Data model visualization
 ![Data model visualization](tilavarauspalvelu_visualized.svg)
 
