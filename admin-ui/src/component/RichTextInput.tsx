@@ -1,7 +1,9 @@
+/// NOTE client only
+/// Quill is not SSR compatible
 import { IconAlertCircleFill, Tooltip } from "hds-react";
 import React from "react";
-// import ReactQuill from "react-quill";
-// import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
 import { HorisontalFlex } from "../styles/layout";
 
@@ -62,7 +64,6 @@ const AlignVertically = styled.div`
   align-items: center;
 `;
 
-/*
 const StyledReactQuill = styled(ReactQuill)<{
   $error?: boolean;
 }>`
@@ -73,7 +74,6 @@ const StyledReactQuill = styled(ReactQuill)<{
     font-family: var(--tilavaraus-admin-font);
   }
 `;
-*/
 
 const modules = {
   toolbar: [["bold"], ["link"]],
@@ -97,7 +97,6 @@ const RichTextInput = ({
         </Label>
         {tooltipText && <Tooltip>{tooltipText}</Tooltip>}
       </HorisontalFlex>
-      {/*
       <StyledReactQuill
         modules={modules}
         readOnly={disabled}
@@ -106,7 +105,6 @@ const RichTextInput = ({
         onChange={onChange}
         $error={errorText !== undefined}
       />
-      */}
       {errorText ? (
         <AlignVertically>
           <IconAlertCircleFill color="var(--color-error)" />

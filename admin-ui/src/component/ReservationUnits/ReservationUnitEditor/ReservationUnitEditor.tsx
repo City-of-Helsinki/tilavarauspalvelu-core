@@ -20,6 +20,7 @@ import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import dynamic from "next/dynamic";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -53,7 +54,6 @@ import {
 
 import { ButtonsStripe, WhiteButton } from "../../../styles/util";
 import Loader from "../../Loader";
-import RichTextInput from "../../RichTextInput";
 import { useNotification } from "../../../context/NotificationContext";
 import ActivationGroup from "./ActivationGroup";
 import EnumSelect from "./EnumSelect";
@@ -94,6 +94,10 @@ import BreadcrumbWrapper from "../../BreadcrumbWrapper";
 import { parseAddress } from "../../../common/util";
 import { Accordion } from "../../../common/hds-fork/Accordion";
 import ReservationStateTag from "./ReservationStateTag";
+
+const RichTextInput = dynamic(() => import("../../RichTextInput"), {
+  ssr: false,
+});
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
