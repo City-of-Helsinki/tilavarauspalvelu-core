@@ -39,7 +39,6 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.4",
     "react-i18next": "^12.2.0",
-    "react-scripts": "5.0.1",
     "styled-components": "5.3.11"
   },
   "devDependencies": {
