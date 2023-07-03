@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 
-import React, { useContext, useEffect, useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import { Query, QueryReservationsArgs } from "common/types/gql-types";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 // import { useAuthState } from "./AuthStateContext";
@@ -27,6 +27,7 @@ export const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
   const [handlingCount, setHandlingCount] = React.useState(0);
   const [hasOwnUnits, setHasOwnUnits] = React.useState(false);
 
+  // FIXME
   // const { authState } = useAuthState();
 
   const { refetch } = useQuery<Query, QueryReservationsArgs>(

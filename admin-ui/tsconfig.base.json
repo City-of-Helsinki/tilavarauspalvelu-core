@@ -19,5 +19,12 @@
       "app/*": ["./src/*"]
     }
   },
-  "include": ["src", "i18next.d.ts", "middleware.ts"]
+  "include": [
+    "src",
+    "i18next.d.ts",
+    "middleware.ts",
+    ".eslintrc.js",
+    "stylelint.config.js",
+    "next.config.js"
+  ]
 }
