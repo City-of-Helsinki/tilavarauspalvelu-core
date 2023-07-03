@@ -1,12 +1,11 @@
 import React from "react";
-import { Helmet } from "react-helmet";
+
+const isCookiehubEnabled = process.env.REACT_APP_COOKIEHUB_ENABLED === "true";
+const isHotjarEnabled = process.env.REACT_APP_HOTJAR_ENABLED === "true";
 
 const ExternalScripts = (): JSX.Element => {
-  const isCookiehubEnabled = process.env.REACT_APP_COOKIEHUB_ENABLED === "true";
-  const isHotjarEnabled = process.env.REACT_APP_HOTJAR_ENABLED === "true";
-
   return (
-    <Helmet>
+    <>
       {isCookiehubEnabled && (
         <script>
           {`
@@ -39,7 +38,7 @@ const ExternalScripts = (): JSX.Element => {
           `}
         </script>
       )}
-    </Helmet>
+    </>
   );
 };
 
