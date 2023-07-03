@@ -1,14 +1,9 @@
 import React from "react";
-/* FIXME
-import MainLander from "app/component/MainLander";
-import { MainMenuWrapper } from "app/component/withMainMenu";
-import { useAuthState } from "../context/AuthStateContext";
-*/
-import { AuthState, Permission } from "../context/authStateReducer";
+import { useSession } from "next-auth/react";
+import { Permission } from "app/context/permissionHelper";
+import usePermission from "app/component/reservations/requested/hooks/usePermission";
 
 import Error403 from "./Error403";
-import Error5xx from "./Error5xx";
-import { useSession } from "next-auth/react";
 
 /* FIXME
 const AuthStateError = (state: AuthState) => {
@@ -30,10 +25,6 @@ const AuthStateError = (state: AuthState) => {
 };
 */
 
-const MainMenuWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
-};
-
 const AuthorisationChecker = ({
   children,
   permission,
@@ -41,20 +32,17 @@ const AuthorisationChecker = ({
   children: React.ReactNode;
   permission?: Permission;
 }) => {
-  /* FIXME
-  const { authState } = useAuthState();
-  const { hasSomePermission } = authState;
-  const error = AuthStateError(authState.state);
-  if (error) return error;
-  */
-  const hasSomePermission = (p: unknown) => true;
+  const { hasSomePermission } = usePermission();
 
+  // Only allow logged in
+  const { data: session } = useSession();
+  if (!session?.user) {
+    return <Error403 />;
+  }
+
+  // Only allow if user has permission
   if (permission && !hasSomePermission(permission)) {
-    return (
-      <MainMenuWrapper>
-        <Error403 />
-      </MainMenuWrapper>
-    );
+    return <Error403 showLogoutSection />;
   }
   return <>{children}</>;
 };

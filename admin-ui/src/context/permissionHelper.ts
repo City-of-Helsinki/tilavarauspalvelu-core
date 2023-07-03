@@ -7,6 +7,18 @@ import {
   UnitType,
 } from "common/types/gql-types";
 
+export enum Permission {
+  CAN_COMMENT_RESERVATIONS = "can_comment_reservations",
+  CAN_CREATE_STAFF_RESERVATIONS = "can_create_staff_reservations",
+  CAN_MANAGE_RESERVATIONS = "can_manage_reservations",
+  CAN_VIEW_RESERVATIONS = "can_view_reservations",
+  CAN_MANAGE_RESERVATION_UNITS = "can_manage_reservation_units",
+  CAN_MANAGE_SPACES = "can_manage_spaces",
+  CAN_MANAGE_RESOURCES = "can_manage_resources",
+  CAN_MANAGE_UNITS = "can_manage_units",
+  CAN_VALIDATE_APPLICATIONS = "can_validate_applications",
+}
+
 const hasGeneralPermission = (permissionName: string, user: UserType) =>
   user.generalRoles?.find((x) =>
     x?.permissions?.find((y) => y?.permission === permissionName)
@@ -111,4 +123,33 @@ const permissionHelper =
     return false;
   };
 
-export default permissionHelper;
+const somePermissions = (user: UserType, permission: Permission) => {
+  if (user.isSuperuser) {
+    return true;
+  }
+
+  const someUnitRoles =
+    user?.unitRoles?.some((role) =>
+      role?.permissions?.some((p) => p?.permission === permission)
+    ) ?? false;
+
+  const someSectorRoles =
+    user?.serviceSectorRoles?.some((role) =>
+      role?.permissions?.some((p) => p?.permission === permission)
+    ) ?? false;
+
+  const someGeneralRoles =
+    user?.generalRoles?.some((role) =>
+      role?.permissions?.some((p) => p?.permission === permission)
+    ) ?? false;
+
+  return someUnitRoles || someSectorRoles || someGeneralRoles;
+};
+
+export const hasSomePermission = (user: UserType, permission: Permission) => {
+  return somePermissions(user, permission);
+};
+
+export const hasPermission = (user: UserType) => {
+  return permissionHelper(user);
+};

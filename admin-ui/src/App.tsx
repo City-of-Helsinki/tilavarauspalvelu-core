@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import { Permission } from "app/context/permissionHelper";
 import ApplicationRound from "./component/recurring-reservations/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
@@ -36,7 +37,6 @@ import ApplicationRoundAllocation from "./component/recurring-reservations/alloc
 import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
 import AuthorizationChecker from "./common/AuthorizationChecker";
-import { Permission } from "./context/authStateReducer";
 
 const UnitsRouter = () => (
   <Routes>

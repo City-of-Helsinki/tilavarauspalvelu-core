@@ -5,15 +5,14 @@ import { NavLink, RouteProps, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import IconPremises from "common/src/icons/IconPremises";
-// FIXME
-// import { useAuthState } from "app/context/AuthStateContext";
-import { Permission } from "app/context/authStateReducer";
+import { Permission } from "app/context/permissionHelper";
 // FIXME move to common and convert to jsx
 // import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
 // import { ReactComponent as IconIndividualReservation } from "../images/icon_individual-reservation.svg";
 import { truncatedText } from "../styles/typography";
 import { useData } from "../context/DataContext";
 import { prefixes } from "../common/urls";
+import usePermission from "./reservations/requested/hooks/usePermission";
 
 const Wrapper = styled.ul<{ placement: string }>`
   display: flex;
@@ -297,9 +296,9 @@ function MainMenu({
 
   const { handlingCount, hasOwnUnits } = useData();
 
-  // FIXME
-  // const { authState } = useAuthState();
-  const hasSomePermission = () => true;
+  const { hasSomePermission, user } = usePermission();
+
+  if (!user) return null;
 
   const count = handlingCount ? (
     <HandlingCount>{handlingCount}</HandlingCount>

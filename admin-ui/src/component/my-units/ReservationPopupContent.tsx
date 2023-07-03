@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
-import { Permission } from "app/context/authStateReducer";
+import { Permission } from "app/context/permissionHelper";
 import { reservationUrl } from "../../common/urls";
 import { formatTime } from "../../common/util";
 import { DenseVerticalFlex } from "../../styles/layout";

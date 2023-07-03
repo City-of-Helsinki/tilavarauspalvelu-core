@@ -19,7 +19,7 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
-import { Permission } from "app/context/authStateReducer";
+import { Permission } from "app/context/permissionHelper";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import {

@@ -1,19 +1,28 @@
+// TODO move this hook up
 import { useQuery } from "@apollo/client";
-import { Permission } from "app/context/authStateReducer";
 import { type Query, type ReservationType } from "common/types/gql-types";
-// import { useAuthState } from "../../../../context/AuthStateContext";
+import {
+  hasPermission as baseHasPermission,
+  hasSomePermission as baseSomeHasPermission,
+  Permission,
+} from "app/context/permissionHelper";
 import { CURRENT_USER } from "../../../../context/queries";
 
 const usePermission = () => {
   const { data: user } = useQuery<Query>(CURRENT_USER);
-  // const { authState } = useAuthState();
-  // const { hasPermission: baseHasPermission } = authState;
+
+  const hasSomePermission = (permissionName: Permission) => {
+    if (!user?.currentUser) return false;
+    return baseSomeHasPermission(user?.currentUser, permissionName);
+  };
 
   const hasPermission = (
     reservation: ReservationType,
     permissionName: Permission,
     includeOwn = true
   ) => {
+    if (!user?.currentUser) return false;
+
     const serviceSectorPks =
       reservation?.reservationUnits?.[0]?.unit?.serviceSectors
         ?.map((x) => x?.pk)
@@ -21,8 +30,8 @@ const usePermission = () => {
 
     const unitPk = reservation?.reservationUnits?.[0]?.unit?.pk ?? undefined;
 
-    /*
-    const permission = baseHasPermission(
+    const permissionCheck = baseHasPermission(user?.currentUser);
+    const permission = permissionCheck(
       permissionName,
       unitPk,
       serviceSectorPks
@@ -33,7 +42,7 @@ const usePermission = () => {
 
     const ownPermissions =
       includeOwn && isUsersOwnReservation
-        ? baseHasPermission(
+        ? permissionCheck(
             Permission.CAN_CREATE_STAFF_RESERVATIONS,
             unitPk,
             serviceSectorPks
@@ -41,12 +50,12 @@ const usePermission = () => {
         : false;
 
     return permission || ownPermissions;
-    */
-    return false;
   };
 
   return {
+    user,
     hasPermission,
+    hasSomePermission,
   };
 };
 
