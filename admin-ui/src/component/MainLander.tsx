@@ -1,17 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 // eslint-disable-next-line import/no-unresolved
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { BrowserRouter } from "react-router-dom";
-import queryString from "query-string";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import KorosHeading, { Heading } from "./KorosHeading";
 import HeroImage from "../images/hero-user@1x.jpg";
 import Footer from "./Footer";
 import PageWrapper from "./PageWrapper";
-import { useAuthState } from "../context/AuthStateContext";
 
 interface IProps {
   withSiteWrapper?: boolean;
@@ -68,10 +66,37 @@ const Ingress = styled(H2).attrs({ $legacy: true })`
   line-height: 1.8125rem;
 `;
 
-function MainLander({ withSiteWrapper = false }: IProps) {
+const Lander = () => {
   const { t } = useTranslation();
-  const { authState } = useAuthState();
+  return (
+    <>
+      <KorosHeading heroImage={HeroImage}>
+        <Heading>{t("common.applicationName")}</Heading>
+        <LoginBtn
+        /*
+          onClick={() => {
+            const { login } = authState;
+            if (login) {
+              login();
+            }
+          }}
+          */
+        >
+          {t("Navigation.login")}
+        </LoginBtn>
+      </KorosHeading>
+      <Content>
+        <Ingress>{t("MainLander.ingress")}</Ingress>
+      </Content>
+      <Footer />
+    </>
+  );
+};
 
+function MainLander({ withSiteWrapper = false }: IProps) {
+  // const { authState } = useAuthState();
+
+  /*
   useEffect(() => {
     if (authState.sid) {
       const search = queryString.parse(window.location.search);
@@ -83,31 +108,13 @@ function MainLander({ withSiteWrapper = false }: IProps) {
       window.location.reload();
     }
   }, [authState]);
-  const Lander = (
-    <>
-      <KorosHeading heroImage={HeroImage}>
-        <Heading>{t("common.applicationName")}</Heading>
-        <LoginBtn
-          onClick={() => {
-            const { login } = authState;
-            if (login) {
-              login();
-            }
-          }}
-        >
-          {t("Navigation.login")}
-        </LoginBtn>
-      </KorosHeading>
-      <Content>
-        <Ingress>{t("MainLander.ingress")}</Ingress>
-      </Content>
-      <Footer />
-    </>
-  );
+  */
 
   return withSiteWrapper ? (
     <BrowserRouter>
-      <PageWrapper>{Lander}</PageWrapper>
+      <PageWrapper>
+        <Lander />
+      </PageWrapper>
     </BrowserRouter>
   ) : (
     Lander

@@ -1,13 +1,13 @@
 import { useQuery } from "@apollo/client";
 import { Permission } from "app/context/authStateReducer";
 import { type Query, type ReservationType } from "common/types/gql-types";
-import { useAuthState } from "../../../../context/AuthStateContext";
+// import { useAuthState } from "../../../../context/AuthStateContext";
 import { CURRENT_USER } from "../../../../context/queries";
 
 const usePermission = () => {
   const { data: user } = useQuery<Query>(CURRENT_USER);
-  const { authState } = useAuthState();
-  const { hasPermission: baseHasPermission } = authState;
+  // const { authState } = useAuthState();
+  // const { hasPermission: baseHasPermission } = authState;
 
   const hasPermission = (
     reservation: ReservationType,
@@ -21,6 +21,7 @@ const usePermission = () => {
 
     const unitPk = reservation?.reservationUnits?.[0]?.unit?.pk ?? undefined;
 
+    /*
     const permission = baseHasPermission(
       permissionName,
       unitPk,
@@ -40,6 +41,8 @@ const usePermission = () => {
         : false;
 
     return permission || ownPermissions;
+    */
+    return false;
   };
 
   return {

@@ -22,7 +22,6 @@ import {
   Parameter,
 } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
 import {
   formatNumber,
   formatDate,
@@ -586,4 +585,4 @@ function ApplicationDetails(): JSX.Element | null {
   );
 }
 
-export default withMainMenu(ApplicationDetails);
+export default ApplicationDetails;

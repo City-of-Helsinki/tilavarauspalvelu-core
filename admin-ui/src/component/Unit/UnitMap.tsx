@@ -8,7 +8,6 @@ import { Query, QueryUnitByPkArgs, UnitByPkType } from "common/types/gql-types";
 import { UNIT_QUERY } from "../../common/queries";
 import { ContentContainer } from "../../styles/layout";
 import Loader from "../Loader";
-import withMainMenu from "../withMainMenu";
 import Map from "./Map";
 import SubPageHead from "./SubPageHead";
 
@@ -78,4 +77,4 @@ const UnitMap = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(UnitMap);
+export default UnitMap;

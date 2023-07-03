@@ -25,7 +25,6 @@ import {
   GridCol,
   NarrowContainer,
 } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { BasicLink, Divider } from "../../styles/util";
 import {
@@ -333,4 +332,4 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
   );
 }
 
-export default withMainMenu(ReservationSummariesByReservationUnit);
+export default ReservationSummariesByReservationUnit;

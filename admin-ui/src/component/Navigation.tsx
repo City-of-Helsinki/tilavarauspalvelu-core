@@ -7,7 +7,7 @@ import { isValidAuthState } from "app/context/authStateReducer";
 import { UserInfo } from "common";
 import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
-import { useAuthState } from "../context/AuthStateContext";
+// import { useAuthState } from "../context/AuthStateContext";
 import { StyledHDSNavigation } from "../styles/util";
 
 const MobileNavigation = styled.div`
@@ -36,14 +36,14 @@ const UserMenu = styled(HDSNavigation.User)`
 
 const Navigation = (): JSX.Element => {
   const { t } = useTranslation();
-  const { authState } = useAuthState();
+  // const { authState } = useAuthState();
 
   const [loggingIn, setLoggingIn] = useState(false);
 
   const [isMenuOpen, setMenuState] = useState(false);
   const history = useNavigate();
 
-  const { state, user, login, logout } = authState;
+  // const { state, user, login, logout } = authState;
 
   return (
     <StyledHDSNavigation
@@ -62,44 +62,41 @@ const Navigation = (): JSX.Element => {
     >
       <HDSNavigation.Actions>
         <MobileNavigation>
-          {user && isValidAuthState(state) && (
-            <MainMenu
-              placement="navigation"
-              onItemSelection={() => setMenuState(false)}
-            />
-          )}
+          <MainMenu onItemSelection={() => setMenuState(false)} />
         </MobileNavigation>
-        <UserMenu
-          userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
-          authenticated={state === "HasPermissions"}
-          label={t(loggingIn ? "Navigation.logging" : "Navigation.login")}
-          onSignIn={() => {
-            setLoggingIn(true);
-            if (login) {
+        {/* state !== "Unknown" && state !== "NoPermissions" && (
+          <UserMenu
+            userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
+            authenticated={state === "HasPermissions"}
+            label={t(loggingIn ? "Navigation.logging" : "Navigation.login")}
+            onSignIn={() => {
               setLoggingIn(true);
-              login();
-            } else {
-              throw Error("cannot log in");
-            }
-          }}
-        >
-          {user && (
-            <UserInfo
-              name={
-                `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-                t("Navigation.noName")
+              if (login) {
+                setLoggingIn(true);
+                login();
+              } else {
+                throw Error("cannot log in");
               }
-              email={user.email}
-            />
-          )}
+            }}
+          >
+            {user && (
+              <UserInfo
+                name={
+                  `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+                  t("Navigation.noName")
+                }
+                email={user.email}
+              />
+            )}
 
-          <HDSNavigation.Item
-            className="btn-logout"
-            label={t("Navigation.logout")}
-            onClick={() => logout && logout()}
-            variant="primary"
-          />
-        </UserMenu>
+            <HDSNavigation.Item
+              className="btn-logout"
+              label={t("Navigation.logout")}
+              onClick={() => logout && logout()}
+              variant="primary"
+            />
+          </UserMenu>
+              ) */}
       </HDSNavigation.Actions>
     </StyledHDSNavigation>
   );

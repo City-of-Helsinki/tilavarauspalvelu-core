@@ -10,7 +10,6 @@ import trim from "lodash/trim";
 import { H1, H3 } from "common/src/common/typography";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import LinkPrev from "../LinkPrev";
-import withMainMenu from "../withMainMenu";
 import { getApplicationRound, getApplications } from "../../common/api";
 import {
   Application as ApplicationType,
@@ -300,4 +299,4 @@ function Applications(): JSX.Element {
   );
 }
 
-export default withMainMenu(Applications);
+export default Applications;

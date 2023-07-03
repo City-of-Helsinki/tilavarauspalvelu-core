@@ -9,7 +9,6 @@ import { useQuery, ApolloError } from "@apollo/client";
 import { H1, Strong } from "common/src/common/typography";
 import { Query, ResourceType } from "common/types/gql-types";
 import { DataFilterConfig } from "../../common/types";
-import withMainMenu from "../withMainMenu";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
 import ClearButton from "../ClearButton";
@@ -212,4 +211,4 @@ const ResourcesList = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(ResourcesList);
+export default ResourcesList;

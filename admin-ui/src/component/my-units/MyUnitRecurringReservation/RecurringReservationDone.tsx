@@ -11,7 +11,6 @@ import { breakpoints } from "common/src/common/style";
 import RecurringReservationsView from "app/component/reservations/requested/RecurringReservationsView";
 import { ActionsWrapper } from "./commonStyling";
 import ReservationList from "../../ReservationsList";
-import withMainMenu from "../../withMainMenu";
 
 const InfoSection = styled.p`
   margin: var(--spacing-l) 0;
@@ -144,4 +143,4 @@ const RecurringReservationDoneErrorWrapped = () => {
   );
 };
 
-export default withMainMenu(RecurringReservationDoneErrorWrapped);
+export default RecurringReservationDoneErrorWrapped;

@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import React, { useContext, useEffect, useMemo } from "react";
 import { Query, QueryReservationsArgs } from "common/types/gql-types";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
-import { useAuthState } from "./AuthStateContext";
+// import { useAuthState } from "./AuthStateContext";
 
 export type DataContextProps = {
   handlingCount: number;
@@ -27,13 +27,13 @@ export const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
   const [handlingCount, setHandlingCount] = React.useState(0);
   const [hasOwnUnits, setHasOwnUnits] = React.useState(false);
 
-  const { authState } = useAuthState();
+  // const { authState } = useAuthState();
 
   const { refetch } = useQuery<Query, QueryReservationsArgs>(
     HANDLING_COUNT_QUERY,
 
     {
-      skip: authState.state !== "HasPermissions",
+      // skip: authState.state !== "HasPermissions",
       fetchPolicy: "no-cache",
       onCompleted: ({ reservations, units }) => {
         setHandlingCount(reservations?.edges?.length || 0);
@@ -51,6 +51,7 @@ export const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
     [handlingCount, hasOwnUnits, refetch]
   );
 
+  /*
   useEffect(() => {
     if (authState.state === "HasPermissions") {
       const timer = setInterval(() => {
@@ -61,6 +62,7 @@ export const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
     return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  */
 
   return (
     <DataContext.Provider value={notificationContextValues}>

@@ -11,7 +11,7 @@ interface IProps {
   children: React.ReactNode;
 }
 
-const modalRoot = document.getElementById("modal-root");
+// const modalRoot = document.getElementById("modal-root");
 
 const Content = styled.div<{ onTransitionEnd: React.TransitionEventHandler }>`
   &:not(:focus-within) {
@@ -70,9 +70,11 @@ const CloseBtn = styled(Button).attrs({
   height: 20px;
 `;
 
-function Modal({ children }: IProps): JSX.Element {
+function Modal({ children }: IProps): JSX.Element | null {
+  /*
   const { setModalContent } = useModal();
   const { t } = useTranslation();
+
   const element = document.createElement("div");
   const focusHolder = React.createRef<HTMLButtonElement>();
   const closeBtn = React.createRef<HTMLButtonElement>();
@@ -108,6 +110,8 @@ function Modal({ children }: IProps): JSX.Element {
     </>,
     element
   );
+  */
+  return null;
 }
 
 export default Modal;

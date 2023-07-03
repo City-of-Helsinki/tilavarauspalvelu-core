@@ -41,7 +41,6 @@ import {
 } from "../../styles/layout";
 import { BasicLink } from "../../styles/util";
 import { ContentHeading } from "../../styles/typography";
-import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import {
@@ -795,4 +794,4 @@ const Application = () => {
   );
 };
 
-export default withMainMenu(Application);
+export default Application;

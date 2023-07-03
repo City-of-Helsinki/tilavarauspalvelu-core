@@ -2,7 +2,6 @@ import { debounce } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
-import withMainMenu from "../withMainMenu";
 import Filters, { FilterArguments, emptyState } from "./Filters";
 import ReservationUnitsDataReader, { Sort } from "./ReservationUnitsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
@@ -44,4 +43,4 @@ const ReservationUnits = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(ReservationUnits);
+export default ReservationUnits;

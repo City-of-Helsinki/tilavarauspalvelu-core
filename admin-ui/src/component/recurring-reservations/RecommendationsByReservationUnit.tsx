@@ -20,7 +20,6 @@ import { breakpoints } from "common/src/common/style";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { BasicLink, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
-import withMainMenu from "../withMainMenu";
 import {
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
@@ -653,4 +652,4 @@ function RecommendationsByReservationUnit(): JSX.Element {
   );
 }
 
-export default withMainMenu(RecommendationsByReservationUnit);
+export default RecommendationsByReservationUnit;

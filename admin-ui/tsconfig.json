@@ -1,3 +1,10 @@
 {
-  "extends": "./tsconfig.base.json"
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "incremental": true,
+    "jsx": "preserve"
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }

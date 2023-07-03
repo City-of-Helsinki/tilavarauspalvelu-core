@@ -28,7 +28,6 @@ import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { BasicLink } from "../../styles/util";
 import Loader from "../Loader";
 import ReservationUnitList from "./ReservationUnitList";
-import withMainMenu from "../withMainMenu";
 import ExternalLink from "./ExternalLink";
 import InfoModalContent from "./InfoModalContent";
 import { publicUrl } from "../../common/const";
@@ -316,4 +315,4 @@ const Unit = (): JSX.Element | null => {
   );
 };
 
-export default withMainMenu(Unit);
+export default Unit;

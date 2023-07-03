@@ -38,7 +38,6 @@ import { processAllocationResult } from "../../common/AllocationResult";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { BasicLink, Divider } from "../../styles/util";
 import Loader from "../Loader";
-import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import RecommendedSlot from "./RecommendedSlot";
 import ApplicationEventStatusBlock from "../applications/ApplicationEventStatusBlock";
@@ -751,4 +750,4 @@ function Recommendation(): JSX.Element {
   );
 }
 
-export default withMainMenu(Recommendation);
+export default Recommendation;

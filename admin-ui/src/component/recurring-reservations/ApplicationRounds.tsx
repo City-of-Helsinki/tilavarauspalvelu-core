@@ -10,14 +10,13 @@ import {
   QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
 import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
-import { MainMenuWrapper } from "../withMainMenu";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import HeroImage from "../../images/hero-user@1x.jpg";
 import { WideContainer, IngressContainer } from "../../styles/layout";
 import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
 import { useNotification } from "../../context/NotificationContext";
-import { useAuthState } from "../../context/AuthStateContext";
+// import { useAuthState } from "../../context/AuthStateContext";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 
 const Wrapper = styled.div``;
@@ -51,7 +50,7 @@ const ApplicationRoundsContainer = styled.div`
 function ApplicationRounds(): JSX.Element {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
-  const { authState } = useAuthState();
+  // const { authState } = useAuthState();
   const [applicationRounds, setApplicationRounds] = useState<
     ApplicationRoundType[]
   >([]);
@@ -60,7 +59,7 @@ function ApplicationRounds(): JSX.Element {
   const { loading } = useQuery<Query, QueryApplicationRoundsArgs>(
     APPLICATION_ROUNDS_QUERY,
     {
-      skip: authState.state !== "HasPermissions",
+      // skip: authState.state !== "HasPermissions",
       onCompleted: (data) => {
         const result = (data?.applicationRounds?.edges || []).map(
           (ar) => ar?.node as ApplicationRoundType
@@ -84,53 +83,51 @@ function ApplicationRounds(): JSX.Element {
   );
 
   let headingStr = t("User.welcome");
-  const name = authState.user?.firstName;
+  const name = "NO NAME"; // authState.user?.firstName;
   if (name) {
     headingStr += `, ${name}`;
   }
 
   return (
-    <MainMenuWrapper>
-      <Wrapper>
-        <KorosHeading heroImage={HeroImage}>
-          <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
-        </KorosHeading>
-        <Ingress>{t("MainLander.ingress")}</Ingress>
-        {handleRounds && (
-          <Deck>
-            <IngressContainer>
-              <Heading>{t("ApplicationRound.listHandlingTitle")}</Heading>
-              <RoundTypeIngress>
-                {t(
-                  `ApplicationRound.listHandlingIngress${
-                    handleRounds.length === 0 ? "Empty" : ""
-                  }`,
-                  {
-                    count: handleRounds.length,
-                  }
-                )}
-              </RoundTypeIngress>
-            </IngressContainer>
-            <WideContainer>
-              <ApplicationRoundsContainer>
-                {handleRounds.length > 0 ? (
-                  handleRounds.map((applicationRound) => (
-                    <ApplicationRoundCard
-                      applicationRound={applicationRound}
-                      key={applicationRound.pk}
-                    />
-                  ))
-                ) : (
-                  <NotificationBox>
-                    {t("ApplicationRound.listHandlingPlaceholder")}
-                  </NotificationBox>
-                )}
-              </ApplicationRoundsContainer>
-            </WideContainer>
-          </Deck>
-        )}
-      </Wrapper>
-    </MainMenuWrapper>
+    <Wrapper>
+      <KorosHeading heroImage={HeroImage}>
+        <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
+      </KorosHeading>
+      <Ingress>{t("MainLander.ingress")}</Ingress>
+      {handleRounds && (
+        <Deck>
+          <IngressContainer>
+            <Heading>{t("ApplicationRound.listHandlingTitle")}</Heading>
+            <RoundTypeIngress>
+              {t(
+                `ApplicationRound.listHandlingIngress${
+                  handleRounds.length === 0 ? "Empty" : ""
+                }`,
+                {
+                  count: handleRounds.length,
+                }
+              )}
+            </RoundTypeIngress>
+          </IngressContainer>
+          <WideContainer>
+            <ApplicationRoundsContainer>
+              {handleRounds.length > 0 ? (
+                handleRounds.map((applicationRound) => (
+                  <ApplicationRoundCard
+                    applicationRound={applicationRound}
+                    key={applicationRound.pk}
+                  />
+                ))
+              ) : (
+                <NotificationBox>
+                  {t("ApplicationRound.listHandlingPlaceholder")}
+                </NotificationBox>
+              )}
+            </ApplicationRoundsContainer>
+          </WideContainer>
+        </Deck>
+      )}
+    </Wrapper>
   );
 }
 

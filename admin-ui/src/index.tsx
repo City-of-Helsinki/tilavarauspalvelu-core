@@ -1,20 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import {
-  oidcLog,
-  AuthenticationProvider,
-  // eslint-disable-next-line import/no-unresolved
-} from "@axa-fr/react-oidc-context";
-import * as Sentry from "@sentry/react";
-import oidcConfiguration from "./common/auth/configuration";
-import "./index.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import Authenticating from "./component/Authentication/Authenticating";
-import MainLander from "./component/MainLander";
-import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
-import { authEnabled } from "./common/const";
-import CustomUserStore from "./common/auth/CustomUserStore";
+import * as Sentry from "@sentry/react";
 
 const dsn = process.env.REACT_APP_SENTRY_DSN;
 const environment = process.env.REACT_APP_SENTRY_ENVIRONMENT;
@@ -31,19 +19,7 @@ const root = createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
   <React.StrictMode>
-    <AuthenticationProvider
-      notAuthenticated={() => <MainLander withSiteWrapper />}
-      notAuthorized={() => <AuthorizationNeeded />}
-      authenticating={() => <Authenticating noNavigation />}
-      configuration={oidcConfiguration}
-      loggerLevel={oidcLog.ERROR}
-      isEnabled={authEnabled}
-      callbackComponentOverride={() => <Authenticating />}
-      sessionLostComponent={() => <MainLander withSiteWrapper />}
-      UserStore={CustomUserStore}
-    >
-      <App />
-    </AuthenticationProvider>
+    <App />
   </React.StrictMode>
 );
 

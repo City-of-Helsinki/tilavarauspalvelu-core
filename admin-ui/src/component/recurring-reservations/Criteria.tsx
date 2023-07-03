@@ -9,7 +9,6 @@ import sortBy from "lodash/sortBy";
 import { H1, H2, H3, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
 import {
   getApplicationRound,
   getParameters,
@@ -468,4 +467,4 @@ function Criteria(): JSX.Element {
   );
 }
 
-export default withMainMenu(Criteria);
+export default Criteria;

@@ -16,7 +16,6 @@ import {
 import { ContentHeading } from "../../styles/typography";
 import { NotificationBox } from "../../styles/util";
 import StatusRecommendation from "../applications/StatusRecommendation";
-import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
@@ -173,4 +172,4 @@ const Allocation = ({
   );
 };
 
-export default withMainMenu(Allocation);
+export default Allocation;

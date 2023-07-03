@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
 import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import withMainMenu from "../withMainMenu";
 import { Sort } from "../Unit/UnitsTable";
 import Filters, { FilterArguments, emptyFilterState } from "../Unit/Filters";
 import { HR } from "../lists/components";
@@ -46,4 +45,4 @@ const MyUnits = () => {
   );
 };
 
-export default withMainMenu(MyUnits);
+export default MyUnits;

@@ -25,7 +25,6 @@ import {
   WideContainer,
 } from "../../styles/layout";
 import Loader from "../Loader";
-import withMainMenu from "../withMainMenu";
 import InfoModalContent from "./InfoModalContent";
 import ResourcesTable from "./ResourcesTable";
 import SpacesTable from "./SpacesTable";
@@ -396,4 +395,4 @@ const SpacesResources = (): JSX.Element | null => {
   );
 };
 
-export default withMainMenu(SpacesResources);
+export default SpacesResources;

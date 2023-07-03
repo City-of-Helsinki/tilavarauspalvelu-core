@@ -22,7 +22,6 @@ import {
 import { Permission } from "app/context/authStateReducer";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
-import withMainMenu from "../../withMainMenu";
 import {
   ageGroup,
   createTagString,
@@ -711,4 +710,4 @@ const PermissionWrappedReservation = () => {
   );
 };
 
-export default withMainMenu(PermissionWrappedReservation);
+export default PermissionWrappedReservation;

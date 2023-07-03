@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import ApplicationRound from "./component/recurring-reservations/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
@@ -27,7 +28,7 @@ import ResourceEditorView from "./component/Resources/resource-editor/ResourceEd
 import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor/ReservationUnitEditor";
 import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnits from "./component/reservation-units/ReservationUnits";
-import { withGlobalContext } from "./context/GlobalContexts";
+import { GlobalContext } from "./context/GlobalContexts";
 
 import { prefixes } from "./common/urls";
 import ExternalScripts from "./common/ExternalScripts";
@@ -149,6 +150,7 @@ const PremisesRouter = () => (
 );
 
 const App = () => {
+  console.log("App: publicUrl", publicUrl);
   return (
     <BrowserRouter basename={publicUrl}>
       <PageWrapper>
@@ -224,4 +226,20 @@ const App = () => {
   );
 };
 
-export default withGlobalContext(App);
+const ContextWrapped = () => (
+  <GlobalContext>
+    <App />
+  </GlobalContext>
+);
+
+const AppWrapper = () => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return <ContextWrapped />;
+};
+
+export default AppWrapper;

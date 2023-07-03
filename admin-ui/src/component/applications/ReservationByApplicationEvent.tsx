@@ -20,7 +20,6 @@ import {
 } from "../../common/types";
 import { ContentContainer, NarrowContainer } from "../../styles/layout";
 import { ContentHeading } from "../../styles/typography";
-import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { Divider } from "../../styles/util";
 import { formatDate, localizedValue } from "../../common/util";
@@ -285,4 +284,4 @@ function ReservationByApplicationEvent(): JSX.Element | null {
   );
 }
 
-export default withMainMenu(ReservationByApplicationEvent);
+export default ReservationByApplicationEvent;

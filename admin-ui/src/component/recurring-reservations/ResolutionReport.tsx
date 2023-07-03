@@ -16,7 +16,6 @@ import {
   DataFilterConfig,
 } from "../../common/types";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
 import { ContentHeading } from "../../styles/typography";
 import DataTable, { CellConfig, OrderTypes } from "../DataTable";
 import { formatNumber, formatDuration } from "../../common/util";
@@ -539,4 +538,4 @@ function ResolutionReport(): JSX.Element {
   );
 }
 
-export default withMainMenu(ResolutionReport);
+export default ResolutionReport;

@@ -17,7 +17,6 @@ import {
   ReservationUnit,
 } from "../../common/types";
 import { ContentContainer, NarrowContainer } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { BasicLink, Divider } from "../../styles/util";
 import { formatDate, localizedValue } from "../../common/util";
@@ -263,4 +262,4 @@ function ReservationsByReservationUnit(): JSX.Element | null {
   );
 }
 
-export default withMainMenu(ReservationsByReservationUnit);
+export default ReservationsByReservationUnit;

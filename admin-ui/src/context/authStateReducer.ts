@@ -1,7 +1,6 @@
 import { get, isEqual, set } from "lodash";
 import { User } from "oidc-client";
 import { UserType } from "common/types/gql-types";
-import { localLogout } from "../common/auth/util";
 import permissionHelper from "./permissionHelper";
 
 export type AuthState =
@@ -122,8 +121,8 @@ export const authStateReducer = (state: Auth, action: Action): Auth => {
       }
       if (!newState.logout && action.logout) {
         set(newState, "logout", () => {
-          localLogout();
-          action.logout();
+          console.warn("TODO logout");
+          // action.logout();
         });
       }
 

@@ -9,7 +9,6 @@ import { publicUrl } from "../../common/const";
 import { parseAddress } from "../../common/util";
 import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import withMainMenu from "../withMainMenu";
 import { myUnitUrl } from "../../common/urls";
 import { BasicLink } from "../../styles/util";
 import ReservationUnitCalendarView from "./ReservationUnitCalendarView";
@@ -120,4 +119,4 @@ const MyUnitView = () => {
   );
 };
 
-export default withMainMenu(MyUnitView);
+export default MyUnitView;

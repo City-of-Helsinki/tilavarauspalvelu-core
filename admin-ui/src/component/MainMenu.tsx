@@ -204,7 +204,6 @@ const getFilteredMenu = (
     route: "/",
     exact: true,
   },
-
   ...(hasOwnUnits
     ? [
         {
@@ -281,14 +280,10 @@ const getFilteredMenu = (
 ];
 
 interface MainMenuProps {
-  placement: string;
   onItemSelection?: () => void;
 }
 
-function MainMenu({
-  placement = "default",
-  onItemSelection,
-}: MainMenuProps): JSX.Element {
+function MainMenu({ onItemSelection }: MainMenuProps): JSX.Element {
   const { t } = useTranslation();
   const { pathname } = useLocation();
 
@@ -306,15 +301,18 @@ function MainMenu({
   );
 
   return (
-    <Wrapper placement={placement}>
+    <Wrapper placement="default">
       {menuItems.map((menuItem: IMenuChild) => {
         const isActive = menuItem?.route
           ? pathname.startsWith(menuItem?.route)
           : false;
 
-        return menuItem ? (
+        return (
           <MenuItem key={menuItem.title}>
+            {menuItem.title}
+            {/* TODO next breaks the SVG Icon
             <Icon>{menuItem.icon}</Icon>
+            */}
             <Heading
               to={menuItem.route || ""}
               className={isActive ? "active" : ""}
@@ -332,7 +330,7 @@ function MainMenu({
               onItemSelection={onItemSelection}
             />
           </MenuItem>
-        ) : null;
+        );
       })}
     </Wrapper>
   );
