@@ -12,7 +12,6 @@
     "dev": "node server.cjs",
     "test": "TZ=Europe/Helsinki jest --runInBand",
     "test:watch": "jest --watch",
-    "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
     "ts-check": "tsc --noEmit --project tsconfig.tscheck.json"
   },
   "husky": {
