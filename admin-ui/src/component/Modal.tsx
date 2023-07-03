@@ -84,10 +84,7 @@ function Modal({ children }: IProps): JSX.Element | null {
   if (typeof window === "undefined") {
     return null;
   }
-  const modalRoot = document.getElementById("modal-root");
-  if (!modalRoot) {
-    return null;
-  }
+  const modalRoot = document.getElementById("modal-root") ?? document.body;
 
   const closeModal = () => setModalContent(null, false);
 

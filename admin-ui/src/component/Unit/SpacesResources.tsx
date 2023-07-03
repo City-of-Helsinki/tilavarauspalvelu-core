@@ -273,7 +273,6 @@ const SpacesResources = (): JSX.Element | null => {
     );
     refetch();
   };
-
   return (
     <ContentContainer>
       <Modal
@@ -308,9 +307,7 @@ const SpacesResources = (): JSX.Element | null => {
           <StyledButton
             variant="supplementary"
             iconRight={<IconInfoCircleFill />}
-            onClick={() =>
-              setModalContent && setModalContent(<InfoModalContent />)
-            }
+            onClick={() => setModalContent(<InfoModalContent />)}
           >
             {t("Unit.hierarchyReadMore")}
           </StyledButton>
