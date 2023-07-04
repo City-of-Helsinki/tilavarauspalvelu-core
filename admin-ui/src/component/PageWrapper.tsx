@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as Sentry from "@sentry/react";
 import styled from "styled-components";
@@ -30,7 +30,17 @@ const FallbackComponent = (err: unknown) => {
   return <Error5xx />;
 };
 
-export default function PageWrapper({ children }: Props): JSX.Element {
+// Pure client side component
+export default function PageWrapper({ children }: Props): JSX.Element | null {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <Navigation />
