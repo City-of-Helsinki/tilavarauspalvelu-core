@@ -23,10 +23,10 @@ import classNames from "classnames";
 import { breakpoints } from "common/src/common/style";
 import FilterControls from "./FilterControls";
 import { DataFilterConfig, DataFilterOption, DataGroup } from "../common/types";
-import { getGridFraction, SelectionCheckbox } from "../styles/util";
-import { ReactComponent as IconOpenAll } from "../images/icon_open-all.svg";
-import { ReactComponent as IconActivateSelection } from "../images/icon_select.svg";
-import { ReactComponent as IconDisableSelection } from "../images/icon_unselect.svg";
+import { SelectionCheckbox, getGridFraction } from "../styles/util";
+import IconOpenAll from "../images/icon_open-all.svg";
+import IconActivateSelection from "../images/icon_select.svg";
+import IconDisableSelection from "../images/icon_unselect.svg";
 import { truncatedText } from "../styles/typography";
 import {
   isTranslationObject,

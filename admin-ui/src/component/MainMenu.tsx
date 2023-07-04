@@ -5,11 +5,10 @@ import { NavLink, RouteProps, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import IconPremises from "common/src/icons/IconPremises";
-import { Permission } from "app/context/permissionHelper";
-// FIXME move to common and convert to jsx
-// import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
-// import { ReactComponent as IconIndividualReservation } from "../images/icon_individual-reservation.svg";
+import IconCalendar from "../images/icon_calendar.svg";
+import IconIndividualReservation from "../images/icon_individual-reservation.svg";
 import { truncatedText } from "../styles/typography";
+import { Permission } from "../context/permissionHelper";
 import { useData } from "../context/DataContext";
 import { prefixes } from "../common/urls";
 import usePermission from "./reservations/requested/hooks/usePermission";
@@ -220,8 +219,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.reservations",
-          // FIXME breaks on nextjs
-          // icon: <IconIndividualReservation aria-hidden />,
+          icon: <IconIndividualReservation aria-hidden />,
           route: "/reservations",
           items: [
             {
@@ -241,8 +239,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.recurringReservations",
-          // FIXME breaks on nextjs
-          // icon: <IconCalendar aria-hidden />,
+          icon: <IconCalendar aria-hidden />,
           route: "/recurring-reservations",
           items: [
             {
