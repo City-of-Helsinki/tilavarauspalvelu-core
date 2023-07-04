@@ -1,7 +1,8 @@
 import { join } from "path";
 import analyser from "@next/bundle-analyzer";
 import * as url from "url";
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+
+const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 
 const withBundleAnalyzer = analyser({
   enabled: process.env.ANALYZE === "true",
@@ -14,7 +15,7 @@ export default withBundleAnalyzer({
   },
   transpilePackages: ["common"],
   sassOptions: {
-    includePaths: [join(__dirname, "src")],
+    includePaths: [join(ROOT_PATH, "src")],
   },
   async rewrites() {
     return [
