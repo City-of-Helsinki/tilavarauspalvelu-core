@@ -19,9 +19,9 @@ export const { baseUrl, apiBaseUrl } = publicRuntimeConfig;
 // export const { nextAuthRoute } = serverRuntimeConfig;
 export const nextAuthRoute = "/api/auth";
 
-export const publicUrl = process.env.PUBLIC_URL;
+export const publicUrl = process.env.NEXT_PUBLIC_URL;
 export const previewUrlPrefix =
-  process.env.REACT_APP_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
+  process.env.NEXT_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
 
 export const PROFILE_TOKEN_HEADER = "X-Authorization";
 export const SESSION_EXPIRED_ERROR = "JWT too old";
@@ -37,3 +37,5 @@ export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
 
 // This is a backend (or library) limit based on testing
 export const GQL_MAX_RESULTS_PER_QUERY = 100;
+
+export const HERO_IMAGE_URL = "hero-user@1x.jpg";

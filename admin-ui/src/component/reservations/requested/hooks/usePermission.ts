@@ -53,7 +53,7 @@ const usePermission = () => {
   };
 
   return {
-    user,
+    user: user?.currentUser ?? undefined,
     hasPermission,
     hasSomePermission,
   };

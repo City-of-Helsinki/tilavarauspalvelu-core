@@ -9,15 +9,14 @@ import {
   Query,
   QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
+import { HERO_IMAGE_URL } from "app/common/const";
 import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
 import ApplicationRoundCard from "./ApplicationRoundCard";
-import HeroImage from "../../images/hero-user@1x.jpg";
 import { WideContainer, IngressContainer } from "../../styles/layout";
-import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
 import { useNotification } from "../../context/NotificationContext";
-// import { useAuthState } from "../../context/AuthStateContext";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
+import { usePermission } from "../reservations/requested/hooks";
 
 const Wrapper = styled.div``;
 
@@ -54,27 +53,23 @@ function ApplicationRounds(): JSX.Element {
   const [applicationRounds, setApplicationRounds] = useState<
     ApplicationRoundType[]
   >([]);
+
+  const { user } = usePermission();
+
   // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
   // TODO include the filter (below) into the query (state); requires backend changes
-  const { loading } = useQuery<Query, QueryApplicationRoundsArgs>(
-    APPLICATION_ROUNDS_QUERY,
-    {
-      // skip: authState.state !== "HasPermissions",
-      onCompleted: (data) => {
-        const result = (data?.applicationRounds?.edges || []).map(
-          (ar) => ar?.node as ApplicationRoundType
-        );
-        setApplicationRounds(result);
-      },
-      onError: (err: ApolloError) => {
-        notifyError(err.message);
-      },
-    }
-  );
-
-  if (loading) {
-    return <Loader />;
-  }
+  useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS_QUERY, {
+    skip: user == null,
+    onCompleted: (data) => {
+      const result = (data?.applicationRounds?.edges || []).map(
+        (ar) => ar?.node as ApplicationRoundType
+      );
+      setApplicationRounds(result);
+    },
+    onError: (err: ApolloError) => {
+      notifyError(err.message);
+    },
+  });
 
   const handleRounds = applicationRounds?.filter((applicationRound) =>
     ["draft", "in_review", "review_done", "allocated", "handled"].includes(
@@ -83,14 +78,14 @@ function ApplicationRounds(): JSX.Element {
   );
 
   let headingStr = t("User.welcome");
-  const name = "NO NAME"; // authState.user?.firstName;
+  const name = user?.firstName;
   if (name) {
     headingStr += `, ${name}`;
   }
 
   return (
     <Wrapper>
-      <KorosHeading heroImage={HeroImage}>
+      <KorosHeading heroImage={HERO_IMAGE_URL}>
         <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
       </KorosHeading>
       <Ingress>{t("MainLander.ingress")}</Ingress>
