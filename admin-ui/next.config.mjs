@@ -1,19 +1,20 @@
-const path = require("path");
+import { join } from "path";
+import analyser from "@next/bundle-analyzer";
+import * as url from "url";
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+
+const withBundleAnalyzer = analyser({
+  enabled: process.env.ANALYZE === "true",
+});
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    typedRoutes: true,
-  },
-};
-
-module.exports = {
+export default withBundleAnalyzer({
   typescript: {
     ignoreBuildErrors: true,
   },
   transpilePackages: ["common"],
   sassOptions: {
-    includePaths: [path.join(__dirname, "src")],
+    includePaths: [join(__dirname, "src")],
   },
   async rewrites() {
     return [
@@ -64,4 +65,4 @@ module.exports = {
     mockRequests: process.env.NEXT_PUBLIC_MOCK_REQUESTS === "true",
     mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
   },
-};
+});
