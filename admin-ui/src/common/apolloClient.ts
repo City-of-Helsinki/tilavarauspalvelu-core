@@ -3,12 +3,11 @@ import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { uniqBy } from "lodash";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
 import { ExtendedSession } from "../pages/api/auth/[...nextauth]";
-// import { getApiAccessToken, updateApiAccessToken } from "./auth/util";
 import {
   PROFILE_TOKEN_HEADER,
   SESSION_EXPIRED_ERROR,
@@ -27,7 +26,7 @@ const uploadLinkOptions = {
 const terminatingLink = createUploadLink(uploadLinkOptions);
 
 const authLink = setContext(
-  async (notUsed, { headers }: { headers: Headers }) => {
+  async (_notUsed, { headers }: { headers: Headers }) => {
     const session = (await getSession()) as ExtendedSession;
 
     const modifiedHeader = {
@@ -51,16 +50,19 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     );
 
     if (isSessionExpired) {
-      console.warn("Should sign out here");
-      // handleSignOut();
+      // eslint-disable-next-line no-console
+      console.warn("Session expired, signing out");
+      signOut();
     }
 
     graphQLErrors.forEach(async (error: GraphQLError) => {
+      // eslint-disable-next-line no-console
       console.error(`GQL_ERROR: ${error.message}`);
     });
   }
 
   if (networkError) {
+    // eslint-disable-next-line no-console
     console.error(`NETWORK_ERROR: ${networkError.message}`);
   }
 });
