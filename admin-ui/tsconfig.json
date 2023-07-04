@@ -23,12 +23,12 @@
   "exclude": ["node_modules"],
   "include": [
     "src",
+    "types",
     "i18next.d.ts",
     "middleware.ts",
     ".eslintrc.cjs",
     "stylelint.config.js",
     "next.config.mjs",
-    "next-env.d.ts",
-    "custom.d.ts"
+    "next-env.d.ts"
   ]
 }

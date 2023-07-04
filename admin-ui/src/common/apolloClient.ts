@@ -7,7 +7,6 @@ import { getSession, signOut } from "next-auth/react";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
-import { ExtendedSession } from "../pages/api/auth/[...nextauth]";
 import {
   PROFILE_TOKEN_HEADER,
   SESSION_EXPIRED_ERROR,
@@ -25,7 +24,7 @@ const terminatingLink = createUploadLink(uploadLinkOptions);
 
 const authLink = setContext(async (request, previousContext) => {
   const headers = previousContext.headers ?? {};
-  const session = (await getSession()) as ExtendedSession;
+  const session = await getSession();
 
   return {
     headers: {

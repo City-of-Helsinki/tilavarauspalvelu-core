@@ -2,20 +2,9 @@
 /* eslint-disable camelcase */
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
-import NextAuth, { NextAuthOptions, Session, Awaitable, User } from "next-auth";
+import NextAuth, { NextAuthOptions, Awaitable, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import getConfig from "next/config";
-
-type TunnistamoAccount = {
-  provider: string;
-  type: "oauth";
-  providerAccountId: string;
-  access_token: string;
-  refresh_token: string;
-  token_type: "bearer";
-  expires_at: number;
-  id_token: string;
-};
 
 type TunnistamoProfile = {
   iss: string;
@@ -35,49 +24,6 @@ type TunnistamoProfile = {
   sid: string;
   amr: string;
   loa: string;
-};
-
-type TilavarauspalveluUser = Omit<User, "image"> & {
-  id: string;
-  name: string;
-  given_name: string;
-  family_name: string;
-  nickname: string;
-  email: string;
-  email_verified: boolean;
-};
-
-type APITokens = {
-  tilavaraus: string;
-  profile: string;
-};
-
-type ExtendedJWT = JWT & {
-  accessToken: string;
-  accessTokenExpires: number;
-  refreshToken: string;
-  user: TilavarauspalveluUser;
-  apiTokens: APITokens;
-  error?: string;
-};
-
-type JwtParams = {
-  token: ExtendedJWT;
-  user: TilavarauspalveluUser;
-  account: TunnistamoAccount;
-};
-
-type ExtendedSession = Session & {
-  accessToken: string;
-  accessTokenExpires: number;
-  user: TilavarauspalveluUser;
-  apiTokens: APITokens;
-};
-
-type SessionParams = {
-  token: ExtendedJWT;
-  user: TilavarauspalveluUser;
-  session: ExtendedSession;
 };
 
 const {
@@ -168,7 +114,7 @@ const getApiAccessTokens = async (accessToken: string | undefined) => {
 // doesn't cut the session.
 const EXP_MS = (10 / 2) * 60 * 1000;
 
-const refreshAccessToken = async (token: ExtendedJWT) => {
+const refreshAccessToken = async (token: JWT) => {
   try {
     const data = await axios
       .request({
@@ -266,7 +212,9 @@ const options = (): NextAuthOptions => {
         token: oidcTokenUrl,
         profileUrl: oidcProfileApiUrl,
         authorization,
-        profile(profile: TunnistamoProfile): Awaitable<TilavarauspalveluUser> {
+        // TODO don't copy unneccessary fields just bloats the cookie
+        // TODO replace casting with schema validation
+        profile(profile: TunnistamoProfile): Awaitable<User> {
           return {
             id: profile.sub,
             ...profile,
@@ -278,19 +226,23 @@ const options = (): NextAuthOptions => {
       strategy: "jwt",
     },
     callbacks: {
-      async jwt({
-        token,
-        user,
-        account,
-      }: JwtParams): Promise<ExtendedJWT | undefined> {
+      async jwt({ token, user, account }) {
         // Initial sign in
         if (account && user) {
           const [tilavarausAPIToken, profileAPIToken] =
             await getApiAccessTokens(account.access_token);
+          if (account.access_token == null) {
+            throw new Error("No access token");
+          }
+          if (account.refresh_token == null) {
+            throw new Error("No refresh token");
+          }
+          const accessTokenExpires =
+            (account.expires_at ?? Date.now() + EXP_MS / 1000) * 1000;
+
           return {
             accessToken: account.access_token,
-            // HACK to deal with incorrect exp value
-            accessTokenExpires: Date.now() + EXP_MS, // account.expires_at * 1000,
+            accessTokenExpires,
             refreshToken: account.refresh_token,
             user,
             apiTokens: {
@@ -311,17 +263,15 @@ const options = (): NextAuthOptions => {
         const refreshedToken = await refreshAccessToken(token);
 
         if (refreshedToken?.error) {
-          return undefined;
+          throw new Error(refreshedToken.error);
         }
 
         return refreshedToken;
       },
-      async session({
-        session,
-        token,
-      }: SessionParams): Promise<ExtendedSession | undefined> {
+      async session({ session, token }) {
         if (!token) {
-          return undefined;
+          // TODO what should this return on no token? DefaultSession / throw error?
+          return session;
         }
 
         const { accessToken, accessTokenExpires, user, apiTokens } = token;
@@ -363,5 +313,3 @@ export default function nextAuthApiHandler(
 
   return NextAuth(req, res, options());
 }
-
-export type { ExtendedSession, ExtendedJWT };
