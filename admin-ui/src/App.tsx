@@ -83,6 +83,15 @@ const ApplicationRoundAllocation = dynamic(
   () => import(`${RECURRING_PATH}/allocation/ApplicationRoundAllocation`)
 );
 
+const withAuthorization = (
+  component: React.JSX.Element,
+  permission?: Permission
+) => (
+  <AuthorizationChecker permission={permission}>
+    {component}
+  </AuthorizationChecker>
+);
+
 const UnitsRouter = () => (
   <Routes>
     <Route path=":unitPk/map" element={<UnitMap />} />
@@ -161,35 +170,25 @@ const PremisesRouter = () => (
   <Routes>
     <Route
       path="spaces"
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_SPACES}>
-          <SpacesList />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(<SpacesList />, Permission.CAN_MANAGE_SPACES)}
     />
     <Route
       path={`${prefixes.reservationUnits}`}
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_UNITS}>
-          <ReservationUnits />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(
+        <ReservationUnits />,
+        Permission.CAN_MANAGE_UNITS
+      )}
     />
     <Route
       path="resources"
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_RESOURCES}>
-          <ResourcesList />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(
+        <ResourcesList />,
+        Permission.CAN_MANAGE_RESOURCES
+      )}
     />
     <Route
       path="units"
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_UNITS}>
-          <Units />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(<Units />, Permission.CAN_MANAGE_UNITS)}
     />
   </Routes>
 );
@@ -199,69 +198,37 @@ const App = () => {
     <BrowserRouter basename={publicUrl}>
       <PageWrapper>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <AuthorizationChecker>
-                <ApplicationRounds />
-              </AuthorizationChecker>
-            }
-          />
+          <Route path="/" element={withAuthorization(<ApplicationRounds />)} />
 
           <Route
             path={`${prefixes.applications}/*`}
-            element={
-              <AuthorizationChecker
-                permission={Permission.CAN_VALIDATE_APPLICATIONS}
-              >
-                <ApplicationRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(
+              <ApplicationRouter />,
+              Permission.CAN_VALIDATE_APPLICATIONS
+            )}
           />
 
           <Route
             path={`${prefixes.recurringReservations}/application-rounds/*`}
-            element={
-              <AuthorizationChecker
-                permission={Permission.CAN_VALIDATE_APPLICATIONS}
-              >
-                <ApplicationRoundsRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(
+              <ApplicationRoundsRouter />,
+              Permission.CAN_VALIDATE_APPLICATIONS
+            )}
           />
 
           <Route
             path="/premises-and-settings/*"
-            element={
-              <AuthorizationChecker>
-                <PremisesRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(<PremisesRouter />)}
           />
 
-          <Route
-            path="/unit/*"
-            element={
-              <AuthorizationChecker>
-                <UnitsRouter />
-              </AuthorizationChecker>
-            }
-          />
+          <Route path="/unit/*" element={withAuthorization(<UnitsRouter />)} />
           <Route
             path="/reservations/*"
-            element={
-              <AuthorizationChecker>
-                <ReservationsRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(<ReservationsRouter />)}
           />
           <Route
             path="/my-units/*"
-            element={
-              <AuthorizationChecker>
-                <MyUnitsRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(<MyUnitsRouter />)}
           />
         </Routes>
         <ExternalScripts />
@@ -270,20 +237,15 @@ const App = () => {
   );
 };
 
-const ContextWrapped = () => (
-  <GlobalContext>
-    <App />
-  </GlobalContext>
-);
-
 const AppWrapper = () => {
-  if (typeof document === "undefined") {
-    return null;
-  }
   if (typeof window === "undefined") {
     return null;
   }
-  return <ContextWrapped />;
+  return (
+    <GlobalContext>
+      <App />
+    </GlobalContext>
+  );
 };
 
 export default AppWrapper;
