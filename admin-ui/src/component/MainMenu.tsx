@@ -5,15 +5,15 @@ import { NavLink, RouteProps, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import IconPremises from "common/src/icons/IconPremises";
+import { Permission } from "app/context/permissionHelper";
 import IconCalendar from "../images/icon_calendar.svg";
 import IconIndividualReservation from "../images/icon_individual-reservation.svg";
 import { truncatedText } from "../styles/typography";
-import { Permission } from "../context/permissionHelper";
 import { useData } from "../context/DataContext";
 import { prefixes } from "../common/urls";
 import usePermission from "./reservations/requested/hooks/usePermission";
 
-const Wrapper = styled.ul<{ placement: string }>`
+const Wrapper = styled.ul<{ $sideMenu?: boolean }>`
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -22,8 +22,8 @@ const Wrapper = styled.ul<{ placement: string }>`
   padding: 1.5rem 1rem;
   list-style: none;
   z-index: var(--tilavaraus-admin-stack-main-menu);
-  ${({ placement }) =>
-    placement === "default" &&
+  ${({ $sideMenu }) =>
+    $sideMenu &&
     `
       @media (min-width: ${breakpoints.m}) {
         display: flex;
@@ -279,35 +279,21 @@ const getFilteredMenu = (
   },
 ];
 
-interface MainMenuProps {
-  onItemSelection?: () => void;
-  placement?: "default" | "navigation";
-}
-
-function MainMenu({
+const Items = ({
+  items,
+  count,
   onItemSelection,
-  placement = "default",
-}: MainMenuProps): JSX.Element | null {
+}: {
+  items: IMenuChild[];
+  count: number;
+  onItemSelection?: () => void;
+}) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
 
-  const { handlingCount, hasOwnUnits } = useData();
-
-  const { hasSomePermission, user } = usePermission();
-
-  if (!user) return null;
-
-  const count = handlingCount ? (
-    <HandlingCount>{handlingCount}</HandlingCount>
-  ) : undefined;
-
-  const menuItems = getFilteredMenu(hasOwnUnits, hasSomePermission).filter(
-    (item) => item.items == null || item.items.length > 0
-  );
-
   return (
-    <Wrapper placement={placement}>
-      {menuItems.map((menuItem: IMenuChild) => {
+    <>
+      {items.map((menuItem: IMenuChild) => {
         const isActive = menuItem?.route
           ? pathname.startsWith(menuItem?.route)
           : false;
@@ -324,7 +310,13 @@ function MainMenu({
             <SubItems
               items={menuItem.items?.map((child) =>
                 child.title === "MainMenu.requestedReservations"
-                  ? { ...child, postFix: count }
+                  ? {
+                      ...child,
+                      postFix:
+                        count > 0 ? (
+                          <HandlingCount>{count}</HandlingCount>
+                        ) : undefined,
+                    }
                   : child
               )}
               parentTitleKey={menuItem.title}
@@ -333,6 +325,36 @@ function MainMenu({
           </MenuItem>
         );
       })}
+    </>
+  );
+};
+
+interface MainMenuProps {
+  onItemSelection?: () => void;
+  placement?: "default" | "navigation";
+}
+
+function MainMenu({
+  onItemSelection,
+  placement = "default",
+}: MainMenuProps): JSX.Element | null {
+  const { handlingCount, hasOwnUnits } = useData();
+
+  const { hasSomePermission, user } = usePermission();
+
+  if (!user) return null;
+
+  const menuItems = getFilteredMenu(hasOwnUnits, hasSomePermission).filter(
+    (item) => item.items == null || item.items.length > 0
+  );
+
+  return (
+    <Wrapper $sideMenu={placement === "default"}>
+      <Items
+        items={menuItems}
+        onItemSelection={onItemSelection}
+        count={handlingCount}
+      />
     </Wrapper>
   );
 }

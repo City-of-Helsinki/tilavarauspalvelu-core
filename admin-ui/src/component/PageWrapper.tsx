@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as Sentry from "@sentry/react";
 import styled from "styled-components";
@@ -7,6 +7,7 @@ import ScrollToTop from "../common/ScrollToTop";
 import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
 import MainMenu from "./MainMenu";
+import Loader from "./Loader";
 
 type Props = {
   children: React.ReactNode | React.ReactElement;
@@ -35,7 +36,9 @@ export default function PageWrapper({ children }: Props): JSX.Element {
       <Navigation />
       <Wrapper>
         <MainMenu placement="default" />
-        <Content>{children}</Content>
+        <Suspense fallback={<Loader />}>
+          <Content>{children}</Content>
+        </Suspense>
         <ScrollToTop />
       </Wrapper>
       <GlobalElements />
