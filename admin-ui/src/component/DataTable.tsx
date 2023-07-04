@@ -93,10 +93,6 @@ interface IProps {
   ) => JSX.Element;
 }
 
-interface IToggleableButton {
-  $isActive: boolean;
-}
-
 const Wrapper = styled.div`
   display: grid;
 `;
@@ -285,37 +281,24 @@ const Body = styled.tbody`
   }
 `;
 
-const HideHandledBtn = styled(Button).attrs(
-  ({ $isActive }: IToggleableButton) => ({
-    iconLeft: $isActive ? (
-      <IconEye aria-hidden />
-    ) : (
-      <IconEyeCrossed aria-hidden />
-    ),
-    style: {
-      "--filter-button-color": "transparent",
-      "--color-bus": "var(--filter-button-color)",
-      "--color-bus-dark": "var(--filter-button-color)",
-      "--color-white": "var(--tilavaraus-admin-content-text-color)",
-      "--background-color-disabled": "transparent",
-      "--border-color-disabled": "transparent",
-      "--color-disabled": "var(--color-black-50)",
-    } as React.CSSProperties,
-  })
-)<IToggleableButton>``;
+const BTN_STYLE = {
+  "--filter-button-color": "transparent",
+  "--color-bus": "var(--filter-button-color)",
+  "--color-bus-dark": "var(--filter-button-color)",
+  "--color-white": "var(--tilavaraus-admin-content-text-color)",
+  "--background-color-disabled": "transparent",
+  "--border-color-disabled": "transparent",
+  "--color-disabled": "var(--color-black-50)",
+} as React.CSSProperties;
+
+const HideHandledBtn = styled(Button).attrs({
+  style: BTN_STYLE,
+})``;
 
 const ToggleVisibilityBtn = styled(Button).attrs({
   iconLeft: <IconOpenAll aria-hidden />,
-  style: {
-    "--filter-button-color": "transparent",
-    "--color-bus": "var(--filter-button-color)",
-    "--color-bus-dark": "var(--filter-button-color)",
-    "--color-white": "var(--tilavaraus-admin-content-text-color)",
-    "--background-color-disabled": "transparent",
-    "--border-color-disabled": "transparent",
-    "--color-disabled": "var(--color-black-50)",
-  } as React.CSSProperties,
-})<IToggleableButton>`
+  style: BTN_STYLE,
+})<{ $isActive?: boolean }>`
   &:disabled {
     svg {
       opacity: 0.5;
@@ -324,7 +307,7 @@ const ToggleVisibilityBtn = styled(Button).attrs({
 
   svg {
     ${({ $isActive }): string | false =>
-      $isActive && "transform: rotate(180deg);"}
+      $isActive ? "transform: rotate(180deg);" : ""}
   }
 
   @media (min-width: ${breakpoints.xl}) {
@@ -333,24 +316,9 @@ const ToggleVisibilityBtn = styled(Button).attrs({
   }
 `;
 
-const SelectionToggleBtn = styled(Button).attrs(
-  ({ $isActive }: IToggleableButton) => ({
-    iconLeft: $isActive ? (
-      <IconDisableSelection aria-hidden />
-    ) : (
-      <IconActivateSelection aria-hidden />
-    ),
-    style: {
-      "--filter-button-color": "transparent",
-      "--color-bus": "var(--filter-button-color)",
-      "--color-bus-dark": "var(--filter-button-color)",
-      "--color-white": "var(--tilavaraus-admin-content-text-color)",
-      "--background-color-disabled": "transparent",
-      "--border-color-disabled": "transparent",
-      "--color-disabled": "var(--color-black-50)",
-    } as React.CSSProperties,
-  })
-)<IToggleableButton>`
+const SelectionToggleBtn = styled(Button).attrs({
+  style: BTN_STYLE,
+})`
   &:disabled {
     svg g {
       fill: var(--color-black-50);
@@ -637,7 +605,13 @@ function DataTable({
               <HideHandledBtn
                 onClick={(): void => toggleHideHandled(!handledAreHidden)}
                 disabled={!actionsEnabled || isSelectionActive}
-                $isActive={handledAreHidden}
+                iconLeft={
+                  handledAreHidden ? (
+                    <IconEye aria-hidden />
+                  ) : (
+                    <IconEyeCrossed aria-hidden />
+                  )
+                }
                 title={t(
                   `common.${
                     handledAreHidden ? "filterShowHandled" : "filterHideHandled"
@@ -660,7 +634,13 @@ function DataTable({
                 setSelectedRows([]);
                 toggleSelectionActivity(!isSelectionActive);
               }}
-              $isActive={isSelectionActive}
+              iconLeft={
+                isSelectionActive ? (
+                  <IconDisableSelection aria-hidden />
+                ) : (
+                  <IconActivateSelection aria-hidden />
+                )
+              }
               disabled={!actionsEnabled}
               title={t(
                 `common.${

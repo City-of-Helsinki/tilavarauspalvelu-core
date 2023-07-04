@@ -19,7 +19,7 @@ export const { baseUrl, apiBaseUrl } = publicRuntimeConfig;
 // export const { nextAuthRoute } = serverRuntimeConfig;
 export const nextAuthRoute = "/api/auth";
 
-export const publicUrl = process.env.NEXT_PUBLIC_URL;
+export const publicUrl = process.env.NEXT_PUBLIC_URL ?? "";
 export const previewUrlPrefix =
   process.env.NEXT_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
 
@@ -39,3 +39,4 @@ export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
 export const GQL_MAX_RESULTS_PER_QUERY = 100;
 
 export const HERO_IMAGE_URL = "hero-user@1x.jpg";
+export const LOGO_IMAGE_URL = "logo.png";

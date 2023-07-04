@@ -14,6 +14,9 @@ export class CustomFormData extends FormData {
       };
       return super.append(name, JSON.stringify(newMap));
     }
+    if (typeof value === "string") {
+      return super.append(name, value);
+    }
     return super.append("image", value, fileName);
   }
 }

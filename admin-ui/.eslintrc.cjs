@@ -1,5 +1,7 @@
 module.exports = {
   extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "airbnb-typescript-prettier",
     "plugin:jsx-a11y/recommended",
     "plugin:@next/next/recommended",
@@ -10,6 +12,8 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: "module",
   },
+  plugins: ["@typescript-eslint", "jsx-a11y"],
+  root: true,
   env: {
     browser: true,
     jest: true,
@@ -67,5 +71,4 @@ module.exports = {
       },
     ],
   },
-  plugins: ["jsx-a11y"],
 };

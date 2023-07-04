@@ -13,34 +13,30 @@ import {
   SESSION_EXPIRED_ERROR,
   apiBaseUrl,
 } from "./const";
-// import { CustomFormData } from "./CustomFormData";
-
-// const getNewToken = () => updateApiAccessToken();
+import { CustomFormData } from "./CustomFormData";
 
 const uploadLinkOptions = {
   uri: `${apiBaseUrl}/graphql/`,
+  FormData: CustomFormData,
 };
 
-// set(uploadLinkOptions, "FormData", CustomFormData);
-
+// FIXME upload link is broken locally (it succeeds but no new image is available)
 const terminatingLink = createUploadLink(uploadLinkOptions);
 
-const authLink = setContext(
-  async (_notUsed, { headers }: { headers: Headers }) => {
-    const session = (await getSession()) as ExtendedSession;
+const authLink = setContext(async (request, previousContext) => {
+  const headers = previousContext.headers ?? {};
+  const session = (await getSession()) as ExtendedSession;
 
-    const modifiedHeader = {
-      headers: {
-        ...headers,
-        authorization: session?.apiTokens?.tilavaraus
-          ? `Bearer ${session.apiTokens.tilavaraus}`
-          : "",
-        [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
-      },
-    };
-    return modifiedHeader;
-  }
-);
+  return {
+    headers: {
+      ...headers,
+      authorization: session?.apiTokens?.tilavaraus
+        ? `Bearer ${session.apiTokens.tilavaraus}`
+        : "",
+      [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
+    },
+  };
+});
 
 // eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, networkError }) => {
