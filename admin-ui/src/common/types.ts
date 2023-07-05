@@ -421,18 +421,6 @@ export interface ReservationUnitCalendarUrl {
   calendarUrl: string;
 }
 
-export interface UnitWIP {
-  id: number;
-  name: string;
-  location: Location;
-  service: string;
-  area: string;
-  resources: [];
-  spaces: [];
-  openingHours: [];
-  reservationUnits: [];
-}
-
 export type AllocationApplicationEventCardType =
   | "unallocated"
   | "allocated"
