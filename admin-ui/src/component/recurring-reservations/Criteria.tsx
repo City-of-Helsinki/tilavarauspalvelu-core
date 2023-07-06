@@ -21,7 +21,7 @@ import {
 } from "../../common/types";
 import Loader from "../Loader";
 import TimeframeStatus from "./TimeframeStatus";
-import { ReactComponent as RecurringReservationIcon } from "../../images/icon_recurring-reservation.svg";
+import RecurringReservationIcon from "../../images/icon_recurring-reservation.svg";
 import Accordion from "../Accordion";
 import { formatDate, localizedValue, parseAgeGroups } from "../../common/util";
 import i18n from "../../i18n";

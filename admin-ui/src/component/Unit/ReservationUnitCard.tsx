@@ -15,7 +15,7 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import { BasicLink } from "../../styles/util";
-import { ReactComponent as IconDraft } from "../../images/icon_draft.svg";
+import IconDraft from "../../images/icon_draft.svg";
 
 interface IProps {
   reservationUnit: ReservationUnitType;

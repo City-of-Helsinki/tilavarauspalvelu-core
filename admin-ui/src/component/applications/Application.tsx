@@ -42,7 +42,7 @@ import {
 import { BasicLink } from "../../styles/util";
 import { ContentHeading } from "../../styles/typography";
 import LinkPrev from "../LinkPrev";
-import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
+import IconCustomers from "../../images/icon_customers.svg";
 import {
   formatDate,
   formatNumber,
