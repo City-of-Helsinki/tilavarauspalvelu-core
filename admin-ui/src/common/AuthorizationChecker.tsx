@@ -2,6 +2,7 @@ import React from "react";
 import { useSession } from "next-auth/react";
 import { Permission } from "app/context/permissionHelper";
 import usePermission from "app/component/reservations/requested/hooks/usePermission";
+import MainLander from "app/component/MainLander";
 
 import Error403 from "./Error403";
 
@@ -37,7 +38,7 @@ const AuthorisationChecker = ({
   // Only allow logged in
   const { data: session } = useSession();
   if (!session?.user) {
-    return <Error403 />;
+    return <MainLander />;
   }
 
   // Only allow if user has permission
