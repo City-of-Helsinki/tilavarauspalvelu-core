@@ -17,6 +17,10 @@ export default withBundleAnalyzer({
   sassOptions: {
     includePaths: [join(ROOT_PATH, "src")],
   },
+  i18n: {
+    locales: ['fi'],
+    defaultLocale: 'fi',
+  },
   async rewrites() {
     return [
       // Do not rewrite API routes
@@ -65,6 +69,7 @@ export default withBundleAnalyzer({
     },
   },
   serverRuntimeConfig: {
+    // TODO use different env variables for ui and admin-ui
     apiBaseUrl: process.env.TILAVARAUS_API_URL,
     authEnabled: process.env.DISABLE_AUTH !== "true",
     oidcClientId: process.env.OIDC_CLIENT_ID,
@@ -79,6 +84,7 @@ export default withBundleAnalyzer({
     env: process.env.NEXT_ENV,
   },
   publicRuntimeConfig: {
+    // TODO use different env variables for ui and admin-ui
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     apiBaseUrl: process.env.TILAVARAUS_API_URL,
     authEnabled: process.env.DISABLE_AUTH !== "true",
