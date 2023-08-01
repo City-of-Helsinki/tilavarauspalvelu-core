@@ -278,10 +278,7 @@ const options = (): NextAuthOptions => {
 
         return { ...session, accessToken, accessTokenExpires, user, apiTokens };
       },
-      async redirect({ url, baseUrl }) {
-        if (url.startsWith(baseUrl)) {
-          return baseUrl;
-        }
+      async redirect({ url }) {
         return url;
       },
     },

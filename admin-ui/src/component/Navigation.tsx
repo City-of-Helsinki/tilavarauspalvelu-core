@@ -2,14 +2,11 @@ import React, { useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-// FIXME
-// import { useNavigate } from "react-router-dom";
-// import { isValidAuthState } from "app/context/authStateReducer";
+import { useNavigate } from "react-router-dom";
 import { UserInfo } from "common";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
 import MainMenu from "./MainMenu";
-// import { useAuthState } from "../context/AuthStateContext";
 import { StyledHDSNavigation } from "../styles/util";
 
 const MobileNavigation = styled.div`
@@ -40,7 +37,7 @@ const Navigation = () => {
   const { t } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
-  // const history = useNavigate();
+  const history = useNavigate();
 
   const { data: session } = useSession();
   const { user } = session || {};
@@ -56,13 +53,13 @@ const Navigation = () => {
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t("Navigation.skipToMainContent")}
-      // onTitleClick={() => history("/")}
+      onTitleClick={() => history("/")}
       onMenuToggle={() => setMenuState(!isMenuOpen)}
       menuOpen={isMenuOpen}
     >
       <HDSNavigation.Actions>
         <MobileNavigation>
-          {user /* && isValidAuthState(state) */ && (
+          {user && (
             <MainMenu
               placement="navigation"
               onItemSelection={() => setMenuState(false)}
