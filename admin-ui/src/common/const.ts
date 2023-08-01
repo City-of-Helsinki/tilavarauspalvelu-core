@@ -38,5 +38,5 @@ export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
 // This is a backend (or library) limit based on testing
 export const GQL_MAX_RESULTS_PER_QUERY = 100;
 
-export const HERO_IMAGE_URL = "hero-user@1x.jpg";
-export const LOGO_IMAGE_URL = "logo.png";
+export const HERO_IMAGE_URL = "/hero-user@1x.jpg";
+export const LOGO_IMAGE_URL = "/logo.png";
