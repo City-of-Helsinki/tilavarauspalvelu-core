@@ -6,7 +6,7 @@
 
 html,
 body,
-#root {
+#__next {
   height: 100%;
   margin: 0;
 }
@@ -43,11 +43,10 @@ a {
   text-underline-offset: 2px;
 }
 
-#root {
+#__next {
   display: flex;
-  padding: 0;
   flex-direction: column;
-  align-items: flex-start;
+  min-height: 100vh;
 }
 
 section[aria-label="Tooltip"] {

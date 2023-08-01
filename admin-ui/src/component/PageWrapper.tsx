@@ -23,6 +23,7 @@ const Content = styled.main`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
+  flex-grow: 1;
 `;
 
 const FallbackComponent = (err: unknown) => {
