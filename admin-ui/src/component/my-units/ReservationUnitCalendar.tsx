@@ -155,6 +155,7 @@ const ReservationUnitCalendar = ({
     ? getEventBuffers(
         events
           .map((e) => e.event)
+          .filter((e) => e?.type !== ReservationsReservationTypeChoices.Blocked)
           .filter((e): e is ReservationType => e != null)
       )
     : [];
