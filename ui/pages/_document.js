@@ -51,6 +51,10 @@ export default class MyDocument extends Document {
           />
           <meta name="color-scheme" content="light only" />
           <meta name="theme-color" content="#0000bf" />
+          <link rel="icon" href="/favicon-32x32.ico" sizes="any" />
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <link rel="manifest" href="/manifest.webmanifest" />
         </Head>
         <body>
           <Main />
