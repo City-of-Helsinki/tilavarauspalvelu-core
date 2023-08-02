@@ -255,12 +255,14 @@ const DialogContent = ({
         metadataSetFields
       );
 
-      const bufferBefore = values.bufferTimeBefore
-        ? reservationUnit.bufferTimeBefore ?? 0
-        : 0;
-      const bufferAfter = values.bufferTimeAfter
-        ? reservationUnit.bufferTimeAfter ?? 0
-        : 0;
+      const bufferBefore =
+        values.type !== "BLOCKED" && values.bufferTimeBefore
+          ? reservationUnit.bufferTimeBefore ?? 0
+          : 0;
+      const bufferAfter =
+        values.type !== "BLOCKED" && values.bufferTimeAfter
+          ? reservationUnit.bufferTimeAfter ?? 0
+          : 0;
       const input: ReservationStaffCreateMutationInput = {
         reservationUnitPks: [reservationUnit.pk],
         type: values.type ?? "",
