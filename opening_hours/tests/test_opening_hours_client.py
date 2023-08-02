@@ -484,7 +484,7 @@ class OpeningHoursClientTestCase(TestCase):
                 start_time=datetime.time(hour=8),
                 end_time=datetime.time(hour=13),
                 end_time_on_next_day=False,
-                resource_state=State.CLOSED.value,
+                resource_state=State.MAINTENANCE.value,
             )
         )
         mock.return_value = data
@@ -493,21 +493,25 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
         )
 
-        begin = datetime.datetime.combine(DATES[0], datetime.time(10))
-        end = datetime.datetime.combine(DATES[0], datetime.time(14))
+        begin_1 = datetime.datetime.combine(DATES[0], datetime.time(8), tzinfo=DEFAULT_TIMEZONE)
+        end_1 = datetime.datetime.combine(DATES[0], datetime.time(13), tzinfo=DEFAULT_TIMEZONE)
 
-        is_open = client.is_resource_open_for_reservations(
-            str(self.reservation_unit.uuid), begin, end
+        begin_2 = datetime.datetime.combine(DATES[0], datetime.time(13), tzinfo=DEFAULT_TIMEZONE)
+        end_2 = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
         )
-        assert_that(is_open).is_false()
 
-        begin = datetime.datetime.combine(DATES[0], datetime.time(13))
-        end = datetime.datetime.combine(DATES[0], datetime.time(14))
+        assert_that(len(times)).is_equal_to(2)
 
-        is_open = client.is_resource_open_for_reservations(
-            str(self.reservation_unit.uuid), begin, end
-        )
-        assert_that(is_open).is_true()
+        assert_that(times[0].start_time).is_equal_to(begin_1)
+        assert_that(times[0].end_time).is_equal_to(end_1)
+        assert_that(times[0].resource_state).is_equal_to(State.MAINTENANCE.value)
+
+        assert_that(times[1].start_time).is_equal_to(begin_2)
+        assert_that(times[1].end_time).is_equal_to(end_2)
+        assert_that(times[1].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
 
     def test_closed_time_affects_open_time_end(self, mock):
         data = self.get_mocked_opening_hours()
@@ -516,7 +520,7 @@ class OpeningHoursClientTestCase(TestCase):
                 start_time=datetime.time(hour=20),
                 end_time=datetime.time(hour=23),
                 end_time_on_next_day=False,
-                resource_state=State.CLOSED.value,
+                resource_state=State.MAINTENANCE.value,
             )
         )
         mock.return_value = data
@@ -525,21 +529,24 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
         )
 
-        begin = datetime.datetime.combine(DATES[0], datetime.time(18))
-        end = datetime.datetime.combine(DATES[0], datetime.time(21))
+        begin_1 = datetime.datetime.combine(DATES[0], datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
+        end_1 = datetime.datetime.combine(DATES[0], datetime.time(20), tzinfo=DEFAULT_TIMEZONE)
 
-        is_open = client.is_resource_open_for_reservations(
-            str(self.reservation_unit.uuid), begin, end
+        begin_2 = datetime.datetime.combine(DATES[0], datetime.time(20), tzinfo=DEFAULT_TIMEZONE)
+        end_2 = datetime.datetime.combine(DATES[0], datetime.time(23), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
         )
-        assert_that(is_open).is_false()
+        assert_that(len(times)).is_equal_to(2)
 
-        begin = datetime.datetime.combine(DATES[0], datetime.time(18))
-        end = datetime.datetime.combine(DATES[0], datetime.time(20))
+        assert_that(times[0].start_time).is_equal_to(begin_1)
+        assert_that(times[0].end_time).is_equal_to(end_1)
+        assert_that(times[0].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
 
-        is_open = client.is_resource_open_for_reservations(
-            str(self.reservation_unit.uuid), begin, end
-        )
-        assert_that(is_open).is_true()
+        assert_that(times[1].start_time).is_equal_to(begin_2)
+        assert_that(times[1].end_time).is_equal_to(end_2)
+        assert_that(times[1].resource_state).is_equal_to(State.MAINTENANCE.value)
 
     def test_closed_time_inside_open_time_creates_two_open_times(self, mock):
         data = self.get_mocked_opening_hours()
@@ -557,26 +564,247 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
         )
 
-        begin = datetime.datetime.combine(DATES[0], datetime.time(14))
-        end = datetime.datetime.combine(DATES[0], datetime.time(16))
+        begin_1 = datetime.datetime.combine(DATES[0], datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
+        end_1 = datetime.datetime.combine(DATES[0], datetime.time(15), tzinfo=DEFAULT_TIMEZONE)
 
-        is_open = client.is_resource_open_for_reservations(
-            str(self.reservation_unit.uuid), begin, end
+        begin_2 = datetime.datetime.combine(DATES[0], datetime.time(15), tzinfo=DEFAULT_TIMEZONE)
+        end_2 = datetime.datetime.combine(DATES[0], datetime.time(18), tzinfo=DEFAULT_TIMEZONE)
+
+        begin_3 = datetime.datetime.combine(DATES[0], datetime.time(18), tzinfo=DEFAULT_TIMEZONE)
+        end_3 = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
         )
-        assert_that(is_open).is_false()
 
-        begin = datetime.datetime.combine(DATES[0], datetime.time(18))
-        end = datetime.datetime.combine(DATES[0], datetime.time(20))
+        assert_that(len(times)).is_equal_to(3)
 
-        is_open = client.is_resource_open_for_reservations(
-            str(self.reservation_unit.uuid), begin, end
+        assert_that(times[0].start_time).is_equal_to(begin_1)
+        assert_that(times[0].end_time).is_equal_to(end_1)
+        assert_that(times[0].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
+
+        assert_that(times[1].start_time).is_equal_to(begin_2)
+        assert_that(times[1].end_time).is_equal_to(end_2)
+        assert_that(times[1].resource_state).is_equal_to(State.MAINTENANCE.value)
+
+        assert_that(times[2].start_time).is_equal_to(begin_3)
+        assert_that(times[2].end_time).is_equal_to(end_3)
+        assert_that(times[2].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
+
+    def test_two_closed_times_inside_open_time_creates_three_open_times(self, mock):
+        data = self.get_mocked_opening_hours()
+        data[0]["times"] += [
+            TimeElement(
+                start_time=datetime.time(hour=11),
+                end_time=datetime.time(hour=12),
+                end_time_on_next_day=False,
+                resource_state=State.MAINTENANCE.value,
+            ),
+            TimeElement(
+                start_time=datetime.time(hour=15),
+                end_time=datetime.time(hour=18),
+                end_time_on_next_day=False,
+                resource_state=State.MAINTENANCE.value,
+            ),
+        ]
+        mock.return_value = data
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
         )
-        assert_that(is_open).is_true()
 
-        begin = datetime.datetime.combine(DATES[0], datetime.time(12))
-        end = datetime.datetime.combine(DATES[0], datetime.time(15))
+        begin_1 = datetime.datetime.combine(DATES[0], datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
+        end_1 = datetime.datetime.combine(DATES[0], datetime.time(11), tzinfo=DEFAULT_TIMEZONE)
 
-        is_open = client.is_resource_open_for_reservations(
-            str(self.reservation_unit.uuid), begin, end
+        begin_2 = datetime.datetime.combine(DATES[0], datetime.time(11), tzinfo=DEFAULT_TIMEZONE)
+        end_2 = datetime.datetime.combine(DATES[0], datetime.time(12), tzinfo=DEFAULT_TIMEZONE)
+
+        begin_3 = datetime.datetime.combine(DATES[0], datetime.time(12), tzinfo=DEFAULT_TIMEZONE)
+        end_3 = datetime.datetime.combine(DATES[0], datetime.time(15), tzinfo=DEFAULT_TIMEZONE)
+
+        begin_4 = datetime.datetime.combine(DATES[0], datetime.time(15), tzinfo=DEFAULT_TIMEZONE)
+        end_4 = datetime.datetime.combine(DATES[0], datetime.time(18), tzinfo=DEFAULT_TIMEZONE)
+
+        begin_5 = datetime.datetime.combine(DATES[0], datetime.time(18), tzinfo=DEFAULT_TIMEZONE)
+        end_5 = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
         )
-        assert_that(is_open).is_true()
+        assert_that(len(times)).is_equal_to(5)
+
+        assert_that(times[0].start_time).is_equal_to(begin_1)
+        assert_that(times[0].end_time).is_equal_to(end_1)
+        assert_that(times[0].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
+
+        assert_that(times[1].start_time).is_equal_to(begin_2)
+        assert_that(times[1].end_time).is_equal_to(end_2)
+        assert_that(times[1].resource_state).is_equal_to(State.MAINTENANCE.value)
+
+        assert_that(times[2].start_time).is_equal_to(begin_3)
+        assert_that(times[2].end_time).is_equal_to(end_3)
+        assert_that(times[2].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
+
+        assert_that(times[3].start_time).is_equal_to(begin_4)
+        assert_that(times[3].end_time).is_equal_to(end_4)
+        assert_that(times[3].resource_state).is_equal_to(State.MAINTENANCE.value)
+
+        assert_that(times[4].start_time).is_equal_to(begin_5)
+        assert_that(times[4].end_time).is_equal_to(end_5)
+        assert_that(times[4].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
+
+    def test_open_time_inside_closed_time_is_removed(self, mock):
+        data = self.get_mocked_opening_hours()
+        first_time_element = data[0]["times"][0]
+        data[0]["times"][0] = TimeElement(
+            start_time=first_time_element.start_time,
+            end_time=first_time_element.end_time,
+            end_time_on_next_day=first_time_element.end_time_on_next_day,
+            resource_state=State.MAINTENANCE.value,
+        )
+        data[0]["times"].append(
+            TimeElement(
+                start_time=datetime.time(hour=15),
+                end_time=datetime.time(hour=18),
+                end_time_on_next_day=False,
+                resource_state=State.OPEN_AND_RESERVABLE.value,
+            )
+        )
+        mock.return_value = data
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+
+        begin = datetime.datetime.combine(DATES[0], datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
+        end = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
+        )
+        assert_that(len(times)).is_equal_to(1)
+        assert_that(times[0].resource_state).is_equal_to(State.MAINTENANCE.value)
+        assert_that(times[0].start_time).is_equal_to(begin)
+        assert_that(times[0].end_time).is_equal_to(end)
+
+    def test_two_open_times_are_concatenated(self, mock):
+        data = self.get_mocked_opening_hours()
+        data[0]["times"].append(
+            TimeElement(
+                start_time=datetime.time(hour=6),
+                end_time=datetime.time(hour=10),
+                end_time_on_next_day=False,
+                resource_state=State.OPEN_AND_RESERVABLE.value,
+            )
+        )
+        mock.return_value = data
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+
+        begin = datetime.datetime.combine(DATES[0], datetime.time(6), tzinfo=DEFAULT_TIMEZONE)
+        end = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
+        )
+        assert_that(len(times)).is_equal_to(1)
+        assert_that(times[0].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
+        assert_that(times[0].start_time).is_equal_to(begin)
+        assert_that(times[0].end_time).is_equal_to(end)
+
+    def test_two_open_times_are_combined(self, mock):
+        data = self.get_mocked_opening_hours()
+        data[0]["times"].append(
+            TimeElement(
+                start_time=datetime.time(hour=8),
+                end_time=datetime.time(hour=12),
+                end_time_on_next_day=False,
+                resource_state=State.OPEN_AND_RESERVABLE.value,
+            )
+        )
+        mock.return_value = data
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+
+        begin = datetime.datetime.combine(DATES[0], datetime.time(8), tzinfo=DEFAULT_TIMEZONE)
+        end = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
+        )
+        assert_that(len(times)).is_equal_to(1)
+        assert_that(times[0].resource_state).is_equal_to(State.OPEN_AND_RESERVABLE.value)
+        assert_that(times[0].start_time).is_equal_to(begin)
+        assert_that(times[0].end_time).is_equal_to(end)
+
+    def test_two_closed_times_are_concatenated(self, mock):
+        data = self.get_mocked_opening_hours()
+        first_time_element = data[0]["times"][0]
+        data[0]["times"][0] = TimeElement(
+            start_time=first_time_element.start_time,
+            end_time=first_time_element.end_time,
+            end_time_on_next_day=first_time_element.end_time_on_next_day,
+            resource_state=State.MAINTENANCE.value,
+        )
+        data[0]["times"].append(
+            TimeElement(
+                start_time=datetime.time(hour=6),
+                end_time=datetime.time(hour=10),
+                end_time_on_next_day=False,
+                resource_state=State.MAINTENANCE.value,
+            )
+        )
+        mock.return_value = data
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+
+        begin = datetime.datetime.combine(DATES[0], datetime.time(6), tzinfo=DEFAULT_TIMEZONE)
+        end = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
+        )
+        assert_that(len(times)).is_equal_to(1)
+        assert_that(times[0].resource_state).is_equal_to(State.MAINTENANCE.value)
+        assert_that(times[0].start_time).is_equal_to(begin)
+        assert_that(times[0].end_time).is_equal_to(end)
+
+    def test_two_closed_times_are_combined(self, mock):
+        data = self.get_mocked_opening_hours()
+        first_time_element = data[0]["times"][0]
+        data[0]["times"][0] = TimeElement(
+            start_time=first_time_element.start_time,
+            end_time=first_time_element.end_time,
+            end_time_on_next_day=first_time_element.end_time_on_next_day,
+            resource_state=State.MAINTENANCE.value,
+        )
+        data[0]["times"].append(
+            TimeElement(
+                start_time=datetime.time(hour=8),
+                end_time=datetime.time(hour=12),
+                end_time_on_next_day=False,
+                resource_state=State.MAINTENANCE.value,
+            )
+        )
+        mock.return_value = data
+
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+
+        begin = datetime.datetime.combine(DATES[0], datetime.time(8), tzinfo=DEFAULT_TIMEZONE)
+        end = datetime.datetime.combine(DATES[0], datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+        times = client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid), DATES[0]
+        )
+        assert_that(len(times)).is_equal_to(1)
+        assert_that(times[0].resource_state).is_equal_to(State.MAINTENANCE.value)
+        assert_that(times[0].start_time).is_equal_to(begin)
+        assert_that(times[0].end_time).is_equal_to(end)

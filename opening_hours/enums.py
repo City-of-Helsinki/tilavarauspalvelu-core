@@ -1,3 +1,5 @@
+from types import DynamicClassAttribute
+
 from django.utils.translation import pgettext_lazy
 from enumfields import Enum
 
@@ -47,6 +49,14 @@ class State(Enum):
     @classmethod
     def closed_states(cls):
         return [None, cls.CLOSED, cls.UNDEFINED, cls.NOT_IN_USE, cls.MAINTENANCE]
+
+    @DynamicClassAttribute
+    def is_open(self) -> bool:
+        return self in State.open_states()
+
+    @DynamicClassAttribute
+    def is_closed(self) -> bool:
+        return self in State.closed_states()
 
     @classmethod
     def reservable_states(cls):
