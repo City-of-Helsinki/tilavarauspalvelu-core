@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import { UserInfo } from "common";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
@@ -33,11 +32,11 @@ const UserMenu = styled(HDSNavigation.User)`
   }
 `;
 
-const Navigation = () => {
+const Navigation = ({ disabledRouter = false }) => {
   const { t } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
-  const history = useNavigate();
+  // const history = useNavigate();
 
   const { data: session } = useSession();
   const { user } = session || {};
@@ -53,13 +52,14 @@ const Navigation = () => {
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t("Navigation.skipToMainContent")}
-      onTitleClick={() => history("/")}
+      // FIXME can't use react-router because we want to reuse this on next page
+      // onTitleClick={() => history("/")}
       onMenuToggle={() => setMenuState(!isMenuOpen)}
       menuOpen={isMenuOpen}
     >
       <HDSNavigation.Actions>
         <MobileNavigation>
-          {user && (
+          {user && !disabledRouter && (
             <MainMenu
               placement="navigation"
               onItemSelection={() => setMenuState(false)}
@@ -82,11 +82,10 @@ const Navigation = () => {
               email={user?.email ?? t("Navigation.noEmail")}
             />
           )}
-
           <HDSNavigation.Item
             className="btn-logout"
             label={t("Navigation.logout")}
-            onClick={() => signOut()}
+            onClick={() => signOut({ callbackUrl: "/logout" })}
             variant="primary"
           />
         </UserMenu>

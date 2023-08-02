@@ -28,6 +28,10 @@ export default withBundleAnalyzer({
         source: "/api/:any*",
         destination: "/api/:any*",
       },
+      {
+        source: "/logout/:any*",
+        destination: "/logout/:any*",
+      },
       // Rewrite everything else to use `pages/index`
       {
         source: "/:any*",
@@ -88,6 +92,7 @@ export default withBundleAnalyzer({
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     apiBaseUrl: process.env.TILAVARAUS_API_URL,
     authEnabled: process.env.DISABLE_AUTH !== "true",
+    tunnistamoUrl: process.env.TUNNISTAMO_URL,
     oidcEndSessionUrl: process.env.NEXT_PUBLIC_OIDC_END_SESSION,
     sentryDSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     sentryEnvironment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
