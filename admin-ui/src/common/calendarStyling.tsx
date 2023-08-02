@@ -51,7 +51,8 @@ export const POST_PAUSE = {
     borderColor: "var(--color-black-40)",
     borderLeft: "3px / 1px solid var(--color-black)",
     background: "var(--tilavaraus-event-booking-break)",
-    color: "black",
+    // Invisibile text, real solution is to fix big-calendar not to render it
+    color: "var(--tilavaraus-event-booking-break)",
   },
 };
 
