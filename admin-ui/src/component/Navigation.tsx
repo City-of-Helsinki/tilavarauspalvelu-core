@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { UserInfo } from "common";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
+import { useNavigate } from "react-router-dom";
 import MainMenu from "./MainMenu";
 import { StyledHDSNavigation } from "../styles/util";
 
@@ -32,11 +33,10 @@ const UserMenu = styled(HDSNavigation.User)`
   }
 `;
 
-const Navigation = ({ disabledRouter = false }) => {
+const Navigation = ({ onLogoClick = () => {}, disabledRouter = false}) => {
   const { t } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
-  // const history = useNavigate();
 
   const { data: session } = useSession();
   const { user } = session || {};
@@ -52,8 +52,7 @@ const Navigation = ({ disabledRouter = false }) => {
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t("Navigation.skipToMainContent")}
-      // FIXME can't use react-router because we want to reuse this on next page
-      // onTitleClick={() => history("/")}
+      onTitleClick={onLogoClick}
       onMenuToggle={() => setMenuState(!isMenuOpen)}
       menuOpen={isMenuOpen}
     >
@@ -94,4 +93,19 @@ const Navigation = ({ disabledRouter = false }) => {
   );
 };
 
-export default Navigation;
+// NOTE requires both client and react-router context
+const NavigationWithRouter = () => {
+  const history = useNavigate();
+  return <Navigation onLogoClick={() => history("/")} />
+};
+
+// NOTE this is a workaround for SSR and react-router. Checking for window is not enough because of context.
+const WrappedNavigation = ({ disabledRouter = false }) => {
+  if (typeof window === "undefined" || disabledRouter) {
+    return <Navigation disabledRouter onLogoClick={() => window.location.assign('/')} />;
+  } else {
+    return <NavigationWithRouter />;
+  }
+};
+
+export default WrappedNavigation;
