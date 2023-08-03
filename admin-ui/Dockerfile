@@ -45,9 +45,7 @@ ENV NPM_CONFIG_LOGLEVEL warn
 WORKDIR /app/admin-ui
 ENV NODE_ENV production
 
-#COPY --from=builder /app/ui/next-i18next.config.js ./
-#COPY --from=builder /app/ui/cypress.config.ts ./
-COPY --from=builder --chown=default:root /app/admin-ui/next.config.js ./
+COPY --from=builder --chown=default:root /app/admin-ui/next.config.mjs ./
 COPY --from=builder --chown=default:root /app/admin-ui/public ./public
 COPY --from=builder --chown=default:root /app/admin-ui/.next ./.next
 COPY --from=builder --chown=default:root /app/admin-ui/package.json ./package.json
