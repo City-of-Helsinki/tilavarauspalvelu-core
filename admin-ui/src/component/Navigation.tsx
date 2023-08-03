@@ -33,7 +33,7 @@ const UserMenu = styled(HDSNavigation.User)`
   }
 `;
 
-const Navigation = ({ onLogoClick = () => {}, disabledRouter = false}) => {
+const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
   const { t } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
@@ -96,16 +96,20 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false}) => {
 // NOTE requires both client and react-router context
 const NavigationWithRouter = () => {
   const history = useNavigate();
-  return <Navigation onLogoClick={() => history("/")} />
+  return <Navigation onLogoClick={() => history("/")} />;
 };
 
 // NOTE this is a workaround for SSR and react-router. Checking for window is not enough because of context.
 const WrappedNavigation = ({ disabledRouter = false }) => {
   if (typeof window === "undefined" || disabledRouter) {
-    return <Navigation disabledRouter onLogoClick={() => window.location.assign('/')} />;
-  } else {
-    return <NavigationWithRouter />;
+    return (
+      <Navigation
+        disabledRouter
+        onLogoClick={() => window.location.assign("/")}
+      />
+    );
   }
+  return <NavigationWithRouter />;
 };
 
 export default WrappedNavigation;
