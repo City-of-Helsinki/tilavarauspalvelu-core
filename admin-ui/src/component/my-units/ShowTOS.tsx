@@ -24,7 +24,7 @@ const Terms = styled.div`
   padding: var(--spacing-m);
 
   & > h3 {
-    margin-top: 0rem;
+    margin-top: 0;
   }
 `;
 

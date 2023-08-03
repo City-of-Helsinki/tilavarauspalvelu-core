@@ -14,6 +14,7 @@ interface IProps {
 }
 
 const Content = styled.div`
+  /* stylelint-disable csstools/value-no-unknown-custom-properties */
   --width: 518px;
   --padding: var(--spacing-layout-l);
   position: fixed;

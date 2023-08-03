@@ -34,7 +34,7 @@ const Content = styled.div<{ onTransitionEnd: React.TransitionEventHandler }>`
     max-width: 700px;
   }
 
-  @media (min-height: 1000px) {
+  @media (height > 1000px) {
     top: 50%;
     transform: translate(-50%, -50%);
   }

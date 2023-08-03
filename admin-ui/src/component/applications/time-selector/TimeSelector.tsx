@@ -44,6 +44,7 @@ const TimeSelectionButton = styled.div<{
   state?: ApplicationEventSchedulePriority;
   firstRow: boolean;
 }>`
+  /* stylelint-disable csstools/value-no-unknown-custom-properties */
   --border-color: var(--color-black-50);
 
   text-align: center;

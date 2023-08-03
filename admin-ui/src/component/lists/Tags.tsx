@@ -13,7 +13,7 @@ export type Tag<T> = {
 
 const StyledTag = styled(HDSTag)`
   border-radius: 30px;
-  padding: 0px 1em;
+  padding: 0 1em;
 `;
 
 const DeleteTag = styled(HDSTag)`

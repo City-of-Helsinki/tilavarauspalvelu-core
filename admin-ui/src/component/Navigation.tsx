@@ -27,6 +27,7 @@ const UserMenu = styled(HDSNavigation.User)`
     cursor: pointer;
   }
 
+  /* stylelint-disable selector-id-pattern */
   #userDropdown-menu {
     right: 0;
     left: auto;

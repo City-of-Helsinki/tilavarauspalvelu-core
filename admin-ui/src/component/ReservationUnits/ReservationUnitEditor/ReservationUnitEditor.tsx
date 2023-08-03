@@ -151,8 +151,7 @@ const getSelectedOptions = (
 
 const TitleSectionWithTags = styled.div`
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   gap: var(--spacing-m);
   justify-content: space-between;
   align-items: center;
