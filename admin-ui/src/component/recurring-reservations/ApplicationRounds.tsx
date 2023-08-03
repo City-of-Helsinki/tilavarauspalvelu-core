@@ -49,7 +49,6 @@ const ApplicationRoundsContainer = styled.div`
 function ApplicationRounds(): JSX.Element {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
-  // const { authState } = useAuthState();
   const [applicationRounds, setApplicationRounds] = useState<
     ApplicationRoundType[]
   >([]);
