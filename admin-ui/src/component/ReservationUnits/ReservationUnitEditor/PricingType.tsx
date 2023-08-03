@@ -321,32 +321,30 @@ const PricingType = ({
                 tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
               />
             </Span3>
-            {type === "ACTIVE" && (
-              <Span3 id="paymentTypes">
-                <SortedSelect
-                  id="paymentTypes"
-                  sort
-                  multiselect
-                  required
-                  placeholder={t("common.select")}
-                  options={state.paymentTypeOptions}
-                  value={[
-                    ...getSelectedOptions(
-                      state,
-                      "paymentTypeOptions",
-                      "paymentTypes"
-                    ),
-                  ]}
-                  label={t("ReservationUnitEditor.label.paymentTypes")}
-                  onChange={(paymentTypes) =>
-                    dispatch({ type: "setPaymentTypes", paymentTypes })
-                  }
-                  tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
-                  error={getValidationError("paymentTypes")}
-                  invalid={!!getValidationError("paymentTypes")}
-                />
-              </Span3>
-            )}
+            <Span3 id="paymentTypes">
+              <SortedSelect
+                id="paymentTypes"
+                sort
+                multiselect
+                required
+                placeholder={t("common.select")}
+                options={state.paymentTypeOptions}
+                value={[
+                  ...getSelectedOptions(
+                    state,
+                    "paymentTypeOptions",
+                    "paymentTypes"
+                  ),
+                ]}
+                label={t("ReservationUnitEditor.label.paymentTypes")}
+                onChange={(paymentTypes) =>
+                  dispatch({ type: "setPaymentTypes", paymentTypes })
+                }
+                tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
+                error={getValidationError("paymentTypes")}
+                invalid={!!getValidationError("paymentTypes")}
+              />
+            </Span3>
           </>
         )}
       </Grid>
