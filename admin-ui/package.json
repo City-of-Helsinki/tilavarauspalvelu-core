@@ -36,12 +36,6 @@
       "last 1 safari version"
     ]
   },
-  "jest": {
-    "moduleNameMapper": {
-      "axios": "axios/dist/node/axios.cjs",
-      "^app(.*)$": "<rootDir>/src/$1"
-    }
-  },
   "dependencies": {
     "@apollo/client": "^3.7.3",
     "@hookform/resolvers": "^2.9.10",
