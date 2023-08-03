@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as Sentry from "@sentry/react";
 import styled from "styled-components";
+import { useSession } from "next-auth/react";
 
 import Error5xx from "app/common/Error5xx";
 import ScrollToTop from "../common/ScrollToTop";
@@ -10,6 +11,7 @@ import Navigation from "./Navigation";
 import MainMenu from "./MainMenu";
 import Loader from "./Loader";
 import ClientOnly from "./ClientOnly";
+import MainLander from "./MainLander";
 
 type Props = {
   children: React.ReactNode;
@@ -35,6 +37,8 @@ const FallbackComponent = (err: unknown) => {
 
 // NOTE client only because Navigation requires react-router-dom
 export default function PageWrapper({ children }: Props): JSX.Element | null {
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <ClientOnly>
@@ -42,7 +46,7 @@ export default function PageWrapper({ children }: Props): JSX.Element | null {
         <Wrapper>
           <MainMenu placement="default" />
           <Suspense fallback={<Loader />}>
-            <Content>{children}</Content>
+            <Content>{isLoggedIn ? children : <MainLander />}</Content>
           </Suspense>
           <ScrollToTop />
         </Wrapper>
