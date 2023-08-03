@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
@@ -11,6 +11,7 @@ import {
   PROFILE_TOKEN_HEADER,
   SESSION_EXPIRED_ERROR,
   apiBaseUrl,
+  isBrowser,
 } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
@@ -20,7 +21,8 @@ const uploadLinkOptions = {
 };
 
 // FIXME upload link is broken locally (it succeeds but no new image is available)
-const terminatingLink = createUploadLink(uploadLinkOptions);
+const uploadLink = createUploadLink(uploadLinkOptions);
+const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/` });
 
 const authLink = setContext(async (request, previousContext) => {
   const headers = previousContext.headers ?? {};
@@ -109,7 +111,8 @@ const client = new ApolloClient({
       },
     },
   }),
-  link: ApolloLink.from([errorLink, authLink, terminatingLink]),
+  link: isBrowser ? from([errorLink, authLink, uploadLink]) : from([httpLink]),
+  ssrMode: !isBrowser,
 });
 
 export default client;

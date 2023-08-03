@@ -1,3 +1,4 @@
+import FormData from "form-data";
 /**
  * Custom FormData for changing the default behaviour of
  * apollo-upload-client so that the format is what core expects.

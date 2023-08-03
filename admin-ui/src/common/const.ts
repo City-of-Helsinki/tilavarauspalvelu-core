@@ -1,6 +1,7 @@
 import getConfig from "next/config";
 
 export const defaultLanguage = "fi";
+export const languages = ["fi"];
 
 export const weekdays = [
   "monday",
@@ -12,7 +13,7 @@ export const weekdays = [
   "sunday",
 ];
 
-export const languages = ["fi", "sv", "en"];
+export const isBrowser = typeof window !== "undefined";
 
 const { publicRuntimeConfig } = getConfig();
 export const { baseUrl, apiBaseUrl } = publicRuntimeConfig;
