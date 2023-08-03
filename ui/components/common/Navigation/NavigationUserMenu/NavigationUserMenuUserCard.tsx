@@ -29,9 +29,7 @@ const Email = styled.div`
 
   @media (min-width: ${(props) => props.theme.breakpoints.m}) {
     padding-bottom: ${(props) => props.theme.spacing.xs};
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-color: ${(props) => props.theme.colors.black.light};
+    border-bottom-style: 1px solid ${(props) => props.theme.colors.black.light};
   }
 `;
 

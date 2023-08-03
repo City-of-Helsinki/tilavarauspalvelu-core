@@ -117,7 +117,7 @@ const BottomWrapper = styled(Container)`
 const StyledSorting = styled(Sorting)`
   display: block;
 
-  @media (min-width: 420px) {
+  @media (width > 420px) {
     display: flex;
   }
 `;

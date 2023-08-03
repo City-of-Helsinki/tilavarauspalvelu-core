@@ -62,7 +62,7 @@ const Modal = styled.div<{
   border-radius: 4px;
   padding: var(--spacing-xs);
 
-  @media (max-width: 600px) {
+  @media (width < 600px) {
     top: ${({ $top, $height }) =>
       $top > 50 ? "30%" : `calc(${$top + $height}% + ${wrapperHeight})`};
     left: ${({ $day }) =>
