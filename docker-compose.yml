@@ -12,6 +12,7 @@ services:
             - "127.0.0.1:5555:5432"
         volumes:
             - postgres-data-volume:/var/lib/postgresql/data
+
     elastic:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
         environment:
@@ -49,7 +50,6 @@ services:
             - CELERY_ENABLED=false
         ports:
             - "8000:8000"
-        entrypoint: ./docker/entrypoint.sh
 
     dev:
         image: tilavarauspalvelu_dev
