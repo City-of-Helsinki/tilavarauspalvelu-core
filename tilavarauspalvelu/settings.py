@@ -361,6 +361,7 @@ MULTI_PROXY_HEADERS = env("MULTI_PROXY_HEADERS")
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
 CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-referrer",       # for authenticating requests from the frontend
     "x-authorization",  # for passing Open City Profile API token from frontend
 ]
 
