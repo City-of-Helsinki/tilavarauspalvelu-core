@@ -19,6 +19,7 @@ django-tinymce
 djangorestframework
 drf-oidc-auth
 drf-spectacular
+pyyaml==6.0.1
 easy-thumbnails
 elasticsearch-django
 flake8==3.8.4
