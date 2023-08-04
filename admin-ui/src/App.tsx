@@ -47,6 +47,11 @@ const UnitsRouter = () => (
       element={<ResourceEditorView />}
     />
     <Route
+      index
+      path=":unitPk/reservationUnit/edit/"
+      element={<ReservationUnitEditor />}
+    />
+    <Route
       path=":unitPk/reservationUnit/edit/:reservationUnitPk"
       element={<ReservationUnitEditor />}
     />
