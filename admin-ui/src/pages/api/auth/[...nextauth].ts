@@ -4,7 +4,7 @@ import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { NextAuthOptions, Awaitable, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
-import getConfig from "next/config";
+import { env } from "app/env.mjs";
 
 type TunnistamoProfile = {
   iss: string;
@@ -25,21 +25,6 @@ type TunnistamoProfile = {
   amr: string;
   loa: string;
 };
-
-const {
-  serverRuntimeConfig: {
-    oidcClientId,
-    oidcClientSecret,
-    oidcIssuer,
-    oidcTokenUrl,
-    oidcAccessTokenUrl,
-    oidcProfileApiUrl,
-    oidcTilavarausApiUrl,
-    oidcScope,
-    oidcCallbackUrl,
-    env,
-  },
-} = getConfig();
 
 const logAxiosError = (error: unknown) => {
   if (typeof error === "object" && error !== null) {
@@ -79,6 +64,9 @@ const getApiAccessTokens = async (accessToken: string | undefined) => {
   if (!accessToken) {
     throw new Error("Access token not available. Cannot update");
   }
+  const oidcProfileApiUrl = env.OIDC_PROFILE_API_SCOPE;
+  const oidcTilavarausApiUrl = env.OIDC_TILAVARAUS_API_SCOPE;
+  const oidcAccessTokenUrl = env.OIDC_ACCESS_TOKEN_URL;
   if (!oidcProfileApiUrl || !oidcTilavarausApiUrl) {
     throw new Error("Application configuration error, missing api urls.");
   }
@@ -186,13 +174,13 @@ const refreshAccessToken = async (token: JWT) => {
 };
 
 const options = (): NextAuthOptions => {
-  const wellKnownUrl = `${oidcIssuer}/.well-known/openid-configuration`;
+  const wellKnownUrl = `${env.OIDC_URL}/.well-known/openid-configuration`;
 
   const authorization = {
     params: {
-      scope: oidcScope,
+      scope: env.OIDC_SCOPE,
       response_type: "code",
-      redirect_uri: oidcCallbackUrl,
+      redirect_uri: env.OIDC_CALLBACK_URL,
     },
   };
 
@@ -202,15 +190,15 @@ const options = (): NextAuthOptions => {
         id: "tunnistamo",
         name: "Tunnistamo OIDC",
         type: "oauth",
-        issuer: oidcIssuer,
-        clientId: oidcClientId,
-        clientSecret: oidcClientSecret,
+        issuer: env.OIDC_URL,
+        clientId: env.OIDC_CLIENT_ID,
+        clientSecret: env.OIDC_CLIENT_SECRET,
         idToken: true,
         checks: ["pkce", "state"],
         wellKnown: wellKnownUrl,
-        accessTokenUrl: oidcAccessTokenUrl,
-        token: oidcTokenUrl,
-        profileUrl: oidcProfileApiUrl,
+        accessTokenUrl: env.OIDC_ACCESS_TOKEN_URL,
+        token: env.OIDC_TOKEN_URL,
+        profileUrl: env.OIDC_PROFILE_API_SCOPE,
         authorization,
         // TODO don't copy unneccessary fields just bloats the cookie
         // TODO replace casting with schema validation
@@ -286,7 +274,7 @@ const options = (): NextAuthOptions => {
       signIn: `/`,
       signOut: "/logout",
     },
-    debug: env === "development",
+    debug: env.NODE_ENV === "development",
   };
 };
 
@@ -294,19 +282,5 @@ export default function nextAuthApiHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): ReturnType<typeof NextAuth> {
-  if (
-    !oidcClientId ||
-    !oidcClientSecret ||
-    !oidcIssuer ||
-    !oidcTokenUrl ||
-    !oidcAccessTokenUrl ||
-    !oidcProfileApiUrl ||
-    !oidcTilavarausApiUrl ||
-    !oidcScope ||
-    !oidcCallbackUrl
-  ) {
-    throw new Error("Invalid configuration");
-  }
-
   return NextAuth(req, res, options());
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import getConfig from "next/config";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
@@ -8,6 +7,7 @@ import { HERO_IMAGE_URL } from "app/common/const";
 import Footer from "app/component/Footer";
 import Navigation from "app/component/Navigation";
 import ClientOnly from "app/component/ClientOnly";
+import { env } from "app/env.mjs";
 import BaseLayout from "../layout";
 
 // NOTE not using App.tsx so need to import i18n here also
@@ -31,10 +31,6 @@ const Ingress = styled.p`
   flex-grow: 1;
 `;
 
-const {
-  publicRuntimeConfig: { tunnistamoUrl },
-} = getConfig();
-
 const Layout = ({ children }: { children: React.ReactNode }) => (
   <BaseLayout>
     <Wrapper>{children}</Wrapper>
@@ -43,7 +39,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
 
 const LogoutPage = () => {
   const { t } = useTranslation(["common", "logout"]);
-  const TUNNISTAMO_LOGOUT_URL = `${tunnistamoUrl}/logout/`;
+  const TUNNISTAMO_LOGOUT_URL = `${env.NEXT_PUBLIC_TUNNISTAMO_URL}/logout/`;
 
   // FIXME i18n breaks SSR
   return (

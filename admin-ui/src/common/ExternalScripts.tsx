@@ -1,7 +1,9 @@
 import React from "react";
 
-const isCookiehubEnabled = process.env.REACT_APP_COOKIEHUB_ENABLED === "true";
-const isHotjarEnabled = process.env.REACT_APP_HOTJAR_ENABLED === "true";
+import { env } from "app/env.mjs";
+
+const isCookiehubEnabled = env.NEXT_PUBLIC_ADMIN_COOKIEHUB_ENABLED;
+const isHotjarEnabled = env.NEXT_PUBLIC_ADMIN_HOTJAR_ENABLED;
 
 const ExternalScripts = (): JSX.Element => {
   return (

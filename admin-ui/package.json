@@ -10,7 +10,7 @@
     "lint:css": "stylelint './src/**/*.tsx'",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "dev": "node server.cjs",
-    "test": "TZ=Europe/Helsinki jest --runInBand",
+    "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki jest --runInBand",
     "test:watch": "jest --watch",
     "ts-check": "tsc --noEmit --project tsconfig.tscheck.json"
   },

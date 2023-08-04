@@ -20,6 +20,16 @@ module.exports = {
     node: true,
   },
   rules: {
+    // mixing mjs with ts in nextjs causes issues
+    "import/extensions": [
+      "error",
+      "never",
+      {
+        "mjs": "always",
+        "cjs": "always",
+        "json": "always",
+      },
+    ],
     // prefer explicit cases over defaults
     "default-case": 0,
     "@typescript-eslint/switch-exhaustiveness-check": "error",

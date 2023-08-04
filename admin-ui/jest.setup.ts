@@ -30,9 +30,3 @@ jest.mock("react-i18next", () => ({
     init: () => {},
   },
 }));
-
-jest.mock('next/config', () => () => ({
-  publicRuntimeConfig: {
-    SOME_VARIABLE_HERE: 'whatever-you-want-here'
-  }
-}))

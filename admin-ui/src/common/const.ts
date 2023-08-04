@@ -1,4 +1,4 @@
-import getConfig from "next/config";
+import { env } from "app/env.mjs";
 
 export const defaultLanguage = "fi";
 export const languages = ["fi"];
@@ -15,14 +15,12 @@ export const weekdays = [
 
 export const isBrowser = typeof window !== "undefined";
 
-const { publicRuntimeConfig } = getConfig();
-export const { baseUrl, apiBaseUrl } = publicRuntimeConfig;
-// export const { nextAuthRoute } = serverRuntimeConfig;
+export const publicUrl = env.NEXT_PUBLIC_ADMIN_BASE_URL;
+export const apiBaseUrl = env.NEXT_PUBLIC_TILAVARAUS_API_URL;
 export const nextAuthRoute = "/api/auth";
 
-export const publicUrl = process.env.NEXT_PUBLIC_URL ?? "";
 export const previewUrlPrefix =
-  process.env.NEXT_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
+  env.NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
 
 export const PROFILE_TOKEN_HEADER = "X-Authorization";
 export const SESSION_EXPIRED_ERROR = "JWT too old";
