@@ -6,12 +6,14 @@ import userEvent from "@testing-library/user-event";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as router from "react-router";
 import { ReservationsReservationReserveeTypeChoices } from "common/types/gql-types";
-import * as NotificationContext from "app/context/NotificationContext";
+import NotificationContextMock, {
+  notifyError,
+  notifySuccess,
+} from "app/__mocks__/NotificationContextMock";
 
 import EditPage from "./EditPage";
 import {
   CHANGED_WORKING_MEMO,
-  NotificationMock,
   mockReservation,
   mocks,
 } from "./hooks/__test__/mocks";
@@ -118,27 +120,17 @@ const wrappedRender = (pk: number) => {
 
   return render(
     <MockedProvider mocks={extendedMocks} addTypename={false}>
-      <MemoryRouter initialEntries={[routeBase, route]}>
-        <Routes>
-          <Route path="/reservations/:id" element={<div>DONE</div>} />
-          <Route path="/reservations/:id/edit" element={<EditPage />} />
-        </Routes>
-      </MemoryRouter>
+      <NotificationContextMock>
+        <MemoryRouter initialEntries={[routeBase, route]}>
+          <Routes>
+            <Route path="/reservations/:id" element={<div>DONE</div>} />
+            <Route path="/reservations/:id/edit" element={<EditPage />} />
+          </Routes>
+        </MemoryRouter>
+      </NotificationContextMock>
     </MockedProvider>
   );
 };
-
-const notifySuccess = jest.fn(() => {});
-const notifyError = jest.fn(() => {});
-beforeEach(() => {
-  notifyError.mockReset();
-  notifySuccess.mockReset();
-  jest.spyOn(NotificationContext, "useNotification").mockImplementation(() => ({
-    ...NotificationMock,
-    notifyError,
-    notifySuccess,
-  }));
-});
 
 describe("EditPage", () => {
   test("Render the edit page with the form data", async () => {
