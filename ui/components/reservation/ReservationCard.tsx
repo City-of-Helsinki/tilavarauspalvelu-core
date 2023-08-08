@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { IconTicket, IconCross, IconArrowRight } from "hds-react";
+import { IconGlyphEuro, IconCross, IconArrowRight } from "hds-react";
 import { i18n, useTranslation } from "next-i18next";
 import { differenceInMinutes, parseISO } from "date-fns";
 import router from "next/router";
@@ -276,7 +276,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
               })}
             </JustForMobile>
             <Price
-              icon={<IconTicket aria-label={t("reservationUnit:price")} />}
+              icon={<IconGlyphEuro aria-label={t("reservationUnit:price")} />}
               text={price}
               data-testid="reservation__card--price"
             />
