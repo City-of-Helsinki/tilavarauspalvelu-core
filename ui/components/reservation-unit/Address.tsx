@@ -78,6 +78,14 @@ const mapUrl = (locale: string, unit: UnitType): string | null => {
   return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}`;
 };
 
+const accessibilityUrl = (locale: string, unit: UnitType): string | null => {
+  if (!unit?.tprekId) {
+    return null;
+  }
+
+  return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}?p=1&t=accessibilityDetails`;
+};
+
 const Address = ({ reservationUnit }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -110,6 +118,10 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
         <ExternalLink
           href={hslUrl(i18n.language, location)}
           name={t("reservationUnit:linkHSL")}
+        />
+        <ExternalLink
+          href={accessibilityUrl(i18n.language, reservationUnit.unit)}
+          name={t("reservationUnit:linkAccessibility")}
         />
       </Links>
     </Container>
