@@ -31,11 +31,7 @@ const List = styled.ul<{ $showAll: boolean; $itemsToShow: number }>`
 `;
 
 const EquipmentItem = styled.li`
-  font-size: var(--fontsize-body-m);
-
-  @media (min-width: ${breakpoints.s}) {
-    font-size: var(--fontsize-body-l);
-  }
+  font-size: var(--fontsize-body-l);
 `;
 
 const ToggleButton = styled(Button)`
