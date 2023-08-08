@@ -1,4 +1,4 @@
-import { IconGroup, IconTicket } from "hds-react";
+import { IconGlyphEuro, IconGroup } from "hds-react";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
@@ -214,7 +214,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
             {unitPrice && (
               <StyledIconWithText
                 icon={
-                  <IconTicket
+                  <IconGlyphEuro
                     aria-label={t("prices:reservationUnitPriceLabel")}
                   />
                 }
