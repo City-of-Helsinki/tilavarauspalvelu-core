@@ -35,6 +35,7 @@ type Props = {
 
 const Wrapper = styled.div`
   align-items: flex-start;
+  margin-bottom: var(--spacing-layout-l);
 `;
 
 const Heading = styled(H2).attrs({ as: "h1" })``;

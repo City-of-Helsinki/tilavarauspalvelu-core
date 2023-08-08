@@ -4,7 +4,8 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import Container from "./Container";
+import { Container as CommonContainer } from "common";
+
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { truncatedText } from "../../styles/util";
 
@@ -21,6 +22,10 @@ const BackgroundContainer = styled.div`
   width: 100%;
   z-index: 20;
   min-width: ${breakpoints.xs};
+`;
+
+const Container = styled(CommonContainer)`
+  padding: var(--spacing-m) var(--spacing-m);
 `;
 
 const CountWrapper = styled.div`
@@ -93,7 +98,7 @@ const StartApplicationBar = ({
 
   return (
     <BackgroundContainer>
-      <Container style={{ padding: "var(--spacing-m) var(--spacing-m)" }}>
+      <Container>
         <InnerContainer>
           <Left>
             <CountWrapper>
