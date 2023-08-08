@@ -227,7 +227,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
           data.bufferTimeBefore && reservationUnit?.bufferTimeBefore
             ? reservationUnit.bufferTimeBefore
             : undefined,
-        end:
+        after:
           data.bufferTimeAfter && reservationUnit?.bufferTimeAfter
             ? reservationUnit.bufferTimeAfter
             : undefined,
