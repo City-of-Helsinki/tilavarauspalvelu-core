@@ -26,7 +26,7 @@ const ServerSchema = z.object({
 });
 
 const ClientSchema = z.object({
-  NEXT_PUBLIC_ADMIN_BASE_URL: z.string().optional(),
+  NEXT_PUBLIC_BASE_URL: z.string(),
   // used for graphql client
   NEXT_PUBLIC_TILAVARAUS_API_URL: z.string(),
   // used for logout page
@@ -34,8 +34,8 @@ const ClientSchema = z.object({
   // Used
   NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX: z.string().optional(),
   // TODO these are copies from ui check which ones are used by admin-ui (remove unused)
-  NEXT_PUBLIC_ADMIN_COOKIEHUB_ENABLED: coerceBoolean.optional(),
-  NEXT_PUBLIC_ADMIN_HOTJAR_ENABLED: coerceBoolean.optional(),
+  NEXT_PUBLIC_COOKIEHUB_ENABLED: coerceBoolean.optional(),
+  NEXT_PUBLIC_HOTJAR_ENABLED: coerceBoolean.optional(),
 });
 
 /* eslint-disable-next-line import/no-mutable-exports */
@@ -50,12 +50,13 @@ if (!process.env.SKIP_ENV_VALIDATION) {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_TILAVARAUS_API_URL: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
     NEXT_PUBLIC_TUNNISTAMO_URL: process.env.NEXT_PUBLIC_TUNNISTAMO_URL,
-    // TODO NEXT_PUBLIC seems to be shared (unlike by ui) so we need to prefix
     NEXT_PUBLIC_COOKIEHUB_ENABLED: process.env.NEXT_PUBLIC_COOKIEHUB_ENABLED,
     NEXT_PUBLIC_HOTJAR_ENABLED: process.env.NEXT_PUBLIC_HOTJAR_ENABLED,
   });
 
   env = { ...serverConfig, ...clientConfig };
+  // FIXME remove this before merge
+  console.log("env", env);
 }
 
 export { env };
