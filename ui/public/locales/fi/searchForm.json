@@ -1,6 +1,6 @@
 {
-  "textSearchLabel": "Vapaasanahaku",
-  "searchTermPlaceholder": "Hae sanalla",
+  "textSearchLabel": "Haku",
+  "searchTermPlaceholder": "Hae tiloja tai laitetta",
   "searchButton": "Hae",
   "purposeLabel": "Käyttötarkoitus",
   "roundLabel": "Hakukierros",
