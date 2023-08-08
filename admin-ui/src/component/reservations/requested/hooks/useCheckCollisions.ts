@@ -85,11 +85,18 @@ const useCheckCollisions = ({
                         ? x.bufferTimeAfter
                         : 0,
                   },
+                  type: x.type ?? undefined,
                 }
               : undefined
           )
-          .filter((x): x is Interval => x != null)
-          .filter((x) => collides({ start, end, buffers }, x))
+          .filter((x) => {
+            if (x == null) return false;
+            const buff =
+              x.type === ReservationsReservationTypeChoices.Blocked
+                ? { before: 0, after: 0 }
+                : buffers;
+            return collides({ start, end, buffers: buff }, x);
+          })
       : [];
 
   return { isLoading: loading, hasCollisions: collisions.length > 0 };
