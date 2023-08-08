@@ -833,8 +833,8 @@ const ReservationUnit = ({
           <div>
             <JustForDesktop customBreakpoint={breakpoints.l}>
               {quickReservationComponent(calendarRef, "desktop")}
+              <Address reservationUnit={reservationUnit} />
             </JustForDesktop>
-            <Address reservationUnit={reservationUnit} />
           </div>
           <Left>
             <JustForMobile customBreakpoint={breakpoints.l}>
@@ -1024,6 +1024,9 @@ const ReservationUnit = ({
                     longitude={Number(reservationUnit.unit.location.longitude)}
                   />
                 </MapWrapper>
+                <JustForMobile customBreakpoint={breakpoints.l}>
+                  <Address reservationUnit={reservationUnit} />
+                </JustForMobile>
               </Accordion>
             )}
             {(paymentTermsContent || cancellationTermsContent) && (
