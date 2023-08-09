@@ -460,7 +460,7 @@ class Query(graphene.ObjectType):
     order = Field(PaymentOrderType, order_uuid=graphene.String())
 
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
-        debug = Field(DjangoDebug, name='_debug')
+        debug = Field(DjangoDebug, name="_debug")
 
     def resolve_current_user(self, info, **kwargs):
         return get_object_or_404(User, pk=info.context.user.pk)
