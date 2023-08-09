@@ -135,6 +135,7 @@ export const useUnitResources = (
       unit: [unitPk],
       from: toApiDate(begin),
       to: toApiDate(begin),
+      includeWithSameComponents: true,
     },
     onError: () => {
       notifyError("Varauksia ei voitu hakea");
