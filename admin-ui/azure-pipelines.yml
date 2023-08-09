@@ -26,6 +26,8 @@ resources:
       type: git
       # project/repository
       name: tilavarauspalvelu/tilavarauspalvelu-pipelines
+      # TEMP testing new docker build for NextJs
+      ref: admin-ui-next-migration
 
 extends:
   template: azure-pipelines-tilavarauspalvelu-admin-ui.yml@tilavarauspalvelu-pipelines
