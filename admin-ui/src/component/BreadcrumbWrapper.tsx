@@ -49,7 +49,7 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
     <Wrapper>
       <StyledBreadcrumb
         routes={[
-          { title: t("breadcrumb.frontpage"), slug: publicUrl },
+          { title: t("breadcrumb.frontpage"), slug: publicUrl ?? "/" },
           ...routes,
         ]}
         isMobile={isMobile}

@@ -106,10 +106,10 @@ const refreshAccessToken = async (token: JWT) => {
   try {
     const data = await axios
       .request({
-        url: oidcTokenUrl,
+        url: env.OIDC_TOKEN_URL,
         method: "POST",
         data: {
-          client_id: oidcClientId,
+          client_id: env.OIDC_CLIENT_ID,
           grant_type: "refresh_token",
           refresh_token: token.refreshToken,
         },
