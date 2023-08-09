@@ -30,7 +30,7 @@ export const MUTATION_DATA = {
     reserveePhone: "43434343",
     reserveeEmail: "",
     reserveeId: "44444444",
-    reserveeIsUnregisteredAssociation: false,
+    reserveeIsUnregisteredAssociation: true,
     reserveeAddressStreet: "Katuosoite",
     reserveeAddressCity: "TRE",
     reserveeAddressZip: "44444",
