@@ -48,6 +48,7 @@ services:
             - REDIS_URL=redis://redis:6379/0
             - DATABASE_URL=postgis://tvp:tvp@db/tvp
             - CELERY_ENABLED=false
+            - DEBUG=true
         ports:
             - "8000:8000"
 
