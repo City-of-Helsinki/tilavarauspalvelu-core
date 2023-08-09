@@ -1,5 +1,5 @@
 celery==5.3.0b2 # https://github.com/celery/billiard/issues/377#issuecomment-1276560060
-Django==4.2.1
+Django==4.2.4
 django-auditlog
 django-admin-sortable2
 django-celery-beat
