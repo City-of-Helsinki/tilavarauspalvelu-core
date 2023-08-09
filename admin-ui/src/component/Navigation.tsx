@@ -6,6 +6,7 @@ import { UserInfo } from "common";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
 import { useNavigate } from "react-router-dom";
+import { publicUrl } from "app/common/const";
 import MainMenu from "./MainMenu";
 import { StyledHDSNavigation } from "../styles/util";
 
@@ -84,7 +85,7 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
           <HDSNavigation.Item
             className="btn-logout"
             label={t("Navigation.logout")}
-            onClick={() => signOut({ callbackUrl: "/logout" })}
+            onClick={() => signOut({ callbackUrl: `${publicUrl}/logout` })}
             variant="primary"
           />
         </UserMenu>
