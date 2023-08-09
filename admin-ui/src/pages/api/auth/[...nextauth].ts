@@ -274,7 +274,7 @@ const options = (): NextAuthOptions => {
       signIn: `/`,
       signOut: "/logout",
     },
-    debug: env.NODE_ENV === "development",
+    debug: env.NEXT_ENV === "development",
   };
 };
 

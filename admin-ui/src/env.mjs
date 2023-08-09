@@ -22,7 +22,7 @@ const ServerSchema = z.object({
   SENTRY_DSN: z.string().optional(),
   // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
-  NODE_ENV: z.enum(["development", "test", "production"]),
+  NEXT_ENV: z.enum(["development", "test", "production"]),
 });
 
 const ClientSchema = z.object({
