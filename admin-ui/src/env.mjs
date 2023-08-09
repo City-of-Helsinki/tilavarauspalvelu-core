@@ -43,10 +43,16 @@ let { env } = process;
 if (!process.env.SKIP_ENV_VALIDATION) {
   const isServer = typeof window === "undefined";
 
-  const serverConfig = isServer ? ServerSchema.parse(process.env) : null;
+  // TODO replace with safe parse, print errors to console
+  // Don't throw because it crashes the server (and has zero logging)
+  const serverConfig = isServer ? ServerSchema.safeParse(process.env) : null;
+
+  if (serverConfig.error) {
+    console.error("Server env validation failed", serverConfig.error);
+  }
 
   // NOTE NextJs does substitutions for process.env. Not using the full variable breaks it!
-  const clientConfig = ClientSchema.parse({
+  const clientConfig = ClientSchema.safeParse({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_TILAVARAUS_API_URL: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
     NEXT_PUBLIC_TUNNISTAMO_URL: process.env.NEXT_PUBLIC_TUNNISTAMO_URL,
@@ -54,7 +60,14 @@ if (!process.env.SKIP_ENV_VALIDATION) {
     NEXT_PUBLIC_HOTJAR_ENABLED: process.env.NEXT_PUBLIC_HOTJAR_ENABLED,
   });
 
-  env = { ...serverConfig, ...clientConfig };
+  if (clientConfig.error) {
+    console.error("Client env validation failed", clientConfig.error);
+  }
+
+  env = {
+    ...(serverConfig.success ? serverConfig.data : {}),
+    ...(clientConfig.success ? clientConfig.data : {}),
+  };
   // FIXME remove this before merge
   console.log("env", env);
 }
