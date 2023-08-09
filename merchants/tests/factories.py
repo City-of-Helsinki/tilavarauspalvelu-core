@@ -24,7 +24,7 @@ class PaymentProductFactory(DjangoModelFactory):
     merchant = SubFactory(PaymentMerchantFactory)
 
     @post_generation
-    def merchant(self, create, merchant, **kwargs):
+    def merchant(self, create, merchant, **kwargs):  # noqa: F811
         if not create or not merchant:
             return
 

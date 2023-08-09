@@ -1,7 +1,9 @@
 import django_filters
 import graphene
+from django.conf import settings
 from django.db.models import Q
 from graphene import Field, relay
+from graphene_django.debug import DjangoDebug
 from graphene_permissions.mixins import AuthFilter
 from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.generics import get_object_or_404
@@ -456,6 +458,9 @@ class Query(graphene.ObjectType):
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
 
     order = Field(PaymentOrderType, order_uuid=graphene.String())
+
+    if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
+        debug = Field(DjangoDebug, name="_debug")
 
     def resolve_current_user(self, info, **kwargs):
         return get_object_or_404(User, pk=info.context.user.pk)
