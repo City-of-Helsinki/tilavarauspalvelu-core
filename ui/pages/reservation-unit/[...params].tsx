@@ -376,6 +376,7 @@ const ReservationUnitReservationWithReservationProp = ({
   });
 
   const { pk: reservationPk } = reservation || {};
+  const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
 
   const options = useMemo(
     () => ({
@@ -383,16 +384,19 @@ const ReservationUnitReservationWithReservationProp = ({
         label: getTranslation(purpose, "name"),
         value: purpose.pk,
       })),
-      ageGroup: ageGroups.map((ageGroup) => ({
-        label: `${ageGroup.minimum} - ${ageGroup.maximum}`,
-        value: ageGroup.pk,
-      })),
+      // the sortedAgeGroups array has "1 - 99" as the first element, so let's move it to the end for correct order
+      ageGroup: [...sortedAgeGroups.slice(1), sortedAgeGroups[0]].map(
+        (ageGroup) => ({
+          label: `${ageGroup.minimum} - ${ageGroup.maximum ?? ""}`,
+          value: ageGroup.pk,
+        })
+      ),
       homeCity: cities.map((city) => ({
         label: getTranslation(city, "name"),
         value: city.pk,
       })),
     }),
-    [reservationPurposes, ageGroups, cities]
+    [reservationPurposes, cities, sortedAgeGroups]
   );
 
   const pageTitle = useMemo(() => {
