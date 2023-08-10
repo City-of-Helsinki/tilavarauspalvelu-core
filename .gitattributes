@@ -21,8 +21,8 @@
 *.md        text diff=markdown
 *.json      text diff=json eol=lf
 *.toml      text diff=toml eol=lf
-*.yml       text diff=yaml eol=crlf
-*.yaml      text diff=yaml eol=crlf
+*.yml       text diff=yaml eol=lf
+*.yaml      text diff=yaml eol=lf
 
 # Archives
 # ============
