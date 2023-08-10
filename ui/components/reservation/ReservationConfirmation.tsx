@@ -26,6 +26,7 @@ import { BlackButton, LinkButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
 import { useLogout } from "../../hooks/useLogout";
+import IconLink from "../common/IconLink";
 
 type Props = {
   reservation: Reservation | ReservationType;
@@ -62,13 +63,8 @@ const ActionContainer2 = styled.div`
   align-items: flex-start;
 `;
 
-const StyledLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  text-decoration: underline;
+const StyledLink = styled(IconLink)`
   color: var(--color-black) !important;
-  ${fontMedium}
 `;
 
 const InlineStyledLink = styled(Link)`
@@ -169,17 +165,29 @@ const ReservationConfirmation = ({
             marginTop: "var(--spacing-3-xl)",
           }}
         >
-          <StyledLink href={reservationUnitPath(reservationUnit.pk)}>
-            {t("reservations:backToReservationUnit")}
-            <IconArrowRight aria-hidden size="m" />
-          </StyledLink>
-          <StyledLink href="/">
-            {t("common:gotoFrontpage")}
-            <IconArrowRight aria-hidden size="m" />
-          </StyledLink>
-          <LinkButton onClick={() => logout()}>
-            {t("common:logout")} <IconSignout size="m" aria-hidden />
-          </LinkButton>
+          <StyledLink
+            href={reservationUnitPath(reservationUnit.pk)}
+            linkText={t("reservations:backToReservationUnit")}
+            icon={<IconArrowRight aria-hidden />}
+          />
+          <StyledLink
+            href="/"
+            linkText={t("common:gotoFrontpage")}
+            icon={<IconArrowRight aria-hidden />}
+          />
+          <div
+            onClick={(e) => {
+              e.preventDefault();
+              e.bubbles = false;
+              logout();
+            }}
+          >
+            <StyledLink
+              icon={<IconSignout aria-hidden />}
+              href="#"
+              linkText={t("common:logout")}
+            />
+          </div>
         </ActionContainer2>
       </div>
     </Wrapper>

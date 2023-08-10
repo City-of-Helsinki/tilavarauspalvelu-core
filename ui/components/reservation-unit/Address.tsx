@@ -8,8 +8,10 @@ import {
   ReservationUnitType,
   UnitType,
 } from "common/types/gql-types";
+import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { getTranslation } from "../../modules/util";
 import ExternalLink from "./ExternalLink";
+import IconLink from "../common/IconLink";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | ReservationUnitType;
@@ -107,17 +109,20 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
         <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>
       )}
       <Links>
-        <ExternalLink
+        <IconLink
           href={mapUrl(i18n.language, reservationUnit.unit)}
-          name={t("reservationUnit:linkMap")}
+          linkText={t("reservationUnit:linkMap")}
+          icon={<IconLinkExternal aria-hidden />}
         />
-        <ExternalLink
+        <IconLink
           href={googleUrl(i18n.language, location)}
-          name={t("reservationUnit:linkGoogle")}
+          linkText={t("reservationUnit:linkGoogle")}
+          icon={<IconLinkExternal aria-hidden />}
         />
-        <ExternalLink
+        <IconLink
           href={hslUrl(i18n.language, location)}
-          name={t("reservationUnit:linkHSL")}
+          linkText={t("reservationUnit:linkHSL")}
+          icon={<IconLinkExternal aria-hidden />}
         />
         <ExternalLink
           href={accessibilityUrl(i18n.language, reservationUnit.unit)}

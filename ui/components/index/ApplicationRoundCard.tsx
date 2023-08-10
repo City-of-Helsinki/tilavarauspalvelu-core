@@ -12,6 +12,7 @@ import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
+import IconLink from "../common/IconLink";
 
 interface Props {
   applicationRound: ApplicationRoundType;
@@ -68,18 +69,8 @@ const CardButton = styled(MediumButton)`
   }
 `;
 
-const StyledLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3-xs);
-  margin-top: var(--spacing-s);
-  margin-bottom: var(--spacing-3-xs);
-  text-decoration: underline;
-  ${fontMedium};
-
-  && {
-    color: var(--color-black);
-  }
+const StyledLink = styled(IconLink)`
+  color: var(--color-black);
 `;
 
 const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
@@ -128,10 +119,11 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
               closingDate: parseISO(applicationRound.applicationPeriodEnd),
             })}
         </StatusMessage>
-        <StyledLink href={`/criteria/${applicationRound.pk}`}>
-          {t("applicationRound:card.criteria")}
-          <IconArrowRight aria-hidden="true" />
-        </StyledLink>
+        <StyledLink
+          href={`/criteria/${applicationRound.pk}`}
+          linkText={t("applicationRound:card.criteria")}
+          icon={<IconArrowRight aria-hidden />}
+        />
       </StyledContainer>
       {state === "active" && (
         <CardButton
