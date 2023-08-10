@@ -35,36 +35,57 @@ class State(Enum):
         MAINTENANCE = pgettext_lazy("State", "Maintenance")
 
     @classmethod
-    def open_states(cls):
+    def accessible_states(cls):
+        """
+        States indicating the space can be accessed in some way,
+        whether the access is restricted (e.g. via key or reservation)
+        or not.
+        """
         return [
+            cls.ENTER_ONLY,
             cls.OPEN,
             cls.OPEN_AND_RESERVABLE,
             cls.SELF_SERVICE,
             cls.WITH_KEY,
-            cls.WITH_RESERVATION,
             cls.WITH_KEY_AND_RESERVATION,
-            cls.ENTER_ONLY,
+            cls.WITH_RESERVATION,
+        ]
+
+    @classmethod
+    def reservable_states(cls):
+        """
+        States indicating the space can be reserved in some way.
+        """
+        return [
+            cls.OPEN_AND_RESERVABLE,
+            cls.WITH_KEY_AND_RESERVATION,
+            cls.WITH_RESERVATION,
         ]
 
     @classmethod
     def closed_states(cls):
-        return [None, cls.CLOSED, cls.UNDEFINED, cls.NOT_IN_USE, cls.MAINTENANCE]
+        """
+        States indicating the space is closed and inaccessible.
+        """
+        return [
+            None,
+            cls.CLOSED,
+            cls.MAINTENANCE,
+            cls.NOT_IN_USE,
+            cls.UNDEFINED,
+        ]
 
     @DynamicClassAttribute
-    def is_open(self) -> bool:
-        return self in State.open_states()
+    def is_accessible(self) -> bool:
+        return self in State.accessible_states()
+
+    @DynamicClassAttribute
+    def is_reservable(self) -> bool:
+        return self in State.reservable_states()
 
     @DynamicClassAttribute
     def is_closed(self) -> bool:
         return self in State.closed_states()
-
-    @classmethod
-    def reservable_states(cls):
-        return [
-            cls.WITH_RESERVATION,
-            cls.OPEN_AND_RESERVABLE,
-            cls.WITH_KEY_AND_RESERVATION,
-        ]
 
     @classmethod
     def get(cls, state):
