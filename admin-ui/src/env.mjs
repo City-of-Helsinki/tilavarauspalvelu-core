@@ -47,7 +47,7 @@ if (!process.env.SKIP_ENV_VALIDATION) {
   // Don't throw because it crashes the server (and has zero logging)
   const serverConfig = isServer ? ServerSchema.safeParse(process.env) : null;
 
-  if (serverConfig.error) {
+  if (isServer && serverConfig.error) {
     console.error("Server env validation failed", serverConfig.error);
   }
 
@@ -65,11 +65,9 @@ if (!process.env.SKIP_ENV_VALIDATION) {
   }
 
   env = {
-    ...(serverConfig.success ? serverConfig.data : {}),
+    ...(isServer && serverConfig.success ? serverConfig.data : {}),
     ...(clientConfig.success ? clientConfig.data : {}),
   };
-  // FIXME remove this before merge
-  console.log("env", env);
 }
 
 export { env };
