@@ -5,7 +5,8 @@ uwsgi:
   # Needed plugins if running against Debian uwsgi-package
   # python docker image cannot use that due to linker mishaps
   # plugins: python3,http
-  wsgi-file: tilavarauspalvelu/wsgi.py
+  module: tilavarauspalvelu.wsgi:application
+  # wsgi-file: tilavarauspalvelu/wsgi.p
   #uid: tvp
   umask: 022
   http: :8000
