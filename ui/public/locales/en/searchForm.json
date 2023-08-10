@@ -1,6 +1,6 @@
 {
-  "textSearchLabel": "Search term",
-  "searchTermPlaceholder": "Search with keyword",
+  "textSearchLabel": "Search",
+  "searchTermPlaceholder": "Search by space or unit",
   "searchButton": "Search",
   "purposeLabel": "Purpose of use",
   "roundLabel": "Application round",
