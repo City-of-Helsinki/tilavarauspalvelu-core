@@ -153,7 +153,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_true()
@@ -169,7 +169,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_false()
@@ -186,7 +186,7 @@ class OpeningHoursClientTestCase(TestCase):
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00+04:00"
         )
 
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_true()
@@ -221,7 +221,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_true()
@@ -256,7 +256,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_false()
@@ -282,7 +282,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_true()
@@ -316,7 +316,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_true()
@@ -350,7 +350,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T16:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_true()
@@ -383,7 +383,7 @@ class OpeningHoursClientTestCase(TestCase):
         end = datetime.datetime.fromisoformat(
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T13:00"
         )
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_false()
@@ -400,7 +400,7 @@ class OpeningHoursClientTestCase(TestCase):
             f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T07:00+02:00"
         )
 
-        is_open = client.is_resource_open_for_reservations(
+        is_open = client.is_resource_reservable(
             str(self.reservation_unit.uuid), begin, end
         )
         assert_that(is_open).is_false()

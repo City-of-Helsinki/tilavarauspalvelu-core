@@ -112,7 +112,7 @@ class ReservationUnitReservationScheduler:
     def is_reservation_unit_open(
         self, start: datetime.datetime, end: datetime.datetime
     ):
-        return self.opening_hours_client.is_resource_open_for_reservations(
+        return self.opening_hours_client.is_resource_reservable(
             str(self.reservation_unit.uuid), start, end
         )
 

@@ -181,57 +181,56 @@ class OpeningHoursClient:
 
         chronological_opening_hours = sorted(opening_hours, key=lambda x: x.start_time)
 
-        tracked_reservable_hours: dict[ResourceState, Optional[OpeningHours]] = {}
+        tracked_accessible_hours: dict[ResourceState, Optional[OpeningHours]] = {}
         tracked_closed_hours: dict[ResourceState, Optional[OpeningHours]] = {}
 
-        # Go through all given open and closed hours in chronological order.
-        # Keep track of open and closed hours, and slice them appropriately
-        # to form a continuous timeline.
+        # Go through all given accessible and closed hours in chronological order.
+        # Keep track of them, and slice them appropriately.
         for opening_hour in chronological_opening_hours:
-            reservable_state = ResourceState(opening_hour.resource_state)
+            resource_state = ResourceState(opening_hour.resource_state)
 
-            # If tracked reservable or closed hours end before this
+            # If tracked accessible or closed hours end before this
             # opening hour starts, the tracked hours can be moved to the
             # finished hours.
             # ----------
             #  oooo
-            #       ****  Reservable hours end before next reservable/closed hours start
+            #       ****  Accessible hours end before next accessible/closed hours start
             # ----------
             #  xxxx
-            #       ****  Closed hours end before next reservable/closed hours start
+            #       ****  Closed hours end before next accessible/closed hours start
             # ----------
-            hours += self._prune_tracked_hours(
-                tracked_reservable_hours,
+            hours += self._remove_past_tracked_hours(
+                tracked_accessible_hours,
                 opening_hour.start_time,
             )
-            hours += self._prune_tracked_hours(
+            hours += self._remove_past_tracked_hours(
                 tracked_closed_hours,
                 opening_hour.start_time,
             )
 
-            if reservable_state.is_open:
-                self._handle_reservable_hours_split(
+            if resource_state.is_accessible:
+                self._handle_accessible_hours_split(
                     opening_hour,
-                    reservable_state,
+                    resource_state,
                     tracked_closed_hours,
-                    tracked_reservable_hours,
+                    tracked_accessible_hours,
                 )
 
-            elif reservable_state.is_closed:
+            elif resource_state.is_closed:
                 self._handle_closed_hours_split(
                     hours,
                     opening_hour,
-                    reservable_state,
+                    resource_state,
                     tracked_closed_hours,
-                    tracked_reservable_hours,
+                    tracked_accessible_hours,
                 )
 
             else:
-                # Not open or closed, add as is.
+                # Not accessible or closed, add as is.
                 hours.append(opening_hour)
 
         # Add remaining tracked hours to the finished hours.
-        for tracked_hours in tracked_reservable_hours.values():
+        for tracked_hours in tracked_accessible_hours.values():
             if tracked_hours is None:
                 continue
             hours.append(tracked_hours)
@@ -246,15 +245,15 @@ class OpeningHoursClient:
         return hours
 
     @staticmethod
-    def _handle_reservable_hours_split(
+    def _handle_accessible_hours_split(
         opening_hour: OpeningHours,
-        reservable_state: ResourceState,
+        resource_state: ResourceState,
         tracked_closed_hours: dict[ResourceState, Optional[OpeningHours]],
-        tracked_reservable_hours: dict[ResourceState, Optional[OpeningHours]],
+        tracked_accessible_hours: dict[ResourceState, Optional[OpeningHours]],
     ) -> None:
-        reservable_hours = tracked_reservable_hours.get(reservable_state)
+        accessible_hours = tracked_accessible_hours.get(resource_state)
 
-        # If the tracked closed hours end after the current reservable
+        # If the tracked closed hours end after the current accessible
         # opening hours start, the current opening hours should be
         # shortened so that they start when the tracked closed hours end.
         # ---------------------------
@@ -266,7 +265,7 @@ class OpeningHoursClient:
         # ---------------------------
         #
         # If the current opening hours would be zero or negative
-        # in length afterward, the current opening hours are skipped.
+        # in length afterward, they are skipped.
         # ---------------------------
         #  xxxxxxxxx  -> xxxxxxxxx
         #     ooooo   ->              Skipped
@@ -288,15 +287,15 @@ class OpeningHoursClient:
         if opening_hour.start_time >= opening_hour.end_time:
             return
 
-        # If there aren't tracked reservable hours
+        # If there aren't tracked accessible hours
         # of this state yet, start tracking the current one.
-        if reservable_hours is None:
-            tracked_reservable_hours[reservable_state] = opening_hour
+        if accessible_hours is None:
+            tracked_accessible_hours[resource_state] = opening_hour
             return
 
-        # If any of the tracked reservable hours have the same state as
-        # the current reservable hours, and they end before the current
-        # reservable hours, extend that tracked reservable hours.
+        # If any of the tracked accessible hours have the same state as
+        # the current accessible hours, and they end before the current
+        # accessible hours, extend those tracked accessible hours.
         # ---------------------------
         #  oooooo     -> ooooooooo
         #      ooooo  ->              Combined
@@ -304,42 +303,42 @@ class OpeningHoursClient:
         #  oooo       -> ooooooooo
         #      ooooo  ->              Continued
         # ---------------------------
-        elif reservable_hours.end_time < opening_hour.end_time:
-            reservable_hours.extend(opening_hour)
+        elif accessible_hours.end_time < opening_hour.end_time:
+            accessible_hours.extend(opening_hour)
 
     @staticmethod
     def _handle_closed_hours_split(
         hours: list[OpeningHours],
         opening_hour: OpeningHours,
-        reservable_state: ResourceState,
+        resource_state: ResourceState,
         tracked_closed_hours: dict[ResourceState, Optional[OpeningHours]],
-        tracked_reservable_hours: dict[ResourceState, Optional[OpeningHours]],
+        tracked_accessible_hours: dict[ResourceState, Optional[OpeningHours]],
     ) -> None:
-        closed_hours = tracked_closed_hours.get(reservable_state)
+        closed_hours = tracked_closed_hours.get(resource_state)
 
-        # If the tracked reservable hours end after the current
-        # closed hours start, the current reservable hours should
+        # If the tracked accessible hours end after the current
+        # closed hours start, the tracked accessible hours should
         # be shortened so that they end when the closed hours start.
-        # The tracked opening hours should then be closed, since
-        # subsequent opening times cannot overlap with it.
+        # The tracked accessible hours should then be closed, since
+        # subsequent opening hours cannot overlap with it.
         # ---------------------------
         #  ooooo      -> ooo
         #     xxxxx   ->    xxxxx     Shortened
         # ---------------------------
         #
-        # If the tracked reservable hours end after the current
-        # closed hours end, new tracked opening should be created
-        # starting from the end time of the current closed hours.
-        # The tracked opening hours should then be closed, since
-        # subsequent opening times cannot overlap with it, and the
-        # newly created opening hours set as the tracked ones.
+        # If the tracked accessible hours end after the current
+        # closed hours end, new tracked accessible hours should be
+        # created starting from the end of the current closed hours.
+        # The old tracked accessible hours should then be closed,
+        # since subsequent opening hours cannot overlap with it.
         # ---------------------------
         #  ooooooooo  -> ooo     o
         #     xxxxx   ->    xxxxx      Sliced
         # ---------------------------
         #
-        # If there are multiple tracked reservable hours which overlap
-        # with the current closed hours, all of them are handled.
+        # If there are multiple tracked accessible hours which overlap
+        # with the current closed hours, all of them are must be sliced
+        # appropriately.
         # ---------------------------
         #     ooooo   ->               Gone
         #   ooooo     ->  oo           Shortened start
@@ -347,21 +346,21 @@ class OpeningHoursClient:
         #  ooooooooo  -> ooo     o     Sliced
         #     xxxxx   ->    xxxxx
         # ---------------------------
-        for state, tracked_hours in tracked_reservable_hours.items():
-            new_reservable_hours: Optional[OpeningHours] = None
+        for state, tracked_hours in tracked_accessible_hours.items():
+            new_open_hours: Optional[OpeningHours] = None
             if tracked_hours.end_time > opening_hour.end_time:
-                new_reservable_hours = copy(tracked_hours)
-                new_reservable_hours.start_time = opening_hour.end_time
+                new_open_hours = copy(tracked_hours)
+                new_open_hours.start_time = opening_hour.end_time
 
             tracked_hours.end_time = opening_hour.start_time
             if tracked_hours.start_time < tracked_hours.end_time:
                 hours.append(tracked_hours)
-            tracked_reservable_hours[state] = new_reservable_hours
+            tracked_accessible_hours[state] = new_open_hours
 
         # If there aren't tracked closed hours of this state yet,
         # start tracking the current one.
         if closed_hours is None:
-            tracked_closed_hours[reservable_state] = opening_hour
+            tracked_closed_hours[resource_state] = opening_hour
             return
 
         # If any of the tracked closed hours have the same state as
@@ -378,24 +377,24 @@ class OpeningHoursClient:
             closed_hours.extend(opening_hour)
 
     @staticmethod
-    def _prune_tracked_hours(
-        all_tracked_hours: dict[ResourceState, Optional[OpeningHours]],
-        start_time: datetime.datetime,
+    def _remove_past_tracked_hours(
+        tracked_hours: dict[ResourceState, Optional[OpeningHours]],
+        current_time: datetime.datetime,
     ) -> list[OpeningHours]:
         to_remove: list[ResourceState] = []
         removed_hours: list[OpeningHours] = []
 
-        for state, tracked_hours in all_tracked_hours.items():
-            if tracked_hours is None:
+        for state, hours in tracked_hours.items():
+            if hours is None:
                 to_remove.append(state)
                 continue
 
-            if tracked_hours.end_time < start_time:
-                removed_hours.append(tracked_hours)
+            if hours.end_time < current_time:
+                removed_hours.append(hours)
                 to_remove.append(state)
 
         for state in to_remove:
-            del all_tracked_hours[state]
+            del tracked_hours[state]
 
         return removed_hours
 
@@ -409,12 +408,15 @@ class OpeningHoursClient:
         return times
 
     def get_opening_hours_for_date_range(
-        self, resource: str, date_start: datetime.date, date_end: datetime.date
+        self,
+        resource: str,
+        date_start: datetime.date,
+        date_end: datetime.date,
     ) -> dict[datetime.date, list[OpeningHours]]:
         opening_hours = {
             date: times
             for date, times in self.opening_hours.get(resource, {}).items()
-            if date >= date_start and date <= date_end and times
+            if date_start <= date <= date_end and times
         }
         return opening_hours
 
@@ -422,8 +424,11 @@ class OpeningHoursClient:
         return self.periods.get(resource)
 
     @datetime_args_to_default_timezone
-    def is_resource_open_for_reservations(
-        self, resource: str, start_time: datetime.datetime, end_time: datetime.datetime
+    def is_resource_reservable(
+        self,
+        resource: str,
+        start_time: datetime.datetime,
+        end_time: datetime.datetime,
     ) -> bool:
         times = self.get_opening_hours_for_resource(resource, start_time.date())
         for time in times:
@@ -440,7 +445,9 @@ class OpeningHoursClient:
         return False
 
     def next_opening_times(
-        self, resource: str, date: datetime.date
+        self,
+        resource: str,
+        date: datetime.date,
     ) -> tuple[datetime.date, list[OpeningHours]]:
         times_for_resource = self.opening_hours.get(resource, {})
         times = times_for_resource.get(date)
