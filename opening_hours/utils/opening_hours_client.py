@@ -432,7 +432,7 @@ class OpeningHoursClient:
     ) -> bool:
         times = self.get_opening_hours_for_resource(resource, start_time.date())
         for time in times:
-            if ResourceState(time.resource_state).is_closed:
+            if not ResourceState(time.resource_state).is_reservable:
                 continue
 
             open_full_day = not time.start_time and not time.end_time
