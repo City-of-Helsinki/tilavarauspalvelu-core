@@ -224,6 +224,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "unit_price",
             "user",
             "working_memo",
+            "handling_details",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -438,6 +439,10 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_staff_field
     def resolve_working_memo(self, info: ResolveInfo) -> Optional[str]:
         return self.working_memo
+
+    @reservation_staff_field(default="")
+    def resolve_handling_details(self: Reservation, info: ResolveInfo) -> str:
+        return self.handling_details
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):

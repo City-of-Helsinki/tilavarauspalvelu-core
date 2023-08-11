@@ -2418,6 +2418,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             reservee_first_name="General",
             reservee_phone="123435",
             working_memo="I should not be visible",
+            handling_details="I should not be visible",
             reservee_email="no_visible@localhost",
             reservee_address_street="not visbile address",
             reservee_address_city="not visible city",
@@ -2448,6 +2449,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 reserveeFirstName
                                 reserveePhone
                                 workingMemo
+                                handlingDetails
                                 reserveeEmail
                                 reserveeAddressStreet
                                 reserveeAddressCity
@@ -2488,6 +2490,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             reservee_first_name="Joe",
             reservee_phone="123435",
             working_memo="Working this memo",
+            handling_details="Handling details",
             reservee_email="email@localhost",
             reservee_address_street="address",
             reservee_address_city="city",
@@ -2517,6 +2520,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 reserveeFirstName
                                 reserveePhone
                                 workingMemo
+                                handlingDetails
                                 reserveeEmail
                                 reserveeAddressStreet
                                 reserveeAddressCity

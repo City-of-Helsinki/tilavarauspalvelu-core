@@ -25,6 +25,7 @@ snapshots['ReservationUnitQueryTestCase::test_admin_sees_reservations_sensitive_
                                 'cancelDetails': 'cancdetails',
                                 'description': 'description',
                                 'freeOfChargeReason': 'reason',
+                                'handlingDetails': 'Handling details',
                                 'reserveeAddressCity': 'city',
                                 'reserveeAddressStreet': 'address',
                                 'reserveeAddressZip': 'zip',
@@ -1412,7 +1413,7 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area 1'] = {
                 },
                 {
                     'node': {
-                        'surfaceArea': 150.00
+                        'surfaceArea': 150.0
                     }
                 }
             ]
@@ -1723,6 +1724,7 @@ snapshots['ReservationUnitQueryTestCase::test_other_reservations_does_not_show_s
                                 'cancelDetails': None,
                                 'description': None,
                                 'freeOfChargeReason': None,
+                                'handlingDetails': '',
                                 'reserveeAddressCity': None,
                                 'reserveeAddressStreet': None,
                                 'reserveeAddressZip': None,
