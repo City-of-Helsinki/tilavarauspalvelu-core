@@ -5,6 +5,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { NextAuthOptions, Awaitable, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { env } from "app/env.mjs";
+import { logAxiosError } from "common/src/axiosUtils";
 
 type TunnistamoProfile = {
   iss: string;
@@ -26,55 +27,18 @@ type TunnistamoProfile = {
   loa: string;
 };
 
-const logAxiosError = (error: unknown) => {
-  if (typeof error === "object" && error !== null) {
-    if ("response" in error) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      const { response } = error as { response: unknown };
-      if (typeof response === "object" && response != null) {
-        if ("data" in response) {
-          console.log(response?.data);
-        }
-        if ("status" in response) {
-          console.log(response?.status);
-        }
-        if ("headers" in response) {
-          console.log(response?.headers);
-        }
-      }
-    } else if ("request" in error) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-      console.log(error.request);
-    } else if ("message" in error) {
-      // Something happened in setting up the request that triggered an Error
-      console.log("Error", error.message);
-    }
-    if ("config" in error) {
-      console.log(error.config);
-    }
-  } else {
-    console.log(error);
-  }
-};
-
 const getApiAccessTokens = async (accessToken: string | undefined) => {
   if (!accessToken) {
     throw new Error("Access token not available. Cannot update");
   }
-  const oidcProfileApiUrl = env.OIDC_PROFILE_API_SCOPE;
-  const oidcTilavarausApiUrl = env.OIDC_TILAVARAUS_API_SCOPE;
-  const oidcAccessTokenUrl = env.OIDC_ACCESS_TOKEN_URL;
-  if (!oidcProfileApiUrl || !oidcTilavarausApiUrl) {
+  if (!env.OIDC_PROFILE_API_SCOPE || !env.OIDC_TILAVARAUS_API_SCOPE) {
     throw new Error("Application configuration error, missing api urls.");
   }
   const data = await axios
     .request({
       responseType: "json",
       method: "POST",
-      url: oidcAccessTokenUrl,
+      url: env.OIDC_ACCESS_TOKEN_URL,
       headers: {
         Authorization: `Bearer ${accessToken}`,
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -91,8 +55,8 @@ const getApiAccessTokens = async (accessToken: string | undefined) => {
     throw new Error("No api-tokens present");
   }
 
-  const apiAccessToken: string = data[oidcTilavarausApiUrl];
-  const profileApiAccessToken: string = data[oidcProfileApiUrl];
+  const apiAccessToken: string = data[env.OIDC_TILAVARAUS_API_SCOPE];
+  const profileApiAccessToken: string = data[env.OIDC_PROFILE_API_SCOPE];
 
   return [apiAccessToken, profileApiAccessToken];
 };
@@ -124,7 +88,6 @@ const refreshAccessToken = async (token: JWT) => {
         logAxiosError(error);
         throw new Error("Error getting RefreshToken from Tunnistamo");
       });
-    // const { data }: { data: unknown } = response;
 
     if (!data) {
       throw new Error("Unable to refresh tokens");

@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { NextAuthOptions, Session, Awaitable, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import getConfig from "next/config";
+import { logAxiosError } from "common/src/axiosUtils";
 
 type TunnistamoProfile = {
   iss: string;
@@ -23,16 +24,6 @@ type TunnistamoProfile = {
   sid: string;
   amr: string;
   loa: string;
-};
-
-type TilavarauspalveluUser = Omit<User, "image"> & {
-  id: string;
-  name: string;
-  given_name: string;
-  family_name: string;
-  nickname: string;
-  email: string;
-  email_verified: boolean;
 };
 
 const {
@@ -87,22 +78,26 @@ const EXP_MS = (10 / 2) * 60 * 1000;
 
 const refreshAccessToken = async (token: JWT) => {
   try {
-    const response = await axios.request({
-      url: oidcTokenUrl,
-      method: "POST",
-      data: {
-        client_id: oidcClientId,
-        grant_type: "refresh_token",
-        refresh_token: token.refreshToken,
-      },
-      headers: {
-        /* eslint-disable @typescript-eslint/naming-convention */
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${token.accessToken}`,
-      },
-    });
-
-    const { data }: { data: unknown } = response;
+    const data = await axios
+      .request({
+        url: oidcTokenUrl,
+        method: "POST",
+        data: {
+          client_id: oidcClientId,
+          grant_type: "refresh_token",
+          refresh_token: token.refreshToken,
+        },
+        headers: {
+          /* eslint-disable @typescript-eslint/naming-convention */
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Bearer ${token.accessToken}`,
+        },
+      })
+      .then((x) => x.data)
+      .catch((error) => {
+        logAxiosError(error);
+        throw new Error("Error getting RefreshToken from Tunnistamo");
+      });
 
     if (!data) {
       throw new Error("Unable to refresh tokens");
@@ -176,7 +171,7 @@ const options = (): NextAuthOptions => {
             redirect_uri: oidcCallbackUrl,
           },
         },
-        profile(profile: TunnistamoProfile): Awaitable<TilavarauspalveluUser> {
+        profile(profile: TunnistamoProfile): Awaitable<User> {
           return {
             id: profile.sub,
             ...profile,
