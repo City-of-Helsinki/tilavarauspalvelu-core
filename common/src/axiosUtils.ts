@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 export const logAxiosError = (error: unknown) => {
   if (typeof error === "object" && error !== null) {
     if ("response" in error) {
@@ -31,4 +32,3 @@ export const logAxiosError = (error: unknown) => {
     console.log(error);
   }
 };
-
