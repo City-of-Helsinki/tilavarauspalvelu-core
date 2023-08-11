@@ -33,7 +33,7 @@ const Filters = styled.div`
   height: 56px;
   position: sticky;
   top: 0;
-  z-index: var(--tilavaraus-admin-stack-sticky-header);
+  z-index: var(--tilavaraus-admin-stack-sticky-filters);
 `;
 
 interface IFilterBtn {
