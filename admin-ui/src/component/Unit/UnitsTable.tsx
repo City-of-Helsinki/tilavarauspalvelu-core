@@ -18,13 +18,23 @@ type Props = {
   isMyUnits?: boolean;
 };
 
+function truncateMaybeString(
+  str: string | undefined,
+  maxLength: number
+): string {
+  if (!str) return "";
+  return str.length > maxLength ? `${str.slice(0, maxLength)}...` : str;
+}
+
+const MAX_NAME_LENGTH = 40;
+
 const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
   {
     headerName: t("Units.headings.name"),
     key: "nameFi",
     transform: ({ nameFi, pk }: UnitType) => (
       <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
-        {nameFi}
+        {truncateMaybeString(nameFi ?? undefined, MAX_NAME_LENGTH)}
       </TableLink>
     ),
     width: "50%",
