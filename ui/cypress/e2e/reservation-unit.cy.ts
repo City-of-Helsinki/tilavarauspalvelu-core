@@ -359,7 +359,7 @@ describe("renders with basic data", () => {
 
     equipment().contains("Tuoli FiKattila FiJoku muu Fi");
 
-    addressContainer().should("have.length", 1);
+    addressContainer().should("have.length", 2);
 
     addressContainer(0).should("contain", "Säterintie 2 Fi");
     addressContainer(0).should("contain", "00720 Helsinki Fi");
