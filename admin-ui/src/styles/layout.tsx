@@ -126,22 +126,6 @@ export const HorisontalFlex = styled.div`
 
 HorisontalFlex.displayName = "HorisontalFlex";
 
-export const SparseVerticalFlex = styled.div`
-  display: flex;
-  gap: var(--spacing-l);
-  flex-direction: column;
-`;
-
-SparseVerticalFlex.displayName = "SparseVerticalFlex";
-
-export const VerticalFlexNoGap = styled.div`
-  display: flex;
-  gap: 0;
-  flex-direction: column;
-`;
-
-VerticalFlexNoGap.displayName = "VerticalFlexNoGap";
-
 export const ButtonContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
