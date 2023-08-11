@@ -106,7 +106,7 @@ const WrappedNavigation = ({ disabledRouter = false }) => {
     return (
       <Navigation
         disabledRouter
-        onLogoClick={() => window.location.assign("/")}
+        onLogoClick={() => window.location.assign(publicUrl ?? "/")}
       />
     );
   }
