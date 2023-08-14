@@ -66,14 +66,6 @@ const IconButton = ({
   openInNewTab = href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
-  const DisplayedIconButton = () => (
-    <Container>
-      <HoverWrapper>
-        <Label>{label}</Label>
-        <IconContainer>{icon && icon}</IconContainer>
-      </HoverWrapper>
-    </Container>
-  );
   const buttonProps = {
     href,
     target: openInNewTab ? "_blank" : undefined,
@@ -89,11 +81,21 @@ const IconButton = ({
   };
   return href.substring(0, 4) === "http" ? (
     <Anchor {...buttonProps}>
-      <DisplayedIconButton />
+      <Container>
+        <HoverWrapper>
+          <Label>{label}</Label>
+          <IconContainer>{icon && icon}</IconContainer>
+        </HoverWrapper>
+      </Container>
     </Anchor>
   ) : (
     <Link {...buttonProps}>
-      <DisplayedIconButton />
+      <Container>
+        <HoverWrapper>
+          <Label>{label}</Label>
+          <IconContainer>{icon && icon}</IconContainer>
+        </HoverWrapper>
+      </Container>
     </Link>
   );
 };
