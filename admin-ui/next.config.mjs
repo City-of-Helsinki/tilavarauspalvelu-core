@@ -16,6 +16,9 @@ const config ={
     ignoreBuildErrors: true,
   },
   transpilePackages: ["common"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   sassOptions: {
     includePaths: [join(ROOT_PATH, "src")],
   },

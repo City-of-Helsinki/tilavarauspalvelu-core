@@ -1,8 +1,8 @@
-import { Card, IconArrowRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { Card, IconArrowRight } from "hds-react";
 import { ApplicationRoundType } from "common/types/gql-types";
 import { applicationRoundUrl } from "../../common/urls";
 import ApplicationRoundStatusTag from "./ApplicationRoundStatusTag";
@@ -57,9 +57,12 @@ const Label = styled.span`
   font-size: var(--fontsize-body-s);
 `;
 
+// HDS and styled-components have incorrect load order
 const StyledCard = styled(Card)`
-  padding: var(--spacing-m);
-  background: var(--color-black-5);
+  && {
+    padding: var(--spacing-m);
+    background: var(--color-black-5);
+  }
 `;
 
 function Stat({ value, label }: { value: number; label: string }): JSX.Element {

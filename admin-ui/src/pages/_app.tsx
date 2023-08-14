@@ -2,6 +2,8 @@
 import React from "react";
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
+
+import "hds-core/lib/base.css";
 import "../index.scss";
 import { nextAuthRoute } from "app/common/const";
 import { ApolloProvider } from "@apollo/client";
