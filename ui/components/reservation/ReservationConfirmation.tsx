@@ -175,19 +175,11 @@ const ReservationConfirmation = ({
             label={t("common:gotoFrontpage")}
             icon={<IconArrowRight aria-hidden />}
           />
-          <div
-            onClick={(e) => {
-              e.preventDefault();
-              e.bubbles = false;
-              logout();
-            }}
-          >
-            <StyledLink
-              icon={<IconSignout aria-hidden />}
-              href="#"
-              label={t("common:logout")}
-            />
-          </div>
+          <StyledLink
+            icon={<IconSignout aria-hidden />}
+            callback={() => logout()}
+            label={t("common:logout")}
+          />
         </ActionContainer2>
       </div>
     </Wrapper>
