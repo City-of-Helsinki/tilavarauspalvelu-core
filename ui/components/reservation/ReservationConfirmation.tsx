@@ -10,7 +10,7 @@ import React, { useMemo } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
-import { fontMedium, fontRegular, H2 } from "common/src/common/typography";
+import { fontRegular, H2 } from "common/src/common/typography";
 import { Reservation } from "common/src/reservation-form/types";
 import {
   PaymentOrderType,
@@ -22,7 +22,7 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { getTranslation, reservationsUrl } from "../../modules/util";
-import { BlackButton, LinkButton } from "../../styles/util";
+import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
 import { useLogout } from "../../hooks/useLogout";

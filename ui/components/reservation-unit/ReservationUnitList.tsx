@@ -15,7 +15,6 @@ import {
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";
-import { MediumButton } from "../../styles/util";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import apolloClient from "../../modules/apolloClient";
 import { CenterSpinner } from "../common/common";

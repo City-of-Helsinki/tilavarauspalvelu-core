@@ -8,7 +8,7 @@ import {
   ReservationUnitType,
   UnitType,
 } from "common/types/gql-types";
-import { IconArrowRight, IconLinkExternal } from "hds-react";
+import { IconLinkExternal } from "hds-react";
 import { getTranslation } from "../../modules/util";
 import ExternalLink from "./ExternalLink";
 import IconButton from "../common/IconButton";

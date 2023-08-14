@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { IconAngleRight, IconArrowRight } from "hds-react";
+import { IconArrowRight } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { fontMedium, H3 } from "common/src/common/typography";
