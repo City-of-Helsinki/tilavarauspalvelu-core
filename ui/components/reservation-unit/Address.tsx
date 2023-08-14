@@ -111,17 +111,17 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
       <Links>
         <IconLink
           href={mapUrl(i18n.language, reservationUnit.unit)}
-          linkText={t("reservationUnit:linkMap")}
+          label={t("reservationUnit:linkMap")}
           icon={<IconLinkExternal aria-hidden />}
         />
         <IconLink
           href={googleUrl(i18n.language, location)}
-          linkText={t("reservationUnit:linkGoogle")}
+          label={t("reservationUnit:linkGoogle")}
           icon={<IconLinkExternal aria-hidden />}
         />
         <IconLink
           href={hslUrl(i18n.language, location)}
-          linkText={t("reservationUnit:linkHSL")}
+          label={t("reservationUnit:linkHSL")}
           icon={<IconLinkExternal aria-hidden />}
         />
         <ExternalLink

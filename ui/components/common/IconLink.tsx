@@ -5,11 +5,11 @@ import { fontMedium } from "common/src/common/typography";
 
 interface IconLinkProps {
   icon: React.ReactNode | null;
-  href: string;
-  linkText: string;
+  href?: string;
+  label: string;
   openInNewTab?: boolean;
   callback?: () => void;
-  rest?: unknown;
+  rest?: unknown; // for possible id's, aria-attributes etc
 }
 
 const Container = styled.div`
@@ -20,7 +20,7 @@ const Container = styled.div`
 `;
 
 const Anchor = styled.a`
-  color: var(--black) !important;
+  color: var(--color-black) !important;
 `;
 
 const HoverWrapper = styled.div`
@@ -62,14 +62,14 @@ const IconLink = ({
   icon,
   label,
   callback,
-  href = "javascript:void(0);",
-  openInNewTab = href.substring(0, 4) === "http",
+  href = callback && "javascript:void(0);", // there's no href if using callback
+  openInNewTab = href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconLinkProps): JSX.Element => {
   const DisplayedIconLink = () => (
     <Container>
       <HoverWrapper>
-        <Name>{linkText}</Name>
+        <Name>{label}</Name>
         <IconContainer>{icon && icon}</IconContainer>
       </HoverWrapper>
     </Container>
@@ -78,7 +78,6 @@ const IconLink = ({
     href,
     target: openInNewTab ? "_blank" : undefined,
     rel: openInNewTab ? "noopener noreferrer" : undefined,
-    style: { color: "--var(color-black)" },
     onClick: callback
       ? (e) => {
           e.preventDefault();

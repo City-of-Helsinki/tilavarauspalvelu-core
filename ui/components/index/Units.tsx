@@ -100,7 +100,7 @@ const Units = ({ units }: Props): JSX.Element => {
           <IconLinkContainer>
             <IconLink
               href={singleSearchPrefix}
-              linkText={t("common:showAll")}
+              label={t("common:showAll")}
               icon={<IconArrowRight aria-hidden />}
             />
           </IconLinkContainer>

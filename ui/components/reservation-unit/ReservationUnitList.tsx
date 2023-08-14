@@ -19,6 +19,7 @@ import { MediumButton } from "../../styles/util";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import apolloClient from "../../modules/apolloClient";
 import { CenterSpinner } from "../common/common";
+import IconLink from "../common/IconLink";
 
 type OptionTypes = {
   purposeOptions: OptionType[];
@@ -213,13 +214,11 @@ const ReservationUnitList = ({
         );
       })}
       <ButtonContainer>
-        <MediumButton
-          variant="supplementary"
-          iconLeft={<IconPlusCircle aria-hidden />}
-          onClick={() => setShowModal(true)}
-        >
-          {t("reservationUnitList:add")}
-        </MediumButton>
+        <IconLink
+          callback={() => setShowModal(true)}
+          icon={<IconPlusCircle aria-hidden />}
+          label={t("reservationUnitList:add")}
+        />
       </ButtonContainer>
       <Modal
         handleClose={() => {

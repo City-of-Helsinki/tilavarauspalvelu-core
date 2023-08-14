@@ -10,6 +10,7 @@ import { PurposeType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
 import ReservationUnitSearch from "./ReservationUnitSearch";
+import IconLink from "../common/IconLink";
 
 type Props = {
   purposes: PurposeType[];
@@ -86,13 +87,13 @@ const Title = styled.div`
   gap: var(--spacing-xs);
 `;
 
-const MoreLink = styled.a`
+const IconLinkContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--spacing-2-xs);
-  align-self: flex-end;
   margin-top: var(--spacing-xl);
-  cursor: pointer;
+  color: var(--color-black) !important;
   ${fontMedium}
 `;
 
@@ -133,18 +134,21 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
           ))}
         </PurposeContainer>
         {purposes?.length > itemLimit && (
-          <MoreLink
-            data-testid="front-page__purposes--more-link"
-            onClick={() => setShowAll(!showAll)}
-            href="javascript:void(0);"
-          >
-            {t(`${showAll ? "common:showLess" : "common:showMore"}`)}{" "}
+          <IconLinkContainer>
             {showAll ? (
-              <IconAngleUp aria-hidden />
+              <IconLink
+                icon={<IconAngleUp aria-hidden />}
+                label={t("common:showLess")}
+                callback={() => setShowAll(!showAll)}
+              />
             ) : (
-              <IconAngleDown aria-hidden />
+              <IconLink
+                icon={<IconAngleDown aria-hidden />}
+                label={t("common:showMore")}
+                callback={() => setShowAll(!showAll)}
+              />
             )}
-          </MoreLink>
+          </IconLinkContainer>
         )}
       </Content>
     </Wrapper>

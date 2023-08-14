@@ -167,12 +167,12 @@ const ReservationConfirmation = ({
         >
           <StyledLink
             href={reservationUnitPath(reservationUnit.pk)}
-            linkText={t("reservations:backToReservationUnit")}
+            label={t("reservations:backToReservationUnit")}
             icon={<IconArrowRight aria-hidden />}
           />
           <StyledLink
             href="/"
-            linkText={t("common:gotoFrontpage")}
+            label={t("common:gotoFrontpage")}
             icon={<IconArrowRight aria-hidden />}
           />
           <div
@@ -185,7 +185,7 @@ const ReservationConfirmation = ({
             <StyledLink
               icon={<IconSignout aria-hidden />}
               href="#"
-              linkText={t("common:logout")}
+              label={t("common:logout")}
             />
           </div>
         </ActionContainer2>

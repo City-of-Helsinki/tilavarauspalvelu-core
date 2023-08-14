@@ -121,7 +121,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
         </StatusMessage>
         <StyledLink
           href={`/criteria/${applicationRound.pk}`}
-          linkText={t("applicationRound:card.criteria")}
+          label={t("applicationRound:card.criteria")}
           icon={<IconArrowRight aria-hidden />}
         />
       </StyledContainer>
