@@ -48,6 +48,7 @@ if (!process.env.SKIP_ENV_VALIDATION) {
   const serverConfig = isServer ? ServerSchema.safeParse(process.env) : null;
 
   if (isServer && serverConfig.error) {
+    // eslint-disable-next-line no-console
     console.error("Server env validation failed", serverConfig.error);
   }
 
@@ -61,6 +62,7 @@ if (!process.env.SKIP_ENV_VALIDATION) {
   });
 
   if (clientConfig.error) {
+    // eslint-disable-next-line no-console
     console.error("Client env validation failed", clientConfig.error);
   }
 

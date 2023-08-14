@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next/types";
+import { apiBaseUrl } from "app/common/const";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const { slug } = req.query;
-  const apiBaseUrl = process.env.TILAVARAUS_API_URL;
   const path = Array.isArray(slug) ? slug.join("/") : slug;
   const url = `${apiBaseUrl}/v1/${path}`;
   // TODO do some safety checks here

@@ -23,8 +23,7 @@ const config ={
     locales: ['fi'],
     defaultLocale: 'fi',
   },
-  // FIXME this should use NEXT_PUBLIC_BASE_PATH but there is some problems with loading env.mjs
-  basePath: "/kasittely",
+  basePath: env.NEXT_PUBLIC_BASE_URL,
   async rewrites() {
     return [
       // Do not rewrite API routes

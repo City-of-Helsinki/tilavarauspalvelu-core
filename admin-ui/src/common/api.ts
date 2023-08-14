@@ -17,8 +17,9 @@ import {
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
 } from "./types";
+import { publicUrl } from "./const";
 
-const apiBaseUrl = "/api";
+const apiBaseUrl = `${publicUrl}/api`;
 
 const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
