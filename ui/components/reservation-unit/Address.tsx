@@ -11,7 +11,7 @@ import {
 import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { getTranslation } from "../../modules/util";
 import ExternalLink from "./ExternalLink";
-import IconLink from "../common/IconLink";
+import IconButton from "../common/IconButton";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | ReservationUnitType;
@@ -109,17 +109,17 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
         <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>
       )}
       <Links>
-        <IconLink
+        <IconButton
           href={mapUrl(i18n.language, reservationUnit.unit)}
           label={t("reservationUnit:linkMap")}
           icon={<IconLinkExternal aria-hidden />}
         />
-        <IconLink
+        <IconButton
           href={googleUrl(i18n.language, location)}
           label={t("reservationUnit:linkGoogle")}
           icon={<IconLinkExternal aria-hidden />}
         />
-        <IconLink
+        <IconButton
           href={hslUrl(i18n.language, location)}
           label={t("reservationUnit:linkHSL")}
           icon={<IconLinkExternal aria-hidden />}

@@ -8,7 +8,7 @@ import { fontMedium, H3 } from "common/src/common/typography";
 import { UnitType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
-import IconLink from "../common/IconLink";
+import IconButton from "../common/IconButton";
 
 type Props = {
   units: UnitType[];
@@ -98,7 +98,7 @@ const Units = ({ units }: Props): JSX.Element => {
         </Content>
         {units?.length > itemLimit && (
           <IconLinkContainer>
-            <IconLink
+            <IconButton
               href={singleSearchPrefix}
               label={t("common:showAll")}
               icon={<IconArrowRight aria-hidden />}

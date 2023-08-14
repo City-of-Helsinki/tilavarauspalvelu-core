@@ -12,7 +12,7 @@ import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
-import IconLink from "../common/IconLink";
+import IconButton from "../common/IconButton";
 
 interface Props {
   applicationRound: ApplicationRoundType;
@@ -69,7 +69,7 @@ const CardButton = styled(MediumButton)`
   }
 `;
 
-const StyledLink = styled(IconLink)`
+const StyledLink = styled(IconButton)`
   color: var(--color-black);
 `;
 

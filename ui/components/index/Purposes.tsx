@@ -10,7 +10,7 @@ import { PurposeType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
 import ReservationUnitSearch from "./ReservationUnitSearch";
-import IconLink from "../common/IconLink";
+import IconButton from "../common/IconButton";
 
 type Props = {
   purposes: PurposeType[];
@@ -136,13 +136,13 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
         {purposes?.length > itemLimit && (
           <IconLinkContainer>
             {showAll ? (
-              <IconLink
+              <IconButton
                 icon={<IconAngleUp aria-hidden />}
                 label={t("common:showLess")}
                 callback={() => setShowAll(!showAll)}
               />
             ) : (
-              <IconLink
+              <IconButton
                 icon={<IconAngleDown aria-hidden />}
                 label={t("common:showMore")}
                 callback={() => setShowAll(!showAll)}

@@ -26,7 +26,7 @@ import { BlackButton, LinkButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
 import { useLogout } from "../../hooks/useLogout";
-import IconLink from "../common/IconLink";
+import IconButton from "../common/IconButton";
 
 type Props = {
   reservation: Reservation | ReservationType;
@@ -63,7 +63,7 @@ const ActionContainer2 = styled.div`
   align-items: flex-start;
 `;
 
-const StyledLink = styled(IconLink)`
+const StyledLink = styled(IconButton)`
   color: var(--color-black) !important;
 `;
 

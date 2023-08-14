@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { fontMedium } from "common/src/common/typography";
 
-interface IconLinkProps {
+interface IconButtonProps {
   icon: React.ReactNode | null;
   href?: string;
   label: string;
@@ -44,7 +44,7 @@ const HoverWrapper = styled.div`
   }
 `;
 
-const Name = styled.span`
+const Label = styled.span`
   display: flex;
   flex-direction: row;
   font-size: var(--fontsize-body-m);
@@ -58,23 +58,23 @@ const IconContainer = styled.div`
   width: var(--icon-size-m);
 `;
 
-const IconLink = ({
+const IconButton = ({
   icon,
   label,
   callback,
   href = callback && "javascript:void(0);", // there's no href if using callback
   openInNewTab = href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
-}: IconLinkProps): JSX.Element => {
-  const DisplayedIconLink = () => (
+}: IconButtonProps): JSX.Element => {
+  const DisplayedIconButton = () => (
     <Container>
       <HoverWrapper>
-        <Name>{label}</Name>
+        <Label>{label}</Label>
         <IconContainer>{icon && icon}</IconContainer>
       </HoverWrapper>
     </Container>
   );
-  const linkProps = {
+  const buttonProps = {
     href,
     target: openInNewTab ? "_blank" : undefined,
     rel: openInNewTab ? "noopener noreferrer" : undefined,
@@ -88,13 +88,13 @@ const IconLink = ({
     ...rest,
   };
   return href.substring(0, 4) === "http" ? (
-    <Anchor {...linkProps}>
-      <DisplayedIconLink />
+    <Anchor {...buttonProps}>
+      <DisplayedIconButton />
     </Anchor>
   ) : (
-    <Link {...linkProps}>
-      <DisplayedIconLink />
+    <Link {...buttonProps}>
+      <DisplayedIconButton />
     </Link>
   );
 };
-export default IconLink;
+export default IconButton;
