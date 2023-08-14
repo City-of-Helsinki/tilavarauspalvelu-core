@@ -44,7 +44,7 @@ export default function PageWrapper({ children }: Props): JSX.Element | null {
       <ClientOnly>
         <Navigation />
         <Wrapper>
-          <MainMenu placement="default" />
+          {isLoggedIn && <MainMenu placement="default" />}
           <Suspense fallback={<Loader />}>
             <Content>{isLoggedIn ? children : <MainLander />}</Content>
           </Suspense>
