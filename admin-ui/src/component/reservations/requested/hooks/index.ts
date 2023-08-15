@@ -243,16 +243,16 @@ export const useReservationEditData = (id?: string) => {
     .filter((x) => new Date(x.begin) > new Date())
     .filter((x) => x.state === ReservationsReservationStateChoices.Confirmed);
 
-  const { data: nextRecurrance } = useQuery<Query, QueryReservationByPkArgs>(
-    SINGLE_RESERVATION_QUERY,
-    {
-      skip: !possibleReservations?.at(0)?.pk,
-      fetchPolicy: "no-cache",
-      variables: {
-        pk: possibleReservations?.at(0)?.pk ?? 0,
-      },
-    }
-  );
+  const { data: nextRecurrance, loading: nextReservationLoading } = useQuery<
+    Query,
+    QueryReservationByPkArgs
+  >(SINGLE_RESERVATION_QUERY, {
+    skip: !possibleReservations?.at(0)?.pk,
+    fetchPolicy: "no-cache",
+    variables: {
+      pk: possibleReservations?.at(0)?.pk ?? 0,
+    },
+  });
 
   const reservation = recurringPk
     ? nextRecurrance?.reservationByPk
@@ -264,7 +264,7 @@ export const useReservationEditData = (id?: string) => {
   return {
     reservation: reservation ?? undefined,
     reservationUnit,
-    loading,
+    loading: loading || nextReservationLoading,
     refetch,
   };
 };
