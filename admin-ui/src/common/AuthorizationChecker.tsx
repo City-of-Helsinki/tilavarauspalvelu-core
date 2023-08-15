@@ -45,6 +45,10 @@ const AuthorisationChecker = ({
   if (permission && !hasSomePermission(permission)) {
     return <Error403 showLogoutSection />;
   }
+  // TODO have a general hasAnyPermission
+  if (!hasSomePermission(Permission.CAN_VIEW_RESERVATIONS)) {
+    return <Error403 showLogoutSection />;
+  }
   return <>{children}</>;
 };
 
