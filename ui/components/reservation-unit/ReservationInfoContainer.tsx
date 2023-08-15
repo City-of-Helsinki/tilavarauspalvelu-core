@@ -41,6 +41,7 @@ const ReservationInfoContainer = ({
     (reservationUnit.reservationsMaxDaysBefore ||
       reservationUnit.reservationsMinDaysBefore);
 
+  // TODO Hydration errros
   return (
     <>
       <Subheading $withBorder>

@@ -254,6 +254,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     return {
       props: {
+        // TODO hydration errors because reservationCalendar is missing from SSR translations
         ...(await serverSideTranslations(locale)),
         key: `${id}-${locale}`,
         reservationUnit: {
@@ -283,6 +284,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   return {
     props: {
+      // TODO hydration errors because reservationCalendar is missing from SSR translations
       ...(await serverSideTranslations(locale)),
       paramsId: id,
     },
@@ -820,6 +822,7 @@ const ReservationUnit = ({
 
   const dayStartTime = addHours(startOfDay(currentDate), 6);
 
+  // TODO Hydration errors here
   return reservationUnit ? (
     <Wrapper>
       <Head
@@ -852,6 +855,7 @@ const ReservationUnit = ({
                 </Content>
               </>
             )}
+            {/* TODO isReservable hasn't been checked for hydration errors */}
             {isReservable && (
               <CalendarWrapper
                 ref={calendarRef}
