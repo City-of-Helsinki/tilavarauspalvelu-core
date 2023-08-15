@@ -20,7 +20,7 @@ describe("Tilavaraus ui front page", () => {
     purposeMoreLink()
       .click()
       .then(() => {
-        purposeLinks().should("have.length", 9);
+        purposeLinks().should("have.length", 11);
       });
 
     purposeMoreLink()
@@ -38,7 +38,7 @@ describe("Tilavaraus ui front page", () => {
     purposeMoreLink()
       .click()
       .then(() => {
-        purposeLinks().should("have.length", 9);
+        purposeLinks().should("have.length", 11);
       });
 
     purposeMoreLink()
@@ -48,7 +48,7 @@ describe("Tilavaraus ui front page", () => {
       });
 
     purposeLinks().eq(3).click();
-    cy.url().should("match", /purposes=4#content$/);
+    cy.url().should("match", /purposes=27#content$/);
   });
 
   it("displays unit links", () => {
@@ -56,8 +56,8 @@ describe("Tilavaraus ui front page", () => {
 
     links.should("have.length", 8);
 
-    links.eq(4).should("have.text", "Tila #5").click();
-    cy.url().should("contain", "?unit=5");
+    links.eq(4).should("have.text", "Koskelan nuorisotalo").click();
+    cy.url().should("contain", "?unit=10");
   });
 
   it("follows general units link", () => {

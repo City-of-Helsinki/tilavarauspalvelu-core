@@ -102,6 +102,7 @@ const Units = ({ units }: Props): JSX.Element => {
               href={singleSearchPrefix}
               label={t("common:showAll")}
               icon={<IconArrowRight aria-hidden />}
+              data-testid="front-page__units--more-link"
             />
           </IconLinkContainer>
         )}
