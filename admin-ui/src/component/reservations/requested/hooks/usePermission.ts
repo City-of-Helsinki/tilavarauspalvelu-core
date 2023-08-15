@@ -5,7 +5,7 @@ import {
   hasPermission as baseHasPermission,
   hasSomePermission as baseSomeHasPermission,
   Permission,
-} from "app/context/permissionHelper";
+} from "app/modules/permissionHelper";
 import { CURRENT_USER } from "../../../../context/queries";
 
 const usePermission = () => {

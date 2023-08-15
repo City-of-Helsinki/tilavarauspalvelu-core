@@ -5,7 +5,7 @@ import { NavLink, RouteProps, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import IconPremises from "common/src/icons/IconPremises";
-import { Permission } from "app/context/permissionHelper";
+import { Permission } from "app/modules/permissionHelper";
 import IconCalendar from "../images/icon_calendar.svg";
 import IconIndividualReservation from "../images/icon_individual-reservation.svg";
 import { truncatedText } from "../styles/typography";

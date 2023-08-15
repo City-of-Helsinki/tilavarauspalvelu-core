@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import dynamic from "next/dynamic";
 
-import { Permission } from "app/context/permissionHelper";
+import { Permission } from "app/modules/permissionHelper";
 import ApplicationRound from "./component/recurring-reservations/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";

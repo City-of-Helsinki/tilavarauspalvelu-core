@@ -13,7 +13,7 @@ import {
   QueryReservationUnitByPkArgs,
   ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
-import { Permission } from "app/context/permissionHelper";
+import { Permission } from "app/modules/permissionHelper";
 import { getEventBuffers } from "common/src/calendar/util";
 import { reservationUrl } from "../../common/urls";
 import { combineResults } from "../../common/util";

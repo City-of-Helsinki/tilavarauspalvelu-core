@@ -1,30 +1,10 @@
 import React from "react";
 import { useSession } from "next-auth/react";
-import { Permission } from "app/context/permissionHelper";
+import { Permission } from "app/modules/permissionHelper";
 import usePermission from "app/component/reservations/requested/hooks/usePermission";
 import MainLander from "app/component/MainLander";
 
 import Error403 from "./Error403";
-
-/* FIXME
-const AuthStateError = (state: AuthState) => {
-  switch (state) {
-    case "HasPermissions":
-      return null;
-    case "NoPermissions":
-      return <Error403 showLogoutSection />;
-    case "NotAutenticated":
-      return <MainLander />;
-    case "ApiKeyAvailable":
-    case "Unknown":
-    case "Authenticated":
-      return <span />;
-    case "Error":
-      return <Error5xx />;
-  }
-  return <Error5xx />;
-};
-*/
 
 const AuthorisationChecker = ({
   children,
