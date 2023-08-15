@@ -122,7 +122,8 @@ const useCheckFormCollisions = ({
       before: bufferBeforeSeconds,
       after: bufferAfterSeconds,
     },
-    reservationType: type as ReservationsReservationTypeChoices,
+    reservationType: (type ??
+      ReservationsReservationTypeChoices.Blocked) as ReservationsReservationTypeChoices,
   });
 
   return { hasCollisions };
