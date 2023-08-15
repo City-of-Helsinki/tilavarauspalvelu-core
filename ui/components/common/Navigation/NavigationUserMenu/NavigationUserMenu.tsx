@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
 import { NavigationUserMenuUserCard } from "./NavigationUserMenuUserCard";
 import { authenticationIssuer } from "../../../../modules/const";
+import { signOut } from "../../../../modules/auth";
 import { MenuItem } from "../types";
-import { useLogout } from "../../../../hooks/useLogout";
 
 const StyledUserMenu = styled(HDSNavigation.User)<{
   $active?: boolean;
@@ -99,7 +99,6 @@ const NavigationUserMenu = () => {
   const router = useRouter();
   const session = useSession();
   const { t } = useTranslation();
-  const { logout } = useLogout();
 
   const user = session.data?.user;
   const isActive = userMenuItems
@@ -113,7 +112,7 @@ const NavigationUserMenu = () => {
   };
 
   const handleSignOut = () => {
-    logout();
+    signOut({ session: session.data });
   };
 
   return (

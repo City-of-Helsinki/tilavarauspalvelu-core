@@ -153,6 +153,8 @@ const options = (): NextAuthOptions => {
   };
 };
 
+const authOptions = options();
+
 export default function nextAuthApiHandler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -171,5 +173,7 @@ export default function nextAuthApiHandler(
     throw new Error("Invalid configuration");
   }
 
-  return NextAuth(req, res, options());
+  return NextAuth(req, res, authOptions);
 }
+
+export { authOptions };

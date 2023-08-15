@@ -1,6 +1,7 @@
 import { Query, UserType } from "common/types/gql-types";
 import { ApolloError, useQuery } from "@apollo/client";
 import { CURRENT_USER, CURRENT_USER_GLOBAL } from "../modules/queries/user";
+import { isBrowser } from "../modules/const";
 
 type Props = {
   global?: boolean;
@@ -17,10 +18,12 @@ export const useCurrentUser = ({
   const { data, error, loading } = useQuery<Query>(query, {
     fetchPolicy: "no-cache",
     context: {
-      headers: {
+      ...(isBrowser ? {
+        headers: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         "x-referrer": window?.location?.href,
       },
+      }: {}),
     },
   });
 
