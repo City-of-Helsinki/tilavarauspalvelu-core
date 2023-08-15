@@ -85,7 +85,7 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
           <HDSNavigation.Item
             className="btn-logout"
             label={t("Navigation.logout")}
-            onClick={() => signOut({ callbackUrl: `${publicUrl}/logout` })}
+            onClick={() => signOut({ callbackUrl: `${publicUrl}/auth/logout` })}
             variant="primary"
           />
         </UserMenu>

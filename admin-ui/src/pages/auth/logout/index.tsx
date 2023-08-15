@@ -8,7 +8,7 @@ import Footer from "app/component/Footer";
 import Navigation from "app/component/Navigation";
 import ClientOnly from "app/component/ClientOnly";
 import { env } from "app/env.mjs";
-import BaseLayout from "../layout";
+import BaseLayout from "../../layout";
 
 // NOTE not using App.tsx so need to import i18n here also
 import "app/i18n";
