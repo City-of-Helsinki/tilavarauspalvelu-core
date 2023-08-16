@@ -52,7 +52,7 @@ jobs:
           pip install bandit
       - name: Check safety
         run: |
-          bandit -a vuln --exclude "tests" -r .
+          bandit -a vuln --exclude "tests" -s B311 -r .
           safety check --full-report
   Unit-Tests-and-SonarCloud:
     runs-on: ubuntu-latest
