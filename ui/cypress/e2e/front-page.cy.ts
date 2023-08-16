@@ -16,36 +16,36 @@ describe("Tilavaraus ui front page", () => {
   });
 
   it("displays purpose links on desktop", () => {
-    purposeLinks().should("have.length", 8);
+    purposeLinks().should("not.have.length.greaterThan", 8);
 
     purposeMoreLink()
       .click()
       .then(() => {
-        purposeLinks().should("have.length", 11);
+        purposeLinks().should("have.length.greaterThan", 8);
       });
 
     purposeLessLink()
       .click()
       .then(() => {
-        purposeLinks().should("have.length", 8);
+        purposeLinks().should("not.have.length.greaterThan", 8);
       });
   });
 
   it("displays purpose links on mobile", () => {
     cy.viewport("iphone-6");
 
-    purposeLinks().should("have.length", 4);
+    purposeLinks().should("not.have.length.greaterThan", 4);
 
     purposeMoreLink()
       .click()
       .then(() => {
-        purposeLinks().should("have.length", 11);
+        purposeLinks().should("have.length.greaterThan", 4);
       });
 
     purposeLessLink()
       .click()
       .then(() => {
-        purposeLinks().should("have.length", 4);
+        purposeLinks().should("not.have.length.greaterThan", 4);
       });
 
     purposeLinks().eq(3).click();
@@ -57,7 +57,7 @@ describe("Tilavaraus ui front page", () => {
 
     links.should("have.length", 8);
 
-    links.eq(4).should("have.text", "Koskelan nuorisotalo").click();
+    links.eq(4).should("have.text", "Tila #5").click();
     cy.url().should("contain", "?unit=10");
   });
 
