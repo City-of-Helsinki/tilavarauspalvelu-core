@@ -63,7 +63,7 @@
     "axios-case-converter": "^0.11.1",
     "classnames": "^2.3.2",
     "common": "*",
-    "date-fns": "^2.29.3",
+    "date-fns": "^2.30.0",
     "focus-trap-react": "^10.0.2",
     "graphql": "^16.6.0",
     "hds-react": "^2.16.0",
