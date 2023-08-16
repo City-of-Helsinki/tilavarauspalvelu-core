@@ -5,17 +5,6 @@ import NextAuth, { NextAuthOptions, Session, Awaitable, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import getConfig from "next/config";
 
-type TunnistamoAccount = {
-  provider: string;
-  type: "oauth";
-  providerAccountId: string;
-  access_token: string;
-  refresh_token: string;
-  token_type: "bearer";
-  expires_at: number;
-  id_token: string;
-};
-
 type TunnistamoProfile = {
   iss: string;
   sub: string;
@@ -44,39 +33,6 @@ type TilavarauspalveluUser = Omit<User, "image"> & {
   nickname: string;
   email: string;
   email_verified: boolean;
-};
-
-type APITokens = {
-  tilavaraus: string;
-  profile: string;
-};
-
-type ExtendedJWT = JWT & {
-  accessToken: string;
-  accessTokenExpires: number;
-  refreshToken: string;
-  user: TilavarauspalveluUser;
-  apiTokens: APITokens;
-  error?: string;
-};
-
-type JwtParams = {
-  token: ExtendedJWT;
-  user: TilavarauspalveluUser;
-  account: TunnistamoAccount;
-};
-
-type ExtendedSession = Session & {
-  accessToken: string;
-  accessTokenExpires: number;
-  user: TilavarauspalveluUser;
-  apiTokens: APITokens;
-};
-
-type SessionParams = {
-  token: ExtendedJWT;
-  user: TilavarauspalveluUser;
-  session: ExtendedSession;
 };
 
 const {
@@ -129,7 +85,7 @@ const getApiAccessTokens = async (accessToken: string | undefined) => {
 // doesn't cut the session.
 const EXP_MS = (10 / 2) * 60 * 1000;
 
-const refreshAccessToken = async (token: ExtendedJWT) => {
+const refreshAccessToken = async (token: JWT) => {
   try {
     const response = await axios.request({
       url: oidcTokenUrl,
@@ -232,7 +188,7 @@ const options = (): NextAuthOptions => {
       strategy: "jwt",
     },
     callbacks: {
-      async jwt({ token, user, account }: JwtParams): Promise<ExtendedJWT> {
+      async jwt({ token, user, account }): Promise<JWT> {
         // Initial sign in
         if (account && user) {
           const [tilavarausAPIToken, profileAPIToken] =
@@ -262,10 +218,7 @@ const options = (): NextAuthOptions => {
 
         return refreshedToken;
       },
-      async session({
-        session,
-        token,
-      }: SessionParams): Promise<ExtendedSession> {
+      async session({ session, token }): Promise<Session> {
         if (!token) return undefined;
 
         const { accessToken, accessTokenExpires, user, apiTokens } = token;
@@ -306,5 +259,3 @@ export default function nextAuthApiHandler(
 
   return NextAuth(req, res, options());
 }
-
-export type { ExtendedSession, ExtendedJWT };

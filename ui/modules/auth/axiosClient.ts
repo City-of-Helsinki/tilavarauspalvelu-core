@@ -2,7 +2,6 @@ import axios from "axios";
 import applyCaseMiddleware from "axios-case-converter";
 
 import { getSession } from "next-auth/react";
-import { ExtendedSession } from "../../pages/api/auth/[...nextauth]";
 import { authEnabled, isBrowser, PROFILE_TOKEN_HEADER } from "../const";
 
 const axiosOptions = {
@@ -17,7 +16,7 @@ const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
 
 if (isBrowser && authEnabled) {
   axiosClient.interceptors.request.use(async (req) => {
-    const session = (await getSession()) as ExtendedSession;
+    const session = await getSession();
 
     if (session?.apiTokens?.tilavaraus) {
       req.headers.Authorization = `Bearer ${session.apiTokens.tilavaraus}`;
