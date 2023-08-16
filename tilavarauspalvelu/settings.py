@@ -107,6 +107,7 @@ INSTALLED_APPS = [
     "import_export",
     "rangefilter",
     "elasticsearch_django",
+    "common",
 ]
 
 MIDDLEWARE = [
