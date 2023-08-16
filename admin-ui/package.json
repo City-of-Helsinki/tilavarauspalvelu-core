@@ -127,7 +127,6 @@
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
     "stylelint-value-no-unknown-custom-properties": "^3.0.0",
-    "testcafe": "^1.11.0",
     "typescript": "^5.1.6"
   }
 }
