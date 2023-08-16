@@ -52,8 +52,8 @@
     "react-transition-group": "^4.4.5",
     "react-use": "^17.4.0",
     "sanitize-html": "^2.8.1",
-    "sass": "^1.57.1",
-    "styled-components": "^5.3.6"
+    "sass": "^1.65.1",
+    "styled-components": "5.3.11"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^2.16.1",

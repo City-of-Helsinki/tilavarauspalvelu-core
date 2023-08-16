@@ -40,7 +40,7 @@
     "react-hook-form": "7.41",
     "react-i18next": "^12.2.0",
     "react-scripts": "5.0.1",
-    "styled-components": "^5.3.6"
+    "styled-components": "5.3.11"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^2.16.1",
