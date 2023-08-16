@@ -5,6 +5,7 @@ import {
   unitLinkSearchForm,
   purposeLinks,
   purposeMoreLink,
+  purposeLessLink,
 } from "../model/home";
 
 describe("Tilavaraus ui front page", () => {
@@ -23,7 +24,7 @@ describe("Tilavaraus ui front page", () => {
         purposeLinks().should("have.length", 11);
       });
 
-    purposeMoreLink()
+    purposeLessLink()
       .click()
       .then(() => {
         purposeLinks().should("have.length", 8);
@@ -41,7 +42,7 @@ describe("Tilavaraus ui front page", () => {
         purposeLinks().should("have.length", 11);
       });
 
-    purposeMoreLink()
+    purposeLessLink()
       .click()
       .then(() => {
         purposeLinks().should("have.length", 4);
