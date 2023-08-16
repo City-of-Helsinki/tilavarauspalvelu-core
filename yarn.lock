@@ -81,26 +81,12 @@
     "@axa-fr/react-oidc-core" "^3.1.6"
     prop-types "^15.7.2"
 
-"@axa-fr/react-oidc-context@^5.14.2":
-  version "5.14.2"
-  resolved "https://registry.yarnpkg.com/@axa-fr/react-oidc-context/-/react-oidc-context-5.14.2.tgz#90244cf89bcc95bac6ac8a4b51d84003c9971900"
-  integrity sha512-hT7ppT29q6zWd8hi/XUowWLdBcC2lCAlnLH6x6tHuAYU+ju+cfv9JlouAAA0GtqequFYZ/6r6ORFbNGO3jcegQ==
-  dependencies:
-    "@axa-fr/react-oidc" "^5.10.6"
-
 "@axa-fr/react-oidc-core@^3.1.6":
   version "3.1.7"
   resolved "https://registry.yarnpkg.com/@axa-fr/react-oidc-core/-/react-oidc-core-3.1.7.tgz#7fd9d564a2b41e45522d9a13d05789f65e7e0203"
   integrity sha512-HF9Bzm4nc7ZrPXrk/9UeEowiPL8IMyIt4AV0ZsRyavXNqWXC1nwLeQFlkKRJYp9swcjQw85bPlE9LeNjxv5Wzg==
   dependencies:
     prop-types "^15.7.2"
-
-"@axa-fr/react-oidc@^5.10.6":
-  version "5.14.2"
-  resolved "https://registry.yarnpkg.com/@axa-fr/react-oidc/-/react-oidc-5.14.2.tgz#f98f749e3ce643a394591e786654dc55e889387a"
-  integrity sha512-N+ssJlVtVHnsvlusMxY3zLPKCB+lGzeHIxWXUb0WY3uA7Z+jxx7A2m9W1kHbhYzHuihgA3rWIcdKsvtdkeKXwg==
-  dependencies:
-    "@openid/appauth" "1.3.1"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.16.0", "@babel/code-frame@^7.18.6", "@babel/code-frame@^7.8.3":
   version "7.18.6"
@@ -2681,18 +2667,6 @@
   resolved "https://registry.yarnpkg.com/@open-draft/until/-/until-1.0.3.tgz#db9cc719191a62e7d9200f6e7bab21c5b848adca"
   integrity sha512-Aq58f5HiWdyDlFffbbSjAlv596h/cOnt2DO1w3DOC7OJ5EHs0hd/nycJfiu9RJbT6Yk6F1knnRRXNSpxoIVZ9Q==
 
-"@openid/appauth@1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@openid/appauth/-/appauth-1.3.1.tgz#851e86507b95f9bbe1d05374eb62aaf9b2378f9b"
-  integrity sha512-e54kpi219wES2ijPzeHe1kMnT8VKH8YeTd1GAn9BzVBmutz3tBgcG1y8a4pziNr4vNjFnuD4W446Ua7ELnNDiA==
-  dependencies:
-    "@types/base64-js" "^1.3.0"
-    "@types/jquery" "^3.5.5"
-    base64-js "^1.5.1"
-    follow-redirects "^1.13.3"
-    form-data "^4.0.0"
-    opener "^1.5.2"
-
 "@panva/hkdf@^1.0.2":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@panva/hkdf/-/hkdf-1.0.4.tgz#4e02bb248402ff6c5c024e23a68438e2b0e69d67"
@@ -3585,11 +3559,6 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/base64-js@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@types/base64-js/-/base64-js-1.3.0.tgz#c939fdba49846861caf5a246b165dbf5698a317c"
-  integrity sha512-ZmI0sZGAUNXUfMWboWwi4LcfpoVUYldyN6Oe0oJ5cCsHDU/LlRq8nQKPXhYLOx36QYSW9bNIb1vvRrD6K7Llgw==
-
 "@types/body-parser@*":
   version "1.19.2"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.2.tgz#aea2059e28b7658639081347ac4fab3de166e6f0"
@@ -3781,13 +3750,6 @@
   dependencies:
     expect "^29.0.0"
     pretty-format "^29.0.0"
-
-"@types/jquery@^3.5.5":
-  version "3.5.16"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.16.tgz#632131baf30951915b0317d48c98e9890bdf051d"
-  integrity sha512-bsI7y4ZgeMkmpG9OM710RRzDFp+w4P1RGiIt30C1mSBT+ExCleeh4HObwgArnDFELmRrOpXgSYN9VF1hj+f1lw==
-  dependencies:
-    "@types/sizzle" "*"
 
 "@types/js-cookie@^2.2.6":
   version "2.2.7"
@@ -4044,7 +4006,7 @@
   resolved "https://registry.yarnpkg.com/@types/sinonjs__fake-timers/-/sinonjs__fake-timers-8.1.1.tgz#b49c2c70150141a15e0fa7e79cf1f92a72934ce3"
   integrity sha512-0kSuKjAS0TrGLJ0M/+8MaFkGsQhZpB6pxOmvS3K8FYI72K//YmdfoW9X2qPsAKh1mkwxGD5zib9s1FIFed6E8g==
 
-"@types/sizzle@*", "@types/sizzle@^2.3.2":
+"@types/sizzle@^2.3.2":
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.3.tgz#ff5e2f1902969d305225a047c8a0fd5c915cebef"
   integrity sha512-JYM8x9EGF163bEyhdJBpR2QX1R5naCJHC8ucJylJ3w9/CVBaskdQ8WqBf8MmQrd1kRvp/a4TS8HJ+bxzR7ZJYQ==
@@ -8393,7 +8355,7 @@ focus-trap@^7.2.0:
   dependencies:
     tabbable "^6.0.1"
 
-follow-redirects@^1.0.0, follow-redirects@^1.13.3, follow-redirects@^1.15.0:
+follow-redirects@^1.0.0, follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
@@ -13433,11 +13395,6 @@ open@^8.0.9, open@^8.4.0:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
-
-opener@^1.5.2:
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.2.tgz#5d37e1f35077b9dcac4301372271afdeb2a13598"
-  integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
 
 openid-client@^5.4.0:
   version "5.4.0"
