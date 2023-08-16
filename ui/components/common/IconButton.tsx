@@ -63,7 +63,7 @@ const IconButton = ({
   label,
   callback,
   href = callback && "javascript:void(0);", // there's no href if using callback
-  openInNewTab = href.substring(0, 4) === "http", // open external links in a new tab by default
+  openInNewTab = href !== null && href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
   const buttonProps = {
