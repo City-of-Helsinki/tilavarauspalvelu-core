@@ -66,7 +66,7 @@
     "date-fns": "^2.29.3",
     "focus-trap-react": "^10.0.2",
     "graphql": "^16.6.0",
-    "hds-react": "^2.9.0",
+    "hds-react": "^2.16.0",
     "http-proxy-middleware": "^2.0.6",
     "i18next": "^22.4.14",
     "joi": "^17.7.0",
