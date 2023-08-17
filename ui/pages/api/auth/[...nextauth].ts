@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { NextAuthOptions, Session, Awaitable, User } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import { type JWT } from "next-auth/jwt";
 import getConfig from "next/config";
 import {
   refreshAccessToken,
@@ -85,16 +85,25 @@ const options = (): NextAuthOptions => {
       async jwt({ token, user, account }): Promise<JWT> {
         // Initial sign in
         if (account && user) {
+          if (account.access_token == null) {
+            throw new Error("No access token");
+          }
+          if (account.refresh_token == null) {
+            throw new Error("No refresh token");
+          }
+          const accessTokenExpires =
+            (account.expires_at ?? Date.now() + EXP_MS / 1000) * 1000;
+
           const [tilavaraus, profile] = await getApiAccessTokens({
             accessToken: account.access_token,
             profileApiScope: oidcProfileApiUrl,
             tilavarausApiScope: oidcTilavarausApiUrl,
             accessTokenUrl: oidcAccessTokenUrl,
           });
+
           return {
             accessToken: account.access_token,
-            // HACK to deal with incorrect exp value
-            accessTokenExpires: Date.now() + EXP_MS, // account.expires_at * 1000,
+            accessTokenExpires,
             refreshToken: account.refresh_token,
             user,
             apiTokens: {
@@ -104,15 +113,20 @@ const options = (): NextAuthOptions => {
           };
         }
 
+        if (!token) {
+          throw new Error("No token");
+        }
+
         if (Date.now() < token.accessTokenExpires) {
           return token;
         }
 
-        const refreshedToken = await refreshAccessToken(
+        const refreshedToken = (await refreshAccessToken(
           token,
           oidcTokenUrl,
           oidcClientId
-        );
+        )) as JWT; // Types are not picked up because the function is in different module
+
         const [tilavaraus, profile] = await getApiAccessTokens({
           accessToken: refreshedToken.accessToken,
           profileApiScope: oidcProfileApiUrl,
@@ -126,6 +140,7 @@ const options = (): NextAuthOptions => {
 
         return {
           ...refreshedToken,
+          user,
           apiTokens: {
             tilavaraus,
             profile,
@@ -133,7 +148,9 @@ const options = (): NextAuthOptions => {
         };
       },
       async session({ session, token }): Promise<Session> {
-        if (!token) return undefined;
+        if (!token) {
+          return session;
+        }
 
         const { accessToken, accessTokenExpires, user, apiTokens } = token;
 
