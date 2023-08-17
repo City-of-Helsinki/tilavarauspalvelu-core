@@ -57,8 +57,8 @@ describe("pricingDetails", () => {
       ],
     } as ReservationType;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(getReservationPriceDetails(r, (s: any) => s)).toEqual("120 €");
+    const t1 = ((_s: unknown, a: string) => get(a, "price") ?? "") as TFunction;
+    expect(getReservationPriceDetails(r, t1)).toEqual("120 €");
   });
 
   test("renders price in hours", () => {
@@ -78,8 +78,9 @@ describe("pricingDetails", () => {
       ],
     } as ReservationType;
 
-    const t1 = ((s: unknown, a: string) => get(a, "price") ?? "") as TFunction;
-    const t2 = ((s: unknown, a: string) => get(a, "volume") ?? "") as TFunction;
+    const t1 = ((_s: unknown, a: string) => get(a, "price") ?? "") as TFunction;
+    const t2 = ((_s: unknown, a: string) =>
+      get(a, "volume") ?? "") as TFunction;
 
     expect(getReservationPriceDetails(reservation, t1)).toEqual("180 €");
     expect(getReservationPriceDetails(reservation, t2)).toEqual("1,5");
