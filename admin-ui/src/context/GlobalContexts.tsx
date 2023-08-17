@@ -1,5 +1,4 @@
 import React from "react";
-import { DataContextProvider } from "./DataContext";
 import { ModalContextProvider } from "./ModalContext";
 import { NotificationContextProvider } from "./NotificationContext";
 import { AllocationContextProvider } from "./AllocationContext";
@@ -7,15 +6,13 @@ import { AllocationContextProvider } from "./AllocationContext";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const withGlobalContext = (App: () => JSX.Element) => (): JSX.Element =>
   (
-    <DataContextProvider>
-      <NotificationContextProvider>
-        <ModalContextProvider>
-          <AllocationContextProvider>
-            <App />
-          </AllocationContextProvider>
-        </ModalContextProvider>
-      </NotificationContextProvider>
-    </DataContextProvider>
+    <NotificationContextProvider>
+      <ModalContextProvider>
+        <AllocationContextProvider>
+          <App />
+        </AllocationContextProvider>
+      </ModalContextProvider>
+    </NotificationContextProvider>
   );
 
 export const GlobalContext = ({ children }: { children: React.ReactNode }) =>
