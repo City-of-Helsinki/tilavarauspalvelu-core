@@ -63,27 +63,12 @@ const Ingress = styled(H2).attrs({ $legacy: true })`
 function MainLander() {
   const { t } = useTranslation();
 
-  /* FIXME
-  useEffect(() => {
-    if (authState.sid) {
-      const search = queryString.parse(window.location.search);
-      if (typeof search.path === "string") {
-        if (window.history) {
-          window.history.pushState({}, "", search.path);
-        }
-      }
-      window.location.reload();
-    }
-  }, [authState]);
-  */
-
   return (
     <>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{t("common.applicationName")}</Heading>
         <LoginBtn
           onClick={() => {
-            // FIXME this does not redirect to user url on login (defaults to /)
             signIn("tunnistamo", {
               callbackUrl: window.location.href,
             });

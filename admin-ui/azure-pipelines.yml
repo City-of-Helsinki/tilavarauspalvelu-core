@@ -26,7 +26,7 @@ resources:
       type: git
       # project/repository
       name: tilavarauspalvelu/tilavarauspalvelu-pipelines
-      # TEMP testing new docker build for NextJs
+      # TODO new docker build, change back to main after all pipelines are migrated
       ref: admin-ui-next-migration
 
 extends:

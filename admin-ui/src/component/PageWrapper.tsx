@@ -36,7 +36,7 @@ const FallbackComponent = (err: unknown) => {
 };
 
 // NOTE client only because Navigation requires react-router-dom
-export default function PageWrapper({ children }: Props): JSX.Element | null {
+export default function PageWrapper({ children }: Props): JSX.Element {
   const { status } = useSession();
   const isLoggedIn = status === "authenticated";
   return (

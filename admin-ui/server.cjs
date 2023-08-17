@@ -27,6 +27,6 @@ app.prepare().then(() => {
     })
     .listen(port, (err) => {
       if (err) throw err;
-      console.log(`> Ready on https://${hostname}:${port}/${publicPath}`);
+      console.log(`> Ready on https://${hostname}:${port}${publicPath}`);
     });
 });
