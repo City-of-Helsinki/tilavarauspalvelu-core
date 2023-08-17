@@ -37,6 +37,7 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: 1fr 382px;
 
+  /* stylelint-disable-next-line */
   #applicationRoundSelect-label {
     display: none;
   }

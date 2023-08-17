@@ -31,7 +31,7 @@ interface Props {
 const Wrapper = styled.div`
   background: var(--color-white);
   color: var(--color-black-90);
-  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
   z-index: 1;
   min-width: fit-content;
 

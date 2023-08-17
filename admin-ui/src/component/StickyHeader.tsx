@@ -6,7 +6,7 @@ import styled from "styled-components";
 const Sticky = styled.div`
   z-index: var(--tilavaraus-admin-stack-sticky-reservation-header);
   position: sticky;
-  top: 0px;
+  top: 0;
   width: 100%;
   background-color: white;
   height: 0;
@@ -15,7 +15,7 @@ const Sticky = styled.div`
 const StickyContent = styled.div`
   color: var(--color-white);
   background: var(--color-bus-dark);
-  border-width: 0px;
+  border-width: 0;
   border-style: solid;
   border-color: var(--color-black-20);
   padding: 10px;

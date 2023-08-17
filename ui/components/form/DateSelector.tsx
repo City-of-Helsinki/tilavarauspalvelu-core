@@ -36,6 +36,7 @@ const Btn = styled.button<{ $isFocused: boolean }>`
   &:focus {
     border-color: var(--color-black-90);
   }
+  /* stylelint-disable custom-property-pattern */
   border: 2px solid
     var(--color-black-${({ $isFocused }) => ($isFocused ? "90" : "50")});
   background: transparent;

@@ -31,6 +31,7 @@ type Props = {
 };
 
 const Wrapper = styled.div<{ $type: Type }>`
+  /* stylelint-disable custom-property-pattern */
   background-color: var(
     --color-${({ $type }) => ($type === "complete" ? "silver" : "gold")}-light
   );

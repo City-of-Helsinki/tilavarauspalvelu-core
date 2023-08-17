@@ -95,7 +95,7 @@ const MediumArrowButton = styled(Button).attrs({
     opacity: 0.5;
   `};
 
-  @media (min-width: calc(${breakpoints.xl} + 130px)) {
+  @media (width > calc(${breakpoints.xl} + 130px)) {
     &:hover {
       opacity: 0.5;
     }

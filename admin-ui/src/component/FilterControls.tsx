@@ -28,7 +28,7 @@ const Wrapper = styled.div<{ $wide: boolean }>`
   background-color: var(--color-white);
   border: 1px solid var(--color-black-90);
   z-index: var(--tilavaraus-admin-stack-dialog);
-  box-shadow: 2px 2px 30px 0px rgba(0, 0, 0, 0.11);
+  box-shadow: 2px 2px 30px 0 rgba(0, 0, 0, 0.11);
   user-select: none;
 
   ${Content} {

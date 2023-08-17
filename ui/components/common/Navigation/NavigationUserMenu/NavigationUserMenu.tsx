@@ -63,9 +63,7 @@ const NavigationUserMenuItem = styled(HDSNavigation.Item)<{
 
       &:after {
         content: "";
-        border-top-style: solid;
-        border-top-width: 1px;
-        border-top-color: ${(props) => props.theme.colors.black.light};
+        border-top: 1px solid ${(props) => props.theme.colors.black.light};
         position: absolute;
         width: 100%;
         top: calc(var(--spacing-xs) * -1);

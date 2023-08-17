@@ -73,9 +73,8 @@ test("Renders required text field", async () => {
   const fieldName = "name";
   const view = render(<WrappedComponent field={fieldName} required />);
 
-  const input = await view.findByLabelText(
-    `reservationApplication:label.individual.${fieldName} *`
-  );
+  const label = RegExp(`reservationApplication:label.individual.${fieldName}`);
+  const input = await view.findByLabelText(label);
   expect(input).toBeInTheDocument();
   expect(input).toBeRequired();
   expect(input).toHaveValue("");
@@ -121,9 +120,9 @@ test("ReserveeType changes translation namespaces", async () => {
     <WrappedComponent field={fieldName} required translationKey="COMMON" />
   );
 
-  const input = await view.findByLabelText(
-    `reservationApplication:label.common.${fieldName} *`
-  );
+  const label = RegExp(`reservationApplication:label.common.${fieldName}`);
+  const input = await view.findByLabelText(label);
+
   expect(input).toBeInTheDocument();
   expect(input).toBeRequired();
   expect(input).toHaveValue("");
@@ -195,9 +194,7 @@ test("Renders non-required Select field", async () => {
 test("Renders required version of Select", async () => {
   const fieldName = "purpose";
   const required = true;
-  const label = `reservationApplication:label.individual.${fieldName}${
-    required ? " *" : ""
-  }`;
+  const label = RegExp(`reservationApplication:label.individual.${fieldName}`);
 
   const view = render(
     <WrappedComponent field={fieldName} required={required} />

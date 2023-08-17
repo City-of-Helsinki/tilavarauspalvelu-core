@@ -2,14 +2,14 @@
 
 exports[`matches snapshot 1`] = `
 <div
-  class="DateSelectorMenu__Wrapper-sc-fd732fbc-0 bsEayr"
+  class="DateSelectorMenu__Wrapper-sc-dee007ce-0 cLxHPf"
   data-testid="date-selector-menu"
 >
   <div
-    class="DateSelectorMenu__CheckboxWrapper-sc-fd732fbc-1 kyZACo"
+    class="DateSelectorMenu__CheckboxWrapper-sc-dee007ce-1 ljnXzQ"
   >
     <div
-      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 bEIAnt"
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 YVBir"
       style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
     >
       <input
@@ -28,7 +28,7 @@ exports[`matches snapshot 1`] = `
       </label>
     </div>
     <div
-      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 bEIAnt"
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 YVBir"
       style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
     >
       <input
@@ -47,7 +47,7 @@ exports[`matches snapshot 1`] = `
       </label>
     </div>
     <div
-      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 bEIAnt"
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 YVBir"
       style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
     >
       <input
@@ -66,7 +66,7 @@ exports[`matches snapshot 1`] = `
       </label>
     </div>
     <div
-      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 bEIAnt"
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 YVBir"
       style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
     >
       <input
@@ -86,7 +86,7 @@ exports[`matches snapshot 1`] = `
     </div>
   </div>
   <button
-    class="DateSelectorMenu__Btn-sc-fd732fbc-2 eQtGMq selectDates"
+    class="DateSelectorMenu__Btn-sc-dee007ce-2 bVbXfe selectDates"
     type="button"
   >
     <svg
@@ -110,7 +110,7 @@ exports[`matches snapshot 1`] = `
       </g>
     </svg>
     <div
-      class="DateSelectorMenu__BtnText-sc-fd732fbc-3 jRgNOX"
+      class="DateSelectorMenu__BtnText-sc-dee007ce-3 hgzzGb"
     >
       dateSelector:menu.buttonCustom
     </div>
@@ -136,7 +136,7 @@ exports[`matches snapshot 1`] = `
     </svg>
   </button>
   <button
-    class="DateSelectorMenu__Btn-sc-fd732fbc-2 kESSnX back"
+    class="DateSelectorMenu__Btn-sc-dee007ce-2 fFcVjb back"
     type="button"
   >
     <svg
@@ -160,17 +160,17 @@ exports[`matches snapshot 1`] = `
       </g>
     </svg>
     <div
-      class="DateSelectorMenu__BtnText-sc-fd732fbc-3 jRgNOX"
+      class="DateSelectorMenu__BtnText-sc-dee007ce-3 hgzzGb"
     >
       dateSelector:menu.buttonBack
     </div>
   </button>
   <button
-    class="DateSelectorMenu__Btn-sc-fd732fbc-2 eQtGMq close"
+    class="DateSelectorMenu__Btn-sc-dee007ce-2 bVbXfe close"
     type="button"
   >
     <div
-      class="DateSelectorMenu__BtnText-sc-fd732fbc-3 jRgNOX"
+      class="DateSelectorMenu__BtnText-sc-dee007ce-3 hgzzGb"
     >
       dateSelector:menu.buttonClose
     </div>

@@ -19,6 +19,7 @@ const ToggleButton = styled.button`
 `;
 
 const Heading = styled.div<{ $disabled: boolean }>`
+  /* stylelint-disable csstools/value-no-unknown-custom-properties */
   display: flex;
   align-items: center;
   justify-content: space-between;

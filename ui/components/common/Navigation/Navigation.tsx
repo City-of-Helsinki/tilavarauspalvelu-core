@@ -19,6 +19,7 @@ const StyledNavigation = styled(HDSNavigation)`
   color: ${(props) => props.theme.colors.black.medium};
   min-width: ${(props) => props.theme.breakpoints.xs};
 
+  /* stylelint-disable selector-id-pattern */
   #languageSelector-menu {
     right: 0;
     left: unset;

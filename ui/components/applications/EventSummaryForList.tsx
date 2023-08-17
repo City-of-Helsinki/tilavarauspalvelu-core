@@ -56,8 +56,7 @@ const WeekDay = styled.span`
 `;
 
 const SpacerRow = styled.div`
-  grid-column-start: 1;
-  grid-column-end: 4;
+  grid-column-start: 1 / 4;
 `;
 
 const EventName = styled.div`
