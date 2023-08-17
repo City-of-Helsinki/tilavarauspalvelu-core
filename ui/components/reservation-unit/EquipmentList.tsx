@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { EquipmentType } from "common/types/gql-types";
 import { getEquipmentList } from "../../modules/reservationUnit";
+import IconButton from "../common/IconButton";
 
 type Props = {
   equipment: EquipmentType[];
@@ -34,8 +35,12 @@ const EquipmentItem = styled.li`
   font-size: var(--fontsize-body-l);
 `;
 
-const ToggleButton = styled(Button)`
-  font-size: var(--fontsize-body-m);
+const StyledButton = styled(IconButton)`
+  display: flex;
+  color: var(--color-bus);
+  @media (max-width: ${breakpoints.s}) {
+    justify-content: center;
+  }
 `;
 
 const EquipmentList = ({ equipment, itemsToShow = 6 }: Props): JSX.Element => {
@@ -55,14 +60,11 @@ const EquipmentList = ({ equipment, itemsToShow = 6 }: Props): JSX.Element => {
         ))}
       </List>
       {itemsToShow < equipment.length && (
-        <ToggleButton
-          variant="supplementary"
-          size="small"
+        <StyledButton
+          label={t(`common:show${showAll ? "Less" : "All"}`)}
+          icon={showAll ? <IconAngleUp /> : <IconAngleDown />}
           onClick={() => setShowAll(!showAll)}
-          iconRight={showAll ? <IconAngleUp /> : <IconAngleDown />}
-        >
-          {t(`common:show${showAll ? "Less" : "More"}`)}
-        </ToggleButton>
+        />
       )}
     </Wrapper>
   );

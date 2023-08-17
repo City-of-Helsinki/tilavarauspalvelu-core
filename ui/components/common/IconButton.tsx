@@ -33,7 +33,6 @@ const HoverWrapper = styled.div`
   gap: var(--spacing-xs);
   padding-bottom: var(--spacing-3-xs);
   border-bottom: 1px solid transparent;
-  color: var(--color-black) !important;
   &:hover {
     border-color: var(--color-black-30);
   }
