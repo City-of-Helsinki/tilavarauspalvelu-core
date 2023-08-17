@@ -1862,6 +1862,8 @@ const translations: ITranslations = {
     noReserveeId: ["Ei y-tunnusta"],
     save: ["Tallenna"],
     appliesSubvention: ["hakee subventiota"],
+    denyReason: ["Hylkäyksen syy"],
+    cancelReason: ["Peruutuksen syy"],
     applyingForFreeOfCharge: ["Hakee subventiota"],
     freeOfChargeReason: ["Subvention perustelu"],
     paymentState: ["Maksutila"],
