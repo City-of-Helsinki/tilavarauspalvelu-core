@@ -563,6 +563,9 @@ export const isReservationUnitReservable = (
   switch (reservationState) {
     case ReservationState.Reservable:
     case ReservationState.ScheduledClosing: {
+      const resBegins = reservationUnit.reservationBegins
+        ? new Date(reservationUnit.reservationBegins)
+        : null;
       const hasSupportedFields =
         (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
       const hasOpeningTimes =
@@ -570,6 +573,7 @@ export const isReservationUnitReservable = (
       return (
         hasSupportedFields &&
         hasOpeningTimes &&
+        (!resBegins || resBegins < new Date()) &&
         !!minReservationDuration &&
         !!maxReservationDuration
       );
