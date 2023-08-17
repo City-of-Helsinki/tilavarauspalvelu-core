@@ -1,11 +1,13 @@
 import { applicationRoundContainer } from "../model/recurring-lander";
 import { checkBreadcrumbs } from "../model/breadcrumb";
 
+const CYPRESS_TIMEOUT = 5000
+Cypress.config("defaultCommandTimeout", CYPRESS_TIMEOUT);
+
 describe("recurring search lander", () => {
   beforeEach(() => {
     cy.visit("/recurring");
     cy.injectAxe();
-    Cypress.config("defaultCommandTimeout", 20000);
   });
 
   it("displays correct application rounds", () => {

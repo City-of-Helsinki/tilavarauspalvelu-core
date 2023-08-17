@@ -48,6 +48,8 @@ import {
 } from "../model/reservation-unit";
 import { textWithIcon } from "../model/search";
 
+const CYPRESS_TIMEOUT = 5000
+
 const matchEvent = (): void => {
   reservationEvent()
     .find(".rbc-event-label")
@@ -124,10 +126,10 @@ const drawReservation = (): void => {
   matchEvent();
 };
 
+Cypress.config("defaultCommandTimeout", CYPRESS_TIMEOUT);
+
 describe("reservation", () => {
   beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-
     cy.visit("/reservation-unit/2");
     cy.injectAxe();
   });
@@ -348,8 +350,6 @@ describe("renders with basic data", () => {
     cy.injectAxe();
   });
 
-  Cypress.config("defaultCommandTimeout", 20000);
-
   it("contains default elements", () => {
     cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
 
@@ -536,10 +536,6 @@ describe("with payment terms", () => {
 });
 
 describe("with reservation times", () => {
-  beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-  });
-
   it("should display no calendar controls when off season", () => {
     cy.visit("/reservation-unit/900");
 
@@ -555,13 +551,6 @@ describe("with reservation times", () => {
 
 describe("with reservation quota notification", () => {
   it("should display apt notification if quota is set and full", () => {
-    cy.window().then(() => {
-      sessionStorage.setItem(
-        `oidc.apiToken.${Cypress.env("API_SCOPE")}`,
-        "foobar"
-      );
-    });
-
     cy.visit("/reservation-unit/901");
 
     calendarWrapper().should("exist");
@@ -576,20 +565,9 @@ describe("with reservation quota notification", () => {
     reservationInfo().contains(
       "Sinulla voi olla samanaikaisesti enintään 10 varausta."
     );
-
-    cy.window().then(() => {
-      sessionStorage.removeItem(`oidc.apiToken.${Cypress.env("API_SCOPE")}`);
-    });
   });
 
   it("should display apt notification if quota is set but not full", () => {
-    cy.window().then(() => {
-      sessionStorage.setItem(
-        `oidc.apiToken.${Cypress.env("API_SCOPE")}`,
-        "foobar"
-      );
-    });
-
     cy.visit("/reservation-unit/902");
 
     calendarWrapper().should("exist");
@@ -601,16 +579,10 @@ describe("with reservation quota notification", () => {
     reservationInfo().contains(
       "Sinulla voi olla samanaikaisesti enintään 30 varausta."
     );
-
-    cy.window().then(() => {
-      sessionStorage.removeItem(`oidc.apiToken.${Cypress.env("API_SCOPE")}`);
-    });
   });
 });
 
 describe("with metadataset", () => {
-  Cypress.config("defaultCommandTimeout", 20000);
-
   it("can cancel an reservation with an application", () => {
     cy.visit("/reservation-unit/903");
     cy.injectAxe();
@@ -774,8 +746,6 @@ describe("with metadataset", () => {
 });
 
 describe("with application", () => {
-  Cypress.config("defaultCommandTimeout", 20000);
-
   it("can do a reservation application", () => {
     cy.visit("/reservation-unit/908");
     cy.injectAxe();
@@ -841,8 +811,6 @@ describe("with application", () => {
 });
 
 describe("publish times", () => {
-  Cypress.config("defaultCommandTimeout", 20000);
-
   it("should display draft item with non-matching publish range", () => {
     cy.visit("/reservation-unit/907?ru=8e5275aa-8625-4458-88b4-d5b1b2df6619", {
       failOnStatusCode: false,
@@ -874,10 +842,6 @@ describe("publish times", () => {
 });
 
 describe("preview", () => {
-  beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-  });
-
   it("should not display draft item", () => {
     cy.visit("/reservation-unit/999", { failOnStatusCode: false });
 

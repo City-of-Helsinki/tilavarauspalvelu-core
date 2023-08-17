@@ -44,25 +44,13 @@ import {
   errorNotification,
 } from "../model/notification";
 
+const CYPRESS_TIMEOUT = 5000
+Cypress.config("defaultCommandTimeout", CYPRESS_TIMEOUT);
+
 describe("Tilavaraus user reservations", () => {
   beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-
-    cy.window().then(() => {
-      sessionStorage.setItem(
-        `oidc.apiToken.${Cypress.env("API_SCOPE")}`,
-        "foobar"
-      );
-    });
-
     cy.visit("/reservations");
     cy.injectAxe();
-  });
-
-  afterEach(() => {
-    cy.window().then(() => {
-      sessionStorage.removeItem(`oidc.apiToken.${Cypress.env("API_SCOPE")}`);
-    });
   });
 
   it("should list proper items with correct button states and link to reservation unit", () => {
@@ -386,8 +374,6 @@ describe("Tilavaraus user reservations", () => {
 
 describe("Unpaid reservation notification", () => {
   beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-
     cy.window().then((win) => {
       win.sessionStorage.clear();
       cy.visit("/search/single");
@@ -419,10 +405,6 @@ describe("Unpaid reservation notification", () => {
 });
 
 describe("Returning reservation", () => {
-  beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-  });
-
   it("should return error for invalid order data", () => {
     cy.visit("/success?orderId=1111-1111-1111-1111");
 
@@ -469,10 +451,6 @@ describe("Returning reservation", () => {
 });
 
 describe("Reservation cancellation callback", () => {
-  beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-  });
-
   it("should display error for invalid order id", () => {
     const orderUuid = "1111-1111-1111-1111";
     cy.visit(`/reservation/cancel?orderId=${orderUuid}`);
