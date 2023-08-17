@@ -5,6 +5,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 from enum import Enum
 from itertools import cycle
+from types import DynamicClassAttribute
 from typing import Any, Literal, NamedTuple, TypedDict, TypeVar
 
 from django.contrib.auth.hashers import make_password
@@ -19,7 +20,11 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
+    ApplicationEventStatus,
     ApplicationRound,
+    ApplicationRoundStatus,
+    ApplicationStatus,
+    City,
     EventReservationUnit,
     Organisation,
     Person,
@@ -111,13 +116,31 @@ RolePermission = TypeVar(
 )
 
 
-class UserType(Enum):
+class UserType(str, Enum):
     reserver = "Varaaja"
     viewer = "Katselija"
     handler = "Käsittelijä"
     admin = "Pääkäyttäjä"
     product_owner = "Tuoteomistaja"
     all = "Ylläpitäjä"
+
+
+class SetName(str, Enum):
+    set_1 = "Lomake 1"
+    set_2 = "Lomake 2"
+    set_3 = "Lomake 3"
+    set_4 = "Lomake 4"
+    set_5 = "Lomake 5"
+    set_6 = "Lomake 6"
+    set_all = "All Fields"
+
+    @classmethod
+    def applying_free_of_charge(cls) -> list["SetName"]:
+        return [cls.set_5, cls.set_6]
+
+    @DynamicClassAttribute
+    def for_applying_free_of_charge(self) -> bool:
+        return self in self.applying_free_of_charge()
 
 
 class FieldCombination(NamedTuple):
@@ -176,6 +199,7 @@ def create_test_data(flush: bool = True) -> None:
     reservation_purposes = _create_reservation_purposes()
     cancel_reasons = _create_cancel_reasons()
     deny_reasons = _create_deny_reasons()
+    cities = _create_cities()
 
     _create_reservations(
         users[0],
@@ -184,12 +208,14 @@ def create_test_data(flush: bool = True) -> None:
         age_groups,
         cancel_reasons,
         deny_reasons,
+        cities,
     )
 
     application_rounds = _create_application_rounds(
         reservation_units,
         reservation_purposes,
         service_sectors,
+        users[0],
     )
     _create_applications(
         application_rounds,
@@ -197,6 +223,7 @@ def create_test_data(flush: bool = True) -> None:
         age_groups,
         reservation_purposes,
         reservation_units,
+        cities,
     )
 
 
@@ -738,7 +765,6 @@ def _create_cancellation_rules(
 ) -> list[ReservationUnitCancellationRule]:
     cancellation_rules: list[ReservationUnitCancellationRule] = []
     for i in range(number):
-
         cancellation_rule = ReservationUnitCancellationRule(
             name=f"Cancellation Rule {i}",
             name_fi=f"Cancellation Rule {i}",
@@ -755,105 +781,221 @@ def _create_cancellation_rules(
     text_entering="Creating reservation metadata sets...",
     text_exiting="Reservation metadata set created!",
 )
-def _create_reservation_metadata_sets(
-    *,
-    number: int = 3,
-) -> list[ReservationMetadataSet]:
-    metadata_sets: list[ReservationMetadataSet] = []
-    for i in range(number):
-        reservation_metadata_set = ReservationMetadataSet(
-            name=f"Reservation Metadata Set {i}",
-        )
-        metadata_sets.append(reservation_metadata_set)
-
-    metadata_sets = ReservationMetadataSet.objects.bulk_create(metadata_sets)
-
+def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]:
     metadata_fields = {field.field_name: field for field in _create_metadata_fields()}
 
-    field_combinations = [
-        FieldCombination(
+    field_combinations: dict[SetName, FieldCombination] = {
+        SetName.set_1: FieldCombination(
             supported=[
                 "reservee_first_name",
                 "reservee_last_name",
                 "reservee_email",
                 "reservee_phone",
+            ],
+            required=[
+                "reservee_first_name",
+                "reservee_last_name",
+                "reservee_email",
+                "reservee_phone",
+            ],
+        ),
+        SetName.set_2: FieldCombination(
+            supported=[
+                "description",
+                "num_persons",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_is_unregistered_association",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+            required=[
+                "description",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+        ),
+        SetName.set_3: FieldCombination(
+            supported=[
+                "description",
+                "home_city",
+                "name",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_is_unregistered_association",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+            required=[
+                "description",
+                "home_city",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+        ),
+        SetName.set_4: FieldCombination(
+            supported=[
+                "age_group",
+                "description",
+                "home_city",
+                "name",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_is_unregistered_association",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+            required=[
+                "age_group",
+                "description",
+                "home_city",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+        ),
+        SetName.set_5: FieldCombination(
+            supported=[
+                "applying_for_free_of_charge",
+                "description",
+                "home_city",
+                "name",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_is_unregistered_association",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+            required=[
+                "description",
+                "home_city",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+        ),
+        SetName.set_6: FieldCombination(
+            supported=[
+                "age_group",
+                "applying_for_free_of_charge",
+                "description",
+                "home_city",
+                "name",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_is_unregistered_association",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+            required=[
+                "age_group",
+                "description",
+                "home_city",
+                "num_persons",
+                "purpose",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
+            ],
+        ),
+        SetName.set_all: FieldCombination(
+            supported=[
+                "age_group",
+                "applying_for_free_of_charge",
+                "billing_address_city",
+                "billing_address_street",
+                "billing_address_zip",
+                "billing_email",
+                "billing_first_name",
+                "billing_last_name",
+                "billing_phone",
+                "description",
+                "free_of_charge_reason",
+                "home_city",
+                "name",
+                "num_persons",
+                "purpose",
+                "reservee_address_city",
                 "reservee_address_street",
                 "reservee_address_zip",
-                "reservee_address_city",
-                "name",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_id",
+                "reservee_is_unregistered_association",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "reservee_phone",
+                "reservee_type",
             ],
             required=[],
         ),
-        FieldCombination(
-            supported=[
-                "reservee_type",
-                "reservee_first_name",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_email",
-                "reservee_id",
-                "reservee_is_unregistered_association",
-                "reservee_address_street",
-                "reservee_address_city",
-                "reservee_address_zip",
-                "billing_first_name",
-                "billing_last_name",
-                "billing_phone",
-                "billing_email",
-                "billing_address_street",
-                "billing_address_city",
-                "billing_address_zip",
-                "home_city",
-                "purpose",
-            ],
-            required=[
-                "reservee_first_name",
-                "reservee_last_name",
-                "reservee_address_street",
-                "reservee_address_city",
-                "reservee_address_zip",
-            ],
-        ),
-        FieldCombination(
-            supported=[
-                "reservee_type",
-                "reservee_first_name",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_email",
-                "reservee_id",
-                "reservee_is_unregistered_association",
-                "reservee_address_street",
-                "reservee_address_city",
-                "reservee_address_zip",
-                "billing_first_name",
-                "billing_last_name",
-                "billing_phone",
-                "billing_email",
-                "billing_address_street",
-                "billing_address_city",
-                "billing_address_zip",
-                "home_city",
-                "age_group",
-                "applying_for_free_of_charge",
-                "free_of_charge_reason",
-                "name",
-                "description",
-                "num_persons",
-                "purpose",
-            ],
-            required=[
-                "purpose",
-            ],
-        ),
-    ]
+    }
 
-    field_combinations_loop = cycle(field_combinations)
+    metadata_sets: list[ReservationMetadataSet] = []
+    for name in field_combinations:
+        reservation_metadata_set = ReservationMetadataSet(name=name.value)
+        metadata_sets.append(reservation_metadata_set)
 
-    for metadata_set in metadata_sets:
-        fields = next(field_combinations_loop)
+    metadata_sets: dict[SetName, ReservationMetadataSet] = {
+        SetName(metadata_set.name): metadata_set
+        for metadata_set in ReservationMetadataSet.objects.bulk_create(metadata_sets)
+    }
+
+    zipped: zip[tuple[ReservationMetadataSet, tuple[SetName, FieldCombination]]]
+    zipped = zip(metadata_sets.values(), field_combinations.items(), strict=True)
+
+    for metadata_set, (name, fields) in zipped:
         supported = [metadata_fields[field] for field in fields.supported]
         required = [metadata_fields[field] for field in fields.required]
         metadata_set.supported_fields.add(*supported)
@@ -1032,7 +1174,7 @@ def _create_reservation_units(
     reservation_unit_types: list[ReservationUnitType],
     terms_of_use: dict[str, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: list[ReservationMetadataSet],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
     equipments: list[Equipment],
     purposes: list[Purpose],
     qualifiers: list[Qualifier],
@@ -1045,7 +1187,7 @@ def _create_reservation_units(
     reservation_unit_types_loop = cycle(reservation_unit_types)
     units_loop = cycle(units)
     cancellation_rules_loop = cycle(cancellation_rules)
-    metadata_set_loop = cycle(metadata_sets)
+    metadata_set_loop = cycle(metadata_sets.items())
 
     hauki_ids = {
         # Oodin nuorisotila - Oodin nuorisotila
@@ -1075,12 +1217,22 @@ def _create_reservation_units(
 
         hauki_id = hauki_ids.get(i, str(uuid.uuid4()))
 
+        can_apply_free_of_charge = random.choices([True, False], weights=[1, 10])[0]
+        if can_apply_free_of_charge:
+            set_name: SetName = random.choice(SetName.applying_free_of_charge())
+            metadata_set = metadata_sets[set_name]
+        else:
+            set_name, metadata_set = next(metadata_set_loop)
+            while set_name.for_applying_free_of_charge:
+                set_name, metadata_set = next(metadata_set_loop)
+
         reservation_unit = ReservationUnit(
             allow_reservations_without_opening_hours=True,
             authentication=random.choices(
-                ReservationUnit.AUTHENTICATION_TYPES, weights=[2, 1]
+                ReservationUnit.AUTHENTICATION_TYPES,
+                weights=[2, 1],
             )[0],
-            can_apply_free_of_charge=random.choices([True, False], weights=[1, 10])[0],
+            can_apply_free_of_charge=can_apply_free_of_charge,
             cancellation_rule=next(cancellation_rules_loop),
             cancellation_terms=terms_of_use[TermsOfUse.TERMS_TYPE_CANCELLATION],
             contact_information=faker_fi.text(),
@@ -1091,9 +1243,10 @@ def _create_reservation_units(
             max_persons=max_persons,
             max_reservation_duration=timedelta(hours=max_duration),
             max_reservations_per_user=random.choices(
-                [None, 2, 5, 10], weights=[10, 1, 1, 1]
+                [None, 2, 5, 10],
+                weights=[10, 1, 1, 1],
             )[0],
-            metadata_set=next(metadata_set_loop),
+            metadata_set=metadata_set,
             min_persons=min_persons,
             min_reservation_duration=timedelta(hours=min_duration),
             name=f"Reservation Unit {i}",
@@ -1112,9 +1265,10 @@ def _create_reservation_units(
             reservation_confirmed_instructions_en=confirmed.en,
             reservation_confirmed_instructions_fi=confirmed.fi,
             reservation_confirmed_instructions_sv=confirmed.sv,
-            reservation_kind=random.choices(ReservationKind.values, weights=[1, 1, 10])[
-                0
-            ],
+            reservation_kind=random.choices(
+                ReservationKind.values,
+                weights=[1, 1, 10],
+            )[0],
             reservation_pending_instructions=pending.fi,
             reservation_pending_instructions_en=pending.en,
             reservation_pending_instructions_fi=pending.fi,
@@ -1328,6 +1482,26 @@ def _create_tax_percentages() -> list[TaxPercentage]:
 
 
 @with_logs(
+    text_entering="Creating cities...",
+    text_exiting="Cities created!",
+)
+def _create_cities(*, number: int = 10) -> list[City]:
+    cities: list[City] = []
+    for _ in range(number):
+        name = faker_fi.city()
+        city = City(
+            name=name,
+            name_fi=name,
+            name_en=faker_en.city(),
+            name_sv=faker_sv.city(),
+            municipality_code=faker_fi.administrative_unit(),
+        )
+        cities.append(city)
+
+    return City.objects.bulk_create(cities)
+
+
+@with_logs(
     text_entering="Creating reservations...",
     text_exiting="Reservations created!",
 )
@@ -1338,6 +1512,7 @@ def _create_reservations(
     age_groups: list[AgeGroup],
     cancel_reasons: list[ReservationCancelReason],
     deny_reasons: list[ReservationDenyReason],
+    cities: list[City],
     *,
     number: int = 200,
 ) -> list[Reservation]:
@@ -1370,31 +1545,55 @@ def _create_reservations(
         end = begin + timedelta(hours=random.choice(range(min_hours, max_hours)))
 
         state = STATE_CHOICES.CONFIRMED
+        applying_for_free_of_charge = random.choice([True, False])
+        free_of_charge_reason: str = ""
+        confirmed_at: datetime | None = begin
+        handled_at: datetime | None = None
 
         pricing: ReservationUnitPricing = random.choice(
             list(reservation_unit.pricings.all())
         )
-        if pricing.highest_price != Decimal("0"):
-            state = random.choice(
-                [STATE_CHOICES.WAITING_FOR_PAYMENT, STATE_CHOICES.CONFIRMED]
-            )
+        if pricing.highest_price != Decimal("0") and applying_for_free_of_charge:
+            state = STATE_CHOICES.REQUIRES_HANDLING
+            free_of_charge_reason = faker_fi.sentence()
+            confirmed_at = None
+            handled_at = begin
 
         deny_reason: ReservationDenyReason | None = None
         cancel_reason = random.choices(
-            [None, random.choice(cancel_reasons)], weights=[3, 1]
+            [None, random.choice(cancel_reasons)],
+            weights=[3, 1],
         )[0]
         if cancel_reason is None:
             deny_reason = random.choices(
-                [None, random.choice(deny_reasons)], weights=[3, 1]
+                [None, random.choice(deny_reasons)],
+                weights=[3, 1],
             )[0]
             if deny_reason is not None:
                 state = STATE_CHOICES.DENIED
+                free_of_charge_reason = faker_fi.sentence()
+                confirmed_at = None
+                handled_at = begin
         else:
             state = STATE_CHOICES.CANCELLED
 
+        reservee_organisation_name: str = ""
+        reservee_id: str = ""
+        reservee_is_unregistered_association: bool = False
+
+        reservee_type: str = random.choice(CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)[0]
+        if reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS:
+            reservee_organisation_name = faker_fi.company()
+            reservee_id = faker_fi.company_business_id()
+        elif reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT:
+            reservee_organisation_name = faker_fi.company()
+            reservee_is_unregistered_association = random.choice([True, False])
+            if not reservee_is_unregistered_association:
+                reservee_id = faker_fi.company_business_id()
+
         reservation = Reservation(
             age_group=random.choice(age_groups),
-            applying_for_free_of_charge=random.choice([True, False]),
+            applying_for_free_of_charge=applying_for_free_of_charge,
             begin=begin,
             billing_address_city=faker_fi.city(),
             billing_address_street=faker_fi.street_name(),
@@ -1406,11 +1605,13 @@ def _create_reservations(
             buffer_time_after=timedelta(hours=random.choice(range(2))),
             buffer_time_before=timedelta(hours=random.choice(range(2))),
             cancel_reason=cancel_reason,
-            confirmed_at=begin,
+            confirmed_at=confirmed_at,
             deny_reason=deny_reason,
             description=faker_fi.sentence(),
+            home_city=random.choice(cities),
             end=end,
-            free_of_charge_reason=faker_fi.sentence(),
+            free_of_charge_reason=free_of_charge_reason,
+            handled_at=handled_at,
             name=f"Reservation {i}",
             num_persons=persons,
             price=pricing.highest_price,
@@ -1421,12 +1622,13 @@ def _create_reservations(
             reservee_address_zip=faker_fi.postcode(),
             reservee_email=faker_fi.email(),
             reservee_first_name=user.first_name,
-            reservee_id=faker_fi.company_business_id(),
+            reservee_id=reservee_id,
+            reservee_is_unregistered_association=reservee_is_unregistered_association,
             reservee_language="fi",
             reservee_last_name=user.last_name,
-            reservee_organisation_name=faker_fi.company(),
+            reservee_organisation_name=reservee_organisation_name,
             reservee_phone=faker_fi.phone_number(),
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=reservee_type,
             state=state,
             tax_percentage_value=pricing.tax_percentage.value,
             user=user,
@@ -1451,10 +1653,10 @@ def _create_application_rounds(
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
     service_sectors: list[ServiceSector],
+    user: User,
     *,
     number: int = 15,
 ) -> list[ApplicationRound]:
-
     service_sectors_loop = cycle(service_sectors)
     period_options = cycle(
         [
@@ -1504,13 +1706,47 @@ def _create_application_rounds(
         application_rounds.append(application_round)
 
     application_rounds = ApplicationRound.objects.bulk_create(application_rounds)
+
+    _create_application_round_statuses(application_rounds, user)
+
     for application_round in application_rounds:
         application_round.reservation_units.add(
-            *random_subset(reservation_units, max_size=10)
+            *random_subset(reservation_units, max_size=10),
         )
-        application_round.purposes.add(*random_subset(reservation_purposes, max_size=5))
+        application_round.purposes.add(
+            *random_subset(reservation_purposes, max_size=5),
+        )
 
     return application_rounds
+
+
+@with_logs(
+    text_entering="Creating application round statuses...",
+    text_exiting="Applications round statuses created!",
+)
+def _create_application_round_statuses(
+    application_rounds: list[ApplicationRound],
+    user: User,
+) -> list[ApplicationRoundStatus]:
+    statuses: list[ApplicationRoundStatus] = []
+    now = datetime.now(tz=timezone.utc)
+
+    for application_round in application_rounds:
+        if application_round.application_period_end < now:
+            application_status = ApplicationRoundStatus.HANDLED
+        elif application_round.application_period_begin > now:
+            application_status = ApplicationRoundStatus.DRAFT
+        else:
+            application_status = ApplicationRoundStatus.DRAFT
+
+        status = ApplicationRoundStatus(
+            application_round=application_round,
+            status=application_status,
+            user=user,
+        )
+        statuses.append(status)
+
+    return ApplicationRoundStatus.objects.bulk_create(statuses)
 
 
 @with_logs(
@@ -1523,39 +1759,87 @@ def _create_applications(
     age_groups: list[AgeGroup],
     reservation_purposes: list[ReservationPurpose],
     reservation_units: list[ReservationUnit],
+    cities: list[City],
     *,
     number: int = 20,
 ) -> list[Application]:
-
     contact_persons = _create_persons(number=number)
     billing_addresses = _create_addresses(number=number)
     organisations = _create_organisation(billing_addresses)
     applications: list[Application] = []
+    now = datetime.now(tz=timezone.utc)
 
     items: zip[tuple[Person, Address, tuple[str, Organisation | None]]]
     items = zip(contact_persons, billing_addresses, organisations, strict=True)
     for contact_person, billing_address, (applicant_type, organisation) in items:
         # User is the overall admin mode often, but other users are also possible
-        user: User = random.choices(
-            users, weights=[len(users)] + ([1] * (len(users) - 1))
-        )[0]
+        weights = [len(users)] + ([1] * (len(users) - 1))
+        user: User = random.choices(users, weights=weights)[0]
+
+        # No applications for future application rounds
+        application_round: ApplicationRound = random.choice(application_rounds)
+        while application_round.application_period_begin > now:
+            application_round = random.choice(application_rounds)
 
         application = Application(
             applicant_type=applicant_type,
             contact_person=contact_person,
             user=user,
             organisation=organisation,
-            application_round=random.choice(application_rounds),
+            application_round=application_round,
             billing_address=billing_address,
+            home_city=random.choice(cities),
             additional_information=faker_fi.sentence(),
         )
         applications.append(application)
 
     applications = Application.objects.bulk_create(applications)
+    _create_application_statuses(applications)
     _create_application_events(
-        applications, age_groups, reservation_purposes, reservation_units
+        applications,
+        age_groups,
+        reservation_purposes,
+        reservation_units,
     )
     return applications
+
+
+@with_logs(
+    text_entering="Creating application statuses...",
+    text_exiting="Application statuses created!",
+)
+def _create_application_statuses(
+    applications: list[Application],
+) -> list[ApplicationStatus]:
+    statuses: list[ApplicationStatus] = []
+    now = datetime.now(tz=timezone.utc)
+
+    for application in applications:
+        if application.application_round.application_period_end < now:
+            application_status: str = random.choice(
+                [
+                    ApplicationStatus.HANDLED,
+                    ApplicationStatus.CANCELLED,
+                    ApplicationStatus.EXPIRED,
+                ]
+            )
+        else:
+            application_status: str = random.choice(
+                [
+                    ApplicationStatus.DRAFT,
+                    ApplicationStatus.RECEIVED,
+                    ApplicationStatus.CANCELLED,
+                ]
+            )
+
+        status = ApplicationStatus(
+            application=application,
+            status=application_status,
+            user=application.user,
+        )
+        statuses.append(status)
+
+    return ApplicationStatus.objects.bulk_create(statuses)
 
 
 @with_logs(
@@ -1582,7 +1866,7 @@ def _create_persons(
 
 @with_logs(
     text_entering="Creating addresses...",
-    text_exiting="Adresses created!",
+    text_exiting="Addresses created!",
 )
 def _create_addresses(
     *,
@@ -1614,12 +1898,12 @@ def _create_addresses(
     text_exiting="Organisations created!",
 )
 def _create_organisation(
-    contact_persons: list[Person],
+    billing_addresses: list[Address],
 ) -> list[tuple[str, Organisation | None]]:
     organisations: list[Organisation] = []
     applicant_types: list[str] = []
 
-    for billing_address in contact_persons:
+    for billing_address in billing_addresses:
         applicant_type = random.choice(APPLICANT_TYPES.APPLICANT_TYPE_CHOICES)[0]
 
         organisation: Organisation | None = None
@@ -1719,9 +2003,41 @@ def _create_application_events(
             application_events.append(event)
 
     application_events = ApplicationEvent.objects.bulk_create(application_events)
+    _create_application_event_statuses(application_events)
     _create_event_reservation_units(application_events, reservation_units)
     _create_application_event_schedules(application_events)
     return application_events
+
+
+@with_logs(
+    text_entering="Creating application even statuses...",
+    text_exiting="Application event statuses created!",
+)
+def _create_application_event_statuses(
+    application_events: list[ApplicationEvent],
+) -> list[ApplicationEventStatus]:
+    statuses: list[ApplicationEventStatus] = []
+    now = datetime.now(tz=timezone.utc)
+
+    for event in application_events:
+        if event.application.application_round.application_period_end < now:
+            event_status: str = random.choice(
+                [
+                    ApplicationEventStatus.APPROVED,
+                    ApplicationEventStatus.DECLINED,
+                ]
+            )
+        else:
+            event_status = ApplicationEventStatus.CREATED
+
+        status = ApplicationEventStatus(
+            application_event=event,
+            status=event_status,
+            user=event.application.user,
+        )
+        statuses.append(status)
+
+    return ApplicationEventStatus.objects.bulk_create(statuses)
 
 
 @with_logs(
@@ -1757,6 +2073,9 @@ def _create_application_event_schedules(
 ) -> list[ApplicationEventSchedule]:
     schedules: list[ApplicationEventSchedule] = []
     for application_event in application_events:
+        if application_event.status != ApplicationEventStatus.APPROVED:
+            continue
+
         weekdays: list[int] = [choice for choice, _ in WEEKDAYS.CHOICES]
         for _ in range(random.randint(1, 4)):
             weekday = weekdays.pop(random.randint(0, len(weekdays) - 1))

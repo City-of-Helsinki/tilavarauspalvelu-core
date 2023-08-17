@@ -6,7 +6,11 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
+    ApplicationEventStatus,
     ApplicationRound,
+    ApplicationRoundStatus,
+    ApplicationStatus,
+    City,
     EventReservationUnit,
     Organisation,
     Person,
@@ -56,7 +60,11 @@ models: list[type[Model]] = [
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
+    ApplicationEventStatus,
     ApplicationRound,
+    ApplicationRoundStatus,
+    ApplicationStatus,
+    City,
     Equipment,
     EquipmentCategory,
     EventReservationUnit,
@@ -100,7 +108,7 @@ models: list[type[Model]] = [
 @pytest.mark.django_db
 def test_create_test_data():
     for model in models:
-        if model in (
+        if model in [
             GeneralRoleChoice,
             GeneralRolePermission,
             ReservationMetadataField,
@@ -110,7 +118,7 @@ def test_create_test_data():
             TaxPercentage,
             UnitRoleChoice,
             UnitRolePermission,
-        ):
+        ]:
             continue
         assert model.objects.count() == 0, f"Model {model.__name__} is not empty"
 
