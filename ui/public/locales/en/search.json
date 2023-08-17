@@ -14,9 +14,9 @@
     "ascendingLabel": "Ascending order",
     "descendingLabel": "Descending order",
     "label": {
-      "name": "By name",
-      "type": "By type",
-      "unit": "By location"
+      "name": "Name",
+      "type": "Type",
+      "unit": "Location"
     }
   }
 }
