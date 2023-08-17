@@ -26,6 +26,7 @@ import { formatDate } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import Carousel from "../Carousel";
 import LoginFragment from "../LoginFragment";
+import ClientOnly from "../ClientOnly";
 
 type Props = {
   isReservationUnitReservable: boolean;
@@ -565,4 +566,8 @@ const QuickReservation = ({
   );
 };
 
-export default QuickReservation;
+export default (props: Props) => (
+  <ClientOnly>
+    <QuickReservation {...props} />
+  </ClientOnly>
+);

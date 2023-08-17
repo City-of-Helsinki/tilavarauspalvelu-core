@@ -5,6 +5,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { daysByMonths } from "../../modules/const";
 import { formatDate } from "../../modules/util";
 import { Content, Subheading } from "./ReservationUnitStyles";
+import ClientOnly from "../ClientOnly";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType;
@@ -41,7 +42,6 @@ const ReservationInfoContainer = ({
     (reservationUnit.reservationsMaxDaysBefore ||
       reservationUnit.reservationsMinDaysBefore);
 
-  // TODO Hydration errros
   return (
     <>
       <Subheading $withBorder>
@@ -186,4 +186,9 @@ const ReservationInfoContainer = ({
   );
 };
 
-export default ReservationInfoContainer;
+// Hack to deal with translations causing hydration errors
+export default (props: Props) => (
+  <ClientOnly>
+    <ReservationInfoContainer {...props} />
+  </ClientOnly>
+);

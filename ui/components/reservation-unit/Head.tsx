@@ -31,6 +31,7 @@ import {
 } from "../../modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import AltNotification from "../common/AltNotification";
+import ClientOnly from "../ClientOnly";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -277,4 +278,9 @@ const Head = ({
   );
 };
 
-export default Head;
+// Hack to deal with hydration errors
+export default (props: PropsType) => (
+  <ClientOnly>
+    <Head {...props} />
+  </ClientOnly>
+);
