@@ -12,6 +12,7 @@ import { applicationRoundState, searchUrl } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 import IconButton from "../common/IconButton";
+import ClientOnly from "../ClientOnly";
 
 interface Props {
   applicationRound: ApplicationRoundType;
@@ -137,4 +138,9 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
   );
 };
 
-export default ApplicationRoundCard;
+// Hack to deal with hydration errors
+export default ({ applicationRound }: Props): JSX.Element => (
+  <ClientOnly>
+    <ApplicationRoundCard applicationRound={applicationRound} />
+  </ClientOnly>
+);
