@@ -16,6 +16,7 @@
     "noEmit": true,
     "incremental": true,
     "jsx": "preserve",
+    "baseUrl": ".",
     "paths": {
       "app/*": ["./src/*"]
     }
