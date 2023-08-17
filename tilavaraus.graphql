@@ -3239,7 +3239,17 @@ input ReservationStaffAdjustTimeMutationInput {
   begin: DateTime!
   end: DateTime!
   state: state
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeBefore: String
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeAfter: String
   clientMutationId: String
 }
@@ -3249,7 +3259,17 @@ type ReservationStaffAdjustTimeMutationPayload {
   begin: DateTime
   end: DateTime
   state: state
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeBefore: String
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeAfter: String
 
   """
@@ -3296,7 +3316,17 @@ input ReservationStaffCreateMutationInput {
   description: String
   begin: DateTime!
   end: DateTime!
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeBefore: String
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeAfter: String
   reservationUnitPks: [Int]!
   purposePk: Int
@@ -3358,7 +3388,17 @@ type ReservationStaffCreateMutationPayload {
   state: state
   begin: DateTime
   end: DateTime
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeBefore: String
+
+  """
+  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+  value means buffer from reservation unit is used.
+  """
   bufferTimeAfter: String
   reservationUnitPks: [Int]
   purposePk: Int
@@ -3436,7 +3476,15 @@ input ReservationStaffModifyMutationInput {
   """
   state: String
   priority: Int
+
+  """
+  Number of seconds. Null/undefined value means buffer from reservation unit is used.
+  """
   bufferTimeBefore: Int
+
+  """
+  Number of seconds. Null/undefined value means buffer from reservation unit is used.
+  """
   bufferTimeAfter: Int
   reservationUnitPks: [Int]
   purposePk: Int
@@ -3493,7 +3541,15 @@ type ReservationStaffModifyMutationPayload {
   priority: Int
   begin: DateTime
   end: DateTime
+
+  """
+  Number of seconds. Null/undefined value means buffer from reservation unit is used.
+  """
   bufferTimeBefore: Int
+
+  """
+  Number of seconds. Null/undefined value means buffer from reservation unit is used.
+  """
   bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
@@ -3599,6 +3655,11 @@ type ReservationType implements Node {
   handledAt: DateTime
 
   """
+  Additional details for denying or approving the reservation
+  """
+  handlingDetails: String!
+
+  """
   Working memo for staff users.
   """
   workingMemo: String
@@ -3688,7 +3749,7 @@ type ReservationUnitByPkType implements Node {
   isDraft: Boolean!
   maxPersons: Int
   minPersons: Int
-  surfaceArea: Decimal
+  surfaceArea: Int
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   cancellationRule: ReservationUnitCancellationRuleType
@@ -3864,7 +3925,7 @@ input ReservationUnitCreateMutationInput {
   qualifierPks: [Int]
   servicePks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Decimal
+  surfaceArea: Int
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -3938,24 +3999,24 @@ input ReservationUnitCreateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -4012,7 +4073,7 @@ type ReservationUnitCreateMutationPayload {
   isDraft: Boolean
   qualifierPks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Decimal
+  surfaceArea: Int
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -4082,24 +4143,24 @@ type ReservationUnitCreateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
 
   """
   May contain more than one error for same field.
@@ -4491,7 +4552,7 @@ type ReservationUnitType implements Node {
   isDraft: Boolean!
   maxPersons: Int
   minPersons: Int
-  surfaceArea: Decimal
+  surfaceArea: Int
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   cancellationRule: ReservationUnitCancellationRuleType
@@ -4686,7 +4747,7 @@ input ReservationUnitUpdateMutationInput {
   qualifierPks: [Int]
   servicePks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Decimal
+  surfaceArea: Int
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -4760,24 +4821,24 @@ input ReservationUnitUpdateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -4834,7 +4895,7 @@ type ReservationUnitUpdateMutationPayload {
   isDraft: Boolean
   qualifierPks: [Int]
   reservationUnitTypePk: Int
-  surfaceArea: Decimal
+  surfaceArea: Int
   bufferTimeBefore: Int
   bufferTimeAfter: Int
   cancellationRulePk: Int
@@ -4903,24 +4964,24 @@ type ReservationUnitUpdateMutationPayload {
   state: String
   pricingTerms: String
   paymentTypes: [String]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
 
   """
   May contain more than one error for same field.
@@ -5445,7 +5506,7 @@ type SpaceType implements Node {
   parent: SpaceType
   building: BuildingType
   unit: UnitByPkType
-  surfaceArea: Float
+  surfaceArea: Int
   maxPersons: Int
   code: String!
 

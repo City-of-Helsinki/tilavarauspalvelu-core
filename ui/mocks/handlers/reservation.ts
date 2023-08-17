@@ -403,6 +403,7 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       name: "Reservation name",
       description:
         "Reservation description - a long one with alotta text and then some",
+      handlingDetails: "",
       reserveeFirstName: "First name",
       reserveeLastName: "Last name",
       reserveePhone: "+358 123 4567",
