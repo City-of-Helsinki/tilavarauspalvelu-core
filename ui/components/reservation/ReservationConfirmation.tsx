@@ -177,7 +177,7 @@ const ReservationConfirmation = ({
           />
           <StyledLink
             icon={<IconSignout aria-hidden />}
-            callback={() => logout()}
+            onClick={() => logout()}
             label={t("common:logout")}
           />
         </ActionContainer2>

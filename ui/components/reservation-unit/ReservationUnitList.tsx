@@ -214,7 +214,7 @@ const ReservationUnitList = ({
       })}
       <ButtonContainer>
         <IconButton
-          callback={() => setShowModal(true)}
+          onClick={() => setShowModal(true)}
           icon={<IconPlusCircle aria-hidden />}
           label={t("reservationUnitList:add")}
         />

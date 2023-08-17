@@ -139,14 +139,14 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
               <IconButton
                 icon={<IconAngleUp aria-hidden />}
                 label={t("common:showLess")}
-                callback={() => setShowAll(!showAll)}
+                onClick={() => setShowAll(!showAll)}
                 data-testid="front-page__purposes--less-link"
               />
             ) : (
               <IconButton
                 icon={<IconAngleDown aria-hidden />}
                 label={t("common:showMore")}
-                callback={() => setShowAll(!showAll)}
+                onClick={() => setShowAll(!showAll)}
                 data-testid="front-page__purposes--more-link"
               />
             )}
