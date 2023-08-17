@@ -50,6 +50,8 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
     taxPercentageValue
     orderUuid
     refundUuid
+    cancelDetails
+    handlingDetails
     user {
       firstName
       lastName

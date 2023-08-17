@@ -2585,7 +2585,15 @@ export type ReservationRequiresHandlingMutationPayload = {
 
 export type ReservationStaffAdjustTimeMutationInput = {
   begin: Scalars["DateTime"];
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeAfter?: InputMaybe<Scalars["String"]>;
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeBefore?: InputMaybe<Scalars["String"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
   end: Scalars["DateTime"];
@@ -2596,7 +2604,15 @@ export type ReservationStaffAdjustTimeMutationInput = {
 export type ReservationStaffAdjustTimeMutationPayload = {
   __typename?: "ReservationStaffAdjustTimeMutationPayload";
   begin?: Maybe<Scalars["DateTime"]>;
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeAfter?: Maybe<Scalars["String"]>;
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeBefore?: Maybe<Scalars["String"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   end?: Maybe<Scalars["DateTime"]>;
@@ -2617,7 +2633,15 @@ export type ReservationStaffCreateMutationInput = {
   billingFirstName?: InputMaybe<Scalars["String"]>;
   billingLastName?: InputMaybe<Scalars["String"]>;
   billingPhone?: InputMaybe<Scalars["String"]>;
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeAfter?: InputMaybe<Scalars["String"]>;
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeBefore?: InputMaybe<Scalars["String"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["String"]>;
@@ -2663,7 +2687,15 @@ export type ReservationStaffCreateMutationPayload = {
   billingFirstName?: Maybe<Scalars["String"]>;
   billingLastName?: Maybe<Scalars["String"]>;
   billingPhone?: Maybe<Scalars["String"]>;
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeAfter?: Maybe<Scalars["String"]>;
+  /**
+   * Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
+   * value means buffer from reservation unit is used.
+   */
   bufferTimeBefore?: Maybe<Scalars["String"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   confirmedAt?: Maybe<Scalars["DateTime"]>;
@@ -2715,7 +2747,9 @@ export type ReservationStaffModifyMutationInput = {
   billingFirstName?: InputMaybe<Scalars["String"]>;
   billingLastName?: InputMaybe<Scalars["String"]>;
   billingPhone?: InputMaybe<Scalars["String"]>;
+  /** Number of seconds. Null/undefined value means buffer from reservation unit is used. */
   bufferTimeAfter?: InputMaybe<Scalars["Int"]>;
+  /** Number of seconds. Null/undefined value means buffer from reservation unit is used. */
   bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["String"]>;
@@ -2762,7 +2796,9 @@ export type ReservationStaffModifyMutationPayload = {
   billingFirstName?: Maybe<Scalars["String"]>;
   billingLastName?: Maybe<Scalars["String"]>;
   billingPhone?: Maybe<Scalars["String"]>;
+  /** Number of seconds. Null/undefined value means buffer from reservation unit is used. */
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  /** Number of seconds. Null/undefined value means buffer from reservation unit is used. */
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   confirmedAt?: Maybe<Scalars["DateTime"]>;
@@ -2841,6 +2877,8 @@ export type ReservationType = Node & {
   end: Scalars["DateTime"];
   freeOfChargeReason?: Maybe<Scalars["String"]>;
   handledAt?: Maybe<Scalars["DateTime"]>;
+  /** Additional details for denying or approving the reservation */
+  handlingDetails: Scalars["String"];
   /** Home city of the group or association */
   homeCity?: Maybe<CityType>;
   /** The ID of the object */
@@ -2991,7 +3029,7 @@ export type ReservationUnitByPkType = Node & {
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<ReservationUnitState>;
-  surfaceArea?: Maybe<Scalars["Decimal"]>;
+  surfaceArea?: Maybe<Scalars["Int"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -3127,7 +3165,7 @@ export type ReservationUnitCreateMutationInput = {
   servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
   spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Decimal"]>;
+  surfaceArea?: InputMaybe<Scalars["Int"]>;
   termsOfUseEn?: InputMaybe<Scalars["String"]>;
   termsOfUseFi?: InputMaybe<Scalars["String"]>;
   termsOfUseSv?: InputMaybe<Scalars["String"]>;
@@ -3221,7 +3259,7 @@ export type ReservationUnitCreateMutationPayload = {
   /** Spaces included in the reservation unit as nested related objects. */
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<Scalars["String"]>;
-  surfaceArea?: Maybe<Scalars["Decimal"]>;
+  surfaceArea?: Maybe<Scalars["Int"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -3455,7 +3493,7 @@ export type ReservationUnitType = Node & {
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<ReservationUnitState>;
-  surfaceArea?: Maybe<Scalars["Decimal"]>;
+  surfaceArea?: Maybe<Scalars["Int"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -3600,7 +3638,7 @@ export type ReservationUnitUpdateMutationInput = {
   servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
   spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Decimal"]>;
+  surfaceArea?: InputMaybe<Scalars["Int"]>;
   termsOfUseEn?: InputMaybe<Scalars["String"]>;
   termsOfUseFi?: InputMaybe<Scalars["String"]>;
   termsOfUseSv?: InputMaybe<Scalars["String"]>;
@@ -3693,7 +3731,7 @@ export type ReservationUnitUpdateMutationPayload = {
   /** Spaces included in the reservation unit as nested related objects. */
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   state?: Maybe<Scalars["String"]>;
-  surfaceArea?: Maybe<Scalars["Decimal"]>;
+  surfaceArea?: Maybe<Scalars["Int"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -4219,7 +4257,7 @@ export type SpaceType = Node & {
   parent?: Maybe<SpaceType>;
   pk?: Maybe<Scalars["Int"]>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
-  surfaceArea?: Maybe<Scalars["Float"]>;
+  surfaceArea?: Maybe<Scalars["Int"]>;
   unit?: Maybe<UnitByPkType>;
 };
 

@@ -83,7 +83,7 @@ const ApplicationProp = ({
 }) =>
   data ? (
     <div>
-      {label}: <strong>{data}</strong>
+      {label}: <strong style={{ whiteSpace: "pre-wrap" }}>{data}</strong>
     </div>
   ) : null;
 
@@ -220,6 +220,21 @@ const ReservationSummary = ({
       }
     : undefined;
 
+  const cancelReasonString =
+    reservation.state === ReservationsReservationStateChoices.Cancelled
+      ? {
+          l: "cancelReason",
+          v: reservation.cancelDetails || "-",
+        }
+      : undefined;
+  const rejectionReasonString =
+    reservation.state === ReservationsReservationStateChoices.Denied
+      ? {
+          l: "denyReason",
+          v: reservation.handlingDetails || "-",
+        }
+      : undefined;
+
   const summary = [
     ...(type != null ? [type] : []),
     ...(numPersons != null ? [numPersons] : []),
@@ -227,6 +242,8 @@ const ReservationSummary = ({
     ...(purpose != null ? [purpose] : []),
     ...(description != null ? [description] : []),
     ...(price != null ? [price] : []),
+    ...(cancelReasonString != null ? [cancelReasonString] : []),
+    ...(rejectionReasonString != null ? [rejectionReasonString] : []),
   ];
 
   if (summary.length === 0) {

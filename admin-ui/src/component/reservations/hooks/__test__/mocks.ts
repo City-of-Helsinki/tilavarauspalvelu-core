@@ -268,6 +268,7 @@ export const mockReservation: ReservationType = {
   priority: ReservationsReservationPriorityChoices.A_200,
   state: ReservationsReservationStateChoices.Confirmed,
   workingMemo: "empty",
+  handlingDetails: "",
 };
 
 export const mockRecurringReservation: ReservationType = {
