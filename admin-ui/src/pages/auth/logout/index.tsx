@@ -41,7 +41,7 @@ const LogoutPage = () => {
   const { t } = useTranslation(["common", "logout"]);
   const TUNNISTAMO_LOGOUT_URL = `${env.NEXT_PUBLIC_TUNNISTAMO_URL}/logout/`;
 
-  // FIXME i18n breaks SSR
+  // TODO i18n breaks SSR
   return (
     <Layout>
       <ClientOnly>

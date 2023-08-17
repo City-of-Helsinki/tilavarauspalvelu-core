@@ -21,6 +21,8 @@ const uploadLinkOptions = {
 };
 
 // FIXME upload link is broken locally (it succeeds but no new image is available)
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions);
 const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/` });
 

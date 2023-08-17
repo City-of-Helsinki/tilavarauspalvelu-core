@@ -83,10 +83,7 @@ const ApplicationRoundAllocation = dynamic(
   () => import(`${RECURRING_PATH}/allocation/ApplicationRoundAllocation`)
 );
 
-const withAuthorization = (
-  component: React.JSX.Element,
-  permission?: Permission
-) => (
+const withAuthorization = (component: JSX.Element, permission?: Permission) => (
   <AuthorizationChecker permission={permission}>
     {component}
   </AuthorizationChecker>

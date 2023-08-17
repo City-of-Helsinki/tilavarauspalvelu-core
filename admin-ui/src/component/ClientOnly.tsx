@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const ClietOnly = ({ children }: { children: React.ReactNode }) => {
   const [mounted, setMounted] = useState(false);
@@ -10,10 +10,7 @@ const ClietOnly = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
-  if (mounted) {
-    return children;
-  }
-  return null;
+  return <>{children}</>;
 };
 
 export default ClietOnly;

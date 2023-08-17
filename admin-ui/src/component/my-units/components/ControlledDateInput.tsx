@@ -37,7 +37,6 @@ const ControlledDateInput = <T extends FieldValues>({
       language="fi"
       value={value}
       errorText={error}
-      // @ts-expect-error TODO: hook-form update improved types
       onChange={(text) => onChange(text)}
       required={required}
       disabled={disabled}

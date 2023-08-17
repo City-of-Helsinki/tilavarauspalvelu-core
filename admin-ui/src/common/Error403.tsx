@@ -58,7 +58,8 @@ const LogoutSection = (): JSX.Element => {
       {isAuthenticated() && (
         <ButtonContainer>
           <Button
-            onClick={() => signOut({ callbackUrl: `${publicUrl}/auth/logout` })}>
+            onClick={() => signOut({ callbackUrl: `${publicUrl}/auth/logout` })}
+          >
             {t("Navigation.logout")}
           </Button>
         </ButtonContainer>

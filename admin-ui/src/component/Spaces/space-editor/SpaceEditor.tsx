@@ -313,7 +313,6 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
       return undefined;
     }
 
-    // @ts-expect-error: TODO: this is broken, but we are about to remove Joi
     return t(`validation.${error.type}`, { ...error.context });
   };
 
