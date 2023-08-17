@@ -1017,6 +1017,9 @@ const ReservationUnit = ({
             )}
             {reservationUnit.unit?.location && (
               <Accordion heading={t("common:location")} theme="thin" open>
+                <JustForMobile customBreakpoint={breakpoints.l}>
+                  <Address reservationUnit={reservationUnit} />
+                </JustForMobile>
                 <MapWrapper>
                   <Map
                     title={getTranslation(reservationUnit.unit, "name")}
@@ -1024,9 +1027,6 @@ const ReservationUnit = ({
                     longitude={Number(reservationUnit.unit.location.longitude)}
                   />
                 </MapWrapper>
-                <JustForMobile customBreakpoint={breakpoints.l}>
-                  <Address reservationUnit={reservationUnit} />
-                </JustForMobile>
               </Accordion>
             )}
             {(paymentTermsContent || cancellationTermsContent) && (
