@@ -27,13 +27,9 @@ const ServerSchema = z.object({
 
 const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string(),
-  // used for graphql client
   NEXT_PUBLIC_TILAVARAUS_API_URL: z.string(),
-  // used for logout page
   NEXT_PUBLIC_TUNNISTAMO_URL: z.string(),
-  // Used
   NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX: z.string().optional(),
-  // TODO these are copies from ui check which ones are used by admin-ui (remove unused)
   NEXT_PUBLIC_COOKIEHUB_ENABLED: coerceBoolean.optional(),
   NEXT_PUBLIC_HOTJAR_ENABLED: coerceBoolean.optional(),
 });
@@ -43,8 +39,6 @@ let { env } = process;
 if (!process.env.SKIP_ENV_VALIDATION) {
   const isServer = typeof window === "undefined";
 
-  // TODO replace with safe parse, print errors to console
-  // Don't throw because it crashes the server (and has zero logging)
   const serverConfig = isServer ? ServerSchema.safeParse(process.env) : null;
 
   if (isServer && serverConfig.error) {
