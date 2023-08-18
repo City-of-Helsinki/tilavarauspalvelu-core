@@ -3,17 +3,23 @@ import { useQuery } from "@apollo/client";
 import { type Query, type ReservationType } from "common/types/gql-types";
 import {
   hasPermission as baseHasPermission,
-  hasSomePermission as baseSomeHasPermission,
+  hasSomePermission as baseHasSomePermission,
+  hasAnyPermission as baseHasAnyPermission,
   Permission,
 } from "app/modules/permissionHelper";
-import { CURRENT_USER } from "../../../../context/queries";
+import { CURRENT_USER } from "app/context/queries";
 
 const usePermission = () => {
   const { data: user } = useQuery<Query>(CURRENT_USER);
 
   const hasSomePermission = (permissionName: Permission) => {
     if (!user?.currentUser) return false;
-    return baseSomeHasPermission(user?.currentUser, permissionName);
+    return baseHasSomePermission(user?.currentUser, permissionName);
+  };
+
+  const hasAnyPermission = () => {
+    if (!user?.currentUser) return false;
+    return baseHasAnyPermission(user?.currentUser);
   };
 
   const hasPermission = (
@@ -56,6 +62,7 @@ const usePermission = () => {
     user: user?.currentUser ?? undefined,
     hasPermission,
     hasSomePermission,
+    hasAnyPermission,
   };
 };
 

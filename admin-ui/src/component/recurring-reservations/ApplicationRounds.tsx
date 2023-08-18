@@ -10,13 +10,13 @@ import {
   QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
 import { HERO_IMAGE_URL } from "app/common/const";
+import usePermission from "app/hooks/usePermission";
 import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import { WideContainer, IngressContainer } from "../../styles/layout";
 import { NotificationBox } from "../../styles/util";
 import { useNotification } from "../../context/NotificationContext";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
-import { usePermission } from "../reservations/requested/hooks";
 
 const Wrapper = styled.div``;
 

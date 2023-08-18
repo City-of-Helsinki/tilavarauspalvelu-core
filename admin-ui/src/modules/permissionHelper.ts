@@ -1,5 +1,6 @@
 import {
   UnitRoleType,
+  type GeneralRoleType,
   type ServiceSectorRolePermissionType,
   type ServiceSectorRoleType,
   type UserType,
@@ -95,7 +96,8 @@ const hasServiceSectorPermission = (
   );
 };
 
-const permissionHelper =
+/// Returns true if the user is allowed to perform operation for a specific unit or service sector
+export const hasPermission =
   (user: UserType) =>
   (
     permissionName: string,
@@ -123,33 +125,54 @@ const permissionHelper =
     return false;
   };
 
-const somePermissions = (user: UserType, permission: Permission) => {
+/// Returns true if the user if the user is allowed to perform what the permission is for
+/// e.g. if the user allowed to view some reservations but not all this will return true
+export const hasSomePermission = (user: UserType, permission: Permission) => {
   if (user.isSuperuser) {
     return true;
   }
 
+  const hasPerm = (
+    role: UnitRoleType | ServiceSectorRoleType | GeneralRoleType | undefined,
+    perm: Permission
+  ) => role?.permissions?.some((p) => p?.permission === perm);
+
   const someUnitRoles =
-    user?.unitRoles?.some((role) =>
-      role?.permissions?.some((p) => p?.permission === permission)
-    ) ?? false;
+    user?.unitRoles?.some((role) => hasPerm(role ?? undefined, permission)) ??
+    false;
 
   const someSectorRoles =
     user?.serviceSectorRoles?.some((role) =>
-      role?.permissions?.some((p) => p?.permission === permission)
+      hasPerm(role ?? undefined, permission)
     ) ?? false;
 
   const someGeneralRoles =
     user?.generalRoles?.some((role) =>
-      role?.permissions?.some((p) => p?.permission === permission)
+      hasPerm(role ?? undefined, permission)
     ) ?? false;
 
   return someUnitRoles || someSectorRoles || someGeneralRoles;
 };
 
-export const hasSomePermission = (user: UserType, permission: Permission) => {
-  return somePermissions(user, permission);
-};
+/// Returns true if the user has any kind of access to the system
+export const hasAnyPermission = (user: UserType) => {
+  if (user.isSuperuser) {
+    return true;
+  }
 
-export const hasPermission = (user: UserType) => {
-  return permissionHelper(user);
+  const hasAnyPerm = (
+    role?: UnitRoleType | ServiceSectorRoleType | GeneralRoleType
+  ) => role?.permissions?.some((p) => p?.permission != null) ?? false;
+
+  const someUnitRoles =
+    user?.unitRoles?.some((role) => hasAnyPerm(role ?? undefined)) ?? false;
+
+  const someSectorRoles =
+    user?.serviceSectorRoles?.some((role) => hasAnyPerm(role ?? undefined)) ??
+    false;
+
+  const someGeneralRoles =
+    user?.generalRoles?.some((role) => hasAnyPerm(role ?? undefined)) ?? false;
+
+  return someUnitRoles || someSectorRoles || someGeneralRoles;
 };

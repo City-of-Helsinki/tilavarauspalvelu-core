@@ -1,7 +1,7 @@
 import React from "react";
 import { type ReservationType } from "common/types/gql-types";
 import { Permission } from "app/modules/permissionHelper";
-import { usePermission } from "./hooks";
+import usePermission from "app/hooks/usePermission";
 
 const VisibleIfPermission = ({
   reservation,

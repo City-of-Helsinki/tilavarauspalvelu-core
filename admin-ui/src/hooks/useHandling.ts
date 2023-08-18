@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { Query, QueryReservationsArgs } from "common/types/gql-types";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 
-export const useHandling = () => {
+const useHandling = () => {
   const { status } = useSession();
 
   const { data, refetch } = useQuery<Query, QueryReservationsArgs>(
@@ -21,3 +21,5 @@ export const useHandling = () => {
 
   return { handlingCount, hasOwnUnits, refetch };
 };
+
+export default useHandling;

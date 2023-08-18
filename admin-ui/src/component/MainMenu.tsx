@@ -6,12 +6,12 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import IconPremises from "common/src/icons/IconPremises";
 import { Permission } from "app/modules/permissionHelper";
-import { useHandling } from "app/hooks/useHandling";
+import useHandling from "app/hooks/useHandling";
+import usePermission from "app/hooks/usePermission";
 import IconCalendar from "../images/icon_calendar.svg";
 import IconIndividualReservation from "../images/icon_individual-reservation.svg";
 import { truncatedText } from "../styles/typography";
 import { prefixes } from "../common/urls";
-import usePermission from "./reservations/requested/hooks/usePermission";
 
 const Wrapper = styled.ul<{ $sideMenu?: boolean }>`
   display: flex;
