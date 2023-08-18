@@ -1,7 +1,11 @@
 import { env } from "app/env.mjs";
 
 export const defaultLanguage = "fi";
-export const languages = ["fi"];
+
+// NOTE this is a dangerous variable, it does not change the frontend language
+// instead it changes the possible data translations saved to backend.
+// Changing it without changing the backend will break all form submits.
+export const languages = ["fi", "sv", "en"];
 
 export const weekdays = [
   "monday",
