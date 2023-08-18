@@ -23,6 +23,12 @@ snapshots['ReservationUnitQueryTestCase::test_admin_sees_reservations_sensitive_
                                 'billingLastName': 'Reggie',
                                 'billingPhone': 'phone',
                                 'cancelDetails': 'cancdetails',
+                                'cancelReason': {
+                                    'reason': 'secret'
+                                },
+                                'denyReason': {
+                                    'reason': 'secret'
+                                },
                                 'description': 'description',
                                 'freeOfChargeReason': 'reason',
                                 'handlingDetails': 'Handling details',
@@ -1722,6 +1728,8 @@ snapshots['ReservationUnitQueryTestCase::test_other_reservations_does_not_show_s
                                 'billingLastName': None,
                                 'billingPhone': None,
                                 'cancelDetails': None,
+                                'cancelReason': None,
+                                'denyReason': None,
                                 'description': None,
                                 'freeOfChargeReason': None,
                                 'handlingDetails': '',
