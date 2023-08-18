@@ -34,6 +34,7 @@ import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
+import ClientOnly from "common/src/ClientOnly";
 import {
   ApplicationRound,
   PendingReservation,
@@ -118,7 +119,6 @@ import {
 import { Toast } from "../../components/common/Toast";
 import QuickReservation from "../../components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
-import ClientOnly from "../../components/ClientOnly";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;

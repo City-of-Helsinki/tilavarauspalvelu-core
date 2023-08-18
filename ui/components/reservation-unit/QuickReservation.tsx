@@ -18,6 +18,7 @@ import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
+import ClientOnly from "common/src/ClientOnly";
 import { ReservationUnitByPkType } from "common/types/gql-types";
 import { ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
@@ -26,7 +27,6 @@ import { formatDate } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import Carousel from "../Carousel";
 import LoginFragment from "../LoginFragment";
-import ClientOnly from "../ClientOnly";
 
 type Props = {
   isReservationUnitReservable: boolean;

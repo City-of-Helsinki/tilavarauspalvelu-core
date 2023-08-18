@@ -6,13 +6,13 @@ import styled from "styled-components";
 import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
+import ClientOnly from "common/src/ClientOnly";
 import { ApplicationRoundType } from "common/types/gql-types";
 import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 import IconButton from "../common/IconButton";
-import ClientOnly from "../ClientOnly";
 
 interface Props {
   applicationRound: ApplicationRoundType;

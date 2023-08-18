@@ -2,11 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
+import ClientOnly from "common/src/ClientOnly";
 import KorosHeading, { Heading } from "app/component/KorosHeading";
 import { HERO_IMAGE_URL } from "app/common/const";
 import Footer from "app/component/Footer";
 import Navigation from "app/component/Navigation";
-import ClientOnly from "app/component/ClientOnly";
 import { env } from "app/env.mjs";
 import BaseLayout from "../../layout";
 

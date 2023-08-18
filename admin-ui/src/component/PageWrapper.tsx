@@ -4,13 +4,13 @@ import * as Sentry from "@sentry/react";
 import styled from "styled-components";
 import { useSession } from "next-auth/react";
 
+import ClientOnly from "common/src/ClientOnly";
 import Error5xx from "app/common/Error5xx";
 import ScrollToTop from "../common/ScrollToTop";
 import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
 import MainMenu from "./MainMenu";
 import Loader from "./Loader";
-import ClientOnly from "./ClientOnly";
 import MainLander from "./MainLander";
 
 type Props = {

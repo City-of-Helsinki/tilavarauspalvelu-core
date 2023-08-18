@@ -14,6 +14,7 @@ import {
 import { omit } from "lodash";
 import { useLocalStorage } from "react-use";
 import { Container } from "common";
+import ClientOnly from "common/src/ClientOnly";
 
 import {
   formatDate,
@@ -31,7 +32,6 @@ import {
 } from "../../modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import AltNotification from "../common/AltNotification";
-import ClientOnly from "../ClientOnly";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
