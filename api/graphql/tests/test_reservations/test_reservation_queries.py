@@ -985,7 +985,6 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_recurring_reservation(self):
-
         rec = RecurringReservationFactory(
             name="Recurring reservation", reservation_unit=self.reservation_unit
         )

@@ -18,7 +18,6 @@ from spaces.models import Space
 
 
 class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
-
     id = serializers.PrimaryKeyRelatedField(
         source="application_event_schedule.id", read_only=True
     )

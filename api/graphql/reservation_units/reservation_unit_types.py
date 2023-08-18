@@ -97,7 +97,6 @@ class TaxPercentageType(AuthNode, PrimaryKeyObjectType):
 
 
 class KeywordGroupType(AuthNode, PrimaryKeyObjectType):
-
     keywords = graphene.List(KeywordType)
 
     class Meta:
@@ -164,7 +163,6 @@ class QualifierType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
-
     url = graphene.String()
 
     permission_classes = (ReservationUnitHaukiUrlPermission,)

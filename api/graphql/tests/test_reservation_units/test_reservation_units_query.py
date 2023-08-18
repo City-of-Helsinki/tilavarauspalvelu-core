@@ -55,7 +55,6 @@ TIMEZONE = get_default_timezone()
 
 @freeze_time("2021-05-03")
 class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
-
     def test_getting_reservation_units(self):
         self.maxDiff = None
         self.client.force_login(self.regular_joe)

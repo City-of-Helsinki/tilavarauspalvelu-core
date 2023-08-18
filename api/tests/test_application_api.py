@@ -422,7 +422,6 @@ def test_application_event_save(user_api_client, valid_application_event_data):
 def test_application_event_reduction_count(
     user_api_client, application_event, event_reduction
 ):
-
     response = user_api_client.get(
         reverse("application_event-detail", kwargs={"pk": application_event.id}),
         format="json",
@@ -964,7 +963,6 @@ def test_creating_weekly_amount_reduction_should_mark_declined(
 def test_cant_create_more_reductions_than_events_per_week(
     application_event, general_admin_api_client, result_scheduled_for_monday
 ):
-
     for i in range(application_event.events_per_week):
         ApplicationEventWeeklyAmountReduction.objects.create(
             application_event=application_event
@@ -1016,7 +1014,6 @@ def test_regular_user_cant_create_reductions(
     result_scheduled_for_monday,
     user_api_client,
 ):
-
     data = {
         "application_event_schedule_result_id": result_scheduled_for_monday.application_event_schedule.id
     }
@@ -1032,7 +1029,6 @@ def test_wrong_service_sector_admin_cant_create_reductions(
     result_scheduled_for_monday,
     service_sector_2_admin_api_client,
 ):
-
     data = {
         "application_event_schedule_result_id": result_scheduled_for_monday.application_event_schedule.id
     }

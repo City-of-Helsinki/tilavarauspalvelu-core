@@ -447,11 +447,15 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         return self.handling_details
 
     @reservation_non_public_field
-    def resolve_cancel_reason(self: Reservation, info: ResolveInfo) -> ReservationCancelReason:
+    def resolve_cancel_reason(
+        self: Reservation, info: ResolveInfo
+    ) -> ReservationCancelReason:
         return self.cancel_reason
 
     @reservation_non_public_field
-    def resolve_deny_reason(self: Reservation, info: ResolveInfo) -> ReservationDenyReason:
+    def resolve_deny_reason(
+        self: Reservation, info: ResolveInfo
+    ) -> ReservationDenyReason:
         return self.deny_reason
 
 

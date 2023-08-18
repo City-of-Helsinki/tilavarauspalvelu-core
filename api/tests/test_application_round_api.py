@@ -162,7 +162,6 @@ def test_partial_update_application_round_status(
     application_round,
     valid_application_round_data,
 ):
-
     data = {
         "status": ApplicationRoundStatus.IN_REVIEW,
     }
@@ -195,7 +194,6 @@ def test_partial_update_application_round_name(
     application_round,
     valid_application_round_data,
 ):
-
     data = {
         "name": "name changes",
     }

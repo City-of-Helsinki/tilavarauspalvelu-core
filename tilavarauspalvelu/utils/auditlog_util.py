@@ -4,7 +4,6 @@ from django.db.models.base import Model
 
 
 class AuditLogger(object):
-
     # Registers model for audit logging if audit logging is enabled
     @staticmethod
     def register(model: Model):

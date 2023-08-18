@@ -89,7 +89,7 @@ def create_verkkokauppa_order(reservation: Reservation):
 
     try:
         payment_order = create_order(order_params)
-    except (CreateOrderError) as err:
+    except CreateOrderError as err:
         with push_scope() as scope:
             scope.set_extra("details", "Creating order in Verkkokauppa failed")
             scope.set_extra("reservation-id", reservation.pk)

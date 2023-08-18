@@ -46,7 +46,6 @@ class UnitMerchantUpdateTestCase(TestCase):
     def test_changing_merchant_updates_reservation_units_without_merchant(
         self, mock_product
     ):
-
         reservation_unit_1 = ReservationUnitFactory(
             name="I should be updated: unit set", unit=self.unit
         )

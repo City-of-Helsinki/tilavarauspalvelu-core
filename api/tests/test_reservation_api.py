@@ -106,7 +106,6 @@ def test_reservation_overlapping_with_same_resource(
 
 @pytest.mark.django_db
 def test_reservation_fetch_should_filter_by_status(user_api_client, reservation):
-
     url = f"{reverse('reservation-list')}?state=created&state=cancelled"
 
     response = user_api_client.get(url, format="json")
@@ -125,7 +124,6 @@ def test_reservation_fetch_should_filter_by_status(user_api_client, reservation)
 def test_reservation_fetch_effectively_active_reservations(
     user_api_client, reservation, confirmed_reservation
 ):
-
     url = f"{reverse('reservation-list')}?active=true"
 
     response = user_api_client.get(url, format="json")

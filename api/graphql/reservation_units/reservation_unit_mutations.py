@@ -138,7 +138,6 @@ class PurposeUpdateMutation(AuthSerializerMutation, SerializerMutation):
 
     @classmethod
     def perform_mutate(cls, serializer, info):
-
         validated_data = serializer.validated_data
         pk = validated_data.get("pk")
         purpose = serializer.update(get_object_or_404(Purpose, pk=pk), validated_data)

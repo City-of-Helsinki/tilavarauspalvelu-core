@@ -39,7 +39,6 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
     )
 
     class Meta(ResourceSerializer.Meta):
-
         fields = [
             "pk",
             "location_type",

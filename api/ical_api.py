@@ -38,7 +38,6 @@ def get_host(request: Union[Request, None]):
 
 
 class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
-
     calendar_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -237,7 +236,6 @@ def export_reservation_events(reservation: Reservation, site_name: str, cal: Cal
 def export(
     application_event: ApplicationEvent, site_name: str, cal: Calendar
 ) -> Calendar:
-
     reservations = Reservation.objects.filter(
         recurring_reservation__application_event=application_event
     )
