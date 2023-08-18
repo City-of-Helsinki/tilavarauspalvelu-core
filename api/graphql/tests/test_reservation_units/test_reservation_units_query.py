@@ -40,7 +40,11 @@ from reservation_units.tests.factories import (
     ReservationUnitTypeFactory,
 )
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from reservations.tests.factories import (
+    ReservationCancelReasonFactory,
+    ReservationDenyReasonFactory,
+    ReservationFactory,
+)
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 from terms_of_use.models import TermsOfUse
 from terms_of_use.tests.factories import TermsOfUseFactory
@@ -51,6 +55,7 @@ TIMEZONE = get_default_timezone()
 
 @freeze_time("2021-05-03")
 class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
+
     def test_getting_reservation_units(self):
         self.maxDiff = None
         self.client.force_login(self.regular_joe)
@@ -2435,6 +2440,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             description="not visible description",
             reservee_id="novisible",
             cancel_details="not visible cancel_details",
+            cancel_reason=ReservationCancelReasonFactory(reason="secret"),
+            deny_reason=ReservationDenyReasonFactory(reason="secret"),
         )
 
         response = self.query(
@@ -2466,6 +2473,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 description
                                 reserveeId
                                 cancelDetails
+                                cancelReason {
+                                    reason
+                                }
+                                denyReason {
+                                    reason
+                                }
                             }
                         }
                     }
@@ -2507,6 +2520,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             description="description",
             reservee_id="residee",
             cancel_details="cancdetails",
+            cancel_reason=ReservationCancelReasonFactory(reason="secret"),
+            deny_reason=ReservationDenyReasonFactory(reason="secret"),
         )
 
         response = self.query(
@@ -2538,6 +2553,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 reserveeId
                                 cancelDetails
                                 user { dateOfBirth }
+                                cancelReason {
+                                    reason
+                                }
+                                denyReason {
+                                    reason
+                                }
                             }
                         }
                     }

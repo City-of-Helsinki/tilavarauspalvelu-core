@@ -11,14 +11,23 @@ P = ParamSpec("P")
 Decorator = Callable[[Callable[P, T]], Callable[P, T]] | Callable[P, T]
 
 
-def reservation_non_public_field(func: callable):
-    def permission_check(*args, **kwargs):
-        if can_view_reservation(args[1].context.user, args[0]):
-            return func(*args, **kwargs)
+def reservation_non_public_field(default: Any = None) -> Decorator:
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        def permission_check(*args, **kwargs):
+            if can_view_reservation(args[1].context.user, args[0]):
+                return func(*args, **kwargs)
 
-        return None
+            return default
 
-    return permission_check
+        return permission_check
+
+    # If used without parentheses: '@reservation_non_public_field'
+    if callable(default):
+        f = decorator(default)
+        default = None
+        return f
+
+    return decorator
 
 
 def reservation_staff_field(default: Any = None) -> Decorator:
