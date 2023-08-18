@@ -10,7 +10,7 @@ import React, { useMemo } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
-import { fontMedium, fontRegular, H2 } from "common/src/common/typography";
+import { fontRegular, H2 } from "common/src/common/typography";
 import { Reservation } from "common/src/reservation-form/types";
 import {
   PaymentOrderType,
@@ -22,10 +22,11 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { getTranslation, reservationsUrl } from "../../modules/util";
-import { BlackButton, LinkButton } from "../../styles/util";
+import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
 import { useLogout } from "../../hooks/useLogout";
+import IconButton from "../common/IconButton";
 
 type Props = {
   reservation: Reservation | ReservationType;
@@ -62,13 +63,8 @@ const ActionContainer2 = styled.div`
   align-items: flex-start;
 `;
 
-const StyledLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  text-decoration: underline;
+const StyledLink = styled(IconButton)`
   color: var(--color-black) !important;
-  ${fontMedium}
 `;
 
 const InlineStyledLink = styled(Link)`
@@ -169,17 +165,21 @@ const ReservationConfirmation = ({
             marginTop: "var(--spacing-3-xl)",
           }}
         >
-          <StyledLink href={reservationUnitPath(reservationUnit.pk)}>
-            {t("reservations:backToReservationUnit")}
-            <IconArrowRight aria-hidden size="m" />
-          </StyledLink>
-          <StyledLink href="/">
-            {t("common:gotoFrontpage")}
-            <IconArrowRight aria-hidden size="m" />
-          </StyledLink>
-          <LinkButton onClick={() => logout()}>
-            {t("common:logout")} <IconSignout size="m" aria-hidden />
-          </LinkButton>
+          <StyledLink
+            href={reservationUnitPath(reservationUnit.pk)}
+            label={t("reservations:backToReservationUnit")}
+            icon={<IconArrowRight aria-hidden />}
+          />
+          <StyledLink
+            href="/"
+            label={t("common:gotoFrontpage")}
+            icon={<IconArrowRight aria-hidden />}
+          />
+          <StyledLink
+            icon={<IconSignout aria-hidden />}
+            onClick={() => logout()}
+            label={t("common:logout")}
+          />
         </ActionContainer2>
       </div>
     </Wrapper>

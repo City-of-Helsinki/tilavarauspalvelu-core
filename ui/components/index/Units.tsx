@@ -1,13 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { IconAngleRight, IconArrowRight } from "hds-react";
+import { IconArrowRight } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { fontMedium, H3 } from "common/src/common/typography";
 import { UnitType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
+import IconButton from "../common/IconButton";
 
 type Props = {
   units: UnitType[];
@@ -51,7 +52,7 @@ const UnitContainer = styled.div`
 
 const UnitItemLink = styled(Link)`
   &:hover {
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   color: var(--color-black) !important;
@@ -67,16 +68,11 @@ const UnitItemLink = styled(Link)`
   }
 `;
 
-const SearchLink = styled(Link)`
-  color: var(--color-bus) !important;
+const IconLinkContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-2-xs);
   ${fontMedium}
-
-  &:hover {
-    text-decoration: underline;
-  }
 `;
 
 const Units = ({ units }: Props): JSX.Element => {
@@ -101,12 +97,14 @@ const Units = ({ units }: Props): JSX.Element => {
           </UnitContainer>
         </Content>
         {units?.length > itemLimit && (
-          <SearchLink
-            href={`${singleSearchPrefix}`}
-            data-testid="front-page__units--more-link"
-          >
-            {t("common:showAll")} <IconAngleRight aria-hidden />
-          </SearchLink>
+          <IconLinkContainer>
+            <IconButton
+              href={singleSearchPrefix}
+              label={t("common:showAll")}
+              icon={<IconArrowRight aria-hidden />}
+              data-testid="front-page__units--more-link"
+            />
+          </IconLinkContainer>
         )}
       </Wrapper>
     )
