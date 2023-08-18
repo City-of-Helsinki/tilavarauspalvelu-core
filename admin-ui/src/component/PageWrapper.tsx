@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import * as Sentry from "@sentry/react";
+import * as Sentry from "@sentry/nextjs";
 import styled from "styled-components";
 import { useSession } from "next-auth/react";
 

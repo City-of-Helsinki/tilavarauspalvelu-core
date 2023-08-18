@@ -1,5 +1,6 @@
 import { join } from "path";
 import analyser from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
 import * as url from "url";
 await import ("./src/env.mjs");
 import { env } from "./src/env.mjs";
