@@ -315,7 +315,6 @@ class ReservationSchedulingMixin:
         buffer_before: Optional[datetime.timedelta] = None,
         buffer_after: Optional[datetime.timedelta] = None,
     ):
-
         current_type = getattr(self.instance, "type", reservation_type)
         if current_type == ReservationType.BLOCKED:
             return

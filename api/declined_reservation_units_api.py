@@ -8,7 +8,6 @@ from reservation_units.models import ReservationUnit
 
 
 class DeclinedReservationUnitSerializer(serializers.ModelSerializer):
-
     declined_reservation_unit_ids = serializers.PrimaryKeyRelatedField(
         queryset=ReservationUnit.objects.all(),
         source="declined_reservation_units",

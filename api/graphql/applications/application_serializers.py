@@ -81,7 +81,6 @@ class ApplicationEventInApplicationSerializer(ApplicationEventCreateSerializer):
 
 
 class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
-
     contact_person = PersonCreateSerializer(
         help_text="Contact person information for the application",
         read_only=False,

@@ -492,7 +492,6 @@ def event_reduction(application_event):
 
 @pytest.fixture
 def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> ApplicationEvent:
-
     return Recurrence.objects.create(
         application_event=application_event,
         recurrence=recurrence.Recurrence(

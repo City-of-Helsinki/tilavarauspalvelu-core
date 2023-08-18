@@ -26,7 +26,6 @@ def test_accepting_allocation_result(
 def test_deleting_allocation_result(
     result_scheduled_for_monday, general_admin_api_client
 ):
-
     assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
     response = general_admin_api_client.delete(
         reverse(

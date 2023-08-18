@@ -38,7 +38,6 @@ class ReservationType(models.TextChoices):
 
 
 class AgeGroup(models.Model):
-
     minimum = models.fields.PositiveIntegerField(
         verbose_name=_("Minimum"), null=False, blank=False
     )
@@ -52,7 +51,6 @@ class AgeGroup(models.Model):
 
 
 class AbilityGroup(models.Model):
-
     name = models.fields.TextField(
         verbose_name=_("Name"), null=False, blank=False, unique=True
     )

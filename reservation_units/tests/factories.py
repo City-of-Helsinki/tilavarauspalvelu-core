@@ -123,7 +123,6 @@ class ReservationUnitImageFactory(DjangoModelFactory):
 
 
 class ReservationUnitPricingFactory(DjangoModelFactory):
-
     begins = date(2021, 1, 1)
     pricing_type = PricingType.PAID
     price_unit = "per_15_mins"

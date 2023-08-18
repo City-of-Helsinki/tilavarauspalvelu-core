@@ -407,7 +407,6 @@ class ApplicationRound(models.Model):
         return status
 
     def get_application_events_by_basket(self):
-
         matching_application_events: Dict[int, List[ApplicationEvent]] = {}
         for basket in self.application_round_baskets.order_by("order_number").all():
             matching_application_events[
@@ -576,7 +575,6 @@ def customer_types_to_applicant_types(
 
 
 class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
-
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
@@ -762,7 +760,6 @@ class ApplicationManager(models.Manager):
 
 
 class Application(APPLICANT_TYPE_CONST, models.Model):
-
     applicant_type = models.CharField(
         max_length=64,
         verbose_name=_("Applicant type"),
@@ -1070,7 +1067,6 @@ class ApplicationEvent(models.Model):
         return occurences
 
     def get_all_occurrences(self):
-
         occurences = {}
         for event_shedule in self.application_event_schedules.all():
             occurences[event_shedule.id] = event_shedule.get_occurences()
@@ -1196,7 +1192,6 @@ class ApplicationEventAggregateData(AggregateDataBase):
 
 
 class EventReservationUnit(models.Model):
-
     priority = models.IntegerField(
         verbose_name=_("Priority"),
         null=True,
@@ -1318,7 +1313,6 @@ class Recurrence(models.Model):
 
 
 class ApplicationEventScheduleResult(models.Model):
-
     accepted = models.BooleanField(default=False, null=False)
 
     declined = models.BooleanField(default=False, null=False)
@@ -1446,7 +1440,6 @@ class ApplicationEventScheduleResultAggregateData(AggregateDataBase):
 
 
 class ApplicationEventWeeklyAmountReduction(models.Model):
-
     application_event = models.ForeignKey(
         ApplicationEvent,
         verbose_name=_("Application event"),

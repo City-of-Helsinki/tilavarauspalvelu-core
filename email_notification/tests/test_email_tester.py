@@ -25,7 +25,6 @@ class ReservationUnitSelectFormTestCase(TestCase):
 
 class EmailTestFormTestCase(TestCase):
     def test_constructor(self):
-
         template1 = EmailTemplateFactory.create(
             name="Template 1", type=EmailType.RESERVATION_CONFIRMED
         )

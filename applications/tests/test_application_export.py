@@ -114,7 +114,6 @@ class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
             data_reader = csv.reader(data_file)
 
             for i, line in enumerate(data_reader):
-
                 # Do not test header rows
                 if i <= 2:
                     continue

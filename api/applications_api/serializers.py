@@ -39,7 +39,6 @@ MAXIMUM_TIME = timezone.datetime(
 
 
 class AddressSerializer(serializers.ModelSerializer):
-
     id = serializers.IntegerField(allow_null=True, required=False)
 
     class Meta:
@@ -49,7 +48,6 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
-
     id = serializers.IntegerField(allow_null=True, required=False)
     address = AddressSerializer(
         help_text="Address object of this organisation",
@@ -114,7 +112,6 @@ class OrganisationSerializer(serializers.ModelSerializer):
 
 
 class PersonSerializer(serializers.ModelSerializer):
-
     id = serializers.IntegerField(allow_null=True, required=False)
 
     class Meta:
@@ -148,7 +145,6 @@ class NullableCurrentUserDefault(object):
 
 
 class ApplicationEventScheduleSerializer(serializers.ModelSerializer):
-
     id = serializers.IntegerField(allow_null=True, required=False)
 
     class Meta:
@@ -425,7 +421,6 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
-
     contact_person = PersonSerializer(
         help_text="Contact person information for the application",
         read_only=False,

@@ -99,14 +99,12 @@ class QueryPerformanceOptimizerMixin:
                 annotations.append(optimization_value)
 
             if optimization_type == "prefetch":
-
                 # CASE: Simple optimization, append field name to prefetch list
                 if isinstance(optimization_value, str):
                     prefetches.append(optimization_value)
 
                 # CASE: Advanced optimization logic
                 if isinstance(optimization_value, dict):
-
                     # CASE: Has child fields, check for deeper optimizations
                     if child.selection_set.selections:
                         (
@@ -225,14 +223,12 @@ class QueryPerformanceOptimizerMixin:
             annotations.append(optimization_value)
 
         if optimization_type == "prefetch":
-
             # CASE: Simple optimization, append field name to prefetch list
             if isinstance(optimization_value, str):
                 prefetches.append(optimization_value)
 
             # CASE: Advanced optimization logic
             if isinstance(optimization_value, dict):
-
                 # CASE: Has child fields, check for deeper optimizations
                 if child.selection_set.selections:
                     (
@@ -252,7 +248,6 @@ class QueryPerformanceOptimizerMixin:
                     prefetches.append(optimization_value.get("field_name"))
 
         if optimization_type == "select_with_child_optimizations":
-
             # CASE: Has child fields, check if deeper optimizations are required
             if child.selection_set.selections:
                 (
@@ -273,14 +268,12 @@ class QueryPerformanceOptimizerMixin:
             parent_selects.append(optimization_value)
 
         if optimization_type == "prefetch_for_parent":
-
             # CASE: Simple optimization, append field name to prefetch list
             if isinstance(optimization_value, str):
                 parent_prefetches.append(optimization_value)
 
             # CASE: Advanced optimization logic
             if isinstance(optimization_value, dict):
-
                 # CASE: Includes child fileds, look deeper for further optimization
                 if child.selection_set.selections:
                     always_prefetch = optimization_value.pop("always_prefetch", False)

@@ -650,7 +650,6 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     def test_create_succeed_when_reservation_unit_closed_on_selected_time_and_opening_hours_are_ignored(
         self, mock_periods, mock_opening_hours
     ):
-
         self.reservation_unit.allow_reservations_without_opening_hours = True
         self.reservation_unit.save()
 

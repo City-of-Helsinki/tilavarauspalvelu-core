@@ -5,7 +5,6 @@ from users.models import ReservationNotification
 
 
 class UserUpdateSerializer(PrimaryKeyUpdateSerializer):
-
     reservation_notification = ChoiceCharField(
         default=ReservationNotification.NONE,
         choices=ReservationNotification.choices,

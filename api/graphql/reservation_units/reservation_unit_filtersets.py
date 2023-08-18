@@ -166,7 +166,6 @@ class ReservationUnitsFilterSet(
         return qs
 
     def get_max_persons_gte(self, qs, property, value):
-
         filters = Q(max_persons__gte=value) | Q(max_persons__isnull=True)
         return qs.filter(filters)
 

@@ -234,7 +234,6 @@ class ApplicationEventWeeklyAmountReductionViewSet(
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
 ):
-
     serializer_class = ApplicationEventWeeklyAmountReductionSerializer
 
     queryset = ApplicationEventWeeklyAmountReduction.objects.all()
