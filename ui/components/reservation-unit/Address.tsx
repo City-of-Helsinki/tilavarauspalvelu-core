@@ -10,7 +10,6 @@ import {
 } from "common/types/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { getTranslation } from "../../modules/util";
-import ExternalLink from "./ExternalLink";
 import IconButton from "../common/IconButton";
 
 type Props = {
@@ -124,9 +123,10 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
           label={t("reservationUnit:linkHSL")}
           icon={<IconLinkExternal aria-hidden />}
         />
-        <ExternalLink
+        <IconButton
           href={accessibilityUrl(i18n.language, reservationUnit.unit)}
-          name={t("reservationUnit:linkAccessibility")}
+          label={t("reservationUnit:linkAccessibility")}
+          icon={<IconLinkExternal aria-hidden />}
         />
       </Links>
     </Container>
