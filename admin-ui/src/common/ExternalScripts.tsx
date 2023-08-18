@@ -1,16 +1,26 @@
 import React from "react";
+import Script from "next/script";
 
 import { env } from "app/env.mjs";
+import { isBrowser } from "app/common/const";
 
 const isCookiehubEnabled = env.NEXT_PUBLIC_COOKIEHUB_ENABLED;
 const isHotjarEnabled = env.NEXT_PUBLIC_HOTJAR_ENABLED;
 
-const ExternalScripts = (): JSX.Element => {
+const ExternalScripts = (): JSX.Element | null => {
+  if (!isBrowser) {
+    return null;
+  }
+
   return (
     <>
       {isCookiehubEnabled && (
-        <script>
-          {`
+        <Script
+          id="cookiehub"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            // eslint-disable-next-line
+            __html: `
             var cpm = {
               cookie: {
                 domain: ''
@@ -23,12 +33,19 @@ const ExternalScripts = (): JSX.Element => {
             e.onload=function(){u.cookiehub.load(b);}
             d.parentNode.insertBefore(e,d);
             })(document,window,cpm);
-          `}
-        </script>
+          `,
+          }}
+        />
       )}
       {isHotjarEnabled && (
-        <script type="text/plain" data-consent="analytics">
-          {`
+        <Script
+          id="hotjar"
+          strategy="afterInteractive"
+          data-consent="analytics"
+          type="text/plain"
+          dangerouslySetInnerHTML={{
+            // eslint-disable-next-line
+            __html: `
             (function(h,o,t,j,a,r){
               h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
               h._hjSettings={hjid:2913611,hjsv:6};
@@ -37,8 +54,9 @@ const ExternalScripts = (): JSX.Element => {
               r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
               a.appendChild(r);
           })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-          `}
-        </script>
+          `,
+          }}
+        />
       )}
     </>
   );

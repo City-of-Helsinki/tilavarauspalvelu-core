@@ -9,7 +9,6 @@ import "./i18n";
 import { publicUrl } from "./common/const";
 import { GlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
-import ExternalScripts from "./common/ExternalScripts";
 import AuthorizationChecker from "./common/AuthorizationChecker";
 
 import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
@@ -228,7 +227,6 @@ const App = () => {
             element={withAuthorization(<MyUnitsRouter />)}
           />
         </Routes>
-        <ExternalScripts />
       </PageWrapper>
     </BrowserRouter>
   );
