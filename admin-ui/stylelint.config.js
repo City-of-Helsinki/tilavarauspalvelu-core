@@ -2,10 +2,7 @@ const path = require("path");
 
 module.exports = {
   processors: ["stylelint-processor-styled-components"],
-  extends: [
-    "stylelint-config-standard",
-    "stylelint-config-styled-components",
-  ],
+  extends: ["stylelint-config-standard", "stylelint-config-styled-components"],
   customSyntax: "postcss-styled-syntax",
   plugins: ["stylelint-value-no-unknown-custom-properties"],
   rules: {
