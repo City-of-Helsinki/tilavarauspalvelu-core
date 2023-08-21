@@ -58,7 +58,6 @@ const ActionContainer1 = styled.div`
 
 const ActionContainer2 = styled.div`
   display: flex;
-  gap: var(--spacing-m);
   flex-direction: column;
   align-items: flex-start;
 `;
