@@ -1,5 +1,6 @@
 // TODO move this hook up
 import { useQuery } from "@apollo/client";
+import { useSession } from "next-auth/react";
 import { type Query, type ReservationType } from "common/types/gql-types";
 import {
   hasPermission as baseHasPermission,
@@ -10,15 +11,20 @@ import {
 import { CURRENT_USER } from "app/context/queries";
 
 const usePermission = () => {
-  const { data: user } = useQuery<Query>(CURRENT_USER);
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
+  const { data: user } = useQuery<Query>(CURRENT_USER, {
+    skip: !isAuthenticated,
+    fetchPolicy: "no-cache",
+  });
 
   const hasSomePermission = (permissionName: Permission) => {
-    if (!user?.currentUser) return false;
+    if (!isAuthenticated || !user?.currentUser) return false;
     return baseHasSomePermission(user?.currentUser, permissionName);
   };
 
   const hasAnyPermission = () => {
-    if (!user?.currentUser) return false;
+    if (!isAuthenticated || !user?.currentUser) return false;
     return baseHasAnyPermission(user?.currentUser);
   };
 
@@ -27,7 +33,7 @@ const usePermission = () => {
     permissionName: Permission,
     includeOwn = true
   ) => {
-    if (!user?.currentUser) return false;
+    if (!isAuthenticated || !user?.currentUser) return false;
 
     const serviceSectorPks =
       reservation?.reservationUnits?.[0]?.unit?.serviceSectors
@@ -58,8 +64,10 @@ const usePermission = () => {
     return permission || ownPermissions;
   };
 
+  const actualUser =
+    isAuthenticated && user?.currentUser ? user.currentUser : undefined;
   return {
-    user: user?.currentUser ?? undefined,
+    user: actualUser,
     hasPermission,
     hasSomePermission,
     hasAnyPermission,
