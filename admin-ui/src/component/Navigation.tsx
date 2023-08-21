@@ -7,6 +7,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
 import { useNavigate } from "react-router-dom";
 import { publicUrl } from "app/common/const";
+import usePermission from "app/hooks/usePermission";
 import MainMenu from "./MainMenu";
 import { StyledHDSNavigation } from "../styles/util";
 
@@ -40,7 +41,11 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
   const [isMenuOpen, setMenuState] = useState(false);
 
   const { data: session } = useSession();
-  const { user } = session || {};
+  // NOTE have to construct the name from GQL query because most users don't have names in oidc profile
+  const { user } = usePermission();
+  const firstName = user?.firstName?.trim() ?? "";
+  const lastName = user?.lastName?.trim() ?? "";
+  const name = `${firstName} ${lastName}`.trim() || t("Navigation.noName");
 
   return (
     <StyledHDSNavigation
@@ -67,19 +72,20 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
           )}
         </MobileNavigation>
         <UserMenu
-          userName={`${user?.name?.trim()}`}
+          userName={name}
           authenticated={user != null}
           label={t(user != null ? "Navigation.logging" : "Navigation.login")}
           onSignIn={() => {
-            signIn("tunnistamo", {
-              callbackUrl: window.location.href,
-            });
+            const callbackUrl = window.location.href.match(/logout/)
+              ? publicUrl
+              : window.location.href;
+            signIn("tunnistamo", { callbackUrl });
           }}
         >
           {user && (
             <UserInfo
-              name={`${user?.name?.trim()}` || t("Navigation.noName")}
-              email={user?.email ?? t("Navigation.noEmail")}
+              name={name}
+              email={session?.user?.email || t("Navigation.noEmail")}
             />
           )}
           <HDSNavigation.Item

@@ -175,7 +175,7 @@ const options = (): NextAuthOptions => {
     pages: {
       signIn: `/`,
       signOut: "/auth/logout",
-      error: `/auth/error`,
+      error: "/auth/error",
     },
     debug: env.NEXT_ENV === "development",
   };
