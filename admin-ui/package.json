@@ -37,7 +37,7 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "^3.7.3",
+    "@apollo/client": "^3.8.1",
     "@hookform/resolvers": "^2.9.10",
     "@joi/date": "^2.1.0",
     "@n8tb1t/use-scroll-position": "^2.0.3",

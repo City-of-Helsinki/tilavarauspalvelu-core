@@ -19,7 +19,7 @@
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\""
   },
   "dependencies": {
-    "@apollo/client": "^3.7.3",
+    "@apollo/client": "^3.8.1",
     "@react-pdf/renderer": "^3.1.12",
     "@sentry/nextjs": "^7.28.1",
     "axios": "^1.2.1",

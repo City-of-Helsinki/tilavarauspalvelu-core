@@ -1,19 +1,15 @@
 import { useQuery } from "@apollo/client";
 import { useSession } from "next-auth/react";
 
-import { Query, QueryReservationsArgs } from "common/types/gql-types";
+import { Query } from "common/types/gql-types";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 
 const useHandling = () => {
   const { status } = useSession();
 
-  const { data, refetch } = useQuery<Query, QueryReservationsArgs>(
-    HANDLING_COUNT_QUERY,
-    {
-      skip: status !== "authenticated",
-      fetchPolicy: "no-cache",
-    }
-  );
+  const { data, refetch } = useQuery<Query>(HANDLING_COUNT_QUERY, {
+    skip: status !== "authenticated",
+  });
 
   const handlingCount: number = data?.reservations?.edges?.length ?? 0;
   const unitCount: number = data?.units?.totalCount ?? 0;
