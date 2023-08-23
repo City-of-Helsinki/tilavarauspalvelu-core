@@ -1,9 +1,26 @@
-# Unit test / coverage reports
-.coverage
-coverage.xml
-.pytest_cache/
-
-.mypy_cache/
-
-# Celery filesystem queue
+*/tests*
 broker/
+__pycache__
+fixtures/
+.pytest_cache
+.ruff_cache
+.github
+.idea
+.vscode
+.mypy_cache
+.coverage
+.dockerignore
+.env
+.env.example
+.git-blame-ignore-revs
+.gitattributes
+.gitignore
+.pre-commit-config.yaml
+azure-pipelines-devtest.yml
+azure-pipelines-stageprod.yml
+docker-compose.yml
+Dockerfile
+Dockerfile.local
+README.md
+requirements.txt
+sonar-project.properties

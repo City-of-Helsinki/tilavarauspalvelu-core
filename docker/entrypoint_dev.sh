@@ -4,5 +4,5 @@ set -euo pipefail
 echo "Applying database migrations..."
 python manage.py migrate
 
-echo "Starting uWSGI server..."
-exec uwsgi --yaml /tvp/deploy/uwsgi.yml
+echo "Starting local server..."
+python manage.py runserver 0.0.0.0:8000

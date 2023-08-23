@@ -1,18 +1,132 @@
-FROM python:3.11-bullseye
+FROM python:3.11-slim-bullseye AS base
 
-RUN mkdir -p /tvp \
+# Setup environment variables.
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random
+
+# Setup build time variables.
+ARG STATIC_ROOT=/srv/static
+ARG USER=tvp
+ARG GROUP=tvp
+ARG TVP=/tvp
+ARG VENV=$TVP/venv
+ARG DEPS=main
+
+# Setup directory structure.
+RUN echo "Setup group" \
+    && addgroup \
+      --gid 1000 $GROUP \
+    && echo "Setup restricted user" \
+    && adduser \
+      --disabled-login \
+      --gecos "tvp user" \
+      --home /nonexistent \
+      --ingroup $GROUP \
+      --no-create-home \
+      --shell /sbin/nologin \
+      --uid 1000 $USER \
+    && echo "Install common dependencies" \
     && apt-get update \
-    && apt-get -y install \
-        libgdal-dev
+    && apt-get install -y --no-install-recommends \
+      gdal-bin \
+      gettext \
+      libpq5 \
+      make \
+    && echo "Create code directory and set permissions" \
+    && mkdir -p $TVP \
+    && chown $USER:$GROUP $TVP \
+    && echo "Create celery broker directories and set permissions" \
+    && mkdir -p /broker/queue \
+    && chown $USER:$GROUP /broker/queue \
+    && chmod g+rw /broker/queue \
+    && mkdir -p /broker/processed \
+    && chown $USER:$GROUP /broker/processed \
+    && chmod g+rw /broker/processed \
+    && echo "Create directory for django-prometheus metrics" \
+    && mkdir -p /metrics \
+    && chown $USER:$GROUP /metrics \
+    && chmod g+rw /metrics \
+    && echo "Create directories for static files" \
+    && mkdir -p $STATIC_ROOT \
+    && chown $USER:$GROUP $STATIC_ROOT \
+    && echo "Done"
 
-WORKDIR /tvp
 
-COPY ./requirements.txt .
+FROM base AS builder
 
-RUN pip install -r requirements.txt
+# Install build dependencies
+# - build-essential: for building uWSGI
+# - curl: for installing poetry
+# - libpcre3 & libpcre3-dev: for uWSGI internal routing support
+# - libpq-dev: for building psycopg2
+RUN apt-get install -y --no-install-recommends \
+      build-essential \
+      curl \
+      libpcre3 \
+      libpcre3-dev \
+      libpq-dev
 
+# Setup environment variables for poetry.
+ENV POETRY_HOME=/usr/pypoetry
+ENV PATH=$POETRY_HOME/bin:$PATH
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+# Disable parallel installer to avoid out-of-memory errors in Azure Pipelines.
+ENV POETRY_INSTALLER_PARALLEL=false
+
+# Install poetry.
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.0 python -
+
+# Copy poetry files.
+COPY poetry.lock pyproject.toml /
+
+# Create virtualenv.
+RUN python -m venv $VENV
+
+# Activate virtualenv by setting some environment variables.
+ENV PATH=$VENV/bin:$PATH \
+    VIRTUAL_ENV=$VENV
+
+# Install production dependencies (to previously created virtualenv).
+RUN poetry install --no-root --only $DEPS
+
+
+FROM base AS build-static
+
+# Copy virtualenv.
+COPY --chown=$USER:$GROUP --from=builder $VENV $VENV
+
+# Activate virtualenv by setting some environment variables.
+ENV PATH=$VENV/bin:$PATH \
+    VIRTUAL_ENV=$VENV
+
+# Change working directory to project directory.
+WORKDIR $TVP
+
+# Copy project files.
 COPY . .
 
-RUN chmod +x /tvp/docker/entrypoint.sh
+# Collect static files.
+RUN python manage.py collectstatic --clear --no-input --verbosity=2
+
+
+FROM base AS production
+
+# Switch to restricted user and working directory.
+USER $USER
+WORKDIR $TVP
+
+# Copy project files, virtualenv, and static files.
+COPY --chown=$USER:$GROUP . .
+COPY --chown=$USER:$GROUP --from=builder $VENV $VENV
+COPY --chown=$USER:$GROUP --from=build-static $STATIC_ROOT $STATIC_ROOT
+
+# Activate virtualenv by setting some environment variables.
+ENV PATH=$VENV/bin:$PATH \
+    VIRTUAL_ENV=$VENV
+
+# Expose port for uWSGI.
+EXPOSE 8000
 
 ENTRYPOINT ["/tvp/docker/entrypoint.sh"]
