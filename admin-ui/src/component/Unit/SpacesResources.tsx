@@ -25,7 +25,6 @@ import {
   WideContainer,
 } from "../../styles/layout";
 import Loader from "../Loader";
-import withMainMenu from "../withMainMenu";
 import InfoModalContent from "./InfoModalContent";
 import ResourcesTable from "./ResourcesTable";
 import SpacesTable from "./SpacesTable";
@@ -274,7 +273,6 @@ const SpacesResources = (): JSX.Element | null => {
     );
     refetch();
   };
-
   return (
     <ContentContainer>
       <Modal
@@ -309,9 +307,7 @@ const SpacesResources = (): JSX.Element | null => {
           <StyledButton
             variant="supplementary"
             iconRight={<IconInfoCircleFill />}
-            onClick={() =>
-              setModalContent && setModalContent(<InfoModalContent />)
-            }
+            onClick={() => setModalContent(<InfoModalContent />)}
           >
             {t("Unit.hierarchyReadMore")}
           </StyledButton>
@@ -396,4 +392,4 @@ const SpacesResources = (): JSX.Element | null => {
   );
 };
 
-export default withMainMenu(SpacesResources);
+export default SpacesResources;

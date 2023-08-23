@@ -15,7 +15,6 @@ import { useNotification } from "../../context/NotificationContext";
 import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
-import withMainMenu from "../withMainMenu";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import { getApplicationRoundStatus } from "./ApplicationRoundStatusTag";
 import { TableLink, CustomTable } from "./components";
@@ -236,4 +235,4 @@ function AllApplicationRounds(): JSX.Element | null {
   );
 }
 
-export default withMainMenu(AllApplicationRounds);
+export default AllApplicationRounds;

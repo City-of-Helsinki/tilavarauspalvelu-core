@@ -8,7 +8,7 @@ import {
   formatDate,
   formatDuration,
 } from "../../common/util";
-import { ReactComponent as IconCalendar } from "../../images/icon_calendar.svg";
+import IconCalendar from "../../images/icon_calendar.svg";
 
 interface IProps {
   id: number | null;

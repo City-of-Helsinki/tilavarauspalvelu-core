@@ -301,11 +301,3 @@ export const mockRecurringReservation: ReservationType = {
     },
   },
 };
-
-export const NotificationMock = {
-  notification: null,
-  notifyError: () => {},
-  notifySuccess: () => {},
-  setNotification: () => {},
-  clearNotification: () => {},
-};

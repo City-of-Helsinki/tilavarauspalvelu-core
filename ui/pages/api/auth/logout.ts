@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getToken } from "next-auth/jwt";
 import getConfig from "next/config";
 
 const {
@@ -10,12 +9,15 @@ const federatedLogOut = async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<NextApiResponse> => {
+  const { token } = req.query;
   try {
-    const token = await getToken({ req });
     if (!token) {
+      // eslint-disable-next-line no-console
+      console.warn("logout: no token parameter: redirect to main page");
       return res.redirect(baseUrl);
     }
 
+    // TODO post_logout_redirect_uri doesn't work sometimes with tunnistamo why?
     const redirectURL = `${baseUrl}/logout`;
     const endSessionParams = new URLSearchParams({
       post_logout_redirect_uri: redirectURL,

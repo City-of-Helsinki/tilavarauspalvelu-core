@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { Button, IconCross } from "hds-react";
@@ -10,8 +10,6 @@ import { Seranwrap } from "../styles/util";
 interface IProps {
   children: React.ReactNode;
 }
-
-const modalRoot = document.getElementById("modal-root");
 
 const Content = styled.div<{ onTransitionEnd: React.TransitionEventHandler }>`
   &:not(:focus-within) {
@@ -70,10 +68,10 @@ const CloseBtn = styled(Button).attrs({
   height: 20px;
 `;
 
-function Modal({ children }: IProps): JSX.Element {
+function Modal({ children }: IProps): JSX.Element | null {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
-  const element = document.createElement("div");
+
   const focusHolder = React.createRef<HTMLButtonElement>();
   const closeBtn = React.createRef<HTMLButtonElement>();
 
@@ -83,21 +81,20 @@ function Modal({ children }: IProps): JSX.Element {
     }, 0);
   }, [focusHolder]);
 
-  useEffect(() => {
-    if (modalRoot) modalRoot.appendChild(element);
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const modalRoot = document.getElementById("modal-root") ?? document.body;
 
-    return () => {
-      if (modalRoot) modalRoot.removeChild(element);
-    };
-  }, [element]);
+  const closeModal = () => setModalContent(null, false);
 
   return ReactDOM.createPortal(
     <>
-      <Seranwrap onClick={() => setModalContent(null)} />
+      <Seranwrap onClick={closeModal} />
       <Content onTransitionEnd={() => focusHolder.current?.focus()}>
         <FocusHolder ref={focusHolder} />
         <CloseBtn
-          onClick={() => setModalContent(null)}
+          onClick={closeModal}
           aria-label={t("common.closeModal")}
           ref={closeBtn}
         >
@@ -106,7 +103,7 @@ function Modal({ children }: IProps): JSX.Element {
         <Inner>{children}</Inner>
       </Content>
     </>,
-    element
+    modalRoot
   );
 }
 

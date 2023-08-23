@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Container } from "../../../styles/layout";
 import Loader from "../../Loader";
-import withMainMenu from "../../withMainMenu";
 import MyUnitRecurringReservationForm from "./MyUnitRecurringReservationForm";
 import { useRecurringReservationsUnits } from "./hooks";
 import LinkPrev from "../../LinkPrev";
@@ -69,4 +68,4 @@ const MyUnitRecurringReservationRouteWrapper = () => {
   return <MyUnitRecurringReservation unitId={parseInt(unitId, 10)} />;
 };
 
-export default withMainMenu(MyUnitRecurringReservationRouteWrapper);
+export default MyUnitRecurringReservationRouteWrapper;

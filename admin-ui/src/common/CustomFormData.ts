@@ -1,3 +1,4 @@
+import FormData from "form-data";
 /**
  * Custom FormData for changing the default behaviour of
  * apollo-upload-client so that the format is what core expects.
@@ -13,6 +14,9 @@ export class CustomFormData extends FormData {
         image: JSON.parse(value as string)[1],
       };
       return super.append(name, JSON.stringify(newMap));
+    }
+    if (typeof value === "string") {
+      return super.append(name, value);
     }
     return super.append("image", value, fileName);
   }

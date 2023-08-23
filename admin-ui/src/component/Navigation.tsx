@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import { isValidAuthState } from "app/context/authStateReducer";
 import { UserInfo } from "common";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
+import { useNavigate } from "react-router-dom";
+import { publicUrl } from "app/common/const";
+import usePermission from "app/hooks/usePermission";
 import MainMenu from "./MainMenu";
-import { useAuthState } from "../context/AuthStateContext";
 import { StyledHDSNavigation } from "../styles/util";
 
 const MobileNavigation = styled.div`
@@ -34,16 +35,17 @@ const UserMenu = styled(HDSNavigation.User)`
   }
 `;
 
-const Navigation = (): JSX.Element => {
+const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
   const { t } = useTranslation();
-  const { authState } = useAuthState();
-
-  const [loggingIn, setLoggingIn] = useState(false);
 
   const [isMenuOpen, setMenuState] = useState(false);
-  const history = useNavigate();
 
-  const { state, user, login, logout } = authState;
+  const { data: session } = useSession();
+  // NOTE have to construct the name from GQL query because most users don't have names in oidc profile
+  const { user } = usePermission();
+  const firstName = user?.firstName?.trim() ?? "";
+  const lastName = user?.lastName?.trim() ?? "";
+  const name = `${firstName} ${lastName}`.trim() || t("Navigation.noName");
 
   return (
     <StyledHDSNavigation
@@ -56,13 +58,13 @@ const Navigation = (): JSX.Element => {
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t("Navigation.skipToMainContent")}
-      onTitleClick={() => history("/")}
+      onTitleClick={onLogoClick}
       onMenuToggle={() => setMenuState(!isMenuOpen)}
       menuOpen={isMenuOpen}
     >
       <HDSNavigation.Actions>
         <MobileNavigation>
-          {user && isValidAuthState(state) && (
+          {user && !disabledRouter && (
             <MainMenu
               placement="navigation"
               onItemSelection={() => setMenuState(false)}
@@ -70,33 +72,26 @@ const Navigation = (): JSX.Element => {
           )}
         </MobileNavigation>
         <UserMenu
-          userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
-          authenticated={state === "HasPermissions"}
-          label={t(loggingIn ? "Navigation.logging" : "Navigation.login")}
+          userName={name}
+          authenticated={user != null}
+          label={t(user != null ? "Navigation.logging" : "Navigation.login")}
           onSignIn={() => {
-            setLoggingIn(true);
-            if (login) {
-              setLoggingIn(true);
-              login();
-            } else {
-              throw Error("cannot log in");
-            }
+            const callbackUrl = window.location.href.match(/logout/)
+              ? publicUrl
+              : window.location.href;
+            signIn("tunnistamo", { callbackUrl });
           }}
         >
           {user && (
             <UserInfo
-              name={
-                `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-                t("Navigation.noName")
-              }
-              email={user.email}
+              name={name}
+              email={session?.user?.email || t("Navigation.noEmail")}
             />
           )}
-
           <HDSNavigation.Item
             className="btn-logout"
             label={t("Navigation.logout")}
-            onClick={() => logout && logout()}
+            onClick={() => signOut({ callbackUrl: `${publicUrl}/auth/logout` })}
             variant="primary"
           />
         </UserMenu>
@@ -105,4 +100,23 @@ const Navigation = (): JSX.Element => {
   );
 };
 
-export default Navigation;
+// NOTE requires both client and react-router context
+const NavigationWithRouter = () => {
+  const history = useNavigate();
+  return <Navigation onLogoClick={() => history("/")} />;
+};
+
+// NOTE this is a workaround for SSR and react-router. Checking for window is not enough because of context.
+const WrappedNavigation = ({ disabledRouter = false }) => {
+  if (typeof window === "undefined" || disabledRouter) {
+    return (
+      <Navigation
+        disabledRouter
+        onLogoClick={() => window.location.assign(publicUrl ?? "/")}
+      />
+    );
+  }
+  return <NavigationWithRouter />;
+};
+
+export default WrappedNavigation;

@@ -1,3 +1,5 @@
+/// NOTE client only
+/// Quill is not SSR compatible
 import { IconAlertCircleFill, Tooltip } from "hds-react";
 import React from "react";
 import ReactQuill from "react-quill";

@@ -34,6 +34,7 @@ import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
+import ClientOnly from "common/src/ClientOnly";
 import {
   ApplicationRound,
   PendingReservation,
@@ -96,7 +97,6 @@ import {
   mockOpeningTimes,
 } from "../../modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
-import QuickReservation from "../../components/reservation-unit/QuickReservation";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { CURRENT_USER } from "../../modules/queries/user";
 import { isReservationReservable } from "../../modules/reservation";
@@ -116,8 +116,9 @@ import {
   TwoColumnLayout,
   Wrapper,
 } from "../../components/reservation-unit/ReservationUnitStyles";
-import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
 import { Toast } from "../../components/common/Toast";
+import QuickReservation from "../../components/reservation-unit/QuickReservation";
+import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -345,12 +346,16 @@ const eventStyleGetter = (
 
 const EventWrapper = styled.div``;
 
-const EventWrapperComponent = (props) => {
-  const { event } = props;
+const EventWrapperComponent = ({
+  event,
+  ...props
+}: {
+  event: CalendarEvent<Reservation | ReservationType>;
+}) => {
   let isSmall = false;
   let isMedium = false;
-  if (event.event.state === "INITIAL") {
-    const { start, end } = props.event;
+  if ((event.event.state as string) === "INITIAL") {
+    const { start, end } = event;
     const diff = differenceInMinutes(end, start);
     if (diff <= 30) isSmall = true;
     if (diff <= 120) isMedium = true;
@@ -359,6 +364,23 @@ const EventWrapperComponent = (props) => {
     <EventWrapper {...props} className={classNames({ isSmall, isMedium })} />
   );
 };
+
+const ClientOnlyCalendar = ({
+  children,
+  ref,
+}: {
+  children: React.ReactNode;
+  ref: React.Ref<HTMLDivElement>;
+}) => (
+  <ClientOnly>
+    <CalendarWrapper
+      ref={ref}
+      data-testid="reservation-unit__calendar--wrapper"
+    >
+      {children}
+    </CalendarWrapper>
+  </ClientOnly>
+);
 
 const ReservationUnit = ({
   reservationUnit,
@@ -721,9 +743,7 @@ const ReservationUnit = ({
     [addReservation, reservationUnit.pk, setInitialReservation]
   );
 
-  const isReservable = useMemo(() => {
-    return isReservationUnitReservable(reservationUnit);
-  }, [reservationUnit]);
+  const isReservable = isReservationUnitReservable(reservationUnit);
 
   const termsOfUseContent = useMemo(
     () => getTranslation(reservationUnit, "termsOfUse"),
@@ -853,10 +873,7 @@ const ReservationUnit = ({
               </>
             )}
             {isReservable && (
-              <CalendarWrapper
-                ref={calendarRef}
-                data-testid="reservation-unit__calendar--wrapper"
-              >
+              <ClientOnlyCalendar ref={calendarRef}>
                 <Subheading>
                   {t("reservations:reservationCalendar", {
                     title: getTranslation(reservationUnit, "name"),
@@ -970,7 +987,7 @@ const ReservationUnit = ({
                     </CalendarFooter>
                   )}
                 <Legend />
-              </CalendarWrapper>
+              </ClientOnlyCalendar>
             )}
             <ReservationInfoContainer
               reservationUnit={reservationUnit}

@@ -25,7 +25,6 @@ import {
   GridCol,
   NarrowContainer,
 } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { BasicLink, Divider } from "../../styles/util";
 import {
@@ -34,7 +33,7 @@ import {
   parseAgeGroups,
   formatDuration,
 } from "../../common/util";
-import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
+import IconBulletList from "../../images/icon_list-bullet.svg";
 import RecommendedSlot from "./RecommendedSlot";
 import { applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
@@ -333,4 +332,4 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
   );
 }
 
-export default withMainMenu(ReservationSummariesByReservationUnit);
+export default ReservationSummariesByReservationUnit;

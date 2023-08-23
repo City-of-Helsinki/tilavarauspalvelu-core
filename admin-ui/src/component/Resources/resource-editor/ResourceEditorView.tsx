@@ -1,8 +1,7 @@
-import React, { memo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { ContentContainer } from "../../../styles/layout";
-import withMainMenu from "../../withMainMenu";
 import ResourceEditor from "./ResourceEditor";
 
 type Props = {
@@ -33,4 +32,4 @@ const ResourceEditorView = (): JSX.Element | null => {
   return <ResourceEditor resourcePk={resource} unitPk={unit} />;
 };
 
-export default memo(withMainMenu(ResourceEditorView));
+export default ResourceEditorView;

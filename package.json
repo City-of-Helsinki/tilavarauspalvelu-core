@@ -12,7 +12,12 @@
   "scripts": {
     "ncu": "npm-check-updates -p yarn --deep --target minor --format group",
     "ncu:upgrade": "npm-check-updates -p yarn --deep --target minor  --format group --upgrade",
-    "clean": "npkill"
+    "clean": "npkill",
+    "lint": "cd common && yarn lint && cd ../ui && yarn lint && cd ../admin-ui && yarn lint",
+    "lint:fix": "cd common && yarn lint --fix && cd ../ui && yarn lint --fix && cd ../admin-ui && yarn lint --fix",
+    "lint:css": "cd common && yarn lint:css && cd ../ui && yarn lint:css && cd ../admin-ui && yarn lint:css",
+    "test": "cd common && yarn test && cd ../ui && yarn test && cd ../admin-ui && yarn test",
+    "tsc": "cd common && yarn tsc && cd ../ui && yarn tsc && cd ../admin-ui && yarn tsc"
   },
   "resolutions": {
     "graphql": "^16.6.0",
@@ -21,7 +26,8 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "npm-check-updates": "^16.6.2",
-    "npkill": "^0.10.0"
-  }
+    "npkill": "^0.10.0",
+    "npm-check-updates": "^16.6.2"
+  },
+  "dependencies": {}
 }

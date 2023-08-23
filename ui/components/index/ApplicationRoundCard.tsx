@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
+import ClientOnly from "common/src/ClientOnly";
 import { ApplicationRoundType } from "common/types/gql-types";
 import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
@@ -137,4 +138,9 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
   );
 };
 
-export default ApplicationRoundCard;
+// Hack to deal with hydration errors
+export default ({ applicationRound }: Props): JSX.Element => (
+  <ClientOnly>
+    <ApplicationRoundCard applicationRound={applicationRound} />
+  </ClientOnly>
+);

@@ -13,7 +13,8 @@ import {
   QueryReservationUnitByPkArgs,
   ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
-import { Permission } from "app/context/authStateReducer";
+import { Permission } from "app/modules/permissionHelper";
+import usePermission from "app/hooks/usePermission";
 import { getEventBuffers } from "common/src/calendar/util";
 import { reservationUrl } from "../../common/urls";
 import { combineResults } from "../../common/util";
@@ -23,7 +24,6 @@ import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { publicUrl } from "../../common/const";
 import { getReserveeName } from "../reservations/requested/util";
-import { usePermission } from "../reservations/requested/hooks";
 
 type Props = {
   begin: string;

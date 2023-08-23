@@ -11,7 +11,6 @@ import { applicationRoundUrl } from "../../../common/urls";
 import { Container } from "../../../styles/layout";
 import StatusRecommendation from "../../applications/StatusRecommendation";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
-import withMainMenu from "../../withMainMenu";
 import { NaviItem } from "../ApplicationRoundNavi";
 import ApplicationRoundStatusTag from "../ApplicationRoundStatusTag";
 import TimeframeStatus from "../TimeframeStatus";
@@ -207,4 +206,4 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
   );
 }
 
-export default withMainMenu(Review);
+export default Review;

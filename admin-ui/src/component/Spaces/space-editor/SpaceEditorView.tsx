@@ -1,8 +1,7 @@
-import React, { memo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { ContentContainer } from "../../../styles/layout";
-import withMainMenu from "../../withMainMenu";
 import SpaceEditor from "./SpaceEditor";
 
 type Props = {
@@ -31,4 +30,4 @@ const SpaceEditorView = (): JSX.Element | null => {
   return <SpaceEditor space={space} unit={unit} />;
 };
 
-export default memo(withMainMenu(SpaceEditorView));
+export default SpaceEditorView;

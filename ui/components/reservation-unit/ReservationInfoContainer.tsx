@@ -1,5 +1,6 @@
 import { formatSecondDuration } from "common/src/common/util";
 import { ReservationUnitByPkType } from "common/types/gql-types";
+import ClientOnly from "common/src/ClientOnly";
 import React, { useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { daysByMonths } from "../../modules/const";
@@ -185,4 +186,9 @@ const ReservationInfoContainer = ({
   );
 };
 
-export default ReservationInfoContainer;
+// Hack to deal with translations causing hydration errors
+export default (props: Props) => (
+  <ClientOnly>
+    <ReservationInfoContainer {...props} />
+  </ClientOnly>
+);

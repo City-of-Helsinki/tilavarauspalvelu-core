@@ -26,6 +26,8 @@ resources:
       type: git
       # project/repository
       name: tilavarauspalvelu/tilavarauspalvelu-pipelines
+      # TODO new docker build, change back to main after all pipelines are migrated
+      ref: admin-ui-next-migration
 
 extends:
   template: azure-pipelines-tilavarauspalvelu-admin-ui.yml@tilavarauspalvelu-pipelines

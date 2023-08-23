@@ -45,7 +45,7 @@ export const checkDate = (
   date: Date | undefined,
   ctx: z.RefinementCtx,
   path: string
-) => {
+): void => {
   if (!date) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -134,9 +134,11 @@ const ReservationFormSchemaRefined = (
   interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ) =>
   ReservationFormSchema.partial()
-    .superRefine(
-      (val, ctx) => val.date && checkDate(fromUIDate(val.date), ctx, "date")
-    )
+    .superRefine((val, ctx) => {
+      if (val.date) {
+        checkDate(fromUIDate(val.date), ctx, "date");
+      }
+    })
     .superRefine((val, ctx) =>
       checkTimeStringFormat(val.startTime, ctx, "startTime")
     )
@@ -165,9 +167,11 @@ export const TimeChangeFormSchemaRefined = (
   interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ) =>
   TimeFormSchema.partial()
-    .superRefine(
-      (val, ctx) => val.date && checkDate(fromUIDate(val.date), ctx, "date")
-    )
+    .superRefine((val, ctx) => {
+      if (val.date) {
+        checkDate(fromUIDate(val.date), ctx, "date");
+      }
+    })
     .superRefine((val, ctx) =>
       checkTimeStringFormat(val.startTime, ctx, "startTime")
     )

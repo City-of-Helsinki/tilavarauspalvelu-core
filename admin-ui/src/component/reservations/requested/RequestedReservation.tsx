@@ -19,10 +19,9 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
-import { Permission } from "app/context/authStateReducer";
+import { Permission } from "app/modules/permissionHelper";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
-import withMainMenu from "../../withMainMenu";
 import {
   ageGroup,
   createTagString,
@@ -711,4 +710,4 @@ const PermissionWrappedReservation = () => {
   );
 };
 
-export default withMainMenu(PermissionWrappedReservation);
+export default PermissionWrappedReservation;

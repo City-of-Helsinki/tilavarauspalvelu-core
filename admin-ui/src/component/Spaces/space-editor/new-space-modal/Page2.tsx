@@ -135,6 +135,8 @@ const Page2 = ({
         return undefined;
       }
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error: TODO: Joi should be deprecated so ignore this for now
       return t(`validation.${error.type}`, { ...error.context });
     };
 

@@ -25,7 +25,6 @@ import { BasicLink, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import ApplicantApplicationsStatusBlock from "./ApplicantApplicationsStatusBlock";
-import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import DataTable, { CellConfig } from "../DataTable";
 import RecommendationCount from "./RecommendationCount";
@@ -492,4 +491,4 @@ function RecommendationsByApplicant(): JSX.Element {
   );
 }
 
-export default withMainMenu(RecommendationsByApplicant);
+export default RecommendationsByApplicant;

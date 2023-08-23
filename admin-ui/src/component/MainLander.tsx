@@ -1,21 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-// eslint-disable-next-line import/no-unresolved
+import { signIn } from "next-auth/react";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
-import { BrowserRouter } from "react-router-dom";
-import queryString from "query-string";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { HERO_IMAGE_URL } from "app/common/const";
 import KorosHeading, { Heading } from "./KorosHeading";
-import HeroImage from "../images/hero-user@1x.jpg";
 import Footer from "./Footer";
-import PageWrapper from "./PageWrapper";
-import { useAuthState } from "../context/AuthStateContext";
-
-interface IProps {
-  withSiteWrapper?: boolean;
-}
 
 const LoginBtn = styled(Button).attrs({
   iconLeft: <IconGroup className="icon-group" />,
@@ -68,31 +60,18 @@ const Ingress = styled(H2).attrs({ $legacy: true })`
   line-height: 1.8125rem;
 `;
 
-function MainLander({ withSiteWrapper = false }: IProps) {
+function MainLander() {
   const { t } = useTranslation();
-  const { authState } = useAuthState();
 
-  useEffect(() => {
-    if (authState.sid) {
-      const search = queryString.parse(window.location.search);
-      if (typeof search.path === "string") {
-        if (window.history) {
-          window.history.pushState({}, "", search.path);
-        }
-      }
-      window.location.reload();
-    }
-  }, [authState]);
-  const Lander = (
+  return (
     <>
-      <KorosHeading heroImage={HeroImage}>
+      <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{t("common.applicationName")}</Heading>
         <LoginBtn
           onClick={() => {
-            const { login } = authState;
-            if (login) {
-              login();
-            }
+            signIn("tunnistamo", {
+              callbackUrl: window.location.href,
+            });
           }}
         >
           {t("Navigation.login")}
@@ -103,14 +82,6 @@ function MainLander({ withSiteWrapper = false }: IProps) {
       </Content>
       <Footer />
     </>
-  );
-
-  return withSiteWrapper ? (
-    <BrowserRouter>
-      <PageWrapper>{Lander}</PageWrapper>
-    </BrowserRouter>
-  ) : (
-    Lander
   );
 }
 

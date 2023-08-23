@@ -25,12 +25,21 @@ i18n.addResourceBundle("fi", "common", {
   today: "Tänään",
   increase: "Lisää",
   decrease: "Vähennä",
+  applicationName: "Tilavarauskäsittely",
 });
 i18n.addResourceBundle("en", "common", {
   day: "Day",
   week: "Week",
   month: "Month",
   today: "Today",
+});
+i18n.addResourceBundle("fi", "logout", {
+  message: "Olet kirjautunut ulos Varaamosta",
+  signOutFromOtherServices: "Kirjaudu ulos myös muista Helsingin palveluista",
+});
+i18n.addResourceBundle("en", "logout", {
+  message: "You have signed out from Varaamo",
+  signOutFromOtherServices: "Sign out from other Helsinki services also",
 });
 i18n.addResourceBundle("fi", "reservationCalendar", {
   showCurrentDay: "Näytä tämä päivä",

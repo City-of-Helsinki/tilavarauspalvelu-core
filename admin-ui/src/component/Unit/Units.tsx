@@ -4,7 +4,6 @@ import { H1 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { debounce } from "lodash";
 import { Container } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Filters, { emptyFilterState, FilterArguments } from "./Filters";
 import UnitsDataLoader from "./UnitsDataLoader";
@@ -56,4 +55,4 @@ const Units = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(Units);
+export default Units;

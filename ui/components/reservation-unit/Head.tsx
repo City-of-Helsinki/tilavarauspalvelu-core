@@ -14,6 +14,7 @@ import {
 import { omit } from "lodash";
 import { useLocalStorage } from "react-use";
 import { Container } from "common";
+import ClientOnly from "common/src/ClientOnly";
 
 import {
   formatDate,
@@ -277,4 +278,9 @@ const Head = ({
   );
 };
 
-export default Head;
+// Hack to deal with hydration errors
+export default (props: PropsType) => (
+  <ClientOnly>
+    <Head {...props} />
+  </ClientOnly>
+);

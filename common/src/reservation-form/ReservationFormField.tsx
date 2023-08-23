@@ -66,13 +66,15 @@ const StyledTextInput = styled(TextInput)<{
   }
 `;
 
-const StyledTextArea = styled(TextArea).attrs(({ $height }: TextAreaProps) => ({
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  style: { "--textarea-height": $height },
-}))<TextAreaProps>`
+const StyledTextArea = styled(TextArea)<TextAreaProps>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
   ${({ $hidden }) => $hidden && "display: none"};
   ${({ $break }) => $break && "grid-column: 1 / -2"};
+
+  && {
+    ${({ $height }) =>
+      $height != null ? `--textarea-height: ${$height}` : ""};
+  }
 
   label {
     ${fontMedium};
@@ -316,7 +318,7 @@ const ReservationFormField = ({
       id={field}
       key={field}
       {...register(field, { required: isFreeOfChargeReasonRequired })}
-      defaultValue={defaultValue ?? ""}
+      defaultValue={defaultValue?.toString() ?? ""}
       errorText={errorText}
       invalid={!!error}
       required={isFreeOfChargeReasonRequired}
@@ -359,7 +361,7 @@ const ReservationFormField = ({
         }),
       })}
       key={field}
-      defaultValue={defaultValue}
+      defaultValue={defaultValue?.toString() ?? ""}
       errorText={errorText}
       invalid={!!error}
       required={required}

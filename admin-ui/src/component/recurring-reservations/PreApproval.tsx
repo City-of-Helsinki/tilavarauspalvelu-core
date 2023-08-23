@@ -21,7 +21,6 @@ import {
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import StatusRecommendation from "../applications/StatusRecommendation";
-import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading } from "../../styles/typography";
@@ -652,4 +651,4 @@ function PreApproval({
   );
 }
 
-export default withMainMenu(PreApproval);
+export default PreApproval;

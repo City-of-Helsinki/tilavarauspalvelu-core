@@ -12,6 +12,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
 import { OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
+import ClientOnly from "common/src/ClientOnly";
 import {
   PageInfo,
   Query,
@@ -26,7 +27,6 @@ import { capitalize, singleSearchUrl } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
-import ClientOnly from "../../components/ClientOnly";
 import ListWithPagination from "../../components/common/ListWithPagination";
 import ReservationUnitCard from "../../components/single-search/ReservationUnitCard";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";

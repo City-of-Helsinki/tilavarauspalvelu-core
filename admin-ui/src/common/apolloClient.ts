@@ -1,74 +1,68 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  fromPromise,
-  InMemoryCache,
-} from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
-import { set, uniqBy } from "lodash";
+import { uniqBy } from "lodash";
+import { getSession, signOut } from "next-auth/react";
+import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
-import { getApiAccessToken, updateApiAccessToken } from "./auth/util";
-import { apiBaseUrl } from "./const";
+import {
+  PROFILE_TOKEN_HEADER,
+  SESSION_EXPIRED_ERROR,
+  apiBaseUrl,
+  isBrowser,
+} from "./const";
 import { CustomFormData } from "./CustomFormData";
-
-const getNewToken = () => updateApiAccessToken();
 
 const uploadLinkOptions = {
   uri: `${apiBaseUrl}/graphql/`,
+  FormData: CustomFormData,
 };
 
-set(uploadLinkOptions, "FormData", CustomFormData);
+// FIXME upload link is broken locally (it succeeds but no new image is available)
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error FIXME
+const uploadLink = createUploadLink(uploadLinkOptions);
+const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/` });
 
-const terminatingLink = createUploadLink(uploadLinkOptions);
+const authLink = setContext(async (request, previousContext) => {
+  const headers = previousContext.headers ?? {};
+  const session = await getSession();
 
-const authLink = setContext((ignore, { headers }) => {
-  const token = getApiAccessToken();
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      authorization: session?.apiTokens?.tilavaraus
+        ? `Bearer ${session.apiTokens.tilavaraus}`
+        : "",
+      [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
     },
   };
 });
 
 // eslint-disable-next-line consistent-return
-const errorLink = onError(({ graphQLErrors, operation, forward }) => {
+const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    const autherror = graphQLErrors.find((e) => {
-      return (
-        e.message !== null &&
-        (e.message.indexOf("AnonymousUser") !== -1 ||
-          e.message.indexOf("has expired") !== -1 ||
-          e.message.indexOf("too old") !== -1 ||
-          e.message.indexOf("No permission to mutate") !== -1)
-      );
-    });
+    const isSessionExpired = graphQLErrors.some((error) =>
+      error.message.includes(SESSION_EXPIRED_ERROR)
+    );
 
-    const hasAuthError = Boolean(autherror !== undefined);
-
-    if (hasAuthError) {
-      return fromPromise(
-        getNewToken().catch(() => {
-          // TODO Handle token refresh error
-          return null;
-        })
-      )
-        .filter((value) => Boolean(value))
-        .flatMap((accessToken) => {
-          const oldHeaders = operation.getContext().headers;
-          operation.setContext({
-            headers: {
-              ...oldHeaders,
-              authorization: `Bearer ${accessToken}`,
-            },
-          });
-
-          return forward(operation);
-        });
+    if (isSessionExpired) {
+      // eslint-disable-next-line no-console
+      console.warn("Session expired, signing out");
+      signOut();
     }
+
+    graphQLErrors.forEach(async (error: GraphQLError) => {
+      // eslint-disable-next-line no-console
+      console.error(`GQL_ERROR: ${error.message}`);
+    });
+  }
+
+  if (networkError) {
+    // eslint-disable-next-line no-console
+    console.error(`NETWORK_ERROR: ${networkError.message}`);
   }
 });
 
@@ -119,7 +113,8 @@ const client = new ApolloClient({
       },
     },
   }),
-  link: ApolloLink.from([errorLink, authLink, terminatingLink]),
+  link: isBrowser ? from([errorLink, authLink, uploadLink]) : from([httpLink]),
+  ssrMode: !isBrowser,
 });
 
 export default client;

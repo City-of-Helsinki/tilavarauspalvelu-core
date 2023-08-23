@@ -344,9 +344,7 @@ export const Table = ({
       >
         <thead>
           <HeaderRow>
-            {verticalHeaders && verticalHeaders.length && (
-              <td role="presentation" />
-            )}
+            {verticalHeaders && verticalHeaders.length && <td />}
             {visibleColumns.map((column) => {
               if (column.isSortable) {
                 return (

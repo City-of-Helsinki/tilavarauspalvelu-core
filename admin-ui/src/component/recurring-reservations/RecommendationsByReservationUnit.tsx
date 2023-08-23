@@ -20,7 +20,6 @@ import { breakpoints } from "common/src/common/style";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { BasicLink, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
-import withMainMenu from "../withMainMenu";
 import {
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
@@ -54,7 +53,7 @@ import StatusCell from "../StatusCell";
 import RecommendationCount from "./RecommendationCount";
 import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
-import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
+import IconBulletList from "../../images/icon_list-bullet.svg";
 import StatusCircle from "../StatusCircle";
 import { applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
@@ -653,4 +652,4 @@ function RecommendationsByReservationUnit(): JSX.Element {
   );
 }
 
-export default withMainMenu(RecommendationsByReservationUnit);
+export default RecommendationsByReservationUnit;

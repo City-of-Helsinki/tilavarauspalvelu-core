@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { H2 } from "common/src/common/typography";
 import { Application as ApplicationType } from "../../common/types";
 import { BasicLink, StatusDot } from "../../styles/util";
-import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
+import IconCustomers from "../../images/icon_customers.svg";
 import { applicationDetailsUrl } from "../../common/urls";
 
 interface IProps {

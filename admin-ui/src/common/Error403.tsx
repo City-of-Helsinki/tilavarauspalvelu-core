@@ -1,12 +1,10 @@
 import { Button, Link } from "hds-react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { signOut, useSession } from "next-auth/react";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { useAuthState } from "../context/AuthStateContext";
-import { localLogout } from "./auth/util";
 import { publicUrl } from "./const";
 
 const Wrapper = styled.div`
@@ -38,17 +36,12 @@ const ButtonContainer = styled.div`
 `;
 
 const LogoutSection = (): JSX.Element => {
-  const { authState } = useAuthState();
-  const navigate = useNavigate();
+  const { data: session } = useSession();
 
   const { t } = useTranslation();
 
-  const handleClick = () => {
-    if (authState.logout) {
-      authState.logout();
-    }
-    localLogout();
-    navigate("/");
+  const isAuthenticated = (): boolean => {
+    return session?.user !== null;
   };
 
   return (
@@ -62,9 +55,13 @@ const LogoutSection = (): JSX.Element => {
       >
         {t("errorPages.accessForbidden.giveFeedback")}
       </Link>
-      {authState.state !== "NotAutenticated" && (
+      {isAuthenticated() && (
         <ButtonContainer>
-          <Button onClick={handleClick}>{t("Navigation.logout")}</Button>
+          <Button
+            onClick={() => signOut({ callbackUrl: `${publicUrl}/auth/logout` })}
+          >
+            {t("Navigation.logout")}
+          </Button>
         </ButtonContainer>
       )}
     </>

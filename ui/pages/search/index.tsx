@@ -12,6 +12,7 @@ import { NetworkStatus, useQuery } from "@apollo/client";
 import { OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import ClientOnly from "common/src/ClientOnly";
 import {
   ApplicationRoundType,
   PageInfo,
@@ -30,7 +31,6 @@ import {
   searchUrl,
 } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
-import ClientOnly from "../../components/ClientOnly";
 import { HeroSubheading } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";

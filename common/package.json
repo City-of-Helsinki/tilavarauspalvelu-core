@@ -7,8 +7,9 @@
   "scripts": {
     "generate-certificate": "mkdirp certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin",
     "lint": "eslint --ext ts,tsx .",
-    "start": "react-scripts start",
-    "test": "TZ=Europe/Helsinki react-scripts test",
+    "lint:fix": "eslint --ext ts,tsx . --fix",
+    "lint:css": "echo 'no stylelint for common'",
+    "test": "TZ=Europe/Helsinki jest",
     "generate-gql-types": "graphql-codegen",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "update-schema": "npx --yes get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql",
@@ -30,17 +31,22 @@
     "classnames": "^2.3.2",
     "date-fns": "^2.30.0",
     "hds-react": "^2.16.0",
-    "i18next": "^22.4.14",
+    "i18next": "^23.4.4",
     "lodash": "^4.17.21",
     "mjml": "^4.13.0",
-    "next-i18next": "^13.0.2",
+    "next-i18next": "^14.0.0",
     "react": "^18.2.0",
     "react-big-calendar": "^1.8.2",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.4",
-    "react-i18next": "^12.2.0",
-    "react-scripts": "5.0.1",
+    "react-i18next": "^13.1.2",
     "styled-components": "5.3.11"
+  },
+  "peerDependencies": {
+    "axios": "^0.24.0",
+    "next-auth": "^4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",
@@ -61,12 +67,14 @@
     "eslint-config-airbnb-typescript-prettier": "^5.0.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "jest": "^29.6.2",
+    "jest-environment-jsdom": "^29.6.2",
     "mkdirp": "^1.0.4",
     "prettier": "^2.8.1",
     "stylelint": "^14.16.0",
     "stylelint-config-recommended": "^9.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.1.6"
   }
 }

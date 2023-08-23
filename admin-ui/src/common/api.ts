@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from "axios";
+import axiosClient from "app/modules/auth/axiosClient";
 import omit from "lodash/omit";
-import axiosClient from "./auth/axiosClient";
 import {
   Application,
   ApplicationRound,
@@ -16,10 +16,10 @@ import {
   ReservationStatus,
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
-  UnitWIP,
 } from "./types";
+import { publicUrl } from "./const";
 
-const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
+const apiBaseUrl = `${publicUrl}/api`;
 
 const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
@@ -55,6 +55,9 @@ interface ApiParameters extends QueryParameters {
   format: ApiResponseFormat;
 }
 
+// TODO JWT token
+
+// TODO replace with fetch
 async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   const config: AxiosRequestConfig = requestConfig;
 
@@ -410,96 +413,4 @@ export function getReservationUnitCalendarUrl(
   return apiGet({
     path: `v1/${reservationUnitCalendarUrlBasePath}/${reservationUnitId}`,
   });
-}
-
-const units = [
-  {
-    id: 1,
-    name: "Toimipiste #1",
-    service: "Palvelu",
-    location: {
-      addressCity: "Helsinki",
-      addressStreet: "Katuosoite 13",
-      addressZip: "00234",
-      latitude: 60.2187538,
-      longitude: 25.0553303,
-    },
-    area: "",
-    resources: [],
-    spaces: [],
-    openingHours: [],
-  },
-  {
-    id: 2,
-    name: "Toimipiste #2",
-    service: "",
-    location: {
-      addressCity: "Helsinki",
-      addressStreet: "Katuosoite 12",
-      addressZip: "00234",
-      latitude: 60.2187538,
-      longitude: 25.1553303,
-    },
-    area: "Alue",
-    resources: [],
-    spaces: [],
-    openingHours: [],
-  },
-  {
-    id: 3,
-    name: "Toimipiste #3",
-    service: "Palvelu #2",
-    location: {
-      addressCity: "Helsinki",
-      addressStreet: "Katuosoite 11",
-      addressZip: "00234",
-      latitude: 60.2187538,
-      longitude: 25.2553303,
-    },
-    area: "Alue #2",
-    resources: [
-      {
-        id: 1,
-        name: {
-          fi: "Resurssin nimi",
-        },
-        resourceType: "Tulostin",
-      },
-      {
-        id: 2,
-        resourceType: "Tulostin",
-        name: {
-          fi: "Toinen resurssi",
-        },
-      },
-    ],
-    spaces: [
-      {
-        id: 1,
-        name: {
-          fi: "Tilan nimi",
-        },
-        maxPersons: 11,
-        surfaceArea: 30,
-      },
-      {
-        id: 2,
-        code: "LK1234",
-        name: {
-          fi: "Toinen tila",
-        },
-      },
-    ],
-    openingHours: [],
-  },
-] as UnitWIP[];
-
-export async function getUnits(): Promise<UnitWIP[]> {
-  return units;
-}
-
-export async function getUnit(id: number): Promise<UnitWIP> {
-  const unit = units.find((u) => u.id === id);
-  if (!unit) throw Error("not found");
-  return unit;
 }

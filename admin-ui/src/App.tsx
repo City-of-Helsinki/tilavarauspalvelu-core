@@ -1,41 +1,92 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import dynamic from "next/dynamic";
+
+import { Permission } from "app/modules/permissionHelper";
 import ApplicationRound from "./component/recurring-reservations/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
-import Application from "./component/applications/Application";
-import ApplicationDetails from "./component/applications/ApplicationDetails";
-import Recommendation from "./component/recurring-reservations/Recommendation";
-import RecommendationsByApplicant from "./component/recurring-reservations/RecommendationsByApplicant";
-import ApplicationRounds from "./component/recurring-reservations/ApplicationRounds";
-import AllApplicationRounds from "./component/recurring-reservations/AllApplicationRounds";
-import Applications from "./component/applications/Applications";
-import Criteria from "./component/recurring-reservations/Criteria";
-import RecommendationsByReservationUnit from "./component/recurring-reservations/RecommendationsByReservationUnit";
 import { publicUrl } from "./common/const";
-import ResolutionReport from "./component/recurring-reservations/ResolutionReport";
-import ReservationsByReservationUnit from "./component/recurring-reservations/ReservationsByReservationUnit";
-import ReservationSummariesByReservationUnit from "./component/recurring-reservations/ReservationSummariesByReservationUnit";
-import ReservationByApplicationEvent from "./component/applications/ReservationByApplicationEvent";
-import SpacesList from "./component/Spaces/SpacesList";
-import Units from "./component/Unit/Units";
-import Unit from "./component/Unit/Unit";
-import UnitMap from "./component/Unit/UnitMap";
-import SpacesResources from "./component/Unit/SpacesResources";
-import SpaceEditorView from "./component/Spaces/space-editor/SpaceEditorView";
-import ResourceEditorView from "./component/Resources/resource-editor/ResourceEditorView";
-import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor/ReservationUnitEditor";
-import ResourcesList from "./component/Resources/ResourcesList";
-import ReservationUnits from "./component/reservation-units/ReservationUnits";
-import { withGlobalContext } from "./context/GlobalContexts";
-
+import { GlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
-import ExternalScripts from "./common/ExternalScripts";
-import ApplicationRoundAllocation from "./component/recurring-reservations/allocation/ApplicationRoundAllocation";
+import AuthorizationChecker from "./common/AuthorizationChecker";
+
 import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
-import AuthorizationChecker from "./common/AuthorizationChecker";
-import { Permission } from "./context/authStateReducer";
+
+const UNIT_PATH = "./component/Unit";
+const Units = dynamic(() => import(`${UNIT_PATH}/Units`));
+const Unit = dynamic(() => import(`${UNIT_PATH}/Unit`));
+const UnitMap = dynamic(() => import(`${UNIT_PATH}/UnitMap`));
+const SpacesResources = dynamic(import(`${UNIT_PATH}/SpacesResources`));
+
+const SpacesList = dynamic(() => import("./component/Spaces/SpacesList"));
+const SpaceEditorView = dynamic(
+  () => import("./component/Spaces/space-editor/SpaceEditorView")
+);
+
+const ResourcesList = dynamic(
+  () => import("./component/Resources/ResourcesList")
+);
+const ResourceEditorView = dynamic(
+  () => import("./component/Resources/resource-editor/ResourceEditorView")
+);
+
+const APPLICATIONS_PATH = "./component/applications";
+const Application = dynamic(() => import(`${APPLICATIONS_PATH}/Application`));
+const Applications = dynamic(() => import(`${APPLICATIONS_PATH}/Applications`));
+const ApplicationDetails = dynamic(
+  () => import(`${APPLICATIONS_PATH}/ApplicationDetails`)
+);
+const ReservationByApplicationEvent = dynamic(
+  () => import(`${APPLICATIONS_PATH}/ReservationByApplicationEvent`)
+);
+
+const ReservationUnits = dynamic(
+  () => import("./component/reservation-units/ReservationUnits")
+);
+const ReservationUnitEditor = dynamic(
+  () =>
+    import(
+      "./component/ReservationUnits/ReservationUnitEditor/ReservationUnitEditor"
+    )
+);
+
+const RECURRING_PATH = "./component/recurring-reservations";
+const Recommendation = dynamic(
+  () => import(`${RECURRING_PATH}/Recommendation`)
+);
+const RecommendationsByApplicant = dynamic(
+  () => import(`${RECURRING_PATH}/RecommendationsByApplicant`)
+);
+const ApplicationRounds = dynamic(
+  () => import(`${RECURRING_PATH}/ApplicationRounds`)
+);
+const AllApplicationRounds = dynamic(
+  () => import(`${RECURRING_PATH}/AllApplicationRounds`)
+);
+const Criteria = dynamic(() => import(`${RECURRING_PATH}/Criteria`));
+const RecommendationsByReservationUnit = dynamic(
+  () => import(`${RECURRING_PATH}/RecommendationsByReservationUnit`)
+);
+const ResolutionReport = dynamic(
+  () => import(`${RECURRING_PATH}/ResolutionReport`)
+);
+const ReservationsByReservationUnit = dynamic(
+  () => import(`${RECURRING_PATH}/ReservationsByReservationUnit`)
+);
+const ReservationSummariesByReservationUnit = dynamic(
+  () => import(`${RECURRING_PATH}/ReservationSummariesByReservationUnit`)
+);
+const ApplicationRoundAllocation = dynamic(
+  () => import(`${RECURRING_PATH}/allocation/ApplicationRoundAllocation`)
+);
+
+const withAuthorization = (component: JSX.Element, permission?: Permission) => (
+  <AuthorizationChecker permission={permission}>
+    {component}
+  </AuthorizationChecker>
+);
 
 const UnitsRouter = () => (
   <Routes>
@@ -115,35 +166,25 @@ const PremisesRouter = () => (
   <Routes>
     <Route
       path="spaces"
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_SPACES}>
-          <SpacesList />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(<SpacesList />, Permission.CAN_MANAGE_SPACES)}
     />
     <Route
       path={`${prefixes.reservationUnits}`}
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_UNITS}>
-          <ReservationUnits />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(
+        <ReservationUnits />,
+        Permission.CAN_MANAGE_UNITS
+      )}
     />
     <Route
       path="resources"
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_RESOURCES}>
-          <ResourcesList />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(
+        <ResourcesList />,
+        Permission.CAN_MANAGE_RESOURCES
+      )}
     />
     <Route
       path="units"
-      element={
-        <AuthorizationChecker permission={Permission.CAN_MANAGE_UNITS}>
-          <Units />
-        </AuthorizationChecker>
-      }
+      element={withAuthorization(<Units />, Permission.CAN_MANAGE_UNITS)}
     />
   </Routes>
 );
@@ -153,75 +194,53 @@ const App = () => {
     <BrowserRouter basename={publicUrl}>
       <PageWrapper>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <AuthorizationChecker>
-                <ApplicationRounds />
-              </AuthorizationChecker>
-            }
-          />
+          <Route path="/" element={withAuthorization(<ApplicationRounds />)} />
 
           <Route
             path={`${prefixes.applications}/*`}
-            element={
-              <AuthorizationChecker
-                permission={Permission.CAN_VALIDATE_APPLICATIONS}
-              >
-                <ApplicationRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(
+              <ApplicationRouter />,
+              Permission.CAN_VALIDATE_APPLICATIONS
+            )}
           />
 
           <Route
             path={`${prefixes.recurringReservations}/application-rounds/*`}
-            element={
-              <AuthorizationChecker
-                permission={Permission.CAN_VALIDATE_APPLICATIONS}
-              >
-                <ApplicationRoundsRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(
+              <ApplicationRoundsRouter />,
+              Permission.CAN_VALIDATE_APPLICATIONS
+            )}
           />
 
           <Route
             path="/premises-and-settings/*"
-            element={
-              <AuthorizationChecker>
-                <PremisesRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(<PremisesRouter />)}
           />
 
-          <Route
-            path="/unit/*"
-            element={
-              <AuthorizationChecker>
-                <UnitsRouter />
-              </AuthorizationChecker>
-            }
-          />
+          <Route path="/unit/*" element={withAuthorization(<UnitsRouter />)} />
           <Route
             path="/reservations/*"
-            element={
-              <AuthorizationChecker>
-                <ReservationsRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(<ReservationsRouter />)}
           />
           <Route
             path="/my-units/*"
-            element={
-              <AuthorizationChecker>
-                <MyUnitsRouter />
-              </AuthorizationChecker>
-            }
+            element={withAuthorization(<MyUnitsRouter />)}
           />
         </Routes>
-        <ExternalScripts />
       </PageWrapper>
     </BrowserRouter>
   );
 };
 
-export default withGlobalContext(App);
+const AppWrapper = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return (
+    <GlobalContext>
+      <App />
+    </GlobalContext>
+  );
+};
+
+export default AppWrapper;

@@ -23,7 +23,6 @@ import { OptionType } from "../../../../common/types";
 import { GQL_MAX_RESULTS_PER_QUERY } from "../../../../common/const";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
-export { default as usePermission } from "./usePermission";
 
 const getEventName = (
   eventType?: ReservationsReservationTypeChoices,

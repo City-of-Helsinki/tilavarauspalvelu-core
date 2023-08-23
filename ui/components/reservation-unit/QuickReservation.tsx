@@ -18,6 +18,7 @@ import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
+import ClientOnly from "common/src/ClientOnly";
 import { ReservationUnitByPkType } from "common/types/gql-types";
 import { ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
@@ -565,4 +566,8 @@ const QuickReservation = ({
   );
 };
 
-export default QuickReservation;
+export default (props: Props) => (
+  <ClientOnly>
+    <QuickReservation {...props} />
+  </ClientOnly>
+);

@@ -19,7 +19,6 @@ import {
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { InlineRowLink, BasicLink } from "../../styles/util";
 import StatusRecommendation from "../applications/StatusRecommendation";
-import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading } from "../../styles/typography";
@@ -577,4 +576,4 @@ function Handling({
   );
 }
 
-export default withMainMenu(Handling);
+export default Handling;

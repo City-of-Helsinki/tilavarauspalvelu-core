@@ -11,6 +11,7 @@ import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
 import { fontRegular, H2 } from "common/src/common/typography";
+import { useSession } from "next-auth/react";
 import { Reservation } from "common/src/reservation-form/types";
 import {
   PaymentOrderType,
@@ -25,8 +26,8 @@ import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
-import { useLogout } from "../../hooks/useLogout";
 import IconButton from "../common/IconButton";
+import { signOut } from "../../modules/auth";
 
 type Props = {
   reservation: Reservation | ReservationType;
@@ -82,7 +83,7 @@ const ReservationConfirmation = ({
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const { logout } = useLogout();
+  const { data: session } = useSession();
 
   const instructionsKey = useMemo(
     () =>
@@ -176,7 +177,7 @@ const ReservationConfirmation = ({
           />
           <StyledLink
             icon={<IconSignout aria-hidden />}
-            onClick={() => logout()}
+            onClick={() => signOut({ session })}
             label={t("common:logout")}
           />
         </ActionContainer2>

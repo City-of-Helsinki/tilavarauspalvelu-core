@@ -9,7 +9,6 @@ import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
 import { Query, SpaceType } from "common/types/gql-types";
 import { DataFilterConfig } from "../../common/types";
-import withMainMenu from "../withMainMenu";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
 import ClearButton from "../ClearButton";
@@ -210,4 +209,4 @@ const SpacesList = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(SpacesList);
+export default SpacesList;

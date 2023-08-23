@@ -12,6 +12,7 @@ const Wrapper = styled(HDSFooter)`
 const Footer = (): JSX.Element => {
   const { t } = useTranslation("footer");
 
+  // TODO HDS:Footer causes a hydration error
   return (
     <Wrapper
       title={t("common:applicationName")}
