@@ -63,6 +63,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgis://tvp:tvp@db/tvp
+      ELASTICSEARCH_URL: http://elastic:9200
     ports:
       - "127.0.0.1:8000:8000"  # django
       - "127.0.0.1:1717:1717"  # uwsgi stats

@@ -49,28 +49,28 @@ bash:
 	@docker exec -it tvp-core bash
 
 clear-db:
-	@poetry run python manage.py dbshell -- -c "DROP SCHEMA public CASCADE;CREATE SCHEMA public;"
+	@python manage.py dbshell -- -c "DROP SCHEMA public CASCADE;CREATE SCHEMA public;"
 
 dev:
-	@poetry run python manage.py runserver localhost:8000
+	@python manage.py runserver localhost:8000
 
 flush-db:
-	@poetry run python manage.py flush --no-input
+	@python manage.py flush --no-input
 
 generate:
-	@poetry run python manage.py create_test_data
+	@python manage.py create_test_data
 
 hooks:
-	@poetry run pre-commit install
+	@pre-commit install
 
 indices:
-	@poetry run python manage.py rebuild_search_index reservation_units
+	@python manage.py rebuild_search_index reservation_units
 
 migrate:
-	@poetry run python manage.py migrate
+	@python manage.py migrate
 
 migrations:
-	@poetry run python manage.py makemigrations
+	@python manage.py makemigrations
 
 run:
 	@docker compose up --detach --build

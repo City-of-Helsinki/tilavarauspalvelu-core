@@ -75,17 +75,21 @@ cp .env.example .env
 make run
 ```
 
-3. (Re)create elastic search index
+3. Connect to running container
 
 ```shell
 make bash
-make indexes
 ```
 
-3. Generate test data
+4. (Re)create elastic search index
 
 ```shell
-# make bash (if not in container)
+make indices
+```
+
+5. Generate test data
+
+```shell
 make generate
 ```
 
@@ -106,37 +110,43 @@ cp .env.example .env
 make services
 ```
 
-3. Create a virtual environment & install dependencies
+3. Install GDAL.
+
+Linux: `sudo apt-get install gdal-bin`
+Mac: `brew install gdal`
+Windows: Use WSL or Docker.
+
+4. Create a virtual environment & install dependencies
 
 ```shell
 poetry install
 ```
 
-4. Add pre-commit hooks
+5. Add pre-commit hooks
 
 ```shell
-make hooks
+poetry run make hooks
 ```
 
-5. Run migrations
+6. Run migrations
 
 ```shell
-make migrate
+poetry run make migrate
 ```
 
-6. (Re)create elastic search indices
+7. (Re)create elastic search indices
 
 ```shell
-make indices
+poetry run make indices
 ```
 
-7. Generate test data
+8. Generate test data
 
 ```shell
-make generate
+poetry run make generate
 ```
 
-8. Start the server
+9. Start the server
 
 ```shell
 make dev
