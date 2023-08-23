@@ -1,0 +1,96 @@
+name: "Tests"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+# Cancel a workflow from the same PR, branch or tag when a new workflow is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  test:
+    name: "Run tests and SonarCloud scan"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:13-3.3-alpine
+        env:
+          POSTGRES_USER: tvp
+          POSTGRES_PASSWORD: tvp
+          POSTGRES_DB: tvp
+          DEBUG: true
+          SECRET_KEY: build_secret
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+        env:
+          xpack.security.enabled: false
+          discovery.type: single-node
+        ports:
+          - 9200:9200
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
+        with:
+          # Disable shallow cloning to improving relevancy of reporting for SonarCloud
+          fetch-depth: 0
+
+      - name: "Install poetry"
+        run: pipx install "poetry==1.6.0"
+
+      - name: "Install GDAL"
+        run: sudo apt install -y --no-install-recommends gdal-bin
+
+      - name: "Set up python"
+        uses: actions/setup-python@v4
+        with:
+          cache: "poetry"
+          python-version: "3.11"
+
+      - name: "Install dependencies"
+        run: poetry install
+
+      - name: "Run pytest with coverage"
+        run: poetry run pytest --cov=. --cov-report=xml --cov-branch
+        env:
+          CACHE_LOCATION: redis://localhost:6379/0
+          DATABASE_URL: postgis://tvp:tvp@localhost/tvp
+          DEBUG: true
+          SECRET_KEY: build_secret
+
+      # Without this workaround Sonar reports a warning about an incorrect source path; credits to linked-events
+      - name: "Override coverage report source path for Sonar"
+        run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
+
+      - name: "SonarCloud Scan"
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
