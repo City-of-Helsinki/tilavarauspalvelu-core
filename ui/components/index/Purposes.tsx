@@ -1,16 +1,16 @@
-import { IconAngleDown, IconAngleUp, IconArrowRight } from "hds-react";
+import { IconArrowRight } from "hds-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { fontMedium, H3 } from "common/src/common/typography";
+import { H3 } from "common/src/common/typography";
 import { PurposeType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
 import ReservationUnitSearch from "./ReservationUnitSearch";
-import IconButton from "../common/IconButton";
+import ShowAllContainer from "../common/ShowAllContainer";
 
 type Props = {
   purposes: PurposeType[];
@@ -44,7 +44,7 @@ const Top = styled.div`
   }
 `;
 
-const PurposeContainer = styled.div`
+const PurposeContainer = styled(ShowAllContainer)`
   display: grid;
   gap: var(--spacing-l) var(--spacing-m);
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -87,28 +87,12 @@ const Title = styled.div`
   gap: var(--spacing-xs);
 `;
 
-const IconLinkContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--spacing-2-xs);
-  margin-top: var(--spacing-xl);
-  color: var(--color-black) !important;
-  ${fontMedium}
-`;
-
 const Purposes = ({ purposes }: Props): JSX.Element => {
   const { t } = useTranslation(["home", "common"]);
 
-  const [showAll, setShowAll] = React.useState(false);
   const isMobile = useMedia(`(max-width: ${mobileBreakpoint})`, false);
 
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
-
-  const items = useMemo(
-    () => (showAll ? purposes : purposes.slice(0, itemLimit)),
-    [purposes, itemLimit, showAll]
-  );
 
   return (
     <Wrapper>
@@ -117,8 +101,13 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
           <Heading>{t("purposesHeading")}</Heading>
           <ReservationUnitSearch />
         </Top>
-        <PurposeContainer>
-          {items.map((item) => (
+        <PurposeContainer
+          showAllLabel={t("common:showMore")}
+          showLessLabel={t("common:showLess")}
+          maxLength={itemLimit}
+          buttonTopMargin="xl"
+        >
+          {purposes.map((item) => (
             <Link
               key={item.pk}
               href={`${singleSearchPrefix}?purposes=${item.pk}#content`}
@@ -133,25 +122,6 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
             </Link>
           ))}
         </PurposeContainer>
-        {purposes?.length > itemLimit && (
-          <IconLinkContainer>
-            {showAll ? (
-              <IconButton
-                icon={<IconAngleUp aria-hidden />}
-                label={t("common:showLess")}
-                onClick={() => setShowAll(!showAll)}
-                data-testid="front-page__purposes--less-link"
-              />
-            ) : (
-              <IconButton
-                icon={<IconAngleDown aria-hidden />}
-                label={t("common:showMore")}
-                onClick={() => setShowAll(!showAll)}
-                data-testid="front-page__purposes--more-link"
-              />
-            )}
-          </IconLinkContainer>
-        )}
       </Content>
     </Wrapper>
   );
