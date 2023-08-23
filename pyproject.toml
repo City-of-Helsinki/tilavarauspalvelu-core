@@ -107,6 +107,14 @@ ignore = [
     "B905",  # zip without strict.
 ]
 
+[tool.ruff.extend-per-file-ignores]
+"common/management/commands/create_test_data.py" = [
+    "S311",  # pseudo-random generators are fine here.
+]
+"common/management/commands/_utils.py" = [
+    "S311",  # pseudo-random generators are fine here.
+]
+
 [tool.ruff.isort]
 combine-as-imports = false
 known-third-party = [
@@ -132,6 +140,7 @@ exclude_dirs = [
 ]
 skips = [
     "B101",  # Assert is fine.
+    "B311",  # Random is fine.
 ]
 
 [tool.pytest.ini_options]
