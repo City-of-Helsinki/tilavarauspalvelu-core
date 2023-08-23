@@ -18,9 +18,7 @@ from spaces.models import Space
 
 
 class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(
-        source="application_event_schedule.id", read_only=True
-    )
+    id = serializers.PrimaryKeyRelatedField(source="application_event_schedule.id", read_only=True)
 
     applicant_id = serializers.PrimaryKeyRelatedField(
         source="application_event_schedule.application_event.application.user_id",
@@ -111,9 +109,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
 
     def get_applicant_name(self, instance):
         if instance.application_event_schedule.application_event.application.user:
-            return (
-                instance.application_event_schedule.application_event.application.user.get_full_name()
-            )
+            return instance.application_event_schedule.application_event.application.user.get_full_name()
 
     def get_basket_name(self, instance):
         if instance.basket:
@@ -129,9 +125,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
 class AllocationResultsFilter(filters.FilterSet):
     application_round_id = filters.NumberFilter(method="filter_application_round")
     applicant = filters.NumberFilter(method="filter_applicant")
-    reservation_unit = ModelInFilter(
-        field_name="allocated_reservation_unit", queryset=ReservationUnit.objects.all()
-    )
+    reservation_unit = ModelInFilter(field_name="allocated_reservation_unit", queryset=ReservationUnit.objects.all())
     application_event = ModelInFilter(
         field_name="application_event_schedule__application_event",
         queryset=ApplicationEvent.objects.all(),
@@ -146,14 +140,10 @@ class AllocationResultsFilter(filters.FilterSet):
 
     def filter_applicant(self, queryset, value, *args, **kwargs):
         user_id = args[0]
-        return queryset.filter(
-            application_event_schedule__application_event__application__user_id=user_id
-        )
+        return queryset.filter(application_event_schedule__application_event__application__user_id=user_id)
 
 
-class AllocationResultViewSet(
-    viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin, mixins.UpdateModelMixin
-):
+class AllocationResultViewSet(viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
     serializer_class = ApplicationEventScheduleResultSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AllocationResultsFilter
@@ -194,9 +184,7 @@ class AllocationResultViewSet(
                                     ),
                                     Prefetch(
                                         "declined_reservation_units",
-                                        queryset=ReservationUnit.objects.all().only(
-                                            "id"
-                                        ),
+                                        queryset=ReservationUnit.objects.all().only("id"),
                                     ),
                                     Prefetch(
                                         "event_reservation_units",
@@ -214,9 +202,7 @@ class AllocationResultViewSet(
                                                 "reservation_unit__equipments",
                                                 Prefetch(
                                                     "reservation_unit__spaces",
-                                                    queryset=Space.objects.all().select_related(
-                                                        "building", "location"
-                                                    ),
+                                                    queryset=Space.objects.all().select_related("building", "location"),
                                                 ),
                                             )
                                         ),

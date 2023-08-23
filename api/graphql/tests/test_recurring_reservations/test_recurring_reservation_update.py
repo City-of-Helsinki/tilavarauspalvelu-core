@@ -54,17 +54,9 @@ class RecurringReservationUpdateTestCase(GrapheneTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.name).is_equal_to(input_data["name"])
@@ -78,17 +70,9 @@ class RecurringReservationUpdateTestCase(GrapheneTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.name).is_equal_to(input_data["name"])
@@ -102,17 +86,9 @@ class RecurringReservationUpdateTestCase(GrapheneTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.name).is_equal_to(input_data["name"])
@@ -130,9 +106,7 @@ class RecurringReservationUpdateTestCase(GrapheneTestCaseBase):
     def test_update_fails_when_end_time_before_begin(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_input_data()
-        input_data["endTime"] = datetime.time(
-            self.recurring.begin_time.hour - 1, 0
-        ).strftime("%H%M%S")
+        input_data["endTime"] = datetime.time(self.recurring.begin_time.hour - 1, 0).strftime("%H%M%S")
 
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
@@ -148,9 +122,7 @@ class RecurringReservationUpdateTestCase(GrapheneTestCaseBase):
     def test_update_fails_when_end_date_before_begin(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_input_data()
-        input_data["endDate"] = (
-            self.recurring.begin_date - datetime.timedelta(days=1)
-        ).strftime("%Y%m%d")
+        input_data["endDate"] = (self.recurring.begin_date - datetime.timedelta(days=1)).strftime("%Y%m%d")
 
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
@@ -189,17 +161,9 @@ class RecurringReservationUpdateTestCase(GrapheneTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("updateRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("updateRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.description).is_empty()

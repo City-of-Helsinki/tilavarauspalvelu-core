@@ -24,9 +24,7 @@ from spaces.tests.factories import UnitGroupFactory
 from .base import ApplicationEventPermissionsTestCaseBase
 
 
-class ApplicationEventsGraphQLPermissionsTestCase(
-    ApplicationEventPermissionsTestCaseBase
-):
+class ApplicationEventsGraphQLPermissionsTestCase(ApplicationEventPermissionsTestCaseBase):
     def perform_basic_query(self):
         response = self.query(
             """
@@ -53,9 +51,7 @@ class ApplicationEventsGraphQLPermissionsTestCase(
 
         content = json.loads(response.content)
 
-        assert_that(
-            content.get("data", {}).get("applicationEvents", {}).get("edges")
-        ).is_empty()
+        assert_that(content.get("data", {}).get("applicationEvents", {}).get("edges")).is_empty()
 
     def test_unauthorized_user_does_not_receive_data(self):
         unauthorized_user = get_user_model().objects.create()
@@ -67,9 +63,7 @@ class ApplicationEventsGraphQLPermissionsTestCase(
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data", {}).get("applicationEvents", {}).get("edges")
-        ).is_empty()
+        assert_that(content.get("data", {}).get("applicationEvents", {}).get("edges")).is_empty()
 
     def test_regular_user_can_view_only_own_applications_event(self):
         self.client.force_login(self.regular_joe)
@@ -106,9 +100,7 @@ class ApplicationEventsGraphQLPermissionsTestCase(
             email="aminadmin.deedee@foo.com",
         )
 
-        application_two = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION
-        )
+        application_two = ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_ASSOCIATION)
 
         ServiceSectorRole.objects.create(
             user=service_sector_admin_two,
@@ -163,9 +155,7 @@ class ApplicationEventsGraphQLPermissionsTestCase(
             permission="can_validate_applications",
         )
 
-        application_two = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION
-        )
+        application_two = ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_ASSOCIATION)
         application_event = ApplicationEventFactory(application=application_two)
         test_unit_1 = ReservationUnitFactory(
             name="Declined unit 10",
@@ -224,9 +214,7 @@ class ApplicationEventsGraphQLPermissionsTestCase(
             permission="can_validate_applications",
         )
 
-        application_two = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION
-        )
+        application_two = ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_ASSOCIATION)
         application_event = ApplicationEventFactory(application=application_two)
         test_unit_1 = ReservationUnitFactory(
             name="Declined unit 10",
@@ -239,9 +227,7 @@ class ApplicationEventsGraphQLPermissionsTestCase(
             reservation_unit=test_unit_1,
             application_event=application_event,
         )
-        unit_group = UnitGroupFactory(
-            units=(event_reservation_unit.reservation_unit.unit,)
-        )
+        unit_group = UnitGroupFactory(units=(event_reservation_unit.reservation_unit.unit,))
 
         unit_role.unit_group.add(unit_group)
 
@@ -267,16 +253,12 @@ class ApplicationEventsGraphQLPermissionsTestCase(
         self.assertMatchSnapshot(content)
 
 
-class ApplicationEventScheduleResultQueryPermissionsTestCase(
-    ApplicationEventPermissionsTestCaseBase
-):
+class ApplicationEventScheduleResultQueryPermissionsTestCase(ApplicationEventPermissionsTestCaseBase):
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
         cls.application_event = cls.application.application_events.first()
-        cls.schedule = cls.application_event.application_event_schedules.filter(
-            priority=300
-        ).first()
+        cls.schedule = cls.application_event.application_event_schedules.filter(priority=300).first()
         cls.result = ApplicationEventScheduleResultFactory(
             accepted=False,
             declined=False,

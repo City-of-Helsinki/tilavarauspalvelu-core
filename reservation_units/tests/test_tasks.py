@@ -47,9 +47,7 @@ class TaskTestBase(TestCase):
     return_value=mock_create_product(),
 )
 class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
-    def test_task_is_called_on_reservation_unit_save(
-        self, mock_product, mock_create_or_update_accounting
-    ):
+    def test_task_is_called_on_reservation_unit_save(self, mock_product, mock_create_or_update_accounting):
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
 
@@ -68,9 +66,7 @@ class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
         assert_that(self.runit.payment_product).is_not_none()
         assert_that(self.runit.payment_product.id).is_equal_to(product_id)
 
-    def test_mapping_is_not_created_if_merchant_is_missing(
-        self, mock_product, mock_create_or_update_accounting
-    ):
+    def test_mapping_is_not_created_if_merchant_is_missing(self, mock_product, mock_create_or_update_accounting):
         self.runit.payment_merchant = None
         self.runit.save()
 
@@ -79,9 +75,7 @@ class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
         self.runit.refresh_from_db()
         assert_that(self.runit.payment_product).is_none()
 
-    def test_mapping_is_not_created_if_unit_is_not_paid(
-        self, mock_product, mock_create_or_update_accounting
-    ):
+    def test_mapping_is_not_created_if_unit_is_not_paid(self, mock_product, mock_create_or_update_accounting):
         self.runit.pricings.set([])
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
@@ -99,9 +93,7 @@ class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
     return_value=mock_create_product(),
 )
 class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
-    def test_accounting_task_is_called_on_reservation_unit_save(
-        self, mock_product, mock_create_or_update_accounting
-    ):
+    def test_accounting_task_is_called_on_reservation_unit_save(self, mock_product, mock_create_or_update_accounting):
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
 
@@ -118,9 +110,7 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
             main_ledger_account=self.accounting.main_ledger_account,
             balance_profit_center=self.accounting.balance_profit_center,
         )
-        mock_create_or_update_accounting.assert_called_with(
-            self.runit.payment_product.id, expected_params
-        )
+        mock_create_or_update_accounting.assert_called_with(self.runit.payment_product.id, expected_params)
 
     def test_accounting_task_api_not_called_when_accounting_does_not_exist(
         self, mock_product, mock_create_or_update_accounting
@@ -155,9 +145,7 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
     def test_accounting_task_captures_api_errors(
         self, mock_capture_exception, mock_product, mock_create_or_update_accounting
     ):
-        mock_create_or_update_accounting.side_effect = CreateOrUpdateAccountingError(
-            "mock-error"
-        )
+        mock_create_or_update_accounting.side_effect = CreateOrUpdateAccountingError("mock-error")
 
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()

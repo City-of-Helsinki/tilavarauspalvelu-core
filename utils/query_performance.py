@@ -72,9 +72,7 @@ class QueryPerformanceOptimizerMixin:
 
         # Children found, optimize queries for selected fields
         if child_selections:
-            query = cls._optimize_query_with_selected_child_elements(
-                child_selections, query_optimizations, query
-            )
+            query = cls._optimize_query_with_selected_child_elements(child_selections, query_optimizations, query)
 
         return query
 
@@ -88,9 +86,7 @@ class QueryPerformanceOptimizerMixin:
         prefetches = []
 
         for child in children:
-            optimization_type, optimization_value = optimizations.get(
-                child.name.value, (None, None)
-            )
+            optimization_type, optimization_value = optimizations.get(child.name.value, (None, None))
 
             if optimization_type == "select":
                 selects.append(optimization_value)
@@ -112,8 +108,7 @@ class QueryPerformanceOptimizerMixin:
                             _,
                             prefetch,
                         ) = QueryPerformanceOptimizerMixin._compile_prefetch(
-                            children=child.selection_set.selections,
-                            **optimization_value
+                            children=child.selection_set.selections, **optimization_value
                         )
 
                         # If no child prefetches, just prefetch the base model

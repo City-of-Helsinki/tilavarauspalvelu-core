@@ -15,12 +15,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
     def setUpTestData(cls):
         super().setUpTestData()
         now = datetime.datetime.now(tz=get_default_timezone())
-        cls.archived_reservation_unit = ReservationUnitFactory(
-            name="I am archived!", is_archived=True
-        )
-        cls.archived_reservation_unit = ReservationUnitFactory(
-            name="I am a draft!", is_archived=False, is_draft=True
-        )
+        cls.archived_reservation_unit = ReservationUnitFactory(name="I am archived!", is_archived=True)
+        cls.archived_reservation_unit = ReservationUnitFactory(name="I am a draft!", is_archived=False, is_draft=True)
         cls.scheduled_publishing_reservation_unit = ReservationUnitFactory(
             name="I am scheduled for publishing!",
             is_archived=False,

@@ -213,9 +213,7 @@ class ServiceSectorRolePermission(models.Model):
         related_name="permissions",
         on_delete=models.CASCADE,
     )
-    permission = models.CharField(
-        verbose_name=_("Permission"), max_length=255, choices=SERVICE_SECTOR_PERMISSIONS
-    )
+    permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=SERVICE_SECTOR_PERMISSIONS)
 
 
 class UnitRolePermission(models.Model):
@@ -225,9 +223,7 @@ class UnitRolePermission(models.Model):
         related_name="permissions",
         on_delete=models.CASCADE,
     )
-    permission = models.CharField(
-        verbose_name=_("Permission"), max_length=255, choices=UNIT_PERMISSIONS
-    )
+    permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=UNIT_PERMISSIONS)
 
 
 class GeneralRolePermission(models.Model):
@@ -237,15 +233,11 @@ class GeneralRolePermission(models.Model):
         related_name="permissions",
         on_delete=models.CASCADE,
     )
-    permission = models.CharField(
-        verbose_name=_("Permission"), max_length=255, choices=GENERAL_PERMISSIONS
-    )
+    permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=GENERAL_PERMISSIONS)
 
 
 class UnitRole(BaseRole):
-    role = models.ForeignKey(
-        UnitRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE
-    )
+    role = models.ForeignKey(UnitRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE)
 
     unit_group = models.ManyToManyField(
         UnitGroup,
@@ -271,9 +263,7 @@ class UnitRole(BaseRole):
 
 
 class ServiceSectorRole(BaseRole):
-    role = models.ForeignKey(
-        ServiceSectorRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE
-    )
+    role = models.ForeignKey(ServiceSectorRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE)
 
     service_sector = models.ForeignKey(
         ServiceSector,
@@ -294,9 +284,7 @@ class ServiceSectorRole(BaseRole):
 
 
 class GeneralRole(BaseRole):
-    role = models.ForeignKey(
-        GeneralRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE
-    )
+    role = models.ForeignKey(GeneralRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE)
     user = models.ForeignKey(
         User,
         verbose_name=_("User"),

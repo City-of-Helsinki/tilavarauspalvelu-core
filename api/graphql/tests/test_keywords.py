@@ -16,9 +16,7 @@ class ResourceGraphQLTestCase(GraphQLTestCase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.category = KeywordCategoryFactory(name="Test category")
-        cls.group = KeywordGroupFactory(
-            name="Test group", keyword_category=cls.category
-        )
+        cls.group = KeywordGroupFactory(name="Test group", keyword_category=cls.category)
         cls.keyword = KeywordFactory(name="Test keyword", keyword_group=cls.group)
 
         cls.api_client = APIClient()

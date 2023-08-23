@@ -20,9 +20,7 @@ DEFAULT_GRAPHQL_URL = "/graphql/"
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-class ReservationUnitImageCreateTestCase(
-    GrapheneTestCaseBase, GraphQLFileUploadTestCase
-):
+class ReservationUnitImageCreateTestCase(GrapheneTestCaseBase, GraphQLFileUploadTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -70,9 +68,7 @@ class ReservationUnitImageCreateTestCase(
         self.res_unit.refresh_from_db()
         img = self.res_unit.images.first()
         assert_that(img).is_not_none()
-        assert_that(img.image.name).starts_with(
-            f"{settings.RESERVATION_UNIT_IMAGES_ROOT}/eltest"
-        )
+        assert_that(img.image.name).starts_with(f"{settings.RESERVATION_UNIT_IMAGES_ROOT}/eltest")
         assert_that(img.image.name).ends_with(".png")
         assert_that(img.image_type).is_equal_to("main")
 
@@ -135,9 +131,7 @@ class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.res_unit = ReservationUnitFactory()
-        cls.res_unit_image = ReservationUnitImageFactory(
-            reservation_unit=cls.res_unit, image_type="main"
-        )
+        cls.res_unit_image = ReservationUnitImageFactory(reservation_unit=cls.res_unit, image_type="main")
 
     def get_update_query(self):
         return """
@@ -203,37 +197,23 @@ class ReservationUnitImageDeleteGraphQLTestCase(GrapheneTestCaseBase):
 
     def test_reservation_unit_image_deleted(self):
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_delete_query(), input_data={"pk": self.res_unit_image.pk}
-        )
+        response = self.query(self.get_delete_query(), input_data={"pk": self.res_unit_image.pk})
 
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteReservationUnitImage").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("deleteReservationUnitImage").get("deleted")
-        ).is_true()
+        assert_that(content.get("data").get("deleteReservationUnitImage").get("errors")).is_none()
+        assert_that(content.get("data").get("deleteReservationUnitImage").get("deleted")).is_true()
 
-        assert_that(
-            ReservationUnitImage.objects.filter(pk=self.res_unit_image.pk).exists()
-        ).is_false()
+        assert_that(ReservationUnitImage.objects.filter(pk=self.res_unit_image.pk).exists()).is_false()
 
     def test_regular_user_cannot_delete(self):
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_delete_query(), input_data={"pk": self.res_unit_image.pk}
-        )
+        response = self.query(self.get_delete_query(), input_data={"pk": self.res_unit_image.pk})
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "No permissions to perform delete."
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("No permissions to perform delete.")
 
-        assert_that(
-            ReservationUnitImage.objects.filter(pk=self.res_unit_image.pk).exists()
-        ).is_true()
+        assert_that(ReservationUnitImage.objects.filter(pk=self.res_unit_image.pk).exists()).is_true()

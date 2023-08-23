@@ -24,9 +24,7 @@ from reservation_units.models import ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup, ReservationPurpose
 
 
-class ApplicationEventScheduleCreateSerializer(
-    ApplicationEventScheduleSerializer, PrimaryKeySerializer
-):
+class ApplicationEventScheduleCreateSerializer(ApplicationEventScheduleSerializer, PrimaryKeySerializer):
     day = serializers.IntegerField()
 
     class Meta:
@@ -44,9 +42,7 @@ class ApplicationEventScheduleCreateSerializer(
                 "help_text": "End time of requested reservation allocation slot.",
             },
             "priority": {
-                "help_text": (
-                    "Priority of requested reservation allocation slot as an integer."
-                ),
+                "help_text": ("Priority of requested reservation allocation slot as an integer."),
             },
         }
 
@@ -71,9 +67,7 @@ class EventReservationUnitCreateSerializer(PrimaryKeySerializer):
         }
 
 
-class ApplicationEventCreateSerializer(
-    ApplicationEventSerializer, PrimaryKeySerializer
-):
+class ApplicationEventCreateSerializer(ApplicationEventSerializer, PrimaryKeySerializer):
     application_event_schedules = ApplicationEventScheduleCreateSerializer(many=True)
 
     event_reservation_units = EventReservationUnitCreateSerializer(many=True)
@@ -83,13 +77,9 @@ class ApplicationEventCreateSerializer(
         choices=ApplicationEventStatus.STATUS_CHOICES,
     )
 
-    application = IntegerPrimaryKeyField(
-        help_text="Application pk for this event", queryset=Application.objects.all()
-    )
+    application = IntegerPrimaryKeyField(help_text="Application pk for this event", queryset=Application.objects.all())
 
-    age_group = IntegerPrimaryKeyField(
-        help_text="Age group pk for this event", queryset=AgeGroup.objects.all()
-    )
+    age_group = IntegerPrimaryKeyField(help_text="Age group pk for this event", queryset=AgeGroup.objects.all())
 
     purpose = IntegerPrimaryKeyField(
         help_text="ReservationPurpose pk for this event",
@@ -130,9 +120,7 @@ class ApplicationEventCreateSerializer(
         return data
 
 
-class ApplicationEventUpdateSerializer(
-    ApplicationEventCreateSerializer, PrimaryKeyUpdateSerializer
-):
+class ApplicationEventUpdateSerializer(ApplicationEventCreateSerializer, PrimaryKeyUpdateSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -143,9 +131,7 @@ class ApplicationEventUpdateSerializer(
 
     def update(self, instance, validated_data):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
         schedule_data = validated_data.pop("application_event_schedules", None)
         unit_data = validated_data.pop("event_reservation_units", None)
         status = validated_data.pop("status", None)
@@ -168,9 +154,7 @@ class ApplicationEventScheduleResultCreateSerializer(PrimaryKeySerializer):
     allocated_day = serializers.IntegerField(required=False)
     allocated_begin = serializers.TimeField(required=False)
     allocated_end = serializers.TimeField(required=False)
-    allocated_reservation_unit = IntegerPrimaryKeyField(
-        required=True, queryset=ReservationUnit.objects.all()
-    )
+    allocated_reservation_unit = IntegerPrimaryKeyField(required=True, queryset=ReservationUnit.objects.all())
 
     class Meta:
         model = ApplicationEventScheduleResult
@@ -207,9 +191,9 @@ class ApplicationEventScheduleResultCreateSerializer(PrimaryKeySerializer):
         end = data.get("allocated_end")
 
         if begin and end:
-            data["allocated_duration"] = datetime.timedelta(
-                hours=end.hour, minutes=end.minute
-            ) - datetime.timedelta(hours=begin.hour, minutes=begin.minute)
+            data["allocated_duration"] = datetime.timedelta(hours=end.hour, minutes=end.minute) - datetime.timedelta(
+                hours=begin.hour, minutes=begin.minute
+            )
 
         return data
 

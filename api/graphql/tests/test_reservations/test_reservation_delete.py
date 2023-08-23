@@ -25,10 +25,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         cls.reservation = ReservationFactory(
             reservation_unit=[cls.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
-            end=(
-                datetime.datetime.now(tz=get_default_timezone())
-                + datetime.timedelta(hours=1)
-            ),
+            end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
             state=ReservationState.CREATED,
             user=cls.regular_joe,
             reservee_email="email@reservee",
@@ -50,72 +47,46 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
     def test_general_admin_can_delete(self):
         self.client.force_login(self.general_admin)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("deleted")
-        ).is_true()
+        assert_that(content.get("data").get("deleteReservation").get("errors")).is_none()
+        assert_that(content.get("data").get("deleteReservation").get("deleted")).is_true()
 
-        assert_that(
-            Reservation.objects.filter(pk=self.reservation.pk).exists()
-        ).is_false()
+        assert_that(Reservation.objects.filter(pk=self.reservation.pk).exists()).is_false()
 
     def test_user_can_delete(self):
         self.client.force_login(self.regular_joe)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("deleted")
-        ).is_true()
+        assert_that(content.get("data").get("deleteReservation").get("errors")).is_none()
+        assert_that(content.get("data").get("deleteReservation").get("deleted")).is_true()
 
-        assert_that(
-            Reservation.objects.filter(pk=self.reservation.pk).exists()
-        ).is_false()
+        assert_that(Reservation.objects.filter(pk=self.reservation.pk).exists()).is_false()
 
     def test_waiting_for_payment_can_be_deleted(self):
         self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
         self.reservation.save()
         self.client.force_login(self.regular_joe)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("deleteReservation").get("deleted")
-        ).is_true()
+        assert_that(content.get("data").get("deleteReservation").get("errors")).is_none()
+        assert_that(content.get("data").get("deleteReservation").get("deleted")).is_true()
 
-        assert_that(
-            Reservation.objects.filter(pk=self.reservation.pk).exists()
-        ).is_false()
+        assert_that(Reservation.objects.filter(pk=self.reservation.pk).exists()).is_false()
 
     @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
-    def test_call_webshop_cancel_and_mark_order_cancelled_on_delete(
-        self, mock_cancel_order
-    ):
+    def test_call_webshop_cancel_and_mark_order_cancelled_on_delete(self, mock_cancel_order):
         mock_cancel_order.return_value = OrderFactory(status="cancelled")
 
         self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
@@ -127,9 +98,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.regular_joe)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
@@ -140,9 +109,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert_that(payment_order.status).is_equal_to(OrderStatus.CANCELLED)
 
     @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
-    def test_dont_call_webshop_cancel_when_order_is_already_cancelled(
-        self, mock_cancel_order
-    ):
+    def test_dont_call_webshop_cancel_when_order_is_already_cancelled(self, mock_cancel_order):
         self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
         self.reservation.save()
 
@@ -154,9 +121,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.regular_joe)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
@@ -179,9 +144,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.regular_joe)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
@@ -207,9 +170,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.regular_joe)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
@@ -226,17 +187,13 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
 
         self.reservation.state = ReservationState.CONFIRMED
         self.reservation.save()
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(
-            Reservation.objects.filter(pk=self.reservation.pk).exists()
-        ).is_true()
+        assert_that(Reservation.objects.filter(pk=self.reservation.pk).exists()).is_true()
 
     def test_other_user_cannot_delete(self):
         other_guy = get_user_model().objects.create(
@@ -247,14 +204,10 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         )
         self.client.force_login(other_guy)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(
-            Reservation.objects.filter(pk=self.reservation.pk).exists()
-        ).is_true()
+        assert_that(Reservation.objects.filter(pk=self.reservation.pk).exists()).is_true()

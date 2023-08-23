@@ -28,9 +28,7 @@ class PaymentMerchantForm(forms.ModelForm):
     email = forms.CharField(label=_("Email address"), max_length=128, required=True)
     phone = forms.CharField(label=_("Phone number"), max_length=32, required=True)
     url = forms.CharField(label=_("URL"), max_length=256, required=True)
-    tos_url = forms.CharField(
-        label=_("Terms of service URL"), max_length=256, required=True
-    )
+    tos_url = forms.CharField(label=_("Terms of service URL"), max_length=256, required=True)
 
     def __init__(self, *args, **kwargs):
         super(PaymentMerchantForm, self).__init__(*args, **kwargs)
@@ -38,9 +36,7 @@ class PaymentMerchantForm(forms.ModelForm):
         if instance and instance.id:
             merchant_info = get_merchant(instance.id)
             if merchant_info is None:
-                raise Exception(
-                    f"Merchant info for {str(instance.id)} not found from Merchant API"
-                )
+                raise Exception(f"Merchant info for {str(instance.id)} not found from Merchant API")
 
             self.fields["shop_id"].initial = merchant_info.shop_id
             self.fields["name"].initial = merchant_info.name

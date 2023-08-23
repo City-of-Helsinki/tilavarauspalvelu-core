@@ -8,33 +8,23 @@ from .unit_types import Unit
 
 
 class UnitsFilterSet(django_filters.FilterSet):
-    pk = django_filters.ModelMultipleChoiceFilter(
-        field_name="pk", method="filter_by_pk", queryset=Unit.objects.all()
-    )
+    pk = django_filters.ModelMultipleChoiceFilter(field_name="pk", method="filter_by_pk", queryset=Unit.objects.all())
 
     name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
     name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
     service_sector = django_filters.NumberFilter(field_name="service_sectors__pk")
 
-    only_with_permission = django_filters.BooleanFilter(
-        method="get_only_with_permission"
-    )
+    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
-    published_reservation_units = django_filters.BooleanFilter(
-        method="get_published_reservation_units"
-    )
+    published_reservation_units = django_filters.BooleanFilter(method="get_published_reservation_units")
 
     own_reservations = django_filters.BooleanFilter(method="get_own_reservations")
 
-    order_by = django_filters.OrderingFilter(
-        fields=("name_fi", "name_en", "name_sv", "rank", "reservation_count")
-    )
+    order_by = django_filters.OrderingFilter(fields=("name_fi", "name_en", "name_sv", "rank", "reservation_count"))
 
     def filter_queryset(self, queryset):
-        queryset = queryset.annotate(
-            reservation_count=Count("reservationunit__reservation")
-        )
+        queryset = queryset.annotate(reservation_count=Count("reservationunit__reservation"))
 
         return super().filter_queryset(queryset)
 
@@ -61,9 +51,7 @@ class UnitsFilterSet(django_filters.FilterSet):
             | Q(unit_groups__in=user.unit_roles.values_list("unit_group", flat=True))
             | Q(
                 id__in=Unit.objects.filter(
-                    service_sectors__in=user.service_sector_roles.values_list(
-                        "service_sector", flat=True
-                    )
+                    service_sectors__in=user.service_sector_roles.values_list("service_sector", flat=True)
                 )
             )
         ).distinct()
@@ -75,22 +63,13 @@ class UnitsFilterSet(django_filters.FilterSet):
             query = (
                 Q(reservationunit__is_archived=False)
                 & Q(reservationunit__is_draft=False)
-                & (
-                    Q(reservationunit__publish_begins__isnull=True)
-                    | Q(reservationunit__publish_begins__lte=now)
-                )
-                & (
-                    Q(reservationunit__publish_ends__isnull=True)
-                    | Q(reservationunit__publish_ends__gt=now)
-                )
+                & (Q(reservationunit__publish_begins__isnull=True) | Q(reservationunit__publish_begins__lte=now))
+                & (Q(reservationunit__publish_ends__isnull=True) | Q(reservationunit__publish_ends__gt=now))
                 & (
                     Q(reservationunit__reservation_begins__isnull=True)
                     | Q(reservationunit__reservation_begins__lte=now)
                 )
-                & (
-                    Q(reservationunit__reservation_ends__isnull=True)
-                    | Q(reservationunit__reservation_ends__gt=now)
-                )
+                & (Q(reservationunit__reservation_ends__isnull=True) | Q(reservationunit__reservation_ends__gt=now))
             )
 
         else:

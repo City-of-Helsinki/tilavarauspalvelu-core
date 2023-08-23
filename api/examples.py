@@ -20,9 +20,7 @@ class BuildingSerializer(serializers.ModelSerializer):
 
 # 1. Write with foreign key ID, read as foreign key ID
 class SpaceSerializer(serializers.ModelSerializer):
-    building_id = serializers.PrimaryKeyRelatedField(
-        queryset=Building.objects.all(), source="building"
-    )
+    building_id = serializers.PrimaryKeyRelatedField(queryset=Building.objects.all(), source="building")
 
     class Meta:
         model = Space

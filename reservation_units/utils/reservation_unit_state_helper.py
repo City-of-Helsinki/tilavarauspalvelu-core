@@ -46,15 +46,10 @@ class ReservationUnitStateHelper:
         if ReservationUnitStateHelper.__draft_or_archived(reservation_unit):
             return False
 
-        return (
-            reservation_unit.publish_begins and now < reservation_unit.publish_begins
-        ) and (
+        return (reservation_unit.publish_begins and now < reservation_unit.publish_begins) and (
             reservation_unit.publish_ends is None
             or reservation_unit.publish_ends <= now
-            or (
-                reservation_unit.publish_ends > now
-                and reservation_unit.publish_begins > reservation_unit.publish_ends
-            )
+            or (reservation_unit.publish_ends > now and reservation_unit.publish_begins > reservation_unit.publish_ends)
         )
 
     @staticmethod
@@ -119,10 +114,7 @@ class ReservationUnitStateHelper:
             and reservation_unit.publish_ends > now
             and (
                 reservation_unit.publish_begins is None
-                or (
-                    reservation_unit.publish_begins
-                    and reservation_unit.publish_begins <= now
-                )
+                or (reservation_unit.publish_begins and reservation_unit.publish_begins <= now)
             )
         )
 
@@ -169,10 +161,7 @@ class ReservationUnitStateHelper:
             Q(
                 Q(publish_ends__lte=now)
                 & (
-                    Q(
-                        Q(publish_begins__lte=now)
-                        & Q(publish_begins__lte=F("publish_ends"))
-                    )
+                    Q(Q(publish_begins__lte=now) & Q(publish_begins__lte=F("publish_ends")))
                     | Q(publish_begins__isnull=True)
                 )
             )
@@ -188,10 +177,7 @@ class ReservationUnitStateHelper:
     def __get_is_published_query() -> Q:
         now = datetime.datetime.now(tz=get_default_timezone())
         return Q(is_archived=False, is_draft=False) & (
-            (
-                Q(publish_ends__isnull=True)
-                & (Q(publish_begins__lte=now) | Q(publish_begins__isnull=True))
-            )
+            (Q(publish_ends__isnull=True) & (Q(publish_begins__lte=now) | Q(publish_begins__isnull=True)))
             | Q(
                 publish_ends__lte=now,
                 publish_begins__lte=now,

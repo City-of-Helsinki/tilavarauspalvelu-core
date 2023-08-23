@@ -42,13 +42,9 @@ class UnitTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
             email="amin.general@foo.com",
         )
         unit_role_choice = UnitRoleChoice.objects.get(code="admin")
-        cls.unit_role = UnitRole.objects.create(
-            user=cls.unit_admin, role=unit_role_choice
-        )
+        cls.unit_role = UnitRole.objects.create(user=cls.unit_admin, role=unit_role_choice)
         cls.unit_role.unit.add(cls.unit)
-        UnitRolePermission.objects.create(
-            role=unit_role_choice, permission="can_manage_units"
-        )
+        UnitRolePermission.objects.create(role=unit_role_choice, permission="can_manage_units")
 
         cls.regular_joe = get_user_model().objects.create(
             username="regjoe",
@@ -87,12 +83,8 @@ class UnitsUpdateTestCase(UnitTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")[0]["message"]).contains(
-            "No permission to mutate"
-        )
-        assert_that(Unit.objects.get(pk=self.unit.pk).description).is_equal_to(
-            "Test description"
-        )
+        assert_that(content.get("errors")[0]["message"]).contains("No permission to mutate")
+        assert_that(Unit.objects.get(pk=self.unit.pk).description).is_equal_to("Test description")
 
 
 class UnitsQueryTestCase(UnitTestCaseBase):
@@ -209,9 +201,7 @@ class UnitsQueryTestCase(UnitTestCaseBase):
     def test_getting_units_filtered_by_service_sector(self):
         target_unit_a = UnitFactory.create(name="Aaaaaa", rank=1)
         target_unit_b = UnitFactory.create(name="Bbbbbb", rank=2)
-        ServiceSectorFactory.create(
-            pk=123, name="Test sector", units=[target_unit_a, target_unit_b]
-        )
+        ServiceSectorFactory.create(pk=123, name="Test sector", units=[target_unit_a, target_unit_b])
         UnitFactory.create(name="Cccccc", rank=3)
 
         response = self.query(
@@ -280,9 +270,7 @@ class UnitsQueryTestCase(UnitTestCaseBase):
             role=ss_role_choice,
             service_sector=service_sector,
         )
-        ServiceSectorRolePermission.objects.create(
-            role=ss_role_choice, permission="can_manage_units"
-        )
+        ServiceSectorRolePermission.objects.create(role=ss_role_choice, permission="can_manage_units")
 
         self.client.force_login(service_sector_admin)
 
@@ -441,16 +429,10 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         resu_too_d = ReservationUnitFactory(unit=l_unit)
         no_resu = ReservationUnitFactory(unit=no_unit)
 
-        ReservationFactory.create_batch(
-            4, reservation_unit=[resu_a], user=self.regular_joe
-        )
-        ReservationFactory.create_batch(
-            3, reservation_unit=[resu_b], user=self.regular_joe
-        )
+        ReservationFactory.create_batch(4, reservation_unit=[resu_a], user=self.regular_joe)
+        ReservationFactory.create_batch(3, reservation_unit=[resu_b], user=self.regular_joe)
         ReservationFactory(reservation_unit=[resu_d], user=self.regular_joe)
-        ReservationFactory.create_batch(
-            3, reservation_unit=[resu_too_d], user=other_user
-        )
+        ReservationFactory.create_batch(3, reservation_unit=[resu_too_d], user=other_user)
         ReservationFactory(reservation_unit=[no_resu], user=other_user)
         self.client.force_login(self.regular_joe)
         response = self.query(

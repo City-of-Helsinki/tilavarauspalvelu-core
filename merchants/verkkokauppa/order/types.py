@@ -136,8 +136,7 @@ class Order:
                                 key=meta["key"],
                                 value=meta["value"],
                                 label=meta.get("label"),
-                                visible_in_checkout=meta.get("visibleInCheckout")
-                                not in [False, "false"],
+                                visible_in_checkout=meta.get("visibleInCheckout") not in [False, "false"],
                                 ordinal=meta.get("ordinal"),
                             )
                             for meta in item["meta"]
@@ -146,9 +145,7 @@ class Order:
                         period_unit=item.get("periodUnit", None),
                         period_count=item.get("periodCount", None),
                         start_date=parse_datetime(item.get("startDate", None)),
-                        billing_start_date=parse_datetime(
-                            item.get("billingStartDate", None)
-                        ),
+                        billing_start_date=parse_datetime(item.get("billingStartDate", None)),
                     )
                     for item in json["items"]
                 ],
@@ -193,9 +190,7 @@ class CreateOrderParams:
             "user": str(self.user),
             "language": self.language,
             # Order Experience API does not support standard ISO 8601 format with UTC offset
-            "lastValidPurchaseDateTime": self.last_valid_purchase_datetime.strftime(
-                "%Y-%m-%dT%H:%M:%S"
-            ),
+            "lastValidPurchaseDateTime": self.last_valid_purchase_datetime.strftime("%Y-%m-%dT%H:%M:%S"),
             "items": [
                 {
                     "productId": str(item.product_id),

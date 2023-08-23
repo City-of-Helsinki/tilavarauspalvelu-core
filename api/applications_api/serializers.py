@@ -29,13 +29,9 @@ from permissions.helpers import can_handle_application
 from reservation_units.models import ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup, ReservationPurpose
 
-MINIMUM_TIME = timezone.datetime(
-    1970, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone()
-)
+MINIMUM_TIME = timezone.datetime(1970, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone())
 
-MAXIMUM_TIME = timezone.datetime(
-    2099, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone()
-)
+MAXIMUM_TIME = timezone.datetime(2099, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone())
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -88,9 +84,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
         if address_data is None:
             return None
         elif "id" not in address_data or address_data["id"] is None:
-            address = AddressSerializer(data=address_data).create(
-                validated_data=address_data
-            )
+            address = AddressSerializer(data=address_data).create(validated_data=address_data)
         else:
             address = AddressSerializer(data=address_data).update(
                 instance=Address.objects.get(pk=address_data["id"]),
@@ -162,9 +156,7 @@ class ApplicationEventScheduleSerializer(serializers.ModelSerializer):
                 "help_text": "End time of requested reservation allocation slot.",
             },
             "priority": {
-                "help_text": (
-                    "Priority of requested reservation allocation slot as an integer."
-                ),
+                "help_text": ("Priority of requested reservation allocation slot as an integer."),
             },
         }
 
@@ -176,9 +168,7 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
         source="reservation_unit",
         help_text="Id of the reservation unit requested for the event.",
     )
-    reservation_unit_details = ReservationUnitSerializer(
-        display=True, source="reservation_unit", read_only=True
-    )
+    reservation_unit_details = ReservationUnitSerializer(display=True, source="reservation_unit", read_only=True)
 
     class Meta:
         model = EventReservationUnit
@@ -198,9 +188,7 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
 class ApplicationEventSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
 
-    application_event_schedules = ApplicationEventScheduleSerializer(
-        many=True, read_only=False
-    )
+    application_event_schedules = ApplicationEventScheduleSerializer(many=True, read_only=False)
 
     application_id = serializers.PrimaryKeyRelatedField(
         queryset=Application.objects.all(),
@@ -215,9 +203,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         help_text="Id of the age group for this event.",
     )
 
-    age_group_display = AgeGroupSerializer(
-        display=True, read_only=True, source="age_group"
-    )
+    age_group_display = AgeGroupSerializer(display=True, read_only=True, source="age_group")
 
     ability_group_id = serializers.PrimaryKeyRelatedField(
         queryset=AbilityGroup.objects.all(),
@@ -261,9 +247,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         source="declined_reservation_units", many=True, read_only=True
     )
 
-    aggregated_data = serializers.DictField(
-        source="aggregated_data_dict", read_only=True
-    )
+    aggregated_data = serializers.DictField(source="aggregated_data_dict", read_only=True)
 
     uuid = serializers.UUIDField(read_only=True)
 
@@ -344,58 +328,40 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         max_duration = data["max_duration"]
 
         if max_duration is not None and max_duration < min_duration:
-            raise serializers.ValidationError(
-                "Maximum duration should be larger than minimum duration"
-            )
+            raise serializers.ValidationError("Maximum duration should be larger than minimum duration")
         return data
 
     @staticmethod
-    def handle_event_schedules(
-        schedule_data: List[Dict[Any, Any]], application_event: ApplicationEvent
-    ) -> None:
+    def handle_event_schedules(schedule_data: List[Dict[Any, Any]], application_event: ApplicationEvent) -> None:
         event_ids = []
 
         for schedule in schedule_data:
-            application_event_schedule = ApplicationEventSchedule(
-                **schedule, application_event=application_event
-            )
+            application_event_schedule = ApplicationEventSchedule(**schedule, application_event=application_event)
             application_event_schedule.save()
             event_ids.append(application_event_schedule.id)
 
-        ApplicationEventSchedule.objects.filter(
-            application_event=application_event
-        ).exclude(id__in=event_ids).delete()
+        ApplicationEventSchedule.objects.filter(application_event=application_event).exclude(id__in=event_ids).delete()
 
     @staticmethod
-    def handle_units(
-        event_unit_data: List[Dict[Any, Any]], application_event: ApplicationEvent
-    ) -> None:
+    def handle_units(event_unit_data: List[Dict[Any, Any]], application_event: ApplicationEvent) -> None:
         event_unit_ids = []
 
         for event_unit in event_unit_data:
-            event_reservation_unit = EventReservationUnit(
-                **event_unit, application_event=application_event
-            )
+            event_reservation_unit = EventReservationUnit(**event_unit, application_event=application_event)
             event_reservation_unit.save()
             event_unit_ids.append(event_reservation_unit.id)
 
-        EventReservationUnit.objects.filter(
-            application_event=application_event
-        ).exclude(id__in=event_unit_ids).delete()
+        EventReservationUnit.objects.filter(application_event=application_event).exclude(id__in=event_unit_ids).delete()
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
         schedule_data = validated_data.pop("application_event_schedules", [])
         unit_data = validated_data.pop("event_reservation_units", [])
         status = validated_data.pop("status")
 
         event = super().create(validated_data)
-        self.handle_event_schedules(
-            schedule_data=schedule_data, application_event=event
-        )
+        self.handle_event_schedules(schedule_data=schedule_data, application_event=event)
 
         self.handle_units(event_unit_data=unit_data, application_event=event)
         event.set_status(status, request_user)
@@ -404,9 +370,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
         schedule_data = validated_data.pop("application_event_schedules")
         unit_data = validated_data.pop("event_reservation_units")
         status = validated_data.pop("status")
@@ -441,17 +405,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     user = serializers.HiddenField(default=NullableCurrentUserDefault())
 
-    application_events = ApplicationEventSerializer(
-        help_text="List of applications events", many=True
-    )
+    application_events = ApplicationEventSerializer(help_text="List of applications events", many=True)
 
-    status = serializers.ChoiceField(
-        help_text="Status of this application", choices=ApplicationStatus.STATUS_CHOICES
-    )
+    status = serializers.ChoiceField(help_text="Status of this application", choices=ApplicationStatus.STATUS_CHOICES)
 
-    aggregated_data = serializers.DictField(
-        source="aggregated_data_dict", read_only=True
-    )
+    aggregated_data = serializers.DictField(source="aggregated_data_dict", read_only=True)
 
     billing_address = AddressSerializer(
         help_text="Billing address for the application",
@@ -508,9 +466,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         if contact_person_data is not None:
             # CASE: Create new person
             if "id" not in contact_person_data or contact_person_data["id"] is None:
-                return PersonSerializer(data=contact_person_data).create(
-                    validated_data=contact_person_data
-                )
+                return PersonSerializer(data=contact_person_data).create(validated_data=contact_person_data)
 
             # CASE: Update existing person
             return PersonSerializer(data=contact_person_data).update(
@@ -520,15 +476,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         return None
 
-    def handle_organisation(
-        self, organisation_data: Dict[Any, Any]
-    ) -> Union[Organisation, None]:
+    def handle_organisation(self, organisation_data: Dict[Any, Any]) -> Union[Organisation, None]:
         if organisation_data is not None:
             # CASE: Create new organisation
             if "id" not in organisation_data or organisation_data["id"] is None:
-                return OrganisationSerializer(data=organisation_data).create(
-                    validated_data=organisation_data
-                )
+                return OrganisationSerializer(data=organisation_data).create(validated_data=organisation_data)
 
             # CASE: Update exisitng organisation
             return OrganisationSerializer(data=organisation_data).update(
@@ -540,9 +492,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     def handle_billing_address(self, billing_address_data: Dict[Any, Any]):
         if "id" not in billing_address_data or billing_address_data["id"] is None:
-            billing_address = AddressSerializer(data=billing_address_data).create(
-                validated_data=billing_address_data
-            )
+            billing_address = AddressSerializer(data=billing_address_data).create(validated_data=billing_address_data)
 
         else:
             billing_address = AddressSerializer(data=billing_address_data).update(
@@ -558,26 +508,19 @@ class ApplicationSerializer(serializers.ModelSerializer):
             data = self.validate_for_review(data)
         if (
             self.instance
-            and self.instance.status
-            in (ApplicationStatus.DRAFT, ApplicationStatus.IN_REVIEW)
+            and self.instance.status in (ApplicationStatus.DRAFT, ApplicationStatus.IN_REVIEW)
             and "status" in data
             and data["status"] == ApplicationStatus.SENT
         ):
-            raise serializers.ValidationError(
-                "Applications in DRAFT or IN_REVIEW status cannot set as SENT."
-            )
+            raise serializers.ValidationError("Applications in DRAFT or IN_REVIEW status cannot set as SENT.")
         if "status" in data and data["status"] not in (
             ApplicationStatus.DRAFT,
             ApplicationStatus.IN_REVIEW,
             ApplicationStatus.CANCELLED,
         ):
             request = self.context["request"] if "request" in self.context else None
-            request_user = (
-                request.user if request and request.user.is_authenticated else None
-            )
-            if not request_user or not can_handle_application(
-                request_user, self.instance
-            ):
+            request_user = request.user if request and request.user.is_authenticated else None
+            if not request_user or not can_handle_application(request_user, self.instance):
                 raise serializers.ValidationError("No permission for status change.")
 
         return data
@@ -589,9 +532,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         else:
             contact_person_info = data.get("contact_person", None)
             if not contact_person_info or contact_person_info == "":
-                raise serializers.ValidationError(
-                    "Contact person is required for review."
-                )
+                raise serializers.ValidationError("Contact person is required for review.")
             for event in application_events:
                 if not len(event["application_event_schedules"]):
                     raise ValidationError(_("Application events must have schedules"))
@@ -599,9 +540,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 for field in ApplicationEvent.REQUIRED_FOR_REVIEW:
                     if event.get(field, None) in [None, ""]:
                         raise ValidationError(
-                            _(
-                                'Field "{field}" is required for application event.'
-                            ).format(field=field)
+                            _('Field "{field}" is required for application event.').format(field=field)
                         )
 
         contact_person = data.get("contact_person", None)
@@ -610,11 +549,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         else:
             for field in Person.REQUIRED_FOR_REVIEW:
                 if contact_person.get(field, None) in [None, ""]:
-                    raise ValidationError(
-                        _('Field "{field}" is required for contact person.').format(
-                            field=field
-                        )
-                    )
+                    raise ValidationError(_('Field "{field}" is required for contact person.').format(field=field))
 
         return data
 
@@ -633,11 +568,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
             # CASE: Create new application event
             if "id" not in event or event["id"] is None:
-                event_ids.append(
-                    ApplicationEventSerializer(data=event)
-                    .create(validated_data=event)
-                    .id
-                )
+                event_ids.append(ApplicationEventSerializer(data=event).create(validated_data=event).id)
 
                 continue
 
@@ -652,15 +583,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
             )
 
         # Delete events that were not created or modified
-        ApplicationEvent.objects.filter(application=application_instance).exclude(
-            id__in=event_ids
-        ).delete()
+        ApplicationEvent.objects.filter(application=application_instance).exclude(id__in=event_ids).delete()
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
 
         validated_data["user"] = request_user
 
@@ -672,14 +599,10 @@ class ApplicationSerializer(serializers.ModelSerializer):
         status = validated_data.pop("status")
 
         contact_person_data = validated_data.pop("contact_person")
-        validated_data["contact_person"] = self.handle_person(
-            contact_person_data=contact_person_data
-        )
+        validated_data["contact_person"] = self.handle_person(contact_person_data=contact_person_data)
 
         organisation_data = validated_data.pop("organisation")
-        validated_data["organisation"] = self.handle_organisation(
-            organisation_data=organisation_data
-        )
+        validated_data["organisation"] = self.handle_organisation(organisation_data=organisation_data)
 
         event_data = validated_data.pop("application_events")
 
@@ -693,9 +616,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
 
         validated_data["user"] = instance.user
 
@@ -710,13 +631,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
         organisation_data = validated_data.pop("organisation", None)
         event_data = validated_data.pop("application_events", None)
 
-        validated_data["contact_person"] = self.handle_person(
-            contact_person_data=contact_person_data
-        )
+        validated_data["contact_person"] = self.handle_person(contact_person_data=contact_person_data)
 
-        validated_data["organisation"] = self.handle_organisation(
-            organisation_data=organisation_data
-        )
+        validated_data["organisation"] = self.handle_organisation(organisation_data=organisation_data)
 
         self.handle_events(application_instance=instance, event_data=event_data)
 
@@ -729,9 +646,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
 
 class ApplicationStatusSerializer(serializers.ModelSerializer):
-    application_id = serializers.PrimaryKeyRelatedField(
-        queryset=Application.objects.all(), source="application"
-    )
+    application_id = serializers.PrimaryKeyRelatedField(queryset=Application.objects.all(), source="application")
     user_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
 
     class Meta:
@@ -761,8 +676,7 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
             ApplicationStatus.DRAFT,
         ):
             raise serializers.ValidationError(
-                "Cannot set the application status to SENT from %s status"
-                % application.status
+                "Cannot set the application status to SENT from %s status" % application.status
             )
 
         return data
@@ -790,10 +704,7 @@ class ApplicationEventStatusSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             instance.user = request.user
 
-        if (
-            instance.status == ApplicationEventStatus.APPROVED
-            and not instance.application_event.is_approved
-        ):
+        if instance.status == ApplicationEventStatus.APPROVED and not instance.application_event.is_approved:
             create_reservations_from_allocation_results(instance.application_event)
 
         instance.save()
@@ -805,9 +716,7 @@ class ApplicationEventWeeklyAmountReductionSerializer(serializers.ModelSerialize
         source="application_event_schedule_result",
         queryset=ApplicationEventScheduleResult.objects.all(),
     )
-    application_event_id = serializers.PrimaryKeyRelatedField(
-        source="application_event", read_only=True
-    )
+    application_event_id = serializers.PrimaryKeyRelatedField(source="application_event", read_only=True)
     user = serializers.HiddenField(default=NullableCurrentUserDefault())
 
     class Meta:
@@ -829,9 +738,7 @@ class ApplicationEventWeeklyAmountReductionSerializer(serializers.ModelSerialize
     def validate(self, data):
         result = data["application_event_schedule_result"]
 
-        application_event: ApplicationEvent = (
-            result.application_event_schedule.application_event
-        )
+        application_event: ApplicationEvent = result.application_event_schedule.application_event
 
         if result.accepted:
             raise serializers.ValidationError("Can't remove approved result.")
@@ -840,8 +747,6 @@ class ApplicationEventWeeklyAmountReductionSerializer(serializers.ModelSerialize
         ).count()
 
         if application_event.events_per_week < reduction_count + 1:
-            raise serializers.ValidationError(
-                "Can't reduce events per week to below zero."
-            )
+            raise serializers.ValidationError("Can't reduce events per week to below zero.")
         data["application_event"] = application_event
         return data

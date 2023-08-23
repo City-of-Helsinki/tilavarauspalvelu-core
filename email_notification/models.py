@@ -13,9 +13,7 @@ class EmailType(models.TextChoices):
     RESERVATION_CANCELLED = "reservation_cancelled"
     ACCESS_CODE_FOR_RESERVATION = "access_code_for_reservation"
     RESERVATION_NEEDS_TO_BE_PAID = "reservation_needs_to_be_paid"
-    STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING = (
-        "staff_notification_reservation_requires_handling"
-    )
+    STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING = "staff_notification_reservation_requires_handling"
     STAFF_NOTIFICATION_RESERVATION_MADE = "staff_notification_reservation_made"
 
 
@@ -40,9 +38,7 @@ class EmailTemplate(models.Model):
     subject = models.CharField(max_length=255, null=False, blank=False)
     content = models.TextField(
         verbose_name=_("Content"),
-        help_text=_(
-            "Email body content. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."
-        ),
+        help_text=_("Email body content. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."),
         null=False,
         blank=False,
     )

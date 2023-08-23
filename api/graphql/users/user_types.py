@@ -57,7 +57,5 @@ class UserType(AuthNode, PrimaryKeyObjectType):
         return UnitRole.objects.filter(user__pk=self.pk)
 
     def resolve_date_of_birth(self, info: graphene.ResolveInfo):
-        save_personal_info_view_log.delay(
-            self.pk, info.context.user.id, "User.date_of_birth"
-        )
+        save_personal_info_view_log.delay(self.pk, info.context.user.id, "User.date_of_birth")
         return self.date_of_birth

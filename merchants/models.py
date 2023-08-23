@@ -22,13 +22,9 @@ class PaymentMerchant(ExportModelOperationsMixin("payment_merchant"), models.Mod
         blank=False,
         null=False,
     )
-    name = models.CharField(
-        verbose_name=_("Merchant name"), blank=False, null=False, max_length=128
-    )
+    name = models.CharField(verbose_name=_("Merchant name"), blank=False, null=False, max_length=128)
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         return super().save(force_insert, force_update, using, update_fields)
 
     def __str__(self) -> str:
@@ -139,13 +135,9 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
         decimal_places=2,
     )
 
-    created_at = models.DateTimeField(
-        verbose_name=_("Created at"), null=False, auto_now_add=True
-    )
+    created_at = models.DateTimeField(verbose_name=_("Created at"), null=False, auto_now_add=True)
 
-    processed_at = models.DateTimeField(
-        verbose_name=_("Processed at"), null=True, blank=True
-    )
+    processed_at = models.DateTimeField(verbose_name=_("Processed at"), null=True, blank=True)
 
     language = models.CharField(
         verbose_name=_("Language"),
@@ -179,20 +171,11 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
         failsafe_price_vat = self.price_vat or Decimal("0.0")
 
         if self.price_net is not None and self.price_net < 0.01:
-            validation_errors.setdefault("price_net", []).append(
-                _("Must be greater than 0.01")
-            )
+            validation_errors.setdefault("price_net", []).append(_("Must be greater than 0.01"))
         if self.price_vat is not None and self.price_vat < 0:
-            validation_errors.setdefault("price_vat", []).append(
-                _("Must be greater than 0")
-            )
-        if (
-            self.price_total is not None
-            and self.price_total != failsafe_price_net + failsafe_price_vat
-        ):
-            validation_errors.setdefault("price_total", []).append(
-                _("Must be the sum of net and vat amounts")
-            )
+            validation_errors.setdefault("price_vat", []).append(_("Must be greater than 0"))
+        if self.price_total is not None and self.price_total != failsafe_price_net + failsafe_price_vat:
+            validation_errors.setdefault("price_total", []).append(_("Must be the sum of net and vat amounts"))
 
         if validation_errors:
             raise ValidationError(validation_errors)
@@ -207,9 +190,7 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
     Custom validation comes from requirements in SAP
     """
 
-    name = models.CharField(
-        verbose_name=_("Accounting name"), blank=False, null=False, max_length=128
-    )
+    name = models.CharField(verbose_name=_("Accounting name"), blank=False, null=False, max_length=128)
 
     company_code = models.CharField(
         verbose_name=_("Company code"),
@@ -227,9 +208,7 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
         validators=[is_numeric],
     )
 
-    vat_code = models.CharField(
-        verbose_name=_("VAT code"), blank=False, null=False, max_length=2
-    )
+    vat_code = models.CharField(verbose_name=_("VAT code"), blank=False, null=False, max_length=2)
 
     internal_order = models.CharField(
         verbose_name=_("Internal order"),
@@ -269,9 +248,7 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
 
     def clean(self) -> None:
         if not self.project and not self.profit_center and not self.internal_order:
-            error_message = _(
-                "One of the following fields must be given: internal_order, profit_center, project"
-            )
+            error_message = _("One of the following fields must be given: internal_order, profit_center, project")
             raise ValidationError(
                 {
                     "internal_order": [error_message],
@@ -286,9 +263,7 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
 
         super(PaymentAccounting, self).save(*args, **kwargs)
         if settings.UPDATE_ACCOUNTING:
-            runits_from_units = ReservationUnit.objects.filter(
-                unit__in=self.units.all()
-            )
+            runits_from_units = ReservationUnit.objects.filter(unit__in=self.units.all())
             runits = runits_from_units.union(self.reservation_units.all())
             for runit in runits:
                 refresh_reservation_unit_accounting.delay(runit.pk)

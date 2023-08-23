@@ -108,9 +108,7 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
     def export_to_csv(self, request, queryset):
         try:
             app_round = queryset.first()
-            path = ApplicationDataExporter.export_application_data(
-                application_round=app_round
-            )
+            path = ApplicationDataExporter.export_application_data(application_round=app_round)
 
         except Exception as e:
             self.message_user(

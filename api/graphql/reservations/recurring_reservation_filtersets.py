@@ -15,23 +15,13 @@ class RecurringReservationFilterSet(django_filters.FilterSet):
     begin_time = django_filters.TimeFilter(field_name="begin_time", lookup_expr="gte")
     end_time = django_filters.TimeFilter(field_name="end_time", lookup_expr="lte")
 
-    user = django_filters.ModelChoiceFilter(
-        field_name="user", queryset=User.objects.all()
-    )
+    user = django_filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
 
-    reservation_unit_name_fi = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
-    reservation_unit_name_en = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
-    reservation_unit_name_sv = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
+    reservation_unit_name_fi = django_filters.CharFilter(method="get_reservation_unit_name")
+    reservation_unit_name_en = django_filters.CharFilter(method="get_reservation_unit_name")
+    reservation_unit_name_sv = django_filters.CharFilter(method="get_reservation_unit_name")
 
-    unit = django_filters.ModelMultipleChoiceFilter(
-        method="get_unit", queryset=Unit.objects.all()
-    )
+    unit = django_filters.ModelMultipleChoiceFilter(method="get_unit", queryset=Unit.objects.all())
 
     reservation_unit = django_filters.ModelMultipleChoiceFilter(
         method="get_reservation_unit", queryset=ReservationUnit.objects.all()

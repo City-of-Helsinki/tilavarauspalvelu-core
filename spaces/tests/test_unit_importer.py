@@ -71,15 +71,9 @@ class UnitImporterBaseTestCase(TestCase):
 
     def check_location_values_vs_data_values(self, location, expected_values):
         """Helper method to assert the location values against expected values"""
-        self.assertEqual(
-            location.address_street_fi, expected_values["street_address_fi"]
-        )
-        self.assertEqual(
-            location.address_street_en, expected_values["street_address_en"]
-        )
-        self.assertEqual(
-            location.address_street_sv, expected_values["street_address_sv"]
-        )
+        self.assertEqual(location.address_street_fi, expected_values["street_address_fi"])
+        self.assertEqual(location.address_street_en, expected_values["street_address_en"])
+        self.assertEqual(location.address_street_sv, expected_values["street_address_sv"])
         self.assertEqual(location.address_zip, expected_values["address_zip"])
         self.assertEqual(location.address_city_fi, expected_values["address_city_fi"])
         self.assertEqual(location.address_city_en, expected_values["address_city_en"])
@@ -233,9 +227,7 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
 
         self.check_unit_values_vs_data_values(unit, check_values)
 
-    def test_importer_fails_when_missing_fields_and_defaults_not_defined(
-        self, mock_response
-    ):
+    def test_importer_fails_when_missing_fields_and_defaults_not_defined(self, mock_response):
         field_map = self.get_field_map()
         field_map["defaults"] = {}
         importer = UnitImporter("", field_map=field_map)
@@ -247,9 +239,7 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
 @pytest.mark.django_db
 @mock.patch("requests.get", return_value=response_mock)
 class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
-    def test_importer_giving_custom_field_map_creates_units_and_locations(
-        self, mock_response
-    ):
+    def test_importer_giving_custom_field_map_creates_units_and_locations(self, mock_response):
         importer = UnitImporter(
             "",
             field_map={
@@ -341,9 +331,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
         with self.assertRaises(Exception):
             importer.import_units()
 
-    def test_importer_giving_custom_field_map_with_empty_defaults_creates_units_and_locations(
-        self, mock_response
-    ):
+    def test_importer_giving_custom_field_map_with_empty_defaults_creates_units_and_locations(self, mock_response):
         importer = UnitImporter(
             "",
             field_map={

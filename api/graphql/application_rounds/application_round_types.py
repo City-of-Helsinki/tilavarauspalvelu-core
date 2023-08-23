@@ -63,9 +63,7 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (ApplicationRoundPermission,)
 
     service_sector = graphene.Field(ServiceSectorType)
-    status = graphene.Field(
-        graphene.Enum("applicationRoundStatus", ApplicationRoundStatus.STATUS_CHOICES)
-    )
+    status = graphene.Field(graphene.Enum("applicationRoundStatus", ApplicationRoundStatus.STATUS_CHOICES))
     status_timestamp = graphene.DateTime()
 
     # With resolvers

@@ -30,12 +30,8 @@ refund_json = {
 class RefundFromJsonTestCase(TestCase):
     def test_refund_from_json(self):
         refund = Refund.from_json(refund_json)
-        assert_that(refund.refund_id).is_equal_to(
-            UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        )
-        assert_that(refund.order_id).is_equal_to(
-            UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        )
+        assert_that(refund.refund_id).is_equal_to(UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"))
+        assert_that(refund.order_id).is_equal_to(UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"))
         assert_that(refund.namespace).is_equal_to("tilavaraus")
         assert_that(refund.user).is_equal_to("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
         assert_that(refund.created_at).is_equal_to(
@@ -76,7 +72,5 @@ class RefundFromJsonTestCase(TestCase):
             data["refundId"] = "not-a-uuid"
             Refund.from_json(data)
 
-        assert_that(str(ex.value)).is_equal_to(
-            "Could not parse refund: badly formed hexadecimal UUID string"
-        )
+        assert_that(str(ex.value)).is_equal_to("Could not parse refund: badly formed hexadecimal UUID string")
         assert_that(mock_capture_exception.called).is_true()

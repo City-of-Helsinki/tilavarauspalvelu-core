@@ -23,18 +23,14 @@ def create_reservations_from_allocation_results(application_event):
         if hasattr(schedule, "application_event_schedule_result")
     ]
     for schedule in scheduled_schedules:
-        create_reservation_from_schedule_result(
-            schedule.application_event_schedule_result, application_event
-        )
+        create_reservation_from_schedule_result(schedule.application_event_schedule_result, application_event)
     ApplicationRoundAggregateDataCreator(
         application_event.application.application_round, reservations_only=True
     ).start()
     ApplicationAggregateDataCreator(application_event.application).start()
 
 
-def create_reservation_from_schedule_result(
-    result, application_event: ApplicationEvent
-):
+def create_reservation_from_schedule_result(result, application_event: ApplicationEvent):
     recurring_reservation = RecurringReservation.objects.create(
         user=application_event.application.user,
         application=application_event.application,
@@ -44,9 +40,7 @@ def create_reservation_from_schedule_result(
         reservation_unit=result.allocated_reservation_unit,
     )
 
-    reservation_date = next_or_current_matching_weekday(
-        application_event.begin, result.allocated_day
-    )
+    reservation_date = next_or_current_matching_weekday(application_event.begin, result.allocated_day)
 
     interval = 14 if application_event.biweekly else 7
     while reservation_date < application_event.end:
@@ -60,13 +54,9 @@ def create_reservation_from_schedule_result(
             result.allocated_end,
             tzinfo=get_default_timezone(),
         )
-        is_overlapping = result.allocated_reservation_unit.check_reservation_overlap(
-            res_start, res_end
-        )
+        is_overlapping = result.allocated_reservation_unit.check_reservation_overlap(res_start, res_end)
 
-        reservation_scheduler = ReservationScheduler(
-            result.allocated_reservation_unit, res_start, res_end
-        )
+        reservation_scheduler = ReservationScheduler(result.allocated_reservation_unit, res_start, res_end)
         (
             start,
             end,
@@ -78,9 +68,7 @@ def create_reservation_from_schedule_result(
 
         try:
             reservation = Reservation.objects.create(
-                state=STATE_CHOICES.DENIED
-                if is_overlapping or is_unit_closed
-                else STATE_CHOICES.CONFIRMED,
+                state=STATE_CHOICES.DENIED if is_overlapping or is_unit_closed else STATE_CHOICES.CONFIRMED,
                 priority=result.application_event_schedule.priority,
                 user=application_event.application.user,
                 begin=start if not is_unit_closed else res_start,
@@ -91,25 +79,17 @@ def create_reservation_from_schedule_result(
                 age_group=application_event.age_group,
                 name=application_event.name,
                 reservee_organisation_name=getattr(organisation, "name", ""),
-                reservee_first_name=getattr(
-                    application.contact_person, "first_name", ""
-                ),
+                reservee_first_name=getattr(application.contact_person, "first_name", ""),
                 reservee_last_name=getattr(application.contact_person, "last_name", ""),
                 reservee_email=getattr(application.contact_person, "email", ""),
                 reservee_phone=getattr(application.contact_person, "phone_number", ""),
                 reservee_id=getattr(organisation, "identifier", ""),
                 reservee_address_zip=getattr(organisation.address, "post_code", ""),
-                reservee_address_street=getattr(
-                    organisation.address, "street_address", ""
-                ),
+                reservee_address_street=getattr(organisation.address, "street_address", ""),
                 reservee_address_city=getattr(organisation.address, "city", ""),
-                billing_address_street=getattr(
-                    application.billing_address, "street_address", ""
-                ),
+                billing_address_street=getattr(application.billing_address, "street_address", ""),
                 billing_address_city=getattr(application.billing_address, "city", ""),
-                billing_address_zip=getattr(
-                    application.billing_address, "post_code", ""
-                ),
+                billing_address_zip=getattr(application.billing_address, "post_code", ""),
                 home_city=application.home_city,
             )
             reservation.reservation_unit.add(result.allocated_reservation_unit)
@@ -138,20 +118,12 @@ class ReservationScheduler:
         for opening_hour in opening_hours:
             opening_hour_date = opening_hour["date"]
             for time in opening_hour["times"]:
-                if (
-                    opening_hour_date == self.begin.date()
-                    and not self.is_multiple_days_reservation
-                ):
+                if opening_hour_date == self.begin.date() and not self.is_multiple_days_reservation:
                     return self._get_datetimes_for_the_day(opening_hour_date, time)
 
                 # Assume opening hours are sorted properly.
-                if (
-                    self.is_multiple_days_reservation
-                    and opening_hour_date in self.dates
-                ):
-                    if not time.end_time == datetime.time(
-                        23, 59, tzinfo=get_default_timezone()
-                    ):
+                if self.is_multiple_days_reservation and opening_hour_date in self.dates:
+                    if not time.end_time == datetime.time(23, 59, tzinfo=get_default_timezone()):
                         return self._get_datetimes_for_the_day(self.begin.date(), time)
                     for date in self.dates[1:]:
                         if self.can_continue_to_next_day(date, time):
@@ -161,12 +133,8 @@ class ReservationScheduler:
         return None, None
 
     def _get_datetimes_for_the_day(self, date, time):
-        start_dt = datetime.datetime.combine(
-            date, time.start_time, tzinfo=get_default_timezone()
-        )
-        end_dt = datetime.datetime.combine(
-            date, time.end_time, tzinfo=get_default_timezone()
-        )
+        start_dt = datetime.datetime.combine(date, time.start_time, tzinfo=get_default_timezone())
+        end_dt = datetime.datetime.combine(date, time.end_time, tzinfo=get_default_timezone())
 
         starts_in_opening_hours = start_dt <= self.begin
         ends_in_opening_hours = end_dt >= self.end
@@ -181,9 +149,7 @@ class ReservationScheduler:
 
     def can_continue_to_next_day(self, date, time):
         last_date = len(self.dates) - 1
-        return (
-            self.dates.index(date) < last_date and time.hour == 23 and time.hour == 59
-        )
+        return self.dates.index(date) < last_date and time.hour == 23 and time.hour == 59
 
     def get_opening_hours(self):
         # TODO: Cache opening hours per unit.

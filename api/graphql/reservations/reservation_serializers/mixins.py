@@ -106,9 +106,7 @@ class ReservationPriceMixin:
         is_first_paid_set = False
 
         for reservation_unit in reservation_units:
-            pricing = ReservationUnitPricingHelper.get_price_by_date(
-                reservation_unit, begin.date()
-            )
+            pricing = ReservationUnitPricingHelper.get_price_by_date(reservation_unit, begin.date())
             # If unit pricing type is not PAID, there is no need for calculations. Skip.
             if pricing is None or pricing.pricing_type != PricingType.PAID:
                 break
@@ -119,9 +117,7 @@ class ReservationPriceMixin:
             # Use same equivalent net price that with vat price.
             # This is merely a cautionary check since this should be highest_price_net.
             reservation_unit_price_net = (
-                pricing.highest_price_net
-                if max_price == pricing.highest_price
-                else pricing.lowest_price_net
+                pricing.highest_price_net if max_price == pricing.highest_price else pricing.lowest_price_net
             )
 
             # Subsidised price is always the lowest price.
@@ -134,34 +130,23 @@ class ReservationPriceMixin:
                 reservation_duration_in_minutes = (end - begin).seconds / Decimal("60")
 
                 # Prices are calculated based on the 15 minutes intervals rounded up
-                reservation_duration_in_15mins = math.ceil(
-                    reservation_duration_in_minutes / Decimal("15")
-                )
+                reservation_duration_in_15mins = math.ceil(reservation_duration_in_minutes / Decimal("15"))
 
-                reservation_unit_price_unit_minutes = price_unit_to_minutes.get(
-                    pricing.price_unit
-                )
+                reservation_unit_price_unit_minutes = price_unit_to_minutes.get(pricing.price_unit)
                 reservation_unit_price_per_15min = (
-                    reservation_unit_price_net
-                    / reservation_unit_price_unit_minutes
-                    * Decimal("15")
+                    reservation_unit_price_net / reservation_unit_price_unit_minutes * Decimal("15")
                 )
 
-                reservation_unit_price_net = Decimal(
-                    reservation_duration_in_15mins * reservation_unit_price_per_15min
-                )
+                reservation_unit_price_net = Decimal(reservation_duration_in_15mins * reservation_unit_price_per_15min)
 
-                reservation_unit_price = reservation_unit_price_net * (
-                    1 + pricing.tax_percentage.decimal
-                )
+                reservation_unit_price = reservation_unit_price_net * (1 + pricing.tax_percentage.decimal)
 
                 reservation_unit_subsidised_price_net = Decimal(
                     reservation_duration_in_15mins * reservation_unit_price_per_15min
                 )
 
-                reservation_unit_subsidised_price = (
-                    reservation_unit_subsidised_price_net
-                    * (1 + pricing.tax_percentage.decimal)
+                reservation_unit_subsidised_price = reservation_unit_subsidised_price_net * (
+                    1 + pricing.tax_percentage.decimal
                 )
 
             # It was agreed in TILA-1765 that when multiple units are given,
@@ -175,9 +160,7 @@ class ReservationPriceMixin:
             total_reservation_price += reservation_unit_price
             total_reservation_price_net += reservation_unit_price_net
             total_reservation_subsidised_price += reservation_unit_subsidised_price
-            total_reservation_subsidised_price_net += (
-                reservation_unit_subsidised_price_net
-            )
+            total_reservation_subsidised_price_net += reservation_unit_subsidised_price_net
 
         non_subsidised_price = total_reservation_price
         non_subsidised_price_net = total_reservation_price_net
@@ -199,22 +182,18 @@ class ReservationSchedulingMixin:
 
     @classmethod
     def _get_invalid_begin(cls, reservation_unit, now: datetime.datetime):
-        return (
-            reservation_unit.reservation_begins
-            and now < reservation_unit.reservation_begins
-        ) or (reservation_unit.publish_begins and now < reservation_unit.publish_begins)
+        return (reservation_unit.reservation_begins and now < reservation_unit.reservation_begins) or (
+            reservation_unit.publish_begins and now < reservation_unit.publish_begins
+        )
 
     @classmethod
-    def _get_invalid_end(
-        cls, reservation_unit: ReservationUnit, now: datetime.datetime
-    ):
+    def _get_invalid_end(cls, reservation_unit: ReservationUnit, now: datetime.datetime):
         reservation_in_reservations_closed_period = (
             reservation_unit.reservation_ends
             and now >= reservation_unit.reservation_ends
             and (
                 reservation_unit.reservation_begins is None
-                or reservation_unit.reservation_begins
-                <= reservation_unit.reservation_ends
+                or reservation_unit.reservation_begins <= reservation_unit.reservation_ends
             )
         )
 
@@ -226,17 +205,11 @@ class ReservationSchedulingMixin:
                 or (reservation_unit.publish_begins <= reservation_unit.publish_ends)
             )
         )
-        return (
-            reservation_in_reservations_closed_period
-            or reservation_in_non_published_reservation_unit
-        )
+        return reservation_in_reservations_closed_period or reservation_in_non_published_reservation_unit
 
     def check_reservation_time(self, reservation_unit: ReservationUnit):
         state = reservation_unit.state
-        if (
-            state == ReservationUnitState.DRAFT
-            or state == ReservationUnitState.ARCHIVED
-        ):
+        if state == ReservationUnitState.DRAFT or state == ReservationUnitState.ARCHIVED:
             raise ValidationErrorWithCode(
                 f"Reservation unit is not reservable due to status is {state}.",
                 ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
@@ -263,10 +236,7 @@ class ReservationSchedulingMixin:
 
     def check_opening_hours(self, scheduler, begin, end):
         is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
-        if (
-            not scheduler.reservation_unit.allow_reservations_without_opening_hours
-            and not is_reservation_unit_open
-        ):
+        if not scheduler.reservation_unit.allow_reservations_without_opening_hours and not is_reservation_unit_open:
             raise ValidationErrorWithCode(
                 "Reservation unit is not open within desired reservation time.",
                 ValidationErrorCodes.RESERVATION_UNIT_IS_NOT_OPEN,
@@ -276,8 +246,7 @@ class ReservationSchedulingMixin:
         duration = end - begin
         if (
             reservation_unit.max_reservation_duration
-            and duration.total_seconds()
-            > reservation_unit.max_reservation_duration.total_seconds()
+            and duration.total_seconds() > reservation_unit.max_reservation_duration.total_seconds()
         ):
             raise ValidationErrorWithCode(
                 "Reservation duration exceeds one or more reservation unit's maximum duration.",
@@ -286,8 +255,7 @@ class ReservationSchedulingMixin:
 
         if (
             reservation_unit.min_reservation_duration
-            and duration.total_seconds()
-            < reservation_unit.min_reservation_duration.total_seconds()
+            and duration.total_seconds() < reservation_unit.min_reservation_duration.total_seconds()
         ):
             raise ValidationErrorWithCode(
                 "Reservation duration less than one or more reservation unit's minimum duration.",
@@ -295,9 +263,7 @@ class ReservationSchedulingMixin:
             )
 
         interval_minutes = int(
-            reservation_unit.reservation_start_interval.replace(
-                "interval_", ""
-            ).replace("_mins", "")
+            reservation_unit.reservation_start_interval.replace("interval_", "").replace("_mins", "")
         )
         duration_minutes = duration.total_seconds() / 60
         if duration_minutes % interval_minutes > 0:
@@ -319,20 +285,14 @@ class ReservationSchedulingMixin:
         if current_type == ReservationType.BLOCKED:
             return
 
-        reservation_after = reservation_unit.get_next_reservation(
-            end, self.instance, exclude_blocked=True
-        )
-        reservation_before = reservation_unit.get_previous_reservation(
-            begin, self.instance, exclude_blocked=True
-        )
+        reservation_after = reservation_unit.get_next_reservation(end, self.instance, exclude_blocked=True)
+        reservation_before = reservation_unit.get_previous_reservation(begin, self.instance, exclude_blocked=True)
 
         buffer_before = max(
             [
                 buffer
                 for buffer in (
-                    buffer_before
-                    if buffer_before is not None
-                    else reservation_unit.buffer_time_before,
+                    buffer_before if buffer_before is not None else reservation_unit.buffer_time_before,
                     getattr(reservation_before, "buffer_time_after", None),
                 )
                 if buffer
@@ -344,9 +304,7 @@ class ReservationSchedulingMixin:
             [
                 buffer
                 for buffer in (
-                    buffer_after
-                    if buffer_after is not None
-                    else reservation_unit.buffer_time_after,
+                    buffer_after if buffer_after is not None else reservation_unit.buffer_time_after,
                     getattr(reservation_after, "buffer_time_before", None),
                     buffer_after,
                 )
@@ -355,21 +313,13 @@ class ReservationSchedulingMixin:
             default=None,
         )
 
-        if (
-            reservation_before
-            and buffer_before
-            and (reservation_before.end + buffer_before) > begin
-        ):
+        if reservation_before and buffer_before and (reservation_before.end + buffer_before) > begin:
             raise ValidationErrorWithCode(
                 "Reservation overlaps with reservation before due to buffer time.",
                 ValidationErrorCodes.RESERVATION_OVERLAP,
             )
 
-        if (
-            reservation_after
-            and buffer_after
-            and (reservation_after.begin - buffer_after) < end
-        ):
+        if reservation_after and buffer_after and (reservation_after.begin - buffer_after) < end:
             raise ValidationErrorWithCode(
                 "Reservation overlaps with reservation after due to buffer time.",
                 ValidationErrorCodes.RESERVATION_OVERLAP,
@@ -388,9 +338,7 @@ class ReservationSchedulingMixin:
         interval = scheduler.reservation_unit.reservation_start_interval
         interval_minutes = interval_to_minutes[interval]
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
-        possible_start_times = scheduler.get_reservation_unit_possible_start_times(
-            begin, interval_timedelta
-        )
+        possible_start_times = scheduler.get_reservation_unit_possible_start_times(begin, interval_timedelta)
         if begin not in possible_start_times:
             raise ValidationErrorWithCode(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",
@@ -399,13 +347,10 @@ class ReservationSchedulingMixin:
 
     def check_reservation_days_before(self, begin, reservation_unit):
         now = datetime.datetime.now().astimezone(get_default_timezone())
-        start_of_the_day = datetime.datetime.combine(now, datetime.time.min).astimezone(
-            get_default_timezone()
-        )
+        start_of_the_day = datetime.datetime.combine(now, datetime.time.min).astimezone(get_default_timezone())
 
         if reservation_unit.reservations_max_days_before and now < (
-            begin
-            - datetime.timedelta(days=reservation_unit.reservations_max_days_before)
+            begin - datetime.timedelta(days=reservation_unit.reservations_max_days_before)
         ):
             raise ValidationErrorWithCode(
                 f"Reservation start time is earlier than {reservation_unit.reservations_max_days_before} days before.",
@@ -413,8 +358,7 @@ class ReservationSchedulingMixin:
             )
 
         if reservation_unit.reservations_min_days_before and start_of_the_day > (
-            begin
-            - datetime.timedelta(days=reservation_unit.reservations_min_days_before)
+            begin - datetime.timedelta(days=reservation_unit.reservations_min_days_before)
         ):
             raise ValidationErrorWithCode(
                 f"Reservation start time is less than {reservation_unit.reservations_min_days_before} days before.",
@@ -422,9 +366,7 @@ class ReservationSchedulingMixin:
             )
 
     def check_open_application_round(self, scheduler, begin, end):
-        open_app_round = scheduler.get_conflicting_open_application_round(
-            begin.date(), end.date()
-        )
+        open_app_round = scheduler.get_conflicting_open_application_round(begin.date(), end.date())
 
         if open_app_round:
             raise ValidationErrorWithCode(
@@ -432,26 +374,19 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_UNIT_IN_OPEN_ROUND,
             )
 
-    def check_reservation_intervals_for_staff_reservation(
-        self, reservation_unit, begin
-    ):
+    def check_reservation_intervals_for_staff_reservation(self, reservation_unit, begin):
         interval_to_minutes = {
             ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
             ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,
             ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES: 60,
             ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES: 90,
         }
-        interval = (
-            reservation_unit.reservation_start_interval
-            or ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
-        )
+        interval = reservation_unit.reservation_start_interval or ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
         interval_minutes = interval_to_minutes[interval]
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
         possible_start_times = set()
 
-        start_time = datetime.datetime.combine(
-            begin.date(), datetime.time()
-        ).astimezone(get_default_timezone())
+        start_time = datetime.datetime.combine(begin.date(), datetime.time()).astimezone(get_default_timezone())
         end_time = start_time + datetime.timedelta(hours=23, minutes=59, seconds=59)
         while start_time < end_time:
             possible_start_times.add(start_time.time())

@@ -33,13 +33,9 @@ class ReservationUnitImageSaveTestCase(TestCase):
         mock_image_data = BytesIO()
         mock_image = Image.new("RGB", (100, 100))
         mock_image.save(fp=mock_image_data, format="PNG")
-        mock_file = SimpleUploadedFile(
-            "image.png", mock_image_data.getvalue(), content_type="image/png"
-        )
+        mock_file = SimpleUploadedFile("image.png", mock_image_data.getvalue(), content_type="image/png")
 
-        runit_image = ReservationUnitImage(
-            reservation_unit=self.res_unit, image_type="main", image=mock_file
-        )
+        runit_image = ReservationUnitImage(reservation_unit=self.res_unit, image_type="main", image=mock_file)
         runit_image.save()
 
         aliases = settings.THUMBNAIL_ALIASES[""]

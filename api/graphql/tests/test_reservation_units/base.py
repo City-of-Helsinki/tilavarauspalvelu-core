@@ -46,15 +46,9 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=30),
         )
-        large_space = SpaceFactory(
-            max_persons=100, name="Large space", surface_area=100
-        )
-        cls.small_space = SpaceFactory(
-            max_persons=10, name="Small space", surface_area=50
-        )
-        rule = ReservationUnitCancellationRuleFactory(
-            name_fi="fi", name_en="en", name_sv="sv"
-        )
+        large_space = SpaceFactory(max_persons=100, name="Large space", surface_area=100)
+        cls.small_space = SpaceFactory(max_persons=10, name="Small space", surface_area=50)
+        rule = ReservationUnitCancellationRuleFactory(name_fi="fi", name_en="en", name_sv="sv")
 
         qualifier = QualifierFactory(name="Test Qualifier")
 
@@ -84,8 +78,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_begins=datetime.datetime.now(tz=TIMEZONE),
             reservation_ends=datetime.datetime.now(tz=TIMEZONE),
             publish_begins=datetime.datetime.now(tz=TIMEZONE),
-            publish_ends=datetime.datetime.now(tz=TIMEZONE)
-            + datetime.timedelta(days=7),
+            publish_ends=datetime.datetime.now(tz=TIMEZONE) + datetime.timedelta(days=7),
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=15),
             min_reservation_duration=datetime.timedelta(minutes=10),
@@ -100,9 +93,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
         )
         cls.reservation_unit.qualifiers.set([qualifier])
         cls.reservation_unit.payment_types.set([PaymentType.ONLINE])
-        cls.reservation_unit.pricings.add(
-            ReservationUnitPricingFactory(reservation_unit=cls.reservation_unit)
-        )
+        cls.reservation_unit.pricings.add(ReservationUnitPricingFactory(reservation_unit=cls.reservation_unit))
 
         cls.api_client = APIClient()
 
@@ -127,9 +118,7 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
             name_sv="sv",
         )
         cls.metadata_set = ReservationMetadataSetFactory(name="Test form")
-        cls.pricing_term = TermsOfUseFactory(
-            name="Test pricing terms", terms_type=TermsOfUse.TERMS_TYPE_PRICING
-        )
+        cls.pricing_term = TermsOfUseFactory(name="Test pricing terms", terms_type=TermsOfUse.TERMS_TYPE_PRICING)
         cls.tax_percentage = TaxPercentage.objects.get(value=24)
 
     def setUp(self):

@@ -13,24 +13,20 @@ from api.graphql.reservations.reservation_serializers.mixins import (
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from applications.models import CUSTOMER_TYPES, City
 from reservation_units.models import ReservationUnit
-from reservations.models import RESERVEE_LANGUAGE_CHOICES
-from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import (
+    RESERVEE_LANGUAGE_CHOICES,
     AgeGroup,
     Reservation,
     ReservationPurpose,
     ReservationType,
 )
+from reservations.models import STATE_CHOICES as ReservationState
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class StaffReservationModifySerializer(
-    PrimaryKeyUpdateSerializer, ReservationSchedulingMixin
-):
-    age_group_pk = IntegerPrimaryKeyField(
-        queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
-    )
+class StaffReservationModifySerializer(PrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
+    age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
 
     buffer_time_before = DurationField(
         required=False,
@@ -41,13 +37,9 @@ class StaffReservationModifySerializer(
         help_text="Number of seconds. Null/undefined value means buffer from reservation unit is used.",
     )
 
-    home_city_pk = IntegerPrimaryKeyField(
-        queryset=City.objects.all(), source="home_city", allow_null=True
-    )
+    home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
     priority = serializers.IntegerField(required=False)
-    purpose_pk = IntegerPrimaryKeyField(
-        queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True
-    )
+    purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
     reservee_type = ChoiceCharField(
         choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
         help_text=(
@@ -59,9 +51,7 @@ class StaffReservationModifySerializer(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
     )
-    reservee_language = ChoiceCharField(
-        choices=RESERVEE_LANGUAGE_CHOICES, required=False, default=""
-    )
+    reservee_language = ChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
     state = ChoiceCharField(
         help_text="Read only string value for ReservationType's ReservationState enum.",
         choices=ReservationState.STATE_CHOICES,
@@ -198,9 +188,7 @@ class StaffReservationModifySerializer(
                 buffer_before=new_buffer_before,
                 buffer_after=new_buffer_after,
             )
-            self.check_reservation_intervals_for_staff_reservation(
-                reservation_unit, begin
-            )
+            self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
 
         self.check_time_passed()
 
@@ -210,19 +198,13 @@ class StaffReservationModifySerializer(
         return data
 
     def check_type(self, type):
-        if (
-            self.instance.type == ReservationType.NORMAL
-            and type != ReservationType.NORMAL
-        ):
+        if self.instance.type == ReservationType.NORMAL and type != ReservationType.NORMAL:
             raise ValidationErrorWithCode(
                 f"Reservation type cannot be changed from NORMAL to {type.upper()}.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        if (
-            type == ReservationType.NORMAL
-            and self.instance.type != ReservationType.NORMAL
-        ):
+        if type == ReservationType.NORMAL and self.instance.type != ReservationType.NORMAL:
             raise ValidationErrorWithCode(
                 f"Reservation type cannot be changed to NORMAl from state {self.instance.type.upper()}.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,

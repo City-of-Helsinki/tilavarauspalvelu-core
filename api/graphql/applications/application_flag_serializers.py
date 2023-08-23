@@ -23,15 +23,11 @@ class SetFlaggedBaseSerializer(PrimaryKeySerializer):
         flagged = data.get("flagged")
 
         if status not in self.CAN_FLAG_STATUSES:
-            raise GraphQLError(
-                f"Only application with status as {', '.join(self.CAN_FLAG_STATUSES)} can be flagged."
-            )
+            raise GraphQLError(f"Only application with status as {', '.join(self.CAN_FLAG_STATUSES)} can be flagged.")
 
         # If Application status is SENT only setting flagged to False is possible.
         if status == ApplicationStatus.SENT and flagged:
-            raise GraphQLError(
-                "Application status is send. Only setting the flagged to False is possible."
-            )
+            raise GraphQLError("Application status is send. Only setting the flagged to False is possible.")
 
         data = super().validate(data)
 

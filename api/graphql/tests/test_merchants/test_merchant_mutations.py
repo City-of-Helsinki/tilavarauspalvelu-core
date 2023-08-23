@@ -24,9 +24,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.reservation = ReservationFactory()
-        cls.payment_order = PaymentOrderFactory(
-            remote_id=uuid4(), reservation=cls.reservation
-        )
+        cls.payment_order = PaymentOrderFactory(remote_id=uuid4(), reservation=cls.reservation)
 
     def setUp(self):
         self.client.force_login(self.general_admin)
@@ -50,9 +48,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
     def test_refresh_mutation_set_order_to_paid(self, mock_get_payment):
         remote_id = str(self.payment_order.remote_id)
-        mock_get_payment.return_value = PaymentFactory(
-            payment_id=remote_id, status="payment_paid_online"
-        )
+        mock_get_payment.return_value = PaymentFactory(payment_id=remote_id, status="payment_paid_online")
 
         response = self.query(
             query=self.get_refresh_order_query(),
@@ -71,16 +67,12 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
-        assert_that(self.payment_order.processed_at).is_equal_to(
-            datetime.now().astimezone(get_default_timezone())
-        )
+        assert_that(self.payment_order.processed_at).is_equal_to(datetime.now().astimezone(get_default_timezone()))
 
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
     def test_refresh_mutation_set_order_to_cancelled(self, mock_get_payment):
         remote_id = str(self.payment_order.remote_id)
-        mock_get_payment.return_value = PaymentFactory(
-            payment_id=remote_id, status="payment_cancelled"
-        )
+        mock_get_payment.return_value = PaymentFactory(payment_id=remote_id, status="payment_cancelled")
 
         response = self.query(
             query=self.get_refresh_order_query(),
@@ -99,14 +91,10 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.CANCELLED)
-        assert_that(self.payment_order.processed_at).is_equal_to(
-            datetime.now().astimezone(get_default_timezone())
-        )
+        assert_that(self.payment_order.processed_at).is_equal_to(datetime.now().astimezone(get_default_timezone()))
 
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
-    def test_refresh_mutation_skip_update_if_order_is_not_in_updateable_state(
-        self, mock_get_payment
-    ):
+    def test_refresh_mutation_skip_update_if_order_is_not_in_updateable_state(self, mock_get_payment):
         self.payment_order.status = OrderStatus.REFUNDED
         self.payment_order.save()
 
@@ -150,9 +138,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
 
         assert_that(len(errors)).is_equal_to(1)
         assert_that(errors[0].get("message")).is_equal_to("Order not found")
-        assert_that(errors[0].get("extensions").get("error_code")).is_equal_to(
-            ValidationErrorCodes.NOT_FOUND.value
-        )
+        assert_that(errors[0].get("extensions").get("error_code")).is_equal_to(ValidationErrorCodes.NOT_FOUND.value)
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.DRAFT)
@@ -160,9 +146,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
 
     @mock.patch("api.graphql.merchants.merchant_mutations.capture_message")
     @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
-    def test_refresh_mutation_raise_error_when_payment_not_found(
-        self, mock_get_payment, mock_capture_message
-    ):
+    def test_refresh_mutation_raise_error_when_payment_not_found(self, mock_get_payment, mock_capture_message):
         remote_id = str(self.payment_order.remote_id)
         mock_get_payment.return_value = None
 
@@ -177,12 +161,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
 
         errors = content.get("errors")
         assert_that(len(errors)).is_equal_to(1)
-        assert_that(errors[0].get("message")).is_equal_to(
-            "Unable to check order payment"
-        )
-        assert_that(errors[0].get("extensions").get("error_code")).is_equal_to(
-            ValidationErrorCodes.NOT_FOUND.value
-        )
+        assert_that(errors[0].get("message")).is_equal_to("Unable to check order payment")
+        assert_that(errors[0].get("extensions").get("error_code")).is_equal_to(ValidationErrorCodes.NOT_FOUND.value)
 
         assert_that(mock_capture_message.called).is_true
 
@@ -204,12 +184,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
         errors = content.get("errors")
         assert_that(len(errors)).is_equal_to(1)
-        assert_that(errors[0].get("message")).is_equal_to(
-            "No permission to refresh the order"
-        )
-        assert_that(errors[0].get("extensions").get("error_code")).is_equal_to(
-            ValidationErrorCodes.NO_PERMISSION.value
-        )
+        assert_that(errors[0].get("message")).is_equal_to("No permission to refresh the order")
+        assert_that(errors[0].get("extensions").get("error_code")).is_equal_to(ValidationErrorCodes.NO_PERMISSION.value)
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.DRAFT)

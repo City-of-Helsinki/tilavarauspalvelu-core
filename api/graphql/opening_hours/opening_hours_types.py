@@ -142,17 +142,14 @@ class OpeningHoursMixin:
                         end_time=time.end_time,
                         state=time.resource_state,
                         periods=time.periods,
-                        is_reservable=ResourceState(time.resource_state)
-                        in ResourceState.reservable_states(),
+                        is_reservable=ResourceState(time.resource_state) in ResourceState.reservable_states(),
                     )
                     opening_hours.append(oh)
             return_object.opening_times = opening_hours
 
         if init_periods:
             periods = []
-            for period in opening_hours_client.get_resource_periods(
-                str(self.hauki_resource_origin_id)
-            ):
+            for period in opening_hours_client.get_resource_periods(str(self.hauki_resource_origin_id)):
                 time_spans = []
                 for time_span in period.time_spans:
                     time_spans.append(

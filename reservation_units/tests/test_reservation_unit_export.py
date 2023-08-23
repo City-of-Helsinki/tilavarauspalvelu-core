@@ -33,7 +33,7 @@ from .factories import (
 
 
 class ReservationUnitDataExporterTestCase(TestCase):
-    export_dir = Path(settings.BASE_DIR) / "exports" / "reservation_unit_exports"
+    export_dir = settings.BASE_DIR / "exports" / "reservation_unit_exports"
     file_name = f"reservation_units__{timezone.now().strftime('%d-%m-%Y')}.csv"
 
     @classmethod
@@ -43,22 +43,17 @@ class ReservationUnitDataExporterTestCase(TestCase):
             resources=ResourceFactory.create_batch(3),
             qualifiers=QualifierFactory.create_batch(3),
             payment_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
-            cancellation_terms=TermsOfUseFactory(
-                terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
-            ),
+            cancellation_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
             pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
             cancellation_rule=ReservationUnitCancellationRuleFactory(),
             reservation_begins=datetime.datetime.now(tz=get_default_timezone()),
-            reservation_ends=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(days=30),
+            reservation_ends=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=30),
             metadata_set=ReservationMetadataSetFactory(),
             services=ServiceFactory.create_batch(3),
             purposes=PurposeFactory.create_batch(3),
             equipments=EquipmentFactory.create_batch(3),
         )
-        cls.pricing = ReservationUnitPricingFactory(
-            reservation_unit=cls.reservation_unit
-        )
+        cls.pricing = ReservationUnitPricingFactory(reservation_unit=cls.reservation_unit)
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -103,12 +98,8 @@ class ReservationUnitDataExporterTestCase(TestCase):
             self.reservation_unit.publish_begins,
             self.reservation_unit.publish_ends,
             ", ".join(self.reservation_unit.spaces.values_list("name_fi", flat=True)),
-            ", ".join(
-                self.reservation_unit.resources.values_list("name_fi", flat=True)
-            ),
-            ", ".join(
-                self.reservation_unit.qualifiers.all().values_list("name_fi", flat=True)
-            ),
+            ", ".join(self.reservation_unit.resources.values_list("name_fi", flat=True)),
+            ", ".join(self.reservation_unit.qualifiers.all().values_list("name_fi", flat=True)),
             self.reservation_unit.payment_terms.name,
             self.reservation_unit.cancellation_terms.name,
             self.reservation_unit.pricing_terms.name,
@@ -117,22 +108,12 @@ class ReservationUnitDataExporterTestCase(TestCase):
             self.pricing.lowest_price,
             self.pricing.highest_price,
             self.pricing.tax_percentage,
-            self.reservation_unit.reservation_begins.astimezone(
-                get_default_timezone()
-            ).strftime("%d:%m:%Y %H:%M"),
-            self.reservation_unit.reservation_ends.astimezone(
-                get_default_timezone()
-            ).strftime("%d:%m:%Y %H:%M"),
-            ", ".join(
-                self.reservation_unit.services.all().values_list("name_fi", flat=True)
-            ),
-            ", ".join(
-                self.reservation_unit.purposes.all().values_list("name_fi", flat=True)
-            ),
+            self.reservation_unit.reservation_begins.astimezone(get_default_timezone()).strftime("%d:%m:%Y %H:%M"),
+            self.reservation_unit.reservation_ends.astimezone(get_default_timezone()).strftime("%d:%m:%Y %H:%M"),
+            ", ".join(self.reservation_unit.services.all().values_list("name_fi", flat=True)),
+            ", ".join(self.reservation_unit.purposes.all().values_list("name_fi", flat=True)),
             self.reservation_unit.require_introduction,
-            ", ".join(
-                self.reservation_unit.equipments.all().values_list("name_fi", flat=True)
-            ),
+            ", ".join(self.reservation_unit.equipments.all().values_list("name_fi", flat=True)),
             self.reservation_unit.state.value,
             self.reservation_unit.reservation_state.value,
         ]
@@ -240,12 +221,8 @@ class ReservationUnitDataExporterTestCase(TestCase):
             self.reservation_unit.publish_begins,
             self.reservation_unit.publish_ends,
             ", ".join(self.reservation_unit.spaces.values_list("name_fi", flat=True)),
-            ", ".join(
-                self.reservation_unit.resources.values_list("name_fi", flat=True)
-            ),
-            ", ".join(
-                self.reservation_unit.qualifiers.all().values_list("name_fi", flat=True)
-            ),
+            ", ".join(self.reservation_unit.resources.values_list("name_fi", flat=True)),
+            ", ".join(self.reservation_unit.qualifiers.all().values_list("name_fi", flat=True)),
             self.reservation_unit.payment_terms.name,
             self.reservation_unit.cancellation_terms.name,
             self.reservation_unit.pricing_terms.name,
@@ -254,22 +231,12 @@ class ReservationUnitDataExporterTestCase(TestCase):
             self.pricing.lowest_price,
             self.pricing.highest_price,
             self.pricing.tax_percentage,
-            self.reservation_unit.reservation_begins.astimezone(
-                get_default_timezone()
-            ).strftime("%d:%m:%Y %H:%M"),
-            self.reservation_unit.reservation_ends.astimezone(
-                get_default_timezone()
-            ).strftime("%d:%m:%Y %H:%M"),
-            ", ".join(
-                self.reservation_unit.services.all().values_list("name_fi", flat=True)
-            ),
-            ", ".join(
-                self.reservation_unit.purposes.all().values_list("name_fi", flat=True)
-            ),
+            self.reservation_unit.reservation_begins.astimezone(get_default_timezone()).strftime("%d:%m:%Y %H:%M"),
+            self.reservation_unit.reservation_ends.astimezone(get_default_timezone()).strftime("%d:%m:%Y %H:%M"),
+            ", ".join(self.reservation_unit.services.all().values_list("name_fi", flat=True)),
+            ", ".join(self.reservation_unit.purposes.all().values_list("name_fi", flat=True)),
             self.reservation_unit.require_introduction,
-            ", ".join(
-                self.reservation_unit.equipments.all().values_list("name_fi", flat=True)
-            ),
+            ", ".join(self.reservation_unit.equipments.all().values_list("name_fi", flat=True)),
             self.reservation_unit.state.value,
             self.reservation_unit.reservation_state.value,
         ]

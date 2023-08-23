@@ -36,9 +36,7 @@ def get_initial_values(request) -> Dict[str, Any]:
         initial_values[f"confirmed_instructions_{lang}"] = getattr(
             runit, f"reservation_confirmed_instructions_{lang}", ""
         )
-        initial_values[f"pending_instructions_{lang}"] = getattr(
-            runit, f"reservation_pending_instructions_{lang}", ""
-        )
+        initial_values[f"pending_instructions_{lang}"] = getattr(runit, f"reservation_pending_instructions_{lang}", "")
         initial_values[f"cancelled_instructions_{lang}"] = getattr(
             runit, f"reservation_cancelled_instructions_{lang}", ""
         )
@@ -47,9 +45,7 @@ def get_initial_values(request) -> Dict[str, Any]:
 
     location = getattr(runit.unit, "location", None)
     if location:
-        initial_values[
-            "unit_location"
-        ] = f"{location.address_street} {location.address_zip} {location.address_city}"
+        initial_values["unit_location"] = f"{location.address_street} {location.address_zip} {location.address_city}"
 
     return initial_values
 
@@ -64,14 +60,8 @@ class EmailTemplateAdminForm(ModelForm):
         if self.instance and self.instance.type:
             existing_types = existing_types.exclude(type=self.instance.type)
 
-        available_types = [
-            (value, label)
-            for value, label in EmailType.choices
-            if value not in existing_types
-        ]
-        self.fields["type"].choices = [
-            (value, label) for value, label in available_types
-        ]
+        available_types = [(value, label) for value, label in EmailType.choices if value not in existing_types]
+        self.fields["type"].choices = [(value, label) for value, label in available_types]
         self.test_context = EmailNotificationContext.with_mock_data().__dict__
 
     def get_validated_field(self, field):
@@ -81,9 +71,7 @@ class EmailTemplateAdminForm(ModelForm):
                 raise ValidationError(f"Field {field} is required.")
             return data
         try:
-            EmailTemplateValidator().validate_string(
-                data, context_dict=self.test_context
-            )
+            EmailTemplateValidator().validate_string(data, context_dict=self.test_context)
         except EmailTemplateValidationError as e:
             raise ValidationError(e.message) from e
         return data
@@ -91,9 +79,7 @@ class EmailTemplateAdminForm(ModelForm):
     def validate_uploaded_html_file(self, language: str):
         file = self.cleaned_data[f"html_content_{language}"]
         if file and isinstance(file, InMemoryUploadedFile):
-            EmailTemplateValidator().validate_html_file(
-                file, context_dict=self.test_context
-            )
+            EmailTemplateValidator().validate_html_file(file, context_dict=self.test_context)
         return file
 
     def clean_subject(self):
@@ -147,13 +133,9 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             form = EmailTestForm(request.POST)
 
             if form.is_valid():
-                template = EmailTemplate.objects.filter(
-                    pk=request.POST["template"]
-                ).first()
+                template = EmailTemplate.objects.filter(pk=request.POST["template"]).first()
                 send_test_emails(template, form)
-                return redirect(
-                    "/admin/email_notification/emailtemplate/template_tester/"
-                )
+                return redirect("/admin/email_notification/emailtemplate/template_tester/")
 
             context["form"] = form
             context["runit_form"] = ReservationUnitSelectForm()

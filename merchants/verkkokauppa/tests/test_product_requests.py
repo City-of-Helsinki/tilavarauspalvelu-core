@@ -134,10 +134,7 @@ class GetProductMappingTestCase(ProductRequestsTestCaseBase):
         get = mock_get(self.get_product_mapping_response())
         get_product_mapping(self.product_id, get)
         get.assert_called_with(
-            url=(
-                settings.VERKKOKAUPPA_PRODUCT_API_URL
-                + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/mapping"
-            ),
+            url=(settings.VERKKOKAUPPA_PRODUCT_API_URL + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/mapping"),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
@@ -183,12 +180,9 @@ class CreateOrUpdateAccountingTestCase(ProductRequestsTestCaseBase):
         params = self.create_or_update_account_params()
         post = mock_post(params.to_json())
         with suppress(Exception):
-            create_or_update_accounting(
-                "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post
-            )
+            create_or_update_accounting("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post)
         post.assert_called_with(
-            url=settings.VERKKOKAUPPA_PRODUCT_API_URL
-            + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/accounting",
+            url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/accounting",
             json=params.to_json(),
             headers={
                 "api-key": settings.VERKKOKAUPPA_API_KEY,
@@ -204,9 +198,7 @@ class CreateOrUpdateAccountingTestCase(ProductRequestsTestCaseBase):
         params = self.create_or_update_account_params()
         post = mock_post(response, status_code=500)
         with raises(CreateOrUpdateAccountingError) as e:
-            create_or_update_accounting(
-                "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post
-            )
+            create_or_update_accounting("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post)
 
         assert_that(str(e.value)).contains("mock-error")
 

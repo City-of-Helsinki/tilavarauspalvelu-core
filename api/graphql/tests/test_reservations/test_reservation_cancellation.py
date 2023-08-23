@@ -39,10 +39,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         self.reservation = ReservationFactory(
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
-            end=(
-                datetime.datetime.now(tz=get_default_timezone())
-                + datetime.timedelta(hours=1)
-            ),
+            end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
             state=STATE_CHOICES.CONFIRMED,
             user=self.regular_joe,
             reservee_email="email@reservee",
@@ -84,9 +81,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         cancel_data = content.get("data").get("cancelReservation")
         assert_that(cancel_data.get("errors")).is_none()
-        assert_that(cancel_data.get("state")).is_equal_to(
-            STATE_CHOICES.CANCELLED.upper()
-        )
+        assert_that(cancel_data.get("state")).is_equal_to(STATE_CHOICES.CANCELLED.upper())
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CANCELLED)
 
@@ -104,9 +99,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         cancel_data = content.get("data").get("cancelReservation")
         assert_that(cancel_data.get("errors")).is_none()
-        assert_that(cancel_data.get("state")).is_equal_to(
-            STATE_CHOICES.CANCELLED.upper()
-        )
+        assert_that(cancel_data.get("state")).is_equal_to(STATE_CHOICES.CANCELLED.upper())
         self.reservation.refresh_from_db()
         assert_that(self.reservation.cancel_reason).is_equal_to(self.cancel_reason)
 
@@ -126,9 +119,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         cancel_data = content.get("data").get("cancelReservation")
         assert_that(cancel_data.get("errors")).is_none()
-        assert_that(cancel_data.get("state")).is_equal_to(
-            STATE_CHOICES.CANCELLED.upper()
-        )
+        assert_that(cancel_data.get("state")).is_equal_to(STATE_CHOICES.CANCELLED.upper())
         self.reservation.refresh_from_db()
         assert_that(self.reservation.cancel_details).is_equal_to(details)
 
@@ -145,9 +136,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Only reservations in confirmed state can be cancelled through this."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "CANCELLATION_NOT_ALLOWED"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("CANCELLATION_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
@@ -176,9 +165,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 
     def test_cancel_reservation_fails_with_rules_time_is_due(self):
-        rule = ReservationUnitCancellationRuleFactory(
-            can_be_cancelled_time_before=datetime.timedelta(hours=12)
-        )
+        rule = ReservationUnitCancellationRuleFactory(can_be_cancelled_time_before=datetime.timedelta(hours=12))
         self.reservation_unit.cancellation_rule = rule
         self.reservation_unit.save()
 
@@ -191,9 +178,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation cannot be cancelled because the cancellation period has expired."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "CANCELLATION_NOT_ALLOWED"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("CANCELLATION_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
@@ -203,9 +188,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=False,
     )
     def test_cancel_reservation_succeed_with_rule_set_and_in_time(self):
-        rule = ReservationUnitCancellationRuleFactory(
-            can_be_cancelled_time_before=datetime.timedelta(hours=1)
-        )
+        rule = ReservationUnitCancellationRuleFactory(can_be_cancelled_time_before=datetime.timedelta(hours=1))
         self.reservation_unit.cancellation_rule = rule
         self.reservation_unit.save()
 
@@ -251,9 +234,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation cannot be cancelled because the cancellation period has expired."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "CANCELLATION_NOT_ALLOWED"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("CANCELLATION_NOT_ALLOWED")
 
         reservation.refresh_from_db()
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
@@ -273,9 +254,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation cannot be cancelled thus no cancellation rule."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "CANCELLATION_NOT_ALLOWED"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("CANCELLATION_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
@@ -303,9 +282,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=False,
     )
     @mock.patch("reservations.tasks.refund_order")
-    def test_cancellation_starts_refund_process_on_paid_reservation(
-        self, mock_refund_order
-    ):
+    def test_cancellation_starts_refund_process_on_paid_reservation(self, mock_refund_order):
         self.client.force_login(self.regular_joe)
 
         self.reservation.price_net = Decimal("124.00")

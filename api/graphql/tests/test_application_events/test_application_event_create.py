@@ -102,9 +102,7 @@ class ApplicationEventCreateTestCase(ApplicationEventPermissionsTestCaseBase):
         assert_that(app_event.events_per_week).is_equal_to(data["eventsPerWeek"])
         assert_that(app_event.biweekly).is_equal_to(data["biweekly"])
         assert_that(app_event.end).is_equal_to(datetime.date.fromisoformat(data["end"]))
-        assert_that(app_event.begin).is_equal_to(
-            datetime.date.fromisoformat(data["begin"])
-        )
+        assert_that(app_event.begin).is_equal_to(datetime.date.fromisoformat(data["begin"]))
         assert_that(app_event.status).is_equal_to(data["status"])
 
     def test_application_event_invalid_durations(self):
@@ -179,9 +177,7 @@ class ApplicationEventCreateTestCase(ApplicationEventPermissionsTestCaseBase):
     def test_wrong_service_sector_admin_cannot_create_to_application(
         self,
     ):
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=ServiceSectorFactory()
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=ServiceSectorFactory())
         self.client.force_login(service_sector_admin)
         data = self.get_event_data()
         data["application"] = self.application.id

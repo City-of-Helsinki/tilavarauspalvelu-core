@@ -27,9 +27,7 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
 
     max_persons = serializers.IntegerField(required=False)
     code = serializers.CharField(required=False)
-    unit_pk = IntegerPrimaryKeyField(
-        queryset=Unit.objects.all(), source="unit", required=False, allow_null=True
-    )
+    unit_pk = IntegerPrimaryKeyField(queryset=Unit.objects.all(), source="unit", required=False, allow_null=True)
     surface_area = DecimalField(required=False)
 
     def __init__(self, *args, **kwargs):

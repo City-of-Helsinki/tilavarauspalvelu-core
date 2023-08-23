@@ -45,9 +45,7 @@ class EmailTemplateValidator:
         variable_tags = []
 
         for strings in tags_inside_brackets:
-            strings_list = [
-                tag for tag in strings if tag and tag not in FILTERS_MAP.keys()
-            ]
+            strings_list = [tag for tag in strings if tag and tag not in FILTERS_MAP.keys()]
 
             variable_tags.append(strings_list[0])
 
@@ -59,9 +57,7 @@ class EmailTemplateValidator:
         expressions = re.findall(self.expression_lookup, str)
         for expression in expressions:
             if expression not in settings.EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS:
-                raise EmailTemplateValidationError(
-                    "Illegal tags found: tag was '%s'" % expression
-                )
+                raise EmailTemplateValidationError("Illegal tags found: tag was '%s'" % expression)
 
     def _validate_in_sandbox(self, str: str, context: Dict, env: SandboxedEnvironment):
         try:
@@ -69,9 +65,7 @@ class EmailTemplateValidator:
         except TemplateError as e:
             raise EmailTemplateValidationError(e)
 
-    def validate_string(
-        self, str: str, context_dict: Dict = (), env: SandboxedEnvironment = None
-    ) -> bool:
+    def validate_string(self, str: str, context_dict: Dict = (), env: SandboxedEnvironment = None) -> bool:
         env = env or get_sandboxed_environment()
         self._validate_in_sandbox(str, context_dict, env)
         self._validate_illegals(str)
@@ -82,9 +76,7 @@ class EmailTemplateValidator:
     def validate_html_file(self, value: InMemoryUploadedFile, context_dict=()):
         ext = os.path.splitext(value.name)[1]
         if not ext.lower() == ".html":
-            raise ValidationError(
-                f"Unsupported file extension {ext}. Only .html files are allowed"
-            )
+            raise ValidationError(f"Unsupported file extension {ext}. Only .html files are allowed")
 
         if value.size <= 0 or value.size > settings.EMAIL_HTML_MAX_FILE_SIZE:
             raise ValidationError(
@@ -222,9 +214,7 @@ class ReservationEmailNotificationBuilder:
         return f"{settings.EMAIL_FEEDBACK_EXT_LINK}?{params}"
 
     def _get_by_language(self, instance, field):
-        return getattr(
-            instance, f"{field}_{self.language}", getattr(instance, field, "")
-        )
+        return getattr(instance, f"{field}_{self.language}", getattr(instance, field, ""))
 
     def _get_html_content(self, instance):
         html_template_file = self._get_by_language(instance, "html_content")
@@ -244,9 +234,7 @@ class ReservationEmailNotificationBuilder:
         for key in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
             value = getattr(self, f"_get_{key}", False)
             if not value:
-                raise EmailBuilderConfigError(
-                    "Email context variable %s did not had _get method defined." % key
-                )
+                raise EmailBuilderConfigError("Email context variable %s did not had _get method defined." % key)
             self.context_attr_map[key] = value()
 
     def validate_template(self):
@@ -256,12 +244,8 @@ class ReservationEmailNotificationBuilder:
         if html_content:
             validator.validate_string(html_content, self.context_attr_map, env=self.env)
 
-        validator.validate_string(
-            self.template.subject, self.context_attr_map, env=self.env
-        )
-        validator.validate_string(
-            self.template.content, self.context_attr_map, env=self.env
-        )
+        validator.validate_string(self.template.subject, self.context_attr_map, env=self.env)
+        validator.validate_string(self.template.content, self.context_attr_map, env=self.env)
 
     def get_subject(self):
         subject = self._get_by_language(self.template, "subject")

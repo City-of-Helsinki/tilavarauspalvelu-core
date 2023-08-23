@@ -38,20 +38,14 @@ def get_mocked_hours():
     ]
 
 
-@mock.patch(
-    "opening_hours.utils.summaries.get_opening_hours", return_value=get_mocked_hours()
-)
+@mock.patch("opening_hours.utils.summaries.get_opening_hours", return_value=get_mocked_hours())
 class GetResourcesTotalHoursTestCase(TestCase):
     def test_total_hours_sums_up_correct(self, mock):
-        total_hours = get_resources_total_hours(
-            [123], datetime.date(2020, 1, 1), datetime.date(2020, 1, 2)
-        )
+        total_hours = get_resources_total_hours([123], datetime.date(2020, 1, 1), datetime.date(2020, 1, 2))
         assert_that(total_hours).is_equal_to(24)
 
 
-@mock.patch(
-    "opening_hours.utils.summaries.get_opening_hours", return_value=get_mocked_hours()
-)
+@mock.patch("opening_hours.utils.summaries.get_opening_hours", return_value=get_mocked_hours())
 class GetResourcesTotalHoursListTestCase(TestCase):
     def test_resource_total_hours_per_resource(self, mock):
         total_hours_dict = get_resources_total_hours_per_resource(

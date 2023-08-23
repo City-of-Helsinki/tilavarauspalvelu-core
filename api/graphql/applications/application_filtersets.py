@@ -1,6 +1,5 @@
-from django.db.models import Case, CharField, F
+from django.db.models import Case, CharField, F, When
 from django.db.models import Value as V
-from django.db.models import When
 from django.db.models.functions import Concat
 from django_filters import rest_framework as filters
 
@@ -17,9 +16,7 @@ from spaces.models import Unit
 
 
 class ApplicationFilterSet(filters.FilterSet):
-    pk = filters.ModelMultipleChoiceFilter(
-        field_name="pk", method="filter_by_pk", queryset=Application.objects.all()
-    )
+    pk = filters.ModelMultipleChoiceFilter(field_name="pk", method="filter_by_pk", queryset=Application.objects.all())
 
     applied_count_gte = filters.NumberFilter(method="filter_by_applied_count_gte")
 
@@ -33,9 +30,7 @@ class ApplicationFilterSet(filters.FilterSet):
         lookup_expr="iexact",
         choices=[(c[0], c[1]) for c in ApplicationStatus.STATUS_CHOICES],
     )
-    unit = filters.ModelMultipleChoiceFilter(
-        method="filter_by_possible_units", queryset=Unit.objects.all()
-    )
+    unit = filters.ModelMultipleChoiceFilter(method="filter_by_possible_units", queryset=Unit.objects.all())
     user = filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
 
     applicant_type = filters.MultipleChoiceFilter(
@@ -93,9 +88,7 @@ class ApplicationFilterSet(filters.FilterSet):
         if not value:
             return qs
 
-        return qs.filter(
-            application_events__event_reservation_units__reservation_unit__unit__in=value
-        )
+        return qs.filter(application_events__event_reservation_units__reservation_unit__unit__in=value)
 
     def filter_by_applicant_type(self, qs, property, value):
         if not value:
@@ -115,9 +108,7 @@ class ApplicationEventFilterSet(filters.FilterSet):
         field_name="pk", method="filter_by_pk", queryset=ApplicationEvent.objects.all()
     )
 
-    application = filters.ModelChoiceFilter(
-        field_name="application", queryset=Application.objects.all()
-    )
+    application = filters.ModelChoiceFilter(field_name="application", queryset=Application.objects.all())
 
     applied_count_gte = filters.NumberFilter(method="filter_by_applied_count_gte")
 
@@ -146,17 +137,11 @@ class ApplicationEventFilterSet(filters.FilterSet):
 
     status = filters.CharFilter(field_name="latest_status", lookup_expr="iexact")
 
-    unit = filters.ModelMultipleChoiceFilter(
-        method="filter_by_possible_units", queryset=Unit.objects.all()
-    )
+    unit = filters.ModelMultipleChoiceFilter(method="filter_by_possible_units", queryset=Unit.objects.all())
 
-    user = filters.ModelChoiceFilter(
-        field_name="application__user", queryset=User.objects.all()
-    )
+    user = filters.ModelChoiceFilter(field_name="application__user", queryset=User.objects.all())
 
-    order_by = filters.OrderingFilter(
-        fields=("pk", "applicant", "name_fi", "name_en", "name_sv")
-    )
+    order_by = filters.OrderingFilter(fields=("pk", "applicant", "name_fi", "name_en", "name_sv"))
 
     class Meta:
         model = ApplicationEvent
@@ -196,14 +181,10 @@ class ApplicationEventFilterSet(filters.FilterSet):
         return super().filter_queryset(queryset)
 
     def filter_by_applied_count_gte(self, qs, property, value):
-        return qs.filter(
-            aggregated_data__name="duration_total", aggregated_data__value__gte=value
-        )
+        return qs.filter(aggregated_data__name="duration_total", aggregated_data__value__gte=value)
 
     def filter_by_applied_count_lte(self, qs, property, value):
-        return qs.filter(
-            aggregated_data__name="duration_total", aggregated_data__value__lte=value
-        )
+        return qs.filter(aggregated_data__name="duration_total", aggregated_data__value__lte=value)
 
     def filter_by_possible_units(self, qs, property, value):
         if not value:

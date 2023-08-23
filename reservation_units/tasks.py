@@ -63,17 +63,13 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
             id=api_product.product_id, defaults={"merchant": payment_merchant}
         )
 
-        ReservationUnit.objects.filter(pk=reservation_unit_pk).update(
-            payment_product=payment_product
-        )
+        ReservationUnit.objects.filter(pk=reservation_unit_pk).update(payment_product=payment_product)
 
         refresh_reservation_unit_accounting.delay(reservation_unit_pk)
 
     # Remove product mapping if merchant is removed
     if reservation_unit.payment_product and not payment_merchant:
-        ReservationUnit.objects.filter(pk=reservation_unit_pk).update(
-            payment_product=None
-        )
+        ReservationUnit.objects.filter(pk=reservation_unit_pk).update(payment_product=None)
 
 
 @app.task(
@@ -107,14 +103,10 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
             balance_profit_center=accounting.balance_profit_center,
         )
         try:
-            accounting = create_or_update_accounting(
-                reservation_unit.payment_product.id, params
-            )
+            accounting = create_or_update_accounting(reservation_unit.payment_product.id, params)
         except CreateOrUpdateAccountingError as err:
             with push_scope() as scope:
-                scope.set_extra(
-                    "details", "Unable to refresh reservation unit accounting data"
-                )
+                scope.set_extra("details", "Unable to refresh reservation unit accounting data")
                 scope.set_extra("reservation-unit-id", reservation_unit_pk)
                 capture_exception(err)
 

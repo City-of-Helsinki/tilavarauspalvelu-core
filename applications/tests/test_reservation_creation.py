@@ -43,12 +43,8 @@ def get_opening_hour_data_single_day(*args, **kwargs):
             "date": start,
             "times": [
                 TimeElement(
-                    start_time=datetime.time(
-                        hour=start_hour, tzinfo=get_default_timezone()
-                    ),
-                    end_time=datetime.time(
-                        hour=end_hour, tzinfo=get_default_timezone()
-                    ),
+                    start_time=datetime.time(hour=start_hour, tzinfo=get_default_timezone()),
+                    end_time=datetime.time(hour=end_hour, tzinfo=get_default_timezone()),
                     end_time_on_next_day=False,
                 )
             ],
@@ -77,9 +73,7 @@ def get_opening_hour_data_for_multiple_days(*args, **kwargs):
             "times": [
                 TimeElement(
                     start_time=datetime.time(hour=8, tzinfo=get_default_timezone()),
-                    end_time=datetime.time(
-                        hour=23, minute=59, tzinfo=get_default_timezone()
-                    ),
+                    end_time=datetime.time(hour=23, minute=59, tzinfo=get_default_timezone()),
                     end_time_on_next_day=False,
                 )
             ],
@@ -118,9 +112,7 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
             reservation_period_begin=date,
             reservation_period_end=date + datetime.timedelta(weeks=4),
         )
-        cls.application = ApplicationFactory(
-            application_round=cls.round, user=user, billing_address=AddressFactory()
-        )
+        cls.application = ApplicationFactory(application_round=cls.round, user=user, billing_address=AddressFactory())
         cls.application_event = ApplicationEventFactory(
             application=cls.application,
             events_per_week=1,
@@ -134,9 +126,7 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
             application_event=cls.application_event,
             reservation_unit=cls.res_unit,
         )
-        cls.schedule = ApplicationEventScheduleFactory(
-            application_event=cls.application_event
-        )
+        cls.schedule = ApplicationEventScheduleFactory(application_event=cls.application_event)
 
         cls.result = ApplicationEventScheduleResultFactory(
             application_event_schedule=cls.schedule,
@@ -150,9 +140,7 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
             last_name="vice",
             email="ser.vice.person@foo.com",
         )
-        reservation_date = next_or_current_matching_weekday(
-            cls.application_event.begin, cls.result.allocated_day
-        )
+        reservation_date = next_or_current_matching_weekday(cls.application_event.begin, cls.result.allocated_day)
         cls.reservation_begin = datetime.datetime.combine(
             reservation_date, cls.result.allocated_begin, tzinfo=get_default_timezone()
         )
@@ -160,24 +148,16 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
             reservation_date, cls.result.allocated_end, tzinfo=get_default_timezone()
         )
 
-    def test_reservation_time_equal_reservation_time_when_open_in_reservation_time(
-        self, mock
-    ):
-        scheduler = ReservationScheduler(
-            self.res_unit, self.reservation_begin, self.reservation_end
-        )
+    def test_reservation_time_equal_reservation_time_when_open_in_reservation_time(self, mock):
+        scheduler = ReservationScheduler(self.res_unit, self.reservation_begin, self.reservation_end)
         start_dt, end_dt = scheduler.get_reservation_times_based_on_opening_hours()
 
         assert_that(start_dt).is_equal_to(self.reservation_begin)
         assert_that(end_dt).is_equal_to(self.reservation_end)
 
-    def test_reservation_time_is_one_hour_reduced_from_reservation_time_when_closes_before_reservation_end(
-        self, mock
-    ):
+    def test_reservation_time_is_one_hour_reduced_from_reservation_time_when_closes_before_reservation_end(self, mock):
         reservation_end = self.reservation_end + datetime.timedelta(hours=1)
-        scheduler = ReservationScheduler(
-            self.res_unit, self.reservation_begin, reservation_end
-        )
+        scheduler = ReservationScheduler(self.res_unit, self.reservation_begin, reservation_end)
         start_dt, end_dt = scheduler.get_reservation_times_based_on_opening_hours()
 
         expected_res_end = datetime.datetime(
@@ -186,13 +166,9 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
         assert_that(start_dt).is_equal_to(self.reservation_begin)
         assert_that(end_dt).is_equal_to(expected_res_end)
 
-    def test_reservation_time_is_one_hour_reduced_from_reservation_time_when_opens_after_reservation_begin(
-        self, mock
-    ):
+    def test_reservation_time_is_one_hour_reduced_from_reservation_time_when_opens_after_reservation_begin(self, mock):
         reservation_start = self.reservation_begin - datetime.timedelta(hours=1)
-        scheduler = ReservationScheduler(
-            self.res_unit, reservation_start, self.reservation_end
-        )
+        scheduler = ReservationScheduler(self.res_unit, reservation_start, self.reservation_end)
         start_dt, end_dt = scheduler.get_reservation_times_based_on_opening_hours()
 
         expected_res_begin = datetime.datetime(
@@ -206,25 +182,19 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
         assert_that(start_dt).is_equal_to(expected_res_begin)
         assert_that(end_dt).is_equal_to(self.reservation_end)
 
-    def test_reservation_times_are_none_when_the_reservation_unit_is_not_open_in_reservation_time(
-        self, mock
-    ):
+    def test_reservation_times_are_none_when_the_reservation_unit_is_not_open_in_reservation_time(self, mock):
         mock.return_value = get_opening_hour_data_not_open_that_day(
             self.res_unit,
             start_date=self.reservation_begin.date(),
             end_date=self.reservation_end.date(),
         )
-        scheduler = ReservationScheduler(
-            self.res_unit, self.reservation_begin, self.reservation_end
-        )
+        scheduler = ReservationScheduler(self.res_unit, self.reservation_begin, self.reservation_end)
         start_dt, end_dt = scheduler.get_reservation_times_based_on_opening_hours()
 
         assert_that(start_dt).is_none()
         assert_that(end_dt).is_none()
 
-    def test_over_day_reservation_is_reduced_to_one_day_if_reservation_unit_not_open_through_night(
-        self, mock
-    ):
+    def test_over_day_reservation_is_reduced_to_one_day_if_reservation_unit_not_open_through_night(self, mock):
         res_end = self.reservation_end + datetime.timedelta(days=1)
         scheduler = ReservationScheduler(self.res_unit, self.reservation_begin, res_end)
         start_dt, end_dt = scheduler.get_reservation_times_based_on_opening_hours()
@@ -279,25 +249,13 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
             organisation = self.application.organisation
             assert_that(res.reservee_organisation_name).is_equal_to(organisation.name)
             assert_that(res.reservee_id).is_equal_to(organisation.identifier)
-            assert_that(res.reservee_address_zip).is_equal_to(
-                organisation.address.post_code
-            )
-            assert_that(res.reservee_address_street).is_equal_to(
-                organisation.address.street_address
-            )
-            assert_that(res.reservee_address_city).is_equal_to(
-                organisation.address.city
-            )
+            assert_that(res.reservee_address_zip).is_equal_to(organisation.address.post_code)
+            assert_that(res.reservee_address_street).is_equal_to(organisation.address.street_address)
+            assert_that(res.reservee_address_city).is_equal_to(organisation.address.city)
 
-            assert_that(res.billing_address_street).is_equal_to(
-                self.application.billing_address.street_address
-            )
-            assert_that(res.billing_address_city).is_equal_to(
-                self.application.billing_address.city
-            )
-            assert_that(res.billing_address_zip).is_equal_to(
-                self.application.billing_address.post_code
-            )
+            assert_that(res.billing_address_street).is_equal_to(self.application.billing_address.street_address)
+            assert_that(res.billing_address_city).is_equal_to(self.application.billing_address.city)
+            assert_that(res.billing_address_zip).is_equal_to(self.application.billing_address.post_code)
 
             contact_person = self.application.contact_person
             assert_that(res.reservee_first_name).is_equal_to(contact_person.first_name)
@@ -309,18 +267,10 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
             recurring_res = res.recurring_reservation
             assert_that(recurring_res.user).is_equal_to(self.application.user)
             assert_that(recurring_res.application).is_equal_to(self.application)
-            assert_that(recurring_res.application_event).is_equal_to(
-                self.application_event
-            )
-            assert_that(recurring_res.age_group).is_equal_to(
-                self.application_event.age_group
-            )
-            assert_that(recurring_res.ability_group).is_equal_to(
-                self.application_event.ability_group
-            )
-            assert_that(recurring_res.reservation_unit).is_equal_to(
-                self.result.allocated_reservation_unit
-            )
+            assert_that(recurring_res.application_event).is_equal_to(self.application_event)
+            assert_that(recurring_res.age_group).is_equal_to(self.application_event.age_group)
+            assert_that(recurring_res.ability_group).is_equal_to(self.application_event.ability_group)
+            assert_that(recurring_res.reservation_unit).is_equal_to(self.result.allocated_reservation_unit)
 
     def test_creating_reservations_without_result(self, mock):
         self.result.delete()

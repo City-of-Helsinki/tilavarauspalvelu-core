@@ -2,9 +2,8 @@ import operator
 from functools import reduce
 
 import django_filters
-from django.db.models import Case, CharField, F, Q
+from django.db.models import Case, CharField, F, Q, When
 from django.db.models import Value as V
-from django.db.models import When
 from django.db.models.functions import Concat
 
 from applications.models import CUSTOMER_TYPES
@@ -22,9 +21,7 @@ class ReservationFilterSet(django_filters.FilterSet):
     end = django_filters.DateTimeFilter(field_name="end", lookup_expr="lte")
     begin = django_filters.DateTimeFilter(field_name="begin", lookup_expr="gte")
 
-    only_with_permission = django_filters.BooleanFilter(
-        method="get_only_with_permission"
-    )
+    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     order_status = django_filters.MultipleChoiceFilter(
         field_name="payment_order__status",
@@ -36,8 +33,7 @@ class ReservationFilterSet(django_filters.FilterSet):
             )
             for key, value in OrderStatus.choices
         ),
-        label="PaymentOrder's statuses; %s"
-        % ", ".join([k for k, v in OrderStatus.choices]),
+        label="PaymentOrder's statuses; %s" % ", ".join([k for k, v in OrderStatus.choices]),
     )
 
     price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
@@ -54,15 +50,9 @@ class ReservationFilterSet(django_filters.FilterSet):
         method="get_reservation_unit", queryset=ReservationUnit.objects.all()
     )
 
-    reservation_unit_name_fi = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
-    reservation_unit_name_en = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
-    reservation_unit_name_sv = django_filters.CharFilter(
-        method="get_reservation_unit_name"
-    )
+    reservation_unit_name_fi = django_filters.CharFilter(method="get_reservation_unit_name")
+    reservation_unit_name_en = django_filters.CharFilter(method="get_reservation_unit_name")
+    reservation_unit_name_sv = django_filters.CharFilter(method="get_reservation_unit_name")
 
     reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
         method="get_reservation_unit_type", queryset=ReservationUnitType.objects.all()
@@ -80,13 +70,9 @@ class ReservationFilterSet(django_filters.FilterSet):
         ),
     )
 
-    unit = django_filters.ModelMultipleChoiceFilter(
-        method="get_unit", queryset=Unit.objects.all()
-    )
+    unit = django_filters.ModelMultipleChoiceFilter(method="get_unit", queryset=Unit.objects.all())
 
-    user = django_filters.ModelChoiceFilter(
-        field_name="user", queryset=User.objects.all()
-    )
+    user = django_filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
@@ -214,9 +200,7 @@ class ReservationFilterSet(django_filters.FilterSet):
             )
         )
 
-        return queryset.filter(
-            Q(name__icontains=value) | Q(reservee_name__icontains=value)
-        )
+        return queryset.filter(Q(name__icontains=value) | Q(reservee_name__icontains=value))
 
     def get_unit(self, qs, property, value):
         if not value:

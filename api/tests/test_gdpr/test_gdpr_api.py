@@ -133,9 +133,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
             "exp": int(expire.timestamp()),
             auth_field: scopes,
         }
-        encoded_jwt = jwt.encode(
-            jwt_data, key=rsa_key.private_key_pem, algorithm=rsa_key.jose_algorithm
-        )
+        encoded_jwt = jwt.encode(jwt_data, key=rsa_key.private_key_pem, algorithm=rsa_key.jose_algorithm)
 
         req_mock.get(config_url, json=configuration)
         req_mock.get(jwks_url, json=keys)
@@ -146,9 +144,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
     @requests_mock.Mocker()
     def test_get_user_data_should_return_data(self, req_mock):
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock)
 
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.get(self.url)
@@ -157,16 +153,12 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
     @requests_mock.Mocker()
     def test_get_user_data_returns_reservations(self, req_mock):
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock)
 
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.get(self.url)
         assert_that(response.status_code).is_equal_to(200)
-        for r in [
-            d for d in response.data["children"] if d.get("key") == "RESERVATIONS"
-        ]:
+        for r in [d for d in response.data["children"] if d.get("key") == "RESERVATIONS"]:
             res_data = r["value"][0]
             expected = [
                 self.reservation.name,
@@ -196,16 +188,12 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
     @requests_mock.Mocker()
     def test_get_user_data_returns_applications(self, req_mock):
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock)
 
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.get(self.url)
         assert_that(response.status_code).is_equal_to(200)
-        for a in [
-            d for d in response.data["children"] if d.get("key") == "APPLICATIONS"
-        ]:
+        for a in [d for d in response.data["children"] if d.get("key") == "APPLICATIONS"]:
             app_data = a["value"][0]
             expected = [
                 self.application.additional_information,
@@ -267,9 +255,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
     @requests_mock.Mocker()
     def test_get_user_data_should_not_returns_not_found(self, req_mock):
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_QUERY_SCOPE], req_mock)
 
         url = reverse("gdpr_v1", kwargs={"uuid": uuid.uuid4()})
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
@@ -285,9 +271,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
     @requests_mock.Mocker()
     def test_delete_user_should_anonymize_data(self, req_mock):
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         old_uuid = self.user.uuid
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(self.url)
@@ -302,13 +286,9 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
     @requests_mock.Mocker()
     def test_delete_user_does_not_anonymize_data_when_open_payments(self, req_mock):
         reservation = ReservationFactory(user=self.user)
-        PaymentOrderFactory(
-            reservation=reservation, status=OrderStatus.DRAFT, remote_id=uuid.uuid4()
-        )
+        PaymentOrderFactory(reservation=reservation, status=OrderStatus.DRAFT, remote_id=uuid.uuid4())
 
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         old_uuid = self.user.uuid
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(self.url)
@@ -324,13 +304,9 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
     def test_delete_user_does_not_anonymize_data_when_open_reservations(self, req_mock):
         begin = timezone.now()
         end = begin + datetime.timedelta(hours=2)
-        ReservationFactory(
-            user=self.user, begin=begin, end=end, state=ReservationState.CREATED
-        )
+        ReservationFactory(user=self.user, begin=begin, end=end, state=ReservationState.CREATED)
 
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         old_uuid = self.user.uuid
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(self.url)
@@ -343,18 +319,12 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
         assert_that(self.user.pk).is_not_none()
 
     @requests_mock.Mocker()
-    def test_delete_user_does_not_anonymize_data_when_reservation_under_month_ago(
-        self, req_mock
-    ):
+    def test_delete_user_does_not_anonymize_data_when_reservation_under_month_ago(self, req_mock):
         begin = timezone.now() - relativedelta(months=1)
         end = begin + datetime.timedelta(hours=2)
-        ReservationFactory(
-            user=self.user, begin=begin, end=end, state=ReservationState.CONFIRMED
-        )
+        ReservationFactory(user=self.user, begin=begin, end=end, state=ReservationState.CONFIRMED)
 
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         old_uuid = self.user.uuid
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(self.url)
@@ -371,9 +341,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
         app = ApplicationFactory(user=self.user)
         ApplicationStatusFactory(application=app, status=ApplicationStatus.ALLOCATED)
 
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         old_uuid = self.user.uuid
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(self.url)
@@ -393,9 +361,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
             last_name="er",
             email="oth.er@foo.com",
         )
-        auth_header = self.get_auth_header(
-            other_user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(other_user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(self.url)
 
@@ -410,9 +376,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
             email="oth.er@foo.com",
         )
         url = reverse("gdpr_v1", kwargs={"uuid": other_user.uuid})
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(url)
 
@@ -420,9 +384,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
     @requests_mock.Mocker()
     def test_delete_user_returns_forbidden_when_using_wrong_scope(self, req_mock):
-        auth_header = self.get_auth_header(
-            self.user, ["testprefix.wrong_scope"], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, ["testprefix.wrong_scope"], req_mock)
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         response = self.client.delete(self.url)
         assert_that(response.status_code, 403)
@@ -431,9 +393,7 @@ class TilavarauspalveluGDPRAPIViewTestCase(APITestCase):
 
     @requests_mock.Mocker()
     def test_delete_profile_should_keep_data_when_dry_run(self, req_mock):
-        auth_header = self.get_auth_header(
-            self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock
-        )
+        auth_header = self.get_auth_header(self.user, [settings.GDPR_API_DELETE_SCOPE], req_mock)
         self.client.credentials(HTTP_AUTHORIZATION=auth_header)
         uuid = self.user.uuid
         # make sure we do not deleted the profile when client specify different types of true values

@@ -20,12 +20,8 @@ class ApplicationStatusUpdateTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.application_round: ApplicationRound = ApplicationRoundFactory()
-        cls.application: Application = ApplicationFactory(
-            application_round=cls.application_round
-        )
-        cls.application_event: ApplicationEvent = ApplicationEventFactory(
-            application=cls.application
-        )
+        cls.application: Application = ApplicationFactory(application_round=cls.application_round)
+        cls.application_event: ApplicationEvent = ApplicationEventFactory(application=cls.application)
 
     def test_draft_applications_change_to_expired_when_round_goes_in_review(self):
         self.application_round.set_status(ApplicationRoundStatus.IN_REVIEW)
@@ -47,9 +43,7 @@ class ApplicationStatusUpdateTestCase(TestCase):
         self.application_round.set_status(ApplicationRoundStatus.REVIEW_DONE)
 
         updated_application = Application.objects.get(id=self.application.id)
-        assert_that(updated_application.status).is_equal_to(
-            ApplicationStatus.REVIEW_DONE
-        )
+        assert_that(updated_application.status).is_equal_to(ApplicationStatus.REVIEW_DONE)
 
     def test_applications_with_declined_events_change_to_allocated_when_round_goes_review_done(
         self,

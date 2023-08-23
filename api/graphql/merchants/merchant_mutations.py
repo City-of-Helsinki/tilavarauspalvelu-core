@@ -32,9 +32,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         if not cls.has_permission(root, info, input):
-            raise ValidationErrorWithCode(
-                "No permission to refresh the order", ValidationErrorCodes.NO_PERMISSION
-            )
+            raise ValidationErrorWithCode("No permission to refresh the order", ValidationErrorCodes.NO_PERMISSION)
 
         needs_update_statuses = [
             OrderStatus.DRAFT,
@@ -45,9 +43,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
         remote_id = input.get("order_uuid")
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:
-            raise ValidationErrorWithCode(
-                "Order not found", ValidationErrorCodes.NOT_FOUND
-            )
+            raise ValidationErrorWithCode("Order not found", ValidationErrorCodes.NOT_FOUND)
 
         if payment_order.status not in needs_update_statuses:
             return RefreshOrderMutation(
@@ -63,9 +59,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                     f"Order payment check failed: payment not found ({remote_id})",
                     level="warning",
                 )
-                raise ValidationErrorWithCode(
-                    "Unable to check order payment", ValidationErrorCodes.NOT_FOUND
-                )
+                raise ValidationErrorWithCode("Unable to check order payment", ValidationErrorCodes.NOT_FOUND)
         except GetPaymentError as err:
             with push_scope() as scope:
                 scope.set_extra("details", "Order payment check failed")
@@ -79,17 +73,11 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
         payment_order.payment_id = payment.payment_id
         payment_order.processed_at = datetime.now().astimezone(TIMEZONE)
 
-        if (
-            payment.status == "payment_cancelled"
-            and payment_order.status is not OrderStatus.CANCELLED
-        ):
+        if payment.status == "payment_cancelled" and payment_order.status is not OrderStatus.CANCELLED:
             payment_order.status = OrderStatus.CANCELLED
             payment_order.save()
 
-        if (
-            payment.status == "payment_paid_online"
-            and payment_order.status is not OrderStatus.PAID
-        ):
+        if payment.status == "payment_paid_online" and payment_order.status is not OrderStatus.PAID:
             payment_order.status = OrderStatus.PAID
             payment_order.save()
 

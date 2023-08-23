@@ -13,16 +13,12 @@ class ReservationUnitReservationStateHelper:
         """Returns True if reservation unit has reservation_begins set in to the future with no ending date."""
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return (
-            reservation_unit.reservation_begins
-            and now < reservation_unit.reservation_begins
-        ) and (
+        return (reservation_unit.reservation_begins and now < reservation_unit.reservation_begins) and (
             reservation_unit.reservation_ends is None
             or reservation_unit.reservation_ends <= now
             or (
                 reservation_unit.reservation_ends > now
-                and reservation_unit.reservation_begins
-                > reservation_unit.reservation_ends
+                and reservation_unit.reservation_begins > reservation_unit.reservation_ends
             )
         )
 
@@ -91,8 +87,7 @@ class ReservationUnitReservationStateHelper:
         now = datetime.datetime.now(tz=get_default_timezone())
 
         return Q(
-            Q(reservation_ends__isnull=True)
-            & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
+            Q(reservation_ends__isnull=True) & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
             | Q(
                 reservation_ends__lte=now,
                 reservation_begins__lte=now,
@@ -113,10 +108,7 @@ class ReservationUnitReservationStateHelper:
             and reservation_unit.reservation_ends > now
             and (
                 reservation_unit.reservation_begins is None
-                or (
-                    reservation_unit.reservation_begins
-                    and reservation_unit.reservation_begins <= now
-                )
+                or (reservation_unit.reservation_begins and reservation_unit.reservation_begins <= now)
             )
         )
 
@@ -124,9 +116,7 @@ class ReservationUnitReservationStateHelper:
     def __get_is_scheduled_closing_query(cls) -> Q:
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return Q(reservation_ends__gt=now) & (
-            Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True)
-        )
+        return Q(reservation_ends__gt=now) & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
 
     @classmethod
     def __is_reservation_closed(cls, reservation_unit: ReservationUnit) -> bool:
@@ -142,8 +132,7 @@ class ReservationUnitReservationStateHelper:
                 reservation_unit.reservation_begins is None
                 or (
                     reservation_unit.reservation_begins <= now
-                    and reservation_unit.reservation_begins
-                    <= reservation_unit.reservation_ends
+                    and reservation_unit.reservation_begins <= reservation_unit.reservation_ends
                 )
             )
             or (
@@ -151,8 +140,7 @@ class ReservationUnitReservationStateHelper:
                 and reservation_unit.reservation_ends
                 and reservation_unit.reservation_ends > now
                 and reservation_unit.reservation_begins > now
-                and reservation_unit.reservation_begins
-                == reservation_unit.reservation_ends
+                and reservation_unit.reservation_begins == reservation_unit.reservation_ends
             )
         )
 
@@ -164,10 +152,7 @@ class ReservationUnitReservationStateHelper:
             Q(
                 Q(reservation_ends__lte=now)
                 & (
-                    Q(
-                        Q(reservation_begins__lte=now)
-                        & Q(reservation_begins__lte=F("reservation_ends"))
-                    )
+                    Q(Q(reservation_begins__lte=now) & Q(reservation_begins__lte=F("reservation_ends")))
                     | Q(reservation_begins__isnull=True)
                 )
             )

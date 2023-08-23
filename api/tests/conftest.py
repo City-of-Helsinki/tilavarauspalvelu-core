@@ -176,9 +176,7 @@ def reservation_unit_with_resource(resource, space):
 
 @pytest.fixture
 def location():
-    return Location.objects.create(
-        address_street="Osoitetienkatu 13b", address_zip="33540", address_city="Tampere"
-    )
+    return Location.objects.create(address_street="Osoitetienkatu 13b", address_zip="33540", address_city="Tampere")
 
 
 @pytest.fixture
@@ -193,9 +191,7 @@ def service_sector_2():
 
 @pytest.fixture
 def reservation_unit2(resource):
-    reservation_unit = ReservationUnit.objects.create(
-        name="Test reservation unit no. 2", require_introduction=False
-    )
+    reservation_unit = ReservationUnit.objects.create(name="Test reservation unit no. 2", require_introduction=False)
     reservation_unit.resources.set([resource])
     return reservation_unit
 
@@ -220,9 +216,7 @@ def application_round(reservation_unit, purpose, service_sector) -> ApplicationR
 
 
 @pytest.fixture
-def application_round_2(
-    reservation_unit, purpose, service_sector_2
-) -> ApplicationRound:
+def application_round_2(reservation_unit, purpose, service_sector_2) -> ApplicationRound:
     application_round = ApplicationRound.objects.create(
         name="Nuorten liikuntavuorot kevät 2021",
         application_period_begin=timezone.datetime(2021, 1, 1, 0, 0, 0).astimezone(),
@@ -260,9 +254,7 @@ def reservation(reservation_unit, user) -> Reservation:
 def confirmed_reservation(reservation_unit, user) -> Reservation:
     begin_time = timezone.datetime(2020, 12, 1, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
-    reservation = Reservation.objects.create(
-        begin=begin_time, end=end_time, state="confirmed", user=user
-    )
+    reservation = Reservation.objects.create(begin=begin_time, end=end_time, state="confirmed", user=user)
     reservation.reservation_unit.set([reservation_unit])
     return reservation
 
@@ -271,9 +263,7 @@ def confirmed_reservation(reservation_unit, user) -> Reservation:
 def reservation_in_second_unit(reservation_unit2, user) -> Reservation:
     begin_time = timezone.datetime(2020, 12, 2, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
-    reservation = Reservation.objects.create(
-        begin=begin_time, end=end_time, state="created", user=user
-    )
+    reservation = Reservation.objects.create(begin=begin_time, end=end_time, state="created", user=user)
     reservation.reservation_unit.set([reservation_unit2])
     return reservation
 
@@ -384,9 +374,7 @@ def purpose2() -> ReservationPurpose:
 
 @pytest.fixture
 def organisation() -> Organisation:
-    return Organisation.objects.create(
-        name="Exercise organisation", identifier="ex-org-id"
-    )
+    return Organisation.objects.create(name="Exercise organisation", identifier="ex-org-id")
 
 
 @pytest.fixture
@@ -396,15 +384,11 @@ def person() -> Person:
 
 @pytest.fixture
 def billing_address() -> Address:
-    return Address.objects.create(
-        street_address="Billing street 666b", post_code="00100", city="Helsinki"
-    )
+    return Address.objects.create(street_address="Billing street 666b", post_code="00100", city="Helsinki")
 
 
 @pytest.fixture
-def application(
-    purpose, organisation, person, application_round, user, billing_address
-) -> Application:
+def application(purpose, organisation, person, application_round, user, billing_address) -> Application:
     application = Application.objects.create(
         organisation=organisation,
         contact_person=person,
@@ -416,9 +400,7 @@ def application(
 
 
 @pytest.fixture
-def application2(
-    purpose, organisation, person, application_round, user, billing_address
-) -> Application:
+def application2(purpose, organisation, person, application_round, user, billing_address) -> Application:
     application = Application.objects.create(
         organisation=organisation,
         contact_person=person,
@@ -430,9 +412,7 @@ def application2(
 
 
 @pytest.fixture
-def application_event(
-    application, purpose, ten_to_15_age_group, hobbyist_ability_group
-) -> ApplicationEvent:
+def application_event(application, purpose, ten_to_15_age_group, hobbyist_ability_group) -> ApplicationEvent:
     return ApplicationEvent.objects.create(
         application=application,
         num_persons=10,
@@ -450,9 +430,7 @@ def application_event(
 
 
 @pytest.fixture
-def application_event_too(
-    application2, purpose, ten_to_15_age_group, hobbyist_ability_group
-) -> ApplicationEvent:
+def application_event_too(application2, purpose, ten_to_15_age_group, hobbyist_ability_group) -> ApplicationEvent:
     return ApplicationEvent.objects.create(
         application=application2,
         num_persons=10,
@@ -471,9 +449,7 @@ def application_event_too(
 
 @pytest.fixture
 def event_reservation_unit(application_event, reservation_unit):
-    return EventReservationUnit.objects.create(
-        application_event=application_event, reservation_unit=reservation_unit
-    )
+    return EventReservationUnit.objects.create(application_event=application_event, reservation_unit=reservation_unit)
 
 
 @pytest.fixture
@@ -498,11 +474,7 @@ def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> Application
             include_dtstart=False,
             dtstart=timezone.datetime(2021, 1, 4, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
             dtend=timezone.datetime(2021, 12, 28, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-            rrules=[
-                recurrence.Rule(
-                    recurrence.WEEKLY, byday=[recurrence.MONDAY, recurrence.TUESDAY]
-                )
-            ],
+            rrules=[recurrence.Rule(recurrence.WEEKLY, byday=[recurrence.MONDAY, recurrence.TUESDAY])],
         ),
         priority=200,
     )
@@ -713,9 +685,7 @@ def unit_admin(unit):
         email="amin.u@foo.com",
     )
     admin_role_choice = UnitRoleChoice.objects.get(code="admin")
-    UnitRolePermission.objects.create(
-        role=admin_role_choice, permission="can_validate_applications"
-    )
+    UnitRolePermission.objects.create(role=admin_role_choice, permission="can_validate_applications")
     unit_role = UnitRole.objects.create(user=user, role=admin_role_choice)
 
     unit_role.unit.add(unit)
@@ -766,9 +736,7 @@ def unit_viewer(unit):
         email="ville.u@foo.com",
     )
 
-    unit_role = UnitRole.objects.create(
-        user=user, role=UnitRoleChoice.objects.get(code="viewer")
-    )
+    unit_role = UnitRole.objects.create(user=user, role=UnitRoleChoice.objects.get(code="viewer"))
     unit_role.unit.add(unit)
 
     return user
@@ -792,9 +760,7 @@ def unit_group_admin(unit_group):
     )
 
     admin_role_choice = UnitRoleChoice.objects.get(code="admin")
-    UnitRolePermission.objects.create(
-        role=admin_role_choice, permission="can_validate_applications"
-    )
+    UnitRolePermission.objects.create(role=admin_role_choice, permission="can_validate_applications")
     unit_role = UnitRole.objects.create(user=user, role=admin_role_choice)
 
     unit_role.unit_group.add(unit_group)

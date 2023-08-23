@@ -67,9 +67,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         return data
 
     def test_pricing_is_not_required_on_create_for_drafts(self):
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_data(True)
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_data(True))
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -79,9 +77,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.pricings.count()).is_equal_to(0)
 
     def test_pricing_is_required_on_create_for_non_drafts(self):
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_data(False)
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_data(False))
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
@@ -116,12 +112,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         input_data = self.get_valid_data(True)
         input_data["pricings"] = [
             self.get_pricing_data(),
-            self.get_pricing_data(
-                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
-            ),
-            self.get_pricing_data(
-                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
-            ),
+            self.get_pricing_data(begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"),
+            self.get_pricing_data(begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"),
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
@@ -158,18 +150,14 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
     def test_active_pricing_must_be_today_or_in_the_past(self):
         pricing_data = datetime.date.today() + datetime.timedelta(days=1)
         input_data = self.get_valid_data(True)
-        input_data["pricings"] = [
-            self.get_pricing_data(begins=pricing_data.strftime("%Y-%m-%d"))
-        ]
+        input_data["pricings"] = [self.get_pricing_data(begins=pricing_data.strftime("%Y-%m-%d"))]
         response = self.query(self.get_create_query(), input_data=input_data)
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).starts_with(
-            "ACTIVE pricing must be in"
-        )
+        assert_that(content.get("errors")[0].get("message")).starts_with("ACTIVE pricing must be in")
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_none()
@@ -177,20 +165,14 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
     def test_future_pricing_must_be_in_the_future(self):
         pricing_date = datetime.date.today()
         input_data = self.get_valid_data(True)
-        input_data["pricings"] = [
-            self.get_pricing_data(
-                begins=pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
-            )
-        ]
+        input_data["pricings"] = [self.get_pricing_data(begins=pricing_date.strftime("%Y-%m-%d"), status="FUTURE")]
         response = self.query(self.get_create_query(), input_data=input_data)
 
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).starts_with(
-            "FUTURE pricing must be in"
-        )
+        assert_that(content.get("errors")[0].get("message")).starts_with("FUTURE pricing must be in")
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_none()
@@ -237,9 +219,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data["pk"] = resunit_pk
         update_data["isDraft"] = False
         update_data["pricings"] = [
-            self.get_pricing_data(
-                begins="2022-09-16", lowestPrice=20.2, highestPrice=31.5
-            ),
+            self.get_pricing_data(begins="2022-09-16", lowestPrice=20.2, highestPrice=31.5),
         ]
 
         response = self.query(self.get_update_query(), input_data=update_data)
@@ -320,9 +300,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         future_pricing_date = datetime.date.today() + datetime.timedelta(days=2)
         create_data = self.get_valid_data(True)
         create_data["pricings"] = [
-            self.get_pricing_data(
-                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
-            ),
+            self.get_pricing_data(begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"),
         ]
         response = self.query(self.get_create_query(), input_data=create_data)
         assert_that(response.status_code).is_equal_to(200)
@@ -352,12 +330,8 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         future_pricing_date = datetime.date.today() + datetime.timedelta(days=2)
         create_data = self.get_valid_data(True)
         create_data["pricings"] = [
-            self.get_pricing_data(
-                begins="2022-01-01", lowestPrice=15.1, highestPrice=18.2
-            ),
-            self.get_pricing_data(
-                begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"
-            ),
+            self.get_pricing_data(begins="2022-01-01", lowestPrice=15.1, highestPrice=18.2),
+            self.get_pricing_data(begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"),
         ]
         response = self.query(self.get_create_query(), input_data=create_data)
         assert_that(response.status_code).is_equal_to(200)

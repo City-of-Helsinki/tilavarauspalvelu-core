@@ -21,17 +21,11 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (UnitPermission,)
 
     # avoid circulars and use path.
-    reservation_units = graphene.List(
-        "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
-    )
+    reservation_units = graphene.List("api.graphql.reservation_units.reservation_unit_types.ReservationUnitType")
     spaces = graphene.List("api.graphql.spaces.space_types.SpaceType")
     location = graphene.Field("api.graphql.spaces.space_types.LocationType")
-    service_sectors = graphene.List(
-        "api.graphql.application_rounds.application_round_types.ServiceSectorType"
-    )
-    payment_merchant = graphene.Field(
-        "api.graphql.merchants.merchant_types.PaymentMerchantType"
-    )
+    service_sectors = graphene.List("api.graphql.application_rounds.application_round_types.ServiceSectorType")
+    payment_merchant = graphene.Field("api.graphql.merchants.merchant_types.PaymentMerchantType")
 
     class Meta:
         model = Unit

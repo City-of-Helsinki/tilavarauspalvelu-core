@@ -29,11 +29,7 @@ def resolve_user(request, payload):
             user.save()
 
     # If auth method is in configured loa levels we can try to read the date of birth of the user.
-    if (
-        payload.get("loa", "").lower()
-        in settings.OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES
-        and not user.date_of_birth
-    ):
+    if payload.get("loa", "").lower() in settings.OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES and not user.date_of_birth:
         b_day_reader = UserBirthdayReader(request)
         try:
             birthday = b_day_reader.get_user_birthday()
@@ -177,13 +173,10 @@ class UserBirthdayReader(ProfileReaderTokenMixin):
                 data = response.json()
             except JSONDecodeError:
                 raise BirthDayReaderError(
-                    "Got %s status code from profile and could not json decode the data"
-                    % response.status_code
+                    "Got %s status code from profile and could not json decode the data" % response.status_code
                 )
         elif status >= 500:
-            raise BirthDayReaderError(
-                "Got internal server error while querying profile data"
-            )
+            raise BirthDayReaderError("Got internal server error while querying profile data")
         else:
             data = response.json()
 

@@ -43,19 +43,13 @@ class GetNotificationRecipientsTestCase(TestCase):
 
         cls.unit_role_choice = UnitRoleChoice.objects.create(code="reservation_manager")
 
-        cls.unit_role = UnitRole.objects.create(
-            role=cls.unit_role_choice, user=cls.manager1
-        )
+        cls.unit_role = UnitRole.objects.create(role=cls.unit_role_choice, user=cls.manager1)
         cls.unit_role.unit.add(cls.unit1)
 
-        cls.unit_role2 = UnitRole.objects.create(
-            role=cls.unit_role_choice, user=cls.manager2
-        )
+        cls.unit_role2 = UnitRole.objects.create(role=cls.unit_role_choice, user=cls.manager2)
         cls.unit_role2.unit.add(cls.unit1)
 
-        UnitRolePermission.objects.create(
-            role=cls.unit_role_choice, permission="can_manage_reservations"
-        )
+        UnitRolePermission.objects.create(role=cls.unit_role_choice, permission="can_manage_reservations")
 
     @pytest.mark.django_db
     def test_get_staff_get_notification_recipients(self):
@@ -71,13 +65,9 @@ class GetNotificationRecipientsTestCase(TestCase):
 
     @pytest.mark.django_db
     def test_get_staff_notification_recipients_matching_settings(self):
-        result = get_staff_notification_recipients(
-            self.reservation, [ReservationNotification.ONLY_HANDLING_REQUIRED]
-        )
+        result = get_staff_notification_recipients(self.reservation, [ReservationNotification.ONLY_HANDLING_REQUIRED])
         assert_that(result).contains(self.manager2.email)
-        assert_that(result).does_not_contain(
-            self.manager1.email, self.normal_user.email
-        )
+        assert_that(result).does_not_contain(self.manager1.email, self.normal_user.email)
 
     @pytest.mark.django_db
     def test_get_staff_notification_recipients_without_reservation_user(self):
@@ -92,6 +82,4 @@ class GetNotificationRecipientsTestCase(TestCase):
             ],
         )
         assert_that(result).contains(self.manager2.email)
-        assert_that(result).does_not_contain(
-            self.manager1.email, self.normal_user.email
-        )
+        assert_that(result).does_not_contain(self.manager1.email, self.normal_user.email)

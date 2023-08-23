@@ -48,15 +48,13 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
         # Filtering queries formation
         user = self.request.user
-        unit_ids = user.unit_roles.filter(
-            role__permissions__permission="can_validate_applications"
-        ).values_list("unit", flat=True)
-        group_ids = user.unit_roles.filter(
-            role__permissions__permission="can_validate_applications"
-        ).values_list("unit_group", flat=True)
-        units = Unit.objects.filter(
-            Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)
-        ).values_list("id", flat=True)
+        unit_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
+            "unit", flat=True
+        )
+        group_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
+            "unit_group", flat=True
+        )
+        units = Unit.objects.filter(Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)).values_list("id", flat=True)
 
         # Subqueries for optimization formation
         declined_reservation_units_qs = ReservationUnit.objects.all().only("id")
@@ -104,14 +102,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         # Main query formation
         queryset = (
             queryset.filter(
-                Q(
-                    application_round__service_sector__in=get_service_sectors_where_can_view_applications(
-                        user
-                    )
-                )
-                | Q(
-                    application_events__event_reservation_units__reservation_unit__unit__in=units
-                )
+                Q(application_round__service_sector__in=get_service_sectors_where_can_view_applications(user))
+                | Q(application_events__event_reservation_units__reservation_unit__unit__in=units)
                 | Q(user=user)
             )
             .select_related(
@@ -194,11 +186,7 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
         user = self.request.user
 
         return queryset.filter(
-            Q(
-                application__application_round__service_sector__in=get_service_sectors_where_can_view_applications(
-                    user
-                )
-            )
+            Q(application__application_round__service_sector__in=get_service_sectors_where_can_view_applications(user))
             | Q(application__user=user)
         )
 

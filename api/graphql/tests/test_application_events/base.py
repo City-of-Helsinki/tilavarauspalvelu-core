@@ -55,9 +55,7 @@ class ApplicationEventTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             additional_information="Something to fill the field with text",
             user=cls.regular_joe,
             home_city=CityFactory(name="Test city"),
-            billing_address=AddressFactory(
-                street_address="Test street", post_code="00100"
-            ),
+            billing_address=AddressFactory(street_address="Test street", post_code="00100"),
             contact_person=PersonFactory(
                 first_name="Test",
                 last_name="Person",
@@ -68,9 +66,7 @@ class ApplicationEventTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
                 name="Test organisation",
                 identifier="Some identifier",
                 year_established=2022,
-                address=AddressFactory(
-                    street_address="Organisation street", post_code="00100"
-                ),
+                address=AddressFactory(street_address="Organisation street", post_code="00100"),
                 active_members=200,
                 organisation_type=Organisation.REGISTERED_ASSOCIATION,
                 core_business="Testing testing",
@@ -78,9 +74,7 @@ class ApplicationEventTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             ),
         )
 
-        ApplicationStatusFactory(
-            application=cls.application, status=ApplicationStatus.IN_REVIEW
-        )
+        ApplicationStatusFactory(application=cls.application, status=ApplicationStatus.IN_REVIEW)
 
         test_date = date(2022, 5, 2)
         application_event = ApplicationEventFactory(
@@ -101,9 +95,7 @@ class ApplicationEventTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
         cls.application_event = application_event
 
-        ApplicationEventStatusFactory(
-            application_event=application_event, status=ApplicationEventStatus.CREATED
-        )
+        ApplicationEventStatusFactory(application_event=application_event, status=ApplicationEventStatus.CREATED)
 
         test_unit_1 = ReservationUnitFactory(
             name="Declined unit 1",
@@ -148,9 +140,7 @@ class ApplicationEventTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             reservation_unit=test_unit_1,
             application_event=application_event,
         )
-        cls.unit_group = UnitGroupFactory(
-            units=(cls.event_reservation_unit.reservation_unit.unit,)
-        )
+        cls.unit_group = UnitGroupFactory(units=(cls.event_reservation_unit.reservation_unit.unit,))
 
         cls.api_client = APIClient()
 
@@ -167,8 +157,7 @@ class ApplicationEventPermissionsTestCaseBase(ApplicationEventTestCaseBase):
         ServiceSectorRole.objects.create(
             user=service_sector_admin,
             role=ServiceSectorRoleChoice.objects.get(code="admin"),
-            service_sector=service_sector
-            or self.application.application_round.service_sector,
+            service_sector=service_sector or self.application.application_round.service_sector,
         )
         ServiceSectorRolePermission.objects.create(
             role=ServiceSectorRoleChoice.objects.get(code="admin"),

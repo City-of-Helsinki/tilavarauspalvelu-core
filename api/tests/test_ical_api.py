@@ -11,22 +11,14 @@ from api.ical_api import hmac_signature
 
 @pytest.mark.django_db
 def test_regular_user_cant_get_url(user_api_client, reservation_unit):
-    response = user_api_client.get(
-        reverse(
-            "reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id}
-        )
-    )
+    response = user_api_client.get(reverse("reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id}))
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_unit_group_admin_can_get_calendar_url(
-    unit_group_admin_api_client, reservation_unit
-):
+def test_unit_group_admin_can_get_calendar_url(unit_group_admin_api_client, reservation_unit):
     response = unit_group_admin_api_client.get(
-        reverse(
-            "reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id}
-        )
+        reverse("reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id})
     )
 
     assert response.status_code == 200
@@ -39,9 +31,7 @@ def test_unit_group_admin_can_get_calendar_url(
 @pytest.mark.django_db
 def test_unit_manager_can_get_calendar_url(unit_manager_api_client, reservation_unit):
     response = unit_manager_api_client.get(
-        reverse(
-            "reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id}
-        )
+        reverse("reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id})
     )
     assert response.status_code == 200
 
@@ -54,20 +44,15 @@ def test_getting_reservation_unit_calendar(
     reservation_in_second_unit,
     set_ical_secret,
 ):
-    base_url = reverse(
-        "reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id}
-    )
+    base_url = reverse("reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id})
     url = f"{base_url}?hash={hmac_signature(reservation_unit.uuid)}"
     response = user_api_client.get(url)
     assert response.status_code == 200
-    zip_content = (
-        io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
-    )
+    zip_content = io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
 
     expected_start = f"DTSTART:{reservation.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     unexpected_start = (
-        f"DTSTART:"
-        f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+        f"DTSTART:" f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     )
 
     assert_that(expected_start in zip_content).is_true()
@@ -82,9 +67,7 @@ def test_getting_reservation_unit_calendar_without_hash(
     reservation_in_second_unit,
     set_ical_secret,
 ):
-    response = user_api_client.get(
-        reverse("reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id})
-    )
+    response = user_api_client.get(reverse("reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id}))
     assert response.status_code == 400
 
 
@@ -96,9 +79,7 @@ def test_getting_reservation_unit_calendar_with_invalid_hash(
     reservation_in_second_unit,
     set_ical_secret,
 ):
-    base_url = reverse(
-        "reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id}
-    )
+    base_url = reverse("reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id})
     url = f"{base_url}?hash={hmac_signature(uuid.uuid4())}"
     response = user_api_client.get(url)
     assert response.status_code == 400
@@ -111,36 +92,22 @@ def test_getting_application_event_calendar_name_for_organisation(
     organisation,
 ):
     application_event.application.organization = organisation
-    response = user_api_client.get(
-        reverse(
-            "application_event_calendar-detail", kwargs={"pk": application_event.uuid}
-        )
-    )
+    response = user_api_client.get(reverse("application_event_calendar-detail", kwargs={"pk": application_event.uuid}))
 
-    zip_content = (
-        io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
-    )
+    zip_content = io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
 
     assert_that(response.status_code).is_equal_to(200)
     assert_that(organisation.name in zip_content).is_true()
 
 
 @pytest.mark.django_db
-def test_getting_application_event_calendar_name_for_contact_person(
-    user_api_client, application_event, person
-):
+def test_getting_application_event_calendar_name_for_contact_person(user_api_client, application_event, person):
     application_event.application.contact_person = person
     application_event.application.organisation = None
     application_event.application.save()
-    response = user_api_client.get(
-        reverse(
-            "application_event_calendar-detail", kwargs={"pk": application_event.uuid}
-        )
-    )
+    response = user_api_client.get(reverse("application_event_calendar-detail", kwargs={"pk": application_event.uuid}))
 
-    zip_content = (
-        io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
-    )
+    zip_content = io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
 
     assert_that(response.status_code).is_equal_to(200)
     assert_that(person.first_name in zip_content).is_true()
@@ -148,9 +115,7 @@ def test_getting_application_event_calendar_name_for_contact_person(
 
 
 @pytest.mark.django_db
-def test_getting_application_event_should_give_404_when_not_found(
-    user_api_client, application_event, person
-):
+def test_getting_application_event_should_give_404_when_not_found(user_api_client, application_event, person):
     response = user_api_client.get(
         reverse(
             "application_event_calendar-detail",
@@ -172,18 +137,13 @@ def test_getting_reservation_calendar(
     url = f"{base_url}?hash={hmac_signature(f'reservation-{reservation.pk}')}"
     response = user_api_client.get(url)
     assert response.status_code == 200
-    zip_content = (
-        io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
-    )
+    zip_content = io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
 
     expected_summary = "SUMMARY:" + reservation.get_ical_summary().replace("\n", "\\n")
-    expected_description = "DESCRIPTION:" + reservation.get_ical_description().replace(
-        "\n", "\\n"
-    )
+    expected_description = "DESCRIPTION:" + reservation.get_ical_description().replace("\n", "\\n")
     expected_start = f"DTSTART:{reservation.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     unexpected_start = (
-        f"DTSTART:"
-        f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+        f"DTSTART:" f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     )
 
     assert_that(zip_content).contains(expected_summary)
@@ -198,9 +158,7 @@ def test_getting_reservation_calendar_without_hash(
     reservation,
     set_ical_secret,
 ):
-    response = user_api_client.get(
-        reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
-    )
+    response = user_api_client.get(reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk}))
     assert response.status_code == 400
 
 

@@ -100,13 +100,9 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
         help_text="Id of the application period for which this application is targeted to",
     )
 
-    application_events = ApplicationEventInApplicationSerializer(
-        help_text="List of applications events", many=True
-    )
+    application_events = ApplicationEventInApplicationSerializer(help_text="List of applications events", many=True)
 
-    status = ChoiceCharField(
-        help_text="Status of this application", choices=ApplicationStatus.STATUS_CHOICES
-    )
+    status = ChoiceCharField(help_text="Status of this application", choices=ApplicationStatus.STATUS_CHOICES)
 
     billing_address = AddressCreateSerializer(
         help_text="Billing address for the application",
@@ -144,9 +140,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
         if contact_person_data is not None:
             # CASE: Create new person
             if "pk" not in contact_person_data or contact_person_data["pk"] is None:
-                return PersonSerializer(data=contact_person_data).create(
-                    validated_data=contact_person_data
-                )
+                return PersonSerializer(data=contact_person_data).create(validated_data=contact_person_data)
 
             # CASE: Update existing person
             return PersonSerializer(data=contact_person_data).update(
@@ -156,15 +150,11 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
 
         return None
 
-    def handle_organisation(
-        self, organisation_data: Dict[Any, Any]
-    ) -> Union[Organisation, None]:
+    def handle_organisation(self, organisation_data: Dict[Any, Any]) -> Union[Organisation, None]:
         if organisation_data is not None:
             # CASE: Create new organisation
             if "pk" not in organisation_data or organisation_data["pk"] is None:
-                return OrganisationSerializer(data=organisation_data).create(
-                    validated_data=organisation_data
-                )
+                return OrganisationSerializer(data=organisation_data).create(validated_data=organisation_data)
 
             # CASE: Update existing organisation
             return OrganisationSerializer(data=organisation_data).update(
@@ -189,11 +179,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
 
             # CASE: Create new application event
             if "pk" not in event or event["pk"] is None:
-                event_ids.append(
-                    ApplicationEventSerializer(data=event)
-                    .create(validated_data=event)
-                    .id
-                )
+                event_ids.append(ApplicationEventSerializer(data=event).create(validated_data=event).id)
 
                 continue
 
@@ -208,15 +194,11 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
             )
 
         # Delete events that were not created or modified
-        ApplicationEvent.objects.filter(application=application_instance).exclude(
-            id__in=event_ids
-        ).delete()
+        ApplicationEvent.objects.filter(application=application_instance).exclude(id__in=event_ids).delete()
 
     def handle_billing_address(self, billing_address_data: Dict[Any, Any]):
         if "pk" not in billing_address_data or billing_address_data["pk"] is None:
-            billing_address = AddressSerializer(data=billing_address_data).create(
-                validated_data=billing_address_data
-            )
+            billing_address = AddressSerializer(data=billing_address_data).create(validated_data=billing_address_data)
 
         else:
             billing_address = AddressSerializer(data=billing_address_data).update(
@@ -240,9 +222,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
         return data
 
 
-class ApplicationUpdateSerializer(
-    ApplicationCreateSerializer, PrimaryKeyUpdateSerializer
-):
+class ApplicationUpdateSerializer(ApplicationCreateSerializer, PrimaryKeyUpdateSerializer):
     application_events = ApplicationEventInApplicationSerializer(
         help_text="Application events in application", many=True
     )
@@ -253,5 +233,5 @@ class ApplicationUpdateSerializer(
         fields = dict(self.fields)
         fields.pop("pk")
 
-        for key, value in fields.items():
+        for key, _value in fields.items():
             self.fields[key].required = False

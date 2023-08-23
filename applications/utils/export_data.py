@@ -22,23 +22,19 @@ class ApplicationDataExporter:
     @classmethod
     def export_application_data(cls, application_round: int) -> Path:
         now = timezone.now()
-        root = Path(settings.BASE_DIR)
+        root = settings.BASE_DIR
         path = root / "exports" / "applications"
         path.mkdir(parents=True, exist_ok=True)
 
         application_events: List[ApplicationEvent] = list(
             ApplicationEvent.objects.annotate(
                 current_status=Subquery(
-                    Application.objects.filter(id=OuterRef("application__id")).values(
-                        "latest_status"
-                    )
+                    Application.objects.filter(id=OuterRef("application__id")).values("latest_status")
                 )
             )
             .alias(
                 first_schedule_id=Subquery(
-                    ApplicationEventSchedule.objects.filter(
-                        application_event=OuterRef("id")
-                    ).values("id")[:1]
+                    ApplicationEventSchedule.objects.filter(application_event=OuterRef("id")).values("id")[:1]
                 )
             )
             .filter(
@@ -57,11 +53,7 @@ class ApplicationDataExporter:
             .prefetch_related(
                 Prefetch(
                     "application_event_schedules",
-                    queryset=(
-                        ApplicationEventSchedule.objects.all()
-                        .order_by("begin")
-                        .only("begin", "end", "day")
-                    ),
+                    queryset=(ApplicationEventSchedule.objects.all().order_by("begin").only("begin", "end", "day")),
                 ),
             )
             .order_by(
@@ -70,9 +62,7 @@ class ApplicationDataExporter:
         )
 
         cls.spaces_max_count = (
-            ApplicationEvent.objects.filter(
-                application__application_round=application_round
-            )
+            ApplicationEvent.objects.filter(application__application_round=application_round)
             .annotate(spaces_count=Count("event_reservation_units"))
             .aggregate(spaces_max_count=Max("spaces_count"))
         ).get("spaces_max_count", 0)
@@ -88,18 +78,12 @@ class ApplicationDataExporter:
                 for event in application_events:
                     application: Application = event.application
                     min_duration_string = (
-                        cls._get_duration_string(event.min_duration.seconds)
-                        if event.min_duration
-                        else ""
+                        cls._get_duration_string(event.min_duration.seconds) if event.min_duration else ""
                     )
                     max_duration_string = (
-                        cls._get_duration_string(event.max_duration.seconds)
-                        if event.max_duration
-                        else ""
+                        cls._get_duration_string(event.max_duration.seconds) if event.max_duration else ""
                     )
-                    duration_range_string = cls._get_time_range_string(
-                        min_duration_string, max_duration_string
-                    )
+                    duration_range_string = cls._get_time_range_string(min_duration_string, max_duration_string)
                     event_schedules_prio_high = {
                         0: "",
                         1: "",
@@ -133,36 +117,18 @@ class ApplicationDataExporter:
                     contact_person_email = ""
                     contact_person_phone = ""
                     applicant = getattr(application.organisation, "name", "")
-                    organisation_id = getattr(
-                        application.organisation, "identifier", ""
-                    )
-                    event_begin = (
-                        f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
-                        if event.begin
-                        else ""
-                    )
-                    event_end = (
-                        f"{event.end.day}.{event.end.month}.{event.end.year}"
-                        if event.end
-                        else ""
-                    )
+                    organisation_id = getattr(application.organisation, "identifier", "")
+                    event_begin = f"{event.begin.day}.{event.begin.month}.{event.begin.year}" if event.begin else ""
+                    event_end = f"{event.end.day}.{event.end.month}.{event.end.year}" if event.end else ""
 
                     if application.contact_person:
-                        contact_person_first_name = (
-                            application.contact_person.first_name
-                        )
+                        contact_person_first_name = application.contact_person.first_name
                         contact_person_last_name = application.contact_person.last_name
-                        contact_person_email = getattr(
-                            application.contact_person, "email", ""
-                        )
-                        contact_person_phone = getattr(
-                            application.contact_person, "phone_number", ""
-                        )
+                        contact_person_email = getattr(application.contact_person, "email", "")
+                        contact_person_phone = getattr(application.contact_person, "phone_number", "")
 
                     if not applicant and application.contact_person:
-                        applicant = (
-                            f"{contact_person_first_name} {contact_person_last_name}"
-                        )
+                        applicant = f"{contact_person_first_name} {contact_person_last_name}"
 
                     # Loop through requested schedules and update
                     # the correct time range string depending on day integer
@@ -184,7 +150,7 @@ class ApplicationDataExporter:
                     # Loop through event reservation units and update strings
                     # by priority.
                     event_reservation_unit: EventReservationUnit
-                    for i, event_reservation_unit in enumerate(
+                    for _i, event_reservation_unit in enumerate(
                         event.event_reservation_units.all()
                         .select_related("reservation_unit")
                         .order_by("priority", "pk")
@@ -216,14 +182,7 @@ class ApplicationDataExporter:
                         duration_range_string,
                     ]
                     row.extend(reservation_units)
-                    row.extend(
-                        [
-                            ""
-                            for _ in range(
-                                cls.spaces_max_count - len(reservation_units)
-                            )
-                        ]
-                    )
+                    row.extend(["" for _ in range(cls.spaces_max_count - len(reservation_units))])
                     row.extend(
                         [
                             event_schedules_prio_high[0],
@@ -387,11 +346,7 @@ class ApplicationDataExporter:
             duration_string += f"{duration_hours} h"
 
         if duration_minutes:
-            duration_string += (
-                f" {duration_minutes} min"
-                if duration_string
-                else f"{duration_minutes} min"
-            )
+            duration_string += f" {duration_minutes} min" if duration_string else f"{duration_minutes} min"
 
         return duration_string
 
@@ -420,40 +375,30 @@ class ApplicationDataExporter:
 
         # For multiple schedules on the same day, separate them by comma
         if event_schedules[new_schedule.day]:
-            time_range_string = (
-                f"{event_schedules[new_schedule.day]}, {time_range_string}"
-            )
+            time_range_string = f"{event_schedules[new_schedule.day]}, {time_range_string}"
 
         event_schedules.update({new_schedule.day: time_range_string})
 
     @classmethod
-    def export_application_round_statistics_for_reservation_units(
-        cls, application_round: int
-    ) -> None:
-        root = Path(settings.BASE_DIR)
+    def export_application_round_statistics_for_reservation_units(cls, application_round: int) -> None:
+        root = settings.BASE_DIR
         path = root / "exports"
         path.mkdir(parents=True, exist_ok=True)
 
         with open(path / "reservation_units.csv", "w", newline="") as export_file:
             export_writer = writer(export_file, dialect="excel", quoting=QUOTE_ALL)
 
-            export_writer.writerow(
-                ["Application ID", "Event name", "Status", "Reservation unit names"]
-            )
+            export_writer.writerow(["Application ID", "Event name", "Status", "Reservation unit names"])
 
             for event_id, application_id, event_name, current_status in (
                 ApplicationEvent.objects.annotate(
                     current_status=Subquery(
-                        Application.objects.filter(
-                            id=OuterRef("application__id")
-                        ).values("latest_status")
+                        Application.objects.filter(id=OuterRef("application__id")).values("latest_status")
                     )
                 )
                 .alias(
                     first_schedule_id=Subquery(
-                        ApplicationEventSchedule.objects.filter(
-                            application_event=OuterRef("id")
-                        ).values("id")[:1]
+                        ApplicationEventSchedule.objects.filter(application_event=OuterRef("id")).values("id")[:1]
                     )
                 )
                 .filter(
@@ -473,9 +418,7 @@ class ApplicationDataExporter:
                 reservation_units_string = reduce(
                     (
                         lambda current_string, unit_name: (
-                            unit_name
-                            if not current_string
-                            else f"{current_string}; {unit_name}"
+                            unit_name if not current_string else f"{current_string}; {unit_name}"
                         )
                     ),
                     event_reservation_unit_names,

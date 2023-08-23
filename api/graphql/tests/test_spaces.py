@@ -56,12 +56,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         self.client.force_login(self.general_admin)
 
     def get_delete_query(self):
-        return (
-            f"mutation deleteSpace {{deleteSpace(input: {{pk: {self.space.pk} }}){{"
-            f"deleted errors"
-            f"}}"
-            f"}}"
-        )
+        return f"mutation deleteSpace {{deleteSpace(input: {{pk: {self.space.pk} }}){{" f"deleted errors" f"}}" f"}}"
 
     def test_space_deleted(self):
         response = self.query(self.get_delete_query())
@@ -76,9 +71,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_false()
 
     def test_space_not_deleted_because_in_active_round(self):
-        self.app_round.statuses.filter(
-            status__in=ApplicationRoundStatus.CLOSED_STATUSES
-        ).delete()
+        self.app_round.statuses.filter(status__in=ApplicationRoundStatus.CLOSED_STATUSES).delete()
         response = self.query(self.get_delete_query())
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -94,9 +87,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "No permissions to perform delete."
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("No permissions to perform delete.")
 
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_true()
 
@@ -134,9 +125,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
 
     def test_space_deleted_when_service_sector_admin(self):
         service_sector = ServiceSectorFactory(units=[self.space.unit])
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=service_sector
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=service_sector)
         ServiceSectorRolePermission.objects.create(
             role=ServiceSectorRoleChoice.objects.get(code="admin"),
             permission="can_manage_spaces",
@@ -157,9 +146,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
     def test_space_not_deleted_when_service_sector_have_no_manage_permissions(self):
         """This one is missing the "can_manage_spaces" permission"""
         service_sector = ServiceSectorFactory(units=[self.space.unit])
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=service_sector
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=service_sector)
         self.client.force_login(service_sector_admin)
 
         response = self.query(self.get_delete_query())
@@ -216,9 +203,7 @@ class CreateSpaceTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["createSpace"]["errors"]).is_none()
-        assert_that(
-            Space.objects.filter(id=content["data"]["createSpace"]["pk"]).exists()
-        ).is_true()
+        assert_that(Space.objects.filter(id=content["data"]["createSpace"]["pk"]).exists()).is_true()
 
     def test_no_name_fi_errors(self):
         data = {"nameSv": "SpaceName"}
@@ -231,9 +216,7 @@ class CreateSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content["data"]["createSpace"]["errors"][0]["messages"][0]
-        ).contains("nameFi cannot be empty.")
+        assert_that(content["data"]["createSpace"]["errors"][0]["messages"][0]).contains("nameFi cannot be empty.")
 
     def test_spaced_name_fi_errors(self):
         data = {"nameFi": " "}
@@ -241,9 +224,7 @@ class CreateSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content["data"]["createSpace"]["errors"][0]["messages"][0]
-        ).contains("nameFi cannot be empty.")
+        assert_that(content["data"]["createSpace"]["errors"][0]["messages"][0]).contains("nameFi cannot be empty.")
 
     def test_surface_area(self):
         data = {"nameFi": "SpaceName", "surfaceArea": 40.0}
@@ -279,9 +260,7 @@ class CreateSpaceTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["createSpace"]["errors"]).is_none()
-        assert_that(
-            Space.objects.filter(id=content["data"]["createSpace"]["pk"]).exists()
-        ).is_true()
+        assert_that(Space.objects.filter(id=content["data"]["createSpace"]["pk"]).exists()).is_true()
 
     def test_space_not_created_when_unit_admin_have_no_manage_permissions(self):
         """This one is missing the "can_manage_spaces" permission"""
@@ -296,9 +275,7 @@ class CreateSpaceTestCase(GrapheneTestCaseBase):
         assert_that(Space.objects.all().exists()).is_false()
 
     def test_space_created_when_service_sector_admin(self):
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=self.service_sector
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=self.service_sector)
         ServiceSectorRolePermission.objects.create(
             role=ServiceSectorRoleChoice.objects.get(code="admin"),
             permission="can_manage_spaces",
@@ -311,16 +288,12 @@ class CreateSpaceTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["createSpace"]["errors"]).is_none()
-        assert_that(
-            Space.objects.filter(id=content["data"]["createSpace"]["pk"]).exists()
-        ).is_true()
+        assert_that(Space.objects.filter(id=content["data"]["createSpace"]["pk"]).exists()).is_true()
 
     def test_space_not_created_when_service_sector_have_no_manage_permissions(self):
         """This one is missing the "can_manage_spaces" permission"""
         service_sector = ServiceSectorFactory(units=[self.unit])
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=service_sector
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=service_sector)
         self.client.force_login(service_sector_admin)
 
         data = {"nameFi": "SpaceName", "unitPk": self.unit.id}
@@ -375,9 +348,7 @@ class UpdateSpaceTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["updateSpace"]["errors"]).is_none()
-        assert_that(
-            Space.objects.get(id=content["data"]["updateSpace"]["pk"]).name_en
-        ).is_equal_to("SpaceName")
+        assert_that(Space.objects.get(id=content["data"]["updateSpace"]["pk"]).name_en).is_equal_to("SpaceName")
 
     def test_empty_name_fi_errors(self):
         data = {"pk": self.space.pk, "nameFi": ""}
@@ -385,9 +356,7 @@ class UpdateSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content["data"]["updateSpace"]["errors"][0]["messages"][0]
-        ).contains("nameFi cannot be empty.")
+        assert_that(content["data"]["updateSpace"]["errors"][0]["messages"][0]).contains("nameFi cannot be empty.")
 
     def test_spaced_name_fi_errors(self):
         data = {"pk": self.space.pk, "nameFi": " "}
@@ -395,9 +364,7 @@ class UpdateSpaceTestCase(GrapheneTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content["data"]["updateSpace"]["errors"][0]["messages"][0]
-        ).contains("nameFi cannot be empty.")
+        assert_that(content["data"]["updateSpace"]["errors"][0]["messages"][0]).contains("nameFi cannot be empty.")
 
     def test_regular_user_cannot_update(self):
         self.client.force_login(self.regular_joe)
@@ -423,9 +390,7 @@ class UpdateSpaceTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["updateSpace"]["errors"]).is_none()
-        assert_that(
-            Space.objects.get(id=content["data"]["updateSpace"]["pk"]).name_en
-        ).is_equal_to("SpaceName")
+        assert_that(Space.objects.get(id=content["data"]["updateSpace"]["pk"]).name_en).is_equal_to("SpaceName")
 
     def test_space_not_updated_when_unit_admin_have_no_manage_permissions(self):
         """This one is missing the "can_manage_spaces" permission"""
@@ -442,9 +407,7 @@ class UpdateSpaceTestCase(GrapheneTestCaseBase):
 
     def test_space_updated_when_service_sector_admin(self):
         service_sector = ServiceSectorFactory(units=[self.space.unit])
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=service_sector
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=service_sector)
         ServiceSectorRolePermission.objects.create(
             role=ServiceSectorRoleChoice.objects.get(code="admin"),
             permission="can_manage_spaces",
@@ -457,16 +420,12 @@ class UpdateSpaceTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["updateSpace"]["errors"]).is_none()
-        assert_that(
-            Space.objects.get(id=content["data"]["updateSpace"]["pk"]).name_en
-        ).is_equal_to("SpaceName")
+        assert_that(Space.objects.get(id=content["data"]["updateSpace"]["pk"]).name_en).is_equal_to("SpaceName")
 
     def test_space_not_updated_when_service_sector_have_no_manage_permissions(self):
         """This one is missing the "can_manage_spaces" permission"""
         service_sector = ServiceSectorFactory(units=[self.space.unit])
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=service_sector
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=service_sector)
         self.client.force_login(service_sector_admin)
 
         data = {"pk": self.space.pk, "nameFi": "Woohoo I created a space!"}
@@ -544,9 +503,7 @@ class SpacesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def test_only_with_permission_with_general_role(self):
         spaces_role_choice = GeneralRoleChoice.objects.create(code="space_manager")
-        GeneralRolePermission.objects.create(
-            role=spaces_role_choice, permission="can_manage_spaces"
-        )
+        GeneralRolePermission.objects.create(role=spaces_role_choice, permission="can_manage_spaces")
         GeneralRole.objects.create(
             user=self.regular_joe,
             role=spaces_role_choice,
@@ -574,12 +531,8 @@ class SpacesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         service_sector = ServiceSectorFactory(name="test service sector", units=[unit])
         SpaceFactory(name_fi="i am from the sector!", unit=unit)
 
-        spaces_role_choice = ServiceSectorRoleChoice.objects.create(
-            code="space_manager"
-        )
-        ServiceSectorRolePermission.objects.create(
-            role=spaces_role_choice, permission="can_manage_spaces"
-        )
+        spaces_role_choice = ServiceSectorRoleChoice.objects.create(code="space_manager")
+        ServiceSectorRolePermission.objects.create(role=spaces_role_choice, permission="can_manage_spaces")
         ServiceSectorRole.objects.create(
             user=self.regular_joe,
             role=spaces_role_choice,
@@ -608,9 +561,7 @@ class SpacesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         SpaceFactory(name_fi="i am from the unit!", unit=unit)
 
         spaces_role_choice = UnitRoleChoice.objects.create(code="space_manager")
-        UnitRolePermission.objects.create(
-            role=spaces_role_choice, permission="can_manage_spaces"
-        )
+        UnitRolePermission.objects.create(role=spaces_role_choice, permission="can_manage_spaces")
         role = UnitRole.objects.create(user=self.regular_joe, role=spaces_role_choice)
         role.unit.set([unit])
 
@@ -638,9 +589,7 @@ class SpacesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         SpaceFactory(name_fi="i am from the unit group!", unit=unit)
 
         spaces_role_choice = UnitRoleChoice.objects.create(code="space_manager")
-        UnitRolePermission.objects.create(
-            role=spaces_role_choice, permission="can_manage_spaces"
-        )
+        UnitRolePermission.objects.create(role=spaces_role_choice, permission="can_manage_spaces")
         role = UnitRole.objects.create(user=self.regular_joe, role=spaces_role_choice)
         role.unit_group.set([unit_group])
 

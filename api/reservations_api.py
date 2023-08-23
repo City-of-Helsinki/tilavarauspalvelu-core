@@ -62,9 +62,7 @@ class AgeGroupSerializer(serializers.ModelSerializer):
         max_age = data["maximum"]
 
         if max_age is not None and max_age <= min_age:
-            raise serializers.ValidationError(
-                "Maximum age should be larger than minimum age"
-            )
+            raise serializers.ValidationError("Maximum age should be larger than minimum age")
         return data
 
 
@@ -174,12 +172,8 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         for reservation_unit in data["reservation_unit"]:
-            if reservation_unit.check_reservation_overlap(
-                data["begin"], data["end"], self.instance
-            ):
-                raise serializers.ValidationError(
-                    "Overlapping reservations are not allowed"
-                )
+            if reservation_unit.check_reservation_overlap(data["begin"], data["end"], self.instance):
+                raise serializers.ValidationError("Overlapping reservations are not allowed")
         return data
 
 
@@ -190,9 +184,7 @@ class ReservationFilter(filters.FilterSet):
     )
 
     # Effectively active or inactive only reservations
-    active = filters.BooleanFilter(
-        method="is_active", help_text="Show only confirmed and active reservations."
-    )
+    active = filters.BooleanFilter(method="is_active", help_text="Show only confirmed and active reservations.")
 
     reservation_unit = filters.ModelMultipleChoiceFilter(
         field_name="reservation_unit",
@@ -241,14 +233,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
                         "services",
                         "images",
                         "unit",
-                        Prefetch(
-                            "equipments", queryset=Equipment.objects.all().only("id")
-                        ),
+                        Prefetch("equipments", queryset=Equipment.objects.all().only("id")),
                         Prefetch(
                             "spaces",
-                            queryset=Space.objects.all().select_related(
-                                "building", "location"
-                            ),
+                            queryset=Space.objects.all().select_related("building", "location"),
                         ),
                         Prefetch(
                             "resources",
@@ -269,11 +257,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return queryset.filter(
             Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user))
-            | Q(
-                reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(
-                    user
-                )
-            )
+            | Q(reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(user))
             | Q(user=user)
         ).order_by("begin")
 
@@ -295,9 +279,7 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
     purpose_name = serializers.SerializerMethodField()
     group_size = serializers.SerializerMethodField()
     denied_reservations = ReservationSerializer(many=True, read_only=True)
-    biweekly = serializers.BooleanField(
-        source="application_event.biweekly", read_only=True
-    )
+    biweekly = serializers.BooleanField(source="application_event.biweekly", read_only=True)
 
     class Meta:
         model = RecurringReservation
@@ -439,15 +421,11 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
                                     ),
                                     Prefetch(
                                         "spaces",
-                                        queryset=Space.objects.all().select_related(
-                                            "building", "location"
-                                        ),
+                                        queryset=Space.objects.all().select_related("building", "location"),
                                     ),
                                     Prefetch(
                                         "resources",
-                                        queryset=Resource.objects.all().select_related(
-                                            "space"
-                                        ),
+                                        queryset=Resource.objects.all().select_related("space"),
                                     ),
                                 )
                             ),
@@ -469,9 +447,7 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
 
         can_view_units_reservations = Q(
-            reservations__reservation_unit__unit__in=get_units_where_can_view_reservations(
-                user
-            )
+            reservations__reservation_unit__unit__in=get_units_where_can_view_reservations(user)
         )
         can_view_service_sectors_reservations = Q(
             reservations__reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(
@@ -480,7 +456,5 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
         return queryset.filter(
-            can_view_units_reservations
-            | can_view_service_sectors_reservations
-            | Q(user=user)
+            can_view_units_reservations | can_view_service_sectors_reservations | Q(user=user)
         ).distinct()

@@ -22,9 +22,7 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         cls.reservation_unit.save()
 
         # Bit of a hack to wait some time to get the search indexes updated.
-        cls.reservation_unit.index_search_document(
-            index=cls.reservation_unit.search_indexes[0]
-        )
+        cls.reservation_unit.index_search_document(index=cls.reservation_unit.search_indexes[0])
 
     def test_filtering_by_type_fi(self):
         response = self.query(

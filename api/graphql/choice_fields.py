@@ -6,10 +6,7 @@ from rest_framework import serializers
 
 @deconstructible
 class ChoiceValidator:
-    message = _(
-        'Choice "%(choice)s" is not allowed. '
-        "Allowed choices are: %(allowed_choices)s."
-    )
+    message = _('Choice "%(choice)s" is not allowed. ' "Allowed choices are: %(allowed_choices)s.")
     code = "invalid_choice"
 
     def __init__(self, allowed_choices):

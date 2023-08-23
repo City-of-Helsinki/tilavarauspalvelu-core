@@ -98,9 +98,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(app_data.get("errors")).is_none()
 
         self.application.refresh_from_db()
-        assert_that(self.application.additional_information).is_equal_to(
-            data.get("additionalInformation")
-        )
+        assert_that(self.application.additional_information).is_equal_to(data.get("additionalInformation"))
 
     def test_user_cannot_update_own_application_status_to_review_done(self):
         self.client.force_login(self.regular_joe)
@@ -113,9 +111,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "No permission for status change"
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("No permission for status change")
 
         self.application.refresh_from_db()
         assert_that(self.application.status).is_equal_to(ApplicationStatus.IN_REVIEW)
@@ -126,9 +122,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
 
         application_round = ApplicationRoundFactory(
             name="Nuorten liikuntavuorot kevät 2021",
-            application_period_begin=timezone.datetime(
-                2021, 1, 1, 0, 0, 0
-            ).astimezone(),
+            application_period_begin=timezone.datetime(2021, 1, 1, 0, 0, 0).astimezone(),
             application_period_end=timezone.datetime(2021, 1, 31, 0, 0, 0).astimezone(),
         )
         self.application.application_round = application_round
@@ -142,14 +136,10 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
 
         self.application.refresh_from_db()
-        assert_that(self.application.additional_information).is_not_equal_to(
-            data.get("additionalInformation")
-        )
+        assert_that(self.application.additional_information).is_not_equal_to(data.get("additionalInformation"))
 
     def test_user_cannot_update_other_users_application(self):
         self.client.force_login(self.other_user)
@@ -162,13 +152,9 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
         self.application.refresh_from_db()
-        assert_that(self.application.additional_information).is_not_equal_to(
-            data.get("additionalInformation")
-        )
+        assert_that(self.application.additional_information).is_not_equal_to(data.get("additionalInformation"))
 
     def test_general_admin_can_update_users_application(self):
         self.client.force_login(self.general_admin)
@@ -185,9 +171,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(app_data.get("errors")).is_none()
 
         self.application.refresh_from_db()
-        assert_that(self.application.additional_information).is_equal_to(
-            data.get("additionalInformation")
-        )
+        assert_that(self.application.additional_information).is_equal_to(data.get("additionalInformation"))
 
     def test_service_sector_admin_can_update_users_application(self):
         self.client.force_login(self.create_service_sector_admin())
@@ -204,9 +188,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(app_data.get("errors")).is_none()
 
         self.application.refresh_from_db()
-        assert_that(self.application.additional_information).is_equal_to(
-            data.get("additionalInformation")
-        )
+        assert_that(self.application.additional_information).is_equal_to(data.get("additionalInformation"))
 
     def test_service_sector_application_manager_can_update_users_application(self):
         self.client.force_login(self.create_service_sector_application_manager())
@@ -223,9 +205,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(app_data.get("errors")).is_none()
 
         self.application.refresh_from_db()
-        assert_that(self.application.additional_information).is_equal_to(
-            data.get("additionalInformation")
-        )
+        assert_that(self.application.additional_information).is_equal_to(data.get("additionalInformation"))
 
     def test_wrong_service_sector_admin_cannot_create_or_update_application(self):
         sadmin = self.create_service_sector_admin()
@@ -243,13 +223,9 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
         self.application.refresh_from_db()
-        assert_that(self.application.additional_information).is_not_equal_to(
-            data.get("additionalInformation")
-        )
+        assert_that(self.application.additional_information).is_not_equal_to(data.get("additionalInformation"))
 
     def test_application_status_set_sent_from_in_review_fails(self):
         self.client.force_login(self.general_admin)
@@ -367,16 +343,10 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(app_data.get("errors")).is_none()
 
         self.application.refresh_from_db()
-        assert_that(self.application.contact_person_id).is_not_equal_to(
-            contact_person_id
-        )
+        assert_that(self.application.contact_person_id).is_not_equal_to(contact_person_id)
         assert_that(self.application.contact_person.last_name).is_equal_to("Malkovich")
-        assert_that(self.application.billing_address_id).is_not_equal_to(
-            billing_address_id
-        )
-        assert_that(self.application.billing_address.street_address).is_equal_to(
-            "Bill me"
-        )
+        assert_that(self.application.billing_address_id).is_not_equal_to(billing_address_id)
+        assert_that(self.application.billing_address.street_address).is_equal_to("Bill me")
 
     def test_application_update_should_update_contact_person_and_billing_address(self):
         self.client.force_login(self.regular_joe)
@@ -416,9 +386,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(self.application.contact_person.id).is_equal_to(person.id)
         assert_that(self.application.contact_person.last_name).is_equal_to("Modified")
         assert_that(self.application.billing_address.id).is_equal_to(address.id)
-        assert_that(self.application.billing_address.street_address).is_equal_to(
-            "No bills please"
-        )
+        assert_that(self.application.billing_address.street_address).is_equal_to("No bills please")
 
     def test_application_update_review_valid(self):
         self.client.force_login(self.regular_joe)
@@ -480,9 +448,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(app_data.get("errors")).is_none()
 
         self.application.refresh_from_db()
-        assert_that(self.application.application_events.count()).is_equal_to(
-            app_event_count
-        )
+        assert_that(self.application.application_events.count()).is_equal_to(app_event_count)
 
     def test_application_events_does_get_deleted_if_in_data_and_empty(self):
         self.client.force_login(self.regular_joe)
@@ -556,9 +522,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         assert_that(application.contact_person.last_name).is_equal_to("The modified")
 
         assert_that(application.organisation.id).is_equal_to(self.organisation.id)
-        assert_that(application.organisation.name).is_equal_to(
-            "Super organisation modified"
-        )
+        assert_that(application.organisation.name).is_equal_to("Super organisation modified")
 
     def test_application_update_should_null_organisation_and_contact_person_for_draft(
         self,
@@ -642,9 +606,7 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
         existing_event["pk"] = application_event.id
         existing_event["name"] = "Updated name"
         existing_event["numPersons"] = 112
-        existing_event["applicationEventSchedules"] = [
-            {"day": 3, "begin": "10:40", "end": "16:30"}
-        ]
+        existing_event["applicationEventSchedules"] = [{"day": 3, "begin": "10:40", "end": "16:30"}]
 
         valid_application_event_data = self.get_event_data(app_id=self.application.id)
 
@@ -674,23 +636,17 @@ class ApplicationUpdateTestCase(ApplicationTestCaseBase):
 
         self.application.refresh_from_db()
         assert_that(
-            self.application.application_events.filter(
-                name__in=["Updated name", "New event name"]
-            ).count()
+            self.application.application_events.filter(name__in=["Updated name", "New event name"]).count()
         ).is_equal_to(2)
         assert_that(self.application.application_events.count()).is_equal_to(2)
 
-        event = self.application.application_events.filter(
-            id=existing_event.get("pk")
-        ).first()
+        event = self.application.application_events.filter(id=existing_event.get("pk")).first()
         assert_that(event).is_not_none()
         assert_that(event.num_persons).is_equal_to(112)
         assert_that(event.name).is_equal_to("Updated name")
         assert_that(event.application_event_schedules.first().day).is_equal_to(3)
 
-        otha_event = self.application.application_events.exclude(
-            id=existing_event.get("pk")
-        ).first()
+        otha_event = self.application.application_events.exclude(id=existing_event.get("pk")).first()
         assert_that(otha_event.name).is_equal_to("New event name")
 
     def test_application_update_should_remove_application_events_if_no_longer_in_data(

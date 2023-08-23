@@ -10,9 +10,7 @@ from reservations.tests.factories import ReservationPurposeFactory
 class ReservationPurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.purpose = ReservationPurposeFactory(
-            name_fi="fi", name_sv="sv", name_en="en"
-        )
+        cls.purpose = ReservationPurposeFactory(name_fi="fi", name_sv="sv", name_en="en")
 
     def test_getting_reservation_unit_purposes(self):
         response = self.query(

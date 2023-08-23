@@ -32,9 +32,7 @@ class HelpersTestCase(TestCase):
             last_name="Last",
             email="first.last@foo.com",
         )
-        self.reservation_unit = ReservationUnitFactory(
-            name_fi="Suomeksi", name_sv="Ruotsiksi", name_en="Englanniksi"
-        )
+        self.reservation_unit = ReservationUnitFactory(name_fi="Suomeksi", name_sv="Ruotsiksi", name_en="Englanniksi")
 
         begin = datetime.now().astimezone(timezone.get_default_timezone())
         end = begin + timedelta(hours=2)
@@ -71,27 +69,13 @@ class HelpersTestCase(TestCase):
         assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
 
     def test_get_validated_phone_number(self):
-        assert_that(get_validated_phone_number("+358 50 123 4567")).is_equal_to(
-            "+358 50 123 4567"
-        )
-        assert_that(get_validated_phone_number("+358 50 023 4567")).is_equal_to(
-            "+358 50 023 4567"
-        )
-        assert_that(get_validated_phone_number("+358501234567")).is_equal_to(
-            "+358501234567"
-        )
-        assert_that(get_validated_phone_number("+358-50-123-4567")).is_equal_to(
-            "+358 50 123 4567"
-        )
-        assert_that(get_validated_phone_number(" +358  50-  123- 4567  ")).is_equal_to(
-            "+358 50 123 4567"
-        )
-        assert_that(get_validated_phone_number("+1-55-50  10 0 ")).is_equal_to(
-            "+1 55 50 10 0"
-        )
-        assert_that(get_validated_phone_number("+1 55 50 10 0")).is_equal_to(
-            "+1 55 50 10 0"
-        )
+        assert_that(get_validated_phone_number("+358 50 123 4567")).is_equal_to("+358 50 123 4567")
+        assert_that(get_validated_phone_number("+358 50 023 4567")).is_equal_to("+358 50 023 4567")
+        assert_that(get_validated_phone_number("+358501234567")).is_equal_to("+358501234567")
+        assert_that(get_validated_phone_number("+358-50-123-4567")).is_equal_to("+358 50 123 4567")
+        assert_that(get_validated_phone_number(" +358  50-  123- 4567  ")).is_equal_to("+358 50 123 4567")
+        assert_that(get_validated_phone_number("+1-55-50  10 0 ")).is_equal_to("+1 55 50 10 0")
+        assert_that(get_validated_phone_number("+1 55 50 10 0")).is_equal_to("+1 55 50 10 0")
         assert_that(get_validated_phone_number("050 123 4567")).is_equal_to("")
         assert_that(get_validated_phone_number("(+358) 50 123 4567")).is_equal_to("")
 
@@ -113,14 +97,10 @@ class HelpersTestCase(TestCase):
         )
 
         create_verkkokauppa_order(reservation)
-        assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to(
-            reservation.reservee_phone
-        )
+        assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to(reservation.reservee_phone)
 
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_create_verkkokauppa_order_phone_number_is_not_set_when_not_individual(
-        self, mock_create_order
-    ):
+    def test_create_verkkokauppa_order_phone_number_is_not_set_when_not_individual(self, mock_create_order):
         user = get_user_model().objects.create(
             username="testuser",
             first_name="Test",
@@ -140,9 +120,7 @@ class HelpersTestCase(TestCase):
         assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to("")
 
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_create_verkkokauppa_order_phone_number_is_not_set_when_invalid(
-        self, mock_create_order
-    ):
+    def test_create_verkkokauppa_order_phone_number_is_not_set_when_invalid(self, mock_create_order):
         user = get_user_model().objects.create(
             username="testuser",
             first_name="Test",
@@ -162,9 +140,7 @@ class HelpersTestCase(TestCase):
         assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to("")
 
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_create_verkkokauppa_order_respect_reservee_language(
-        self, mock_create_order
-    ):
+    def test_create_verkkokauppa_order_respect_reservee_language(self, mock_create_order):
         user = get_user_model().objects.create(
             username="testuser",
             first_name="Test",
@@ -192,14 +168,10 @@ class HelpersTestCase(TestCase):
         )
 
         create_verkkokauppa_order(reservation_en)
-        assert_that(
-            mock_create_order.call_args.args[0].items[0].product_name
-        ).is_equal_to("Name")
+        assert_that(mock_create_order.call_args.args[0].items[0].product_name).is_equal_to("Name")
 
         create_verkkokauppa_order(reservation_sv)
-        assert_that(
-            mock_create_order.call_args.args[0].items[0].product_name
-        ).is_equal_to("Namn")
+        assert_that(mock_create_order.call_args.args[0].items[0].product_name).is_equal_to("Namn")
 
     def test_get_meta_label_returns_label_with_supported_key(self):
         period_label = get_meta_label("reservationPeriod", self.reservation)

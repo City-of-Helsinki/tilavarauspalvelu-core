@@ -23,9 +23,7 @@ class TermsOfUse(models.Model):
     )
 
     id = models.CharField(primary_key=True, max_length=100)
-    name = models.CharField(
-        verbose_name=_("Name"), max_length=255, null=True, blank=True
-    )
+    name = models.CharField(verbose_name=_("Name"), max_length=255, null=True, blank=True)
     text = models.TextField(verbose_name=_("Text"))
     terms_type = models.CharField(
         blank=False,

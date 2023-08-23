@@ -177,34 +177,22 @@ class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (ApplicationPermission,)
 
     @classmethod
-    def resolve_queryset(
-        cls, connection, iterable, info, args, filtering_args, filterset_class
-    ):
-        queryset = super().resolve_queryset(
-            connection, iterable, info, args, filtering_args, filterset_class
-        )
+    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
+        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
 
         # Filtering queries formation
         user = info.context.user
-        unit_ids = user.unit_roles.filter(
-            role__permissions__permission="can_validate_applications"
-        ).values_list("unit", flat=True)
-        group_ids = user.unit_roles.filter(
-            role__permissions__permission="can_validate_applications"
-        ).values_list("unit_group", flat=True)
-        units = Unit.objects.filter(
-            Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)
-        ).values_list("id", flat=True)
+        unit_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
+            "unit", flat=True
+        )
+        group_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
+            "unit_group", flat=True
+        )
+        units = Unit.objects.filter(Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)).values_list("id", flat=True)
 
         return queryset.filter(
-            Q(
-                application_round__service_sector__in=get_service_sectors_where_can_view_applications(
-                    user
-                )
-            )
-            | Q(
-                application_events__event_reservation_units__reservation_unit__unit__in=units
-            )
+            Q(application_round__service_sector__in=get_service_sectors_where_can_view_applications(user))
+            | Q(application_events__event_reservation_units__reservation_unit__unit__in=units)
             | Q(user=user)
         ).distinct()
 
@@ -213,31 +201,21 @@ class ApplicationEventsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (ApplicationEventPermission,)
 
     @classmethod
-    def resolve_queryset(
-        cls, connection, iterable, info, args, filtering_args, filterset_class
-    ):
-        queryset = super().resolve_queryset(
-            connection, iterable, info, args, filtering_args, filterset_class
-        )
+    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
+        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
 
         # Filtering queries formation
         user = info.context.user
-        unit_ids = user.unit_roles.filter(
-            role__permissions__permission="can_validate_applications"
-        ).values_list("unit", flat=True)
-        group_ids = user.unit_roles.filter(
-            role__permissions__permission="can_validate_applications"
-        ).values_list("unit_group", flat=True)
-        units = Unit.objects.filter(
-            Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)
-        ).values_list("id", flat=True)
+        unit_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
+            "unit", flat=True
+        )
+        group_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
+            "unit_group", flat=True
+        )
+        units = Unit.objects.filter(Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)).values_list("id", flat=True)
 
         return queryset.filter(
-            Q(
-                application__application_round__service_sector__in=get_service_sectors_where_can_view_applications(
-                    user
-                )
-            )
+            Q(application__application_round__service_sector__in=get_service_sectors_where_can_view_applications(user))
             | Q(event_reservation_units__reservation_unit__unit__in=units)
             | Q(application__user=user)
         ).distinct()
@@ -247,12 +225,8 @@ class ReservationsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (ReservationPermission,)
 
     @classmethod
-    def resolve_queryset(
-        cls, connection, iterable, info, args, filtering_args, filterset_class
-    ):
-        queryset = super().resolve_queryset(
-            connection, iterable, info, args, filtering_args, filterset_class
-        )
+    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
+        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
 
         if not args.get("order_by", None):
             queryset = queryset.order_by("begin")
@@ -263,12 +237,8 @@ class RecurringReservationsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (RecurringReservationPermission,)
 
     @classmethod
-    def resolve_queryset(
-        cls, connection, iterable, info, args, filtering_args, filterset_class
-    ):
-        queryset = super().resolve_queryset(
-            connection, iterable, info, args, filtering_args, filterset_class
-        )
+    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
+        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
         user = info.context.user
         viewable_units = get_units_where_can_view_reservations(user)
         viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
@@ -289,12 +259,8 @@ class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (ReservationUnitPermission,)
 
     @classmethod
-    def resolve_queryset(
-        cls, connection, iterable, info, args, filtering_args, filterset_class
-    ):
-        queryset = super().resolve_queryset(
-            connection, iterable, info, args, filtering_args, filterset_class
-        )
+    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
+        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
         # Hide archived reservation units
         return queryset.filter(is_archived=False)
 
@@ -376,39 +342,25 @@ class ServiceSectorFilter(AuthFilter):
 
 
 class Query(graphene.ObjectType):
-    applications = ApplicationsFilter(
-        ApplicationType, filterset_class=ApplicationFilterSet
-    )
-    application_events = ApplicationEventsFilter(
-        ApplicationEventType, filterset_class=ApplicationEventFilterSet
-    )
-    application_rounds = ApplicationRoundFilter(
-        ApplicationRoundType, filterset_class=ApplicationRoundFilterSet
-    )
+    applications = ApplicationsFilter(ApplicationType, filterset_class=ApplicationFilterSet)
+    application_events = ApplicationEventsFilter(ApplicationEventType, filterset_class=ApplicationEventFilterSet)
+    application_rounds = ApplicationRoundFilter(ApplicationRoundType, filterset_class=ApplicationRoundFilterSet)
 
-    reservations = ReservationsFilter(
-        ReservationType, filterset_class=ReservationFilterSet
-    )
+    reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
 
     recurring_reservations = RecurringReservationsFilter(
         RecurringReservationType, filterset_class=RecurringReservationFilterSet
     )
 
-    reservation_cancel_reasons = ReservationCancelReasonFilter(
-        ReservationCancelReasonType
-    )
+    reservation_cancel_reasons = ReservationCancelReasonFilter(ReservationCancelReasonType)
 
     reservation_deny_reasons = ReservationDenyReasonFilter(ReservationDenyReasonType)
 
-    reservation_units = ReservationUnitsFilter(
-        ReservationUnitType, filterset_class=ReservationUnitsFilterSet
-    )
+    reservation_units = ReservationUnitsFilter(ReservationUnitType, filterset_class=ReservationUnitsFilterSet)
     reservation_unit = relay.Node.Field(ReservationUnitType)
     reservation_unit_by_pk = Field(ReservationUnitByPkType, pk=graphene.Int())
-    reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(
-        ReservationUnitCancellationRuleType
-    )
+    reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(ReservationUnitCancellationRuleType)
     reservation_unit_hauki_url = Field(
         ReservationUnitHaukiUrlType,
         pk=graphene.Int(),
@@ -541,12 +493,8 @@ class Mutation(graphene.ObjectType):
     decline_application_event = ApplicationEventDeclineMutation.Field()
     flag_application_event = ApplicationEventFlagMutation.Field()
 
-    create_application_event_schedule_result = (
-        ApplicationEventScheduleResultCreateMutation.Field()
-    )
-    update_application_event_schedule_result = (
-        ApplicationEventScheduleResultUpdateMutation.Field()
-    )
+    create_application_event_schedule_result = ApplicationEventScheduleResultCreateMutation.Field()
+    update_application_event_schedule_result = ApplicationEventScheduleResultUpdateMutation.Field()
 
     create_recurring_reservation = RecurringReservationCreateMutation.Field()
     update_recurring_reservation = RecurringReservationUpdateMutation.Field()

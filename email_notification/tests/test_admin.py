@@ -122,11 +122,7 @@ class GetInitialValuesTestCase(TestCase):
         )
 
     def test_get_initial_values_with_reservation_unit_missing(self):
-        request = RequestFactory().get(
-            "/", {"recipient": "test@example.com", "reservation_unit": 99999}
-        )
+        request = RequestFactory().get("/", {"recipient": "test@example.com", "reservation_unit": 99999})
 
         request.user = self.user
-        assert_that(get_initial_values(request)).is_equal_to(
-            {"recipient": "test@example.com"}
-        )
+        assert_that(get_initial_values(request)).is_equal_to({"recipient": "test@example.com"})

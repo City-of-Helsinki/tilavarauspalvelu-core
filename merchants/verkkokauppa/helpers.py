@@ -26,9 +26,7 @@ from utils.decimal_utils import round_decimal
 def parse_datetime(string: Optional[str]) -> Optional[datetime]:
     if string is None:
         return None
-    return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%f").astimezone(
-        settings.VERKKOKAUPPA_TIMEZONE
-    )
+    return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%f").astimezone(settings.VERKKOKAUPPA_TIMEZONE)
 
 
 def get_formatted_reservation_time(reservation: Reservation) -> str:
@@ -106,9 +104,7 @@ def _get_order_params(reservation: Reservation):
     quantity = 1  # Currently, we don't support quantities larger than 1
     price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)
     price_vat = round_decimal(
-        Decimal(
-            quantity * reservation.price_net * (reservation.tax_percentage_value / 100)
-        ),
+        Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)),
         2,
     )
     preferred_language = getattr(reservation, "reservee_language", "fi")

@@ -30,9 +30,7 @@ class BirthdayResolverGetUserBirthDayTestCase(TestCase):
             "data": {
                 "myProfile": {
                     "id": "aaa-bbb-ccc",
-                    "verifiedPersonalInformation": {
-                        "nationalIdentificationNumber": f"120345{century_code}6789"
-                    },
+                    "verifiedPersonalInformation": {"nationalIdentificationNumber": f"120345{century_code}6789"},
                 }
             }
         }
@@ -44,18 +42,14 @@ class BirthdayResolverGetUserBirthDayTestCase(TestCase):
     def test_getting_birthday_success_20th_century(self, gql_mock):
         the_birth_day = datetime.date(1945, 3, 12)
         for century in ["-", "Y", "X", "W", "V", "U"]:
-            response_mock.json.return_value = self.__get_profile_gql_response(
-                century_code=century
-            )
+            response_mock.json.return_value = self.__get_profile_gql_response(century_code=century)
 
             assert_that(self.reader.get_user_birthday()).is_equal_to(the_birth_day)
 
     def test_getting_birthday_success_21th_century(self, gql_mock):
         the_birth_day = datetime.date(2045, 3, 12)
         for century in ["A", "B", "C", "D", "E", "F"]:
-            response_mock.json.return_value = self.__get_profile_gql_response(
-                century_code=century
-            )
+            response_mock.json.return_value = self.__get_profile_gql_response(century_code=century)
 
             assert_that(self.reader.get_user_birthday()).is_equal_to(the_birth_day)
 
@@ -73,44 +67,26 @@ class BirthdayResolverGetUserBirthDayTestCase(TestCase):
             self.reader.get_user_birthday()
 
     def test_is_none_when_century_invalid(self, gql_mock):
-        response_mock.json.return_value = self.__get_profile_gql_response(
-            century_code="K"
-        )
+        response_mock.json.return_value = self.__get_profile_gql_response(century_code="K")
 
         assert_that(self.reader.get_user_birthday()).is_none()
 
     def test_is_none_when_national_identification_number_is_none(self, gql_mock):
         response_mock.json.return_value = {
-            "data": {
-                "myProfile": {
-                    "verifiedPersonalInformation": {
-                        "nationalIdentificationNumber": None
-                    }
-                }
-            }
+            "data": {"myProfile": {"verifiedPersonalInformation": {"nationalIdentificationNumber": None}}}
         }
 
         assert_that(self.reader.get_user_birthday()).is_none()
 
-    def test_is_none_when_national_identification_number_is_wrong_length(
-        self, gql_mock
-    ):
+    def test_is_none_when_national_identification_number_is_wrong_length(self, gql_mock):
         response_mock.json.return_value = {
-            "data": {
-                "myProfile": {
-                    "verifiedPersonalInformation": {
-                        "nationalIdentificationNumber": "1234"
-                    }
-                }
-            }
+            "data": {"myProfile": {"verifiedPersonalInformation": {"nationalIdentificationNumber": "1234"}}}
         }
 
         assert_that(self.reader.get_user_birthday()).is_none()
 
     def test_is_none_when_no_verified_personal_info(self, gql_mock):
-        response_mock.json.return_value = {
-            "data": {"myProfile": {"verifiedPersonalInformation": None}}
-        }
+        response_mock.json.return_value = {"data": {"myProfile": {"verifiedPersonalInformation": None}}}
 
         assert_that(self.reader.get_user_birthday()).is_none()
 

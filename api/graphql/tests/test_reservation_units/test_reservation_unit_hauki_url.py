@@ -35,19 +35,13 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
         )
 
         cls.unit = UnitFactory(tprek_department_id="depid")
-        cls.reservation_unit = ReservationUnitFactory(
-            unit=cls.unit, uuid="3774af34-9916-40f2-acc7-68db5a627710"
-        )
-        cls.target_runit = ReservationUnitFactory(
-            unit=cls.unit, uuid="3774af34-9916-40f2-acc7-68db5a627711"
-        )
+        cls.reservation_unit = ReservationUnitFactory(unit=cls.unit, uuid="3774af34-9916-40f2-acc7-68db5a627710")
+        cls.target_runit = ReservationUnitFactory(unit=cls.unit, uuid="3774af34-9916-40f2-acc7-68db5a627711")
         cls.target_reservation_unit_ids = [str(cls.target_runit.id)]
         cls.service_sector = ServiceSectorFactory(units=[cls.unit])
 
     def get_query(self, res_unit_id=None, target_reservation_unit_ids=None):
-        target_reservation_unit_ids = (
-            target_reservation_unit_ids or self.target_reservation_unit_ids
-        )
+        target_reservation_unit_ids = target_reservation_unit_ids or self.target_reservation_unit_ids
 
         target_res_units = ",".join([r for r in target_reservation_unit_ids])
 
@@ -92,9 +86,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
         self.assertMatchSnapshot(content)
 
     def test_service_sector_admin_can_get_the_url(self):
-        self.client.force_login(
-            self.create_service_sector_admin(service_sector=self.service_sector)
-        )
+        self.client.force_login(self.create_service_sector_admin(service_sector=self.service_sector))
         ServiceSectorRolePermission.objects.create(
             role=ServiceSectorRoleChoice.objects.get(code="admin"),
             permission="can_manage_units",
@@ -132,9 +124,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
         self.client.force_login(self.general_admin)
         res_unit = ReservationUnitFactory(unit=UnitFactory())
         target_res_units = self.target_reservation_unit_ids + [str(res_unit.id)]
-        response = self.query(
-            self.get_query(target_reservation_unit_ids=target_res_units)
-        )
+        response = self.query(self.get_query(target_reservation_unit_ids=target_res_units))
 
         content = json.loads(response.content)
 

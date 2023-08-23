@@ -72,21 +72,15 @@ class Merchant:
                 email=cls._parse_configuration("merchantEmail", configurations),
                 phone=cls._parse_configuration("merchantPhone", configurations),
                 url=cls._parse_configuration("merchantUrl", configurations),
-                tos_url=cls._parse_configuration(
-                    "merchantTermsOfServiceUrl", configurations
-                ),
-                business_id=cls._parse_configuration(
-                    "merchantBusinessId", configurations
-                ),
+                tos_url=cls._parse_configuration("merchantTermsOfServiceUrl", configurations),
+                business_id=cls._parse_configuration("merchantBusinessId", configurations),
                 shop_id=cls._parse_configuration("merchantShopId", configurations),
             )
         except (KeyError, ValueError) as e:
             raise ParseMerchantError(f"Could not parse merchant: {e}")
 
     @classmethod
-    def _parse_configuration(
-        cls, key: str, configurations: List[Dict[str, Any]]
-    ) -> str:
+    def _parse_configuration(cls, key: str, configurations: List[Dict[str, Any]]) -> str:
         for config in configurations:
             if config["key"] == key:
                 return config["value"]

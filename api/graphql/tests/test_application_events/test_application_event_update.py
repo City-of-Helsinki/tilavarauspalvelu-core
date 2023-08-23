@@ -119,16 +119,10 @@ class ApplicationEventUpdateTestCase(ApplicationEventPermissionsTestCaseBase):
         schedule = app_event.application_event_schedules.first()
         assert_that(schedule.id).is_not_equal_to(self.schedule.id)
         assert_that(schedule.day).is_equal_to(self.get_schedule_data()["day"])
-        assert_that(schedule.begin).is_equal_to(
-            datetime.time().fromisoformat(self.get_schedule_data()["begin"])
-        )
-        assert_that(schedule.end).is_equal_to(
-            datetime.time().fromisoformat(self.get_schedule_data()["end"])
-        )
+        assert_that(schedule.begin).is_equal_to(datetime.time().fromisoformat(self.get_schedule_data()["begin"]))
+        assert_that(schedule.end).is_equal_to(datetime.time().fromisoformat(self.get_schedule_data()["end"]))
         assert_that(app_event.event_reservation_units.count()).is_equal_to(1)
-        assert_that(
-            app_event.event_reservation_units.first().reservation_unit.id
-        ).is_equal_to(self.reservation_unit.id)
+        assert_that(app_event.event_reservation_units.first().reservation_unit.id).is_equal_to(self.reservation_unit.id)
         assert_that(app_event.name).is_equal_to(data["name"])
         assert_that(app_event.num_persons).is_equal_to(data["numPersons"])
         assert_that(app_event.age_group_id).is_equal_to(self.age_group.id)
@@ -140,9 +134,7 @@ class ApplicationEventUpdateTestCase(ApplicationEventPermissionsTestCaseBase):
         assert_that(app_event.events_per_week).is_equal_to(data["eventsPerWeek"])
         assert_that(app_event.biweekly).is_equal_to(data["biweekly"])
         assert_that(app_event.end).is_equal_to(datetime.date.fromisoformat(data["end"]))
-        assert_that(app_event.begin).is_equal_to(
-            datetime.date.fromisoformat(data["begin"])
-        )
+        assert_that(app_event.begin).is_equal_to(datetime.date.fromisoformat(data["begin"]))
         assert_that(app_event.status).is_equal_to(data["status"])
         assert_that(ApplicationEvent.objects.count()).is_equal_to(2)
 
@@ -217,9 +209,7 @@ class ApplicationEventUpdateTestCase(ApplicationEventPermissionsTestCaseBase):
     def test_wrong_service_sector_admin_cannot_create_to_application(
         self,
     ):
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=ServiceSectorFactory()
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=ServiceSectorFactory())
         self.client.force_login(service_sector_admin)
         data = self.get_event_data()
 

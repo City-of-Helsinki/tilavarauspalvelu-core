@@ -81,9 +81,7 @@ def get_opening_hours(
 
     resource_prefix = f"{hauki_origin_id}"
     if not (settings.HAUKI_API_URL and resource_prefix):
-        raise HaukiConfigurationError(
-            "Both hauki api url and hauki origin id need to be configured"
-        )
+        raise HaukiConfigurationError("Both hauki api url and hauki origin id need to be configured")
     if isinstance(resource_id, list):
         resource_id = [str(uuid) for uuid in resource_id]
         resource_id = "%s:%s" % (
@@ -97,9 +95,7 @@ def get_opening_hours(
     if isinstance(end_date, datetime.date):
         end_date = end_date.isoformat()
 
-    resource_opening_hours_url = (
-        f"{settings.HAUKI_API_URL}/v1/opening_hours/?resource={resource_id}"
-    )
+    resource_opening_hours_url = f"{settings.HAUKI_API_URL}/v1/opening_hours/?resource={resource_id}"
     query_params = {
         "start_date": start_date,
         "end_date": end_date,
@@ -108,17 +104,13 @@ def get_opening_hours(
 
     days_data_out = []
     for day_data_in in days_data_in["results"]:
-        timezone = ZoneInfo(
-            day_data_in.get("resource", {}).get("timezone", DEFAULT_TIMEZONE.key)
-        )
+        timezone = ZoneInfo(day_data_in.get("resource", {}).get("timezone", DEFAULT_TIMEZONE.key))
         for opening_hours in day_data_in["opening_hours"]:
             day_data_out = {
                 "timezone": timezone,
                 "resource_id": day_data_in["resource"]["id"],
                 "origin_id": day_data_in["resource"]["origins"][0]["origin_id"],
-                "date": datetime.datetime.strptime(
-                    opening_hours["date"], "%Y-%m-%d"
-                ).date(),
+                "date": datetime.datetime.strptime(opening_hours["date"], "%Y-%m-%d").date(),
                 "times": [],
             }
             for time_data_in in opening_hours["times"]:
@@ -128,12 +120,8 @@ def get_opening_hours(
 
                 day_data_out["times"].append(
                     TimeElement(
-                        start_time=datetime.time.fromisoformat(start_time)
-                        if start_time
-                        else None,
-                        end_time=datetime.time.fromisoformat(end_time)
-                        if end_time
-                        else None,
+                        start_time=datetime.time.fromisoformat(start_time) if start_time else None,
+                        end_time=datetime.time.fromisoformat(end_time) if end_time else None,
                         resource_state=State.get(state),
                         **time_data_in,
                     )
@@ -142,18 +130,14 @@ def get_opening_hours(
     return days_data_out
 
 
-def get_periods_for_resource(
-    resource_id: Union[str, int, list], hauki_origin_id=None
-) -> List[Period]:
+def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id=None) -> List[Period]:
     """Get periods for Hauki resource"""
     if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
 
     resource_prefix = f"{hauki_origin_id}"
     if not (settings.HAUKI_API_URL and resource_prefix):
-        raise HaukiConfigurationError(
-            "Both hauki api url and hauki origin id need to be configured"
-        )
+        raise HaukiConfigurationError("Both hauki api url and hauki origin id need to be configured")
     if isinstance(resource_id, list):
         resource_id = [str(uuid) for uuid in resource_id]
         resource_id = "%s:%s" % (
@@ -163,9 +147,7 @@ def get_periods_for_resource(
     else:
         resource_id = f"{resource_prefix}:{resource_id}"
 
-    resource_periods_url = (
-        f"{settings.HAUKI_API_URL}/v1/date_period/?resource={resource_id}"
-    )
+    resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/?resource={resource_id}"
 
     periods_data_in = make_hauki_get_request(resource_periods_url, None)
 
@@ -174,14 +156,10 @@ def get_periods_for_resource(
         period_data_out = {
             "id": period["id"],
             "resource": period["resource"],
-            "start_date": datetime.datetime.strptime(
-                period["start_date"], "%Y-%m-%d"
-            ).date()
+            "start_date": datetime.datetime.strptime(period["start_date"], "%Y-%m-%d").date()
             if period["start_date"]
             else None,
-            "end_date": datetime.datetime.strptime(
-                period["end_date"], "%Y-%m-%d"
-            ).date()
+            "end_date": datetime.datetime.strptime(period["end_date"], "%Y-%m-%d").date()
             if period["end_date"]
             else None,
             "description": period["description"],
@@ -193,12 +171,8 @@ def get_periods_for_resource(
             for time_data_in in time_span_group["time_spans"]:
                 period_data_out["time_spans"].append(
                     TimeSpan(
-                        start_time=datetime.time.fromisoformat(
-                            time_data_in.pop("start_time")
-                        ),
-                        end_time=datetime.time.fromisoformat(
-                            time_data_in.pop("end_time")
-                        ),
+                        start_time=datetime.time.fromisoformat(time_data_in.pop("start_time")),
+                        end_time=datetime.time.fromisoformat(time_data_in.pop("end_time")),
                         **time_data_in,
                     )
                 )

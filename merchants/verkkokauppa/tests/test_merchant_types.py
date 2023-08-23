@@ -86,12 +86,8 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
         expected = Merchant(
             id=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
             namespace="tilanvaraus",
-            created_at=datetime(
-                2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
-            ),
-            updated_at=datetime(
-                2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
-            ),
+            created_at=datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+            updated_at=datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
             name="Test Merchant",
             street="Test Street 1",
             zip="00112",
@@ -110,12 +106,8 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
         expected = Merchant(
             id=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
             namespace="tilanvaraus",
-            created_at=datetime(
-                2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
-            ),
-            updated_at=datetime(
-                2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
-            ),
+            created_at=datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+            updated_at=datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
             name="",
             street="",
             zip="",
@@ -136,9 +128,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
     def test_merchant_from_json_missing_field(self):
         response = self.mutation_merchant_response.copy()
         response.pop("merchantId")
-        assert_that(Merchant.from_json).raises(ParseMerchantError).when_called_with(
-            response
-        )
+        assert_that(Merchant.from_json).raises(ParseMerchantError).when_called_with(response)
 
     def test_create_merchant_params_to_json(self):
         params = CreateMerchantParams(

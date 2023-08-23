@@ -22,9 +22,7 @@ class ResolveUserTestCase(TestCase):
             "data": {
                 "myProfile": {
                     "id": "aaa-bbb-ccc",
-                    "verifiedPersonalInformation": {
-                        "nationalIdentificationNumber": "120345-6789"
-                    },
+                    "verifiedPersonalInformation": {"nationalIdentificationNumber": "120345-6789"},
                 }
             }
         }
@@ -88,9 +86,7 @@ class ResolveUserTestCase(TestCase):
         assert_that(self.user.profile_id).is_equal_to(profile_id)
 
     @mock.patch("users.utils.open_city_profile.birthday_resolver.capture_exception")
-    def test_reading_user_profile_id_raises_sends_to_sentry(
-        self, mock_sentry, req_mock
-    ):
+    def test_reading_user_profile_id_raises_sends_to_sentry(self, mock_sentry, req_mock):
         req_mock.return_value.status_code = 500
 
         resolve_user(self.request, self.get_payload())

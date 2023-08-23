@@ -79,9 +79,7 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
             return None
 
         now = datetime.now(tz=timezone.utc).astimezone(get_default_timezone())
-        expired = now - timedelta(
-            minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
-        )
+        expired = now - timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
 
         if self.created_at > expired:
             return self.checkout_url

@@ -66,9 +66,7 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
                     "Reservation cannot be cancelled thus no cancellation rule.",
                     ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
                 )
-            must_be_cancelled_before = (
-                self.instance.begin - cancel_rule.can_be_cancelled_time_before
-            )
+            must_be_cancelled_before = self.instance.begin - cancel_rule.can_be_cancelled_time_before
             if must_be_cancelled_before < now:
                 raise ValidationErrorWithCode(
                     "Reservation cannot be cancelled because the cancellation period has expired.",
@@ -87,9 +85,7 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
 
         payment_order = PaymentOrder.objects.filter(reservation=self.instance).first()
         payment_is_refundable = (
-            payment_order
-            and payment_order.status == OrderStatus.PAID
-            and not payment_order.refund_id
+            payment_order and payment_order.status == OrderStatus.PAID and not payment_order.refund_id
         )
 
         if payment_is_refundable and self.instance.price_net > 0:

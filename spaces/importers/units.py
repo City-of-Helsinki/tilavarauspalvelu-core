@@ -105,15 +105,11 @@ class UnitImporter:
             created = self.create_unit(row)
             self._update_counters(created)
 
-        logger.info(
-            "Created %s\nUpdated %s" % (self.creation_counter, self.update_counter)
-        )
+        logger.info("Created %s\nUpdated %s" % (self.creation_counter, self.update_counter))
         if self.import_hauki_resource_ids:
             hauki_importer = UnitHaukiResourceIdImporter()
             logger.info("Importing from Hauki...")
-            hauki_importer.import_hauki_resource_ids_for_units(
-                unit_ids=self.imported_unit_ids
-            )
+            hauki_importer.import_hauki_resource_ids_for_units(unit_ids=self.imported_unit_ids)
 
     def _update_counters(self, created: bool):
         if created:
@@ -126,19 +122,13 @@ class UnitImporter:
         """Creates or updates an Unit object"""
         unit_data = {}
         for model_field, data_field in self.field_map["unit"].items():
-            unit_data[model_field] = importer_data.get(
-                data_field, self.field_map["defaults"].get(model_field)
-            )
+            unit_data[model_field] = importer_data.get(data_field, self.field_map["defaults"].get(model_field))
 
-        unit, unit_created = Unit.objects.update_or_create(
-            tprek_id=importer_data.get("id"), defaults=unit_data
-        )
+        unit, unit_created = Unit.objects.update_or_create(tprek_id=importer_data.get("id"), defaults=unit_data)
 
         location_data = {}
         for model_field, data_field in self.field_map["location"].items():
-            location_data[model_field] = importer_data.get(
-                data_field, self.field_map["defaults"].get(model_field)
-            )
+            location_data[model_field] = importer_data.get(data_field, self.field_map["defaults"].get(model_field))
         location_data["unit"] = unit
 
         point = None
@@ -149,9 +139,7 @@ class UnitImporter:
 
         location_data["coordinates"] = point
 
-        location, _ = Location.objects.update_or_create(
-            unit=unit, defaults=location_data
-        )
+        location, _ = Location.objects.update_or_create(unit=unit, defaults=location_data)
 
         self.imported_unit_ids.append(unit.id)
 
@@ -210,4 +198,4 @@ class UnitHaukiResourceIdImporter:
                 unit.save()
                 resource_ids_updated.append(unit.tprek_id)
 
-        print(f"Updated resource ids for {len(resource_ids_updated)} units.")
+        print(f"Updated resource ids for {len(resource_ids_updated)} units.")  # noqa: T201

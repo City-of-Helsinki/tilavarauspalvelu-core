@@ -63,9 +63,7 @@ class OrganisationFactory(DjangoModelFactory):
 class PersonFactory(DjangoModelFactory):
     first_name = Faker("first_name")
     last_name = Faker("last_name")
-    email = LazyAttribute(
-        lambda o: f"{o.first_name.lower()}.{o.last_name.lower()}@example.com"
-    )
+    email = LazyAttribute(lambda o: f"{o.first_name.lower()}.{o.last_name.lower()}@example.com")
     phone_number = FuzzyText(length=7, chars=[str(c) for c in range(10)])
 
     class Meta:
@@ -93,9 +91,7 @@ class ApplicationRoundFactory(DjangoModelFactory):
         start_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
         end_dt=(datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(weeks=4)),
     )
-    reservation_period_begin = FuzzyDate(
-        start_date=datetime.date.today(), end_date=datetime.date.today()
-    )
+    reservation_period_begin = FuzzyDate(start_date=datetime.date.today(), end_date=datetime.date.today())
     reservation_period_end = FuzzyDate(
         start_date=(datetime.date.today() + datetime.timedelta(days=1)),
         end_date=(datetime.date.today() + datetime.timedelta(weeks=4)),
@@ -205,9 +201,7 @@ class ApplicationEventScheduleFactory(DjangoModelFactory):
     begin = datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE)
     application_event = SubFactory(ApplicationEventFactory)
-    priority = FuzzyChoice(
-        choices=[choice[0] for choice in PRIORITIES.PRIORITY_CHOICES]
-    )
+    priority = FuzzyChoice(choices=[choice[0] for choice in PRIORITIES.PRIORITY_CHOICES])
 
 
 class ApplicationEventScheduleResultFactory(DjangoModelFactory):

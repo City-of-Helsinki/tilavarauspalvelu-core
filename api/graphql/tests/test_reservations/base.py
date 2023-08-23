@@ -35,9 +35,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.space = SpaceFactory()
         cls.unit = UnitFactory(name="unit")
         cls.service_sector = ServiceSectorFactory(units=[cls.unit])
-        cls.reservation_unit_type = ReservationUnitTypeFactory(
-            name="reservation_unit_type"
-        )
+        cls.reservation_unit_type = ReservationUnitTypeFactory(name="reservation_unit_type")
         cls.payment_merchant = PaymentMerchantFactory()
         cls.payment_product = PaymentProductFactory(merchant=cls.payment_merchant)
         cls.reservation_unit = ReservationUnitFactory(
@@ -62,14 +60,10 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
         cls.unit_role_choice = UnitRoleChoice.objects.create(code="reservation_manager")
 
-        cls.unit_role = UnitRole.objects.create(
-            role=cls.unit_role_choice, user=cls.reservation_handler
-        )
+        cls.unit_role = UnitRole.objects.create(role=cls.unit_role_choice, user=cls.reservation_handler)
         cls.unit_role.unit.add(cls.unit)
 
-        UnitRolePermission.objects.create(
-            role=cls.unit_role_choice, permission="can_manage_reservations"
-        )
+        UnitRolePermission.objects.create(role=cls.unit_role_choice, permission="can_manage_reservations")
 
         cls.reservation_viewer = get_user_model().objects.create(
             username="res_viewer",
@@ -80,16 +74,12 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
         unit_group_viewer_role_choice = UnitRoleChoice.objects.get(code="viewer")
 
-        cls.unit_group_role = UnitRole.objects.create(
-            role=unit_group_viewer_role_choice, user=cls.reservation_viewer
-        )
+        cls.unit_group_role = UnitRole.objects.create(role=unit_group_viewer_role_choice, user=cls.reservation_viewer)
 
         cls.unit_group = UnitGroupFactory(units=[cls.unit])
         cls.unit_group_role.unit_group.add(cls.unit_group)
 
-        UnitRolePermission.objects.create(
-            role=unit_group_viewer_role_choice, permission="can_view_reservations"
-        )
+        UnitRolePermission.objects.create(role=unit_group_viewer_role_choice, permission="can_view_reservations")
 
     def get_mocked_opening_hours(
         self,
@@ -106,15 +96,9 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}"
         origin_id = str(reservation_unit.uuid)
 
-        return [
-            self._get_single_opening_hour_block(
-                resource_id, origin_id, date, start_hour, end_hour
-            )
-        ]
+        return [self._get_single_opening_hour_block(resource_id, origin_id, date, start_hour, end_hour)]
 
-    def _get_single_opening_hour_block(
-        self, resource_id, origin_id, date, start_hour, end_hour
-    ):
+    def _get_single_opening_hour_block(self, resource_id, origin_id, date, start_hour, end_hour):
         return {
             "timezone": DEFAULT_TIMEZONE,
             "resource_id": resource_id,

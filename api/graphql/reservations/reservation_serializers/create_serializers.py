@@ -38,9 +38,7 @@ from users.utils.open_city_profile.basic_info_resolver import (
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class ReservationCreateSerializer(
-    PrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin
-):
+class ReservationCreateSerializer(PrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
     state = ChoiceCharField(
         help_text="Read only string value for ReservationType's ReservationState enum.",
         choices=STATE_CHOICES.STATE_CHOICES,
@@ -50,15 +48,9 @@ class ReservationCreateSerializer(
         source="reservation_unit",
     )
     priority = serializers.IntegerField(required=False)
-    purpose_pk = IntegerPrimaryKeyField(
-        queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True
-    )
-    home_city_pk = IntegerPrimaryKeyField(
-        queryset=City.objects.all(), source="home_city", allow_null=True
-    )
-    age_group_pk = IntegerPrimaryKeyField(
-        queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
-    )
+    purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
+    home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
+    age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
     reservee_type = ChoiceCharField(
         choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
         help_text=(
@@ -66,9 +58,7 @@ class ReservationCreateSerializer(
             f"Possible values are {', '.join(value[0].upper() for value in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)}."
         ),
     )
-    reservee_language = ChoiceCharField(
-        choices=RESERVEE_LANGUAGE_CHOICES, required=False, default=""
-    )
+    reservee_language = ChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
     buffer_time_before = DurationField(required=False)
     buffer_time_after = DurationField(required=False)
     type = ChoiceCharField(
@@ -174,9 +164,7 @@ class ReservationCreateSerializer(
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_units = data.get(
-            "reservation_unit", getattr(self.instance, "reservation_unit", None)
-        )
+        reservation_units = data.get("reservation_unit", getattr(self.instance, "reservation_unit", None))
         if hasattr(reservation_units, "all"):
             reservation_units = reservation_units.all()
 
@@ -186,20 +174,14 @@ class ReservationCreateSerializer(
             self.check_reservation_time(reservation_unit)
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_reservation_duration(reservation_unit, begin, end)
-            self.check_buffer_times(
-                reservation_unit, begin, end, reservation_type=reservation_type
-            )
+            self.check_buffer_times(reservation_unit, begin, end, reservation_type=reservation_type)
             self.check_reservation_days_before(begin, reservation_unit)
-            self.check_max_reservations_per_user(
-                self.context.get("request").user, reservation_unit
-            )
+            self.check_max_reservations_per_user(self.context.get("request").user, reservation_unit)
             self.check_sku(sku, reservation_unit.sku)
             self.check_reservation_kind(reservation_unit)
 
             # Scheduler dependent checks.
-            scheduler = ReservationUnitReservationScheduler(
-                reservation_unit, opening_hours_end=end.date()
-            )
+            scheduler = ReservationUnitReservationScheduler(reservation_unit, opening_hours_end=end.date())
             self.check_opening_hours(scheduler, begin, end)
             self.check_open_application_round(scheduler, begin, end)
             self.check_reservation_start_time(scheduler, begin)
@@ -208,14 +190,10 @@ class ReservationCreateSerializer(
 
         data["sku"] = sku
         data["state"] = STATE_CHOICES.CREATED
-        data[
-            "buffer_time_before"
-        ] = self._get_biggest_buffer_time_from_reservation_units(
+        data["buffer_time_before"] = self._get_biggest_buffer_time_from_reservation_units(
             "buffer_time_before", reservation_units
         )
-        data[
-            "buffer_time_after"
-        ] = self._get_biggest_buffer_time_from_reservation_units(
+        data["buffer_time_after"] = self._get_biggest_buffer_time_from_reservation_units(
             "buffer_time_after", reservation_units
         )
         user = self.context.get("request").user
@@ -225,20 +203,16 @@ class ReservationCreateSerializer(
         data["user"] = user
 
         if self.requires_price_calculation(data):
-            price_calculation_result = self.calculate_price(
-                begin, end, reservation_units
-            )
+            price_calculation_result = self.calculate_price(begin, end, reservation_units)
             data["price"] = price_calculation_result.reservation_price
             data["unit_price"] = price_calculation_result.unit_price
             data["tax_percentage_value"] = price_calculation_result.tax_percentage
             data["price_net"] = price_calculation_result.reservation_price_net
             data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
-            data[
-                "non_subsidised_price_net"
-            ] = price_calculation_result.non_subsidised_price_net
+            data["non_subsidised_price_net"] = price_calculation_result.non_subsidised_price_net
 
         reservation_type = data.get("type", None)
-        reservation_unit_ids = list(map(lambda x: x.pk, reservation_units))
+        reservation_unit_ids = [x.pk for x in reservation_units]
         self.check_reservation_type(user, reservation_unit_ids, reservation_type)
 
         if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA and prefill_from_profile:
@@ -250,9 +224,7 @@ class ReservationCreateSerializer(
         self, field: str, reservation_units: List[ReservationUnit]
     ) -> [datetime.timedelta]:
         buffer_times = [
-            getattr(res_unit, field)
-            for res_unit in reservation_units
-            if getattr(res_unit, field, None) is not None
+            getattr(res_unit, field) for res_unit in reservation_units if getattr(res_unit, field, None) is not None
         ]
         return max(buffer_times, default=None)
 
@@ -268,9 +240,7 @@ class ReservationCreateSerializer(
                 "home_city": reader.get_user_home_city(),
             }
 
-            for key, value in [
-                (key, value) for key, value in basic_details.items() if value
-            ]:
+            for key, value in [(key, value) for key, value in basic_details.items() if value]:
                 data[key] = value
 
             address = reader.get_address()
@@ -319,12 +289,8 @@ class ReservationCreateSerializer(
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
 
-    def check_reservation_type(
-        self, user, reservation_unit_ids: List[int], reservation_type: Optional[str]
-    ):
-        if reservation_type is None or can_handle_reservation_with_units(
-            user, reservation_unit_ids
-        ):
+    def check_reservation_type(self, user, reservation_unit_ids: List[int], reservation_type: Optional[str]):
+        if reservation_type is None or can_handle_reservation_with_units(user, reservation_unit_ids):
             return
 
         raise GraphQLError("You don't have permissions to set type")

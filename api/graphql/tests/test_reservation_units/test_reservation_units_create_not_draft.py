@@ -85,17 +85,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
                     "pricingType": PricingType.PAID,
                     "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
                     "lowestPrice": 10.5,
-                    "lowestPriceNet": float(
-                        round_decimal(
-                            Decimal("10.5") / (1 + self.tax_percentage.decimal), 6
-                        )
-                    ),
+                    "lowestPriceNet": float(round_decimal(Decimal("10.5") / (1 + self.tax_percentage.decimal), 6)),
                     "highestPrice": 18.8,
-                    "highestPriceNet": float(
-                        round_decimal(
-                            Decimal("18.8") / (1 + self.tax_percentage.decimal), 6
-                        )
-                    ),
+                    "highestPriceNet": float(round_decimal(Decimal("18.8") / (1 + self.tax_percentage.decimal), 6)),
                     "taxPercentagePk": self.tax_percentage.id,
                     "status": PricingStatus.PRICING_STATUS_ACTIVE,
                 }
@@ -124,36 +116,24 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.spaces.first().id).is_equal_to(self.space.id)
         assert_that(res_unit.resources.first().id).is_equal_to(self.resource.id)
         assert_that(res_unit.services.first().id).is_equal_to(self.service.id)
-        assert_that(res_unit.reservation_unit_type).is_equal_to(
-            self.reservation_unit_type
-        )
+        assert_that(res_unit.reservation_unit_type).is_equal_to(self.reservation_unit_type)
         assert_that(res_unit.surface_area).is_equal_to(data.get("surfaceArea"))
         assert_that(res_unit.max_persons).is_equal_to(data.get("maxPersons"))
         assert_that(res_unit.min_persons).is_equal_to(data.get("minPersons"))
         assert_that(res_unit.buffer_time_after).is_equal_to(datetime.timedelta(hours=1))
-        assert_that(res_unit.buffer_time_before).is_equal_to(
-            datetime.timedelta(hours=1)
-        )
+        assert_that(res_unit.buffer_time_before).is_equal_to(datetime.timedelta(hours=1))
         assert_that(res_unit.cancellation_rule).is_equal_to(self.rule)
-        assert_that(res_unit.reservation_start_interval.upper()).is_equal_to(
-            data.get("reservationStartInterval")
-        )
+        assert_that(res_unit.reservation_start_interval.upper()).is_equal_to(data.get("reservationStartInterval"))
         publish_begins = datetime.datetime.fromisoformat(data.get("publishBegins"))
         assert_that(res_unit.publish_begins).is_equal_to(publish_begins)
         publish_ends = datetime.datetime.fromisoformat(data.get("publishEnds"))
         assert_that(res_unit.publish_ends).is_equal_to(publish_ends)
-        reservation_begins = datetime.datetime.fromisoformat(
-            data.get("reservationBegins")
-        )
+        reservation_begins = datetime.datetime.fromisoformat(data.get("reservationBegins"))
         assert_that(res_unit.reservation_begins).is_equal_to(reservation_begins)
-        reservation_ends = datetime.datetime.fromisoformat(
-            data.get("reservationBegins")
-        )
+        reservation_ends = datetime.datetime.fromisoformat(data.get("reservationBegins"))
         assert_that(res_unit.reservation_ends).is_equal_to(reservation_ends)
         assert_that(res_unit.metadata_set).is_equal_to(self.metadata_set)
-        assert_that(res_unit.max_reservations_per_user).is_equal_to(
-            data.get("maxReservationsPerUser")
-        )
+        assert_that(res_unit.max_reservations_per_user).is_equal_to(data.get("maxReservationsPerUser"))
         assert_that(res_unit.require_reservation_handling).is_equal_to(True)
         assert_that(res_unit.authentication).is_equal_to("strong")
         assert_that(res_unit.reservation_kind).is_equal_to(ReservationKind.DIRECT)
@@ -166,23 +146,15 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         tax_percentage = TaxPercentage.objects.get(pk=pricing_data["taxPercentagePk"])
 
         assert_that(res_unit.pricings.count()).is_equal_to(len(data.get("pricings")))
-        assert_that(pricing.begins.strftime("%Y-%m-%d")).is_equal_to(
-            pricing_data["begins"]
-        )
+        assert_that(pricing.begins.strftime("%Y-%m-%d")).is_equal_to(pricing_data["begins"])
         assert_that(pricing.pricing_type).is_equal_to(pricing_data["pricingType"])
         assert_that(pricing.price_unit).is_equal_to(pricing_data["priceUnit"])
-        assert_that(pricing.lowest_price).is_close_to(
-            Decimal(pricing_data["lowestPrice"]), Decimal("0.001")
-        )
-        assert_that(pricing.highest_price).is_close_to(
-            Decimal(pricing_data["highestPrice"]), Decimal("0.001")
-        )
+        assert_that(pricing.lowest_price).is_close_to(Decimal(pricing_data["lowestPrice"]), Decimal("0.001"))
+        assert_that(pricing.highest_price).is_close_to(Decimal(pricing_data["highestPrice"]), Decimal("0.001"))
         assert_that(pricing.tax_percentage).is_equal_to(tax_percentage)
         assert_that(pricing.status).is_equal_to(pricing_data["status"])
 
-    @mock.patch(
-        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
-    )
+    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called(self, send_resource_mock):
         res = HaukiResource(
@@ -211,12 +183,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
-    @mock.patch(
-        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
-    )
-    def test_send_resource_to_hauki_errors_returns_error_message(
-        self, send_resource_mock
-    ):
+    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    def test_send_resource_to_hauki_errors_returns_error_message(self, send_resource_mock):
         send_resource_mock.side_effect = HaukiAPIError()
 
         data = self.get_valid_data()
@@ -404,9 +372,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.spaces.all().values_list("id", flat=True))).is_in(
-            data.get("spacePks")
-        )
+        assert_that(list(res_unit.spaces.all().values_list("id", flat=True))).is_in(data.get("spacePks"))
 
     def test_create_with_multiple_purposes(self):
         purposes = PurposeFactory.create_batch(5)
@@ -423,9 +389,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.purposes.all().values_list("id", flat=True))).is_in(
-            data.get("purposePks")
-        )
+        assert_that(list(res_unit.purposes.all().values_list("id", flat=True))).is_in(data.get("purposePks"))
 
     def test_create_errors_on_wrong_type_of_purpose_pk(self):
         data = self.get_valid_data()
@@ -451,9 +415,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.qualifiers.all().values_list("id", flat=True))).is_in(
-            data.get("qualifierPks")
-        )
+        assert_that(list(res_unit.qualifiers.all().values_list("id", flat=True))).is_in(data.get("qualifierPks"))
 
     def test_create_errors_on_wrong_type_of_qualifier_pk(self):
         data = self.get_valid_data()
@@ -479,9 +441,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.services.all().values_list("id", flat=True))).is_in(
-            data.get("servicePks")
-        )
+        assert_that(list(res_unit.services.all().values_list("id", flat=True))).is_in(data.get("servicePks"))
 
     def test_create_errors_on_wrong_type_of_service_pk(self):
         data = self.get_valid_data()
@@ -507,9 +467,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.resources.all().values_list("id", flat=True))).is_in(
-            data.get("resourcePks")
-        )
+        assert_that(list(res_unit.resources.all().values_list("id", flat=True))).is_in(data.get("resourcePks"))
 
     def test_create_with_multiple_equipments(self):
         equipments = EquipmentFactory.create_batch(5)
@@ -526,9 +484,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.equipments.all().values_list("id", flat=True))).is_in(
-            data.get("equipmentPks")
-        )
+        assert_that(list(res_unit.equipments.all().values_list("id", flat=True))).is_in(data.get("equipmentPks"))
 
     def test_create_errors_on_wrong_type_of_equipment_pk(self):
         data = self.get_valid_data()
@@ -559,9 +515,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "minPersons can't be more than maxPersons"
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("minPersons can't be more than maxPersons")
         assert_that(ReservationUnit.objects.exists()).is_false()
 
     def test_reservation_kind_defaults_to_direct_and_season(self):
@@ -576,9 +530,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.reservation_kind).is_equal_to(
-            ReservationKind.DIRECT_AND_SEASON
-        )
+        assert_that(res_unit.reservation_kind).is_equal_to(ReservationKind.DIRECT_AND_SEASON)
 
     def test_create_with_instructions(self):
         self.client.force_login(self.general_admin)
@@ -598,13 +550,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservationUnit").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservationUnit").get("pk")).is_not_none()
 
-        created_unit = ReservationUnit.objects.get(
-            pk=content.get("data").get("createReservationUnit").get("pk")
-        )
+        created_unit = ReservationUnit.objects.get(pk=content.get("data").get("createReservationUnit").get("pk"))
         assert_that(created_unit).is_not_none()
         assert_that(created_unit.reservation_pending_instructions_fi).is_equal_to(
             data["reservationPendingInstructionsFi"]

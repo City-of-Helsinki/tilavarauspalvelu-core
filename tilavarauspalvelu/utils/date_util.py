@@ -24,9 +24,7 @@ def next_or_current_matching_weekday(d: datetime.date, weekday: int) -> datetime
     return d + datetime.timedelta(days_ahead)
 
 
-def previous_or_current_matching_weekday(
-    d: datetime.date, weekday: int
-) -> datetime.date:
+def previous_or_current_matching_weekday(d: datetime.date, weekday: int) -> datetime.date:
     validate_weekday(weekday=weekday)
     days_ahead = weekday - d.weekday()
     if days_ahead > 0:  # Target day already happened this week
@@ -49,15 +47,11 @@ def localized_short_weekday(weekday: int, lang_code: str) -> str:
 
 def start_of_day(date: Optional[datetime.date]) -> datetime.datetime:
     if date:
-        return datetime.datetime.combine(
-            date, datetime.time.min, tzinfo=get_default_timezone()
-        )
+        return datetime.datetime.combine(date, datetime.time.min, tzinfo=get_default_timezone())
     return None
 
 
 def end_of_day(date: Optional[datetime.date]) -> datetime.datetime:
     if date:
-        return datetime.datetime.combine(
-            date, datetime.time.max, tzinfo=get_default_timezone()
-        )
+        return datetime.datetime.combine(date, datetime.time.max, tzinfo=get_default_timezone())
     return None

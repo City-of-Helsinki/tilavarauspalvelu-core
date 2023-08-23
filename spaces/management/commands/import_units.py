@@ -49,9 +49,7 @@ class Command(BaseCommand):
         import_hauki_resource_ids = options.get("import_hauki_resource_ids", False)
 
         if use_field_map:
-            importer = UnitImporter(
-                url, field_map=field_map, single=options.get("single")
-            )
+            importer = UnitImporter(url, field_map=field_map, single=options.get("single"))
         else:
             importer = UnitImporter(url, single=options.get("single"))
 
@@ -66,9 +64,7 @@ class Command(BaseCommand):
         for id in ids:
             importer.url = "{}{}".format(url, id)
             importer.import_units(import_hauki_resource_id=import_hauki_resource_ids)
-        return (
-            f"Created: {importer.creation_counter} Updated: {importer.update_counter}"
-        )
+        return f"Created: {importer.creation_counter} Updated: {importer.update_counter}"
 
     def get_version(self):
         """

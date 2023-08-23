@@ -48,9 +48,7 @@ from terms_of_use.models import TermsOfUse
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
-    category_pk = IntegerPrimaryKeyField(
-        queryset=EquipmentCategory.objects.all(), source="category"
-    )
+    category_pk = IntegerPrimaryKeyField(queryset=EquipmentCategory.objects.all(), source="category")
 
     class Meta(EquipmentSerializer.Meta):
         fields = [
@@ -72,9 +70,7 @@ class EquipmentUpdateSerializer(PrimaryKeyUpdateSerializer, EquipmentCreateSeria
         fields = EquipmentCreateSerializer.Meta.fields + ["pk"]
 
 
-class EquipmentCategoryCreateSerializer(
-    EquipmentCategorySerializer, PrimaryKeySerializer
-):
+class EquipmentCategoryCreateSerializer(EquipmentCategorySerializer, PrimaryKeySerializer):
     class Meta(EquipmentCategorySerializer.Meta):
         fields = ["pk"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
@@ -87,9 +83,7 @@ class EquipmentCategoryCreateSerializer(
         return data
 
 
-class EquipmentCategoryUpdateSerializer(
-    PrimaryKeyUpdateSerializer, EquipmentCategoryCreateSerializer
-):
+class EquipmentCategoryUpdateSerializer(PrimaryKeyUpdateSerializer, EquipmentCategoryCreateSerializer):
     class Meta(EquipmentCategoryCreateSerializer.Meta):
         fields = EquipmentCategoryCreateSerializer.Meta.fields + ["pk"]
 
@@ -118,8 +112,7 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
         required=False,
         choices=PriceUnit.choices,
         help_text=(
-            "Unit of the price. "
-            f"Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
+            "Unit of the price. " f"Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
         ),
     )
 
@@ -133,8 +126,7 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
         required=True,
         choices=PricingStatus.choices,
         help_text=(
-            "Pricing status. "
-            f"Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
+            "Pricing status. " f"Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
         ),
     )
 
@@ -158,9 +150,7 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
         ]
 
 
-class ReservationUnitPricingUpdateSerializer(
-    PrimaryKeyUpdateSerializer, ReservationUnitPricingCreateSerializer
-):
+class ReservationUnitPricingUpdateSerializer(PrimaryKeyUpdateSerializer, ReservationUnitPricingCreateSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["pk"].required = False
@@ -242,9 +232,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         allow_null=True,
     )
     cancellation_terms_pk = serializers.PrimaryKeyRelatedField(
-        queryset=TermsOfUse.objects.filter(
-            terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
-        ),
+        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
         source="cancellation_terms",
         required=False,
         allow_null=True,
@@ -295,21 +283,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         help_text="Allow reservations without opening hours. Used for testing.",
     )
 
-    is_archived = serializers.BooleanField(
-        required=False, default=False, help_text="Is reservation unit archived"
-    )
+    is_archived = serializers.BooleanField(required=False, default=False, help_text="Is reservation unit archived")
 
     payment_types = ValidatingListField(
-        child=serializers.PrimaryKeyRelatedField(
-            queryset=ReservationUnitPaymentType.objects.all()
-        ),
+        child=serializers.PrimaryKeyRelatedField(queryset=ReservationUnitPaymentType.objects.all()),
         allow_empty=True,
         required=False,
     )
 
-    pricings = ReservationUnitPricingCreateSerializer(
-        many=True, read_only=False, required=False
-    )
+    pricings = ReservationUnitPricingCreateSerializer(many=True, read_only=False, required=False)
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -430,27 +412,17 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         spaces = data.get("spaces", getattr(self.instance, "spaces", None))
         resources = data.get("resources", getattr(self.instance, "resources", None))
         if not (spaces or resources):
-            raise GraphQLError(
-                "Not draft state reservation unit must have one or more space or resource defined"
-            )
+            raise GraphQLError("Not draft state reservation unit must have one or more space or resource defined")
 
         reservation_unit_type = data.get(
             "reservation_unit_type",
             getattr(self.instance, "reservation_unit_type", None),
         )
         if not reservation_unit_type:
-            raise GraphQLError(
-                "Not draft reservation unit must have a reservation unit type."
-            )
+            raise GraphQLError("Not draft reservation unit must have a reservation unit type.")
 
-        max_persons = data.get(
-            "max_persons", getattr(self.instance, "max_persons", None)
-        )
-        if (
-            data.get("min_persons")
-            and max_persons
-            and data.get("min_persons") > max_persons
-        ):
+        max_persons = data.get("max_persons", getattr(self.instance, "max_persons", None))
+        if data.get("min_persons") and max_persons and data.get("min_persons") > max_persons:
             raise GraphQLError("minPersons can't be more than maxPersons")
 
     def validate_pricing_fields(self, data):
@@ -466,9 +438,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     @staticmethod
     def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
         for pricing in pricings:
-            ReservationUnitPricing.objects.create(
-                **pricing, reservation_unit=reservation_unit
-            )
+            ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
     def create(self, validated_data):
         pricings = validated_data.pop("pricings", [])
@@ -477,12 +447,8 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         return reservation_unit
 
 
-class ReservationUnitUpdateSerializer(
-    PrimaryKeyUpdateSerializer, ReservationUnitCreateSerializer
-):
-    pricings = ReservationUnitPricingUpdateSerializer(
-        many=True, read_only=False, required=True
-    )
+class ReservationUnitUpdateSerializer(PrimaryKeyUpdateSerializer, ReservationUnitCreateSerializer):
+    pricings = ReservationUnitPricingUpdateSerializer(many=True, read_only=False, required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -498,28 +464,16 @@ class ReservationUnitUpdateSerializer(
         return data
 
     def validate_pricing(self, data) -> Dict[str, Any]:
-        current_active_pricing = ReservationUnitPricingHelper.get_active_price(
-            self.instance
-        )
-        current_future_pricing = ReservationUnitPricingHelper.get_future_price(
-            self.instance
-        )
+        current_active_pricing = ReservationUnitPricingHelper.get_active_price(self.instance)
+        current_future_pricing = ReservationUnitPricingHelper.get_future_price(self.instance)
 
         for pricing in data.get("pricings"):
             if ReservationUnitPricingHelper.is_active(pricing):
-                if current_active_pricing and current_active_pricing.pk != pricing.get(
-                    "pk", 0
-                ):
-                    raise GraphQLError(
-                        "ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed"
-                    )
+                if current_active_pricing and current_active_pricing.pk != pricing.get("pk", 0):
+                    raise GraphQLError("ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed")
             elif ReservationUnitPricingHelper.is_future(pricing):
-                if current_future_pricing and current_future_pricing.pk != pricing.get(
-                    "pk", 0
-                ):
-                    raise GraphQLError(
-                        "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
-                    )
+                if current_future_pricing and current_future_pricing.pk != pricing.get("pk", 0):
+                    raise GraphQLError("FUTURE pricing is already defined. Only one FUTURE pricing is allowed")
 
         data = ReservationUnitPricingHelper.calculate_vat_prices(data)
         return data
@@ -527,16 +481,12 @@ class ReservationUnitUpdateSerializer(
     @staticmethod
     def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
         # Delete pricings that are not in the payload
-        if not ReservationUnitPricingHelper.contains_status(
-            PricingStatus.PRICING_STATUS_ACTIVE, pricings
-        ):
+        if not ReservationUnitPricingHelper.contains_status(PricingStatus.PRICING_STATUS_ACTIVE, pricings):
             ReservationUnitPricing.objects.filter(
                 reservation_unit=reservation_unit,
                 status=PricingStatus.PRICING_STATUS_ACTIVE,
             ).delete()
-        if not ReservationUnitPricingHelper.contains_status(
-            PricingStatus.PRICING_STATUS_FUTURE, pricings
-        ):
+        if not ReservationUnitPricingHelper.contains_status(PricingStatus.PRICING_STATUS_FUTURE, pricings):
             ReservationUnitPricing.objects.filter(
                 reservation_unit=reservation_unit,
                 status=PricingStatus.PRICING_STATUS_FUTURE,
@@ -544,17 +494,11 @@ class ReservationUnitUpdateSerializer(
 
         for pricing in pricings:
             if "pk" in pricing:  # Update existing pricings
-                ReservationUnitPricing.objects.update_or_create(
-                    pk=pricing["pk"], defaults=pricing
-                )
+                ReservationUnitPricing.objects.update_or_create(pk=pricing["pk"], defaults=pricing)
             else:  # Create new pricings
                 status = pricing.get("status")
-                ReservationUnitPricing.objects.filter(
-                    reservation_unit=reservation_unit, status=status
-                ).delete()
-                ReservationUnitPricing.objects.create(
-                    **pricing, reservation_unit=reservation_unit
-                )
+                ReservationUnitPricing.objects.filter(reservation_unit=reservation_unit, status=status).delete()
+                ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
     def update(self, instance, validated_data):
         pricings = validated_data.pop("pricings", [])
@@ -564,9 +508,7 @@ class ReservationUnitUpdateSerializer(
 
 
 class ReservationUnitImageCreateSerializer(PrimaryKeySerializer):
-    reservation_unit_pk = IntegerPrimaryKeyField(
-        queryset=ReservationUnit.objects.all(), source="reservation_unit"
-    )
+    reservation_unit_pk = IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all(), source="reservation_unit")
     image_type = serializers.CharField(
         help_text="Type of image. Value is one of image_type enum values: "
         f"{', '.join(value[0].upper() for value in ReservationUnitImage.TYPES)}.",

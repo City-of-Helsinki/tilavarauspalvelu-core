@@ -30,19 +30,13 @@ class ApplicationEventAggregateDataBaseTestCase(TestCase):
 
 
 @mock.patch("applications.utils.aggregate_data.EventAggregateDataCreator.start")
-class ApplicationEventAggregateDataCreatorTestCase(
-    ApplicationEventAggregateDataBaseTestCase
-):
-    def test_application_event_aggregate_data_creator_start_called_when_app_status_change_in_review(
-        self, mock
-    ):
+class ApplicationEventAggregateDataCreatorTestCase(ApplicationEventAggregateDataBaseTestCase):
+    def test_application_event_aggregate_data_creator_start_called_when_app_status_change_in_review(self, mock):
         assert_that(ApplicationEventAggregateData.objects.exists()).is_false()
         self.application_event.application.set_status(ApplicationStatus.IN_REVIEW)
         assert_that(mock.call_count).is_greater_than(0)
 
-    def test_application_event_aggregate_data_does_not_call_creator_start_when_app_status_not_in_review(
-        self, mock
-    ):
+    def test_application_event_aggregate_data_does_not_call_creator_start_when_app_status_not_in_review(self, mock):
         self.application_event.application.set_status(ApplicationStatus.DRAFT)
         assert_that(mock.called).is_false()
 

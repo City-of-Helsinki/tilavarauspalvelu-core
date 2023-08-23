@@ -69,9 +69,7 @@ class GetPaymentRequestsTestCase(TestCase):
         }
         order_id = UUID(self.get_payment_response["orderId"])
         namespace = self.get_payment_response["namespace"]
-        payment = get_payment(
-            order_id, namespace, mock_get(error_response, status_code=500)
-        )
+        payment = get_payment(order_id, namespace, mock_get(error_response, status_code=500))
         assert_that(payment).is_none()
 
     def test_get_payment_raises_exception_if_key_is_missing(self):
@@ -133,9 +131,7 @@ class RefundPaymentRequestsTestCase(TestCase):
         with raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
-        assert_that(str(ex.value)).is_equal_to(
-            "Payment refund failed: problem with upstream service"
-        )
+        assert_that(str(ex.value)).is_equal_to("Payment refund failed: problem with upstream service")
         assert_that(mock_capture.called).is_true()
 
     @mock.patch("merchants.verkkokauppa.payment.requests.capture_message")
@@ -150,9 +146,7 @@ class RefundPaymentRequestsTestCase(TestCase):
         with raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
-        assert_that(str(ex.value)).is_equal_to(
-            "Refund response refund count expected to be 1 but was 2"
-        )
+        assert_that(str(ex.value)).is_equal_to("Refund response refund count expected to be 1 but was 2")
         assert_that(mock_capture.called).is_true()
 
     @mock.patch("merchants.verkkokauppa.payment.requests.capture_exception")

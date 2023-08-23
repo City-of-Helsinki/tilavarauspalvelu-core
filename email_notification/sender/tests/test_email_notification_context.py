@@ -21,9 +21,7 @@ from spaces.tests.factories import LocationFactory, UnitFactory
 
 class EmailNotificationContextTestCase(TestCase):
     def setUp(self) -> None:
-        self.unit = UnitFactory.create(
-            name="Test unit", name_sv="Svensk test namn", name_en="English test name"
-        )
+        self.unit = UnitFactory.create(name="Test unit", name_sv="Svensk test namn", name_en="English test name")
         self.location = LocationFactory.create(
             unit=self.unit,
             address_street="Street",
@@ -42,12 +40,8 @@ class EmailNotificationContextTestCase(TestCase):
     def test_with_mock_data(self):
         context = EmailNotificationContext.with_mock_data()
         assert_that(context.reservee_name).is_equal_to("Email Test")
-        assert_that(context.begin_datetime).is_equal_to(
-            datetime.datetime(2100, 1, 1, 12, 00)
-        )
-        assert_that(context.end_datetime).is_equal_to(
-            datetime.datetime(2100, 1, 1, 13, 15)
-        )
+        assert_that(context.begin_datetime).is_equal_to(datetime.datetime(2100, 1, 1, 12, 00))
+        assert_that(context.end_datetime).is_equal_to(datetime.datetime(2100, 1, 1, 13, 15))
         assert_that(context.reservation_number).is_equal_to(1234567)
         assert_that(context.unit_location).is_equal_to("Testikatu 99999 Korvatunturi")
         assert_that(context.unit_name).is_equal_to("TOIMIPISTE")
@@ -101,28 +95,18 @@ class EmailNotificationContextTestCase(TestCase):
             f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
         )
         assert_that(context.reservation_name).is_equal_to(self.reservation.name)
-        assert_that(context.begin_datetime).is_equal_to(
-            self.reservation.begin.astimezone(get_default_timezone())
-        )
-        assert_that(context.end_datetime).is_equal_to(
-            self.reservation.end.astimezone(get_default_timezone())
-        )
+        assert_that(context.begin_datetime).is_equal_to(self.reservation.begin.astimezone(get_default_timezone()))
+        assert_that(context.end_datetime).is_equal_to(self.reservation.end.astimezone(get_default_timezone()))
         assert_that(context.reservation_number).is_equal_to(self.reservation.id)
         assert_that(context.unit_location).is_equal_to(
             f"{self.location.address_street} {self.location.address_zip} {self.location.address_city}"
         )
         assert_that(context.unit_name).is_equal_to(self.unit.name)
         assert_that(context.price).is_equal_to(self.reservation.price)
-        assert_that(context.non_subsidised_price).is_equal_to(
-            self.reservation.non_subsidised_price
-        )
+        assert_that(context.non_subsidised_price).is_equal_to(self.reservation.non_subsidised_price)
         assert_that(context.subsidised_price).is_equal_to(self.reservation.price)
-        assert_that(context.tax_percentage).is_equal_to(
-            self.reservation.tax_percentage_value
-        )
-        assert_that(context.reservee_language).is_equal_to(
-            self.reservation.reservee_language
-        )
+        assert_that(context.tax_percentage).is_equal_to(self.reservation.tax_percentage_value)
+        assert_that(context.reservee_language).is_equal_to(self.reservation.reservee_language)
         assert_that(context.confirmed_instructions["fi"]).is_equal_to(
             self.reservation_unit.reservation_confirmed_instructions_fi
         )
@@ -153,15 +137,9 @@ class EmailNotificationContextTestCase(TestCase):
         assert_that(context.deny_reason["fi"]).is_equal_to(self.deny_reason.reason_fi)
         assert_that(context.deny_reason["sv"]).is_equal_to(self.deny_reason.reason_sv)
         assert_that(context.deny_reason["en"]).is_equal_to(self.deny_reason.reason_en)
-        assert_that(context.cancel_reason["fi"]).is_equal_to(
-            self.cancel_reason.reason_fi
-        )
-        assert_that(context.cancel_reason["sv"]).is_equal_to(
-            self.cancel_reason.reason_sv
-        )
-        assert_that(context.cancel_reason["en"]).is_equal_to(
-            self.cancel_reason.reason_en
-        )
+        assert_that(context.cancel_reason["fi"]).is_equal_to(self.cancel_reason.reason_fi)
+        assert_that(context.cancel_reason["sv"]).is_equal_to(self.cancel_reason.reason_sv)
+        assert_that(context.cancel_reason["en"]).is_equal_to(self.cancel_reason.reason_en)
 
     def test_from_reservation_organisation_name(self):
         self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS
@@ -169,9 +147,7 @@ class EmailNotificationContextTestCase(TestCase):
         self.reservation.save()
 
         context = EmailNotificationContext.from_reservation(self.reservation)
-        assert_that(context.reservee_name).is_equal_to(
-            self.reservation.reservee_organisation_name
-        )
+        assert_that(context.reservee_name).is_equal_to(self.reservation.reservee_organisation_name)
 
     def test_from_reservation_no_location(self):
         self.location.delete()
@@ -204,9 +180,7 @@ class EmailNotificationContextTestCase(TestCase):
         self.reservation.save()
 
         context = EmailNotificationContext.from_reservation(self.reservation)
-        assert_that(context.reservation_unit_name).is_equal_to(
-            self.reservation_unit.name_sv
-        )
+        assert_that(context.reservation_unit_name).is_equal_to(self.reservation_unit.name_sv)
 
     def test_from_reservation_reservation_unit_name_uses_reservation_user_preferred_language(
         self,
@@ -222,6 +196,4 @@ class EmailNotificationContextTestCase(TestCase):
         self.reservation.save()
 
         context = EmailNotificationContext.from_reservation(self.reservation)
-        assert_that(context.reservation_unit_name).is_equal_to(
-            self.reservation_unit.name_sv
-        )
+        assert_that(context.reservation_unit_name).is_equal_to(self.reservation_unit.name_sv)

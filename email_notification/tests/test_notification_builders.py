@@ -21,45 +21,33 @@ from tilavarauspalvelu.utils.commons import LANGUAGES
 
 
 class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
-    def get_builder(
-        self, language: Optional[LANGUAGES] = None
-    ) -> ReservationEmailNotificationBuilder:
-        builder = ReservationEmailNotificationBuilder(
-            self.reservation, self.email_template
-        )
+    def get_builder(self, language: Optional[LANGUAGES] = None) -> ReservationEmailNotificationBuilder:
+        builder = ReservationEmailNotificationBuilder(self.reservation, self.email_template)
         if language:
             builder._set_language(language)
         return builder
 
     def test_get_reservee_name(self):
         reservee_name_str = f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
-        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(
-            reservee_name_str
-        )
+        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
 
     def test_get_reservee_name_when_reservee_type_business(self):
         self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS
         self.reservation.save()
         reservee_name_str = self.reservation.reservee_organisation_name
-        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(
-            reservee_name_str
-        )
+        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
 
     def test_get_reservee_name_when_reservee_type_nonprofit(self):
         self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT
         self.reservation.save()
         reservee_name_str = self.reservation.reservee_organisation_name
-        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(
-            reservee_name_str
-        )
+        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
 
     def test_get_begin_time(self):
         assert_that(self.get_builder()._get_begin_time()).is_equal_to("10:00")
 
     def test_get_begin_time_respects_timezone(self):
-        self.reservation.begin = datetime.datetime(
-            2022, 2, 28, 23, 00, tzinfo=timezone.utc
-        )
+        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
         assert_that(self.get_builder()._get_begin_time()).is_equal_to("01:00")
@@ -68,9 +56,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_begin_date()).is_equal_to("9.2.2022")
 
     def test_get_begin_date_respects_timezone(self):
-        self.reservation.begin = datetime.datetime(
-            2022, 2, 28, 23, 00, tzinfo=timezone.utc
-        )
+        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
         assert_that(self.get_builder()._get_begin_date()).is_equal_to("1.3.2022")
@@ -88,9 +74,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_end_date()).is_equal_to("9.2.2022")
 
     def test_get_end_date_respects_timezone(self):
-        self.reservation.end = datetime.datetime(
-            2022, 2, 28, 23, 00, tzinfo=timezone.utc
-        )
+        self.reservation.end = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
         assert_that(self.get_builder()._get_end_date()).is_equal_to("1.3.2022")
@@ -107,9 +91,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_unit_name()).is_equal_to(self.unit.name)
 
     def test_get_reservation_unit_when_single(self):
-        assert_that(self.get_builder()._get_reservation_unit()).is_equal_to(
-            self.reservation_unit.name
-        )
+        assert_that(self.get_builder()._get_reservation_unit()).is_equal_to(self.reservation_unit.name)
 
     def test_get_reservation_unit_when_multiple(self):
         res_unit_one = self.reservation_unit.name
@@ -119,22 +101,16 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         res_unit_too = res_unit.name
 
         self.reservation.reservation_unit.add(res_unit)
-        assert_that(self.get_builder()._get_reservation_unit()).is_equal_to(
-            f"{res_unit_one}, {res_unit_too}"
-        )
+        assert_that(self.get_builder()._get_reservation_unit()).is_equal_to(f"{res_unit_one}, {res_unit_too}")
 
     def test_get_price(self):
         assert_that(self.get_builder()._get_price()).is_equal_to(self.reservation.price)
 
     def test_get_non_subsidised_price(self):
-        assert_that(self.get_builder()._get_non_subsidised_price()).is_equal_to(
-            self.reservation.non_subsidised_price
-        )
+        assert_that(self.get_builder()._get_non_subsidised_price()).is_equal_to(self.reservation.non_subsidised_price)
 
     def test_get_tax_percentage(self):
-        assert_that(self.get_builder()._get_tax_percentage()).is_equal_to(
-            self.reservation.tax_percentage_value
-        )
+        assert_that(self.get_builder()._get_tax_percentage()).is_equal_to(self.reservation.tax_percentage_value)
 
     def test_get_current_year(self):
         now = datetime.datetime.now(timezone.get_default_timezone())
@@ -174,47 +150,33 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_get_deny_reason(self):
-        assert_that(self.get_builder()._get_deny_reason()).is_equal_to(
-            self.reservation.deny_reason.reason
-        )
+        assert_that(self.get_builder()._get_deny_reason()).is_equal_to(self.reservation.deny_reason.reason)
 
     def test_get_deny_reason_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_deny_reason()).is_equal_to(
-            self.reservation.deny_reason.reason_en
-        )
+        assert_that(builder._get_deny_reason()).is_equal_to(self.reservation.deny_reason.reason_en)
 
     def test_get_cancel_reason(self):
-        assert_that(self.get_builder()._get_cancel_reason()).is_equal_to(
-            self.reservation.cancel_reason.reason
-        )
+        assert_that(self.get_builder()._get_cancel_reason()).is_equal_to(self.reservation.cancel_reason.reason)
 
     def test_get_cancel_reason_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_cancel_reason()).is_equal_to(
-            self.reservation.cancel_reason.reason_en
-        )
+        assert_that(builder._get_cancel_reason()).is_equal_to(self.reservation.cancel_reason.reason_en)
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_fi(self):
         builder = self.get_builder(LANGUAGES.FI)
-        assert_that(builder._get_my_reservations_ext_link()).is_equal_to(
-            "https://thesite.com/reservations"
-        )
+        assert_that(builder._get_my_reservations_ext_link()).is_equal_to("https://thesite.com/reservations")
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_my_reservations_ext_link()).is_equal_to(
-            "https://thesite.com/en/reservations"
-        )
+        assert_that(builder._get_my_reservations_ext_link()).is_equal_to("https://thesite.com/en/reservations")
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_sv(self):
         builder = self.get_builder(LANGUAGES.SV)
-        assert_that(builder._get_my_reservations_ext_link()).is_equal_to(
-            "https://thesite.com/sv/reservations"
-        )
+        assert_that(builder._get_my_reservations_ext_link()).is_equal_to("https://thesite.com/sv/reservations")
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link(self):
@@ -224,16 +186,12 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_varaamo_ext_link()).is_equal_to(
-            "https://thesite.com/en"
-        )
+        assert_that(builder._get_varaamo_ext_link()).is_equal_to("https://thesite.com/en")
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link_sv(self):
         builder = self.get_builder(LANGUAGES.SV)
-        assert_that(builder._get_varaamo_ext_link()).is_equal_to(
-            "https://thesite.com/sv"
-        )
+        assert_that(builder._get_varaamo_ext_link()).is_equal_to("https://thesite.com/sv")
 
     @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
     def get_feedback_ext_link_fi(self):
@@ -256,10 +214,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             "https://feedback.com/forms/?site=varaamopalaute&lang=en&ref=https://tilavaraus.hel.fi"
         )
 
-    @override_settings(
-        EMAIL_TEMPLATE_CONTEXT_VARIABLES=settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES
-        + ["imnotdefined"]
-    )
+    @override_settings(EMAIL_TEMPLATE_CONTEXT_VARIABLES=settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES + ["imnotdefined"])
     def test_context_attr_map_fails_on_undefined_methods(self):
         with self.assertRaises(EmailBuilderConfigError):
             ReservationEmailNotificationBuilder(self.reservation, self.email_template)
@@ -286,9 +241,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         subject = "Hello {{ reservee_name }}"
         compiled_subject = "Hello Let it Snow"
 
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_CANCELLED, subject=subject, content="content"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_CANCELLED, subject=subject, content="content")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_subject()).is_equal_to(compiled_subject)
 
@@ -314,8 +267,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         """
         year = datetime.datetime.now(timezone.get_default_timezone()).year
         feedback_url = (
-            "https://feedtheback.com/survey/?site=varaamopalaute&lang=fi"
-            "&ref=https%3A%2F%2Fresourcebooking.com"
+            "https://feedtheback.com/survey/?site=varaamopalaute&lang=fi" "&ref=https%3A%2F%2Fresourcebooking.com"
         )
         compiled_content = f"""
             Should contain Dance time! and 9.2.2022 and 10:00 and 9.2.2022
@@ -332,18 +284,14 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             link to reservations https://resourcebooking.com/reservations
             link to feedback {feedback_url}
         """
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
     def test_padding_does_not_matter_in_curly_brackets(self):
         EmailTemplate.objects.all().delete()
         content_with_space_inside_braces = "I have {{ reservation_number }} padding"
-        compiled_content_with_space_inside_braces = (
-            f"I have {self.reservation.id} padding"
-        )
+        compiled_content_with_space_inside_braces = f"I have {self.reservation.id} padding"
         template = EmailTemplateFactory(
             type=EmailType.RESERVATION_MODIFIED,
             content=content_with_space_inside_braces,
@@ -356,9 +304,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
         content_without_space_in_brackets = "I have {{reservation_number}} padding"
-        compiled_content_without_space_in_brackets = (
-            f"I have {self.reservation.id} padding"
-        )
+        compiled_content_without_space_in_brackets = f"I have {self.reservation.id} padding"
         template.content = content_without_space_in_brackets
         template.save()
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
@@ -377,9 +323,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         builder.template.content_sv = None
         builder._set_language(LANGUAGES.SV)
         assert_that(builder.language).is_equal_to(LANGUAGES.FI)
-        assert_that(builder._get_deny_reason()).is_equal_to(
-            self.reservation.deny_reason.reason_fi
-        )
+        assert_that(builder._get_deny_reason()).is_equal_to(self.reservation.deny_reason.reason_fi)
 
     def test_confirmed_instructions_renders(self):
         content = """
@@ -396,9 +340,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             Yours truly:
             system.
         """
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
@@ -417,9 +359,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             Yours truly:
             system.
         """
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
@@ -438,9 +378,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             Yours truly:
             system.
         """
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
@@ -459,9 +397,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
                     This is else
                 """
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
@@ -475,9 +411,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
                     ninja sabotage
                     {% endmacro %}
                 """
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         with self.assertRaises(EmailTemplateValidationError):
             ReservationEmailNotificationBuilder(self.reservation, template)
 
@@ -491,9 +425,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
                     ninja sabotage
                     {% endmacro %}
                 """
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         with self.assertRaises(EmailTemplateValidationError):
             ReservationEmailNotificationBuilder(self.reservation, template)
 
@@ -501,9 +433,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         content = "{{price | currency}}"
         compiled_content = "52,00"
 
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
@@ -513,9 +443,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         content = "{{price | currency}}"
         compiled_content = "10 000,00"
 
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
@@ -532,9 +460,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         compiled_content = "Varauksen hinta: 52,00 € (sis. alv 10%)"
 
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
 
@@ -553,8 +479,6 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         compiled_content = "Varauksen hinta: 0,00 - 52,00 € (sis. alv 10%)"
 
-        template = EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject"
-        )
+        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)

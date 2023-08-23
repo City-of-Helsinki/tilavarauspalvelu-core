@@ -14,9 +14,7 @@ from reservations.models import Reservation, ReservationType
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class StaffReservationAdjustTimeSerializer(
-    PrimaryKeyUpdateSerializer, ReservationSchedulingMixin
-):
+class StaffReservationAdjustTimeSerializer(PrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
     class Meta:
         model = Reservation
         fields = [
@@ -73,9 +71,7 @@ class StaffReservationAdjustTimeSerializer(
                 buffer_before=new_buffer_before,
                 buffer_after=new_buffer_after,
             )
-            self.check_reservation_intervals_for_staff_reservation(
-                reservation_unit, begin
-            )
+            self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
 
         self.check_begin(begin, end)
 

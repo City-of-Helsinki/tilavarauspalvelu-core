@@ -41,9 +41,7 @@ class UserTestCase(TestCase):
     def test_user_with_service_sector_role_has_staff_permissions(self):
         sector = ServiceSectorFactory(name="Test Sector")
         role = ServiceSectorRoleChoice.objects.create(code="Service Sector Role")
-        ServiceSectorRole.objects.create(
-            role=role, user=self.user, service_sector=sector
-        )
+        ServiceSectorRole.objects.create(role=role, user=self.user, service_sector=sector)
 
         assert_that(self.user.has_staff_permissions).is_true()
 

@@ -76,23 +76,13 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
 
     def test_general_admin_can_create(self):
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
@@ -111,24 +101,14 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
             permission="can_create_staff_reservations",
         )
 
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
@@ -147,24 +127,14 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
             permission="can_create_staff_reservations",
         )
 
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
@@ -184,9 +154,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).contains_ignoring_case(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0]["message"]).contains_ignoring_case("No permission to mutate")
 
         assert_that(RecurringReservation.objects.exists()).is_false()
 
@@ -256,17 +224,9 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.weekday_list).is_equal_to([WEEKDAYS.MONDAY])
@@ -290,17 +250,9 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
+            content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.description).is_empty()
@@ -329,12 +281,7 @@ class RecurringReservationTestCase(GrapheneTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
 
-        pk = (
-            content.get("data")
-            .get("createRecurringReservation")
-            .get("recurringReservation")
-            .get("pk")
-        )
+        pk = content.get("data").get("createRecurringReservation").get("recurringReservation").get("pk")
         recurring = RecurringReservation.objects.get(id=pk)
 
         assert_that(recurring.user).is_equal_to(self.general_admin)

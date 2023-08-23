@@ -53,9 +53,7 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
         self.weekly_query = self._base_query.filter(biweekly=False)
 
         self.bi_weekly_query = self._base_query.filter(biweekly=True).annotate(
-            events_count=ExpressionWrapper(
-                F("events_count") / 2, output_field=DurationField()
-            )
+            events_count=ExpressionWrapper(F("events_count") / 2, output_field=DurationField())
         )
 
         self._create_event_based_aggregate_data()
@@ -65,9 +63,7 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
         total_min_duration = 0
         events_count = 0
         for duration in self.weekly_query.union(self.bi_weekly_query):
-            total_min_duration += (
-                duration["events_count"].days * duration["min_duration"].total_seconds()
-            )
+            total_min_duration += duration["events_count"].days * duration["min_duration"].total_seconds()
             events_count += duration["events_count"].days
 
         data_values = {
@@ -83,17 +79,13 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
     def _create_reservation_based_aggregate_data(self):
         from reservations.models import Reservation
 
-        res_qs = Reservation.objects.filter(
-            recurring_reservation__application=self.application
-        ).going_to_occur()
+        res_qs = Reservation.objects.filter(recurring_reservation__application=self.application).going_to_occur()
         created_reservations = res_qs.count()
         reservations_duration = res_qs.total_duration().get("total_duration")
 
         data_values = {
             "created_reservations_total": created_reservations,
-            "reservations_duration_total": reservations_duration.total_seconds()
-            if reservations_duration
-            else 0,
+            "reservations_duration_total": reservations_duration.total_seconds() if reservations_duration else 0,
         }
         self._update_or_create_aggregate_data_values(data_values)
 
@@ -178,9 +170,7 @@ class ApplicationRoundAggregateDataCreator(BaseAggregateDataCreator):
             )
         except HaukiConfigurationError:
             total_opening_hours = 0
-            logger.error(
-                "Got HaukiConfigurationError while trying to fetch opening hours."
-            )
+            logger.error("Got HaukiConfigurationError while trying to fetch opening hours.")
 
         data = {"total_hour_capacity": total_opening_hours}
 
@@ -198,9 +188,7 @@ class ApplicationRoundAggregateDataCreator(BaseAggregateDataCreator):
         )
         total_duration = total_duration_qs.get("total_duration")
         data = {
-            "total_reservation_duration": total_duration.total_seconds() / 3600.0
-            if total_duration is not None
-            else 0,
+            "total_reservation_duration": total_duration.total_seconds() / 3600.0 if total_duration is not None else 0,
         }
 
         self._update_or_create_aggregate_data_values(data)

@@ -16,9 +16,7 @@ User = get_user_model()
 
 
 class BaseRoleSerializer(TranslatedModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user"
-    )
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
 
     def create(self, validated_data):
         request = self.context.get("request", None)
@@ -31,12 +29,8 @@ class UnitRoleSerializer(BaseRoleSerializer):
     unit_group_id = serializers.PrimaryKeyRelatedField(
         queryset=UnitGroup.objects.all(), source="unit_group", required=False, many=True
     )
-    unit_id = serializers.PrimaryKeyRelatedField(
-        queryset=Unit.objects.all(), source="unit", required=False, many=True
-    )
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user"
-    )
+    unit_id = serializers.PrimaryKeyRelatedField(queryset=Unit.objects.all(), source="unit", required=False, many=True)
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
 
     class Meta:
         model = UnitRole
@@ -62,9 +56,7 @@ class UnitRoleSerializer(BaseRoleSerializer):
 
     def validate(self, data):
         if "unit" not in data and "unit_group" not in data:
-            raise ValidationError(
-                _("Either 'unit_group_id' or 'unit_id' must be specified.")
-            )
+            raise ValidationError(_("Either 'unit_group_id' or 'unit_id' must be specified."))
 
         return data
 
@@ -73,9 +65,7 @@ class ServiceSectorRoleSerializer(BaseRoleSerializer):
     service_sector_id = serializers.PrimaryKeyRelatedField(
         queryset=ServiceSector.objects.all(), source="service_sector"
     )
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user"
-    )
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
 
     class Meta:
         model = ServiceSectorRole
@@ -95,9 +85,7 @@ class ServiceSectorRoleSerializer(BaseRoleSerializer):
 
 
 class GeneralRoleSerializer(BaseRoleSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user"
-    )
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
 
     class Meta:
         model = GeneralRole

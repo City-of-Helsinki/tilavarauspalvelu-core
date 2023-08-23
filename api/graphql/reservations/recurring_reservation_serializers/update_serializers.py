@@ -4,9 +4,7 @@ from api.graphql.reservations.recurring_reservation_serializers.create_serialize
 )
 
 
-class RecurringReservationUpdateSerializer(
-    PrimaryKeyUpdateSerializer, RecurringReservationCreateSerializer
-):
+class RecurringReservationUpdateSerializer(PrimaryKeyUpdateSerializer, RecurringReservationCreateSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

@@ -21,24 +21,16 @@ class FlaggedTestCaseBase(ApplicationEventPermissionsTestCaseBase):
         super().setUpTestData()
 
         cls.draft_application = ApplicationFactory()
-        ApplicationStatusFactory(
-            status=ApplicationStatus.DRAFT, application=cls.draft_application
-        )
+        ApplicationStatusFactory(status=ApplicationStatus.DRAFT, application=cls.draft_application)
         cls.draft_app_event = ApplicationEventFactory(application=cls.draft_application)
 
         cls.sent_application = ApplicationFactory()
-        ApplicationStatusFactory(
-            status=ApplicationStatus.SENT, application=cls.sent_application
-        )
+        ApplicationStatusFactory(status=ApplicationStatus.SENT, application=cls.sent_application)
         cls.sent_app_event = ApplicationEventFactory(application=cls.sent_application)
 
         cls.allocated_application = ApplicationFactory()
-        ApplicationStatusFactory(
-            status=ApplicationStatus.ALLOCATED, application=cls.allocated_application
-        )
-        cls.allocated_app_event = ApplicationEventFactory(
-            application=cls.allocated_application
-        )
+        ApplicationStatusFactory(status=ApplicationStatus.ALLOCATED, application=cls.allocated_application)
+        cls.allocated_app_event = ApplicationEventFactory(application=cls.allocated_application)
 
 
 class ApplicationEventFlaggedTestCase(FlaggedTestCaseBase):
@@ -76,9 +68,7 @@ class ApplicationEventFlaggedTestCase(FlaggedTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "Only application with status as"
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("Only application with status as")
 
         self.draft_app_event.refresh_from_db()
         assert_that(self.draft_app_event.flagged).is_false()
@@ -140,9 +130,7 @@ class ApplicationEventFlaggedTestCase(FlaggedTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
 
     def test_regular_user_cant_flag(self):
         self.client.force_login(self.regular_joe)
@@ -152,9 +140,7 @@ class ApplicationEventFlaggedTestCase(FlaggedTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
 
 
 class ApplicationFlaggedTestCase(FlaggedTestCaseBase):
@@ -191,9 +177,7 @@ class ApplicationFlaggedTestCase(FlaggedTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "Only application with status as"
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("Only application with status as")
 
         self.draft_app_event.refresh_from_db()
         assert_that(self.draft_app_event.flagged).is_false()
@@ -255,9 +239,7 @@ class ApplicationFlaggedTestCase(FlaggedTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
 
     def test_regular_user_cant_flag(self):
         self.client.force_login(self.regular_joe)
@@ -267,6 +249,4 @@ class ApplicationFlaggedTestCase(FlaggedTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")

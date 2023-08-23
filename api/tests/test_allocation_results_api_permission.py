@@ -84,9 +84,7 @@ def test_service_sector_admin_can_access_results(
     assert response.status_code == 200
 
 
-def test_service_sector_admin_cant_post_results(
-    service_sector_application_manager_api_client, service_sector
-):
+def test_service_sector_admin_cant_post_results(service_sector_application_manager_api_client, service_sector):
     response = service_sector_application_manager_api_client.post(
         reverse("allocation_results-list"),
         data={},

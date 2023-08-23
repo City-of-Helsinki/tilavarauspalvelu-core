@@ -35,9 +35,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             role=GeneralRoleChoice.objects.get(code="admin"),
             permission="can_create_staff_reservations",
         )
-        cls.recurring = RecurringReservationFactory(
-            reservation_unit=cls.reservation_unit
-        )
+        cls.recurring = RecurringReservationFactory(reservation_unit=cls.reservation_unit)
 
     def get_create_query(self):
         return """
@@ -101,32 +99,18 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
 
     def test_general_admin_can_create(self):
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        )
+        assert_that(content.get("data").get("createStaffReservation").get("reservation").get("pk")).is_not_none()
+        pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
         assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(
-            self.reservation_unit
-        )
+        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_none()
         assert_that(reservation.buffer_time_before).is_none()
 
@@ -137,32 +121,18 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             permission="can_create_staff_reservations",
         )
 
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        )
+        assert_that(content.get("data").get("createStaffReservation").get("reservation").get("pk")).is_not_none()
+        pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
         assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(
-            self.reservation_unit
-        )
+        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_none()
         assert_that(reservation.buffer_time_before).is_none()
 
@@ -173,32 +143,18 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             permission="can_create_staff_reservations",
         )
 
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        )
+        assert_that(content.get("data").get("createStaffReservation").get("reservation").get("pk")).is_not_none()
+        pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
         assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(
-            self.reservation_unit
-        )
+        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_none()
         assert_that(reservation.buffer_time_before).is_none()
 
@@ -210,9 +166,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).contains_ignoring_case(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0]["message"]).contains_ignoring_case("No permission to mutate")
 
         assert_that(Reservation.objects.exists()).is_false()
 
@@ -271,9 +225,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_BEGIN_AFTER_END"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_BEGIN_AFTER_END")
         assert_that(Reservation.objects.exists()).is_false()
 
     def test_optional_fields(self):
@@ -283,44 +235,24 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        )
+        assert_that(content.get("data").get("createStaffReservation").get("reservation").get("pk")).is_not_none()
+        pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
         assert_that(reservation.type).is_equal_to(ReservationType.BLOCKED)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(
-            self.reservation_unit
-        )
+        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.user).is_equal_to(self.general_admin)
         assert_that(reservation.state).is_equal_to(ReservationState.CONFIRMED)
-        assert_that(reservation.reservee_first_name).is_equal_to(
-            input_data["reserveeFirstName"]
-        )
-        assert_that(reservation.reservee_last_name).is_equal_to(
-            input_data["reserveeLastName"]
-        )
+        assert_that(reservation.reservee_first_name).is_equal_to(input_data["reserveeFirstName"])
+        assert_that(reservation.reservee_last_name).is_equal_to(input_data["reserveeLastName"])
         assert_that(reservation.reservee_phone).is_equal_to(input_data["reserveePhone"])
         assert_that(reservation.name).is_equal_to(input_data["name"])
         assert_that(reservation.description).is_equal_to(input_data["description"])
         assert_that(reservation.purpose).is_equal_to(self.purpose)
-        assert_that(reservation.buffer_time_after).is_equal_to(
-            datetime.timedelta(minutes=30)
-        )
-        assert_that(reservation.buffer_time_before).is_equal_to(
-            datetime.timedelta(minutes=30)
-        )
+        assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta(minutes=30))
+        assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta(minutes=30))
         assert_that(reservation.recurring_reservation).is_equal_to(self.recurring)
 
     def test_reservation_overlapping_fails(self):
@@ -332,15 +264,11 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             state=ReservationState.CONFIRMED,
         )
 
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "OVERLAPPING_RESERVATIONS"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("OVERLAPPING_RESERVATIONS")
         assert_that(Reservation.objects.count()).is_equal_to(1)
 
     def test_buffer_times_cause_overlap_fails(self):
@@ -358,9 +286,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
         assert_that(Reservation.objects.count()).is_equal_to(1)
 
     def test_buffer_times_cause_overlap_fails_with_buffer_time_before(self):
@@ -378,9 +304,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
         assert_that(Reservation.objects.count()).is_equal_to(1)
 
     def test_buffer_times_cause_overlap_fails_with_buffer_time_after(self):
@@ -398,9 +322,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
         assert_that(Reservation.objects.count()).is_equal_to(1)
 
     def test_buffer_times_is_successful_with_zero_buffers(self):
@@ -431,45 +353,27 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
 
     @patch("opening_hours.utils.opening_hours_client.get_opening_hours")
     def test_can_reserve_outside_opening_hours(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(
-            start_hour=1, end_hour=2
-        )
+        mock_opening_hours.return_value = self.get_mocked_opening_hours(start_hour=1, end_hour=2)
 
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_minimum_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        )
+        assert_that(content.get("data").get("createStaffReservation").get("reservation").get("pk")).is_not_none()
+        pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(
-            self.reservation_unit
-        )
+        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_none()
         assert_that(reservation.buffer_time_before).is_none()
 
     def test_interval_not_respected_fails(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_minimum_input_data()
-        input_data["begin"] = (
-            self.res_begin + datetime.timedelta(minutes=10)
-        ).strftime("%Y%m%dT%H%M%S%z")
+        input_data["begin"] = (self.res_begin + datetime.timedelta(minutes=10)).strftime("%Y%m%dT%H%M%S%z")
 
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
@@ -489,9 +393,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_TYPE_NOT_ALLOWED"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_TYPE_NOT_ALLOWED")
         assert_that(Reservation.objects.exists()).is_false()
 
     def test_reservation_type_behalf_accepted(self):
@@ -504,25 +406,13 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        ).is_not_none()
-        pk = (
-            content.get("data")
-            .get("createStaffReservation")
-            .get("reservation")
-            .get("pk")
-        )
+        assert_that(content.get("data").get("createStaffReservation").get("reservation").get("pk")).is_not_none()
+        pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
         assert_that(reservation.type).is_equal_to(ReservationType.BEHALF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(
-            self.reservation_unit
-        )
+        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_none()
         assert_that(reservation.buffer_time_before).is_none()

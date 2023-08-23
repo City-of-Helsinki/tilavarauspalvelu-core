@@ -12,22 +12,20 @@ from api.graphql.reservations.reservation_serializers.mixins import (
 from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from applications.models import CUSTOMER_TYPES, City
 from reservation_units.models import ReservationUnit
-from reservations.models import RESERVEE_LANGUAGE_CHOICES
-from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import (
+    RESERVEE_LANGUAGE_CHOICES,
     AgeGroup,
     RecurringReservation,
     Reservation,
     ReservationPurpose,
     ReservationType,
 )
+from reservations.models import STATE_CHOICES as ReservationState
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class ReservationStaffCreateSerializer(
-    PrimaryKeySerializer, ReservationSchedulingMixin
-):
+class ReservationStaffCreateSerializer(PrimaryKeySerializer, ReservationSchedulingMixin):
     recurring_reservation_pk = IntegerPrimaryKeyField(
         queryset=RecurringReservation.objects.all(),
         source="recurring_reservation",
@@ -39,15 +37,9 @@ class ReservationStaffCreateSerializer(
         source="reservation_unit",
         required=True,
     )
-    purpose_pk = IntegerPrimaryKeyField(
-        queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True
-    )
-    home_city_pk = IntegerPrimaryKeyField(
-        queryset=City.objects.all(), source="home_city", allow_null=True
-    )
-    age_group_pk = IntegerPrimaryKeyField(
-        queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
-    )
+    purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
+    home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
+    age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
     reservee_type = ChoiceCharField(
         choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
         help_text=(
@@ -55,9 +47,7 @@ class ReservationStaffCreateSerializer(
             f"Possible values are {', '.join(value[0].upper() for value in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)}."
         ),
     )
-    reservee_language = ChoiceCharField(
-        choices=RESERVEE_LANGUAGE_CHOICES, required=False, default=""
-    )
+    reservee_language = ChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
     type = ChoiceCharField(
         required=True,
         choices=ReservationType.choices,
@@ -185,9 +175,7 @@ class ReservationStaffCreateSerializer(
                 buffer_before=buffer_before,
                 buffer_after=buffer_after,
             )
-            self.check_reservation_intervals_for_staff_reservation(
-                reservation_unit, begin
-            )
+            self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
 
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         data["handled_at"] = now

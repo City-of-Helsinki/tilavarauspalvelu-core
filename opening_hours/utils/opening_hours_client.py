@@ -6,9 +6,8 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from opening_hours.decorators import datetime_args_to_default_timezone
-from opening_hours.hours import Period
+from opening_hours.hours import Period, TimeElement, get_opening_hours, get_periods_for_resource
 from opening_hours.hours import State as ResourceState
-from opening_hours.hours import TimeElement, get_opening_hours, get_periods_for_resource
 
 TIMEZONE = get_default_timezone()
 
@@ -59,35 +58,19 @@ class OpeningHours:
         date: datetime.date,
         timezone: datetime.timezone | Any,
     ):
-        full_day = time_element.full_day or (
-            time_element.start_time is None and time_element.end_time is None
-        )
+        full_day = time_element.full_day or (time_element.start_time is None and time_element.end_time is None)
         end_time_on_next_day = time_element.end_time_on_next_day or full_day
 
-        start = (
-            datetime.time(0)
-            if full_day or not time_element.start_time
-            else time_element.start_time
-        )
-        end = (
-            datetime.time(0)
-            if full_day or not time_element.end_time
-            else time_element.end_time
-        )
-        start_time = datetime.datetime(
-            date.year, date.month, date.day, start.hour, start.minute, tzinfo=timezone
-        )
+        start = datetime.time(0) if full_day or not time_element.start_time else time_element.start_time
+        end = datetime.time(0) if full_day or not time_element.end_time else time_element.end_time
+        start_time = datetime.datetime(date.year, date.month, date.day, start.hour, start.minute, tzinfo=timezone)
 
         if end_time_on_next_day:
             date += datetime.timedelta(days=1)
-        end_time = datetime.datetime(
-            date.year, date.month, date.day, end.hour, end.minute, tzinfo=timezone
-        )
+        end_time = datetime.datetime(date.year, date.month, date.day, end.hour, end.minute, tzinfo=timezone)
 
         # If the length of opening is zero, return None for helping the UI.
-        if not end_time_on_next_day and (end_time - start_time) == datetime.timedelta(
-            seconds=0
-        ):
+        if not end_time_on_next_day and (end_time - start_time) == datetime.timedelta(seconds=0):
             return None
 
         return OpeningHours(
@@ -161,15 +144,11 @@ class OpeningHoursClient:
             date = hour["date"]
             opening_hours = []
             for time in hour["times"]:
-                opening_times = OpeningHours.get_opening_hours_class_from_time_element(
-                    time, date, timezone
-                )
+                opening_times = OpeningHours.get_opening_hours_class_from_time_element(time, date, timezone)
                 if opening_times:
                     opening_hours.append(opening_times)
 
-            opening_hours = self._split_opening_hours_based_on_closed_states(
-                opening_hours
-            )
+            opening_hours = self._split_opening_hours_based_on_closed_states(opening_hours)
 
             self.opening_hours[res_id][date].extend(opening_hours)
 

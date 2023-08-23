@@ -49,9 +49,7 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
                 + f"Response body: {response.text}",
                 level="error",
             )
-            raise CreateOrderError(
-                "Order creation failed: problem with upstream service"
-            )
+            raise CreateOrderError("Order creation failed: problem with upstream service")
 
         json = response.json()
         if response.status_code != 201:
@@ -67,9 +65,7 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
 
 def get_order(order_id: UUID, user: str, get=_get) -> Order:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "GET", "/order/admin/{order_id}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/order/admin/{order_id}") as metric:
             response = get(
                 url=urljoin(_get_base_url(), f"admin/{order_id}"),
                 headers={
@@ -96,9 +92,7 @@ def get_order(order_id: UUID, user: str, get=_get) -> Order:
 
 def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Optional[Order]:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "POST", "/order/{order_id}/cancel"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/order/{order_id}/cancel") as metric:
             response = post(
                 url=urljoin(_get_base_url(), f"{str(order_id)}/cancel"),
                 headers={
@@ -115,9 +109,7 @@ def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Optional[Order]
                 + f"Response body: {response.text}",
                 level="error",
             )
-            raise CancelOrderError(
-                "Order cancellation failed: problem with upstream service"
-            )
+            raise CancelOrderError("Order cancellation failed: problem with upstream service")
         if response.status_code == 404:
             return None
 

@@ -26,9 +26,7 @@ class ServiceSector(models.Model):
     """
 
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    units = models.ManyToManyField(
-        "Unit", verbose_name=_("Units"), related_name="service_sectors"
-    )
+    units = models.ManyToManyField("Unit", verbose_name=_("Units"), related_name="service_sectors")
 
     def __str__(self):
         return self.name
@@ -55,25 +53,15 @@ class Unit(models.Model):
         blank=True,
         null=True,  # If some units needs to be created manually.
     )
-    tprek_department_id = models.CharField(
-        verbose_name=_("TPREK department id"), max_length=255, blank=True, null=True
-    )
+    tprek_department_id = models.CharField(verbose_name=_("TPREK department id"), max_length=255, blank=True, null=True)
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    description = models.TextField(
-        verbose_name=_("Description"), max_length=4000, blank=True, default=""
-    )
-    short_description = models.CharField(
-        verbose_name=_("Short description"), max_length=255, blank=True, default=""
-    )
-    web_page = models.URLField(
-        verbose_name=_("Homepage for the unit"), max_length=255, blank=True, default=""
-    )
+    description = models.TextField(verbose_name=_("Description"), max_length=4000, blank=True, default="")
+    short_description = models.CharField(verbose_name=_("Short description"), max_length=255, blank=True, default="")
+    web_page = models.URLField(verbose_name=_("Homepage for the unit"), max_length=255, blank=True, default="")
     email = models.EmailField(verbose_name=_("Email"), blank=True, max_length=255)
     phone = models.CharField(verbose_name=_("Telephone"), blank=True, max_length=255)
 
-    hauki_resource_id = models.CharField(
-        verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True
-    )
+    hauki_resource_id = models.CharField(verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True)
     rank = models.PositiveIntegerField(
         blank=True,
         null=True,
@@ -129,9 +117,7 @@ class Unit(models.Model):
         if settings.UPDATE_PRODUCT_MAPPING and (
             old_values is None or old_values.payment_merchant != self.payment_merchant
         ):
-            reservation_units = self.reservationunit_set.filter(
-                payment_merchant__isnull=True
-            ).all()
+            reservation_units = self.reservationunit_set.filter(payment_merchant__isnull=True).all()
             for runit in reservation_units:
                 refresh_reservation_unit_product_mapping.delay(runit.pk)
 
@@ -209,9 +195,7 @@ class Space(MPTTModel):
         blank=True,
         null=True,
     )
-    max_persons = models.fields.PositiveIntegerField(
-        verbose_name=_("Maximum number of persons"), null=True, blank=True
-    )
+    max_persons = models.fields.PositiveIntegerField(verbose_name=_("Maximum number of persons"), null=True, blank=True)
     code = models.CharField(
         verbose_name=_("Code for the space"),
         max_length=255,
@@ -236,15 +220,9 @@ class Location(models.Model):
     Relations are defined in OneToOne relations and can be added when needed.
     """
 
-    address_street = models.CharField(
-        verbose_name=_("Address street"), max_length=100, blank=True
-    )
-    address_zip = models.CharField(
-        verbose_name=_("Address zip"), max_length=30, blank=True
-    )
-    address_city = models.CharField(
-        verbose_name=_("Address city"), max_length=100, blank=True
-    )
+    address_street = models.CharField(verbose_name=_("Address street"), max_length=100, blank=True)
+    address_zip = models.CharField(verbose_name=_("Address zip"), max_length=30, blank=True)
+    address_city = models.CharField(verbose_name=_("Address city"), max_length=100, blank=True)
     space = models.OneToOneField(
         "Space",
         verbose_name=_("Space"),
@@ -292,6 +270,4 @@ class Location(models.Model):
         return self.coordinates.x if self.coordinates else None
 
     def __str__(self):
-        return "{}, {} {}".format(
-            self.address_street, self.address_city, self.address_zip
-        )
+        return "{}, {} {}".format(self.address_street, self.address_city, self.address_zip)

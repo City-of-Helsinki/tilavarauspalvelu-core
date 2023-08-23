@@ -31,9 +31,7 @@ from users.models import PersonalInfoViewLog
 class ReservationQueryTestCase(ReservationTestCaseBase):
     def create_reservation_by_admin(self):
         reservation_begin = datetime.datetime.now(tz=get_default_timezone())
-        reservation_end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) + datetime.timedelta(hours=1)
+        reservation_end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)
         ReservationFactory(
             reservee_first_name="Shouldbe",
             reservee_last_name="Hidden",
@@ -131,9 +129,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def setUp(self):
         super().setUp()
         reservation_begin = datetime.datetime.now(tz=get_default_timezone())
-        reservation_end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) + datetime.timedelta(hours=1)
+        reservation_end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)
         self.reservation = ReservationFactory(
             reservee_first_name="Reser",
             reservee_last_name="Vee",
@@ -284,16 +280,14 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(days=2),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=2),
         )
         ReservationFactory(
             state=STATE_CHOICES.CANCELLED,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me too",
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(days=1),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=1),
         )
         response = self.query(
             """
@@ -355,8 +349,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(days=2),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=2),
         )
         PaymentOrderFactory(reservation=res, status=OrderStatus.PAID)
         res_too = ReservationFactory(
@@ -364,8 +357,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me too",
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(days=1),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=1),
         )
         PaymentOrderFactory(reservation=res_too, status=OrderStatus.REFUNDED)
 
@@ -374,8 +366,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="I shouldn't be visible in snapshots. PANIC!",
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(days=1),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=1),
         )
         PaymentOrderFactory(reservation=res_too, status=OrderStatus.EXPIRED)
 
@@ -409,9 +400,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             recurring_reservation=None,
             name="show me",
         )
-        PaymentOrderFactory(
-            reservation=res, refund_id=UUID("e521e259-af10-40dc-84ce-308fe66f77d5")
-        )
+        PaymentOrderFactory(reservation=res, refund_id=UUID("e521e259-af10-40dc-84ce-308fe66f77d5"))
         response = self.query(
             """
             query {
@@ -585,9 +574,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_hide_fields_with_personal_information(self):
         self.create_reservation_by_admin()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_query_with_personal_fields("""reservations(orderBy:"name")""")
-        )
+        response = self.query(self.get_query_with_personal_fields("""reservations(orderBy:"name")"""))
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
@@ -596,9 +583,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.create_reservation_by_admin()
         self.client.force_login(self.regular_joe)
         response = self.query(
-            self.get_query_with_personal_fields(
-                """reservations(onlyWithPermission:true, orderBy:"name")"""
-            )
+            self.get_query_with_personal_fields("""reservations(onlyWithPermission:true, orderBy:"name")""")
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -609,9 +594,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.create_reservation_by_admin()
         self.client.force_login(self.general_admin)
         response = self.query(
-            self.get_query_with_personal_fields(
-                """reservations(onlyWithPermission:true, orderBy:"name")"""
-            )
+            self.get_query_with_personal_fields("""reservations(onlyWithPermission:true, orderBy:"name")""")
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -622,9 +605,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.reservation_viewer)
         response = self.query(
-            self.get_query_with_personal_fields(
-                """reservations(onlyWithPermission:true, orderBy:"name")"""
-            )
+            self.get_query_with_personal_fields("""reservations(onlyWithPermission:true, orderBy:"name")""")
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -721,9 +702,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_reservee_date_of_birth_is_shown_to_service_sector_admin(self):
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=self.service_sector
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=self.service_sector)
         self.client.force_login(service_sector_admin)
         self.regular_joe.date_of_birth = datetime.date(2020, 1, 1)
         self.regular_joe.save()
@@ -900,9 +879,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_filter_by_unit_multiple_values(self):
         unit = UnitFactory(name="Another unit")
         reservation_unit = ReservationUnitFactory(name="Another resunit", unit=unit)
-        ReservationFactory(
-            name="Another reservation", reservation_unit=[reservation_unit]
-        )
+        ReservationFactory(name="Another reservation", reservation_unit=[reservation_unit])
 
         self.client.force_login(self.general_admin)
         response = self.query(
@@ -985,9 +962,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_recurring_reservation(self):
-        rec = RecurringReservationFactory(
-            name="Recurring reservation", reservation_unit=self.reservation_unit
-        )
+        rec = RecurringReservationFactory(name="Recurring reservation", reservation_unit=self.reservation_unit)
 
         ReservationFactory(
             recurring_reservation=rec,
@@ -1020,9 +995,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     def test_filter_by_reservation_unit_type(self):
         reservation_unit_type = ReservationUnitTypeFactory(name="another type")
-        reservation_unit = ReservationUnitFactory(
-            name="another resunit", reservation_unit_type=reservation_unit_type
-        )
+        reservation_unit = ReservationUnitFactory(name="another resunit", reservation_unit_type=reservation_unit_type)
         ReservationFactory(
             name="another reservation",
             reservation_unit=[reservation_unit],
@@ -1055,9 +1028,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     def test_filter_by_reservation_unit_type_multiple_values(self):
         reservation_unit_type = ReservationUnitTypeFactory(name="Another type")
-        reservation_unit = ReservationUnitFactory(
-            name="Another resunit", reservation_unit_type=reservation_unit_type
-        )
+        reservation_unit = ReservationUnitFactory(name="Another resunit", reservation_unit_type=reservation_unit_type)
         ReservationFactory(
             name="Another reservation",
             reservation_unit=[reservation_unit],
@@ -1222,15 +1193,9 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_order_by_reservation_unit_name(self):
-        resunitA = ReservationUnitFactory(
-            name_fi="a Unit", name_en="d Unit", name_sv="g unit"
-        )
-        resunitB = ReservationUnitFactory(
-            name_fi="b Unit", name_en="e Unit", name_sv="h unit"
-        )
-        resunitC = ReservationUnitFactory(
-            name_fi="c Unit", name_en="f Unit", name_sv="i unit"
-        )
+        resunitA = ReservationUnitFactory(name_fi="a Unit", name_en="d Unit", name_sv="g unit")
+        resunitB = ReservationUnitFactory(name_fi="b Unit", name_en="e Unit", name_sv="h unit")
+        resunitC = ReservationUnitFactory(name_fi="c Unit", name_en="f Unit", name_sv="i unit")
 
         ReservationFactory(name="this should be 1st", reservation_unit=[resunitA])
         ReservationFactory(name="this should be 2nd", reservation_unit=[resunitB])
@@ -1354,18 +1319,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     @freezegun.freeze_time("2021-10-12T12:00:00Z")
     def test_order_by_created_at(self):
         now = datetime.datetime.now(tz=get_default_timezone())
-        ReservationFactory(
-            name="this should be 1st", created_at=now + datetime.timedelta(hours=-3)
-        )
-        ReservationFactory(
-            name="this should be 2nd", created_at=now + datetime.timedelta(hours=-2)
-        )
-        ReservationFactory(
-            name="this should be 3rd", created_at=now + datetime.timedelta(hours=-1)
-        )
-        ReservationFactory(
-            name="this should be last", created_at=now + datetime.timedelta(hours=10)
-        )
+        ReservationFactory(name="this should be 1st", created_at=now + datetime.timedelta(hours=-3))
+        ReservationFactory(name="this should be 2nd", created_at=now + datetime.timedelta(hours=-2))
+        ReservationFactory(name="this should be 3rd", created_at=now + datetime.timedelta(hours=-1))
+        ReservationFactory(name="this should be last", created_at=now + datetime.timedelta(hours=10))
 
         self.client.force_login(self.general_admin)
         response = self.query(
@@ -1630,9 +1587,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_is_handled(self):
         self.client.force_login(self.general_admin)
 
-        response = self.query(
-            self.get_query_with_personal_fields("""reservations(orderBy:"name")""")
-        )
+        response = self.query(self.get_query_with_personal_fields("""reservations(orderBy:"name")"""))
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         reservations = content.get("data").get("reservations").get("edges")
@@ -1641,9 +1596,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.reservation.handled_at = datetime.datetime.now()
         self.reservation.save()
 
-        response = self.query(
-            self.get_query_with_personal_fields("""reservations(orderBy:"name")""")
-        )
+        response = self.query(self.get_query_with_personal_fields("""reservations(orderBy:"name")"""))
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         reservations = content.get("data").get("reservations").get("edges")
@@ -1781,9 +1734,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         assert_that(view_log.viewer_user).is_equal_to(self.general_admin)
         assert_that(view_log.viewer_username).is_equal_to(self.general_admin.username)
         assert_that(view_log.field).is_equal_to("User.date_of_birth")
-        assert_that(view_log.viewer_user_full_name).is_equal_to(
-            self.general_admin.get_full_name()
-        )
+        assert_that(view_log.viewer_user_full_name).is_equal_to(self.general_admin.get_full_name())
         assert_that(view_log.viewer_user_email).is_equal_to(self.general_admin.email)
 
     def test_reservee_name_for_individual_reservee(self):
@@ -1805,9 +1756,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content["data"]).is_not_none()
         assert_that(content["data"]["reservationByPk"]).is_not_none()
-        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to(
-            "First Last"
-        )
+        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to("First Last")
 
     def test_reservee_name_for_business_reservee(self):
         reservation = ReservationFactory(
@@ -1827,9 +1776,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content["data"]).is_not_none()
         assert_that(content["data"]["reservationByPk"]).is_not_none()
-        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to(
-            "Business Oy"
-        )
+        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to("Business Oy")
 
     def test_reservee_name_for_nonprofit_reservee(self):
         reservation = ReservationFactory(
@@ -1849,6 +1796,4 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content["data"]).is_not_none()
         assert_that(content["data"]["reservationByPk"]).is_not_none()
-        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to(
-            "Nonprofit Ry"
-        )
+        assert_that(content["data"]["reservationByPk"]["reserveeName"]).is_equal_to("Nonprofit Ry")

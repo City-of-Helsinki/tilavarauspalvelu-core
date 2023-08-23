@@ -134,9 +134,7 @@ class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (AllowAuthenticated,)
     day = graphene.Int()
     priority = graphene.Int()
-    application_event_schedule_result = graphene.Field(
-        ApplicationEventScheduleResultType
-    )
+    application_event_schedule_result = graphene.Field(ApplicationEventScheduleResultType)
 
     class Meta:
         model = ApplicationEventSchedule
@@ -185,17 +183,13 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
 
     event_reservation_units = graphene.List(EventReservationUnitType)
 
-    status = graphene.Field(
-        graphene.Enum("applicationEventStatus", ApplicationEventStatus.STATUS_CHOICES)
-    )
+    status = graphene.Field(graphene.Enum("applicationEventStatus", ApplicationEventStatus.STATUS_CHOICES))
 
     weekly_amount_reductions_count = graphene.Int()
 
     declined_reservation_units = DjangoListField(ReservationUnitType)
 
-    aggregated_data = graphene.Field(
-        ApplicationEventAggregatedDataType, source="aggregated_data_dict"
-    )
+    aggregated_data = graphene.Field(ApplicationEventAggregatedDataType, source="aggregated_data_dict")
 
     class Meta:
         model = ApplicationEvent
@@ -263,9 +257,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
 
     application_events = graphene.List(ApplicationEventType)
 
-    status = graphene.Field(
-        graphene.Enum("applicationStatus", ApplicationStatus.STATUS_CHOICES)
-    )
+    status = graphene.Field(graphene.Enum("applicationStatus", ApplicationStatus.STATUS_CHOICES))
 
     aggregated_data = graphene.Field(
         ApplicationAggregatedDataType,

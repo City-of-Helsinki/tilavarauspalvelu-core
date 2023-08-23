@@ -74,12 +74,8 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
         """Validates necessary fields for published resources."""
         validation_errors = {}
 
-        if data.get("location_type") == Resource.LOCATION_FIXED and not data.get(
-            "space"
-        ):
-            validation_errors["space"] = GraphQLError(
-                "Location type 'fixed' needs a space to be defined."
-            )
+        if data.get("location_type") == Resource.LOCATION_FIXED and not data.get("space"):
+            validation_errors["space"] = GraphQLError("Location type 'fixed' needs a space to be defined.")
 
         return validation_errors
 
@@ -108,8 +104,6 @@ class ResourceUpdateSerializer(PrimaryKeyUpdateSerializer, ResourceCreateSeriali
                 if not location_type:
                     location_type = self.instance.location_type
                 if not data.get("space") and location_type == Resource.LOCATION_FIXED:
-                    raise GraphQLError(
-                        "Location type 'fixed' needs a space to be defined."
-                    )
+                    raise GraphQLError("Location type 'fixed' needs a space to be defined.")
 
         return data

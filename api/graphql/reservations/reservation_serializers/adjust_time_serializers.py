@@ -17,9 +17,7 @@ from reservations.models import STATE_CHOICES, Reservation
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class ReservationAdjustTimeSerializer(
-    PrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin
-):
+class ReservationAdjustTimeSerializer(PrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin):
     class Meta:
         model = Reservation
         fields = [
@@ -64,9 +62,7 @@ class ReservationAdjustTimeSerializer(
             self.check_buffer_times(reservation_unit, begin, end)
             self.check_reservation_days_before(begin, reservation_unit)
 
-            scheduler = ReservationUnitReservationScheduler(
-                reservation_unit, opening_hours_end=end.date()
-            )
+            scheduler = ReservationUnitReservationScheduler(reservation_unit, opening_hours_end=end.date())
             self.check_opening_hours(scheduler, begin, end)
             self.check_open_application_round(scheduler, begin, end)
             self.check_reservation_start_time(scheduler, begin)
@@ -108,9 +104,7 @@ class ReservationAdjustTimeSerializer(
                 "Reservation time cannot be changed thus no cancellation rule.",
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
-        must_be_cancelled_before = (
-            self.instance.begin - cancel_rule.can_be_cancelled_time_before
-        )
+        must_be_cancelled_before = self.instance.begin - cancel_rule.can_be_cancelled_time_before
         if must_be_cancelled_before < now:
             raise ValidationErrorWithCode(
                 "Reservation time cannot be changed because the cancellation period has expired.",
@@ -129,9 +123,7 @@ class ReservationAdjustTimeSerializer(
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
         elif self.requires_price_calculation(data):
-            pricing = self.calculate_price(
-                data["begin"], data["end"], self.instance.reservation_unit.all()
-            )
+            pricing = self.calculate_price(data["begin"], data["end"], self.instance.reservation_unit.all())
 
             if pricing.reservation_price_net > 0:
                 raise ValidationErrorWithCode(

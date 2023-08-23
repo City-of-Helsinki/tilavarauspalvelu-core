@@ -40,9 +40,7 @@ def anonymize_user(user):
 
 
 def anonymize_user_reservations(user):
-    long_text_replacement = (
-        "Sensitive data of this reservation has been anonymized by a script"
-    )
+    long_text_replacement = "Sensitive data of this reservation has been anonymized by a script"
     reservations = Reservation.objects.filter(user=user).exclude(
         type__in=[ReservationType.BLOCKED, ReservationType.STAFF]
     )
@@ -54,36 +52,22 @@ def anonymize_user_reservations(user):
             reservee_last_name=user.last_name,
             reservee_email=user.email,
             reservee_phone="",
-            reservee_address_zip=anonymize_string(
-                reservation.reservee_address_zip, "999999"
-            ),
+            reservee_address_zip=anonymize_string(reservation.reservee_address_zip, "999999"),
             reservee_address_city=anonymize_string(reservation.reservee_address_city),
-            reservee_address_street=anonymize_string(
-                reservation.reservee_address_street
-            ),
+            reservee_address_street=anonymize_string(reservation.reservee_address_street),
             billing_first_name=user.first_name,
             billing_last_name=user.last_name,
             billing_email=user.email,
             billing_phone="",
-            billing_address_zip=anonymize_string(
-                reservation.billing_address_zip, "99999"
-            ),
+            billing_address_zip=anonymize_string(reservation.billing_address_zip, "99999"),
             billing_address_city=anonymize_string(reservation.billing_address_city),
             billing_address_street=anonymize_string(reservation.billing_address_street),
             working_memo="",
-            free_of_charge_reason=anonymize_string(
-                reservation.free_of_charge_reason, long_text_replacement
-            ),
-            cancel_details=anonymize_string(
-                reservation.cancel_details, long_text_replacement
-            ),
-            handling_details=anonymize_string(
-                reservation.handling_details, long_text_replacement
-            ),
+            free_of_charge_reason=anonymize_string(reservation.free_of_charge_reason, long_text_replacement),
+            cancel_details=anonymize_string(reservation.cancel_details, long_text_replacement),
+            handling_details=anonymize_string(reservation.handling_details, long_text_replacement),
         )
-    audit_log_ids = LogEntry.objects.get_for_objects(reservations).values_list(
-        "id", flat=True
-    )
+    audit_log_ids = LogEntry.objects.get_for_objects(reservations).values_list("id", flat=True)
     LogEntry.objects.filter(id__in=audit_log_ids).delete()
 
 

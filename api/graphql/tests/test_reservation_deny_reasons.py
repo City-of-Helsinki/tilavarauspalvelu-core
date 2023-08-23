@@ -11,9 +11,7 @@ class ReservationDenyReasonsQueryTestCase(GrapheneTestCaseBase, snapshottest.Tes
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.reason = ReservationDenyReasonFactory(
-            reason_fi="fi", reason_sv="sv", reason_en="en"
-        )
+        cls.reason = ReservationDenyReasonFactory(reason_fi="fi", reason_sv="sv", reason_en="en")
 
     def test_getting_reservation_deny_reasons_for_logged_in_user(self):
         self.client.force_login(self.regular_joe)
@@ -56,6 +54,4 @@ class ReservationDenyReasonsQueryTestCase(GrapheneTestCaseBase, snapshottest.Tes
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("reservationDenyReasons").get("edges")
-        ).is_empty()
+        assert_that(content.get("data").get("reservationDenyReasons").get("edges")).is_empty()
