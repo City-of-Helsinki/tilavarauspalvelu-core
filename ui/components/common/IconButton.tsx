@@ -14,7 +14,7 @@ interface IconButtonProps {
   openInNewTab?: boolean;
   // an optional function to call when clicking the button
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  rest?: unknown; // any other params, like id/aria/testing/etc
+  [rest: string]: unknown; // any other params, like id/aria/testing/etc
 }
 
 const Container = styled.div`
@@ -22,6 +22,13 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   text-decoration: none !important;
+  a {
+    color: var(--color-black);
+  }
+`;
+
+const StyledLink = styled(Link)`
+  color: var(--color-black);
 `;
 
 const Anchor = styled.a`
@@ -87,14 +94,14 @@ const IconButton = ({
     ...rest,
   };
   return !!href && href.substring(0, 4) !== "http" ? (
-    <Link {...buttonProps}>
+    <StyledLink {...buttonProps}>
       <Container>
         <HoverWrapper>
           <Label>{label}</Label>
           {icon && <IconContainer>{icon}</IconContainer>}
         </HoverWrapper>
       </Container>
-    </Link>
+    </StyledLink>
   ) : (
     <Anchor {...buttonProps}>
       <Container>
