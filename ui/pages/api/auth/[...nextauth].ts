@@ -177,6 +177,17 @@ const options = (): NextAuthOptions => {
           : Promise.resolve(baseUrl);
       },
     },
+    logger: {
+      error: console.error,
+      warn: console.warn,
+      debug: (code, metadata) => {
+        // Our cookies are too large and split into two, don't need to flood the logs with warnings
+        if (code === "CHUNKING_SESSION_COOKIE") {
+          return;
+        }
+        console.log(`[NEXT_AUTH]: [${code}]`, metadata);
+      },
+    },
     pages: {
       signIn: `/`,
       signOut: "/logout",

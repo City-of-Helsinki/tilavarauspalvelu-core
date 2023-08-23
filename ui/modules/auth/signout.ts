@@ -7,5 +7,5 @@ export default function signOut({ session }: { session: Session }) {
           ? window.location.origin
           : '';
   const callbackUrl = `${origin}${authenticationLogoutApiRoute}?token=${session.accessToken}`
-  signOutAuth({ callbackUrl });
+  return signOutAuth({ callbackUrl });
 };
