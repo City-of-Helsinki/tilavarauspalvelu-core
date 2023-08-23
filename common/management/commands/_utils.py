@@ -1,6 +1,6 @@
 import random
 from functools import wraps
-from typing import Any, Callable, Generator, NamedTuple, ParamSpec, TypeVar
+from typing import Any, Callable, Generator, NamedTuple, ParamSpec, Sequence, TypeVar
 
 from faker import Faker
 
@@ -21,9 +21,7 @@ class Paragraphs(NamedTuple):
 
 
 def pascal_case_to_snake_case(string: str) -> str:
-    return "".join(
-        ("_" + char.lower() if char.isupper() else char for char in string)
-    ).lstrip("_")
+    return "".join(("_" + char.lower() if char.isupper() else char for char in string)).lstrip("_")
 
 
 def as_p_tags(texts: list[str]) -> str:
@@ -59,6 +57,10 @@ def random_subset(
     return random.sample(iterable, counts=counts, k=size)
 
 
+def weighted_choice(choices: Sequence[T], weights: list[int]) -> T:
+    return random.choices(choices, weights=weights)[0]
+
+
 def with_logs(
     text_entering: str,
     text_exiting: str,
@@ -66,9 +68,9 @@ def with_logs(
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-            print(text_entering)
+            print(text_entering)  # noqa: T201
             return_value = func(*args, **kwargs)
-            print(text_exiting)
+            print(text_exiting)  # noqa: T201
             return return_value
 
         return wrapper

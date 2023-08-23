@@ -91,6 +91,7 @@ from ._utils import (
     get_paragraphs,
     pascal_case_to_snake_case,
     random_subset,
+    weighted_choice,
     with_logs,
 )
 
@@ -466,9 +467,7 @@ def _create_roles_and_permissions() -> Roles:
                     )
                 )
 
-        roles[role_kind] = {
-            role.code: role for role in role_choice.objects.bulk_create(role_choices)
-        }
+        roles[role_kind] = {role.code: role for role in role_choice.objects.bulk_create(role_choices)}
         permission.objects.bulk_create(role_permissions)
 
     return roles
@@ -750,9 +749,7 @@ def _create_terms_of_use() -> dict[str, TermsOfUse]:
         )
         terms_of_use.append(terms)
 
-    return {
-        term.terms_type: term for term in TermsOfUse.objects.bulk_create(terms_of_use)
-    }
+    return {term.terms_type: term for term in TermsOfUse.objects.bulk_create(terms_of_use)}
 
 
 @with_logs(
@@ -995,7 +992,7 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
     zipped: zip[tuple[ReservationMetadataSet, tuple[SetName, FieldCombination]]]
     zipped = zip(metadata_sets.values(), field_combinations.items(), strict=True)
 
-    for metadata_set, (name, fields) in zipped:
+    for metadata_set, (_, fields) in zipped:
         supported = [metadata_fields[field] for field in fields.supported]
         required = [metadata_fields[field] for field in fields.required]
         metadata_set.supported_fields.add(*supported)
@@ -1123,8 +1120,8 @@ def _create_purposes(*, number: int = 10) -> list[Purpose]:
 def _create_resources(spaces: list[Space], *, number: int = 10) -> list[Resource]:
     resources: list[Resource] = []
     for i in range(number):
-        buffer_after: int = random.choices([0, 1], weights=[5, 1])[0]
-        buffer_before: int = random.choices([0, 1], weights=[5, 1])[0]
+        buffer_after = weighted_choice([0, 1], weights=[5, 1])
+        buffer_before = weighted_choice([0, 1], weights=[5, 1])
 
         reservation_purpose = Resource(
             name=f"Resource {i}",
@@ -1148,8 +1145,8 @@ def _create_resources(spaces: list[Space], *, number: int = 10) -> list[Resource
 def _create_services(*, number: int = 10) -> list[Service]:
     services: list[Service] = []
     for i in range(number):
-        buffer_after: int = random.choices([0, 1], weights=[5, 1])[0]
-        buffer_before: int = random.choices([0, 1], weights=[5, 1])[0]
+        buffer_after = weighted_choice([0, 1], weights=[5, 1])
+        buffer_before = weighted_choice([0, 1], weights=[5, 1])
 
         service = Service(
             name=f"Service {i}",
@@ -1217,7 +1214,7 @@ def _create_reservation_units(
 
         hauki_id = hauki_ids.get(i, str(uuid.uuid4()))
 
-        can_apply_free_of_charge = random.choices([True, False], weights=[1, 10])[0]
+        can_apply_free_of_charge = weighted_choice([True, False], weights=[1, 10])
         if can_apply_free_of_charge:
             set_name: SetName = random.choice(SetName.applying_free_of_charge())
             metadata_set = metadata_sets[set_name]
@@ -1228,7 +1225,7 @@ def _create_reservation_units(
 
         reservation_unit = ReservationUnit(
             allow_reservations_without_opening_hours=True,
-            authentication=random.choices(
+            authentication=weighted_choice(
                 ReservationUnit.AUTHENTICATION_TYPES,
                 weights=[2, 1],
             )[0],
@@ -1242,10 +1239,10 @@ def _create_reservation_units(
             description_sv=description.sv,
             max_persons=max_persons,
             max_reservation_duration=timedelta(hours=max_duration),
-            max_reservations_per_user=random.choices(
+            max_reservations_per_user=weighted_choice(
                 [None, 2, 5, 10],
                 weights=[10, 1, 1, 1],
-            )[0],
+            ),
             metadata_set=metadata_set,
             min_persons=min_persons,
             min_reservation_duration=timedelta(hours=min_duration),
@@ -1265,17 +1262,15 @@ def _create_reservation_units(
             reservation_confirmed_instructions_en=confirmed.en,
             reservation_confirmed_instructions_fi=confirmed.fi,
             reservation_confirmed_instructions_sv=confirmed.sv,
-            reservation_kind=random.choices(
+            reservation_kind=weighted_choice(
                 ReservationKind.values,
                 weights=[1, 1, 10],
-            )[0],
+            ),
             reservation_pending_instructions=pending.fi,
             reservation_pending_instructions_en=pending.en,
             reservation_pending_instructions_fi=pending.fi,
             reservation_pending_instructions_sv=pending.sv,
-            reservation_start_interval=random.choice(
-                ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
-            )[0],
+            reservation_start_interval=random.choice(ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)[0],
             reservation_unit_type=next(reservation_unit_types_loop),
             reservations_max_days_before=max_before,
             reservations_min_days_before=min_before,
@@ -1432,7 +1427,7 @@ def _create_pricings(
         pricings.append(pricing)
 
         # Around 1/5 of the reservation units have two pricings
-        add_another: bool = random.choices([True, False], weights=[1, 5])[0]
+        add_another: bool = weighted_choice([True, False], weights=[1, 5])
         if not add_another:
             continue
 
@@ -1445,7 +1440,7 @@ def _create_pricings(
         highest = float(highest_net * multiplier)
 
         # Around 1/10 of the pricings are inactive
-        pricing_status: str = random.choices(PricingStatus.values, weights=[1, 10, 0])
+        pricing_status: str = weighted_choice(PricingStatus.values, weights=[1, 10, 0])
 
         pricing = ReservationUnitPricing(
             begins=date(2021, 1, 1),
@@ -1527,15 +1522,9 @@ def _create_reservations(
 
         reservation_unit: ReservationUnit = random.choice(reservation_units)
 
-        persons = random.randint(
-            reservation_unit.min_persons, reservation_unit.max_persons
-        )
-        min_hours = math.ceil(
-            reservation_unit.min_reservation_duration.total_seconds() / 3600
-        )
-        max_hours = math.ceil(
-            reservation_unit.max_reservation_duration.total_seconds() / 3600
-        )
+        persons = random.randint(reservation_unit.min_persons, reservation_unit.max_persons)
+        min_hours = math.ceil(reservation_unit.min_reservation_duration.total_seconds() / 3600)
+        max_hours = math.ceil(reservation_unit.max_reservation_duration.total_seconds() / 3600)
 
         begin = past_date_start + timedelta(days=i)
         begin = begin.replace(
@@ -1550,9 +1539,7 @@ def _create_reservations(
         confirmed_at: datetime | None = begin
         handled_at: datetime | None = None
 
-        pricing: ReservationUnitPricing = random.choice(
-            list(reservation_unit.pricings.all())
-        )
+        pricing: ReservationUnitPricing = random.choice(list(reservation_unit.pricings.all()))
         if pricing.highest_price != Decimal("0") and applying_for_free_of_charge:
             state = STATE_CHOICES.REQUIRES_HANDLING
             free_of_charge_reason = faker_fi.sentence()
@@ -1560,15 +1547,15 @@ def _create_reservations(
             handled_at = begin
 
         deny_reason: ReservationDenyReason | None = None
-        cancel_reason = random.choices(
+        cancel_reason = weighted_choice(
             [None, random.choice(cancel_reasons)],
             weights=[3, 1],
-        )[0]
+        )
         if cancel_reason is None:
-            deny_reason = random.choices(
+            deny_reason = weighted_choice(
                 [None, random.choice(deny_reasons)],
                 weights=[3, 1],
-            )[0]
+            )
             if deny_reason is not None:
                 state = STATE_CHOICES.DENIED
                 free_of_charge_reason = faker_fi.sentence()
@@ -1637,9 +1624,7 @@ def _create_reservations(
         reservation_units_chosen.append(reservation_unit)
 
     reservations = Reservation.objects.bulk_create(reservations)
-    for reservation, reservation_unit in zip(
-        reservations, reservation_units_chosen, strict=True
-    ):
+    for reservation, reservation_unit in zip(reservations, reservation_units_chosen, strict=True):
         reservation.reservation_unit.add(reservation_unit)
 
     return reservations
@@ -1774,7 +1759,7 @@ def _create_applications(
     for contact_person, billing_address, (applicant_type, organisation) in items:
         # User is the overall admin mode often, but other users are also possible
         weights = [len(users)] + ([1] * (len(users) - 1))
-        user: User = random.choices(users, weights=weights)[0]
+        user: User = weighted_choice(users, weights=weights)
 
         # No applications for future application rounds
         application_round: ApplicationRound = random.choice(application_rounds)
@@ -1994,7 +1979,7 @@ def _create_application_events(
                 min_duration=timedelta(hours=min_duration),
                 max_duration=timedelta(hours=max_duration),
                 events_per_week=random.randint(1, 10),
-                biweekly=random.choices([True, False], weights=[1, 5])[0],
+                biweekly=weighted_choice([True, False], weights=[1, 5]),
                 begin=application.application_round.reservation_period_begin,
                 end=application.application_round.reservation_period_end,
                 application=application,
