@@ -1,61 +1,42 @@
-# Install dependencies only when needed
-FROM registry.access.redhat.com/ubi8/nodejs-16 AS deps
-USER root
-RUN npm install --global pnpm
+FROM node:16 AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-ENV NPM_CONFIG_LOGLEVEL warn
-
+FROM base AS builder
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-COPY packages/common/package.json packages/common/package.json common/
-COPY apps/admin-ui/package.json apps/admin-ui/package.json admin-ui/
-RUN pnpm install --frozen-lockfile
+RUN pnpm -g add turbo
+COPY . .
+RUN turbo prune --scope=admin-ui --docker
 
-FROM registry.access.redhat.com/ubi8/nodejs-16 as builder
-USER root
-RUN npm install --global pnpm
+# Add lockfile and package.json's of isolated subworkspace
+FROM base AS installer
+WORKDIR /app
+# First install the dependencies (as they change less often)
+COPY .gitignore .gitignore
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install #--frozen-lockfile
 
-# Offical image has npm log verbosity as info. More info - https://github.com/nodejs/docker-node#verbosity
-ENV NPM_CONFIG_LOGLEVEL warn
+# Build the project
+COPY --from=builder /app/out/full/ .
+RUN pnpm turbo run build --filter=admin-ui
 
-# Copy all files
-WORKDIR /app/common
-COPY packages/common .
-WORKDIR /app/admin-ui
-COPY apps/admin-ui .
+FROM base AS runner
+WORKDIR /app
 
-#WORKDIR /app
-COPY --from=deps /app/node_modules /app/node_modules
-COPY --from=deps /app/pnpm-lock.yaml /app/pnpm-lock.yaml
-COPY --from=deps /app/package.json /app/package.json
-COPY --from=deps /app/common/node_modules /app/common/node_modules
-COPY --from=deps /app/common/package.json /app/common/package.json
-COPY --from=deps /app/admin-ui/node_modules /app/admin-ui/node_modules
-COPY --from=deps /app/admin-ui/package.json /app/admin-ui/package.json
-RUN pnpm build
+# Don't run production as root
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
 
-FROM registry.access.redhat.com/ubi8/nodejs-16 AS runner
-USER root
-RUN wget -qO- https://get.pnpm.io/install.sh | sh -
-USER default
+COPY --from=installer /app/apps/admin-ui/next.config.js .
+COPY --from=installer /app/apps/admin-ui/package.json .
 
-ENV NPM_CONFIG_LOGLEVEL warn
-WORKDIR /app/admin-ui
-ENV NODE_ENV production
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=installer --chown=nextjs:nodejs /app/apps/admin-ui/.next/standalone ./
+COPY --from=installer --chown=nextjs:nodejs /app/apps/admin-ui/.next/static ./apps/admin-ui/.next/static
+COPY --from=installer --chown=nextjs:nodejs /app/apps/admin-ui/public ./apps/admin-ui/public
 
-COPY --from=builder --chown=default:root /app/admin-ui/src/env.mjs ./src/
-COPY --from=builder --chown=default:root /app/admin-ui/next.config.mjs ./
-COPY --from=builder --chown=default:root /app/admin-ui/public ./public
-COPY --from=builder --chown=default:root /app/admin-ui/.next ./.next
-COPY --from=builder --chown=default:root /app/admin-ui/node_modules /app/admin-ui/node_modules
-COPY --from=builder --chown=default:root /app/admin-ui/package.json ./package.json
-COPY --from=builder --chown=default:root /app/node_modules /app/node_modules
-COPY --from=builder --chown=default:root /app/common/node_modules /app/common/node_modules
-COPY --from=builder --chown=default:root /app/common/package.json /app/common/package.json
-COPY --from=builder --chown=default:root /app/package.json /app/package.json
-
-RUN install -d -o default -g root /app/ui/.next/cache/images && chmod g+w -R /app/admin-ui/.next
-EXPOSE 3000
-ENV NEXT_TELEMETRY_DISABLED 1
-
-CMD ["pnpm", "start"]
+CMD node apps/admin-ui/server.js

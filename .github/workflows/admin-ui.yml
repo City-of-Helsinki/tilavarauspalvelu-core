@@ -32,6 +32,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+      # TODO add project specific toggle to pnpm commands
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
@@ -44,5 +45,4 @@ jobs:
           pnpm lint:css
           pnpm build
           pnpm test
-          cd ..
-          docker build -f admin-ui/Dockerfile -t tilavaraus-admin-ui .
+          docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
