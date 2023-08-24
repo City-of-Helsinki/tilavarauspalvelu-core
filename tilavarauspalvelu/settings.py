@@ -45,55 +45,56 @@ def get_git_revision_hash() -> str:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# Application definition
 
 INSTALLED_APPS = [
+    # -- Load order important ---
+    "modeltranslation",
     "helusers.apps.HelusersConfig",
     "helusers.apps.HelusersAdminConfig",
+    # ---Django builtins --------
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.gis",
+    # -- Load order important ---
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    "graphene_django",
-    "rest_framework",
-    "drf_spectacular",
-    "resources",
-    "spaces",
-    "reservations",
-    "services",
-    "reservation_units",
-    "merchants",
-    "api",
-    "applications",
-    "opening_hours",
-    "django_extensions",
-    "mptt",
-    "django_filters",
-    "corsheaders",
+    # -- Third party apps -------
+    "admin_extra_buttons",
+    "adminsortable2",
     "auditlog",
-    "modeltranslation",
-    "django.contrib.gis",
-    "permissions",
-    "users",
+    "corsheaders",
+    "django_celery_beat",
+    "django_celery_results",
+    "django_extensions",
+    "django_filters",
+    "django_prometheus",
+    "drf_spectacular",
+    "easy_thumbnails",
+    "elasticsearch_django",
+    "graphene_django",
+    "import_export",
+    "mptt",
+    "rangefilter",
+    "rest_framework",
     "social_django",
     "tinymce",
-    "easy_thumbnails",
-    "django_celery_results",
-    "terms_of_use",
-    "email_notification",
-    "django_celery_beat",
-    "adminsortable2",
-    "django_prometheus",
-    "admin_extra_buttons",
-    "import_export",
-    "rangefilter",
-    "elasticsearch_django",
+    # -- Our apps ------------
     "common",
+    "users",
+    "applications",
+    "email_notification",
+    "merchants",
+    "opening_hours",
+    "permissions",
+    "reservation_units",
+    "reservations",
+    "resources",
+    "services",
+    "spaces",
+    "terms_of_use",
+    "api",
 ]
 
 MIDDLEWARE = [
