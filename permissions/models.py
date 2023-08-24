@@ -17,7 +17,10 @@ GENERAL_PERMISSIONS = (
         "can_manage_service_sector_roles",
         _("Can manage roles for service sectors for the whole system"),
     ),
-    ("can_manage_unit_roles", _("Can manage roles for units in the whole system")),
+    (
+        "can_manage_unit_roles",
+        _("Can manage roles for units in the whole system"),
+    ),
     (
         "can_manage_reservation_units",
         _("Can create, edit and delete reservation units in the whole system"),
@@ -66,9 +69,18 @@ GENERAL_PERMISSIONS = (
         "can_manage_spaces",
         _("Can create, edit and delete spaces in the whole system"),
     ),
-    ("can_handle_applications", _("Can handle applications in the whole system")),
-    ("can_validate_applications", _("Can validate applications in the whole system")),
-    ("can_allocate_applications", _("Can allocate applications in the whole system")),
+    (
+        "can_handle_applications",
+        _("Can handle applications in the whole system"),
+    ),
+    (
+        "can_validate_applications",
+        _("Can validate applications in the whole system"),
+    ),
+    (
+        "can_allocate_applications",
+        _("Can allocate applications in the whole system"),
+    ),
     (
         "can_manage_application_rounds",
         _("Can create, edit and delete application rounds in the whole system"),
@@ -85,12 +97,22 @@ GENERAL_PERMISSIONS = (
         "can_create_staff_reservations",
         _("Can create staff reservations in the whole system"),
     ),
-    ("can_manage_units", _("Can edit unit information in the whole system")),
+    (
+        "can_manage_units",
+        _("Can edit unit information in the whole system"),
+    ),
+    (
+        "can_manage_notifications",
+        _("Can create, edit and delete banner notifications in the whole system"),
+    ),
 )
 
 
 UNIT_PERMISSIONS = (
-    ("can_manage_unit_roles", _("Can modify roles for the unit")),
+    (
+        "can_manage_unit_roles",
+        _("Can modify roles for the unit"),
+    ),
     (
         "can_manage_reservation_units",
         _("Can create, edit and delete reservation units in the unit"),
@@ -111,10 +133,22 @@ UNIT_PERMISSIONS = (
         "can_allocate_applications",
         _("Can allocate applications"),
     ),
-    ("can_validate_applications", _("Can validate applications in the unit")),
-    ("can_allocate_applications", _("Can allocate application in the unit")),
-    ("can_handle_applications", _("Can handle application in the unit")),
-    ("can_manage_units", _("Can edit unit information")),
+    (
+        "can_validate_applications",
+        _("Can validate applications in the unit"),
+    ),
+    (
+        "can_allocate_applications",
+        _("Can allocate application in the unit"),
+    ),
+    (
+        "can_handle_applications",
+        _("Can handle application in the unit"),
+    ),
+    (
+        "can_manage_units",
+        _("Can edit unit information"),
+    ),
     (
         "can_manage_spaces",
         _("Can create, edit and delete spaces in the unit"),
@@ -134,8 +168,14 @@ UNIT_PERMISSIONS = (
 )
 
 SERVICE_SECTOR_PERMISSIONS = (
-    ("can_manage_service_sector_roles", _("Can modify roles for the service sector")),
-    ("can_manage_unit_roles", _("Can modify roles for units in the service sector")),
+    (
+        "can_manage_service_sector_roles",
+        _("Can modify roles for the service sector"),
+    ),
+    (
+        "can_manage_unit_roles",
+        _("Can modify roles for units in the service sector"),
+    ),
     (
         "can_manage_reservation_units",
         _("Can create, edit and delete reservation units in the service sector"),
@@ -144,12 +184,18 @@ SERVICE_SECTOR_PERMISSIONS = (
         "can_manage_application_rounds",
         _("Can create, edit and delete application rounds in the service sector"),
     ),
-    ("can_handle_applications", _("Can handle applications in the service sector")),
+    (
+        "can_handle_applications",
+        _("Can handle applications in the service sector"),
+    ),
     (
         "can_manage_reservations",
         _("Can create, edit and cancel reservations in the service sector"),
     ),
-    ("can_validate_applications", _("Can validate application in the service sector")),
+    (
+        "can_validate_applications",
+        _("Can validate application in the service sector"),
+    ),
     (
         "can_view_reservations",
         _("Can view details of all reservations in the service sector"),
@@ -178,7 +224,10 @@ SERVICE_SECTOR_PERMISSIONS = (
         "can_comment_reservations",
         _("Can comment reservations in the service sector"),
     ),
-    ("can_manage_units", _("Can edit unit information in the service sector")),
+    (
+        "can_manage_units",
+        _("Can edit unit information in the service sector"),
+    ),
 )
 
 
