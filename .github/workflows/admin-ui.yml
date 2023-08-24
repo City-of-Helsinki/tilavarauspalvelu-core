@@ -5,24 +5,24 @@ name: admin-ui
 
 defaults:
   run:
-    working-directory: admin-ui
+    working-directory: apps/admin-ui
 
 on:
   push:
     branches: [main]
     paths:
-      - "common/**"
-      - "admin-ui/**"
+      - "packages/common/**"
+      - "apps/admin-ui/**"
       - ".github/workflows/admin-ui.yml"
-      - "yarn.lock"
+      - "pnpm-lock.yaml"
 
   pull_request:
     branches:
       - "main"
     paths:
-      - "common/**"
-      - "admin-ui/**"
-      - "yarn.lock"
+      - "packages/common/**"
+      - "apps/admin-ui/**"
+      - "pnpm-lock.yaml"
       - ".github/workflows/admin-ui.yml"
 
 env:
@@ -39,10 +39,10 @@ jobs:
           node-version: 16
       - name: Run CI checks
         run: |
-          yarn install --frozen-lockfile
-          yarn lint
-          yarn lint:css
-          yarn build
-          yarn test
+          pnpm install --frozen-lockfile
+          pnpm lint
+          pnpm lint:css
+          pnpm build
+          pnpm test
           cd ..
           docker build -f admin-ui/Dockerfile -t tilavaraus-admin-ui .

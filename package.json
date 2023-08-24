@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "npkill": "^0.10.0",
-    "npm-check-updates": "^16.6.2"
-  },
-  "dependencies": {}
+    "npm-check-updates": "^16.6.2",
+    "turbo": "^1.10.13"
+  }
 }
