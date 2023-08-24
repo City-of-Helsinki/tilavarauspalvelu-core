@@ -33,12 +33,13 @@ const authLink = setContext(async (_request, previousContext) => {
   const headers = previousContext.headers ?? {};
   const session = await getSession();
 
+  if (!session?.apiTokens?.tilavaraus) {
+    return headers;
+  }
   return {
     headers: {
       ...headers,
-      authorization: session?.apiTokens?.tilavaraus
-        ? `Bearer ${session.apiTokens.tilavaraus}`
-        : "",
+      authorization: `Bearer ${session.apiTokens.tilavaraus}`,
     },
   };
 });
