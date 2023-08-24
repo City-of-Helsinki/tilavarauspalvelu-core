@@ -378,10 +378,10 @@ class ReservationSchedulingMixin:
         interval_to_minutes = {
             ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
             ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,
-            ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES: 60,
-            ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES: 90,
+            ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES: 30,
+            ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES: 30,
         }
-        interval = reservation_unit.reservation_start_interval or ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
+        interval = reservation_unit.reservation_start_interval or ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES
         interval_minutes = interval_to_minutes[interval]
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
         possible_start_times = set()
