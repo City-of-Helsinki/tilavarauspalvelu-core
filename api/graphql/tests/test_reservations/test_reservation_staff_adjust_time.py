@@ -358,6 +358,40 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
+    def test_reservation_start_interval_interpretation_60_allows_30_intervals(self):
+        self.reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES
+        self.reservation_unit.save()
+
+        expected_change = self.reservation_begin + datetime.timedelta(minutes=30)
+
+        data = self.get_valid_adjust_data()
+        data["begin"] = expected_change.strftime("%Y%m%dT%H%M%S%zZ")
+
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.begin).is_equal_to(expected_change)
+
+    def test_reservation_start_interval_interpretation_90_allows_30_intervals(self):
+        self.reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES
+        self.reservation_unit.save()
+
+        expected_change = self.reservation_begin + datetime.timedelta(minutes=30)
+
+        data = self.get_valid_adjust_data()
+        data["begin"] = expected_change.strftime("%Y%m%dT%H%M%S%zZ")
+
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.begin).is_equal_to(expected_change)
+
     def test_time_change_not_allowed_for_another_user_reservation_if_reserver_role(
         self,
     ):
