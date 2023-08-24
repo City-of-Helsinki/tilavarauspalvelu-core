@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Card, IconArrowRight } from "hds-react";
 import { ApplicationRoundType } from "common/types/gql-types";
+import { breakpoints } from "common/src/common/style";
 import { applicationRoundUrl } from "../../common/urls";
 import ApplicationRoundStatusTag from "./ApplicationRoundStatusTag";
 import ReservationPeriod from "./ReservationPeriod";
@@ -16,36 +17,60 @@ interface IProps {
 const Layout = styled.div`
   display: flex;
   justify-content: space-between;
+  flex-flow: row wrap;
+  position: relative;
+  gap: var(--spacing-2-xs);
 `;
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
+const StatusTagContainer = styled.div`
+  order: 4;
+  @media (width > ${breakpoints.s}) {
+    order: 1;
+  }
 `;
-const ServiceSector = styled.span``;
+
+const TitleContainer = styled.div`
+  width: 100%;
+  @media (width > ${breakpoints.s}) {
+    width: 80%;
+  }
+`;
+
 const Name = styled.span`
   font-size: var(--fontsize-heading-s);
   font-family: var(--font-medium);
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-2-xs);
+  order: 1;
 `;
 const Times = styled.div`
   display: flex;
-  gap: var(--spacing-l);
+  flex-direction: column;
+  gap: var(--spacing-2-xs);
   font-size: var(--fontsize-body-s);
   padding-bottom: var(--spacing-s);
+  order: 3;
+  width: 100%;
+  @media (width > ${breakpoints.s}) {
+    flex-direction: row;
+    gap: var(--spacing-l);
+  }
 `;
 
+const BottomContainer = styled.div`
+  display: flex;
+  order: 5;
+  width: 100%;
+  align-items: center;
+`;
 const Stats = styled.div`
   display: flex;
-  gap: var(--spacing-m);
-`;
-
-const RightColumn = styled.div`
-  display: flex;
   flex-direction: column;
-  gap: var(--spacing-m);
-  justify-content: space-between;
-  align-items: flex-end;
+  gap: var(--spacing-2-xs);
+  width: 100%;
+  @media (width > ${breakpoints.s}) {
+    flex-direction: row;
+    gap: var(--spacing-m);
+  }
 `;
 
 const Number = styled.span`
@@ -80,21 +105,24 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
   return (
     <StyledCard>
       <Layout>
-        <Container>
-          <ServiceSector>
-            {applicationRound.serviceSector?.nameFi}
-          </ServiceSector>
+        <TitleContainer>
+          <div>{applicationRound.serviceSector?.nameFi}</div>
           <Name>{applicationRound.nameFi}</Name>
-          <Times>
-            <TimeframeStatus
-              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-            />
-            <ReservationPeriod
-              reservationPeriodBegin={applicationRound.reservationPeriodBegin}
-              reservationPeriodEnd={applicationRound.reservationPeriodEnd}
-            />
-          </Times>
+        </TitleContainer>
+        <Times>
+          <TimeframeStatus
+            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+          />
+          <ReservationPeriod
+            reservationPeriodBegin={applicationRound.reservationPeriodBegin}
+            reservationPeriodEnd={applicationRound.reservationPeriodEnd}
+          />
+        </Times>
+        <StatusTagContainer>
+          <ApplicationRoundStatusTag applicationRound={applicationRound} />
+        </StatusTagContainer>
+        <BottomContainer>
           <Stats>
             <Stat
               value={applicationRound.reservationUnitCount ?? 0}
@@ -109,13 +137,10 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
               })}
             />
           </Stats>
-        </Container>
-        <RightColumn>
-          <ApplicationRoundStatusTag applicationRound={applicationRound} />
           <Link to={applicationRoundUrl(String(applicationRound.pk))}>
             <IconArrowRight size="l" style={{ color: "var(--color-black)" }} />
           </Link>
-        </RightColumn>
+        </BottomContainer>
       </Layout>
     </StyledCard>
   );
