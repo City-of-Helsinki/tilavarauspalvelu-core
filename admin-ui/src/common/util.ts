@@ -37,7 +37,7 @@ export const formatDate = (
 
 export const formatTime = (
   date: string | null,
-  outputFormat = "HH.mm"
+  outputFormat = "HH:mm"
 ): string | null => {
   return date ? format(parseISO(date), outputFormat) : null;
 };
