@@ -13,6 +13,7 @@ const withBundleAnalyzer = analyser({
 
 /** @type {import('next').NextConfig} */
 const config ={
+  reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -71,7 +72,6 @@ const config ={
 
     return config;
   },
-  reactStrictMode: true,
   // common with user ui
   compiler: {
     styledComponents: {

@@ -6,8 +6,8 @@ const { parse } = require("url");
 // TODO env variables don't seem to work for hostname and port
 const publicPath = "/kasittely";
 const hostname = "local-tilavaraus.hel.fi";
-const SSL_CRT_FILE = "../common/certificates/local-tilavaraus.crt";
-const SSL_KEY_FILE = "../common/certificates/local-tilavaraus.key";
+const SSL_CRT_FILE = "../../certificates/local-tilavaraus.crt";
+const SSL_KEY_FILE = "../../certificates/local-tilavaraus.key";
 
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 const dev = process.env.NODE_ENV !== "production";

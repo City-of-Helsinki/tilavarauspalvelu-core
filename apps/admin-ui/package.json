@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "node server.cjs",
     "build": "next build",
     "start": "next start",
     "lint": "SKIP_ENV_VALIDATION=true next lint",
     "lint:fix": "SKIP_ENV_VALIDATION=true next lint --fix",
     "lint:css": "SKIP_ENV_VALIDATION=true stylelint './src/**/*.tsx'",
     "format": "SKIP_ENV_VALIDATION=true prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
-    "dev": "node server.cjs",
     "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki jest --runInBand",
     "test:watch": "SKIP_ENV_VALIDATION=true jest --watch",
     "ts-check": "tsc --noEmit --project tsconfig.tscheck.json"
@@ -23,18 +24,6 @@
     "*.{js,css,md,ts,tsx}": "prettier --write",
     "*.{js,ts,tsx}": "eslint --cache",
     "*.{tsx,css,scss}": "stylelint"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "dependencies": {
     "@apollo/client": "^3.8.1",
@@ -52,7 +41,7 @@
     "axios-auth-refresh": "^3.3.4",
     "axios-case-converter": "^0.11.1",
     "classnames": "^2.3.2",
-    "common": "*",
+    "common": "workspace:*",
     "date-fns": "^2.30.0",
     "focus-trap-react": "^10.2.1",
     "form-data": "^4.0.0",

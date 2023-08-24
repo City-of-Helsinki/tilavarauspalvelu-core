@@ -4,8 +4,10 @@ yarn-error.log
 .yarnrc.yml
 
 # local certs
-/common/certificates
+**/certificates
 
+# turbo
+**/.turbo
 # local config
 .env.local
 tsconfig.tsbuildinfo

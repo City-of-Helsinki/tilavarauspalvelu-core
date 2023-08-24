@@ -4,25 +4,33 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "noEmit": true,
     "incremental": true,
-    "allowSyntheticDefaultImports": true,
-    "types": ["cypress", "cypress-axe"]
+    "jsx": "preserve",
+    "types": ["cypress", "cypress-axe"],
+    "paths": {
+      "~/*": ["./*"]
+    }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "*.d.ts",
+    "next-config.js",
+    "next-env.d.ts",
+    "next-i18next.config.js",
     "jest.setup.js",
     "jest.config.ts",
+    "stylelint.config.cjs",
     ".eslintrc.js"
   ],
   "exclude": [

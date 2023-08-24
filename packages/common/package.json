@@ -2,10 +2,12 @@
   "name": "common",
   "version": "0.1.0",
   "private": true,
-  "main": "index.ts",
-  "module": "index.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./index.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "generate-certificate": "mkdirp certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin",
     "lint": "eslint --ext ts,tsx .",
     "lint:fix": "eslint --ext ts,tsx . --fix",
     "lint:css": "echo 'no stylelint for common'",
@@ -14,18 +16,6 @@
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "update-schema": "npx --yes get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql",
     "generate-email-templates": "node ./email/convertToHTML.mjs"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "dependencies": {
     "@apollo/client": "^3.8.1",
@@ -52,6 +42,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@apollo/client": "^3.7.3",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/typescript": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^2.5.10",

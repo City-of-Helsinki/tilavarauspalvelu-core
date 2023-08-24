@@ -4,6 +4,13 @@ const { withSentryConfig } = require("@sentry/nextjs");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  transpilePackages: ["common"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   i18n,
   serverRuntimeConfig: {
     apiBaseUrl: process.env.TILAVARAUS_API_URL,
@@ -32,7 +39,6 @@ const nextConfig = {
     mockRequests: process.env.NEXT_PUBLIC_MOCK_REQUESTS === "true",
     mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
   },
-  transpilePackages: ["common"],
   compiler: {
     styledComponents: {
       ssr: true,
