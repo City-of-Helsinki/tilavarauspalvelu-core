@@ -114,14 +114,14 @@ const ApplicationEventCard = ({
   applications,
   reservationUnit,
   type,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const [isExpanded, setIsExpanded] = useState(false);
 
   const application = getApplicationByApplicationEvent(
     applications,
-    applicationEvent.pk as number
+    applicationEvent.pk ?? 0
   );
   const applicantName = getApplicantName(application);
   const isActive = applicationEvent === selectedApplicationEvent;
@@ -136,6 +136,11 @@ const ApplicationEventCard = ({
     .filter((ru) => ru?.pk !== reservationUnit.pk)
     .map((ru) => ru?.nameFi)
     .join(", ");
+
+  if (!application || !applicationEvent) {
+    return null;
+  }
+
   return (
     <Card $type={type}>
       <StyledRadioButton
@@ -155,7 +160,7 @@ const ApplicationEventCard = ({
       {isExpanded && (
         <Details>
           <StyledLink
-            href={`${publicUrl}/application/${application?.pk}/details`}
+            href={`${publicUrl}/application/${application.pk}/details#${applicationEvent.pk}`}
             external
             openInNewTab
             openInExternalDomainAriaLabel={t("common.openToNewTab")}

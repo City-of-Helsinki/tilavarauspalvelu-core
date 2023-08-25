@@ -1,8 +1,10 @@
 import React from "react";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize } from "lodash";
-import { CustomTable, DataOrMessage, TableLink } from "../../lists/components";
+import { publicUrl } from "app/common/const";
+import { CustomTable, DataOrMessage } from "../../lists/components";
 
 import { ApplicationEventView, truncate } from "../util";
 import { applicationDetailsUrl } from "../../../common/urls";
@@ -21,6 +23,10 @@ type Props = {
   applicationEvents: ApplicationEventView[];
 };
 
+const A = styled.a`
+  color: var(--color-black);
+`;
+
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("ApplicationEvent.headings.id"),
@@ -32,12 +38,16 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ApplicationEvent.headings.customer"),
     isSortable: true,
     key: "applicant",
-    transform: ({ applicant, applicationId }: ApplicationEventView) => (
-      <TableLink href={applicationDetailsUrl(applicationId)}>
+    transform: ({ applicant, applicationId, id }: ApplicationEventView) => (
+      <A
+        href={`${publicUrl}${applicationDetailsUrl(applicationId)}#${id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <span title={applicant}>
-          {truncate(applicant as string, applicantTruncateLen)}
+          {truncate(applicant ?? "-", applicantTruncateLen)}
         </span>
-      </TableLink>
+      </A>
     ),
   },
   {
