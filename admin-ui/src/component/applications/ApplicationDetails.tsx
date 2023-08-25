@@ -366,7 +366,7 @@ function ApplicationDetails(): JSX.Element | null {
                     hash={applicationEvent.id.toString()}
                   >
                     <StyledAccordion
-                      heading={applicationEvent.name}
+                      heading={`${application.id}-${applicationEvent.id} ${applicationEvent.name}`}
                       defaultOpen
                     >
                       <EventProps>
