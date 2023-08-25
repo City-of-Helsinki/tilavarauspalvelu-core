@@ -118,6 +118,7 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
         cellSpacing={24}
       >
         {units.map((unit) => {
+          const name = getReservationUnitName(unit);
           const pricing = getActivePricing(unit);
           const unitPrice = getPrice({ pricing });
           const reservationUnitTypeName = getTranslation(
@@ -128,12 +129,12 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
             <Unit key={unit.pk}>
               <Image
                 src={getMainImage(unit)?.mediumUrl}
-                alt=""
+                alt={name}
                 style={{ marginTop: 0 }}
               />
               <Content>
                 <Link href={reservationUnitPath(unit.pk)}>
-                  <Name>{getReservationUnitName(unit)}</Name>
+                  <Name>{name}</Name>
                 </Link>
                 <Building>{getUnitName(unit.unit)}</Building>
                 <Props>
@@ -142,10 +143,10 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
                       icon={
                         <NextImage
                           src="/icons/icon_premises.svg"
-                          alt={t("common:headAlt")}
+                          alt=""
                           width="24"
                           height="24"
-                          aria-label={t("reservationUnitCard:type")}
+                          aria-hidden="true"
                         />
                       }
                       text={reservationUnitTypeName}

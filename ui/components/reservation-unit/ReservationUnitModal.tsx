@@ -160,9 +160,7 @@ const ReservationUnitCard = ({
   return (
     <Container>
       <Image
-        alt={t("common:imgAltForSpace", {
-          name: reservationUnitName,
-        })}
+        alt={reservationUnitName}
         src={getMainImage(reservationUnit)?.smallUrl || pixel}
       />
       <Main>

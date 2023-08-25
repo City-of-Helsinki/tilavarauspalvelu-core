@@ -241,9 +241,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
   return (
     <Container data-testid="reservation__card--container">
       <Image
-        alt={t("common:imgAltForSpace", {
-          name: getTranslation(reservationUnit, "name"),
-        })}
+        alt={getTranslation(reservationUnit, "name")}
         src={
           getMainImage(reservationUnit)?.mediumUrl ||
           "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="

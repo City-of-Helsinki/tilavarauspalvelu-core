@@ -176,9 +176,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
     <Container>
       <StyledLink href={link}>
         <Image
-          alt={t("common:imgAltForSpace", {
-            name,
-          })}
+          alt={name}
           src={getMainImage(reservationUnit)?.smallUrl || pixel}
         />
       </StyledLink>
@@ -202,10 +200,10 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
                 icon={
                   <NextImage
                     src="/icons/icon_premises.svg"
-                    alt={t("common:headAlt")}
+                    alt=""
                     width="24"
                     height="24"
-                    aria-label={t("reservationUnitCard:type")}
+                    aria-hidden="true"
                   />
                 }
                 text={reservationUnitTypeName}
