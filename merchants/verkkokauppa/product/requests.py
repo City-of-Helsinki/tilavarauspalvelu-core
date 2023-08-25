@@ -58,9 +58,7 @@ def create_product(params: CreateProductParams, post=_post) -> Product:
 
 def get_product_mapping(product_id: UUID, get=_get) -> Optional[Product]:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "GET", "/product/{product_id}/mapping"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/product/{product_id}/mapping") as metric:
             response = get(
                 url=urljoin(_get_base_url(), f"{str(product_id)}/mapping"),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -72,17 +70,13 @@ def get_product_mapping(product_id: UUID, get=_get) -> Optional[Product]:
         if response.status_code == 404:
             return None
         if response.status_code != 200:
-            raise GetProductMappingError(
-                f"Fetching product mapping failed: {json.get('errors')}"
-            )
+            raise GetProductMappingError(f"Fetching product mapping failed: {json.get('errors')}")
         return Product.from_json(json)
     except (RequestException, JSONDecodeError, ParseProductError) as e:
         raise GetProductMappingError(f"Fetching product mapping failed: {e}")
 
 
-def create_or_update_accounting(
-    product_id: UUID, params: CreateOrUpdateAccountingParams, post=_post
-) -> Accounting:
+def create_or_update_accounting(product_id: UUID, params: CreateOrUpdateAccountingParams, post=_post) -> Accounting:
     """
     Be aware that this endpoint allows creating accouting data for products that
     do not exist. This is intentional, since in some uses cases there is a need
@@ -92,9 +86,7 @@ def create_or_update_accounting(
     Otherwise payments will fail.
     """
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "POST", "/product/{product_id}/accounting"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/product/{product_id}/accounting") as metric:
             response = post(
                 url=urljoin(_get_base_url(), f"{product_id}/accounting"),
                 json=params.to_json(),
@@ -110,11 +102,7 @@ def create_or_update_accounting(
         if response.status_code == 201:
             return Accounting.from_json(json)
 
-        raise CreateOrUpdateAccountingError(
-            f"Creating or updating accounting failed: {json.get('errors')}"
-        )
+        raise CreateOrUpdateAccountingError(f"Creating or updating accounting failed: {json.get('errors')}")
 
     except (RequestException, JSONDecodeError, ParseAccountingError) as e:
-        raise CreateOrUpdateAccountingError(
-            f"Creating or updating accounting failed: {e}"
-        )
+        raise CreateOrUpdateAccountingError(f"Creating or updating accounting failed: {e}")

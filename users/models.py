@@ -16,9 +16,7 @@ class ReservationNotification(models.TextChoices):
 
 
 class User(AbstractUser):
-    tvp_uuid = models.UUIDField(
-        default=uuid.uuid4, null=False, editable=False, unique=True
-    )
+    tvp_uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
     preferred_language = models.CharField(
         max_length=8,
         null=True,

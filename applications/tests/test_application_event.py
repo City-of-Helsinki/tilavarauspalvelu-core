@@ -44,9 +44,7 @@ def test_getting_not_scheduled_occurrences_for_accepted_result(
 
 
 @pytest.mark.django_db
-def test_getting_not_scheduled_occurrences_without_schedule_result(
-    recurring_application_event, scheduled_for_tuesday
-):
+def test_getting_not_scheduled_occurrences_without_schedule_result(recurring_application_event, scheduled_for_tuesday):
     occurrences = recurring_application_event.get_not_scheduled_occurrences()
 
     assert_that(hasattr(occurrences, f"{scheduled_for_tuesday.id}")).is_false()
@@ -58,9 +56,7 @@ def test_should_filter_to_baskets_by_purpose(
 ):
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
+    assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
 @pytest.mark.django_db
@@ -90,9 +86,7 @@ def test_should_include_if_basket_has_no_purposes(
 
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
+    assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
 @pytest.mark.django_db
@@ -109,9 +103,7 @@ def test_should_filter_by_age_group(
     recurring_application_event.save()
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
+    assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
 @pytest.mark.django_db
@@ -178,9 +170,7 @@ def test_should_filter_to_baskets_by_home_city(
 
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
+    assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
 @pytest.mark.django_db
@@ -213,9 +203,7 @@ def test_should_include_if_basket_has_no_home_city(
 
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
+    assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
 @pytest.mark.parametrize(
@@ -251,9 +239,7 @@ def test_should_filter_to_baskets_by_customer_type(
 
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
+    assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
 @pytest.mark.parametrize(
@@ -328,6 +314,4 @@ def test_should_include_if_no_customer_type(
 
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
+    assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}

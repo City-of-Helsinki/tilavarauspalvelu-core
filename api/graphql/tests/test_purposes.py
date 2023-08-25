@@ -71,14 +71,10 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         content = json.loads(response.content)
         errors = content.get("errors")
         assert_that(len(errors)).is_equal_to(1)
-        assert_that(errors[0].get("message")).is_equal_to(
-            "No Purpose matches the given query."
-        )
+        assert_that(errors[0].get("message")).is_equal_to("No Purpose matches the given query.")
 
     def test_creating_purpose(self):
-        response = self.query(
-            self.get_create_query(), input_data={"nameFi": "Created purpose"}
-        )
+        response = self.query(self.get_create_query(), input_data={"nameFi": "Created purpose"})
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

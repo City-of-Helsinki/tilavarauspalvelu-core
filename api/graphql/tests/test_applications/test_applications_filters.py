@@ -353,9 +353,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
             application=self.application, name="applied_min_duration_total", value=8600
         )
         application = ApplicationFactory(additional_information="Don't show me")
-        ApplicationAggregateData.objects.create(
-            application=application, name="applied_min_duration_total", value=9000
-        )
+        ApplicationAggregateData.objects.create(application=application, name="applied_min_duration_total", value=9000)
 
         filter_clause = "appliedCountLte: 8601"
 
@@ -369,9 +367,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
             application=self.application, name="applied_min_duration_total", value=9000
         )
         application = ApplicationFactory(additional_information="Don't show me")
-        ApplicationAggregateData.objects.create(
-            application=application, name="applied_min_duration_total", value=8600
-        )
+        ApplicationAggregateData.objects.create(application=application, name="applied_min_duration_total", value=8600)
 
         filter_clause = "appliedCountGte: 8601"
 
@@ -387,18 +383,14 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
             value=8600,
         )
         application = ApplicationFactory(additional_information="Show me")
-        ApplicationAggregateData.objects.create(
-            application=application, name="applied_min_duration_total", value=9000
-        )
+        ApplicationAggregateData.objects.create(application=application, name="applied_min_duration_total", value=9000)
         application_too = ApplicationFactory(additional_information="Don't show me")
         ApplicationAggregateData.objects.create(
             application=application_too,
             name="applied_min_duration_total",
             value=9500,
         )
-        application_too_too = ApplicationFactory(
-            additional_information="Don't show me either"
-        )
+        application_too_too = ApplicationFactory(additional_information="Don't show me either")
         ApplicationAggregateData.objects.create(
             application=application_too_too,
             name="applied_min_duration_total",
@@ -428,9 +420,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
             % Application.APPLICANT_TYPE_COMMUNITY
         )
 
-        ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_COMPANY, user=self.regular_joe
-        )
+        ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_COMPANY, user=self.regular_joe)
         response = self.query(query)
         assert_that(response.status_code).is_equal_to(200)
 
@@ -454,9 +444,7 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
             }}
         """
 
-        ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_COMPANY, user=self.regular_joe
-        )
+        ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_COMPANY, user=self.regular_joe)
         response = self.query(query)
         assert_that(response.status_code).is_equal_to(200)
 

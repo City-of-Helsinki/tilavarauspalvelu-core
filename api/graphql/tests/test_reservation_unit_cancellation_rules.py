@@ -7,15 +7,11 @@ from api.graphql.tests.base import GrapheneTestCaseBase
 from reservation_units.tests.factories import ReservationUnitCancellationRuleFactory
 
 
-class ReservationUnitCancellationRulesQueryTestCase(
-    GrapheneTestCaseBase, snapshottest.TestCase
-):
+class ReservationUnitCancellationRulesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.rule = ReservationUnitCancellationRuleFactory(
-            name_fi="fi", name_sv="sv", name_en="en"
-        )
+        cls.rule = ReservationUnitCancellationRuleFactory(name_fi="fi", name_sv="sv", name_en="en")
 
     def test_getting_reservation_unit_cancellation_rules_for_logged_in_user(self):
         self.client.force_login(self.regular_joe)
@@ -60,6 +56,4 @@ class ReservationUnitCancellationRulesQueryTestCase(
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("reservationUnitCancellationRules").get("edges")
-        ).is_empty()
+        assert_that(content.get("data").get("reservationUnitCancellationRules").get("edges")).is_empty()

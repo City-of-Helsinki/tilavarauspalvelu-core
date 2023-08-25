@@ -65,12 +65,8 @@ class ApplicationStatusBaseTestCase(TestCase):
             begin=date,
             end=date + datetime.timedelta(weeks=4),
         )
-        event_res_unit = EventReservationUnitFactory(
-            application_event=cls.application_event
-        )
-        cls.schedule = ApplicationEventScheduleFactory(
-            application_event=cls.application_event
-        )
+        event_res_unit = EventReservationUnitFactory(application_event=cls.application_event)
+        cls.schedule = ApplicationEventScheduleFactory(application_event=cls.application_event)
         space = SpaceFactory()
         cls.result = ApplicationEventScheduleResultFactory(
             application_event_schedule=cls.schedule,
@@ -149,9 +145,7 @@ class ApplicationStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase):
             },
         )
         assert_that(response.status_code).is_equal_to(201)
-        assert_that(ApplicationStatus.objects.latest("id").status).is_equal_to(
-            ApplicationStatus.REVIEW_DONE
-        )
+        assert_that(ApplicationStatus.objects.latest("id").status).is_equal_to(ApplicationStatus.REVIEW_DONE)
 
     def test_service_sector_manager_can_create_status_for_multiple(self):
         application_too = ApplicationFactory(application_round=self.round)
@@ -165,20 +159,14 @@ class ApplicationStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase):
                 "application_id": application_too.id,
             },
         ]
-        response = self.manager_api_client.post(
-            reverse("application_status-list"), data=body, format="json"
-        )
+        response = self.manager_api_client.post(reverse("application_status-list"), data=body, format="json")
         assert_that(response.status_code).is_equal_to(201)
-        assert_that(
-            ApplicationStatus.objects.filter(application=self.application)
-            .latest("id")
-            .status
-        ).is_equal_to(ApplicationStatus.REVIEW_DONE)
-        assert_that(
-            ApplicationStatus.objects.filter(application=application_too)
-            .latest("id")
-            .status
-        ).is_equal_to(ApplicationStatus.REVIEW_DONE)
+        assert_that(ApplicationStatus.objects.filter(application=self.application).latest("id").status).is_equal_to(
+            ApplicationStatus.REVIEW_DONE
+        )
+        assert_that(ApplicationStatus.objects.filter(application=application_too).latest("id").status).is_equal_to(
+            ApplicationStatus.REVIEW_DONE
+        )
 
 
 @pytest.mark.django_db
@@ -202,9 +190,7 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
             },
         )
         assert_that(response.status_code).is_equal_to(403)
-        assert_that(ApplicationEventStatus.objects.latest("id").status).is_equal_to(
-            ApplicationEventStatus.CREATED
-        )
+        assert_that(ApplicationEventStatus.objects.latest("id").status).is_equal_to(ApplicationEventStatus.CREATED)
 
     @mock.patch(
         "applications.utils.reservation_creation.ReservationScheduler",
@@ -219,9 +205,7 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
             },
         )
         assert_that(response.status_code).is_equal_to(201)
-        assert_that(ApplicationEventStatus.objects.latest("id").status).is_equal_to(
-            ApplicationEventStatus.APPROVED
-        )
+        assert_that(ApplicationEventStatus.objects.latest("id").status).is_equal_to(ApplicationEventStatus.APPROVED)
 
     def test_status_change_with_empty_data_returns_403(self):
         response = self.applicant_api_client.post(
@@ -283,24 +267,14 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
             },
         )
         assert_that(response.status_code).is_equal_to(201)
-        reservations = Reservation.objects.filter(
-            recurring_reservation__application=self.application
-        ).order_by("begin")
-        schedule_result = (
-            self.application_event.application_event_schedules.first().application_event_schedule_result
-        )
+        reservations = Reservation.objects.filter(recurring_reservation__application=self.application).order_by("begin")
+        schedule_result = self.application_event.application_event_schedules.first().application_event_schedule_result
         for reservation in reservations:
-            assert_that(reservation.begin.weekday()).is_equal_to(
-                schedule_result.allocated_day
-            )
+            assert_that(reservation.begin.weekday()).is_equal_to(schedule_result.allocated_day)
 
     def test_reservation_gets_denied_status_when_overlapping(self, mock):
-        res_date = next_or_current_matching_weekday(
-            self.application_event.begin, self.result.allocated_day
-        )
-        res_dt = datetime.datetime.combine(
-            res_date, self.result.allocated_begin, tzinfo=get_default_timezone()
-        )
+        res_date = next_or_current_matching_weekday(self.application_event.begin, self.result.allocated_day)
+        res_dt = datetime.datetime.combine(res_date, self.result.allocated_begin, tzinfo=get_default_timezone())
         ReservationFactory(
             begin=res_dt,
             end=res_dt + datetime.timedelta(hours=12),
@@ -316,9 +290,7 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         )
         assert_that(response.status_code).is_equal_to(201)
 
-        reservations = Reservation.objects.filter(
-            recurring_reservation__application=self.application
-        ).order_by("begin")
+        reservations = Reservation.objects.filter(recurring_reservation__application=self.application).order_by("begin")
         assert_that(reservations[0].state).is_equal_to(STATE_CHOICES.DENIED)
         for reservation in reservations[1:4]:
             assert_that(reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
@@ -340,9 +312,7 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.DENIED)
 
 
-class ApplicationAggregateDataCreationOnEventStatusChangeTestCase(
-    ApplicationStatusBaseTestCase
-):
+class ApplicationAggregateDataCreationOnEventStatusChangeTestCase(ApplicationStatusBaseTestCase):
     @mock.patch(
         "applications.utils.reservation_creation.ReservationScheduler",
         wraps=MockedScheduler,
@@ -356,9 +326,7 @@ class ApplicationAggregateDataCreationOnEventStatusChangeTestCase(
             },
         )
         assert_that(response.status_code).is_equal_to(201)
-        aggregate_datas_one = ApplicationAggregateData.objects.filter(
-            application=self.application
-        ).count()
+        aggregate_datas_one = ApplicationAggregateData.objects.filter(application=self.application).count()
 
         assert_that(aggregate_datas_one).is_equal_to(4)
 

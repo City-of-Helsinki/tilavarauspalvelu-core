@@ -25,9 +25,7 @@ class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
         queryset=ReservationPurpose.objects.all(), source="purposes", many=True
     )
 
-    age_group_ids = serializers.PrimaryKeyRelatedField(
-        queryset=AgeGroup.objects.all(), source="age_groups", many=True
-    )
+    age_group_ids = serializers.PrimaryKeyRelatedField(queryset=AgeGroup.objects.all(), source="age_groups", many=True)
 
     home_city_id = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all(), source="home_city", required=False, allow_null=True
@@ -191,17 +189,13 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     def get_is_admin(self, obj):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
 
         if request_user is None:
             return False
         service_sector = obj.service_sector
 
-        return can_manage_service_sectors_application_rounds(
-            request_user, service_sector
-        )
+        return can_manage_service_sectors_application_rounds(request_user, service_sector)
 
     def get_aggregated_data(self, instance):
         allocation_result_dict = {}
@@ -234,9 +228,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
 
         status = validated_data.pop("status")
 
@@ -244,9 +236,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
         application_round = super().create(validated_data)
 
-        self.handle_baskets(
-            application_round_instance=application_round, basket_data=basket_data
-        )
+        self.handle_baskets(application_round_instance=application_round, basket_data=basket_data)
 
         application_round.set_status(status, request_user)
 
@@ -257,17 +247,13 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             return self.partial_update(instance, validated_data)
 
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
 
         status = validated_data.pop("status")
 
         basket_data = validated_data.pop("application_round_baskets")
 
-        self.handle_baskets(
-            application_round_instance=instance, basket_data=basket_data
-        )
+        self.handle_baskets(application_round_instance=instance, basket_data=basket_data)
 
         application_round = super().update(instance, validated_data)
 
@@ -277,9 +263,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     def partial_update(self, instance, validated_data):
         request = self.context["request"] if "request" in self.context else None
-        request_user = (
-            request.user if request and request.user.is_authenticated else None
-        )
+        request_user = request.user if request and request.user.is_authenticated else None
         status = validated_data.pop("status", None)
         if status:
             instance.set_status(status, request_user)
@@ -291,7 +275,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         if self.partial and not baskets:
             return data
 
-        basket_order_numbers = list(map(lambda basket: basket["order_number"], baskets))
+        basket_order_numbers = [basket["order_number"] for basket in baskets]
         if len(basket_order_numbers) > len(set(basket_order_numbers)):
             raise serializers.ValidationError("Order numbers should be unique")
 
@@ -302,15 +286,12 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             and self.instance.status == ApplicationRoundStatus.ARCHIVED
             and status != ApplicationRoundStatus.ARCHIVED
         ):
-            raise serializers.ValidationError(
-                "Cannot change status of ARCHIVED application round."
-            )
+            raise serializers.ValidationError("Cannot change status of ARCHIVED application round.")
 
         if (
             self.instance
             and self.instance.status == ApplicationRoundStatus.SENT
-            and status
-            not in [ApplicationRoundStatus.SENDING, ApplicationRoundStatus.ARCHIVED]
+            and status not in [ApplicationRoundStatus.SENDING, ApplicationRoundStatus.ARCHIVED]
         ):
             raise serializers.ValidationError(
                 "Status of SENT application round can be changed only to SENDING or ARCHIVED."
@@ -323,11 +304,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         for basket in basket_data:
             basket["application_round"] = application_round_instance
             if "id" not in basket or ["id"] is None:
-                basket_ids.append(
-                    ApplicationRoundBasketSerializer(data=basket)
-                    .create(validated_data=basket)
-                    .id
-                )
+                basket_ids.append(ApplicationRoundBasketSerializer(data=basket).create(validated_data=basket).id)
             else:
                 basket_ids.append(
                     ApplicationRoundBasketSerializer(data=basket)
@@ -337,9 +314,9 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
                     )
                     .id
                 )
-        ApplicationRoundBasket.objects.filter(
-            application_round=application_round_instance
-        ).exclude(id__in=basket_ids).delete()
+        ApplicationRoundBasket.objects.filter(application_round=application_round_instance).exclude(
+            id__in=basket_ids
+        ).delete()
 
 
 class ApplicationRoundViewSet(viewsets.ModelViewSet):
@@ -350,9 +327,7 @@ class ApplicationRoundViewSet(viewsets.ModelViewSet):
         .annotate(
             events_count=Subquery(
                 ApplicationEventAggregateData.objects.filter(
-                    application_event__application__application_round__id=OuterRef(
-                        "id"
-                    ),
+                    application_event__application__application_round__id=OuterRef("id"),
                     name="allocation_results_reservations_total",
                 )
                 .distinct()
@@ -362,9 +337,7 @@ class ApplicationRoundViewSet(viewsets.ModelViewSet):
             ),
             duration_total=Subquery(
                 ApplicationEventAggregateData.objects.filter(
-                    application_event__application__application_round__id=OuterRef(
-                        "id"
-                    ),
+                    application_event__application__application_round__id=OuterRef("id"),
                     name="allocation_results_duration_total",
                 )
                 .distinct()
@@ -393,8 +366,6 @@ class ApplicationRoundViewSet(viewsets.ModelViewSet):
             "aggregated_data",
             "application_round_baskets",
             Prefetch("purposes", queryset=ReservationPurpose.objects.all().only("id")),
-            Prefetch(
-                "reservation_units", queryset=ReservationUnit.objects.all().only("id")
-            ),
+            Prefetch("reservation_units", queryset=ReservationUnit.objects.all().only("id")),
         )
     )

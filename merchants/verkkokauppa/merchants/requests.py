@@ -34,9 +34,7 @@ def _get_base_url():
 
 def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "POST", "/merchant/create/merchant/{namespace}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/merchant/create/merchant/{namespace}") as metric:
             response = post(
                 url=urljoin(
                     _get_base_url(),
@@ -58,9 +56,7 @@ def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
 
 def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merchant:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "POST", "/merchant/update/merchant/{namespace}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/merchant/update/merchant/{namespace}") as metric:
             response = post(
                 url=urljoin(
                     _get_base_url(),
@@ -74,9 +70,7 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
 
         json = response.json()
         if response.status_code == 404:
-            raise UpdateMerchantError(
-                f"Merchant update failed: merchant {str(id)} not found"
-            )
+            raise UpdateMerchantError(f"Merchant update failed: merchant {str(id)} not found")
         if response.status_code != 200:
             raise UpdateMerchantError(f"Merchant update failed: {json.get('errors')}")
 
@@ -87,9 +81,7 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
 
 def get_merchants(get=_get) -> List[Merchant]:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "GET", "/merchant/list/merchants/{namespace}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/merchant/list/merchants/{namespace}") as metric:
             response = get(
                 url=urljoin(
                     _get_base_url(),
@@ -114,13 +106,9 @@ def get_merchants(get=_get) -> List[Merchant]:
 
 def get_merchant(id: UUID, get=_get) -> Optional[MerchantInfo]:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "GET", "/merchant/{namespace}/{merchant_id}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/merchant/{namespace}/{merchant_id}") as metric:
             response = get(
-                url=urljoin(
-                    _get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"
-                ),
+                url=urljoin(_get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
                 timeout=REQUEST_TIMEOUT_SECONDS,
             )
@@ -132,9 +120,7 @@ def get_merchant(id: UUID, get=_get) -> Optional[MerchantInfo]:
             return None
 
         if response.status_code != 200:
-            raise GetMerchantError(
-                f"Fetching merchant {str(id)} failed: {json.get('errors')}"
-            )
+            raise GetMerchantError(f"Fetching merchant {str(id)} failed: {json.get('errors')}")
 
         return MerchantInfo.from_json(json)
     except (RequestException, JSONDecodeError, ParseMerchantError) as e:

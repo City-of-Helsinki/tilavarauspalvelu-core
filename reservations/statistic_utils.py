@@ -23,28 +23,19 @@ def create_or_update_reservation_statistics(reservation_pk: Reservation):
             "reservee_language": reservation.reservee_language,
             "num_persons": reservation.num_persons,
             "priority": reservation.priority,
-            "priority_name": PRIORITIES.get_priority_name_from_constant(
-                reservation.priority
-            ),
+            "priority_name": PRIORITIES.get_priority_name_from_constant(reservation.priority),
             "home_city": reservation.home_city,
-            "home_city_name": reservation.home_city.name
-            if reservation.home_city
-            else "",
-            "home_city_municipality_code": reservation.home_city.municipality_code
-            if reservation.home_city
-            else "",
+            "home_city_name": reservation.home_city.name if reservation.home_city else "",
+            "home_city_municipality_code": reservation.home_city.municipality_code if reservation.home_city else "",
             "purpose": reservation.purpose,
             "purpose_name": reservation.purpose.name if reservation.purpose else "",
             "age_group": reservation.age_group,
             "age_group_name": str(reservation.age_group),
             "is_applied": getattr(recurring, "application", None) is not None,
-            "ability_group": getattr(
-                reservation.recurring_reservation, "ability_group", None
-            ),
+            "ability_group": getattr(reservation.recurring_reservation, "ability_group", None),
             "begin": reservation.begin,
             "end": reservation.end,
-            "duration_minutes": (reservation.end - reservation.begin).total_seconds()
-            / 60,
+            "duration_minutes": (reservation.end - reservation.begin).total_seconds() / 60,
             "reservation_type": reservation.type,
             "state": reservation.state,
             "cancel_reason": reservation.cancel_reason,
@@ -79,9 +70,7 @@ def create_or_update_reservation_statistics(reservation_pk: Reservation):
             },
         )
 
-    stat.reservation_stats_reservation_units.exclude(
-        reservation_unit__in=reservation.reservation_unit.all()
-    ).delete()
+    stat.reservation_stats_reservation_units.exclude(reservation_unit__in=reservation.reservation_unit.all()).delete()
 
     res_unit = reservation.reservation_unit.first()
     if res_unit:

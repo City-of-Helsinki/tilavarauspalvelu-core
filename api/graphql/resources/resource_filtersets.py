@@ -5,9 +5,7 @@ from spaces.models import Space
 
 
 class ResourceFilterSet(django_filters.FilterSet):
-    only_with_permission = django_filters.BooleanFilter(
-        method="get_only_with_permission"
-    )
+    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     def get_only_with_permission(self, qs, property, value):
         """Returns resources where the user has resource management permissions"""

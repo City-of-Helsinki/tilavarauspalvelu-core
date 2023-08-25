@@ -31,12 +31,8 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
         self.reservation = ReservationFactory(
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            - datetime.timedelta(hours=2),
-            end=(
-                datetime.datetime.now(tz=get_default_timezone())
-                - datetime.timedelta(hours=12)
-            ),
+            begin=datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=2),
+            end=(datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=12)),
             state=STATE_CHOICES.CANCELLED,
             user=self.regular_joe,
             reservee_email="email@reservee",
@@ -91,9 +87,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
         refund_data = content.get("data").get("refundReservation")
         assert_that(refund_data).is_none()
 
@@ -104,9 +98,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
 
         self.reservation.state = STATE_CHOICES.CONFIRMED
-        self.reservation.end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) + datetime.timedelta(hours=2)
+        self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
         self.reservation.save()
 
         input_data = self.get_valid_refund_data()
@@ -124,13 +116,9 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         assert_that(self.payment_order.refund_id).is_none
 
     @mock.patch("reservations.tasks.refund_order")
-    def test_refund_success_when_correct_state_and_not_in_the_past(
-        self, mock_refund_order
-    ):
+    def test_refund_success_when_correct_state_and_not_in_the_past(self, mock_refund_order):
         self.reservation.state = STATE_CHOICES.CANCELLED
-        self.reservation.end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) + datetime.timedelta(hours=2)
+        self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
         self.reservation.save()
 
         refund = mock.MagicMock()
@@ -155,9 +143,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
     @mock.patch("reservations.tasks.refund_order")
     def test_refund_success_when_invalid_state_and_in_the_past(self, mock_refund_order):
         self.reservation.state = STATE_CHOICES.CONFIRMED
-        self.reservation.end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) - datetime.timedelta(hours=2)
+        self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=2)
         self.reservation.save()
 
         refund = mock.MagicMock()

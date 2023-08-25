@@ -174,20 +174,12 @@ class ReservationDeleteMutation(AuthDeleteMutation, ClientIDMutation):
             ReservationState.CREATED,
             ReservationState.WAITING_FOR_PAYMENT,
         ):
-            raise ValidationError(
-                "Reservation which is not in created or waiting_for_payment state cannot be deleted."
-            )
+            raise ValidationError("Reservation which is not in created or waiting_for_payment state cannot be deleted.")
 
         payment_order: PaymentOrder = reservation.payment_order.first()
-        if (
-            payment_order
-            and payment_order.remote_id
-            and payment_order.status != OrderStatus.CANCELLED.value
-        ):
+        if payment_order and payment_order.remote_id and payment_order.status != OrderStatus.CANCELLED.value:
             try:
-                webshop_order = cancel_order(
-                    payment_order.remote_id, payment_order.reservation_user_uuid
-                )
+                webshop_order = cancel_order(payment_order.remote_id, payment_order.reservation_user_uuid)
 
                 if webshop_order and webshop_order.status == "cancelled":
                     payment_order.status = OrderStatus.CANCELLED

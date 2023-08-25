@@ -1,98 +1,79 @@
-version: '3.7'
+version: "3.9"
 
 services:
 
-    db:
-        image: "postgis/postgis:13-3.3-alpine"
-        environment:
-            POSTGRES_USER: tvp
-            POSTGRES_PASSWORD: tvp
-            POSTGRES_DB: tvp
-        ports:
-            - "127.0.0.1:5555:5432"
-        volumes:
-            - postgres-data-volume:/var/lib/postgresql/data
+  db:
+    container_name: tvp-db
+    image: "postgis/postgis:13-3.3-alpine"
+    environment:
+      POSTGRES_USER: tvp
+      POSTGRES_PASSWORD: tvp
+      POSTGRES_DB: tvp
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "tvp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "127.0.0.1:5555:5432"
+    volumes:
+      - tvp-postgres:/var/lib/postgresql/data
 
-    elastic:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
-        environment:
-            - xpack.security.enabled=false
-            - discovery.type=single-node
-        volumes:
-            - elastic_data:/usr/share/elasticsearch/data
-        ulimits:
-          memlock:
-              soft: -1
-              hard: -1
-        ports:
-            - "9200:9200"
-            - "9300:9300"
-        networks:
-            - default
+  elastic:
+    container_name: tvp-elastic
+    image: "docker.elastic.co/elasticsearch/elasticsearch:8.8.0"
+    environment:
+      xpack.security.enabled: false
+      discovery.type: single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "127.0.0.1:9200:9200"
+    volumes:
+      - tvp-elastic:/usr/share/elasticsearch/data
 
-    redis:
-        image: "redis:7-alpine"
-        ports:
-            - "127.0.0.1:6379:6379"
+  redis:
+    container_name: tvp-redis
+    image: "redis:7-alpine"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "127.0.0.1:6379:6379"
 
-    backend:
-        container_name: tilavarauspalvelu_core
-        image: tilavarauspalvelu_core_local
-        depends_on:
-            - db
-            - redis
-        build:
-            context: ./
-            dockerfile: ./Dockerfile.local
-        environment:
-            - REDIS_URL=redis://redis:6379/0
-            - DATABASE_URL=postgis://tvp:tvp@db/tvp
-            - CELERY_ENABLED=false
-            - DEBUG=true
-        ports:
-            - "8000:8000"
-
-    dev:
-        image: tilavarauspalvelu_dev
-        depends_on:
-            - db
-        build:
-            context: ./
-            dockerfile: ./Dockerfile
-            target: development
-            args:
-                BUILD_MODE: ${BUILD_MODE}
-                LOCAL_REDHAT_USERNAME: ${REDHAT_USERNAME}
-                LOCAL_REDHAT_PASSWORD: ${REDHAT_PASSWORD}
-        environment:
-            - DEBUG=true
-            - DATABASE_URL=postgis://tvp:tvp@db/tvp
-            - WAIT_FOR_IT_ADDRESS=postgres:5432
-            - CELERY_ENABLED=true
-            - CELERY_FILESYSTEM_BACKEND=true
-            - CELERY_QUEUE_FOLDER_OUT=/broker/queue/
-            - CELERY_QUEUE_FOLDER_IN=/broker/queue/
-            - CELERY_PROCESSED_FOLDER=/broker/processed/
-        command: ["start_django_development_server"]
-        ports:
-            - "127.0.0.1:8000:8000"
-        volumes:
-            - .:/tvp
-
-    deploy:
-        image: tilavarauspalvelu
-        build:
-            context: ./
-            dockerfile: ./Dockerfile
-            target: production
-        command: "e echo Not running deploy image from compose"
-
+  backend:
+    container_name: tvp-core
+    image: tvp-core
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      args:
+        DEPS: main,test,lint
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgis://tvp:tvp@db/tvp
+      ELASTICSEARCH_URL: http://elastic:9200
+    ports:
+      - "127.0.0.1:8000:8000"  # django
+      - "127.0.0.1:1717:1717"  # uwsgi stats
+    entrypoint: /tvp/docker/entrypoint_dev.sh
 
 volumes:
-        postgres-data-volume:
-        elastic_data:
-            driver: local
+  tvp-postgres:
+  tvp-elastic:
+    driver: local
 
 networks:
-    default:
-        name: helsinki
+  default:
+    name: helsinki

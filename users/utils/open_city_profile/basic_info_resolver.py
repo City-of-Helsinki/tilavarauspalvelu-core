@@ -115,13 +115,10 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
                 self.data = response.json()
             except JSONDecodeError:
                 raise ProfileReadError(
-                    "Got %s status code from profile and could not json decode the data"
-                    % response.status_code
+                    "Got %s status code from profile and could not json decode the data" % response.status_code
                 )
         elif status >= 500:
-            raise ProfileReadError(
-                "Got internal server error while querying profile data"
-            )
+            raise ProfileReadError("Got internal server error while querying profile data")
         else:
             self.data = response.json().get("data", {}).get("myProfile", {}) or {}
 
@@ -143,9 +140,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
             city = City.objects.filter(name__iexact=city_str).first()
 
         if not city:
-            city = City.objects.filter(
-                name__iexact=settings.SECONDARY_MUNICIPALITY_NAME
-            ).first()
+            city = City.objects.filter(name__iexact=settings.SECONDARY_MUNICIPALITY_NAME).first()
 
         return city
 
@@ -287,13 +282,10 @@ class ProfileNodeIdReader(ProfileReaderTokenMixin):
                 data = response.json()
             except JSONDecodeError:
                 raise ProfileReadError(
-                    "Got %s status code from profile and could not json decode the data"
-                    % response.status_code
+                    "Got %s status code from profile and could not json decode the data" % response.status_code
                 )
         elif status >= 500:
-            raise ProfileReadError(
-                "Got internal server error while querying profile data"
-            )
+            raise ProfileReadError("Got internal server error while querying profile data")
         else:
             data = response.json()
 

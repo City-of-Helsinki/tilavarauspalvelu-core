@@ -64,15 +64,11 @@ class AggregateDataBase(models.Model):
         abstract = True
 
     name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(
-        max_length=255, verbose_name=_("Value"), null=True, default=0
-    )
+    value = models.FloatField(max_length=255, verbose_name=_("Value"), null=True, default=0)
 
 
 class Address(models.Model):
-    street_address = models.TextField(
-        verbose_name=_("Street address"), null=False, blank=False, max_length=80
-    )
+    street_address = models.TextField(verbose_name=_("Street address"), null=False, blank=False, max_length=80)
 
     post_code = models.CharField(
         verbose_name=_("Post code"),
@@ -81,9 +77,7 @@ class Address(models.Model):
         blank=False,
     )
 
-    city = models.TextField(
-        verbose_name=_("City"), null=False, blank=False, max_length=80
-    )
+    city = models.TextField(verbose_name=_("City"), null=False, blank=False, max_length=80)
 
     def __str__(self):
         return f"{self.street_address}, {self.post_code}, {self.city}"
@@ -92,13 +86,9 @@ class Address(models.Model):
 class Person(ContactInformation):
     REQUIRED_FOR_REVIEW = ["first_name", "last_name"]
 
-    first_name = models.TextField(
-        verbose_name=_("First name"), null=False, blank=False, max_length=50
-    )
+    first_name = models.TextField(verbose_name=_("First name"), null=False, blank=False, max_length=50)
 
-    last_name = models.TextField(
-        verbose_name=_("Last name"), null=False, blank=False, max_length=50
-    )
+    last_name = models.TextField(verbose_name=_("Last name"), null=False, blank=False, max_length=50)
 
     def __str__(self):
         value = super().__str__()
@@ -146,9 +136,7 @@ class Organisation(models.Model):
         blank=True,
     )
 
-    address = models.ForeignKey(
-        Address, null=True, blank=False, on_delete=models.SET_NULL
-    )
+    address = models.ForeignKey(Address, null=True, blank=False, on_delete=models.SET_NULL)
 
     active_members = models.PositiveIntegerField(
         verbose_name=_("Active members"),
@@ -160,9 +148,7 @@ class Organisation(models.Model):
         blank=True,
     )
 
-    organisation_type = models.CharField(
-        max_length=255, choices=TYPE_CHOICES, default=COMPANY
-    )
+    organisation_type = models.CharField(max_length=255, choices=TYPE_CHOICES, default=COMPANY)
 
     email = models.EmailField(
         verbose_name=_("Email"),
@@ -223,9 +209,7 @@ class ApplicationRoundStatus(models.Model, StatusMixin):
 
     CLOSED_STATUSES = [SENT, ARCHIVED]
 
-    status = models.CharField(
-        max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES
-    )
+    status = models.CharField(max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES)
 
     application_round = models.ForeignKey(
         "ApplicationRound",
@@ -260,16 +244,12 @@ class ApplicationRoundManager(models.Manager):
             .get_queryset()
             .annotate(
                 latest_status=Subquery(
-                    ApplicationRoundStatus.objects.filter(
-                        application_round__id=OuterRef("id")
-                    )
+                    ApplicationRoundStatus.objects.filter(application_round__id=OuterRef("id"))
                     .order_by("-id")
                     .values("status")[:1]
                 ),
                 latest_status_timestamp=Subquery(
-                    ApplicationRoundStatus.objects.filter(
-                        application_round__id=OuterRef("id")
-                    )
+                    ApplicationRoundStatus.objects.filter(application_round__id=OuterRef("id"))
                     .order_by("-id")
                     .values("timestamp")[:1]
                 ),
@@ -293,13 +273,9 @@ class ApplicationRound(models.Model):
         max_length=255,
     )
 
-    target_group = models.CharField(
-        max_length=50, verbose_name=_("Target group"), choices=TARGET_GROUP_CHOICES
-    )
+    target_group = models.CharField(max_length=50, verbose_name=_("Target group"), choices=TARGET_GROUP_CHOICES)
 
-    allocating = models.BooleanField(
-        verbose_name=_("Allocating"), blank=True, default=False
-    )
+    allocating = models.BooleanField(verbose_name=_("Allocating"), blank=True, default=False)
 
     reservation_units = models.ManyToManyField(
         ReservationUnit,
@@ -347,9 +323,7 @@ class ApplicationRound(models.Model):
     objects = ApplicationRoundManager()
 
     def __str__(self):
-        return "{} ({} - {})".format(
-            self.name, self.reservation_period_begin, self.reservation_period_end
-        )
+        return "{} ({} - {})".format(self.name, self.reservation_period_begin, self.reservation_period_end)
 
     def refresh_from_db(self, using=None, fields=None) -> None:
         super().refresh_from_db(using, fields)
@@ -388,9 +362,7 @@ class ApplicationRound(models.Model):
     def set_status(self, status, user=None):
         if status not in ApplicationRoundStatus.get_statuses():
             raise ValidationError(_("Invalid status"))
-        ApplicationRoundStatus.objects.create(
-            application_round=self, status=status, user=user
-        )
+        ApplicationRoundStatus.objects.create(application_round=self, status=status, user=user)
         self.latest_status = status
         self.update_application_status(status)
 
@@ -409,9 +381,7 @@ class ApplicationRound(models.Model):
     def get_application_events_by_basket(self):
         matching_application_events: Dict[int, List[ApplicationEvent]] = {}
         for basket in self.application_round_baskets.order_by("order_number").all():
-            matching_application_events[
-                basket.id
-            ] = basket.get_application_events_in_basket()
+            matching_application_events[basket.id] = basket.get_application_events_in_basket()
         return matching_application_events
 
     def create_aggregate_data(self):
@@ -499,16 +469,12 @@ class ApplicationRound(models.Model):
 
 
 class ApplicationRoundAggregateData(AggregateDataBase):
-    application_round = models.ForeignKey(
-        ApplicationRound, on_delete=models.CASCADE, related_name="aggregated_data"
-    )
+    application_round = models.ForeignKey(ApplicationRound, on_delete=models.CASCADE, related_name="aggregated_data")
 
 
 class City(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=100)
-    municipality_code = models.CharField(
-        verbose_name=_("Municipality code"), default="", max_length=30
-    )
+    municipality_code = models.CharField(verbose_name=_("Municipality code"), default="", max_length=30)
 
     def __str__(self):
         return self.name
@@ -528,9 +494,7 @@ class CUSTOMER_TYPE_CONST(object):
 
 
 CUSTOMER_TYPES = CUSTOMER_TYPE_CONST()
-_CustomerTypes = TypeVar(
-    "_CustomerTypes", *[name for name, _ in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES]
-)
+_CustomerTypes = TypeVar("_CustomerTypes", *[name for name, _ in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES])
 
 
 class APPLICANT_TYPE_CONST(object):
@@ -549,9 +513,7 @@ class APPLICANT_TYPE_CONST(object):
 
 
 APPLICANT_TYPES = APPLICANT_TYPE_CONST()
-_ApplicantTypes = TypeVar(
-    "_ApplicantTypes", *[name for name, _ in APPLICANT_TYPES.APPLICANT_TYPE_CHOICES]
-)
+_ApplicantTypes = TypeVar("_ApplicantTypes", *[name for name, _ in APPLICANT_TYPES.APPLICANT_TYPE_CHOICES])
 
 
 def customer_types_to_applicant_types(
@@ -564,9 +526,7 @@ def customer_types_to_applicant_types(
             APPLICANT_TYPES.APPLICANT_TYPE_ASSOCIATION,
             APPLICANT_TYPES.APPLICANT_TYPE_COMMUNITY,
         ],
-        CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL: [
-            APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL
-        ],
+        CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL: [APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL],
     }
 
     for type in customer_types:
@@ -613,18 +573,12 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
         null=True,
         blank=True,
     )
-    allocation_percentage = models.PositiveSmallIntegerField(
-        verbose_name=_("Allocation percentage"), default=0
-    )
+    allocation_percentage = models.PositiveSmallIntegerField(verbose_name=_("Allocation percentage"), default=0)
 
-    order_number = models.PositiveSmallIntegerField(
-        verbose_name=_("Order number"), default=1, null=False, blank=True
-    )
+    order_number = models.PositiveSmallIntegerField(verbose_name=_("Order number"), default=1, null=False, blank=True)
 
     def get_application_events_in_basket(self):
-        events = ApplicationEvent.objects.filter(
-            application__application_round=self.application_round
-        )
+        events = ApplicationEvent.objects.filter(application__application_round=self.application_round)
 
         if self.home_city is not None:
             events = events.filter(application__home_city=self.home_city)
@@ -634,9 +588,7 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
             events = events.filter(age_group__in=self.age_groups.all())
         if self.customer_type is not None and len(self.customer_type) > 0:
             events = events.filter(
-                application__applicant_type__in=customer_types_to_applicant_types(
-                    self.customer_type
-                )
+                application__applicant_type__in=customer_types_to_applicant_types(self.customer_type)
             )
         return list(events.all())
 
@@ -672,9 +624,7 @@ class ApplicationStatus(models.Model, StatusMixin):
         (CANCELLED, _("Cancelled")),
     )
 
-    status = models.CharField(
-        max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES
-    )
+    status = models.CharField(max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES)
 
     application = models.ForeignKey(
         "Application",
@@ -717,9 +667,7 @@ class ApplicationEventStatus(models.Model, StatusMixin):
         (DECLINED, _("Declined")),
     )
 
-    status = models.CharField(
-        max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES
-    )
+    status = models.CharField(max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES)
 
     application_event = models.ForeignKey(
         "ApplicationEvent",
@@ -801,9 +749,7 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
         related_name="applications",
     )
 
-    billing_address = models.ForeignKey(
-        Address, null=True, blank=True, on_delete=models.SET_NULL
-    )
+    billing_address = models.ForeignKey(Address, null=True, blank=True, on_delete=models.SET_NULL)
 
     # Automatically updated through signal.
     cached_latest_status = models.CharField(
@@ -899,9 +845,7 @@ class ApplicationAggregateData(AggregateDataBase):
     Overall hour counts, application event counts etc.
     """
 
-    application = models.ForeignKey(
-        Application, on_delete=models.CASCADE, related_name="aggregated_data"
-    )
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="aggregated_data")
 
 
 class ApplicationEventManager(models.Manager):
@@ -911,9 +855,7 @@ class ApplicationEventManager(models.Manager):
             .get_queryset()
             .annotate(
                 latest_status=Subquery(
-                    ApplicationEventStatus.objects.filter(
-                        application_event__id=OuterRef("id")
-                    )
+                    ApplicationEventStatus.objects.filter(application_event__id=OuterRef("id"))
                     .order_by("-id")
                     .values("status")[:1]
                 )
@@ -961,21 +903,13 @@ class ApplicationEvent(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    min_duration = models.DurationField(
-        verbose_name=_("Minimum duration"), null=True, blank=True
-    )
+    min_duration = models.DurationField(verbose_name=_("Minimum duration"), null=True, blank=True)
 
-    max_duration = models.DurationField(
-        verbose_name=_("Maximum duration"), null=True, blank=True
-    )
+    max_duration = models.DurationField(verbose_name=_("Maximum duration"), null=True, blank=True)
 
-    events_per_week = models.PositiveIntegerField(
-        verbose_name=_("Events per week"), null=True, blank=True
-    )
+    events_per_week = models.PositiveIntegerField(verbose_name=_("Events per week"), null=True, blank=True)
 
-    biweekly = models.BooleanField(
-        verbose_name=_("Every second week only"), default=False, null=False, blank=True
-    )
+    biweekly = models.BooleanField(verbose_name=_("Every second week only"), default=False, null=False, blank=True)
 
     begin = models.DateField(verbose_name=_("Start date"), null=True, blank=True)
 
@@ -1005,9 +939,7 @@ class ApplicationEvent(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
-    flagged = models.BooleanField(
-        verbose_name=_("Is the event flagged"), default=False, null=False, blank=True
-    )
+    flagged = models.BooleanField(verbose_name=_("Is the event flagged"), default=False, null=False, blank=True)
 
     objects = ApplicationEventManager()
 
@@ -1032,9 +964,7 @@ class ApplicationEvent(models.Model):
     def set_status(self, status, user=None):
         if status not in ApplicationEventStatus.get_statuses():
             raise ValidationError(_("Invalid application event status"))
-        ApplicationEventStatus.objects.create(
-            application_event=self, status=status, user=user
-        )
+        ApplicationEventStatus.objects.create(application_event=self, status=status, user=user)
         self.latest_status = status
 
     def get_status(self):
@@ -1085,18 +1015,12 @@ class ApplicationEvent(models.Model):
             events_count = len(schedule.get_occurences().occurrences)
             total_events.append(events_count)
 
-            total_events_durations.append(
-                (self.min_duration * events_count).total_seconds()
-            )
+            total_events_durations.append((self.min_duration * events_count).total_seconds())
 
-        total_events_durations = sorted(total_events_durations, reverse=True)[
-            : self.events_per_week
-        ]
+        total_events_durations = sorted(total_events_durations, reverse=True)[: self.events_per_week]
         total_events_duration = sum(total_events_durations) / 3600.0
 
-        total_amounts_of_events = sum(
-            sorted(total_events, reverse=True)[: self.events_per_week]
-        )
+        total_amounts_of_events = sum(sorted(total_events, reverse=True)[: self.events_per_week])
         try:
             name = "duration_total"
             ApplicationEventAggregateData.objects.update_or_create(
@@ -1113,9 +1037,7 @@ class ApplicationEvent(models.Model):
             )
         except Error as err:
             with push_scope() as scope:
-                scope.set_extra(
-                    "details", "Caught an error while saving event aggregate data"
-                )
+                scope.set_extra("details", "Caught an error while saving event aggregate data")
                 capture_exception(err)
         else:
             logger.info("Event #{} aggregate data created.".format(self.id))
@@ -1132,15 +1054,10 @@ class ApplicationEvent(models.Model):
             if schedule.application_event_schedule_result.declined:
                 continue
 
-            amount_of_events = len(
-                schedule.application_event_schedule_result.get_result_occurrences().occurrences
-            )
+            amount_of_events = len(schedule.application_event_schedule_result.get_result_occurrences().occurrences)
             total_amount_of_events.append(amount_of_events)
             total_events_duration.append(
-                (
-                    amount_of_events
-                    * schedule.application_event_schedule_result.allocated_duration
-                ).total_seconds()
+                (amount_of_events * schedule.application_event_schedule_result.allocated_duration).total_seconds()
             )
 
         total_reservations = sum(total_amount_of_events)
@@ -1168,9 +1085,7 @@ class ApplicationEvent(models.Model):
                 )
                 capture_exception(err)
         else:
-            logger.info(
-                "Event schedule result #{} aggregate data created.".format(self.pk)
-            )
+            logger.info("Event schedule result #{} aggregate data created.".format(self.pk))
 
     @property
     def aggregated_data_dict(self):
@@ -1186,9 +1101,7 @@ class ApplicationEventAggregateData(AggregateDataBase):
     Overall hour counts etc.
     """
 
-    application_event = models.ForeignKey(
-        ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data"
-    )
+    application_event = models.ForeignKey(ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data")
 
 
 class EventReservationUnit(models.Model):
@@ -1205,9 +1118,7 @@ class EventReservationUnit(models.Model):
         on_delete=models.CASCADE,
     )
 
-    reservation_unit = models.ForeignKey(
-        ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.PROTECT
-    )
+    reservation_unit = models.ForeignKey(ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.PROTECT)
 
 
 class EventOccurrence(object):
@@ -1225,9 +1136,7 @@ class EventOccurrence(object):
 
 
 class ApplicationEventSchedule(models.Model):
-    day = models.IntegerField(
-        verbose_name=_("Day"), choices=WEEKDAYS.CHOICES, null=False
-    )
+    day = models.IntegerField(verbose_name=_("Day"), choices=WEEKDAYS.CHOICES, null=False)
 
     begin = models.TimeField(
         verbose_name=_("Start"),
@@ -1241,9 +1150,7 @@ class ApplicationEventSchedule(models.Model):
         blank=False,
     )
 
-    priority = models.IntegerField(
-        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_HIGH
-    )
+    priority = models.IntegerField(choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_HIGH)
 
     application_event = models.ForeignKey(
         ApplicationEvent,
@@ -1254,12 +1161,8 @@ class ApplicationEventSchedule(models.Model):
     )
 
     def get_occurences(self) -> List[EventOccurrence]:
-        first_matching_day = next_or_current_matching_weekday(
-            self.application_event.begin, self.day
-        )
-        previous_match = previous_or_current_matching_weekday(
-            self.application_event.end, self.day
-        )
+        first_matching_day = next_or_current_matching_weekday(self.application_event.begin, self.day)
+        previous_match = previous_or_current_matching_weekday(self.application_event.end, self.day)
         myrule = recurrence.Rule(
             recurrence.WEEKLY,
             interval=1 if not self.application_event.biweekly else 2,
@@ -1299,9 +1202,7 @@ class ApplicationEventSchedule(models.Model):
 class Recurrence(models.Model):
     recurrence = RecurrenceField()
 
-    priority = models.IntegerField(
-        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
-    )
+    priority = models.IntegerField(choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM)
 
     application_event = models.ForeignKey(
         ApplicationEvent,
@@ -1324,14 +1225,10 @@ class ApplicationEventScheduleResult(models.Model):
         related_name="application_event_schedule_result",
     )
 
-    allocated_reservation_unit = models.ForeignKey(
-        "reservation_units.ReservationUnit", on_delete=models.CASCADE
-    )
+    allocated_reservation_unit = models.ForeignKey("reservation_units.ReservationUnit", on_delete=models.CASCADE)
 
     allocated_duration = models.DurationField()
-    allocated_day = models.IntegerField(
-        verbose_name=_("Day"), choices=WEEKDAYS.CHOICES, null=False
-    )
+    allocated_day = models.IntegerField(verbose_name=_("Day"), choices=WEEKDAYS.CHOICES, null=False)
 
     allocated_begin = models.TimeField(
         verbose_name=_("Start"),
@@ -1402,9 +1299,7 @@ class ApplicationEventScheduleResult(models.Model):
 
     def create_aggregate_data(self):
         total_amount_of_events = len(self.get_result_occurrences().occurrences)
-        total_events_duration = (
-            total_amount_of_events * self.allocated_duration
-        ).total_seconds()
+        total_events_duration = (total_amount_of_events * self.allocated_duration).total_seconds()
 
         try:
             name = "duration_total"

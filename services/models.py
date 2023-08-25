@@ -22,12 +22,8 @@ class Service(models.Model):
         default=TYPE_INTRODUCTION,
     )
 
-    buffer_time_before = models.DurationField(
-        verbose_name=_("Buffer time before"), blank=True, null=True
-    )
-    buffer_time_after = models.DurationField(
-        verbose_name=_("Buffer time after"), blank=True, null=True
-    )
+    buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
+    buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
 
     def __str__(self):
         return "{} ({})".format(self.name, self.service_type)

@@ -29,23 +29,15 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
         self.reservation = ReservationFactory(
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(hours=1),
-            end=(
-                datetime.datetime.now(tz=get_default_timezone())
-                + datetime.timedelta(hours=2)
-            ),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
+            end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=STATE_CHOICES.REQUIRES_HANDLING,
             user=self.regular_joe,
             reservee_email="email@reservee",
             type=ReservationType.NORMAL,
         )
-        self.reason = ReservationDenyReasonFactory(
-            reason_fi="syy", reason_en="reason", reason_sv="resonera"
-        )
-        EmailTemplateFactory(
-            type=EmailType.RESERVATION_REJECTED, content="", subject="denied"
-        )
+        self.reason = ReservationDenyReasonFactory(reason_fi="syy", reason_en="reason", reason_sv="resonera")
+        EmailTemplateFactory(type=EmailType.RESERVATION_REJECTED, content="", subject="denied")
 
     def get_handle_query(self):
         return """
@@ -131,9 +123,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
             email="staff.persson@foo.com",
         )
 
-        unit_role = UnitRole.objects.create(
-            user=staff_person, role=UnitRoleChoice.objects.get(code="admin")
-        )
+        unit_role = UnitRole.objects.create(user=staff_person, role=UnitRoleChoice.objects.get(code="admin"))
         UnitRolePermission.objects.create(
             role=UnitRoleChoice.objects.get(code="admin"),
             permission="can_create_staff_reservations",
@@ -185,9 +175,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Only reservations with state as requires_handling, confirmed can be denied."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "DENYING_NOT_ALLOWED"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("DENYING_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
@@ -218,9 +206,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
-        assert_that(self.reservation.handling_details).is_not_equal_to(
-            self.reservation.working_memo
-        )
+        assert_that(self.reservation.handling_details).is_not_equal_to(self.reservation.working_memo)
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,

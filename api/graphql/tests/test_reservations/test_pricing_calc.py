@@ -41,9 +41,7 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
 
         assert_that(prices.reservation_price).is_equal_to(Decimal("3"))
         assert_that(prices.subsidised_price).is_equal_to(pricing.lowest_price)
-        assert_that(prices.subsidised_price_net).is_close_to(
-            pricing.lowest_price_net, 6
-        )
+        assert_that(prices.subsidised_price_net).is_close_to(pricing.lowest_price_net, 6)
 
     def test_reservation_subsidised_price_is_equal_to_lowest_price_time_based_calc(
         self,
@@ -65,22 +63,14 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
             reservation_unit=self.reservation_unit,
         )
         price_calc = ReservationPriceMixin()
-        begin = datetime.datetime(2022, 12, 23, 15, 0).astimezone(
-            get_default_timezone()
-        )
+        begin = datetime.datetime(2022, 12, 23, 15, 0).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(hours=2)
 
         prices = price_calc.calculate_price(begin, end, [self.reservation_unit])
 
-        assert_that(prices.reservation_price).is_close_to(
-            pricing.highest_price * Decimal("2"), 6
-        )
-        assert_that(prices.subsidised_price).is_close_to(
-            pricing.lowest_price * Decimal("2"), 6
-        )
-        assert_that(prices.subsidised_price_net).is_close_to(
-            pricing.lowest_price_net * Decimal("2"), 6
-        )
+        assert_that(prices.reservation_price).is_close_to(pricing.highest_price * Decimal("2"), 6)
+        assert_that(prices.subsidised_price).is_close_to(pricing.lowest_price * Decimal("2"), 6)
+        assert_that(prices.subsidised_price_net).is_close_to(pricing.lowest_price_net * Decimal("2"), 6)
 
     def test_pricing_is_calculated_per_15mins_with_pricing_type_less_than_half_day(
         self,
@@ -106,9 +96,7 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         )
         price_calc = ReservationPriceMixin()
         prices = price_calc.calculate_price(begin, end, [self.reservation_unit])
-        assert_that(prices.reservation_price).is_close_to(
-            pricing.lowest_price * Decimal("1.25"), 6
-        )
+        assert_that(prices.reservation_price).is_close_to(pricing.lowest_price * Decimal("1.25"), 6)
 
     def test_pricing_is_fixed_with_pricing_type_more_than_half_day(self):
         self.reservation_unit.allow_reservations_without_opening_hours = True

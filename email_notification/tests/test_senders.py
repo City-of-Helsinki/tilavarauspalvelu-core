@@ -19,9 +19,7 @@ from email_notification.tests.factories import EmailTemplateFactory
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class SendReservationEmailNotificationTestCase(ReservationEmailBaseTestCase):
     def test_send_email_success(self):
-        send_reservation_email_notification(
-            EmailType.RESERVATION_CONFIRMED, self.reservation
-        )
+        send_reservation_email_notification(EmailType.RESERVATION_CONFIRMED, self.reservation)
         should_be_body = f"This is the {self.reservation.id } content"
         should_be_subject = f"Los subjectos { self.reservation.name }"
 
@@ -37,9 +35,7 @@ class SendReservationEmailNotificationTestCase(ReservationEmailBaseTestCase):
             "shao.kahn@outworld.com",
             "mileena@outworld.com",
         ]
-        send_reservation_email_notification(
-            EmailType.RESERVATION_CONFIRMED, self.reservation, recipients
-        )
+        send_reservation_email_notification(EmailType.RESERVATION_CONFIRMED, self.reservation, recipients)
         should_be_body = f"This is the { self.reservation.id } content"
         should_be_subject = f"Los subjectos { self.reservation.name }"
 
@@ -60,21 +56,15 @@ class SendReservationEmailNotificationTestCase(ReservationEmailBaseTestCase):
         exception = (
             assert_that(send_reservation_email_notification)
             .raises(Exception)
-            .when_called_with(
-                EmailType.RESERVATION_CONFIRMED, self.reservation, recipients
-            )
+            .when_called_with(EmailType.RESERVATION_CONFIRMED, self.reservation, recipients)
             .val
         )
-        assert_that(exception).contains(
-            f"Refusing to notify more than {settings.EMAIL_MAX_RECIPIENTS} users."
-        )
+        assert_that(exception).contains(f"Refusing to notify more than {settings.EMAIL_MAX_RECIPIENTS} users.")
 
     def test_reservation_language_is_used(self):
         self.reservation.reservee_language = "en"
         self.reservation.save()
-        send_reservation_email_notification(
-            EmailType.RESERVATION_CONFIRMED, self.reservation
-        )
+        send_reservation_email_notification(EmailType.RESERVATION_CONFIRMED, self.reservation)
         should_be_body = f"This is the {self.reservation.id} content in english"
         should_be_subject = f"Los subjectos inglesa {self.reservation.name}"
 

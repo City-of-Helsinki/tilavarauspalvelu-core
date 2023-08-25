@@ -77,9 +77,7 @@ class Payment:
 
     @classmethod
     def _parse_datetime(cls, string: str) -> datetime:
-        return datetime.strptime(string, "%Y%m%d-%H%M%S").astimezone(
-            settings.VERKKOKAUPPA_TIMEZONE
-        )
+        return datetime.strptime(string, "%Y%m%d-%H%M%S").astimezone(settings.VERKKOKAUPPA_TIMEZONE)
 
 
 @dataclass(frozen=True)
@@ -149,6 +147,4 @@ class RefundStatusResult:
                 scope.set_extra("details", "Parsing refund status failed")
                 scope.set_extra("json", json)
                 capture_exception(err)
-            raise ParseRefundStatusError(
-                f"Could not parse refund status: {str(err)}"
-            ) from err
+            raise ParseRefundStatusError(f"Could not parse refund status: {str(err)}") from err

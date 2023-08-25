@@ -159,9 +159,7 @@ class ApplicationDeclinePermission(BasePermission):
         if not application:
             return False
 
-        return can_manage_service_sectors_applications(
-            info.context.user, application.application_round.service_sector
-        )
+        return can_manage_service_sectors_applications(info.context.user, application.application_round.service_sector)
 
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
@@ -182,9 +180,7 @@ class ApplicationEventScheduleResultPermission(BasePermission):
         application = schedule.application_event.application
         service_sector = application.application_round.service_sector
 
-        return can_manage_service_sectors_applications(
-            info.context.user, service_sector
-        )
+        return can_manage_service_sectors_applications(info.context.user, service_sector)
 
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
@@ -198,11 +194,7 @@ class ApplicationEventScheduleResultPermission(BasePermission):
         general_roles = user.general_roles.all()
 
         # User need to have some roles to have any access to results.
-        if (
-            service_sector_roles.exists()
-            or unit_roles.exists()
-            or general_roles.exists()
-        ):
+        if service_sector_roles.exists() or unit_roles.exists() or general_roles.exists():
             return True
 
         return False
@@ -259,9 +251,7 @@ class ReservationUnitPermission(BasePermission):
         unit_pk = input.get("unit_pk")
         pk = input.get("pk")
         if not unit_pk:
-            unit_pk = getattr(
-                ReservationUnit.objects.filter(pk=pk).first(), "unit_id", None
-            )
+            unit_pk = getattr(ReservationUnit.objects.filter(pk=pk).first(), "unit_id", None)
         if not unit_pk:
             return False
         unit = Unit.objects.filter(id=unit_pk).first()
@@ -356,8 +346,7 @@ class ReservationHandlingPermission(BasePermission):
             reservation = get_object_or_404(Reservation, pk=pk)
             user = info.context.user
             return can_handle_reservation(user, reservation) or (
-                can_create_staff_reservation(user, reservation.reservation_unit.all())
-                and reservation.user == user
+                can_create_staff_reservation(user, reservation.reservation_unit.all()) and reservation.user == user
             )
         return False
 
@@ -370,8 +359,7 @@ class ReservationDenyPermission(BasePermission):
             reservation = get_object_or_404(Reservation, pk=pk)
             user = info.context.user
             return can_handle_reservation(user, reservation) or (
-                can_create_staff_reservation(user, reservation.reservation_unit.all())
-                and reservation.user == user
+                can_create_staff_reservation(user, reservation.reservation_unit.all()) and reservation.user == user
             )
         return False
 
@@ -394,8 +382,7 @@ class StaffAdjustTimePermission(BasePermission):
             reservation = get_object_or_404(Reservation, pk=pk)
             user = info.context.user
             return can_handle_reservation(user, reservation) or (
-                can_create_staff_reservation(user, reservation.reservation_unit.all())
-                and reservation.user == user
+                can_create_staff_reservation(user, reservation.reservation_unit.all()) and reservation.user == user
             )
         return False
 
@@ -411,12 +398,7 @@ class StaffReservationModifyPermission(BasePermission):
             return (
                 user.has_staff_permissions
                 and can_modify_reservation(user, reservation)
-                or (
-                    can_create_staff_reservation(
-                        user, reservation.reservation_unit.all()
-                    )
-                    and reservation.user == user
-                )
+                or (can_create_staff_reservation(user, reservation.reservation_unit.all()) and reservation.user == user)
             )
         return False
 
@@ -460,9 +442,7 @@ class RecurringReservationPermission(BasePermission):
             if not recurring_reservation:
                 return False
 
-            return can_modify_recurring_reservation(
-                info.context.user, recurring_reservation
-            )
+            return can_modify_recurring_reservation(info.context.user, recurring_reservation)
 
         reservation_unit_id = input.get("reservation_unit_pk", None)
 
@@ -717,12 +697,7 @@ class UserPermission(BasePermission):
         unit_roles = user.unit_roles.all()
         general_roles = user.general_roles.all()
 
-        if (
-            user.is_superuser
-            or service_sector_roles.exists()
-            or unit_roles.exists()
-            or general_roles.exists()
-        ):
+        if user.is_superuser or service_sector_roles.exists() or unit_roles.exists() or general_roles.exists():
             return True
 
         return False

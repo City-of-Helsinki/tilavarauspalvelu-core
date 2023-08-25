@@ -4,12 +4,12 @@ from django.db import migrations
 
 def update_ranks(apps, schema_editor):
     ReservationUnitType = apps.get_model("reservation_units", "ReservationUnitType")
-    
+
     # We might already have some rank values so fetch the largest rank
     # and fill missing ranks starting from there. If there are no ranks, start from 0.
     max_rank_type = ReservationUnitType.objects.filter(rank__isnull=False).order_by("-rank").first()
     current_rank = max_rank_type.rank if max_rank_type and max_rank_type.rank is not None else 0
-    
+
     types_without_rank = ReservationUnitType.objects.filter(rank__isnull=True)
     for runit_type in types_without_rank:
         current_rank += 1

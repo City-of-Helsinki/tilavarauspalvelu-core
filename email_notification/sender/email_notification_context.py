@@ -88,13 +88,8 @@ class EmailNotificationContext:
         """Build context from reservation"""
         context = EmailNotificationContext()
 
-        if (
-            not reservation.reservee_type
-            or reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
-        ):
-            context.reservee_name = (
-                f"{reservation.reservee_first_name} {reservation.reservee_last_name}"
-            )
+        if not reservation.reservee_type or reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL:
+            context.reservee_name = f"{reservation.reservee_first_name} {reservation.reservee_last_name}"
         else:
             context.reservee_name = reservation.reservee_organisation_name
 
@@ -128,9 +123,7 @@ class EmailNotificationContext:
             )
         else:
             res_unit = reservation.reservation_unit.first()
-            context.reservation_unit_name = getattr(
-                res_unit, f"name_{language}", res_unit.name
-            )
+            context.reservation_unit_name = getattr(res_unit, f"name_{language}", res_unit.name)
 
         context.price = reservation.price
         context.non_subsidised_price = reservation.non_subsidised_price

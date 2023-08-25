@@ -90,9 +90,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_pk(self):
-        event = ApplicationEventFactory(
-            application=self.application, name="Show only me"
-        )
+        event = ApplicationEventFactory(application=self.application, name="Show only me")
         filter_clause = f"pk: {event.id}"
 
         response = self.query(self.get_query(filter_section=filter_clause))
@@ -115,9 +113,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
             application_event=self.application_event, name="duration_total", value=8600
         )
         event = ApplicationEventFactory(name="Don't show me")
-        ApplicationEventAggregateData.objects.create(
-            application_event=event, name="duration_total", value=9000
-        )
+        ApplicationEventAggregateData.objects.create(application_event=event, name="duration_total", value=9000)
 
         filter_clause = "appliedCountLte: 8601"
 
@@ -131,9 +127,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
             application_event=self.application_event, name="duration_total", value=9000
         )
         event = ApplicationEventFactory(name="Don't show me")
-        ApplicationEventAggregateData.objects.create(
-            application_event=event, name="duration_total", value=8600
-        )
+        ApplicationEventAggregateData.objects.create(application_event=event, name="duration_total", value=8600)
 
         filter_clause = "appliedCountGte: 8601"
 
@@ -147,17 +141,11 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
             application_event=self.application_event, name="duration_total", value=8600
         )
         event = ApplicationEventFactory(name="Show me")
-        ApplicationEventAggregateData.objects.create(
-            application_event=event, name="duration_total", value=9000
-        )
+        ApplicationEventAggregateData.objects.create(application_event=event, name="duration_total", value=9000)
         event_too = ApplicationEventFactory(name="Don't show me")
-        ApplicationEventAggregateData.objects.create(
-            application_event=event_too, name="duration_total", value=9500
-        )
+        ApplicationEventAggregateData.objects.create(application_event=event_too, name="duration_total", value=9500)
         event_too_too = ApplicationEventFactory(name="Don't show me either")
-        ApplicationEventAggregateData.objects.create(
-            application_event=event_too_too, name="duration_total", value=8000
-        )
+        ApplicationEventAggregateData.objects.create(application_event=event_too_too, name="duration_total", value=8000)
 
         filter_clause = "appliedCountGte: 8200 appliedCountLte: 9400"
 
@@ -197,13 +185,9 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_status(self):
-        event = ApplicationEventFactory(
-            application=self.application, name="Only I should be listed"
-        )
+        event = ApplicationEventFactory(application=self.application, name="Only I should be listed")
         event.set_status(ApplicationEventStatus.APPROVED)
-        another = ApplicationEventFactory(
-            application=self.application, name="Do not show me ever never ikinä"
-        )
+        another = ApplicationEventFactory(application=self.application, name="Do not show me ever never ikinä")
         another.set_status(ApplicationEventStatus.RESERVED)
 
         filter_clause = f'status: "{ApplicationEventStatus.APPROVED}"'
@@ -217,9 +201,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         self.maxDiff = None
         application = ApplicationFactory()
         ApplicationEventFactory(application=application, name="I shouldn't be listed")
-        filter_clause = (
-            f"reservationUnit: {self.event_reservation_unit.reservation_unit.id}"
-        )
+        filter_clause = f"reservationUnit: {self.event_reservation_unit.reservation_unit.id}"
 
         response = self.query(self.get_query(filter_section=filter_clause))
         assert_that(response.status_code).is_equal_to(200)
@@ -238,9 +220,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
 
     def test_filter_by_applicant_type(self):
         self.maxDiff = None
-        application = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_COMMUNITY, user=self.regular_joe
-        )
+        application = ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_COMMUNITY, user=self.regular_joe)
         ApplicationEventFactory(application=application, name="I should be listed")
         filter_clause = f'applicantType: "{Application.APPLICANT_TYPE_COMMUNITY}"'
 
@@ -251,9 +231,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
 
     def test_filter_by_application_status(self):
         application = ApplicationFactory(user=self.regular_joe)
-        ApplicationStatusFactory(
-            application=application, status=ApplicationStatus.HANDLED
-        )
+        ApplicationStatusFactory(application=application, status=ApplicationStatus.HANDLED)
         ApplicationEventFactory(application=application, name="I only should be listed")
         filter_clause = f'applicationStatus: "{ApplicationStatus.HANDLED}"'
 
@@ -290,14 +268,10 @@ class ApplicationEventScheduleResultQueryTestCase(ApplicationEventTestCaseBase):
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
-        schedule = (
-            cls.application.application_events.first().application_event_schedules.first()
-        )
+        schedule = cls.application.application_events.first().application_event_schedules.first()
         cls.result = ApplicationEventScheduleResultFactory(
             application_event_schedule=schedule,
-            allocated_reservation_unit=ReservationUnitFactory(
-                name="You got this reservation unit"
-            ),
+            allocated_reservation_unit=ReservationUnitFactory(name="You got this reservation unit"),
             allocated_duration="02:00",
             allocated_day=0,
             allocated_begin=datetime.time(12, 0),

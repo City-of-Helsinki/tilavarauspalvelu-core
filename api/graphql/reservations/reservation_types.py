@@ -151,9 +151,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     order_status = graphene.String()
     price = graphene.Float()
     price_net = graphene.Decimal()
-    reservation_units = graphene.List(
-        "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
-    )
+    reservation_units = graphene.List("api.graphql.reservation_units.reservation_unit_types.ReservationUnitType")
     recurring_reservation = graphene.Field(RecurringReservationType)
     refund_uuid = graphene.String()
     reservee_first_name = graphene.String()
@@ -407,9 +405,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         return self.reservee_type
 
     @reservation_non_public_field
-    def resolve_reservee_is_unregistered_association(
-        self, info: ResolveInfo
-    ) -> Optional[bool]:
+    def resolve_reservee_is_unregistered_association(self, info: ResolveInfo) -> Optional[bool]:
         return self.reservee_is_unregistered_association
 
     @check_resolver_permission(ReservationUnitPermission)
@@ -447,15 +443,11 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         return self.handling_details
 
     @reservation_non_public_field
-    def resolve_cancel_reason(
-        self: Reservation, info: ResolveInfo
-    ) -> ReservationCancelReason:
+    def resolve_cancel_reason(self: Reservation, info: ResolveInfo) -> ReservationCancelReason:
         return self.cancel_reason
 
     @reservation_non_public_field
-    def resolve_deny_reason(
-        self: Reservation, info: ResolveInfo
-    ) -> ReservationDenyReason:
+    def resolve_deny_reason(self: Reservation, info: ResolveInfo) -> ReservationDenyReason:
         return self.deny_reason
 
 

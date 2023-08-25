@@ -53,13 +53,9 @@ class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     def update_from_tprek(self, request, queryset):
         ids = queryset.filter(tprek_id__isnull=False).values_list("tprek_id", flat=True)
         try:
-            output = call_command(
-                "import_units", settings.TPREK_UNIT_URL, "--ids", *ids
-            )
+            output = call_command("import_units", settings.TPREK_UNIT_URL, "--ids", *ids)
         except Exception as e:
-            self.message_user(
-                request, f"Error while importing units: {e}", level=messages.ERROR
-            )
+            self.message_user(request, f"Error while importing units: {e}", level=messages.ERROR)
         else:
             self.message_user(request, output, level=messages.SUCCESS)
 

@@ -20,7 +20,5 @@ class TestRecurringReservationUUIDMigration(TestCase):
         migration = MigrationExecutor(connection)
         migration.migrate([("reservations", "0045_reservee_stats_field_updates")])
 
-        assert_that(
-            RecurringReservation.objects.filter(uuid__isnull=True).exists()
-        ).is_false()
+        assert_that(RecurringReservation.objects.filter(uuid__isnull=True).exists()).is_false()
         assert_that(RecurringReservation.objects.exists()).is_true()

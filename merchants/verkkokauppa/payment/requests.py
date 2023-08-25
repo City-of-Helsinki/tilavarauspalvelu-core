@@ -36,9 +36,7 @@ def _get_base_url():
 
 def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "GET", "/payment/admin/{order_id}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/payment/admin/{order_id}") as metric:
             response = get(
                 url=urljoin(_get_base_url(), f"admin/{order_id}"),
                 headers={
@@ -58,9 +56,7 @@ def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
         # are handling both cases. 500 handling can be removed after
         # webshop API is updated.
         if (
-            response.status_code == 500
-            and errors
-            and errors[0].get("code") == "failed-to-get-payment-for-order"
+            response.status_code == 500 and errors and errors[0].get("code") == "failed-to-get-payment-for-order"
         ) or response.status_code == 404:
             return None
 
@@ -71,13 +67,9 @@ def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
         raise GetPaymentError("Payment retrieval failed") from e
 
 
-def get_refund_status(
-    order_id: UUID, namespace: str, get=_get
-) -> Optional[RefundStatusResult]:
+def get_refund_status(order_id: UUID, namespace: str, get=_get) -> Optional[RefundStatusResult]:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "GET", "/payment/admin/refund-payment/{order_id}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/payment/admin/refund-payment/{order_id}") as metric:
             response = get(
                 url=urljoin(_get_base_url(), f"admin/refund-payment/{order_id}"),
                 headers={
@@ -104,21 +96,15 @@ def get_refund_status(
             return None
 
         if response.status_code != 200:
-            raise GetRefundStatusError(
-                f"Payment refund status retrieval failed: {json.get('errors')}"
-            )
+            raise GetRefundStatusError(f"Payment refund status retrieval failed: {json.get('errors')}")
         return RefundStatusResult.from_json(json)
     except (RequestException, JSONDecodeError, ParseRefundStatusError) as e:
-        raise GetRefundStatusError(
-            f"Payment refund status retrieval failed: {str(e)}"
-        ) from e
+        raise GetRefundStatusError(f"Payment refund status retrieval failed: {str(e)}") from e
 
 
 def refund_order(order_id: UUID, post=_post) -> Optional[Refund]:
     try:
-        with ExternalServiceMetric(
-            METRIC_SERVICE_NAME, "POST", f"/refund/instant/{order_id}"
-        ) as metric:
+        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", f"/refund/instant/{order_id}") as metric:
             response = post(
                 url=urljoin(_get_base_url(), f"refund/instant/{order_id}"),
                 headers={
@@ -135,9 +121,7 @@ def refund_order(order_id: UUID, post=_post) -> Optional[Refund]:
                 + f"Response body: {response.text}",
                 level="error",
             )
-            raise RefundPaymentError(
-                "Payment refund failed: problem with upstream service"
-            )
+            raise RefundPaymentError("Payment refund failed: problem with upstream service")
         json = response.json()
         refund_count = len(json["refunds"]) if "refunds" in json else 0
         if refund_count == 1:
@@ -149,9 +133,7 @@ def refund_order(order_id: UUID, post=_post) -> Optional[Refund]:
                 + f"Response body: {response.text}",
                 level="error",
             )
-            raise RefundPaymentError(
-                f"Refund response refund count expected to be 1 but was {refund_count}"
-            )
+            raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")
     except (RequestException, JSONDecodeError, ParseRefundError) as err:
         with push_scope() as scope:
             scope.set_extra("details", "Payment refund failed")

@@ -31,9 +31,7 @@ def generate_hauki_link(
         "hsa_username": username,
         "hsa_organization": organization_id,
         "hsa_created_at": now.isoformat(),
-        "hsa_valid_until": (
-            now + timedelta(minutes=HAUKI_EXPIRACY_TIME_MINUTES)
-        ).isoformat(),
+        "hsa_valid_until": (now + timedelta(minutes=HAUKI_EXPIRACY_TIME_MINUTES)).isoformat(),
         "hsa_resource": f"{settings.HAUKI_ORIGIN_ID}:{uuid}",
         "hsa_has_organization_rights": "true",
     }
@@ -48,13 +46,7 @@ def generate_hauki_link(
         "hsa_has_organization_rights",
     ]
 
-    data_string = "".join(
-        [
-            get_parameters_dict[field]
-            for field in data_fields
-            if field in get_parameters_dict
-        ]
-    )
+    data_string = "".join([get_parameters_dict[field] for field in data_fields if field in get_parameters_dict])
 
     calculated_signature = hmac.new(
         key=settings.HAUKI_SECRET.encode("utf-8"),
@@ -65,9 +57,7 @@ def generate_hauki_link(
     get_parameters_dict["hsa_signature"] = calculated_signature
 
     if target_resources:
-        target_resources = [
-            f"{settings.HAUKI_ORIGIN_ID}:{uuid}" for uuid in target_resources
-        ]
+        target_resources = [f"{settings.HAUKI_ORIGIN_ID}:{uuid}" for uuid in target_resources]
         target_resources = ",".join(target_resources)
         get_parameters_dict["target_resources"] = target_resources
 

@@ -30,30 +30,18 @@ from reservation_units.utils.reservation_unit_state_helper import (
 from spaces.models import Unit
 
 
-class ReservationUnitsFilterSet(
-    django_filters.FilterSet, ReservationUnitQueryBuilderMixin
-):
+class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBuilderMixin):
     pk = django_filters.ModelMultipleChoiceFilter(
         field_name="pk", method="filter_by_pk", queryset=ReservationUnit.objects.all()
     )
-    unit = django_filters.ModelMultipleChoiceFilter(
-        field_name="unit", queryset=Unit.objects.all()
-    )
+    unit = django_filters.ModelMultipleChoiceFilter(field_name="unit", queryset=Unit.objects.all())
     reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
         field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
     )
-    min_persons_gte = django_filters.NumberFilter(
-        field_name="min_persons", method="get_min_persons_gte"
-    )
-    min_persons_lte = django_filters.NumberFilter(
-        field_name="min_persons", method="get_min_persons_lte"
-    )
-    max_persons_gte = django_filters.NumberFilter(
-        field_name="max_persons", method="get_max_persons_gte"
-    )
-    max_persons_lte = django_filters.NumberFilter(
-        field_name="max_persons", method="get_max_persons_lte"
-    )
+    min_persons_gte = django_filters.NumberFilter(field_name="min_persons", method="get_min_persons_gte")
+    min_persons_lte = django_filters.NumberFilter(field_name="min_persons", method="get_min_persons_lte")
+    max_persons_gte = django_filters.NumberFilter(field_name="max_persons", method="get_max_persons_gte")
+    max_persons_lte = django_filters.NumberFilter(field_name="max_persons", method="get_max_persons_lte")
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
@@ -61,13 +49,9 @@ class ReservationUnitsFilterSet(
         field_name="keyword_groups", queryset=KeywordGroup.objects.all()
     )
 
-    purposes = django_filters.ModelMultipleChoiceFilter(
-        field_name="purposes", queryset=Purpose.objects.all()
-    )
+    purposes = django_filters.ModelMultipleChoiceFilter(field_name="purposes", queryset=Purpose.objects.all())
 
-    qualifiers = django_filters.ModelMultipleChoiceFilter(
-        field_name="qualifiers", queryset=Qualifier.objects.all()
-    )
+    qualifiers = django_filters.ModelMultipleChoiceFilter(field_name="qualifiers", queryset=Qualifier.objects.all())
 
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
 
@@ -81,26 +65,16 @@ class ReservationUnitsFilterSet(
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
     name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
 
-    surface_area_gte = django_filters.NumberFilter(
-        field_name="surface_area", lookup_expr="gte"
-    )
-    surface_area_lte = django_filters.NumberFilter(
-        field_name="surface_area", lookup_expr="lte"
-    )
+    surface_area_gte = django_filters.NumberFilter(field_name="surface_area", lookup_expr="gte")
+    surface_area_lte = django_filters.NumberFilter(field_name="surface_area", lookup_expr="lte")
 
     rank_gte = django_filters.NumberFilter(field_name="rank", lookup_expr="gte")
     rank_lte = django_filters.NumberFilter(field_name="rank", lookup_expr="lte")
 
-    type_rank_gte = django_filters.NumberFilter(
-        field_name="reservation_unit_type__rank", lookup_expr="gte"
-    )
-    type_rank_lte = django_filters.NumberFilter(
-        field_name="reservation_unit_type__rank", lookup_expr="lte"
-    )
+    type_rank_gte = django_filters.NumberFilter(field_name="reservation_unit_type__rank", lookup_expr="gte")
+    type_rank_lte = django_filters.NumberFilter(field_name="reservation_unit_type__rank", lookup_expr="lte")
 
-    reservation_kind = django_filters.CharFilter(
-        field_name="reservation_kind", method="get_reservation_kind"
-    )
+    reservation_kind = django_filters.CharFilter(field_name="reservation_kind", method="get_reservation_kind")
 
     state = django_filters.MultipleChoiceFilter(
         method="get_state",
@@ -124,9 +98,7 @@ class ReservationUnitsFilterSet(
         ),
     )
 
-    only_with_permission = django_filters.BooleanFilter(
-        method="get_only_with_permission"
-    )
+    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -153,9 +125,7 @@ class ReservationUnitsFilterSet(
     def get_text_search(self, qs, property, value: str):
         query_str = self.build_elastic_query_str(value)
 
-        sq = SearchQuery.do_search(
-            "reservation_units", {"query_string": {"query": query_str}}
-        )
+        sq = SearchQuery.do_search("reservation_units", {"query_string": {"query": query_str}})
 
         return ReservationUnit.objects.from_search_results(sq)
 
@@ -230,28 +200,18 @@ class ReservationUnitsFilterSet(
 
         return qs.filter(
             Q(unit_id__in=user.unit_roles.values_list("unit", flat=True))
-            | Q(
-                unit__unit_groups__in=user.unit_roles.values_list(
-                    "unit_group", flat=True
-                )
-            )
+            | Q(unit__unit_groups__in=user.unit_roles.values_list("unit_group", flat=True))
             | Q(
                 unit_id__in=Unit.objects.filter(
-                    service_sectors__in=user.service_sector_roles.values_list(
-                        "service_sector", flat=True
-                    )
+                    service_sectors__in=user.service_sector_roles.values_list("service_sector", flat=True)
                 )
             )
         ).distinct()
 
 
 class EquipmentFilterSet(django_filters.FilterSet):
-    rank_gte = django_filters.NumberFilter(
-        field_name="category__rank", lookup_expr="gte"
-    )
-    rank_lte = django_filters.NumberFilter(
-        field_name="category__rank", lookup_expr="lte"
-    )
+    rank_gte = django_filters.NumberFilter(field_name="category__rank", lookup_expr="gte")
+    rank_lte = django_filters.NumberFilter(field_name="category__rank", lookup_expr="lte")
 
     order_by = django_filters.OrderingFilter(
         fields=("name", ("category__rank", "category_rank")),

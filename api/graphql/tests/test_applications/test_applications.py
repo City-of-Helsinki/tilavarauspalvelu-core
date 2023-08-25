@@ -477,9 +477,7 @@ class ApplicationsGraphQLTestCase(ApplicationTestCaseBase):
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content["data"]["applications"]["edges"][0]["node"]["applicantUser"]
-        ).is_none()
+        assert_that(content["data"]["applications"]["edges"][0]["node"]["applicantUser"]).is_none()
         self.assertMatchSnapshot(content)
 
     def test_application_applicant_user_does_render_to_application_validator_user(self):
@@ -503,9 +501,7 @@ class ApplicationsGraphQLTestCase(ApplicationTestCaseBase):
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content["data"]["applications"]["edges"][0]["node"]["applicantUser"]
-        ).is_not_none()
+        assert_that(content["data"]["applications"]["edges"][0]["node"]["applicantUser"]).is_not_none()
         self.assertMatchSnapshot(content)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)

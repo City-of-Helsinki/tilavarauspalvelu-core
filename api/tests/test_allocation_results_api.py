@@ -6,9 +6,7 @@ from applications.models import ApplicationEventScheduleResult
 
 
 @pytest.mark.django_db
-def test_accepting_allocation_result(
-    result_scheduled_for_monday, general_admin_api_client
-):
+def test_accepting_allocation_result(result_scheduled_for_monday, general_admin_api_client):
     response = general_admin_api_client.put(
         reverse(
             "allocation_results-detail",
@@ -23,9 +21,7 @@ def test_accepting_allocation_result(
 
 
 @pytest.mark.django_db
-def test_deleting_allocation_result(
-    result_scheduled_for_monday, general_admin_api_client
-):
+def test_deleting_allocation_result(result_scheduled_for_monday, general_admin_api_client):
     assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
     response = general_admin_api_client.delete(
         reverse(

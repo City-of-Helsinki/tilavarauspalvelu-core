@@ -38,9 +38,7 @@ def get_profile_data():
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 @patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-@patch(
-    "opening_hours.hours.get_periods_for_resource", return_value=get_mocked_periods()
-)
+@patch("opening_hours.hours.get_periods_for_resource", return_value=get_mocked_periods())
 class ReservationCreateTestCase(ReservationTestCaseBase):
     def get_create_query(self):
         return """
@@ -88,9 +86,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "numPersons": 1,
             "purposePk": self.purpose.pk,
             "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
-            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%SZ"
-            ),
+            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ"),
             "reservationUnitPks": [self.reservation_unit.pk],
         }
 
@@ -112,51 +108,35 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
         assert_that(reservation.user).is_equal_to(self.regular_joe)
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(reservation.priority).is_equal_to(PRIORITY_CONST.PRIORITY_MEDIUM)
-        assert_that(reservation.reservee_first_name).is_equal_to(
-            input_data["reserveeFirstName"]
-        )
-        assert_that(reservation.reservee_last_name).is_equal_to(
-            input_data["reserveeLastName"]
-        )
+        assert_that(reservation.reservee_first_name).is_equal_to(input_data["reserveeFirstName"])
+        assert_that(reservation.reservee_last_name).is_equal_to(input_data["reserveeLastName"])
         assert_that(reservation.reservee_phone).is_equal_to(input_data["reserveePhone"])
         assert_that(reservation.name).is_equal_to(input_data["name"])
         assert_that(reservation.description).is_equal_to(input_data["description"])
         assert_that(reservation.purpose).is_equal_to(self.purpose)
-        assert_that(reservation.buffer_time_after).is_equal_to(
-            self.reservation_unit.buffer_time_after
-        )
-        assert_that(reservation.buffer_time_before).is_equal_to(
-            self.reservation_unit.buffer_time_before
-        )
+        assert_that(reservation.buffer_time_after).is_equal_to(self.reservation_unit.buffer_time_after)
+        assert_that(reservation.buffer_time_before).is_equal_to(self.reservation_unit.buffer_time_before)
 
     @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
     @patch(
         "users.utils.open_city_profile.basic_info_resolver.requests.get",
-        return_value=MagicMock(
-            status_code=200, json=MagicMock(return_value=get_profile_data())
-        ),
+        return_value=MagicMock(status_code=200, json=MagicMock(return_value=get_profile_data())),
     )
-    def test_reservation_succeed_with_minimum_data(
-        self, mock_profile_call, mock_periods, mock_opening_hours
-    ):
+    def test_reservation_succeed_with_minimum_data(self, mock_profile_call, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = {
             "name": "Test reservation",
             "description": "Test description",
             "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
-            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%SZ"
-            ),
+            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ"),
             "reservationUnitPks": [self.reservation_unit.pk],
         }
 
@@ -164,9 +144,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
@@ -174,18 +152,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(reservation.priority).is_equal_to(PRIORITY_CONST.PRIORITY_MEDIUM)
 
-        assert_that(reservation.buffer_time_after).is_equal_to(
-            self.reservation_unit.buffer_time_after
-        )
-        assert_that(reservation.buffer_time_before).is_equal_to(
-            self.reservation_unit.buffer_time_before
-        )
+        assert_that(reservation.buffer_time_after).is_equal_to(self.reservation_unit.buffer_time_after)
+        assert_that(reservation.buffer_time_before).is_equal_to(self.reservation_unit.buffer_time_before)
 
     @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
     @patch("users.utils.open_city_profile.basic_info_resolver.requests.get")
-    def test_reservation_details_prefilled_with_profile_data(
-        self, mock_profile_call, mock_periods, mock_opening_hours
-    ):
+    def test_reservation_details_prefilled_with_profile_data(self, mock_profile_call, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         city = CityFactory(name="Helsinki", municipality_code="12345")
         data = {
@@ -209,17 +181,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
                 }
             }
         }
-        mock_profile_call.return_value = MagicMock(
-            status_code=200, json=MagicMock(return_value=data)
-        )
+        mock_profile_call.return_value = MagicMock(status_code=200, json=MagicMock(return_value=data))
 
         input_data = {
             "name": "Test reservation",
             "description": "Test description",
             "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
-            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%SZ"
-            ),
+            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ"),
             "reservationUnitPks": [self.reservation_unit.pk],
         }
 
@@ -228,9 +196,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
@@ -265,17 +231,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
                 }
             }
         }
-        mock_profile_call.return_value = MagicMock(
-            status_code=200, json=MagicMock(return_value=data)
-        )
+        mock_profile_call.return_value = MagicMock(status_code=200, json=MagicMock(return_value=data))
 
         input_data = {
             "name": "Test reservation",
             "description": "Test description",
             "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
-            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%SZ"
-            ),
+            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ"),
             "reservationUnitPks": [self.reservation_unit.pk],
         }
 
@@ -284,9 +246,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
@@ -294,9 +254,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.reservee_address_street).is_equal_to("Foreign street 1")
         assert_that(reservation.reservee_address_zip).is_empty()
 
-    def test_creating_reservation_with_reservation_language_succeed(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_with_reservation_language_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
@@ -305,9 +263,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
@@ -335,9 +291,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     ):
         mock_is_open.return_value = True
         mock_get_conflicting_open_application_round.return_value = None
-        mock_get_reservation_unit_possible_start_times.return_value = [
-            datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        ]
+        mock_get_reservation_unit_possible_start_times.return_value = [datetime.datetime.now(tz=DEFAULT_TIMEZONE)]
         sku = "340026__2652000155___44_10000100"
         self.reservation_unit.sku = sku
         self.reservation_unit.save(update_fields=["sku"])
@@ -359,22 +313,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.buffer_time_after).is_equal_to(
-            self.reservation_unit.buffer_time_after
-        )
-        assert_that(reservation.buffer_time_before).is_equal_to(
-            res_unit_too.buffer_time_before
-        )
+        assert_that(reservation.buffer_time_after).is_equal_to(self.reservation_unit.buffer_time_after)
+        assert_that(reservation.buffer_time_before).is_equal_to(res_unit_too.buffer_time_before)
 
-    def test_creating_reservation_without_optional_fields_succeeds(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_without_optional_fields_succeeds(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
@@ -434,35 +380,24 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_not_none()
         assert_that(Reservation.objects.exists()).is_false()
 
-    def test_create_fails_when_overlapping_reservation(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_overlapping_reservation(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
-            end=datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-            + datetime.timedelta(hours=2),
+            end=datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2),
             state=STATE_CHOICES.CONFIRMED,
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to(
-            "Overlapping reservations are not allowed."
-        )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "OVERLAPPING_RESERVATIONS"
-        )
+        assert_that(content.get("errors")[0]["message"]).is_equal_to("Overlapping reservations are not allowed.")
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("OVERLAPPING_RESERVATIONS")
 
-    def test_create_fails_when_buffer_time_overlaps_reservation_before(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_buffer_time_overlaps_reservation_before(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
@@ -475,18 +410,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation overlaps with reservation before due to buffer time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
 
     def test_create_succeed_when_buffer_time_overlaps_blocked_reservation_before(
         self, mock_periods, mock_opening_hours
@@ -504,16 +435,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
 
-    def test_create_fails_when_buffer_time_overlaps_reservation_after(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_buffer_time_overlaps_reservation_after(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
@@ -526,22 +453,16 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation overlaps with reservation after due to buffer time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
 
-    def test_create_succeed_when_buffer_time_overlaps_block_reservation_after(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_succeed_when_buffer_time_overlaps_block_reservation_after(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
@@ -555,9 +476,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
@@ -566,9 +485,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.buffer_time_before = datetime.timedelta(
-            hours=1, minutes=1
-        )
+        self.reservation_unit.buffer_time_before = datetime.timedelta(hours=1, minutes=1)
         self.reservation_unit.save()
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
@@ -580,18 +497,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation overlaps with reservation before due to buffer time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(
         self, mock_periods, mock_opening_hours
@@ -609,28 +522,20 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation overlaps with reservation after due to buffer time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
 
-    def test_create_fails_when_reservation_unit_closed_on_selected_time(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_reservation_unit_closed_on_selected_time(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_input_data()
         today = datetime.date.today()
-        begin = datetime.datetime(
-            today.year, today.month, today.day, 21, 0, tzinfo=get_default_timezone()
-        )
+        begin = datetime.datetime(today.year, today.month, today.day, 21, 0, tzinfo=get_default_timezone())
         end = begin + datetime.timedelta(hours=2)
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
         input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
@@ -643,9 +548,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation unit is not open within desired reservation time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_IS_NOT_OPEN"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_IS_NOT_OPEN")
 
     def test_create_succeed_when_reservation_unit_closed_on_selected_time_and_opening_hours_are_ignored(
         self, mock_periods, mock_opening_hours
@@ -656,9 +559,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_input_data()
         today = datetime.date.today()
-        begin = datetime.datetime(
-            today.year, today.month, today.day, 21, 0, tzinfo=get_default_timezone()
-        )
+        begin = datetime.datetime(today.year, today.month, today.day, 21, 0, tzinfo=get_default_timezone())
         end = begin + datetime.timedelta(hours=2)
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
         input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
@@ -668,19 +569,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
-        reservation_id = (
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        )
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
+        reservation_id = content.get("data").get("createReservation").get("reservation").get("pk")
         assert_that(reservation_id).is_greater_than_or_equal_to(1)
         saved_reservation = Reservation.objects.get(pk=reservation_id)
         assert_that(saved_reservation).is_not_none()
 
-    def test_create_fails_when_reservation_unit_in_open_application_round(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_reservation_unit_in_open_application_round(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         ApplicationRoundFactory(
             reservation_units=[self.reservation_unit],
@@ -689,18 +584,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "One or more reservation units are in open application round."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_IN_OPEN_ROUND"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_IN_OPEN_ROUND")
 
     def test_create_fails_when_reservation_unit_max_reservation_duration_exceeds(
         self, mock_periods, mock_opening_hours
@@ -710,9 +601,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
@@ -732,9 +621,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
@@ -745,25 +632,17 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED"
         )
 
-    def test_create_succeeds_when_start_time_matches_reservation_start_interval(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_succeeds_when_start_time_matches_reservation_start_interval(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        intervals = [
-            value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
-        ]
+        intervals = [value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES]
         for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
             self.reservation_unit.save(update_fields=["reservation_start_interval"])
-            begin = datetime.datetime.now() + datetime.timedelta(
-                minutes=interval_minutes
-            )
+            begin = datetime.datetime.now() + datetime.timedelta(minutes=interval_minutes)
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
-            input_data["end"] = (
-                begin + datetime.timedelta(minutes=interval_minutes)
-            ).strftime("%Y%m%dT%H%M%SZ")
+            input_data["end"] = (begin + datetime.timedelta(minutes=interval_minutes)).strftime("%Y%m%dT%H%M%SZ")
             response = self.query(self.get_create_query(), input_data=input_data)
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -776,16 +655,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        intervals = [
-            value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
-        ]
+        intervals = [value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES]
         for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
             self.reservation_unit.save(update_fields=["reservation_start_interval"])
-            begin = datetime.datetime.now() + datetime.timedelta(
-                minutes=interval_minutes + 1
-            )
+            begin = datetime.datetime.now() + datetime.timedelta(minutes=interval_minutes + 1)
             end = begin + datetime.timedelta(minutes=interval_minutes)
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
             input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
@@ -796,9 +671,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             assert_that(content.get("errors")[0]["message"]).is_equal_to(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             )
-            assert_that(
-                content.get("errors")[0]["extensions"]["error_code"]
-            ).is_equal_to("RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL")
+            assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+                "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL"
+            )
 
     def test_create_succeed_when_start_time_does_not_match_reservation_start_interval_and_opening_hours_are_ignored(
         self, mock_periods, mock_opening_hours
@@ -808,20 +683,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        intervals = [
-            value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
-        ]
+        intervals = [value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES]
         for interval, interval_minutes in zip(intervals, [15, 90]):
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
             self.reservation_unit.save(update_fields=["reservation_start_interval"])
-            begin = datetime.datetime.now() + datetime.timedelta(
-                minutes=interval_minutes + 1
-            )
+            begin = datetime.datetime.now() + datetime.timedelta(minutes=interval_minutes + 1)
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
-            input_data["end"] = (
-                begin + datetime.timedelta(minutes=interval_minutes)
-            ).strftime("%Y%m%dT%H%M%SZ")
+            input_data["end"] = (begin + datetime.timedelta(minutes=interval_minutes)).strftime("%Y%m%dT%H%M%SZ")
             response = self.query(self.get_create_query(), input_data=input_data)
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -832,179 +701,127 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             saved_reservation = Reservation.objects.get(pk=reservation_id)
             assert_that(saved_reservation).is_not_none()
 
-    def test_create_fails_when_reservation_unit_reservation_begins_in_future(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_reservation_unit_reservation_begins_in_future(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.reservation_begins = datetime.datetime.now(
-            tz=DEFAULT_TIMEZONE
-        ) + datetime.timedelta(days=10)
+        self.reservation_unit.reservation_begins = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(
+            days=10
+        )
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation unit is not reservable at current time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_NOT_RESERVABLE"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_NOT_RESERVABLE")
 
-    def test_create_fails_when_reservation_unit_publish_begins_in_future(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_reservation_unit_publish_begins_in_future(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.publish_begins = datetime.datetime.now(
-            tz=DEFAULT_TIMEZONE
-        ) + datetime.timedelta(days=10)
+        self.reservation_unit.publish_begins = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(days=10)
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation unit is not reservable at current time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_NOT_RESERVABLE"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_NOT_RESERVABLE")
 
-    def test_create_fails_when_reservation_unit_reservation_ends_in_past(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_reservation_unit_reservation_ends_in_past(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.reservation_ends = datetime.datetime.now(
-            tz=DEFAULT_TIMEZONE
-        ) - datetime.timedelta(days=10)
+        self.reservation_unit.reservation_ends = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(
+            days=10
+        )
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation unit is not reservable at current time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_NOT_RESERVABLE"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_NOT_RESERVABLE")
 
-    def test_create_fails_reservation_unit_state_is_archived(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_reservation_unit_state_is_archived(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.is_archived = True
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation unit is not reservable due to status is ReservationUnitState.ARCHIVED."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_NOT_RESERVABLE"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_NOT_RESERVABLE")
 
-    def test_create_fails_reservation_unit_state_is_draft(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_reservation_unit_state_is_draft(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.is_draft = True
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation unit is not reservable due to status is ReservationUnitState.DRAFT."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_NOT_RESERVABLE"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_NOT_RESERVABLE")
 
-    def test_create_fails_when_reservation_unit_publish_ends_in_past(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_reservation_unit_publish_ends_in_past(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.publish_ends = datetime.datetime.now(
-            tz=DEFAULT_TIMEZONE
-        ) - datetime.timedelta(days=10)
+        self.reservation_unit.publish_ends = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(days=10)
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation unit is not reservable at current time."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_NOT_RESERVABLE"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_NOT_RESERVABLE")
 
-    def test_create_success_when_reservation_unit_reservation_begin_in_past(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_success_when_reservation_unit_reservation_begin_in_past(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.reservation_begins = datetime.datetime.now(
-            tz=DEFAULT_TIMEZONE
-        ) - datetime.timedelta(days=10)
+        self.reservation_unit.reservation_begins = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(
+            days=10
+        )
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
         reservation = Reservation.objects.filter(
             id=content.get("data").get("createReservation").get("reservation").get("pk")
         ).first()
         assert_that(reservation).is_not_none()
 
-    def test_create_success_when_reservation_unit_reservation_end_in_future(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_success_when_reservation_unit_reservation_end_in_future(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.reservation_ends = datetime.datetime.now(
-            tz=DEFAULT_TIMEZONE
-        ) + datetime.timedelta(days=10)
+        self.reservation_unit.reservation_ends = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(
+            days=10
+        )
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
         reservation = Reservation.objects.filter(
             id=content.get("data").get("createReservation").get("reservation").get("pk")
         ).first()
@@ -1012,19 +829,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_create_fails_when_not_logged_in(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
 
-    def test_create_success_when_reservation_date_over_next_spring(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_success_when_reservation_date_over_next_spring(self, mock_periods, mock_opening_hours):
         """In reservation creation it is needed to use opening_hours_end date
         parameter in ReservationUnitReservationScheduler initialization to get
         the possible opening hours from beyond next spring which is what the scheduler
@@ -1037,41 +848,29 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         res_start = datetime.datetime(2022, 6, 15, 15, 0, tzinfo=get_default_timezone())
         valid_data = self.get_valid_input_data()
         valid_data["begin"] = res_start.strftime("%Y%m%dT%H%M%SZ")
-        valid_data["end"] = (res_start + datetime.timedelta(hours=1)).strftime(
-            "%Y%m%dT%H%M%SZ"
-        )
+        valid_data["end"] = (res_start + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ")
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_create_query(), input_data=valid_data)
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
 
-    def test_creating_reservation_succeeds_when_under_max_reservations_per_user(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_succeeds_when_under_max_reservations_per_user(self, mock_periods, mock_opening_hours):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
         assert_that(Reservation.objects.exists()).is_true()
 
-    def test_creating_reservation_fails_when_max_reservations_per_user_reached(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_fails_when_max_reservations_per_user_reached(self, mock_periods, mock_opening_hours):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])
         existing_reservation = ReservationFactory(
@@ -1083,9 +882,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
@@ -1094,13 +891,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
             "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED"
         )
-        assert_that(
-            Reservation.objects.exclude(pk=existing_reservation.pk).exists()
-        ).is_false()
+        assert_that(Reservation.objects.exclude(pk=existing_reservation.pk).exists()).is_false()
 
-    def test_old_reservations_are_not_counted_towards_max_reservations_per_user(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_old_reservations_are_not_counted_towards_max_reservations_per_user(self, mock_periods, mock_opening_hours):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])
         ReservationFactory(
@@ -1112,14 +905,10 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
         assert_that(Reservation.objects.exists()).is_true()
 
     def test_reservations_from_other_runits_are_not_counted_towards_max_reservations_per_user(
@@ -1153,37 +942,25 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
         assert_that(Reservation.objects.exists()).is_true()
 
-    def test_creating_reservation_copies_sku_from_reservation_unit(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_copies_sku_from_reservation_unit(self, mock_periods, mock_opening_hours):
         self.reservation_unit.sku = "340026__2652000155___44_10000117"
         self.reservation_unit.save(update_fields=["sku"])
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
         reservation = Reservation.objects.get()
         assert_that(reservation.sku).is_equal_to(self.reservation_unit.sku)
 
-    def test_creating_reservation_fails_if_sku_is_ambiguous(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_fails_if_sku_is_ambiguous(self, mock_periods, mock_opening_hours):
         resunit1 = ReservationUnitFactory(sku="340026__2652000155___44_10000001")
         resunit2 = ReservationUnitFactory(sku="340026__2652000155___44_10000002")
         input_data = self.get_valid_input_data()
@@ -1203,34 +980,26 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "An ambiguous SKU cannot be assigned for this reservation."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "AMBIGUOUS_SKU"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("AMBIGUOUS_SKU")
 
     def test_create_fails_when_reservation_unit_reservations_max_days_before_exceeds(
         self, mock_periods, mock_opening_hours
     ):
         res_begin = datetime.datetime.now() + datetime.timedelta(days=181)
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(
-            date=res_begin.date()
-        )
+        mock_opening_hours.return_value = self.get_mocked_opening_hours(date=res_begin.date())
         self.reservation_unit.reservations_max_days_before = 180
         self.reservation_unit.save()
 
         data = self.get_valid_input_data()
         data["begin"] = res_begin.strftime("%Y%m%dT%H%M%SZ")
-        data["end"] = (res_begin + datetime.timedelta(hours=1)).strftime(
-            "%Y%m%dT%H%M%SZ"
-        )
+        data["end"] = (res_begin + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ")
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_create_query(), input_data=data)
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).contains(
-            "Reservation start time is earlier than"
-        )
+        assert_that(content.get("errors")[0]["message"]).contains("Reservation start time is earlier than")
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
             "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE"
         )
@@ -1247,9 +1016,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
@@ -1262,15 +1029,11 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).contains(
-            "Reservation start time is less than"
-        )
+        assert_that(content.get("errors")[0]["message"]).contains("Reservation start time is less than")
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
             "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE"
         )
@@ -1278,14 +1041,10 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     def test_create_succeed_when_reservation_is_done_less_than_one_full_day_before(
         self, mock_periods, mock_opening_hours
     ):
-        reservation_begin = datetime.datetime(
-            2021, 10, 13, 0, 0, 0, tzinfo=get_default_timezone()
-        )
+        reservation_begin = datetime.datetime(2021, 10, 13, 0, 0, 0, tzinfo=get_default_timezone())
         reservation_end = reservation_begin + datetime.timedelta(hours=1)
 
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(
-            date=reservation_begin.date(), start_hour=0
-        )
+        mock_opening_hours.return_value = self.get_mocked_opening_hours(date=reservation_begin.date(), start_hour=0)
 
         self.reservation_unit.reservations_min_days_before = 1
         self.reservation_unit.save()
@@ -1299,9 +1058,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
 
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
@@ -1319,37 +1076,25 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
 
-    def test_create_fails_when_reservation_unit_reservation_kind_is_season(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_fails_when_reservation_unit_reservation_kind_is_season(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.reservation_kind = ReservationKind.SEASON
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_create_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).contains(
-            "reservation kind is SEASON"
-        )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_UNIT_TYPE_IS_SEASON"
-        )
+        assert_that(content.get("errors")[0]["message"]).contains("reservation kind is SEASON")
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_UNIT_TYPE_IS_SEASON")
 
-    def test_creating_reservation_type_to_staff_succeed(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_type_to_staff_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_input_data()
@@ -1357,20 +1102,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
         assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
 
-    def test_creating_reservation_with_type_succeed(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_reservation_with_type_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_input_data()
@@ -1378,20 +1117,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("errors")).is_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
         assert_that(reservation.type).is_equal_to("blocked")
 
-    def test_creating_fails_when_type_is_provided_without_permissions(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_creating_fails_when_type_is_provided_without_permissions(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
@@ -1399,13 +1132,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "You don't have permissions to set type"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("You don't have permissions to set type")
 
-    def test_create_price_calculation_with_free_reservation_unit(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_price_calculation_with_free_reservation_unit(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
@@ -1413,9 +1142,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
@@ -1424,15 +1151,11 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation.price
         )  # Non subsidised price should copy of price
         assert_that(reservation.price_net).is_zero()
-        assert_that(reservation.non_subsidised_price_net).is_equal_to(
-            reservation.price_net
-        )
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(reservation.price_net)
         assert_that(reservation.unit_price).is_zero()
         assert_that(reservation.tax_percentage_value).is_zero()
 
-    def test_create_price_calculation_with_fixed_price_reservation_unit(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_price_calculation_with_fixed_price_reservation_unit(self, mock_periods, mock_opening_hours):
         tax_percentage = TaxPercentageFactory()
 
         ReservationUnitPricingFactory(
@@ -1455,28 +1178,18 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.price).is_equal_to(
-            3.0
-        )  # With fixed price unit, time is ignored
+        assert_that(reservation.price).is_equal_to(3.0)  # With fixed price unit, time is ignored
         assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 3)
         assert_that(reservation.unit_price).is_equal_to(3.0)
-        assert_that(reservation.price_net).is_close_to(
-            Decimal("3") / (1 + tax_percentage.decimal), 6
-        )
-        assert_that(reservation.non_subsidised_price_net).is_equal_to(
-            reservation.price_net
-        )
+        assert_that(reservation.price_net).is_close_to(Decimal("3") / (1 + tax_percentage.decimal), 6)
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(reservation.price_net)
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
-    def test_create_price_calculation_with_time_based_price_reservation_unit(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_price_calculation_with_time_based_price_reservation_unit(self, mock_periods, mock_opening_hours):
         tax_percentage = TaxPercentageFactory()
 
         ReservationUnitPricingFactory(
@@ -1500,25 +1213,15 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.price).is_equal_to(
-            3.0 * 4
-        )  # 1h reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.price).is_equal_to(3.0 * 4)  # 1h reservation = 4 x 15 min = 4 x 3 €
         assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 3)
-        assert_that(reservation.price_net).is_close_to(
-            (Decimal("3") * 4) / (1 + tax_percentage.decimal), 6
-        )
-        assert_that(reservation.non_subsidised_price_net).is_equal_to(
-            reservation.price_net
-        )
-        assert_that(reservation.unit_price).is_equal_to(
-            3.0
-        )  # 1h reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.price_net).is_close_to((Decimal("3") * 4) / (1 + tax_percentage.decimal), 6)
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(reservation.price_net)
+        assert_that(reservation.unit_price).is_equal_to(3.0)  # 1h reservation = 4 x 15 min = 4 x 3 €
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
     @patch(
@@ -1543,9 +1246,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     ):
         mock_is_open.return_value = True
         mock_get_conflicting_open_application_round.return_value = None
-        mock_get_reservation_unit_possible_start_times.return_value = [
-            datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        ]
+        mock_get_reservation_unit_possible_start_times.return_value = [datetime.datetime.now(tz=DEFAULT_TIMEZONE)]
 
         tax_percentage = TaxPercentageFactory()
 
@@ -1598,30 +1299,18 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.price).is_equal_to(
-            3.0 * 4 + 4.0 * 4
-        )  # 1h reservation = 4 x 15 min from both units
+        assert_that(reservation.price).is_equal_to(3.0 * 4 + 4.0 * 4)  # 1h reservation = 4 x 15 min from both units
         assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 6)
-        assert_that(reservation.unit_price).is_equal_to(
-            3.0
-        )  # 3€ from from the first unit
+        assert_that(reservation.unit_price).is_equal_to(3.0)  # 3€ from from the first unit
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
-        assert_that(reservation.price_net).is_close_to(
-            reservation.price / (1 + tax_percentage.decimal), 6
-        )
-        assert_that(reservation.non_subsidised_price_net).is_equal_to(
-            reservation.price_net
-        )
+        assert_that(reservation.price_net).is_close_to(reservation.price / (1 + tax_percentage.decimal), 6)
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(reservation.price_net)
 
-    def test_create_price_calculation_with_future_pricing(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_create_price_calculation_with_future_pricing(self, mock_periods, mock_opening_hours):
         self.reservation_unit.allow_reservations_without_opening_hours = True
         self.reservation_unit.save()
 
@@ -1657,39 +1346,25 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
 
         input_data = self.get_valid_input_data()
-        input_data["begin"] = (
-            datetime.datetime.now() + datetime.timedelta(days=2)
-        ).strftime("%Y%m%dT%H%M%SZ")
+        input_data["begin"] = (datetime.datetime.now() + datetime.timedelta(days=2)).strftime("%Y%m%dT%H%M%SZ")
 
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.price).is_equal_to(
-            6.0
-        )  # With fixed price unit, time is ignored
+        assert_that(reservation.price).is_equal_to(6.0)  # With fixed price unit, time is ignored
         assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 6)
-        assert_that(reservation.price_net).is_close_to(
-            6 / (1 + tax_percentage.decimal), 6
-        )
+        assert_that(reservation.price_net).is_close_to(6 / (1 + tax_percentage.decimal), 6)
         assert_that(reservation.unit_price).is_equal_to(6.0)
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
-        assert_that(reservation.price_net).is_close_to(
-            reservation.price / (1 + tax_percentage.decimal), 6
-        )
-        assert_that(reservation.non_subsidised_price_net).is_equal_to(
-            reservation.price_net
-        )
+        assert_that(reservation.price_net).is_close_to(reservation.price / (1 + tax_percentage.decimal), 6)
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(reservation.price_net)
 
-    def test_reservation_non_subsidised_price_is_equal_to_price(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_reservation_non_subsidised_price_is_equal_to_price(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.allow_reservations_without_opening_hours = True
         self.reservation_unit.save()
@@ -1713,24 +1388,16 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("reservation").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
         assert_that(reservation.price).is_equal_to(Decimal("3"))
         assert_that(reservation.non_subsidised_price).is_close_to(reservation.price, 6)
-        assert_that(reservation.price_net).is_close_to(
-            Decimal("3") / (1 + tax_percentage.decimal), 6
-        )
-        assert_that(reservation.non_subsidised_price_net).is_equal_to(
-            reservation.price_net
-        )
+        assert_that(reservation.price_net).is_close_to(Decimal("3") / (1 + tax_percentage.decimal), 6)
+        assert_that(reservation.non_subsidised_price_net).is_equal_to(reservation.price_net)
 
-    def test_reservation_duration_is_multiple_of_interval(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_reservation_duration_is_multiple_of_interval(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         tax_percentage = TaxPercentageFactory()
@@ -1750,9 +1417,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         input_data = self.get_valid_input_data()
 
         today = datetime.date.today()
-        begin = datetime.datetime(
-            today.year, today.month, today.day, 12, 0, tzinfo=get_default_timezone()
-        )
+        begin = datetime.datetime(today.year, today.month, today.day, 12, 0, tzinfo=get_default_timezone())
         end = begin + datetime.timedelta(minutes=15)  # Is multiple. Should be OK.
 
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
@@ -1763,9 +1428,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
 
-        begin = datetime.datetime(
-            today.year, today.month, today.day, 13, 0, tzinfo=get_default_timezone()
-        )
+        begin = datetime.datetime(today.year, today.month, today.day, 13, 0, tzinfo=get_default_timezone())
         end = begin + datetime.timedelta(minutes=16)  # Is not multiple. Should fail.
 
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")

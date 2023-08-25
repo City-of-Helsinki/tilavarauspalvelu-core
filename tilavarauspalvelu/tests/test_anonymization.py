@@ -44,9 +44,7 @@ class AnonymizationTestCase(TestCase):
         GeneralRole.objects.create(role=general_role_choice, user=cls.mr_anonymous)
 
         service_sector = ServiceSectorFactory(name="Role testing sector")
-        service_sector_role_choice = ServiceSectorRoleChoice.objects.create(
-            code="service_sector_role"
-        )
+        service_sector_role_choice = ServiceSectorRoleChoice.objects.create(code="service_sector_role")
         ServiceSectorRole.objects.create(
             role=service_sector_role_choice,
             service_sector=service_sector,
@@ -55,9 +53,7 @@ class AnonymizationTestCase(TestCase):
 
         unit = UnitFactory(name="Role testing unit")
         unit_role_choice = UnitRoleChoice.objects.create(code="unit_role")
-        unit_role = UnitRole.objects.create(
-            role=unit_role_choice, user=cls.mr_anonymous
-        )
+        unit_role = UnitRole.objects.create(role=unit_role_choice, user=cls.mr_anonymous)
         unit_role.unit.add(unit)
 
         cls.reservation = ReservationFactory.create(
@@ -73,37 +69,27 @@ class AnonymizationTestCase(TestCase):
             handling_details="Test handling details",
         )
         billing_address = AddressFactory()
-        cls.application = ApplicationFactory.create(
-            user=cls.mr_anonymous, billing_address=billing_address
-        )
+        cls.application = ApplicationFactory.create(user=cls.mr_anonymous, billing_address=billing_address)
         cls.app_event = ApplicationEventFactory.create(application=cls.application)
 
     def test_user_anonymization(self):
         user_data = self.mr_anonymous.__dict__.copy()
         anonymize_user(self.mr_anonymous)
         self.mr_anonymous.refresh_from_db()
-        assert_that(self.mr_anonymous.username).is_equal_to(
-            f"anonymized-{self.mr_anonymous.uuid}"
-        )
+        assert_that(self.mr_anonymous.username).is_equal_to(f"anonymized-{self.mr_anonymous.uuid}")
         assert_that(self.mr_anonymous.first_name).is_equal_to("ANON")
         assert_that(self.mr_anonymous.last_name).is_equal_to("ANONYMIZED")
         assert_that(self.mr_anonymous.email).is_equal_to(
             f"{self.mr_anonymous.first_name}.{self.mr_anonymous.last_name}@anonymized.net"
         )
         assert_that(self.mr_anonymous.uuid).is_not_equal_to(user_data["uuid"])
-        assert_that(self.mr_anonymous.reservation_notification).is_equal_to(
-            ReservationNotification.NONE
-        )
+        assert_that(self.mr_anonymous.reservation_notification).is_equal_to(ReservationNotification.NONE)
         assert_that(self.mr_anonymous.is_active).is_false()
         assert_that(self.mr_anonymous.is_superuser).is_false()
         assert_that(self.mr_anonymous.is_staff).is_false()
 
-        assert_that(
-            GeneralRole.objects.filter(user=self.mr_anonymous).count()
-        ).is_zero()
-        assert_that(
-            ServiceSectorRole.objects.filter(user=self.mr_anonymous).count()
-        ).is_zero()
+        assert_that(GeneralRole.objects.filter(user=self.mr_anonymous).count()).is_zero()
+        assert_that(ServiceSectorRole.objects.filter(user=self.mr_anonymous).count()).is_zero()
         assert_that(UnitRole.objects.filter(user=self.mr_anonymous).count()).is_zero()
 
     def test_application_anonymization(self):
@@ -131,84 +117,40 @@ class AnonymizationTestCase(TestCase):
         )
         # Application billing address
         assert_that(self.application.billing_address.post_code).is_equal_to("99999")
-        assert_that(self.application.billing_address.street_address).is_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.billing_address.street_address_fi).is_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.billing_address.street_address_en).is_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.billing_address.street_address_sv).is_equal_to(
-            "Anonymized"
-        )
+        assert_that(self.application.billing_address.street_address).is_equal_to("Anonymized")
+        assert_that(self.application.billing_address.street_address_fi).is_equal_to("Anonymized")
+        assert_that(self.application.billing_address.street_address_en).is_equal_to("Anonymized")
+        assert_that(self.application.billing_address.street_address_sv).is_equal_to("Anonymized")
         assert_that(self.application.billing_address.city).is_equal_to("Anonymized")
         assert_that(self.application.billing_address.city_fi).is_equal_to("Anonymized")
         assert_that(self.application.billing_address.city_en).is_equal_to("Anonymized")
         assert_that(self.application.billing_address.city_sv).is_equal_to("Anonymized")
 
         # Contact person
-        assert_that(self.application.contact_person.first_name).is_equal_to(
-            self.mr_anonymous.first_name
-        )
-        assert_that(self.application.contact_person.last_name).is_equal_to(
-            self.mr_anonymous.last_name
-        )
-        assert_that(self.application.contact_person.email).is_equal_to(
-            self.mr_anonymous.email
-        )
+        assert_that(self.application.contact_person.first_name).is_equal_to(self.mr_anonymous.first_name)
+        assert_that(self.application.contact_person.last_name).is_equal_to(self.mr_anonymous.last_name)
+        assert_that(self.application.contact_person.email).is_equal_to(self.mr_anonymous.email)
         assert_that(self.application.contact_person.phone_number).is_equal_to("")
 
         # Organisation data should not be anonymized
         assert_that(self.application.organisation.name).is_not_equal_to("Anonymized")
-        assert_that(self.application.organisation.identifier).is_not_equal_to(
-            "1234567-2"
-        )
-        assert_that(self.application.organisation.email).is_not_equal_to(
-            self.mr_anonymous.email
-        )
-        assert_that(self.application.organisation.core_business).is_not_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.organisation.core_business_fi).is_not_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.organisation.core_business_en).is_not_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.organisation.core_business_sv).is_not_equal_to(
-            "Anonymized"
-        )
+        assert_that(self.application.organisation.identifier).is_not_equal_to("1234567-2")
+        assert_that(self.application.organisation.email).is_not_equal_to(self.mr_anonymous.email)
+        assert_that(self.application.organisation.core_business).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.core_business_fi).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.core_business_en).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.core_business_sv).is_not_equal_to("Anonymized")
 
         # Organisation address should not be anonymized
-        assert_that(self.application.organisation.address.post_code).is_not_equal_to(
-            "99999"
-        )
-        assert_that(
-            self.application.organisation.address.street_address
-        ).is_not_equal_to("Anonymized")
-        assert_that(
-            self.application.organisation.address.street_address_fi
-        ).is_not_equal_to("Anonymized")
-        assert_that(
-            self.application.organisation.address.street_address_en
-        ).is_not_equal_to("Anonymized")
-        assert_that(
-            self.application.organisation.address.street_address_sv
-        ).is_not_equal_to("Anonymized")
-        assert_that(self.application.organisation.address.city).is_not_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.organisation.address.city_fi).is_not_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.organisation.address.city_en).is_not_equal_to(
-            "Anonymized"
-        )
-        assert_that(self.application.organisation.address.city_sv).is_not_equal_to(
-            "Anonymized"
-        )
+        assert_that(self.application.organisation.address.post_code).is_not_equal_to("99999")
+        assert_that(self.application.organisation.address.street_address).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.address.street_address_fi).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.address.street_address_en).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.address.street_address_sv).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.address.city).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.address.city_fi).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.address.city_en).is_not_equal_to("Anonymized")
+        assert_that(self.application.organisation.address.city_sv).is_not_equal_to("Anonymized")
 
     def test_reservation_anonymization(self):
         """Test also that the audit logger instances gets anonymized"""
@@ -217,25 +159,15 @@ class AnonymizationTestCase(TestCase):
 
         assert_that(self.reservation.name).is_equal_to("Anonymized")
         assert_that(self.reservation.description).is_equal_to("Anonymized")
-        assert_that(self.reservation.reservee_first_name).is_equal_to(
-            self.mr_anonymous.first_name
-        )
-        assert_that(self.reservation.reservee_last_name).is_equal_to(
-            self.mr_anonymous.last_name
-        )
-        assert_that(self.reservation.reservee_email).is_equal_to(
-            self.mr_anonymous.email
-        )
+        assert_that(self.reservation.reservee_first_name).is_equal_to(self.mr_anonymous.first_name)
+        assert_that(self.reservation.reservee_last_name).is_equal_to(self.mr_anonymous.last_name)
+        assert_that(self.reservation.reservee_email).is_equal_to(self.mr_anonymous.email)
         assert_that(self.reservation.reservee_phone).is_equal_to("")
         assert_that(self.reservation.reservee_address_zip).is_equal_to("999999")
         assert_that(self.reservation.reservee_address_city).is_equal_to("Anonymized")
         assert_that(self.reservation.reservee_address_street).is_equal_to("Anonymized")
-        assert_that(self.reservation.billing_first_name).is_equal_to(
-            self.mr_anonymous.first_name
-        )
-        assert_that(self.reservation.billing_last_name).is_equal_to(
-            self.mr_anonymous.last_name
-        )
+        assert_that(self.reservation.billing_first_name).is_equal_to(self.mr_anonymous.first_name)
+        assert_that(self.reservation.billing_last_name).is_equal_to(self.mr_anonymous.last_name)
         assert_that(self.reservation.billing_email).is_equal_to(self.mr_anonymous.email)
         assert_that(self.reservation.billing_phone).is_equal_to("")
         assert_that(self.reservation.billing_address_zip).is_equal_to("99999")
@@ -244,9 +176,7 @@ class AnonymizationTestCase(TestCase):
 
         # Reservee_id and organisation name should not be anonymized
         assert_that(self.reservation.reservee_id).is_not_equal_to("1234567-2")
-        assert_that(self.reservation.reservee_organisation_name).is_not_equal_to(
-            "Anonymized"
-        )
+        assert_that(self.reservation.reservee_organisation_name).is_not_equal_to("Anonymized")
 
         assert_that(self.reservation.working_memo).is_equal_to("")
         assert_that(self.reservation.free_of_charge_reason).is_equal_to(

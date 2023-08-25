@@ -45,6 +45,4 @@ class EnsureAdminUserTestCase(TestCase):
         }
         call_command("ensure_admin_user", *args, **kwargs)
         assert_that(User.objects.count()).is_equal_to(1)
-        assert_that(out.getvalue()).is_equal_to(
-            "  User already exists. Initial user creation skipped.\n"
-        )
+        assert_that(out.getvalue()).is_equal_to("  User already exists. Initial user creation skipped.\n")

@@ -9,17 +9,13 @@ class ApplicationFilter(filters.FilterSet):
         field_name="application_round", queryset=ApplicationRound.objects.all()
     )
     status = filters.BaseInFilter(field_name="cached_latest_status")
-    unit = filters.ModelMultipleChoiceFilter(
-        method="filter_by_possible_units", queryset=Unit.objects.all()
-    )
+    unit = filters.ModelMultipleChoiceFilter(method="filter_by_possible_units", queryset=Unit.objects.all())
     user = filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
 
     def filter_by_possible_units(self, qs, property, value):
         if not value:
             return qs
-        return qs.filter(
-            application_events__event_reservation_units__reservation_unit__unit__in=value
-        )
+        return qs.filter(application_events__event_reservation_units__reservation_unit__unit__in=value)
 
 
 class ApplicationEventWeeklyAmountReductionFilter(filters.FilterSet):

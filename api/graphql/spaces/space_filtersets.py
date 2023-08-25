@@ -5,9 +5,7 @@ from permissions.helpers import can_manage_spaces, get_units_with_permission
 
 
 class SpaceFilterSet(django_filters.FilterSet):
-    only_with_permission = django_filters.BooleanFilter(
-        method="get_only_with_permission"
-    )
+    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     def get_only_with_permission(self, qs, property, value):
         """Returns spaces where the user has space management permissions"""

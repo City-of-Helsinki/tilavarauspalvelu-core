@@ -20,9 +20,7 @@ from reservations.tests.factories import (
 from spaces.tests.factories import ServiceSectorFactory
 
 
-class ApplicationEventScheduleResultUpdateTestCase(
-    ApplicationEventPermissionsTestCaseBase
-):
+class ApplicationEventScheduleResultUpdateTestCase(ApplicationEventPermissionsTestCaseBase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -40,9 +38,7 @@ class ApplicationEventScheduleResultUpdateTestCase(
             email="oth.er@foo.com",
         )
         cls.application_event = cls.application.application_events.first()
-        cls.schedule = cls.application_event.application_event_schedules.filter(
-            priority=300
-        ).first()
+        cls.schedule = cls.application_event.application_event_schedules.filter(priority=300).first()
         cls.result = ApplicationEventScheduleResultFactory(
             accepted=False,
             declined=False,
@@ -88,18 +84,12 @@ class ApplicationEventScheduleResultUpdateTestCase(
         self.schedule.refresh_from_db()
         self.result.refresh_from_db()
 
-        assert_that(self.result.application_event_schedule.id).is_equal_to(
-            self.schedule.id
-        )
+        assert_that(self.result.application_event_schedule.id).is_equal_to(self.schedule.id)
         assert_that(self.result.allocated_begin).is_equal_to(self.schedule.begin)
         assert_that(self.result.allocated_end).is_equal_to(self.schedule.end)
-        assert_that(self.result.allocated_reservation_unit.id).is_equal_to(
-            self.reservation_unit.id
-        )
+        assert_that(self.result.allocated_reservation_unit.id).is_equal_to(self.reservation_unit.id)
         assert_that(self.result.allocated_day).is_equal_to(self.schedule.day)
-        assert_that(self.result.allocated_duration).is_equal_to(
-            datetime.timedelta(hours=1)
-        )
+        assert_that(self.result.allocated_duration).is_equal_to(datetime.timedelta(hours=1))
         assert_that(self.result.accepted).is_true()
         assert_that(self.result.declined).is_true()
 
@@ -131,9 +121,7 @@ class ApplicationEventScheduleResultUpdateTestCase(
     def test_wrong_service_sector_admin_cannot_update_result(
         self,
     ):
-        service_sector_admin = self.create_service_sector_admin(
-            service_sector=ServiceSectorFactory()
-        )
+        service_sector_admin = self.create_service_sector_admin(service_sector=ServiceSectorFactory())
         self.client.force_login(service_sector_admin)
 
         response = self.query(self.get_create_query(), input_data=self.get_data())

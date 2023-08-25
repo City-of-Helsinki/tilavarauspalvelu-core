@@ -27,9 +27,7 @@ default_responses = (
         200: OpenApiResponse(description="OK"),
         400: OpenApiResponse(description="Invalid payload or namespace"),
         404: OpenApiResponse(description="Order not found"),
-        500: OpenApiResponse(
-            description="Internal server error or problem with upstream service"
-        ),
+        500: OpenApiResponse(description="Internal server error or problem with upstream service"),
         501: OpenApiResponse(description="Unsupported type"),
     },
 )
@@ -56,9 +54,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
         ]
         for field in required_field:
             if field not in request.data:
-                raise WebhookError(
-                    message=f"Required field missing: {field}", status_code=400
-                )
+                raise WebhookError(message=f"Required field missing: {field}", status_code=400)
 
         namespace = request.data.get("namespace", None)
         webhook_type = request.data.get("eventType", None)
@@ -122,9 +118,7 @@ class WebhookPaymentViewSet(viewsets.GenericViewSet):
             if payment_order.status in needs_update_statuses:
                 payment_order.status = OrderStatus.PAID
                 payment_order.payment_id = payment_id
-                payment_order.processed_at = datetime.now().astimezone(
-                    get_default_timezone()
-                )
+                payment_order.processed_at = datetime.now().astimezone(get_default_timezone())
                 payment_order.save()
 
             reservation: Reservation = payment_order.reservation
@@ -159,9 +153,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
         required_field = ["orderId", "namespace", "eventType"]
         for field in required_field:
             if field not in request.data:
-                raise WebhookError(
-                    message=f"Required field missing: {field}", status_code=400
-                )
+                raise WebhookError(message=f"Required field missing: {field}", status_code=400)
 
         namespace = request.data.get("namespace", None)
         webhook_type = request.data.get("eventType", None)
@@ -178,9 +170,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
             fields={
                 "orderId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "eventType": serializers.ChoiceField(
-                    choices=[("ORDER_CANCELLED", "ORDER_CANCELLED")]
-                ),
+                "eventType": serializers.ChoiceField(choices=[("ORDER_CANCELLED", "ORDER_CANCELLED")]),
             },
         ),
         responses=default_responses,
@@ -211,9 +201,7 @@ class WebhookOrderViewSet(viewsets.ViewSet):
                 raise WebhookError(message="Invalid order state", status_code=400)
 
             payment_order.status = OrderStatus.CANCELLED
-            payment_order.processed_at = datetime.now().astimezone(
-                get_default_timezone()
-            )
+            payment_order.processed_at = datetime.now().astimezone(get_default_timezone())
             payment_order.save()
 
             return Response(status=200)
@@ -248,9 +236,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
         ]
         for field in required_field:
             if field not in request.data:
-                raise WebhookError(
-                    message=f"Required field missing: {field}", status_code=400
-                )
+                raise WebhookError(message=f"Required field missing: {field}", status_code=400)
 
         namespace = request.data.get("namespace", None)
         webhook_type = request.data.get("eventType", None)
@@ -269,9 +255,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
                 "refundId": serializers.UUIDField(),
                 "refundPaymentId": serializers.UUIDField(),
                 "namespace": serializers.CharField(),
-                "eventType": serializers.ChoiceField(
-                    choices=[("REFUND_PAID", "REFUND_PAID")]
-                ),
+                "eventType": serializers.ChoiceField(choices=[("REFUND_PAID", "REFUND_PAID")]),
             },
         ),
         responses=default_responses,
@@ -282,9 +266,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
 
             remote_id = request.data.get("orderId", "")
             refund_id = request.data.get("refundId", "")
-            payment_order = PaymentOrder.objects.filter(
-                remote_id=remote_id, refund_id=refund_id
-            ).first()
+            payment_order = PaymentOrder.objects.filter(remote_id=remote_id, refund_id=refund_id).first()
 
             if not payment_order:
                 raise WebhookError(message="Order not found", status_code=404)
@@ -293,18 +275,14 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             if payment_order.status != OrderStatus.PAID:
                 return Response(status=200)
 
-            refund_status = get_refund_status(
-                remote_id, settings.VERKKOKAUPPA_NAMESPACE
-            )
+            refund_status = get_refund_status(remote_id, settings.VERKKOKAUPPA_NAMESPACE)
             if not refund_status:
                 raise WebhookError(message="Refund not found", status_code=400)
             if refund_status.status != RefundStatus.PAID_ONLINE.value:
                 raise WebhookError(message="Invalid refund state", status_code=400)
 
             payment_order.status = OrderStatus.REFUNDED
-            payment_order.processed_at = datetime.now().astimezone(
-                get_default_timezone()
-            )
+            payment_order.processed_at = datetime.now().astimezone(get_default_timezone())
             payment_order.save()
 
             return Response(status=200)

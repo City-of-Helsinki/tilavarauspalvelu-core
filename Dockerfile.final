@@ -1,0 +1,1 @@
+FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core:main AS core

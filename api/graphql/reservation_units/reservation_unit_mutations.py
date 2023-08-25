@@ -164,9 +164,7 @@ class ReservationUnitMutationMixin:
         return mutation_response
 
 
-class ReservationUnitCreateMutation(
-    ReservationUnitMutationMixin, AuthSerializerMutation, SerializerMutation
-):
+class ReservationUnitCreateMutation(ReservationUnitMutationMixin, AuthSerializerMutation, SerializerMutation):
     reservation_unit = graphene.Field(ReservationUnitType)
 
     permission_classes = (ReservationUnitPermission,)
@@ -177,9 +175,7 @@ class ReservationUnitCreateMutation(
         serializer_class = ReservationUnitCreateSerializer
 
 
-class ReservationUnitUpdateMutation(
-    ReservationUnitMutationMixin, AuthSerializerMutation, SerializerMutation
-):
+class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, AuthSerializerMutation, SerializerMutation):
     reservation_unit = graphene.Field(ReservationUnitType)
 
     permission_classes = (ReservationUnitPermission,)

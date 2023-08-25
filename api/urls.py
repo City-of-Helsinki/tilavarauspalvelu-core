@@ -55,9 +55,7 @@ router = routers.DefaultRouter()
 router.register(r"reservation_unit", ReservationUnitViewSet, "reservationunit")
 router.register(r"resource", ResourceViewSet, "resource")
 router.register(r"reservation", ReservationViewSet, "reservation")
-router.register(
-    r"recurring_reservation", RecurringReservationViewSet, "recurring_reservation"
-)
+router.register(r"recurring_reservation", RecurringReservationViewSet, "recurring_reservation")
 router.register(r"application", ApplicationViewSet, "application")
 router.register(r"application_status", ApplicationStatusViewSet, "application_status")
 router.register(r"application_event", ApplicationEventViewSet, "application_event")
@@ -129,9 +127,7 @@ router.register(r"webhook/payment", WebhookPaymentViewSet, "payment")
 router.register(r"webhook/order", WebhookOrderViewSet, "order")
 router.register(r"webhook/refund", WebhookRefundViewSet, "refund")
 urlpatterns = [
-    path(
-        "graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))
-    ),
+    path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))),  # NOSONAR
     path(
         "gdpr/v1/user/<str:uuid>/",
         TilavarauspalveluGDPRAPIView.as_view(),

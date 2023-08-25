@@ -97,12 +97,8 @@ class ApplicationEventDeleteMutation(AuthDeleteMutation, ClientIDMutation):
         return None
 
 
-class ApplicationEventScheduleResultCreateMutation(
-    AuthSerializerMutation, SerializerMutation
-):
-    application_event_schedule_result = graphene.Field(
-        ApplicationEventScheduleResultType
-    )
+class ApplicationEventScheduleResultCreateMutation(AuthSerializerMutation, SerializerMutation):
+    application_event_schedule_result = graphene.Field(ApplicationEventScheduleResultType)
 
     permission_classes = (ApplicationEventScheduleResultPermission,)
 
@@ -112,12 +108,8 @@ class ApplicationEventScheduleResultCreateMutation(
         serializer_class = ApplicationEventScheduleResultCreateSerializer
 
 
-class ApplicationEventScheduleResultUpdateMutation(
-    AuthSerializerMutation, SerializerMutation
-):
-    application_event_schedule_result = graphene.Field(
-        ApplicationEventScheduleResultType
-    )
+class ApplicationEventScheduleResultUpdateMutation(AuthSerializerMutation, SerializerMutation):
+    application_event_schedule_result = graphene.Field(ApplicationEventScheduleResultType)
 
     permission_classes = (ApplicationEventScheduleResultPermission,)
 

@@ -13,18 +13,14 @@ from opening_hours.hours import get_opening_hours
 class GetOpeningHoursTestCase(TestCase):
     @classmethod
     def get_opening_hours(self):
-        with open(
-            "opening_hours/tests/fixtures/hauki_opening_hours_response.json"
-        ) as data:
+        with open("opening_hours/tests/fixtures/hauki_opening_hours_response.json") as data:
             response = json.load(data)
 
         return response
 
     @classmethod
     def get_opening_hours_closed(self):
-        with open(
-            "opening_hours/tests/fixtures/hauki_opening_hours_response_resource_closed.json"
-        ) as data:
+        with open("opening_hours/tests/fixtures/hauki_opening_hours_response_resource_closed.json") as data:
             response = json.load(data)
 
         return response
@@ -47,9 +43,7 @@ class GetOpeningHoursTestCase(TestCase):
 
     def test_get_opening_hours_with_non_defined_state_is_undefined(self, mock):
         hours_data = self.get_opening_hours()
-        hours_data["results"][0]["opening_hours"][0]["times"][0][
-            "resource_state"
-        ] = "some_funky_state"
+        hours_data["results"][0]["opening_hours"][0]["times"][0]["resource_state"] = "some_funky_state"
         mock.return_value = hours_data
 
         data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
@@ -59,9 +53,7 @@ class GetOpeningHoursTestCase(TestCase):
 
     def test_get_opening_hours_with_resource_state_is_none_is_undefined(self, mock):
         hours_data = self.get_opening_hours()
-        hours_data["results"][0]["opening_hours"][0]["times"][0][
-            "resource_state"
-        ] = None
+        hours_data["results"][0]["opening_hours"][0]["times"][0]["resource_state"] = None
         mock.return_value = hours_data
 
         data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")

@@ -31,60 +31,40 @@ class ApplicationEventDeleteTestCase(ApplicationEventPermissionsTestCaseBase):
     def test_general_admin_can_delete(self):
         self.client.force_login(self.general_admin)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("deleted")
-        ).is_true()
+        assert_that(content.get("data").get("deleteApplicationEvent").get("errors")).is_none()
+        assert_that(content.get("data").get("deleteApplicationEvent").get("deleted")).is_true()
 
-        assert_that(
-            ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()
-        ).is_false()
+        assert_that(ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()).is_false()
 
     def test_user_can_delete(self):
         self.client.force_login(self.regular_joe)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("errors")
-        ).is_none()
-        assert_that(
-            content.get("data").get("deleteApplicationEvent").get("deleted")
-        ).is_true()
+        assert_that(content.get("data").get("deleteApplicationEvent").get("errors")).is_none()
+        assert_that(content.get("data").get("deleteApplicationEvent").get("deleted")).is_true()
 
-        assert_that(
-            ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()
-        ).is_false()
+        assert_that(ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()).is_false()
 
     def test_cannot_delete_when_status_not_created(self):
         self.client.force_login(self.general_admin)
 
         self.application_event.set_status(ApplicationEventStatus.DECLINED)
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(
-            ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()
-        ).is_true()
+        assert_that(ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()).is_true()
 
     def test_other_user_cannot_delete(self):
         other_guy = get_user_model().objects.create(
@@ -95,14 +75,10 @@ class ApplicationEventDeleteTestCase(ApplicationEventPermissionsTestCaseBase):
         )
         self.client.force_login(other_guy)
 
-        response = self.query(
-            self.get_delete_query(), input_data=self.get_delete_input_data()
-        )
+        response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(
-            ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()
-        ).is_true()
+        assert_that(ApplicationEvent.objects.filter(pk=self.application_event.pk).exists()).is_true()

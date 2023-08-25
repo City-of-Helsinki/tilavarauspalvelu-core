@@ -41,9 +41,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         cls.reservation_unit.save()
 
         cls.reservation_begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        cls.reservation_end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) + datetime.timedelta(hours=1)
+        cls.reservation_end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)
         cls.reservation = ReservationFactory(
             reservation_unit=[cls.reservation_unit],
             reservee_email=cls.regular_joe.email,
@@ -58,9 +56,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
             price_net=Decimal(0) / (Decimal("1.24")),
         )
 
-        EmailTemplateFactory(
-            type=EmailType.RESERVATION_MODIFIED, content="", subject="modified"
-        )
+        EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content="", subject="modified")
 
         EmailTemplateFactory(
             type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
@@ -86,12 +82,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
     def get_valid_adjust_data(self):
         return {
             "pk": self.reservation.pk,
-            "begin": (self.reservation_begin + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%S%zZ"
-            ),
-            "end": (self.reservation_end + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%S%zZ"
-            ),
+            "begin": (self.reservation_begin + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%S%zZ"),
+            "end": (self.reservation_end + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%S%zZ"),
         }
 
     @override_settings(
@@ -102,9 +94,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
     def test_time_change_success(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
 
@@ -113,12 +103,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
-        assert_that(self.reservation.begin).is_equal_to(
-            self.reservation_begin + datetime.timedelta(hours=1)
-        )
-        assert_that(self.reservation.end).is_equal_to(
-            (self.reservation_end + datetime.timedelta(hours=1))
-        )
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
+        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")
 
@@ -127,9 +113,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.state = STATE_CHOICES.CANCELLED
         self.reservation.save()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -144,12 +128,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         data = self.get_valid_adjust_data()
-        data["begin"] = (self.reservation_begin - datetime.timedelta(hours=5)).strftime(
-            "%Y%m%dT%H%M%S%zZ"
-        )
-        data["end"] = (self.reservation_end - datetime.timedelta(hours=5)).strftime(
-            "%Y%m%dT%H%M%S%zZ"
-        )
+        data["begin"] = (self.reservation_begin - datetime.timedelta(hours=5)).strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = (self.reservation_end - datetime.timedelta(hours=5)).strftime("%Y%m%dT%H%M%S%zZ")
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
@@ -169,9 +149,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.end = self.reservation_end - datetime.timedelta(hours=5)
         self.reservation.save()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -179,21 +157,15 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
-        assert_that(self.reservation.begin).is_equal_to(
-            self.reservation_begin - datetime.timedelta(hours=5)
-        )
-        assert_that(self.reservation.end).is_equal_to(
-            self.reservation_end - datetime.timedelta(hours=5)
-        )
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin - datetime.timedelta(hours=5))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end - datetime.timedelta(hours=5))
 
     def test_reservation_unit_missing_cancellation_rule_fails(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.cancellation_rule = None
         self.reservation_unit.save()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -210,9 +182,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.cancel_rule.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -229,9 +199,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.cancel_rule.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -248,9 +216,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -267,9 +233,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -282,21 +246,18 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
     def test_new_time_causes_price_change_fails(self, mock_opening_hours):
         money_making_date = datetime.date.today() + datetime.timedelta(days=1)
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(
-            date=money_making_date
-        )
+        mock_opening_hours.return_value = self.get_mocked_opening_hours(date=money_making_date)
         ReservationUnitPricingFactory(
             begins=money_making_date,
             reservation_unit=self.reservation_unit,
         )
         data = self.get_valid_adjust_data()
-        data["begin"] = (
-            datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(days=1)
-        ).strftime("%Y%m%dT%H%M%S%zZ")
-        data["end"] = (
-            datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-            + datetime.timedelta(days=1, hours=1)
-        ).strftime("%Y%m%dT%H%M%S%zZ")
+        data["begin"] = (datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(days=1)).strftime(
+            "%Y%m%dT%H%M%S%zZ"
+        )
+        data["end"] = (datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(days=1, hours=1)).strftime(
+            "%Y%m%dT%H%M%S%zZ"
+        )
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
@@ -310,19 +271,13 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_unit_not_reservable_in_new_time_fails(
-        self, mock_opening_hours
-    ):
+    def test_reservation_unit_not_reservable_in_new_time_fails(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.reservation_begins = (
-            self.reservation_begin + datetime.timedelta(days=1)
-        )
+        self.reservation_unit.reservation_begins = self.reservation_begin + datetime.timedelta(days=1)
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -343,9 +298,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -362,9 +315,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -381,9 +332,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -406,12 +355,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         )
 
         data = self.get_valid_adjust_data()
-        data["begin"] = (self.reservation_begin + datetime.timedelta(hours=3)).strftime(
-            "%Y%m%dT%H%M%S%zZ"
-        )
-        data["end"] = (self.reservation_end + datetime.timedelta(hours=3)).strftime(
-            "%Y%m%dT%H%M%S%zZ"
-        )
+        data["begin"] = (self.reservation_begin + datetime.timedelta(hours=3)).strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = (self.reservation_end + datetime.timedelta(hours=3)).strftime("%Y%m%dT%H%M%S%zZ")
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
@@ -432,12 +377,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         data = self.get_valid_adjust_data()
-        data["begin"] = (self.reservation_begin + datetime.timedelta(days=2)).strftime(
-            "%Y%m%dT%H%M%S%zZ"
-        )
-        data["end"] = (self.reservation_end + datetime.timedelta(days=2)).strftime(
-            "%Y%m%dT%H%M%S%zZ"
-        )
+        data["begin"] = (self.reservation_begin + datetime.timedelta(days=2)).strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = (self.reservation_end + datetime.timedelta(days=2)).strftime("%Y%m%dT%H%M%S%zZ")
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
@@ -457,9 +398,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -471,14 +410,10 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
     def test_reservation_unit_not_open_in_new_time_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(
-            start_hour=22, end_hour=23
-        )
+        mock_opening_hours.return_value = self.get_mocked_opening_hours(start_hour=22, end_hour=23)
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -498,9 +433,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         )
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -511,28 +444,20 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_start_time_not_within_the_interval_fails(
-        self, mock_opening_hours
-    ):
+    def test_reservation_start_time_not_within_the_interval_fails(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.reservation_start_interval = (
-            ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
-        )
+        self.reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
         self.reservation_unit.save()
 
         data = self.get_valid_adjust_data()
-        data["begin"] = (
-            datetime.datetime.now() + datetime.timedelta(hours=1, minutes=10)
-        ).strftime("%Y%m%dT%H%M%S%zZ")
+        data["begin"] = (datetime.datetime.now() + datetime.timedelta(hours=1, minutes=10)).strftime("%Y%m%dT%H%M%S%zZ")
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
-        assert_that(error).is_equal_to(
-            "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL"
-        )
+        assert_that(error).is_equal_to("RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
@@ -549,9 +474,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
             email="j.reg@foo.com",
         )
         self.client.force_login(reggie_jim)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("message")
@@ -566,9 +489,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         unit_admin = self.create_unit_admin(self.unit)
         self.client.force_login(unit_admin)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
 
@@ -577,12 +498,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
-        assert_that(self.reservation.begin).is_equal_to(
-            self.reservation_begin + datetime.timedelta(hours=1)
-        )
-        assert_that(self.reservation.end).is_equal_to(
-            (self.reservation_end + datetime.timedelta(hours=1))
-        )
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
+        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
@@ -595,9 +512,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
 
@@ -606,12 +521,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
-        assert_that(self.reservation.begin).is_equal_to(
-            self.reservation_begin + datetime.timedelta(hours=1)
-        )
-        assert_that(self.reservation.end).is_equal_to(
-            (self.reservation_end + datetime.timedelta(hours=1))
-        )
+        assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
+        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
 
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")

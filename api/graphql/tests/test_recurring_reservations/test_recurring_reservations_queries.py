@@ -19,9 +19,7 @@ from spaces.tests.factories import UnitFactory
 class ReservationQueryTestCase(ReservationTestCaseBase):
     def create_recurring_by_admin(self):
         reservation_begin = datetime.datetime.now(tz=get_default_timezone())
-        reservation_end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) + datetime.timedelta(hours=1)
+        reservation_end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)
         RecurringReservationFactory(
             name="admin movies",
             reservation_unit=self.reservation_unit,
@@ -53,9 +51,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def setUp(self):
         super().setUp()
         reservation_begin = datetime.datetime.now(tz=get_default_timezone())
-        reservation_end = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) + datetime.timedelta(hours=1)
+        reservation_end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)
         self.recurring = RecurringReservationFactory(
             name="movies",
             description="good movies",
@@ -126,11 +122,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_regular_user_cannot_see_other_than_own(self):
         self.create_recurring_by_admin()
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_query_with_personal_fields(
-                """recurringReservations(orderBy:"name")"""
-            )
-        )
+        response = self.query(self.get_query_with_personal_fields("""recurringReservations(orderBy:"name")"""))
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
@@ -138,11 +130,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_general_admin_can_see_all(self):
         self.create_recurring_by_admin()
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_query_with_personal_fields(
-                """recurringReservations(orderBy:"name")"""
-            )
-        )
+        response = self.query(self.get_query_with_personal_fields("""recurringReservations(orderBy:"name")"""))
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
@@ -150,11 +138,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_unit_admin_can_see_unit_recurrings(self):
         self.create_recurring_by_admin()
         self.client.force_login(self.create_unit_admin(unit=self.unit))
-        response = self.query(
-            self.get_query_with_personal_fields(
-                """recurringReservations(orderBy:"name")"""
-            )
-        )
+        response = self.query(self.get_query_with_personal_fields("""recurringReservations(orderBy:"name")"""))
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
@@ -163,11 +147,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.create_recurring_by_admin()
 
         self.client.force_login(self.create_service_sector_admin(self.service_sector))
-        response = self.query(
-            self.get_query_with_personal_fields(
-                """recurringReservations(orderBy:"name")"""
-            )
-        )
+        response = self.query(self.get_query_with_personal_fields("""recurringReservations(orderBy:"name")"""))
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
@@ -305,9 +285,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_filter_by_unit_multiple_values(self):
         unit = UnitFactory(name="Another unit")
         reservation_unit = ReservationUnitFactory(name="Another resunit", unit=unit)
-        RecurringReservationFactory(
-            name="Another recurring", reservation_unit=reservation_unit
-        )
+        RecurringReservationFactory(name="Another recurring", reservation_unit=reservation_unit)
 
         self.client.force_login(self.general_admin)
         response = self.query(
@@ -337,9 +315,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     def test_filter_by_reservation_unit_type(self):
         reservation_unit_type = ReservationUnitTypeFactory(name="another type")
-        reservation_unit = ReservationUnitFactory(
-            name="another resunit", reservation_unit_type=reservation_unit_type
-        )
+        reservation_unit = ReservationUnitFactory(name="another resunit", reservation_unit_type=reservation_unit_type)
         RecurringReservationFactory(
             name="another recurring",
             reservation_unit=reservation_unit,
@@ -371,9 +347,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     def test_filter_by_reservation_unit_type_multiple_values(self):
         reservation_unit_type = ReservationUnitTypeFactory(name="Another type")
-        reservation_unit = ReservationUnitFactory(
-            name="Another resunit", reservation_unit_type=reservation_unit_type
-        )
+        reservation_unit = ReservationUnitFactory(name="Another resunit", reservation_unit_type=reservation_unit_type)
         RecurringReservationFactory(
             name="Another recurring",
             reservation_unit=reservation_unit,
@@ -404,25 +378,13 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_order_by_reservation_unit_name(self):
-        resunitA = ReservationUnitFactory(
-            name_fi="a Unit", name_en="d Unit", name_sv="g unit"
-        )
-        resunitB = ReservationUnitFactory(
-            name_fi="b Unit", name_en="e Unit", name_sv="h unit"
-        )
-        resunitC = ReservationUnitFactory(
-            name_fi="c Unit", name_en="f Unit", name_sv="i unit"
-        )
+        resunitA = ReservationUnitFactory(name_fi="a Unit", name_en="d Unit", name_sv="g unit")
+        resunitB = ReservationUnitFactory(name_fi="b Unit", name_en="e Unit", name_sv="h unit")
+        resunitC = ReservationUnitFactory(name_fi="c Unit", name_en="f Unit", name_sv="i unit")
 
-        RecurringReservationFactory(
-            name="this should be 1st", reservation_unit=resunitA
-        )
-        RecurringReservationFactory(
-            name="this should be 2nd", reservation_unit=resunitB
-        )
-        RecurringReservationFactory(
-            name="this should be 3rd", reservation_unit=resunitC
-        )
+        RecurringReservationFactory(name="this should be 1st", reservation_unit=resunitA)
+        RecurringReservationFactory(name="this should be 2nd", reservation_unit=resunitB)
+        RecurringReservationFactory(name="this should be 3rd", reservation_unit=resunitC)
 
         self.client.force_login(self.general_admin)
         test_data = ["Fi", "En", "Sv"]
@@ -458,15 +420,9 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         resunitB = ReservationUnitFactory(name="2nd resunit", unit=unitB)
         resunitC = ReservationUnitFactory(name="3nd resunit", unit=unitC)
 
-        RecurringReservationFactory(
-            name="this should be 1st", reservation_unit=resunitA
-        )
-        RecurringReservationFactory(
-            name="this should be 2nd", reservation_unit=resunitB
-        )
-        RecurringReservationFactory(
-            name="this should be 3rd", reservation_unit=resunitC
-        )
+        RecurringReservationFactory(name="this should be 1st", reservation_unit=resunitA)
+        RecurringReservationFactory(name="this should be 2nd", reservation_unit=resunitB)
+        RecurringReservationFactory(name="this should be 3rd", reservation_unit=resunitC)
 
         self.client.force_login(self.general_admin)
         test_data = ["Fi", "En", "Sv"]

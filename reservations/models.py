@@ -38,22 +38,18 @@ class ReservationType(models.TextChoices):
 
 
 class AgeGroup(models.Model):
-    minimum = models.fields.PositiveIntegerField(
-        verbose_name=_("Minimum"), null=False, blank=False
-    )
+    minimum = models.fields.PositiveIntegerField(verbose_name=_("Minimum"), null=False, blank=False)
 
-    maximum = models.fields.PositiveIntegerField(
-        verbose_name=_("Maximum"), null=True, blank=True
-    )
+    minimum = models.fields.PositiveIntegerField(verbose_name=_("Minimum"), null=False, blank=False)
+
+    maximum = models.fields.PositiveIntegerField(verbose_name=_("Maximum"), null=True, blank=True)
 
     def __str__(self):
         return "{} - {}".format(self.minimum, self.maximum)
 
 
 class AbilityGroup(models.Model):
-    name = models.fields.TextField(
-        verbose_name=_("Name"), null=False, blank=False, unique=True
-    )
+    name = models.fields.TextField(verbose_name=_("Name"), null=False, blank=False, unique=True)
 
     def __str__(self):
         return self.name
@@ -173,11 +169,7 @@ class RecurringReservation(models.Model):
     def denied_reservations(self):
         # Avoid a query to the database if we have fetched list already
         if "reservations" in self._prefetched_objects_cache:
-            return [
-                reservation
-                for reservation in self.reservations.all()
-                if reservation.state == STATE_CHOICES.DENIED
-            ]
+            return [reservation for reservation in self.reservations.all() if reservation.state == STATE_CHOICES.DENIED]
 
         return self.reservations.filter(state=STATE_CHOICES.DENIED)
 
@@ -212,9 +204,7 @@ STATE_CHOICES = STATE_CHOISE_CONST()
 
 class ReservationQuerySet(models.QuerySet):
     def total_duration(self):
-        return self.annotate(duration=F("end") - F("begin")).aggregate(
-            total_duration=Sum("duration")
-        )
+        return self.annotate(duration=F("end") - F("begin")).aggregate(total_duration=Sum("duration"))
 
     def within_application_round_period(self, app_round: ApplicationRound):
         return self.within_period(
@@ -244,8 +234,7 @@ class ReservationQuerySet(models.QuerySet):
     def inactive(self, older_than_minutes: int):
         return self.filter(
             state=STATE_CHOICES.CREATED,
-            created_at__lte=datetime.now(tz=get_current_timezone())
-            - timedelta(minutes=older_than_minutes),
+            created_at__lte=datetime.now(tz=get_current_timezone()) - timedelta(minutes=older_than_minutes),
         )
 
     def with_same_components(self, reservation_unit, begin, end):
@@ -280,21 +269,15 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
     reservee_first_name = models.CharField(
         verbose_name=_("Reservee first name"), max_length=255, blank=True, default=""
     )
-    reservee_last_name = models.CharField(
-        verbose_name=_("Reservee last name"), max_length=255, blank=True, default=""
-    )
+    reservee_last_name = models.CharField(verbose_name=_("Reservee last name"), max_length=255, blank=True, default="")
     reservee_organisation_name = models.CharField(
         verbose_name=_("Reservee organisation name"),
         max_length=255,
         blank=True,
         default="",
     )
-    reservee_phone = models.CharField(
-        verbose_name=_("Reservee phone"), max_length=255, blank=True, default=""
-    )
-    reservee_email = models.EmailField(
-        verbose_name=_("Reservee email"), null=True, blank=True
-    )
+    reservee_phone = models.CharField(verbose_name=_("Reservee phone"), max_length=255, blank=True, default="")
+    reservee_email = models.EmailField(verbose_name=_("Reservee email"), null=True, blank=True)
     reservee_id = models.CharField(
         verbose_name=_("Reservee ID"),
         max_length=255,
@@ -333,18 +316,10 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         default="",
         choices=RESERVEE_LANGUAGE_CHOICES,
     )
-    billing_first_name = models.CharField(
-        verbose_name=_("Billing first name"), max_length=255, blank=True, default=""
-    )
-    billing_last_name = models.CharField(
-        verbose_name=_("Billing last name"), max_length=255, blank=True, default=""
-    )
-    billing_phone = models.CharField(
-        verbose_name=_("Billing phone"), max_length=255, blank=True, default=""
-    )
-    billing_email = models.EmailField(
-        verbose_name=_("Billing email"), null=True, blank=True
-    )
+    billing_first_name = models.CharField(verbose_name=_("Billing first name"), max_length=255, blank=True, default="")
+    billing_last_name = models.CharField(verbose_name=_("Billing last name"), max_length=255, blank=True, default="")
+    billing_phone = models.CharField(verbose_name=_("Billing phone"), max_length=255, blank=True, default="")
+    billing_email = models.EmailField(verbose_name=_("Billing email"), null=True, blank=True)
     billing_address_street = models.CharField(
         verbose_name=_("Billing address street"),
         max_length=255,
@@ -391,15 +366,9 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         blank=True,
     )
 
-    sku = models.CharField(
-        verbose_name=_("SKU"), max_length=255, blank=True, default=""
-    )
-    name = models.CharField(
-        verbose_name=_("Name"), max_length=255, blank=True, default=""
-    )
-    description = models.CharField(
-        verbose_name=_("Description"), max_length=255, blank=True, default=""
-    )
+    sku = models.CharField(verbose_name=_("SKU"), max_length=255, blank=True, default="")
+    name = models.CharField(verbose_name=_("Name"), max_length=255, blank=True, default="")
+    description = models.CharField(verbose_name=_("Description"), max_length=255, blank=True, default="")
 
     state = models.CharField(
         max_length=32,
@@ -409,9 +378,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         db_index=True,
     )
 
-    priority = models.IntegerField(
-        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
-    )
+    priority = models.IntegerField(choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM)
 
     user = models.ForeignKey(
         User,
@@ -422,16 +389,10 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
     begin = models.DateTimeField(verbose_name=_("Begin time"))
     end = models.DateTimeField(verbose_name=_("End time"))
 
-    buffer_time_before = models.DurationField(
-        verbose_name=_("Buffer time before"), blank=True, null=True
-    )
-    buffer_time_after = models.DurationField(
-        verbose_name=_("Buffer time after"), blank=True, null=True
-    )
+    buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
+    buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
 
-    reservation_unit = models.ManyToManyField(
-        ReservationUnit, verbose_name=_("Reservation unit")
-    )
+    reservation_unit = models.ManyToManyField(ReservationUnit, verbose_name=_("Reservation unit"))
 
     recurring_reservation = models.ForeignKey(
         RecurringReservation,
@@ -442,9 +403,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         blank=True,
     )
 
-    num_persons = models.fields.PositiveIntegerField(
-        verbose_name=_("Number of persons"), null=True, blank=True
-    )
+    num_persons = models.fields.PositiveIntegerField(verbose_name=_("Number of persons"), null=True, blank=True)
 
     purpose = models.ForeignKey(
         "ReservationPurpose",
@@ -463,13 +422,9 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         blank=True,
     )
 
-    cancel_details = models.TextField(
-        verbose_name=_("Details for this reservation's cancellation"), blank=True
-    )
+    cancel_details = models.TextField(verbose_name=_("Details for this reservation's cancellation"), blank=True)
 
-    created_at = models.DateTimeField(
-        verbose_name=_("Created at"), null=True, default=timezone.now
-    )
+    created_at = models.DateTimeField(verbose_name=_("Created at"), null=True, default=timezone.now)
     confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
 
     unit_price = models.DecimalField(
@@ -555,13 +510,10 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
 
     def _requires_handling(self):
         return (
-            self.reservation_unit.filter(require_reservation_handling=True).exists()
-            or self.applying_for_free_of_charge
+            self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
         )
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(
             force_insert=force_insert,
             force_update=force_update,
@@ -587,9 +539,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
     def get_ical_description(self):
         reservation_units = self.reservation_unit.all()
         unit_names = [
-            reservation_unit.unit.name
-            for reservation_unit in reservation_units
-            if hasattr(reservation_unit, "unit")
+            reservation_unit.unit.name for reservation_unit in reservation_units if hasattr(reservation_unit, "unit")
         ]
 
         if self.recurring_reservation is None:
@@ -630,9 +580,7 @@ class ReservationPurpose(models.Model):
 
 
 class ReservationMetadataField(models.Model):
-    field_name = models.CharField(
-        max_length=100, verbose_name=_("Field name"), unique=True
-    )
+    field_name = models.CharField(max_length=100, verbose_name=_("Field name"), unique=True)
 
     class Meta:
         verbose_name = _("Reservation metadata field")
@@ -665,13 +613,9 @@ class ReservationMetadataSet(models.Model):
 
 
 class ReservationStatistic(models.Model):
-    reservation = models.OneToOneField(
-        Reservation, on_delete=models.SET_NULL, null=True
-    )
+    reservation = models.OneToOneField(Reservation, on_delete=models.SET_NULL, null=True)
 
-    reservation_created_at = models.DateTimeField(
-        verbose_name=_("Created at"), null=True, default=timezone.now
-    )
+    reservation_created_at = models.DateTimeField(verbose_name=_("Created at"), null=True, default=timezone.now)
 
     reservation_handled_at = models.DateTimeField(
         verbose_name=_("Handled at"),
@@ -680,20 +624,12 @@ class ReservationStatistic(models.Model):
         help_text="When this reservation was handled.",
     )
 
-    reservation_confirmed_at = models.DateTimeField(
-        verbose_name=_("Confirmed at"), null=True
-    )
+    reservation_confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
 
-    buffer_time_before = models.DurationField(
-        verbose_name=_("Buffer time before"), blank=True, null=True
-    )
-    buffer_time_after = models.DurationField(
-        verbose_name=_("Buffer time after"), blank=True, null=True
-    )
+    buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
+    buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
 
-    updated_at = models.DateTimeField(
-        verbose_name=_("Statistics updated at"), null=True, blank=True, auto_now=True
-    )
+    updated_at = models.DateTimeField(verbose_name=_("Statistics updated at"), null=True, blank=True, auto_now=True)
 
     reservee_type = models.CharField(
         max_length=50,
@@ -717,13 +653,9 @@ class ReservationStatistic(models.Model):
         default="",
     )
 
-    num_persons = models.fields.PositiveIntegerField(
-        verbose_name=_("Number of persons"), null=True, blank=True
-    )
+    num_persons = models.fields.PositiveIntegerField(verbose_name=_("Number of persons"), null=True, blank=True)
 
-    priority = models.IntegerField(
-        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
-    )
+    priority = models.IntegerField(choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM)
 
     priority_name = models.CharField(max_length=255, null=False, default="", blank=True)
 
@@ -767,9 +699,7 @@ class ReservationStatistic(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    age_group_name = models.fields.CharField(
-        max_length=255, null=False, default="", blank=True
-    )
+    age_group_name = models.fields.CharField(max_length=255, null=False, default="", blank=True)
 
     is_applied = models.BooleanField(
         default=False,
@@ -795,9 +725,7 @@ class ReservationStatistic(models.Model):
 
     end = models.DateTimeField(verbose_name=_("End time"))
 
-    duration_minutes = models.IntegerField(
-        null=False, verbose_name=_("Reservation duration in minutes")
-    )
+    duration_minutes = models.IntegerField(null=False, verbose_name=_("Reservation duration in minutes"))
 
     reservation_type = models.CharField(
         max_length=50,
@@ -873,30 +801,18 @@ class ReservationStatistic(models.Model):
         default=0,
         help_text="The non subsidised price of the reservation excluding VAT",
     )
-    is_subsidised = models.BooleanField(
-        help_text="Is the reservation price subsidised", default=False
-    )
-    is_recurring = models.BooleanField(
-        help_text="Is the reservation recurring", default=False
-    )
-    recurrence_begin_date = models.DateField(
-        verbose_name="Recurrence begin date", null=True
-    )
-    recurrence_end_date = models.DateField(
-        verbose_name="Recurrence end date", null=True
-    )
-    recurrence_uuid = models.CharField(
-        verbose_name="Recurrence UUID", max_length=255, default="", blank=True
-    )
+    is_subsidised = models.BooleanField(help_text="Is the reservation price subsidised", default=False)
+    is_recurring = models.BooleanField(help_text="Is the reservation recurring", default=False)
+    recurrence_begin_date = models.DateField(verbose_name="Recurrence begin date", null=True)
+    recurrence_end_date = models.DateField(verbose_name="Recurrence end date", null=True)
+    recurrence_uuid = models.CharField(verbose_name="Recurrence UUID", max_length=255, default="", blank=True)
     reservee_is_unregistered_association = models.BooleanField(
         verbose_name=_("Reservee is an unregistered association"),
         null=True,
         default=False,
         blank=True,
     )
-    reservee_uuid = models.CharField(
-        verbose_name="Reservee UUID", max_length=255, default="", blank=True
-    )
+    reservee_uuid = models.CharField(verbose_name="Reservee UUID", max_length=255, default="", blank=True)
     tax_percentage_value = models.DecimalField(
         verbose_name=_("Tax percentage value"),
         max_digits=5,
@@ -905,13 +821,9 @@ class ReservationStatistic(models.Model):
         help_text="The value of the tax percentage for this particular reservation",
     )
 
-    primary_reservation_unit = models.ForeignKey(
-        ReservationUnit, null=True, on_delete=models.SET_NULL
-    )
+    primary_reservation_unit = models.ForeignKey(ReservationUnit, null=True, on_delete=models.SET_NULL)
 
-    primary_reservation_unit_name = models.CharField(
-        verbose_name=_("Name"), max_length=255
-    )
+    primary_reservation_unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
     primary_unit_tprek_id = models.CharField(
         verbose_name=_("TPREK id"),
         max_length=255,
@@ -926,9 +838,7 @@ class ReservationStatisticsReservationUnit(models.Model):
         on_delete=models.CASCADE,
         related_name="reservation_stats_reservation_units",
     )
-    reservation_unit = models.ForeignKey(
-        ReservationUnit, null=True, on_delete=models.SET_NULL
-    )
+    reservation_unit = models.ForeignKey(ReservationUnit, null=True, on_delete=models.SET_NULL)
     unit_tprek_id = models.CharField(
         verbose_name=_("TPREK id"),
         max_length=255,

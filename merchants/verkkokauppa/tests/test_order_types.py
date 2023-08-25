@@ -209,12 +209,8 @@ class OrderTypesTestCase(TestCase):
                         vat_percentage=Decimal("24"),
                         meta=[
                             OrderItemMeta(
-                                order_item_meta_id=UUID(
-                                    "60f1949a-e2c8-497c-b9d4-c1ae61d20973"
-                                ),
-                                order_item_id=UUID(
-                                    "10e64522-bc1b-4758-b8c0-14d42e0719d4"
-                                ),
+                                order_item_meta_id=UUID("60f1949a-e2c8-497c-b9d4-c1ae61d20973"),
+                                order_item_id=UUID("10e64522-bc1b-4758-b8c0-14d42e0719d4"),
                                 order_id=UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
                                 key="testKey",
                                 value="Test Value",

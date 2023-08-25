@@ -22,9 +22,7 @@ class HTMLFileValidatorTestCase(TestCase):
 
         with raises(ValidationError) as err:
             self.validator.validate_html_file(mock_field_file)
-        assert_that(err.value.message).is_equal_to(
-            "Unsupported file extension .jpg. Only .html files are allowed"
-        )
+        assert_that(err.value.message).is_equal_to("Unsupported file extension .jpg. Only .html files are allowed")
 
     def test_raises_validation_error_on_zero_size_file(self):
         mock_field_file = mock.MagicMock()

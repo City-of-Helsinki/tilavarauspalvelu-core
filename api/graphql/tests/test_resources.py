@@ -182,9 +182,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
         content = json.loads(response.content)
         errors = content.get("errors")
         assert_that(len(errors)).is_equal_to(1)
-        assert_that(errors[0].get("message")).is_equal_to(
-            "No Resource matches the given query."
-        )
+        assert_that(errors[0].get("message")).is_equal_to("No Resource matches the given query.")
 
     def test_only_with_permissions_with_no_permissions(self):
         response = self.query(
@@ -208,9 +206,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
 
     def test_only_with_permissions_with_general_role(self):
         role_choice = GeneralRoleChoice.objects.create(code="resource_manager")
-        GeneralRolePermission.objects.create(
-            role=role_choice, permission="can_manage_resources"
-        )
+        GeneralRolePermission.objects.create(role=role_choice, permission="can_manage_resources")
         GeneralRole.objects.create(
             user=self.regular_joe,
             role=role_choice,
@@ -244,12 +240,8 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
         ResourceFactory(name_fi="i am from the sector!", space=space)
         ResourceFactory(name_fi="hide me", space=another_space)
 
-        spaces_role_choice = ServiceSectorRoleChoice.objects.create(
-            code="resource_manager"
-        )
-        ServiceSectorRolePermission.objects.create(
-            role=spaces_role_choice, permission="can_manage_resources"
-        )
+        spaces_role_choice = ServiceSectorRoleChoice.objects.create(code="resource_manager")
+        ServiceSectorRolePermission.objects.create(role=spaces_role_choice, permission="can_manage_resources")
         ServiceSectorRole.objects.create(
             user=self.regular_joe,
             role=spaces_role_choice,
@@ -281,9 +273,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
         ResourceFactory(name_fi="hide me", space=another_space)
 
         role_choice = UnitRoleChoice.objects.create(code="resource_manager")
-        UnitRolePermission.objects.create(
-            role=role_choice, permission="can_manage_resources"
-        )
+        UnitRolePermission.objects.create(role=role_choice, permission="can_manage_resources")
         role = UnitRole.objects.create(user=self.regular_joe, role=role_choice)
         role.unit.set([unit])
 
@@ -315,9 +305,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
         ResourceFactory(name_fi="hide me", space=another_space)
 
         role_choice = UnitRoleChoice.objects.create(code="resource_manager")
-        UnitRolePermission.objects.create(
-            role=role_choice, permission="can_manage_resources"
-        )
+        UnitRolePermission.objects.create(role=role_choice, permission="can_manage_resources")
         role = UnitRole.objects.create(user=self.regular_joe, role=role_choice)
         role.unit_group.set([unit_group])
 
@@ -368,9 +356,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
 
     def test_service_sector_admin_can_create_resource(self):
         self.client.force_login(self.service_sector_admin)
@@ -383,9 +369,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
 
     def test_unit_admin_can_create_resource(self):
         self.client.force_login(self.unit_admin)
@@ -398,9 +382,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
 
     def test_unit_group_admin_can_create_resource(self):
         self.client.force_login(self.unit_group_admin)
@@ -413,9 +395,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
 
     def test_validation_error_when_no_space_and_fixed_location(self):
         data = self.get_valid_input_data()
@@ -429,9 +409,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(content.get("errors")[0].get("message")).contains(
             "Location type 'fixed' needs a space to be defined."
         )
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            0
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(0)
 
     def test_created_when_no_space_and_movable_location(self):
         data = self.get_valid_input_data()
@@ -445,9 +423,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
 
     def test_regular_user_cannot_create(self):
         self.client.force_login(self.regular_joe)
@@ -458,9 +434,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            0
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(0)
 
     def test_location_type_wrong_errors(self):
         data = self.get_valid_input_data()
@@ -471,12 +445,8 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         )
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "Wrong type of location type"
-        )
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            0
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("Wrong type of location type")
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(0)
 
 
 class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
@@ -507,9 +477,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
         res_pk = content.get("data").get("createResource").get("pk")
         assert_that(Resource.objects.get(pk=res_pk))
 
@@ -524,9 +492,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
         res_pk = content.get("data").get("createResource").get("pk")
         assert_that(Resource.objects.get(pk=res_pk))
 
@@ -541,9 +507,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(1)
         res_pk = content.get("data").get("createResource").get("pk")
         assert_that(Resource.objects.get(pk=res_pk))
 
@@ -556,9 +520,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            0
-        )
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(0)
 
 
 class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
@@ -588,9 +550,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         }
 
     def test_resource_updated(self):
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_input_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_input_data())
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -620,9 +580,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "Missing translation for nameFi."
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("Missing translation for nameFi.")
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
         data = self.get_valid_input_data()
@@ -696,9 +654,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "Wrong type of location type"
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("Wrong type of location type")
 
 
 class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
@@ -716,9 +672,7 @@ class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
 
     def test_resource_deleted(self):
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_delete_query(), input_data={"pk": self.resource.pk}
-        )
+        response = self.query(self.get_delete_query(), input_data={"pk": self.resource.pk})
 
         assert_that(response.status_code).is_equal_to(200)
 
@@ -731,14 +685,10 @@ class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
 
     def test_regular_user_cannot_delete(self):
         self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_delete_query(), input_data={"pk": self.resource.pk}
-        )
+        response = self.query(self.get_delete_query(), input_data={"pk": self.resource.pk})
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).contains(
-            "No permissions to perform delete."
-        )
+        assert_that(content.get("errors")[0].get("message")).contains("No permissions to perform delete.")
 
         assert_that(Resource.objects.filter(pk=self.resource.pk).exists()).is_true()

@@ -20,6 +20,4 @@ class Command(BaseCommand):
         application_rounds = options.get("application_round")
 
         for application_round in application_rounds:
-            ApplicationDataExporter.export_application_round_statistics_for_reservation_units(
-                application_round
-            )
+            ApplicationDataExporter.export_application_round_statistics_for_reservation_units(application_round)

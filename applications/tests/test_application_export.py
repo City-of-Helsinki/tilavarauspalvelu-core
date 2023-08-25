@@ -64,15 +64,11 @@ class ApplicationDataExportTestCaseBase(TestCase):
             ),
         )
 
-        cls.application_round_id = (
-            cls.application_event.application.application_round.id
-        )
+        cls.application_round_id = cls.application_event.application.application_round.id
 
         # Add random ID of application round that does not exist
         # This is to test that no file should be written
-        application_round_ids = ApplicationRound.objects.all().values_list(
-            "id", flat=True
-        )
+        application_round_ids = ApplicationRound.objects.all().values_list("id", flat=True)
 
         cls.space_2_name = (
             f"{cls.event_reservation_unit_2.reservation_unit.name}, "
@@ -98,15 +94,13 @@ class ApplicationDataExportTestCaseBase(TestCase):
 
 
 class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
-    export_dir = Path(settings.BASE_DIR) / "exports" / "applications"
+    export_dir = settings.BASE_DIR / "exports" / "applications"
     application_round_id = None
     random_empty_application_round_id = None
 
     @staticmethod
     def _get_filename_for_round(round: int):
-        return (
-            f"application_data_round_{round}_{datetime.now().strftime('%d-%m-%Y')}.csv"
-        )
+        return f"application_data_round_{round}_{datetime.now().strftime('%d-%m-%Y')}.csv"
 
     @classmethod
     def _test_first_data_line(cls, file_name: str, expected_row: List[Any]):
@@ -1361,9 +1355,7 @@ class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
         )
 
         existing_file_name = self._get_filename_for_round(self.application_round_id)
-        empty_file_name = self._get_filename_for_round(
-            self.random_empty_application_round_id
-        )
+        empty_file_name = self._get_filename_for_round(self.random_empty_application_round_id)
 
         existing_file = self.export_dir / existing_file_name
         not_existing_file_high = self.export_dir / empty_file_name

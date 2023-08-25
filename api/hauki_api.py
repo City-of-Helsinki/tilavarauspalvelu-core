@@ -43,9 +43,5 @@ class OpeningHoursViewSet(viewsets.ViewSet):
         end_date = self.request.query_params.get("end_date")
         unit = ReservationUnit.objects.select_related("unit").get(pk=pk)
         return Response(
-            OpeningHoursSerializer(
-                instance=OpeningHours(
-                    id=unit.id, start_date=start_date, end_date=end_date
-                )
-            ).data
+            OpeningHoursSerializer(instance=OpeningHours(id=unit.id, start_date=start_date, end_date=end_date)).data
         )

@@ -57,9 +57,7 @@ class UserTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
         GeneralRole.objects.create(role=general_role_choice, user=cls.staff_user)
-        GeneralRolePermission.objects.create(
-            role=general_role_choice, permission="can_do_stuff"
-        )
+        GeneralRolePermission.objects.create(role=general_role_choice, permission="can_do_stuff")
         GeneralRole.objects.create(role=general_role_choice, user=cls.non_staff_user)
 
 
@@ -141,9 +139,7 @@ class UserQueryTestCase(UserTestCaseBase):
             service_sector=service_sector,
             role=service_sector_role,
         )
-        ServiceSectorRolePermission.objects.create(
-            role=service_sector_role, permission="can_do_service_sector_things"
-        )
+        ServiceSectorRolePermission.objects.create(role=service_sector_role, permission="can_do_service_sector_things")
 
         self.client.force_login(self.staff_user)
         response = self.query(
@@ -175,12 +171,8 @@ class UserQueryTestCase(UserTestCaseBase):
     def test_show_unit_roles(self):
         unit = UnitFactory(name="Test Unit")
         unit_group = UnitGroupFactory(name="Test Unit Group", units=[unit])
-        unit_role = UnitRoleChoice.objects.create(
-            code="TEST_UNIT_ROLE", verbose_name="Test Unit Role"
-        )
-        UnitRolePermission.objects.create(
-            role=unit_role, permission="can_do_unit_things"
-        )
+        unit_role = UnitRoleChoice.objects.create(code="TEST_UNIT_ROLE", verbose_name="Test Unit Role")
+        UnitRolePermission.objects.create(role=unit_role, permission="can_do_unit_things")
 
         role = UnitRole.objects.create(user=self.staff_user, role=unit_role)
         role.unit.set([unit])
@@ -240,9 +232,7 @@ class UpdateUserTestCase(UserTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0]["message"]).is_equal_to("No permission to mutate")
         assert_that(content["data"]["updateUser"]).is_none()
 
     def test_update_fails_when_user_tries_to_update_other_user(self):
@@ -252,9 +242,7 @@ class UpdateUserTestCase(UserTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0]["message"]).is_equal_to("No permission to mutate")
         assert_that(content["data"]["updateUser"]).is_none()
 
     def test_update_fails_when_user_has_no_roles(self):
@@ -273,9 +261,7 @@ class UpdateUserTestCase(UserTestCaseBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0]["message"]).is_equal_to("No permission to mutate")
         assert_that(content["data"]["updateUser"]).is_none()
 
     def test_update_by_staff_with_roles_succeeds(self):
@@ -299,9 +285,7 @@ class UpdateUserTestCase(UserTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["updateUser"]["errors"]).is_none()
-        assert_that(content["data"]["updateUser"]["pk"]).is_equal_to(
-            self.non_staff_user.pk
-        )
+        assert_that(content["data"]["updateUser"]["pk"]).is_equal_to(self.non_staff_user.pk)
 
         updated_user = User.objects.get(pk=self.non_staff_user.pk)
         assert_that(updated_user.reservation_notification).is_equal_to("none")

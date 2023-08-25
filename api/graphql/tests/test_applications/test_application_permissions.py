@@ -69,9 +69,7 @@ class ApplicationsGraphQLPermissionsTestCase(ApplicationTestCaseBase):
 
         content = json.loads(response.content)
 
-        assert_that(
-            content.get("data", {}).get("applications", {}).get("edges")
-        ).is_empty()
+        assert_that(content.get("data", {}).get("applications", {}).get("edges")).is_empty()
 
     def test_unauthorized_user_does_not_receive_data(self):
         unauthorized_user = get_user_model().objects.create()
@@ -83,9 +81,7 @@ class ApplicationsGraphQLPermissionsTestCase(ApplicationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data", {}).get("applications", {}).get("edges")
-        ).is_empty()
+        assert_that(content.get("data", {}).get("applications", {}).get("edges")).is_empty()
 
     def test_regular_user_can_view_only_own_application(self):
         self.client.force_login(self.regular_joe)
@@ -122,9 +118,7 @@ class ApplicationsGraphQLPermissionsTestCase(ApplicationTestCaseBase):
             email="aminadmin.deedee@foo.com",
         )
 
-        application_two = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION
-        )
+        application_two = ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_ASSOCIATION)
 
         ServiceSectorRole.objects.create(
             user=service_sector_admin_two,
@@ -179,9 +173,7 @@ class ApplicationsGraphQLPermissionsTestCase(ApplicationTestCaseBase):
             permission="can_validate_applications",
         )
 
-        application_two = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION
-        )
+        application_two = ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_ASSOCIATION)
         application_event = ApplicationEventFactory(application=application_two)
         test_unit_1 = ReservationUnitFactory(
             name="Declined unit 10",
@@ -240,9 +232,7 @@ class ApplicationsGraphQLPermissionsTestCase(ApplicationTestCaseBase):
             permission="can_validate_applications",
         )
 
-        application_two = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION
-        )
+        application_two = ApplicationFactory(applicant_type=Application.APPLICANT_TYPE_ASSOCIATION)
         application_event = ApplicationEventFactory(application=application_two)
         test_unit_1 = ReservationUnitFactory(
             name="Declined unit 10",
@@ -255,9 +245,7 @@ class ApplicationsGraphQLPermissionsTestCase(ApplicationTestCaseBase):
             reservation_unit=test_unit_1,
             application_event=application_event,
         )
-        unit_group = UnitGroupFactory(
-            units=(event_reservation_unit.reservation_unit.unit,)
-        )
+        unit_group = UnitGroupFactory(units=(event_reservation_unit.reservation_unit.unit,))
 
         unit_role.unit_group.add(unit_group)
 

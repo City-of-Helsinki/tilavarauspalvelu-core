@@ -11,20 +11,12 @@ from ..models import PricingStatus, ReservationUnit, ReservationUnitPricing
 
 class ReservationUnitPricingHelper:
     @classmethod
-    def get_active_price(
-        cls, reservation_unit: ReservationUnit
-    ) -> Optional[ReservationUnitPricing]:
-        return reservation_unit.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_ACTIVE
-        ).first()
+    def get_active_price(cls, reservation_unit: ReservationUnit) -> Optional[ReservationUnitPricing]:
+        return reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
 
     @classmethod
-    def get_future_price(
-        cls, reservation_unit: ReservationUnit
-    ) -> Optional[ReservationUnitPricing]:
-        return reservation_unit.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_FUTURE
-        ).first()
+    def get_future_price(cls, reservation_unit: ReservationUnit) -> Optional[ReservationUnitPricing]:
+        return reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
 
     @classmethod
     def get_price_by_date(
@@ -49,9 +41,7 @@ class ReservationUnitPricingHelper:
         pricings = data.get("pricings", [])
 
         if not is_draft and not pricings:
-            raise GraphQLError(
-                "pricings is required and must have one ACTIVE and one optional FUTURE pricing"
-            )
+            raise GraphQLError("pricings is required and must have one ACTIVE and one optional FUTURE pricing")
 
     @classmethod
     def check_pricing_dates(cls, data: Dict[str, Any]):
@@ -105,19 +95,13 @@ class ReservationUnitPricingHelper:
                 pricing["highest_price"] = highest_price_net
                 pricing["lowest_price"] = lowest_price_net
             else:
-                pricing["highest_price"] = round_decimal(
-                    Decimal(highest_price_net * (1 + tax_percentage.decimal)), 2
-                )
-                pricing["lowest_price"] = round_decimal(
-                    Decimal(lowest_price_net * (1 + tax_percentage.decimal)), 2
-                )
+                pricing["highest_price"] = round_decimal(Decimal(highest_price_net * (1 + tax_percentage.decimal)), 2)
+                pricing["lowest_price"] = round_decimal(Decimal(lowest_price_net * (1 + tax_percentage.decimal)), 2)
 
         return pricings
 
     @classmethod
-    def contains_status(
-        cls, status: PricingStatus, pricings: List[Dict[Any, Any]]
-    ) -> bool:
+    def contains_status(cls, status: PricingStatus, pricings: List[Dict[Any, Any]]) -> bool:
         for pricing in pricings:
             if pricing.get("status", "") == status:
                 return True

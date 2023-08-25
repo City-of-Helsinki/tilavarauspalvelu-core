@@ -33,22 +33,16 @@ class RefundStatusFromJsonTestCase(TestCase):
     def test_refund_status_from_json(self):
         refund_status = RefundStatusResult.from_json(refund_status_json)
 
-        assert_that(refund_status.order_id).is_equal_to(
-            UUID("63c0e5b7-a460-38f1-97d8-2ffce25cce31")
-        )
+        assert_that(refund_status.order_id).is_equal_to(UUID("63c0e5b7-a460-38f1-97d8-2ffce25cce31"))
         assert_that(refund_status.refund_payment_id).is_equal_to(
             "ea0f16e8-14d7-4510-b83f-1a29494756f0_at_20230329-073612"
         )
-        assert_that(refund_status.refund_transaction_id).is_equal_to(
-            UUID("61b2d842-ce04-11ed-9991-c7842594818f")
-        )
+        assert_that(refund_status.refund_transaction_id).is_equal_to(UUID("61b2d842-ce04-11ed-9991-c7842594818f"))
 
         assert_that(refund_status.namespace).is_equal_to("tilanvaraus")
         assert_that(refund_status.status).is_equal_to("refund_paid_online")
         assert_that(refund_status.created_at).is_equal_to(
-            datetime(
-                2023, 3, 29, 7, 36, 13, 576000, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
-            )
+            datetime(2023, 3, 29, 7, 36, 13, 576000, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
         )
 
     @mock.patch("merchants.verkkokauppa.payment.types.capture_exception")
@@ -58,7 +52,5 @@ class RefundStatusFromJsonTestCase(TestCase):
             data["orderId"] = "not-a-uuid"
             RefundStatusResult.from_json(data)
 
-        assert_that(str(ex.value)).is_equal_to(
-            "Could not parse refund status: badly formed hexadecimal UUID string"
-        )
+        assert_that(str(ex.value)).is_equal_to("Could not parse refund status: badly formed hexadecimal UUID string")
         assert_that(mock_capture_exception.called).is_true()

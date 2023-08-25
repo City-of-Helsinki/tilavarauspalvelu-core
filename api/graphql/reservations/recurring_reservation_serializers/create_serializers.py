@@ -38,18 +38,10 @@ class RecurringReservationCreateSerializer(PrimaryKeySerializer):
 
     name = serializers.CharField(required=False, default="")
     description = serializers.CharField(required=False, default="", allow_blank=True)
-    begin_time = serializers.TimeField(
-        required=True, help_text="Time when reservations begins."
-    )
-    end_time = serializers.TimeField(
-        required=True, help_text="Time when reservations ends."
-    )
-    begin_date = serializers.DateField(
-        required=True, help_text="Date when first reservation begins."
-    )
-    end_date = serializers.DateField(
-        required=True, help_text="Date when last reservation begins."
-    )
+    begin_time = serializers.TimeField(required=True, help_text="Time when reservations begins.")
+    end_time = serializers.TimeField(required=True, help_text="Time when reservations ends.")
+    begin_date = serializers.DateField(required=True, help_text="Date when first reservation begins.")
+    end_date = serializers.DateField(required=True, help_text="Date when last reservation begins.")
     recurrence_in_days = serializers.IntegerField(required=True)
 
     class Meta:
@@ -107,9 +99,7 @@ class RecurringReservationCreateSerializer(PrimaryKeySerializer):
         weekdays = weekdays or getattr(self.instance, "weekdays", [])
         for weekday in weekdays:
             if weekday not in WEEKDAYS.VALUES:
-                raise ValidationErrorWithCode(
-                    f"Invalid weekday {weekday}.", ValidationErrorCodes.INVALID_WEEKDAY
-                )
+                raise ValidationErrorWithCode(f"Invalid weekday {weekday}.", ValidationErrorCodes.INVALID_WEEKDAY)
             days.append(str(weekday))
 
         return ",".join(days)

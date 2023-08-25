@@ -215,20 +215,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_should_be_able_to_find_by_pk(self):
-        query = (
-            f"{{\n"
-            f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
-            f"id nameFi pk\n"
-            f"}}"
-            f"}}"
-        )
+        query = f"{{\n" f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n" f"id nameFi pk\n" f"}}" f"}}"
         response = self.query(query)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("reservationUnitByPk").get("pk")
-        ).is_equal_to(self.reservation_unit.id)
+        assert_that(content.get("data").get("reservationUnitByPk").get("pk")).is_equal_to(self.reservation_unit.id)
 
     def test_getting_authentication_by_pk(self):
         response = self.query(
@@ -242,9 +234,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("reservationUnitByPk").get("authentication")
-        ).is_equal_to("WEAK")
+        assert_that(content.get("data").get("reservationUnitByPk").get("authentication")).is_equal_to("WEAK")
 
     def test_getting_hauki_url_is_none_when_regular_user(self):
         settings.HAUKI_SECRET = "HAUKISECRET"
@@ -279,9 +269,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.unit.save()
         self.maxDiff = None
         gen_role_choice = GeneralRoleChoice.objects.get(code="admin")
-        GeneralRolePermission.objects.create(
-            role=gen_role_choice, permission="can_manage_units"
-        )
+        GeneralRolePermission.objects.create(role=gen_role_choice, permission="can_manage_units")
         self.client.force_login(self.general_admin)
         query = (
             """
@@ -316,9 +304,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         unit_role_choice = UnitRoleChoice.objects.get(code="manager")
         unit_role = UnitRole.objects.create(user=unit_manager, role=unit_role_choice)
         unit_role.unit.add(self.reservation_unit.unit)
-        UnitRolePermission.objects.create(
-            role=unit_role_choice, permission="can_manage_units"
-        )
+        UnitRolePermission.objects.create(role=unit_role_choice, permission="can_manage_units")
         self.client.force_login(unit_manager)
         query = (
             """
@@ -338,29 +324,19 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_should_error_when_not_found_by_pk(self):
-        query = (
-            f"{{\n"
-            f"reservationUnitByPk(pk: {self.reservation_unit.id + 666}) {{\n"
-            f"id\n"
-            f"}}"
-            f"}}"
-        )
+        query = f"{{\n" f"reservationUnitByPk(pk: {self.reservation_unit.id + 666}) {{\n" f"id\n" f"}}" f"}}"
         response = self.query(query)
 
         content = json.loads(response.content)
         errors = content.get("errors")
         assert_that(len(errors)).is_equal_to(1)
-        assert_that(errors[0].get("message")).is_equal_to(
-            "No ReservationUnit matches the given query."
-        )
+        assert_that(errors[0].get("message")).is_equal_to("No ReservationUnit matches the given query.")
 
     @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
     @mock.patch("opening_hours.hours.make_hauki_get_request")
     def test_opening_hours(self, mock_periods, mock_opening_times):
-        mock_opening_times.return_value = get_mocked_opening_hours(
-            self.reservation_unit.uuid
-        )
+        mock_opening_times.return_value = get_mocked_opening_hours(self.reservation_unit.uuid)
         mock_periods.return_value = get_mocked_periods()
         query = (
             f"{{\n"
@@ -384,37 +360,23 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ).is_not_empty()
 
         assert_that(
-            content.get("data")
-            .get("reservationUnitByPk")
-            .get("openingHours")
-            .get("openingTimes")
+            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")
         ).is_not_empty()
         assert_that(
-            content.get("data")
-            .get("reservationUnitByPk")
-            .get("openingHours")
-            .get("openingTimes")[0]["startTime"]
+            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["startTime"]
         ).is_equal_to("2020-01-01T10:00:00+02:00")
         assert_that(
-            content.get("data")
-            .get("reservationUnitByPk")
-            .get("openingHours")
-            .get("openingTimes")[0]["endTime"]
+            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["endTime"]
         ).is_equal_to("2020-01-01T22:00:00+02:00")
         assert_that(
-            content.get("data")
-            .get("reservationUnitByPk")
-            .get("openingHours")
-            .get("openingTimes")[0]["isReservable"]
+            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["isReservable"]
         ).is_true()
 
     @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
     @mock.patch("opening_hours.hours.make_hauki_get_request")
     def test_opening_hours_is_reservable_false(self, mock_periods, mock_opening_times):
-        mock_opening_times.return_value = get_mocked_opening_hours(
-            self.reservation_unit.uuid, state=State.SELF_SERVICE
-        )
+        mock_opening_times.return_value = get_mocked_opening_hours(self.reservation_unit.uuid, state=State.SELF_SERVICE)
         mock_periods.return_value = get_mocked_periods()
         query = (
             f"{{\n"
@@ -430,10 +392,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data")
-            .get("reservationUnitByPk")
-            .get("openingHours")
-            .get("openingTimes")[0]["isReservable"]
+            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["isReservable"]
         ).is_false()
 
     def test_reservations_date_filter(self):
@@ -478,9 +437,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
 
-        reservations = (
-            content.get("data").get("reservationUnitByPk").get("reservations")
-        )
+        reservations = content.get("data").get("reservationUnitByPk").get("reservations")
         assert_that(len(reservations)).is_equal_to(2)
         assert_that(reservations[0]["name"]).contains("Show me")
         assert_that(reservations[1]["name"]).contains("Show me too")
@@ -998,12 +955,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         category = KeywordCategoryFactory()
         excluded = ReservationUnitFactory()  # should be excluded
         excluded.keyword_groups.set([KeywordGroupFactory(keyword_category=category)])
-        keyword_group = KeywordGroupFactory(
-            name="Test group", keyword_category=category
-        )
-        other_keyword_group = KeywordGroupFactory(
-            name="Other group", keyword_category=category
-        )
+        keyword_group = KeywordGroupFactory(name="Test group", keyword_category=category)
+        other_keyword_group = KeywordGroupFactory(name="Other group", keyword_category=category)
         self.reservation_unit.keyword_groups.set([keyword_group])
         response = self.query(
             f"""
@@ -1101,15 +1054,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         rank3 = ReservationUnitTypeFactory(rank=3)
         rank4 = ReservationUnitTypeFactory(rank=4)
         rank5 = ReservationUnitTypeFactory(rank=5)  # Do not include
-        ReservationUnitFactory(
-            reservation_unit_type=rank1, name_fi="Rank 1"
-        )  # Do not include
+        ReservationUnitFactory(reservation_unit_type=rank1, name_fi="Rank 1")  # Do not include
         ReservationUnitFactory(reservation_unit_type=rank2, name_fi="Rank 2")
         ReservationUnitFactory(reservation_unit_type=rank3, name_fi="Rank 3")
         ReservationUnitFactory(reservation_unit_type=rank4, name_fi="Rank 4")
-        ReservationUnitFactory(
-            reservation_unit_type=rank5, name_fi="Rank 5"
-        )  # Do not include
+        ReservationUnitFactory(reservation_unit_type=rank5, name_fi="Rank 5")  # Do not include
         response = self.query(
             """
             query {
@@ -1142,9 +1091,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             begin=datetime.datetime(2021, 1, 1),
             end=datetime.datetime(2021, 1, 2),
         )
-        self.reservation_unit.reservation_set.set(
-            [matching_reservation, other_reservation]
-        )
+        self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
@@ -1186,9 +1133,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             end=now + one_hour + one_hour,
             state=STATE_CHOICES.CANCELLED,
         )
-        self.reservation_unit.reservation_set.set(
-            [matching_reservation, other_reservation]
-        )
+        self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
         self.client.force_login(self.regular_joe)
         response = self.query(
@@ -1220,21 +1165,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         one_hour = datetime.timedelta(hours=1)
         two_hours = datetime.timedelta(hours=2)
         matching_reservations = [
-            ReservationFactory(
-                begin=now, end=now + one_hour, state=STATE_CHOICES.CREATED
-            ),
-            ReservationFactory(
-                begin=now + one_hour, end=now + two_hours, state=STATE_CHOICES.CONFIRMED
-            ),
+            ReservationFactory(begin=now, end=now + one_hour, state=STATE_CHOICES.CREATED),
+            ReservationFactory(begin=now + one_hour, end=now + two_hours, state=STATE_CHOICES.CONFIRMED),
         ]
         other_reservation = ReservationFactory(
             begin=now + two_hours,
             end=now + two_hours + one_hour,
             state=STATE_CHOICES.CANCELLED,
         )
-        self.reservation_unit.reservation_set.set(
-            matching_reservations + [other_reservation]
-        )
+        self.reservation_unit.reservation_set.set(matching_reservations + [other_reservation])
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
@@ -1431,16 +1370,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_kind_direct(self):
-        ReservationUnitFactory(
-            reservation_kind=ReservationKind.DIRECT, name_fi="show me"
-        )
+        ReservationUnitFactory(reservation_kind=ReservationKind.DIRECT, name_fi="show me")
         ReservationUnitFactory(
             reservation_kind=ReservationKind.DIRECT_AND_SEASON,
             name_fi="show me as well",
         )
-        ReservationUnitFactory(
-            reservation_kind=ReservationKind.SEASON, name_fi="Don't you ever show me"
-        )
+        ReservationUnitFactory(reservation_kind=ReservationKind.SEASON, name_fi="Don't you ever show me")
 
         response = self.query(
             """
@@ -1460,16 +1395,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_kind_season(self):
-        ReservationUnitFactory(
-            reservation_kind=ReservationKind.SEASON, name_fi="show me"
-        )
+        ReservationUnitFactory(reservation_kind=ReservationKind.SEASON, name_fi="show me")
         ReservationUnitFactory(
             reservation_kind=ReservationKind.DIRECT_AND_SEASON,
             name_fi="show me as well",
         )
-        ReservationUnitFactory(
-            reservation_kind=ReservationKind.DIRECT, name_fi="Don't you ever show me"
-        )
+        ReservationUnitFactory(reservation_kind=ReservationKind.DIRECT, name_fi="Don't you ever show me")
 
         response = self.query(
             """
@@ -2319,9 +2250,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         other_unit = UnitFactory()
         unit_role.unit_group.add(UnitGroupFactory(units=[other_unit]))
 
-        ReservationUnitFactory(
-            unit=other_unit, name_fi="I'm in result since i'm in the group"
-        )
+        ReservationUnitFactory(unit=other_unit, name_fi="I'm in result since i'm in the group")
         ReservationUnitFactory(unit=unit, name_fi="I should be in the result")
 
         self.client.force_login(unit_group_admin)
@@ -2571,9 +2500,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
         assert_that(PersonalInfoViewLog.objects.all().count()).is_equal_to(1)
 
-    @mock.patch(
-        "reservation_units.tasks.create_product", return_value=mock_create_product()
-    )
+    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_show_payment_merchant_from_reservation_unit(self, mock_product):
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.client.force_login(self.general_admin)
@@ -2602,9 +2529,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    @mock.patch(
-        "reservation_units.tasks.create_product", return_value=mock_create_product()
-    )
+    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_show_payment_merchant_from_unit(self, mock_create_product):
         self.client.force_login(self.general_admin)
 
@@ -2633,9 +2558,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    @mock.patch(
-        "reservation_units.tasks.create_product", return_value=mock_create_product()
-    )
+    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_hide_payment_merchant_without_permissions(self, mock_product):
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
 
@@ -2675,9 +2598,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             begin=datetime.datetime(2021, 1, 1, tzinfo=TIMEZONE),
             end=datetime.datetime(2021, 1, 2, tzinfo=TIMEZONE),
         )
-        self.reservation_unit.reservation_set.set(
-            [matching_reservation, other_reservation]
-        )
+        self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
@@ -2702,9 +2623,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    @mock.patch(
-        "reservation_units.tasks.create_product", return_value=mock_create_product()
-    )
+    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_show_payment_product(self, mock_product):
         self.client.force_login(self.general_admin)
 
@@ -2738,9 +2657,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    @mock.patch(
-        "reservation_units.tasks.create_product", return_value=mock_create_product()
-    )
+    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_hide_payment_product_without_permissions(self, mock_product):
         merchant_pk = UUID("3828ac38-3e26-4501-8556-ba2ea3442627")
         merchant = PaymentMerchantFactory.create(pk=merchant_pk, name="Test Merchant")

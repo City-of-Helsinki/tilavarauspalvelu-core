@@ -22,9 +22,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         super().setUpTestData()
 
         cls.reservation_begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        cls.reservation_end = datetime.datetime.now(
-            tz=DEFAULT_TIMEZONE
-        ) + datetime.timedelta(hours=1)
+        cls.reservation_end = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=1)
         cls.reservation = ReservationFactory(
             name="Original name",
             description="Original description",
@@ -78,9 +76,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.name).is_equal_to(data.get("name"))
         assert_that(self.reservation.description).is_equal_to(data.get("description"))
-        assert_that(self.reservation.reservee_email).is_equal_to(
-            data.get("reserveeEmail")
-        )
+        assert_that(self.reservation.reservee_email).is_equal_to(data.get("reserveeEmail"))
 
     def test_unit_handler_can_modify_user_reservation(self):
         unit_admin = self.create_unit_admin(self.unit)
@@ -88,9 +84,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
 
         data = self.get_valid_adjust_data()
 
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
 
@@ -101,9 +95,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.name).is_equal_to(data.get("name"))
         assert_that(self.reservation.description).is_equal_to(data.get("description"))
-        assert_that(self.reservation.reservee_email).is_equal_to(
-            data.get("reserveeEmail")
-        )
+        assert_that(self.reservation.reservee_email).is_equal_to(data.get("reserveeEmail"))
 
     def test_cant_change_type_normal_reservation_to_staff(self):
         self.client.force_login(self.general_admin)
@@ -119,9 +111,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         message = content.get("errors")[0].get("message")
 
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
-        assert_that(message).is_equal_to(
-            "Reservation type cannot be changed from NORMAL to STAFF."
-        )
+        assert_that(message).is_equal_to("Reservation type cannot be changed from NORMAL to STAFF.")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.type).is_equal_to(ReservationType.NORMAL)
@@ -140,9 +130,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         message = content.get("errors")[0].get("message")
 
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
-        assert_that(message).is_equal_to(
-            "Reservation type cannot be changed from NORMAL to BEHALF."
-        )
+        assert_that(message).is_equal_to("Reservation type cannot be changed from NORMAL to BEHALF.")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.type).is_equal_to(ReservationType.NORMAL)
@@ -161,9 +149,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         message = content.get("errors")[0].get("message")
 
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
-        assert_that(message).is_equal_to(
-            "Reservation type cannot be changed from NORMAL to BLOCKED."
-        )
+        assert_that(message).is_equal_to("Reservation type cannot be changed from NORMAL to BLOCKED.")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.type).is_equal_to(ReservationType.NORMAL)
@@ -185,9 +171,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         message = content.get("errors")[0].get("message")
 
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
-        assert_that(message).is_equal_to(
-            "Reservation type cannot be changed to NORMAl from state STAFF."
-        )
+        assert_that(message).is_equal_to("Reservation type cannot be changed to NORMAl from state STAFF.")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.type).is_equal_to(ReservationType.STAFF)
@@ -209,9 +193,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         message = content.get("errors")[0].get("message")
 
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
-        assert_that(message).is_equal_to(
-            "Reservation type cannot be changed to NORMAl from state BEHALF."
-        )
+        assert_that(message).is_equal_to("Reservation type cannot be changed to NORMAl from state BEHALF.")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.type).is_equal_to(ReservationType.BEHALF)
@@ -233,9 +215,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         message = content.get("errors")[0].get("message")
 
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
-        assert_that(message).is_equal_to(
-            "Reservation type cannot be changed to NORMAl from state BLOCKED."
-        )
+        assert_that(message).is_equal_to("Reservation type cannot be changed to NORMAl from state BLOCKED.")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.type).is_equal_to(ReservationType.BLOCKED)
@@ -244,9 +224,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         self.reservation.state = STATE_CHOICES.CANCELLED
         self.reservation.save()
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -282,9 +260,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         unit_role.unit.add(self.unit)
 
         self.client.force_login(reserver_staff_user)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("message")
@@ -298,9 +274,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
     @freezegun.freeze_time("2021-10-13T12:00:00Z")
     def test_new_reservation_date_passed_time_change_fails(self):
         self.client.force_login(self.general_admin)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_adjust_data()
-        )
+        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         error = content.get("errors")[0].get("extensions").get("error_code")
@@ -314,9 +288,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.name).is_equal_to("Original name")
         assert_that(self.reservation.description).is_equal_to("Original description")
 
-    @freezegun.freeze_time(
-        datetime.datetime(2021, 10, 13, 0).astimezone(DEFAULT_TIMEZONE)
-    )
+    @freezegun.freeze_time(datetime.datetime(2021, 10, 13, 0).astimezone(DEFAULT_TIMEZONE))
     def test_modify_success_when_in_first_hour_of_next_day(self):
         self.client.force_login(self.general_admin)
 
@@ -351,9 +323,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")
 
     def test_buffer_check_fails_with_buffer_time_after(self):
         self.client.force_login(self.general_admin)
@@ -372,6 +342,4 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "RESERVATION_OVERLAP"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("RESERVATION_OVERLAP")

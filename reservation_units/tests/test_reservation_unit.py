@@ -17,9 +17,7 @@ class GetPreviousReservationTestCase(TestCase):
     def setUp(self):
         super().setUp()
         self.space: Space = SpaceFactory()
-        self.reservation_unit: ReservationUnit = ReservationUnitFactory(
-            spaces=[self.space]
-        )
+        self.reservation_unit: ReservationUnit = ReservationUnitFactory(spaces=[self.space])
         self.now = datetime.now(tz=timezone.utc)
         self.reservation_blocked = ReservationFactory(
             begin=(self.now - timedelta(hours=2)),
@@ -38,9 +36,7 @@ class GetPreviousReservationTestCase(TestCase):
     def test_get_previous_reservation(self):
         previous_reservation = self.reservation_unit.get_previous_reservation(self.now)
         assert_that(previous_reservation).is_not_none()
-        assert_that(previous_reservation.name).is_equal_to(
-            self.reservation_blocked.name
-        )
+        assert_that(previous_reservation.name).is_equal_to(self.reservation_blocked.name)
 
     def test_get_previous_reservation_ignored_given_reservation(self):
         previous_reservation = self.reservation_unit.get_previous_reservation(
@@ -50,9 +46,7 @@ class GetPreviousReservationTestCase(TestCase):
         assert_that(previous_reservation.name).is_equal_to(self.reservation.name)
 
     def test_get_previous_reservation_ignores_blocked(self):
-        previous_reservation = self.reservation_unit.get_previous_reservation(
-            self.now, exclude_blocked=True
-        )
+        previous_reservation = self.reservation_unit.get_previous_reservation(self.now, exclude_blocked=True)
         assert_that(previous_reservation).is_not_none()
         assert_that(previous_reservation.name).is_equal_to(self.reservation.name)
 
@@ -62,9 +56,7 @@ class GetNextReservationTestCase(TestCase):
     def setUp(self):
         super().setUp()
         self.space: Space = SpaceFactory()
-        self.reservation_unit: ReservationUnit = ReservationUnitFactory(
-            spaces=[self.space]
-        )
+        self.reservation_unit: ReservationUnit = ReservationUnitFactory(spaces=[self.space])
         self.now = datetime.now(tz=timezone.utc)
         self.reservation_blocked = ReservationFactory(
             begin=(self.now + timedelta(hours=1)),
@@ -86,15 +78,11 @@ class GetNextReservationTestCase(TestCase):
         assert_that(next_reservation.name).is_equal_to(self.reservation_blocked.name)
 
     def test_get_next_reservation_ignored_given_reservation(self):
-        next_reservation = self.reservation_unit.get_next_reservation(
-            self.now, reservation=self.reservation_blocked
-        )
+        next_reservation = self.reservation_unit.get_next_reservation(self.now, reservation=self.reservation_blocked)
         assert_that(next_reservation).is_not_none()
         assert_that(next_reservation.name).is_equal_to(self.reservation.name)
 
     def test_get_next_reservation_ignores_blocked(self):
-        next_reservation = self.reservation_unit.get_next_reservation(
-            self.now, exclude_blocked=True
-        )
+        next_reservation = self.reservation_unit.get_next_reservation(self.now, exclude_blocked=True)
         assert_that(next_reservation).is_not_none()
         assert_that(next_reservation.name).is_equal_to(self.reservation.name)

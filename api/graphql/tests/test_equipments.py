@@ -210,9 +210,7 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
         response = self.query(self.get_create_query(), input_data=data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createEquipmentCategory").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createEquipmentCategory").get("pk")).is_not_none()
 
     def test_empty_name_errors(self):
         data = {

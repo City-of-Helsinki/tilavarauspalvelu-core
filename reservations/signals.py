@@ -5,9 +5,7 @@ from reservations.models import Reservation
 from reservations.statistic_utils import create_or_update_reservation_statistics
 
 
-@receiver(
-    post_save, sender=Reservation, dispatch_uid="update_reservation_statistics_on_save"
-)
+@receiver(post_save, sender=Reservation, dispatch_uid="update_reservation_statistics_on_save")
 def update_reservation_statistics_on_save(sender, instance=None, raw=False, **kwargs):
     if raw:
         return
@@ -31,9 +29,7 @@ def update_reservation_statistics_on_save(sender, instance=None, raw=False, **kw
     sender=Reservation.reservation_unit.through,
     dispatch_uid="update_reservation_statistics_on_runit_change",
 )
-def update_reservation_statistics_on_runit_change(
-    sender, instance=None, action="", reverse=False, **kwargs
-):
+def update_reservation_statistics_on_runit_change(sender, instance=None, action="", reverse=False, **kwargs):
     raw = kwargs.get("raw", False)
     if action == "post_add" and reverse is False and raw is False:
         create_or_update_reservation_statistics(instance.pk)

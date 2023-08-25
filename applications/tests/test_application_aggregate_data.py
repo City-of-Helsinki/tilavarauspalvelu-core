@@ -50,9 +50,7 @@ def test_application_aggregate_data_contains_min_duration_total(
 
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
     assert ApplicationAggregateData.objects.count() == 4
-    min_dur_tot = ApplicationAggregateData.objects.get(
-        name="applied_min_duration_total"
-    )
+    min_dur_tot = ApplicationAggregateData.objects.get(name="applied_min_duration_total")
 
     # Two times per week every second week for 89 days => 12 whole weeks
     # 12 whole weeks every other week => 1 / week => 1 * 12 weeks => 12h
@@ -107,24 +105,11 @@ def test_aggregate_data_creates_data_per_application(
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
     application_in_second_application_round.set_status(ApplicationStatus.IN_REVIEW)
 
-    assert (
-        recurring_application_event.application
-        is not application_in_second_application_round
-    )
+    assert recurring_application_event.application is not application_in_second_application_round
 
-    assert (
-        ApplicationAggregateData.objects.filter(
-            application=recurring_application_event.application
-        ).count()
-        == 4
-    )
+    assert ApplicationAggregateData.objects.filter(application=recurring_application_event.application).count() == 4
 
-    assert (
-        ApplicationAggregateData.objects.filter(
-            application=application_in_second_application_round
-        ).count()
-        == 4
-    )
+    assert ApplicationAggregateData.objects.filter(application=application_in_second_application_round).count() == 4
 
 
 @pytest.mark.django_db
@@ -146,13 +131,9 @@ def test_aggregate_data_creates_data_per_application_reservations_total(
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
     application_in_second_application_round.set_status(ApplicationStatus.IN_REVIEW)
 
-    aggregate_datas_one = ApplicationAggregateData.objects.filter(
-        application=recurring_application_event.application
-    )
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(application=recurring_application_event.application)
 
-    aggregate_datas_two = ApplicationAggregateData.objects.filter(
-        application=application_in_second_application_round
-    )
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(application=application_in_second_application_round)
 
     one_res = aggregate_datas_one.get(name="applied_reservations_total")
     assert one_res.value == 16
@@ -180,13 +161,9 @@ def test_aggregate_data_creates_data_per_application_min_duration_total(
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
     application_in_second_application_round.set_status(ApplicationStatus.IN_REVIEW)
 
-    aggregate_datas_one = ApplicationAggregateData.objects.filter(
-        application=recurring_application_event.application
-    )
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(application=recurring_application_event.application)
 
-    aggregate_datas_two = ApplicationAggregateData.objects.filter(
-        application=application_in_second_application_round
-    )
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(application=application_in_second_application_round)
 
     one_res = aggregate_datas_one.get(name="applied_min_duration_total")
     assert one_res.value == 16 * 3600
@@ -225,13 +202,9 @@ def test_aggregate_data_creates_data_per_application_reservations_duration_total
     recurring_application_event.application.create_aggregate_data()
     application_in_second_application_round.create_aggregate_data()
 
-    aggregate_datas_one = ApplicationAggregateData.objects.filter(
-        application=recurring_application_event.application
-    )
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(application=recurring_application_event.application)
 
-    aggregate_datas_two = ApplicationAggregateData.objects.filter(
-        application=application_in_second_application_round
-    )
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(application=application_in_second_application_round)
 
     one_res = aggregate_datas_one.get(name="reservations_duration_total")
     assert_that(one_res.value).is_equal_to(3600 * 2)
@@ -269,13 +242,9 @@ def test_aggregate_data_creates_data_per_application_created_reservations_total(
     recurring_application_event.application.create_aggregate_data()
     application_in_second_application_round.create_aggregate_data()
 
-    aggregate_datas_one = ApplicationAggregateData.objects.filter(
-        application=recurring_application_event.application
-    )
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(application=recurring_application_event.application)
 
-    aggregate_datas_two = ApplicationAggregateData.objects.filter(
-        application=application_in_second_application_round
-    )
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(application=application_in_second_application_round)
 
     one_res = aggregate_datas_one.get(name="created_reservations_total")
     assert_that(one_res.value).is_equal_to(1)

@@ -15,12 +15,7 @@ class HierarchyModelMultipleChoiceFilter(filters.ModelMultipleChoiceFilter):
         # qs is the initial list of objects to be filtered
         # value is a list of objects to be used for filtering
         values_with_children = chain.from_iterable(
-            [
-                obj.get_descendants(include_self=True)
-                if hasattr(obj, "get_descendants")
-                else [obj]
-                for obj in value
-            ]
+            [obj.get_descendants(include_self=True) if hasattr(obj, "get_descendants") else [obj] for obj in value]
         )
         return super().filter(qs, list(values_with_children))
 
@@ -52,9 +47,7 @@ class TranslatedFieldSerializer(serializers.Serializer):
         original_field_name = kwargs.pop("source", None)
         original_field_class = kwargs.pop("field_class", None)
         if original_field_name is None:
-            raise AssertionError(
-                "Translated fields must specify source field in kwargs"
-            )
+            raise AssertionError("Translated fields must specify source field in kwargs")
         for language_code in LANGUAGE_CODES:
             translated_field_name = f"{original_field_name}_{language_code}"
             field_kwargs = kwargs.copy()
@@ -81,9 +74,7 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.model_translatable_fields = (
-            get_translatable_fields_for_model(self.Meta.model) or []
-        )
+        self.model_translatable_fields = get_translatable_fields_for_model(self.Meta.model) or []
 
     def build_field(self, source, *args, **kwargs):
         field_class, field_kwargs = super().build_field(source, *args, **kwargs)

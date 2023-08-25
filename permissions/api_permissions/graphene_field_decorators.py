@@ -34,9 +34,7 @@ def reservation_staff_field(default: Any = None) -> Decorator:
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @wraps(func)
         def permission_check(*args: P.args, **kwargs: P.kwargs) -> T:
-            if can_view_reservation(
-                args[1].context.user, args[0], needs_staff_permissions=True
-            ):
+            if can_view_reservation(args[1].context.user, args[0], needs_staff_permissions=True):
                 return func(*args, **kwargs)
 
             return default
@@ -62,9 +60,7 @@ def recurring_reservation_non_public_field(func: callable):
     return permission_check
 
 
-def check_resolver_permission(
-    permission_class: BasePermission, raise_permission_error=False
-):
+def check_resolver_permission(permission_class: BasePermission, raise_permission_error=False):
     def inner(func):
         def permission_check(*args, **kwargs):
             if permission_class.has_permission(args[1]):

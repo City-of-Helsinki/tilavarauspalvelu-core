@@ -43,12 +43,8 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
             reservation_units=[cls.reservation_unit],
             reservation_period_begin=datetime.date(2022, 8, 1),
             reservation_period_end=datetime.date(2023, 2, 28),
-            application_period_begin=datetime.datetime(
-                2022, 4, 1, 9, 0, tzinfo=DEFAULT_TIMEZONE
-            ),
-            application_period_end=datetime.datetime(
-                2022, 4, 30, 16, 00, tzinfo=DEFAULT_TIMEZONE
-            ),
+            application_period_begin=datetime.datetime(2022, 4, 1, 9, 0, tzinfo=DEFAULT_TIMEZONE),
+            application_period_end=datetime.datetime(2022, 4, 30, 16, 00, tzinfo=DEFAULT_TIMEZONE),
         )
         cls.reservation = ReservationFactory(
             begin=datetime.datetime(2022, 4, 15, 12, 00, tzinfo=DEFAULT_TIMEZONE),
@@ -60,9 +56,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
     def setUp(self, mock) -> None:
         mock.return_value = self.get_mocked_opening_hours()
-        self.scheduler = ReservationUnitReservationScheduler(
-            self.reservation_unit, opening_hours_end=self.DATES[2]
-        )
+        self.scheduler = ReservationUnitReservationScheduler(self.reservation_unit, opening_hours_end=self.DATES[2])
         self.app_round.set_status(ApplicationRoundStatus.SENT)
 
     def get_mocked_opening_hours(self):
@@ -115,9 +109,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
     def test_get_reservation_unit_possible_start_times(self, mock):
         start_date = datetime.date(2022, 1, 1)
         interval = datetime.timedelta(minutes=90)
-        possible_start_times = self.scheduler.get_reservation_unit_possible_start_times(
-            start_date, interval
-        )
+        possible_start_times = self.scheduler.get_reservation_unit_possible_start_times(start_date, interval)
         assert_that(possible_start_times).is_equal_to(
             {
                 datetime.datetime(2022, 1, 1, 10, 0).astimezone(DEFAULT_TIMEZONE),

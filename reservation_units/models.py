@@ -119,13 +119,9 @@ class Keyword(models.Model):
 
 
 class ReservationUnitCancellationRule(models.Model):
-    name = models.CharField(
-        verbose_name=_("Name for the rule"), max_length=255, null=False, blank=False
-    )
+    name = models.CharField(verbose_name=_("Name for the rule"), max_length=255, null=False, blank=False)
     can_be_cancelled_time_before = models.DurationField(
-        verbose_name=_(
-            "Time before user can cancel reservations of this reservation unit"
-        ),
+        verbose_name=_("Time before user can cancel reservations of this reservation unit"),
         blank=True,
         null=True,
         default=datetime.timedelta(hours=24),
@@ -194,9 +190,7 @@ class PricingStatus(models.TextChoices):
 
 
 class ReservationUnitPaymentType(models.Model):
-    code = models.CharField(
-        verbose_name=_("Code"), max_length=32, blank=False, null=False, primary_key=True
-    )
+    code = models.CharField(verbose_name=_("Code"), max_length=32, blank=False, null=False, primary_key=True)
 
     def __str__(self):
         return self.code
@@ -219,21 +213,13 @@ class ReservationUnitManager(SearchDocumentManagerMixin):
         return self.get_queryset()
 
 
-class ReservationUnit(
-    SearchDocumentMixin, ExportModelOperationsMixin("reservation_unit"), models.Model
-):
+class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservation_unit"), models.Model):
     objects = ReservationUnitManager.from_queryset(ReservationUnitQuerySet)()
 
-    sku = models.CharField(
-        verbose_name=_("SKU"), max_length=255, blank=True, default=""
-    )
+    sku = models.CharField(verbose_name=_("SKU"), max_length=255, blank=True, default="")
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    description = models.TextField(
-        verbose_name=_("Description"), blank=True, default=""
-    )
-    spaces = models.ManyToManyField(
-        Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True
-    )
+    description = models.TextField(verbose_name=_("Description"), blank=True, default="")
+    spaces = models.ManyToManyField(Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True)
 
     keyword_groups = models.ManyToManyField(
         KeywordGroup,
@@ -276,9 +262,7 @@ class ReservationUnit(
         null=True,
         on_delete=models.SET_NULL,
     )
-    require_introduction = models.BooleanField(
-        verbose_name=_("Require introduction"), default=False
-    )
+    require_introduction = models.BooleanField(verbose_name=_("Require introduction"), default=False)
     equipments = models.ManyToManyField(
         Equipment,
         verbose_name=_("Equipments"),
@@ -368,13 +352,9 @@ class ReservationUnit(
         db_index=True,
     )
 
-    max_persons = models.fields.PositiveIntegerField(
-        verbose_name=_("Maximum number of persons"), null=True, blank=True
-    )
+    max_persons = models.fields.PositiveIntegerField(verbose_name=_("Maximum number of persons"), null=True, blank=True)
 
-    min_persons = models.fields.PositiveIntegerField(
-        verbose_name=_("Minimum number of persons"), null=True, blank=True
-    )
+    min_persons = models.fields.PositiveIntegerField(verbose_name=_("Minimum number of persons"), null=True, blank=True)
 
     surface_area = models.IntegerField(
         verbose_name=_("Surface area"),
@@ -382,17 +362,11 @@ class ReservationUnit(
         null=True,
     )
 
-    buffer_time_before = models.DurationField(
-        verbose_name=_("Buffer time before reservation"), blank=True, null=True
-    )
+    buffer_time_before = models.DurationField(verbose_name=_("Buffer time before reservation"), blank=True, null=True)
 
-    buffer_time_after = models.DurationField(
-        verbose_name=_("Buffer time after reservation"), blank=True, null=True
-    )
+    buffer_time_after = models.DurationField(verbose_name=_("Buffer time after reservation"), blank=True, null=True)
 
-    hauki_resource_id = models.CharField(
-        verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True
-    )
+    hauki_resource_id = models.CharField(verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True)
 
     cancellation_rule = models.ForeignKey(
         ReservationUnitCancellationRule,
@@ -439,30 +413,22 @@ class ReservationUnit(
     reservation_begins = models.DateTimeField(
         null=True,
         blank=True,
-        help_text=_(
-            "Time when making reservations become possible for this reservation unit."
-        ),
+        help_text=_("Time when making reservations become possible for this reservation unit."),
     )
     reservation_ends = models.DateTimeField(
         null=True,
         blank=True,
-        help_text=_(
-            "Time when making reservations become not possible for this reservation unit"
-        ),
+        help_text=_("Time when making reservations become not possible for this reservation unit"),
     )
     publish_begins = models.DateTimeField(
         null=True,
         blank=True,
-        help_text=_(
-            "Time after this reservation unit should be publicly visible in UI."
-        ),
+        help_text=_("Time after this reservation unit should be publicly visible in UI."),
     )
     publish_ends = models.DateTimeField(
         null=True,
         blank=True,
-        help_text=_(
-            "Time after this reservation unit should not be publicly visible in UI."
-        ),
+        help_text=_("Time after this reservation unit should not be publicly visible in UI."),
     )
     metadata_set = models.ForeignKey(
         "reservations.ReservationMetadataSet",
@@ -486,9 +452,7 @@ class ReservationUnit(
         verbose_name=_("Does the reservations of this require a handling"),
         default=False,
         blank=True,
-        help_text=_(
-            "Does reservations of this reservation unit need to be handled before they're confirmed."
-        ),
+        help_text=_("Does reservations of this reservation unit need to be handled before they're confirmed."),
     )
 
     AUTHENTICATION_TYPES = (("weak", _("Weak")), ("strong", _("Strong")))
@@ -522,9 +486,7 @@ class ReservationUnit(
         blank=True,
         default=False,
         verbose_name=_("Can apply free of charge"),
-        help_text=_(
-            "Can reservations to this reservation unit be able to apply free of charge."
-        ),
+        help_text=_("Can reservations to this reservation unit be able to apply free of charge."),
     )
 
     allow_reservations_without_opening_hours = models.BooleanField(
@@ -584,16 +546,12 @@ class ReservationUnit(
     def get_location(self):
         # For now we assume that if reservation has multiple spaces they all have same location
         spaces = self.spaces.all()
-        return next(
-            (space.location for space in spaces if hasattr(space, "location")), None
-        )
+        return next((space.location for space in spaces if hasattr(space, "location")), None)
 
     def get_building(self):
         # For now we assume that if reservation has multiple spaces they all have same building
         spaces = self.spaces.all()
-        return next(
-            (space.building for space in spaces if hasattr(space, "building")), None
-        )
+        return next((space.building for space in spaces if hasattr(space, "building")), None)
 
     def get_max_persons(self):
         # Sum of max persons for all spaces because group can be divided to different spaces
@@ -666,9 +624,7 @@ class ReservationUnit(
         for space in self.spaces.all():
             spaces += list(space.get_family())
 
-        return ReservationUnit.objects.filter(
-            Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)
-        ).distinct()
+        return ReservationUnit.objects.filter(Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)).distinct()
 
     @property
     def hauki_resource_origin_id(self):
@@ -713,60 +669,24 @@ class ReservationUnit(
                 "space_name_fi": ",".join([s.name_fi or "" for s in self.spaces.all()]),
                 "space_name_en": ",".join([s.name_en or "" for s in self.spaces.all()]),
                 "space_name_sv": ",".join([s.name_sv or "" for s in self.spaces.all()]),
-                "keyword_groups_name_fi": ",".join(
-                    [k.name_fi or "" for k in self.keyword_groups.all()]
-                ),
-                "keyword_groups_en": ",".join(
-                    [k.name_e or "" for k in self.keyword_groups.all()]
-                ),
-                "keyword_groups_sv": ",".join(
-                    [k.name_sv or "" for k in self.keyword_groups.all()]
-                ),
-                "resources_name_fi": ",".join(
-                    [r.name_fi for r in self.resources.all()]
-                ),
-                "resources_name_en": ",".join(
-                    [r.name_en or "" for r in self.resources.all()]
-                ),
-                "resources_name_sv": ",".join(
-                    [r.name_sv or "" for r in self.resources.all()]
-                ),
-                "services_name_fi": ",".join(
-                    [s.name_fi or "" for s in self.services.all()]
-                ),
-                "services_name_en": ",".join(
-                    [s.name_en or "" for s in self.services.all()]
-                ),
-                "services_name_sv": ",".join(
-                    [s.name_sv or "" for s in self.services.all()]
-                ),
-                "purposes_name_fi": ",".join(
-                    [p.name_fi or "" for p in self.purposes.all()]
-                ),
-                "purposes_name_en": ",".join(
-                    [p.name_en or "" for p in self.purposes.all()]
-                ),
-                "purposes_name_sv": ",".join(
-                    [p.name_sv or "" for p in self.purposes.all()]
-                ),
-                "reservation_unit_type_name_fi": getattr(
-                    self.reservation_unit_type, "name_fi", ""
-                ),
-                "reservation_unit_type_name_en": getattr(
-                    self.reservation_unit_type, "name_en", ""
-                ),
-                "reservation_unit_type_name_sv": getattr(
-                    self.reservation_unit_type, "name_sv", ""
-                ),
-                "equipments_name_fi": ",".join(
-                    [e.name_fi or "" for e in self.equipments.all()]
-                ),
-                "equipments_name_en": ",".join(
-                    [e.name_en or "" for e in self.equipments.all()]
-                ),
-                "equipments_name_sv": ",".join(
-                    [e.name_sv or "" for e in self.equipments.all()]
-                ),
+                "keyword_groups_name_fi": ",".join([k.name_fi or "" for k in self.keyword_groups.all()]),
+                "keyword_groups_en": ",".join([k.name_e or "" for k in self.keyword_groups.all()]),
+                "keyword_groups_sv": ",".join([k.name_sv or "" for k in self.keyword_groups.all()]),
+                "resources_name_fi": ",".join([r.name_fi for r in self.resources.all()]),
+                "resources_name_en": ",".join([r.name_en or "" for r in self.resources.all()]),
+                "resources_name_sv": ",".join([r.name_sv or "" for r in self.resources.all()]),
+                "services_name_fi": ",".join([s.name_fi or "" for s in self.services.all()]),
+                "services_name_en": ",".join([s.name_en or "" for s in self.services.all()]),
+                "services_name_sv": ",".join([s.name_sv or "" for s in self.services.all()]),
+                "purposes_name_fi": ",".join([p.name_fi or "" for p in self.purposes.all()]),
+                "purposes_name_en": ",".join([p.name_en or "" for p in self.purposes.all()]),
+                "purposes_name_sv": ",".join([p.name_sv or "" for p in self.purposes.all()]),
+                "reservation_unit_type_name_fi": getattr(self.reservation_unit_type, "name_fi", ""),
+                "reservation_unit_type_name_en": getattr(self.reservation_unit_type, "name_en", ""),
+                "reservation_unit_type_name_sv": getattr(self.reservation_unit_type, "name_sv", ""),
+                "equipments_name_fi": ",".join([e.name_fi or "" for e in self.equipments.all()]),
+                "equipments_name_en": ",".join([e.name_en or "" for e in self.equipments.all()]),
+                "equipments_name_sv": ",".join([e.name_sv or "" for e in self.equipments.all()]),
                 "unit_name_fi": getattr(self.unit, "name_fi", ""),
                 "unit_name_en": getattr(self.unit, "name_en", ""),
                 "unit_name_sv": getattr(self.unit, "name_sv", ""),
@@ -894,9 +814,7 @@ class ReservationUnitImage(models.Model):
     small_url = models.URLField(null=False, blank=True, max_length=255, default="")
 
     def __str__(self):
-        return "{} ({})".format(
-            self.reservation_unit.name, self.get_image_type_display()
-        )
+        return "{} ({})".format(self.reservation_unit.name, self.get_image_type_display())
 
     def save(
         self,
@@ -929,9 +847,7 @@ class ReservationUnitImage(models.Model):
 class Purpose(models.Model):
     name = models.CharField(max_length=200)
 
-    image = ThumbnailerImageField(
-        upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True
-    )
+    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True)
 
     rank = models.PositiveIntegerField(
         blank=True,
@@ -997,15 +913,9 @@ class Period(models.Model):
     start = models.DateField(verbose_name=_("Start date"))
     end = models.DateField(verbose_name=_("End date"))
 
-    name = models.CharField(
-        max_length=200, verbose_name=_("Name"), blank=True, default=""
-    )
-    description = models.CharField(
-        verbose_name=_("Description"), null=True, blank=True, max_length=500
-    )
-    closed = models.BooleanField(
-        verbose_name=_("Closed"), default=False, editable=False
-    )
+    name = models.CharField(max_length=200, verbose_name=_("Name"), blank=True, default="")
+    description = models.CharField(verbose_name=_("Description"), null=True, blank=True, max_length=500)
+    closed = models.BooleanField(verbose_name=_("Closed"), default=False, editable=False)
 
     def __str__(self):
         return "{}({} - {})".format(self.reservation_unit.name, self.start, self.end)
@@ -1030,9 +940,7 @@ class Day(models.Model):
     closes = models.TimeField(verbose_name=_("Time when closes"), null=True, blank=True)
 
     def __str__(self):
-        return "{}({})".format(
-            self.get_weekday_display(), self.period.reservation_unit.name
-        )
+        return "{}({})".format(self.get_weekday_display(), self.period.reservation_unit.name)
 
 
 class DayPart(models.Model):
@@ -1047,12 +955,8 @@ class DayPart(models.Model):
     )
 
     allowed_group = models.CharField(max_length=255, choices=ALLOWED_GROUP_CHOICES)
-    begin = models.TimeField(
-        verbose_name=_("Begin time of day part"), null=True, blank=True
-    )
-    end = models.TimeField(
-        verbose_name=_("End time of day part"), null=True, blank=True
-    )
+    begin = models.TimeField(verbose_name=_("Begin time of day part"), null=True, blank=True)
+    end = models.TimeField(verbose_name=_("End time of day part"), null=True, blank=True)
     day = models.ForeignKey(Day, verbose_name=_("Day"), on_delete=models.CASCADE)
 
     def __str__(self):
@@ -1071,9 +975,7 @@ class Introduction(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
-    reservation_unit = models.ForeignKey(
-        ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.CASCADE
-    )
+    reservation_unit = models.ForeignKey(ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.CASCADE)
 
     completed_at = models.DateTimeField(verbose_name=_("Completed at"))
 

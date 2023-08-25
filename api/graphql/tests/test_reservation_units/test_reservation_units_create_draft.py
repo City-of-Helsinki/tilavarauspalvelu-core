@@ -45,9 +45,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
 
-    @mock.patch(
-        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
-    )
+    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORT_ENABLED=True)
     def test_send_resource_to_hauki_is_not_called(self, send_resource_mock):
         response = self.query(self.get_create_query(), input_data=self.get_valid_data())
@@ -112,20 +110,12 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservationUnit").get("pk")
-        ).is_not_none()
+        assert_that(content.get("data").get("createReservationUnit").get("pk")).is_not_none()
 
-        created_unit = ReservationUnit.objects.get(
-            pk=content.get("data").get("createReservationUnit").get("pk")
-        )
-        unit_payment_type_codes = list(
-            map(lambda ptype: ptype.code, created_unit.payment_types.all())
-        )
+        created_unit = ReservationUnit.objects.get(pk=content.get("data").get("createReservationUnit").get("pk"))
+        unit_payment_type_codes = list(map(lambda ptype: ptype.code, created_unit.payment_types.all()))
         assert_that(created_unit).is_not_none()
-        assert_that(unit_payment_type_codes).contains_only(
-            PaymentType.ON_SITE.value, PaymentType.INVOICE.value
-        )
+        assert_that(unit_payment_type_codes).contains_only(PaymentType.ON_SITE.value, PaymentType.INVOICE.value)
 
     def test_create_with_instructions(self):
         data = self.get_valid_data()
@@ -149,15 +139,9 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(res_unit.reservation_pending_instructions_fi).is_equal_to(
-            data["reservationPendingInstructionsFi"]
-        )
-        assert_that(res_unit.reservation_pending_instructions_sv).is_equal_to(
-            data["reservationPendingInstructionsSv"]
-        )
-        assert_that(res_unit.reservation_pending_instructions_en).is_equal_to(
-            data["reservationPendingInstructionsEn"]
-        )
+        assert_that(res_unit.reservation_pending_instructions_fi).is_equal_to(data["reservationPendingInstructionsFi"])
+        assert_that(res_unit.reservation_pending_instructions_sv).is_equal_to(data["reservationPendingInstructionsSv"])
+        assert_that(res_unit.reservation_pending_instructions_en).is_equal_to(data["reservationPendingInstructionsEn"])
         assert_that(res_unit.reservation_confirmed_instructions_fi).is_equal_to(
             data["reservationConfirmedInstructionsFi"]
         )

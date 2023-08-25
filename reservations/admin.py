@@ -91,9 +91,7 @@ class ReservationMetadataSetForm(forms.ModelForm):
         supported = set(self.cleaned_data.get("supported_fields"))
         required = set(self.cleaned_data.get("required_fields"))
         if not required.issubset(supported):
-            raise ValidationError(
-                _("Required fields must be a subset of supported fields")
-            )
+            raise ValidationError(_("Required fields must be a subset of supported fields"))
         return self.cleaned_data
 
 

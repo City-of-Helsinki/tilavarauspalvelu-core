@@ -26,9 +26,7 @@ class PricingUpdatesTestCase(TestCase):
             reservation_unit=cls.runit_1,
         )
 
-        cls.runit_2 = ReservationUnitFactory(
-            name="Unit with future price with non-matching date"
-        )
+        cls.runit_2 = ReservationUnitFactory(name="Unit with future price with non-matching date")
         ReservationUnitPricingFactory(
             begins=date(2022, 1, 1),
             status=PricingStatus.PRICING_STATUS_ACTIVE,
@@ -56,41 +54,23 @@ class PricingUpdatesTestCase(TestCase):
         self.runit_2.refresh_from_db()
         self.runit_3.refresh_from_db()
 
-        active_pricing_1 = self.runit_1.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_ACTIVE
-        ).first()
-        future_pricing_1 = self.runit_1.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_FUTURE
-        ).first()
-        past_pricing_1 = self.runit_1.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_PAST
-        ).first()
+        active_pricing_1 = self.runit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+        future_pricing_1 = self.runit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+        past_pricing_1 = self.runit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
         assert_that(active_pricing_1.begins).is_equal_to(today)
         assert_that(future_pricing_1).is_none()
         assert_that(past_pricing_1.begins).is_equal_to(date(2022, 1, 1))
 
-        active_pricing_2 = self.runit_2.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_ACTIVE
-        ).first()
-        future_pricing_2 = self.runit_2.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_FUTURE
-        ).first()
-        past_pricing_2 = self.runit_2.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_PAST
-        ).first()
+        active_pricing_2 = self.runit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+        future_pricing_2 = self.runit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+        past_pricing_2 = self.runit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
         assert_that(active_pricing_2.begins).is_equal_to(date(2022, 1, 1))
         assert_that(future_pricing_2.begins).is_equal_to(date(2022, 9, 20))
         assert_that(past_pricing_2).is_none()
 
-        active_pricing_3 = self.runit_3.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_ACTIVE
-        ).first()
-        future_pricing_3 = self.runit_3.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_FUTURE
-        ).first()
-        past_pricing_3 = self.runit_3.pricings.filter(
-            status=PricingStatus.PRICING_STATUS_PAST
-        ).first()
+        active_pricing_3 = self.runit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+        future_pricing_3 = self.runit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+        past_pricing_3 = self.runit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
         assert_that(active_pricing_3.begins).is_equal_to(date(2022, 1, 1))
         assert_that(future_pricing_3).is_none()
         assert_that(past_pricing_3).is_none()

@@ -13,20 +13,16 @@ class ReservationUnitExporter:
     @classmethod
     def export_reservation_unit_data(cls, queryset=None) -> Optional[Path]:
         now = timezone.now()
-        root = Path(settings.BASE_DIR)
+        root = settings.BASE_DIR
         path = root / "exports" / "reservation_unit_exports"
         path.mkdir(parents=True, exist_ok=True)
-        reservation_units: List[ReservationUnit] = (
-            list(queryset) if queryset else list(ReservationUnit.objects.all())
-        )
+        reservation_units: List[ReservationUnit] = list(queryset) if queryset else list(ReservationUnit.objects.all())
 
         if reservation_units:
             file_name = f"reservation_units__{now.strftime('%d-%m-%Y')}.csv"
 
             with open(path / file_name, "w", newline="") as reservations_file:
-                reservations_writer = writer(
-                    reservations_file, "excel", quoting=QUOTE_ALL
-                )
+                reservations_writer = writer(reservations_file, "excel", quoting=QUOTE_ALL)
 
                 cls._write_header_row(reservations_writer)
 
@@ -54,21 +50,9 @@ class ReservationUnitExporter:
                             reservation_unit.is_draft,
                             reservation_unit.publish_begins,
                             reservation_unit.publish_ends,
-                            ", ".join(
-                                reservation_unit.spaces.values_list(
-                                    "name_fi", flat=True
-                                )
-                            ),
-                            ", ".join(
-                                reservation_unit.resources.values_list(
-                                    "name_fi", flat=True
-                                )
-                            ),
-                            ", ".join(
-                                reservation_unit.qualifiers.all().values_list(
-                                    "name_fi", flat=True
-                                )
-                            ),
+                            ", ".join(reservation_unit.spaces.values_list("name_fi", flat=True)),
+                            ", ".join(reservation_unit.resources.values_list("name_fi", flat=True)),
+                            ", ".join(reservation_unit.qualifiers.all().values_list("name_fi", flat=True)),
                             getattr(reservation_unit.payment_terms, "name", ""),
                             getattr(reservation_unit.cancellation_terms, "name", ""),
                             getattr(reservation_unit.pricing_terms, "name", ""),
@@ -77,14 +61,14 @@ class ReservationUnitExporter:
                             pricing.lowest_price,
                             pricing.highest_price,
                             pricing.tax_percentage,
-                            reservation_unit.reservation_begins.astimezone(
-                                get_default_timezone()
-                            ).strftime("%d:%m:%Y %H:%M")
+                            reservation_unit.reservation_begins.astimezone(get_default_timezone()).strftime(
+                                "%d:%m:%Y %H:%M"
+                            )
                             if reservation_unit.reservation_begins
                             else "",
-                            reservation_unit.reservation_ends.astimezone(
-                                get_default_timezone()
-                            ).strftime("%d:%m:%Y %H:%M")
+                            reservation_unit.reservation_ends.astimezone(get_default_timezone()).strftime(
+                                "%d:%m:%Y %H:%M"
+                            )
                             if reservation_unit.reservation_ends
                             else "",
                             getattr(reservation_unit.metadata_set, "name", ""),
@@ -92,11 +76,7 @@ class ReservationUnitExporter:
                             reservation_unit.authentication,
                             reservation_unit.reservation_kind,
                             pricing.pricing_type,
-                            ", ".join(
-                                reservation_unit.payment_types.values_list(
-                                    "code", flat=True
-                                )
-                            ),
+                            ", ".join(reservation_unit.payment_types.values_list("code", flat=True)),
                             reservation_unit.can_apply_free_of_charge,
                             reservation_unit.reservation_pending_instructions_fi,
                             reservation_unit.reservation_pending_instructions_sv,
@@ -121,22 +101,10 @@ class ReservationUnitExporter:
                             reservation_unit.max_reservations_per_user,
                             reservation_unit.allow_reservations_without_opening_hours,
                             reservation_unit.is_archived,
-                            ", ".join(
-                                reservation_unit.services.all().values_list(
-                                    "name_fi", flat=True
-                                )
-                            ),
-                            ", ".join(
-                                reservation_unit.purposes.all().values_list(
-                                    "name_fi", flat=True
-                                )
-                            ),
+                            ", ".join(reservation_unit.services.all().values_list("name_fi", flat=True)),
+                            ", ".join(reservation_unit.purposes.all().values_list("name_fi", flat=True)),
                             reservation_unit.require_introduction,
-                            ", ".join(
-                                reservation_unit.equipments.all().values_list(
-                                    "name_fi", flat=True
-                                )
-                            ),
+                            ", ".join(reservation_unit.equipments.all().values_list("name_fi", flat=True)),
                             reservation_unit.state.value,
                             reservation_unit.reservation_state.value,
                         ]

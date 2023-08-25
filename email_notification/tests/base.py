@@ -37,12 +37,8 @@ class ReservationEmailBaseTestCase(TestCase):
         )
         cls.begin = datetime.datetime(2022, 2, 9, 10, 0, tzinfo=get_default_timezone())
         cls.end = datetime.datetime(2022, 2, 9, 12, 0, tzinfo=get_default_timezone())
-        deny_reason = ReservationDenyReasonFactory(
-            reason="deny reason", reason_en="en deny reason"
-        )
-        cancel_reason = ReservationCancelReasonFactory(
-            reason="cancel reason", reason_en="en cancel reason"
-        )
+        deny_reason = ReservationDenyReasonFactory(reason="deny reason", reason_en="en deny reason")
+        cancel_reason = ReservationCancelReasonFactory(reason="cancel reason", reason_en="en cancel reason")
         cls.reservation_unit = ReservationUnitFactory(
             unit=cls.unit,
             reservation_pending_instructions="pend instru",

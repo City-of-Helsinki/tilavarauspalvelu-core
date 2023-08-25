@@ -14,9 +14,7 @@ from reservations.models import STATE_CHOICES
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class ReservationUpdateSerializer(
-    PrimaryKeyUpdateSerializer, ReservationCreateSerializer
-):
+class ReservationUpdateSerializer(PrimaryKeyUpdateSerializer, ReservationCreateSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = False
@@ -56,9 +54,7 @@ class ReservationUpdateSerializer(
         data = super().validate(data, prefill_from_profile)
         data["state"] = new_state
 
-        reservation_units = data.get(
-            "reservation_unit", getattr(self.instance, "reservation_unit", None)
-        )
+        reservation_units = data.get("reservation_unit", getattr(self.instance, "reservation_unit", None))
         if hasattr(reservation_units, "all"):
             reservation_units = reservation_units.all()
 
@@ -66,9 +62,7 @@ class ReservationUpdateSerializer(
             self.check_metadata_fields(data, reservation_unit)
 
         # If the reservation as applying_for_free_of_charge True then we require free_of_charge_reason.
-        if data.get(
-            "applying_for_free_of_charge", self.instance.applying_for_free_of_charge
-        ) and not data.get(
+        if data.get("applying_for_free_of_charge", self.instance.applying_for_free_of_charge) and not data.get(
             "free_of_charge_reason", self.instance.free_of_charge_reason
         ):
             raise ValidationErrorWithCode(
@@ -82,9 +76,7 @@ class ReservationUpdateSerializer(
     def validated_data(self):
         validated_data = super().validated_data
         validated_data["user"] = self.instance.user  # Do not change the user.
-        validated_data["confirmed_at"] = datetime.datetime.now().astimezone(
-            DEFAULT_TIMEZONE
-        )
+        validated_data["confirmed_at"] = datetime.datetime.now().astimezone(DEFAULT_TIMEZONE)
         return validated_data
 
     def check_metadata_fields(self, data, reservation_unit) -> None:
@@ -98,13 +90,9 @@ class ReservationUpdateSerializer(
         metadata_set = reservation_unit.metadata_set
         required_fields = metadata_set.required_fields.all() if metadata_set else []
 
-        reservee_type = data.get(
-            "reservee_type", getattr(self.instance, "reservee_type", None)
-        )
+        reservee_type = data.get("reservee_type", getattr(self.instance, "reservee_type", None))
         if required_fields and reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL:
-            required_fields = metadata_set.required_fields.exclude(
-                field_name__in=non_mandatory_fields_for_person
-            )
+            required_fields = metadata_set.required_fields.exclude(field_name__in=non_mandatory_fields_for_person)
 
         for required_field in required_fields:
             internal_field_name = required_field.field_name

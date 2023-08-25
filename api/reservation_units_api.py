@@ -37,9 +37,7 @@ from spaces.models import Space, Unit
 
 
 class ReservationUnitFilter(filters.FilterSet):
-    purpose = filters.ModelMultipleChoiceFilter(
-        field_name="purposes", queryset=Purpose.objects.all()
-    )
+    purpose = filters.ModelMultipleChoiceFilter(field_name="purposes", queryset=Purpose.objects.all())
     application_round = filters.ModelMultipleChoiceFilter(
         field_name="application_rounds",
         queryset=ApplicationRound.objects.all(),
@@ -156,15 +154,11 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         required=False,
     )
 
-    unit_id = serializers.PrimaryKeyRelatedField(
-        queryset=Unit.objects.all(), source="unit"
-    )
+    unit_id = serializers.PrimaryKeyRelatedField(queryset=Unit.objects.all(), source="unit")
 
     uuid = serializers.UUIDField(read_only=True)
 
-    unit = UnitSerializer(
-        read_only=True, help_text="Unit linked to this reservation unit."
-    )
+    unit = UnitSerializer(read_only=True, help_text="Unit linked to this reservation unit.")
 
     class Meta:
         model = ReservationUnit
@@ -254,9 +248,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
                     "spaces",
                     queryset=Space.objects.all().select_related("building", "location"),
                 ),
-                Prefetch(
-                    "resources", queryset=Resource.objects.all().select_related("space")
-                ),
+                Prefetch("resources", queryset=Resource.objects.all().select_related("space")),
             )
         )
         return qs
@@ -268,9 +260,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         period_end = self.request.query_params.get("period_end")
 
         if not (period_start and period_end):
-            raise serializers.ValidationError(
-                "Parameters period_start and period_end are required."
-            )
+            raise serializers.ValidationError("Parameters period_start and period_end are required.")
         try:
             period_start = parse(period_start).date()
             period_end = parse(period_end).date()
@@ -281,25 +271,18 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError("reservation_unit parameter is required.")
 
         try:
-            reservation_units = [
-                int(res_unit) for res_unit in reservation_units.split(",")
-            ]
+            reservation_units = [int(res_unit) for res_unit in reservation_units.split(",")]
         except ValueError:
-            raise serializers.ValidationError(
-                "Given reservation unit id is not an integer"
-            )
+            raise serializers.ValidationError("Given reservation unit id is not an integer")
 
         reservation_unit_qs = ReservationUnit.objects.filter(id__in=reservation_units)
 
         try:
             resource_ids = reservation_unit_qs.values_list("uuid", flat=True)
-            total_opening_hours = get_resources_total_hours_per_resource(
-                resource_ids, period_start, period_end
-            )
+            total_opening_hours = get_resources_total_hours_per_resource(resource_ids, period_start, period_end)
         except HaukiRequestError:
             total_opening_hours = {
-                res_unit: "Got an error while making request to HAUKI"
-                for res_unit in reservation_units
+                res_unit: "Got an error while making request to HAUKI" for res_unit in reservation_units
             }
 
         result_data = []
@@ -311,9 +294,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
                 .total_duration()
             ).get("total_duration")
 
-            total_duration = (
-                total_duration.total_seconds() / 3600 if total_duration else 0
-            )
+            total_duration = total_duration.total_seconds() / 3600 if total_duration else 0
             resource_id = f"{settings.HAUKI_ORIGIN_ID}:{res_unit.uuid}"
             result_data.append(
                 {
@@ -327,17 +308,13 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         return Response(result_data)
 
 
-class ReservationPurposeViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
+class ReservationPurposeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     serializer_class = ReservationPurposeSerializer
     queryset = ReservationPurpose.objects.all()
     permission_classes = [PurposePermission]
 
 
-class ReservationUnitTypeViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
+class ReservationUnitTypeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     serializer_class = ReservationUnitTypeSerializer
     queryset = ReservationUnitType.objects.all()
     permission_classes = [ReservationUnitTypePermission]
@@ -359,9 +336,7 @@ class EquipmentCategoryViewSet(viewsets.ModelViewSet):
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
-    category_id = serializers.PrimaryKeyRelatedField(
-        queryset=EquipmentCategory.objects.all(), source="category"
-    )
+    category_id = serializers.PrimaryKeyRelatedField(queryset=EquipmentCategory.objects.all(), source="category")
 
     class Meta:
         model = Equipment

@@ -46,12 +46,8 @@ class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
 
     def get_calendar_url(self, instance):
         request = self.context["request"] if "request" in self.context else None
-        scheme = (
-            urlsplit(request.build_absolute_uri(None)).scheme if request else "http"
-        )
-        calendar_url = reverse(
-            "reservation_unit_calendar-detail", kwargs={"pk": instance.id}
-        )
+        scheme = urlsplit(request.build_absolute_uri(None)).scheme if request else "http"
+        calendar_url = reverse("reservation_unit_calendar-detail", kwargs={"pk": instance.id})
 
         return f"{scheme}://{get_host(request)}{calendar_url}?hash={hmac_signature(instance.uuid)}"
 
@@ -60,11 +56,7 @@ class ReservationIcalViewset(ViewSet):
     queryset = Reservation.objects.all()
 
     def get_object(self):
-        return (
-            Reservation.objects.filter(pk=self.kwargs["pk"])
-            .prefetch_related("reservation_unit")
-            .first()
-        )
+        return Reservation.objects.filter(pk=self.kwargs["pk"]).prefetch_related("reservation_unit").first()
 
     def retrieve(self, request, *args, **kwargs):
         hash = request.query_params.get("hash", None)
@@ -89,9 +81,7 @@ class ReservationIcalViewset(ViewSet):
         )
         buffer.seek(0)
 
-        return FileResponse(
-            buffer, as_attachment=True, filename="reservation_calendar.ics"
-        )
+        return FileResponse(buffer, as_attachment=True, filename="reservation_calendar.ics")
 
 
 class ReservationUnitCalendarUrlViewSet(
@@ -123,15 +113,11 @@ class ReservationUnitIcalViewset(ViewSet):
 
         buffer = io.BytesIO()
         buffer.write(
-            export_reservation_unit_events(
-                instance, get_host(request), reservation_unit_calendar(instance)
-            ).to_ical()
+            export_reservation_unit_events(instance, get_host(request), reservation_unit_calendar(instance)).to_ical()
         )
         buffer.seek(0)
 
-        return FileResponse(
-            buffer, as_attachment=True, filename="reservation_unit_calendar.ics"
-        )
+        return FileResponse(buffer, as_attachment=True, filename="reservation_unit_calendar.ics")
 
 
 class ApplicationEventIcalViewset(ViewSet):
@@ -161,9 +147,7 @@ class ApplicationEventIcalViewset(ViewSet):
         )
         buffer.seek(0)
 
-        return FileResponse(
-            buffer, as_attachment=True, filename="application_event_calendar.ics"
-        )
+        return FileResponse(buffer, as_attachment=True, filename="application_event_calendar.ics")
 
     def get_object(self):
         application_event = (
@@ -211,9 +195,7 @@ def application_event_calendar(application_event: ApplicationEvent) -> Calendar:
     return cal
 
 
-def export_reservation_unit_events(
-    reservation_unit: ReservationUnit, site_name: str, cal: Calendar
-):
+def export_reservation_unit_events(reservation_unit: ReservationUnit, site_name: str, cal: Calendar):
     reservations = Reservation.objects.filter(reservation_unit=reservation_unit)
     for reservation in reservations:
         export_reservation_events(reservation, site_name, cal)
@@ -233,12 +215,8 @@ def export_reservation_events(reservation: Reservation, site_name: str, cal: Cal
     return cal
 
 
-def export(
-    application_event: ApplicationEvent, site_name: str, cal: Calendar
-) -> Calendar:
-    reservations = Reservation.objects.filter(
-        recurring_reservation__application_event=application_event
-    )
+def export(application_event: ApplicationEvent, site_name: str, cal: Calendar) -> Calendar:
+    reservations = Reservation.objects.filter(recurring_reservation__application_event=application_event)
     for reservation in reservations:
         ical_event = Event()
         ical_event.add("summary", application_event.name)

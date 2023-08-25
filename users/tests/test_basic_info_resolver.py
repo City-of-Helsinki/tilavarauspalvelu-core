@@ -174,9 +174,7 @@ class ProfileUserInfoReaderTestCase(TestCase):
         )
         with patch(
             "requests.get",
-            return_value=MagicMock(
-                status_code=200, json=MagicMock(return_value=get_profile_gql_response())
-            ),
+            return_value=MagicMock(status_code=200, json=MagicMock(return_value=get_profile_gql_response())),
         ):
             cls.reader = ProfileUserInfoReader(cls.user, cls.request)
 
@@ -225,9 +223,7 @@ class ProfileUserInfoReaderTestCase(TestCase):
             assert_that(address.get("address")).is_equal_to(expected_address)
 
     @patch("requests.get")
-    def test_get_address_no_primary_and_addresses_defaults_to_permanent_address(
-        self, mock_get
-    ):
+    def test_get_address_no_primary_and_addresses_defaults_to_permanent_address(self, mock_get):
         gql_response = get_profile_gql_response(addresses=[])
         gql_response["data"]["myProfile"]["primaryAddress"] = None
         gql_response["data"]["myProfile"]["addresses"] = {"edges": []}
@@ -242,15 +238,11 @@ class ProfileUserInfoReaderTestCase(TestCase):
         assert_that(address.get("city")).is_equal_to("Helsinki")
 
     @patch("requests.get")
-    def test_get_address_no_primary_and_addresses_nor_permanent_defaults_to_permanent_foreign_address(
-        self, mock_get
-    ):
+    def test_get_address_no_primary_and_addresses_nor_permanent_defaults_to_permanent_foreign_address(self, mock_get):
         gql_response = get_profile_gql_response(addresses=[])
         gql_response["data"]["myProfile"]["primaryAddress"] = None
         gql_response["data"]["myProfile"]["addresses"] = {"edges": []}
-        gql_response["data"]["myProfile"]["verifiedPersonalInformation"][
-            "permanentAddress"
-        ] = None
+        gql_response["data"]["myProfile"]["verifiedPersonalInformation"]["permanentAddress"] = None
         ret_val = MagicMock(status_code=200, json=MagicMock(return_value=gql_response))
         mock_get.return_value = ret_val
         reader = ProfileUserInfoReader(self.user, self.request)
@@ -263,18 +255,12 @@ class ProfileUserInfoReaderTestCase(TestCase):
         assert_that(address.get("countryCode")).is_equal_to("AX")
 
     @patch("requests.get")
-    def test_get_address_no_primary_and_addresses_nor_permanent_nor_permanent_foreign_address(
-        self, mock_get
-    ):
+    def test_get_address_no_primary_and_addresses_nor_permanent_nor_permanent_foreign_address(self, mock_get):
         gql_response = get_profile_gql_response(addresses=[])
         gql_response["data"]["myProfile"]["primaryAddress"] = None
         gql_response["data"]["myProfile"]["addresses"] = {"edges": []}
-        gql_response["data"]["myProfile"]["verifiedPersonalInformation"][
-            "permanentAddress"
-        ] = None
-        gql_response["data"]["myProfile"]["verifiedPersonalInformation"][
-            "permanentForeignAddress"
-        ] = None
+        gql_response["data"]["myProfile"]["verifiedPersonalInformation"]["permanentAddress"] = None
+        gql_response["data"]["myProfile"]["verifiedPersonalInformation"]["permanentForeignAddress"] = None
         ret_val = MagicMock(status_code=200, json=MagicMock(return_value=gql_response))
         mock_get.return_value = ret_val
         reader = ProfileUserInfoReader(self.user, self.request)

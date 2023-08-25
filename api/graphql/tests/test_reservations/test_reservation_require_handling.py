@@ -30,24 +30,16 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         reservation_unit = ReservationUnitFactory()
         self.confirmed_reservation = ReservationFactory(
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(hours=1),
-            end=(
-                datetime.datetime.now(tz=get_default_timezone())
-                + datetime.timedelta(hours=2)
-            ),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
+            end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=STATE_CHOICES.CONFIRMED,
             user=self.regular_joe,
             reservee_email="email@reservee",
         )
         self.denied_reservation = ReservationFactory(
             reservation_unit=[reservation_unit],
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(hours=1),
-            end=(
-                datetime.datetime.now(tz=get_default_timezone())
-                + datetime.timedelta(hours=2)
-            ),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
+            end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=STATE_CHOICES.DENIED,
             user=self.regular_joe,
             reservee_email="email@reservee",
@@ -85,22 +77,16 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
     def test_require_handling_succeed_on_confirmed_reservation(self):
         self.client.force_login(self.general_admin)
         input_data = {"pk": self.confirmed_reservation.id}
-        assert_that(self.confirmed_reservation.state).is_equal_to(
-            STATE_CHOICES.CONFIRMED
-        )
+        assert_that(self.confirmed_reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         response = self.query(self.get_require_handling_query(), input_data=input_data)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("requireHandlingForReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(
-            STATE_CHOICES.REQUIRES_HANDLING.upper()
-        )
+        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING.upper())
         self.confirmed_reservation.refresh_from_db()
-        assert_that(self.confirmed_reservation.state).is_equal_to(
-            STATE_CHOICES.REQUIRES_HANDLING
-        )
+        assert_that(self.confirmed_reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("staff requires handling")
 
@@ -119,13 +105,9 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("requireHandlingForReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(
-            STATE_CHOICES.REQUIRES_HANDLING.upper()
-        )
+        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING.upper())
         self.denied_reservation.refresh_from_db()
-        assert_that(self.denied_reservation.state).is_equal_to(
-            STATE_CHOICES.REQUIRES_HANDLING
-        )
+        assert_that(self.denied_reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(len(mail.outbox)).is_equal_to(0)
 
     def test_cant_deny_if_regular_user(self):
@@ -170,22 +152,16 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         self.client.force_login(reserver_staff_user)
 
         input_data = {"pk": self.confirmed_reservation.id}
-        assert_that(self.confirmed_reservation.state).is_equal_to(
-            STATE_CHOICES.CONFIRMED
-        )
+        assert_that(self.confirmed_reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         response = self.query(self.get_require_handling_query(), input_data=input_data)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("requireHandlingForReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(
-            STATE_CHOICES.REQUIRES_HANDLING.upper()
-        )
+        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING.upper())
         self.confirmed_reservation.refresh_from_db()
-        assert_that(self.confirmed_reservation.state).is_equal_to(
-            STATE_CHOICES.REQUIRES_HANDLING
-        )
+        assert_that(self.confirmed_reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
 
     def test_unit_reserver_cant_require_handling_other_reservation(self):
         reserver_staff_user = get_user_model().objects.create(
@@ -218,6 +194,4 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")

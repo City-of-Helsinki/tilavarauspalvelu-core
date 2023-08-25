@@ -53,12 +53,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         if payment_types.count() == 1:
             return payment_types.first().code
-        elif (
-            payment_types.filter(
-                code__in=[PaymentType.INVOICE, PaymentType.ON_SITE]
-            ).count()
-            == payment_types.count()
-        ):
+        elif payment_types.filter(code__in=[PaymentType.INVOICE, PaymentType.ON_SITE]).count() == payment_types.count():
             return PaymentType.INVOICE
         else:
             return PaymentType.ONLINE
@@ -82,13 +77,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             payment_type = data.get("payment_type", "").upper()
             reservation_unit = self.instance.reservation_unit.first()
 
-            active_price = ReservationUnitPricingHelper.get_active_price(
-                reservation_unit
-            )
-            if (
-                active_price.pricing_type == PricingType.PAID
-                or self.instance.price_net > 0
-            ):
+            active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
+            if active_price.pricing_type == PricingType.PAID or self.instance.price_net > 0:
                 if not reservation_unit.payment_product:
                     raise ValidationErrorWithCode(
                         "Reservation unit is missing payment product",
@@ -97,12 +87,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
                 if not payment_type:
                     data["payment_type"] = self._get_default_payment_type()
-                elif not reservation_unit.payment_types.filter(
-                    code=payment_type
-                ).exists():
-                    allowed_values = list(
-                        map(lambda x: x.code, reservation_unit.payment_types.all())
-                    )
+                elif not reservation_unit.payment_types.filter(code=payment_type).exists():
+                    allowed_values = [x.code for x in reservation_unit.payment_types.all()]
                     raise ValidationErrorWithCode(
                         f"Reservation unit does not support {payment_type} payment type. "
                         f"Allowed values: {', '.join(allowed_values)}",
@@ -128,15 +114,10 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         self.fields.pop("payment_type")
         state = self.validated_data["state"]
 
-        if (
-            state in [STATE_CHOICES.CONFIRMED, STATE_CHOICES.WAITING_FOR_PAYMENT]
-            and self.instance.price_net > 0
-        ):
+        if state in [STATE_CHOICES.CONFIRMED, STATE_CHOICES.WAITING_FOR_PAYMENT] and self.instance.price_net > 0:
             payment_type = self.validated_data["payment_type"].upper()
             price_net = round_decimal(self.instance.price_net, 2)
-            price_vat = round_decimal(
-                self.instance.price_net * (self.instance.tax_percentage_value / 100), 2
-            )
+            price_vat = round_decimal(self.instance.price_net * (self.instance.tax_percentage_value / 100), 2)
             price_total = round_decimal(self.instance.price, 2)
 
             if payment_type == PaymentType.ON_SITE:

@@ -41,9 +41,7 @@ def purpose_two() -> ReservationPurpose:
 
 @pytest.fixture
 def reservation_unit(space_for_15_persons) -> ReservationUnit:
-    reservation_unit = ReservationUnit.objects.create(
-        name_en="Test reservation unit", require_introduction=False
-    )
+    reservation_unit = ReservationUnit.objects.create(name_en="Test reservation unit", require_introduction=False)
     reservation_unit.spaces.set([space_for_15_persons])
     return reservation_unit
 
@@ -74,9 +72,7 @@ def result_scheduled_for_monday(scheduled_for_monday, reservation_unit):
 
 
 @pytest.fixture
-def matching_event_reservation_unit(
-    recurring_application_event, reservation_unit
-) -> EventReservationUnit:
+def matching_event_reservation_unit(recurring_application_event, reservation_unit) -> EventReservationUnit:
     return EventReservationUnit.objects.create(
         priority=100,
         application_event=recurring_application_event,
@@ -87,20 +83,12 @@ def matching_event_reservation_unit(
 @pytest.fixture
 def default_application_round(purpose) -> ApplicationRound:
     application_round = ApplicationRound.objects.create(
-        application_period_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=timezone.utc
-        ),
-        application_period_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=timezone.utc
-        ),
+        application_period_begin=datetime.datetime(year=2020, month=1, day=1, tzinfo=timezone.utc),
+        application_period_end=datetime.datetime(year=2020, month=8, day=30, tzinfo=timezone.utc),
         reservation_period_begin=datetime.date(year=2020, month=1, day=1),
         reservation_period_end=datetime.date(year=2020, month=8, day=30),
-        public_display_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=timezone.utc
-        ),
-        public_display_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=timezone.utc
-        ),
+        public_display_begin=datetime.datetime(year=2020, month=1, day=1, tzinfo=timezone.utc),
+        public_display_end=datetime.datetime(year=2020, month=8, day=30, tzinfo=timezone.utc),
     )
     application_round.purposes.set([purpose])
     return application_round
@@ -109,29 +97,19 @@ def default_application_round(purpose) -> ApplicationRound:
 @pytest.fixture
 def second_application_round(purpose) -> ApplicationRound:
     application_round = ApplicationRound.objects.create(
-        application_period_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=timezone.utc
-        ),
-        application_period_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=timezone.utc
-        ),
+        application_period_begin=datetime.datetime(year=2020, month=1, day=1, tzinfo=timezone.utc),
+        application_period_end=datetime.datetime(year=2020, month=8, day=30, tzinfo=timezone.utc),
         reservation_period_begin=datetime.date(year=2020, month=1, day=1),
         reservation_period_end=datetime.date(year=2020, month=8, day=30),
-        public_display_begin=datetime.datetime(
-            year=2020, month=1, day=1, tzinfo=timezone.utc
-        ),
-        public_display_end=datetime.datetime(
-            year=2020, month=8, day=30, tzinfo=timezone.utc
-        ),
+        public_display_begin=datetime.datetime(year=2020, month=1, day=1, tzinfo=timezone.utc),
+        public_display_end=datetime.datetime(year=2020, month=8, day=30, tzinfo=timezone.utc),
     )
     application_round.purposes.set([purpose])
     return application_round
 
 
 @pytest.fixture
-def application_round_with_reservation_units(
-    reservation_unit, default_application_round
-) -> ApplicationRound:
+def application_round_with_reservation_units(reservation_unit, default_application_round) -> ApplicationRound:
     default_application_round.reservation_units.set([reservation_unit])
     return default_application_round
 
@@ -217,9 +195,7 @@ def result_scheduled_for_tuesday(scheduled_for_tuesday, reservation_unit):
 
 
 @pytest.fixture
-def application_round_basket_one(
-    default_application_round, purpose
-) -> ApplicationRoundBasket:
+def application_round_basket_one(default_application_round, purpose) -> ApplicationRoundBasket:
     basket = ApplicationRoundBasket.objects.create(
         name="Basket with order number one",
         application_round=default_application_round,
@@ -231,9 +207,7 @@ def application_round_basket_one(
 
 
 @pytest.fixture
-def application_round_basket_two(
-    default_application_round, purpose
-) -> ApplicationRoundBasket:
+def application_round_basket_two(default_application_round, purpose) -> ApplicationRoundBasket:
     basket = ApplicationRoundBasket.objects.create(
         name="Basket with order number two",
         application_round=default_application_round,

@@ -220,11 +220,7 @@ class CreateMerchantRequestTestCase(MerchantRequestsBaseTestCase):
         post = mock_post(self.mutation_merchant_response)
         create_merchant(self.create_merchant_params, post)
         post.assert_called_with(
-            url=(
-                settings.VERKKOKAUPPA_MERCHANT_API_URL
-                + "/create/merchant/"
-                + settings.VERKKOKAUPPA_NAMESPACE
-            ),
+            url=(settings.VERKKOKAUPPA_MERCHANT_API_URL + "/create/merchant/" + settings.VERKKOKAUPPA_NAMESPACE),
             json=self.create_merchant_params.to_json(),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
@@ -252,9 +248,7 @@ class CreateMerchantRequestTestCase(MerchantRequestsBaseTestCase):
 
     def test_create_merchant_raises_exception_if_status_code_is_not_201(self):
         post = mock_post(self.mutation_merchant_response, status_code=500)
-        assert_that(create_merchant).raises(CreateMerchantError).when_called_with(
-            self.create_merchant_params, post
-        )
+        assert_that(create_merchant).raises(CreateMerchantError).when_called_with(self.create_merchant_params, post)
 
 
 class UpdateMerchantRequestTestCase(MerchantRequestsBaseTestCase):
@@ -326,11 +320,7 @@ class GetMerchantsRequestTestCase(MerchantRequestsBaseTestCase):
         get = mock_get(self.get_merchants_response)
         get_merchants(get)
         get.assert_called_with(
-            url=(
-                settings.VERKKOKAUPPA_MERCHANT_API_URL
-                + "/list/merchants/"
-                + settings.VERKKOKAUPPA_NAMESPACE
-            ),
+            url=(settings.VERKKOKAUPPA_MERCHANT_API_URL + "/list/merchants/" + settings.VERKKOKAUPPA_NAMESPACE),
             headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
@@ -350,14 +340,10 @@ class GetMerchantsRequestTestCase(MerchantRequestsBaseTestCase):
             "1": self.get_merchants_response["1"].copy(),
         }
         response["0"].pop("merchantId")
-        assert_that(get_merchants).raises(GetMerchantsError).when_called_with(
-            mock_get(response)
-        )
+        assert_that(get_merchants).raises(GetMerchantsError).when_called_with(mock_get(response))
 
     def test_get_merchants_raises_exception_on_timeout(self):
-        assert_that(get_merchants).raises(GetMerchantsError).when_called_with(
-            Mock(side_effect=Timeout())
-        )
+        assert_that(get_merchants).raises(GetMerchantsError).when_called_with(Mock(side_effect=Timeout()))
 
 
 class GetMerchantRequestTestCase(MerchantRequestsBaseTestCase):

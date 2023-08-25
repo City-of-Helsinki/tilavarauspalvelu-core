@@ -76,6 +76,4 @@ translator.register(Qualifier, QualifierTranslationOptions)
 translator.register(Period, PeriodTranslationOptions)
 translator.register(Equipment, EquipmentTranslationOptions)
 translator.register(EquipmentCategory, EquipmentCategoryTranslationOptions)
-translator.register(
-    ReservationUnitCancellationRule, ReservationUnitCancellationRuleTranslationOptions
-)
+translator.register(ReservationUnitCancellationRule, ReservationUnitCancellationRuleTranslationOptions)

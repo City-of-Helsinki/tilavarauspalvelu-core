@@ -26,12 +26,8 @@ def mock_create_product():
 class UnitMerchantUpdateTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.merchant_1 = PaymentMerchantFactory(
-            pk=UUID("f9a94a6e-007d-4157-94f2-5ac9bd6e1a5f"), name="First Merchant"
-        )
-        cls.merchant_2 = PaymentMerchantFactory(
-            pk=UUID("83c0b65c-2e4f-4600-8466-66f67422bf43"), name="Second Merchant"
-        )
+        cls.merchant_1 = PaymentMerchantFactory(pk=UUID("f9a94a6e-007d-4157-94f2-5ac9bd6e1a5f"), name="First Merchant")
+        cls.merchant_2 = PaymentMerchantFactory(pk=UUID("83c0b65c-2e4f-4600-8466-66f67422bf43"), name="Second Merchant")
         cls.unit = UnitFactory(name="Test unit", payment_merchant=cls.merchant_1)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
@@ -43,12 +39,8 @@ class UnitMerchantUpdateTestCase(TestCase):
             mock_create_product(),
         ],
     )
-    def test_changing_merchant_updates_reservation_units_without_merchant(
-        self, mock_product
-    ):
-        reservation_unit_1 = ReservationUnitFactory(
-            name="I should be updated: unit set", unit=self.unit
-        )
+    def test_changing_merchant_updates_reservation_units_without_merchant(self, mock_product):
+        reservation_unit_1 = ReservationUnitFactory(name="I should be updated: unit set", unit=self.unit)
         pricing_1 = ReservationUnitPricingFactory(reservation_unit=reservation_unit_1)
         reservation_unit_1.pricings.set([pricing_1])
         reservation_unit_1.save()
@@ -58,9 +50,7 @@ class UnitMerchantUpdateTestCase(TestCase):
         reservation_unit_2.pricings.set([pricing_2])
         reservation_unit_2.save()
 
-        reservation_unit_3 = ReservationUnitFactory(
-            name="I am ignored: own merchant", payment_merchant=self.merchant_1
-        )
+        reservation_unit_3 = ReservationUnitFactory(name="I am ignored: own merchant", payment_merchant=self.merchant_1)
         pricing_3 = ReservationUnitPricingFactory(reservation_unit=reservation_unit_3)
         reservation_unit_3.pricings.set([pricing_3])
         reservation_unit_3.save()

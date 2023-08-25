@@ -15,9 +15,7 @@ def datetime_args_to_default_timezone(func: callable):
                 timezone = arg.tzinfo
                 if not timezone:
                     timezone = TIMEZONE
-                dt = datetime.datetime(
-                    1977, 1, 1, arg.hour, arg.minute, arg.second, tzinfo=timezone
-                )
+                dt = datetime.datetime(1977, 1, 1, arg.hour, arg.minute, arg.second, tzinfo=timezone)
                 arg = dt.astimezone(TIMEZONE).time()
             converted_args.append(arg)
 

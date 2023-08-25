@@ -37,12 +37,8 @@ class WebhookAPITestCaseBase(TestCase):
             last_name="Blade",
             email="sonya.blade@earthrealm.com",
         )
-        self.reservation = ReservationFactory.create(
-            state=STATE_CHOICES.WAITING_FOR_PAYMENT, user=self.user
-        )
-        self.payment_order = PaymentOrderFactory.create(
-            reservation=self.reservation, status=OrderStatus.DRAFT
-        )
+        self.reservation = ReservationFactory.create(state=STATE_CHOICES.WAITING_FOR_PAYMENT, user=self.user)
+        self.payment_order = PaymentOrderFactory.create(reservation=self.reservation, status=OrderStatus.DRAFT)
         self.verkkokauppa_payment = Payment(
             payment_id=uuid4(),
             namespace="tilanvaraus",
@@ -98,9 +94,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         }
 
     @mock.patch("api.webhook_api.views.send_confirmation_email")
-    def test_returns_200_without_body_on_success(
-        self, mock_send_confirmation_email, mock_get_payment
-    ):
+    def test_returns_200_without_body_on_success(self, mock_send_confirmation_email, mock_get_payment):
         mock_get_payment.return_value = self.verkkokauppa_payment
 
         response = self.client.post(
@@ -113,9 +107,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
-        assert_that(self.payment_order.payment_id).is_equal_to(
-            str(self.verkkokauppa_payment.payment_id)
-        )
+        assert_that(self.payment_order.payment_id).is_equal_to(str(self.verkkokauppa_payment.payment_id))
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
@@ -134,9 +126,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.data).is_none()
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_returns_400_with_error_on_invalid_payload(
-        self, mock_capture_exception, mock_get_payment
-    ):
+    def test_returns_400_with_error_on_invalid_payload(self, mock_capture_exception, mock_get_payment):
         data = self.get_valid_data()
         data.pop("eventType")
 
@@ -152,9 +142,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         assert_that(mock_capture_exception.called).is_true
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_returns_400_with_error_on_invalid_namespace(
-        self, mock_capture_exception, mock_get_payment
-    ):
+    def test_returns_400_with_error_on_invalid_namespace(self, mock_capture_exception, mock_get_payment):
         data = self.get_valid_data()
         data["namespace"] = "invalid"
 
@@ -174,9 +162,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
     def test_returns_400_with_error_on_invalid_payment_state(
         self, mock_capture_message, mock_capture_exception, mock_get_payment
     ):
-        self.verkkokauppa_payment = dataclasses.replace(
-            self.verkkokauppa_payment, status="something_else"
-        )
+        self.verkkokauppa_payment = dataclasses.replace(self.verkkokauppa_payment, status="something_else")
         mock_get_payment.return_value = self.verkkokauppa_payment
 
         response = self.client.post(
@@ -206,9 +192,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.data).is_equal_to(expected_error)
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_returns_500_with_error_on_payment_fetch_failure(
-        self, mock_capture_exception, mock_get_payment
-    ):
+    def test_returns_500_with_error_on_payment_fetch_failure(self, mock_capture_exception, mock_get_payment):
         mock_get_payment.side_effect = GetPaymentError("Mock error")
 
         response = self.client.post(
@@ -277,9 +261,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID_MANUALLY)
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_returns_400_with_error_on_invalid_payload(
-        self, mock_capture_exception, mock_get_payment
-    ):
+    def test_returns_400_with_error_on_invalid_payload(self, mock_capture_exception, mock_get_payment):
         data = self.get_valid_data()
         data.pop("eventType")
 
@@ -295,9 +277,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         assert_that(mock_capture_exception.called).is_true()
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_returns_400_with_error_on_invalid_namespace(
-        self, mock_capture_exception, mock_get_payment
-    ):
+    def test_returns_400_with_error_on_invalid_namespace(self, mock_capture_exception, mock_get_payment):
         data = self.get_valid_data()
         data["namespace"] = "invalid"
 
@@ -317,9 +297,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
     def test_returns_400_with_error_on_invalid_order_state(
         self, mock_capture_message, mock_capture_exception, mock_get_order
     ):
-        self.verkkokauppa_order = dataclasses.replace(
-            self.verkkokauppa_order, status="something_else"
-        )
+        self.verkkokauppa_order = dataclasses.replace(self.verkkokauppa_order, status="something_else")
         mock_get_order.return_value = self.verkkokauppa_order
 
         response = self.client.post(
@@ -349,9 +327,7 @@ class WebhookOrderAPITestCase(WebhookAPITestCaseBase):
         assert_that(response.data).is_equal_to(expected_error)
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_returns_500_with_error_on_order_fetch_failure(
-        self, mock_capture_exception, mock_get_order
-    ):
+    def test_returns_500_with_error_on_order_fetch_failure(self, mock_capture_exception, mock_get_order):
         mock_get_order.side_effect = GetOrderError("Mock error")
 
         response = self.client.post(
@@ -412,9 +388,7 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.REFUNDED)
 
-    def test_refund_returns_200_when_order_is_already_handled(
-        self, mock_get_refund_status
-    ):
+    def test_refund_returns_200_when_order_is_already_handled(self, mock_get_refund_status):
         self.payment_order.status = OrderStatus.REFUNDED
         self.payment_order.save()
 
@@ -429,9 +403,7 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.REFUNDED)
 
-    def test_refund_returns_400_with_no_changes_when_refund_is_not_found(
-        self, mock_get_refund_status
-    ):
+    def test_refund_returns_400_with_no_changes_when_refund_is_not_found(self, mock_get_refund_status):
         mock_get_refund_status.return_value = None
 
         response = self.client.post(
@@ -446,12 +418,8 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
 
-    def test_refund_returns_400_with_no_changes_when_refund_is_in_invalid_state(
-        self, mock_get_refund_status
-    ):
-        refund_status = dataclasses.replace(
-            self.refund_status, status=RefundStatus.CANCELLED.value
-        )
+    def test_refund_returns_400_with_no_changes_when_refund_is_in_invalid_state(self, mock_get_refund_status):
+        refund_status = dataclasses.replace(self.refund_status, status=RefundStatus.CANCELLED.value)
         mock_get_refund_status.return_value = refund_status
 
         response = self.client.post(
@@ -466,9 +434,7 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
 
-    def test_refund_returns_500_with_no_changes_when_get_refund_status_fails(
-        self, mock_get_refund_status
-    ):
+    def test_refund_returns_500_with_no_changes_when_get_refund_status_fails(self, mock_get_refund_status):
         mock_get_refund_status.side_effect = GetRefundStatusError("mock-error")
 
         response = self.client.post(
@@ -478,16 +444,12 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         )
         assert_that(response.status_code).is_equal_to(500)
         assert_that(response.data["status"]).is_equal_to(500)
-        assert_that(response.data["message"]).is_equal_to(
-            "Problem with upstream service"
-        )
+        assert_that(response.data["message"]).is_equal_to("Problem with upstream service")
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
 
-    def test_refund_returns_404_with_no_changes_when_order_is_not_found(
-        self, mock_get_refund_status
-    ):
+    def test_refund_returns_404_with_no_changes_when_order_is_not_found(self, mock_get_refund_status):
         self.payment_order.remote_id = uuid4()
         self.payment_order.save()
 
@@ -504,9 +466,7 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_refund_returns_400_when_payload_is_invalid(
-        self, mock_capture_exception, mock_get_refund_status
-    ):
+    def test_refund_returns_400_when_payload_is_invalid(self, mock_capture_exception, mock_get_refund_status):
         data = self.get_valid_data()
         data.pop("refundPaymentId")
         response = self.client.post(
@@ -516,18 +476,14 @@ class WebhookRefundAPITestCase(WebhookAPITestCaseBase):
         )
         assert_that(response.status_code).is_equal_to(400)
         assert_that(response.data["status"]).is_equal_to(400)
-        assert_that(response.data["message"]).is_equal_to(
-            "Required field missing: refundPaymentId"
-        )
+        assert_that(response.data["message"]).is_equal_to("Required field missing: refundPaymentId")
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
         assert_that(mock_capture_exception.called).is_true()
 
     @mock.patch("api.webhook_api.views.capture_exception")
-    def test_refund_returns_400_on_invalid_namespace(
-        self, mock_capture_exception, mock_get_refund_status
-    ):
+    def test_refund_returns_400_on_invalid_namespace(self, mock_capture_exception, mock_get_refund_status):
         data = self.get_valid_data()
         data["namespace"] = "invalid"
 

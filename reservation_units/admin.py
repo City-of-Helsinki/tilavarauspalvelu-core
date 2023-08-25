@@ -35,12 +35,8 @@ class ReservationUnitAdminForm(ModelForm):
     terms_of_use = CharField(widget=TinyMCE(), required=False)
     pricing_terms = ModelChoiceField(queryset=TermsOfUse.objects.none(), required=False)
     payment_terms = ModelChoiceField(queryset=TermsOfUse.objects.none(), required=False)
-    cancellation_terms = ModelChoiceField(
-        queryset=TermsOfUse.objects.none(), required=False
-    )
-    service_specific_terms = ModelChoiceField(
-        queryset=TermsOfUse.objects.none(), required=False
-    )
+    cancellation_terms = ModelChoiceField(queryset=TermsOfUse.objects.none(), required=False)
+    service_specific_terms = ModelChoiceField(queryset=TermsOfUse.objects.none(), required=False)
 
     class Meta:
         model = ReservationUnit
@@ -49,12 +45,8 @@ class ReservationUnitAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["pricing_terms"].queryset = TermsOfUse.objects.filter(
-            terms_type=TermsOfUse.TERMS_TYPE_PRICING
-        )
-        self.fields["payment_terms"].queryset = TermsOfUse.objects.filter(
-            terms_type=TermsOfUse.TERMS_TYPE_PAYMENT
-        )
+        self.fields["pricing_terms"].queryset = TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
+        self.fields["payment_terms"].queryset = TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
         self.fields["cancellation_terms"].queryset = TermsOfUse.objects.filter(
             terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
         )
@@ -86,9 +78,7 @@ class ReservationUnitAdminForm(ModelForm):
     def clean_service_specific_terms(self):
         terms = self.cleaned_data.get("service_specific_terms")
         if terms and terms.terms_type != TermsOfUse.TERMS_TYPE_SERVICE:
-            raise ValidationError(
-                "Selected value for service specific terms is not valid."
-            )
+            raise ValidationError("Selected value for service specific terms is not valid.")
 
         return terms
 
@@ -115,9 +105,7 @@ class ReservationUnitAdmin(ExtraButtonsMixin, SortableAdminMixin, admin.ModelAdm
     ordering = ["rank"]
 
     def get_search_results(self, request, queryset, search_term):
-        queryset, may_have_duplicates = super().get_search_results(
-            request, queryset, search_term
-        )
+        queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
 
         model_name = request.GET.get("model_name")
         if model_name == "applicationround":
@@ -128,9 +116,7 @@ class ReservationUnitAdmin(ExtraButtonsMixin, SortableAdminMixin, admin.ModelAdm
     @admin.action(description="Export selected reservation units to CSV")
     def export_to_csv(self, request, queryset):
         try:
-            path = ReservationUnitExporter.export_reservation_unit_data(
-                queryset=queryset
-            )
+            path = ReservationUnitExporter.export_reservation_unit_data(queryset=queryset)
         except Exception as e:
             self.message_user(
                 request,

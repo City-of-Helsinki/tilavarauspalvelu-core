@@ -56,12 +56,8 @@ class ExternalServiceMetric:
     def __exit__(self, *args):
         duration = perf_counter() - self.start_time
 
-        Metrics.service_calls_latency.labels(
-            service=self.service, method=self.method, path=self.path
-        ).observe(duration)
-        Metrics.service_calls.labels(
-            service=self.service, method=self.method, path=self.path
-        ).inc()
+        Metrics.service_calls_latency.labels(service=self.service, method=self.method, path=self.path).observe(duration)
+        Metrics.service_calls.labels(service=self.service, method=self.method, path=self.path).inc()
 
         if self.response_status:
             Metrics.service_responses.labels(

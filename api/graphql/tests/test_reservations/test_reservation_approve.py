@@ -29,12 +29,8 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
         self.reservation = ReservationFactory(
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(hours=1),
-            end=(
-                datetime.datetime.now(tz=get_default_timezone())
-                + datetime.timedelta(hours=2)
-            ),
+            begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
+            end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=STATE_CHOICES.REQUIRES_HANDLING,
             user=self.regular_joe,
             reservee_email="email@reservee",
@@ -86,16 +82,12 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(
-            STATE_CHOICES.CONFIRMED.upper()
-        )
+        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.handling_details).is_equal_to("You're welcome.")
         assert_that(self.reservation.handled_at).is_not_none()
-        assert_that(self.reservation.price).is_equal_to(
-            Decimal("10.59")
-        )  # Float does not cause abnormality.
+        assert_that(self.reservation.price).is_equal_to(Decimal("10.59"))  # Float does not cause abnormality.
         assert_that(self.reservation.price_net).is_equal_to(Decimal("8.61"))
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("approved")
@@ -120,19 +112,13 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(
-            STATE_CHOICES.CONFIRMED.upper()
-        )
+        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.handling_details).is_equal_to("You're welcome.")
         assert_that(self.reservation.handled_at).is_not_none()
-        assert_that(self.reservation.price).is_equal_to(
-            Decimal("0.0")
-        )  # Float does not cause abnormality.
-        assert_that(self.reservation.price_net).is_equal_to(
-            Decimal("0.0")
-        )  # Float does not cause abnormality.
+        assert_that(self.reservation.price).is_equal_to(Decimal("0.0"))  # Float does not cause abnormality.
+        assert_that(self.reservation.price_net).is_equal_to(Decimal("0.0"))  # Float does not cause abnormality.
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("approved")
         assert_that(mail.outbox[1].subject).is_equal_to("staff reservation made")
@@ -163,9 +149,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Only reservations with state as REQUIRES_HANDLING can be approved."
         )
-        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
-            "APPROVING_NOT_ALLOWED"
-        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("APPROVING_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
@@ -223,9 +207,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
-        assert_that(self.reservation.handling_details).is_not_equal_to(
-            self.reservation.working_memo
-        )
+        assert_that(self.reservation.handling_details).is_not_equal_to(self.reservation.working_memo)
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
@@ -243,16 +225,12 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(
-            STATE_CHOICES.CONFIRMED.upper()
-        )
+        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.handling_details).is_equal_to("")
         assert_that(self.reservation.handled_at).is_not_none()
-        assert_that(self.reservation.price).is_equal_to(
-            Decimal("10.59")
-        )  # Float does not cause abnormality.
+        assert_that(self.reservation.price).is_equal_to(Decimal("10.59"))  # Float does not cause abnormality.
         assert_that(self.reservation.price_net).is_equal_to(Decimal("8.61"))
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("approved")
@@ -295,9 +273,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(
-            STATE_CHOICES.CONFIRMED.upper()
-        )
+        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 
@@ -333,6 +309,4 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
 
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")

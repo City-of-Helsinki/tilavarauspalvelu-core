@@ -9,7 +9,7 @@ def migrate_active_pricing(apps, schema):
     """Copy current price information to pricing table and mark it as active"""
     ReservationUnitType = apps.get_model('reservation_units', 'ReservationUnit')
     ReservationUnitPricingType = apps.get_model('reservation_units', 'ReservationUnitPricing')
-    
+
     reservation_units = ReservationUnitType.objects.all()
     for ru in reservation_units:
         begins = datetime.date(2022, 1, 1)
@@ -22,7 +22,7 @@ def migrate_active_pricing(apps, schema):
             status = "active",
             reservation_unit = ru,
             tax_percentage = ru.tax_percentage,
-            
+
         )
         ru.active_pricing = active_pricing
         ru.save()

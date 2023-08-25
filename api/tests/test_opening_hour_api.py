@@ -40,6 +40,6 @@ def test_fetching_opening_hours_for_reservation_unit(
     assert_that(response.data["id"]).is_equal_to(reservation_unit.id)
     opening_hours = response.data["opening_hours"][0]
     assert_that(opening_hours).has_date("2021-01-01")
-    assert_that(opening_hours["times"][0]).has_start_time("10:00:00").has_end_time(
-        "22:00:00"
-    ).has_end_time_on_next_day(False)
+    assert_that(opening_hours["times"][0]).has_start_time("10:00:00").has_end_time("22:00:00").has_end_time_on_next_day(
+        False
+    )

@@ -186,9 +186,7 @@ class OrderRequestsTestCaseBase(TestCase):
         "merchant": {},
     }
 
-    get_order_404_response: Dict[str, Any] = {
-        "errors": [{"code": "order-not-found", "message": "Order not found"}]
-    }
+    get_order_404_response: Dict[str, Any] = {"errors": [{"code": "order-not-found", "message": "Order not found"}]}
 
     cancel_order_response: Dict[str, Any] = {
         "order": {
@@ -280,9 +278,7 @@ class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
         )
 
     def test_create_order_returns_order_info(self):
-        order_info = create_order(
-            self.create_order_params, mock_post(self.create_order_response)
-        )
+        order_info = create_order(self.create_order_params, mock_post(self.create_order_response))
         expected = Order.from_json(self.create_order_response)
         assert_that(order_info).is_equal_to(expected)
 
@@ -313,9 +309,7 @@ class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
         with raises(CreateOrderError) as ex:
             create_order(self.create_order_params, post)
 
-        assert_that(str(ex.value)).is_equal_to(
-            "Order creation failed: problem with upstream service"
-        )
+        assert_that(str(ex.value)).is_equal_to("Order creation failed: problem with upstream service")
 
     def test_create_order_raises_exception_if_status_code_is_not_201(self):
         post = mock_post(self.create_order_response, status_code=400)
@@ -422,7 +416,5 @@ class CancelOrderRequestsTestCase(OrderRequestsTestCaseBase):
         with raises(CancelOrderError) as ex:
             cancel_order(order_id, user, post)
 
-        assert_that(str(ex.value)).is_equal_to(
-            "Order cancellation failed: problem with upstream service"
-        )
+        assert_that(str(ex.value)).is_equal_to("Order cancellation failed: problem with upstream service")
         assert_that(mock_capture.called).is_true()

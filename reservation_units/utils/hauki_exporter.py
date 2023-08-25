@@ -25,9 +25,7 @@ class ReservationUnitHaukiExporter:
         unit = self.reservation_unit.unit
         if not unit:
             return None
-        unit_resource_id = (
-            f"{unit.hauki_resource_data_source_id}:{unit.hauki_resource_origin_id}"
-        )
+        unit_resource_id = f"{unit.hauki_resource_data_source_id}:{unit.hauki_resource_origin_id}"
         url = urljoin(
             settings.HAUKI_API_URL,
             f"/v1/resource/{unit_resource_id}",
@@ -43,13 +41,9 @@ class ReservationUnitHaukiExporter:
         return id
 
     def _get_hauki_resource_object_from_reservation_unit(self) -> Resource:
-        parent_id = (
-            self.reservation_unit.unit.hauki_resource_id or self._get_parent_id()
-        )
+        parent_id = self.reservation_unit.unit.hauki_resource_id or self._get_parent_id()
         if parent_id is None:
-            raise ValueError(
-                "Unit did not have hauki resource id and could not get it from hauki."
-            )
+            raise ValueError("Unit did not have hauki resource id and could not get it from hauki.")
 
         department_id = getattr(self.reservation_unit.unit, "tprek_department_id", None)
         if not department_id:

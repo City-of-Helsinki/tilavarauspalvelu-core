@@ -12,13 +12,11 @@ from permissions.api_permissions.graphene_permissions import (
     UnitRolePermission,
 )
 from permissions.helpers import can_view_users
-from permissions.models import GeneralRole
+from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from permissions.models import GeneralRolePermission as GeneralRolePermissionModel
-from permissions.models import ServiceSectorRole
 from permissions.models import (
     ServiceSectorRolePermission as ServiceSectorRolePermissionModel,
 )
-from permissions.models import UnitRole
 from permissions.models import UnitRolePermission as UnitRolePermissionModel
 
 

@@ -24,16 +24,12 @@ TIMEZONE = get_default_timezone()
 @freeze_time(datetime(2022, 11, 28, 10, 10, 0, tzinfo=TIMEZONE))
 class UpdateExpiredOrderTestCase(TestCase):
     def setUp(self) -> None:
-        self.reservation = ReservationFactory.create(
-            state=STATE_CHOICES.WAITING_FOR_PAYMENT
-        )
+        self.reservation = ReservationFactory.create(state=STATE_CHOICES.WAITING_FOR_PAYMENT)
         return super().setUp()
 
     @mock.patch("merchants.pruning.get_payment")
     def test_handle_cancelled_orders(self, mock_get_payment):
-        mock_get_payment.return_value = PaymentFactory(
-            status=WebShopPaymentStatus.CANCELLED.value
-        )
+        mock_get_payment.return_value = PaymentFactory(status=WebShopPaymentStatus.CANCELLED.value)
 
         six_minutes_ago = datetime.now(tz=TIMEZONE) - timedelta(minutes=6)
         order = PaymentOrderFactory.create(
@@ -52,9 +48,7 @@ class UpdateExpiredOrderTestCase(TestCase):
     @mock.patch("merchants.pruning.send_confirmation_email")
     @mock.patch("merchants.pruning.get_payment")
     def test_handle_paid_orders(self, mock_get_payment, mock_confirmation_email):
-        mock_get_payment.return_value = PaymentFactory(
-            status=WebShopPaymentStatus.PAID_ONLINE.value
-        )
+        mock_get_payment.return_value = PaymentFactory(status=WebShopPaymentStatus.PAID_ONLINE.value)
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
         order = PaymentOrderFactory.create(
@@ -123,9 +117,7 @@ class UpdateExpiredOrderTestCase(TestCase):
 
     @mock.patch("merchants.pruning.capture_exception")
     @mock.patch("merchants.pruning.get_payment")
-    def test_get_payment_errors_are_logged(
-        self, mock_get_payment, mock_capture_exception
-    ):
+    def test_get_payment_errors_are_logged(self, mock_get_payment, mock_capture_exception):
         mock_get_payment.side_effect = GetPaymentError("mock-error")
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
@@ -146,9 +138,7 @@ class UpdateExpiredOrderTestCase(TestCase):
     @mock.patch("merchants.pruning.capture_exception")
     @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
-    def test_cancel_error_errors_are_logged(
-        self, mock_get_payment, mock_cancel_order, mock_capture_message
-    ):
+    def test_cancel_error_errors_are_logged(self, mock_get_payment, mock_cancel_order, mock_capture_message):
         six_minutes_ago = datetime.now(tz=TIMEZONE) - timedelta(minutes=6)
         mock_get_payment.return_value = PaymentFactory(
             status=WebShopPaymentStatus.CREATED.value,
@@ -172,9 +162,7 @@ class UpdateExpiredOrderTestCase(TestCase):
 
     @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
-    def test_give_more_time_if_user_entered_to_payment_phase(
-        self, mock_get_payment, mock_cancel_order
-    ):
+    def test_give_more_time_if_user_entered_to_payment_phase(self, mock_get_payment, mock_cancel_order):
         four_minutes_in_the_future = datetime.now(tz=TIMEZONE) + timedelta(minutes=4)
         six_minutes_ago = datetime.now(tz=TIMEZONE) - timedelta(minutes=6)
 

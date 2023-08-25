@@ -68,9 +68,7 @@ class ReservationFactory(DjangoModelFactory):
             STATE_CHOICES.DENIED,
         )
     )
-    priority = FuzzyInteger(
-        low=PRIORITIES.PRIORITY_LOW, high=PRIORITIES.PRIORITY_HIGH, step=100
-    )
+    priority = FuzzyInteger(low=PRIORITIES.PRIORITY_LOW, high=PRIORITIES.PRIORITY_HIGH, step=100)
     begin = FuzzyDateTime(
         start_dt=datetime(2021, 1, 1, tzinfo=timezone.utc),
         end_dt=datetime(2022, 5, 31, tzinfo=timezone.utc),

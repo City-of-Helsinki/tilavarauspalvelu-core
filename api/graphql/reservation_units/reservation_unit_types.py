@@ -58,9 +58,9 @@ from reservation_units.models import (
     ReservationUnitImage,
     ReservationUnitPaymentType,
     ReservationUnitPricing,
+    TaxPercentage,
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
-from reservation_units.models import TaxPercentage
 from reservations.models import Reservation
 from spaces.models import Space
 from tilavarauspalvelu.utils.date_util import end_of_day, start_of_day
@@ -70,12 +70,7 @@ TIMEZONE = get_default_timezone()
 
 
 def get_payment_type_codes() -> List[str]:
-    return list(
-        map(
-            lambda payment_type: payment_type.code,
-            ReservationUnitPaymentType.objects.all(),
-        )
-    )
+    return [payment_type.code for payment_type in ReservationUnitPaymentType.objects.all()]
 
 
 class KeywordType(AuthNode, PrimaryKeyObjectType):
@@ -132,9 +127,7 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Purpose
-        fields = ["pk", "image_url", "small_url", "rank"] + get_all_translatable_fields(
-            model
-        )
+        fields = ["pk", "image_url", "small_url", "rank"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
@@ -193,21 +186,13 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
             include_reservation_units = getattr(self, "include_reservation_units", None)
 
             if include_reservation_units:
-                res_units_in_db = ReservationUnit.objects.filter(
-                    id__in=include_reservation_units
-                )
+                res_units_in_db = ReservationUnit.objects.filter(id__in=include_reservation_units)
 
-                difference = set(include_reservation_units).difference(
-                    {res_unit.id for res_unit in res_units_in_db}
-                )
+                difference = set(include_reservation_units).difference({res_unit.id for res_unit in res_units_in_db})
 
                 if difference:
-                    raise GraphQLError(
-                        "Wrong identifier for reservation unit in url generation."
-                    )
-                target_uuids = res_units_in_db.filter(unit=self.unit).values_list(
-                    "uuid", flat=True
-                )
+                    raise GraphQLError("Wrong identifier for reservation unit in url generation.")
+                target_uuids = res_units_in_db.filter(unit=self.unit).values_list("uuid", flat=True)
 
             return generate_hauki_link(
                 self.uuid,
@@ -332,10 +317,7 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
 class ReservationUnitPaymentTypeType(AuthNode, PrimaryKeyObjectType):
     code = graphene.Field(
         graphene.String,
-        description=(
-            "Available values: "
-            f"{', '.join(value for value in get_payment_type_codes())}"
-        ),
+        description=("Available values: " f"{', '.join(value for value in get_payment_type_codes())}"),
     )
 
     class Meta:
@@ -550,9 +532,7 @@ class ReservationUnitType(
                 "prefetch",
                 {
                     "field_name": "pricings",
-                    "base_queryset": ReservationUnitPricing.objects.all().select_related(
-                        "tax_percentage"
-                    ),
+                    "base_queryset": ReservationUnitPricing.objects.all().select_related("tax_percentage"),
                     "child_optimizations": {
                         "taxPercentage": ("select", "tax_percentage"),
                     },
@@ -617,9 +597,7 @@ class ReservationUnitType(
     def resolve_payment_types(self, info):
         return self.payment_types.all()
 
-    def resolve_application_rounds(
-        self, info: ResolveInfo, active: Optional[bool] = None
-    ) -> QuerySet:
+    def resolve_application_rounds(self, info: ResolveInfo, active: Optional[bool] = None) -> QuerySet:
         application_rounds = self.application_rounds.all()
         if active is None:
             return application_rounds
@@ -648,12 +626,8 @@ class ReservationUnitType(
         return None
 
 
-class ReservationUnitByPkType(
-    ReservationUnitType, OpeningHoursMixin, ReservationUnitWithReservationsMixin
-):
-    next_available_slot = graphene.DateTime(
-        deprecation_reason="Old deprecated scalar. Does not yield any return."
-    )
+class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin, ReservationUnitWithReservationsMixin):
+    next_available_slot = graphene.DateTime(deprecation_reason="Old deprecated scalar. Does not yield any return.")
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
 
     class Meta:

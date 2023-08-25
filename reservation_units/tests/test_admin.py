@@ -12,12 +12,8 @@ from terms_of_use.tests.factories import TermsOfUseFactory
 class ReservationUnitAdminApplicationRoundTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.include_these = ReservationUnitFactory.create_batch(
-            5, reservation_kind=ReservationKind.DIRECT_AND_SEASON
-        )
-        cls.exclude_these = ReservationUnitFactory.create_batch(
-            4, reservation_kind=ReservationKind.DIRECT
-        )
+        cls.include_these = ReservationUnitFactory.create_batch(5, reservation_kind=ReservationKind.DIRECT_AND_SEASON)
+        cls.exclude_these = ReservationUnitFactory.create_batch(4, reservation_kind=ReservationKind.DIRECT)
 
         cls.queryset = ReservationUnit.objects.all()
         cls.req_factory = RequestFactory()
@@ -84,16 +80,12 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
     def test_pricing_terms_accepts_type_pricing(self):
         pricing_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["pricing_terms"] = pricing_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_true()
@@ -101,16 +93,12 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
     def test_pricing_terms_errors_when_type_not_pricing(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["pricing_terms"] = wrong_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_false()
@@ -118,16 +106,12 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
     def test_payment_terms_accepts_type_payment(self):
         payment_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["payment_terms"] = payment_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_true()
@@ -135,35 +119,25 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
     def test_payment_terms_errors_when_type_not_payment(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["payment_terms"] = wrong_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_false()
 
     def test_cancellation_terms_accepts_type_cancellation(self):
-        cancellation_terms = TermsOfUseFactory(
-            terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
-        )
+        cancellation_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["cancellation_terms"] = cancellation_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_true()
@@ -171,35 +145,25 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
     def test_cancellation_terms_errors_when_type_not_cancellation(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["cancellation_terms"] = wrong_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_false()
 
     def test_service_specific_terms_accepts_type_service(self):
-        service_specific_terms = TermsOfUseFactory(
-            terms_type=TermsOfUse.TERMS_TYPE_SERVICE
-        )
+        service_specific_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_SERVICE)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["service_specific_terms"] = service_specific_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_true()
@@ -207,16 +171,12 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
     def test_service_specific_terms_errors_when_type_not_service(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
 
-        request = self.req_factory.get(
-            f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/"
-        )
+        request = self.req_factory.get(f"/admin/reservation_units/reservationunit/{self.reservation_unit.id}/change/")
 
         data = self.get_valid_data()
         data["service_specific_terms"] = wrong_terms
 
-        ReservationUnitModelForm = self.runit_admin.get_form(
-            request, obj=self.reservation_unit
-        )
+        ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
         assert_that(form.is_valid()).is_false()

@@ -10,9 +10,7 @@ from reservation_units.tests.factories import QualifierFactory
 class QualifierQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.qualifier = QualifierFactory(
-            name_fi="Qualifier FI", name_en="Qualifier EN", name_sv="Qualifier SV"
-        )
+        cls.qualifier = QualifierFactory(name_fi="Qualifier FI", name_en="Qualifier EN", name_sv="Qualifier SV")
 
     def test_getting_qualifiers(self):
         response = self.query(

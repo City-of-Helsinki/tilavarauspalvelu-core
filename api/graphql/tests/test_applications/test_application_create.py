@@ -137,9 +137,7 @@ class ApplicationCreateTestCase(ApplicationTestCaseBase):
         assert_that(application.status).is_equal_to(data["status"])
 
         assert_that(application.application_events.count()).is_equal_to(1)
-        assert_that(application.application_events.first().name).is_equal_to(
-            "App event name"
-        )
+        assert_that(application.application_events.first().name).is_equal_to("App event name")
 
     def test_application_create_organization_identifier_not_required(self):
         assert_that(Application.objects.count()).is_equal_to(1)
@@ -257,20 +255,14 @@ class ApplicationCreateTestCase(ApplicationTestCaseBase):
         assert_that(Application.objects.count()).is_equal_to(1)
 
     def test_unauthenticated_cannot_create_application(self):
-        response = self.query(
-            self.get_create_query(), input_data=self.get_application_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_application_data())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "No permission to mutate"
-        )
+        assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
         assert_that(Application.objects.count()).is_equal_to(1)
 
     def test_user_can_create_application_event(self):
-        response = self.query(
-            self.get_create_query(), input_data=self.get_application_data()
-        )
+        response = self.query(self.get_create_query(), input_data=self.get_application_data())
         assert_that(response.status_code).is_equal_to(200)

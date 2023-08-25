@@ -66,10 +66,7 @@ class ApplicationEventDeclineSerializer(PrimaryKeySerializer):
                 f"Only application events with status as {', '.join(self.CAN_DECLINE_STATUSES)} can be approved."
             )
 
-        if (
-            self.instance.application.status
-            not in ApplicationDeclineSerializer.CAN_DECLINE_STATUSES
-        ):
+        if self.instance.application.status not in ApplicationDeclineSerializer.CAN_DECLINE_STATUSES:
             raise GraphQLError(
                 f"Only application events with application status as "
                 f"{', '.join(ApplicationDeclineSerializer.CAN_DECLINE_STATUSES)} can be approved."

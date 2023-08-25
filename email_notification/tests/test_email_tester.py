@@ -25,15 +25,9 @@ class ReservationUnitSelectFormTestCase(TestCase):
 
 class EmailTestFormTestCase(TestCase):
     def test_constructor(self):
-        template1 = EmailTemplateFactory.create(
-            name="Template 1", type=EmailType.RESERVATION_CONFIRMED
-        )
-        template2 = EmailTemplateFactory.create(
-            name="Template 2", type=EmailType.RESERVATION_CANCELLED
-        )
-        template3 = EmailTemplateFactory.create(
-            name="Template 3", type=EmailType.RESERVATION_REJECTED
-        )
+        template1 = EmailTemplateFactory.create(name="Template 1", type=EmailType.RESERVATION_CONFIRMED)
+        template2 = EmailTemplateFactory.create(name="Template 2", type=EmailType.RESERVATION_CANCELLED)
+        template3 = EmailTemplateFactory.create(name="Template 3", type=EmailType.RESERVATION_REJECTED)
 
         form = EmailTestForm()
         assert_that(form.fields["template"].choices).is_equal_to(

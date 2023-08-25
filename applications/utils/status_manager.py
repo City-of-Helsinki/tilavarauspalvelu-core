@@ -28,9 +28,7 @@ def handle_applications_on_review_done(application_round: ApplicationRound):
         events = ApplicationEvent.objects.filter(
             application=application,
         )
-        declined_event_count = events.filter(
-            latest_status=ApplicationEventStatus.DECLINED
-        ).count()
+        declined_event_count = events.filter(latest_status=ApplicationEventStatus.DECLINED).count()
         if events.exists() and declined_event_count == events.count():
             application.set_status(ApplicationStatus.ALLOCATED)
         else:
@@ -45,9 +43,7 @@ def handle_applications_on_handled(application_round: ApplicationRound):
     for application in applications:
         application.set_status(ApplicationStatus.HANDLED)
 
-        events = ApplicationEvent.objects.filter(
-            application=application, latest_status=ApplicationEventStatus.APPROVED
-        )
+        events = ApplicationEvent.objects.filter(application=application, latest_status=ApplicationEventStatus.APPROVED)
         for event in events:
             event.set_status(ApplicationEventStatus.RESERVED)
 

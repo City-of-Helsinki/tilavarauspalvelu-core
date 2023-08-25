@@ -94,59 +94,37 @@ class ApplicationRoundAggregateDataTestCase(TestCase):
         ApplicationRoundAggregateDataCreator(self.application_round).run()
         assert_that(ApplicationRoundAggregateData.objects.count()).is_equal_to(2)
 
-    def test_only_reservations_total_duration_created_when_reservations_only(
-        self, mock
-    ):
+    def test_only_reservations_total_duration_created_when_reservations_only(self, mock):
         assert_that(ApplicationRoundAggregateData.objects.count()).is_zero()
-        ApplicationRoundAggregateDataCreator(
-            self.application_round, reservations_only=True
-        ).run()
+        ApplicationRoundAggregateDataCreator(self.application_round, reservations_only=True).run()
         assert_that(ApplicationRoundAggregateData.objects.count()).is_equal_to(1)
-        res_tot = ApplicationRoundAggregateData.objects.filter(
-            name="total_reservation_duration"
-        ).first()
+        res_tot = ApplicationRoundAggregateData.objects.filter(name="total_reservation_duration").first()
         assert_that(res_tot).is_not_none()
 
     def test_total_amount_of_hours_within_round_when_one_opening_time(self, mock):
         ApplicationRoundAggregateDataCreator(self.application_round).run()
-        assert_that(
-            ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value
-        ).is_equal_to(8)
+        assert_that(ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value).is_equal_to(8)
 
     def test_total_amount_of_hours_within_round_when_multiple_opening_times(self, mock):
         mock.return_value = get_mocked_opening_hours(days=4)
         ApplicationRoundAggregateDataCreator(self.application_round).run()
-        assert_that(
-            ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value
-        ).is_equal_to(8 * 4)
+        assert_that(ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value).is_equal_to(8 * 4)
 
     def test_total_reservation_hours_within_round(self, mock):
         ApplicationRoundAggregateDataCreator(self.application_round).run()
-        assert_that(
-            ApplicationRoundAggregateData.objects.get(
-                name="total_reservation_duration"
-            ).value
-        ).is_equal_to(8)
+        assert_that(ApplicationRoundAggregateData.objects.get(name="total_reservation_duration").value).is_equal_to(8)
 
     def test_total_amount_of_hours_within_round_when_full_days_one(self, mock):
         mock.return_value = get_mocked_opening_hours(days=2, full_days=1)
         ApplicationRoundAggregateDataCreator(self.application_round).run()
-        assert_that(
-            ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value
-        ).is_equal_to(8 + 24)
+        assert_that(ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value).is_equal_to(8 + 24)
 
-    def test_total_amount_of_hours_within_round_when_full_days_more_than_one(
-        self, mock
-    ):
+    def test_total_amount_of_hours_within_round_when_full_days_more_than_one(self, mock):
         mock.return_value = get_mocked_opening_hours(days=4, full_days=3)
         ApplicationRoundAggregateDataCreator(self.application_round).run()
-        assert_that(
-            ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value
-        ).is_equal_to(8 + 24 * 3)
+        assert_that(ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value).is_equal_to(8 + 24 * 3)
 
-    def test_total_amount_of_hours_within_round_when_end_time_next_day_cuts_the_day(
-        self, mock
-    ):
+    def test_total_amount_of_hours_within_round_when_end_time_next_day_cuts_the_day(self, mock):
         opening_hours = get_mocked_opening_hours()
         opening_hours.append(
             {
@@ -154,9 +132,7 @@ class ApplicationRoundAggregateDataTestCase(TestCase):
                 "date": datetime.date.today() + datetime.timedelta(days=1),
                 "times": [
                     TimeElement(
-                        start_time=datetime.time(
-                            hour=20, tzinfo=get_default_timezone()
-                        ),
+                        start_time=datetime.time(hour=20, tzinfo=get_default_timezone()),
                         end_time=datetime.time(hour=8, tzinfo=get_default_timezone()),
                         end_time_on_next_day=True,
                     )
@@ -165,6 +141,4 @@ class ApplicationRoundAggregateDataTestCase(TestCase):
         )
         mock.return_value = opening_hours
         ApplicationRoundAggregateDataCreator(self.application_round).run()
-        assert_that(
-            ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value
-        ).is_equal_to(8 + 4)
+        assert_that(ApplicationRoundAggregateData.objects.get(name="total_hour_capacity").value).is_equal_to(8 + 4)
