@@ -1,5 +1,4 @@
 import type {
-  RequestHandler,
   ResponseFunction,
   RestContext,
   RestRequest,
@@ -39,10 +38,11 @@ import * as getReservationUnitResponse from "../fixtures/v1/reservation_unit/2.j
 
 const applicationEventNames = ["Kurikan vimma", "Toca"];
 
+const CYPRESS_TIMEOUT = 5000
+Cypress.config("defaultCommandTimeout", CYPRESS_TIMEOUT);
+
 describe("application", () => {
   beforeEach(() => {
-    Cypress.config("defaultCommandTimeout", 20000);
-
     cy.window().then((win) => {
       win.sessionStorage.clear();
       cy.visit("/search/?search=");
