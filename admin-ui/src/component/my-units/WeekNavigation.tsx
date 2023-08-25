@@ -42,7 +42,7 @@ const WeekNavigation = ({ date, onNext, onPrev }: Props): JSX.Element => {
         <div style={{ minWidth: "10em", textAlign: "center" }}>
           {t("common.week")} {week} /{" "}
           {formatDate(startOfISOWeek(d).toISOString(), DATE_FORMAT_SHORT)} -{" "}
-          {formatDate(endOfISOWeek(d).toISOString(), DATE_FORMAT_SHORT)}
+          {formatDate(endOfISOWeek(d).toISOString())}
         </div>
         <Button
           aria-label={t("common.next")}
