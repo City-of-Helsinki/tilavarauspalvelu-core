@@ -16,7 +16,6 @@ concurrency:
 
 env:
   REGISTRY: "ghcr.io"
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -41,11 +40,23 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    # Repository name needs to be lowercase
+    - name: "Create repository name"
+      id: repo
+      run: >-
+        echo "repo=$(
+          echo ${{ env.REGISTRY }}/${{ github.repository }} | tr '[:upper:]' '[:lower:]'
+        )" >> $GITHUB_OUTPUT
+
     - name: "Extract metadata (tags, labels) for Docker"
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: ${{ steps.repo.outputs.repo }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
+          type=ref,event=pr
 
     - name: "Build backend container"
       uses: docker/build-push-action@v4
@@ -55,5 +66,6 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha,scope=backend
-        cache-to: type=gha,scope=backend
+        # Use a shared cache to speed up builds
+        cache-from: type=registry,ref=${{ steps.repo.outputs.repo }}:cache
+        cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}:cache,mode=max
