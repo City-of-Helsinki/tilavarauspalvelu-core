@@ -10,7 +10,6 @@ fixtures/
 .mypy_cache
 .coverage
 .dockerignore
-.env
 .env.example
 .git-blame-ignore-revs
 .gitattributes
@@ -22,5 +21,4 @@ docker-compose.yml
 Dockerfile
 Dockerfile.local
 README.md
-requirements.txt
 sonar-project.properties
