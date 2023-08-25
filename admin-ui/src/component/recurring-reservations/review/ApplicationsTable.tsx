@@ -35,7 +35,7 @@ const getColConfig = (t: TFunction) => [
     transform: ({ applicant, id }: ApplicationView) => (
       <TableLink href={applicationDetailsUrl(id)}>
         <span title={applicant}>
-          {truncate(applicant as string, applicantTruncateLen)}
+          {truncate(applicant ?? "-", applicantTruncateLen)}
         </span>
       </TableLink>
     ),
@@ -54,7 +54,7 @@ const getColConfig = (t: TFunction) => [
         <span title={allUnits}>
           {truncate(
             units
-              .filter((u, i) => i < 2)
+              .filter((_, i) => i < 2)
               .map((u) => u.nameFi)
               .join(", "),
             unitsTruncateLen
