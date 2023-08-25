@@ -223,14 +223,14 @@ const ReservationSummary = ({
     reservation.state === ReservationsReservationStateChoices.Cancelled
       ? {
           l: "cancelReason",
-          v: reservation.cancelDetails || "-",
+          v: reservation?.cancelReason?.reasonFi || "-",
         }
       : undefined;
   const rejectionReasonString =
     reservation.state === ReservationsReservationStateChoices.Denied
       ? {
           l: "denyReason",
-          v: reservation.handlingDetails || "-",
+          v: reservation?.denyReason?.reasonFi || "-",
         }
       : undefined;
 
