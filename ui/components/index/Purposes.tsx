@@ -10,7 +10,7 @@ import { PurposeType } from "common/types/gql-types";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
 import ReservationUnitSearch from "./ReservationUnitSearch";
-import ShowAllContainer from "../common/ShowAllContainer";
+import ShowAllContainer from "../../../common/src/components/ShowAllContainer";
 
 type Props = {
   purposes: PurposeType[];
@@ -45,9 +45,11 @@ const Top = styled.div`
 `;
 
 const PurposeContainer = styled(ShowAllContainer)`
-  display: grid;
-  gap: var(--spacing-l) var(--spacing-m);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  .ShowAllContainer__Content {
+    display: grid;
+    gap: var(--spacing-l) var(--spacing-m);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
 `;
 
 const PurposeItem = styled.div`
@@ -104,8 +106,8 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
         <PurposeContainer
           showAllLabel={t("common:showMore")}
           showLessLabel={t("common:showLess")}
-          maxLength={itemLimit}
-          buttonTopMargin="xl"
+          maximumNumber={itemLimit}
+          alignButton="right"
         >
           {purposes.map((item) => (
             <Link

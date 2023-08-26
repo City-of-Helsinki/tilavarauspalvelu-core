@@ -9,8 +9,8 @@ import {
   UnitType,
 } from "common/types/gql-types";
 import { IconLinkExternal } from "hds-react";
+import IconButton from "common/src/components/IconButton";
 import { getTranslation } from "../../modules/util";
-import IconButton from "../common/IconButton";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | ReservationUnitType;

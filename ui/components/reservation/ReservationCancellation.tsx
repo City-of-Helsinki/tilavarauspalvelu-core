@@ -3,14 +3,7 @@ import styled from "styled-components";
 import { useMutation, useQuery } from "@apollo/client";
 import router from "next/router";
 import { Controller, useForm } from "react-hook-form";
-import {
-  IconAngleDown,
-  IconAngleUp,
-  IconArrowRight,
-  IconCross,
-  IconSignout,
-  Select,
-} from "hds-react";
+import { IconArrowRight, IconCross, IconSignout, Select } from "hds-react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { OptionType } from "common/types/common";
@@ -26,6 +19,7 @@ import {
 } from "common/types/gql-types";
 import { Container as CommonContainer } from "common";
 
+import ShowAllContainer from "common/src/components/ShowAllContainer";
 import Sanitize from "../common/Sanitize";
 import {
   CANCEL_RESERVATION,
@@ -64,10 +58,10 @@ const Heading = styled.div`
   font-size: var(--fontsize-body-l);
 `;
 
-const TermsToggleButton = styled(MediumButton)`
-  font-size: var(--fontsize-body-m);
-  ${fontMedium};
-  margin-bottom: var(--spacing-s);
+const TermsContainer = styled(ShowAllContainer)`
+  .ShowAllContainer__ToggleButton {
+    color: var(--color-bus);
+  }
 `;
 
 const Actions = styled.div`
@@ -157,7 +151,6 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
   const [reservation, setReservation] = useState<ReservationType>();
   const [reasons, setReasons] = useState<OptionType[]>([]);
-  const [areTermsVisible, setAreTermsVisible] = useState(false);
 
   useQuery(GET_RESERVATION, {
     fetchPolicy: "no-cache",
@@ -272,25 +265,11 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                 {formState === "unsent" ? (
                   <>
                     <p>{t("reservations:cancelInfoBody")}</p>
-                    <TermsToggleButton
-                      variant="supplementary"
-                      size="small"
-                      onClick={() => setAreTermsVisible(!areTermsVisible)}
-                      iconRight={
-                        areTermsVisible ? (
-                          <IconAngleUp aria-hidden />
-                        ) : (
-                          <IconAngleDown aria-hidden />
-                        )
-                      }
+                    <TermsContainer
+                      showAllLabel={t("reservations:showCancellationTerms")}
+                      showLessLabel={t("reservations:hideCancellationTerms")}
+                      maximumNumber={0}
                     >
-                      {t(
-                        `reservations:${
-                          areTermsVisible ? "hide" : "show"
-                        }CancellationTerms`
-                      )}
-                    </TermsToggleButton>
-                    {areTermsVisible && (
                       <NotificationBox
                         heading={t("reservationUnit:cancellationTerms")}
                         body={
@@ -302,7 +281,7 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                           />
                         }
                       />
-                    )}
+                    </TermsContainer>
                     <Form onSubmit={handleSubmit(onSubmit)}>
                       <Controller
                         name="reason"

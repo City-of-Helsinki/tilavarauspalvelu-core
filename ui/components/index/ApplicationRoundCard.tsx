@@ -12,7 +12,7 @@ import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
-import IconButton from "../common/IconButton";
+import IconButton from "../../../common/src/components/IconButton";
 
 interface Props {
   applicationRound: ApplicationRoundType;

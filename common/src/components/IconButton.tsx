@@ -1,7 +1,7 @@
-import styled from "styled-components";
 import React from "react";
 import Link from "next/link";
-import { fontMedium } from "common/src/common/typography";
+import styled from "styled-components";
+import { fontMedium } from "../common/typography";
 
 interface IconButtonProps {
   // the button label text
@@ -18,17 +18,18 @@ interface IconButtonProps {
 }
 
 const Container = styled.div`
-  margin-top: var(--spacing-s);
+  margin: var(--spacing-s) 0;
   display: flex;
   align-items: center;
   text-decoration: none !important;
-  a {
-    color: var(--color-black);
-  }
 `;
 
 const StyledLink = styled(Link)`
   color: var(--color-black);
+  text-decoration: none;
+  &:hover {
+    text-decoration: none;
+  }
 `;
 
 const Anchor = styled.a`
@@ -70,7 +71,7 @@ const IconContainer = styled.div`
 
 /*
  *  @param {string} label - the button label text (required)
- *  @param {React.ReactNode | null} icon - a HDS-icon element (required, use `null` if no icon is desired)
+ *  @param {React.ReactNode | null} icon - an HDS-icon element (required, use `null` if no icon is desired)
  *  @param {string} [href] - the link URI (optional, defaults to "javascript:void(0);")
  *  @param {boolean} [openInNewTab] - should the link open in a new tab (optional, default true if href begins "http...")
  *  @param {function} [onClick] - a function to execute upon clicking the button (optional)
@@ -82,7 +83,8 @@ const IconButton = ({
   icon,
   label,
   onClick,
-  href = onClick && "javascript:void(0);", // there's no href if using callback
+  // eslint-disable-next-line no-script-url
+  href = "javascript:void(0);", // so the link won't trigger if there's no href given (e.g. when using only onClick)
   openInNewTab = !!href && href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
@@ -90,7 +92,7 @@ const IconButton = ({
     href,
     target: openInNewTab ? "_blank" : undefined,
     rel: openInNewTab ? "noopener noreferrer" : undefined,
-    onClick: onClick ? (e) => onClick(e) : undefined,
+    onClick,
     ...rest,
   };
   return !!href && href.substring(0, 4) !== "http" ? (
