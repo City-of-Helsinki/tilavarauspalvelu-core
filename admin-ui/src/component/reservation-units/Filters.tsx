@@ -1,10 +1,11 @@
-import { Button, IconAngleDown, IconAngleUp, TextInput } from "hds-react";
+import { TextInput } from "hds-react";
 import { isEmpty } from "lodash";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
+import ShowAllContainer from "common/src/components/ShowAllContainer";
 import { OptionType } from "../../common/types";
 import UnitFilter from "../filters/UnitFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
@@ -61,17 +62,11 @@ const Wrapper = styled.div`
   gap: var(--spacing-layout-xs);
 `;
 
-const ThinButton = styled(Button)`
-  margin: var(--spacing-xs) 0 0 0;
-  border: 0;
-  padding-left: 0;
-  span {
-    padding: 0;
-    line-height: 1;
+const MoreWrapper = styled(ShowAllContainer)`
+  [class*="ShowAllContainer__ToggleButtonContainer"] {
+    margin-top: 0;
   }
 `;
-
-const Buttons = styled.div``;
 
 export const emptyState = {
   reservationUnitType: [],
@@ -120,7 +115,6 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
     getReducer<FilterArguments>(emptyState),
     emptyState
   );
-  const [more, setMore] = useState(false);
 
   useEffect(() => {
     onSearch(state);
@@ -177,7 +171,11 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
             />
           </Span3>
         </Grid>
-        {more && (
+        <MoreWrapper
+          showAllLabel={t("ReservationUnitsSearch.moreFilters")}
+          showLessLabel={t("ReservationUnitsSearch.lessFilters")}
+          maximumNumber={0}
+        >
           <Grid2Container>
             <div>
               <div>{t("ReservationUnitsSearch.maxPersonsLabel")}</div>
@@ -210,22 +208,9 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
               </RangeContrainer>
             </div>
           </Grid2Container>
-        )}
+        </MoreWrapper>
       </Wrapper>
 
-      <Buttons>
-        <ThinButton
-          variant="supplementary"
-          onClick={() => setMore(!more)}
-          iconRight={more ? <IconAngleUp /> : <IconAngleDown />}
-        >
-          {t(
-            more
-              ? "ReservationUnitsSearch.lessFilters"
-              : "ReservationUnitsSearch.moreFilters"
-          )}
-        </ThinButton>
-      </Buttons>
       <Tags tags={tags} t={t} dispatch={dispatch} />
     </div>
   );

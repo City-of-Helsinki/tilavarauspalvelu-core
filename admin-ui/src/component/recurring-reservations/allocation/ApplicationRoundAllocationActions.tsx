@@ -9,6 +9,7 @@ import {
   ApplicationType,
   ReservationUnitType,
 } from "common/types/gql-types";
+import { ShowAllContainer } from "common/src/components/";
 import { ALLOCATION_CALENDAR_TIMES } from "../../../common/const";
 import { OptionType } from "../../../common/types";
 import Accordion from "../../Accordion";
@@ -49,37 +50,18 @@ const CloseBtn = styled.button`
   cursor: pointer;
 `;
 
-const TimeAccordion = styled(Accordion)`
-  > div:first-of-type {
-    justify-content: flex-start;
-    border: 0;
-    margin-bottom: 0;
-
-    h2 {
-      ${Strongish};
-      font-size: var(--fontsize-body-m);
-      display: inline-block;
-      color: var(--color-bus);
-      padding-left: 4px;
-    }
-
-    button {
-      color: var(--color-bus);
-    }
+const StyledShowAllContainer = styled(ShowAllContainer)`
+  .ShowAllContainer__ToggleButton {
+    margin-top: var(--spacing-2-xs);
+    color: var(--color-bus);
   }
-
-  > div:nth-of-type(2) {
-    padding: 0;
-  }
-
-  margin-top: var(--spacing-xs);
 `;
 
 const TimeSelectWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   padding-bottom: var(--spacing-s);
-
+  margin-top: var(--spacing-s);
   > * {
     width: calc(50% - var(--spacing-xs));
   }
@@ -205,7 +187,10 @@ const ApplicationRoundAllocationActions = ({
         <IconCross />
       </CloseBtn>
       <TimeLabel>{getTimeLabel(selection, t)}</TimeLabel>
-      <TimeAccordion heading={t("Allocation.changeTime")}>
+      <StyledShowAllContainer
+        showAllLabel={t("Allocation.changeTime")}
+        maximumNumber={0}
+      >
         <TimeSelectWrapper>
           <Select
             label={t("Allocation.startingTime")}
@@ -258,7 +243,7 @@ const ApplicationRoundAllocationActions = ({
             }}
           />
         </TimeSelectWrapper>
-      </TimeAccordion>
+      </StyledShowAllContainer>
       {(primaryApplicationEvents?.length > 0 ||
         otherApplicationEvents?.length > 0) && (
         <>

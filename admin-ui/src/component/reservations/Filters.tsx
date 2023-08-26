@@ -1,15 +1,13 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import {
-  Button,
   DateInput,
-  IconAngleDown,
-  IconAngleUp,
   NumberInput,
   TextInput,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import i18next from "i18next";
+import ShowAllContainer from "common/src/components/ShowAllContainer";
 import { OptionType } from "../../common/types";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
@@ -49,16 +47,12 @@ type Props = {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-layout-xs);
+  gap: var(--spacing-2-xs);
 `;
 
-const ThinButton = styled(Button)`
-  margin: var(--spacing-xs) 0 0 0;
-  border: 0;
-  padding-left: 0;
-  span {
-    padding: 0;
-    line-height: 1;
+const MoreWrapper = styled(ShowAllContainer)`
+  .ShowAllContainer__ToggleButton {
+    color: var(--color-bus);
   }
 `;
 
@@ -113,7 +107,6 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
     getReducer<FilterArguments>(initialEmptyState),
     initialEmptyState
   );
-  const [more, setMore] = useState(false);
 
   useEffect(() => {
     onSearch(state);
@@ -196,7 +189,11 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
             />
           </div>
         </AutoGrid>
-        {more && (
+        <MoreWrapper
+          showAllLabel={t("ReservationUnitsSearch.moreFilters")}
+          showLessLabel={t("ReservationUnitsSearch.lessFilters")}
+          maximumNumber={0}
+        >
           <AutoGrid>
             <div>
               <NumberInput
@@ -245,22 +242,9 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
               />
             </div>
           </AutoGrid>
-        )}
+        </MoreWrapper>
       </Wrapper>
 
-      <div>
-        <ThinButton
-          variant="supplementary"
-          onClick={() => setMore(!more)}
-          iconRight={more ? <IconAngleUp /> : <IconAngleDown />}
-        >
-          {t(
-            more
-              ? "ReservationUnitsSearch.lessFilters"
-              : "ReservationUnitsSearch.moreFilters"
-          )}
-        </ThinButton>
-      </div>
       <Tags tags={tags} t={t} dispatch={dispatch} />
     </div>
   );
