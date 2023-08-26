@@ -12,7 +12,7 @@ import {
   ReservationUnitByPkType,
   ReservationUnitType,
 } from "common/types/gql-types";
-import IconButton from "common/src/components/IconButton";
+import { IconButton } from "common/src/components";
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";

@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { EquipmentType } from "common/types/gql-types";
-import ShowAllContainer from "common/src/components/ShowAllContainer";
+import { ShowAllContainer } from "common/src/components";
 import { getEquipmentList } from "../../modules/reservationUnit";
 
 type Props = {

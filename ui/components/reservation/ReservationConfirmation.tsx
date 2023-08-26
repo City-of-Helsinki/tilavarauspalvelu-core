@@ -21,7 +21,7 @@ import {
 } from "common/types/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
-import IconButton from "common/src/components/IconButton";
+import { IconButton } from "common/src/components";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";

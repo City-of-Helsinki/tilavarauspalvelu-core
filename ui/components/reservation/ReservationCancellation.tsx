@@ -18,8 +18,7 @@ import {
   ReservationType,
 } from "common/types/gql-types";
 import { Container as CommonContainer } from "common";
-
-import ShowAllContainer from "common/src/components/ShowAllContainer";
+import { ShowAllContainer } from "common/src/components";
 import Sanitize from "../common/Sanitize";
 import {
   CANCEL_RESERVATION,

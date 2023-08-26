@@ -20,7 +20,10 @@ interface ShowAllContainerProps {
   [rest: string]: unknown; // any other params, like id/aria/testing/etc
 }
 
-const ToggleButtonContainer = styled.div<{ $buttonAlign: string; $topMargin: string; }>`
+const ToggleButtonContainer = styled.div<{
+  $buttonAlign: string;
+  $topMargin: string;
+}>`
   display: flex;
   align-items: center;
   justify-content: ${(props) => props.$buttonAlign};
@@ -29,12 +32,14 @@ const ToggleButtonContainer = styled.div<{ $buttonAlign: string; $topMargin: str
 `;
 
 /*
- * @param {string} label - Label-text for the "Show all"-button
- * @param {number} maxLength - Maximum number of child elements shown unless "Show all" is clicked
- * @param {React.ReactNode} children - child elements
+ * @param {string} showAllLabel - Label-text for the "Show all"-button
+ * @param {string} showLessLabel - Label-text for the "show less" toggle-button (optional, defaults to showAllLabel)
+ * @param {number} maximumNumber - Maximum number of child elements shown unless "Show all" is clicked
+ * @param {"left" | "right" | "center"} alignButton - "Show all"-button alignment <"left" | "center" | "right> (optional, defaults to "right")
+ * @param {React.ReactNode} children - All the elements to show, when "show all" is toggled
  * @returns {JSX.Element} A container which renders `maximumNumber` of children followed by a "Show all" button. The
  * button text is defined via `showAllLabel` (and optionally `showLessLabel` if the text should change upon toggle).
- * The button toggles whether or not to show all `children` or only the amount defined by `maximumNumber`.
+ * The button toggles between showing all `children` and showing only the amount defined by `maximumNumber`.
  * Using `0` as `maximumNumber` will result in a button which toggles the visibility of the entire content.
  */
 const ShowAllContainer = ({
@@ -61,7 +66,7 @@ const ShowAllContainer = ({
   return (
     <div {...rest}>
       {renderAsUl ? (
-        <ul className={"ShowAllContainer__Content"}>
+        <ul className="ShowAllContainer__Content">
           {showAll
             ? children
             : Children.map(
@@ -70,7 +75,7 @@ const ShowAllContainer = ({
               )}
         </ul>
       ) : (
-        <div className={"ShowAllContainer__Content"}>
+        <div className="ShowAllContainer__Content">
           {showAll
             ? children
             : Children.map(

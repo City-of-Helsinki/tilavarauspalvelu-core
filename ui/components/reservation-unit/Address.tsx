@@ -9,7 +9,7 @@ import {
   UnitType,
 } from "common/types/gql-types";
 import { IconLinkExternal } from "hds-react";
-import IconButton from "common/src/components/IconButton";
+import { IconButton } from "common/src/components";
 import { getTranslation } from "../../modules/util";
 
 type Props = {
