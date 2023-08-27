@@ -66,7 +66,10 @@ const ShowAllContainer = ({
   return (
     <div {...rest}>
       {renderAsUl ? (
-        <ul className="ShowAllContainer__Content">
+        <ul
+          data-testid="show-all__content"
+          className="ShowAllContainer__Content"
+        >
           {showAll
             ? children
             : Children.map(
@@ -75,7 +78,10 @@ const ShowAllContainer = ({
               )}
         </ul>
       ) : (
-        <div className="ShowAllContainer__Content">
+        <div
+          data-testid="show-all__content"
+          className="ShowAllContainer__Content"
+        >
           {showAll
             ? children
             : Children.map(
@@ -94,6 +100,7 @@ const ShowAllContainer = ({
             icon={showAll ? <IconAngleUp /> : <IconAngleDown />}
             onClick={() => setShowAll((prev) => !prev)}
             className="ShowAllContainer__ToggleButton"
+            data-testid="show-all__toggle-button"
           />
         </ToggleButtonContainer>
       )}

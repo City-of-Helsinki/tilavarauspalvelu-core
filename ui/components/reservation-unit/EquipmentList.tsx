@@ -43,6 +43,7 @@ const EquipmentList = ({ equipment, itemsToShow = 6 }: Props): JSX.Element => {
       showLessLabel={t("common:showLess")}
       maximumNumber={itemsToShow}
       renderAsUl
+      data-testid="reservation-unit__equipment"
     >
       {equipmentList.map((item) => (
         <EquipmentItem key={item}>{item}</EquipmentItem>

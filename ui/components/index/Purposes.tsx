@@ -108,6 +108,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
           showLessLabel={t("common:showLess")}
           maximumNumber={itemLimit}
           alignButton="right"
+          data-testid="front-page__purposes"
         >
           {purposes.map((item) => (
             <Link

@@ -1,9 +1,5 @@
 import React, { useEffect, useReducer } from "react";
-import {
-  DateInput,
-  NumberInput,
-  TextInput,
-} from "hds-react";
+import { DateInput, NumberInput, TextInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import i18next from "i18next";
