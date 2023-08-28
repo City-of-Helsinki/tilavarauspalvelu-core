@@ -9,16 +9,16 @@
 !public*
 !src*
 !server
-!nginx
 
 #################################################
 # Whitelisted files
 #################################################
-!.env*
+!next.config.mjs
 !package.json
-!yarn.lock
 !tsconfig.json
 !LICENSE
-!webpack.server*
+#!webpack.server*
 !.babel*
-!tsconfig.server*
+#!tsconfig.server*
+# allow env for now because it is required for builds
+!.env*

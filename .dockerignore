@@ -1,9 +1,11 @@
 # Blacklisted folders
 #################################################
-*/node_modules
-node_modules
-*/.next
-*/.yarn
-.yarn
-*/cypress
-*/build
+**/node_modules
+**/.next
+**/.yarn
+**/cypress
+**/build
+.git
+**/.env*
+**/.swc
+**/.turbo

@@ -14,10 +14,17 @@ const withBundleAnalyzer = analyser({
 /** @type {import('next').NextConfig} */
 const config ={
   reactStrictMode: true,
+  transpilePackages: ["common"],
+  // create a smaller bundle
+  output: 'standalone',
+  experimental: {
+    // this includes files from the monorepo base two directories up
+    outputFileTracingRoot: join(ROOT_PATH, '../../'),
+  },
+  // don't block builds use a separate CI step for this
   typescript: {
     ignoreBuildErrors: true,
   },
-  transpilePackages: ["common"],
   eslint: {
     ignoreDuringBuilds: true,
   },
