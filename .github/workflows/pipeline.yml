@@ -18,20 +18,15 @@ jobs:
 
   build-admin-ui:
     name: Check Admin UI changes
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.admin_changed == 'true'
     runs-on: ubuntu-latest
+    needs: [changed-packages, install]
+    # TODO disabled for testing
+    #if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Setup step
+        uses: ./.github/actions/common-steps.yml
       - name: Run CI checks
         run: |
-          pnpm install --frozen-lockfile
           pnpm lint --filter=admin-ui...
           pnpm lint:css --filter=admin-ui...
           # TODO run tsc also when it's not broken
@@ -40,25 +35,32 @@ jobs:
           pnpm test --filter=admin-ui...
           docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
 
-  build-ui:
-    name: Check UI changes
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.ui_changed == 'true'
+  lint-ui:
+    name: Lint UI
     runs-on: ubuntu-latest
+    needs: [changed-packages, install]
+    # TODO disabled for testing
+    #if: needs.changed-packages.outputs.ui_changed == 'true'
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Setup step
+        uses: ./.github/actions/common-steps.yml
       - name: Run CI checks
         run: |
-          pnpm install --frozen-lockfile
           pnpm lint --filter=ui...
           pnpm lint:css --filter=ui...
           # TODO run tsc also when it's not broken
+
+  build-ui:
+    name: Check UI changes
+    runs-on: ubuntu-latest
+    needs: [changed-packages, install]
+    # TODO disabled for testing
+    #if: needs.changed-packages.outputs.ui_changed == 'true'
+    steps:
+      - name: Setup step
+        uses: ./.github/actions/common-steps.yml
+      - name: Run CI checks
+        run: |
           pnpm build --filter=ui...
           # TODO common tests are broken, don't include them here
           pnpm test --filter=ui...

@@ -1,0 +1,17 @@
+name: Common Steps
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    - name: Reuse Installation Job
+      uses: ./.github/workflows
+      with:
+        job_path: installation.yml
