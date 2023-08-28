@@ -15,9 +15,29 @@ jobs:
   #changed-packages:
   #  name: Determine which apps changed
   #  uses: ./.github/workflows/changed-packages.yml
+  lint-admin-ui:
+    name: Lint admin ui
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint admin ui
+        run: |
+          pnpm lint --filter=admin-ui...
+          pnpm lint:css --filter=admin-ui...
+          # TODO run tsc also when it's not broken
 
   build-admin-ui:
-    name: Check Admin UI changes
+    name: Build admin ui
     runs-on: ubuntu-latest
     #needs: [changed-packages, install]
     # TODO disabled for testing
@@ -36,13 +56,27 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Run CI checks
         run: |
-          pnpm lint --filter=admin-ui...
-          pnpm lint:css --filter=admin-ui...
-          # TODO run tsc also when it's not broken
           pnpm build --filter=admin-ui...
-          # TODO common tests are broken, don't include them here
-          pnpm test --filter=admin-ui...
           docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
+
+  test-admin-ui:
+    name: Test admin ui
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run CI checks
+        run: |
+          pnpm test --filter=admin-ui...
 
   lint-ui:
     name: Lint UI
@@ -70,7 +104,7 @@ jobs:
           # TODO run tsc also when it's not broken
 
   build-ui:
-    name: Check UI changes
+    name: Build ui
     runs-on: ubuntu-latest
     #needs: [changed-packages, install]
     # TODO disabled for testing
@@ -78,10 +112,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: TurboRepo local server
-        uses: felixmosh/turborepo-gh-artifacts@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -89,17 +119,12 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run CI checks
+      - name: Build ui
         run: |
           pnpm build --filter=ui...
           # TODO common tests are broken, don't include them here
           pnpm test --filter=ui...
           docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
-        env:
-          TURBO_API: 'http://127.0.0.1:9080'
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-          TURBO_TEAM: 'foo'
