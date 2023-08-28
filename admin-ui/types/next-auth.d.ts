@@ -35,12 +35,10 @@ declare module "next-auth" {
 
   interface User {
     id: string;
-    name: string;
-    given_name: string;
-    family_name: string;
-    nickname: string;
+    name?: string;
+    given_name?: string;
+    family_name?: string;
     email: string;
-    email_verified: boolean;
   }
   interface Session {
     accessToken: string;

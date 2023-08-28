@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable camelcase */
 import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { NextAuthOptions, Awaitable, User } from "next-auth";
@@ -18,9 +17,9 @@ type TunnistamoProfile = {
   auth_time: number;
   at_hash: string;
   name: string;
-  given_name: string;
-  family_name: string;
-  nickname: string;
+  given_name?: string;
+  family_name?: string;
+  nickname?: string;
   email: string;
   email_verified: boolean;
   azp: string;
@@ -61,9 +60,11 @@ const options = (): NextAuthOptions => {
         // TODO don't copy unneccessary fields just bloats the cookie
         // TODO replace casting with schema validation
         profile(profile: TunnistamoProfile): Awaitable<User> {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { sub, email_verified, nickname, ...rest } = profile;
           return {
-            id: profile.sub,
-            ...profile,
+            id: sub,
+            ...rest,
           };
         },
       },
