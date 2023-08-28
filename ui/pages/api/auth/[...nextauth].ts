@@ -9,9 +9,9 @@ import {
 } from "common/src/next-auth/helpers";
 
 type TunnistamoProfile = {
-  iss: string;
-  sub: string;
-  aud: string;
+  iss: string; // issuer: matches OIDC_URL
+  sub: string; // subject: user id
+  aud: string; // client name: matches OIDC_CLIENT_ID
   exp: number;
   iat: number;
   auth_time: number;
@@ -22,10 +22,11 @@ type TunnistamoProfile = {
   nickname?: string;
   email: string;
   email_verified: boolean;
-  azp: string;
-  sid: string;
-  amr: string;
-  loa: string;
+  ad_groups: string[];
+  azp: string; // client name: matches OIDC_CLIENT_ID
+  sid: string; // session id
+  amr: string; // authentication method reference e.g. heltunnistussuomifi
+  loa: string; // level of assurance e.g. "substantial"
 };
 
 const EXP_MS = (10 / 2) * 60 * 1000;
@@ -71,8 +72,20 @@ const options = (): NextAuthOptions => {
           },
         },
         profile(profile: TunnistamoProfile): Awaitable<User> {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
-          const { sub, email_verified, nickname, ...rest } = profile;
+          /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention */
+          const {
+            aud,
+            azp,
+            loa,
+            amr,
+            iss,
+            sub,
+            email_verified,
+            ad_groups,
+            nickname,
+            ...rest
+          } = profile;
+          /* eslint-enable @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention */
           return {
             id: sub,
             ...rest,
