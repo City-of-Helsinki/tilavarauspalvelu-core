@@ -25,14 +25,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install deps
+        uses: ./.github/actions/common-steps.yml
       - name: Run CI checks
         run: |
           pnpm lint --filter=admin-ui...
@@ -52,14 +46,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install deps
+        uses: ./.github/actions/common-steps.yml
       - name: Run CI checks
         run: |
           pnpm lint --filter=ui...
@@ -75,14 +63,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install deps
+        uses: ./.github/actions/common-steps.yml
       - name: Run CI checks
         run: |
           pnpm build --filter=ui...
