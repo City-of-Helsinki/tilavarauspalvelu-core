@@ -11,7 +11,5 @@ runs:
     - uses: pnpm/action-setup@v2
       with:
         version: 8
-    - name: Reuse Installation Job
-      uses: ./.github/workflows
-      with:
-        job_path: installation.yml
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
