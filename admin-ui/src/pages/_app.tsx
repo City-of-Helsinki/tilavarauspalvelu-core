@@ -13,7 +13,13 @@ import ExternalScripts from "../common/ExternalScripts";
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <SessionProvider session={pageProps.session} basePath={nextAuthRoute}>
+      <SessionProvider
+        session={pageProps.session}
+        basePath={nextAuthRoute}
+        refetchInterval={5 * 60}
+        // NOTE: too slow because causes a full refetch of the SPA
+        refetchOnWindowFocus={false}
+      >
         <ApolloProvider client={apolloClient}>
           <Component {...pageProps} />
         </ApolloProvider>

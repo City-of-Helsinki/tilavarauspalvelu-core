@@ -106,8 +106,6 @@ export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";
 
-export const PROFILE_TOKEN_HEADER = "X-Authorization";
-
 export const SESSION_EXPIRED_ERROR = "JWT too old";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();

@@ -17,9 +17,9 @@ type TunnistamoProfile = {
   auth_time: number;
   at_hash: string;
   name: string;
-  given_name: string;
-  family_name: string;
-  nickname: string;
+  given_name?: string;
+  family_name?: string;
+  nickname?: string;
   email: string;
   email_verified: boolean;
   azp: string;
@@ -71,9 +71,11 @@ const options = (): NextAuthOptions => {
           },
         },
         profile(profile: TunnistamoProfile): Awaitable<User> {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
+          const { sub, email_verified, nickname, ...rest } = profile;
           return {
-            id: profile.sub,
-            ...profile,
+            id: sub,
+            ...rest,
           };
         },
       },

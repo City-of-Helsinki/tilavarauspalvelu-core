@@ -7,16 +7,12 @@ import { getSession, signOut } from "next-auth/react";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
-import {
-  PROFILE_TOKEN_HEADER,
-  SESSION_EXPIRED_ERROR,
-  apiBaseUrl,
-  isBrowser,
-} from "./const";
+import { SESSION_EXPIRED_ERROR, publicUrl, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
+const uri = `${publicUrl}/api/graphql`;
 const uploadLinkOptions = {
-  uri: `${apiBaseUrl}/graphql/`,
+  uri,
   FormData: CustomFormData,
 };
 
@@ -24,9 +20,9 @@ const uploadLinkOptions = {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions);
-const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/` });
+const httpLink = new HttpLink({ uri });
 
-const authLink = setContext(async (request, previousContext) => {
+const authLink = setContext(async (_request, previousContext) => {
   const headers = previousContext.headers ?? {};
   const session = await getSession();
 
@@ -36,7 +32,6 @@ const authLink = setContext(async (request, previousContext) => {
       authorization: session?.apiTokens?.tilavaraus
         ? `Bearer ${session.apiTokens.tilavaraus}`
         : "",
-      [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
     },
   };
 });

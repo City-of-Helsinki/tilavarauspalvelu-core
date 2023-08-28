@@ -8,7 +8,6 @@ import { GraphQLError } from "graphql";
 import {
   apiBaseUrl,
   isBrowser,
-  PROFILE_TOKEN_HEADER,
   SESSION_EXPIRED_ERROR,
 } from "./const";
 
@@ -22,7 +21,6 @@ const authLink = setContext(
         authorization: session?.apiTokens?.tilavaraus
           ? `Bearer ${session.apiTokens.tilavaraus}`
           : "",
-        [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
       },
     };
     return modifiedHeader;
