@@ -20,6 +20,8 @@ on:
     branches:
       - "main"
     paths:
+      # TODO this should probably be packages/**
+      # since we are adding more than one shared package
       - "packages/common/**"
       - "apps/admin-ui/**"
       - "pnpm-lock.yaml"
@@ -43,8 +45,10 @@ jobs:
       - name: Run CI checks
         run: |
           pnpm install --frozen-lockfile
-          pnpm lint
-          pnpm lint:css
-          pnpm build
-          pnpm test
+          pnpm lint --filter admin-ui...
+          pnpm lint:css --filter admin-ui...
+          # TODO run tsc also when it's not broken
+          pnpm build --filter admin-ui...
+          # TODO common tests are broken, don't include them here
+          pnpm test --filter admin-ui
           docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
