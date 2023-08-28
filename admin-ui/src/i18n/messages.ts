@@ -1954,7 +1954,7 @@ const translations: ITranslations = {
     otherReservationUnits: ["Muut toivotut tilat"],
     changeTime: ["Muuta aikaa"],
     startingTime: ["Aloitusaika"],
-    endindTime: ["Päättymisaika"],
+    endingTime: ["Päättymisaika"],
     primaryItems: ["Ensisijaiset"],
     noPrimaryItems: ["Ei ensisijaisia aikatoiveita."],
     secondaryItems: ["Muut"],

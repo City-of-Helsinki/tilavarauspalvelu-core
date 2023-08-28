@@ -1,11 +1,11 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { Accordion, RadioButton, SelectionGroup, TextArea } from "hds-react";
+import { RadioButton, SelectionGroup, TextArea } from "hds-react";
 import type { ReservationUnitType } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-
 import { type ReservationFormType, ReservationTypes } from "app/schemas";
+import { ShowAllContainer } from "common/src/components/";
 import {
   ReservationMetadataSetForm,
   ReserverMetadataSetForm,
@@ -20,22 +20,9 @@ const CommentsTextArea = styled(TextArea)`
   max-width: var(--prose-width);
 `;
 
-const ButtonLikeAccordion = styled(Accordion)`
-  && {
-    border: none;
-  }
-  & > div:first-of-type {
-    margin: 0;
-    padding: 0;
-  }
-  & > div:first-of-type > div > div {
-    justify-content: left;
-    gap: 1rem;
+const StyledShowAllContainer = styled(ShowAllContainer)`
+  .ShowAllContainer__ToggleButton {
     color: var(--color-bus);
-    font-weight: 500;
-    & span {
-      font-size: 1rem;
-    }
   }
 `;
 
@@ -138,14 +125,14 @@ const ReservationTypeForm = ({
               <ReservationMetadataSetForm reservationUnit={reservationUnit} />
             </div>
             {type === "STAFF" ? (
-              <ButtonLikeAccordion
-                size="s"
-                heading={t("MyUnits.ReservationForm.showReserver")}
+              <StyledShowAllContainer
+                showAllLabel={t("MyUnits.ReservationForm.showReserver")}
+                maximumNumber={0}
               >
                 <ReserverMetadataSetForm reservationUnit={reservationUnit} />
                 <HR style={{ gridColumn: "1 / -1" }} />
                 <ShowTOS reservationUnit={reservationUnit} />
-              </ButtonLikeAccordion>
+              </StyledShowAllContainer>
             ) : (
               <>
                 <ReserverMetadataSetForm reservationUnit={reservationUnit} />

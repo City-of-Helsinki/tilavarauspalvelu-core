@@ -23,9 +23,7 @@ export function unitLinkSearchForm(): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 export function purposeMoreLink(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get('[data-testid="front-page__purposes--more-link"]');
-}
-
-export function purposeLessLink(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get('[data-testid="front-page__purposes--less-link"]');
+  return cy.get(
+    '[data-testid="front-page__purposes"] [data-testid="show-all__toggle-button"]'
+  );
 }
