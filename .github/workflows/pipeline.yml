@@ -74,12 +74,11 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Run CI checks
-        run: |
-          pnpm test --filter=admin-ui...
+      - name: Test admin ui
+        run: pnpm test --filter=admin-ui...
 
   lint-ui:
-    name: Lint UI
+    name: Lint ui
     runs-on: ubuntu-latest
     #needs: [changed-packages, install]
     # TODO disabled for testing
@@ -97,7 +96,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run CI checks
+      - name: Lint ui
         run: |
           pnpm lint --filter=ui...
           pnpm lint:css --filter=ui...
@@ -125,6 +124,26 @@ jobs:
       - name: Build ui
         run: |
           pnpm build --filter=ui...
-          # TODO common tests are broken, don't include them here
-          pnpm test --filter=ui...
           docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
+
+  test-ui:
+    name: Test ui
+    runs-on: ubuntu-latest
+    #needs: [changed-packages, install]
+    # TODO disabled for testing
+    #if: needs.changed-packages.outputs.ui_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test ui
+        run: pnpm test --filter=ui...
