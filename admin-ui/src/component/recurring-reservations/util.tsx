@@ -84,8 +84,8 @@ export const appMapper = (
     "asc"
   ) as UnitType[];
   const name = app.applicationEvents?.find(() => true)?.name || "-";
-  const eventId = app.applicationEvents?.find(() => true)
-    ?.id as unknown as number;
+  const firstEvent = app.applicationEvents?.find(() => true);
+  const eventId = firstEvent?.pk ?? 0;
 
   const status = getNormalizedApplicationStatus(
     app.status as ApplicationStatus,
@@ -95,8 +95,8 @@ export const appMapper = (
   const applicant = applicantName(app);
 
   return {
-    key: `${app.id}-${eventId || "-"} `,
-    id: app.pk as number,
+    key: `${app.pk}-${eventId || "-"} `,
+    id: app.pk ?? 0,
     eventId,
     applicant,
     type: app.applicantType

@@ -54,7 +54,7 @@ const ApplicationDataLoader = ({
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  let sortString;
+  let sortString = "";
   if (sort) {
     sortString = (sort?.sort ? "" : "-") + sort.field;
   }
@@ -80,9 +80,10 @@ const ApplicationDataLoader = ({
     return <Loader />;
   }
 
-  const applications = (data?.applications?.edges || []).map((edge) =>
-    appMapper(applicationRound, edge?.node as ApplicationType, t)
-  );
+  const applications = (data?.applications?.edges || [])
+    .map((edge) => edge?.node)
+    .filter((node): node is ApplicationType => node != null)
+    .map((application) => appMapper(applicationRound, application, t));
 
   return (
     <>

@@ -455,7 +455,7 @@ const translations: ITranslations = {
     statuses: {
       draft: ["Luonnos"],
       in_review: ["Tarkastuksessa"],
-      review_done: ["Etenee jakoon"],
+      review_done: ["Vastaanotettu"],
       allocating: ["Varauksessa"],
       allocated: ["Käsittelemättä"],
       validated: ["Hyväksytty"],

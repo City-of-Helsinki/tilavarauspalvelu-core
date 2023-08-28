@@ -33,6 +33,7 @@ export const APPLICATIONS_QUERY = gql`
           }
           applicationEvents {
             name
+            pk
             eventReservationUnits {
               priority
               reservationUnit {
