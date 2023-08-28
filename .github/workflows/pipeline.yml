@@ -25,13 +25,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Cache turbo build setup
-        uses: actions/cache@v3
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -60,13 +53,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Cache turbo build setup
-        uses: actions/cache@v3
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -92,13 +78,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Cache turbo build setup
-        uses: actions/cache@v3
+      - name: TurboRepo local server
+        uses: felixmosh/turborepo-gh-artifacts@v2
         with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -116,3 +99,7 @@ jobs:
           # TODO common tests are broken, don't include them here
           pnpm test --filter=ui...
           docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
+        env:
+          TURBO_API: 'http://127.0.0.1:9080'
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: 'foo'
