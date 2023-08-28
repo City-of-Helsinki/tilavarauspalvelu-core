@@ -6,9 +6,11 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: "module",
   },
+  root: true,
   env: {
     browser: true,
     jest: true,
+    node: true,
   },
   rules: {
     "global-require": 0,

@@ -12,10 +12,10 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "lint:fix": "cd common && pnpm lint --fix && cd ../ui && pnpm lint --fix && cd ../admin-ui && pnpm lint --fix",
-    "lint:css": "cd common && pnpm lint:css && cd ../ui && pnpm lint:css && cd ../admin-ui && pnpm lint:css",
-    "test": "cd common && pnpm test && cd ../ui && pnpm test && cd ../admin-ui && pnpm test",
-    "tsc": "cd common && pnpm tsc && cd ../ui && pnpm tsc && cd ../admin-ui && pnpm tsc",
+    "lint:fix": "turbo lint -- --fix",
+    "lint:css": "turbo lint:css",
+    "test": "turbo test",
+    "tsc": "turbo tsc",
     "generate-certificate": "mkdir -p certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
   },
   "resolutions": {

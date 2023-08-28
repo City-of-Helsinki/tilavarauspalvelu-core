@@ -20,7 +20,7 @@ module.exports = {
       true,
       {
         importFrom: [
-          path.resolve(__dirname, "../node_modules/hds-core/lib/base.css"),
+          path.resolve(__dirname, "./node_modules/hds-core/lib/base.css"),
           path.resolve(__dirname, "./src/variables.css"),
         ],
       },

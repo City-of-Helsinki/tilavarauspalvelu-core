@@ -17,6 +17,8 @@
       // being completed. It also has no filesystem outputs.
       "dependsOn": ["build", "test", "lint"]
     },
+    "tsc": {},
+    "lint:css": {},
     "test": {
       // A package's `test` script depends on that package's
       // own `build` script being completed first.
