@@ -2,7 +2,7 @@ import axios from "axios";
 import applyCaseMiddleware from "axios-case-converter";
 
 import { getSession } from "next-auth/react";
-import { authEnabled, isBrowser, PROFILE_TOKEN_HEADER } from "../const";
+import { authEnabled, isBrowser } from "../const";
 
 const axiosOptions = {
   timeout: 20000,
@@ -20,10 +20,6 @@ if (isBrowser && authEnabled) {
 
     if (session?.apiTokens?.tilavaraus) {
       req.headers.Authorization = `Bearer ${session.apiTokens.tilavaraus}`;
-    }
-
-    if (session?.apiTokens?.profile) {
-      req.headers[PROFILE_TOKEN_HEADER] = `${session?.apiTokens.profile}`;
     }
 
     return req;

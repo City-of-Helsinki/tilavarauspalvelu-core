@@ -8,7 +8,6 @@ import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
 import {
-  PROFILE_TOKEN_HEADER,
   SESSION_EXPIRED_ERROR,
   apiBaseUrl,
   isBrowser,
@@ -26,7 +25,7 @@ const uploadLinkOptions = {
 const uploadLink = createUploadLink(uploadLinkOptions);
 const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/` });
 
-const authLink = setContext(async (request, previousContext) => {
+const authLink = setContext(async (_request, previousContext) => {
   const headers = previousContext.headers ?? {};
   const session = await getSession();
 
@@ -36,7 +35,6 @@ const authLink = setContext(async (request, previousContext) => {
       authorization: session?.apiTokens?.tilavaraus
         ? `Bearer ${session.apiTokens.tilavaraus}`
         : "",
-      [PROFILE_TOKEN_HEADER]: session?.apiTokens?.profile ?? "",
     },
   };
 });
