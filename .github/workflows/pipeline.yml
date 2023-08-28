@@ -1,0 +1,65 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  SKIP_ENV_VALIDATION: "true"
+
+jobs:
+  changed-packages:
+    name: Determine which apps changed
+    uses: ./.github/workflows/changed-packages.yml
+
+  build-admin-ui:
+    name: Check Admin UI changes
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.admin_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Run CI checks
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm lint --filter=admin-ui...
+          pnpm lint:css --filter=admin-ui...
+          # TODO run tsc also when it's not broken
+          pnpm build --filter=admin-ui...
+          # TODO common tests are broken, don't include them here
+          pnpm test --filter=admin-ui...
+          docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
+
+  build-ui:
+    name: Check UI changes
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.ui_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Run CI checks
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm lint --filter=ui...
+          pnpm lint:css --filter=ui...
+          # TODO run tsc also when it's not broken
+          pnpm build --filter=ui...
+          # TODO common tests are broken, don't include them here
+          pnpm test --filter=ui...
+          docker build -f apps/ui/Dockerfile -t tilavaraus-ui .

@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "incremental": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
     "outDir": "./dist",
     "paths": {
       "*": ["./src/*"]
