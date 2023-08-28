@@ -37,7 +37,7 @@ jobs:
           # TODO run tsc also when it's not broken
 
   build-admin-ui:
-    name: Build admin ui
+    name: Build admin ui Docker image
     runs-on: ubuntu-latest
     #needs: [changed-packages, install]
     # TODO disabled for testing
@@ -54,10 +54,9 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Run CI checks
-        run: |
-          pnpm build --filter=admin-ui...
-          docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
+      - name: Build admin ui
+        run: docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
+      # pnpm build --filter=admin-ui...
 
   test-admin-ui:
     name: Test admin ui
@@ -103,7 +102,7 @@ jobs:
           # TODO run tsc also when it's not broken
 
   build-ui:
-    name: Build ui
+    name: Build ui Docker image
     runs-on: ubuntu-latest
     #needs: [changed-packages, install]
     # TODO disabled for testing
@@ -122,9 +121,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build ui
-        run: |
-          pnpm build --filter=ui...
-          docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
+        run: docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
+      #pnpm build --filter=ui...
 
   test-ui:
     name: Test ui
