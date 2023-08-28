@@ -18,15 +18,9 @@
     "tsc": "turbo tsc",
     "generate-certificate": "mkdir -p certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
   },
-  "resolutions": {
-    "graphql": "^16.6.0",
-    "next": "13.1.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
   "devDependencies": {
     "npkill": "^0.10.0",
-    "npm-check-updates": "^16.6.2",
+    "npm-check-updates": "^16.13.1",
     "turbo": "^1.10.13"
   }
 }

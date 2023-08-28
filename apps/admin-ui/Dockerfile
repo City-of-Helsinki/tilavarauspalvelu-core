@@ -20,7 +20,7 @@ RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 ENV SKIP_ENV_VALIDATION=true
-RUN pnpm turbo run build --filter=admin-ui
+RUN pnpm turbo run build --filter=admin-ui...
 
 FROM base AS runner
 WORKDIR /app

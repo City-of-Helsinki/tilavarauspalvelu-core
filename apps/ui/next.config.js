@@ -1,13 +1,15 @@
 const { i18n } = require("./next-i18next.config");
-const { withSentryConfig } = require("@sentry/nextjs");
+// const { withSentryConfig } = require("@sentry/nextjs");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  // create a smaller bundle
+  output: 'standalone',
+  transpilePackages: ["common"],
   typescript: {
     ignoreBuildErrors: true,
   },
-  transpilePackages: ["common"],
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -47,6 +49,7 @@ const nextConfig = {
   },
 };
 
+/* FIXME sentry import broken
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
   // the following options are set automatically, and overriding them is not
@@ -66,3 +69,5 @@ const sentryWebpackPluginOptions = {
 module.exports = !!process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT
   ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
   : nextConfig;
+*/
+module.exports  = nextConfig;
