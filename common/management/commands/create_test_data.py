@@ -11,6 +11,7 @@ from typing import Any, Literal, NamedTuple, TypedDict, TypeVar
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
 from django.core.management import BaseCommand, call_command
+from django.utils.timezone import now
 
 from applications.models import (
     APPLICANT_TYPES,
@@ -83,6 +84,8 @@ from terms_of_use.models import TermsOfUse
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 from users.models import User
 
+from ...choices import BannerNotificationTarget, BannerNotificationType
+from ...models import BannerNotification
 from ._utils import (
     batched,
     faker_en,
@@ -226,6 +229,7 @@ def create_test_data(flush: bool = True) -> None:
         reservation_units,
         cities,
     )
+    _create_banner_notifications()
 
 
 @with_logs(
@@ -2077,3 +2081,71 @@ def _create_application_event_schedules(
             schedules.append(schedule)
 
     return ApplicationEventSchedule.objects.bulk_create(schedules)
+
+
+@with_logs(
+    text_entering="Creating banner notifications...",
+    text_exiting="Banner notifications created!",
+)
+def _create_banner_notifications():
+    today = now()
+    banner_notifications: list[BannerNotification] = []
+    for target in BannerNotificationTarget.values:
+        for type_ in BannerNotificationType.values:
+            draft_message_fi = faker_fi.sentence()
+            active_message_fi = faker_fi.sentence()
+            scheduled_message_fi = faker_fi.sentence()
+            past_message_fi = faker_fi.sentence()
+
+            banner_notifications += [
+                BannerNotification(
+                    name=f"Draft {type_} notification for {target}",
+                    message=draft_message_fi,
+                    message_fi=draft_message_fi,
+                    message_en=faker_en.sentence(),
+                    message_sv=faker_sv.sentence(),
+                    type=type_,
+                    target=target,
+                    draft=True,
+                    active_from=None,
+                    active_until=None,
+                ),
+                BannerNotification(
+                    name=f"Active {type_} notification for {target}",
+                    message=active_message_fi,
+                    message_fi=active_message_fi,
+                    message_en=faker_en.sentence(),
+                    message_sv=faker_sv.sentence(),
+                    type=type_,
+                    target=target,
+                    draft=False,
+                    active_from=today - timedelta(days=1),
+                    active_until=today + timedelta(days=7),
+                ),
+                BannerNotification(
+                    name=f"Scheduled {type_} notification for {target}",
+                    message=scheduled_message_fi,
+                    message_fi=scheduled_message_fi,
+                    message_en=faker_en.sentence(),
+                    message_sv=faker_sv.sentence(),
+                    type=type_,
+                    target=target,
+                    draft=False,
+                    active_from=today + timedelta(days=7),
+                    active_until=today + timedelta(days=14),
+                ),
+                BannerNotification(
+                    name=f"Past {type_} notification for {target}",
+                    message=past_message_fi,
+                    message_fi=past_message_fi,
+                    message_en=faker_en.sentence(),
+                    message_sv=faker_sv.sentence(),
+                    type=type_,
+                    target=target,
+                    draft=False,
+                    active_from=today - timedelta(days=7),
+                    active_until=today - timedelta(days=1),
+                ),
+            ]
+
+    return BannerNotification.objects.bulk_create(banner_notifications)

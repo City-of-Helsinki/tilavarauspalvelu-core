@@ -16,6 +16,7 @@ from applications.models import (
     Person,
 )
 from common.management.commands.create_test_data import create_test_data
+from common.models import BannerNotification
 from permissions.models import (
     GeneralRole,
     GeneralRoleChoice,
@@ -64,6 +65,7 @@ models: list[type[Model]] = [
     ApplicationRound,
     ApplicationRoundStatus,
     ApplicationStatus,
+    BannerNotification,
     City,
     Equipment,
     EquipmentCategory,
