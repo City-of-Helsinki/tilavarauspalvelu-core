@@ -1,5 +1,7 @@
-const { i18n } = require("./next-i18next.config");
+import i18nconfig from "./next-i18next.config.js";
 // const { withSentryConfig } = require("@sentry/nextjs");
+
+const { i18n } = i18nconfig;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -70,4 +72,4 @@ module.exports = !!process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT
   ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
   : nextConfig;
 */
-module.exports  = nextConfig;
+export default nextConfig;

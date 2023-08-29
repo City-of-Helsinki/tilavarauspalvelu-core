@@ -17,7 +17,7 @@ import {
   mockRequests,
 } from "../modules/const";
 import { TrackingWrapper } from "../modules/tracking";
-import nextI18NextConfig from "../next-i18next.config";
+import nextI18NextConfig from "../next-i18next.config.js";
 import "../styles/global.scss";
 import { initMocks } from "../mocks";
 

@@ -62,7 +62,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Build admin ui
-        run: docker build -f apps/admin-ui/Dockerfile -t tilavaraus-admin-ui .
+        run: docker build -t tilavaraus-admin-ui --build-arg APP=admin-ui .
       # pnpm build --filter=admin-ui...
 
   test-admin-ui:
@@ -131,7 +131,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build ui
-        run: docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
+        run: docker build -t tilavaraus-ui --build-arg APP=ui .
 
   test-ui:
     name: Unit tests ui
@@ -175,7 +175,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build ui Docker image
-        run: docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
+        run: docker build -t tilavaraus-ui --build-arg APP=ui .
       - name: Start Docker container
         run: docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -e TILAVARAUS_API_URL=http://localhost:8000 -e NEXT_PUBLIC_MOCK_REQUESTS=true -p 3000:3000 -d --ipc=host --name tilavaraus-ui-server tilavaraus-ui
       - name: Cypress e2e & a11y

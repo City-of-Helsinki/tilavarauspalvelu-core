@@ -1,3 +1,4 @@
+// NOTE don't move this file or use cjs / mjs extensions only .js works
 module.exports = {
   i18n: {
     defaultLocale: "fi",
