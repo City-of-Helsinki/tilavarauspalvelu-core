@@ -1,5 +1,7 @@
-FROM node:18-bullseye AS base
+FROM node:18-bullseye-slim AS base
 
+# This doesn invalidate layer cache if the result from turbo prune stays the same
+# this step generates a trimmed down version of the package list for installer
 FROM base AS builder
 WORKDIR /app
 RUN npm install -g turbo
@@ -9,8 +11,6 @@ RUN turbo prune --scope=ui --docker
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 WORKDIR /app
-# First install the dependencies (as they change less often)
-COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN corepack enable
@@ -26,8 +26,8 @@ FROM base AS runner
 WORKDIR /app
 
 # Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 nextjs
 USER nextjs
 
 COPY --from=installer /app/apps/ui/next.config.js .
