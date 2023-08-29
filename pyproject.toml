@@ -73,6 +73,7 @@ pytest-factoryboy = "^2.5.1"
 requests-mock = "^1.11.0"
 snapshottest = "^0.6.0"
 faker = "^19.3.0"
+django-graphiql-debug-toolbar = "^0.2.0"
 
 [tool.poetry.group.lint.dependencies]
 pre-commit = "^3.3.3"

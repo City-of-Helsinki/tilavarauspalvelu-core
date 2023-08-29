@@ -735,6 +735,21 @@ files = [
 Django = ">=3.2"
 
 [[package]]
+name = "django-debug-toolbar"
+version = "4.2.0"
+description = "A configurable set of panels that display various debug information about the current request/response."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_debug_toolbar-4.2.0-py3-none-any.whl", hash = "sha256:af99128c06e8e794479e65ab62cc6c7d1e74e1c19beb44dcbf9bad7a9c017327"},
+    {file = "django_debug_toolbar-4.2.0.tar.gz", hash = "sha256:bc7fdaafafcdedefcc67a4a5ad9dac96efd6e41db15bc74d402a54a2ba4854dc"},
+]
+
+[package.dependencies]
+django = ">=3.2.4"
+sqlparse = ">=0.2"
+
+[[package]]
 name = "django-enumfields2"
 version = "3.0.2"
 description = "Real Python Enums for Django."
@@ -808,6 +823,22 @@ files = [
 
 [package.dependencies]
 Django = ">=3.2"
+
+[[package]]
+name = "django-graphiql-debug-toolbar"
+version = "0.2.0"
+description = "Django Debug Toolbar for GraphiQL IDE."
+optional = false
+python-versions = ">=3.6,<4.0"
+files = [
+    {file = "django-graphiql-debug-toolbar-0.2.0.tar.gz", hash = "sha256:aec7a9e096594123d9fc359a583da794a0020b5391d941dda584ce1e667e0afd"},
+    {file = "django_graphiql_debug_toolbar-0.2.0-py3-none-any.whl", hash = "sha256:85bf4e4bdf6b699aa07567bcd28f16454742bf24b3c3334c502bc0be40777777"},
+]
+
+[package.dependencies]
+Django = ">=2.2"
+django-debug-toolbar = ">=3.1"
+graphene-django = ">=2.0.0"
 
 [[package]]
 name = "django-graphql-jwt"
@@ -2967,4 +2998,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "60b7d913a4fc610783cb50e2307dbabe2074479de9db78b1d8007e67eb7a0ec7"
+content-hash = "9bcface5c6e379bdddf88ca7a9e879c23c1203c754ba91f9c808eb8d9a5ea22d"
