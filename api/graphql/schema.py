@@ -1,3 +1,5 @@
+from typing import Any
+
 import django_filters
 import graphene
 from django.conf import settings
@@ -101,6 +103,9 @@ from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
 from api.graphql.users.user_mutations import UserUpdateMutation
 from api.graphql.users.user_types import UserType
+from common.models import BannerNotification
+from common.querysets import BannerNotificationQuerySet
+from common.typing import GQLInfo
 from merchants.models import PaymentOrder
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
@@ -133,6 +138,7 @@ from permissions.api_permissions.graphene_permissions import (
 )
 from permissions.helpers import (
     can_handle_reservation,
+    can_manage_banner_notifications,
     get_service_sectors_where_can_view_applications,
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
@@ -158,6 +164,8 @@ from .applications.application_mutations import (
     ApplicationFlagMutation,
     ApplicationUpdateMutation,
 )
+from .banner_notification.filter import BannerNotificationConnection
+from .banner_notification.types import BannerNotificationType
 from .reservations.recurring_reservation_filtersets import RecurringReservationFilterSet
 from .reservations.recurring_reservation_mutations import (
     RecurringReservationCreateMutation,
@@ -411,6 +419,8 @@ class Query(graphene.ObjectType):
 
     order = Field(PaymentOrderType, order_uuid=graphene.String())
 
+    banner_notifications = BannerNotificationConnection(BannerNotificationType)
+
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
         debug = Field(DjangoDebug, name="_debug")
 
@@ -479,6 +489,14 @@ class Query(graphene.ObjectType):
         ):
             return order
         return None
+
+    def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any) -> BannerNotificationQuerySet:
+        can_see_all = can_manage_banner_notifications(info.context.user)
+        if can_see_all:
+            return BannerNotification.objects.all()
+        if kwargs.get("is_visible", False):
+            return BannerNotification.objects.visible(info.context.user)
+        return BannerNotification.objects.none()
 
 
 class Mutation(graphene.ObjectType):

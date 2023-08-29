@@ -57,7 +57,7 @@ class User(AbstractUser):
             return self.preferred_language
 
     @property
-    def has_staff_permissions(self):
+    def has_staff_permissions(self) -> bool:
         return (
             self.is_superuser
             or self.general_roles.exists()
