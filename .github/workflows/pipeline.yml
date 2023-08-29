@@ -4,9 +4,12 @@ on:
   push:
     branches:
       - main
+    # TODO tags is only needed on build jobs (not on test / lint)
+    # move the build jobs into separate workflow
+    tags:
+      - "v*"
   pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 env:
   SKIP_ENV_VALIDATION: "true"
