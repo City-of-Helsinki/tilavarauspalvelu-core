@@ -20,5 +20,6 @@ azure-pipelines-stageprod.yml
 docker-compose.yml
 Dockerfile
 Dockerfile.local
+pytest.ini
 README.md
 sonar-project.properties
