@@ -22,7 +22,7 @@ repos:
         args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.284
+    rev: v0.0.286
     hooks:
       - id: ruff
 
