@@ -33,3 +33,4 @@ coverage.xml
 celery.exchange
 celery.pidbox.exchange
 .ruff_cache
+pytest.ini
