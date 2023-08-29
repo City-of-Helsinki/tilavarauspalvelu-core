@@ -171,16 +171,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build ui docker image
+      - name: Build ui Docker image
         run: docker build -f apps/ui/Dockerfile -t tilavaraus-ui .
-      - name: Start container
+      - name: Start Docker container
         run: docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -e TILAVARAUS_API_URL=http://localhost:8000 -e NEXT_PUBLIC_MOCK_REQUESTS=true -p 3000:3000 -d --ipc=host --name tilavaraus-ui-server tilavaraus-ui
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v5
         with:
           project: ./apps/ui
-          config-file: cypress.config.ts
-          install-command: pnpm install --frozen-lockfile
+          # config-file: cypress.config.ts
+          # install-command: pnpm install --frozen-lockfile
+          install: false
+          command: pnpm test:browser:ci
+          wait-on: 'http://localhost:3000'
+          #start: pnpm --dir myclient/ dev
       - name: Upload images on failure
         uses: actions/upload-artifact@v3
         if: failure()

@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start",
     "test": "TZ=Europe/Helsinki jest --runInBand",
+    "test:browser:ci": "CYPRESS_BASE_URL=http://localhost:3000 TZ=Europe/Helsinki cypress run --config-file='cypress.config.ts' --browser chrome",
     "test:browser": "CYPRESS_BASE_URL=http://localhost:4000 TZ=Europe/Helsinki cypress run --config-file='cypress.config.ts' --browser chrome",
     "test:browser-gui": "CYPRESS_BASE_URL=http://localhost:4000 TZ=Europe/Helsinki cypress open --config-file='cypress.config.ts' --browser chrome",
     "test:browser-headed": "CYPRESS_BASE_URL=http://localhost:4000 TZ=Europe/Helsinki cypress run --config-file='cypress.config.ts' --browser chrome --headed",
