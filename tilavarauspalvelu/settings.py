@@ -1,11 +1,10 @@
-import os
 import subprocess  # nosec
 import zoneinfo
+from pathlib import Path
 
 import environ
 import graphql
 import sentry_sdk
-from pathlib import Path
 from corsheaders.defaults import default_headers
 from django.conf.global_settings import DEFAULT_FROM_EMAIL as django_default_from_email
 from django.conf.global_settings import EMAIL_PORT as django_default_email_port

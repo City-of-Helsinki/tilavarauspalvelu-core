@@ -486,3 +486,8 @@ def can_create_staff_reservation(user: User, reservation_unit: Iterable[Reservat
         or has_general_permission(user, permission)
         or has_service_sector_permission(user, service_sectors, permission)
     )
+
+
+def can_manage_banner_notifications(user: User) -> bool:
+    permission = "can_manage_notifications"
+    return is_superuser(user) or has_general_permission(user, permission)
