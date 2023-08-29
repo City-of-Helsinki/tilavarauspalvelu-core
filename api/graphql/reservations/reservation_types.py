@@ -277,7 +277,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         return self.billing_email
 
     def resolve_created_at(self, info: ResolveInfo) -> str:
-        if self is None:
+        if self is None:  # NOSONAR
             return ""
         return self.created_at.strftime("%Y-%m-%dT%H:%M:%S%z")
 
