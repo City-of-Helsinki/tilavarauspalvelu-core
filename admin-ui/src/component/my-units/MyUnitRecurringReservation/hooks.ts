@@ -6,7 +6,7 @@ import type {
   Query,
   QueryReservationUnitByPkArgs,
   QueryUnitsArgs,
-  ReservationType,
+  ReservationsReservationTypeChoices,
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
   ErrorType,
@@ -19,7 +19,12 @@ import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
 import { toApiDate, fromUIDate, toApiDateUnsafe } from "common/src/common/util";
-import { addDays, addSeconds } from "date-fns";
+import { addDays } from "date-fns";
+import {
+  CollisionInterval,
+  doesIntervalCollide,
+  reservationToInterval,
+} from "app/helpers";
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "../../../context/NotificationContext";
 import { RECURRING_RESERVATION_UNIT_QUERY } from "../queries";
@@ -28,7 +33,7 @@ import {
   CREATE_RECURRING_RESERVATION,
 } from "./queries";
 import { NewReservationListItem } from "../../ReservationsList";
-import { convertToDate, isOverlapping } from "./utils";
+import { convertToDate } from "./utils";
 import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
@@ -103,35 +108,16 @@ export const useRecurringReservationsUnits = (unitId: number) => {
   return { loading, reservationUnits };
 };
 
-type TimeInterval = {
-  begin: Date;
-  end: Date;
-  buffers: {
-    before: number;
-    after: number;
-  };
-};
-
-const reservationToInterval = (x: ReservationType): TimeInterval | undefined =>
-  x.begin && x.end
-    ? {
-        begin: new Date(x.begin),
-        end: new Date(x.end),
-        buffers: {
-          before: x.bufferTimeBefore ?? 0,
-          after: x.bufferTimeAfter ?? 0,
-        },
-      }
-    : undefined;
-
-export const useReservationsInInterval = ({
+const useReservationsInInterval = ({
   begin,
   end,
   reservationUnitPk,
+  reservationType,
 }: {
   begin: Date;
   end: Date;
   reservationUnitPk?: number;
+  reservationType: ReservationsReservationTypeChoices;
 }) => {
   const { notifyError } = useNotification();
 
@@ -161,15 +147,31 @@ export const useReservationsInInterval = ({
     },
   });
 
-  const reservations = useMemo(
-    () =>
-      data?.reservationUnitByPk?.reservations
-        ?.map((x) => (x ? reservationToInterval(x) : undefined))
-        ?.filter((x): x is TimeInterval => x != null) ?? [],
-    [data]
-  );
+  const reservations = (data?.reservationUnitByPk?.reservations ?? [])
+    .map((x) => (x ? reservationToInterval(x, reservationType) : undefined))
+    .filter((x): x is CollisionInterval => x != null);
 
   return { reservations, loading, refetch };
+};
+
+const listItemToInterval = (
+  item: NewReservationListItem,
+  type: ReservationsReservationTypeChoices
+): CollisionInterval | undefined => {
+  const start = convertToDate(item.date, item.startTime);
+  const end = convertToDate(item.date, item.endTime);
+  if (start && end) {
+    return {
+      start,
+      end,
+      buffers: {
+        before: item.buffers?.before ?? 0,
+        after: item.buffers?.after ?? 0,
+      },
+      type,
+    };
+  }
+  return undefined;
 };
 
 export const useFilteredReservationList = ({
@@ -177,54 +179,44 @@ export const useFilteredReservationList = ({
   reservationUnitPk,
   begin,
   end,
+  reservationType,
 }: {
   items: NewReservationListItem[];
   reservationUnitPk?: number;
   begin: Date;
   end: Date;
+  reservationType: ReservationsReservationTypeChoices;
 }) => {
   const { reservations, refetch } = useReservationsInInterval({
     reservationUnitPk,
     begin,
     end,
+    reservationType,
   });
 
-  const isReservationInsideRange = (
-    res: NewReservationListItem,
-    range: TimeInterval
-  ) => {
-    const startDate = convertToDate(res.date, res.startTime);
-    const endDate = convertToDate(res.date, res.endTime);
-    const bufferBefore = Math.max(
-      res.buffers?.before ?? 0,
-      range.buffers.before
-    );
-    const bufferAfter = Math.max(res.buffers?.after ?? 0, range.buffers.after);
-    if (startDate && endDate) {
-      return isOverlapping(
-        {
-          begin: addSeconds(startDate, -bufferBefore),
-          end: addSeconds(endDate, bufferAfter),
-        },
-        range
-      );
-    }
-    return false;
-  };
-
-  const res = useMemo(() => {
+  const data = useMemo(() => {
     if (reservations.length === 0) {
       return items;
     }
-    const tested = items.map((x) =>
+    const isReservationInsideRange = (
+      res: NewReservationListItem,
+      interval: CollisionInterval
+    ) => {
+      const interval2 = listItemToInterval(res, reservationType);
+      if (interval2 && interval) {
+        return doesIntervalCollide(interval2, interval);
+      }
+      return false;
+    };
+
+    return items.map((x) =>
       reservations.find((y) => isReservationInsideRange(x, y))
         ? { ...x, isOverlapping: true }
         : x
     );
-    return tested;
-  }, [items, reservations]);
+  }, [items, reservations, reservationType]);
 
-  return { reservations: res, refetch };
+  return { reservations: data, refetch };
 };
 
 // TODO this is common with the ReservationForm combine them
