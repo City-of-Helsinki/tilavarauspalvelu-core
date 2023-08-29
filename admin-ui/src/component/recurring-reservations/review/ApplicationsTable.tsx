@@ -2,8 +2,13 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize } from "lodash";
-import { CustomTable, DataOrMessage, TableLink } from "../../lists/components";
-
+import { IconLinkExternal } from "hds-react";
+import { publicUrl } from "app/common/const";
+import {
+  CustomTable,
+  DataOrMessage,
+  ExternalTableLink,
+} from "../../lists/components";
 import { ApplicationView, truncate } from "../util";
 import { applicationDetailsUrl } from "../../../common/urls";
 
@@ -33,11 +38,14 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     key: "applicant",
     transform: ({ applicant, id }: ApplicationView) => (
-      <TableLink href={applicationDetailsUrl(id)}>
-        <span title={applicant}>
-          {truncate(applicant ?? "-", applicantTruncateLen)}
-        </span>
-      </TableLink>
+      <ExternalTableLink
+        href={`${publicUrl}${applicationDetailsUrl(id)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {truncate(applicant ?? "-", applicantTruncateLen)}
+        <IconLinkExternal size="xs" aria-hidden />
+      </ExternalTableLink>
     ),
   },
   {
