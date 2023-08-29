@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy
 
 from common.choices import BannerNotificationState, BannerNotificationTarget, BannerNotificationType
+from common.fields import ChoiceField
 from common.querysets import BannerNotificationQuerySet
 from common.querysets.banner_notification import BANNER_TARGET_SORT_ORDER, BANNER_TYPE_SORT_ORDER
 
@@ -13,8 +14,8 @@ class BannerNotification(models.Model):
     name: str = models.CharField(max_length=100, null=False, blank=False, unique=True)
     message: str = models.TextField(max_length=1_000, blank=True, default="")
     draft: bool = models.BooleanField(default=True)
-    type: str = models.CharField(choices=BannerNotificationType.choices)
-    target: str = models.CharField(choices=BannerNotificationTarget.choices)
+    type: str = ChoiceField(choices=BannerNotificationType.choices)
+    target: str = ChoiceField(choices=BannerNotificationTarget.choices)
     active_from: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     active_until: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
