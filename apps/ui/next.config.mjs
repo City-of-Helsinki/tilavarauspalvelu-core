@@ -1,4 +1,4 @@
-import i18nconfig from "./next-i18next.config";
+import i18nconfig from "./next-i18next.config.js";
 // const { withSentryConfig } = require("@sentry/nextjs");
 
 const { i18n } = i18nconfig;
