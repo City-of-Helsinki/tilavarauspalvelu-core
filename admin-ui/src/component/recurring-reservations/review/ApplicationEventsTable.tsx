@@ -1,11 +1,14 @@
 import React from "react";
-import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { publicUrl } from "app/common/const";
-import { CustomTable, DataOrMessage } from "../../lists/components";
-
+import { IconLinkExternal } from "hds-react";
+import {
+  CustomTable,
+  DataOrMessage,
+  ExternalTableLink,
+} from "../../lists/components";
 import { ApplicationEventView, truncate } from "../util";
 import { applicationDetailsUrl } from "../../../common/urls";
 
@@ -23,10 +26,6 @@ type Props = {
   applicationEvents: ApplicationEventView[];
 };
 
-const A = styled.a`
-  color: var(--color-black);
-`;
-
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("ApplicationEvent.headings.id"),
@@ -39,15 +38,14 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     key: "applicant",
     transform: ({ applicant, applicationId, id }: ApplicationEventView) => (
-      <A
+      <ExternalTableLink
         href={`${publicUrl}${applicationDetailsUrl(applicationId)}#${id}`}
         target="_blank"
         rel="noopener noreferrer"
       >
-        <span title={applicant}>
-          {truncate(applicant ?? "-", applicantTruncateLen)}
-        </span>
-      </A>
+        {truncate(applicant ?? "-", applicantTruncateLen)}
+        <IconLinkExternal size="xs" aria-hidden />
+      </ExternalTableLink>
     ),
   },
   {
@@ -64,7 +62,7 @@ const getColConfig = (t: TFunction) => [
         <span title={allUnits}>
           {truncate(
             units
-              .filter((u, i) => i < 2)
+              .filter((_u, i) => i < 2)
               .map((u) => u.nameFi)
               .join(", "),
             unitsTruncateLen

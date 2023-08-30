@@ -67,6 +67,17 @@ const A = styled(Link)`
   color: black;
 `;
 
+// NOTE not using IconButton because of hover effect
+export const ExternalTableLink = styled.a`
+  color: var(--color-black);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3-xs);
+  & > svg {
+    margin-top: var(--spacing-3-xs);
+  }
+`;
+
 export const TableLink = ({
   href,
   children,
