@@ -7,8 +7,8 @@ from common.querysets import BannerNotificationQuerySet
 
 class BannerNotificationOrderingFilter(CustomOrderingFilter):
     @staticmethod
-    def order_by_type(qs: BannerNotificationQuerySet, desc: bool) -> BannerNotificationQuerySet:
-        return qs.order_by_type(desc)
+    def order_by_level(qs: BannerNotificationQuerySet, desc: bool) -> BannerNotificationQuerySet:
+        return qs.order_by_level(desc)
 
     @staticmethod
     def order_by_target(qs: BannerNotificationQuerySet, desc: bool) -> BannerNotificationQuerySet:
@@ -29,7 +29,7 @@ class BannerNotificationFilterSet(django_filters.FilterSet):
             ("active_until", "ends"),
         ),
         custom_fields=(
-            "type",
+            "level",
             "state",
             "target",
         ),

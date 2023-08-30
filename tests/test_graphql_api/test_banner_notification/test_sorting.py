@@ -5,7 +5,7 @@ import pytest
 from django.utils import timezone
 from freezegun import freeze_time
 
-from common.choices import BannerNotificationTarget, BannerNotificationType
+from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import BannerNotificationFactory
 from tests.factories.user import UserFactory
 from tests.helpers import load_content, parametrize_helper
@@ -368,39 +368,39 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
     **parametrize_helper(
         {
             "Ascending order": OrderingParams(
-                order_by="type",
+                order_by="level",
                 expected=[
-                    {"node": {"message": "3", "type": "EXCEPTION"}},
-                    {"node": {"message": "2", "type": "WARNING"}},
-                    {"node": {"message": "1", "type": "NORMAL"}},
+                    {"node": {"message": "3", "level": "EXCEPTION"}},
+                    {"node": {"message": "2", "level": "WARNING"}},
+                    {"node": {"message": "1", "level": "NORMAL"}},
                 ],
             ),
             "Descending order": OrderingParams(
-                order_by="-type",
+                order_by="-level",
                 expected=[
-                    {"node": {"message": "1", "type": "NORMAL"}},
-                    {"node": {"message": "2", "type": "WARNING"}},
-                    {"node": {"message": "3", "type": "EXCEPTION"}},
+                    {"node": {"message": "1", "level": "NORMAL"}},
+                    {"node": {"message": "2", "level": "WARNING"}},
+                    {"node": {"message": "3", "level": "EXCEPTION"}},
                 ],
             ),
         },
     )
 )
-def test_sort_banner_notifications_by_type(graphql, order_by, expected):
+def test_sort_banner_notifications_by_level(graphql, order_by, expected):
     # given:
     # - There are banner notification for all types in the system
     # - Notification manager user is using the system
     BannerNotificationFactory.create_active(
         message="1",
-        type=BannerNotificationType.NORMAL,
+        level=BannerNotificationLevel.NORMAL,
     )
     BannerNotificationFactory.create_active(
         message="2",
-        type=BannerNotificationType.WARNING,
+        level=BannerNotificationLevel.WARNING,
     )
     BannerNotificationFactory.create_active(
         message="3",
-        type=BannerNotificationType.EXCEPTION,
+        level=BannerNotificationLevel.EXCEPTION,
     )
     user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
     graphql.force_login(user)
@@ -414,7 +414,7 @@ def test_sort_banner_notifications_by_type(graphql, order_by, expected):
             edges {
               node {
                 message
-                type
+                level
               }
             }
           }

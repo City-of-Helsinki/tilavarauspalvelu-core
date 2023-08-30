@@ -5,7 +5,7 @@ import factory
 from django.utils import timezone
 from factory import fuzzy
 
-from common.choices import BannerNotificationTarget, BannerNotificationType
+from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 
 from ._base import GenericDjangoModelFactory
@@ -18,7 +18,7 @@ class BannerNotificationFactory(GenericDjangoModelFactory[BannerNotification]):
     name = factory.Faker("text", max_nb_chars=100)
     message = factory.Faker("text", max_nb_chars=1_000)
     draft = True
-    type = fuzzy.FuzzyChoice(BannerNotificationType.values)
+    level = fuzzy.FuzzyChoice(BannerNotificationLevel.values)
     target = fuzzy.FuzzyChoice(BannerNotificationTarget.values)
     active_from = None
     active_until = None
