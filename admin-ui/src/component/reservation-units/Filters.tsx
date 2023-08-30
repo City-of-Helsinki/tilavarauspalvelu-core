@@ -63,6 +63,9 @@ const Wrapper = styled.div`
 `;
 
 const MoreWrapper = styled(ShowAllContainer)`
+  .ShowAllContainer__ToggleButton {
+    color: var(--color-bus);
+  }
   [class*="ShowAllContainer__ToggleButtonContainer"] {
     margin-top: 0;
   }
