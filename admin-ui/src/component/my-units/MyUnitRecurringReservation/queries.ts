@@ -33,6 +33,7 @@ export const GET_RESERVATIONS_IN_INTERVAL = gql`
         end
         bufferTimeBefore
         bufferTimeAfter
+        type
       }
     }
   }

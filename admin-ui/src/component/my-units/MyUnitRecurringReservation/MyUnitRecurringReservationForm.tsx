@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ReservationUnitType } from "common/types/gql-types";
+import {
+  ReservationsReservationTypeChoices,
+  type ReservationUnitType,
+} from "common/types/gql-types";
 import { camelCase, get } from "lodash";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -182,11 +185,13 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     interval: reservationUnit?.reservationStartInterval,
   });
 
+  const reservationType = watch("type");
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,
     reservationUnitPk: reservationUnit?.pk ?? undefined,
     begin: fromUIDate(getValues("startingDate")),
     end: fromUIDate(getValues("endingDate")),
+    reservationType: reservationType as ReservationsReservationTypeChoices,
   });
 
   const navigate = useNavigate();
