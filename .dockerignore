@@ -2,11 +2,54 @@
 #################################################
 node_modules
 **/node_modules
-**/.next
-**/.yarn
+
+# tests
+**/__tests__
+**/__mocks__
 **/cypress
-**/build
+
 .git
+.github
+
 **/.env*
+
+# build just in case
+**/build
+**/dist
+
+# caches
 **/.swc
 **/.turbo
+**/.next
+
+# old just in case
+**/.yarn
+
+# pipelines
+**/azure-pipelines.yml
+
+# logs
+**/*.log
+
+# misc
+**/.local/
+certificates/
+
+# docs
+**/README.md
+**/LICENSE
+**/CHANGELOG.md
+
+# configs
+**/.nvmrc
+**/.eslintrc*
+**/.babelrc*
+**/.prettierignore
+**/.huskyrc
+**/.eslintignore
+**/.editorconfig
+**/.prettierrc
+**/stylelint.config.js
+**/jest.config.js
+**/jest.setup.js
+**/codegen.yml
