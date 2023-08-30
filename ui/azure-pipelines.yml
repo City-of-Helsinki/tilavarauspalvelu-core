@@ -1,5 +1,10 @@
 # File: tilavarauspalvelu-ui/azure-pipelines.yml
 
+# TODO this should be moved either to the repo root (if we can swap the apps with an arg)
+# or to apps/ui if not
+# problem is that it's going to break all pipes so do it last in an independent PR
+# to finalize the change the Pipeline configuration in Azure UI
+
 # Continuous integration (CI) triggers cause a pipeline to run whenever you push
 # an update to the specified branches or you push specified tags.
 trigger:
@@ -9,9 +14,10 @@ trigger:
       - main
       - refs/tags/*
   paths:
+    # TODO should use turborepo to calculate the real needed packages
     include:
-      - common
-      - ui
+      - packages/common
+      - apps/ui
 
 # By default, use self-hosted agents
 pool: Default
@@ -26,8 +32,7 @@ resources:
       type: git
       # project/repository
       name: tilavarauspalvelu/tilavarauspalvelu-pipelines
-      # TODO new docker build, change back to main after all pipelines are migrated
-      ref: admin-ui-next-migration
+      ref: turborepo
 
 extends:
   template: azure-pipelines-tilavarauspalvelu-ui.yml@tilavarauspalvelu-pipelines
