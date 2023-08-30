@@ -11,7 +11,7 @@ class BannerNotificationAdminForm(forms.ModelForm):
         fields = [
             "name",
             "message",
-            "type",
+            "level",
             "target",
             "active_from",
             "active_until",
@@ -23,7 +23,7 @@ class BannerNotificationAdminForm(forms.ModelForm):
         help_texts = {
             "name": gettext_lazy("Name of the notification. Should be unique."),
             "message": gettext_lazy("Notification body."),
-            "type": gettext_lazy("Type of the notification."),
+            "level": gettext_lazy("Level of the notification."),
             "target": gettext_lazy("Target user interface of the notification."),
             "active_from": gettext_lazy(
                 "Start date of the notification. If empty, 'active_until' must also be empty.",

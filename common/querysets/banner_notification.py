@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db import models
 from django.db.models.functions import Now
 
-from common.choices import BannerNotificationTarget, BannerNotificationType
+from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from permissions.helpers import can_manage_banner_notifications
 
 from ._base import BaseQuerySet
@@ -48,8 +48,8 @@ class BannerNotificationQuerySet(BaseQuerySet):
 
         return self.none()
 
-    def order_by_type(self, desc: bool = False) -> Self:
-        return self.order_by_expression(alias="__type", expression=BANNER_TYPE_SORT_ORDER, desc=desc)
+    def order_by_level(self, desc: bool = False) -> Self:
+        return self.order_by_expression(alias="__level", expression=BANNER_LEVEL_SORT_ORDER, desc=desc)
 
     def order_by_state(self, desc: bool = False) -> Self:
         return self.order_by_expression(alias="__state", expression=BANNER_STATE_SORT_ORDER, desc=desc)
@@ -58,17 +58,17 @@ class BannerNotificationQuerySet(BaseQuerySet):
         return self.order_by_expression(alias="__target", expression=BANNER_TARGET_SORT_ORDER, desc=desc)
 
 
-BANNER_TYPE_SORT_ORDER = models.Case(
+BANNER_LEVEL_SORT_ORDER = models.Case(
     models.When(
-        type=BannerNotificationType.EXCEPTION,
+        level=BannerNotificationLevel.EXCEPTION,
         then=models.Value(1),
     ),
     models.When(
-        type=BannerNotificationType.WARNING,
+        level=BannerNotificationLevel.WARNING,
         then=models.Value(2),
     ),
     models.When(
-        type=BannerNotificationType.NORMAL,
+        level=BannerNotificationLevel.NORMAL,
         then=models.Value(3),
     ),
     default=models.Value(4),

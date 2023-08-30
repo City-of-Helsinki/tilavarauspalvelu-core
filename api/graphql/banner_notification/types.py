@@ -26,7 +26,7 @@ class BannerNotificationType(AuthNode, PrimaryKeyObjectType):
             "message_en",
             "message_sv",
             "draft",
-            "type",
+            "level",
             "target",
             "active_from",
             "active_until",

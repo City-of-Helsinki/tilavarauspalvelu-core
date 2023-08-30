@@ -4,17 +4,17 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy
 
-from common.choices import BannerNotificationState, BannerNotificationTarget, BannerNotificationType
+from common.choices import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
 from common.fields import ChoiceField
 from common.querysets import BannerNotificationQuerySet
-from common.querysets.banner_notification import BANNER_TARGET_SORT_ORDER, BANNER_TYPE_SORT_ORDER
+from common.querysets.banner_notification import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER
 
 
 class BannerNotification(models.Model):
     name: str = models.CharField(max_length=100, null=False, blank=False, unique=True)
     message: str = models.TextField(max_length=1_000, blank=True, default="")
     draft: bool = models.BooleanField(default=True)
-    type: str = ChoiceField(choices=BannerNotificationType.choices)
+    level: str = ChoiceField(choices=BannerNotificationLevel.choices)
     target: str = ChoiceField(choices=BannerNotificationTarget.choices)
     active_from: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     active_until: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
@@ -51,8 +51,8 @@ class BannerNotification(models.Model):
         base_manager_name = "objects"
         indexes = [
             models.Index(
-                BANNER_TYPE_SORT_ORDER,
-                name="type_priority_index",
+                BANNER_LEVEL_SORT_ORDER,
+                name="level_priority_index",
             ),
             models.Index(
                 BANNER_TARGET_SORT_ORDER,
