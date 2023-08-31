@@ -628,7 +628,7 @@ def test_permission_on_creating_banner_notifications(graphql, user_type, expecte
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
-            "Anonymous user should not be able to create banner notifications": UserTypeParams(
+            "Anonymous user should not be able to update banner notifications": UserTypeParams(
                 user_type=UserType.ANONYMOUS,
                 expected={
                     "data": {
@@ -640,7 +640,7 @@ def test_permission_on_creating_banner_notifications(graphql, user_type, expecte
                     }
                 },
             ),
-            "Regular user should not be able to create banner notifications": UserTypeParams(
+            "Regular user should not be able to update banner notifications": UserTypeParams(
                 user_type=UserType.REGULAR,
                 expected={
                     "data": {
@@ -652,7 +652,7 @@ def test_permission_on_creating_banner_notifications(graphql, user_type, expecte
                     }
                 },
             ),
-            "Staff user should not be able to create banner notifications": UserTypeParams(
+            "Staff user should not be able to update banner notifications": UserTypeParams(
                 user_type=UserType.STAFF,
                 expected={
                     "data": {
@@ -664,7 +664,7 @@ def test_permission_on_creating_banner_notifications(graphql, user_type, expecte
                     }
                 },
             ),
-            "Notification manager should be able to create banner notifications": UserTypeParams(
+            "Notification manager should be able to update banner notifications": UserTypeParams(
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected={
                     "data": {
@@ -719,7 +719,7 @@ def test_permission_on_updating_banner_notifications(graphql, user_type, expecte
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
-            "Anonymous user should not be able to create banner notifications": UserTypeParams(
+            "Anonymous user should not be able to delete banner notifications": UserTypeParams(
                 user_type=UserType.ANONYMOUS,
                 expected={
                     "data": {
@@ -731,7 +731,7 @@ def test_permission_on_updating_banner_notifications(graphql, user_type, expecte
                     },
                 },
             ),
-            "Regular user should not be able to create banner notifications": UserTypeParams(
+            "Regular user should not be able to delete banner notifications": UserTypeParams(
                 user_type=UserType.REGULAR,
                 expected={
                     "data": {
@@ -743,7 +743,7 @@ def test_permission_on_updating_banner_notifications(graphql, user_type, expecte
                     },
                 },
             ),
-            "Staff user should not be able to create banner notifications": UserTypeParams(
+            "Staff user should not be able to delete banner notifications": UserTypeParams(
                 user_type=UserType.STAFF,
                 expected={
                     "data": {
@@ -755,7 +755,7 @@ def test_permission_on_updating_banner_notifications(graphql, user_type, expecte
                     },
                 },
             ),
-            "Notification manager should be able to create banner notifications": UserTypeParams(
+            "Notification manager should be able to delete banner notifications": UserTypeParams(
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected={
                     "data": {
