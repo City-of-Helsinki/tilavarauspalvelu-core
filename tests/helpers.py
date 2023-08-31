@@ -54,16 +54,13 @@ def parametrize_helper(__tests: dict[str, TNamedTuple], /) -> ParametrizeArgs:
 
 
 class PrintableDefaultDict(defaultdict):
-    """Default dict that pretty-prints."""
+    """Defaultdict that pretty-prints like a regular dict."""
 
-    def to_dict(self) -> dict[str, Any]:
-        return json.loads(str(self))
+    __str__ = dict.__str__
+    __repr__ = dict.__repr__
 
-    def __str__(self) -> str:
+    def json(self) -> str:
         return json.dumps(self, indent=2, sort_keys=True, default=str)
-
-    def __repr__(self) -> str:
-        return str(self)
 
 
 def _recursive_defaultdict() -> PrintableDefaultDict:
