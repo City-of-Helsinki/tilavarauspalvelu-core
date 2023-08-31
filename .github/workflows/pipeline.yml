@@ -172,16 +172,11 @@ jobs:
     # TODO disabled for testing
     #if: needs.changed-packages.outputs.ui_changed == 'true'
     env:
-      - name: NEXT_PUBLIC_MOCK_REQUESTS
-        value: true
-      - name: DISABLE_AUTH
-        value: true
-      - name: NEXT_PUBLIC_TILAVARAUS_API_URL
-        value: http://localhost:4000
-      - name: PORT
-        value: 4000
-      - name: NEXTAUTH_SECRET
-        value: not-a-good-secret
+      NEXT_PUBLIC_MOCK_REQUESTS: 'true'
+      DISABLE_AUTH: 'true'
+      NEXT_PUBLIC_TILAVARAUS_API_URL: http://localhost:4000
+      PORT: 4000
+      NEXTAUTH_SECRET: not-a-good-secret
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -203,8 +198,8 @@ jobs:
         with:
           context: .
           build-args: |
-            NEXT_PUBLIC_TILAVARAUS_API_URL=${{ NEXT_PUBLIC_TILAVARAUS_API_URL }}
-            NEXT_PUBLIC_MOCK_REQUESTS=${{ NEXT_PUBLIC_MOCK_REQUESTS }}
+            NEXT_PUBLIC_TILAVARAUS_API_URL=${{ env.NEXT_PUBLIC_TILAVARAUS_API_URL }}
+            NEXT_PUBLIC_MOCK_REQUESTS=${{ env.NEXT_PUBLIC_MOCK_REQUESTS }}
             APP=ui
             DISABLE_AUTH=true
           # TODO the first push needs to be done manually
