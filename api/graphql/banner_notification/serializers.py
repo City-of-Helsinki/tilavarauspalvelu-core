@@ -40,7 +40,7 @@ class BannerNotificationSerializer(TranslatedModelSerializer):
             errors["active_until"].append(msg)
             errors["active_from"].append(msg)
 
-        if active_from and active_until and active_from > active_until:
+        if active_from and active_until and active_from >= active_until:
             errors["active_from"].append("'active_from' must be before 'active_until'.")
 
         if not draft:
