@@ -215,6 +215,18 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
                     },
                 ],
             ),
+            "Active from same as active until": InvalidActiveParams(
+                active_from="2022-01-02T00:00:00",
+                active_until="2022-01-02T00:00:00",
+                expected=[
+                    {
+                        "field": "activeFrom",
+                        "messages": [
+                            "'active_from' must be before 'active_until'.",
+                        ],
+                    },
+                ],
+            ),
         },
     ),
 )

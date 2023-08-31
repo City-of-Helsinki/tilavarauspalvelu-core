@@ -227,6 +227,18 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
                     },
                 ],
             ),
+            "Active from same active until": InvalidActiveParams(
+                active_from="2022-01-01T00:00:00",
+                active_until="2022-01-01T00:00:00",
+                expected=[
+                    {
+                        "field": "activeFrom",
+                        "messages": [
+                            "'active_from' must be before 'active_until'.",
+                        ],
+                    },
+                ],
+            ),
         },
     ),
 )
