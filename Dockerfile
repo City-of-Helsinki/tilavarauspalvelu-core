@@ -27,8 +27,9 @@ COPY --from=builder /app/out/full/ .
 ENV NEXT_PUBLIC_MOCK_REQUESTS=$NEXT_PUBLIC_MOCK_REQUESTS
 ENV NEXT_PUBLIC_TILAVARAUS_API_URL=$NEXT_PUBLIC_TILAVARAUS_API_URL
 ENV DISABLE_AUTH=$DISABLE_AUTH
-COPY turbo.json turbo.json
 ENV SKIP_ENV_VALIDATION=true
+COPY turbo.json turbo.json
+RUN corepack enable
 RUN pnpm turbo run build --filter=$APP...
 
 FROM base AS runner
