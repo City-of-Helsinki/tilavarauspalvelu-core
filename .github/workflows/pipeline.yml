@@ -134,8 +134,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build ui
-        run: docker build -t tilavaraus-ui --build-arg APP=ui .
+      - uses: docker/build-push-action@v4
+        with:
+          context: .
+          build-args: |
+            APP=ui
+          # TODO the first push needs to be done manually
+          push: false
+          tags: tilavaraus-ui/ui:latest
 
   test-ui:
     name: Unit tests ui
@@ -165,6 +171,17 @@ jobs:
     #needs: [changed-packages, install]
     # TODO disabled for testing
     #if: needs.changed-packages.outputs.ui_changed == 'true'
+    env:
+      - name: NEXT_PUBLIC_MOCK_REQUESTS
+        value: true
+      - name: DISABLE_AUTH
+        value: true
+      - name: NEXT_PUBLIC_TILAVARAUS_API_URL
+        value: http://localhost:4000
+      - name: PORT
+        value: 4000
+      - name: NEXTAUTH_SECRET
+        value: not-a-good-secret
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -178,20 +195,32 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build ui Docker image
-        run: docker build -t tilavaraus-ui --build-arg APP=ui .
+          .
+      # TODO NEXT_PUBLIC_* needs to be in the build step (either .env.test file or use BUILD ARGs)
+      # Real solution is to move them server side so we can use them without rebuilding the container
+      # TODO DISABLE_AUTH doesn't work as a runtime only variable either
+      - uses: docker/build-push-action@v4
+        with:
+          context: .
+          build-args: |
+            NEXT_PUBLIC_TILAVARAUS_API_URL=${{ NEXT_PUBLIC_TILAVARAUS_API_URL }}
+            NEXT_PUBLIC_MOCK_REQUESTS=${{ NEXT_PUBLIC_MOCK_REQUESTS }}
+            APP=ui
+            DISABLE_AUTH=true
+          # TODO the first push needs to be done manually
+          push: false
+          tags: tilavaraus-ui/ui-e2e:latest
       - name: Start Docker container
-        run: docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -e TILAVARAUS_API_URL=http://localhost:8000 -e NEXT_PUBLIC_MOCK_REQUESTS=true -p 3000:3000 -d --ipc=host --name tilavaraus-ui-server tilavaraus-ui
+        run: docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -p 4000:4000 -d --ipc=host --name tilavaraus-ui-server tilavaraus-ui
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v5
         with:
           project: ./apps/ui
-          # config-file: cypress.config.ts
+          config-file: cypress.config.ts
           # install-command: pnpm install --frozen-lockfile
           install: false
           command: pnpm test:browser:ci
           wait-on: 'http://localhost:3000'
-          #start: pnpm --dir myclient/ dev
       - name: Upload images on failure
         uses: actions/upload-artifact@v3
         if: failure()

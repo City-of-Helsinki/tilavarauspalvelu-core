@@ -17,7 +17,7 @@ const nextConfig = {
   },
   i18n,
   serverRuntimeConfig: {
-    apiBaseUrl: process.env.TILAVARAUS_API_URL,
+    apiBaseUrl: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
     authEnabled: process.env.DISABLE_AUTH !== "true",
     oidcClientId: process.env.OIDC_CLIENT_ID,
     oidcClientSecret: process.env.OIDC_CLIENT_SECRET,
@@ -32,7 +32,7 @@ const nextConfig = {
   },
   publicRuntimeConfig: {
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
-    apiBaseUrl: process.env.TILAVARAUS_API_URL,
+    apiBaseUrl: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
     authEnabled: process.env.DISABLE_AUTH !== "true",
     oidcEndSessionUrl: process.env.NEXT_PUBLIC_OIDC_END_SESSION,
     sentryDSN: process.env.NEXT_PUBLIC_SENTRY_DSN,

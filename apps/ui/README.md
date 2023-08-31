@@ -103,6 +103,37 @@ Builds a production version
 
 Starts production version
 
+## Cypress tests
+
+### Running against a docker container
+
+Mind that you need to specify both build args for browser variables and envs for the server variables.
+There is no easy env file for these on purpose (no .envs should be loaded to docker).
+The variables are explicit, to make it easier to match them to what we have on the CI.
+If you find using them alot locally add a docker-compose file.
+
+``` sh
+# in repo root
+docker build -t tilavaraus-ui-mocked \
+  -f ./Dockerfile \
+  --build-arg APP=ui \
+  --build-arg NEXT_PUBLIC_TILAVARAUS_API_URL=http://localhost:4000 \
+  --build-arg=NEXT_PUBLIC_MOCK_REQUESTS=true \
+  --build-arg DISABLE_AUTH=true .
+
+docker run -e TZ=Europe/Helsinki \
+  -e DISABLE_AUTH=true \
+  -e NEXT_PUBLIC_TILAVARAUS_API_URL=http://localhost:4000 \
+  -e PORT=4000 \
+  -e NEXT_PUBLIC_MOCK_REQUESTS=true \
+  -e NEXTAUTH_SECRET=not-a-good-secret \
+  -p 4000:4000 -d --ipc=host --name tilavaraus-ui-test \
+  tilavaraus-ui-mocked
+
+cd apps/ui
+pnpm test:browser
+```
+
 ### Mocking network requests
 
 You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Can also be used for mocking browser data.
@@ -114,7 +145,7 @@ See `.env.local.example` and Azure DevOps library for values.
 | Name                           | Description                                                     |
 | ------------------------------ | --------------------------------------------------------------- |
 | NEXT_PUBLIC_BASE_URL           | application baseUrl                                             |
-| TILAVARAUS_API_URL             | tilavaraus-core base url                                        |
+| NEXT_PUBLIC_TILAVARAUS_API_URL | tilavaraus-core base url                                        |
 | NEXTAUTH_URL                   | the root path of next-auth apiroute                             |
 | NEXTAUTH_SECRET                | secret used by next to sign cookies and webtokens               |
 | DISABLE_AUTH                   | used for cypress testing, disables the next-auth private routes |

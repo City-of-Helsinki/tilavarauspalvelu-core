@@ -11,6 +11,7 @@ RUN turbo prune --scope=$APP --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
@@ -19,12 +20,19 @@ RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
+ARG NEXT_PUBLIC_MOCK_REQUESTS=false
+ENV NEXT_PUBLIC_MOCK_REQUESTS=$NEXT_PUBLIC_MOCK_REQUESTS
+ARG NEXT_PUBLIC_TILAVARAUS_API_URL
+ENV NEXT_PUBLIC_TILAVARAUS_API_URL=$NEXT_PUBLIC_TILAVARAUS_API_URL
+ARG DISABLE_AUTH=false
+ENV DISABLE_AUTH=$DISABLE_AUTH
 ARG APP
 COPY turbo.json turbo.json
 ENV SKIP_ENV_VALIDATION=true
 RUN pnpm turbo run build --filter=$APP...
 
 FROM base AS runner
+COPY --from=installer /usr/bin/dumb-init /usr/bin/dumb-init
 WORKDIR /app
 
 # Don't run production as root
@@ -44,4 +52,4 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/public ./apps/$APP/pu
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/next-i18next.config.js ./apps/$APP/
 
 ENV BIN "apps/$APP/server.js"
-CMD ["sh", "-c", "node $BIN"]
+CMD ["sh", "-c", "dumb-init node $BIN"]
