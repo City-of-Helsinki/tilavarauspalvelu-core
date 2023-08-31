@@ -118,7 +118,7 @@ def refund_order(order_id: UUID, post=_post) -> Optional[Refund]:
         if response.status_code > 200:
             capture_message(
                 f"Call to Payment Experience API refund endpoint failed with status {response.status_code}. "
-                + f"Response body: {response.text}",
+                f"Response body: {response.text}",
                 level="error",
             )
             raise RefundPaymentError("Payment refund failed: problem with upstream service")
@@ -129,8 +129,8 @@ def refund_order(order_id: UUID, post=_post) -> Optional[Refund]:
         else:
             capture_message(
                 "Call to Payment Experience API refund endpoint failed. "
-                + f"Response contains {refund_count} refunds instead of one. "
-                + f"Response body: {response.text}",
+                f"Response contains {refund_count} refunds instead of one. "
+                f"Response body: {response.text}",
                 level="error",
             )
             raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")

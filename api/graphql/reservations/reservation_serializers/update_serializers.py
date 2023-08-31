@@ -21,7 +21,7 @@ class ReservationUpdateSerializer(PrimaryKeyUpdateSerializer, ReservationCreateS
         self.fields["state"].required = False
         self.fields["state"].help_text = (
             "String value for ReservationType's ReservationState enum. "
-            + f"Possible values are {', '.join(value[0].upper() for value in STATE_CHOICES.STATE_CHOICES)}."
+            f"Possible values are {', '.join(value[0].upper() for value in STATE_CHOICES.STATE_CHOICES)}."
         )
         self.fields["reservee_first_name"].required = False
         self.fields["reservee_last_name"].required = False

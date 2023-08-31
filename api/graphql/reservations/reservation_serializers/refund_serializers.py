@@ -30,7 +30,7 @@ class ReservationRefundSerializer(PrimaryKeySerializer):
         if self.instance.state not in [STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED] and self.instance.end >= now:
             raise ValidationErrorWithCode(
                 f"Only reservations in the past or in state {STATE_CHOICES.CANCELLED.upper()} "
-                + f"or {STATE_CHOICES.DENIED.upper()} can be refunded.",
+                f"or {STATE_CHOICES.DENIED.upper()} can be refunded.",
                 ValidationErrorCodes.REFUND_NOT_ALLOWED,
             )
 
