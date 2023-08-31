@@ -46,7 +46,7 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
         if response.status_code >= 500:
             capture_message(
                 f"Call to Order Experience API failed with status {response.status_code}. "
-                + f"Response body: {response.text}",
+                f"Response body: {response.text}",
                 level="error",
             )
             raise CreateOrderError("Order creation failed: problem with upstream service")
@@ -106,7 +106,7 @@ def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Optional[Order]
         if response.status_code >= 500:
             capture_message(
                 f"Call to Order Experience API cancel endpoint failed with status {response.status_code}. "
-                + f"Response body: {response.text}",
+                f"Response body: {response.text}",
                 level="error",
             )
             raise CancelOrderError("Order cancellation failed: problem with upstream service")

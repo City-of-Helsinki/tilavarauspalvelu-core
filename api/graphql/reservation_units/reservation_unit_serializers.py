@@ -112,7 +112,7 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
         required=False,
         choices=PriceUnit.choices,
         help_text=(
-            "Unit of the price. " f"Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
+            f"Unit of the price. Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
         ),
     )
 
@@ -126,7 +126,7 @@ class ReservationUnitPricingCreateSerializer(PrimaryKeySerializer):
         required=True,
         choices=PricingStatus.choices,
         help_text=(
-            "Pricing status. " f"Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
+            f"Pricing status. Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
         ),
     )
 

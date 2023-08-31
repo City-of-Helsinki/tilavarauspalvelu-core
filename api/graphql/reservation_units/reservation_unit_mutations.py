@@ -208,7 +208,7 @@ class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, AuthSerializer
 
         logger.info(
             f"Reservation unit {reservation_unit_pk} archived. Content information "
-            + f"removed and {deleted_log_entries} audit log entries deleted."
+            f"removed and {deleted_log_entries} audit log entries deleted."
         )
 
     @classmethod

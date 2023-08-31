@@ -155,7 +155,7 @@ class StaffReservationModifySerializer(PrimaryKeyUpdateSerializer, ReservationSc
         self.fields["state"].required = False
         self.fields["state"].help_text = (
             "String value for ReservationType's ReservationState enum. "
-            + f"Possible values are {', '.join(value[0].upper() for value in ReservationState.STATE_CHOICES)}."
+            f"Possible values are {', '.join(value[0].upper() for value in ReservationState.STATE_CHOICES)}."
         )
         self.fields["priority"].required = False
         self.fields["buffer_time_before"].required = False

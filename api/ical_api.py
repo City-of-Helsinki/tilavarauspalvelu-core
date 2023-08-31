@@ -191,7 +191,7 @@ def application_event_calendar(application_event: ApplicationEvent) -> Calendar:
     elif contact_person:
         applicant_name = f"{contact_person.first_name} {contact_person.last_name}"
 
-    cal["x-wr-calname"] = f"{applicant_name}, " f"{application_event.name}"
+    cal["x-wr-calname"] = f"{applicant_name}, {application_event.name}"
     return cal
 
 

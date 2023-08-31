@@ -317,7 +317,7 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
 class ReservationUnitPaymentTypeType(AuthNode, PrimaryKeyObjectType):
     code = graphene.Field(
         graphene.String,
-        description=("Available values: " f"{', '.join(value for value in get_payment_type_codes())}"),
+        description=f"Available values: {', '.join(value for value in get_payment_type_codes())}",
     )
 
     class Meta:
