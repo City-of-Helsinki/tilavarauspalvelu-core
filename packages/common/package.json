@@ -8,6 +8,7 @@
   "main": "./index.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "preinstall": "npx -y only-allow pnpm",
     "lint": "echo 'FIXME eslint is broken on a monorepo setup'",
     "lint:fix": "echo 'FIXME eslint is broken on a monorepo setup'",
     "lint:css": "echo 'TODO no stylelint for common'",
