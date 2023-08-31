@@ -165,6 +165,11 @@ from .applications.application_mutations import (
     ApplicationUpdateMutation,
 )
 from .banner_notification.filter import BannerNotificationConnection
+from .banner_notification.mutations import (
+    BannerNotificationCreateMutation,
+    BannerNotificationDeleteMutation,
+    BannerNotificationUpdateMutation,
+)
 from .banner_notification.types import BannerNotificationType
 from .reservations.recurring_reservation_filtersets import RecurringReservationFilterSet
 from .reservations.recurring_reservation_mutations import (
@@ -563,6 +568,10 @@ class Mutation(graphene.ObjectType):
     update_user = UserUpdateMutation.Field()
 
     refresh_order = RefreshOrderMutation.Field()
+
+    create_banner_notification = BannerNotificationCreateMutation.Field()
+    update_banner_notification = BannerNotificationUpdateMutation.Field()
+    delete_banner_notification = BannerNotificationDeleteMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
