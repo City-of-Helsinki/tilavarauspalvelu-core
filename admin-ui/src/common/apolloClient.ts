@@ -7,10 +7,10 @@ import { getSession, signOut } from "next-auth/react";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
-import { SESSION_EXPIRED_ERROR, apiBaseUrl, isBrowser } from "./const";
+import { SESSION_EXPIRED_ERROR, publicUrl, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
-const uri = `${apiBaseUrl}/graphql/`;
+const uri = `${publicUrl}/api/graphql`;
 const uploadLinkOptions = {
   uri,
   FormData: CustomFormData,
