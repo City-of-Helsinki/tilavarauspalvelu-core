@@ -185,7 +185,8 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     interval: reservationUnit?.reservationStartInterval,
   });
 
-  const reservationType = watch("type");
+  const reservationType =
+    watch("type") ?? ReservationsReservationTypeChoices.Blocked;
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,
     reservationUnitPk: reservationUnit?.pk ?? undefined,
