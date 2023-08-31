@@ -55,6 +55,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v2
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -64,9 +66,14 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Build admin ui
-        run: docker build -t tilavaraus-admin-ui --build-arg APP=admin-ui .
-      # pnpm build --filter=admin-ui...
+      - uses: docker/build-push-action@v4
+        with:
+          context: .
+          build-args: |
+            APP=admin-ui
+          # TODO the first push needs to be done manually
+          push: false
+          tags: tilavaraus-ui/admin-ui:latest
 
   test-admin-ui:
     name: Test admin ui
@@ -191,7 +198,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-          .
       # TODO NEXT_PUBLIC_* needs to be in the build step (either .env.test file or use BUILD ARGs)
       # Real solution is to move them server side so we can use them without rebuilding the container
       # TODO DISABLE_AUTH doesn't work as a runtime only variable either
@@ -216,7 +222,7 @@ jobs:
           # install-command: pnpm install --frozen-lockfile
           install: false
           command: pnpm test:browser:ci
-          wait-on: 'http://localhost:3000'
+          wait-on: 'http://localhost:4000'
       - name: Upload images on failure
         uses: actions/upload-artifact@v3
         if: failure()
