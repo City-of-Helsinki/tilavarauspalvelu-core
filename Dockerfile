@@ -1,9 +1,13 @@
 FROM node:18-bullseye-slim AS base
-
-# This doesn invalidate layer cache if the result from turbo prune stays the same
-# this step generates a trimmed down version of the package list for installer
-FROM base AS builder
 ARG APP
+# Required because the client (js bundle) variables are compile time only
+ARG NEXT_PUBLIC_MOCK_REQUESTS=false
+ARG NEXT_PUBLIC_TILAVARAUS_API_URL
+ARG DISABLE_AUTH=false
+
+# Generates a trimmed down version of the package list for installer
+# doesn't invalidate layer cache if the result from turbo prune stays the same.
+FROM base AS builder
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
@@ -20,13 +24,9 @@ RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-ARG NEXT_PUBLIC_MOCK_REQUESTS=false
 ENV NEXT_PUBLIC_MOCK_REQUESTS=$NEXT_PUBLIC_MOCK_REQUESTS
-ARG NEXT_PUBLIC_TILAVARAUS_API_URL
 ENV NEXT_PUBLIC_TILAVARAUS_API_URL=$NEXT_PUBLIC_TILAVARAUS_API_URL
-ARG DISABLE_AUTH=false
 ENV DISABLE_AUTH=$DISABLE_AUTH
-ARG APP
 COPY turbo.json turbo.json
 ENV SKIP_ENV_VALIDATION=true
 RUN pnpm turbo run build --filter=$APP...
@@ -40,7 +40,6 @@ RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs
 USER nextjs
 
-ARG APP
 COPY --from=installer /app/apps/$APP/next.config.mjs .
 COPY --from=installer /app/apps/$APP/package.json .
 
