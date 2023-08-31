@@ -1,9 +1,9 @@
 from enum import Enum, auto
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import pytest
 
-from common.choices import BannerNotificationTarget
+from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import BannerNotificationFactory
 from tests.factories.user import UserFactory
 from tests.helpers import GraphQLClient, load_content, parametrize_helper
@@ -24,19 +24,19 @@ class UserType(Enum):
 
 class UserTypeParams(NamedTuple):
     user_type: UserType
-    expected: int | list[dict[str, dict[str, str] | None]]
+    expected: Any
 
 
 class TargetParams(NamedTuple):
     target: BannerNotificationTarget
     user_type: UserType
-    expected: int
+    expected: Any
 
 
 class FieldParams(NamedTuple):
     field: str
     user_type: UserType
-    expected: int
+    expected: Any
 
 
 _PRIVATE_FIELDS = ("draft", "name", "target", "state")
@@ -149,7 +149,7 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
     # - The response contains the expected amount of notifications
     content = load_content(response.content)
     notifications = content["data"]["bannerNotifications"]["edges"]
-    assert len(notifications) == expected, str(content)
+    assert len(notifications) == expected, content.json()
 
 
 @pytest.mark.parametrize(
@@ -257,7 +257,7 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
     # - The response contains the expected amount of notifications
     content = load_content(response.content)
     notifications = content["data"]["bannerNotifications"]["edges"]
-    assert len(notifications) == expected, str(content)
+    assert len(notifications) == expected, content.json()
 
 
 @pytest.mark.parametrize(
@@ -334,7 +334,7 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
     # - The response contains the expected notifications
     content = load_content(response.content)
     notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected, str(content)
+    assert notifications == expected, content.json()
 
 
 @pytest.mark.parametrize(
@@ -404,7 +404,7 @@ def test_field_permissions_on_banner_notifications(graphql, field, user_type, ex
     # - The error complains about the selected field
     content = load_content(response.content)
     errors = content["errors"]
-    assert len(errors) == expected, str(content)
+    assert len(errors) == expected, content.json()
     if errors:
         assert errors[0]["path"][-1] == field
 
@@ -458,7 +458,7 @@ def test_permissions_on_non_visible_banner_notifications(graphql, user_type, exp
     # - The response contains the expected amount of notifications
     content = load_content(response.content)
     notifications = content["data"]["bannerNotifications"]["edges"]
-    assert len(notifications) == expected, str(content)
+    assert len(notifications) == expected, content.json()
 
 
 @pytest.mark.parametrize(
@@ -511,4 +511,295 @@ def test_permission_on_both_non_visible_and_visible_banner_notifications(graphql
     # - The response contains the expected amount of notifications
     content = load_content(response.content)
     notifications = content["data"]["bannerNotifications"]["edges"]
-    assert len(notifications) == expected, str(content)
+    assert len(notifications) == expected, content.json()
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "Anonymous user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.ANONYMOUS,
+                expected={
+                    "data": {
+                        "createBannerNotification": {
+                            "errors": [
+                                {
+                                    "field": "nonFieldErrors",
+                                    "messages": [
+                                        "No permission to mutate.",
+                                    ],
+                                }
+                            ],
+                            "message": None,
+                            "name": None,
+                        }
+                    }
+                },
+            ),
+            "Regular user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.REGULAR,
+                expected={
+                    "data": {
+                        "createBannerNotification": {
+                            "errors": [
+                                {
+                                    "field": "nonFieldErrors",
+                                    "messages": [
+                                        "No permission to mutate.",
+                                    ],
+                                }
+                            ],
+                            "message": None,
+                            "name": None,
+                        }
+                    }
+                },
+            ),
+            "Staff user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.STAFF,
+                expected={
+                    "data": {
+                        "createBannerNotification": {
+                            "errors": [
+                                {
+                                    "field": "nonFieldErrors",
+                                    "messages": [
+                                        "No permission to mutate.",
+                                    ],
+                                }
+                            ],
+                            "message": None,
+                            "name": None,
+                        }
+                    }
+                },
+            ),
+            "Notification manager should be able to create banner notifications": UserTypeParams(
+                user_type=UserType.NOTIFICATION_MANAGER,
+                expected={
+                    "data": {
+                        "createBannerNotification": {
+                            "name": "foo",
+                            "message": "bar",
+                            "errors": None,
+                        },
+                    },
+                },
+            ),
+        },
+    ),
+)
+def test_permission_on_creating_banner_notifications(graphql, user_type, expected):
+    # given:
+    # - User of the given type is using the system
+    login_user_based_on_type(graphql, user_type)
+
+    # when:
+    # - User tries to create a new banner notification
+    response = graphql(
+        """
+        mutation ($input: BannerNotificationCreateMutationInput!) {
+          createBannerNotification(input: $input) {
+            name
+            message
+            errors {
+              field
+              messages
+            }
+          }
+        }
+        """,
+        variables={
+            "input": {
+                "name": "foo",
+                "message": "bar",
+                "target": BannerNotificationTarget.ALL.value,
+                "level": BannerNotificationLevel.NORMAL.value,
+            },
+        },
+    )
+
+    # then:
+    # - The response contains the expected result
+    content = load_content(response.content)
+    assert content == expected
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "Anonymous user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.ANONYMOUS,
+                expected={
+                    "data": {
+                        "updateBannerNotification": {
+                            "errors": [{"field": "nonFieldErrors", "messages": ["No permission to mutate."]}],
+                            "message": None,
+                            "name": None,
+                        }
+                    }
+                },
+            ),
+            "Regular user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.REGULAR,
+                expected={
+                    "data": {
+                        "updateBannerNotification": {
+                            "errors": [{"field": "nonFieldErrors", "messages": ["No permission to mutate."]}],
+                            "message": None,
+                            "name": None,
+                        }
+                    }
+                },
+            ),
+            "Staff user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.STAFF,
+                expected={
+                    "data": {
+                        "updateBannerNotification": {
+                            "errors": [{"field": "nonFieldErrors", "messages": ["No permission to mutate."]}],
+                            "message": None,
+                            "name": None,
+                        }
+                    }
+                },
+            ),
+            "Notification manager should be able to create banner notifications": UserTypeParams(
+                user_type=UserType.NOTIFICATION_MANAGER,
+                expected={
+                    "data": {
+                        "updateBannerNotification": {
+                            "name": "1",
+                            "message": "2",
+                            "errors": None,
+                        },
+                    },
+                },
+            ),
+        },
+    ),
+)
+def test_permission_on_updating_banner_notifications(graphql, user_type, expected):
+    # given:
+    # - There is a draft notification in the system
+    # - User of the given type is using the system
+    notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
+    login_user_based_on_type(graphql, user_type)
+
+    # when:
+    # - User tries to update the banner notification
+    response = graphql(
+        """
+        mutation ($input: BannerNotificationUpdateMutationInput!) {
+          updateBannerNotification(input: $input) {
+            name
+            message
+            errors {
+              field
+              messages
+            }
+          }
+        }
+        """,
+        variables={
+            "input": {
+                "pk": notification.pk,
+                "name": "1",
+                "message": "2",
+            },
+        },
+    )
+
+    # then:
+    # - The response contains the expected result
+    content = load_content(response.content)
+    assert content == expected
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "Anonymous user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.ANONYMOUS,
+                expected={
+                    "data": {
+                        "deleteBannerNotification": {
+                            "deleted": False,
+                            "errors": [{"field": "nonFieldErrors", "messages": ["No permission to mutate."]}],
+                            "rowCount": 0,
+                        },
+                    },
+                },
+            ),
+            "Regular user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.REGULAR,
+                expected={
+                    "data": {
+                        "deleteBannerNotification": {
+                            "deleted": False,
+                            "errors": [{"field": "nonFieldErrors", "messages": ["No permission to mutate."]}],
+                            "rowCount": 0,
+                        },
+                    },
+                },
+            ),
+            "Staff user should not be able to create banner notifications": UserTypeParams(
+                user_type=UserType.STAFF,
+                expected={
+                    "data": {
+                        "deleteBannerNotification": {
+                            "deleted": False,
+                            "errors": [{"field": "nonFieldErrors", "messages": ["No permission to mutate."]}],
+                            "rowCount": 0,
+                        },
+                    },
+                },
+            ),
+            "Notification manager should be able to create banner notifications": UserTypeParams(
+                user_type=UserType.NOTIFICATION_MANAGER,
+                expected={
+                    "data": {
+                        "deleteBannerNotification": {
+                            "deleted": True,
+                            "errors": None,
+                            "rowCount": 1,
+                        },
+                    },
+                },
+            ),
+        },
+    ),
+)
+def test_permission_on_deleting_banner_notifications(graphql, user_type, expected):
+    # given:
+    # - There is a draft banner notification in the system
+    # - Notification manager is using the system
+    notification = BannerNotificationFactory.create(draft=True)
+    login_user_based_on_type(graphql, user_type)
+
+    # when:
+    # - User tries to delete the banner notification
+    response = graphql(
+        """
+        mutation ($input: BannerNotificationDeleteMutationInput!) {
+          deleteBannerNotification(input: $input) {
+            deleted
+            rowCount
+            errors {
+              field
+              messages
+            }
+          }
+        }
+        """,
+        variables={
+            "input": {
+                "pk": notification.pk,
+            }
+        },
+    )
+
+    # then:
+    # - The response contains the result of the deletion
+    content = load_content(response.content)
+    assert content == expected
