@@ -6,7 +6,6 @@ import type {
   Query,
   QueryReservationUnitByPkArgs,
   QueryUnitsArgs,
-  ReservationsReservationTypeChoices,
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
   ErrorType,
@@ -15,7 +14,10 @@ import type {
   ReservationStaffCreateMutationInput,
   ReservationStaffCreateMutationPayload,
 } from "common/types/gql-types";
-import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import {
+  ReservationsReservationTypeChoices,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+} from "common/types/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
 import { toApiDate, fromUIDate, toApiDateUnsafe } from "common/src/common/util";
@@ -165,8 +167,14 @@ const listItemToInterval = (
       start,
       end,
       buffers: {
-        before: item.buffers?.before ?? 0,
-        after: item.buffers?.after ?? 0,
+        before:
+          type !== ReservationsReservationTypeChoices.Blocked
+            ? item.buffers?.before ?? 0
+            : 0,
+        after:
+          type !== ReservationsReservationTypeChoices.Blocked
+            ? item.buffers?.after ?? 0
+            : 0,
       },
       type,
     };
@@ -199,10 +207,11 @@ export const useFilteredReservationList = ({
       return items;
     }
     const isReservationInsideRange = (
-      res: NewReservationListItem,
+      reservationToMake: NewReservationListItem,
       interval: CollisionInterval
     ) => {
-      const interval2 = listItemToInterval(res, reservationType);
+      const type = interval.type ?? ReservationsReservationTypeChoices.Blocked;
+      const interval2 = listItemToInterval(reservationToMake, type);
       if (interval2 && interval) {
         return doesIntervalCollide(interval2, interval);
       }
@@ -214,7 +223,7 @@ export const useFilteredReservationList = ({
         ? { ...x, isOverlapping: true }
         : x
     );
-  }, [items, reservations, reservationType]);
+  }, [items, reservations]);
 
   return { reservations: data, refetch };
 };
