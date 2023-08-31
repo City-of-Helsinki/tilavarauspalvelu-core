@@ -93,14 +93,15 @@ extend-exclude = [
     "local_settings.py",
 ]
 select = [
-    "F",  # pyflakes
-    "E",  # pycodestyle errors
-    "I",  # isort
-    "S",  # flake8-bandit
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
-    "T",  # flake8-print
-    "W",  # pycodestyle warnings
+    "F",        # pyflakes
+    "E",        # pycodestyle errors
+    "I",        # isort
+    "ISC",      # flake8-implicit-str-concat
+    "S",        # flake8-bandit
+    "C4",       # flake8-comprehensions
+    "B",        # flake8-bugbear
+    "T20",      # flake8-print
+    "W",        # pycodestyle warnings
 ]
 ignore = [
     "S101",  # assert is fine.
