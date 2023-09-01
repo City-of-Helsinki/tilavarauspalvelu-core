@@ -1,9 +1,4 @@
 FROM node:18-bullseye-slim AS base
-ARG APP
-# Required because the client (js bundle) variables are compile time only
-ARG NEXT_PUBLIC_MOCK_REQUESTS=false
-ARG NEXT_PUBLIC_TILAVARAUS_API_URL
-ARG DISABLE_AUTH=false
 
 # Generates a trimmed down version of the package list for installer
 # doesn't invalidate layer cache if the result from turbo prune stays the same.
@@ -11,6 +6,8 @@ FROM base AS builder
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
+ARG APP
+RUN echo "APP: $APP"
 RUN turbo prune --scope=$APP --docker
 
 # Add lockfile and package.json's of isolated subworkspace
@@ -24,6 +21,11 @@ RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
+ARG APP
+# Required because the client (js bundle) variables are compile time only
+ARG NEXT_PUBLIC_MOCK_REQUESTS=false
+ARG NEXT_PUBLIC_TILAVARAUS_API_URL
+ARG DISABLE_AUTH=false
 ENV NEXT_PUBLIC_MOCK_REQUESTS=$NEXT_PUBLIC_MOCK_REQUESTS
 ENV NEXT_PUBLIC_TILAVARAUS_API_URL=$NEXT_PUBLIC_TILAVARAUS_API_URL
 ENV DISABLE_AUTH=$DISABLE_AUTH
@@ -33,6 +35,7 @@ RUN corepack enable
 RUN pnpm turbo run build --filter=$APP...
 
 FROM base AS runner
+ARG APP
 COPY --from=installer /usr/bin/dumb-init /usr/bin/dumb-init
 WORKDIR /app
 

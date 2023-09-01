@@ -13,11 +13,11 @@ trigger:
     include:
       - main
       - refs/tags/*
-  paths:
     # TODO should use turborepo to calculate the real needed packages
-    include:
-      - packages/common
-      - apps/admin-ui
+#  paths:
+#    include:
+#      - packages/common
+#      - apps/admin-ui
 
 # By default, use self-hosted agents
 pool: Default
