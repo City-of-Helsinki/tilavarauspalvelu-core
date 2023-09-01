@@ -307,13 +307,11 @@ const EventContainer = styled.div`
 `;
 
 const Events = ({
-  currentReservationUnit,
   firstHour,
   events,
   eventStyleGetter,
   numHours,
 }: {
-  currentReservationUnit: number;
   firstHour: number;
   events: CalendarEvent<ReservationType>[];
   eventStyleGetter: EventStyleGetter;
@@ -339,23 +337,18 @@ const Events = ({
 
         const durationMinutes = differenceInMinutes(endDate, startDate);
 
-        const isEventInCurrentReservationUnit =
-          currentReservationUnit === e.event?.reservationUnits?.[0]?.pk;
-
         const right = `calc(${left} + ${durationMinutes / 60} * ${
           100 / numHours
         }% + 1px)`;
 
         return (
           <Fragment key={`${title}-${startDate.toISOString()}`}>
-            {isEventInCurrentReservationUnit && (
-              <PreBuffer
-                event={e}
-                hourPercent={hourPercent}
-                left={left}
-                style={TemplateProps}
-              />
-            )}
+            <PreBuffer
+              event={e}
+              hourPercent={hourPercent}
+              left={left}
+              style={TemplateProps}
+            />
             <div
               style={{
                 left,
@@ -376,14 +369,12 @@ const Events = ({
                 </Popup>
               </EventContent>
             </div>
-            {isEventInCurrentReservationUnit && (
-              <PostBuffer
-                event={e}
-                hourPercent={hourPercent}
-                right={right}
-                style={TemplateProps}
-              />
-            )}
+            <PostBuffer
+              event={e}
+              hourPercent={hourPercent}
+              right={right}
+              style={TemplateProps}
+            />
           </Fragment>
         );
       })}
@@ -475,7 +466,6 @@ const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
                 onComplete={refetch}
               />
               <Events
-                currentReservationUnit={row.pk}
                 firstHour={beginHour}
                 numHours={numHours}
                 events={row.events}
