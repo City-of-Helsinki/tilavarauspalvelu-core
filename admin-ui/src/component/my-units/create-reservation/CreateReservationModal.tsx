@@ -8,6 +8,7 @@ import {
   type ReservationStaffCreateMutationPayload,
   type ReservationUnitType,
   ReservationsReservationTypeChoices,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "common/types/gql-types";
 import styled from "styled-components";
 import { camelCase, get } from "lodash";
@@ -199,10 +200,13 @@ const DialogContent = ({
   start: Date;
 }) => {
   const { t, i18n } = useTranslation();
+  const interval =
+    reservationUnit.reservationStartInterval ===
+    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      ? ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      : ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
   const form = useForm<FormValueType>({
-    resolver: zodResolver(
-      ReservationFormSchema(reservationUnit.reservationStartInterval)
-    ),
+    resolver: zodResolver(ReservationFormSchema(interval)),
     // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields
     // onBlur on the other hand does no validation on the focused field till it's blurred
 

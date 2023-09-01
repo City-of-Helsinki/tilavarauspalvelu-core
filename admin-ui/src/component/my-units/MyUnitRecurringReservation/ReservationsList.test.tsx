@@ -199,9 +199,7 @@ describe("ReservationsList", () => {
 
     const screen = render(<ReservationList items={items} />);
     expect(await screen.findAllByText(/19:00/)).toHaveLength(1);
-    expect(
-      screen.getByText(/Overlapping reservations are not allowed./)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/overlap/)).toBeInTheDocument();
   });
 
   test("Error message that has no translation has a default message", async () => {

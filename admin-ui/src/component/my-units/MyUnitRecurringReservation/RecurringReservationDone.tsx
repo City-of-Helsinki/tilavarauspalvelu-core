@@ -1,5 +1,4 @@
 import React from "react";
-import type { ErrorType } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
@@ -33,21 +32,14 @@ const ReservationMadeSchema = z.object({
   startTime: z.string(),
   endTime: z.string(),
   date: z.date(),
-  error: z.string().or(z.array(z.unknown())).optional(), // string | ErrorType[];
+  error: z.string().or(z.unknown()).optional(),
 });
+export type ReservationMade = z.infer<typeof ReservationMadeSchema>;
 
 const RecurringReservationDoneParamsSchema = z.object({
   reservations: z.array(ReservationMadeSchema),
   recurringPk: z.number(),
 });
-
-export type ReservationMade = {
-  reservationPk?: number;
-  startTime: string;
-  endTime: string;
-  date: Date;
-  error?: string | ErrorType[];
-};
 
 const RecurringReservationDone = () => {
   const location = useLocation();

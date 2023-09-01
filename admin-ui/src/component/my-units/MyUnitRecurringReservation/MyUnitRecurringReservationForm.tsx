@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ReservationsReservationTypeChoices,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
   type ReservationUnitType,
 } from "common/types/gql-types";
 import { camelCase, get } from "lodash";
@@ -179,10 +180,15 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
+  const interval =
+    reservationUnit?.reservationStartInterval ===
+    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      ? ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      : ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
   const newReservations = useMultipleReservation({
     form,
     reservationUnit,
-    interval: reservationUnit?.reservationStartInterval,
+    interval,
   });
 
   const reservationType =
