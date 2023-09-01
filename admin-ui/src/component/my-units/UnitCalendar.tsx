@@ -230,7 +230,7 @@ const PreBuffer = ({
           left: `calc(${left} - ${width})`,
           width,
         }}
-        title={t("MyUnits.UnitCalendar.legend.pause")}
+        title={t("MyUnits.Calendar.legend.pause")}
         key={`${event.event?.pk}-pre`}
       />
     );
@@ -262,7 +262,7 @@ const PostBuffer = ({
           left: right,
           width,
         }}
-        title={t("MyUnits.UnitCalendar.legend.pause")}
+        title={t("MyUnits.Calendar.legend.pause")}
         key={`${event.event?.pk}-post`}
       />
     );
