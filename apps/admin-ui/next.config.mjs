@@ -1,6 +1,6 @@
 import { join } from "path";
 import analyser from "@next/bundle-analyzer";
-// import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs";
 import * as url from "url";
 await import ("./src/env.mjs");
 import { env } from "./src/env.mjs";
@@ -90,7 +90,6 @@ const config ={
 
 const nextConfig = withBundleAnalyzer(config)
 
-/*
 const sentryWebpackPluginOptions = {
   hideSourceMaps: true,
   dryRun: env.SENTRY_AUTH_TOKEN === undefined,
@@ -101,5 +100,3 @@ const sentryWebpackPluginOptions = {
 // ensure that your source maps include changes from all other Webpack plugins
 export default env.SENTRY_ENVIRONMENT
   ? withSentryConfig(nextConfig, sentryWebpackPluginOptions) : nextConfig;
-*/
-export default nextConfig;

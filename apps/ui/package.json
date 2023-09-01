@@ -23,7 +23,7 @@
   "dependencies": {
     "@apollo/client": "^3.8.1",
     "@react-pdf/renderer": "^3.1.12",
-    "@sentry/nextjs": "^7.28.1",
+    "@sentry/nextjs": "^7.66.0",
     "axios": "^1.2.1",
     "axios-auth-refresh": "^3.3.4",
     "axios-case-converter": "^0.11.1",

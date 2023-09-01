@@ -1,5 +1,5 @@
 import i18nconfig from "./next-i18next.config.js";
-// const { withSentryConfig } = require("@sentry/nextjs");
+import { withSentryConfig } from "@sentry/nextjs"
 
 const { i18n } = i18nconfig;
 
@@ -51,7 +51,6 @@ const nextConfig = {
   },
 };
 
-/* FIXME sentry import broken
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
   // the following options are set automatically, and overriding them is not
@@ -68,8 +67,6 @@ const sentryWebpackPluginOptions = {
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports = !!process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT
+export default !!process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT
   ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
   : nextConfig;
-*/
-export default nextConfig;
