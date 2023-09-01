@@ -28,9 +28,17 @@ import { MediumButton } from "../../styles/util";
 import Carousel from "../Carousel";
 import LoginFragment from "../LoginFragment";
 
+export type QuickReservationSlotProps = {
+  start: Date;
+  end: Date;
+};
+
 type Props = {
   isReservationUnitReservable: boolean;
   createReservation: (arg: ReservationProps) => void;
+  setQuickReservationSlot: React.Dispatch<
+    React.SetStateAction<QuickReservationSlotProps>
+  >;
   reservationUnit: ReservationUnitByPkType;
   scrollPosition: number;
   isSlotReservable: (arg1: Date, arg2: Date, arg3?: boolean) => boolean;
@@ -210,6 +218,7 @@ const QuickReservation = ({
   setErrorMsg,
   idPrefix,
   subventionSuffix,
+  setQuickReservationSlot,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -317,8 +326,9 @@ const QuickReservation = ({
         reservationUnitPk: reservationUnit.pk,
       };
       setLocalReservation(res);
+      setQuickReservationSlot({ start: begin, end });
     }
-  }, [date, duration, slot, reservationUnit.pk]);
+  }, [date, duration, slot, reservationUnit.pk, setQuickReservationSlot]);
 
   const availableTimes = useCallback(
     (day: Date, fromStartOfDay = false): string[] => {
@@ -468,6 +478,7 @@ const QuickReservation = ({
           </>
         ) : null}
       </Price>
+
       <Subheading>
         {t("reservationCalendar:quickReservation.subheading")}
       </Subheading>

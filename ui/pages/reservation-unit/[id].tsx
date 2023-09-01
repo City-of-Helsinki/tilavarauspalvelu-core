@@ -117,7 +117,9 @@ import {
   Wrapper,
 } from "../../components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "../../components/common/Toast";
-import QuickReservation from "../../components/reservation-unit/QuickReservation";
+import QuickReservation, {
+  QuickReservationSlotProps,
+} from "../../components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
 
 type Props = {
@@ -770,38 +772,19 @@ const ReservationUnit = ({
     [reservationUnit]
   );
 
-  const quickReservationComponent = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (calendar: React.MutableRefObject<any>, type: "mobile" | "desktop") => {
-      const scrollPosition = calendar?.current?.offsetTop
-        ? calendar.current.offsetTop - 20
-        : undefined;
+  const [quickReservationSlot, setQuickReservationSlot] =
+    useState<QuickReservationSlotProps>(null);
 
-      return (
-        !isReservationStartInFuture(reservationUnit) &&
-        isReservable && (
-          <QuickReservation
-            isSlotReservable={isSlotReservable}
-            isReservationUnitReservable={!isReservationQuotaReached}
-            createReservation={(res) => createReservation(res)}
-            reservationUnit={reservationUnit}
-            scrollPosition={scrollPosition}
-            setErrorMsg={setErrorMsg}
-            idPrefix={type}
-            subventionSuffix={subventionSuffix}
-          />
-        )
-      );
-    },
-    [
-      createReservation,
-      isReservationQuotaReached,
-      isSlotReservable,
-      reservationUnit,
-      isReservable,
-      subventionSuffix,
-    ]
-  );
+  const quickReservationProps = {
+    isSlotReservable,
+    isReservationUnitReservable: !isReservationQuotaReached,
+    createReservation: (res) => createReservation(res),
+    reservationUnit,
+    calendarRef,
+    setErrorMsg,
+    subventionSuffix,
+    setQuickReservationSlot,
+  };
 
   const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<
     number | null
@@ -814,6 +797,16 @@ const ReservationUnit = ({
     const height: number = banner?.offsetHeight;
     setCookiehubBannerHeight(height);
   };
+
+  // Update the calendar to reflect a selected quick reservation slot
+  // TODO: unselecting the slot should also be reflected in the calendar
+  useEffect(() => {
+    if (quickReservationSlot !== null)
+      handleEventChange({
+        start: quickReservationSlot.start,
+        end: quickReservationSlot.end,
+      });
+  }, [handleEventChange, quickReservationSlot]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -852,13 +845,23 @@ const ReservationUnit = ({
         <Columns>
           <div>
             <JustForDesktop customBreakpoint={breakpoints.l}>
-              {quickReservationComponent(calendarRef, "desktop")}
+              {!isReservationStartInFuture(reservationUnit) && isReservable && (
+                <QuickReservation
+                  {...quickReservationProps}
+                  idPrefix="desktop"
+                />
+              )}
               <Address reservationUnit={reservationUnit} />
             </JustForDesktop>
           </div>
           <Left>
             <JustForMobile customBreakpoint={breakpoints.l}>
-              {quickReservationComponent(calendarRef, "mobile")}
+              {!isReservationStartInFuture(reservationUnit) && isReservable && (
+                <QuickReservation
+                  {...quickReservationProps}
+                  idPrefix="mobile"
+                />
+              )}
             </JustForMobile>
             <Subheading>{t("reservationUnit:description")}</Subheading>
             <Content data-testid="reservation-unit__description">
