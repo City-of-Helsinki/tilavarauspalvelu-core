@@ -10,10 +10,10 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
-from email_notification.tests.factories import EmailTemplateFactory
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservations.models import STATE_CHOICES, ReservationType
-from reservations.tests.factories import (
+from tests.factories import (
+    EmailTemplateFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,

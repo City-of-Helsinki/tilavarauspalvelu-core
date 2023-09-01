@@ -9,8 +9,7 @@ from django.utils.timezone import get_default_timezone
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
-from reservation_units.tests.factories import ReservationUnitFactory
-from spaces.tests.factories import UnitFactory
+from tests.factories import ReservationUnitFactory, UnitFactory
 
 DATES = [
     datetime.datetime.strptime("2021-01-01", "%Y-%m-%d").date(),

@@ -19,7 +19,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
+from tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 from users.models import PersonalInfoViewLog, ReservationNotification, User
 
 

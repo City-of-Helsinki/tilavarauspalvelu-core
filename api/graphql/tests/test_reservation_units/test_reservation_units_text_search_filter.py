@@ -5,7 +5,7 @@ from assertpy import assert_that
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
 )
-from spaces.tests.factories import SpaceFactory
+from tests.factories import SpaceFactory
 
 
 class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):

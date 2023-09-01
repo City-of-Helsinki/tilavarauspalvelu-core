@@ -7,12 +7,13 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import (
+from tests.factories import (
+    RecurringReservationFactory,
+    ReservationFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
+    UnitFactory,
 )
-from reservations.tests.factories import RecurringReservationFactory, ReservationFactory
-from spaces.tests.factories import UnitFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

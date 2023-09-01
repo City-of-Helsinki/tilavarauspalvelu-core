@@ -3,7 +3,7 @@ from typing import Any, NamedTuple
 import pytest
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
-from tests.factories.user import UserFactory
+from tests.factories import UserFactory
 from tests.helpers import load_content, parametrize_helper
 
 # Applied to all tests

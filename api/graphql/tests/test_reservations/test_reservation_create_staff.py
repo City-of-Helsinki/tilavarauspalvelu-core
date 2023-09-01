@@ -20,7 +20,7 @@ from permissions.models import (
 )
 from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import AgeGroup, Reservation, ReservationType
-from reservations.tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import RecurringReservationFactory, ReservationFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

@@ -12,9 +12,7 @@ from freezegun import freeze_time
 from api.graphql.tests.base import GrapheneTestCaseBase
 from api.graphql.validation_errors import ValidationErrorCodes
 from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
-from merchants.verkkokauppa.payment.test.factories import PaymentFactory
-from reservations.tests.factories import ReservationFactory
+from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 
 
 @override_settings(VERKKOKAUPPA_NAMESPACE="tilanvaraus")

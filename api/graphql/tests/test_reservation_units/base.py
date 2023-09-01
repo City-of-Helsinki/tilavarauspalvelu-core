@@ -12,20 +12,21 @@ from merchants.verkkokauppa.product.types import Product
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from reservation_units.models import PaymentType, ReservationUnit, TaxPercentage
-from reservation_units.tests.factories import (
+from terms_of_use.models import TermsOfUse
+from tests.factories import (
     PurposeFactory,
     QualifierFactory,
+    ReservationMetadataSetFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
     ReservationUnitTypeFactory,
+    ResourceFactory,
+    ServiceFactory,
+    SpaceFactory,
+    TermsOfUseFactory,
+    UnitFactory,
 )
-from reservations.tests.factories import ReservationMetadataSetFactory
-from resources.tests.factories import ResourceFactory
-from services.tests.factories import ServiceFactory
-from spaces.tests.factories import SpaceFactory, UnitFactory
-from terms_of_use.models import TermsOfUse
-from terms_of_use.tests.factories import TermsOfUseFactory
 
 TIMEZONE = get_default_timezone()
 

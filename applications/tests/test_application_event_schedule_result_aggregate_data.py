@@ -10,13 +10,13 @@ from applications.models import (
     ApplicationEventAggregateData,
     ApplicationEventScheduleResultAggregateData,
 )
-from applications.tests.factories import (
+from applications.utils.aggregate_data import (
+    ApplicationEventScheduleResultAggregateDataRunner,
+)
+from tests.factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
     ApplicationEventScheduleResultFactory,
-)
-from applications.utils.aggregate_data import (
-    ApplicationEventScheduleResultAggregateDataRunner,
 )
 
 

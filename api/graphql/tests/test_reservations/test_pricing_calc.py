@@ -9,10 +9,7 @@ from api.graphql.reservations.reservation_serializers.mixins import (
 )
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from reservation_units.models import PriceUnit, PricingStatus, PricingType
-from reservation_units.tests.factories import (
-    ReservationUnitPricingFactory,
-    TaxPercentageFactory,
-)
+from tests.factories import ReservationUnitPricingFactory, TaxPercentageFactory
 
 
 class ReservationPricingTestCase(ReservationTestCaseBase):

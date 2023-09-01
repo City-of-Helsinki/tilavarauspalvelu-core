@@ -7,18 +7,17 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from merchants.tests.factories import PaymentMerchantFactory, PaymentProductFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservation_units.models import PaymentType, ReservationUnit
-from reservation_units.tests.factories import (
+from reservations.models import ReservationMetadataField, ReservationMetadataSet
+from tests.factories import (
+    PaymentMerchantFactory,
+    PaymentProductFactory,
+    ReservationPurposeFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
-)
-from reservations.models import ReservationMetadataField, ReservationMetadataSet
-from reservations.tests.factories import ReservationPurposeFactory
-from spaces.tests.factories import (
     ServiceSectorFactory,
     SpaceFactory,
     UnitFactory,

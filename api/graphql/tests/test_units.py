@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 from graphene_django.utils import GraphQLTestCase
 
-from merchants.tests.factories import PaymentMerchantFactory
 from permissions.models import (
     ServiceSectorRole,
     ServiceSectorRoleChoice,
@@ -16,10 +15,15 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import ReservationFactory
 from spaces.models import Unit
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
+from tests.factories import (
+    PaymentMerchantFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+    ServiceSectorFactory,
+    UnitFactory,
+    UnitGroupFactory,
+)
 
 
 class UnitTestCaseBase(GraphQLTestCase, snapshottest.TestCase):

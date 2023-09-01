@@ -11,16 +11,16 @@ from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from applications.tests.factories import ApplicationRoundFactory
 from email_notification.models import EmailType
-from email_notification.tests.factories import EmailTemplateFactory
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import (
+from reservations.models import STATE_CHOICES
+from tests.factories import (
+    ApplicationRoundFactory,
+    EmailTemplateFactory,
+    ReservationFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitPricingFactory,
 )
-from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

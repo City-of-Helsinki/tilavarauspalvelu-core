@@ -5,7 +5,7 @@ from assertpy import assert_that
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from reservation_units.models import Purpose
-from reservation_units.tests.factories import PurposeFactory
+from tests.factories import PurposeFactory
 
 
 class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):

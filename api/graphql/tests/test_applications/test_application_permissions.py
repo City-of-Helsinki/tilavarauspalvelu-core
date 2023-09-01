@@ -5,11 +5,6 @@ from assertpy import assert_that
 from django.contrib.auth import get_user_model
 
 from applications.models import Application
-from applications.tests.factories import (
-    ApplicationEventFactory,
-    ApplicationFactory,
-    EventReservationUnitFactory,
-)
 from permissions.models import (
     ServiceSectorRole,
     ServiceSectorRoleChoice,
@@ -18,8 +13,13 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
-from spaces.tests.factories import UnitGroupFactory
+from tests.factories import (
+    ApplicationEventFactory,
+    ApplicationFactory,
+    EventReservationUnitFactory,
+    ReservationUnitFactory,
+    UnitGroupFactory,
+)
 
 from .base import ApplicationTestCaseBase
 

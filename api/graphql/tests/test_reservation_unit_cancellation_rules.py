@@ -4,7 +4,7 @@ import snapshottest
 from assertpy import assert_that
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from reservation_units.tests.factories import ReservationUnitCancellationRuleFactory
+from tests.factories import ReservationUnitCancellationRuleFactory
 
 
 class ReservationUnitCancellationRulesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):

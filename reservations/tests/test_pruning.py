@@ -8,7 +8,7 @@ from django.utils.timezone import get_current_timezone, get_default_timezone
 from freezegun import freeze_time
 
 from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
+from tests.factories import PaymentOrderFactory, RecurringReservationFactory, ReservationFactory
 
 from ..models import (
     STATE_CHOICES,
@@ -22,7 +22,6 @@ from ..pruning import (
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
-from .factories import RecurringReservationFactory, ReservationFactory
 
 
 class PruneInactiveReservationsTestCase(TestCase):

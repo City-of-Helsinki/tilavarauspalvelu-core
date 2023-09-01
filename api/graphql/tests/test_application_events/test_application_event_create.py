@@ -8,14 +8,14 @@ from api.graphql.tests.test_application_events.base import (
     ApplicationEventPermissionsTestCaseBase,
 )
 from applications.models import ApplicationEvent, ApplicationEventStatus
-from applications.tests.factories import ApplicationFactory
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import (
+from tests.factories import (
     AbilityGroupFactory,
     AgeGroupFactory,
+    ApplicationFactory,
     ReservationPurposeFactory,
+    ReservationUnitFactory,
+    ServiceSectorFactory,
 )
-from spaces.tests.factories import ServiceSectorFactory
 
 
 class ApplicationEventCreateTestCase(ApplicationEventPermissionsTestCaseBase):

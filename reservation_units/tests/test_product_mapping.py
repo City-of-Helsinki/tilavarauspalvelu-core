@@ -4,12 +4,8 @@ from uuid import uuid4
 from assertpy import assert_that
 from django.test import TestCase, override_settings
 
-from merchants.tests.factories import PaymentMerchantFactory
 from merchants.verkkokauppa.product.types import Product
-from reservation_units.tests.factories import (
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-)
+from tests.factories import PaymentMerchantFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 
 product_id = uuid4()
 

@@ -5,12 +5,7 @@ from assertpy import assert_that
 from django.contrib.auth import get_user_model
 
 from applications.models import Application, ApplicationAggregateData, ApplicationStatus
-from applications.tests.factories import (
-    ApplicationFactory,
-    ApplicationStatusFactory,
-    OrganisationFactory,
-    PersonFactory,
-)
+from tests.factories import ApplicationFactory, ApplicationStatusFactory, OrganisationFactory, PersonFactory
 
 from .base import ApplicationTestCaseBase
 

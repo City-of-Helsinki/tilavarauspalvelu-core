@@ -12,6 +12,11 @@ from .role import GeneralRoleChoiceFactory, GeneralRoleFactory, GeneralRolePermi
 _GENERAL_PERMISSIONS = {perm[0] for perm in GENERAL_PERMISSIONS}
 
 
+__all__ = [
+    "UserFactory",
+]
+
+
 class UserFactory(GenericDjangoModelFactory[User]):
     class Meta:
         model = User

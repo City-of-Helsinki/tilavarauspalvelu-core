@@ -19,7 +19,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from tests.factories import ReservationFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

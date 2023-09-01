@@ -15,24 +15,24 @@ from applications.models import (
     ApplicationEventStatus,
     ApplicationStatus,
 )
-from applications.tests.factories import (
-    ApplicationEventFactory,
-    ApplicationEventScheduleFactory,
-    ApplicationEventScheduleResultFactory,
-    ApplicationFactory,
-    ApplicationRoundFactory,
-    EventReservationUnitFactory,
-)
 from permissions.models import (
     ServiceSectorRole,
     ServiceSectorRoleChoice,
     UnitRole,
     UnitRoleChoice,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES, RecurringReservation, Reservation
-from reservations.tests.factories import ReservationFactory
-from spaces.tests.factories import SpaceFactory
+from tests.factories import (
+    ApplicationEventFactory,
+    ApplicationEventScheduleFactory,
+    ApplicationEventScheduleResultFactory,
+    ApplicationFactory,
+    ApplicationRoundFactory,
+    EventReservationUnitFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+    SpaceFactory,
+)
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
 User = get_user_model()

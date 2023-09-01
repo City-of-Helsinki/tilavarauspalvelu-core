@@ -11,8 +11,18 @@ from applications.models import (
     ApplicationStatus,
     Organisation,
 )
-from applications.tests.factories import (
+from permissions.models import (
+    ServiceSectorRole,
+    ServiceSectorRoleChoice,
+    ServiceSectorRolePermission,
+    UnitRole,
+    UnitRoleChoice,
+    UnitRolePermission,
+)
+from tests.factories import (
+    AbilityGroupFactory,
     AddressFactory,
+    AgeGroupFactory,
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
     ApplicationEventStatusFactory,
@@ -22,25 +32,11 @@ from applications.tests.factories import (
     EventReservationUnitFactory,
     OrganisationFactory,
     PersonFactory,
-)
-from permissions.models import (
-    ServiceSectorRole,
-    ServiceSectorRoleChoice,
-    ServiceSectorRolePermission,
-    UnitRole,
-    UnitRoleChoice,
-    UnitRolePermission,
-)
-from reservation_units.tests.factories import (
+    ReservationPurposeFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
+    UnitGroupFactory,
 )
-from reservations.tests.factories import (
-    AbilityGroupFactory,
-    AgeGroupFactory,
-    ReservationPurposeFactory,
-)
-from spaces.tests.factories import UnitGroupFactory
 
 from ..base import GrapheneTestCaseBase
 

@@ -10,10 +10,8 @@ from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import ReservationMetadataSetFactory
 from terms_of_use.models import TermsOfUse
-from terms_of_use.tests.factories import TermsOfUseFactory
+from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 

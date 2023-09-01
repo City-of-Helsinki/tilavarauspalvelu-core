@@ -15,8 +15,7 @@ from email_notification.sender.email_notification_builder import (
     ReservationEmailNotificationBuilder,
 )
 from email_notification.tests.base import ReservationEmailBaseTestCase
-from email_notification.tests.factories import EmailTemplateFactory
-from reservation_units.tests.factories import ReservationUnitFactory
+from tests.factories import EmailTemplateFactory, ReservationUnitFactory
 from tilavarauspalvelu.utils.commons import LANGUAGES
 
 
@@ -267,7 +266,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         """
         year = datetime.datetime.now(timezone.get_default_timezone()).year
         feedback_url = (
-            "https://feedtheback.com/survey/?site=varaamopalaute&lang=fi" "&ref=https%3A%2F%2Fresourcebooking.com"
+            "https://feedtheback.com/survey/?site=varaamopalaute&lang=fi&ref=https%3A%2F%2Fresourcebooking.com"
         )
         compiled_content = f"""
             Should contain Dance time! and 9.2.2022 and 10:00 and 9.2.2022

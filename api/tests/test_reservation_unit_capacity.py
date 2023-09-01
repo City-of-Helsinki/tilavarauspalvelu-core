@@ -12,9 +12,8 @@ from rest_framework.test import APIClient
 from opening_hours.hours import TimeElement
 from permissions.models import GeneralRole, GeneralRoleChoice
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

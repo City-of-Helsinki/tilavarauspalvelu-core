@@ -7,7 +7,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
+from tests.factories import ReservationUnitFactory
 
 
 class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):

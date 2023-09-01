@@ -3,8 +3,7 @@ from django.test.testcases import TestCase
 
 from email_notification.email_tester import EmailTestForm, ReservationUnitSelectForm
 from email_notification.models import EmailType
-from email_notification.tests.factories import EmailTemplateFactory
-from reservation_units.tests.factories import ReservationUnitFactory
+from tests.factories import EmailTemplateFactory, ReservationUnitFactory
 
 
 class ReservationUnitSelectFormTestCase(TestCase):

@@ -11,10 +11,7 @@ from graphene_file_upload.django.testing import (
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from reservation_units.models import ReservationUnitImage
-from reservation_units.tests.factories import (
-    ReservationUnitFactory,
-    ReservationUnitImageFactory,
-)
+from tests.factories import ReservationUnitFactory, ReservationUnitImageFactory
 
 DEFAULT_GRAPHQL_URL = "/graphql/"
 

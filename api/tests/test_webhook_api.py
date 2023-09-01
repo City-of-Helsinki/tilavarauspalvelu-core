@@ -12,7 +12,6 @@ from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
 
 from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.order.types import Order
 from merchants.verkkokauppa.payment.exceptions import (
@@ -25,7 +24,7 @@ from merchants.verkkokauppa.payment.types import (
     RefundStatusResult,
 )
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from tests.factories import PaymentOrderFactory, ReservationFactory
 
 
 class WebhookAPITestCaseBase(TestCase):

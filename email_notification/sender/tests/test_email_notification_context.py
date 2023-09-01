@@ -10,13 +10,14 @@ from applications.models import CUSTOMER_TYPES
 from email_notification.sender.email_notification_context import (
     EmailNotificationContext,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import (
+from tests.factories import (
+    LocationFactory,
     ReservationCancelReasonFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,
+    ReservationUnitFactory,
+    UnitFactory,
 )
-from spaces.tests.factories import LocationFactory, UnitFactory
 
 
 class EmailNotificationContextTestCase(TestCase):

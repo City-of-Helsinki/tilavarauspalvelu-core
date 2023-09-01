@@ -5,6 +5,12 @@ from permissions.models import GENERAL_PERMISSIONS, GeneralRole, GeneralRoleChoi
 
 from ._base import GenericDjangoModelFactory
 
+__all__ = [
+    "GeneralRoleChoiceFactory",
+    "GeneralRoleFactory",
+    "GeneralRolePermissionFactory",
+]
+
 
 class GeneralRoleChoiceFactory(GenericDjangoModelFactory[GeneralRoleChoice]):
     class Meta:
@@ -20,8 +26,8 @@ class GeneralRoleFactory(GenericDjangoModelFactory[GeneralRole]):
         model = GeneralRole
         django_get_or_create = ["role", "user"]
 
-    role = factory.SubFactory("tests.factories.role.GeneralRoleChoiceFactory")
-    user = factory.SubFactory("tests.factories.user.UserFactory")
+    role = factory.SubFactory("tests.factories.GeneralRoleChoiceFactory")
+    user = factory.SubFactory("tests.factories.UserFactory")
 
 
 class GeneralRolePermissionFactory(GenericDjangoModelFactory[GeneralRolePermission]):
@@ -29,5 +35,5 @@ class GeneralRolePermissionFactory(GenericDjangoModelFactory[GeneralRolePermissi
         model = GeneralRolePermission
         django_get_or_create = ["role", "permission"]
 
-    role = factory.SubFactory("tests.factories.role.GeneralRoleChoiceFactory")
+    role = factory.SubFactory("tests.factories.GeneralRoleChoiceFactory")
     permission = fuzzy.FuzzyChoice([perm[0] for perm in GENERAL_PERMISSIONS])

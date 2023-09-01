@@ -5,7 +5,7 @@ from assertpy import assert_that
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from terms_of_use.models import TermsOfUse
-from terms_of_use.tests.factories import TermsOfUseFactory
+from tests.factories import TermsOfUseFactory
 
 
 class TermsOfUseQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):

@@ -7,10 +7,8 @@ from assertpy import assert_that
 from api.graphql.tests.base import GrapheneTestCaseBase
 from api.graphql.tests.test_reservations.base import DEFAULT_TIMEZONE
 from api.graphql.validation_errors import ValidationErrorCodes
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import RecurringReservation
-from reservations.tests.factories import RecurringReservationFactory
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory
+from tests.factories import RecurringReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UnitFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

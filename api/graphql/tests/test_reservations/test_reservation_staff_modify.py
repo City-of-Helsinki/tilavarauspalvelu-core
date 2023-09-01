@@ -10,7 +10,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservations.models import STATE_CHOICES, ReservationType
-from reservations.tests.factories import ReservationFactory
+from tests.factories import ReservationFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

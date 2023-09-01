@@ -5,10 +5,10 @@ from django.test.testcases import TestCase
 
 from reservation_units.enums import ReservationUnitState
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservation_units.utils.reservation_unit_state_helper import (
     ReservationUnitStateHelper as Helper,
 )
+from tests.factories import ReservationUnitFactory
 
 
 class ReservationUnitStateHelperTestCase(TestCase):

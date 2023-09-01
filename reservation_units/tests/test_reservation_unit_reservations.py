@@ -5,11 +5,8 @@ import pytest
 from django.test.testcases import TestCase
 from django.utils import timezone
 
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
-from services.tests.factories import ServiceFactory
-from spaces.tests.factories import SpaceFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 
 
 @pytest.mark.django_db

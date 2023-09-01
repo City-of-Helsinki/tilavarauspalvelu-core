@@ -6,10 +6,6 @@ from factory.fuzzy import FuzzyChoice
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from applications.models import ApplicationRoundStatus
-from applications.tests.factories import (
-    ApplicationRoundFactory,
-    ApplicationRoundStatusFactory,
-)
 from permissions.models import (
     GeneralRole,
     GeneralRoleChoice,
@@ -21,9 +17,11 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
 from spaces.models import Space
-from spaces.tests.factories import (
+from tests.factories import (
+    ApplicationRoundFactory,
+    ApplicationRoundStatusFactory,
+    ReservationUnitFactory,
     ServiceSectorFactory,
     SpaceFactory,
     UnitFactory,
@@ -56,7 +54,7 @@ class DeleteSpaceTestCase(GrapheneTestCaseBase):
         self.client.force_login(self.general_admin)
 
     def get_delete_query(self):
-        return f"mutation deleteSpace {{deleteSpace(input: {{pk: {self.space.pk} }}){{" f"deleted errors" f"}}" f"}}"
+        return f"mutation deleteSpace {{deleteSpace(input: {{pk: {self.space.pk} }}){{deleted errors}}}}"
 
     def test_space_deleted(self):
         response = self.query(self.get_delete_query())

@@ -4,9 +4,7 @@ from django.test.testcases import TestCase
 
 from email_notification.sender.helpers import get_staff_notification_recipients
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import ReservationFactory
-from spaces.tests.factories import UnitFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory
 from users.models import ReservationNotification, User
 
 

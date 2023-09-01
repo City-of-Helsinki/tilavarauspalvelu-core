@@ -1,8 +1,7 @@
 import pytest
 
 from common.models import BannerNotification
-from tests.factories import BannerNotificationFactory
-from tests.factories.user import UserFactory
+from tests.factories import BannerNotificationFactory, UserFactory
 from tests.helpers import load_content
 
 # Applied to all tests

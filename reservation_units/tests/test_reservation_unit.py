@@ -5,11 +5,9 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES, ReservationType
-from reservations.tests.factories import ReservationFactory
 from spaces.models import Space
-from spaces.tests.factories import SpaceFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 
 
 @freeze_time("2023-05-25 12:23:00")

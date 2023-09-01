@@ -4,9 +4,8 @@ from django.test import RequestFactory, TestCase
 
 from reservation_units.admin import ReservationUnitAdmin
 from reservation_units.models import ReservationKind, ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
 from terms_of_use.models import TermsOfUse
-from terms_of_use.tests.factories import TermsOfUseFactory
+from tests.factories import ReservationUnitFactory, TermsOfUseFactory
 
 
 class ReservationUnitAdminApplicationRoundTestCase(TestCase):

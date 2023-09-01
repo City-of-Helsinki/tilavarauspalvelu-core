@@ -1,7 +1,6 @@
 import csv
 import shutil
 from datetime import datetime, time, timedelta
-from pathlib import Path
 from typing import Any, List
 
 import pytest
@@ -13,6 +12,13 @@ from django.test import RequestFactory
 from django.test.testcases import TestCase
 from factory.fuzzy import FuzzyChoice, FuzzyInteger
 
+from tests.factories import (
+    ApplicationEventFactory,
+    ApplicationEventScheduleFactory,
+    ApplicationStatusFactory,
+    EventReservationUnitFactory,
+)
+
 from ..admin import ApplicationRoundAdmin
 from ..models import (
     PRIORITIES,
@@ -20,12 +26,6 @@ from ..models import (
     ApplicationEvent,
     ApplicationRound,
     ApplicationStatus,
-)
-from .factories import (
-    ApplicationEventFactory,
-    ApplicationEventScheduleFactory,
-    ApplicationStatusFactory,
-    EventReservationUnitFactory,
 )
 
 

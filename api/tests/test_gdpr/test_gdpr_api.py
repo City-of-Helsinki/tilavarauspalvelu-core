@@ -16,18 +16,18 @@ from rest_framework.test import APITestCase
 
 from api.tests.test_gdpr.gdpr_key import rsa_key
 from applications.models import ApplicationStatus
-from applications.tests.factories import (
+from merchants.models import OrderStatus
+from reservations.models import STATE_CHOICES as ReservationState
+from tests.factories import (
     AddressFactory,
     ApplicationEventFactory,
     ApplicationFactory,
     ApplicationStatusFactory,
     OrganisationFactory,
+    PaymentOrderFactory,
     PersonFactory,
+    ReservationFactory,
 )
-from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
-from reservations.models import STATE_CHOICES as ReservationState
-from reservations.tests.factories import ReservationFactory
 
 User = get_user_model()
 

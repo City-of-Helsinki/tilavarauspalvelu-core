@@ -11,7 +11,6 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import CUSTOMER_TYPES, City
-from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.hours import DEFAULT_TIMEZONE
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservation_units.models import (
@@ -20,11 +19,6 @@ from reservation_units.models import (
     PricingType,
     ReservationUnit,
 )
-from reservation_units.tests.factories import (
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-    TaxPercentageFactory,
-)
 from reservations.models import (
     STATE_CHOICES,
     AgeGroup,
@@ -32,7 +26,13 @@ from reservations.models import (
     ReservationMetadataField,
     ReservationType,
 )
-from reservations.tests.factories import ReservationFactory
+from tests.factories import (
+    ApplicationRoundFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingFactory,
+    TaxPercentageFactory,
+)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

@@ -7,12 +7,10 @@ from django.test.testcases import TestCase
 from django.utils.timezone import get_default_timezone
 
 from applications.models import ApplicationRoundAggregateData
-from applications.tests.factories import ApplicationRoundFactory
 from applications.utils.aggregate_data import ApplicationRoundAggregateDataCreator
 from opening_hours.hours import TimeElement
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from tests.factories import ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory
 
 
 def get_mocked_opening_hours(*args, **kwargs):
@@ -20,7 +18,7 @@ def get_mocked_opening_hours(*args, **kwargs):
     full_days = list(range(kwargs.get("full_days", 0)))
     opening_day = kwargs.get("start_date", datetime.date.today())
     opening_hours = []
-    for c in range(days):
+    for _c in range(days):
         is_full_day = len(full_days) > 0
         if is_full_day:
             full_days.pop()

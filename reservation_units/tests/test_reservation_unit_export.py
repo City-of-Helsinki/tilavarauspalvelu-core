@@ -1,7 +1,6 @@
 import csv
 import datetime
 import shutil
-from pathlib import Path
 from typing import Any, List
 
 from assertpy import assert_that
@@ -12,24 +11,24 @@ from django.test.testcases import TestCase
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
-from reservations.tests.factories import ReservationMetadataSetFactory
-from resources.tests.factories import ResourceFactory
-from services.tests.factories import ServiceFactory
-from spaces.tests.factories import SpaceFactory
 from terms_of_use.models import TermsOfUse
-from terms_of_use.tests.factories import TermsOfUseFactory
+from tests.factories import (
+    EquipmentFactory,
+    PurposeFactory,
+    QualifierFactory,
+    ReservationMetadataSetFactory,
+    ReservationUnitCancellationRuleFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingFactory,
+    ResourceFactory,
+    ServiceFactory,
+    SpaceFactory,
+    TermsOfUseFactory,
+)
 
 from ..admin import ReservationUnitAdmin
 from ..models import ReservationUnit
 from ..utils.export_data import ReservationUnitExporter
-from .factories import (
-    EquipmentFactory,
-    PurposeFactory,
-    QualifierFactory,
-    ReservationUnitCancellationRuleFactory,
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-)
 
 
 class ReservationUnitDataExporterTestCase(TestCase):
@@ -38,22 +37,22 @@ class ReservationUnitDataExporterTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.reservation_unit = ReservationUnitFactory(
+        cls.reservation_unit = ReservationUnitFactory.create(
             spaces=SpaceFactory.create_batch(3),
             resources=ResourceFactory.create_batch(3),
             qualifiers=QualifierFactory.create_batch(3),
-            payment_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
-            cancellation_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
-            pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
-            cancellation_rule=ReservationUnitCancellationRuleFactory(),
+            payment_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
+            cancellation_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
+            pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
+            cancellation_rule=ReservationUnitCancellationRuleFactory.create(),
             reservation_begins=datetime.datetime.now(tz=get_default_timezone()),
             reservation_ends=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=30),
-            metadata_set=ReservationMetadataSetFactory(),
+            metadata_set=ReservationMetadataSetFactory.create(),
             services=ServiceFactory.create_batch(3),
             purposes=PurposeFactory.create_batch(3),
             equipments=EquipmentFactory.create_batch(3),
         )
-        cls.pricing = ReservationUnitPricingFactory(reservation_unit=cls.reservation_unit)
+        cls.pricing = ReservationUnitPricingFactory.create(reservation_unit=cls.reservation_unit)
 
     def tearDown(self) -> None:
         super().tearDown()

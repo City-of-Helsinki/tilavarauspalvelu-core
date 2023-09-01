@@ -15,10 +15,14 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import RecurringReservation
-from reservations.tests.factories import AbilityGroupFactory, AgeGroupFactory
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory
+from tests.factories import (
+    AbilityGroupFactory,
+    AgeGroupFactory,
+    ReservationUnitFactory,
+    ServiceSectorFactory,
+    UnitFactory,
+)
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 

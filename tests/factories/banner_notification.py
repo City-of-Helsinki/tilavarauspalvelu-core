@@ -10,6 +10,10 @@ from common.models import BannerNotification
 
 from ._base import GenericDjangoModelFactory
 
+__all__ = [
+    "BannerNotificationFactory",
+]
+
 
 class BannerNotificationFactory(GenericDjangoModelFactory[BannerNotification]):
     class Meta:
