@@ -28,7 +28,7 @@
   --tilavaraus-admin-stack-main-menu: 500;
   --tilavaraus-admin-stack-sticky-reservation-header: 101;
   --tilavaraus-admin-stack-sticky-filters: 5;
-  --tilavaraus-admin-stack-calendar-buffer: 9;
+  --tilavaraus-admin-stack-calendar-buffer: 2;
   --tilavaraus-admin-stack-select-over-calendar: 11;
   --tilavaraus-admin-stack-calendar-title-cells: 10;
   --tilavaraus-stack-order-calendar-gutter: 9;
