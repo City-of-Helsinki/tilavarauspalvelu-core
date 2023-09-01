@@ -84,36 +84,48 @@ const CenterContent = styled.div`
 const stripTimeZeros = (time: string) =>
   time.substring(0, 1) === "0" ? time.substring(1) : time;
 
+const getStatus = (x: NewReservationListItem) => {
+  if (x.isOverlapping) {
+    return {
+      isError: true,
+      msg: "overlapping",
+    };
+  }
+  if (x.isRemoved) {
+    return {
+      isError: false,
+      msg: "removed",
+    };
+  }
+  if (x.error) {
+    // TODO the error handling is really messy and it's impossible to get codes rather than the error message string
+    // also the i18n map is built stupidly so we can't use strings with spaces as keys
+    const intervalErrorMsg =
+      /ApolloError: Reservation start time does not match the allowed interval/;
+    const overlapErrorMsg = /Overlapping reservations are not allowed/;
+    const reservationInPastErrorMsg =
+      /ApolloError: Reservation new begin cannot be in the past/;
+    let errorCode = "default";
+    if (x.error.match(intervalErrorMsg)) {
+      errorCode = "interval";
+    } else if (x.error.match(overlapErrorMsg)) {
+      errorCode = "overlap";
+    } else if (x.error.match(reservationInPastErrorMsg)) {
+      errorCode = "reservationInPast";
+    }
+
+    return {
+      isError: true,
+      msg: `failureMessages.${errorCode}`,
+    };
+  }
+  return undefined;
+};
+
 const StatusElement = ({ item }: { item: NewReservationListItem }) => {
-  const { t, i18n } = useTranslation("translation", {
+  const { t } = useTranslation("translation", {
     keyPrefix: "MyUnits.RecurringReservation.Confirmation",
   });
-
-  const getStatus = (x: NewReservationListItem) => {
-    if (x.isOverlapping) {
-      return {
-        isError: true,
-        msg: "overlapping",
-      };
-    }
-    if (x.isRemoved) {
-      return {
-        isError: false,
-        msg: "removed",
-      };
-    }
-    if (x.error) {
-      const hasTranslatedErrorMsg = i18n.exists(`failureMessages.${x.error}`);
-      const errorTranslated = hasTranslatedErrorMsg
-        ? `failureMessages.${x.error}`
-        : `failureMessages.default`;
-      return {
-        isError: true,
-        msg: errorTranslated,
-      };
-    }
-    return undefined;
-  };
 
   const status = getStatus(item);
   if (!status) {

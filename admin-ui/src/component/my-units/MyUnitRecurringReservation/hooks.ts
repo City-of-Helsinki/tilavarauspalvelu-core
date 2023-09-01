@@ -254,8 +254,9 @@ export const useCreateRecurringReservation = () => {
 
   const { t } = useTranslation();
   const { notifyError } = useNotification();
-  const handleError = (error = "") => {
-    notifyError(t("ReservationDialog.saveFailed", { error }));
+  const handleError = (error: ErrorType | undefined) => {
+    const errorMessage = get(error, "messages[0]");
+    notifyError(t("ReservationDialog.saveFailed", { errorMessage }));
   };
 
   const makeSingleReservation = async (
@@ -311,12 +312,14 @@ export const useCreateRecurringReservation = () => {
 
       // TODO When does the graphql send errors as data? oposed to exceptions
       if (response.errors != null) {
+        const errors =
+          response.errors
+            .filter((y): y is ErrorType => y != null)
+            ?.find(() => true)?.messages ?? [];
         return {
           ...common,
           reservationPk: undefined,
-          error:
-            response.errors.filter((y): y is ErrorType => y != null) ??
-            "unkown error",
+          error: errors.length > 0 ? errors[0] : "unkownError",
         };
       }
       return {
@@ -377,8 +380,7 @@ export const useCreateRecurringReservation = () => {
         createResponse?.createRecurringReservation?.errors || []
       ).find(() => true);
 
-      const errorMessage = get(firstError, "messages[0]");
-      handleError(errorMessage);
+      handleError(firstError ?? undefined);
       return [undefined, []];
     }
     const staffInput = {
