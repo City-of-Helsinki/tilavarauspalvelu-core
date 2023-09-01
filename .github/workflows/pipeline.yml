@@ -193,6 +193,10 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
+
+      - name: Start the server
+        working-directory: apps/ui
+        run: pnpm dev:test &
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v5
         with:
@@ -201,8 +205,8 @@ jobs:
           # install-command: pnpm install --frozen-lockfile
           install: false
           command: pnpm test:browser:ci
-          with: pnpm dev:test
-          wait-on: 'http://127.0.0.1:4000'
+          #wait-on: 'http://127.0.0.1:4000'
+          wait-on: 'http://localhost:4000'
       - name: Upload images on failure
         uses: actions/upload-artifact@v3
         if: failure()
