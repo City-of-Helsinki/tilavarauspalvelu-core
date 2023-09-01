@@ -9,12 +9,10 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
-from merchants.verkkokauppa.order.test.factories import OrderFactory
 from reservations.models import STATE_CHOICES as ReservationState
 from reservations.models import Reservation
-from reservations.tests.factories import ReservationFactory
+from tests.factories import OrderFactory, PaymentOrderFactory, ReservationFactory
 
 
 class ReservationDeleteTestCase(ReservationTestCaseBase):

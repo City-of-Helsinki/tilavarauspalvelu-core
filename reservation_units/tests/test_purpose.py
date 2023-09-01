@@ -8,7 +8,7 @@ from django.test.testcases import TestCase
 from easy_thumbnails.files import get_thumbnailer
 from PIL import Image
 
-from reservation_units.tests.factories import PurposeFactory
+from tests.factories import PurposeFactory
 
 
 class PurposeTestCase(TestCase):

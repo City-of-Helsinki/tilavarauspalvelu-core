@@ -6,13 +6,13 @@ from api.graphql.tests.test_application_events.base import (
     ApplicationEventPermissionsTestCaseBase,
 )
 from applications.models import ApplicationStatus
-from applications.tests.factories import (
+from tests.factories import (
     ApplicationEventFactory,
     ApplicationFactory,
     ApplicationStatusFactory,
     EventReservationUnitFactory,
+    ReservationUnitFactory,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
 
 
 class FlaggedTestCaseBase(ApplicationEventPermissionsTestCaseBase):

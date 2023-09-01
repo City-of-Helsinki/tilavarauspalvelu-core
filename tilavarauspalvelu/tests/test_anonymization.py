@@ -3,11 +3,6 @@ from auditlog.models import LogEntry
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from applications.tests.factories import (
-    AddressFactory,
-    ApplicationEventFactory,
-    ApplicationFactory,
-)
 from permissions.models import (
     GeneralRole,
     GeneralRoleChoice,
@@ -16,8 +11,14 @@ from permissions.models import (
     UnitRole,
     UnitRoleChoice,
 )
-from reservations.tests.factories import ReservationFactory
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory
+from tests.factories import (
+    AddressFactory,
+    ApplicationEventFactory,
+    ApplicationFactory,
+    ReservationFactory,
+    ServiceSectorFactory,
+    UnitFactory,
+)
 from tilavarauspalvelu.utils.anonymisation import (
     anonymize_user,
     anonymize_user_applications,

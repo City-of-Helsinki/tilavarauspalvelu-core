@@ -9,10 +9,8 @@ from freezegun import freeze_time
 from pytest import raises
 
 from applications.models import CUSTOMER_TYPES
-from merchants.tests.factories import PaymentProductFactory
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import ReservationFactory
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
 from ..helpers import (
     create_verkkokauppa_order,

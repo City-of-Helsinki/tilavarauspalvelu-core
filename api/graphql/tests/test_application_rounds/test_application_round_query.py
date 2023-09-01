@@ -11,15 +11,15 @@ from applications.models import (
     ApplicationRoundStatus,
     ApplicationStatus,
 )
-from applications.tests.factories import (
+from permissions.models import GeneralRole, GeneralRoleChoice
+from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     ApplicationRoundStatusFactory,
     ApplicationStatusFactory,
+    ReservationUnitFactory,
+    ServiceSectorFactory,
 )
-from permissions.models import GeneralRole, GeneralRoleChoice
-from reservation_units.tests.factories import ReservationUnitFactory
-from spaces.tests.factories import ServiceSectorFactory
 
 
 @freeze_time("2021-05-03 03:21:34")

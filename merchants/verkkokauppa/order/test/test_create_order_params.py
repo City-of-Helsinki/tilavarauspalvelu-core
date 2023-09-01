@@ -9,10 +9,8 @@ from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
 from applications.models import CUSTOMER_TYPES
-from merchants.tests.factories import PaymentProductFactory
 from merchants.verkkokauppa.helpers import _get_order_params, get_validated_phone_number
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import ReservationFactory
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
 
 class CreateOrderParamsToJsonTestCase(TestCase):

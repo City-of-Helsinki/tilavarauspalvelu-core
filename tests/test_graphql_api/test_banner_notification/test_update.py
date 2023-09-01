@@ -4,8 +4,7 @@ import pytest
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
-from tests.factories import BannerNotificationFactory
-from tests.factories.user import UserFactory
+from tests.factories import BannerNotificationFactory, UserFactory
 from tests.helpers import load_content, parametrize_helper
 
 # Applied to all tests

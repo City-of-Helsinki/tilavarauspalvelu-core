@@ -8,10 +8,7 @@ from django.test.testcases import TestCase
 from django.utils.timezone import get_default_timezone
 
 from applications.models import ApplicationEventAggregateData, ApplicationStatus
-from applications.tests.factories import (
-    ApplicationEventFactory,
-    ApplicationEventScheduleFactory,
-)
+from tests.factories import ApplicationEventFactory, ApplicationEventScheduleFactory
 
 
 class ApplicationEventAggregateDataBaseTestCase(TestCase):

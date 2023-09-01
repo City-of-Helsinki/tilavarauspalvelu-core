@@ -14,12 +14,9 @@ from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.models import OrderStatus, PaymentOrder
-from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.test.factories import PaymentFactory
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 
 NOW = datetime(2023, 5, 10, 13, 0, 0, tzinfo=timezone.utc).astimezone(get_default_timezone())
 

@@ -7,7 +7,7 @@ from api.graphql.tests.test_application_events.base import (
     ApplicationEventPermissionsTestCaseBase,
 )
 from applications.models import ApplicationEvent, ApplicationEventStatus
-from applications.tests.factories import ApplicationEventFactory
+from tests.factories import ApplicationEventFactory
 
 
 class ApplicationEventDeleteTestCase(ApplicationEventPermissionsTestCaseBase):

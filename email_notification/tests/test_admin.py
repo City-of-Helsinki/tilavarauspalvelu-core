@@ -4,8 +4,7 @@ from django.test.client import RequestFactory
 from django.test.testcases import TestCase
 
 from email_notification.admin import get_initial_values
-from reservation_units.tests.factories import ReservationUnitFactory
-from spaces.tests.factories import LocationFactory, UnitFactory
+from tests.factories import LocationFactory, ReservationUnitFactory, UnitFactory
 
 
 class GetInitialValuesTestCase(TestCase):

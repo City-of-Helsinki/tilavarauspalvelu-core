@@ -9,7 +9,7 @@ from easy_thumbnails.files import get_thumbnailer
 from PIL import Image
 
 from reservation_units.models import ReservationUnitImage
-from reservation_units.tests.factories import ReservationUnitFactory
+from tests.factories import ReservationUnitFactory
 
 
 class ReservationUnitImageSaveTestCase(TestCase):

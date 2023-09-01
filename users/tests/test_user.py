@@ -10,7 +10,7 @@ from permissions.models import (
     UnitRole,
     UnitRoleChoice,
 )
-from spaces.tests.factories import ServiceSectorFactory
+from tests.factories import ServiceSectorFactory
 
 
 class UserTestCase(TestCase):

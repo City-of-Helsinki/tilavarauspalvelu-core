@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
-from reservation_units.tests.factories import PurposeFactory
+from tests.factories import PurposeFactory
 
 
 @pytest.mark.django_db
@@ -139,7 +139,7 @@ def test_reservation_unit_create(user, user_api_client, equipment_hammer, valid_
     assert ReservationUnit.objects.count() == 1
     unit = ReservationUnit.objects.all()[0]
     assert unit.name_en == "New reservation unit"
-    assert list(map(lambda x: x.id, unit.equipments.all())) == [equipment_hammer.id]
+    assert [x.id for x in unit.equipments.all()] == [equipment_hammer.id]
 
 
 @pytest.mark.django_db

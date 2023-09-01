@@ -4,7 +4,7 @@ from assertpy import assert_that
 from django.test.testcases import TestCase
 
 from spaces.importers.units import UnitHaukiResourceIdImporter
-from spaces.tests.factories import UnitFactory
+from tests.factories import UnitFactory
 
 RET_VAL = {
     "count": 1,

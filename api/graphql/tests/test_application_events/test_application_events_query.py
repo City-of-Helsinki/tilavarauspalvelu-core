@@ -11,13 +11,13 @@ from applications.models import (
     ApplicationEventWeeklyAmountReduction,
     ApplicationStatus,
 )
-from applications.tests.factories import (
+from tests.factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleResultFactory,
     ApplicationFactory,
     ApplicationStatusFactory,
+    ReservationUnitFactory,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
 
 
 class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):

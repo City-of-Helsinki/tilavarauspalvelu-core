@@ -5,20 +5,17 @@ from uuid import uuid4
 import factory
 from django.utils.timezone import get_default_timezone
 
-from ..types import Order, OrderCustomer
+from merchants.verkkokauppa.order.types import Order, OrderCustomer
+
+from ._base import GenericFactory
+
+__all__ = [
+    "OrderFactory",
+    "OrderCustomerFactory",
+]
 
 
-class OrderCustomerFactory(factory.Factory):
-    class Meta:
-        model = OrderCustomer
-
-    first_name = "Foo"
-    last_name = "Bar"
-    email = "foo.bar@email.com"
-    phone = "+358 50 123 4567"
-
-
-class OrderFactory(factory.Factory):
+class OrderFactory(GenericFactory[Order]):
     class Meta:
         model = Order
 
@@ -35,4 +32,14 @@ class OrderFactory(factory.Factory):
     status = "draft"
     type = "order"
     subscription_id = None
-    customer = factory.SubFactory(OrderCustomerFactory)
+    customer = factory.SubFactory("tests.factories.OrderCustomerFactory")
+
+
+class OrderCustomerFactory(GenericFactory[OrderCustomer]):
+    class Meta:
+        model = OrderCustomer
+
+    first_name = "Foo"
+    last_name = "Bar"
+    email = "foo.bar@email.com"
+    phone = "+358 50 123 4567"

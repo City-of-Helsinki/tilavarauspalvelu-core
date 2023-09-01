@@ -13,15 +13,17 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
-from email_notification.tests.factories import EmailTemplateFactory
 from merchants.models import OrderStatus, PaymentOrder, PaymentType
-from merchants.tests.factories import PaymentOrderFactory
-from merchants.verkkokauppa.order.test.factories import OrderFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservation_units.models import PricingType
-from reservation_units.tests.factories import ReservationUnitPricingFactory
 from reservations.models import STATE_CHOICES, AgeGroup
-from reservations.tests.factories import ReservationFactory
+from tests.factories import (
+    EmailTemplateFactory,
+    OrderFactory,
+    PaymentOrderFactory,
+    ReservationFactory,
+    ReservationUnitPricingFactory,
+)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

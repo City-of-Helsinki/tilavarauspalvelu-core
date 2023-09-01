@@ -7,17 +7,18 @@ from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
 from applications.models import CUSTOMER_TYPES, PRIORITIES, City
-from applications.tests.factories import ApplicationEventFactory, ApplicationFactory
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES, AgeGroup, ReservationStatistic
-from reservations.tests.factories import (
+from tests.factories import (
     AbilityGroupFactory,
+    ApplicationEventFactory,
+    ApplicationFactory,
     RecurringReservationFactory,
     ReservationCancelReasonFactory,
     ReservationFactory,
     ReservationPurposeFactory,
+    ReservationUnitFactory,
+    UnitFactory,
 )
-from spaces.tests.factories import UnitFactory
 
 
 class ReservationStatisticsCreateTestCase(TestCase):

@@ -4,8 +4,7 @@ from typing import Any, NamedTuple
 import pytest
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
-from tests.factories import BannerNotificationFactory
-from tests.factories.user import UserFactory
+from tests.factories import BannerNotificationFactory, UserFactory
 from tests.helpers import GraphQLClient, load_content, parametrize_helper
 from users.models import User
 

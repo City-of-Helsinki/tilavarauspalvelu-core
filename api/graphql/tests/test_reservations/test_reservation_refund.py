@@ -11,12 +11,8 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import (
-    ReservationFactory,
-    ReservationMetadataSetFactory,
-)
+from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationMetadataSetFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

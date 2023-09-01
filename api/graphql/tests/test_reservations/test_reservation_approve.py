@@ -11,13 +11,9 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
-from email_notification.tests.factories import EmailTemplateFactory
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import (
-    ReservationFactory,
-    ReservationMetadataSetFactory,
-)
+from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationMetadataSetFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

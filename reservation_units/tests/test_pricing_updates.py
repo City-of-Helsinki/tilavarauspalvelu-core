@@ -5,10 +5,7 @@ from django.test import TestCase
 
 from reservation_units.models import PricingStatus
 from reservation_units.pricing_updates import update_reservation_unit_pricings
-from reservation_units.tests.factories import (
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-)
+from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 
 
 class PricingUpdatesTestCase(TestCase):

@@ -5,13 +5,8 @@ from assertpy import assert_that
 from django.test import override_settings
 from django.test.testcases import TestCase
 
-from merchants.tests.factories import PaymentMerchantFactory
 from merchants.verkkokauppa.product.types import Product
-from reservation_units.tests.factories import (
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-)
-from spaces.tests.factories import UnitFactory
+from tests.factories import PaymentMerchantFactory, ReservationUnitFactory, ReservationUnitPricingFactory, UnitFactory
 
 
 def mock_create_product():

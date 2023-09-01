@@ -12,7 +12,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from spaces.models import Unit
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
+from tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 
 
 class GrapheneTestCaseBase(GraphQLTestCase):

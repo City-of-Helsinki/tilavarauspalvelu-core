@@ -13,7 +13,7 @@ from email_notification.sender.senders import (
     send_test_emails,
 )
 from email_notification.tests.base import ReservationEmailBaseTestCase
-from email_notification.tests.factories import EmailTemplateFactory
+from tests.factories import EmailTemplateFactory
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")

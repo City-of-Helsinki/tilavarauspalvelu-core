@@ -4,7 +4,7 @@ from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase
 
 from reservations.models import RecurringReservation
-from reservations.tests.factories import RecurringReservationFactory
+from tests.factories import RecurringReservationFactory
 
 
 class TestRecurringReservationUUIDMigration(TestCase):

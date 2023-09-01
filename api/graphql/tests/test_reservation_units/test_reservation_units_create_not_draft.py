@@ -19,14 +19,14 @@ from reservation_units.models import (
     ReservationUnit,
     TaxPercentage,
 )
-from reservation_units.tests.factories import (
+from tests.factories import (
     EquipmentFactory,
     PurposeFactory,
     QualifierFactory,
+    ResourceFactory,
+    ServiceFactory,
+    SpaceFactory,
 )
-from resources.tests.factories import ResourceFactory
-from services.tests.factories import ServiceFactory
-from spaces.tests.factories import SpaceFactory
 from utils.decimal_utils import round_decimal
 
 

@@ -5,14 +5,15 @@ from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
 from email_notification.models import EmailType
-from email_notification.tests.factories import EmailTemplateFactory
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import (
+from tests.factories import (
+    EmailTemplateFactory,
+    LocationFactory,
     ReservationCancelReasonFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,
+    ReservationUnitFactory,
+    UnitFactory,
 )
-from spaces.tests.factories import LocationFactory, UnitFactory
 
 
 class ReservationEmailBaseTestCase(TestCase):

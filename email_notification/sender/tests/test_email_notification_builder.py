@@ -3,10 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from pytest import raises
 
-from email_notification.tests.factories import EmailTemplateFactory
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import ReservationFactory
-from spaces.tests.factories import UnitFactory
+from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UnitFactory
 
 from ..email_notification_builder import (
     EmailNotificationContext,

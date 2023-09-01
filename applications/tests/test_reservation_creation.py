@@ -8,7 +8,14 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.tests.factories import (
+from applications.utils.reservation_creation import (
+    ReservationScheduler,
+    create_reservations_from_allocation_results,
+)
+from opening_hours.hours import TimeElement
+from reservations.models import STATE_CHOICES, Reservation
+from tests.factories import (
+    AbilityGroupFactory,
     AddressFactory,
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
@@ -16,16 +23,9 @@ from applications.tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     EventReservationUnitFactory,
+    ReservationUnitFactory,
+    SpaceFactory,
 )
-from applications.utils.reservation_creation import (
-    ReservationScheduler,
-    create_reservations_from_allocation_results,
-)
-from opening_hours.hours import TimeElement
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.models import STATE_CHOICES, Reservation
-from reservations.tests.factories import AbilityGroupFactory
-from spaces.tests.factories import SpaceFactory
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
 User = get_user_model()

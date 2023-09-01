@@ -12,7 +12,7 @@ from merchants.models import PaymentType
 from opening_hours.errors import HaukiAPIError
 from opening_hours.resources import Resource as HaukiResource
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
+from tests.factories import ReservationUnitFactory
 
 
 class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -449,7 +449,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(content.get("data").get("updateReservationUnit").get("pk")).is_not_none()
 
         updated_unit = ReservationUnit.objects.get(pk=content.get("data").get("updateReservationUnit").get("pk"))
-        unit_payment_type_codes = list(map(lambda ptype: ptype.code, updated_unit.payment_types.all()))
+        unit_payment_type_codes = [ptype.code for ptype in updated_unit.payment_types.all()]
         assert_that(updated_unit).is_not_none()
         assert_that(unit_payment_type_codes).contains_only(PaymentType.ON_SITE.value, PaymentType.INVOICE.value)
 

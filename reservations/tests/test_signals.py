@@ -1,10 +1,8 @@
 from assertpy import assert_that
 from django.test.testcases import TestCase
 
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import ReservationStatistic
-from reservations.tests.factories import ReservationFactory
-from spaces.tests.factories import UnitFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory
 
 
 class ReservationSignalTestCase(TestCase):

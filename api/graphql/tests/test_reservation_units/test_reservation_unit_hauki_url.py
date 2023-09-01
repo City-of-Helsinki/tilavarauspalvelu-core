@@ -14,8 +14,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.tests.factories import ReservationUnitFactory
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory
+from tests.factories import ReservationUnitFactory, ServiceSectorFactory, UnitFactory
 
 
 @override_settings(
@@ -43,7 +42,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
     def get_query(self, res_unit_id=None, target_reservation_unit_ids=None):
         target_reservation_unit_ids = target_reservation_unit_ids or self.target_reservation_unit_ids
 
-        target_res_units = ",".join([r for r in target_reservation_unit_ids])
+        target_res_units = ",".join(list(target_reservation_unit_ids))
 
         res_unit_id = res_unit_id or self.reservation_unit.id
 

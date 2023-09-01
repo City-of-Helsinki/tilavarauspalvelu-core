@@ -7,12 +7,13 @@ from freezegun import freeze_time
 
 from api.graphql.tests.test_applications.base import ApplicationTestCaseBase
 from applications.models import Application, ApplicationEventStatus, ApplicationStatus
-from applications.tests.factories import CityFactory, OrganisationFactory
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import (
+from tests.factories import (
     AbilityGroupFactory,
     AgeGroupFactory,
+    CityFactory,
+    OrganisationFactory,
     ReservationPurposeFactory,
+    ReservationUnitFactory,
 )
 
 
@@ -175,7 +176,7 @@ class ApplicationCreateTestCase(ApplicationTestCaseBase):
     def test_application_create_organization_address_cannot_be_empty(self):
         self.client.force_login(self.regular_joe)
         data = self.get_application_data()
-        data["organisation"].update({"address": dict()})
+        data["organisation"].update({"address": {}})
         assert_that(Application.objects.count()).is_equal_to(1)
 
         response = self.query(self.get_create_query(), input_data=data)

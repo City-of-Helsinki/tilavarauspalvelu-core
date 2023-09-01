@@ -10,10 +10,7 @@ from django.test.testcases import TestCase
 from pytest import raises
 
 from merchants.models import PaymentOrder
-from merchants.tests.factories import PaymentAccountingFactory
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import ReservationFactory
-from spaces.tests.factories import UnitFactory
+from tests.factories import PaymentAccountingFactory, ReservationFactory, ReservationUnitFactory, UnitFactory
 
 
 class PaymentOrderTestCase(TestCase):

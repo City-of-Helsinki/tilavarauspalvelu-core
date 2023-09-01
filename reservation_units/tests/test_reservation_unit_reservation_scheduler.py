@@ -9,16 +9,13 @@ from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from applications.models import ApplicationRoundStatus
-from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
-from spaces.tests.factories import SpaceFactory
+from tests.factories import ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory, SpaceFactory
 from utils.test_utils import skip_long_running
 
 DEFAULT_TIMEZONE = get_default_timezone()

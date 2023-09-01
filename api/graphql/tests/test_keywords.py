@@ -5,11 +5,7 @@ from assertpy import assert_that
 from graphene_django.utils import GraphQLTestCase
 from rest_framework.test import APIClient
 
-from reservation_units.tests.factories import (
-    KeywordCategoryFactory,
-    KeywordFactory,
-    KeywordGroupFactory,
-)
+from tests.factories import KeywordCategoryFactory, KeywordFactory, KeywordGroupFactory
 
 
 class ResourceGraphQLTestCase(GraphQLTestCase, snapshottest.TestCase):

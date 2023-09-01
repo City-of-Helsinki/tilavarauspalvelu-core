@@ -8,20 +8,18 @@ from freezegun import freeze_time
 
 from api.graphql.tests.test_applications.base import ApplicationTestCaseBase
 from applications.models import Application, ApplicationEventStatus, ApplicationStatus
-from applications.tests.factories import (
+from tests.factories import (
+    AbilityGroupFactory,
     AddressFactory,
+    AgeGroupFactory,
     ApplicationRoundFactory,
     CityFactory,
     OrganisationFactory,
     PersonFactory,
-)
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import (
-    AbilityGroupFactory,
-    AgeGroupFactory,
     ReservationPurposeFactory,
+    ReservationUnitFactory,
+    ServiceSectorFactory,
 )
-from spaces.tests.factories import ServiceSectorFactory
 
 
 class ApplicationUpdateTestCase(ApplicationTestCaseBase):

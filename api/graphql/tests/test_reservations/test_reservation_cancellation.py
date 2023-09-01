@@ -13,14 +13,14 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
-from email_notification.tests.factories import EmailTemplateFactory
 from merchants.models import OrderStatus, PaymentType
-from merchants.tests.factories import PaymentOrderFactory
-from reservation_units.tests.factories import ReservationUnitCancellationRuleFactory
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import (
+from tests.factories import (
+    EmailTemplateFactory,
+    PaymentOrderFactory,
     ReservationCancelReasonFactory,
     ReservationFactory,
+    ReservationUnitCancellationRuleFactory,
 )
 
 

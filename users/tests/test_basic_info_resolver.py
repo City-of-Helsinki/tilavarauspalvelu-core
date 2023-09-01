@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from requests import Response
 
-from applications.tests.factories import CityFactory
+from tests.factories import CityFactory
 from users.utils.open_city_profile.basic_info_resolver import (
     ProfileNodeIdReader,
     ProfileReadError,

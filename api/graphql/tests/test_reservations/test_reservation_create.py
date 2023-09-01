@@ -14,7 +14,6 @@ from api.graphql.tests.test_reservations.base import (
 )
 from api.graphql.validation_errors import ValidationErrorCodes
 from applications.models import PRIORITY_CONST, City
-from applications.tests.factories import ApplicationRoundFactory, CityFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservation_units.models import (
     PriceUnit,
@@ -23,13 +22,15 @@ from reservation_units.models import (
     ReservationKind,
     ReservationUnit,
 )
-from reservation_units.tests.factories import (
+from reservations.models import STATE_CHOICES, AgeGroup, Reservation, ReservationType
+from tests.factories import (
+    ApplicationRoundFactory,
+    CityFactory,
+    ReservationFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
     TaxPercentageFactory,
 )
-from reservations.models import STATE_CHOICES, AgeGroup, Reservation, ReservationType
-from reservations.tests.factories import ReservationFactory
 
 
 def get_profile_data():

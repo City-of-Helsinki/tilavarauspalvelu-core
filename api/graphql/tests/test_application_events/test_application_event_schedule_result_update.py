@@ -7,17 +7,15 @@ from django.contrib.auth import get_user_model
 from api.graphql.tests.test_application_events.base import (
     ApplicationEventPermissionsTestCaseBase,
 )
-from applications.tests.factories import (
-    ApplicationEventScheduleResultFactory,
-    ApplicationFactory,
-)
-from reservation_units.tests.factories import ReservationUnitFactory
-from reservations.tests.factories import (
+from tests.factories import (
     AbilityGroupFactory,
     AgeGroupFactory,
+    ApplicationEventScheduleResultFactory,
+    ApplicationFactory,
     ReservationPurposeFactory,
+    ReservationUnitFactory,
+    ServiceSectorFactory,
 )
-from spaces.tests.factories import ServiceSectorFactory
 
 
 class ApplicationEventScheduleResultUpdateTestCase(ApplicationEventPermissionsTestCaseBase):

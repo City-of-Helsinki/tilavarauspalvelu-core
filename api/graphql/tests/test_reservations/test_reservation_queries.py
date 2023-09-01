@@ -11,19 +11,17 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import CUSTOMER_TYPES, City
 from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import (
-    ReservationUnitFactory,
-    ReservationUnitTypeFactory,
-)
 from reservations.models import STATE_CHOICES, AgeGroup, ReservationType
-from reservations.tests.factories import (
+from tests.factories import (
+    PaymentOrderFactory,
     RecurringReservationFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,
+    ReservationUnitFactory,
+    ReservationUnitTypeFactory,
+    UnitFactory,
 )
-from spaces.tests.factories import UnitFactory
 from users.models import PersonalInfoViewLog
 
 

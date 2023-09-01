@@ -9,11 +9,7 @@ from applications.models import (
     ApplicationRoundStatus,
     ApplicationStatus,
 )
-from applications.tests.factories import (
-    ApplicationEventFactory,
-    ApplicationFactory,
-    ApplicationRoundFactory,
-)
+from tests.factories import ApplicationEventFactory, ApplicationFactory, ApplicationRoundFactory
 
 
 class ApplicationStatusUpdateTestCase(TestCase):

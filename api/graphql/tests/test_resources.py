@@ -18,13 +18,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from resources.models import Resource
-from resources.tests.factories import ResourceFactory
-from spaces.tests.factories import (
-    ServiceSectorFactory,
-    SpaceFactory,
-    UnitFactory,
-    UnitGroupFactory,
-)
+from tests.factories import ResourceFactory, ServiceSectorFactory, SpaceFactory, UnitFactory, UnitGroupFactory
 
 
 class ResourceGraphQLBase(GraphQLTestCase):

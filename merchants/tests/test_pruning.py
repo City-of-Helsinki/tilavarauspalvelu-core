@@ -8,13 +8,11 @@ from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from merchants.models import OrderStatus
-from merchants.tests.factories import PaymentOrderFactory
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.test.factories import PaymentFactory
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 
 from ..pruning import update_expired_orders
 

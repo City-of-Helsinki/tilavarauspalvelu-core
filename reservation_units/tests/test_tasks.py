@@ -4,14 +4,15 @@ from uuid import uuid4
 from assertpy import assert_that
 from django.test import TestCase, override_settings
 
-from merchants.tests.factories import PaymentAccountingFactory, PaymentMerchantFactory
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
 from reservation_units.tasks import (
     refresh_reservation_unit_accounting,
     refresh_reservation_unit_product_mapping,
 )
-from reservation_units.tests.factories import (
+from tests.factories import (
+    PaymentAccountingFactory,
+    PaymentMerchantFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
 )

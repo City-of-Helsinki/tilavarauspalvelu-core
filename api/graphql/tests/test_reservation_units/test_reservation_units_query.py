@@ -16,8 +16,6 @@ from api.graphql.tests.test_reservation_units.base import (
     get_mocked_periods,
     mock_create_product,
 )
-from applications.tests.factories import ApplicationRoundFactory
-from merchants.tests.factories import PaymentMerchantFactory
 from opening_hours.enums import State
 from permissions.models import (
     GeneralRoleChoice,
@@ -30,24 +28,26 @@ from permissions.models import (
     UnitRolePermission,
 )
 from reservation_units.models import ReservationKind, ReservationUnit
-from reservation_units.tests.factories import (
+from reservations.models import STATE_CHOICES
+from terms_of_use.models import TermsOfUse
+from tests.factories import (
+    ApplicationRoundFactory,
     KeywordCategoryFactory,
     KeywordGroupFactory,
+    PaymentMerchantFactory,
     PurposeFactory,
     QualifierFactory,
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-    ReservationUnitTypeFactory,
-)
-from reservations.models import STATE_CHOICES
-from reservations.tests.factories import (
     ReservationCancelReasonFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingFactory,
+    ReservationUnitTypeFactory,
+    ServiceSectorFactory,
+    TermsOfUseFactory,
+    UnitFactory,
+    UnitGroupFactory,
 )
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
-from terms_of_use.models import TermsOfUse
-from terms_of_use.tests.factories import TermsOfUseFactory
 from users.models import PersonalInfoViewLog
 
 TIMEZONE = get_default_timezone()
@@ -215,7 +215,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_should_be_able_to_find_by_pk(self):
-        query = f"{{\n" f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n" f"id nameFi pk\n" f"}}" f"}}"
+        query = f"{{\nreservationUnitByPk(pk: {self.reservation_unit.id}) {{\nid nameFi pk\n}}}}"
         response = self.query(query)
 
         content = json.loads(response.content)
@@ -324,7 +324,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_should_error_when_not_found_by_pk(self):
-        query = f"{{\n" f"reservationUnitByPk(pk: {self.reservation_unit.id + 666}) {{\n" f"id\n" f"}}" f"}}"
+        query = f"{{\nreservationUnitByPk(pk: {self.reservation_unit.id + 666}) {{\nid\n}}}}"
         response = self.query(query)
 
         content = json.loads(response.content)

@@ -7,9 +7,8 @@ from django.test.testcases import TestCase
 from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError
 from opening_hours.resources import Resource
-from reservation_units.tests.factories import ReservationUnitFactory
 from reservation_units.utils.hauki_exporter import ReservationUnitHaukiExporter
-from spaces.tests.factories import UnitFactory
+from tests.factories import ReservationUnitFactory, UnitFactory
 
 
 @mock.patch("reservation_units.utils.hauki_exporter.make_hauki_get_request")

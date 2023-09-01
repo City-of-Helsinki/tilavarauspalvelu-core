@@ -10,7 +10,7 @@ from applications.models import (
     ApplicationStatus,
 )
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import RecurringReservationFactory, ReservationFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
