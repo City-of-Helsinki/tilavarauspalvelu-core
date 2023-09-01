@@ -245,7 +245,7 @@ jobs:
           cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}:cache,mode=max
 
       - name: Start Docker container
-        run: docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -p 4000:4000 -d --ipc=host --name ${{ steps.meta.outputs.tags }} tilavaraus-ui-server
+        run: docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -p 4000:4000 -d --ipc=host --name tilavaraus-ui-server ${{ steps.repo.outputs.repo }}:cache
 
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v5
