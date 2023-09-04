@@ -110,11 +110,15 @@ const drawReservation = (): void => {
       .trigger("mouseup", { force: true, button: 0 });
   });
 
-  durationSelectorToggle().should("not.exist");
+  cy.get("#reservation__input--duration-toggle-button").should("not.exist");
 
-  reservationControlsToggleButton().click();
+  cy.get(
+    "[data-testid='reservation-unit__reservation-controls--toggle-button']"
+  ).click();
+  // TODO: the next should('exists') fails here
+  // cy.wait(1000);
 
-  durationSelectorToggle().should("exist");
+  cy.get("#reservation__input--duration-toggle-button").should("exist");
 
   durationSelectorToggle()
     .click()
@@ -160,7 +164,9 @@ describe("reservation", () => {
 
     dateSelector().should("not.exist");
 
-    reservationControlsToggleButton().click();
+    cy.get(
+      "[data-testid='reservation-unit__reservation-controls--toggle-button']"
+    ).click();
 
     dateSelector()
       .invoke("val")
@@ -729,6 +735,7 @@ describe("with metadataset", () => {
     );
   });
 
+  // Flaky
   it("should populate default values", () => {
     cy.visit("/reservation-unit/700");
     cy.injectAxe();
