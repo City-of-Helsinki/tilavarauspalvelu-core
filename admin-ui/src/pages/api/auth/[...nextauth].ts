@@ -161,7 +161,7 @@ const options = (): NextAuthOptions => {
         });
 
         if (refreshedToken?.error) {
-          throw new Error(refreshedToken.error);
+          console.warn("Error refreshing token", refreshedToken.error);
         }
 
         return {
@@ -173,17 +173,25 @@ const options = (): NextAuthOptions => {
         };
       },
       async session({ session, token }) {
-        if (!token) {
-          // TODO what should this return on no token? DefaultSession / throw error?
-          return session;
-        }
-
         const { accessToken, accessTokenExpires, user, apiTokens } = token;
 
         return { ...session, accessToken, accessTokenExpires, user, apiTokens };
       },
       async redirect({ url }) {
+        // TODO this fails on Error callbacks (for some reason they are in a format ${host}?callbackUrl=${host}/auth/error)
+        // which redirects to the main app not to the admin side
         return url;
+      },
+    },
+    logger: {
+      error: console.error,
+      warn: console.warn,
+      debug: (code, metadata) => {
+        // Our cookies are too large and split into two, don't need to flood the logs with warnings
+        if (code === "CHUNKING_SESSION_COOKIE") {
+          return;
+        }
+        console.log(`[NEXT_AUTH]: [${code}]`, metadata);
       },
     },
     pages: {

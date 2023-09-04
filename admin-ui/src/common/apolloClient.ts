@@ -1,4 +1,10 @@
-import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+  from,
+} from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
@@ -16,22 +22,24 @@ const uploadLinkOptions = {
   FormData: CustomFormData,
 };
 
+// NOTE upload link typing is broken when updating apollo to 3.8
 // FIXME upload link is broken locally (it succeeds but no new image is available)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error FIXME
-const uploadLink = createUploadLink(uploadLinkOptions);
+const uploadLink = createUploadLink(uploadLinkOptions) as unknown as ApolloLink;
 const httpLink = new HttpLink({ uri });
 
 const authLink = setContext(async (_request, previousContext) => {
   const headers = previousContext.headers ?? {};
   const session = await getSession();
 
+  if (!session?.apiTokens?.tilavaraus) {
+    return headers;
+  }
   return {
     headers: {
       ...headers,
-      authorization: session?.apiTokens?.tilavaraus
-        ? `Bearer ${session.apiTokens.tilavaraus}`
-        : "",
+      authorization: `Bearer ${session.apiTokens.tilavaraus}`,
     },
   };
 });
@@ -108,7 +116,9 @@ const client = new ApolloClient({
       },
     },
   }),
-  link: isBrowser ? from([errorLink, authLink, uploadLink]) : from([httpLink]),
+  link: isBrowser
+    ? from([authLink, errorLink, uploadLink])
+    : from([authLink, errorLink, httpLink]),
   ssrMode: !isBrowser,
 });
 

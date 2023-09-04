@@ -44,5 +44,6 @@ declare module "next-auth" {
     accessToken: string;
     accessTokenExpires: number;
     apiTokens: APITokens;
+    error?: string;
   }
 }

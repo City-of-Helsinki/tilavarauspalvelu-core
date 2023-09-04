@@ -1,5 +1,4 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useEffect } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
@@ -11,6 +10,8 @@ import {
   UnitType,
 } from "common/types/gql-types";
 import { Container } from "common";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 import Header from "../components/index/Header";
 import SearchGuides from "../components/index/SearchGuides";
@@ -21,24 +22,44 @@ import {
   RESERVATION_UNIT_PURPOSES,
   SEARCH_FORM_PARAMS_UNIT,
 } from "../modules/queries/params";
+import { signOut } from "../modules/auth";
 
 type Props = {
   purposes: PurposeType[];
   units: UnitType[];
 };
 
-const Wrapper = styled(Container)``;
+/// @desc
+/// Our home page is also our login page, next-auth returns login errors
+/// as query parameters, and the session is not automatically cleared.
+/// Without this the session goes into a permanent error state
+/// where it tries to signIn the invalid session and that returns always an error.
+const useRedirectOnLoginError = () => {
+  const { data: session } = useSession();
+  const r = useRouter();
+  useEffect(() => {
+    if (r.query.error) {
+      // eslint-disable-next-line no-console
+      console.warn("Login failed with: ", r.query.error);
+      signOut({ session }).then(() => {
+        r.push("/");
+      });
+    }
+  }, [r, session]);
+};
 
 const Home = ({ purposes, units }: Props): JSX.Element => {
   const { t } = useTranslation(["home", "common"]);
 
+  useRedirectOnLoginError();
+
   return (
-    <Wrapper>
+    <Container>
       <Header heading={t("head.heading")} text={t("head.text")} />
       <Purposes purposes={purposes} />
       <Units units={units} />
       <SearchGuides />
-    </Wrapper>
+    </Container>
   );
 };
 
