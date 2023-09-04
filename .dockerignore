@@ -18,8 +18,8 @@ fixtures/
 azure-pipelines-devtest.yml
 azure-pipelines-stageprod.yml
 docker-compose.yml
-Dockerfile
 docker/Dockerfile
+docker/Dockerfile.final
 pytest.ini
 README.md
 sonar-project.properties

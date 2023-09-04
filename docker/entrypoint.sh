@@ -2,4 +2,4 @@
 set -euo pipefail
 
 echo "Starting uWSGI server..."
-exec uwsgi --yaml /tvp/deploy/uwsgi.yml
+exec uwsgi --yaml /tvp/docker/uwsgi.yml

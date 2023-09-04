@@ -1,0 +1,2 @@
+ARG TAG=main
+FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core:$TAG AS core
