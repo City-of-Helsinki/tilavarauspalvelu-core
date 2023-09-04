@@ -256,12 +256,5 @@ jobs:
           name: cypress-screenshots
           path: apps/ui/cypress/screenshots
           if-no-files-found: ignore
-      - name: Upload videos
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: cypress-videos
-          path: apps/ui/cypress/videos
-          if-no-files-found: ignore
       - name: Stop container
         run: docker stop tilavaraus-ui-server
