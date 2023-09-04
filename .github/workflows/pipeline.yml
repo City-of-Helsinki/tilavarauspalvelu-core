@@ -240,7 +240,7 @@ jobs:
 
       - name: Run the test container
         run: |
-          docker run -p 4000:4000 --rm ${{ steps.meta.outputs.tags }}
+          docker run -p 4000:4000 --rm -e PORT=4000 -d --ipc=host --name tilavaraus-ui-server ${{ steps.meta.outputs.tags }}
 
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v5
