@@ -187,6 +187,7 @@ jobs:
       NEXT_PUBLIC_TILAVARAUS_API_URL: http://localhost:4000
       PORT: 4000
       NEXTAUTH_SECRET: not-a-good-secret
+      TZ: Europe/Helsinki
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -254,7 +255,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
-          options: -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -p 4000:4000
+          options: -p 4000:4000
           #run: docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -p 4000:4000 -d --ipc=host --name tilavaraus-ui-server
 
       - name: Cypress e2e & a11y
