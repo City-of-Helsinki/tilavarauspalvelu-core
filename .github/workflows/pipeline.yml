@@ -246,6 +246,7 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           project: ./apps/ui
+          working-directory: ./apps/ui
           config-file: cypress.config.ts
           # install-command: pnpm install --frozen-lockfile
           install: false
