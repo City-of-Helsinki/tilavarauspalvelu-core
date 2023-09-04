@@ -41,6 +41,7 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Lint admin ui
         run: |
           pnpm lint --filter=admin-ui...
@@ -67,14 +68,9 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - uses: docker/build-push-action@v4
-        with:
-          context: .
-          build-args: |
-            APP=admin-ui
-          # TODO the first push needs to be done manually
-          push: false
-          tags: tilavaraus-ui/admin-ui:latest
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Build ui
+        run: pnpm build --filter ui...
 
   test-admin-ui:
     name: Test admin ui
@@ -94,6 +90,7 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Test admin ui
         run: pnpm test --filter=admin-ui...
 
@@ -115,6 +112,7 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
 
       - name: Lint ui
         run: |
@@ -123,15 +121,13 @@ jobs:
           # TODO run tsc also when it's not broken
 
   build-ui:
-    name: Build ui Docker image
+    name: Build ui
     runs-on: ubuntu-latest
     needs: [changed-packages]
     if: needs.changed-packages.outputs.ui_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: "Set up Docker Buildx"
-        uses: docker/setup-buildx-action@v2
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -141,15 +137,9 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - uses: docker/build-push-action@v4
-        with:
-          context: .
-          build-args: |
-            APP=ui
-          # TODO the first push needs to be done manually
-          push: false
-          tags: tilavaraus-ui/ui:latest
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Build ui
+        run: pnpm build --filter ui...
 
   test-ui:
     name: Unit tests ui
@@ -168,7 +158,7 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Test ui
         run: pnpm test --filter=ui...
 
@@ -250,7 +240,7 @@ jobs:
 
       - name: Run the test container
         run: |
-          docker run --rm ${{ steps.meta.outputs.tags }} -p 4000:4000
+          docker run -p 4000:4000 --rm ${{ steps.meta.outputs.tags }}
 
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v5
