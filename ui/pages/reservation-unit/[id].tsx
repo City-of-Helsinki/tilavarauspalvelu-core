@@ -779,6 +779,9 @@ const ReservationUnit = ({
     isSlotReservable,
     isReservationUnitReservable: !isReservationQuotaReached,
     createReservation: (res) => createReservation(res),
+    scrollPosition: calendarRef?.current?.offsetTop
+      ? calendarRef.current.offsetTop - 20
+      : undefined,
     reservationUnit,
     calendarRef,
     setErrorMsg,

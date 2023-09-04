@@ -340,6 +340,7 @@ const QuickReservation = ({
       setLocalReservation(null);
       setQuickReservationSlot(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, duration, slot, reservationUnit.pk, setQuickReservationSlot]);
 
   useEffect(() => {
