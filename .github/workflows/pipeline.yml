@@ -242,6 +242,8 @@ jobs:
         run: |
           docker run -p 4000:4000 --rm -e PORT=4000 -d --ipc=host --name tilavaraus-ui-server ${{ steps.meta.outputs.tags }}
 
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v5
         with:
@@ -252,7 +254,7 @@ jobs:
           install: false
           command: pnpm test:browser:ci
           #wait-on: 'http://127.0.0.1:4000'
-          wait-on: 'http://localhost:4000'
+          #wait-on: 'http://localhost:4000'
 
       - name: Upload images on failure
         uses: actions/upload-artifact@v3
@@ -268,3 +270,5 @@ jobs:
           name: cypress-videos
           path: apps/ui/cypress/videos
           if-no-files-found: ignore
+      - name: Stop container
+        run: docker stop tilavaraus-ui-server
