@@ -5,7 +5,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
+    "preinstall": "npx -y only-allow pnpm",
+    "test:browser:ci": "cd apps/ui && pnpm run test:browser:ci",
     "ncu": "npm-check-updates -p pnpm --deep --target minor --format group",
     "ncu:upgrade": "npm-check-updates -p pnpm --deep --target minor  --format group --upgrade",
     "clean": "npkill",

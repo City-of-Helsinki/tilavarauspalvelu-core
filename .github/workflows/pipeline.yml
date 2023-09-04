@@ -49,7 +49,7 @@ jobs:
           # TODO run tsc also when it's not broken
 
   build-admin-ui:
-    name: Build admin ui Docker image
+    name: Build admin ui
     runs-on: ubuntu-latest
     needs: [changed-packages]
     # TODO disabled for testing
@@ -242,16 +242,13 @@ jobs:
         run: |
           docker run -p 4000:4000 --rm -e PORT=4000 -d --ipc=host --name tilavaraus-ui-server ${{ steps.meta.outputs.tags }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
       - name: Cypress e2e & a11y
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           project: ./apps/ui
-          working-directory: ./apps/ui
           config-file: cypress.config.ts
-          # install-command: pnpm install --frozen-lockfile
-          install: false
+          install-command: pnpm install --frozen-lockfile
+          #install: false
           command: pnpm test:browser:ci
           #wait-on: 'http://127.0.0.1:4000'
           #wait-on: 'http://localhost:4000'
