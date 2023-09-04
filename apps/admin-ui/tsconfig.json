@@ -23,7 +23,7 @@
   "exclude": ["node_modules"],
   "include": [
     "src",
-    "types",
+    "types/**/*.d.ts",
     "i18next.d.ts",
     "middleware.ts",
     ".eslintrc.cjs",

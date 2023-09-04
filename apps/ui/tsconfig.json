@@ -25,6 +25,7 @@
     "**/*.ts",
     "**/*.tsx",
     "*.d.ts",
+    "types/**/*.d.ts",
     "next-config.js",
     "next-env.d.ts",
     "next-i18next.config.js",
