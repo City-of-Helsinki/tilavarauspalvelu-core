@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { getAvailableTimes, getOpenDays } from "common/src/calendar/util";
 import { chunkArray, toUIDate } from "common/src/common/util";
-import { Language, OptionType } from "common/types/common";
+import { Language, OptionType, PendingReservation } from "common/types/common";
 import {
   addDays,
   addHours,
@@ -36,6 +36,11 @@ export type QuickReservationSlotProps = {
 type Props = {
   isReservationUnitReservable: boolean;
   createReservation: (arg: ReservationProps) => void;
+  shouldUnselect: number;
+  setInitialReservation: React.Dispatch<
+    React.SetStateAction<PendingReservation | null>
+  >;
+  quickReservationSlot: QuickReservationSlotProps;
   setQuickReservationSlot: React.Dispatch<
     React.SetStateAction<QuickReservationSlotProps>
   >;
@@ -218,6 +223,9 @@ const QuickReservation = ({
   setErrorMsg,
   idPrefix,
   subventionSuffix,
+  shouldUnselect,
+  setInitialReservation,
+  quickReservationSlot,
   setQuickReservationSlot,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -328,7 +336,15 @@ const QuickReservation = ({
       setLocalReservation(res);
       setQuickReservationSlot({ start: begin, end });
     }
+    if (!slot && quickReservationSlot) {
+      setLocalReservation(null);
+      setQuickReservationSlot(null);
+    }
   }, [date, duration, slot, reservationUnit.pk, setQuickReservationSlot]);
+
+  useEffect(() => {
+    if (shouldUnselect) setSlot(null);
+  }, [shouldUnselect]);
 
   const availableTimes = useCallback(
     (day: Date, fromStartOfDay = false): string[] => {
@@ -497,7 +513,12 @@ const QuickReservation = ({
                     <Slot $active={slot === val} key={val}>
                       <SlotButton
                         data-testid="quick-reservation-slot"
-                        onClick={() => setSlot(slot === val ? null : val)}
+                        onClick={() => {
+                          if (slot === val) {
+                            setSlot(null);
+                            setInitialReservation(null);
+                          } else setSlot(val);
+                        }}
                       >
                         {val}
                       </SlotButton>

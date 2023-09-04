@@ -413,7 +413,7 @@ const ReservationUnit = ({
   const [isReserving, setIsReserving] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
+  const [shouldUnselect, setShouldUnselect] = useState(0);
   const [storedReservation, , removeStoredReservation] =
     useLocalStorage<PendingReservation>("reservation");
 
@@ -540,7 +540,7 @@ const ReservationUnit = ({
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
 
-  const handleEventChange = useCallback(
+  const handleCalendarEventChange = useCallback(
     (
       { start, end }: CalendarEvent<Reservation | ReservationType>,
       skipLengthCheck = false
@@ -638,7 +638,7 @@ const ReservationUnit = ({
     const end = storedReservation?.end ? new Date(storedReservation.end) : null;
 
     if (start && end) {
-      handleEventChange(
+      handleCalendarEventChange(
         { start, end } as CalendarEvent<Reservation | ReservationType>,
         true
       );
@@ -783,7 +783,10 @@ const ReservationUnit = ({
     calendarRef,
     setErrorMsg,
     subventionSuffix,
+    shouldUnselect,
+    quickReservationSlot,
     setQuickReservationSlot,
+    setInitialReservation,
   };
 
   const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<
@@ -799,14 +802,34 @@ const ReservationUnit = ({
   };
 
   // Update the calendar to reflect a selected quick reservation slot
-  // TODO: unselecting the slot should also be reflected in the calendar
   useEffect(() => {
     if (quickReservationSlot !== null)
-      handleEventChange({
+      handleCalendarEventChange({
         start: quickReservationSlot.start,
         end: quickReservationSlot.end,
       });
-  }, [handleEventChange, quickReservationSlot]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleCalendarEventChange, quickReservationSlot]);
+
+  // Update quickReservation widget to reflect a changed calendar time, thus unselecting any quick reservation slot
+  useEffect(() => {
+    if (
+      quickReservationSlot &&
+      initialReservation &&
+      initialReservation.begin &&
+      initialReservation.end &&
+      (quickReservationSlot.start.toISOString() !== initialReservation.begin ||
+        quickReservationSlot.end.toISOString() !== initialReservation.end)
+    ) {
+      setShouldUnselect((prev) => prev + 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    // quickReservationSlot,
+    initialReservation,
+    setShouldUnselect,
+    setQuickReservationSlot,
+  ]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -927,7 +950,7 @@ const ReservationUnit = ({
                     }}
                     onSelecting={(
                       event: CalendarEvent<Reservation | ReservationType>
-                    ) => handleEventChange(event, true)}
+                    ) => handleCalendarEventChange(event, true)}
                     min={dayStartTime}
                     showToolbar
                     reservable={!isReservationQuotaReached}
@@ -938,8 +961,8 @@ const ReservationUnit = ({
                     draggable={
                       !isReservationQuotaReached && !isClientATouchDevice
                     }
-                    onEventDrop={handleEventChange}
-                    onEventResize={handleEventChange}
+                    onEventDrop={handleCalendarEventChange}
+                    onEventResize={handleCalendarEventChange}
                     onSelectSlot={handleSlotClick}
                     draggableAccessor={({
                       event,
@@ -977,7 +1000,7 @@ const ReservationUnit = ({
                         activeApplicationRounds={activeApplicationRounds}
                         createReservation={(res) => createReservation(res)}
                         setErrorMsg={setErrorMsg}
-                        handleEventChange={handleEventChange}
+                        handleEventChange={handleCalendarEventChange}
                         mode="create"
                         shouldCalendarControlsBeVisible={
                           shouldCalendarControlsBeVisible
