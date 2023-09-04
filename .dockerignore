@@ -19,7 +19,7 @@ azure-pipelines-devtest.yml
 azure-pipelines-stageprod.yml
 docker-compose.yml
 Dockerfile
-Dockerfile.local
+docker/Dockerfile
 pytest.ini
 README.md
 sonar-project.properties

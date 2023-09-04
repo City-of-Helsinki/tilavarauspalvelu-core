@@ -50,7 +50,7 @@ services:
     image: tvp-core
     build:
       context: .
-      dockerfile: Dockerfile.local
+      dockerfile: docker/Dockerfile
       args:
         DEPS: main,test,lint
     depends_on:

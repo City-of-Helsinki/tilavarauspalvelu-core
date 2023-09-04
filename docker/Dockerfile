@@ -1,5 +1,8 @@
 FROM python:3.11-slim-bullseye AS base
 
+# Make sure we build as the root user.
+USER root
+
 # Setup environment variables.
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -7,54 +10,41 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONHASHSEED=random
 
 # Setup build time variables.
+ARG PROJECT_ROOT=/tvp
 ARG STATIC_ROOT=/srv/static
-ARG USER=tvp
-ARG GROUP=tvp
-ARG TVP=/tvp
-ARG VENV=$TVP/venv
-ARG DEPS=main
 
-# Setup directory structure.
-RUN echo "Setup group" \
-    && addgroup \
-      --gid 1000 $GROUP \
-    && echo "Setup restricted user" \
-    && adduser \
-      --disabled-login \
-      --gecos "tvp user" \
-      --home /nonexistent \
-      --ingroup $GROUP \
-      --no-create-home \
-      --shell /sbin/nologin \
-      --uid 1000 $USER \
-    && echo "Install common dependencies" \
+# Setup common dependencies and create required directories.
+RUN echo "Install common dependencies" \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       gdal-bin \
       gettext \
       libpq5 \
       make \
-    && echo "Create code directory and set permissions" \
-    && mkdir -p $TVP \
-    && chown $USER:$GROUP $TVP \
+    && echo "Create project directory" \
+    && mkdir -p $PROJECT_ROOT \
+    && chmod g=u $PROJECT_ROOT \
+    && echo "Create directories for static files" \
+    && mkdir -p $STATIC_ROOT \
+    && chmod g=u $STATIC_ROOT \
     && echo "Create celery broker directories and set permissions" \
     && mkdir -p /broker/queue \
-    && chown $USER:$GROUP /broker/queue \
-    && chmod g+rw /broker/queue \
     && mkdir -p /broker/processed \
-    && chown $USER:$GROUP /broker/processed \
+    && chmod g+rw /broker/queue \
     && chmod g+rw /broker/processed \
     && echo "Create directory for django-prometheus metrics" \
     && mkdir -p /metrics \
-    && chown $USER:$GROUP /metrics \
     && chmod g+rw /metrics \
-    && echo "Create directories for static files" \
-    && mkdir -p $STATIC_ROOT \
-    && chown $USER:$GROUP $STATIC_ROOT \
     && echo "Done"
 
 
 FROM base AS builder
+
+# Setup build time variables.
+# Old variables need to be redeclared so that defaults can be used.
+ARG PROJECT_ROOT=/tvp
+ARG VENV_ROOT=$PROJECT_ROOT/venv
+ARG DEPS=main
 
 # Install build dependencies
 # - build-essential: for building uWSGI
@@ -82,11 +72,11 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.0 python -
 COPY poetry.lock pyproject.toml /
 
 # Create virtualenv.
-RUN python -m venv $VENV
+RUN python -m venv $VENV_ROOT
 
 # Activate virtualenv by setting some environment variables.
-ENV PATH=$VENV/bin:$PATH \
-    VIRTUAL_ENV=$VENV
+ENV PATH=$VENV_ROOT/bin:$PATH \
+    VIRTUAL_ENV=$VENV_ROOT
 
 # Install production dependencies (to previously created virtualenv).
 RUN poetry install --no-root --only $DEPS
@@ -94,18 +84,21 @@ RUN poetry install --no-root --only $DEPS
 
 FROM base AS build-static
 
-# Copy virtualenv.
-COPY --chown=$USER:$GROUP --from=builder $VENV $VENV
-
-# Activate virtualenv by setting some environment variables.
-ENV PATH=$VENV/bin:$PATH \
-    VIRTUAL_ENV=$VENV
+# Setup build time variables.
+# Old variables need to be redeclared so that defaults can be used.
+ARG PROJECT_ROOT=/tvp
+ARG VENV_ROOT=$PROJECT_ROOT/venv
 
 # Change working directory to project directory.
-WORKDIR $TVP
+WORKDIR $PROJECT_ROOT
 
-# Copy project files.
+# Copy project files and virtualenv.
 COPY . .
+COPY --from=builder $VENV_ROOT $VENV_ROOT
+
+# Activate virtualenv by setting some environment variables.
+ENV PATH=$VENV_ROOT/bin:$PATH \
+    VIRTUAL_ENV=$VENV_ROOT
 
 # Collect static files.
 RUN python manage.py collectstatic --clear --no-input --verbosity=2
@@ -113,18 +106,25 @@ RUN python manage.py collectstatic --clear --no-input --verbosity=2
 
 FROM base AS production
 
-# Switch to restricted user and working directory.
-USER $USER
-WORKDIR $TVP
+# Setup build time variables.
+# Old variables need to be redeclared after "from" statements" so that defaults can be used.
+ARG PROJECT_ROOT=/tvp
+ARG VENV_ROOT=$PROJECT_ROOT/venv
+ARG STATIC_ROOT=/srv/static
+
+# Change working directory to project directory.
+WORKDIR $PROJECT_ROOT
 
 # Copy project files, virtualenv, and static files.
-COPY --chown=$USER:$GROUP . .
-COPY --chown=$USER:$GROUP --from=builder $VENV $VENV
-COPY --chown=$USER:$GROUP --from=build-static $STATIC_ROOT $STATIC_ROOT
+# Give ownership and permissions to root group to support running with arbitrary user IDs.
+# https://docs.openshift.com/container-platform/4.11/openshift_images/create-images.html#:~:text=Support%20arbitrary%20user%20ids
+COPY --chown=root:root --chmod=774 . .
+COPY --chown=root:root --chmod=774 --from=builder $VENV_ROOT $VENV_ROOT
+COPY --chown=root:root --chmod=774 --from=build-static $STATIC_ROOT $STATIC_ROOT
 
 # Activate virtualenv by setting some environment variables.
-ENV PATH=$VENV/bin:$PATH \
-    VIRTUAL_ENV=$VENV
+ENV PATH=$VENV_ROOT/bin:$PATH \
+    VIRTUAL_ENV=$VENV_ROOT
 
 # Expose port for uWSGI.
 EXPOSE 8000
