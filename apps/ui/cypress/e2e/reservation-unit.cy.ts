@@ -42,7 +42,6 @@ import {
   reservationInfo,
   reservationNotice,
   termsOfUse,
-  reservationControlsToggleButton,
   pricingTermsLink,
   pricingTermsDialog,
 } from "../model/reservation-unit";
@@ -110,15 +109,13 @@ const drawReservation = (): void => {
       .trigger("mouseup", { force: true, button: 0 });
   });
 
-  cy.get("#reservation__input--duration-toggle-button").should("not.exist");
+  cy.get("[data-testid='reservation__input--duration']").should("not.exist");
 
   cy.get(
     "[data-testid='reservation-unit__reservation-controls--toggle-button']"
   ).click();
-  // TODO: the next should('exists') fails here
-  // cy.wait(1000);
 
-  cy.get("#reservation__input--duration-toggle-button").should("exist");
+  cy.get("[data-testid='reservation__input--duration']").should("exist");
 
   durationSelectorToggle()
     .click()

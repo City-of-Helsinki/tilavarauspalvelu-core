@@ -697,15 +697,17 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               options={startingTimesOptions}
               value={startingTimesOptions.find((n) => n.value === startTime)}
             />
-            <StyledSelect
-              id="reservation__input--duration"
-              label={t("reservationCalendar:duration")}
-              onChange={(val: OptionType) => {
-                setDuration(val);
-              }}
-              options={durationOptions}
-              value={duration}
-            />
+            <div data-testid="reservation__input--duration">
+              <StyledSelect
+                id="reservation__input--duration"
+                label={t("reservationCalendar:duration")}
+                onChange={(val: OptionType) => {
+                  setDuration(val);
+                }}
+                options={durationOptions}
+                value={duration}
+              />
+            </div>
             <PriceWrapper>
               {isReservable && (
                 <>
