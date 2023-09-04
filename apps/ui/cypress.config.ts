@@ -6,6 +6,7 @@ export default defineConfig({
     runMode: 2,
     openMode: 0,
   },
+  video: false,
   e2e: {
     setupNodeEvents(on, config) {
       // eslint-disable-next-line import/extensions
