@@ -1,4 +1,5 @@
 # Turbo dry run to determine which apps have changed between the latest commit and target or previous commit
+# For PR:s this comparison is done against the main branch
 name: 'Determine changed packages'
 
 on:
