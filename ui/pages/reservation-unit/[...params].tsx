@@ -377,6 +377,7 @@ const ReservationUnitReservationWithReservationProp = ({
 
   const { pk: reservationPk } = reservation || {};
   if (!ageGroups || ageGroups.length < 1)
+    // eslint-disable-next-line no-console
     console.warn("No ageGroups received!");
   const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
 

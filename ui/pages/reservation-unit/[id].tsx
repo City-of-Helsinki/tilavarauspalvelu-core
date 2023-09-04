@@ -117,7 +117,9 @@ import {
   Wrapper,
 } from "../../components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "../../components/common/Toast";
-import QuickReservation from "../../components/reservation-unit/QuickReservation";
+import QuickReservation, {
+  QuickReservationSlotProps,
+} from "../../components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
 
 type Props = {
@@ -411,7 +413,7 @@ const ReservationUnit = ({
   const [isReserving, setIsReserving] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
+  const [shouldUnselect, setShouldUnselect] = useState(0);
   const [storedReservation, , removeStoredReservation] =
     useLocalStorage<PendingReservation>("reservation");
 
@@ -538,7 +540,7 @@ const ReservationUnit = ({
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
 
-  const handleEventChange = useCallback(
+  const handleCalendarEventChange = useCallback(
     (
       { start, end }: CalendarEvent<Reservation | ReservationType>,
       skipLengthCheck = false
@@ -636,7 +638,7 @@ const ReservationUnit = ({
     const end = storedReservation?.end ? new Date(storedReservation.end) : null;
 
     if (start && end) {
-      handleEventChange(
+      handleCalendarEventChange(
         { start, end } as CalendarEvent<Reservation | ReservationType>,
         true
       );
@@ -770,38 +772,25 @@ const ReservationUnit = ({
     [reservationUnit]
   );
 
-  const quickReservationComponent = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (calendar: React.MutableRefObject<any>, type: "mobile" | "desktop") => {
-      const scrollPosition = calendar?.current?.offsetTop
-        ? calendar.current.offsetTop - 20
-        : undefined;
+  const [quickReservationSlot, setQuickReservationSlot] =
+    useState<QuickReservationSlotProps>(null);
 
-      return (
-        !isReservationStartInFuture(reservationUnit) &&
-        isReservable && (
-          <QuickReservation
-            isSlotReservable={isSlotReservable}
-            isReservationUnitReservable={!isReservationQuotaReached}
-            createReservation={(res) => createReservation(res)}
-            reservationUnit={reservationUnit}
-            scrollPosition={scrollPosition}
-            setErrorMsg={setErrorMsg}
-            idPrefix={type}
-            subventionSuffix={subventionSuffix}
-          />
-        )
-      );
-    },
-    [
-      createReservation,
-      isReservationQuotaReached,
-      isSlotReservable,
-      reservationUnit,
-      isReservable,
-      subventionSuffix,
-    ]
-  );
+  const quickReservationProps = {
+    isSlotReservable,
+    isReservationUnitReservable: !isReservationQuotaReached,
+    createReservation: (res) => createReservation(res),
+    scrollPosition: calendarRef?.current?.offsetTop
+      ? calendarRef.current.offsetTop - 20
+      : undefined,
+    reservationUnit,
+    calendarRef,
+    setErrorMsg,
+    subventionSuffix,
+    shouldUnselect,
+    quickReservationSlot,
+    setQuickReservationSlot,
+    setInitialReservation,
+  };
 
   const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<
     number | null
@@ -814,6 +803,36 @@ const ReservationUnit = ({
     const height: number = banner?.offsetHeight;
     setCookiehubBannerHeight(height);
   };
+
+  // Update the calendar to reflect a selected quick reservation slot
+  useEffect(() => {
+    if (quickReservationSlot !== null)
+      handleCalendarEventChange({
+        start: quickReservationSlot.start,
+        end: quickReservationSlot.end,
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleCalendarEventChange, quickReservationSlot]);
+
+  // Update quickReservation widget to reflect a changed calendar time, thus unselecting any quick reservation slot
+  useEffect(() => {
+    if (
+      quickReservationSlot &&
+      initialReservation &&
+      initialReservation.begin &&
+      initialReservation.end &&
+      (quickReservationSlot.start.toISOString() !== initialReservation.begin ||
+        quickReservationSlot.end.toISOString() !== initialReservation.end)
+    ) {
+      setShouldUnselect((prev) => prev + 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    // quickReservationSlot,
+    initialReservation,
+    setShouldUnselect,
+    setQuickReservationSlot,
+  ]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -852,13 +871,23 @@ const ReservationUnit = ({
         <Columns>
           <div>
             <JustForDesktop customBreakpoint={breakpoints.l}>
-              {quickReservationComponent(calendarRef, "desktop")}
+              {!isReservationStartInFuture(reservationUnit) && isReservable && (
+                <QuickReservation
+                  {...quickReservationProps}
+                  idPrefix="desktop"
+                />
+              )}
               <Address reservationUnit={reservationUnit} />
             </JustForDesktop>
           </div>
           <Left>
             <JustForMobile customBreakpoint={breakpoints.l}>
-              {quickReservationComponent(calendarRef, "mobile")}
+              {!isReservationStartInFuture(reservationUnit) && isReservable && (
+                <QuickReservation
+                  {...quickReservationProps}
+                  idPrefix="mobile"
+                />
+              )}
             </JustForMobile>
             <Subheading>{t("reservationUnit:description")}</Subheading>
             <Content data-testid="reservation-unit__description">
@@ -924,7 +953,7 @@ const ReservationUnit = ({
                     }}
                     onSelecting={(
                       event: CalendarEvent<Reservation | ReservationType>
-                    ) => handleEventChange(event, true)}
+                    ) => handleCalendarEventChange(event, true)}
                     min={dayStartTime}
                     showToolbar
                     reservable={!isReservationQuotaReached}
@@ -935,8 +964,8 @@ const ReservationUnit = ({
                     draggable={
                       !isReservationQuotaReached && !isClientATouchDevice
                     }
-                    onEventDrop={handleEventChange}
-                    onEventResize={handleEventChange}
+                    onEventDrop={handleCalendarEventChange}
+                    onEventResize={handleCalendarEventChange}
                     onSelectSlot={handleSlotClick}
                     draggableAccessor={({
                       event,
@@ -974,7 +1003,7 @@ const ReservationUnit = ({
                         activeApplicationRounds={activeApplicationRounds}
                         createReservation={(res) => createReservation(res)}
                         setErrorMsg={setErrorMsg}
-                        handleEventChange={handleEventChange}
+                        handleEventChange={handleCalendarEventChange}
                         mode="create"
                         shouldCalendarControlsBeVisible={
                           shouldCalendarControlsBeVisible
