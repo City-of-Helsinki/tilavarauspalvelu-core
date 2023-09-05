@@ -1,9 +1,9 @@
 import React from "react";
-import { fontBold } from "common/src/common/typography";
 import styled from "styled-components";
 import { IconCross, NotificationType } from "hds-react";
-import NotificationWrapper from "./common/NotificationWrapper";
-import {breakpoints} from "common/src/common/style";
+import NotificationWrapper from "ui/components/common/NotificationWrapper";
+import { fontBold } from "../common/typography";
+import { breakpoints } from "../common/style";
 
 type UserNotificationProps = {
   date: Date;
