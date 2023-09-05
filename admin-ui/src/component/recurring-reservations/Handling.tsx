@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
@@ -354,43 +355,39 @@ function Handling({
     applicationRound.status
   );
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [recommendations, setRecommendations] = useState<AllocationResult[]>(
-    []
-  );
   const [isResolutionNotificationVisible, setIsResolutionNotificationVisible] =
     useState<boolean>(isApplicationRoundApproved);
-  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
   const [selections, setSelections] = useState<number[]>([]);
 
   const { t } = useTranslation();
 
-  const fetchRecommendations = async () => {
-    try {
-      const result = await getAllocationResults({
-        applicationRoundId: applicationRound.id,
-        serviceSectorId: applicationRound.serviceSectorId,
-      });
-
-      const processedResult = processAllocationResult(result);
-
-      setFilterConfig(getFilterConfig(processedResult));
-      setCellConfig(getCellConfig(t, applicationRound));
-      setRecommendations(processedResult);
-    } catch (error) {
+  const {
+    data: allocations,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "allocationResultsByRound",
+      applicationRound?.id,
+      applicationRound?.serviceSectorId ?? 0,
+    ],
+    queryFn: () =>
+      getAllocationResults({
+        applicationRoundId: applicationRound?.id,
+        serviceSectorId: applicationRound?.serviceSectorId,
+      }),
+    enabled: applicationRound?.id != null,
+    onError: () => {
       notifyError(t("errors.errorFetchingApplications"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
-  useEffect(() => {
-    if (typeof applicationRound?.id === "number") {
-      fetchRecommendations();
-    }
-  }, [applicationRound, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  const processedResult = processAllocationResult(allocations ?? []);
+  const cellConfig = getCellConfig(t, applicationRound);
+  const filterConfig = getFilterConfig(processedResult);
+
+  const recommendations = processedResult;
 
   const unhandledRecommendationCount: number = recommendations
     .flatMap((recommendation) => recommendation.applicationEvent)
@@ -409,141 +406,132 @@ function Handling({
     applicationRound.aggregatedData.totalReservationDuration
   );
 
+  if (!applicationRound) {
+    return <div>{t("ApplicationRound.errors.noApplicationRound")}</div>;
+  }
+
   return (
-    <Wrapper>
-      <BreadcrumbWrapper
-        route={[
-          "recurring-reservations",
-          "/recurring-reservations/application-rounds",
-          "application-round",
-        ]}
-        aliases={[{ slug: "application-round", title: applicationRound.name }]}
-      />
-      {applicationRound && (
-        <>
+    <>
+      <>
+        {!isApplicationRoundApproved && (
+          <StyledKorosHeading>
+            <KorosHeadingHeading>
+              {unhandledRecommendationCount}
+            </KorosHeadingHeading>
+            <SubHeading>
+              {t("ApplicationRound.suffixUnhandledSuggestions")}
+            </SubHeading>
+          </StyledKorosHeading>
+        )}
+        <IngressContainer>
+          <ApplicationRoundNavi
+            applicationRoundId={applicationRound.id}
+            applicationRoundStatus={applicationRound.status}
+          />
+          <TopIngress>
+            <div>
+              <ContentHeading>{applicationRound.name}</ContentHeading>
+              <TimeframeStatus
+                applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+                applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+                isResolved={isApplicationRoundApproved}
+                resolutionDate={applicationRound.statusTimestamp}
+              />
+            </div>
+            <div>
+              {applicationRound.aggregatedData.totalHourCapacity &&
+                capacity && (
+                  <>
+                    <StatusCircle status={capacity.percentage} />
+                    <H3>{t("ApplicationRound.amountReserved")}</H3>
+                  </>
+                )}
+            </div>
+          </TopIngress>
+        </IngressContainer>
+        <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
           {!isApplicationRoundApproved && (
-            <StyledKorosHeading>
-              <KorosHeadingHeading>
-                {unhandledRecommendationCount}
-              </KorosHeadingHeading>
-              <SubHeading>
-                {t("ApplicationRound.suffixUnhandledSuggestions")}
-              </SubHeading>
-            </StyledKorosHeading>
+            <>
+              <Recommendation>
+                <RecommendationLabel>
+                  {t("Application.recommendedStage")}:
+                </RecommendationLabel>
+                <RecommendationValue>
+                  <StatusRecommendation
+                    status="allocated"
+                    applicationRound={applicationRound}
+                  />
+                </RecommendationValue>
+              </Recommendation>
+              <ActionContainer>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setApplicationRoundStatus("handled");
+                  }}
+                  disabled={unhandledRecommendationCount > 0 || isSaving}
+                >
+                  {t("ApplicationRound.navigateToApprovalPreparation")}
+                </Button>
+              </ActionContainer>
+            </>
           )}
-          <IngressContainer>
-            <ApplicationRoundNavi
-              applicationRoundId={applicationRound.id}
-              applicationRoundStatus={applicationRound.status}
-            />
-            <TopIngress>
-              <div>
-                <ContentHeading>{applicationRound.name}</ContentHeading>
-                <TimeframeStatus
-                  applicationPeriodBegin={
-                    applicationRound.applicationPeriodBegin
-                  }
-                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                  isResolved={isApplicationRoundApproved}
-                  resolutionDate={applicationRound.statusTimestamp}
-                />
-              </div>
-              <div>
-                {applicationRound.aggregatedData.totalHourCapacity &&
-                  capacity && (
-                    <>
-                      <StatusCircle status={capacity.percentage} />
-                      <H3>{t("ApplicationRound.amountReserved")}</H3>
-                    </>
-                  )}
-              </div>
-            </TopIngress>
-          </IngressContainer>
-          <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
-            {!isApplicationRoundApproved && (
-              <>
-                <Recommendation>
-                  <RecommendationLabel>
-                    {t("Application.recommendedStage")}:
-                  </RecommendationLabel>
-                  <RecommendationValue>
-                    <StatusRecommendation
-                      status="allocated"
-                      applicationRound={applicationRound}
-                    />
-                  </RecommendationValue>
-                </Recommendation>
-                <ActionContainer>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => {
-                      setApplicationRoundStatus("handled");
-                    }}
-                    disabled={unhandledRecommendationCount > 0 || isSaving}
-                  >
-                    {t("ApplicationRound.navigateToApprovalPreparation")}
-                  </Button>
-                </ActionContainer>
-              </>
-            )}
-            {isResolutionNotificationVisible && (
-              <StyledNotification
-                type="success"
-                label=""
-                dismissible
-                closeButtonLabelText={`${t("common.close")}`}
-                onClose={() => setIsResolutionNotificationVisible(false)}
-              >
-                <H3>
-                  <IconCheckCircle size="m" />{" "}
-                  {t("ApplicationRound.notificationResolutionDoneHeading")}
-                </H3>
-                <p>
-                  <BasicLink
-                    to={applicationRoundApplications(applicationRound.id)}
-                    style={{ textDecoration: "underline" }}
-                  >
-                    {t("ApplicationRound.notificationResolutionDoneBody")}
-                  </BasicLink>
-                </p>
-              </StyledNotification>
-            )}
-          </NarrowContainer>
-          {cellConfig && (
-            <DataTable
-              groups={prepareAllocationResults(recommendations)}
-              setSelections={setSelections}
-              renderGroup={renderGroup}
-              hasGrouping
-              config={{
-                filtering: true,
-                rowFilters: true,
-                handledStatuses: isApplicationRoundApproved
-                  ? []
-                  : ["ignored", "validated", "handled"],
-                selection: !isApplicationRoundApproved,
-              }}
-              filterConfig={filterConfig}
-              cellConfig={cellConfig}
-              areAllRowsDisabled={recommendations.every(
-                (row) =>
-                  row.applicationEvent.status === "ignored" ||
-                  row.accepted ||
-                  row.declined
-              )}
-              isRowDisabled={(row: AllocationResult) => {
-                return (
-                  ["ignored", "declined"].includes(
-                    row.applicationEvent.status
-                  ) || row.accepted
-                );
-              }}
-              statusField="applicationEvent.status"
-            />
+          {isResolutionNotificationVisible && (
+            <StyledNotification
+              type="success"
+              label=""
+              dismissible
+              closeButtonLabelText={`${t("common.close")}`}
+              onClose={() => setIsResolutionNotificationVisible(false)}
+            >
+              <H3>
+                <IconCheckCircle size="m" />{" "}
+                {t("ApplicationRound.notificationResolutionDoneHeading")}
+              </H3>
+              <p>
+                <BasicLink
+                  to={applicationRoundApplications(applicationRound.id)}
+                  style={{ textDecoration: "underline" }}
+                >
+                  {t("ApplicationRound.notificationResolutionDoneBody")}
+                </BasicLink>
+              </p>
+            </StyledNotification>
           )}
-        </>
-      )}
+        </NarrowContainer>
+        {cellConfig && (
+          <DataTable
+            groups={prepareAllocationResults(recommendations)}
+            setSelections={setSelections}
+            renderGroup={renderGroup}
+            hasGrouping
+            config={{
+              filtering: true,
+              rowFilters: true,
+              handledStatuses: isApplicationRoundApproved
+                ? []
+                : ["ignored", "validated", "handled"],
+              selection: !isApplicationRoundApproved,
+            }}
+            filterConfig={filterConfig}
+            cellConfig={cellConfig}
+            areAllRowsDisabled={recommendations.every(
+              (row) =>
+                row.applicationEvent.status === "ignored" ||
+                row.accepted ||
+                row.declined
+            )}
+            isRowDisabled={(row: AllocationResult) => {
+              return (
+                ["ignored", "declined"].includes(row.applicationEvent.status) ||
+                row.accepted
+              );
+            }}
+            statusField="applicationEvent.status"
+          />
+        )}
+      </>
       {selections?.length > 0 && (
         <SelectionActionBar
           selections={selections}
@@ -564,16 +552,37 @@ function Handling({
               notifyError,
               t,
               callback: () => {
+                // LOL
                 setTimeout(() => setIsSaving(false), 1000);
-                fetchRecommendations();
+                refetch();
               },
             });
           }}
           isSaving={isSaving}
         />
       )}
-    </Wrapper>
+    </>
   );
 }
 
-export default Handling;
+const PageWrapper = ({
+  applicationRound,
+  setApplicationRoundStatus,
+}: IProps) => (
+  <Wrapper>
+    <BreadcrumbWrapper
+      route={[
+        "recurring-reservations",
+        "/recurring-reservations/application-rounds",
+        "application-round",
+      ]}
+      aliases={[{ slug: "application-round", title: applicationRound.name }]}
+    />
+    <Handling
+      applicationRound={applicationRound}
+      setApplicationRoundStatus={setApplicationRoundStatus}
+    />
+  </Wrapper>
+);
+
+export default PageWrapper;

@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Card, Table } from "hds-react";
-import { isEqual, set, orderBy, trim } from "lodash";
+import { isEqual, trim } from "lodash";
 import omit from "lodash/omit";
 import { TFunction } from "i18next";
+import { useQuery } from "@tanstack/react-query";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import Accordion from "../Accordion";
@@ -15,12 +16,7 @@ import {
   getParameters,
 } from "../../common/api";
 import Loader from "../Loader";
-import {
-  Application as ApplicationType,
-  ApplicationEvent,
-  ApplicationRound,
-  Parameter,
-} from "../../common/types";
+import { ApplicationEvent } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import {
   formatNumber,
@@ -198,60 +194,52 @@ const appEventDuration = (
   return trim(duration, ", ");
 };
 
-function ApplicationDetails(): JSX.Element | null {
-  const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRound | null>(null);
-  const [cities, setCities] = useState<Parameter[]>([]);
-
-  const { applicationId } = useParams<IRouteParams>();
-  const { t } = useTranslation();
-
-  const fetchApplication = async (id: number) => {
-    try {
-      const appResult = await getApplication(id);
-      const citiesResult = await getParameters("city");
-      const applicationRoundResult = await getApplicationRound({
-        id: appResult.applicationRoundId,
-      });
-      appResult.applicationEvents.forEach((ae) => {
-        set(
-          ae,
-          "eventReservationUnits",
-          orderBy(ae.eventReservationUnits, "priority", "asc")
-        );
-        set(
-          ae,
-          "applicationEventSchedules",
-          orderBy(ae.applicationEventSchedules, "begin", "asc")
-        );
-      });
-
-      setApplication(appResult);
-      setCities(citiesResult);
-      setApplicationRound(applicationRoundResult);
-    } catch (error) {
-      notifyError(t("errors.errorFetchingApplication"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchApplication(Number(applicationId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationId]);
-
+function ApplicationDetails({
+  applicationId,
+}: {
+  applicationId: number;
+}): JSX.Element | null {
   const ref = useRef<HTMLHeadingElement>(null);
+  const { t } = useTranslation();
+  const { notifyError } = useNotification();
+
+  const { data: application, isLoading: loadingApplication } = useQuery({
+    queryKey: ["application", applicationId],
+    queryFn: () => getApplication(applicationId),
+    enabled: applicationId !== 0,
+    onError: () => {
+      notifyError(t("errors.errorFetchingApplication"));
+    },
+  });
+
+  const { data: cities, isLoading: loadingCities } = useQuery({
+    queryKey: ["cities"],
+    queryFn: () => getParameters("city"),
+    onError: () => {
+      // TODO specific error message
+      notifyError(t("errors.errorFetchingApplication"));
+    },
+  });
+
+  const { data: applicationRound, isLoading: loadingApplicationRound } =
+    useQuery({
+      queryKey: ["applicationRound", application?.applicationRoundId ?? 0],
+      queryFn: () =>
+        getApplicationRound({
+          id: application?.applicationRoundId ?? 0,
+        }),
+      enabled: application?.applicationRoundId != null,
+      onError: () => {
+        // TODO specific error message
+        notifyError(t("errors.errorFetchingApplication"));
+      },
+    });
+
+  const isLoading =
+    loadingApplication || loadingCities || loadingApplicationRound;
 
   if (isLoading) {
     return <Loader />;
-  }
-
-  if (!application) {
-    return null;
   }
 
   const isOrganisation = Boolean(application?.organisation);
@@ -263,11 +251,13 @@ function ApplicationDetails(): JSX.Element | null {
       omit(application?.organisation?.address, "id")
     );
 
-  const customerName = applicantName(application);
+  // TODO error handling
+  if (!application || !applicationRound) {
+    return null;
+  }
 
-  const homeCity: Parameter | undefined = cities.find(
-    (n) => n.id === application?.homeCityId
-  );
+  const customerName = applicantName(application);
+  const homeCity = cities?.find((n) => n.id === application?.homeCityId);
 
   return (
     <Wrapper>
@@ -585,4 +575,14 @@ function ApplicationDetails(): JSX.Element | null {
   );
 }
 
-export default ApplicationDetails;
+function ApplicationDetailsRouted(): JSX.Element {
+  const { applicationId } = useParams<IRouteParams>();
+
+  if (!applicationId || Number.isNaN(Number(applicationId))) {
+    return <div>Virheellinen hakemusnumero</div>;
+  }
+
+  return <ApplicationDetails applicationId={Number(applicationId)} />;
+}
+
+export default ApplicationDetailsRouted;

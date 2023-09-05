@@ -1,5 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery as useApolloQuery } from "@apollo/client";
 import { uniqBy } from "lodash";
+import {
+  type Query,
+  type QueryApplicationsArgs,
+  ApplicationStatus,
+  type ApplicationType,
+  type UnitType,
+  ApplicationsApplicationApplicantTypeChoices,
+} from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { useParams } from "react-router-dom";
@@ -8,17 +17,17 @@ import styled from "styled-components";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
 import { H1, H3 } from "common/src/common/typography";
+import { useQuery } from "@tanstack/react-query";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import LinkPrev from "../LinkPrev";
-import { getApplicationRound, getApplications } from "../../common/api";
+import { getApplicationRound } from "../../common/api";
+import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../recurring-reservations/queries";
 import {
-  Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
-  ApplicationRoundStatus,
+  ApplicationRoundStatus as ApplicationRoundStatusRest,
   DataFilterConfig,
-  ApplicationStatus,
+  ApplicationStatus as ApplicationStatusRest,
   ApplicationEventStatus,
-  Unit,
 } from "../../common/types";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
@@ -55,11 +64,11 @@ type ApplicationView = {
   id: number;
   applicant: string;
   type: string;
-  units: Unit[];
+  units: UnitType[];
   unitsSort: string;
   applicationCount: string;
   applicationCountSort: number;
-  status: ApplicationStatus | ApplicationEventStatus;
+  status: ApplicationStatusRest | ApplicationEventStatus;
 };
 
 const getFilterConfig = (
@@ -95,7 +104,7 @@ const getFilterConfig = (
       title: "Application.headings.unit",
       filters: units.map((unit) => ({
         key: "unit",
-        title: unit.name.fi,
+        title: unit.nameFi || "",
         function: (application: ApplicationView) =>
           Boolean(application.units.find((u) => u.id === unit.id)),
       })),
@@ -104,12 +113,12 @@ const getFilterConfig = (
 };
 
 const appMapper = (
-  round: ApplicationRoundType,
+  round: ApplicationRoundStatusRest | undefined,
   app: ApplicationType,
   t: TFunction
 ): ApplicationView => {
-  let applicationStatusView: ApplicationRoundStatus;
-  switch (round.status) {
+  let applicationStatusView: ApplicationRoundStatusRest;
+  switch (round) {
     case "approved":
       applicationStatusView = "approved";
       break;
@@ -118,24 +127,29 @@ const appMapper = (
   }
 
   const units = uniqBy(
-    app.applicationEvents
-      .flatMap((ae) => ae.eventReservationUnits)
-      .flatMap((eru) => eru.reservationUnitDetails.unit),
-    "id"
-  );
+    app?.applicationEvents
+      ?.flatMap((ae) => ae?.eventReservationUnits)
+      ?.flatMap((eru) => eru?.reservationUnit?.unit),
+    "pk"
+  ).filter((u): u is UnitType => u != null);
 
   return {
-    id: app.id,
+    id: app.pk ?? 0,
     applicant:
-      app.applicantType === "individual"
+      app.applicantType ===
+      ApplicationsApplicationApplicantTypeChoices.Individual
         ? app.applicantName || ""
         : app.organisation?.name || "",
     type: app.applicantType
       ? t(`Application.applicantTypes.${app.applicantType}`)
       : "",
-    unitsSort: units.find(() => true)?.name.fi || "",
+    unitsSort: units.find(() => true)?.nameFi || "",
     units,
-    status: getNormalizedApplicationStatus(app.status, applicationStatusView),
+    // FIXME dangerous coercion: rewrite the normalization function to work on GQL types
+    status: getNormalizedApplicationStatus(
+      app.status as ApplicationStatusRest,
+      applicationStatusView
+    ),
     applicationCount: trim(
       `${formatNumber(
         app.aggregatedData?.appliedReservationsTotal,
@@ -171,7 +185,7 @@ const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
         title: "Application.headings.unit",
         key: "unitsSort",
         transform: ({ units }: ApplicationView) =>
-          units.map((u) => u.name.fi).join(", "),
+          units.map((u) => u.nameFi).join(", "),
       },
       {
         title: "Application.headings.applicationCount",
@@ -199,104 +213,108 @@ const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
   };
 };
 
-function Applications(): JSX.Element {
+function Applications({
+  applicationRoundId,
+}: {
+  applicationRoundId: number;
+}): JSX.Element {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-  const [applications, setApplications] = useState<ApplicationView[] | []>([]);
-  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
-    null
-  );
-  const { applicationRoundId } = useParams<IRouteParams>();
+
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setIsLoading(true);
+  const { data: applicationRound, isLoading: isLoadingRound } = useQuery({
+    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
+    queryKey: ["applicationRound", { id: Number(applicationRoundId) }],
+    enabled: applicationRoundId != null,
+    onError: (error: unknown) => {
+      const msg =
+        (error as AxiosError).response?.status === 404
+          ? "errors.applicationRoundNotFound"
+          : "errors.errorFetchingData";
+      notifyError(t(msg));
+    },
+  });
 
-      try {
-        const result = await getApplicationRound({
-          id: Number(applicationRoundId),
-        });
-        setApplicationRound(result);
-      } catch (error) {
-        const msg =
-          (error as AxiosError).response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        notifyError(t(msg));
-      } finally {
-        setIsLoading(false);
+  const { loading: isApplicationsLoading, data: applicationsData } =
+    useApolloQuery<Query, QueryApplicationsArgs>(
+      APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
+      {
+        skip: !applicationRound?.id,
+        variables: {
+          applicationRound: String(applicationRound?.id ?? 0),
+          status: [
+            // original REST status:
+            // status: "in_review,review_done,declined,sent",
+            // TODO check the map for them (or ask Krista / Elina what should be on this page)
+            ApplicationStatus.Allocated,
+            ApplicationStatus.Expired,
+            ApplicationStatus.Handled,
+            ApplicationStatus.InReview,
+            ApplicationStatus.Received,
+            ApplicationStatus.ReviewDone,
+            ApplicationStatus.Sent,
+          ],
+        },
+        onError: () => {
+          notifyError(t("errors.errorFetchingApplications"));
+        },
       }
-    };
+    );
 
-    fetchApplicationRound();
-  }, [applicationRoundId, notifyError, t]);
+  const status = applicationRound?.status;
+  const applications =
+    applicationsData?.applications?.edges
+      ?.map((edge) => edge?.node)
+      ?.filter((app): app is ApplicationType => app != null)
+      ?.map((app) => appMapper(status, app, t)) ?? [];
+  const cellConfig = applicationRound
+    ? getCellConfig(applicationRound)
+    : undefined;
+  const filterConfig = getFilterConfig(applications);
 
-  useEffect(() => {
-    const fetchApplications = async (ar: ApplicationRoundType) => {
-      setIsLoading(true);
-
-      try {
-        const result = await getApplications({
-          applicationRound: ar.id,
-          status: "in_review,review_done,declined,sent",
-        });
-        const mapped = result.map((app) => appMapper(ar, app, t));
-        setCellConfig(getCellConfig(ar));
-        setFilterConfig(getFilterConfig(mapped));
-        setApplications(mapped);
-      } catch (error) {
-        notifyError(t("errors.errorFetchingApplications"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (applicationRound) {
-      fetchApplications(applicationRound);
-    }
-  }, [applicationRound, notifyError, t]);
-
+  const isLoading = isLoadingRound || isApplicationsLoading;
+  // TODO move the loader down (skeletons rather than spinners)
   if (isLoading) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
-      {applicationRound && (
-        <>
-          <ContentContainer>
-            <LinkPrev />
-          </ContentContainer>
-          <IngressContainer>
-            <Title>{t("Application.allApplications")}</Title>
-            <ApplicationRoundTitle>
-              {applicationRound.name}
-            </ApplicationRoundTitle>
-            <ApplicationCount data-testid="application-count">
-              {applications.length} {t("common.volumeUnit")}
-            </ApplicationCount>
-          </IngressContainer>
-          {cellConfig && filterConfig && (
-            <DataTable
-              groups={[{ id: 1, data: applications }]}
-              hasGrouping={false}
-              config={{
-                filtering: true,
-                rowFilters: true,
-                selection: false,
-              }}
-              cellConfig={cellConfig}
-              filterConfig={filterConfig}
-            />
-          )}
-        </>
+      <ContentContainer>
+        <LinkPrev />
+      </ContentContainer>
+      <IngressContainer>
+        <Title>{t("Application.allApplications")}</Title>
+        <ApplicationRoundTitle>{applicationRound?.name}</ApplicationRoundTitle>
+        <ApplicationCount data-testid="application-count">
+          {applications.length} {t("common.volumeUnit")}
+        </ApplicationCount>
+      </IngressContainer>
+      {cellConfig && filterConfig && (
+        <DataTable
+          groups={[{ id: 1, data: applications }]}
+          hasGrouping={false}
+          config={{
+            filtering: true,
+            rowFilters: true,
+            selection: false,
+          }}
+          cellConfig={cellConfig}
+          filterConfig={filterConfig}
+        />
       )}
     </Wrapper>
   );
 }
 
-export default Applications;
+function ApplicationsRouted(): JSX.Element {
+  const { applicationRoundId } = useParams<IRouteParams>();
+  const { t } = useTranslation();
+
+  if (!applicationRoundId) {
+    <div>{t("errors.applicationRoundNotFound")}</div>;
+  }
+  return <Applications applicationRoundId={Number(applicationRoundId)} />;
+}
+
+export default ApplicationsRouted;

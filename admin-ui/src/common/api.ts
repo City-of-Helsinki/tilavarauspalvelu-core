@@ -219,14 +219,19 @@ export interface ApplicationParameters {
   status?: string;
 }
 
+/* TODO BROKEN on the backend, grep it => refactor it out => tell the backend to remove it
 export function getApplications(
   params: ApplicationParameters
 ): Promise<Application[]> {
-  return apiGet<Application[]>({
+  console.log("getApplications", params);
+  const res = apiGet<Application[]>({
     parameters: params,
     path: `v1/${applicationBasePath}`,
   });
+  console.log("getApplications res", res);
+  return res;
 }
+*/
 
 export function setApplicationStatus(
   applicationId: number,

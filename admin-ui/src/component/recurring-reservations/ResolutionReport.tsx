@@ -1,4 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useQuery as useApolloQuery } from "@apollo/client";
+import {
+  type Query,
+  type QueryApplicationsArgs,
+  ApplicationStatus,
+  type ApplicationType,
+} from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { TFunction } from "i18next";
@@ -11,10 +19,11 @@ import { H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   AllocationResult,
-  Application as ApplicationType,
+  Application as ApplicationTypeRest,
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
 } from "../../common/types";
+import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "./queries";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { ContentHeading } from "../../styles/typography";
 import DataTable, { CellConfig, OrderTypes } from "../DataTable";
@@ -28,11 +37,7 @@ import {
 import BigRadio from "../BigRadio";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import {
-  getAllocationResults,
-  getApplicationRound,
-  getApplications,
-} from "../../common/api";
+import { getAllocationResults, getApplicationRound } from "../../common/api";
 import TimeframeStatus from "./TimeframeStatus";
 import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
@@ -115,7 +120,7 @@ const BoldValue = styled.span`
 
 const getCellConfig = (
   t: TFunction,
-  applicationRound: ApplicationRoundType | null,
+  applicationRoundId: number | undefined,
   type: "unallocated" | "allocated"
 ): CellConfig => {
   const unallocatedCellConfig = {
@@ -127,7 +132,7 @@ const getCellConfig = (
           applicantName,
           applicantType,
           organisation,
-        }: ApplicationType) =>
+        }: ApplicationTypeRest) =>
           applicantType === "individual"
             ? applicantName || ""
             : organisation?.name || "",
@@ -135,7 +140,7 @@ const getCellConfig = (
       {
         title: "Application.headings.applicantType",
         key: "applicantType",
-        transform: ({ applicantType }: ApplicationType) =>
+        transform: ({ applicantType }: ApplicationTypeRest) =>
           applicantType ? t(`Application.applicantTypes.${applicantType}`) : "",
       },
       {
@@ -158,7 +163,7 @@ const getCellConfig = (
     index: "id",
     sorting: "organisation.name",
     order: "asc" as OrderTypes,
-    rowLink: ({ id }: ApplicationType) => applicationDetailsUrl(id),
+    rowLink: ({ id }: ApplicationTypeRest) => applicationDetailsUrl(id),
   };
 
   const allocatedCellConfig = {
@@ -178,7 +183,7 @@ const getCellConfig = (
       {
         title: "Application.headings.applicantType",
         key: "applicantType",
-        transform: ({ applicantType }: ApplicationType) =>
+        transform: ({ applicantType }: ApplicationTypeRest) =>
           applicantType ? t(`Application.applicantTypes.${applicantType}`) : "",
       },
       {
@@ -212,9 +217,9 @@ const getCellConfig = (
     sorting: "organisation.name",
     order: "asc" as OrderTypes,
     rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
-      return applicationEventScheduleId && applicationRound
+      return applicationEventScheduleId && applicationRoundId
         ? `${applicationRoundUrl(
-            applicationRound.id
+            applicationRoundId
           )}/recommendation/${applicationEventScheduleId}`
         : "";
     },
@@ -229,6 +234,7 @@ const getCellConfig = (
   }
 };
 
+// TODO refactor this not to need the Application, just the ApplicationType
 const getFilterConfig = (
   recommendations: AllocationResult[] | null,
   applications: ApplicationType[] | null,
@@ -289,25 +295,6 @@ const getFilterConfig = (
 
 function ResolutionReport(): JSX.Element {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-  const [recommendations, setRecommendations] = useState<
-    AllocationResult[] | []
-  >([]);
-  const [unallocatedApplications, setUnallocatedApplications] = useState<
-    ApplicationType[]
-  >([]);
-  const [unAllocatedFilterConfig, setUnallocatedFilterConfig] = useState<
-    DataFilterConfig[] | null
-  >(null);
-  const [allocatedFilterConfig, setAllocatedFilterConfig] = useState<
-    DataFilterConfig[] | null
-  >(null);
-  const [unAllocatedCellConfig, setUnallocatedCellConfig] =
-    useState<CellConfig | null>(null);
-  const [allocatedCellConfig, setAllocatedCellConfig] =
-    useState<CellConfig | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("allocated");
   const [capacity, setCapacity] = useState<IAllocationCapacity | null>(null);
   const [filteredApplicationsCount, setFilteredApplicationsCount] = useState<
@@ -317,75 +304,99 @@ function ResolutionReport(): JSX.Element {
   const { applicationRoundId } = useParams<IProps>();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchApplicationRound = async (id: number) => {
-      setIsLoading(true);
+  const { data: applicationRound, isLoading: isRoundLoading } = useQuery({
+    queryKey: ["applicationRound", Number(applicationRoundId) ?? 0],
+    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
+    enabled:
+      applicationRoundId != null && !Number.isNaN(Number(applicationRoundId)),
+    onError: (error: AxiosError) => {
+      const msg =
+        error?.response?.status === 404
+          ? "errors.applicationRoundNotFound"
+          : "errors.errorFetchingData";
+      notifyError(t(msg));
+    },
+  });
 
-      try {
-        const result = await getApplicationRound({
-          id,
-        });
-        setApplicationRound(result);
-      } catch (error) {
-        const msg =
-          (error as AxiosError).response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        notifyError(t(msg));
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplicationRound(Number(applicationRoundId));
-  }, [applicationRoundId, notifyError, t]);
-
-  useEffect(() => {
-    const fetchRecommendationsAndApplications = async (
-      ar: ApplicationRoundType
-    ) => {
-      try {
-        const allocationResults = await getAllocationResults({
-          applicationRoundId: ar.id,
-          serviceSectorId: ar.serviceSectorId,
-        });
-
-        const applicationsResult = await getApplications({
-          applicationRound: ar.id,
-          status: "in_review,review_done,declined",
-        });
-
-        const processedResult = processAllocationResult(allocationResults);
-
-        const allocatedApplicationIds = uniq(
-          processedResult.map((result) => result.applicationId)
-        );
-        const unallocatedApps = applicationsResult.filter(
-          (application) => !allocatedApplicationIds.includes(application.id)
-        );
-
-        setUnallocatedFilterConfig(
-          getFilterConfig(processedResult, unallocatedApps, "unallocated", t)
-        );
-        setAllocatedFilterConfig(
-          getFilterConfig(processedResult, unallocatedApps, "allocated", t)
-        );
-        setUnallocatedCellConfig(
-          getCellConfig(t, applicationRound, "unallocated")
-        );
-        setAllocatedCellConfig(getCellConfig(t, applicationRound, "allocated"));
-        setRecommendations(processAllocationResult(allocationResults) || []);
-        setUnallocatedApplications(unallocatedApps);
-      } catch (error) {
-        notifyError(t("errors.errorFetchingApplications"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (typeof applicationRound?.id === "number") {
-      fetchRecommendationsAndApplications(applicationRound);
+  const { data: allocationResults, isLoading: isAllocationsLoading } = useQuery(
+    {
+      queryKey: [
+        "allocationResults",
+        applicationRoundId,
+        applicationRound?.serviceSectorId,
+      ],
+      queryFn: () =>
+        getAllocationResults({
+          applicationRoundId: applicationRound?.id ?? 0,
+          serviceSectorId: applicationRound?.serviceSectorId ?? 0,
+        }),
+      enabled:
+        applicationRoundId != null && applicationRound?.serviceSectorId != null,
+      onError: () => {
+        notifyError(t("errors.errorFetchingData"));
+      },
     }
-  }, [applicationRound, notifyError, t]);
+  );
+
+  const processedResult = processAllocationResult(allocationResults ?? []);
+  const allocatedApplicationIds = uniq(
+    processedResult.map((result) => result.applicationId)
+  );
+
+  const { loading: isApplicationsLoading, data: applicationsData } =
+    useApolloQuery<Query, QueryApplicationsArgs>(
+      APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
+      {
+        skip: !applicationRound?.id,
+        variables: {
+          applicationRound: String(applicationRound?.id ?? 0),
+          status: [
+            // original REST status: "in_review,review_done,declined",
+            // TODO check the map for them (or ask Krista / Elina what should be on this page)
+            ApplicationStatus.Allocated,
+            ApplicationStatus.Expired,
+            ApplicationStatus.Handled,
+            ApplicationStatus.InReview,
+            ApplicationStatus.Received,
+            ApplicationStatus.ReviewDone,
+            ApplicationStatus.Sent,
+          ],
+        },
+      }
+    );
+
+  const applicationsResult =
+    applicationsData?.applications?.edges
+      ?.map((x) => x?.node)
+      ?.filter((x): x is ApplicationType => x != null) ?? [];
+
+  const unallocatedApplications = applicationsResult.filter(
+    (application) => !allocatedApplicationIds.includes(application?.pk ?? 0)
+  );
+
+  const unAllocatedFilterConfig = getFilterConfig(
+    processedResult,
+    unallocatedApplications,
+    "unallocated",
+    t
+  );
+  const allocatedFilterConfig = getFilterConfig(
+    processedResult,
+    unallocatedApplications,
+    "allocated",
+    t
+  );
+  const unAllocatedCellConfig = getCellConfig(
+    t,
+    applicationRound?.id,
+    "unallocated"
+  );
+  const allocatedCellConfig = getCellConfig(
+    t,
+    applicationRound?.id,
+    "allocated"
+  );
+  const recommendations = processAllocationResult(allocationResults ?? []);
 
   const filteredResults =
     activeFilter === "unallocated"
@@ -406,6 +417,8 @@ function ResolutionReport(): JSX.Element {
     setCapacity(result);
   };
 
+  const isLoading =
+    isRoundLoading || isAllocationsLoading || isApplicationsLoading;
   if (isLoading) {
     return <Loader />;
   }
@@ -510,7 +523,7 @@ function ResolutionReport(): JSX.Element {
                 }}
                 cellConfig={unAllocatedCellConfig}
                 filterConfig={unAllocatedFilterConfig}
-                getActiveRows={(rows: ApplicationType[]) => {
+                getActiveRows={(rows: ApplicationTypeRest[]) => {
                   setFilteredApplicationsCount(rows.length);
                 }}
               />

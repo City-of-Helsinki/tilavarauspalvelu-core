@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AxiosError } from "axios";
+import { type AxiosError } from "axios";
+import { useQuery } from "@tanstack/react-query";
 import Review from "./review/Review";
 import Allocation from "./Allocation";
 import Handling from "./Handling";
 import PreApproval from "./PreApproval";
-import {
-  ApplicationRoundStatus,
-  ApplicationRound as ApplicationRoundType,
-} from "../../common/types";
+import { ApplicationRoundStatus } from "../../common/types";
 import {
   getApplicationRound,
   patchApplicationRoundStatus,
@@ -21,50 +19,43 @@ type IProps = {
   applicationRoundId: string;
 };
 
-function ApplicationRound(): JSX.Element | null {
-  const [isLoading, setIsLoading] = useState(true);
+// TODO split the router params to separate component
+function ApplicationRound({
+  applicationRoundId,
+}: {
+  applicationRoundId: number;
+}): JSX.Element | null {
   const { notifyError } = useNotification();
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-
-  const { applicationRoundId } = useParams<IProps>();
   const { t } = useTranslation();
+
+  const {
+    data: applicationRound,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["applicationRound", applicationRoundId],
+    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
+    onError: (error: AxiosError) => {
+      const msg =
+        (error as AxiosError).response?.status === 404
+          ? "errors.applicationRoundNotFound"
+          : "errors.errorFetchingData";
+      notifyError(t(msg));
+    },
+  });
 
   const setApplicationRoundStatus = async (
     id: number,
     status: ApplicationRoundStatus
   ) => {
     try {
-      const result = await patchApplicationRoundStatus(id, status);
-      setApplicationRound(result);
+      // TODO replace with mutation
+      await patchApplicationRoundStatus(id, status);
+      refetch();
     } catch (error) {
       notifyError(t("errors.errorSavingData"));
     }
   };
-
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: Number(applicationRoundId),
-        });
-        setApplicationRound(result);
-      } catch (error) {
-        const msg =
-          (error as AxiosError).response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        notifyError(t(msg));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplicationRound();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationRoundId]);
 
   if (isLoading) {
     return <Loader />;
@@ -109,4 +100,12 @@ function ApplicationRound(): JSX.Element | null {
   }
 }
 
-export default ApplicationRound;
+function ApplicationRoundRouted(): JSX.Element | null {
+  const { applicationRoundId } = useParams<IProps>();
+  if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
+    return null;
+  }
+  return <ApplicationRound applicationRoundId={Number(applicationRoundId)} />;
+}
+
+export default ApplicationRoundRouted;
