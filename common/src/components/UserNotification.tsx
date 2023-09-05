@@ -13,6 +13,7 @@ type UserNotificationProps = {
 
 const NotificationBackground = styled.div`
   position: relative;
+  z-index: 1000;
   display: flex;
   > div {
     width: 100vw;
@@ -22,17 +23,6 @@ const NotificationBackground = styled.div`
 const NotificationContainer = styled(NotificationWrapper)`
   font-size: var(--fontsize-body-m);
   width: calc(100vw - 48px);
-  [class*="Notification-module_content"] {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    overflow: hidden;
-    @media (width < ${breakpoints.l}) {
-      -webkit-line-clamp: 6;
-      -line-clamp: 6;
-    }
-  }
 `;
 
 const NotificationText = styled.span`
@@ -50,11 +40,11 @@ const NotificationDate = styled.span`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 50%;
+  top: var(--spacing-m);
+  right: var(--spacing-s);
   transform: translateY(-50%);
   padding: var(--spacing-xs);
   padding-right: 0;
-  right: var(--spacing-s);
   background-color: transparent;
   border: none;
   cursor: pointer;

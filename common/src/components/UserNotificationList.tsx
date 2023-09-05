@@ -2,6 +2,7 @@ import React from "react";
 import { NotificationType } from "hds-react";
 import styled from "styled-components";
 import UserNotification from "./UserNotification";
+import { breakpoints } from "../common/style";
 
 const notifications = [
   {
@@ -28,10 +29,9 @@ const notifications = [
 ];
 
 const PositionWrapper = styled.div`
-  position: absolute;
-  top: 74px;
-  left: 0;
   width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
 `;
 
 const UserNotificationList = ({ maxAmount = 3 }) => {
