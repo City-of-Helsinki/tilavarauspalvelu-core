@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import {NotificationType} from "hds-react";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -148,7 +147,6 @@ export type ApplicationCreateMutationInput = {
   organisation?: InputMaybe<OrganisationCreateSerializerInput>;
   /** Status of this application */
   status: Scalars["String"]["input"];
-  user?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ApplicationCreateMutationPayload = {
@@ -678,7 +676,6 @@ export type ApplicationUpdateMutationInput = {
   pk?: InputMaybe<Scalars["Int"]["input"]>;
   /** Status of this application */
   status?: InputMaybe<Scalars["String"]["input"]>;
-  user?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ApplicationUpdateMutationPayload = {
@@ -710,6 +707,7 @@ export type ApplicationUpdateMutationPayload = {
   status?: Maybe<Scalars["String"]["output"]>;
 };
 
+/** An enumeration. */
 export enum ApplicationsApplicationApplicantTypeChoices {
   /** Association */
   Association = "ASSOCIATION",
@@ -721,6 +719,7 @@ export enum ApplicationsApplicationApplicantTypeChoices {
   Individual = "INDIVIDUAL",
 }
 
+/** An enumeration. */
 export enum ApplicationsApplicationRoundTargetGroupChoices {
   /** Kaikki */
   All = "ALL",
@@ -730,6 +729,7 @@ export enum ApplicationsApplicationRoundTargetGroupChoices {
   Public = "PUBLIC",
 }
 
+/** An enumeration. */
 export enum ApplicationsOrganisationOrganisationTypeChoices {
   /** Company */
   Company = "COMPANY",
@@ -744,6 +744,130 @@ export enum ApplicationsOrganisationOrganisationTypeChoices {
   /** Unregistered association */
   UnregisteredAssociation = "UNREGISTERED_ASSOCIATION",
 }
+
+export type BannerNotificationCreateMutationInput = {
+  activeFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
+  activeUntil?: InputMaybe<Scalars["DateTime"]["input"]>;
+  clientMutationId?: InputMaybe<Scalars["String"]["input"]>;
+  draft?: InputMaybe<Scalars["Boolean"]["input"]>;
+  level: Level;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  messageEn?: InputMaybe<Scalars["String"]["input"]>;
+  messageFi?: InputMaybe<Scalars["String"]["input"]>;
+  messageSv?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+  target: Target;
+};
+
+export type BannerNotificationCreateMutationPayload = {
+  __typename?: "BannerNotificationCreateMutationPayload";
+  activeFrom?: Maybe<Scalars["DateTime"]["output"]>;
+  activeUntil?: Maybe<Scalars["DateTime"]["output"]>;
+  clientMutationId?: Maybe<Scalars["String"]["output"]>;
+  draft?: Maybe<Scalars["Boolean"]["output"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  level?: Maybe<Level>;
+  message?: Maybe<Scalars["String"]["output"]>;
+  messageEn?: Maybe<Scalars["String"]["output"]>;
+  messageFi?: Maybe<Scalars["String"]["output"]>;
+  messageSv?: Maybe<Scalars["String"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  target?: Maybe<Target>;
+};
+
+export type BannerNotificationDeleteMutationInput = {
+  clientMutationId?: InputMaybe<Scalars["String"]["input"]>;
+  pk: Scalars["ID"]["input"];
+};
+
+export type BannerNotificationDeleteMutationPayload = {
+  __typename?: "BannerNotificationDeleteMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]["output"]>;
+  /** Whether the object was deleted successfully. */
+  deleted?: Maybe<Scalars["Boolean"]["output"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** Number of rows deleted. */
+  rowCount?: Maybe<Scalars["Int"]["output"]>;
+};
+
+/** An enumeration. */
+export enum BannerNotificationState {
+  Active = "ACTIVE",
+  Draft = "DRAFT",
+  Scheduled = "SCHEDULED",
+}
+
+export type BannerNotificationType = Node & {
+  __typename?: "BannerNotificationType";
+  activeFrom?: Maybe<Scalars["DateTime"]["output"]>;
+  activeUntil?: Maybe<Scalars["DateTime"]["output"]>;
+  draft: Scalars["Boolean"]["output"];
+  /** The ID of the object */
+  id: Scalars["ID"]["output"];
+  level: CommonBannerNotificationLevelChoices;
+  message: Scalars["String"]["output"];
+  messageEn?: Maybe<Scalars["String"]["output"]>;
+  messageFi?: Maybe<Scalars["String"]["output"]>;
+  messageSv?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  state?: Maybe<BannerNotificationState>;
+  target: CommonBannerNotificationTargetChoices;
+};
+
+export type BannerNotificationTypeConnection = {
+  __typename?: "BannerNotificationTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<BannerNotificationTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]["output"]>;
+};
+
+/** A Relay edge containing a `BannerNotificationType` and its cursor. */
+export type BannerNotificationTypeEdge = {
+  __typename?: "BannerNotificationTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"]["output"];
+  /** The item at the end of the edge */
+  node?: Maybe<BannerNotificationType>;
+};
+
+export type BannerNotificationUpdateMutationInput = {
+  activeFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
+  activeUntil?: InputMaybe<Scalars["DateTime"]["input"]>;
+  clientMutationId?: InputMaybe<Scalars["String"]["input"]>;
+  draft?: InputMaybe<Scalars["Boolean"]["input"]>;
+  level?: InputMaybe<Level>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  messageEn?: InputMaybe<Scalars["String"]["input"]>;
+  messageFi?: InputMaybe<Scalars["String"]["input"]>;
+  messageSv?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  target?: InputMaybe<Target>;
+};
+
+export type BannerNotificationUpdateMutationPayload = {
+  __typename?: "BannerNotificationUpdateMutationPayload";
+  activeFrom?: Maybe<Scalars["DateTime"]["output"]>;
+  activeUntil?: Maybe<Scalars["DateTime"]["output"]>;
+  clientMutationId?: Maybe<Scalars["String"]["output"]>;
+  draft?: Maybe<Scalars["Boolean"]["output"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  level?: Maybe<Level>;
+  message?: Maybe<Scalars["String"]["output"]>;
+  messageEn?: Maybe<Scalars["String"]["output"]>;
+  messageFi?: Maybe<Scalars["String"]["output"]>;
+  messageSv?: Maybe<Scalars["String"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  target?: Maybe<Target>;
+};
 
 export type BuildingType = Node & {
   __typename?: "BuildingType";
@@ -785,6 +909,26 @@ export type CityTypeEdge = {
   /** The item at the end of the edge */
   node?: Maybe<CityType>;
 };
+
+/** An enumeration. */
+export enum CommonBannerNotificationLevelChoices {
+  /** Exception */
+  Exception = "EXCEPTION",
+  /** Normal */
+  Normal = "NORMAL",
+  /** Warning */
+  Warning = "WARNING",
+}
+
+/** An enumeration. */
+export enum CommonBannerNotificationTargetChoices {
+  /** Kaikki */
+  All = "ALL",
+  /** Staff */
+  Staff = "STAFF",
+  /** Käyttäjä */
+  User = "USER",
+}
 
 export type EquipmentCategoryCreateMutationInput = {
   clientMutationId?: InputMaybe<Scalars["String"]["input"]>;
@@ -1097,6 +1241,7 @@ export type Mutation = {
   createApplication?: Maybe<ApplicationCreateMutationPayload>;
   createApplicationEvent?: Maybe<ApplicationEventCreateMutationPayload>;
   createApplicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultCreateMutationPayload>;
+  createBannerNotification?: Maybe<BannerNotificationCreateMutationPayload>;
   createEquipment?: Maybe<EquipmentCreateMutationPayload>;
   createEquipmentCategory?: Maybe<EquipmentCategoryCreateMutationPayload>;
   createPurpose?: Maybe<PurposeCreateMutationPayload>;
@@ -1110,6 +1255,7 @@ export type Mutation = {
   declineApplication?: Maybe<ApplicationDeclineMutationPayload>;
   declineApplicationEvent?: Maybe<ApplicationEventDeclineMutationPayload>;
   deleteApplicationEvent?: Maybe<ApplicationEventDeleteMutationPayload>;
+  deleteBannerNotification?: Maybe<BannerNotificationDeleteMutationPayload>;
   deleteEquipment?: Maybe<EquipmentDeleteMutationPayload>;
   deleteEquipmentCategory?: Maybe<EquipmentCategoryDeleteMutationPayload>;
   deleteReservation?: Maybe<ReservationDeleteMutationPayload>;
@@ -1127,6 +1273,7 @@ export type Mutation = {
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
   updateApplicationEvent?: Maybe<ApplicationEventUpdateMutationPayload>;
   updateApplicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultUpdateMutationPayload>;
+  updateBannerNotification?: Maybe<BannerNotificationUpdateMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
@@ -1167,6 +1314,10 @@ export type MutationCreateApplicationEventArgs = {
 
 export type MutationCreateApplicationEventScheduleResultArgs = {
   input: ApplicationEventScheduleResultCreateMutationInput;
+};
+
+export type MutationCreateBannerNotificationArgs = {
+  input: BannerNotificationCreateMutationInput;
 };
 
 export type MutationCreateEquipmentArgs = {
@@ -1219,6 +1370,10 @@ export type MutationDeclineApplicationEventArgs = {
 
 export type MutationDeleteApplicationEventArgs = {
   input: ApplicationEventDeleteMutationInput;
+};
+
+export type MutationDeleteBannerNotificationArgs = {
+  input: BannerNotificationDeleteMutationInput;
 };
 
 export type MutationDeleteEquipmentArgs = {
@@ -1289,6 +1444,10 @@ export type MutationUpdateApplicationEventScheduleResultArgs = {
   input: ApplicationEventScheduleResultUpdateMutationInput;
 };
 
+export type MutationUpdateBannerNotificationArgs = {
+  input: BannerNotificationUpdateMutationInput;
+};
+
 export type MutationUpdateEquipmentArgs = {
   input: EquipmentUpdateMutationInput;
 };
@@ -1342,19 +1501,6 @@ export type Node = {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
 };
-
-export type Notification_Type = {
-  __typename?: "Notification";
-  /** The ID of the object */
-  id?: Scalars["ID"]["output"];
-  date?: Scalars["Date"]["output"];
-  target?: Scalars["String"]["output"];
-  is_visible?: Scalars["Boolean"]["output"];
-  type?: NotificationType;
-  contentFi?: Maybe<Scalars["String"]["output"]>;
-  contentSv?: Maybe<Scalars["String"]["output"]>;
-  contentEn?: Maybe<Scalars["String"]["output"]>;
-}
 
 export type OpeningHoursType = {
   __typename?: "OpeningHoursType";
@@ -1582,6 +1728,7 @@ export type Query = {
   applicationEvents?: Maybe<ApplicationEventTypeConnection>;
   applicationRounds?: Maybe<ApplicationRoundTypeConnection>;
   applications?: Maybe<ApplicationTypeConnection>;
+  bannerNotifications?: Maybe<BannerNotificationTypeConnection>;
   cities?: Maybe<CityTypeConnection>;
   currentUser?: Maybe<UserType>;
   equipment?: Maybe<EquipmentType>;
@@ -1677,6 +1824,19 @@ export type QueryApplicationsArgs = {
   status?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
   user?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type QueryBannerNotificationsArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  orderBy?: InputMaybe<Scalars["String"]["input"]>;
+  target?: InputMaybe<CommonBannerNotificationTargetChoices>;
 };
 
 export type QueryCitiesArgs = {
@@ -2871,6 +3031,7 @@ export type ReservationStaffModifyMutationPayload = {
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
+/** An enumeration. */
 export enum ReservationState {
   Reservable = "RESERVABLE",
   ReservationClosed = "RESERVATION_CLOSED",
@@ -3425,6 +3586,7 @@ export type ReservationUnitPricingUpdateSerializerInput = {
   taxPercentagePk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
+/** An enumeration. */
 export enum ReservationUnitState {
   Archived = "ARCHIVED",
   Draft = "DRAFT",
@@ -3768,6 +3930,7 @@ export type ReservationUnitUpdateMutationPayload = {
   uuid?: Maybe<Scalars["String"]["output"]>;
 };
 
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitAuthenticationChoices {
   /** Strong */
   Strong = "STRONG",
@@ -3775,6 +3938,7 @@ export enum ReservationUnitsReservationUnitAuthenticationChoices {
   Weak = "WEAK",
 }
 
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitImageImageTypeChoices {
   /** Ground plan */
   GroundPlan = "GROUND_PLAN",
@@ -3786,6 +3950,7 @@ export enum ReservationUnitsReservationUnitImageImageTypeChoices {
   Other = "OTHER",
 }
 
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
   /** fixed */
   Fixed = "FIXED",
@@ -3803,6 +3968,7 @@ export enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
   PerWeek = "PER_WEEK",
 }
 
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitPricingPricingTypeChoices {
   /** Free */
   Free = "FREE",
@@ -3810,6 +3976,7 @@ export enum ReservationUnitsReservationUnitPricingPricingTypeChoices {
   Paid = "PAID",
 }
 
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitPricingStatusChoices {
   /** voimassa */
   Active = "ACTIVE",
@@ -3819,6 +3986,7 @@ export enum ReservationUnitsReservationUnitPricingStatusChoices {
   Past = "PAST",
 }
 
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitReservationKindChoices {
   /** Direct */
   Direct = "DIRECT",
@@ -3828,6 +3996,7 @@ export enum ReservationUnitsReservationUnitReservationKindChoices {
   Season = "SEASON",
 }
 
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
   /** 15 minutes */
   Interval_15Mins = "INTERVAL_15_MINS",
@@ -3968,6 +4137,7 @@ export type ReservationWorkingMemoMutationPayload = {
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
 
+/** An enumeration. */
 export enum ReservationsReservationPriorityChoices {
   /** Low */
   A_100 = "A_100",
@@ -3977,6 +4147,7 @@ export enum ReservationsReservationPriorityChoices {
   A_300 = "A_300",
 }
 
+/** An enumeration. */
 export enum ReservationsReservationReserveeTypeChoices {
   /** Business */
   Business = "BUSINESS",
@@ -3986,6 +4157,7 @@ export enum ReservationsReservationReserveeTypeChoices {
   Nonprofit = "NONPROFIT",
 }
 
+/** An enumeration. */
 export enum ReservationsReservationStateChoices {
   /** cancelled */
   Cancelled = "CANCELLED",
@@ -4001,6 +4173,7 @@ export enum ReservationsReservationStateChoices {
   WaitingForPayment = "WAITING_FOR_PAYMENT",
 }
 
+/** An enumeration. */
 export enum ReservationsReservationTypeChoices {
   /** Behalf */
   Behalf = "BEHALF",
@@ -4148,6 +4321,7 @@ export type ResourceUpdateMutationPayload = {
   spacePk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+/** An enumeration. */
 export enum ResourcesResourceLocationTypeChoices {
   /** Fixed */
   Fixed = "FIXED",
@@ -4220,6 +4394,7 @@ export type ServiceType = Node & {
   serviceType: ServicesServiceServiceTypeChoices;
 };
 
+/** An enumeration. */
 export enum ServicesServiceServiceTypeChoices {
   /** Catering */
   Catering = "CATERING",
@@ -4367,6 +4542,7 @@ export type TaxPercentageTypeEdge = {
   node?: Maybe<TaxPercentageType>;
 };
 
+/** An enumeration. */
 export enum TermsOfUseTermsOfUseTermsTypeChoices {
   /** Cancellation terms */
   CancellationTerms = "CANCELLATION_TERMS",
@@ -4608,6 +4784,7 @@ export type UserUpdateMutationPayload = {
   user?: Maybe<UserType>;
 };
 
+/** An enumeration. */
 export enum ApplicationEventStatus {
   Approved = "approved",
   Created = "created",
@@ -4616,6 +4793,7 @@ export enum ApplicationEventStatus {
   Reserved = "reserved",
 }
 
+/** An enumeration. */
 export enum ApplicationRoundStatus {
   Allocated = "allocated",
   Archived = "archived",
@@ -4628,6 +4806,7 @@ export enum ApplicationRoundStatus {
   Sent = "sent",
 }
 
+/** An enumeration. */
 export enum ApplicationStatus {
   Allocated = "allocated",
   Cancelled = "cancelled",
@@ -4640,6 +4819,17 @@ export enum ApplicationStatus {
   Sent = "sent",
 }
 
+/** An enumeration. */
+export enum Level {
+  /** Exception */
+  Exception = "EXCEPTION",
+  /** Normal */
+  Normal = "NORMAL",
+  /** Warning */
+  Warning = "WARNING",
+}
+
+/** An enumeration. */
 export enum Organisation_Type {
   /** Company */
   Company = "COMPANY",
@@ -4655,6 +4845,7 @@ export enum Organisation_Type {
   UnregisteredAssociation = "UNREGISTERED_ASSOCIATION",
 }
 
+/** An enumeration. */
 export enum Priority {
   /** Low */
   A_100 = "A_100",
@@ -4664,6 +4855,7 @@ export enum Priority {
   A_300 = "A_300",
 }
 
+/** An enumeration. */
 export enum State {
   /** cancelled */
   Cancelled = "CANCELLED",
@@ -4677,4 +4869,14 @@ export enum State {
   RequiresHandling = "REQUIRES_HANDLING",
   /** waiting_for_payment */
   WaitingForPayment = "WAITING_FOR_PAYMENT",
+}
+
+/** An enumeration. */
+export enum Target {
+  /** Kaikki */
+  All = "ALL",
+  /** Staff */
+  Staff = "STAFF",
+  /** Käyttäjä */
+  User = "USER",
 }
