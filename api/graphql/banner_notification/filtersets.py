@@ -48,7 +48,7 @@ class BannerNotificationFilterSet(django_filters.FilterSet):
         name: str,
         value: bool,
     ) -> BannerNotificationQuerySet:
-        return qs.active() if value else qs
+        return qs.active() if value else qs.inactive()
 
     def filter_visible(
         self,
