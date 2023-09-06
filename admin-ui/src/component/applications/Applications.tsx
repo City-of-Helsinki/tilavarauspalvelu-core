@@ -243,14 +243,11 @@ function Applications({
         variables: {
           applicationRound: String(applicationRound?.id ?? 0),
           status: [
-            // original REST status:
-            // status: "in_review,review_done,declined,sent",
+            // original REST status: "in_review,review_done,declined,sent",
             // TODO check the map for them (or ask Krista / Elina what should be on this page)
             ApplicationStatus.Allocated,
-            ApplicationStatus.Expired,
             ApplicationStatus.Handled,
             ApplicationStatus.InReview,
-            ApplicationStatus.Received,
             ApplicationStatus.ReviewDone,
             ApplicationStatus.Sent,
           ],

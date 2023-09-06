@@ -51,7 +51,9 @@ import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
+  setApplicationRoundStatus: (
+    status: ApplicationRoundStatus
+  ) => Promise<ApplicationRoundType>;
 }
 
 const Wrapper = styled.div`
@@ -389,10 +391,8 @@ function PreApproval({
             // original REST status: "in_review,review_done,declined"
             // TODO check the map for them (or ask Krista / Elina what should be on this page)
             ApplicationStatus.Allocated,
-            ApplicationStatus.Expired,
             ApplicationStatus.Handled,
             ApplicationStatus.InReview,
-            ApplicationStatus.Received,
             ApplicationStatus.ReviewDone,
             ApplicationStatus.Sent,
           ],

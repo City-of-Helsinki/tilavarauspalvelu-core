@@ -1,8 +1,8 @@
 import React from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { type AxiosError } from "axios";
-import { useQuery } from "@tanstack/react-query";
 import Review from "./review/Review";
 import Allocation from "./Allocation";
 import Handling from "./Handling";
@@ -27,6 +27,7 @@ function ApplicationRound({
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
+  // TODO converting this to graphql requires translating the State type
   const {
     data: applicationRound,
     isLoading,
@@ -43,18 +44,16 @@ function ApplicationRound({
     },
   });
 
-  const setApplicationRoundStatus = async (
-    id: number,
-    status: ApplicationRoundStatus
-  ) => {
-    try {
-      // TODO replace with mutation
-      await patchApplicationRoundStatus(id, status);
+  const mutation = useMutation({
+    mutationFn: ({ status }: { status: ApplicationRoundStatus }) =>
+      patchApplicationRoundStatus(applicationRoundId, status),
+    onSuccess: () => {
       refetch();
-    } catch (error) {
+    },
+    onError: () => {
       notifyError(t("errors.errorSavingData"));
-    }
-  };
+    },
+  });
 
   if (isLoading) {
     return <Loader />;
@@ -65,8 +64,8 @@ function ApplicationRound({
       return (
         <Allocation
           applicationRound={applicationRound}
-          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-            setApplicationRoundStatus(Number(applicationRoundId), status)
+          setApplicationRoundStatus={(status) =>
+            mutation.mutateAsync({ status })
           }
         />
       );
@@ -75,8 +74,8 @@ function ApplicationRound({
       return (
         <Handling
           applicationRound={applicationRound}
-          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-            setApplicationRoundStatus(Number(applicationRoundId), status)
+          setApplicationRoundStatus={(status) =>
+            mutation.mutateAsync({ status })
           }
         />
       );
@@ -85,8 +84,8 @@ function ApplicationRound({
       return (
         <PreApproval
           applicationRound={applicationRound}
-          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-            setApplicationRoundStatus(Number(applicationRoundId), status)
+          setApplicationRoundStatus={(status) =>
+            mutation.mutateAsync({ status })
           }
         />
       );

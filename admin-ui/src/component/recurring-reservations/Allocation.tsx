@@ -22,7 +22,9 @@ import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 type IProps = {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
+  setApplicationRoundStatus: (
+    status: ApplicationRoundStatus
+  ) => Promise<ApplicationRoundType>;
 };
 
 const Wrapper = styled.div`
