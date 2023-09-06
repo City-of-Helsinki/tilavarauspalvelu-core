@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { AxiosError } from "axios";
@@ -24,8 +25,6 @@ import {
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
   AllocationResult,
-  ReservationUnit,
-  ReservationUnitCapacity,
 } from "../../common/types";
 import DataTable, { CellConfig } from "../DataTable";
 import {
@@ -169,7 +168,7 @@ const StatusContainer = styled.div`
 
 const getCellConfig = (
   t: TFunction,
-  applicationRound: ApplicationRoundType
+  applicationRound?: ApplicationRoundType
 ): CellConfig => {
   return {
     cols: [
@@ -186,7 +185,7 @@ const getCellConfig = (
           const index = organisationId || applicantId;
           const title =
             applicantType === "individual" ? applicantName : organisationName;
-          return index ? (
+          return index && applicationRound ? (
             <InlineRowLink
               to={`${applicationRoundUrl(applicationRound.id)}/${
                 organisationId ? "organisation" : "applicant"
@@ -324,133 +323,100 @@ const getFilterConfig = (
   ];
 };
 
-function RecommendationsByReservationUnit(): JSX.Element {
+function RecommendationsByReservationUnit({
+  applicationRoundId,
+  reservationUnitId,
+}: {
+  applicationRoundId: number;
+  reservationUnitId: number;
+}): JSX.Element | null {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [recommendations, setRecommendations] = useState<
-    AllocationResult[] | null
-  >(null);
-  const [reservationUnit, setReservationUnit] =
-    useState<ReservationUnit | null>(null);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-  const [reservationUnitCapacity, setReservationUnitCapacity] =
-    useState<ReservationUnitCapacity | null>(null);
-  const [reservationUnitCalendarUrl, setReservationUnitCalendarUrl] = useState<
-    string | null
-  >(null);
-  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
-    null
-  );
   const [selections, setSelections] = useState<number[]>([]);
 
   const { t } = useTranslation();
-  const { applicationRoundId, reservationUnitId } = useParams<IRouteParams>(); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-  const fetchRecommendations = async (
-    ar: ApplicationRoundType,
-    ruId: number
-  ) => {
-    try {
-      const result = await getAllocationResults({
-        applicationRoundId: ar.id,
-        serviceSectorId: ar.serviceSectorId,
-      });
-
-      const filteredResult: AllocationResult[] = processAllocationResult(
-        result
-      ).filter((n: AllocationResult) => n.allocatedReservationUnitId === ruId);
-
-      setFilterConfig(getFilterConfig(filteredResult));
-      setCellConfig(getCellConfig(t, ar));
-      setRecommendations(filteredResult || []);
-    } catch (error) {
-      notifyError(t("errors.errorFetchingApplications"));
-      setIsLoading(false);
-    }
-  };
-
-  const fetchReservationUnitCapacity = async (
-    ruId: number,
-    ar: ApplicationRoundType
-  ) => {
-    try {
-      const result = await getReservationUnitCapacity({
-        reservationUnit: ruId,
-        periodStart: ar.reservationPeriodBegin,
-        periodEnd: ar.reservationPeriodEnd,
-      });
-      setReservationUnitCapacity(result);
-    } catch (error) {
-      console.error(t("errors.errorFetchingCapacity")); // eslint-disable-line no-console
-    }
-  };
-
-  const fetchReservationUnitCalendarUrl = async (ruId: number) => {
-    try {
-      const result = await getReservationUnitCalendarUrl(ruId);
-      setReservationUnitCalendarUrl(result.calendarUrl);
-    } catch (error) {
-      notifyError(t("errors.errorFetchingData"));
-    }
-  };
-
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: Number(applicationRoundId),
-        });
-        setApplicationRound(result);
-      } catch (error) {
+  const { data: applicationRound, isLoading: applicationRoundLoading } =
+    useQuery({
+      queryKey: ["applicationRound", applicationRoundId],
+      queryFn: async () =>
+        getApplicationRound({ id: Number(applicationRoundId) }),
+      onError: (error: AxiosError) => {
         const msg =
-          (error as AxiosError).response?.status === 404
+          error.response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         notifyError(t(msg));
-        setIsLoading(false);
-      }
-    };
+      },
+    });
 
-    fetchApplicationRound();
-  }, [applicationRoundId, notifyError, t]);
-
-  useEffect(() => {
-    if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound, Number(reservationUnitId));
-    }
-  }, [applicationRound, reservationUnitId, t]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const fetchReservationUnit = async (ruId: number) => {
-      try {
-        const result = await getReservationUnit(ruId);
-        setReservationUnit(result);
-      } catch (error) {
+  const { data: reservationUnit, isLoading: reservationUnitLoading } = useQuery(
+    {
+      queryKey: ["reservationUnit", reservationUnitId],
+      queryFn: () => getReservationUnit(Number(reservationUnitId)),
+      enabled: applicationRound != null,
+      onError: () => {
         notifyError(t("errors.errorFetchingApplications"));
-        setIsLoading(false);
-      }
-    };
-
-    fetchReservationUnit(Number(reservationUnitId));
-  }, [notifyError, recommendations, reservationUnitId, t]);
-
-  useEffect(() => {
-    if (reservationUnit && applicationRound) {
-      fetchReservationUnitCapacity(reservationUnit.id, applicationRound);
-      fetchReservationUnitCalendarUrl(reservationUnit.id);
+      },
     }
-  }, [reservationUnit, applicationRound]); // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
-  useEffect(() => {
-    if (recommendations && reservationUnit && applicationRound) {
-      setIsLoading(false);
-    }
-  }, [recommendations, reservationUnit, applicationRound]);
+  const {
+    data: reservationUnitCapacity,
+    isLoading: reservationUnitCapacityLoading,
+  } = useQuery({
+    queryKey: [
+      "reservationUnitCapacity",
+      reservationUnit?.id,
+      applicationRound,
+    ],
+    queryFn: () => {
+      const ar = applicationRound;
+      const ruId = reservationUnit?.id;
+      return getReservationUnitCapacity({
+        reservationUnit: ruId ?? 0,
+        periodStart: ar?.reservationPeriodBegin ?? "",
+        periodEnd: ar?.reservationPeriodEnd ?? "",
+      });
+    },
+    enabled: applicationRound != null && reservationUnit != null,
+    onError: () => {
+      console.error(t("errors.errorFetchingCapacity")); // eslint-disable-line no-console
+    },
+  });
+
+  const {
+    data: recommendations,
+    isLoading: recommendationsLoading,
+    refetch: refetchRecommendations,
+  } = useQuery({
+    queryKey: ["recommendations", applicationRound, reservationUnitId],
+    queryFn: async () => {
+      const result = await getAllocationResults({
+        applicationRoundId: applicationRound?.id ?? 0,
+        serviceSectorId: applicationRound?.serviceSectorId ?? 0,
+      });
+      const filteredResult = processAllocationResult(result).filter(
+        (n) => n.allocatedReservationUnitId === Number(reservationUnitId)
+      );
+      return filteredResult;
+    },
+    onError: () => {
+      notifyError(t("errors.errorFetchingApplications"));
+    },
+  });
+
+  const { data: reservationUnitCalendarUrl } = useQuery({
+    queryKey: ["reservationUnitCalendarUrl", reservationUnit?.id ?? 0],
+    queryFn: async () => {
+      const res = await getReservationUnitCalendarUrl(reservationUnit?.id ?? 0);
+      return res.calendarUrl;
+    },
+    enabled: reservationUnit != null,
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
   const unhandledRecommendationCount = recommendations
     ? recommendations.filter((n) =>
@@ -462,194 +428,209 @@ function RecommendationsByReservationUnit(): JSX.Element {
 
   const mainImage = reservationUnit?.images.find((n) => n.imageType === "main");
 
+  const isLoading =
+    applicationRoundLoading ||
+    reservationUnitLoading ||
+    recommendationsLoading ||
+    reservationUnitCapacityLoading;
   if (isLoading) {
     return <Loader />;
   }
 
   const isApplicationRoundApproved =
-    applicationRound && ["approved"].includes(applicationRound.status);
+    applicationRound && applicationRound.status === "approved";
+
+  if (!applicationRound || !recommendations || !reservationUnit) {
+    return null;
+  }
+
+  const filterConfig = getFilterConfig(recommendations ?? []);
+  const cellConfig = getCellConfig(t, applicationRound ?? undefined);
+
+  return (
+    <>
+      <ContentContainer style={{ paddingBottom: "var(--spacing-s)" }}>
+        {applicationRoundId ? (
+          <LinkPrev route={applicationRoundUrl(applicationRoundId)} />
+        ) : null}
+        <IngressContainer>
+          <Ingress>
+            {mainImage ? (
+              <ReservationUnitImage src={mainImage.smallUrl} alt="" />
+            ) : (
+              <ImageFiller />
+            )}
+            <div>
+              <Title>
+                {localizedValue(reservationUnit.name, i18n.language)}
+              </Title>
+              {reservationUnit.location && (
+                <div>{parseAddress(reservationUnit.location)}</div>
+              )}
+              <Props>
+                <Prop>
+                  <IconLocation aria-hidden /> {reservationUnit.unit?.name.fi}
+                </Prop>
+                {reservationUnit.purposes && (
+                  <Prop>
+                    <IconLayers aria-hidden />{" "}
+                    {t("ReservationUnit.purposeCount", {
+                      count: reservationUnit.purposes?.length,
+                    })}
+                  </Prop>
+                )}
+                <Prop>
+                  <IconHome aria-hidden />{" "}
+                  {reservationUnit.reservationUnitType.name}
+                </Prop>
+                {reservationUnit.maxPersons && (
+                  <Prop>
+                    <IconGroup aria-hidden /> {reservationUnit.maxPersons}
+                  </Prop>
+                )}
+              </Props>
+            </div>
+          </Ingress>
+          <TitleContainer>
+            <div>
+              <H1 as="h2" $legacy>
+                {applicationRound?.name}
+              </H1>
+              {["approved"].includes(applicationRound?.status) &&
+                reservationUnitCalendarUrl && (
+                  <CalendarLink
+                    href={reservationUnitCalendarUrl}
+                    target="_blank"
+                  >
+                    <IconCalendarPlus aria-hidden />{" "}
+                    {t("ReservationUnit.downloadSpaceCalendar")}
+                  </CalendarLink>
+                )}
+            </div>
+            <StatusContainer>
+              {reservationUnitCapacity?.reservationDurationTotal &&
+                reservationUnitCapacity?.hourCapacity && (
+                  <>
+                    <StatusCircle
+                      status={
+                        (reservationUnitCapacity.reservationDurationTotal /
+                          reservationUnitCapacity.hourCapacity) *
+                        100
+                      }
+                    />
+                    <div>
+                      <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
+                      <div>
+                        {t("ApplicationRound.amountReservedOfSpaceSubtext")}
+                      </div>
+                    </div>
+                  </>
+                )}
+            </StatusContainer>
+          </TitleContainer>
+          <BottomContainer>
+            <RecommendationCount
+              recommendationCount={recommendations.length}
+              unhandledCount={unhandledRecommendationCount}
+            />
+            {applicationRound.status === "approved" && applicationRoundId ? (
+              <ReservationLink
+                to={`${applicationRoundUrl(
+                  applicationRoundId
+                )}/reservationUnit/${reservationUnitId}/reservations`}
+              >
+                <IconBulletList aria-hidden />
+                {t("Reservation.showSummaryOfReservationsByReservationUnit")}
+                <IconArrowRight aria-hidden />
+              </ReservationLink>
+            ) : null}
+          </BottomContainer>
+        </IngressContainer>
+      </ContentContainer>
+      <DataTable
+        groups={prepareAllocationResults(recommendations)}
+        setSelections={setSelections}
+        hasGrouping={false}
+        config={{
+          filtering: true,
+          rowFilters: true,
+          selection: !isApplicationRoundApproved,
+        }}
+        cellConfig={cellConfig}
+        filterConfig={filterConfig}
+        areAllRowsDisabled={recommendations.every(
+          (row) =>
+            row.applicationEvent.status === "ignored" ||
+            row.accepted ||
+            row.declined
+        )}
+        isRowDisabled={(row: AllocationResult) => {
+          return (
+            ["ignored", "declined"].includes(row.applicationEvent.status) ||
+            row.accepted
+          );
+        }}
+      />
+      {selections?.length > 0 && (
+        <SelectionActionBar
+          selections={selections}
+          options={[
+            {
+              label: t("Recommendation.actionMassApprove"),
+              value: "approve",
+            },
+            {
+              label: t("Recommendation.actionMassDecline"),
+              value: "decline",
+            },
+            {
+              label: t("Recommendation.actionMassIgnoreReservationUnit"),
+              value: "ignore",
+            },
+          ]}
+          callback={(action: string) => {
+            setIsSaving(true);
+
+            modifyAllocationResults({
+              data: recommendations,
+              selections,
+              action,
+              t,
+              notifyError,
+              callback: () => {
+                setTimeout(() => setIsSaving(false), 1000);
+                refetchRecommendations();
+              },
+            });
+          }}
+          isSaving={isSaving}
+        />
+      )}
+    </>
+  );
+}
+
+function RecommendationsByReservationUnitRouted(): JSX.Element {
+  const { applicationRoundId, reservationUnitId } = useParams<IRouteParams>(); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const { t } = useTranslation();
+
+  if (
+    !applicationRoundId ||
+    !reservationUnitId ||
+    Number.isNaN(Number(applicationRoundId)) ||
+    Number.isNaN(Number(reservationUnitId))
+  ) {
+    return <div>{t("errors.incorrectQueryParams")}</div>;
+  }
 
   return (
     <Wrapper>
-      {applicationRound &&
-        recommendations &&
-        reservationUnit &&
-        filterConfig &&
-        cellConfig && (
-          <>
-            <ContentContainer style={{ paddingBottom: "var(--spacing-s)" }}>
-              {applicationRoundId ? (
-                <LinkPrev route={applicationRoundUrl(applicationRoundId)} />
-              ) : null}
-              <IngressContainer>
-                <Ingress>
-                  {mainImage ? (
-                    <ReservationUnitImage src={mainImage.smallUrl} alt="" />
-                  ) : (
-                    <ImageFiller />
-                  )}
-                  <div>
-                    <Title>
-                      {localizedValue(reservationUnit.name, i18n.language)}
-                    </Title>
-                    {reservationUnit.location && (
-                      <div>{parseAddress(reservationUnit.location)}</div>
-                    )}
-                    <Props>
-                      <Prop>
-                        <IconLocation aria-hidden />{" "}
-                        {reservationUnit.unit?.name.fi}
-                      </Prop>
-                      {reservationUnit.purposes && (
-                        <Prop>
-                          <IconLayers aria-hidden />{" "}
-                          {t("ReservationUnit.purposeCount", {
-                            count: reservationUnit.purposes?.length,
-                          })}
-                        </Prop>
-                      )}
-                      <Prop>
-                        <IconHome aria-hidden />{" "}
-                        {reservationUnit.reservationUnitType.name}
-                      </Prop>
-                      {reservationUnit.maxPersons && (
-                        <Prop>
-                          <IconGroup aria-hidden /> {reservationUnit.maxPersons}
-                        </Prop>
-                      )}
-                    </Props>
-                  </div>
-                </Ingress>
-                <TitleContainer>
-                  <div>
-                    <H1 as="h2" $legacy>
-                      {applicationRound?.name}
-                    </H1>
-                    {["approved"].includes(applicationRound?.status) &&
-                      reservationUnitCalendarUrl && (
-                        <CalendarLink
-                          href={reservationUnitCalendarUrl}
-                          target="_blank"
-                        >
-                          <IconCalendarPlus aria-hidden />{" "}
-                          {t("ReservationUnit.downloadSpaceCalendar")}
-                        </CalendarLink>
-                      )}
-                  </div>
-                  <StatusContainer>
-                    {reservationUnitCapacity?.reservationDurationTotal &&
-                      reservationUnitCapacity?.hourCapacity && (
-                        <>
-                          <StatusCircle
-                            status={
-                              (reservationUnitCapacity.reservationDurationTotal /
-                                reservationUnitCapacity.hourCapacity) *
-                              100
-                            }
-                          />
-                          <div>
-                            <H3>
-                              {t("ApplicationRound.amountReservedOfSpace")}
-                            </H3>
-                            <div>
-                              {t(
-                                "ApplicationRound.amountReservedOfSpaceSubtext"
-                              )}
-                            </div>
-                          </div>
-                        </>
-                      )}
-                  </StatusContainer>
-                </TitleContainer>
-                <BottomContainer>
-                  <RecommendationCount
-                    recommendationCount={recommendations.length}
-                    unhandledCount={unhandledRecommendationCount}
-                  />
-                  {["approved"].includes(applicationRound.status) &&
-                  applicationRoundId ? (
-                    <ReservationLink
-                      to={`${applicationRoundUrl(
-                        applicationRoundId
-                      )}/reservationUnit/${reservationUnitId}/reservations`}
-                    >
-                      <IconBulletList aria-hidden />
-                      {t(
-                        "Reservation.showSummaryOfReservationsByReservationUnit"
-                      )}
-                      <IconArrowRight aria-hidden />
-                    </ReservationLink>
-                  ) : null}
-                </BottomContainer>
-              </IngressContainer>
-            </ContentContainer>
-            <DataTable
-              groups={prepareAllocationResults(recommendations)}
-              setSelections={setSelections}
-              hasGrouping={false}
-              config={{
-                filtering: true,
-                rowFilters: true,
-                selection: !isApplicationRoundApproved,
-              }}
-              cellConfig={cellConfig}
-              filterConfig={filterConfig}
-              areAllRowsDisabled={recommendations.every(
-                (row) =>
-                  row.applicationEvent.status === "ignored" ||
-                  row.accepted ||
-                  row.declined
-              )}
-              isRowDisabled={(row: AllocationResult) => {
-                return (
-                  ["ignored", "declined"].includes(
-                    row.applicationEvent.status
-                  ) || row.accepted
-                );
-              }}
-            />
-            {selections?.length > 0 && (
-              <SelectionActionBar
-                selections={selections}
-                options={[
-                  {
-                    label: t("Recommendation.actionMassApprove"),
-                    value: "approve",
-                  },
-                  {
-                    label: t("Recommendation.actionMassDecline"),
-                    value: "decline",
-                  },
-                  {
-                    label: t("Recommendation.actionMassIgnoreReservationUnit"),
-                    value: "ignore",
-                  },
-                ]}
-                callback={(action: string) => {
-                  setIsSaving(true);
-
-                  modifyAllocationResults({
-                    data: recommendations,
-                    selections,
-                    action,
-                    t,
-                    notifyError,
-                    callback: () => {
-                      setTimeout(() => setIsSaving(false), 1000);
-                      fetchRecommendations(
-                        applicationRound,
-                        Number(reservationUnitId)
-                      );
-                    },
-                  });
-                }}
-                isSaving={isSaving}
-              />
-            )}
-          </>
-        )}
+      <RecommendationsByReservationUnit
+        applicationRoundId={Number(applicationRoundId)}
+        reservationUnitId={Number(reservationUnitId)}
+      />
     </Wrapper>
   );
 }
 
-export default RecommendationsByReservationUnit;
+export default RecommendationsByReservationUnitRouted;

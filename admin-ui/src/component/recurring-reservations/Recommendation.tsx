@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
@@ -186,12 +187,6 @@ function Recommendation(): JSX.Element {
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [recommendation, setRecommendation] = useState<AllocationResult | null>(
-    null
-  );
-  const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
   const [actionNotification, setActionNotification] =
     useState<NotificationStatus | null>(null);
   const [isRevertRejectionDialogVisible, setIsRevertRejectionDialogVisible] =
@@ -207,6 +202,8 @@ function Recommendation(): JSX.Element {
   const { applicationRoundId, applicationEventScheduleId } =
     useParams<IRouteParams>();
 
+  const [recommendation, setRecommendation] = useState<AllocationResult | null>( null);
+  const [applicationRound, setApplicationRound] = useState<ApplicationRoundType | null>(null);
   const fetchRecommendation = async (aesId: number, appRoundId: number) => {
     try {
       const applicationRoundResult = await getApplicationRound({
@@ -330,23 +327,12 @@ function Recommendation(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationRoundId, applicationEventScheduleId]);
 
-  useEffect(() => {
-    const fetchApplication = async (aId: number) => {
-      try {
-        const applicationResult = await getApplication(aId);
-
-        setApplication(applicationResult);
-      } catch (error) {
-        notifyError(t("errors.errorFetchingApplication"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (recommendation?.applicationId) {
-      fetchApplication(recommendation.applicationId);
-    }
-  }, [notifyError, recommendation, t]);
+  const { data: application } = useQuery({
+    queryKey: ["application", recommendation?.applicationId],
+    queryFn: () => getApplication(recommendation?.applicationId ?? 0),
+    enabled: !!recommendation?.applicationId,
+    onError: () => notifyError(t("errors.errorFetchingApplication")),
+  });
 
   if (isLoading) {
     return <Loader />;

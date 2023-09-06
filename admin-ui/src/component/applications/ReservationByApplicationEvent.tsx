@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconLocation } from "hds-react";
 import { H2, H3, Strong } from "common/src/common/typography";
+import { useQuery } from "@tanstack/react-query";
 import {
   getApplication,
   getApplicationRound,
@@ -11,10 +12,7 @@ import {
 } from "../../common/api";
 import Loader from "../Loader";
 import {
-  Application as ApplicationType,
   ApplicationEvent,
-  ApplicationRound as ApplicationRoundType,
-  RecurringReservation,
   Reservation,
   ReservationUnit,
 } from "../../common/types";
@@ -81,76 +79,48 @@ const Reservations = styled.table`
   }
 `;
 
-function ReservationByApplicationEvent(): JSX.Element | null {
+function ReservationByApplicationEvent({
+  applicationId,
+  recurringReservationId,
+}: {
+  applicationId: number;
+  recurringReservationId: number;
+}): JSX.Element | null {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-  const [recurringReservation, setRecurringReservation] =
-    useState<RecurringReservation | null>(null);
 
-  const { applicationId, recurringReservationId } = useParams<IRouteParams>();
   const { t, i18n } = useTranslation();
 
-  const fetchApplication = async (id: number) => {
-    try {
-      const result = await getApplication(id);
-
-      setApplication(result);
-    } catch (error) {
+  const { data: application, isLoading: isLoadingApplication } = useQuery({
+    queryKey: ["application", applicationId],
+    queryFn: () => getApplication(applicationId),
+    enabled: !!applicationId,
+    onError: () => {
       notifyError(t("errors.errorFetchingApplication"));
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
-  const fetchApplicationRound = async (app: ApplicationType) => {
-    try {
-      const applicationRoundResult = await getApplicationRound({
-        id: app.applicationRoundId,
-      });
-      setApplicationRound(applicationRoundResult);
-    } catch (error) {
+  const { data: applicationRound, isLoading: isLoadingRound } = useQuery({
+    queryKey: ["applicationRound", application?.applicationRoundId ?? 0],
+    queryFn: () =>
+      getApplicationRound({ id: application?.applicationRoundId ?? 0 }),
+    enabled: application?.applicationRoundId != null,
+    onError: () => {
       notifyError(t("errors.errorFetchingApplicationRound"));
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
-  const fetchRecurringReservations = async (rrId: number) => {
-    try {
-      const result = await getRecurringReservation(rrId);
-      setRecurringReservation(result);
-    } catch (error) {
-      notifyError(t("errors.errorFetchingReservations"));
-      setIsLoading(false);
-    }
-  };
+  const { data: recurringReservation, isLoading: isLoadingRecurring } =
+    useQuery({
+      queryKey: ["recurringReservation", recurringReservationId],
+      queryFn: () => getRecurringReservation(recurringReservationId),
+      enabled: recurringReservationId != null,
+      onError: () => {
+        notifyError(t("errors.errorFetchingReservations"));
+      },
+    });
 
-  useEffect(() => {
-    fetchApplication(Number(applicationId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationId]);
-
-  useEffect(() => {
-    if (application?.applicationRoundId) {
-      fetchApplicationRound(application);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [application]);
-
-  useEffect(() => {
-    if (recurringReservationId) {
-      fetchRecurringReservations(Number(recurringReservationId));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recurringReservationId]);
-
-  useEffect(() => {
-    if (application && applicationRound && recurringReservation) {
-      setIsLoading(false);
-    }
-  }, [application, applicationRound, recurringReservation]);
-
+  const isLoading =
+    isLoadingApplication || isLoadingRound || isLoadingRecurring;
   if (isLoading) {
     return <Loader />;
   }
@@ -169,119 +139,138 @@ function ReservationByApplicationEvent(): JSX.Element | null {
   const reservationUnit: ReservationUnit | undefined =
     recurringReservation?.reservations?.[0].reservationUnit?.[0];
 
+  if (
+    !application ||
+    !applicationRound ||
+    !applicationEvent ||
+    !reservationUnit ||
+    !recurringReservation
+  ) {
+    return null;
+  }
+
+  return (
+    <>
+      {applicationId ? (
+        <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
+          <LinkPrev route={applicationUrl(applicationId)} />
+        </ContentContainer>
+      ) : null}
+      <NarrowContainer>
+        <p>{customerName}</p>
+        <Heading>{applicationEvent.name}</Heading>
+        <p>
+          <Strong>{t("Application.allocatedReservations")}</Strong>
+        </p>
+        <div>{applicationRound.name}</div>
+        <Divider />
+        <Location>
+          <IconLocation />
+          <H2>
+            {localizedValue(reservationUnit.unit?.name.fi, i18n.language)}
+          </H2>
+          <span>{localizedValue(reservationUnit.name, i18n.language)}</span>
+        </Location>
+        <Subheading>
+          {t("Application.allocatedForGroupX", {
+            group: applicationEvent.name,
+          })}
+        </Subheading>
+        {recurringReservation.reservations.length > 0 ? (
+          <Reservations>
+            <thead>
+              <tr>
+                <th>{t("common.weekday")}</th>
+                <th>{t("common.date")}</th>
+                <th>{t("common.time")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recurringReservation.reservations.map(
+                (reservation: Reservation) => (
+                  <tr key={reservation.id}>
+                    <td>
+                      {t(
+                        `calendar.${weekdays[Number(reservation.beginWeekday)]}`
+                      )}
+                    </td>
+                    <td>
+                      <Strong>{formatDate(reservation.begin)}</Strong>
+                    </td>
+                    <td>
+                      {formatDate(reservation.begin, "H:mm")} -{" "}
+                      {formatDate(reservation.end, "H:mm")}
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </Reservations>
+        ) : (
+          <div>-</div>
+        )}
+        <Subheading>{t("Application.declinedReservations")}</Subheading>
+        {recurringReservation.deniedReservations &&
+        recurringReservation.deniedReservations.length > 0 ? (
+          <Reservations>
+            <thead>
+              <tr>
+                <th>{t("common.weekday")}</th>
+                <th>{t("common.date")}</th>
+                <th>{t("common.time")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recurringReservation.deniedReservations
+                .reverse()
+                .map((reservation: Reservation) => (
+                  <tr key={reservation.id}>
+                    <td>
+                      {" "}
+                      {t(
+                        `calendar.${weekdays[Number(reservation.beginWeekday)]}`
+                      )}
+                    </td>
+                    <td>
+                      <Strong>{formatDate(reservation.begin)}</Strong>
+                    </td>
+                    <td>
+                      {formatDate(reservation.begin, "H:mm")}—
+                      {formatDate(reservation.end, "H:mm")}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </Reservations>
+        ) : (
+          <div>-</div>
+        )}
+      </NarrowContainer>
+    </>
+  );
+}
+
+function ReservationByApplicationEventRouted(): JSX.Element | null {
+  const { applicationId, recurringReservationId } = useParams<IRouteParams>();
+  const { t } = useTranslation();
+
+  if (
+    !applicationId ||
+    !recurringReservationId ||
+    Number.isNaN(Number(applicationId)) ||
+    Number.isNaN(Number(recurringReservationId))
+  ) {
+    return <div>{t("errors.incorrectQueryParams")}</div>;
+  }
+
   return (
     <Wrapper>
-      {application &&
-        applicationRound &&
-        applicationEvent &&
-        reservationUnit &&
-        recurringReservation && (
-          <>
-            {applicationId ? (
-              <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
-                <LinkPrev route={applicationUrl(applicationId)} />
-              </ContentContainer>
-            ) : null}
-            <NarrowContainer>
-              <p>{customerName}</p>
-              <Heading>{applicationEvent.name}</Heading>
-              <p>
-                <Strong>{t("Application.allocatedReservations")}</Strong>
-              </p>
-              <div>{applicationRound.name}</div>
-              <Divider />
-              <Location>
-                <IconLocation />
-                <H2>
-                  {localizedValue(reservationUnit.unit?.name.fi, i18n.language)}
-                </H2>
-                <span>
-                  {localizedValue(reservationUnit.name, i18n.language)}
-                </span>
-              </Location>
-              <Subheading>
-                {t("Application.allocatedForGroupX", {
-                  group: applicationEvent.name,
-                })}
-              </Subheading>
-              {recurringReservation.reservations.length > 0 ? (
-                <Reservations>
-                  <thead>
-                    <tr>
-                      <th>{t("common.weekday")}</th>
-                      <th>{t("common.date")}</th>
-                      <th>{t("common.time")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recurringReservation.reservations.map(
-                      (reservation: Reservation) => (
-                        <tr key={reservation.id}>
-                          <td>
-                            {t(
-                              `calendar.${
-                                weekdays[Number(reservation.beginWeekday)]
-                              }`
-                            )}
-                          </td>
-                          <td>
-                            <Strong>{formatDate(reservation.begin)}</Strong>
-                          </td>
-                          <td>
-                            {formatDate(reservation.begin, "H:mm")} -{" "}
-                            {formatDate(reservation.end, "H:mm")}
-                          </td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </Reservations>
-              ) : (
-                <div>-</div>
-              )}
-              <Subheading>{t("Application.declinedReservations")}</Subheading>
-              {recurringReservation.deniedReservations &&
-              recurringReservation.deniedReservations.length > 0 ? (
-                <Reservations>
-                  <thead>
-                    <tr>
-                      <th>{t("common.weekday")}</th>
-                      <th>{t("common.date")}</th>
-                      <th>{t("common.time")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recurringReservation.deniedReservations
-                      .reverse()
-                      .map((reservation: Reservation) => (
-                        <tr key={reservation.id}>
-                          <td>
-                            {" "}
-                            {t(
-                              `calendar.${
-                                weekdays[Number(reservation.beginWeekday)]
-                              }`
-                            )}
-                          </td>
-                          <td>
-                            <Strong>{formatDate(reservation.begin)}</Strong>
-                          </td>
-                          <td>
-                            {formatDate(reservation.begin, "H:mm")}—
-                            {formatDate(reservation.end, "H:mm")}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </Reservations>
-              ) : (
-                <div>-</div>
-              )}
-            </NarrowContainer>
-          </>
-        )}
+      <ReservationByApplicationEvent
+        applicationId={Number(applicationId)}
+        recurringReservationId={Number(recurringReservationId)}
+      />
     </Wrapper>
   );
 }
 
-export default ReservationByApplicationEvent;
+export default ReservationByApplicationEventRouted;
