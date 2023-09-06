@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -16,6 +17,7 @@ import get from "lodash/get";
 import differenceInSeconds from "date-fns/differenceInSeconds";
 import { H2, H3, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { getNormalizedApplicationRoundStatus } from "app/common/util";
 import {
   getApplication,
   getApplicationRound,
@@ -26,7 +28,6 @@ import Loader from "../Loader";
 import {
   Application as ApplicationType,
   ApplicationEvent,
-  ApplicationRound as ApplicationRoundType,
   ApplicationStatus,
   RecurringReservation,
   Reservation,
@@ -363,120 +364,94 @@ const AccordionContent = ({
 
 const Application = () => {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [documentStatus, setDocumentStatus] = useState<
     "init" | "loading" | "done" | "error"
   >("init");
-  const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-  const [recurringReservations, setRecurringReservations] = useState<
-    RecurringReservation[] | null
-  >(null);
   const [statusNotification, setStatusNotification] =
     useState<ApplicationStatus | null>(null);
 
   const { applicationId } = useParams<IRouteParams>();
   const { t } = useTranslation();
 
-  const fetchApplication = async (id: number) => {
-    try {
-      const result = await getApplication(id);
-
-      setApplication(result);
-    } catch (error) {
+  const {
+    data: application,
+    isLoading: isLoadingApplication,
+    refetch,
+  } = useQuery({
+    queryKey: ["application", applicationId],
+    queryFn: () => getApplication(Number(applicationId)),
+    onError: () => {
       notifyError(t("errors.errorFetchingApplication"));
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
-  const fetchAllRecurringReservations = async (
-    applicationEventsIds: number[]
-  ): Promise<RecurringReservation[]> => {
-    const recRes = await Promise.all(
-      applicationEventsIds.map((applicationEventId) =>
-        getRecurringReservations({
-          applicationEvent: applicationEventId,
-        })
-      )
-    );
-
-    return recRes.flat();
-  };
-
-  const fetchApplicationRound = async (app: ApplicationType) => {
-    try {
-      const applicationRoundResult = await getApplicationRound({
-        id: app.applicationRoundId,
-      });
-      setApplicationRound(applicationRoundResult);
-    } catch (error) {
+  const { data: applicationRound, isLoading: isLoadingRound } = useQuery({
+    queryKey: ["applicationRound", application?.applicationRoundId],
+    queryFn: () =>
+      getApplicationRound({ id: application?.applicationRoundId ?? 0 }),
+    enabled: application?.applicationRoundId != null,
+    onError: () => {
       notifyError(t("errors.errorFetchingApplicationRound"));
-    }
-  };
+    },
+  });
 
-  const fetchRecurringReservations = async (app: ApplicationType) => {
-    try {
-      const applicationEventIds = app.applicationEvents.map((n) => n.id);
-      const recurringReservationsResult = await fetchAllRecurringReservations(
-        applicationEventIds
-      );
+  const isApplicationRoundApproved: boolean =
+    applicationRound != null &&
+    (applicationRound.status === "approved" ||
+      getNormalizedApplicationRoundStatus(applicationRound) === "sent");
 
-      setRecurringReservations(
-        recurringReservationsResult.length > 0
-          ? recurringReservationsResult
-          : []
+  const { data: recurringReservations } = useQuery({
+    queryKey: ["recurringReservations", application?.id ?? 0],
+    queryFn: async () => {
+      const applicationEventIds =
+        application?.applicationEvents?.map((n) => n.id) ?? [];
+      const recRes = await Promise.all(
+        applicationEventIds.map((applicationEventId) =>
+          getRecurringReservations({
+            applicationEvent: applicationEventId,
+          })
+        )
       );
-    } catch (error) {
+      return recRes.flat();
+    },
+    enabled: application != null && isApplicationRoundApproved,
+    onError: () => {
       notifyError(t("errors.errorFetchingReservations"));
-    }
-  };
+    },
+  });
 
-  useEffect(() => {
-    fetchApplication(Number(applicationId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationId]);
-
-  useEffect(() => {
-    if (application?.applicationRoundId) {
-      fetchApplicationRound(application);
-    }
-  }, [application]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (
-      application &&
-      applicationRound &&
-      ["approved", "sent"].includes(applicationRound.status)
-    )
-      fetchRecurringReservations(application);
-  }, [application, applicationRound]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (application && applicationRound) {
-      setIsLoading(false);
-    }
-  }, [application, applicationRound]);
-
-  const modifyApplicationStatus = async (
-    app: ApplicationType,
-    status: ApplicationStatus,
-    withNotification = false
-  ) => {
-    if (!app) return;
-    try {
-      setIsSaving(true);
-      await setApplicationStatus(app.id, status);
-      fetchApplication(app.id);
+  // FIXME POSTS don't work (not a mutation specific problem but the REST call doesn't work at all)
+  // might just be this endpoint, or might be all POSTs
+  const mutation = useMutation({
+    mutationFn: ({
+      applicationType,
+      status,
+      withNotification,
+    }: {
+      applicationType: ApplicationType;
+      status: ApplicationStatus;
+      withNotification: boolean;
+    }) => {
       if (withNotification) {
         setStatusNotification(status);
       }
-    } catch (error) {
+      return setApplicationStatus(applicationType.id, status);
+    },
+    onSuccess: () => {
+      refetch();
+    },
+    onError: () => {
       notifyError(t("errors.errorSavingApplication"));
-    } finally {
-      setTimeout(() => setIsSaving(false), 1000);
-    }
+    },
+  });
+
+  const modifyApplicationStatus = async (
+    applicationType: ApplicationType | null,
+    status: ApplicationStatus,
+    withNotification = false
+  ) => {
+    if (!applicationType) return;
+    mutation.mutate({ applicationType, status, withNotification });
   };
 
   let action: {
@@ -505,6 +480,7 @@ const Application = () => {
       action = {};
   }
 
+  const isLoading = isLoadingApplication || isLoadingRound;
   if (isLoading) {
     return <Loader />;
   }
@@ -525,15 +501,12 @@ const Application = () => {
 
   const customerName = applicantName(application);
 
-  const isApplicationRoundApproved: boolean | null =
-    applicationRound && ["approved", "sent"].includes(applicationRound.status);
-
   const applicantId: number | null | undefined =
     application?.applicantType === "individual"
       ? application?.applicantId
       : application?.organisation?.id;
 
-  const normalizedApplicationStatus: ApplicationStatus | null =
+  const normalizedApplicationStatus: ApplicationStatus | undefined =
     application &&
     applicationRound &&
     getNormalizedApplicationStatus(application.status, applicationRound.status);
@@ -766,8 +739,9 @@ const Application = () => {
                   data-testid="application__button--toggle-state"
                   id="submit"
                   variant={action.button}
+                  disabled={mutation.isLoading}
                   onClick={() =>
-                    action.function && !isSaving && action.function()
+                    action.function && !mutation.isLoading && action.function()
                   }
                 >
                   {action.text}
