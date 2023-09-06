@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -185,7 +185,6 @@ const DialogActionContainer = styled(ActionContainer)`
 
 function Recommendation(): JSX.Element {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [actionNotification, setActionNotification] =
     useState<NotificationStatus | null>(null);
@@ -202,25 +201,29 @@ function Recommendation(): JSX.Element {
   const { applicationRoundId, applicationEventScheduleId } =
     useParams<IRouteParams>();
 
-  const [recommendation, setRecommendation] = useState<AllocationResult | null>( null);
-  const [applicationRound, setApplicationRound] = useState<ApplicationRoundType | null>(null);
-  const fetchRecommendation = async (aesId: number, appRoundId: number) => {
-    try {
-      const applicationRoundResult = await getApplicationRound({
-        id: appRoundId,
-      });
-
-      const recommendationResult = await getAllocationResult({
-        id: aesId,
-        serviceSectorId: applicationRoundResult.serviceSectorId,
-      });
-
-      setRecommendation(processAllocationResult([recommendationResult])[0]);
-      setApplicationRound(applicationRoundResult);
-    } catch (error) {
+  const { data: applicationRound, isLoading: isLoadingRound } = useQuery({
+    queryKey: ["applicationRound", applicationRoundId ?? ""],
+    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
+    onError: () => {
       notifyError(t("errors.errorFetchingApplication"));
-      setIsLoading(false);
-    }
+    },
+  });
+
+  const [recommendation, setRecommendation] = useState<AllocationResult | null>(null);
+  const { refetch } = useQuery({
+    queryKey: ["recommendation", applicationEventScheduleId ?? "", applicationRound?.serviceSectorId ?? ""],
+    queryFn: () => getAllocationResult({ id: Number(applicationEventScheduleId), serviceSectorId: applicationRound?.serviceSectorId ?? 0 }),
+    onSuccess: (data) => {
+      setRecommendation(processAllocationResult([data])[0]);
+    },
+    enabled: !!applicationEventScheduleId && !!applicationRound?.serviceSectorId,
+    onError: () => {
+      notifyError(t("errors.errorFetchingApplication"));
+    },
+  });
+
+  const fetchRecommendation = async (_serviceSectorId: number) => {
+    refetch();
   };
 
   const toggleAcceptance = async (id: number, accepted: boolean) => {
@@ -232,7 +235,7 @@ function Recommendation(): JSX.Element {
     } catch (error) {
       notifyError(t("errors.errorSavingRecommendation"));
     } finally {
-      fetchRecommendation(id, Number(applicationRoundId));
+      fetchRecommendation(id)
       setTimeout(() => setIsSaving(false), 1000);
     }
   };
@@ -248,10 +251,7 @@ function Recommendation(): JSX.Element {
     } catch (error) {
       notifyError(t("errors.errorSavingRecommendation"));
     } finally {
-      fetchRecommendation(
-        applicationEventScheduleResultId,
-        Number(applicationRoundId)
-      );
+      fetchRecommendation(applicationEventScheduleResultId);
       setTimeout(() => setIsSaving(false), 1000);
     }
   };
@@ -319,22 +319,14 @@ function Recommendation(): JSX.Element {
     }
   };
 
-  useEffect(() => {
-    fetchRecommendation(
-      Number(applicationEventScheduleId),
-      Number(applicationRoundId)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationRoundId, applicationEventScheduleId]);
-
-  const { data: application } = useQuery({
+  const { data: application, isLoading: isLoadingApplication } = useQuery({
     queryKey: ["application", recommendation?.applicationId],
     queryFn: () => getApplication(recommendation?.applicationId ?? 0),
     enabled: !!recommendation?.applicationId,
     onError: () => notifyError(t("errors.errorFetchingApplication")),
   });
 
-  if (isLoading) {
+  if (isLoadingRound || isLoadingApplication) {
     return <Loader />;
   }
 
