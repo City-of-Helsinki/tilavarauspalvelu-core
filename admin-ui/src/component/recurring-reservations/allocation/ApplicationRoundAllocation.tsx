@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@apollo/client";
+import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useQuery as useApolloQuery } from "@apollo/client";
 import { Select, Tabs } from "hds-react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
@@ -16,7 +17,7 @@ import {
   ApplicationStatus,
 } from "common/types/gql-types";
 import { getApplicationRound } from "../../../common/api";
-import { ApplicationRound, OptionType } from "../../../common/types";
+import { OptionType } from "../../../common/types";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
@@ -72,15 +73,7 @@ const Tab = styled(Tabs.Tab)`
 function ApplicationRoundAllocation(): JSX.Element {
   const { refreshApplicationEvents, setRefreshApplicationEvents } =
     useAllocationContext();
-
-  const [isLoading, setIsLoading] = useState(true);
   const { notifyError } = useNotification();
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRound | null>(null);
-  const [applications, setApplications] = useState<ApplicationType[]>([]);
-  const [applicationEvents, setApplicationEvents] = useState<
-    ApplicationEventType[] | null
-  >(null);
   const [selectedReservationUnit, setSelectedReservationUnit] =
     useState<ReservationUnitType | null>(null);
 
@@ -91,36 +84,25 @@ function ApplicationRoundAllocation(): JSX.Element {
   const { applicationRoundId } = useParams<Props>();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: Number(applicationRoundId),
-        });
-        setApplicationRound(result);
-      } catch (error) {
-        const msg =
-          (error as AxiosError).response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        notifyError(t(msg));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplicationRound();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationRoundId, t]);
+  const { data: applicationRound, isLoading: isRoundLoading } = useQuery({
+    queryKey: ["applicationRound", { id: Number(applicationRoundId) }],
+    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
+    enabled: !!applicationRoundId,
+    onError: (error: AxiosError) => {
+      const msg =
+        error.response?.status === 404
+          ? "errors.applicationRoundNotFound"
+          : "errors.errorFetchingData";
+      notifyError(t(msg));
+    },
+  });
 
   // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
   const {
     loading: loadingApplications,
     data: applicationsData,
     refetch,
-  } = useQuery<Query, QueryApplicationsArgs>(
+  } = useApolloQuery<Query, QueryApplicationsArgs>(
     APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
     {
       variables: {
@@ -138,45 +120,34 @@ function ApplicationRoundAllocation(): JSX.Element {
     }
   );
 
-  useEffect(() => {
-    const loadedApplications =
-      applicationsData?.applications?.edges.map((n) => n?.node) || [];
-    setApplications(loadedApplications as ApplicationType[]);
-  }, [applicationsData]);
+  const applications =
+    applicationsData?.applications?.edges
+      .map((e) => e?.node)
+      ?.filter((x): x is ApplicationType => x != null) ?? [];
 
-  const units = useMemo(
-    () =>
-      uniqBy(
-        applications.flatMap((application) =>
-          application?.applicationEvents?.flatMap((applicationEvent) =>
-            applicationEvent?.eventReservationUnits
-              ?.flatMap(
-                (eventReservationUnit) =>
-                  eventReservationUnit?.reservationUnit?.unit
-              )
-              .filter((n) => !!n)
+  const units = uniqBy(
+    applications.flatMap((application) =>
+      application?.applicationEvents?.flatMap((applicationEvent) =>
+        applicationEvent?.eventReservationUnits
+          ?.flatMap(
+            (eventReservationUnit) =>
+              eventReservationUnit?.reservationUnit?.unit
           )
-        ),
-        "pk"
-      ),
-    [applications]
+          .filter((n) => !!n)
+      )
+    ),
+    "pk"
   );
 
-  const unitOptions = useMemo(() => {
-    return units.map((unit) => ({
-      value: unit?.pk,
-      label: unit?.nameFi,
-    }));
-  }, [units]);
+  const unitOptions = units.map((unit) => ({
+    value: unit?.pk,
+    label: unit?.nameFi,
+  }));
 
-  const timeOptions = useMemo(
-    () =>
-      [300, 200].map((n) => ({
-        value: n,
-        label: t(`ApplicationEvent.priority.${n}`),
-      })),
-    [t]
-  );
+  const timeOptions = [300, 200].map((n) => ({
+    value: n,
+    label: t(`ApplicationEvent.priority.${n}`),
+  }));
 
   const orderOptions = [
     {
@@ -197,24 +168,20 @@ function ApplicationRoundAllocation(): JSX.Element {
     },
   ];
 
-  const reservationUnits: ReservationUnitType[] = useMemo(
-    () =>
-      uniqBy(
-        applications.flatMap((application) =>
-          application?.applicationEvents?.flatMap((applicationEvent) =>
-            applicationEvent?.eventReservationUnits?.flatMap(
-              (eventReservationUnit) =>
-                eventReservationUnit?.reservationUnit as ReservationUnitType
-            )
-          )
-        ),
-        "pk"
-      ).filter(
-        (reservationUnit) => unitFilter?.value === reservationUnit?.unit?.pk
-      ) as ReservationUnitType[],
-    [applications, unitFilter]
-  );
+  const reservationUnits: ReservationUnitType[] = uniqBy(
+    applications.flatMap((application) =>
+      application?.applicationEvents?.flatMap((applicationEvent) =>
+        applicationEvent?.eventReservationUnits
+          ?.flatMap((evtRu) => evtRu?.reservationUnit)
+          .filter((ru): ru is ReservationUnitType => ru != null)
+      )
+    ),
+    "pk"
+  )
+    .filter((ru) => unitFilter?.value === ru?.unit?.pk)
+    .filter((ru): ru is ReservationUnitType => ru != null);
 
+  // NOTE rather sketchy: this is the context event listener
   useEffect(() => {
     if (refreshApplicationEvents) {
       refetch();
@@ -222,26 +189,16 @@ function ApplicationRoundAllocation(): JSX.Element {
     }
   }, [refetch, refreshApplicationEvents, setRefreshApplicationEvents]);
 
-  useEffect(() => {
-    setApplicationEvents(
-      getFilteredApplicationEvents(
-        applications,
-        unitFilter,
-        timeFilter,
-        orderFilter,
-        selectedReservationUnit || reservationUnits[0]
-      ) as ApplicationEventType[]
+  const applicationEvents: ApplicationEventType[] =
+    getFilteredApplicationEvents(
+      applications,
+      unitFilter,
+      timeFilter,
+      orderFilter,
+      selectedReservationUnit || reservationUnits[0]
     );
-  }, [
-    applications,
-    unitFilter,
-    timeFilter,
-    orderFilter,
-    selectedReservationUnit,
-    reservationUnits,
-  ]);
 
-  if (isLoading || loadingApplications) {
+  if (isRoundLoading || loadingApplications) {
     return <Loader />;
   }
 
@@ -302,8 +259,7 @@ function ApplicationRoundAllocation(): JSX.Element {
           ))}
         </ReservationUnits>
       </Tabs>
-      {Object.prototype.hasOwnProperty.call(applicationEvents, "length") &&
-      unitFilter ? (
+      {applicationEvents && applicationEvents.length  && unitFilter ? (
         <ApplicationRoundAllocationApplicationEvents
           applications={applications}
           applicationEvents={applicationEvents}
