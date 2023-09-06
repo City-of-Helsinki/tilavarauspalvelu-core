@@ -1,7 +1,9 @@
 import React from "react";
-import { NotificationType } from "hds-react";
+import { IconCross, NotificationType } from "hds-react";
 import styled from "styled-components";
-import UserNotification from "./UserNotification";
+import NotificationWrapper from "ui/components/common/NotificationWrapper";
+import { breakpoints } from "../common/style";
+import { fontBold } from "../common/typography";
 
 const notifications = [
   {
@@ -29,15 +31,78 @@ const notifications = [
 
 const PositionWrapper = styled.div`
   width: 100%;
-  display: flex;
-  flex-flow: column nowrap;
+  display: grid;
 `;
 
-const UserNotificationList = ({ maxAmount = 3 }) => {
+type UserNotificationProps = {
+  date: Date;
+  content: string;
+  type: NotificationType;
+};
+
+const NotificationBackground = styled.div`
+  position: relative;
+  z-index: 1000;
+  display: flex;
+  > div {
+    width: 100vw;
+  }
+`;
+
+const NotificationContainer = styled(NotificationWrapper)`
+  font-size: var(--fontsize-body-m);
+  width: calc(100vw - 48px);
+`;
+
+const NotificationText = styled.span`
+  font-size: var(--fontsize-body-m);
+  @media (width < ${breakpoints.xl}) {
+    padding-right: var(--spacing-l);
+  }
+`;
+
+const NotificationDate = styled.span`
+  margin-right: 0.25rem;
+  font-size: var(--fontsize-body-m);
+  ${fontBold}
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: var(--spacing-m);
+  right: var(--spacing-m);
+  transform: translateY(-50%);
+  padding: var(--spacing-xs);
+  padding-right: 0;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    color: var(--color-black-50);
+  }
+`;
+
+const NotificationItem = ({ date, content, type }: UserNotificationProps) => {
+  return (
+    <NotificationBackground>
+      <NotificationContainer type={type}>
+        <NotificationDate>
+          {`${date.getDate()}.${date.getMonth()}.`}
+        </NotificationDate>
+        <NotificationText>{content}</NotificationText>
+        <CloseButton>
+          <IconCross size="s" />
+        </CloseButton>
+      </NotificationContainer>
+    </NotificationBackground>
+  );
+};
+
+const NotificationList = ({ maxAmount = 3 }) => {
   return (
     <PositionWrapper>
       {notifications.slice(0, maxAmount).map((notification) => (
-        <UserNotification
+        <NotificationItem
           key={notification.id}
           date={notification.date}
           content={notification.content}
@@ -48,4 +113,4 @@ const UserNotificationList = ({ maxAmount = 3 }) => {
   );
 };
 
-export default UserNotificationList;
+export default NotificationList;
