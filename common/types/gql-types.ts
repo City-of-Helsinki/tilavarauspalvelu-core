@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import {NotificationType} from "hds-react";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -1341,6 +1342,19 @@ export type Node = {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
 };
+
+export type Notification_Type = {
+  __typename?: "Notification";
+  /** The ID of the object */
+  id?: Scalars["ID"]["output"];
+  date?: Scalars["Date"]["output"];
+  target?: Scalars["String"]["output"];
+  is_visible?: Scalars["Boolean"]["output"];
+  type?: NotificationType;
+  contentFi?: Maybe<Scalars["String"]["output"]>;
+  contentSv?: Maybe<Scalars["String"]["output"]>;
+  contentEn?: Maybe<Scalars["String"]["output"]>;
+}
 
 export type OpeningHoursType = {
   __typename?: "OpeningHoursType";
