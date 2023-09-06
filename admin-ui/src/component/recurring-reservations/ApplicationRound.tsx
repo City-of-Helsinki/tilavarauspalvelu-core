@@ -15,11 +15,10 @@ import {
 import Loader from "../Loader";
 import { useNotification } from "../../context/NotificationContext";
 
-type IProps = {
+type IParams = {
   applicationRoundId: string;
 };
 
-// TODO split the router params to separate component
 function ApplicationRound({
   applicationRoundId,
 }: {
@@ -101,7 +100,7 @@ function ApplicationRound({
 }
 
 function ApplicationRoundRouted(): JSX.Element | null {
-  const { applicationRoundId } = useParams<IProps>();
+  const { applicationRoundId } = useParams<IParams>();
   if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
     return null;
   }

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconGroup } from "hds-react";
@@ -14,11 +15,7 @@ import {
   getParameters,
   getReservationUnits,
 } from "../../common/api";
-import {
-  ApplicationRound as ApplicationRoundType,
-  Parameter,
-  ReservationUnit as ReservationUnitType,
-} from "../../common/types";
+import { ReservationUnit as ReservationUnitType } from "../../common/types";
 import Loader from "../Loader";
 import TimeframeStatus from "./TimeframeStatus";
 import RecurringReservationIcon from "../../images/icon_recurring-reservation.svg";
@@ -173,95 +170,66 @@ const ReservationUnit = styled.div`
   }
 `;
 
-function Criteria(): JSX.Element {
-  const [isLoading, setIsLoading] = useState(true);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-  const [ageGroups, setAgeGroups] = useState<Parameter[] | null>(null);
-  const [purposes, setPurposes] = useState<Parameter[] | null>(null);
-  const [cities, setCities] = useState<Parameter[] | null>(null);
-  const [reservationUnits, setReservationUnits] = useState<
-    ReservationUnitType[] | null
-  >(null);
-
-  const applicationRoundId = Number(
-    useParams<IRouteParams>().applicationRoundId
-  );
+function Criteria({
+  applicationRoundId,
+}: {
+  applicationRoundId: number;
+}): JSX.Element {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  useEffect(() => {
-    const fetchParameters = async () => {
-      try {
-        const ageGroupsResult = await getParameters("age_group");
-        const purposesResult = await getParameters("purpose");
-        const citiesResult = await getParameters("city");
+  const { data: ageGroups, isLoading: isLoadingAgeGroups } = useQuery({
+    queryKey: ["age_group"],
+    queryFn: () => getParameters("age_group"),
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
-        setAgeGroups(ageGroupsResult);
-        setPurposes(purposesResult);
-        setCities(citiesResult);
+  const { data: purposes, isLoading: isLoadingPurposes } = useQuery({
+    queryKey: ["purpose"],
+    queryFn: () => getParameters("purpose"),
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
-        setIsLoading(false);
-      } catch (error) {
-        const msg = "errors.errorFetchingData";
-        notifyError(t(msg));
-        setIsLoading(false);
-      }
-    };
+  const { data: cities, isLoading: isLoadingCities } = useQuery({
+    queryKey: ["city"],
+    queryFn: () => getParameters("city"),
+  });
 
-    fetchParameters();
-  }, [notifyError, t]);
-
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: applicationRoundId,
-        });
-        setApplicationRound(result);
-        setIsLoading(false);
-      } catch (error) {
+  const { data: applicationRound, isLoading: isLoadingApplicationRound } =
+    useQuery({
+      queryKey: ["application_round", { id: applicationRoundId }],
+      queryFn: () => getApplicationRound({ id: applicationRoundId }),
+      onError: (error: AxiosError) => {
         const msg =
-          (error as AxiosError).response?.status === 404
+          error.response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         notifyError(t(msg));
-        setIsLoading(false);
-      }
-    };
+      },
+    });
 
-    fetchApplicationRound();
-  }, [applicationRoundId, notifyError, t]);
-
-  useEffect(() => {
-    const fetchReservationUnits = async () => {
-      setIsLoading(true);
-
-      try {
-        const result = applicationRound
-          ? await getReservationUnits({
-              applicationRound: applicationRound.id,
-            })
-          : null;
-        setReservationUnits(result);
-        setIsLoading(false);
-      } catch (error) {
-        const msg = "errors.errorFetchingData";
-        notifyError(t(msg));
-        setIsLoading(false);
-      }
-    };
-
-    fetchReservationUnits();
-  }, [applicationRound, notifyError, t]);
+  const { data: reservationUnits, isLoading: isLoadingReservationUnits } =
+    useQuery({
+      queryKey: ["reservation_unit", { applicationRound: applicationRoundId }],
+      queryFn: () =>
+        getReservationUnits({ applicationRound: applicationRoundId }),
+    });
 
   const baskets = sortBy(
     applicationRound?.applicationRoundBaskets,
     "orderNumber"
   );
 
+  const isLoading =
+    isLoadingAgeGroups ||
+    isLoadingPurposes ||
+    isLoadingCities ||
+    isLoadingApplicationRound ||
+    isLoadingReservationUnits;
   if (isLoading) {
     return <Loader />;
   }
@@ -467,4 +435,14 @@ function Criteria(): JSX.Element {
   );
 }
 
-export default Criteria;
+function CriteriaRouted(): JSX.Element {
+  const { applicationRoundId } = useParams<IRouteParams>();
+
+  if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
+    // TODO translation
+    return <div>Invalid application round id</div>;
+  }
+  return <Criteria applicationRoundId={Number(applicationRoundId)} />;
+}
+
+export default CriteriaRouted;
