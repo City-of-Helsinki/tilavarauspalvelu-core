@@ -826,6 +826,10 @@ const ReservationUnit = ({
     ) {
       setShouldUnselect((prev) => prev + 1);
     }
+    // If user resets the calendar/unselects a slot, unselect the quick reservation slot
+    if (quickReservationSlot && !initialReservation) {
+      setShouldUnselect((prev) => prev + 1);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     // quickReservationSlot,
