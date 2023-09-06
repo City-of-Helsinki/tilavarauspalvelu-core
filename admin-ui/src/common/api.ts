@@ -7,7 +7,6 @@ import {
   ReservationUnit,
   Parameter,
   AllocationResult,
-  ApplicationEventStatus,
   ApplicationEventsDeclinedReservationUnits,
   Reservation,
   RecurringReservation,
@@ -34,7 +33,6 @@ const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
 const allocationResultBasePath = "allocation_results";
-const applicationEventStatusBasePath = "application_event_status";
 const declinedApplicationEventReservationUnitsBasePath =
   "application_event_declined_reservation_unit";
 const applicationEventWeeklyAmountReductionBasePath =
@@ -86,7 +84,7 @@ async function apiGet<T>({
   };
 
   return request<T>({
-    url: `${apiBaseUrl}/${path}/`,
+    url: `${apiBaseUrl}/${path}`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -144,11 +142,13 @@ async function apiPatch<T>({ path, data }: RequestParameters): Promise<T> {
   });
 }
 
+/*
 export function getApplicationRounds(): Promise<ApplicationRound[]> {
   return apiGet<ApplicationRound[]>({
     path: `v1/${applicationRoundsBasePath}`,
   });
 }
+*/
 
 export function getApplicationRound(
   params: IDParameter
@@ -158,14 +158,16 @@ export function getApplicationRound(
   });
 }
 
+/*
 export function saveApplicationRound(
   applicationRound: ApplicationRound
 ): Promise<ApplicationRound> {
   return apiPut<ApplicationRound>({
     data: applicationRound,
-    path: `v1/${applicationRoundsBasePath}/${applicationRound.id}/`,
+    path: `v1/${applicationRoundsBasePath}/${applicationRound.id}`,
   });
 }
+*/
 
 export function patchApplicationRoundStatus(
   id: number,
@@ -173,7 +175,7 @@ export function patchApplicationRoundStatus(
 ): Promise<ApplicationRound> {
   return apiPatch<ApplicationRound>({
     data: { status },
-    path: `v1/${applicationRoundsBasePath}/${id}/`,
+    path: `v1/${applicationRoundsBasePath}/${id}`,
   });
 }
 
@@ -247,7 +249,7 @@ export function setApplicationStatus(
 ): Promise<Application> {
   return apiPost<Application>({
     data: { applicationId, status },
-    path: `v1/${applicationStatusBasePath}/`,
+    path: `v1/${applicationStatusBasePath}`,
   });
 }
 
@@ -284,7 +286,7 @@ export function getAllocationResult(
 
 export function deleteAllocationResult(id: number): Promise<void> {
   return apiDelete({
-    path: `v1/${allocationResultBasePath}/${id}/`,
+    path: `v1/${allocationResultBasePath}/${id}`,
   });
 }
 
@@ -293,15 +295,18 @@ export interface ApplicationStatusPayload {
   applicationId: number;
 }
 
+/*
 export function setApplicationStatuses(
   payload: ApplicationStatusPayload[]
 ): Promise<ApplicationStatusPayload[]> {
   return apiPost({
     data: payload,
-    path: `v1/${applicationStatusBasePath}/`,
+    path: `v1/${applicationStatusBasePath}`,
   });
 }
+*/
 
+/*
 interface ApplicationEventPayload {
   status: ApplicationEventStatus;
   applicationEventId: number;
@@ -315,7 +320,9 @@ export function setApplicationEventStatuses(
     path: `v1/${applicationEventStatusBasePath}/`,
   });
 }
+*/
 
+/*
 export function getDeclinedApplicationEventReservationUnits(
   applicationEventId: number
 ): Promise<ApplicationEventsDeclinedReservationUnits> {
@@ -323,6 +330,7 @@ export function getDeclinedApplicationEventReservationUnits(
     path: `v1/${declinedApplicationEventReservationUnitsBasePath}/${applicationEventId}`,
   });
 }
+*/
 
 export function setDeclinedApplicationEventReservationUnits(
   applicationEventId: number,
