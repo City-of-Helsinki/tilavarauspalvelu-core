@@ -10,7 +10,7 @@ import {
   useReservation,
   useOrder,
 } from "../../hooks/reservation";
-import NotificationWrapper from "../common/NotificationWrapper";
+import NotificationWrapper from "../../../common/src/components/NotificationWrapper";
 import { useCurrentUser } from "../../hooks/user";
 import { getCheckoutUrl } from "../../modules/reservation";
 

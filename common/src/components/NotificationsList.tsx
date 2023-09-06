@@ -1,10 +1,10 @@
 import React from "react";
 import { IconCross, NotificationType } from "hds-react";
 import styled from "styled-components";
-import NotificationWrapper from "ui/components/common/NotificationWrapper";
-import { getTranslation } from "ui/modules/util";
 import { useLocalStorage } from "react-use";
 import { useQuery } from "@apollo/client";
+import NotificationWrapper from "./NotificationWrapper";
+import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
 import { fontBold } from "../common/typography";
 import { BannerNotificationType, Query } from "../../types/gql-types";
