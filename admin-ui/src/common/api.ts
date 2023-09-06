@@ -1,5 +1,5 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
-import axiosClient from "app/modules/auth/axiosClient";
+import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import applyCaseMiddleware from "axios-case-converter";
 import omit from "lodash/omit";
 import {
   Application,
@@ -18,6 +18,14 @@ import {
   ReservationUnitCalendarUrl,
 } from "./types";
 import { publicUrl } from "./const";
+
+const axiosOptions = {
+  headers: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "Content-Type": "application/json",
+  },
+};
+const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
 
 const apiBaseUrl = `${publicUrl}/api`;
 
