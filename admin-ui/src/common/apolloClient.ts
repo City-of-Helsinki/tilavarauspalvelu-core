@@ -6,10 +6,8 @@ import {
   from,
 } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
-import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { uniqBy } from "lodash";
-import { getSession, signOut } from "next-auth/react";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
@@ -28,21 +26,6 @@ const uploadLinkOptions = {
 // @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions) as unknown as ApolloLink;
 const httpLink = new HttpLink({ uri });
-
-const authLink = setContext(async (_request, previousContext) => {
-  const headers = previousContext.headers ?? {};
-  const session = await getSession();
-
-  if (!session?.apiTokens?.tilavaraus) {
-    return headers;
-  }
-  return {
-    headers: {
-      ...headers,
-      authorization: `Bearer ${session.apiTokens.tilavaraus}`,
-    },
-  };
-});
 
 // eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -116,9 +99,7 @@ const client = new ApolloClient({
       },
     },
   }),
-  link: isBrowser
-    ? from([authLink, errorLink, uploadLink])
-    : from([authLink, errorLink, httpLink]),
+  link: isBrowser ? from([errorLink, uploadLink]) : from([errorLink, httpLink]),
   ssrMode: !isBrowser,
 });
 
