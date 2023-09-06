@@ -26,7 +26,7 @@ import ApplicationRoundAllocationApplicationEvents from "./ApplicationRoundAlloc
 import LinkPrev from "../../LinkPrev";
 import { useAllocationContext } from "../../../context/AllocationContext";
 
-type Props = {
+type IParams = {
   applicationRoundId: string;
 };
 
@@ -70,7 +70,11 @@ const Tab = styled(Tabs.Tab)`
   }
 `;
 
-function ApplicationRoundAllocation(): JSX.Element {
+function ApplicationRoundAllocation({
+  applicationRoundId,
+}: {
+  applicationRoundId: number;
+}): JSX.Element {
   const { refreshApplicationEvents, setRefreshApplicationEvents } =
     useAllocationContext();
   const { notifyError } = useNotification();
@@ -81,7 +85,6 @@ function ApplicationRoundAllocation(): JSX.Element {
   const [timeFilter, setTimeFilter] = useState<OptionType[]>([]);
   const [orderFilter, setOrderFilter] = useState<OptionType[]>([]);
 
-  const { applicationRoundId } = useParams<Props>();
   const { t } = useTranslation();
 
   const { data: applicationRound, isLoading: isRoundLoading } = useQuery({
@@ -259,7 +262,7 @@ function ApplicationRoundAllocation(): JSX.Element {
           ))}
         </ReservationUnits>
       </Tabs>
-      {applicationEvents && applicationEvents.length  && unitFilter ? (
+      {applicationEvents && applicationEvents.length && unitFilter ? (
         <ApplicationRoundAllocationApplicationEvents
           applications={applications}
           applicationEvents={applicationEvents}
@@ -270,4 +273,18 @@ function ApplicationRoundAllocation(): JSX.Element {
   );
 }
 
-export default ApplicationRoundAllocation;
+function ApplicationRoundAllocationRouted(): JSX.Element {
+  const { applicationRoundId } = useParams<IParams>();
+  const { t } = useTranslation();
+
+  if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
+    return <div>{t("ApplicationRoundAllocationRouted.error")}</div>;
+  }
+  return (
+    <ApplicationRoundAllocation
+      applicationRoundId={Number(applicationRoundId)}
+    />
+  );
+}
+
+export default ApplicationRoundAllocationRouted;
