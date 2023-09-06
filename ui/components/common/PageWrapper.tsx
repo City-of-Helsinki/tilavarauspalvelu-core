@@ -4,6 +4,7 @@ import Footer from "./Footer";
 import { Navigation } from "./Navigation/Navigation";
 import Title from "./Title";
 import UnpaidReservationNotification from "../reservations/UnpaidReservationNotification";
+import UserNotificationList from "common/src/components/UserNotificationList";
 
 interface Props {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ const PageWrapper = (props: Props): JSX.Element => {
     <>
       <Title>Tilavarauspalvelu</Title>
       <Navigation />
+      <UserNotificationList />
       <UnpaidReservationNotification />
       <Main
         $bgColor={props.overrideBackgroundColor}
