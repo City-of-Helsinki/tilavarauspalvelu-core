@@ -84,7 +84,7 @@ const IconButton = ({
   label,
   onClick,
   // eslint-disable-next-line no-script-url
-  href = "javascript:void(0);", // so the link won't trigger if there's no href given (e.g. when using only onClick)
+  href = "#",
   openInNewTab = !!href && href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
