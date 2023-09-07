@@ -6,6 +6,7 @@ __all__ = [
     "GraphQLClient",
     "load_content",
     "parametrize_helper",
+    "ResponseMock",
 ]
 
 from django.test import Client
@@ -77,3 +78,12 @@ def _recursive_object_hook(data: dict[str, Any] | None = None) -> PrintableDefau
 def load_content(string: str | bytes, /) -> PrintableDefaultDict:
     """Load GraphQL response contents to custom defaultdicts for easier content checking."""
     return json.loads(string, object_hook=_recursive_object_hook)
+
+
+class ResponseMock:
+    def __init__(self, json_data: dict[str, Any], status_code: int = 200) -> None:
+        self.json_data = json_data
+        self.status_code = status_code
+
+    def json(self) -> dict[str, Any]:
+        return self.json_data
