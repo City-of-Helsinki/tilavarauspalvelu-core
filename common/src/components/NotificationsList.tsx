@@ -65,7 +65,10 @@ const CloseButton = styled.button`
   }
 `;
 
-const NotificationItem = ({ notification, closeFn }: NotificationItemProps) => {
+const NotificationsListItem = ({
+  notification,
+  closeFn,
+}: NotificationItemProps) => {
   const displayDate = new Date(notification.activeFrom || "");
   let notificationType;
   switch (notification.level) {
@@ -85,7 +88,9 @@ const NotificationItem = ({ notification, closeFn }: NotificationItemProps) => {
     });
   };
   return (
-    <NotificationBackground>
+    <NotificationBackground
+      style={{ borderBottom: `1px solid var(--color-${notificationType}-dark` }}
+    >
       <NotificationContainer type={notificationType}>
         {notification.activeFrom && (
           <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}`}</NotificationDate>
@@ -134,9 +139,8 @@ const NotificationsList = ({ target }: NotificationListProps) => {
     (item) => {
       if (
         !closedNotificationsList ||
-        closedNotificationsList.includes(item?.id as never) ||
-        item?.target !== target
         closedNotificationsList.includes(String(item?.id)) ||
+        (item?.target !== target && item?.target !== "ALL")
       ) {
         return false;
       }
@@ -150,7 +154,7 @@ const NotificationsList = ({ target }: NotificationListProps) => {
       {displayedNotificationsList
         ?.slice(0, maximumNotificationAmount)
         .map((notification) => (
-          <NotificationItem
+          <NotificationsListItem
             key={notification?.id}
             notification={notification as BannerNotificationType}
             closeFn={setClosedNotificationsList}
