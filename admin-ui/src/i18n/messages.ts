@@ -556,6 +556,9 @@ const translations: ITranslations = {
       applicationCount: ["Hakemukset"],
       sent: ["Lähetetty"],
     },
+    errors: {
+      noApplicationRound: ["Hakukierrosta ei löytynyt"],
+    },
     allocate: ["Jaa vuoroja"],
     applicationCount: ["hakemusta"],
     reservationUnitCount: ["varausyksikköä"],

@@ -119,14 +119,19 @@ export type Parameter = {
   maximum?: number;
 };
 
+// TODO this is a copy of common/types/common.ts
 export type ApplicationStatus =
   | "draft"
   | "in_review"
   | "review_done"
+  | "allocating"
+  | "allocated"
+  | "validated"
+  | "handled"
   | "declined"
   | "cancelled"
-  | "approved"
-  | "sent";
+  | "sent"
+  | "approved"; // just in case, old type
 
 export type ApplicationAggregatedData = {
   appliedMinDurationTotal?: number;

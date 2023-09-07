@@ -18,6 +18,7 @@ import uniq from "lodash/uniq";
 import trim from "lodash/trim";
 import { H1, H3 } from "common/src/common/typography";
 import { useQuery } from "@tanstack/react-query";
+import { ApplicationStatus as ApplicationStatusRest } from "common/types/common";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import LinkPrev from "../LinkPrev";
 import { getApplicationRound } from "../../common/api";
@@ -26,7 +27,6 @@ import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus as ApplicationRoundStatusRest,
   DataFilterConfig,
-  ApplicationStatus as ApplicationStatusRest,
   ApplicationEventStatus,
 } from "../../common/types";
 import Loader from "../Loader";
@@ -34,7 +34,10 @@ import DataTable, { CellConfig } from "../DataTable";
 import { formatNumber, formatDuration } from "../../common/util";
 import StatusCell from "../StatusCell";
 import { applicationUrl } from "../../common/urls";
-import { getNormalizedApplicationStatus } from "./util";
+import {
+  getNormalizedApplicationStatus,
+  applicationStatusFromGqlToRest,
+} from "./util";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
@@ -147,7 +150,7 @@ const appMapper = (
     units,
     // FIXME dangerous coercion: rewrite the normalization function to work on GQL types
     status: getNormalizedApplicationStatus(
-      app.status as ApplicationStatusRest,
+      applicationStatusFromGqlToRest(app.status ?? undefined),
       applicationStatusView
     ),
     applicationCount: trim(

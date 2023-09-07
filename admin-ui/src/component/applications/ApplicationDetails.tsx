@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Card, Table } from "hds-react";
-import { isEqual, trim } from "lodash";
+import { isEqual, trim, orderBy } from "lodash";
 import omit from "lodash/omit";
 import { TFunction } from "i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -250,6 +250,15 @@ function ApplicationDetails({
 
   const customerName = application != null ? applicantName(application) : "";
   const homeCity = cities?.find((n) => n.id === application?.homeCityId);
+  const applicationEvents = application?.applicationEvents.map((ae) => ({
+    ...ae,
+    eventReservationUnits: orderBy(ae.eventReservationUnits, "priority", "asc"),
+    applicationEventSchedules: orderBy(
+      ae.applicationEventSchedules,
+      "begin",
+      "asc"
+    ),
+  }));
 
   return (
     <Wrapper>
@@ -334,135 +343,130 @@ function ApplicationDetails({
             </Card>
           </IngressContainer>
           <IngressContainer>
-            {application.applicationEvents.map(
-              (applicationEvent: ApplicationEvent) => {
-                const duration = appEventDuration(
-                  applicationEvent.minDuration,
-                  applicationEvent.maxDuration,
-                  t
-                );
+            {applicationEvents?.map((applicationEvent: ApplicationEvent) => {
+              const duration = appEventDuration(
+                applicationEvent.minDuration,
+                applicationEvent.maxDuration,
+                t
+              );
 
-                return (
-                  <ScrollIntoView
-                    key={applicationEvent.id}
-                    hash={applicationEvent.id.toString()}
+              return (
+                <ScrollIntoView
+                  key={applicationEvent.id}
+                  hash={applicationEvent.id.toString()}
+                >
+                  <StyledAccordion
+                    heading={`${application.id}-${applicationEvent.id} ${applicationEvent.name}`}
+                    defaultOpen
                   >
-                    <StyledAccordion
-                      heading={`${application.id}-${applicationEvent.id} ${applicationEvent.name}`}
-                      defaultOpen
-                    >
-                      <EventProps>
-                        <ValueBox
-                          label={t("ApplicationEvent.ageGroup")}
-                          value={parseAgeGroups(
-                            applicationEvent.ageGroupDisplay
-                          )}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.groupSize")}
-                          value={`${formatNumber(
-                            applicationEvent.numPersons,
-                            t("common.membersSuffix")
-                          )}`}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.purpose")}
-                          value={applicationEvent.purpose}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.eventDuration")}
-                          value={duration}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.eventsPerWeek")}
-                          value={`${applicationEvent.eventsPerWeek}`}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.dates")}
-                          value={`${formatDate(
-                            applicationEvent.begin
-                          )} - ${formatDate(applicationEvent.end)}`}
-                        />
-                      </EventProps>
-                      <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
-                      <StyledTable
-                        rows={applicationEvent.eventReservationUnits.map(
-                          (reservationUnit, index) => ({
-                            index: index + 1,
-                            id: reservationUnit.id,
-                            unit: reservationUnit.reservationUnitDetails.unit
-                              .name.fi,
-                            name: reservationUnit.reservationUnitDetails.name
-                              .fi,
-                          })
-                        )}
-                        cols={[
-                          { headerName: "a", key: "index" },
-                          { headerName: "b", key: "unit" },
-                          { headerName: "c", key: "name" },
-                        ]}
-                        indexKey="id"
+                    <EventProps>
+                      <ValueBox
+                        label={t("ApplicationEvent.ageGroup")}
+                        value={parseAgeGroups(applicationEvent.ageGroupDisplay)}
                       />
-                      <H4>{t("ApplicationEvent.requestedTimes")}</H4>
-                      <EventSchedules>
-                        <TimeSelector applicationEvent={applicationEvent} />
-                        <Card
-                          border
-                          theme={{
-                            "--background-color": "var(--color-black-5)",
-                            "--padding-horizontal": "var(--spacing-m)",
-                            "--padding-vertical": "var(--spacing-m)",
-                          }}
-                        >
-                          <SchedulesCardContainer>
-                            <div>
-                              <StyledH5>
-                                {t("ApplicationEvent.primarySchedules")}
-                              </StyledH5>
-                              {weekdays.map((day, index) => {
-                                const schedulesTxt =
-                                  parseApplicationEventSchedules(
-                                    applicationEvent.applicationEventSchedules,
-                                    index,
-                                    300
-                                  );
-
-                                return (
-                                  <EventSchedule key={day}>
-                                    <Strong>{t(`calendar.${day}`)}</Strong>
-                                    {schedulesTxt ? `: ${schedulesTxt}` : ""}
-                                  </EventSchedule>
+                      <ValueBox
+                        label={t("ApplicationEvent.groupSize")}
+                        value={`${formatNumber(
+                          applicationEvent.numPersons,
+                          t("common.membersSuffix")
+                        )}`}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.purpose")}
+                        value={applicationEvent.purpose}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.eventDuration")}
+                        value={duration}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.eventsPerWeek")}
+                        value={`${applicationEvent.eventsPerWeek}`}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.dates")}
+                        value={`${formatDate(
+                          applicationEvent.begin
+                        )} - ${formatDate(applicationEvent.end)}`}
+                      />
+                    </EventProps>
+                    <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
+                    <StyledTable
+                      rows={applicationEvent.eventReservationUnits.map(
+                        (reservationUnit, index) => ({
+                          index: index + 1,
+                          id: reservationUnit.id,
+                          unit: reservationUnit.reservationUnitDetails.unit.name
+                            .fi,
+                          name: reservationUnit.reservationUnitDetails.name.fi,
+                        })
+                      )}
+                      cols={[
+                        { headerName: "a", key: "index" },
+                        { headerName: "b", key: "unit" },
+                        { headerName: "c", key: "name" },
+                      ]}
+                      indexKey="id"
+                    />
+                    <H4>{t("ApplicationEvent.requestedTimes")}</H4>
+                    <EventSchedules>
+                      <TimeSelector applicationEvent={applicationEvent} />
+                      <Card
+                        border
+                        theme={{
+                          "--background-color": "var(--color-black-5)",
+                          "--padding-horizontal": "var(--spacing-m)",
+                          "--padding-vertical": "var(--spacing-m)",
+                        }}
+                      >
+                        <SchedulesCardContainer>
+                          <div>
+                            <StyledH5>
+                              {t("ApplicationEvent.primarySchedules")}
+                            </StyledH5>
+                            {weekdays.map((day, index) => {
+                              const schedulesTxt =
+                                parseApplicationEventSchedules(
+                                  applicationEvent.applicationEventSchedules,
+                                  index,
+                                  300
                                 );
-                              })}
-                            </div>
-                            <div>
-                              <StyledH5>
-                                {t("ApplicationEvent.secondarySchedules")}
-                              </StyledH5>
-                              {weekdays.map((day, index) => {
-                                const schedulesTxt =
-                                  parseApplicationEventSchedules(
-                                    applicationEvent.applicationEventSchedules,
-                                    index,
-                                    200
-                                  );
 
-                                return (
-                                  <EventSchedule key={day}>
-                                    <Strong>{t(`calendar.${day}`)}</Strong>
-                                    {schedulesTxt ? `: ${schedulesTxt}` : ""}
-                                  </EventSchedule>
+                              return (
+                                <EventSchedule key={day}>
+                                  <Strong>{t(`calendar.${day}`)}</Strong>
+                                  {schedulesTxt ? `: ${schedulesTxt}` : ""}
+                                </EventSchedule>
+                              );
+                            })}
+                          </div>
+                          <div>
+                            <StyledH5>
+                              {t("ApplicationEvent.secondarySchedules")}
+                            </StyledH5>
+                            {weekdays.map((day, index) => {
+                              const schedulesTxt =
+                                parseApplicationEventSchedules(
+                                  applicationEvent.applicationEventSchedules,
+                                  index,
+                                  200
                                 );
-                              })}
-                            </div>
-                          </SchedulesCardContainer>
-                        </Card>
-                      </EventSchedules>
-                    </StyledAccordion>
-                  </ScrollIntoView>
-                );
-              }
-            )}
+
+                              return (
+                                <EventSchedule key={day}>
+                                  <Strong>{t(`calendar.${day}`)}</Strong>
+                                  {schedulesTxt ? `: ${schedulesTxt}` : ""}
+                                </EventSchedule>
+                              );
+                            })}
+                          </div>
+                        </SchedulesCardContainer>
+                      </Card>
+                    </EventSchedules>
+                  </StyledAccordion>
+                </ScrollIntoView>
+              );
+            })}
             <H4>{t("Application.customerBasicInfo")}</H4>
             <EventProps>
               <ValueBox
