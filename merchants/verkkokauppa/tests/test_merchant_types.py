@@ -133,6 +133,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
     def test_create_merchant_params_to_json(self):
         params = CreateMerchantParams(
             name="Test Merchant",
+            paytrail_merchant_id="123456",
             street="Test street 1",
             zip="00112",
             city="Helsinki",
@@ -146,6 +147,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
 
         expected = {
             "merchantName": "Test Merchant",
+            "merchantPaytrailMerchantId": "123456",
             "merchantStreet": "Test street 1",
             "merchantZip": "00112",
             "merchantCity": "Helsinki",

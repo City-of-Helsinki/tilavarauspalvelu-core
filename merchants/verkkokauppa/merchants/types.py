@@ -117,4 +117,9 @@ class UpdateMerchantParams:
 
 @dataclass(init=True, frozen=True)
 class CreateMerchantParams(UpdateMerchantParams):
-    pass
+    paytrail_merchant_id: str
+
+    def to_json(self) -> Dict[str, Any]:
+        json = super().to_json()
+        json["merchantPaytrailMerchantId"] = self.paytrail_merchant_id
+        return json

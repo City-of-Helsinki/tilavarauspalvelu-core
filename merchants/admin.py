@@ -16,6 +16,9 @@ from merchants.verkkokauppa.merchants.types import (
 
 
 class PaymentMerchantForm(forms.ModelForm):
+    # paytrail_merchant_id is only used when creating a merchant, later we use the ID returned from the Merchant API
+    paytrail_merchant_id = forms.CharField(label=_("Paytrail merchant ID"), min_length=6, max_length=6, required=True)
+
     # These fields are saved to / loaded from Merchant API, so they are not part of the model
     shop_id = forms.CharField(label=_("Shop ID"), max_length=256, required=True)
     business_id = forms.CharField(
@@ -50,6 +53,10 @@ class PaymentMerchantForm(forms.ModelForm):
             self.fields["tos_url"].initial = merchant_info.tos_url
             self.fields["business_id"].initial = merchant_info.business_id
 
+            # Hide paytrail_merchant_id field when editing an existing merchant
+            self.fields["paytrail_merchant_id"].required = False
+            self.fields["paytrail_merchant_id"].widget.input_type = "hidden"
+
     def save(self, commit=True):
         if self.instance:
             params = {
@@ -66,7 +73,10 @@ class PaymentMerchantForm(forms.ModelForm):
             }
 
             if self.instance.id is None:
-                params = CreateMerchantParams(**params)
+                params = CreateMerchantParams(
+                    **params,
+                    paytrail_merchant_id=self.cleaned_data.get("shop_id", ""),
+                )
                 created_merchant = create_merchant(params)
                 self.instance.id = created_merchant.id
             else:
