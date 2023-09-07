@@ -1,10 +1,5 @@
 # tilavarauspalvelu-admin-ui
 
-## Prerequisites
-
-1. Node 16 (`nvm use`)
-1. Yarn
-
 ## Developing locally
 
 ### backend
@@ -28,7 +23,7 @@ Create a self-signed certificate for SSL connection on developpment server by ru
 
 ```sh
 # in common module
-yarn generate-certificate
+pnpm generate-certificate
 ```
 
 ### environment variables
@@ -88,7 +83,7 @@ local core runs by default in http://localhost:8000 you can also use the develop
 
 ```sh
 # in admin-ui
-yarn start
+pnpm start
 ```
 
 ### Access with browser
@@ -124,7 +119,7 @@ Update the version backend version in `http://localhost:8000` using git and rebu
 
 ```sh
 # in common module
-yarn update-schema generate-gql-types
+pnpm update-schema generate-gql-types
 ```
 
 - Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
@@ -133,26 +128,26 @@ yarn update-schema generate-gql-types
 
 In the project directory, you can run:
 
-### `yarn start`
+### `pnpm start`
 
-### `yarn test`
+### `pnpm test`
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn ts-check`
+### `pnpm ts-check`
 
 Typescript check
 
-### `yarn lint`
+### `pnpm lint`
 
 Runs eslint against _.ts and _.tsx files in `./src`.
 
-### `yarn lint:css`
+### `pnpm lint:css`
 
 Run stylelint to validate style declarations in `./src/**/*.tsx`.
 
-### `yarn build`
+### `pnpm build`
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.

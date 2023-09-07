@@ -1,32 +1,27 @@
-## Prerequisites
-
-1. Node 16 (`nvm use`)
-1. Yarn
-
 ## Available Scripts
 
 ### When GQL API changes, update local schema from core running at localhost:
 
 ```
-yarn update-schema
+pnpm update-schema
 ```
 
 ### When GQL API changes, update API types from local schema:
 
 ```
-yarn generate-gql-types
+pnpm generate-gql-types
 ```
 
 ### Generate dummy certificates for local ui
 
 ```
-yarn generate-certificate
+pnpm generate-certificate
 ```
 
 ### Generate email .html templates
 
 ```
-yarn generate-email-templates
+pnpm generate-email-templates
 ```
 
  - Converts and translates (using `i18n/*.json`) the `templates/*.template.mjml` files to `html/*_{lang}.html` and `text-templates/*.template.txt` to `txt/*_{lang}.txt`.

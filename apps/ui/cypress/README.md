@@ -8,4 +8,4 @@ Most of the expected server data can be updated with the update-fixtures.sh scri
 
 ## Testing locally with dev server
 
-`yarn test:browser` will launch the cypress ui.
+`pnpm test:browser:open` will launch the cypress ui.

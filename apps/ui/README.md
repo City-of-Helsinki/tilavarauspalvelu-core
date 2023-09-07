@@ -4,8 +4,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Prerequisites
 
-1. Node 16 (`nvm use`)
-1. Yarn
+1. Node 18 (`nvm use`)
+1. pnpm
 
 ### Recommended editor/IDE tooling
 
@@ -26,13 +26,13 @@ Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is 
 Create a self-signed certificate for SSL connection on development server by running the following command in the common directory
 
 ```
-yarn generate-certificate
+pnpm generate-certificate
 ```
 
 ### Start UI
 
 ```
-yarn dev
+pnpm dev
 ```
 
 ### When GQL api changes and you need to update the Typescript types
@@ -40,7 +40,7 @@ yarn dev
 go to common module and run
 
 ```
-yarn generate-gql-types
+pnpm generate-gql-types
 ```
 
 ### Access with browser
@@ -64,7 +64,7 @@ docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 
 ### Graphql workflow
 
-When server has new api changes -> update schema & generate new types by running: `yarn update-schema generate-gql-types` in common module.
+When server has new api changes -> update schema & generate new types by running: `pnpm update-schema generate-gql-types` in common module.
 
 - Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
 
@@ -74,7 +74,7 @@ When a query is modified and you need new mock data types run: `generate-gql-typ
 
 In the project directory, you can run:
 
-### `yarn dev`
+### `pnpm dev`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -82,28 +82,40 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
-### `yarn dev:test`
+### `pnpm dev:test`
 
 Runs the dev server and mocks network requests
 
-### `yarn test`
+### `pnpm test`
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn test:browser`
+### `pnpm test:browser`
 
 Runs end to end tests against local setup. Both ui and api must be running before running this script.
 
-### `yarn build`
+### `pnpm build`
 
 Builds a production version
 
-### `yarn start`
+### `pnpm start`
 
 Starts production version
 
 ## Cypress tests
+
+### Running without docker
+
+``` sh
+cd apps/ui
+# start the test server
+pnpm dev:test
+# headless
+pnpm test:browser
+# GUI
+pnpm test:browser:open
+```
 
 ### Running against a docker container
 
