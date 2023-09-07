@@ -134,7 +134,10 @@ export const sortAgeGroups = (ageGroups: Parameter[]): Parameter[] => {
   });
 };
 
-export const getTranslation = (parent: unknown, key: string): string => {
+export const getTranslation = (
+  parent: Record<string, string>,
+  key: string
+): string => {
   const keyString = `${key}${capitalize(i18n?.language)}`;
   if (parent && parent[keyString]) {
     return parent[keyString];

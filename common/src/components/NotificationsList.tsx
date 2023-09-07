@@ -136,6 +136,7 @@ const NotificationsList = ({ target }: NotificationListProps) => {
         !closedNotificationsList ||
         closedNotificationsList.includes(item?.id as never) ||
         item?.target !== target
+        closedNotificationsList.includes(String(item?.id)) ||
       ) {
         return false;
       }
