@@ -9,19 +9,15 @@ from django.test.testcases import TestCase
 from pytest import raises
 from requests import Timeout
 
-from ..constants import REQUEST_TIMEOUT_SECONDS
-from ..product.exceptions import (
+from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
     CreateProductError,
     GetProductMappingError,
 )
-from ..product.requests import (
-    create_or_update_accounting,
-    create_product,
-    get_product_mapping,
-)
-from ..product.types import CreateOrUpdateAccountingParams, CreateProductParams, Product
-from ..tests.mocks import mock_get, mock_post
+from merchants.verkkokauppa.product.requests import create_or_update_accounting, create_product, get_product_mapping
+from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams, Product
+from merchants.verkkokauppa.tests.mocks import mock_get, mock_post
 
 
 class ProductRequestsTestCaseBase(TestCase):

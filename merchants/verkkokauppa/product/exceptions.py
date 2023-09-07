@@ -1,4 +1,4 @@
-from ..exceptions import VerkkokauppaError
+from merchants.verkkokauppa.exceptions import VerkkokauppaError
 
 
 class ProductError(VerkkokauppaError):

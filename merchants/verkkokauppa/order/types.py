@@ -6,7 +6,7 @@ from uuid import UUID
 
 from sentry_sdk import capture_exception, push_scope
 
-from .exceptions import ParseOrderError
+from merchants.verkkokauppa.order.exceptions import ParseOrderError
 
 
 @dataclass(frozen=True)
@@ -99,7 +99,7 @@ class Order:
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "Order":
-        from ..helpers import parse_datetime
+        from merchants.verkkokauppa.helpers import parse_datetime
 
         subscription_id = json.get("subscriptionId")
         try:

@@ -8,23 +8,22 @@ from requests import RequestException
 from requests import get as _get
 from requests import post as _post
 
-from utils.metrics import ExternalServiceMetric
-
-from ..constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
-from ..exceptions import VerkkokauppaConfigurationError
-from .exceptions import (
+from merchants.verkkokauppa.constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
+from merchants.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
     CreateProductError,
     GetProductMappingError,
     ParseAccountingError,
     ParseProductError,
 )
-from .types import (
+from merchants.verkkokauppa.product.types import (
     Accounting,
     CreateOrUpdateAccountingParams,
     CreateProductParams,
     Product,
 )
+from utils.metrics import ExternalServiceMetric
 
 
 def _get_base_url():

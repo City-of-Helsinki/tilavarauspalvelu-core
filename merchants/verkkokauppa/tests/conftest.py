@@ -2,7 +2,7 @@ from typing import Dict
 
 from pytest import fixture
 
-from ..product.types import CreateProductParams
+from merchants.verkkokauppa.product.types import CreateProductParams
 
 
 @fixture(autouse=True)

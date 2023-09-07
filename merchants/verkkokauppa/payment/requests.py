@@ -9,11 +9,9 @@ from requests import get as _get
 from requests import post as _post
 from sentry_sdk import capture_exception, capture_message, push_scope
 
-from utils.metrics import ExternalServiceMetric
-
-from ..constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
-from ..exceptions import VerkkokauppaConfigurationError
-from .exceptions import (
+from merchants.verkkokauppa.constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
+from merchants.verkkokauppa.payment.exceptions import (
     GetPaymentError,
     GetRefundStatusError,
     ParsePaymentError,
@@ -21,7 +19,8 @@ from .exceptions import (
     ParseRefundStatusError,
     RefundPaymentError,
 )
-from .types import Payment, Refund, RefundStatusResult
+from merchants.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
+from utils.metrics import ExternalServiceMetric
 
 
 def _get_base_url():

@@ -13,17 +13,17 @@ from django.utils.timezone import utc
 from pytest import raises
 from requests import Timeout
 
-from ..constants import REQUEST_TIMEOUT_SECONDS
-from ..order.exceptions import CancelOrderError, CreateOrderError, GetOrderError
-from ..order.requests import cancel_order, create_order, get_order
-from ..order.types import (
+from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError
+from merchants.verkkokauppa.order.requests import cancel_order, create_order, get_order
+from merchants.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
     OrderCustomer,
     OrderItemMetaParams,
     OrderItemParams,
 )
-from .mocks import mock_get, mock_post
+from merchants.verkkokauppa.tests.mocks import mock_get, mock_post
 
 
 class OrderRequestsTestCaseBase(TestCase):
