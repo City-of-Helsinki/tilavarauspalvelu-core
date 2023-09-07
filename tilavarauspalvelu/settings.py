@@ -10,6 +10,7 @@ from django.conf.global_settings import DEFAULT_FROM_EMAIL as django_default_fro
 from django.conf.global_settings import EMAIL_PORT as django_default_email_port
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
+from helusers import defaults
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from tilavarauspalvelu.utils.logging import getLogger
@@ -169,6 +170,7 @@ env = environ.Env(
     TUNNISTAMO_ADMIN_KEY=(str, "tilavaraus-django-admin-dev"),
     TUNNISTAMO_ADMIN_SECRET=(str, None),
     TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://tunnistamo.test.hel.ninja/openid"),
+    TUNNISTAMO_ACCESS_TOKEN_ENDPOINT=(str, "https://tunnistamo.test.hel.ninja/api-tokens/"),
     TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, []),
     OIDC_LEEWAY=(int, 60 * 60),
     IPWARE_META_PRECEDENCE_ORDER=(str, "HTTP_X_FORWARDED_FOR"),
@@ -225,6 +227,7 @@ env = environ.Env(
     GDPR_API_DELETE_SCOPE=(str, ""),
     # Open City Profile
     OPEN_CITY_PROFILE_GRAPHQL_API=(str, "https://profile-api.test.hel.ninja/graphql/"),
+    OPEN_CITY_PROFILE_SCOPE=(str, "https://api.hel.fi/auth/helsinkiprofile/"),
     OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES=(list, ["substantial", "high"]),
     PREFILL_RESERVATION_WITH_PROFILE_DATA=(bool, False),
     # Logging
@@ -470,6 +473,16 @@ SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
 SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("TUNNISTAMO_ADMIN_OIDC_ENDPOINT")
 SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = env("TUNNISTAMO_ALLOWED_REDIRECT_HOSTS")
 
+TUNNISTAMO_ACCESS_TOKEN_ENDPOINT = env("TUNNISTAMO_ACCESS_TOKEN_ENDPOINT")
+
+pipeline = list(defaults.SOCIAL_AUTH_PIPELINE)
+index = pipeline.index("helusers.pipeline.create_or_update_user")
+pipeline.insert(index + 1, "users.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile")
+SOCIAL_AUTH_TUNNISTAMO_PIPELINE = tuple(pipeline)
+
+HELUSERS_PASSWORD_LOGIN_DISABLED = False
+HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
+
 IPWARE_META_PRECEDENCE_ORDER = ("HTTP_X_FORWARDED_FOR",)
 
 GRAPHENE = {
@@ -603,6 +616,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Open city profile confs
 OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
+OPEN_CITY_PROFILE_SCOPE = env("OPEN_CITY_PROFILE_SCOPE")
 OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES = env("OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES")
 PREFILL_RESERVATION_WITH_PROFILE_DATA = env("PREFILL_RESERVATION_WITH_PROFILE_DATA")
 
