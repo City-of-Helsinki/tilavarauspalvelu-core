@@ -31,6 +31,7 @@ from .mocks import mock_get, mock_post
 class MerchantRequestsBaseTestCase(TestCase):
     create_merchant_params: CreateMerchantParams = CreateMerchantParams(
         name="Test Merchant",
+        paytrail_merchant_id="123456",
         street="Test street 1",
         zip="00112",
         city="Helsinki",
