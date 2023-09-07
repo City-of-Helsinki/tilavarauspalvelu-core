@@ -4,13 +4,13 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { ReservationsReservationStateChoices } from "common/types/gql-types";
+import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { BlackButton, Toast } from "../../styles/util";
 import {
   useReservations,
   useReservation,
   useOrder,
 } from "../../hooks/reservation";
-import NotificationWrapper from "../../../common/src/components/NotificationWrapper";
 import { useCurrentUser } from "../../hooks/user";
 import { getCheckoutUrl } from "../../modules/reservation";
 

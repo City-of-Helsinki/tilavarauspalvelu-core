@@ -178,13 +178,16 @@ const options = (): NextAuthOptions => {
       },
     },
     logger: {
+      // eslint-disable-next-line no-console
       error: console.error,
+      // eslint-disable-next-line no-console
       warn: console.warn,
       debug: (code, metadata) => {
         // Our cookies are too large and split into two, don't need to flood the logs with warnings
         if (code === "CHUNKING_SESSION_COOKIE") {
           return;
         }
+        // eslint-disable-next-line no-console
         console.log(`[NEXT_AUTH]: [${code}]`, metadata);
       },
     },

@@ -18,7 +18,6 @@ const Main = styled.main<{ $bgColor?: string }>`
 `;
 
 const PageWrapper = (props: Props): JSX.Element => {
-
   return (
     <>
       <Title>Tilavarauspalvelu</Title>
