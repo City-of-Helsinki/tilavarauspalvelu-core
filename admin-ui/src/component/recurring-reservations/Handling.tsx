@@ -54,7 +54,9 @@ import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
+  setApplicationRoundStatus: (
+    status: ApplicationRoundStatus
+  ) => Promise<ApplicationRoundType>;
 }
 
 const Wrapper = styled.div`

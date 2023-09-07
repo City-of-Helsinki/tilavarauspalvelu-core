@@ -20,6 +20,7 @@ import {
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
 import { Permission } from "app/modules/permissionHelper";
+import { publicUrl } from "app/common/const";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import {
@@ -38,7 +39,6 @@ import {
   Container,
   HorisontalFlex,
 } from "../../../styles/layout";
-import { publicUrl } from "../../../common/const";
 import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
 import StickyHeader from "../../StickyHeader";
 import Calendar from "./Calendar";

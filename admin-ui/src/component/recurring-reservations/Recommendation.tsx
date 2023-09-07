@@ -209,22 +209,29 @@ function Recommendation(): JSX.Element {
     },
   });
 
-  const [recommendation, setRecommendation] = useState<AllocationResult | null>(null);
-  const { refetch } = useQuery({
-    queryKey: ["recommendation", applicationEventScheduleId ?? "", applicationRound?.serviceSectorId ?? ""],
-    queryFn: () => getAllocationResult({ id: Number(applicationEventScheduleId), serviceSectorId: applicationRound?.serviceSectorId ?? 0 }),
+  const [recommendation, setRecommendation] = useState<AllocationResult | null>(
+    null
+  );
+  const { refetch: refetchRecommendation } = useQuery({
+    queryKey: [
+      "recommendation",
+      applicationEventScheduleId ?? "",
+      applicationRound?.serviceSectorId ?? "",
+    ],
+    queryFn: () =>
+      getAllocationResult({
+        id: Number(applicationEventScheduleId),
+        serviceSectorId: applicationRound?.serviceSectorId ?? 0,
+      }),
     onSuccess: (data) => {
       setRecommendation(processAllocationResult([data])[0]);
     },
-    enabled: !!applicationEventScheduleId && !!applicationRound?.serviceSectorId,
+    enabled:
+      !!applicationEventScheduleId && !!applicationRound?.serviceSectorId,
     onError: () => {
       notifyError(t("errors.errorFetchingApplication"));
     },
   });
-
-  const fetchRecommendation = async (_serviceSectorId: number) => {
-    refetch();
-  };
 
   const toggleAcceptance = async (id: number, accepted: boolean) => {
     try {
@@ -235,7 +242,7 @@ function Recommendation(): JSX.Element {
     } catch (error) {
       notifyError(t("errors.errorSavingRecommendation"));
     } finally {
-      fetchRecommendation(id)
+      refetchRecommendation();
       setTimeout(() => setIsSaving(false), 1000);
     }
   };
@@ -251,7 +258,7 @@ function Recommendation(): JSX.Element {
     } catch (error) {
       notifyError(t("errors.errorSavingRecommendation"));
     } finally {
-      fetchRecommendation(applicationEventScheduleResultId);
+      refetchRecommendation();
       setTimeout(() => setIsSaving(false), 1000);
     }
   };

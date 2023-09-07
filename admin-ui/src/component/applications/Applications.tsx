@@ -235,32 +235,29 @@ function Applications({
     },
   });
 
-  const { loading: isApplicationsLoading, data: applicationsData } =
-    useApolloQuery<Query, QueryApplicationsArgs>(
-      APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
-      {
-        skip: !applicationRound?.id,
-        variables: {
-          applicationRound: String(applicationRound?.id ?? 0),
-          status: [
-            // original REST status: "in_review,review_done,declined,sent",
-            // TODO check the map for them (or ask Krista / Elina what should be on this page)
-            ApplicationStatus.Allocated,
-            ApplicationStatus.Handled,
-            ApplicationStatus.InReview,
-            ApplicationStatus.ReviewDone,
-            ApplicationStatus.Sent,
-          ],
-        },
-        onError: () => {
-          notifyError(t("errors.errorFetchingApplications"));
-        },
-      }
-    );
+  const { loading: isApplicationsLoading, data } = useApolloQuery<
+    Query,
+    QueryApplicationsArgs
+  >(APPLICATIONS_BY_APPLICATION_ROUND_QUERY, {
+    skip: !applicationRound?.id,
+    variables: {
+      applicationRound: String(applicationRound?.id ?? 0),
+      status: [
+        ApplicationStatus.Allocated,
+        ApplicationStatus.Handled,
+        ApplicationStatus.InReview,
+        ApplicationStatus.ReviewDone,
+        ApplicationStatus.Sent,
+      ],
+    },
+    onError: () => {
+      notifyError(t("errors.errorFetchingApplications"));
+    },
+  });
 
   const status = applicationRound?.status;
   const applications =
-    applicationsData?.applications?.edges
+    data?.applications?.edges
       ?.map((edge) => edge?.node)
       ?.filter((app): app is ApplicationType => app != null)
       ?.map((app) => appMapper(status, app, t)) ?? [];
@@ -270,7 +267,6 @@ function Applications({
   const filterConfig = getFilterConfig(applications);
 
   const isLoading = isLoadingRound || isApplicationsLoading;
-  // TODO move the loader down (skeletons rather than spinners)
   if (isLoading) {
     return <Loader />;
   }
@@ -308,8 +304,8 @@ function ApplicationsRouted(): JSX.Element {
   const { applicationRoundId } = useParams<IRouteParams>();
   const { t } = useTranslation();
 
-  if (!applicationRoundId) {
-    <div>{t("errors.applicationRoundNotFound")}</div>;
+  if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
+    return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
   return <Applications applicationRoundId={Number(applicationRoundId)} />;
 }

@@ -20,6 +20,7 @@ import trim from "lodash/trim";
 import uniq from "lodash/uniq";
 import { H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { publicUrl } from "app/common/const";
 import {
   AllocationResult,
   Application as ApplicationTypeRest,
@@ -380,35 +381,32 @@ function PreApproval({
       },
     });
 
-  const { loading: isApplicationsLoading, data: applicationsData } =
-    useApolloQuery<Query, QueryApplicationsArgs>(
-      APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
-      {
-        skip: !applicationRound?.id,
-        variables: {
-          applicationRound: String(applicationRound?.id ?? 0),
-          status: [
-            // original REST status: "in_review,review_done,declined"
-            // TODO check the map for them (or ask Krista / Elina what should be on this page)
-            ApplicationStatus.Allocated,
-            ApplicationStatus.Handled,
-            ApplicationStatus.InReview,
-            ApplicationStatus.ReviewDone,
-            ApplicationStatus.Sent,
-          ],
-        },
-      }
-    );
+  const { loading: isApplicationsLoading, data } = useApolloQuery<
+    Query,
+    QueryApplicationsArgs
+  >(APPLICATIONS_BY_APPLICATION_ROUND_QUERY, {
+    skip: !applicationRound?.id,
+    variables: {
+      applicationRound: String(applicationRound?.id ?? 0),
+      status: [
+        ApplicationStatus.Allocated,
+        ApplicationStatus.Handled,
+        ApplicationStatus.InReview,
+        ApplicationStatus.ReviewDone,
+        ApplicationStatus.Sent,
+      ],
+    },
+  });
 
   const applications =
-    applicationsData?.applications?.edges
+    data?.applications?.edges
       ?.map((edge) => edge?.node)
       ?.filter((node): node is ApplicationType => node != null) ?? [];
 
-  const processedResult = processAllocationResult(allocationResults ?? []);
+  const recommendations = processAllocationResult(allocationResults ?? []);
 
   const allocatedApplicationIds = uniq(
-    processedResult?.map((result) => result.applicationId)
+    recommendations?.map((result) => result.applicationId)
   );
 
   const unallocatedApplications = applications?.filter(
@@ -417,13 +415,13 @@ function PreApproval({
       !allocatedApplicationIds.includes(application.pk)
   );
   const unAllocatedFilterConfig = getFilterConfig(
-    processedResult,
+    recommendations,
     unallocatedApplications,
     "unallocated",
     t
   );
   const allocatedFilterConfig = getFilterConfig(
-    processedResult,
+    recommendations,
     unallocatedApplications,
     "allocated",
     t
@@ -434,7 +432,6 @@ function PreApproval({
     "unallocated"
   );
   const allocatedCellConfig = getCellConfig(t, applicationRound, "allocated");
-  const recommendations = processedResult;
 
   const hasBeenSentForApproval = applicationRound.status === "validated";
 
@@ -457,24 +454,10 @@ function PreApproval({
     setCapacity(result);
   };
 
-  // TODO loader is too high up, but requires us to fix the error states first
   const isLoading = isAllocationResultsLoading || isApplicationsLoading;
   if (isLoading) {
     return <Loader />;
   }
-
-  // TODO only block what is needed, report errors when the error happens
-  if (
-    !recommendations ||
-    !unAllocatedCellConfig ||
-    !allocatedCellConfig ||
-    !unAllocatedFilterConfig ||
-    !allocatedFilterConfig
-  ) {
-    // TODO improve error reporting (and translate)
-    return <div>Unexpected error</div>;
-  }
-
   return (
     <>
       <IngressContainer>
@@ -677,7 +660,7 @@ const PageWrapper = ({
     <BreadcrumbWrapper
       route={[
         "recurring-reservations",
-        "/recurring-reservations/application-rounds",
+        `${publicUrl}/recurring-reservations/application-rounds`,
         "application-round",
       ]}
       aliases={[{ slug: "application-round", title: applicationRound.name }]}
