@@ -109,7 +109,7 @@ function ApplicationRoundAllocation({
     APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
     {
       variables: {
-        applicationRound: applicationRoundId,
+        applicationRound: String(applicationRoundId),
         status: [
           ApplicationStatus.Allocated,
           ApplicationStatus.Expired,

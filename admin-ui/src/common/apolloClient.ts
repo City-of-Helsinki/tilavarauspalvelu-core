@@ -5,6 +5,7 @@ import {
   InMemoryCache,
   from,
 } from "@apollo/client";
+import { signOut } from "next-auth/react";
 import { createUploadLink } from "apollo-upload-client";
 import { onError } from "@apollo/client/link/error";
 import { uniqBy } from "lodash";
