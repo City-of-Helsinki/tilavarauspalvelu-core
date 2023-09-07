@@ -21,6 +21,13 @@ class BannerNotificationQuerySet(BaseQuerySet):
             active_until__gte=Now(),
         )
 
+    def inactive(self) -> Self:
+        return self.filter(
+            draft=True,
+            active_from__isnull=True,
+            active_until__isnull=True,
+        )
+
     def visible(self, user: User | AnonymousUser) -> Self:
         if user.is_anonymous:
             return self.active().filter(
@@ -44,7 +51,7 @@ class BannerNotificationQuerySet(BaseQuerySet):
             return self.none()
 
         if can_manage_banner_notifications(user):
-            return self.filter(draft=True)
+            return self.inactive()
 
         return self.none()
 

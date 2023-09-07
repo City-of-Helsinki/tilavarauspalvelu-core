@@ -7,14 +7,15 @@
 .PHONY: help
 .PHONY: hooks
 .PHONY: indices
+.PHONY: lint
 .PHONY: Makefile
 .PHONY: migrate
 .PHONY: migrations
 .PHONY: run
 .PHONY: services
 .PHONY: services-local-start
-.PHONY: services-local-stop
 .PHONY: services-local-status
+.PHONY: services-local-stop
 .PHONY: stop
 
 define helptext
@@ -28,6 +29,7 @@ define helptext
   generate                           Generate test data via a script.
   hooks                              Add pre-commit hooks.
   indices                            Rebuild search indices.
+  lint                               Run pre-commit hooks.
   migrate                            Run database migrations.
   migrations                         Compile database migrations.
   run                                Start docker containers for frontend development.
@@ -65,6 +67,9 @@ hooks:
 
 indices:
 	@python manage.py rebuild_search_index reservation_units
+
+lint:
+	@pre-commit run --all-files
 
 migrate:
 	@python manage.py migrate
