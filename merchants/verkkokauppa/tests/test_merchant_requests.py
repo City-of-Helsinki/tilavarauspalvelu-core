@@ -7,24 +7,11 @@ from django.conf import settings
 from django.test.testcases import TestCase
 from requests import Timeout
 
-from ..constants import REQUEST_TIMEOUT_SECONDS
-from ..merchants.exceptions import (
-    CreateMerchantError,
-    GetMerchantsError,
-    UpdateMerchantError,
-)
-from ..merchants.requests import (
-    create_merchant,
-    get_merchant,
-    get_merchants,
-    update_merchant,
-)
-from ..merchants.types import (
-    CreateMerchantParams,
-    Merchant,
-    MerchantInfo,
-    UpdateMerchantParams,
-)
+from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.merchants.exceptions import CreateMerchantError, GetMerchantsError, UpdateMerchantError
+from merchants.verkkokauppa.merchants.requests import create_merchant, get_merchant, get_merchants, update_merchant
+from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
+
 from .mocks import mock_get, mock_post
 
 

@@ -8,11 +8,7 @@ from uuid import UUID
 from django.conf import settings
 from sentry_sdk import capture_exception, push_scope
 
-from ..payment.exceptions import (
-    ParsePaymentError,
-    ParseRefundError,
-    ParseRefundStatusError,
-)
+from merchants.verkkokauppa.payment.exceptions import ParsePaymentError, ParseRefundError, ParseRefundStatusError
 
 
 class PaymentStatus(Enum):
@@ -96,7 +92,7 @@ class Refund:
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "Refund":
-        from ..helpers import parse_datetime
+        from merchants.verkkokauppa.helpers import parse_datetime
 
         try:
             return Refund(
@@ -131,7 +127,7 @@ class RefundStatusResult:
 
     @classmethod
     def from_json(cls, json: Dict[str, Any]) -> "RefundStatusResult":
-        from ..helpers import parse_datetime
+        from merchants.verkkokauppa.helpers import parse_datetime
 
         try:
             return RefundStatusResult(

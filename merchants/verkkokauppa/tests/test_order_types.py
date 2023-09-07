@@ -9,8 +9,8 @@ from django.test.testcases import TestCase
 from django.utils.timezone import utc
 from pytest import raises
 
-from ..order.exceptions import ParseOrderError
-from ..order.types import (
+from merchants.verkkokauppa.order.exceptions import ParseOrderError
+from merchants.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
     OrderCustomer,

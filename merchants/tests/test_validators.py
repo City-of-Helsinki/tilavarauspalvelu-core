@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from pytest import raises
 
-from ..validators import is_numeric, validate_accounting_project
+from merchants.validators import is_numeric, validate_accounting_project
 
 
 class ValidatorTestCase(TestCase):

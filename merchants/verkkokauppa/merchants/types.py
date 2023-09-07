@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Any, Dict, List
 from uuid import UUID
 
-from ..helpers import parse_datetime
-from .exceptions import ParseMerchantError, ParseMerchantInfoError
+from merchants.verkkokauppa.helpers import parse_datetime
+from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
 
 
 @dataclass(frozen=True)

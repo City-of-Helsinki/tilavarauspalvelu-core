@@ -4,8 +4,8 @@ from assertpy import assert_that
 from django.test.testcases import TestCase
 from pytest import raises
 
-from ..product.exceptions import ParseAccountingError, ParseProductError
-from ..product.types import (
+from merchants.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
+from merchants.verkkokauppa.product.types import (
     Accounting,
     CreateOrUpdateAccountingParams,
     CreateProductParams,

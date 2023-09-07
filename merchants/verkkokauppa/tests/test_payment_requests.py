@@ -11,11 +11,11 @@ from django.test.testcases import TestCase
 from pytest import raises
 from requests import Timeout
 
-from ..constants import REQUEST_TIMEOUT_SECONDS
-from ..payment.exceptions import GetPaymentError, RefundPaymentError
-from ..payment.requests import get_payment, get_refund_status, refund_order
-from ..payment.types import Payment, Refund, RefundStatusResult
-from .mocks import mock_get, mock_post
+from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.payment.exceptions import GetPaymentError, RefundPaymentError
+from merchants.verkkokauppa.payment.requests import get_payment, get_refund_status, refund_order
+from merchants.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
+from merchants.verkkokauppa.tests.mocks import mock_get, mock_post
 
 
 class GetPaymentRequestsTestCase(TestCase):

@@ -10,14 +10,13 @@ from pytest import raises
 
 from applications.models import CUSTOMER_TYPES
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
-from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
-
-from ..helpers import (
+from merchants.verkkokauppa.helpers import (
     create_verkkokauppa_order,
     get_formatted_reservation_time,
     get_meta_label,
     get_validated_phone_number,
 )
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
 
 @freeze_time("2022-11-05T10:00:00")
