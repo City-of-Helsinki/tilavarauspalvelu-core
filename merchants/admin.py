@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentOrder
+from merchants.verkkokauppa.merchants.exceptions import GetMerchantsError
 from merchants.verkkokauppa.merchants.requests import (
     create_merchant,
     get_merchant,
@@ -15,7 +16,7 @@ from merchants.verkkokauppa.merchants.types import (
 
 
 class PaymentMerchantForm(forms.ModelForm):
-    # These fields are saved to / loaded from Merchant API so they are not part of the model
+    # These fields are saved to / loaded from Merchant API, so they are not part of the model
     shop_id = forms.CharField(label=_("Shop ID"), max_length=256, required=True)
     business_id = forms.CharField(
         label=_("Business ID"),
@@ -36,7 +37,7 @@ class PaymentMerchantForm(forms.ModelForm):
         if instance and instance.id:
             merchant_info = get_merchant(instance.id)
             if merchant_info is None:
-                raise Exception(f"Merchant info for {str(instance.id)} not found from Merchant API")
+                raise GetMerchantsError(f"Merchant info for {str(instance.id)} not found from Merchant API")
 
             self.fields["shop_id"].initial = merchant_info.shop_id
             self.fields["name"].initial = merchant_info.name
@@ -50,35 +51,27 @@ class PaymentMerchantForm(forms.ModelForm):
             self.fields["business_id"].initial = merchant_info.business_id
 
     def save(self, commit=True):
-        if self.instance and self.instance.id is None:
-            params = CreateMerchantParams(
-                name=self.cleaned_data.get("name", ""),
-                street=self.cleaned_data.get("street", ""),
-                zip=self.cleaned_data.get("zip", ""),
-                city=self.cleaned_data.get("city", ""),
-                email=self.cleaned_data.get("email", ""),
-                phone=self.cleaned_data.get("phone", ""),
-                url=self.cleaned_data.get("url", ""),
-                tos_url=self.cleaned_data.get("tos_url", ""),
-                business_id=self.cleaned_data.get("business_id", ""),
-                shop_id=self.cleaned_data.get("shop_id", ""),
-            )
-            created_merchant = create_merchant(params)
-            self.instance.id = created_merchant.id
-        elif self.instance:
-            params = UpdateMerchantParams(
-                name=self.cleaned_data.get("name", ""),
-                street=self.cleaned_data.get("street", ""),
-                zip=self.cleaned_data.get("zip", ""),
-                city=self.cleaned_data.get("city", ""),
-                email=self.cleaned_data.get("email", ""),
-                phone=self.cleaned_data.get("phone", ""),
-                url=self.cleaned_data.get("url", ""),
-                tos_url=self.cleaned_data.get("tos_url", ""),
-                business_id=self.cleaned_data.get("business_id", ""),
-                shop_id=self.cleaned_data.get("shop_id", ""),
-            )
-            update_merchant(self.instance.id, params)
+        if self.instance:
+            params = {
+                "name": self.cleaned_data.get("name", ""),
+                "street": self.cleaned_data.get("street", ""),
+                "zip": self.cleaned_data.get("zip", ""),
+                "city": self.cleaned_data.get("city", ""),
+                "email": self.cleaned_data.get("email", ""),
+                "phone": self.cleaned_data.get("phone", ""),
+                "url": self.cleaned_data.get("url", ""),
+                "tos_url": self.cleaned_data.get("tos_url", ""),
+                "business_id": self.cleaned_data.get("business_id", ""),
+                "shop_id": self.cleaned_data.get("shop_id", ""),
+            }
+
+            if self.instance.id is None:
+                params = CreateMerchantParams(**params)
+                created_merchant = create_merchant(params)
+                self.instance.id = created_merchant.id
+            else:
+                params = UpdateMerchantParams(**params)
+                update_merchant(self.instance.id, params)
 
         return super(PaymentMerchantForm, self).save(commit=commit)
 
