@@ -420,8 +420,6 @@ const Application = () => {
     },
   });
 
-  // FIXME POSTS don't work (not a mutation specific problem but the REST call doesn't work at all)
-  // might just be this endpoint, or might be all POSTs
   const mutation = useMutation({
     mutationFn: ({
       applicationType,
