@@ -204,9 +204,7 @@ function Recommendation(): JSX.Element {
   const { data: applicationRound, isLoading: isLoadingRound } = useQuery({
     queryKey: ["applicationRound", applicationRoundId ?? ""],
     queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
-    onError: () => {
-      notifyError(t("errors.errorFetchingApplication"));
-    },
+    onError: () => notifyError(t("errors.errorFetchingApplicationRound")),
   });
 
   const [recommendation, setRecommendation] = useState<AllocationResult | null>(
@@ -228,9 +226,7 @@ function Recommendation(): JSX.Element {
     },
     enabled:
       !!applicationEventScheduleId && !!applicationRound?.serviceSectorId,
-    onError: () => {
-      notifyError(t("errors.errorFetchingApplication"));
-    },
+    onError: () => notifyError(t("errors.errorFetchingRecommendations")),
   });
 
   const toggleAcceptance = async (id: number, accepted: boolean) => {

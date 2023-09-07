@@ -234,7 +234,6 @@ const getCellConfig = (
   }
 };
 
-// TODO refactor this not to need the Application, just the ApplicationType
 const getFilterConfig = (
   recommendations: AllocationResult[] | null,
   applications: ApplicationType[] | null,
@@ -332,9 +331,7 @@ function ResolutionReport(): JSX.Element {
         }),
       enabled:
         applicationRoundId != null && applicationRound?.serviceSectorId != null,
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
+      onError: () => notifyError(t("errors.errorFetchingData")),
     }
   );
 
@@ -351,8 +348,6 @@ function ResolutionReport(): JSX.Element {
         variables: {
           applicationRound: String(applicationRound?.id ?? 0),
           status: [
-            // original REST status: "in_review,review_done,declined",
-            // TODO check the map for them (or ask Krista / Elina what should be on this page)
             ApplicationStatus.Allocated,
             ApplicationStatus.Handled,
             ApplicationStatus.InReview,

@@ -260,7 +260,7 @@ function ReservationByApplicationEventRouted(): JSX.Element | null {
     Number.isNaN(Number(applicationId)) ||
     Number.isNaN(Number(recurringReservationId))
   ) {
-    return <div>{t("errors.incorrectQueryParams")}</div>;
+    return <div>{t("errors.router.invalidPath")}</div>;
   }
 
   return (

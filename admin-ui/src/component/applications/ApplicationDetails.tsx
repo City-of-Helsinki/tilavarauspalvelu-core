@@ -216,8 +216,7 @@ function ApplicationDetails({
     queryKey: ["cities"],
     queryFn: () => getParameters("city"),
     onError: () => {
-      // TODO specific error message
-      notifyError(t("errors.errorFetchingApplication"));
+      notifyError(t("errors.errorFetchingCities"));
     },
   });
 
@@ -230,14 +229,12 @@ function ApplicationDetails({
         }),
       enabled: application?.applicationRoundId != null,
       onError: () => {
-        // TODO specific error message
-        notifyError(t("errors.errorFetchingApplication"));
+        notifyError(t("errors.errorFetchingApplicationRound"));
       },
     });
 
   const isLoading =
     loadingApplication || loadingCities || loadingApplicationRound;
-
   if (isLoading) {
     return <Loader />;
   }
@@ -251,12 +248,7 @@ function ApplicationDetails({
       omit(application?.organisation?.address, "id")
     );
 
-  // TODO error handling
-  if (!application || !applicationRound) {
-    return null;
-  }
-
-  const customerName = applicantName(application);
+  const customerName = application != null ? applicantName(application) : "";
   const homeCity = cities?.find((n) => n.id === application?.homeCityId);
 
   return (
@@ -576,10 +568,11 @@ function ApplicationDetails({
 }
 
 function ApplicationDetailsRouted(): JSX.Element {
+  const { t } = useTranslation();
   const { applicationId } = useParams<IRouteParams>();
 
   if (!applicationId || Number.isNaN(Number(applicationId))) {
-    return <div>Virheellinen hakemusnumero</div>;
+    return <div>{t("errors.router.invalidApplicationNumber")}</div>;
   }
 
   return <ApplicationDetails applicationId={Number(applicationId)} />;

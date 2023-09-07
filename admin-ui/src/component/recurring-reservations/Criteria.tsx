@@ -437,10 +437,10 @@ function Criteria({
 
 function CriteriaRouted(): JSX.Element {
   const { applicationRoundId } = useParams<IRouteParams>();
+  const { t } = useTranslation();
 
   if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
-    // TODO translation
-    return <div>Invalid application round id</div>;
+    return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
   return <Criteria applicationRoundId={Number(applicationRoundId)} />;
 }

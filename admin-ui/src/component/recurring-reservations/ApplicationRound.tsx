@@ -99,9 +99,11 @@ function ApplicationRound({
 }
 
 function ApplicationRoundRouted(): JSX.Element | null {
+  const { t } = useTranslation();
   const { applicationRoundId } = useParams<IParams>();
+
   if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
-    return null;
+    return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
   return <ApplicationRound applicationRoundId={Number(applicationRoundId)} />;
 }

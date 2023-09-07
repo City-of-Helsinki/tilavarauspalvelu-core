@@ -620,7 +620,7 @@ function RecommendationsByReservationUnitRouted(): JSX.Element {
     Number.isNaN(Number(applicationRoundId)) ||
     Number.isNaN(Number(reservationUnitId))
   ) {
-    return <div>{t("errors.incorrectQueryParams")}</div>;
+    return <div>{t("errors.router.invalidPath")}</div>;
   }
 
   return (

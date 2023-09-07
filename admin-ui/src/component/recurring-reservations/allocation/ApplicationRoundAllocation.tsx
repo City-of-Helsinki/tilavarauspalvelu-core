@@ -278,7 +278,7 @@ function ApplicationRoundAllocationRouted(): JSX.Element {
   const { t } = useTranslation();
 
   if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
-    return <div>{t("ApplicationRoundAllocationRouted.error")}</div>;
+    return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
   return (
     <ApplicationRoundAllocation
