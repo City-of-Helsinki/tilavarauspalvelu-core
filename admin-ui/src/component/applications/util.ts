@@ -1,6 +1,10 @@
 import { differenceInWeeks } from "date-fns";
 import { sum } from "lodash";
-import { ApplicationType } from "common/types/gql-types";
+import {
+  ApplicationRoundStatus as ApplicationRoundStatusGql,
+  ApplicationStatus as ApplicationStatusGql,
+  ApplicationType,
+} from "common/types/gql-types";
 import {
   Application,
   ApplicationRoundStatus,
@@ -48,6 +52,51 @@ export const getApplicationStatusColor = (
   }
 
   return color;
+};
+
+export const applicationRoundStatusFromGqlToRest = (
+  t?: ApplicationRoundStatusGql
+): ApplicationRoundStatus => {
+  switch (t) {
+    case ApplicationRoundStatusGql.InReview:
+      return "in_review";
+    case ApplicationRoundStatusGql.Allocated:
+    case ApplicationRoundStatusGql.ReviewDone:
+      return "review_done";
+    case ApplicationRoundStatusGql.Handled:
+    case ApplicationRoundStatusGql.Reserving:
+    case ApplicationRoundStatusGql.Sent:
+    case ApplicationRoundStatusGql.Sending:
+    case ApplicationRoundStatusGql.Archived:
+      return "handled";
+    case ApplicationRoundStatusGql.Draft:
+    default:
+      return "draft";
+  }
+};
+
+export const applicationStatusFromGqlToRest = (
+  t?: ApplicationStatusGql
+): ApplicationStatus => {
+  switch (t) {
+    case ApplicationStatusGql.Handled:
+      return "handled";
+    case ApplicationStatusGql.ReviewDone:
+      return "review_done";
+    case ApplicationStatusGql.InReview:
+    case ApplicationStatusGql.Expired:
+      return "in_review";
+    case ApplicationStatusGql.Cancelled:
+      return "cancelled";
+    case ApplicationStatusGql.Sent:
+      return "sent";
+    case ApplicationStatusGql.Allocated:
+      return "allocated";
+    case ApplicationStatusGql.Received:
+    case ApplicationStatusGql.Draft:
+    default:
+      return "draft";
+  }
 };
 
 export const getNormalizedApplicationStatus = (

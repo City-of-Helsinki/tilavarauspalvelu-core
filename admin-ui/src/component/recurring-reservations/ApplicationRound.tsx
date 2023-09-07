@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AxiosError } from "axios";
+import { type AxiosError } from "axios";
 import Review from "./review/Review";
 import Allocation from "./Allocation";
 import Handling from "./Handling";
 import PreApproval from "./PreApproval";
-import {
-  ApplicationRoundStatus,
-  ApplicationRound as ApplicationRoundType,
-} from "../../common/types";
+import { ApplicationRoundStatus } from "../../common/types";
 import {
   getApplicationRound,
   patchApplicationRoundStatus,
@@ -17,54 +15,45 @@ import {
 import Loader from "../Loader";
 import { useNotification } from "../../context/NotificationContext";
 
-type IProps = {
+type IParams = {
   applicationRoundId: string;
 };
 
-function ApplicationRound(): JSX.Element | null {
-  const [isLoading, setIsLoading] = useState(true);
+function ApplicationRound({
+  applicationRoundId,
+}: {
+  applicationRoundId: number;
+}): JSX.Element | null {
   const { notifyError } = useNotification();
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
-
-  const { applicationRoundId } = useParams<IProps>();
   const { t } = useTranslation();
 
-  const setApplicationRoundStatus = async (
-    id: number,
-    status: ApplicationRoundStatus
-  ) => {
-    try {
-      const result = await patchApplicationRoundStatus(id, status);
-      setApplicationRound(result);
-    } catch (error) {
+  // TODO converting this to graphql requires translating the State type
+  const {
+    data: applicationRound,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["applicationRound", applicationRoundId],
+    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
+    onError: (error: AxiosError) => {
+      const msg =
+        (error as AxiosError).response?.status === 404
+          ? "errors.applicationRoundNotFound"
+          : "errors.errorFetchingData";
+      notifyError(t(msg));
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: ({ status }: { status: ApplicationRoundStatus }) =>
+      patchApplicationRoundStatus(applicationRoundId, status),
+    onSuccess: () => {
+      refetch();
+    },
+    onError: () => {
       notifyError(t("errors.errorSavingData"));
-    }
-  };
-
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: Number(applicationRoundId),
-        });
-        setApplicationRound(result);
-      } catch (error) {
-        const msg =
-          (error as AxiosError).response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        notifyError(t(msg));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplicationRound();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationRoundId]);
+    },
+  });
 
   if (isLoading) {
     return <Loader />;
@@ -75,8 +64,8 @@ function ApplicationRound(): JSX.Element | null {
       return (
         <Allocation
           applicationRound={applicationRound}
-          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-            setApplicationRoundStatus(Number(applicationRoundId), status)
+          setApplicationRoundStatus={(status) =>
+            mutation.mutateAsync({ status })
           }
         />
       );
@@ -85,8 +74,8 @@ function ApplicationRound(): JSX.Element | null {
       return (
         <Handling
           applicationRound={applicationRound}
-          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-            setApplicationRoundStatus(Number(applicationRoundId), status)
+          setApplicationRoundStatus={(status) =>
+            mutation.mutateAsync({ status })
           }
         />
       );
@@ -95,8 +84,8 @@ function ApplicationRound(): JSX.Element | null {
       return (
         <PreApproval
           applicationRound={applicationRound}
-          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-            setApplicationRoundStatus(Number(applicationRoundId), status)
+          setApplicationRoundStatus={(status) =>
+            mutation.mutateAsync({ status })
           }
         />
       );
@@ -109,4 +98,14 @@ function ApplicationRound(): JSX.Element | null {
   }
 }
 
-export default ApplicationRound;
+function ApplicationRoundRouted(): JSX.Element | null {
+  const { t } = useTranslation();
+  const { applicationRoundId } = useParams<IParams>();
+
+  if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
+    return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
+  }
+  return <ApplicationRound applicationRoundId={Number(applicationRoundId)} />;
+}
+
+export default ApplicationRoundRouted;

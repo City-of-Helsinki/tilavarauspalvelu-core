@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Button } from "hds-react";
 import { Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { publicUrl } from "app/common/const";
 import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
@@ -22,7 +23,9 @@ import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 type IProps = {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
+  setApplicationRoundStatus: (
+    status: ApplicationRoundStatus
+  ) => Promise<ApplicationRoundType>;
 };
 
 const Wrapper = styled.div`
@@ -114,7 +117,7 @@ const Allocation = ({
       <BreadcrumbWrapper
         route={[
           "recurring-reservations",
-          "/recurring-reservations/application-rounds",
+          `${publicUrl}/recurring-reservations/application-rounds`,
           "application-round",
         ]}
         aliases={[{ slug: "application-round", title: applicationRound.name }]}

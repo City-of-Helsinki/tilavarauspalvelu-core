@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Card, Table } from "hds-react";
-import { isEqual, set, orderBy, trim } from "lodash";
+import { isEqual, trim, orderBy } from "lodash";
 import omit from "lodash/omit";
 import { TFunction } from "i18next";
+import { useQuery } from "@tanstack/react-query";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import Accordion from "../Accordion";
@@ -15,12 +16,7 @@ import {
   getParameters,
 } from "../../common/api";
 import Loader from "../Loader";
-import {
-  Application as ApplicationType,
-  ApplicationEvent,
-  ApplicationRound,
-  Parameter,
-} from "../../common/types";
+import { ApplicationEvent } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import {
   formatNumber,
@@ -198,60 +194,49 @@ const appEventDuration = (
   return trim(duration, ", ");
 };
 
-function ApplicationDetails(): JSX.Element | null {
-  const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRound | null>(null);
-  const [cities, setCities] = useState<Parameter[]>([]);
-
-  const { applicationId } = useParams<IRouteParams>();
-  const { t } = useTranslation();
-
-  const fetchApplication = async (id: number) => {
-    try {
-      const appResult = await getApplication(id);
-      const citiesResult = await getParameters("city");
-      const applicationRoundResult = await getApplicationRound({
-        id: appResult.applicationRoundId,
-      });
-      appResult.applicationEvents.forEach((ae) => {
-        set(
-          ae,
-          "eventReservationUnits",
-          orderBy(ae.eventReservationUnits, "priority", "asc")
-        );
-        set(
-          ae,
-          "applicationEventSchedules",
-          orderBy(ae.applicationEventSchedules, "begin", "asc")
-        );
-      });
-
-      setApplication(appResult);
-      setCities(citiesResult);
-      setApplicationRound(applicationRoundResult);
-    } catch (error) {
-      notifyError(t("errors.errorFetchingApplication"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchApplication(Number(applicationId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationId]);
-
+function ApplicationDetails({
+  applicationId,
+}: {
+  applicationId: number;
+}): JSX.Element | null {
   const ref = useRef<HTMLHeadingElement>(null);
+  const { t } = useTranslation();
+  const { notifyError } = useNotification();
 
+  const { data: application, isLoading: loadingApplication } = useQuery({
+    queryKey: ["application", applicationId],
+    queryFn: () => getApplication(applicationId),
+    enabled: applicationId !== 0,
+    onError: () => {
+      notifyError(t("errors.errorFetchingApplication"));
+    },
+  });
+
+  const { data: cities, isLoading: loadingCities } = useQuery({
+    queryKey: ["cities"],
+    queryFn: () => getParameters("city"),
+    onError: () => {
+      notifyError(t("errors.errorFetchingCities"));
+    },
+  });
+
+  const { data: applicationRound, isLoading: loadingApplicationRound } =
+    useQuery({
+      queryKey: ["applicationRound", application?.applicationRoundId ?? 0],
+      queryFn: () =>
+        getApplicationRound({
+          id: application?.applicationRoundId ?? 0,
+        }),
+      enabled: application?.applicationRoundId != null,
+      onError: () => {
+        notifyError(t("errors.errorFetchingApplicationRound"));
+      },
+    });
+
+  const isLoading =
+    loadingApplication || loadingCities || loadingApplicationRound;
   if (isLoading) {
     return <Loader />;
-  }
-
-  if (!application) {
-    return null;
   }
 
   const isOrganisation = Boolean(application?.organisation);
@@ -263,11 +248,17 @@ function ApplicationDetails(): JSX.Element | null {
       omit(application?.organisation?.address, "id")
     );
 
-  const customerName = applicantName(application);
-
-  const homeCity: Parameter | undefined = cities.find(
-    (n) => n.id === application?.homeCityId
-  );
+  const customerName = application != null ? applicantName(application) : "";
+  const homeCity = cities?.find((n) => n.id === application?.homeCityId);
+  const applicationEvents = application?.applicationEvents.map((ae) => ({
+    ...ae,
+    eventReservationUnits: orderBy(ae.eventReservationUnits, "priority", "asc"),
+    applicationEventSchedules: orderBy(
+      ae.applicationEventSchedules,
+      "begin",
+      "asc"
+    ),
+  }));
 
   return (
     <Wrapper>
@@ -352,135 +343,130 @@ function ApplicationDetails(): JSX.Element | null {
             </Card>
           </IngressContainer>
           <IngressContainer>
-            {application.applicationEvents.map(
-              (applicationEvent: ApplicationEvent) => {
-                const duration = appEventDuration(
-                  applicationEvent.minDuration,
-                  applicationEvent.maxDuration,
-                  t
-                );
+            {applicationEvents?.map((applicationEvent: ApplicationEvent) => {
+              const duration = appEventDuration(
+                applicationEvent.minDuration,
+                applicationEvent.maxDuration,
+                t
+              );
 
-                return (
-                  <ScrollIntoView
-                    key={applicationEvent.id}
-                    hash={applicationEvent.id.toString()}
+              return (
+                <ScrollIntoView
+                  key={applicationEvent.id}
+                  hash={applicationEvent.id.toString()}
+                >
+                  <StyledAccordion
+                    heading={`${application.id}-${applicationEvent.id} ${applicationEvent.name}`}
+                    defaultOpen
                   >
-                    <StyledAccordion
-                      heading={`${application.id}-${applicationEvent.id} ${applicationEvent.name}`}
-                      defaultOpen
-                    >
-                      <EventProps>
-                        <ValueBox
-                          label={t("ApplicationEvent.ageGroup")}
-                          value={parseAgeGroups(
-                            applicationEvent.ageGroupDisplay
-                          )}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.groupSize")}
-                          value={`${formatNumber(
-                            applicationEvent.numPersons,
-                            t("common.membersSuffix")
-                          )}`}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.purpose")}
-                          value={applicationEvent.purpose}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.eventDuration")}
-                          value={duration}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.eventsPerWeek")}
-                          value={`${applicationEvent.eventsPerWeek}`}
-                        />
-                        <ValueBox
-                          label={t("ApplicationEvent.dates")}
-                          value={`${formatDate(
-                            applicationEvent.begin
-                          )} - ${formatDate(applicationEvent.end)}`}
-                        />
-                      </EventProps>
-                      <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
-                      <StyledTable
-                        rows={applicationEvent.eventReservationUnits.map(
-                          (reservationUnit, index) => ({
-                            index: index + 1,
-                            id: reservationUnit.id,
-                            unit: reservationUnit.reservationUnitDetails.unit
-                              .name.fi,
-                            name: reservationUnit.reservationUnitDetails.name
-                              .fi,
-                          })
-                        )}
-                        cols={[
-                          { headerName: "a", key: "index" },
-                          { headerName: "b", key: "unit" },
-                          { headerName: "c", key: "name" },
-                        ]}
-                        indexKey="id"
+                    <EventProps>
+                      <ValueBox
+                        label={t("ApplicationEvent.ageGroup")}
+                        value={parseAgeGroups(applicationEvent.ageGroupDisplay)}
                       />
-                      <H4>{t("ApplicationEvent.requestedTimes")}</H4>
-                      <EventSchedules>
-                        <TimeSelector applicationEvent={applicationEvent} />
-                        <Card
-                          border
-                          theme={{
-                            "--background-color": "var(--color-black-5)",
-                            "--padding-horizontal": "var(--spacing-m)",
-                            "--padding-vertical": "var(--spacing-m)",
-                          }}
-                        >
-                          <SchedulesCardContainer>
-                            <div>
-                              <StyledH5>
-                                {t("ApplicationEvent.primarySchedules")}
-                              </StyledH5>
-                              {weekdays.map((day, index) => {
-                                const schedulesTxt =
-                                  parseApplicationEventSchedules(
-                                    applicationEvent.applicationEventSchedules,
-                                    index,
-                                    300
-                                  );
-
-                                return (
-                                  <EventSchedule key={day}>
-                                    <Strong>{t(`calendar.${day}`)}</Strong>
-                                    {schedulesTxt ? `: ${schedulesTxt}` : ""}
-                                  </EventSchedule>
+                      <ValueBox
+                        label={t("ApplicationEvent.groupSize")}
+                        value={`${formatNumber(
+                          applicationEvent.numPersons,
+                          t("common.membersSuffix")
+                        )}`}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.purpose")}
+                        value={applicationEvent.purpose}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.eventDuration")}
+                        value={duration}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.eventsPerWeek")}
+                        value={`${applicationEvent.eventsPerWeek}`}
+                      />
+                      <ValueBox
+                        label={t("ApplicationEvent.dates")}
+                        value={`${formatDate(
+                          applicationEvent.begin
+                        )} - ${formatDate(applicationEvent.end)}`}
+                      />
+                    </EventProps>
+                    <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
+                    <StyledTable
+                      rows={applicationEvent.eventReservationUnits.map(
+                        (reservationUnit, index) => ({
+                          index: index + 1,
+                          id: reservationUnit.id,
+                          unit: reservationUnit.reservationUnitDetails.unit.name
+                            .fi,
+                          name: reservationUnit.reservationUnitDetails.name.fi,
+                        })
+                      )}
+                      cols={[
+                        { headerName: "a", key: "index" },
+                        { headerName: "b", key: "unit" },
+                        { headerName: "c", key: "name" },
+                      ]}
+                      indexKey="id"
+                    />
+                    <H4>{t("ApplicationEvent.requestedTimes")}</H4>
+                    <EventSchedules>
+                      <TimeSelector applicationEvent={applicationEvent} />
+                      <Card
+                        border
+                        theme={{
+                          "--background-color": "var(--color-black-5)",
+                          "--padding-horizontal": "var(--spacing-m)",
+                          "--padding-vertical": "var(--spacing-m)",
+                        }}
+                      >
+                        <SchedulesCardContainer>
+                          <div>
+                            <StyledH5>
+                              {t("ApplicationEvent.primarySchedules")}
+                            </StyledH5>
+                            {weekdays.map((day, index) => {
+                              const schedulesTxt =
+                                parseApplicationEventSchedules(
+                                  applicationEvent.applicationEventSchedules,
+                                  index,
+                                  300
                                 );
-                              })}
-                            </div>
-                            <div>
-                              <StyledH5>
-                                {t("ApplicationEvent.secondarySchedules")}
-                              </StyledH5>
-                              {weekdays.map((day, index) => {
-                                const schedulesTxt =
-                                  parseApplicationEventSchedules(
-                                    applicationEvent.applicationEventSchedules,
-                                    index,
-                                    200
-                                  );
 
-                                return (
-                                  <EventSchedule key={day}>
-                                    <Strong>{t(`calendar.${day}`)}</Strong>
-                                    {schedulesTxt ? `: ${schedulesTxt}` : ""}
-                                  </EventSchedule>
+                              return (
+                                <EventSchedule key={day}>
+                                  <Strong>{t(`calendar.${day}`)}</Strong>
+                                  {schedulesTxt ? `: ${schedulesTxt}` : ""}
+                                </EventSchedule>
+                              );
+                            })}
+                          </div>
+                          <div>
+                            <StyledH5>
+                              {t("ApplicationEvent.secondarySchedules")}
+                            </StyledH5>
+                            {weekdays.map((day, index) => {
+                              const schedulesTxt =
+                                parseApplicationEventSchedules(
+                                  applicationEvent.applicationEventSchedules,
+                                  index,
+                                  200
                                 );
-                              })}
-                            </div>
-                          </SchedulesCardContainer>
-                        </Card>
-                      </EventSchedules>
-                    </StyledAccordion>
-                  </ScrollIntoView>
-                );
-              }
-            )}
+
+                              return (
+                                <EventSchedule key={day}>
+                                  <Strong>{t(`calendar.${day}`)}</Strong>
+                                  {schedulesTxt ? `: ${schedulesTxt}` : ""}
+                                </EventSchedule>
+                              );
+                            })}
+                          </div>
+                        </SchedulesCardContainer>
+                      </Card>
+                    </EventSchedules>
+                  </StyledAccordion>
+                </ScrollIntoView>
+              );
+            })}
             <H4>{t("Application.customerBasicInfo")}</H4>
             <EventProps>
               <ValueBox
@@ -585,4 +571,15 @@ function ApplicationDetails(): JSX.Element | null {
   );
 }
 
-export default ApplicationDetails;
+function ApplicationDetailsRouted(): JSX.Element {
+  const { t } = useTranslation();
+  const { applicationId } = useParams<IRouteParams>();
+
+  if (!applicationId || Number.isNaN(Number(applicationId))) {
+    return <div>{t("errors.router.invalidApplicationNumber")}</div>;
+  }
+
+  return <ApplicationDetails applicationId={Number(applicationId)} />;
+}
+
+export default ApplicationDetailsRouted;

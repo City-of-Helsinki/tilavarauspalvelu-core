@@ -1,14 +1,10 @@
+import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { groupBy, orderBy } from "lodash";
-import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
-import {
-  ApplicationRoundType,
-  Query,
-  QueryApplicationRoundsArgs,
-} from "common/types/gql-types";
+import type { ApplicationRoundType, Query } from "common/types/gql-types";
 import { applicationRoundUrl } from "../../common/urls";
 import { formatDate } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
@@ -72,35 +68,22 @@ const RoundsAccordion = ({
 };
 
 function AllApplicationRounds(): JSX.Element | null {
-  const [applicationRounds, setApplicationRounds] = useState<{
-    [key: string]: ApplicationRoundType[];
-  } | null>(null);
-
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
   // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
-  const { loading } = useQuery<Query, QueryApplicationRoundsArgs>(
-    APPLICATION_ROUNDS_QUERY,
-    {
-      onCompleted: (data) => {
-        const result = data?.applicationRounds?.edges?.map(
-          (ar) => ar?.node as ApplicationRoundType
-        );
-        if (result) {
-          // group
-          const roundsByStatus = groupBy(
-            result,
-            (round) => getApplicationRoundStatus(round).group
-          );
+  const { data, loading } = useQuery<Query>(APPLICATION_ROUNDS_QUERY, {
+    onError: (err: ApolloError) => {
+      notifyError(err.message);
+    },
+  });
 
-          setApplicationRounds(roundsByStatus);
-        }
-      },
-      onError: (err: ApolloError) => {
-        notifyError(err.message);
-      },
-    }
+  const allApplicationRounds = data?.applicationRounds?.edges
+    ?.map((ar) => ar?.node)
+    ?.filter((ar): ar is ApplicationRoundType => ar !== null);
+  const applicationRounds = groupBy(
+    allApplicationRounds,
+    (round) => getApplicationRoundStatus(round).group
   );
 
   if (loading) {

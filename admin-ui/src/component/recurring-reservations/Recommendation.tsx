@@ -1,4 +1,5 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
@@ -184,14 +185,7 @@ const DialogActionContainer = styled(ActionContainer)`
 
 function Recommendation(): JSX.Element {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [recommendation, setRecommendation] = useState<AllocationResult | null>(
-    null
-  );
-  const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [applicationRound, setApplicationRound] =
-    useState<ApplicationRoundType | null>(null);
   const [actionNotification, setActionNotification] =
     useState<NotificationStatus | null>(null);
   const [isRevertRejectionDialogVisible, setIsRevertRejectionDialogVisible] =
@@ -207,24 +201,33 @@ function Recommendation(): JSX.Element {
   const { applicationRoundId, applicationEventScheduleId } =
     useParams<IRouteParams>();
 
-  const fetchRecommendation = async (aesId: number, appRoundId: number) => {
-    try {
-      const applicationRoundResult = await getApplicationRound({
-        id: appRoundId,
-      });
+  const { data: applicationRound, isLoading: isLoadingRound } = useQuery({
+    queryKey: ["applicationRound", applicationRoundId ?? ""],
+    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
+    onError: () => notifyError(t("errors.errorFetchingApplicationRound")),
+  });
 
-      const recommendationResult = await getAllocationResult({
-        id: aesId,
-        serviceSectorId: applicationRoundResult.serviceSectorId,
-      });
-
-      setRecommendation(processAllocationResult([recommendationResult])[0]);
-      setApplicationRound(applicationRoundResult);
-    } catch (error) {
-      notifyError(t("errors.errorFetchingApplication"));
-      setIsLoading(false);
-    }
-  };
+  const [recommendation, setRecommendation] = useState<AllocationResult | null>(
+    null
+  );
+  const { refetch: refetchRecommendation } = useQuery({
+    queryKey: [
+      "recommendation",
+      applicationEventScheduleId ?? "",
+      applicationRound?.serviceSectorId ?? "",
+    ],
+    queryFn: () =>
+      getAllocationResult({
+        id: Number(applicationEventScheduleId),
+        serviceSectorId: applicationRound?.serviceSectorId ?? 0,
+      }),
+    onSuccess: (data) => {
+      setRecommendation(processAllocationResult([data])[0]);
+    },
+    enabled:
+      !!applicationEventScheduleId && !!applicationRound?.serviceSectorId,
+    onError: () => notifyError(t("errors.errorFetchingRecommendations")),
+  });
 
   const toggleAcceptance = async (id: number, accepted: boolean) => {
     try {
@@ -235,7 +238,7 @@ function Recommendation(): JSX.Element {
     } catch (error) {
       notifyError(t("errors.errorSavingRecommendation"));
     } finally {
-      fetchRecommendation(id, Number(applicationRoundId));
+      refetchRecommendation();
       setTimeout(() => setIsSaving(false), 1000);
     }
   };
@@ -251,10 +254,7 @@ function Recommendation(): JSX.Element {
     } catch (error) {
       notifyError(t("errors.errorSavingRecommendation"));
     } finally {
-      fetchRecommendation(
-        applicationEventScheduleResultId,
-        Number(applicationRoundId)
-      );
+      refetchRecommendation();
       setTimeout(() => setIsSaving(false), 1000);
     }
   };
@@ -322,33 +322,14 @@ function Recommendation(): JSX.Element {
     }
   };
 
-  useEffect(() => {
-    fetchRecommendation(
-      Number(applicationEventScheduleId),
-      Number(applicationRoundId)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationRoundId, applicationEventScheduleId]);
+  const { data: application, isLoading: isLoadingApplication } = useQuery({
+    queryKey: ["application", recommendation?.applicationId],
+    queryFn: () => getApplication(recommendation?.applicationId ?? 0),
+    enabled: !!recommendation?.applicationId,
+    onError: () => notifyError(t("errors.errorFetchingApplication")),
+  });
 
-  useEffect(() => {
-    const fetchApplication = async (aId: number) => {
-      try {
-        const applicationResult = await getApplication(aId);
-
-        setApplication(applicationResult);
-      } catch (error) {
-        notifyError(t("errors.errorFetchingApplication"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (recommendation?.applicationId) {
-      fetchApplication(recommendation.applicationId);
-    }
-  }, [notifyError, recommendation, t]);
-
-  if (isLoading) {
+  if (isLoadingRound || isLoadingApplication) {
     return <Loader />;
   }
 

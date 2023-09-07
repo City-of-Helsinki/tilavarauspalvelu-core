@@ -203,9 +203,11 @@ const options = (): NextAuthOptions => {
   };
 };
 
+export const authOptions = options();
+
 export default function nextAuthApiHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): ReturnType<typeof NextAuth> {
-  return NextAuth(req, res, options());
+  return NextAuth(req, res, authOptions);
 }

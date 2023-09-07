@@ -1,5 +1,5 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
-import axiosClient from "app/modules/auth/axiosClient";
+import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import applyCaseMiddleware from "axios-case-converter";
 import omit from "lodash/omit";
 import {
   Application,
@@ -7,7 +7,6 @@ import {
   ReservationUnit,
   Parameter,
   AllocationResult,
-  ApplicationEventStatus,
   ApplicationEventsDeclinedReservationUnits,
   Reservation,
   RecurringReservation,
@@ -19,6 +18,14 @@ import {
 } from "./types";
 import { publicUrl } from "./const";
 
+const axiosOptions = {
+  headers: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "Content-Type": "application/json",
+  },
+};
+const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
+
 const apiBaseUrl = `${publicUrl}/api`;
 
 const applicationRoundsBasePath = "application_round";
@@ -26,7 +33,6 @@ const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
 const allocationResultBasePath = "allocation_results";
-const applicationEventStatusBasePath = "application_event_status";
 const declinedApplicationEventReservationUnitsBasePath =
   "application_event_declined_reservation_unit";
 const applicationEventWeeklyAmountReductionBasePath =
@@ -78,7 +84,7 @@ async function apiGet<T>({
   };
 
   return request<T>({
-    url: `${apiBaseUrl}/${path}/`,
+    url: `${apiBaseUrl}/${path}`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -136,26 +142,11 @@ async function apiPatch<T>({ path, data }: RequestParameters): Promise<T> {
   });
 }
 
-export function getApplicationRounds(): Promise<ApplicationRound[]> {
-  return apiGet<ApplicationRound[]>({
-    path: `v1/${applicationRoundsBasePath}`,
-  });
-}
-
 export function getApplicationRound(
   params: IDParameter
 ): Promise<ApplicationRound> {
   return apiGet<ApplicationRound>({
     path: `v1/${applicationRoundsBasePath}/${params.id}`,
-  });
-}
-
-export function saveApplicationRound(
-  applicationRound: ApplicationRound
-): Promise<ApplicationRound> {
-  return apiPut<ApplicationRound>({
-    data: applicationRound,
-    path: `v1/${applicationRoundsBasePath}/${applicationRound.id}/`,
   });
 }
 
@@ -165,7 +156,7 @@ export function patchApplicationRoundStatus(
 ): Promise<ApplicationRound> {
   return apiPatch<ApplicationRound>({
     data: { status },
-    path: `v1/${applicationRoundsBasePath}/${id}/`,
+    path: `v1/${applicationRoundsBasePath}/${id}`,
   });
 }
 
@@ -219,22 +210,13 @@ export interface ApplicationParameters {
   status?: string;
 }
 
-export function getApplications(
-  params: ApplicationParameters
-): Promise<Application[]> {
-  return apiGet<Application[]>({
-    parameters: params,
-    path: `v1/${applicationBasePath}`,
-  });
-}
-
 export function setApplicationStatus(
   applicationId: number,
   status: ApplicationStatus
 ): Promise<Application> {
   return apiPost<Application>({
     data: { applicationId, status },
-    path: `v1/${applicationStatusBasePath}/`,
+    path: `v1/${applicationStatusBasePath}`,
   });
 }
 
@@ -271,44 +253,13 @@ export function getAllocationResult(
 
 export function deleteAllocationResult(id: number): Promise<void> {
   return apiDelete({
-    path: `v1/${allocationResultBasePath}/${id}/`,
+    path: `v1/${allocationResultBasePath}/${id}`,
   });
 }
 
 export interface ApplicationStatusPayload {
   status: ApplicationStatus;
   applicationId: number;
-}
-
-export function setApplicationStatuses(
-  payload: ApplicationStatusPayload[]
-): Promise<ApplicationStatusPayload[]> {
-  return apiPost({
-    data: payload,
-    path: `v1/${applicationStatusBasePath}/`,
-  });
-}
-
-interface ApplicationEventPayload {
-  status: ApplicationEventStatus;
-  applicationEventId: number;
-}
-
-export function setApplicationEventStatuses(
-  payload: ApplicationEventPayload[]
-): Promise<ApplicationEventPayload[]> {
-  return apiPost({
-    data: payload,
-    path: `v1/${applicationEventStatusBasePath}/`,
-  });
-}
-
-export function getDeclinedApplicationEventReservationUnits(
-  applicationEventId: number
-): Promise<ApplicationEventsDeclinedReservationUnits> {
-  return apiGet({
-    path: `v1/${declinedApplicationEventReservationUnitsBasePath}/${applicationEventId}`,
-  });
 }
 
 export function setDeclinedApplicationEventReservationUnits(
