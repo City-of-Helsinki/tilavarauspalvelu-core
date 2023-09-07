@@ -88,7 +88,7 @@ class Merchant:
 
 
 @dataclass(init=True, frozen=True)
-class CreateMerchantParams:
+class UpdateMerchantParams:
     name: str
     street: str
     zip: str
@@ -116,28 +116,5 @@ class CreateMerchantParams:
 
 
 @dataclass(init=True, frozen=True)
-class UpdateMerchantParams:
-    name: str
-    street: str
-    zip: str
-    city: str
-    email: str
-    phone: str
-    url: str
-    tos_url: str
-    business_id: str
-    shop_id: str
-
-    def to_json(self) -> Dict[str, Any]:
-        return {
-            "merchantName": self.name,
-            "merchantStreet": self.street,
-            "merchantZip": self.zip,
-            "merchantCity": self.city,
-            "merchantEmail": self.email,
-            "merchantPhone": self.phone,
-            "merchantUrl": self.url,
-            "merchantTermsOfServiceUrl": self.tos_url,
-            "merchantBusinessId": self.business_id,
-            "merchantShopId": self.shop_id,
-        }
+class CreateMerchantParams(UpdateMerchantParams):
+    pass
