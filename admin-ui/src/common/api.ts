@@ -142,14 +142,6 @@ async function apiPatch<T>({ path, data }: RequestParameters): Promise<T> {
   });
 }
 
-/*
-export function getApplicationRounds(): Promise<ApplicationRound[]> {
-  return apiGet<ApplicationRound[]>({
-    path: `v1/${applicationRoundsBasePath}`,
-  });
-}
-*/
-
 export function getApplicationRound(
   params: IDParameter
 ): Promise<ApplicationRound> {
@@ -157,17 +149,6 @@ export function getApplicationRound(
     path: `v1/${applicationRoundsBasePath}/${params.id}`,
   });
 }
-
-/*
-export function saveApplicationRound(
-  applicationRound: ApplicationRound
-): Promise<ApplicationRound> {
-  return apiPut<ApplicationRound>({
-    data: applicationRound,
-    path: `v1/${applicationRoundsBasePath}/${applicationRound.id}`,
-  });
-}
-*/
 
 export function patchApplicationRoundStatus(
   id: number,
@@ -229,20 +210,6 @@ export interface ApplicationParameters {
   status?: string;
 }
 
-/* TODO BROKEN on the backend, grep it => refactor it out => tell the backend to remove it
-export function getApplications(
-  params: ApplicationParameters
-): Promise<Application[]> {
-  console.log("getApplications", params);
-  const res = apiGet<Application[]>({
-    parameters: params,
-    path: `v1/${applicationBasePath}`,
-  });
-  console.log("getApplications res", res);
-  return res;
-}
-*/
-
 export function setApplicationStatus(
   applicationId: number,
   status: ApplicationStatus
@@ -294,43 +261,6 @@ export interface ApplicationStatusPayload {
   status: ApplicationStatus;
   applicationId: number;
 }
-
-/*
-export function setApplicationStatuses(
-  payload: ApplicationStatusPayload[]
-): Promise<ApplicationStatusPayload[]> {
-  return apiPost({
-    data: payload,
-    path: `v1/${applicationStatusBasePath}`,
-  });
-}
-*/
-
-/*
-interface ApplicationEventPayload {
-  status: ApplicationEventStatus;
-  applicationEventId: number;
-}
-
-export function setApplicationEventStatuses(
-  payload: ApplicationEventPayload[]
-): Promise<ApplicationEventPayload[]> {
-  return apiPost({
-    data: payload,
-    path: `v1/${applicationEventStatusBasePath}/`,
-  });
-}
-*/
-
-/*
-export function getDeclinedApplicationEventReservationUnits(
-  applicationEventId: number
-): Promise<ApplicationEventsDeclinedReservationUnits> {
-  return apiGet({
-    path: `v1/${declinedApplicationEventReservationUnitsBasePath}/${applicationEventId}`,
-  });
-}
-*/
 
 export function setDeclinedApplicationEventReservationUnits(
   applicationEventId: number,
