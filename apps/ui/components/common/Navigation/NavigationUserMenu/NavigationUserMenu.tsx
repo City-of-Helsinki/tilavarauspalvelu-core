@@ -124,7 +124,7 @@ const NavigationUserMenu = () => {
       closeOnItemClick
       $active={isActive}
     >
-      <NavigationUserMenuUserCard user={user} />
+      <NavigationUserMenuUserCard user={user ?? {}} />
       {userMenuItems.map((item) => (
         <NavigationUserMenuItem
           href="#"
