@@ -8,7 +8,7 @@ import {
   parse,
 } from "date-fns";
 import { fi } from "date-fns/locale";
-import { isNumber } from "lodash";
+import { capitalize, isNumber } from "lodash";
 import { i18n } from "next-i18next";
 import { HMS, Parameter } from "../../types/common";
 
@@ -132,4 +132,18 @@ export const sortAgeGroups = (ageGroups: Parameter[]): Parameter[] => {
       ? order.indexOf(strA) - order.indexOf(strB)
       : (a.minimum || 0) - (b.minimum || 0);
   });
+};
+
+export const getTranslation = (
+  parent: Record<string, unknown>,
+  key: string
+): string => {
+  const keyString = `${key}${capitalize(i18n?.language)}`;
+  if (parent && parent[keyString]) {
+    if (typeof parent[keyString] === "string") {
+      return String(parent[keyString]);
+    }
+  }
+
+  return "";
 };
