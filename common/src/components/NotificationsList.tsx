@@ -29,13 +29,8 @@ const NotificationBackground = styled.div`
   position: relative;
   display: flex;
   > div {
-    width: 100vw;
+    width: 100%;
   }
-`;
-
-const NotificationContainer = styled(NotificationWrapper)`
-  font-size: var(--fontsize-body-m);
-  width: calc(100vw - 48px);
 `;
 
 const NotificationText = styled.span`
@@ -90,9 +85,9 @@ const NotificationsListItem = ({
     <NotificationBackground
       style={{ borderBottom: `1px solid var(--color-${notificationType}-dark` }}
     >
-      <NotificationContainer type={notificationType}>
+      <NotificationWrapper type={notificationType}>
         {notification.activeFrom && (
-          <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}`}</NotificationDate>
+          <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</NotificationDate>
         )}
         <NotificationText>
           {notification && getTranslation(notification, "message")}
@@ -100,7 +95,7 @@ const NotificationsListItem = ({
         <CloseButton onClick={() => handleCloseButtonClick(notification.id)}>
           <IconCross size="s" />
         </CloseButton>
-      </NotificationContainer>
+      </NotificationWrapper>
     </NotificationBackground>
   );
 };
