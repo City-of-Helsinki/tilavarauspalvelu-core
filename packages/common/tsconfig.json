@@ -1,26 +1,16 @@
 {
+  "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "incremental": true,
-    "jsx": "preserve",
-    "outDir": "./dist",
-    "paths": {
-      "*": ["./src/*"]
-    }
+    "plugins": [{ "name": "next" }]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules/"],
+  "include": [
+    "src",
+    "index.ts",
+    "types/**/*.d.ts",
+    ".eslintrc.js",
+    "stylelint.config.js",
+    "jest.setup.cjs",
+    "jest.config.cjs"
+  ]
 }

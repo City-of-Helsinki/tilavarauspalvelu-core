@@ -1,9 +1,10 @@
-import { join } from "path";
+import { join } from "node:path";
+import * as url from "node:url";
 import analyser from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
-import * as url from "url";
-await import ("./src/env.mjs");
 import { env } from "./src/env.mjs";
+
+await import ("./src/env.mjs");
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 

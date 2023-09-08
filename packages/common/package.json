@@ -9,9 +9,9 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
-    "lint": "echo 'FIXME eslint is broken on a monorepo setup'",
-    "lint:fix": "echo 'FIXME eslint is broken on a monorepo setup'",
-    "lint:css": "echo 'TODO no stylelint for common'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:css": "stylelint './src/**/*.tsx'",
     "test": "echo 'FIXME common tests are broken'",
     "generate-gql-types": "graphql-codegen",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
@@ -35,6 +35,7 @@
     "react-i18next": "^13.1.2",
     "react-use": "^17.4.0",
     "styled-components": "5.3.11"
+    "tsconfig": "workspace:*"
   },
   "peerDependencies": {
     "axios": "^1.3.4",
@@ -57,12 +58,14 @@
     "@types/react-big-calendar": "^0.38.3",
     "@types/react-dom": "^18.0.10",
     "@types/styled-components": "^5.1.26",
-    "@typescript-eslint/eslint-plugin": "^5.47.1",
-    "@typescript-eslint/parser": "^5.47.1",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "@vercel/style-guide": "^5.0.1",
     "axios": "^1.3.4",
     "chalk": "^5.2.0",
-    "eslint": "^8.30.0",
+    "eslint": "^8.44.0",
     "eslint-config-airbnb-typescript-prettier": "^5.0.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "jest": "^29.6.2",
     "jest-environment-jsdom": "^29.6.2",

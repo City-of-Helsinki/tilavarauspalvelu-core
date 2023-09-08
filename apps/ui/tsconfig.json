@@ -1,21 +1,7 @@
 {
+  "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "incremental": true,
-    "jsx": "preserve",
+    "plugins": [{ "name": "next" }],
     "types": ["cypress", "cypress-axe"],
     "paths": {
       "~/*": ["./*"]
@@ -32,6 +18,13 @@
     "jest.setup.js",
     "jest.config.ts",
     "stylelint.config.cjs",
+    "sentry.server.config.js",
+    "sentry.edge.config.js",
+    "sentry.client.config.js",
+    "jest.config.js",
+    "jest.setup.js",
+    "cypress/",
+    "server.js",
     ".eslintrc.js"
   ],
   "exclude": [

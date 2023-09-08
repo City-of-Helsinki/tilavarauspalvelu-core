@@ -18,11 +18,11 @@ declare module "next-auth/jwt" {
 }
 
 declare module "next-auth" {
-  type APITokens = {
+  interface APITokens {
     tilavaraus: string;
     profile: string;
   };
-  type TunnistamoAccount = {
+  interface TunnistamoAccount {
     provider: string;
     type: "oauth";
     providerAccountId: string;

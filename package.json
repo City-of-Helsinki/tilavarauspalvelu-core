@@ -23,5 +23,6 @@
     "npkill": "^0.10.0",
     "npm-check-updates": "^16.13.1",
     "turbo": "^1.10.13"
-  }
+  },
+  "packageManager": "pnpm@8.6.10"
 }

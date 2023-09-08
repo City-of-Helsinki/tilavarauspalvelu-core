@@ -54,7 +54,8 @@
     "react-use": "^17.4.0",
     "sanitize-html": "^2.11.0",
     "sass": "^1.65.1",
-    "styled-components": "5.3.11"
+    "styled-components": "5.3.11",
+    "tsconfig": "workspace:*"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",

@@ -1,8 +1,8 @@
 module.exports = {
   extends: ["airbnb-typescript-prettier", "plugin:jsx-a11y/recommended"],
   parser: "@typescript-eslint/parser",
+  plugins: ["jsx-a11y", "@typescript-eslint"],
   parserOptions: {
-    project: "./tsconfig.eslint.json",
     tsconfigRootDir: __dirname,
     sourceType: "module",
   },
@@ -12,6 +12,15 @@ module.exports = {
     jest: true,
     node: true,
   },
+  ignorePatterns: ["node_modules", "dist", "email", "types/gql-types.ts"],
+  overrides: [
+    {
+      files: [".eslintrc.js", ".eslintrc.cjs"],
+      rules: {
+        "@typescript-eslint/naming-convention": ["off"],
+      },
+    },
+  ],
   rules: {
     "global-require": 0,
     "import/no-extraneous-dependencies": [
@@ -77,5 +86,4 @@ module.exports = {
       },
     ],
   },
-  plugins: ["jsx-a11y", "@typescript-eslint"],
 };
