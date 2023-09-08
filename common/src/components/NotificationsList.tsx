@@ -17,6 +17,7 @@ type NotificationListProps = {
 type NotificationItemProps = {
   notification: BannerNotificationType;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
+  closedArray: string[];
 };
 
 const PositionWrapper = styled.div`
@@ -68,6 +69,7 @@ const CloseButton = styled.button`
 const NotificationsListItem = ({
   notification,
   closeFn,
+  closedArray,
 }: NotificationItemProps) => {
   const displayDate = new Date(notification.activeFrom || "");
   let notificationType: NotificationType = "info" as const;
@@ -81,11 +83,8 @@ const NotificationsListItem = ({
     default:
       notificationType = "info";
   }
-  const handleCloseButtonClick = () => {
-    closeFn((prev) => {
-      if (!prev?.length) return [notification.id];
-      return [...prev, notification.id];
-    });
+  const handleCloseButtonClick = (closedId: string) => {
+    closeFn([...closedArray, closedId]);
   };
   return (
     <NotificationBackground
@@ -98,7 +97,7 @@ const NotificationsListItem = ({
         <NotificationText>
           {notification && getTranslation(notification, "message")}
         </NotificationText>
-        <CloseButton onClick={() => handleCloseButtonClick()}>
+        <CloseButton onClick={() => handleCloseButtonClick(notification.id)}>
           <IconCross size="s" />
         </CloseButton>
       </NotificationContainer>
@@ -108,14 +107,13 @@ const NotificationsListItem = ({
 
 const NotificationsList = ({ target }: NotificationListProps) => {
   const { data: notificationData } = useQuery<Query>(BANNER_NOTIFICATIONS_LIST);
-
   const notificationsList = notificationData?.bannerNotifications?.edges.map(
     (edge) => edge?.node
   );
 
   const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
     string[]
-  >("seenNotificationsList", []);
+  >("tilavarausClosedNotificationsList", []);
   const maximumNotificationAmount = 2;
 
   // Separate notifications by level
@@ -150,6 +148,7 @@ const NotificationsList = ({ target }: NotificationListProps) => {
           <NotificationsListItem
             key={notification?.id}
             notification={notification as BannerNotificationType}
+            closedArray={closedNotificationsList ?? []}
             closeFn={setClosedNotificationsList}
           />
         ))}
