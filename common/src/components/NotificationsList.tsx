@@ -70,16 +70,16 @@ const NotificationsListItem = ({
   closeFn,
 }: NotificationItemProps) => {
   const displayDate = new Date(notification.activeFrom || "");
-  let notificationType;
+  let notificationType: NotificationType = "info" as const;
   switch (notification.level) {
     case "EXCEPTION":
-      notificationType = "alert" as NotificationType;
+      notificationType = "alert";
       break;
     case "WARNING":
-      notificationType = "error" as NotificationType;
+      notificationType = "error";
       break;
     default:
-      notificationType = "info" as NotificationType;
+      notificationType = "info";
   }
   const handleCloseButtonClick = () => {
     closeFn((prev) => {
@@ -96,7 +96,7 @@ const NotificationsListItem = ({
           <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}`}</NotificationDate>
         )}
         <NotificationText>
-          {getTranslation(notification, "message")}
+          {notification && getTranslation(notification, "message")}
         </NotificationText>
         <CloseButton onClick={() => handleCloseButtonClick()}>
           <IconCross size="s" />
@@ -136,16 +136,9 @@ const NotificationsList = ({ target }: NotificationListProps) => {
   ];
   // Filter out notifications that have been closed by the user, or aren't targeted to the user
   const displayedNotificationsList = groupedNotificationsList?.filter(
-    (item) => {
-      if (
-        !closedNotificationsList ||
-        closedNotificationsList.includes(String(item?.id)) ||
-        (item?.target !== target && item?.target !== "ALL")
-      ) {
-        return false;
-      }
-      return true;
-    }
+    (item) =>
+      !(closedNotificationsList as string[]).includes(String(item?.id)) &&
+      !(item?.target !== target && item?.target !== "ALL")
   );
 
   // TODO: Add sorting by date within level arrays
