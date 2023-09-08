@@ -514,6 +514,9 @@ importers:
 
   packages/common:
     dependencies:
+      '@apollo/client':
+        specifier: ^3.8.1
+        version: 3.8.1(graphql@16.8.0)(react-dom@18.2.0)(react@18.2.0)
       classnames:
         specifier: ^2.3.2
         version: 2.3.2
@@ -556,6 +559,9 @@ importers:
       react-i18next:
         specifier: ^13.1.2
         version: 13.1.2(i18next@23.4.4)(react-dom@18.2.0)(react-native@0.72.4)(react@18.2.0)
+      react-use:
+        specifier: ^17.4.0
+        version: 17.4.0(react-dom@18.2.0)(react@18.2.0)
       styled-components:
         specifier: 5.3.11
         version: 5.3.11(@babel/core@7.22.15)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
@@ -563,9 +569,6 @@ importers:
         specifier: workspace:*
         version: link:../tsconfig
     devDependencies:
-      '@apollo/client':
-        specifier: ^3.7.3
-        version: 3.8.1(graphql@16.8.0)(react-dom@18.2.0)(react@18.2.0)
       '@graphql-codegen/cli':
         specifier: ^5.0.0
         version: 5.0.0(@types/node@18.11.18)(graphql@16.8.0)(typescript@5.2.2)

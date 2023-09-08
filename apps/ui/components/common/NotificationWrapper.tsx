@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Notification, NotificationProps } from "hds-react";
-import { breakpoints } from "../common/style";
+import { breakpoints } from "common/src/common/style";
 
 const Wrapper = styled.div`
   @media (min-width: ${breakpoints.xl}) {
