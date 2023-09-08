@@ -12,6 +12,8 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   required?: boolean;
   disabled?: boolean;
   testId?: string;
+  label?: string;
+  id?: string;
 }
 
 const ControlledTimeInput = <T extends FieldValues>({
@@ -21,14 +23,16 @@ const ControlledTimeInput = <T extends FieldValues>({
   required,
   disabled,
   testId,
+  label,
+  id,
 }: ControllerProps<T>) => {
   const { t } = useTranslation();
   const { field } = useController({ control, name, rules: { required } });
 
   return (
     <TimeInput
-      id={`ReservationDialog.${field.name}`}
-      label={t(`ReservationDialog.${field.name}`)}
+      id={id ?? `ReservationDialog.${field.name}`}
+      label={label ?? t(`ReservationDialog.${field.name}`)}
       hoursLabel={t("common.hoursLabel")}
       minutesLabel={t("common.minutesLabel")}
       required={required}

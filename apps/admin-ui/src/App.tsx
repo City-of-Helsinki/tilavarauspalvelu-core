@@ -13,6 +13,7 @@ import AuthorizationChecker from "./common/AuthorizationChecker";
 
 import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
+import NotificationsRouter from "./component/notifications/router";
 
 const UNIT_PATH = "./component/Unit";
 const Units = dynamic(() => import(`${UNIT_PATH}/Units`));
@@ -225,6 +226,10 @@ const App = () => {
           <Route
             path="/my-units/*"
             element={withAuthorization(<MyUnitsRouter />)}
+          />
+          <Route
+            path="/messaging/notifications/*"
+            element={withAuthorization(<NotificationsRouter />)}
           />
         </Routes>
       </PageWrapper>

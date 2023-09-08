@@ -277,6 +277,18 @@ const getFilteredMenu = (
       },
     ].filter((item) => hasPermission(item.permission)),
   },
+  {
+    title: "breadcrumb.messaging",
+    route: "/messaging",
+    items: [
+      {
+        // FIXME permission
+        permission: Permission.CAN_MANAGE_UNITS,
+        title: "breadcrumb.notifications",
+        route: "/messaging/notifications",
+      },
+    ].filter((item) => hasPermission(item.permission)),
+  },
 ];
 
 const Items = ({

@@ -5,7 +5,9 @@ export const BANNER_NOTIFICATIONS_LIST = gql`
     bannerNotifications(isVisible: true) {
       edges {
         node {
-          id
+          pk
+          name
+          state
           level
           message
           activeFrom
