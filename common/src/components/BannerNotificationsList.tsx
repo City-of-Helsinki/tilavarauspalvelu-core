@@ -10,12 +10,12 @@ import { fontBold } from "../common/typography";
 import { BannerNotificationType, Query } from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
-type NotificationListProps = {
+type BannerNotificationListProps = {
   target: "USER" | "STAFF";
   centered?: boolean;
 };
 
-type NotificationItemProps = {
+type BannerNotificationItemProps = {
   notification: BannerNotificationType;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   closedArray: string[];
@@ -27,7 +27,7 @@ const PositionWrapper = styled.div`
   display: grid;
 `;
 
-const NotificationBackground = styled.div`
+const BannerNotificationBackground = styled.div`
   position: relative;
   display: flex;
   section {
@@ -38,20 +38,20 @@ const NotificationBackground = styled.div`
   }
 `;
 
-const NotificationText = styled.span`
+const BannerNotificationText = styled.span`
   font-size: var(--fontsize-body-m);
   @media (width < ${breakpoints.xl}) {
     padding-right: var(--spacing-l);
   }
 `;
 
-const NotificationDate = styled.span`
+const BannerNotificationDate = styled.span`
   margin-right: 0.25rem;
   font-size: var(--fontsize-body-m);
   ${fontBold}
 `;
 
-const CloseButton = styled.button`
+const BannerCloseButton = styled.button`
   position: absolute;
   top: var(--spacing-m);
   right: var(--spacing-m);
@@ -71,7 +71,7 @@ const NotificationsListItem = ({
   closeFn,
   closedArray,
   centered,
-}: NotificationItemProps) => {
+}: BannerNotificationItemProps) => {
   const displayDate = new Date(notification.activeFrom || "");
   let notificationType: NotificationType = "info" as const;
   switch (notification.level) {
@@ -88,23 +88,28 @@ const NotificationsListItem = ({
     closeFn([...closedArray, closedId]);
   };
   return (
-    <NotificationBackground>
+    <BannerNotificationBackground>
       <NotificationWrapper type={notificationType} centered={centered}>
         {notification.activeFrom && (
-          <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</NotificationDate>
+          <BannerNotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</BannerNotificationDate>
         )}
-        <NotificationText>
+        <BannerNotificationText>
           {notification && getTranslation(notification, "message")}
-        </NotificationText>
-        <CloseButton onClick={() => handleCloseButtonClick(notification.id)}>
+        </BannerNotificationText>
+        <BannerCloseButton
+          onClick={() => handleCloseButtonClick(notification.id)}
+        >
           <IconCross size="s" />
-        </CloseButton>
+        </BannerCloseButton>
       </NotificationWrapper>
-    </NotificationBackground>
+    </BannerNotificationBackground>
   );
 };
 
-const NotificationsList = ({ target, centered }: NotificationListProps) => {
+const BannerNotificationsList = ({
+  target,
+  centered,
+}: BannerNotificationListProps) => {
   const { data: notificationData } = useQuery<Query>(BANNER_NOTIFICATIONS_LIST);
   const notificationsList = notificationData?.bannerNotifications?.edges.map(
     (edge) => edge?.node
@@ -138,7 +143,6 @@ const NotificationsList = ({ target, centered }: NotificationListProps) => {
       !(item?.target !== target && item?.target !== "ALL")
   );
 
-  // TODO: Add sorting by date within level arrays
   return (
     <PositionWrapper>
       {displayedNotificationsList
@@ -156,4 +160,4 @@ const NotificationsList = ({ target, centered }: NotificationListProps) => {
   );
 };
 
-export default NotificationsList;
+export default BannerNotificationsList;

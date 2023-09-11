@@ -1,5 +1,5 @@
 import IconButton from "./IconButton";
 import ShowAllContainer from "./ShowAllContainer";
-import NotificationsList from "./NotificationsList";
+import BannerNotificationsList from "./BannerNotificationsList";
 
-export { IconButton, ShowAllContainer, NotificationsList };
+export { IconButton, ShowAllContainer, BannerNotificationsList };

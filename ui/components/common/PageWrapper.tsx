@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { NotificationsList } from "common/src/components";
+import { BannerNotificationsList } from "common/src/components";
 import Footer from "./Footer";
 import { Navigation } from "./Navigation/Navigation";
 import Title from "./Title";
@@ -22,7 +22,7 @@ const PageWrapper = (props: Props): JSX.Element => {
     <>
       <Title>Tilavarauspalvelu</Title>
       <Navigation />
-      <NotificationsList target="USER" centered />
+      <BannerNotificationsList target="USER" centered />
       <UnpaidReservationNotification />
       <Main
         $bgColor={props.overrideBackgroundColor}

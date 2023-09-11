@@ -15,7 +15,9 @@ const Wrapper = styled.div<{ $centerContent?: boolean }>`
   }
 `;
 
-const NotificationWrapper = (props: NotificationPropsWithCentering): JSX.Element | null => {
+const NotificationWrapper = (
+  props: NotificationPropsWithCentering
+): JSX.Element | null => {
   const [isVisible, setIsVisible] = React.useState(true);
 
   return isVisible ? (
