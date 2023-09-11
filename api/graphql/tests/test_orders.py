@@ -74,6 +74,8 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
+        assert "reservationPk" in content["data"]["order"]
+        del content["data"]["order"]["reservationPk"]  # Ignore ID to allow db reuse
         self.assertMatchSnapshot(content)
 
     def test_returns_order_when_user_can_handle_reservations(self):
@@ -83,6 +85,8 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
+        assert "reservationPk" in content["data"]["order"]
+        del content["data"]["order"]["reservationPk"]  # Ignore ID to allow db reuse
         self.assertMatchSnapshot(content)
 
     def test_returns_refund_id_when_it_exists(self):
@@ -94,6 +98,8 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         response = self.query(self.get_order_query())
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
+        assert "reservationPk" in content["data"]["order"]
+        del content["data"]["order"]["reservationPk"]  # Ignore ID to allow db reuse
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 

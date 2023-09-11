@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['ReservationUnitCancellationRulesQueryTestCase::test_getting_reservation_unit_cancellation_rules_for_logged_in_user 1'] = {
@@ -16,7 +15,6 @@ snapshots['ReservationUnitCancellationRulesQueryTestCase::test_getting_reservati
                         'nameEn': 'en',
                         'nameFi': 'fi',
                         'nameSv': 'sv',
-                        'pk': 1
                     }
                 }
             ]

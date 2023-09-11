@@ -34,6 +34,8 @@ class ReservationUnitCancellationRulesQueryTestCase(GrapheneTestCaseBase, snapsh
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
+        assert "pk" in content["data"]["reservationUnitCancellationRules"]["edges"][0]["node"]
+        del content["data"]["reservationUnitCancellationRules"]["edges"][0]["node"]["pk"]  # Ignore ID to allow db reuse
         self.assertMatchSnapshot(content)
 
     def test_getting_reservation_unit_cancellation_rules_for_not_logged_in_user(self):
