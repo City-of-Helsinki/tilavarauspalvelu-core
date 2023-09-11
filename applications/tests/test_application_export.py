@@ -177,66 +177,6 @@ class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
         file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
 
-    def test_no_time_range(self):
-        self.application_event.max_duration = timedelta(hours=1)
-        self.application_event.save()
-
-        call_command("export_applications", self.application_round_id)
-
-        event: ApplicationEvent = self.application_event
-        application: Application = event.application
-
-        expected_row = [
-            str(application.id),
-            ApplicationStatus.get_verbose_status(self.application_status.status),
-            application.organisation.name,
-            application.organisation.identifier,
-            application.contact_person.first_name,
-            application.contact_person.last_name,
-            application.contact_person.email,
-            application.contact_person.phone_number,
-            str(event.id),
-            event.name,
-            (
-                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
-                f" - {event.end.day}.{event.end.month}.{event.end.year}"
-            ),
-            application.home_city.name,
-            event.purpose.name,
-            str(event.age_group),
-            str(event.num_persons),
-            application.applicant_type,
-            str(event.events_per_week),
-            "1 h",
-            self.space_2_name,
-            self.space_3_name,
-            self.space_1_name,
-            "",
-            "12:00 - 14:00",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-        ]
-
-        file_name = self._get_filename_for_round(self.application_round_id)
-        self._test_first_data_line(file_name, expected_row)
-
     def test_only_one_distinct_duration(self):
         self.application_event.max_duration = timedelta(hours=1)
         self.application_event.save()
@@ -1364,7 +1304,7 @@ class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
         assert_that(not_existing_file_high.is_file()).is_false()
 
     def test_empty_arguments_throw_error(self):
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             call_command("export_applications")
 
     def test_spaces_columns_are_added_dynamically(self):

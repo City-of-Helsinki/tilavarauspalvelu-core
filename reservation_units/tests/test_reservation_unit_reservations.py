@@ -78,15 +78,6 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
         )
         self.assertTrue(self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end))
 
-    def test_part_of_the_room_reserved_whole_room_partly_same_time_overlaps(self):
-        ReservationFactory(
-            reservation_unit=[self.res_unit_first_half_room],
-            begin=self.begin + timedelta(minutes=30),
-            end=self.end,
-            state=STATE_CHOICES.CREATED,
-        )
-        self.assertTrue(self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end))
-
     def test_part_of_the_part_room_overlaps_with_same_time_whole_room(self):
         ReservationFactory(
             reservation_unit=[self.res_unit_corner_of_second_half],
