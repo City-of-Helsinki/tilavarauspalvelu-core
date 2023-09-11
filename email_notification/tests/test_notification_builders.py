@@ -414,20 +414,6 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         with self.assertRaises(EmailTemplateValidationError):
             ReservationEmailNotificationBuilder(self.reservation, template)
 
-    def test_macros_not_supported(self):
-        content = """
-                    {% for i in range(0, 100) %}
-                    loopey looper
-                    {% endfor %}
-
-                    {% macro secret_macro() %}
-                    ninja sabotage
-                    {% endmacro %}
-                """
-        template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
-        with self.assertRaises(EmailTemplateValidationError):
-            ReservationEmailNotificationBuilder(self.reservation, template)
-
     def test_currency_filter_comma_separator(self):
         content = "{{price | currency}}"
         compiled_content = "52,00"

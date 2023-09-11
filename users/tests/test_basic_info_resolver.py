@@ -178,10 +178,6 @@ class ProfileUserInfoReaderTestCase(TestCase):
         ):
             cls.reader = ProfileUserInfoReader(cls.user, cls.request)
 
-    @classmethod
-    def __get_profile_gql_with_errors(cls):
-        return {"errors": [{"message": "Bad bad error"}]}
-
     def test_get_first_name(self):
         assert_that(self.reader.get_first_name()).is_equal_to("John")
 
