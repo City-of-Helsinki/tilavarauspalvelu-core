@@ -8,8 +8,7 @@ type NotificationPropsWithCentering = NotificationProps & {
 };
 
 const Wrapper = styled.div<{ $centerContent?: boolean }>`
-  [class*="Notification-module_notification"]
-    [class*="Notification-module_content"] {
+  > section > div {
     max-width: calc(${breakpoints.xl} - (2 * var(--spacing-m)));
     margin: 0 ${(props) => (props.$centerContent ? "auto" : "0")} !important;
   }

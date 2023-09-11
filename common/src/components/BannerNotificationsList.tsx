@@ -10,8 +10,10 @@ import { fontBold } from "../common/typography";
 import { BannerNotificationType, Query } from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
+type BannerNotificationTarget = "USER" | "STAFF" | "ALL";
 type BannerNotificationListProps = {
-  target: "USER" | "STAFF";
+  displayAmount?: number;
+  targetList: BannerNotificationTarget[];
   centered?: boolean;
 };
 
@@ -106,8 +108,15 @@ const NotificationsListItem = ({
   );
 };
 
+/// @brief List of banner notifications
+/// @param displayAmount {number} - the amount of notifications to display at one time
+/// @param targets {BannerNotificationTarget[]} - the targets that the notification is targeted to ("STAFF", "USER", "ALL")
+/// @param centered {boolean} - whether the notification should be centered when page width exceeds xl-breakpoint
+/// @return A list of banner notifications targeted to the specified targets, ordered by level (EXCEPTION, WARNING, NORMAL)
+/// @desc A component which returns a list of styled banner notifications, clipped at the specified amount, targeted to the specified targets and ordered by level
 const BannerNotificationsList = ({
-  target,
+  displayAmount = 2,
+  targetList = ["ALL"],
   centered,
 }: BannerNotificationListProps) => {
   const { data: notificationData } = useQuery<Query>(BANNER_NOTIFICATIONS_LIST);
@@ -118,7 +127,6 @@ const BannerNotificationsList = ({
   const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
     string[]
   >("tilavarausHKIClosedNotificationsList", []);
-  const maximumNotificationAmount = 2;
 
   // Separate notifications by level
   const errorNotificationsList = notificationsList?.filter(
@@ -136,17 +144,17 @@ const BannerNotificationsList = ({
     ...(alertNotificationsList || []),
     ...(infoNotificationsList || []),
   ];
-  // Filter out notifications that have been closed by the user, or aren't targeted to the user
+  // Filter out notifications that have been closed by the user, or aren't targeted to them
   const displayedNotificationsList = groupedNotificationsList?.filter(
     (item) =>
       !(closedNotificationsList as string[]).includes(String(item?.id)) &&
-      !(item?.target !== target && item?.target !== "ALL")
+      !(item?.target !== targetList[0] && item?.target !== targetList[1])
   );
 
   return (
     <PositionWrapper>
       {displayedNotificationsList
-        ?.slice(0, maximumNotificationAmount)
+        ?.slice(0, displayAmount)
         .map((notification) => (
           <NotificationsListItem
             key={notification?.id}

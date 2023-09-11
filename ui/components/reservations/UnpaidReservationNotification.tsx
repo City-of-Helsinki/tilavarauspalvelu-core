@@ -90,6 +90,7 @@ const ReservationNotification = () => {
     <NotificationWrapper
       type="alert"
       dismissible
+      centered
       label={t("notification:waitingForPayment.title")}
       closeButtonLabelText={t("common:close")}
     >
