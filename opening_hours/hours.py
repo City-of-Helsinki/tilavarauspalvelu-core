@@ -169,10 +169,13 @@ def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id
         }
         for time_span_group in period["time_span_groups"]:
             for time_data_in in time_span_group["time_spans"]:
+                start_time = time_data_in.pop("start_time")
+                end_time = time_data_in.pop("end_time")
+
                 period_data_out["time_spans"].append(
                     TimeSpan(
-                        start_time=datetime.time.fromisoformat(time_data_in.pop("start_time")),
-                        end_time=datetime.time.fromisoformat(time_data_in.pop("end_time")),
+                        start_time=datetime.time.fromisoformat(start_time) if start_time else None,
+                        end_time=datetime.time.fromisoformat(end_time) if end_time else None,
                         **time_data_in,
                     )
                 )
