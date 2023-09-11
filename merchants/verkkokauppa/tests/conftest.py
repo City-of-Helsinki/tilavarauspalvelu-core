@@ -6,7 +6,7 @@ from merchants.verkkokauppa.product.types import CreateProductParams
 
 
 @fixture(autouse=True)
-def setup_audit_log(settings):
+def setup_verkkokauppa_env_variables(settings):
     settings.VERKKOKAUPPA_API_KEY = "test-api-key"
     settings.VERKKOKAUPPA_PRODUCT_API_URL = "http://test-product:1234"
     settings.VERKKOKAUPPA_ORDER_API_URL = "http://test-order:1234"
