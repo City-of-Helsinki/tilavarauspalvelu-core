@@ -48,7 +48,7 @@ export default function PageWrapper({ children }: Props): JSX.Element {
           {hasAccess && <MainMenu placement="default" />}
           <Suspense fallback={<Loader />}>
             <Content>
-              <NotificationsPositioner target="STAFF" />
+              {hasAccess && <NotificationsList target="STAFF" />}
               {user ? children : <MainLander />}
             </Content>
           </Suspense>
