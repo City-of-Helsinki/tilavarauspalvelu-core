@@ -31,6 +31,13 @@ const Wrapper = styled.div`
   flex-grow: 1;
 `;
 
+const NotificationsPositioner = styled(NotificationsList)`
+  [class*="Notification-module_content"] {
+    max-width: 100%;
+    margin: 0;
+  }
+`;
+
 const FallbackComponent = (err: unknown) => {
   Sentry.captureException(err);
   return <Error5xx />;
@@ -44,11 +51,13 @@ export default function PageWrapper({ children }: Props): JSX.Element {
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <ClientOnly>
         <Navigation />
-        <NotificationsList target="STAFF" />
         <Wrapper>
           {hasAccess && <MainMenu placement="default" />}
           <Suspense fallback={<Loader />}>
-            <Content>{user ? children : <MainLander />}</Content>
+            <Content>
+              <NotificationsPositioner target="STAFF" />
+              {user ? children : <MainLander />}
+            </Content>
           </Suspense>
           <ScrollToTop />
         </Wrapper>
