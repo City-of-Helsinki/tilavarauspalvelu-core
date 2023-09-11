@@ -31,13 +31,6 @@ const Wrapper = styled.div`
   flex-grow: 1;
 `;
 
-const NotificationsPositioner = styled(NotificationsList)`
-  [class*="Notification-module_content"] {
-    max-width: 100%;
-    margin: 0;
-  }
-`;
-
 const FallbackComponent = (err: unknown) => {
   Sentry.captureException(err);
   return <Error5xx />;

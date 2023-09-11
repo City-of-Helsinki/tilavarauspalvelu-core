@@ -12,12 +12,14 @@ import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
 type NotificationListProps = {
   target: "USER" | "STAFF";
+  centered?: boolean;
 };
 
 type NotificationItemProps = {
   notification: BannerNotificationType;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   closedArray: string[];
+  centered?: boolean;
 };
 
 const PositionWrapper = styled.div`
@@ -30,9 +32,6 @@ const NotificationBackground = styled.div`
   display: flex;
   section {
     border-bottom: 1px solid var(--notification-border-color);
-    > div {
-      margin: 0;
-    }
   }
   > div {
     width: 100%;
@@ -71,6 +70,7 @@ const NotificationsListItem = ({
   notification,
   closeFn,
   closedArray,
+  centered,
 }: NotificationItemProps) => {
   const displayDate = new Date(notification.activeFrom || "");
   let notificationType: NotificationType = "info" as const;
@@ -89,7 +89,7 @@ const NotificationsListItem = ({
   };
   return (
     <NotificationBackground>
-      <NotificationWrapper type={notificationType}>
+      <NotificationWrapper type={notificationType} centered={centered}>
         {notification.activeFrom && (
           <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</NotificationDate>
         )}
@@ -104,7 +104,7 @@ const NotificationsListItem = ({
   );
 };
 
-const NotificationsList = ({ target }: NotificationListProps) => {
+const NotificationsList = ({ target, centered }: NotificationListProps) => {
   const { data: notificationData } = useQuery<Query>(BANNER_NOTIFICATIONS_LIST);
   const notificationsList = notificationData?.bannerNotifications?.edges.map(
     (edge) => edge?.node
@@ -149,6 +149,7 @@ const NotificationsList = ({ target }: NotificationListProps) => {
             notification={notification as BannerNotificationType}
             closedArray={closedNotificationsList ?? []}
             closeFn={setClosedNotificationsList}
+            centered={centered}
           />
         ))}
     </PositionWrapper>
