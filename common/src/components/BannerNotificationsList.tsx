@@ -148,7 +148,7 @@ const BannerNotificationsList = ({
   const displayedNotificationsList = groupedNotificationsList?.filter(
     (item) =>
       !(closedNotificationsList as string[]).includes(String(item?.id)) &&
-      !(item?.target !== targetList[0] && item?.target !== targetList[1])
+      targetList.map((t) => t === item?.target).includes(true)
   );
 
   return (
