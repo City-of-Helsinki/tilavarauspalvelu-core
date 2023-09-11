@@ -1,7 +1,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -31,6 +31,28 @@ import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 const RichTextInput = dynamic(() => import("app/component/RichTextInput"), {
   ssr: false,
 });
+
+const BANNER_NOTIFICATIONS_CREATE = gql`
+  mutation ($input: BannerNotificationCreateMutationInput!) {
+    createBannerNotification(input: $input) {
+      pk
+      errors {
+        messages
+      }
+    }
+  }
+`;
+
+const BANNER_NOTIFICATIONS_UPDATE = gql`
+  mutation ($input: BannerNotificationUpdateMutationInput!) {
+    updateBannerNotification(input: $input) {
+      pk
+      errors {
+        messages
+      }
+    }
+  }
+`;
 
 type Props = {
   id?: number;
@@ -147,16 +169,56 @@ const Page = ({ id }: Props) => {
     }
   );
 
+  const [createMutation] = useMutation<Query>(BANNER_NOTIFICATIONS_CREATE);
+  const [updateMutation] = useMutation<Query>(BANNER_NOTIFICATIONS_UPDATE);
+
   const notification = data?.bannerNotifications?.edges
     ?.map((edge) => edge?.node)
     .find((node) => node?.pk === id);
 
   // TODO mutation need to split between create and update
-  const onSubmit = (data: NotificationFormType) => {
+  const onSubmit = async (data: NotificationFormType) => {
+    console.log("submitting", data);
+    const input = {
+      name: data.name,
+      activeFrom: data.activeFrom,
+      activeUntil: data.activeUntil,
+      messageFi: data.messageFi,
+      messageEn: data.messageEn,
+      messageSv: data.messageSv,
+      target: data.targetGroup.value,
+      level: data.level.value,
+    }
     if (data.pk === 0) {
       console.log("create", data);
+      try {
+        const res = createMutation({
+          variables: {
+            input,
+          },
+        })
+        console.log('create mutation: ', res);
+        return res;
+      } catch (e) {
+        // TODO handle errors
+        console.error('create mutation error: ', e);
+        return null;
+      }
     } else {
       console.log("update", data);
+      try {
+        const res = await updateMutation({
+          variables: {
+            input,
+          },
+        })
+        console.log('update mutation: ', res);
+        return res;
+      } catch (e) {
+        // TODO handle errors
+        console.error('update mutation error: ', e);
+        return null;
+      }
     }
   };
 
@@ -341,6 +403,9 @@ const Page = ({ id }: Props) => {
           style={{ marginLeft: "auto" }}
           variant="secondary"
           type="button"
+          onClick={() => {
+            console.log("TODO: save draft");
+          }}
           // TODO submit the form in draft state
         >
           {t("form.saveDraft")}
@@ -370,7 +435,6 @@ const PageWrapped = ({ id }: Props) => (
 
 const PageRouted = () => {
   const { id } = useParams<{ id: string }>();
-  console.log(id);
   if (!id || (id !== "new" && Number.isNaN(Number(id)))) {
     return <div>Invalid ID</div>;
   }
