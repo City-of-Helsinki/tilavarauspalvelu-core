@@ -9,7 +9,7 @@ from opening_hours.hours import get_opening_hours
 
 
 @mock.patch("opening_hours.hours.make_hauki_get_request")
-@override_settings(HAUKI_API_URL="asdf")
+@override_settings(HAUKI_API_URL="url")
 class GetOpeningHoursTestCase(TestCase):
     @classmethod
     def get_opening_hours(self):

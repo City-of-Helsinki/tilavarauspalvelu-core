@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
@@ -20,7 +21,6 @@ from applications.models import (
 )
 from merchants.models import OrderStatus
 from reservation_units.models import ReservationUnit
-from tilavarauspalvelu import settings
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 
