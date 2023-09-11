@@ -28,6 +28,12 @@ const PositionWrapper = styled.div`
 const NotificationBackground = styled.div`
   position: relative;
   display: flex;
+  section {
+    border-bottom: 1px solid var(--notification-border-color);
+    > div {
+      margin: 0;
+    }
+  }
   > div {
     width: 100%;
   }
@@ -82,9 +88,7 @@ const NotificationsListItem = ({
     closeFn([...closedArray, closedId]);
   };
   return (
-    <NotificationBackground
-      style={{ borderBottom: `1px solid var(--color-${notificationType}-dark` }}
-    >
+    <NotificationBackground>
       <NotificationWrapper type={notificationType}>
         {notification.activeFrom && (
           <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</NotificationDate>
@@ -108,7 +112,7 @@ const NotificationsList = ({ target }: NotificationListProps) => {
 
   const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
     string[]
-  >("tilavarausClosedNotificationsList", []);
+  >("tilavarausHKIClosedNotificationsList", []);
   const maximumNotificationAmount = 2;
 
   // Separate notifications by level
