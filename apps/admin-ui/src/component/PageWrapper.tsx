@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-// import * as Sentry from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import styled from "styled-components";
 
 import ClientOnly from "common/src/ClientOnly";
@@ -34,7 +34,7 @@ const Wrapper = styled.div`
 const FallbackComponent = (err: unknown) => {
   // eslint-disable-next-line no-console
   console.error(err);
-  // Sentry.captureException(err);
+  Sentry.captureException(err);
   return <Error5xx />;
 };
 
