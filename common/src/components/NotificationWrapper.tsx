@@ -3,20 +3,24 @@ import styled from "styled-components";
 import { Notification, NotificationProps } from "hds-react";
 import { breakpoints } from "../common/style";
 
-const Wrapper = styled.div`
-  @media (min-width: ${breakpoints.xl}) {
-    > section > div {
-      max-width: calc(${breakpoints.xl} - (2 * var(--spacing-m)));
-      margin: 0 auto;
-    }
+type NotificationPropsWithCentering = NotificationProps & {
+  centered?: boolean;
+};
+
+const Wrapper = styled.div<{ $centerContent?: boolean }>`
+  > section > div {
+    max-width: calc(${breakpoints.xl} - (2 * var(--spacing-m)));
+    margin: 0 ${(props) => (props.$centerContent ? "auto" : "0")} !important;
   }
 `;
 
-const NotificationWrapper = (props: NotificationProps): JSX.Element | null => {
+const NotificationWrapper = (
+  props: NotificationPropsWithCentering
+): JSX.Element | null => {
   const [isVisible, setIsVisible] = React.useState(true);
 
   return isVisible ? (
-    <Wrapper>
+    <Wrapper $centerContent={props.centered}>
       <Notification
         {...props}
         onClose={() => {

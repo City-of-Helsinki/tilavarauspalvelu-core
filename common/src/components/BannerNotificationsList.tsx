@@ -10,14 +10,18 @@ import { fontBold } from "../common/typography";
 import { BannerNotificationType, Query } from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
-type NotificationListProps = {
-  target: "USER" | "STAFF";
+type BannerNotificationTarget = "USER" | "STAFF" | "ALL";
+type BannerNotificationListProps = {
+  displayAmount?: number;
+  targetList: BannerNotificationTarget[];
+  centered?: boolean;
 };
 
-type NotificationItemProps = {
+type BannerNotificationItemProps = {
   notification: BannerNotificationType;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   closedArray: string[];
+  centered?: boolean;
 };
 
 const PositionWrapper = styled.div`
@@ -25,28 +29,31 @@ const PositionWrapper = styled.div`
   display: grid;
 `;
 
-const NotificationBackground = styled.div`
+const BannerNotificationBackground = styled.div`
   position: relative;
   display: flex;
+  section {
+    border-bottom: 1px solid var(--notification-border-color);
+  }
   > div {
     width: 100%;
   }
 `;
 
-const NotificationText = styled.span`
+const BannerNotificationText = styled.span`
   font-size: var(--fontsize-body-m);
   @media (width < ${breakpoints.xl}) {
     padding-right: var(--spacing-l);
   }
 `;
 
-const NotificationDate = styled.span`
+const BannerNotificationDate = styled.span`
   margin-right: 0.25rem;
   font-size: var(--fontsize-body-m);
   ${fontBold}
 `;
 
-const CloseButton = styled.button`
+const BannerCloseButton = styled.button`
   position: absolute;
   top: var(--spacing-m);
   right: var(--spacing-m);
@@ -65,7 +72,8 @@ const NotificationsListItem = ({
   notification,
   closeFn,
   closedArray,
-}: NotificationItemProps) => {
+  centered,
+}: BannerNotificationItemProps) => {
   const displayDate = new Date(notification.activeFrom || "");
   let notificationType: NotificationType = "info" as const;
   switch (notification.level) {
@@ -82,25 +90,35 @@ const NotificationsListItem = ({
     closeFn([...closedArray, closedId]);
   };
   return (
-    <NotificationBackground
-      style={{ borderBottom: `1px solid var(--color-${notificationType}-dark` }}
-    >
-      <NotificationWrapper type={notificationType}>
+    <BannerNotificationBackground>
+      <NotificationWrapper type={notificationType} centered={centered}>
         {notification.activeFrom && (
-          <NotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</NotificationDate>
+          <BannerNotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</BannerNotificationDate>
         )}
-        <NotificationText>
+        <BannerNotificationText>
           {notification && getTranslation(notification, "message")}
-        </NotificationText>
-        <CloseButton onClick={() => handleCloseButtonClick(notification.id)}>
+        </BannerNotificationText>
+        <BannerCloseButton
+          onClick={() => handleCloseButtonClick(notification.id)}
+        >
           <IconCross size="s" />
-        </CloseButton>
+        </BannerCloseButton>
       </NotificationWrapper>
-    </NotificationBackground>
+    </BannerNotificationBackground>
   );
 };
 
-const NotificationsList = ({ target }: NotificationListProps) => {
+/// @brief List of banner notifications
+/// @param displayAmount {number} - the amount of notifications to display at one time
+/// @param targets {BannerNotificationTarget[]} - the targets that the notification is targeted to ("STAFF", "USER", "ALL")
+/// @param centered {boolean} - whether the notification should be centered when page width exceeds xl-breakpoint
+/// @return A list of banner notifications targeted to the specified targets, ordered by level (EXCEPTION, WARNING, NORMAL)
+/// @desc A component which returns a list of styled banner notifications, clipped at the specified amount, targeted to the specified targets and ordered by level
+const BannerNotificationsList = ({
+  displayAmount = 2,
+  targetList = ["ALL"],
+  centered,
+}: BannerNotificationListProps) => {
   const { data: notificationData } = useQuery<Query>(BANNER_NOTIFICATIONS_LIST);
   const notificationsList = notificationData?.bannerNotifications?.edges.map(
     (edge) => edge?.node
@@ -108,8 +126,7 @@ const NotificationsList = ({ target }: NotificationListProps) => {
 
   const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
     string[]
-  >("tilavarausClosedNotificationsList", []);
-  const maximumNotificationAmount = 2;
+  >("tilavarausHKIClosedNotificationsList", []);
 
   // Separate notifications by level
   const errorNotificationsList = notificationsList?.filter(
@@ -127,28 +144,28 @@ const NotificationsList = ({ target }: NotificationListProps) => {
     ...(alertNotificationsList || []),
     ...(infoNotificationsList || []),
   ];
-  // Filter out notifications that have been closed by the user, or aren't targeted to the user
+  // Filter out notifications that have been closed by the user, or aren't targeted to them
   const displayedNotificationsList = groupedNotificationsList?.filter(
     (item) =>
       !(closedNotificationsList as string[]).includes(String(item?.id)) &&
-      !(item?.target !== target && item?.target !== "ALL")
+      targetList.map((t) => t === item?.target).includes(true)
   );
 
-  // TODO: Add sorting by date within level arrays
   return (
     <PositionWrapper>
       {displayedNotificationsList
-        ?.slice(0, maximumNotificationAmount)
+        ?.slice(0, displayAmount)
         .map((notification) => (
           <NotificationsListItem
             key={notification?.id}
             notification={notification as BannerNotificationType}
             closedArray={closedNotificationsList ?? []}
             closeFn={setClosedNotificationsList}
+            centered={centered}
           />
         ))}
     </PositionWrapper>
   );
 };
 
-export default NotificationsList;
+export default BannerNotificationsList;

@@ -6,7 +6,7 @@ import styled from "styled-components";
 import ClientOnly from "common/src/ClientOnly";
 import Error5xx from "app/common/Error5xx";
 import usePermission from "app/hooks/usePermission";
-import { NotificationsList } from "common/src/components";
+import { BannerNotificationsList } from "common/src/components";
 import ScrollToTop from "../common/ScrollToTop";
 import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
@@ -44,11 +44,15 @@ export default function PageWrapper({ children }: Props): JSX.Element {
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <ClientOnly>
         <Navigation />
-        <NotificationsList target="STAFF" />
         <Wrapper>
           {hasAccess && <MainMenu placement="default" />}
           <Suspense fallback={<Loader />}>
-            <Content>{user ? children : <MainLander />}</Content>
+            <Content>
+              {hasAccess && (
+                <BannerNotificationsList targetList={["STAFF", "ALL"]} />
+              )}
+              {user ? children : <MainLander />}
+            </Content>
           </Suspense>
           <ScrollToTop />
         </Wrapper>
