@@ -7,8 +7,12 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BannerNotificationState, type Query } from "common/types/gql-types";
-import { BANNER_NOTIFICATIONS_LIST } from "common/src/components/BannerNotificationsQuery";
+import {
+  BannerNotificationState,
+  BannerNotificationType,
+  type Query,
+} from "common/types/gql-types";
+import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import { publicUrl } from "app/common/const";
@@ -25,8 +29,10 @@ import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import {
   valueForDateInput,
   valueForTimeInput,
+  dateTime,
 } from "../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
+import { useNotification } from "app/context/NotificationContext";
 
 const RichTextInput = dynamic(() => import("app/component/RichTextInput"), {
   ssr: false,
@@ -101,8 +107,27 @@ const GridForm = styled.form`
 `;
 
 /// @brief This is the create / edit page for a single notification.
-const Page = ({ id }: Props) => {
+const Page = ({ notification }: { notification?: BannerNotificationType }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
+
+  // TODO this parsing doesn't work properly
+  console.log("notification", notification);
+  const activeFrom = notification?.activeFrom
+    ? valueForDateInput(notification.activeFrom)
+    : "";
+  const activeFromTime = notification?.activeFrom
+    ? valueForTimeInput(notification?.activeFrom)
+    : "";
+  const activeUntil = notification?.activeUntil
+    ? valueForDateInput(notification?.activeUntil)
+    : "";
+  const activeUntilTime = notification?.activeUntil
+    ? valueForTimeInput(notification?.activeUntil)
+    : "";
+  console.log("activeFrom", activeFrom);
+  console.log("activeFromTime", activeFromTime);
+  console.log("activeUntil", activeUntil);
+  console.log("activeUntilTime", activeUntilTime);
 
   const {
     handleSubmit,
@@ -110,97 +135,104 @@ const Page = ({ id }: Props) => {
     control,
     formState: { errors },
     watch,
-    reset,
   } = useForm<NotificationFormType>({
     reValidateMode: "onChange",
     resolver: zodResolver(NotificationFormSchema),
     defaultValues: {
-      inFuture: false,
-      isDraft: false,
+      name: notification?.name ?? "",
+      inFuture: notification
+        ? notification?.state === BannerNotificationState.Scheduled
+        : false,
+      isDraft: notification
+        ? notification?.state === BannerNotificationState.Draft
+        : false,
+      activeFrom,
+      activeUntil,
+      activeFromTime,
+      activeUntilTime,
+      // TODO enum checking, and default to reasonable values
+      targetGroup: notification?.target
+        ? { value: notification.target, label: notification.target }
+        : { value: "", label: "" },
+      level: notification?.level
+        ? { value: notification.level, label: notification.level }
+        : { value: "", label: "" },
+      messageFi: notification?.messageFi ?? "",
+      messageEn: notification?.messageEn ?? "",
+      messageSv: notification?.messageSv ?? "",
+      // TODO strip out the pk in the submit if it's 0 (new)
+      // also use different mutation (create vs update)
+      pk: notification?.pk ?? 0,
     },
   });
-
-  // TODO there is neither singular version of this, nor a pk filter
-  const { data, loading: isLoading } = useQuery<Query>(
-    BANNER_NOTIFICATIONS_LIST,
-    {
-      skip: !id,
-      onCompleted: (data) => {
-        const notification = data?.bannerNotifications?.edges
-          ?.map((edge) => edge?.node)
-          .find((node) => node?.pk === id);
-
-        const activeFrom = notification?.activeFrom
-          ? valueForDateInput(notification.activeFrom)
-          : "";
-        const activeFromTime = notification?.activeFrom
-          ? valueForTimeInput(notification?.activeFrom)
-          : "";
-        const activeUntil = notification?.activeUntil
-          ? valueForDateInput(notification?.activeUntil)
-          : "";
-        const activeUntilTime = notification?.activeUntil
-          ? valueForTimeInput(notification?.activeUntil)
-          : "";
-        reset({
-          name: notification?.name ?? "",
-          // Should these be automatic or no?
-          inFuture: notification?.state === BannerNotificationState.Scheduled,
-          isDraft: notification?.state === BannerNotificationState.Draft,
-          activeFrom,
-          activeUntil,
-          activeFromTime,
-          activeUntilTime,
-          // TODO enum checking, and default to reasonable values
-          targetGroup: notification?.target
-            ? { value: notification.target, label: notification.target }
-            : { value: "", label: "" },
-          level: notification?.level
-            ? { value: notification.level, label: notification.level }
-            : { value: "", label: "" },
-          messageFi: notification?.messageFi ?? "",
-          messageEn: notification?.messageEn ?? "",
-          messageSv: notification?.messageSv ?? "",
-          // TODO strip out the pk in the submit if it's 0 (new)
-          // also use different mutation (create vs update)
-          pk: notification?.pk ?? 0,
-        });
-      },
-    }
-  );
 
   const [createMutation] = useMutation<Query>(BANNER_NOTIFICATIONS_CREATE);
   const [updateMutation] = useMutation<Query>(BANNER_NOTIFICATIONS_UPDATE);
 
-  const notification = data?.bannerNotifications?.edges
-    ?.map((edge) => edge?.node)
-    .find((node) => node?.pk === id);
+  const { notifyError, notifySuccess } = useNotification();
+  // For now the errors are just strings, so print them out
+  const handleError = (errors: string[]) => {
+    console.error(errors);
+    // TODO add a generic error notification
+    notifyError(errors.join(", "));
+  };
 
   // TODO mutation need to split between create and update
   const onSubmit = async (data: NotificationFormType) => {
     console.log("submitting", data);
+    const activeUntil = dateTime(data.activeUntil, data.activeUntilTime);
+    const activeFrom = dateTime(data.activeFrom, data.activeFromTime);
     const input = {
       name: data.name,
-      activeFrom: data.activeFrom,
-      activeUntil: data.activeUntil,
+      activeFrom,
+      activeUntil,
       messageFi: data.messageFi,
       messageEn: data.messageEn,
       messageSv: data.messageSv,
       target: data.targetGroup.value,
       level: data.level.value,
+      ...(data.pk !== 0 && { pk: data.pk }),
+    };
+    const mutationFn = data.pk === 0 ? createMutation : updateMutation;
+    try {
+      const res = await mutationFn({
+        variables: {
+          input,
+        },
+        onError: (e) => {
+          console.error("error", e);
+          handleError(e.graphQLErrors.map((err) => err.message));
+        },
+        onCompleted: () => {
+          notifySuccess("notification saved");
+        },
+      });
+      console.log("res", res);
+    } catch (e) {
+      console.error("error", e);
+      // handleError(e.graphQLErrors.map((err) => err.message));
     }
-    if (data.pk === 0) {
-      console.log("create", data);
+    /*
+        if (res?.data?.createBannerNotification?.errors) {
+          handleError(res.errors.map((err) => err.message));
+        }
+        */
+
+    /*
+    // if (data.pk === 0) {
       try {
-        const res = createMutation({
+        const res = await createMutation({
           variables: {
             input,
           },
         })
-        console.log('create mutation: ', res);
+        // Return errors as in res.errors.messages
+        // are missing inputs or similar
         return res;
       } catch (e) {
         // TODO handle errors
+        // Thrown erros are invalid syntax in the query for example
+        // e.errors.map((err) => err.message)
         console.error('create mutation error: ', e);
         return null;
       }
@@ -220,14 +252,11 @@ const Page = ({ id }: Props) => {
         return null;
       }
     }
+    */
   };
 
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`form.errors.${errorMsg}`) : "";
-
-  if (isLoading) {
-    return <Loader />;
-  }
 
   const levelOptions = [
     { value: "NORMAL", label: t("level.NORMAL") },
@@ -243,7 +272,9 @@ const Page = ({ id }: Props) => {
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <h1 style={{ gridColumn: "1 / -1" }}>
-        {id ? notification?.name ?? t("noName") : t("newNotification")}
+        {notification
+          ? notification?.name ?? t("noName")
+          : t("newNotification")}
       </h1>
       <Controller
         control={control}
@@ -417,21 +448,47 @@ const Page = ({ id }: Props) => {
 };
 
 // We don't have proper layouts yet, so just separate the container stuff here
-// TODO add id to the breadcrumb
-const PageWrapped = ({ id }: Props) => (
-  <>
-    <BreadcrumbWrapper
-      route={[
-        "messaging",
-        `${publicUrl}/messaging/notifications`,
-        id != null && id > 0 ? "editNotification" : "newNotification",
-      ]}
-    />
-    <Container>
-      <Page id={id} />
-    </Container>
-  </>
-);
+// TODO need to move the query here because we want the name in the breadcrumb
+const PageWrapped = ({ id }: Props) => {
+  // TODO there is neither singular version of this, nor a pk filter
+  const { data, loading: isLoading } = useQuery<Query>(
+    BANNER_NOTIFICATIONS_ADMIN_LIST,
+    { skip: !id }
+  );
+  const { t } = useTranslation();
+
+  const notification = data?.bannerNotifications?.edges
+    ?.map((edge) => edge?.node)
+    .find((node) => node?.pk === id);
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  return (
+    <>
+      <BreadcrumbWrapper
+        route={[
+          { slug: "messaging" },
+          {
+            slug: `${publicUrl}/messaging/notifications`,
+            alias: t("breadcrumb.notifications"),
+          },
+          // TODO Breadcumb has automatic t function so passing a name is bad
+          {
+            slug: "",
+            alias: notification
+              ? notification.name
+              : t("headings.newNotification"),
+          },
+        ]}
+      />
+      <Container>
+        <Page notification={notification ?? undefined} />
+      </Container>
+    </>
+  );
+};
 
 const PageRouted = () => {
   const { id } = useParams<{ id: string }>();

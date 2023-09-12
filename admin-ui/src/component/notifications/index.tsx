@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
-import { BANNER_NOTIFICATIONS_LIST } from "common/src/components/BannerNotificationsQuery";
+import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import type { Query, BannerNotificationType } from "common/types/gql-types";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
@@ -110,7 +110,7 @@ const NotificationsTable = ({
 /// @brief this is the listing page for all notifications.
 const Page = () => {
   const { data, loading: isLoading } = useQuery<Query>(
-    BANNER_NOTIFICATIONS_LIST
+    BANNER_NOTIFICATIONS_ADMIN_LIST
   );
 
   const notifications =

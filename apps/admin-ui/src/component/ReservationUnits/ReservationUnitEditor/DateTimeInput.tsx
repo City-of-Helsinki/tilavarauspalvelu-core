@@ -15,6 +15,7 @@ export const valueForTimeInput = (from: string): string => {
 };
 
 /* Construct date from dateinput + timeinput */
+// TODO move this to common/util and rename
 export const dateTime = (date: string, time: string): string => {
   return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date()).toISOString();
 };
