@@ -1,32 +1,6 @@
 # tilavarauspalvelu-admin-ui
 
-## Developing locally
-
-### backend
-
-First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core
-and follow it's instructions.
-
-Alternatively you can use an Azure development backend by changing the environment variable.
-
-### https
-
-Because we use tunnistamo SSO we require https and a valid domain (not localhost).
-
-Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
-
-```
-127.0.0.1       local-tilavaraus.hel.fi
-```
-
-Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
-
-```sh
-# in common module
-pnpm generate-certificate
-```
-
-### environment variables
+## environment variables
 
 Use `.env.local` for development, you can copy the defaults from `.env.example`.
 
@@ -79,69 +53,23 @@ NEXT_PUBLIC_TILAVARAUS_API_URL
 
 local core runs by default in http://localhost:8000 you can also use the development server that runs in Azure.
 
-### Start UI
-
-```sh
-# in admin-ui
-pnpm start
-```
-
-### Access with browser
-
-With the standard env the admin-ui is accessible from: https://local-tilavaraus.hel.fi:3001/kasittely
-
-### Test data
-
-Some test data can be loaded to the backend with following command:
-
-```
-docker exec tilavarauspalvelu-core_dev_1 python manage.py loaddata fixtures/cases.json
-```
-
-You can also manually add test data by visiting the django admin at http://127.0.0.1:8000/admin after you create admin user:
-
-```
-docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
-```
-
-## GraphQL
-
-Assuming you are using local backend.
-Interactive graphql: `http://localhost:8000/graphql/`
-
-Using the graphql console qequires login in to django at `http://localhost:8000/admin/`
-
-### when the backend has changed
-
-New api changes require updating the schema and typescript types.
-
-Update the version backend version in `http://localhost:8000` using git and rebuild it (follow the backend README).
-
-```sh
-# in common module
-pnpm update-schema generate-gql-types
-```
-
-- Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
-
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `pnpm start`
+### `pnpm dev`
+
+With the standard env the admin-ui is accessible from: https://local-tilavaraus.hel.fi:3001/kasittely
 
 ### `pnpm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### `pnpm test:watch`
 
-### `pnpm ts-check`
+### `pnpm tsc`
 
 Typescript check
 
 ### `pnpm lint`
-
-Runs eslint against _.ts and _.tsx files in `./src`.
 
 ### `pnpm lint:css`
 
@@ -149,5 +77,3 @@ Run stylelint to validate style declarations in `./src/**/*.tsx`.
 
 ### `pnpm build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.

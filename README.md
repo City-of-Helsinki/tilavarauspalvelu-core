@@ -4,7 +4,10 @@
 - [Common UI components](common/)
 
 ## Making a release
-Draft a new release in https://github.com/City-of-Helsinki/tilavarauspalvelu-ui/releases - `ui` and `admin-ui` pipelines will pick up releases named `release-*`.
+
+Draft a new release in https://github.com/City-of-Helsinki/tilavarauspalvelu-ui/releases - `ui` and `admin-ui` pipelines will pick up releases named `v-*`.
+
+Old releases are named `release-*`
 
 Include a changelog if applicable.
 
@@ -74,6 +77,64 @@ Dependencies that are used by multiple applications
 ```
 /packages
 ```
+
+## Developing locally
+
+### backend
+
+First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core
+and follow it's instructions.
+
+Alternatively you can use an Azure development backend by changing the environment variable.
+
+### https
+
+Because we use tunnistamo SSO we require https and a valid domain (not localhost).
+
+Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
+
+```
+127.0.0.1       local-tilavaraus.hel.fi
+```
+
+Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
+
+```sh
+# in the repo root
+pnpm generate-certificate
+```
+
+### set environment variables
+
+These are done app by app so you need to go to `apps/admin-ui` and `apps/ui` and follow their instructions.
+
+### access
+
+If you run all the apps using `pnpm dev` in the root.
+
+Admin-ui: https://local-tilavaraus.hel.fi:3001/kasittely
+UI: https://local-tilavaraus.hel.fi:3000
+
+## GraphQL
+
+Assuming you are using local backend.
+Interactive graphql: `http://localhost:8000/graphql/`
+
+Using the graphql console qequires login in to django at `http://localhost:8000/admin/`
+
+### Updates to graphql schema
+
+New api changes require updating the schema and typescript types.
+
+Update the version backend version in `http://localhost:8000` using git and rebuild it (follow the backend README).
+
+```sh
+cd packages/common
+pnpm update-schema generate-gql-types
+```
+
+Some breaking changes might require fixing mocks in such case the Cypress tests will break.
+Check the Cypress section in [UI](apps/ui/README.md).
 
 ## FAQ
 

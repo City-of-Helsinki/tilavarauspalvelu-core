@@ -1,74 +1,13 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# tilavarauspalvelu-ui ui app
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Prerequisites
-
-1. Node 18 (`nvm use`)
-1. pnpm
-
-### Recommended editor/IDE tooling
-
-- eslint
-- prettier
-- stylelint
-
-## Developing locally
-
-First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core and start it according to the instructions in the backend project README.md.
-
-Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
-
-```
-127.0.0.1       local-tilavaraus.hel.fi
-```
-
-Create a self-signed certificate for SSL connection on development server by running the following command in the common directory
-
-```
-pnpm generate-certificate
-```
-
-### Start UI
-
-```
-pnpm dev
-```
-
-### When GQL api changes and you need to update the Typescript types
-
-go to common module and run
-
-```
-pnpm generate-gql-types
-```
+Follow the instructions on the main README before this.
 
 ### Access with browser
 
 UI is at https://local-tilavaraus.hel.fi:3000/
 Backend is at http://127.0.0.1:8000/v1/
 
-### Test data
-
-Some test data can be loaded to the backend with following command:
-
-```
-docker exec tilavarauspalvelu-core_dev_1 python manage.py loaddata fixtures/cases.json
-```
-
-You can also manually add test data by visiting the django admin at http://127.0.0.1:8000/admin after you create admin user:
-
-```
-docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
-```
-
 ### Graphql workflow
-
-When server has new api changes -> update schema & generate new types by running: `pnpm update-schema generate-gql-types` in common module.
-
-- Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
-
-When a query is modified and you need new mock data types run: `generate-gql-types`, see [mocks/handlers/singleSearch.ts](mocks/handlers/singleSearch.ts) for example on how to use type safe mock test data.
 
 ## Available Scripts
 
@@ -77,7 +16,7 @@ In the project directory, you can run:
 ### `pnpm dev`
 
 Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Open [https://local-tilavaraus.hel.fi:3000]/(https://local-tilavaraus.hel.fi:3000) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
@@ -149,6 +88,10 @@ pnpm test:browser
 ### Mocking network requests
 
 You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Can also be used for mocking browser data.
+
+### GraphQL schema changes
+
+If the queries change significantly the mocks in `mocks` might need to be updated after you've ran `generate-gql-types`.
 
 ## Configurable environment variables
 
