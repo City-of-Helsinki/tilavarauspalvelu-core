@@ -54,7 +54,7 @@ def get_validated_phone_number(phone_number: str) -> str:
     phone_number = re.sub(" +", " ", phone_number)
     phone_number = phone_number.strip()
 
-    pattern = r"^\+(?:[0-9] ?){6,14}[0-9]$"
+    pattern = r"^\+(?:\d ?){6,14}\d$"
     match = re.match(pattern, phone_number)
     if match:
         return match.group(0)
