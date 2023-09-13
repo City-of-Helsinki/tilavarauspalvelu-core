@@ -232,7 +232,7 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
         field_map["defaults"] = {}
         importer = UnitImporter("", field_map=field_map)
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017
             importer.import_units()
 
 
@@ -328,7 +328,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
             },
         )
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017
             importer.import_units()
 
     def test_importer_giving_custom_field_map_with_empty_defaults_creates_units_and_locations(self, mock_response):

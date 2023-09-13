@@ -13,6 +13,10 @@ from email_notification.sender.email_notification_builder import (
 from reservations.models import Reservation
 
 
+class SendReservationEmailNotificationException(Exception):
+    pass
+
+
 def send_reservation_email_notification(
     email_type: EmailType,
     reservation: Optional[Reservation],
@@ -20,7 +24,7 @@ def send_reservation_email_notification(
     context: Optional[EmailNotificationContext] = None,
 ):
     if recipients is not None and len(recipients) > settings.EMAIL_MAX_RECIPIENTS:
-        raise Exception(
+        raise SendReservationEmailNotificationException(
             f"Refusing to notify more than {settings.EMAIL_MAX_RECIPIENTS} users. Email type: %s. Reservation: %s"
             % (
                 email_type,

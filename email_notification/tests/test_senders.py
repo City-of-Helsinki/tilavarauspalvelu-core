@@ -9,6 +9,7 @@ from django.test import override_settings
 
 from email_notification.models import EmailType
 from email_notification.sender.senders import (
+    SendReservationEmailNotificationException,
     send_reservation_email_notification,
     send_test_emails,
 )
@@ -55,7 +56,7 @@ class SendReservationEmailNotificationTestCase(ReservationEmailBaseTestCase):
 
         exception = (
             assert_that(send_reservation_email_notification)
-            .raises(Exception)
+            .raises(SendReservationEmailNotificationException)
             .when_called_with(EmailType.RESERVATION_CONFIRMED, self.reservation, recipients)
             .val
         )

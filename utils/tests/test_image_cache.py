@@ -31,7 +31,7 @@ class ImageCacheTestCase(TestCase):
         )
 
     @override_settings(IMAGE_CACHE_PURGE_KEY=None)
-    def test_purge_error_if_cache_purge_key_missing(self):
+    def test_purge_error_if_cache_purge_key_missing(self):  # NOSONAR python:S4144
         with raises(image_cache.ImageCacheConfigurationError) as err:
             image_cache.purge("foo/bar.jpg")
 
