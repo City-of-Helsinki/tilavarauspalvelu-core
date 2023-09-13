@@ -110,7 +110,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
         )
 
         status = response.status_code
-        if status >= 400 and status < 500:
+        if 400 <= status < 500:
             try:
                 self.data = response.json()
             except JSONDecodeError:
@@ -277,7 +277,7 @@ class ProfileNodeIdReader(ProfileReaderTokenMixin):
         )
 
         status = response.status_code
-        if status >= 400 and status < 500:
+        if 400 <= status < 500:
             try:
                 data = response.json()
             except JSONDecodeError:

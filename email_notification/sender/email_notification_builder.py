@@ -75,7 +75,7 @@ class EmailTemplateValidator:
 
     def validate_html_file(self, value: InMemoryUploadedFile, context_dict=()):
         ext = os.path.splitext(value.name)[1]
-        if not ext.lower() == ".html":
+        if ext.lower() != ".html":
             raise ValidationError(f"Unsupported file extension {ext}. Only .html files are allowed")
 
         if value.size <= 0 or value.size > settings.EMAIL_HTML_MAX_FILE_SIZE:

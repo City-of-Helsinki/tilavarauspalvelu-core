@@ -478,8 +478,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 validated_data=organisation_data,
             )
 
-        return
-
     def handle_billing_address(self, billing_address_data: Dict[Any, Any]):
         if "id" not in billing_address_data or billing_address_data["id"] is None:
             billing_address = AddressSerializer(data=billing_address_data).create(validated_data=billing_address_data)

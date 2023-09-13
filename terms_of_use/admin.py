@@ -10,7 +10,18 @@ class TermsOfUseAdminForm(ModelForm):
 
     class Meta:
         model = TermsOfUse
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "name_fi",
+            "name_en",
+            "name_sv",
+            "text",
+            "text_fi",
+            "text_en",
+            "text_sv",
+            "terms_type",
+        ]
 
 
 @admin.register(TermsOfUse)

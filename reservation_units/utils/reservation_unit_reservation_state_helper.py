@@ -16,10 +16,7 @@ class ReservationUnitReservationStateHelper:
         return (reservation_unit.reservation_begins and now < reservation_unit.reservation_begins) and (
             reservation_unit.reservation_ends is None
             or reservation_unit.reservation_ends <= now
-            or (
-                reservation_unit.reservation_ends > now
-                and reservation_unit.reservation_begins > reservation_unit.reservation_ends
-            )
+            or (now < reservation_unit.reservation_ends < reservation_unit.reservation_begins)
         )
 
     @classmethod
@@ -78,8 +75,7 @@ class ReservationUnitReservationStateHelper:
             )
             or reservation_unit.reservation_ends <= now
             and reservation_unit.reservation_begins
-            and reservation_unit.reservation_begins <= now
-            and reservation_unit.reservation_begins > reservation_unit.reservation_ends
+            and now >= reservation_unit.reservation_begins > reservation_unit.reservation_ends
         )
 
     @classmethod

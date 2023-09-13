@@ -123,7 +123,7 @@ class ReservationScheduler:
 
                 # Assume opening hours are sorted properly.
                 if self.is_multiple_days_reservation and opening_hour_date in self.dates:
-                    if not time.end_time == datetime.time(23, 59, tzinfo=get_default_timezone()):
+                    if time.end_time != datetime.time(23, 59, tzinfo=get_default_timezone()):
                         return self._get_datetimes_for_the_day(self.begin.date(), time)
                     for date in self.dates[1:]:
                         if self.can_continue_to_next_day(date, time):

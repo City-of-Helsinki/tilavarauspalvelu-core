@@ -12,7 +12,7 @@ def test_normal_user_can_view_only_self(user_api_client, user_2):
         format="json",
     )
     assert response.status_code == 200
-    user_id_list = map(lambda x: x["id"], response.data)
+    user_id_list = (x["id"] for x in response.data)
     assert_that(user_id_list).does_not_contain(user_2.id)
 
 
@@ -35,7 +35,7 @@ def test_general_admin_can_view_all_users(general_admin_api_client, general_admi
     )
 
     assert response.status_code == 200
-    user_id_list = list(map(lambda x: x["id"], response.data))
+    user_id_list = [x["id"] for x in response.data]
 
     assert_that(user_id_list).contains_only(user.id, user_2.id, general_admin.id)
 

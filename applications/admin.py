@@ -91,7 +91,27 @@ class ApplicationRoundAdminForm(ModelForm):
 
     class Meta:
         model = ApplicationRound
-        fields = "__all__"
+        fields = [
+            "name",
+            "name_fi",
+            "name_en",
+            "name_sv",
+            "target_group",
+            "allocating",
+            "reservation_units",
+            "application_period_begin",
+            "application_period_end",
+            "reservation_period_begin",
+            "reservation_period_end",
+            "public_display_begin",
+            "public_display_end",
+            "purposes",
+            "service_sector",
+            "criteria",
+            "criteria_fi",
+            "criteria_en",
+            "criteria_sv",
+        ]
 
 
 @admin.register(ApplicationRound)
