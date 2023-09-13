@@ -303,7 +303,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         basket_ids = []
         for basket in basket_data:
             basket["application_round"] = application_round_instance
-            if "id" not in basket or ["id"] is None:
+            if "id" not in basket or basket["id"] is None:
                 basket_ids.append(ApplicationRoundBasketSerializer(data=basket).create(validated_data=basket).id)
             else:
                 basket_ids.append(
