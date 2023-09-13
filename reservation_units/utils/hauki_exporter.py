@@ -32,13 +32,11 @@ class ReservationUnitHaukiExporter:
         )
         try:
             resource_data = make_hauki_get_request(url, params={})
-            id = resource_data["id"]
-        except (HaukiAPIError, HaukiRequestError):
-            id = None
-        except (KeyError, IndexError, TypeError):
-            id = None
+            resource_id = resource_data["id"]
+        except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
+            resource_id = None
 
-        return id
+        return resource_id
 
     def _get_hauki_resource_object_from_reservation_unit(self) -> Resource:
         parent_id = self.reservation_unit.unit.hauki_resource_id or self._get_parent_id()

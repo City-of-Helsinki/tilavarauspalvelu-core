@@ -59,8 +59,8 @@ class ReservationIcalViewset(ViewSet):
         return Reservation.objects.filter(pk=self.kwargs["pk"]).prefetch_related("reservation_unit").first()
 
     def retrieve(self, request, *args, **kwargs):
-        hash = request.query_params.get("hash", None)
-        if hash is None:
+        hash_pram = request.query_params.get("hash", None)
+        if hash_pram is None:
             raise ValidationError("hash is required")
 
         instance = self.get_object()
@@ -68,7 +68,7 @@ class ReservationIcalViewset(ViewSet):
         # could enable reusing the hashes for accessing other resources.
         comparison_signature = hmac_signature(f"reservation-{instance.pk}")
 
-        if not hmac.compare_digest(comparison_signature, hash):
+        if not hmac.compare_digest(comparison_signature, hash_pram):
             raise ValidationError("invalid hash signature")
 
         buffer = io.BytesIO()
@@ -100,15 +100,15 @@ class ReservationUnitIcalViewset(ViewSet):
         return ReservationUnit.objects.get(pk=self.kwargs["pk"])
 
     def retrieve(self, request, *args, **kwargs):
-        hash = request.query_params.get("hash", None)
-        if not hash:
+        hash_param = request.query_params.get("hash", None)
+        if not hash_param:
             raise ValidationError("hash is required")
 
         instance = self.get_object()
 
         comparison_signature = hmac_signature(instance.uuid)
 
-        if not hmac.compare_digest(comparison_signature, hash):
+        if not hmac.compare_digest(comparison_signature, hash_param):
             raise ValidationError("invalid hash signature")
 
         buffer = io.BytesIO()

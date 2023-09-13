@@ -45,8 +45,8 @@ class AuthDeleteMutation(AuthMutation):
 
         try:
             if cls.is_valid(root, info, **input):
-                object = get_object_or_404(cls.model, pk=input["pk"])
-                object.delete()
+                obj = get_object_or_404(cls.model, pk=input["pk"])
+                obj.delete()
                 return cls(deleted=True)
         except ValidationError as ve:
             raise GraphQLError(ve.message)
