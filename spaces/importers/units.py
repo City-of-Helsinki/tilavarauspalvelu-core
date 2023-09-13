@@ -147,6 +147,18 @@ class UnitImporter:
 
 
 class UnitHaukiResourceIdImporter:
+    def __init__(self):
+        self.resource_id_map = {}
+        self.response_page_counter = 0
+
+    def read_response(self, data):
+        self.response_page_counter += 1
+        logger.info(f"Fetching from hauki. Page number: {self.response_page_counter}")
+        for resource in data["results"]:
+            for origin in resource["origins"]:
+                if origin["data_source"]["id"] == "tprek":
+                    self.resource_id_map[origin["origin_id"]] = resource["id"]
+
     @transaction.atomic
     def import_hauki_resource_ids_for_units(
         self,
@@ -172,23 +184,10 @@ class UnitHaukiResourceIdImporter:
             "page_size": 50000,
         }
 
-        self.resource_id_map = {}
-        counter = 0
-
-        def read_response(counter):
-            counter += 1
-            logger.info(f"Fetching from hauki. Page number: {counter}")
-            for resource in data["results"]:
-                for origin in resource["origins"]:
-                    if origin["data_source"]["id"] == "tprek":
-                        self.resource_id_map[origin["origin_id"]] = resource["id"]
-            return counter
-
-        next = url
-        while next:
-            data = make_hauki_get_request(next, params)
-            counter = read_response(counter)
-            next = data.get("next", False)
+        while url:
+            data = make_hauki_get_request(url, params)
+            self.read_response(data)
+            url = data.get("next", False)
 
         resource_ids_updated = []
         for unit in units:
