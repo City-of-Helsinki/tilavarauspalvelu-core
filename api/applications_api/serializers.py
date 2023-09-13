@@ -517,29 +517,25 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     def validate_for_review(self, data):
         application_events = data.get("application_events", [])
+
         if not len(application_events):
             raise ValidationError(_("Application must have application events"))
-        else:
-            contact_person_info = data.get("contact_person", None)
-            if not contact_person_info or contact_person_info == "":
-                raise serializers.ValidationError("Contact person is required for review.")
-            for event in application_events:
-                if not len(event["application_event_schedules"]):
-                    raise ValidationError(_("Application events must have schedules"))
-
-                for field in ApplicationEvent.REQUIRED_FOR_REVIEW:
-                    if event.get(field, None) in [None, ""]:
-                        raise ValidationError(
-                            _('Field "{field}" is required for application event.').format(field=field)
-                        )
 
         contact_person = data.get("contact_person", None)
         if not contact_person:
             raise ValidationError(_("Application must have contact person"))
-        else:
-            for field in Person.REQUIRED_FOR_REVIEW:
-                if contact_person.get(field, None) in [None, ""]:
-                    raise ValidationError(_('Field "{field}" is required for contact person.').format(field=field))
+
+        for event in application_events:
+            if not len(event["application_event_schedules"]):
+                raise ValidationError(_("Application events must have schedules"))
+
+            for field in ApplicationEvent.REQUIRED_FOR_REVIEW:
+                if event.get(field, None) in [None, ""]:
+                    raise ValidationError(_('Field "{field}" is required for application event.').format(field=field))
+
+        for field in Person.REQUIRED_FOR_REVIEW:
+            if contact_person.get(field, None) in [None, ""]:
+                raise ValidationError(_('Field "{field}" is required for contact person.').format(field=field))
 
         return data
 
