@@ -16,8 +16,8 @@ def test_accepting_allocation_result(result_scheduled_for_monday, general_admin_
         format="json",
     )
 
-    assert_that(response).has_status_code == 201
-    assert_that(response.data["accepted"]).is_true()
+    assert response.status_code == 200
+    assert response.data["accepted"] is True
 
 
 @pytest.mark.django_db
@@ -32,5 +32,5 @@ def test_deleting_allocation_result(result_scheduled_for_monday, general_admin_a
         format="json",
     )
 
-    assert_that(response).has_status_code == 201
-    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(0)
+    assert response.status_code == 204
+    assert ApplicationEventScheduleResult.objects.count() == 0
