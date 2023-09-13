@@ -3,9 +3,7 @@ import { gql } from "@apollo/client";
 // TODO remove the extras that I added to this query (the UI side)
 export const BANNER_NOTIFICATION_COMMON = gql`
   fragment BannerNotificationCommon on BannerNotificationType {
-    pk
     name
-    state
     level
     message
     activeFrom
@@ -22,9 +20,11 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
     bannerNotifications {
       edges {
         node {
+          pk
           ...BannerNotificationCommon
           activeUntil
           draft
+          state
         }
       }
     }
@@ -37,6 +37,7 @@ export const BANNER_NOTIFICATIONS_LIST = gql`
     bannerNotifications(isVisible: true) {
       edges {
         node {
+          id
           ...BannerNotificationCommon
         }
       }

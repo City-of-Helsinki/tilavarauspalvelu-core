@@ -7,24 +7,31 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  BannerNotificationState,
-  BannerNotificationType,
-  type Query,
-} from "common/types/gql-types";
-import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
-import { Container } from "app/styles/layout";
-import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
-import { publicUrl } from "app/common/const";
-import Loader from "app/component/Loader";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
   RadioButton,
   Select,
   SelectionGroup,
+  Tag,
   TextInput,
 } from "hds-react";
+import {
+  BannerNotificationState,
+  BannerNotificationType,
+  Level,
+  Target,
+  type Mutation,
+  type Query,
+  type MutationUpdateBannerNotificationArgs,
+  type MutationCreateBannerNotificationArgs,
+} from "common/types/gql-types";
+import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
+import { H1 } from "common/src/common/typography";
+import { Container } from "app/styles/layout";
+import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
+import { publicUrl } from "app/common/const";
+import Loader from "app/component/Loader";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import {
   valueForDateInput,
@@ -60,6 +67,65 @@ const BANNER_NOTIFICATIONS_UPDATE = gql`
   }
 `;
 
+// helpers so we get typechecking without casting
+const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): Level => {
+  switch (level) {
+    case "EXCEPTION":
+      return Level.Exception;
+    case "NORMAL":
+      return Level.Normal;
+    case "WARNING":
+      return Level.Warning;
+  }
+};
+
+const convertTarget = (target: "ALL" | "STAFF" | "USER"): Target => {
+  switch (target) {
+    case "ALL":
+      return Target.All;
+    case "STAFF":
+      return Target.Staff;
+    case "USER":
+      return Target.User;
+  }
+};
+
+function BannerNotificationStateTag({
+  state,
+}: {
+  state: BannerNotificationState;
+}) {
+  const color = ((s: BannerNotificationState) => {
+    switch (s) {
+      case BannerNotificationState.Draft:
+        return "var(--color-summer-light)";
+      case BannerNotificationState.Active:
+        return "var(--color-bus-light)";
+      case BannerNotificationState.Scheduled:
+        return "var(--color-black-5)";
+    }
+  })(state);
+
+  const { t } = useTranslation();
+
+  return (
+    <Tag
+      theme={{ "--tag-background": color }}
+      labelProps={{ style: { whiteSpace: "nowrap" } }}
+    >
+      {t(`Notifications.state.${state}`)}
+    </Tag>
+  );
+}
+
+const StatusTagContainer = styled.div`
+  display: grid;
+  justify-items: justify-between;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+`;
+
 type Props = {
   id?: number;
 };
@@ -87,14 +153,9 @@ const NotificationFormSchema = z.object({
   messageEn: z.string(),
   messageSv: z.string(),
   // TODO validators can't be empty, needs to be in the list of options (look at reservation schema)
-  targetGroup: z.object({
-    label: z.string(),
-    value: z.string(),
-  }),
-  level: z.object({
-    label: z.string(),
-    value: z.string(),
-  }),
+  // refinement is not empty for these two (not having empty as option forces a default value)
+  targetGroup: z.enum(["", "ALL", "STAFF", "USER"]),
+  level: z.enum(["", "EXCEPTION", "NORMAL", "WARNING"]),
   pk: z.number(),
 });
 
@@ -110,24 +171,20 @@ const GridForm = styled.form`
 const Page = ({ notification }: { notification?: BannerNotificationType }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
-  // TODO this parsing doesn't work properly
-  console.log("notification", notification);
-  const activeFrom = notification?.activeFrom
-    ? valueForDateInput(notification.activeFrom)
-    : "";
-  const activeFromTime = notification?.activeFrom
-    ? valueForTimeInput(notification?.activeFrom)
-    : "";
+  // const activeFrom = data.activeFrom !== "" ? dateTime(data.activeFrom, data.activeFromTime) : undefined;
+  const today = new Date();
+  const activeFrom = valueForDateInput(
+    notification?.activeFrom ?? today.toISOString()
+  );
+  const activeFromTime = valueForTimeInput(
+    notification?.activeFrom ?? today.toISOString()
+  );
   const activeUntil = notification?.activeUntil
     ? valueForDateInput(notification?.activeUntil)
     : "";
   const activeUntilTime = notification?.activeUntil
     ? valueForTimeInput(notification?.activeUntil)
     : "";
-  console.log("activeFrom", activeFrom);
-  console.log("activeFromTime", activeFromTime);
-  console.log("activeUntil", activeUntil);
-  console.log("activeUntilTime", activeUntilTime);
 
   const {
     handleSubmit,
@@ -135,6 +192,7 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
     control,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<NotificationFormType>({
     reValidateMode: "onChange",
     resolver: zodResolver(NotificationFormSchema),
@@ -150,24 +208,23 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
       activeUntil,
       activeFromTime,
       activeUntilTime,
-      // TODO enum checking, and default to reasonable values
-      targetGroup: notification?.target
-        ? { value: notification.target, label: notification.target }
-        : { value: "", label: "" },
-      level: notification?.level
-        ? { value: notification.level, label: notification.level }
-        : { value: "", label: "" },
+      targetGroup: notification?.target ?? "",
+      level: notification?.level ?? "",
       messageFi: notification?.messageFi ?? "",
       messageEn: notification?.messageEn ?? "",
       messageSv: notification?.messageSv ?? "",
-      // TODO strip out the pk in the submit if it's 0 (new)
-      // also use different mutation (create vs update)
       pk: notification?.pk ?? 0,
     },
   });
 
-  const [createMutation] = useMutation<Query>(BANNER_NOTIFICATIONS_CREATE);
-  const [updateMutation] = useMutation<Query>(BANNER_NOTIFICATIONS_UPDATE);
+  const [createMutation] = useMutation<
+    Mutation,
+    MutationCreateBannerNotificationArgs
+  >(BANNER_NOTIFICATIONS_CREATE);
+  const [updateMutation] = useMutation<
+    Mutation,
+    MutationUpdateBannerNotificationArgs
+  >(BANNER_NOTIFICATIONS_UPDATE);
 
   const { notifyError, notifySuccess } = useNotification();
   // For now the errors are just strings, so print them out
@@ -177,20 +234,29 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
     notifyError(errors.join(", "));
   };
 
-  // TODO mutation need to split between create and update
   const onSubmit = async (data: NotificationFormType) => {
-    console.log("submitting", data);
     const activeUntil = dateTime(data.activeUntil, data.activeUntilTime);
-    const activeFrom = dateTime(data.activeFrom, data.activeFromTime);
+    const activeFrom =
+      data.activeFrom !== ""
+        ? dateTime(data.activeFrom, data.activeFromTime)
+        : undefined;
+
+    // TODO: hack, use schema refinement
+    if (data.targetGroup === "" || data.level === "") {
+      notifyError(t("Notifications.error.empty"));
+      return;
+    }
+
     const input = {
       name: data.name,
       activeFrom,
       activeUntil,
+      draft: data.isDraft,
       messageFi: data.messageFi,
       messageEn: data.messageEn,
       messageSv: data.messageSv,
-      target: data.targetGroup.value,
-      level: data.level.value,
+      target: convertTarget(data.targetGroup),
+      level: convertLevel(data.level),
       ...(data.pk !== 0 && { pk: data.pk }),
     };
     const mutationFn = data.pk === 0 ? createMutation : updateMutation;
@@ -203,56 +269,22 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
           console.error("error", e);
           handleError(e.graphQLErrors.map((err) => err.message));
         },
-        onCompleted: () => {
-          notifySuccess("notification saved");
-        },
       });
       console.log("res", res);
+      if (res?.data?.createBannerNotification?.errors) {
+        const { errors } = res.data.createBannerNotification;
+        // TODO error translations and logic
+        handleError(
+          errors.map((err) => err?.messages?.join(", ") ?? "unknown error")
+        );
+      } else {
+        notifySuccess("notification saved");
+      }
     } catch (e) {
+      // TODO what is the format of these errors?
       console.error("error", e);
       // handleError(e.graphQLErrors.map((err) => err.message));
     }
-    /*
-        if (res?.data?.createBannerNotification?.errors) {
-          handleError(res.errors.map((err) => err.message));
-        }
-        */
-
-    /*
-    // if (data.pk === 0) {
-      try {
-        const res = await createMutation({
-          variables: {
-            input,
-          },
-        })
-        // Return errors as in res.errors.messages
-        // are missing inputs or similar
-        return res;
-      } catch (e) {
-        // TODO handle errors
-        // Thrown erros are invalid syntax in the query for example
-        // e.errors.map((err) => err.message)
-        console.error('create mutation error: ', e);
-        return null;
-      }
-    } else {
-      console.log("update", data);
-      try {
-        const res = await updateMutation({
-          variables: {
-            input,
-          },
-        })
-        console.log('update mutation: ', res);
-        return res;
-      } catch (e) {
-        // TODO handle errors
-        console.error('update mutation error: ', e);
-        return null;
-      }
-    }
-    */
   };
 
   const translateError = (errorMsg?: string) =>
@@ -269,13 +301,23 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
     { value: "USER", label: t("target.USER") },
   ];
 
+  // TODO logic here
+  // draft always if selected (editing a draft, new ones can't be draft)
+  // scheduled if start is in future
+  // active otherwise (though if it's in the past only backend probably thinks of it as draft?)
+  const state = watch("isDraft")
+    ? BannerNotificationState.Draft
+    : BannerNotificationState.Active;
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <h1 style={{ gridColumn: "1 / -1" }}>
-        {notification
-          ? notification?.name ?? t("noName")
-          : t("newNotification")}
-      </h1>
+      <StatusTagContainer>
+        <H1 $legacy style={{ gridColumn: "1 / span 5", gridRow: "1 / span 4" }}>
+          {notification
+            ? notification?.name ?? t("noName")
+            : t("newNotification")}
+        </H1>
+        {notification && <BannerNotificationStateTag state={state} />}
+      </StatusTagContainer>
       <Controller
         control={control}
         name="inFuture"
@@ -351,13 +393,19 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
       <Controller
         control={control}
         name="level"
-        render={({ field }) => (
-          <Select
+        render={({ field: { value, onChange } }) => (
+          <Select<{ value: string; label: string }>
             id="notification-level"
             label={t("form.level")}
             options={levelOptions}
             placeholder={t("form.selectPlaceholder")}
-            {...field}
+            onChange={({ value }: { value: string; label: string }) =>
+              onChange(value)
+            }
+            value={{
+              value: value,
+              label: value !== "" ? t(`level.${value}`) : "",
+            }}
             error={translateError(errors.level?.message)}
             required
           />
@@ -366,13 +414,19 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
       <Controller
         control={control}
         name="targetGroup"
-        render={({ field }) => (
-          <Select
+        render={({ field: { value, onChange } }) => (
+          <Select<{ value: string; label: string }>
             id="notification-target-group"
             label={t("headings.targetGroup")}
             options={targetGroupOptions}
             placeholder={t("form.selectPlaceholder")}
-            {...field}
+            onChange={({ value }: { value: string; label: string }) =>
+              onChange(value)
+            }
+            value={{
+              value: value,
+              label: value !== "" ? t(`target.${value}`) : "",
+            }}
             error={translateError(errors.targetGroup?.message)}
             required
           />
@@ -435,9 +489,9 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
           variant="secondary"
           type="button"
           onClick={() => {
-            console.log("TODO: save draft");
+            setValue("isDraft", true);
+            handleSubmit(onSubmit)();
           }}
-          // TODO submit the form in draft state
         >
           {t("form.saveDraft")}
         </Button>
@@ -448,7 +502,6 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
 };
 
 // We don't have proper layouts yet, so just separate the container stuff here
-// TODO need to move the query here because we want the name in the breadcrumb
 const PageWrapped = ({ id }: Props) => {
   // TODO there is neither singular version of this, nor a pk filter
   const { data, loading: isLoading } = useQuery<Query>(
@@ -467,6 +520,7 @@ const PageWrapped = ({ id }: Props) => {
 
   return (
     <>
+      {/* TODO if new page should show "Back" button instead of breadcrumb */}
       <BreadcrumbWrapper
         route={[
           { slug: "messaging" },
@@ -474,12 +528,11 @@ const PageWrapped = ({ id }: Props) => {
             slug: `${publicUrl}/messaging/notifications`,
             alias: t("breadcrumb.notifications"),
           },
-          // TODO Breadcumb has automatic t function so passing a name is bad
           {
             slug: "",
             alias: notification
               ? notification.name
-              : t("headings.newNotification"),
+              : t("breadcrumb.newNotification"),
           },
         ]}
       />
@@ -491,11 +544,12 @@ const PageWrapped = ({ id }: Props) => {
 };
 
 const PageRouted = () => {
+  // TODO can_manage_notifications permission
+
   const { id } = useParams<{ id: string }>();
   if (!id || (id !== "new" && Number.isNaN(Number(id)))) {
     return <div>Invalid ID</div>;
   }
-  // TODO new unitialised should not do a query
   if (id === "new") {
     return <PageWrapped id={0} />;
   }
