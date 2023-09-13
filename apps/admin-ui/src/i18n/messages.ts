@@ -971,12 +971,17 @@ const translations: ITranslations = {
       cancel: ["Peruuta"],
       saveDraft: ["Tallenna luonnoksena"],
       save: ["Julkaise"],
+      created: ["luotu"],
+      updated: ["päivitetty"],
+      saveSuccessToast: ["Ilmoitus {{ name }} {{ state }}"],
       errors: {
         Required: ["Pakollinen"],
         "String must contain at least 1 character(s)": ["Pakollinen"],
         "Target group cannot be empty": ["Pakollinen"],
         "Level cannot be empty": ["Pakollinen"],
         "Date can't be in the past": ["Päivämäärä ei voi olla menneisyydessä"],
+        "activeFromTime is not in time format.": ["Alkamisaika ei ole aika"],
+        "activeUntilTime is not in time format.": ["Päättymisaika ei ole aika"],
         "End time needs to be after start time.": [
           "Päättymisajan tulee olla alkamisajan jälkeen",
         ],

@@ -1,6 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -160,6 +160,7 @@ const checkStartIsBeforeEnd = (
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       // NOTE Don't add to multiple paths, it hides the error message
+      // TODO this is problematic because it doesn't update if any of the other fields change
       path: ["activeUntil"],
       message: "End time needs to be after start time.",
     });
@@ -280,9 +281,11 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
     notifyError(errorMsgs.join(", "));
   };
 
+  const navigate = useNavigate();
+
   const onSubmit = async (data: NotificationFormType) => {
-    const start = dateTime(data.activeUntil, data.activeUntilTime);
-    const end =
+    const end = dateTime(data.activeUntil, data.activeUntilTime);
+    const start =
       data.activeFrom !== ""
         ? dateTime(data.activeFrom, data.activeFromTime)
         : undefined;
@@ -326,7 +329,13 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
           )
         );
       } else {
-        notifySuccess("notification saved");
+        notifySuccess(
+          t("form.saveSuccessToast", {
+            name: data.name,
+            state: data.pk === 0 ? t("form.created") : t("form.updated"),
+          })
+        );
+        navigate("..");
       }
     } catch (e) {
       // TODO what is the format of these errors?
