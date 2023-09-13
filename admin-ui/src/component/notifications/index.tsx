@@ -99,6 +99,7 @@ const NotificationsTable = ({
   // Default sort: state, activeUntil
   // Oletuksena lista on järjestetty ensisijaisesti Tila-sarakkeen arvon mukaan [desc], toissijaisesti "Voimassa asti" mukaan, siten että tuorein ilmoitus on ensin [desc].
   const onSortChanged = (key: string) => {
+    // eslint-disable-next-line no-console
     console.warn("TODO: implement sorting: ", key);
     if (sort.field === key) {
       setSort({ field: key, asc: !sort.asc });

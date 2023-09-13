@@ -2,7 +2,7 @@
 /// Quill is not SSR compatible
 import { IconAlertCircleFill, Tooltip } from "hds-react";
 import React from "react";
-import ReactQuill, { type ReactQuillProps } from "react-quill";
+import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
 import { HorisontalFlex } from "../styles/layout";

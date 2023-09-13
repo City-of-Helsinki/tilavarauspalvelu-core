@@ -1,10 +1,9 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -71,6 +70,7 @@ const BANNER_NOTIFICATIONS_UPDATE = gql`
 `;
 
 // helpers so we get typechecking without casting
+// eslint-disable-next-line consistent-return -- end of switch is unreachable
 const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): Level => {
   switch (level) {
     case "EXCEPTION":
@@ -82,6 +82,7 @@ const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): Level => {
   }
 };
 
+// eslint-disable-next-line consistent-return -- end of switch is unreachable
 const convertTarget = (target: "ALL" | "STAFF" | "USER"): Target => {
   switch (target) {
     case "ALL":
@@ -93,11 +94,16 @@ const convertTarget = (target: "ALL" | "STAFF" | "USER"): Target => {
   }
 };
 
+const StyledTag = styled(Tag)`
+  justify-content: center;
+`;
+
 function BannerNotificationStateTag({
   state,
 }: {
   state: BannerNotificationState;
 }) {
+  // eslint-disable-next-line consistent-return -- end of switch is unreachable
   const color = ((s: BannerNotificationState) => {
     switch (s) {
       case BannerNotificationState.Draft:
@@ -112,12 +118,12 @@ function BannerNotificationStateTag({
   const { t } = useTranslation();
 
   return (
-    <Tag
+    <StyledTag
       theme={{ "--tag-background": color }}
       labelProps={{ style: { whiteSpace: "nowrap" } }}
     >
       {t(`Notifications.state.${state}`)}
-    </Tag>
+    </StyledTag>
   );
 }
 
@@ -267,15 +273,16 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
 
   const { notifyError, notifySuccess } = useNotification();
   // For now the errors are just strings, so print them out
-  const handleError = (errors: string[]) => {
-    console.error(errors);
+  const handleError = (errorMsgs: string[]) => {
+    // eslint-disable-next-line no-console
+    console.error(errorMsgs);
     // TODO add a generic error notification
-    notifyError(errors.join(", "));
+    notifyError(errorMsgs.join(", "));
   };
 
   const onSubmit = async (data: NotificationFormType) => {
-    const activeUntil = dateTime(data.activeUntil, data.activeUntilTime);
-    const activeFrom =
+    const start = dateTime(data.activeUntil, data.activeUntilTime);
+    const end =
       data.activeFrom !== ""
         ? dateTime(data.activeFrom, data.activeFromTime)
         : undefined;
@@ -288,8 +295,8 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
 
     const input = {
       name: data.name,
-      activeFrom,
-      activeUntil,
+      activeFrom: start,
+      activeUntil: end,
       draft: data.isDraft,
       messageFi: data.messageFi,
       messageEn: data.messageEn,
@@ -305,22 +312,25 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
           input,
         },
         onError: (e) => {
+          // eslint-disable-next-line no-console
           console.error("error", e);
           handleError(e.graphQLErrors.map((err) => err.message));
         },
       });
-      console.log("res", res);
       if (res?.data?.createBannerNotification?.errors) {
-        const { errors } = res.data.createBannerNotification;
+        const { errors: mutationErrors } = res.data.createBannerNotification;
         // TODO error translations and logic
         handleError(
-          errors.map((err) => err?.messages?.join(", ") ?? "unknown error")
+          mutationErrors.map(
+            (err) => err?.messages?.join(", ") ?? "unknown error"
+          )
         );
       } else {
         notifySuccess("notification saved");
       }
     } catch (e) {
       // TODO what is the format of these errors?
+      // eslint-disable-next-line no-console
       console.error("error", e);
       // handleError(e.graphQLErrors.map((err) => err.message));
     }
@@ -438,11 +448,11 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
             label={t("form.level")}
             options={levelOptions}
             placeholder={t("form.selectPlaceholder")}
-            onChange={({ value }: { value: string; label: string }) =>
-              onChange(value)
+            onChange={(x: { value: string; label: string }) =>
+              onChange(x.value)
             }
             value={{
-              value: value,
+              value,
               label: value !== "" ? t(`level.${value}`) : "",
             }}
             invalid={!!errors.level}
@@ -460,11 +470,11 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
             label={t("headings.targetGroup")}
             options={targetGroupOptions}
             placeholder={t("form.selectPlaceholder")}
-            onChange={({ value }: { value: string; label: string }) =>
-              onChange(value)
+            onChange={(x: { value: string; label: string }) =>
+              onChange(x.value)
             }
             value={{
-              value: value,
+              value,
               label: value !== "" ? t(`target.${value}`) : "",
             }}
             invalid={!!errors.targetGroup}

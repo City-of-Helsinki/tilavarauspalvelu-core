@@ -40,16 +40,16 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
           title: n.alias || t(`breadcrumb.${trim(n.slug, "/")}`) || "",
           slug: n.slug,
         };
-      } else {
-        const title = n.split("/").pop();
-        return {
-          title:
-            aliases?.find((alias) => alias.slug === title)?.title ||
-            t(`breadcrumb.${trim(title, "/")}`) ||
-            "",
-          slug: n.includes("/") ? n : "",
-        };
       }
+
+      const title = n.split("/").pop();
+      return {
+        title:
+          aliases?.find((alias) => alias.slug === title)?.title ||
+          t(`breadcrumb.${trim(title, "/")}`) ||
+          "",
+        slug: n.includes("/") ? n : "",
+      };
     }) || [];
 
   return (
