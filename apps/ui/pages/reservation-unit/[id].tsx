@@ -438,7 +438,10 @@ const ReservationUnit = ({
   useEffect(() => {
     const scrollToCalendar = () =>
       window.scroll({
-        top: calendarRef.current.offsetTop - 20,
+        top:
+          calendarRef.current !== null
+            ? calendarRef.current.offsetTop - 20
+            : undefined,
         left: 0,
         behavior: "smooth",
       });
