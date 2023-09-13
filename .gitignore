@@ -1,16 +1,34 @@
 **/node_modules
-yarn-error.log
+**/.pnpm
+**/.pnp.js
+# yarn
 **/.yarn
-.yarnrc.yml
+**/.yarnrc.yml
+
+# debug
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
 
 # local certs
 **/certificates
 
-# turbo
+# caches
 **/.turbo
+**/.next
+
+**/dist
+**/build
+**/out
+
 # local config
-.env.local
-tsconfig.tsbuildinfo
-.local
-.DS_Store
-/.idea
+**/.env.local
+**/.local
+**/.idea
+
+# misc
+**/.DS_Store
+**/*.pem
+**/.eslintcache
+**/*.tsbuildinfo
