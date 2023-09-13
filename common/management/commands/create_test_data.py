@@ -1504,7 +1504,7 @@ def _create_cities(*, number: int = 10) -> list[City]:
     text_entering="Creating reservations...",
     text_exiting="Reservations created!",
 )
-def _create_reservations(
+def _create_reservations(  # NOSONAR (python:S3776)
     user: User,
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
