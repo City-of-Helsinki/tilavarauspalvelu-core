@@ -971,6 +971,16 @@ const translations: ITranslations = {
       cancel: ["Peruuta"],
       saveDraft: ["Tallenna luonnoksena"],
       save: ["Julkaise"],
+      errors: {
+        Required: ["Pakollinen"],
+        "String must contain at least 1 character(s)": ["Pakollinen"],
+        "Target group cannot be empty": ["Pakollinen"],
+        "Level cannot be empty": ["Pakollinen"],
+        "Date can't be in the past": ["Päivämäärä ei voi olla menneisyydessä"],
+        "End time needs to be after start time.": [
+          "Päättymisajan tulee olla alkamisajan jälkeen",
+        ],
+      },
     },
     level: {
       noLevel: ["(ei tasoa)"],
@@ -980,7 +990,7 @@ const translations: ITranslations = {
     },
     state: {
       noState: ["(ei tilaa)"],
-      ACTIVE: ["Aktiivinen"],
+      ACTIVE: ["Julkaistu"],
       DRAFT: ["Luonnos"],
       SCHEDULED: ["Ajasitetu"],
     },

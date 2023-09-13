@@ -19,6 +19,16 @@ export const valueForTimeInput = (from: string): string => {
 export const dateTime = (date: string, time: string): string => {
   return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date()).toISOString();
 };
+export const parseDateTimeSafe = (
+  date: string,
+  time: string
+): Date | undefined => {
+  try {
+    return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date());
+  } catch (e) {
+    return undefined;
+  }
+};
 
 type Props = { value?: string; setValue: (value: string) => void };
 

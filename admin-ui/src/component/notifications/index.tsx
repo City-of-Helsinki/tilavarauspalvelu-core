@@ -9,7 +9,10 @@ import type { Query, BannerNotificationType } from "common/types/gql-types";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import Loader from "app/component/Loader";
-import { valueForDateInput } from "../ReservationUnits/ReservationUnitEditor/DateTimeInput";
+import {
+  valueForDateInput,
+  valueForTimeInput,
+} from "../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
@@ -43,7 +46,9 @@ const getColConfig = (t: TFunction) => [
     transform: (notification: NonNullable<BannerNotificationType>) =>
       // TODO should have time also (not just the date)
       notification.activeFrom
-        ? valueForDateInput(notification.activeFrom)
+        ? `${valueForDateInput(notification.activeFrom)} ${valueForTimeInput(
+            notification.activeFrom
+          )}`
         : "-",
   },
   {
@@ -53,7 +58,9 @@ const getColConfig = (t: TFunction) => [
     transform: (notification: NonNullable<BannerNotificationType>) =>
       // TODO should have time also (not just the date)
       notification.activeUntil
-        ? valueForDateInput(notification.activeUntil)
+        ? `${valueForDateInput(notification.activeUntil)} ${valueForTimeInput(
+            notification.activeUntil
+          )}`
         : "-",
   },
   {

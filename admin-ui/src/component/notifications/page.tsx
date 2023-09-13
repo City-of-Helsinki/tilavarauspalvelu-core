@@ -28,16 +28,19 @@ import {
 } from "common/types/gql-types";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
+import { fromUIDate } from "common/src/common/util";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import { publicUrl } from "app/common/const";
 import Loader from "app/component/Loader";
 import { useNotification } from "app/context/NotificationContext";
+import { checkDate, checkTimeStringFormat } from "app/schemas";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import {
   valueForDateInput,
   valueForTimeInput,
   dateTime,
+  parseDateTimeSafe,
 } from "../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 
@@ -126,10 +129,6 @@ const StatusTagContainer = styled.div`
   grid-template-rows: repeat(4, 1fr);
 `;
 
-type Props = {
-  id?: number;
-};
-
 /* TODO mobile styling */
 const ButtonContainer = styled.div`
   grid-column: 1 / -1;
@@ -140,24 +139,64 @@ const ButtonContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const NotificationFormSchema = z.object({
-  name: z.string().min(1),
-  inFuture: z.boolean(),
-  isDraft: z.boolean(),
-  // TODO time and date validators (reservation schema)
-  activeFrom: z.string(),
-  activeFromTime: z.string(),
-  activeUntil: z.string(),
-  activeUntilTime: z.string(),
-  messageFi: z.string().min(1),
-  messageEn: z.string(),
-  messageSv: z.string(),
-  // TODO validators can't be empty, needs to be in the list of options (look at reservation schema)
-  // refinement is not empty for these two (not having empty as option forces a default value)
-  targetGroup: z.enum(["", "ALL", "STAFF", "USER"]),
-  level: z.enum(["", "EXCEPTION", "NORMAL", "WARNING"]),
-  pk: z.number(),
-});
+const checkStartIsBeforeEnd = (
+  data: {
+    activeFrom: string;
+    activeUntil: string;
+    activeFromTime: string;
+    activeUntilTime: string;
+  },
+  ctx: z.RefinementCtx
+) => {
+  const start = parseDateTimeSafe(data.activeFrom, data.activeFromTime);
+  const end = parseDateTimeSafe(data.activeUntil, data.activeUntilTime);
+  if (start && end && start > end) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      // NOTE Don't add to multiple paths, it hides the error message
+      path: ["activeUntil"],
+      message: "End time needs to be after start time.",
+    });
+  }
+};
+
+const NotificationFormSchema = z
+  .object({
+    name: z.string().min(1),
+    inFuture: z.boolean(),
+    isDraft: z.boolean(),
+    activeFrom: z.string(),
+    activeFromTime: z.string(),
+    activeUntil: z.string(),
+    activeUntilTime: z.string(),
+    messageFi: z.string().min(1),
+    messageEn: z.string(),
+    messageSv: z.string(),
+    // refinement is not empty for these two (not having empty as an option forces a default value)
+    targetGroup: z.enum(["", "ALL", "STAFF", "USER"]).refine((x) => x !== "", {
+      message: "Target group cannot be empty",
+    }),
+    level: z
+      .enum(["", "EXCEPTION", "NORMAL", "WARNING"])
+      .refine((x) => x !== "", {
+        message: "Level cannot be empty",
+      }),
+    pk: z.number(),
+  })
+  // TODO checkDate doesn't check for valid days or months i.e. 2024-02-31 and 2024-13-41 are valid
+  .superRefine((val, ctx) =>
+    checkDate(fromUIDate(val.activeFrom), ctx, "activeFrom")
+  )
+  .superRefine((val, ctx) =>
+    checkDate(fromUIDate(val.activeUntil), ctx, "activeUntil")
+  )
+  .superRefine((x, ctx) =>
+    checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime")
+  )
+  .superRefine((x, ctx) =>
+    checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime")
+  )
+  .superRefine((val, ctx) => checkStartIsBeforeEnd(val, ctx));
 
 type NotificationFormType = z.infer<typeof NotificationFormSchema>;
 
@@ -406,6 +445,7 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
               value: value,
               label: value !== "" ? t(`level.${value}`) : "",
             }}
+            invalid={!!errors.level}
             error={translateError(errors.level?.message)}
             required
           />
@@ -427,6 +467,7 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
               value: value,
               label: value !== "" ? t(`target.${value}`) : "",
             }}
+            invalid={!!errors.targetGroup}
             error={translateError(errors.targetGroup?.message)}
             required
           />
@@ -502,7 +543,7 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
 };
 
 // We don't have proper layouts yet, so just separate the container stuff here
-const PageWrapped = ({ id }: Props) => {
+const PageWrapped = ({ id }: { id?: number }) => {
   // TODO there is neither singular version of this, nor a pk filter
   const { data, loading: isLoading } = useQuery<Query>(
     BANNER_NOTIFICATIONS_ADMIN_LIST,
