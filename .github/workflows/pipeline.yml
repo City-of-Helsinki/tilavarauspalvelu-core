@@ -1,0 +1,260 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    # TODO tags is only needed on build jobs (not on test / lint)
+    # move the build jobs into separate workflow
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SKIP_ENV_VALIDATION: "true"
+  REGISTRY: "ghcr.io"
+
+jobs:
+  changed-packages:
+    name: Determine which apps changed
+    uses: ./.github/workflows/changed-packages.yml
+
+  lint-admin-ui:
+    name: Lint admin ui
+    runs-on: ubuntu-latest
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.admin_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Lint admin ui
+        run: |
+          pnpm lint --filter=admin-ui...
+          pnpm lint:css --filter=admin-ui...
+          # TODO run tsc also when it's not broken
+
+  build-admin-ui:
+    name: Build admin ui
+    runs-on: ubuntu-latest
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.admin_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Build ui
+        run: pnpm build --filter ui...
+
+  test-admin-ui:
+    name: Test admin ui
+    runs-on: ubuntu-latest
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.admin_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Test admin ui
+        run: pnpm test --filter=admin-ui...
+
+  lint-ui:
+    name: Lint ui
+    runs-on: ubuntu-latest
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.ui_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
+      - name: Lint ui
+        run: |
+          pnpm lint --filter=ui...
+          pnpm lint:css --filter=ui...
+          # TODO run tsc also when it's not broken
+
+  build-ui:
+    name: Build ui
+    runs-on: ubuntu-latest
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.ui_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Build ui
+        run: pnpm build --filter ui...
+
+  test-ui:
+    name: Unit tests ui
+    runs-on: ubuntu-latest
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.ui_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Test ui
+        run: pnpm test --filter=ui...
+
+  test-cypress-ui:
+    name: Cypress tests ui
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [changed-packages]
+    if: needs.changed-packages.outputs.ui_changed == 'true'
+    env:
+      NEXT_PUBLIC_MOCK_REQUESTS: 'true'
+      DISABLE_AUTH: 'true'
+      NEXT_PUBLIC_TILAVARAUS_API_URL: http://localhost:4000
+      PORT: 4000
+      NEXTAUTH_SECRET: not-a-good-secret
+      TZ: Europe/Helsinki
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v2
+      - name: "Log in to the Container registry"
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      # Repository name needs to be lowercase
+      # TODO remember to fix the image name after we can reuse the regular image (build-args)
+      - name: "Create repository name"
+        id: repo
+        run: >-
+          echo "repo=$(
+            echo ${{ env.REGISTRY }}/${{ github.repository }} | tr '[:upper:]' '[:lower:]'
+          )" >> $GITHUB_OUTPUT
+
+      - name: "Extract metadata (tags, labels) for Docker"
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ steps.repo.outputs.repo }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+
+      # TODO reuse the ui image (problem is the build-args)
+      - name: "Build ui e2e container"
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            NEXT_PUBLIC_TILAVARAUS_API_URL=${{ env.NEXT_PUBLIC_TILAVARAUS_API_URL }}
+            NEXT_PUBLIC_MOCK_REQUESTS=${{ env.NEXT_PUBLIC_MOCK_REQUESTS }}
+            APP=ui
+            DISABLE_AUTH=true
+          push: ${{ github.event_name != 'pull_request' }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          # TODO can we add a tag here like e2e-latest or smth, that we can use for the next step just tilavaraus-ui:e2e-latest
+          # instead of referencing the whole path
+          labels: ${{ steps.meta.outputs.labels }}
+          # Use a shared cache to speed up builds
+          cache-from: type=registry,ref=${{ steps.repo.outputs.repo }}:cache
+          cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}:cache,mode=max
+
+      - name: Run the test container
+        run: |
+          docker run -p 4000:4000 --rm -e PORT=4000 -d --ipc=host --name tilavaraus-ui-server ${{ steps.meta.outputs.tags }}
+
+      - name: Cypress e2e & a11y
+        uses: cypress-io/github-action@v6
+        with:
+          project: ./apps/ui
+          config-file: cypress.config.ts
+          install-command: pnpm install --frozen-lockfile
+          #install: false
+          command: pnpm test:browser:ci
+          #wait-on: 'http://127.0.0.1:4000'
+          #wait-on: 'http://localhost:4000'
+
+      - name: Upload images on failure
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: apps/ui/cypress/screenshots
+          if-no-files-found: ignore
+      - name: Stop container
+        run: docker stop tilavaraus-ui-server

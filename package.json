@@ -1,33 +1,28 @@
 {
   "name": "tilavaraus",
   "private": true,
-  "workspaces": [
-    "common",
-    "ui",
-    "admin-ui"
-  ],
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "ncu": "npm-check-updates -p yarn --deep --target minor --format group",
-    "ncu:upgrade": "npm-check-updates -p yarn --deep --target minor  --format group --upgrade",
+    "preinstall": "npx -y only-allow pnpm",
+    "test:browser:ci": "cd apps/ui && pnpm run test:browser:ci",
+    "ncu": "npm-check-updates -p pnpm --deep --target minor --format group",
+    "ncu:upgrade": "npm-check-updates -p pnpm --deep --target minor  --format group --upgrade",
     "clean": "npkill",
-    "lint": "cd common && yarn lint && cd ../ui && yarn lint && cd ../admin-ui && yarn lint",
-    "lint:fix": "cd common && yarn lint --fix && cd ../ui && yarn lint --fix && cd ../admin-ui && yarn lint --fix",
-    "lint:css": "cd common && yarn lint:css && cd ../ui && yarn lint:css && cd ../admin-ui && yarn lint:css",
-    "test": "cd common && yarn test && cd ../ui && yarn test && cd ../admin-ui && yarn test",
-    "tsc": "cd common && yarn tsc && cd ../ui && yarn tsc && cd ../admin-ui && yarn tsc"
-  },
-  "resolutions": {
-    "graphql": "^16.6.0",
-    "next": "13.1.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint -- --fix",
+    "lint:css": "turbo lint:css",
+    "test": "turbo test",
+    "tsc": "turbo tsc",
+    "generate-certificate": "mkdir -p certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
   },
   "devDependencies": {
     "npkill": "^0.10.0",
-    "npm-check-updates": "^16.6.2"
+    "npm-check-updates": "^16.13.1",
+    "turbo": "^1.10.13"
   },
-  "dependencies": {}
+  "packageManager": "pnpm@8.6.10"
 }

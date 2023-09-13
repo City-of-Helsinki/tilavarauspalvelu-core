@@ -1,0 +1,55 @@
+# Turbo dry run to determine which apps have changed between the latest commit and target or previous commit
+# For PR:s this comparison is done against the main branch
+name: 'Determine changed packages'
+
+on:
+  workflow_call:
+    outputs:
+      changed_packages:
+        description: 'Stringified JSON array of changed packages in this changeset'
+        value: ${{ jobs.dry-run.outputs.changed_packages }}
+      admin_changed:
+        description: 'Indicates if the Admin UI or its dependencies have changed'
+        value: ${{ jobs.dry-run.outputs.admin_changed }}
+      ui_changed:
+        description: 'Indicates if the UI or its dependencies have changed'
+        value: ${{ jobs.dry-run.outputs.ui_changed }}
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    env:
+      TURBO_REF_FILTER: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+    outputs:
+      changed_packages: ${{ steps.output-changed-packages.outputs.changed_packages }}
+      admin_changed: ${{ steps.admin-changed.outputs.result }}
+      ui_changed: ${{ steps.ui-changed.outputs.result }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Changeset
+        id: changeset
+        run: |
+          echo 'result<<CHANGESET_DELIMITER' >> $GITHUB_OUTPUT
+          echo "$(npx -y turbo build --dry-run=json --filter=...[$TURBO_REF_FILTER]  --global-deps=.github/*)" >> $GITHUB_OUTPUT
+          echo 'CHANGESET_DELIMITER' >> $GITHUB_OUTPUT
+
+      - name: Output changed packages
+        id: output-changed-packages
+        run: |
+          echo 'changed_packages<<CHANGED_PACKAGES_DELIMITER' >> $GITHUB_OUTPUT
+          echo "${{ toJSON(fromJSON(steps.changeset.outputs.result).packages) }}" >> $GITHUB_OUTPUT
+          echo 'CHANGED_PACKAGES_DELIMITER' >> $GITHUB_OUTPUT
+
+      - name: Did the Admin UI or its dependencies change?
+        id: admin-changed
+        if: ${{ contains(fromJSON(steps.changeset.outputs.result).packages, 'admin-ui') }}
+        run: echo "result=true" >> $GITHUB_OUTPUT
+
+      - name: Did the UI or its dependencies change?
+        id: ui-changed
+        if: ${{ contains(fromJSON(steps.changeset.outputs.result).packages, 'ui') }}
+        run: echo "result=true" >> $GITHUB_OUTPUT

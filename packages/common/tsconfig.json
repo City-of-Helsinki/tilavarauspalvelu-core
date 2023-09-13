@@ -1,0 +1,16 @@
+{
+  "extends": "tsconfig/nextjs.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }]
+  },
+  "exclude": ["node_modules/"],
+  "include": [
+    "src",
+    "index.ts",
+    "types/**/*.d.ts",
+    ".eslintrc.js",
+    "stylelint.config.js",
+    "jest.setup.cjs",
+    "jest.config.cjs"
+  ]
+}
