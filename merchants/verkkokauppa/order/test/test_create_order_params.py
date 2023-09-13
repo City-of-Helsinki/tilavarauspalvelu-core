@@ -77,7 +77,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         assert_that(json["items"][0]["meta"][0]["value"]).is_equal_to(str(reservation.reservation_unit.first().uuid))
         assert_that(json["items"][0]["meta"][0]["label"]).is_none()
         assert_that(json["items"][0]["meta"][0]["visibleInCheckout"]).is_false()
-        assert_that(json["items"][0]["meta"][0]["ordinal"]).is_equal_to(0)
+        assert_that(json["items"][0]["meta"][0]["ordinal"]).is_equal_to("0")
         assert_that(json["items"][0]["meta"][1]["key"]).is_equal_to("reservationPeriod")
         assert_that(json["items"][0]["meta"][1]["label"]).is_equal_to("Varausaika")
         assert_that(json["items"][0]["meta"][2]["key"]).is_equal_to("reservationNumber")

@@ -27,7 +27,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
     def setUp(self):
         self.client.force_login(self.general_admin)
 
-    def get_valid_data(self, order_uuid: bool) -> Dict[str, Any]:
+    @staticmethod
+    def get_valid_data(order_uuid: str) -> Dict[str, Any]:
         return {
             "orderUuid": order_uuid,
         }

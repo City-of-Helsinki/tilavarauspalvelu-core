@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 from django.utils.timezone import get_default_timezone
 
@@ -45,13 +44,13 @@ def localized_short_weekday(weekday: int, lang_code: str) -> str:
     return weekdays[lang_code][weekday]
 
 
-def start_of_day(date: Optional[datetime.date]) -> datetime.datetime:
+def start_of_day(date: datetime.date | None) -> datetime.datetime | None:
     if date:
         return datetime.datetime.combine(date, datetime.time.min, tzinfo=get_default_timezone())
     return None
 
 
-def end_of_day(date: Optional[datetime.date]) -> datetime.datetime:
+def end_of_day(date: datetime.date | None) -> datetime.datetime | None:
     if date:
         return datetime.datetime.combine(date, datetime.time.max, tzinfo=get_default_timezone())
     return None

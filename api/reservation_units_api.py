@@ -203,14 +203,14 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         if display:
             self.fields.pop("id")
 
-    def get_building(self, reservation_unit) -> dict:
+    def get_building(self, reservation_unit) -> dict | None:
         building = reservation_unit.get_building()
         if building:
             return BuildingSerializer(building).data
 
         return None
 
-    def get_location(self, reservation_unit) -> dict:
+    def get_location(self, reservation_unit) -> dict | None:
         location = reservation_unit.get_location()
         if location:
             return LocationSerializer(location).data

@@ -48,7 +48,7 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
 
 def get_validated_phone_number(phone_number: str) -> str:
     if not phone_number:
-        return None
+        return ""
 
     phone_number = phone_number.replace("-", " ")
     phone_number = re.sub(" +", " ", phone_number)
@@ -127,21 +127,21 @@ def _get_order_params(reservation: Reservation):
                     value=runit.uuid,
                     label=None,
                     visible_in_checkout=False,
-                    ordinal=0,
+                    ordinal="0",
                 ),
                 OrderItemMetaParams(
                     key="reservationPeriod",
                     value=get_formatted_reservation_time(reservation),
                     label=get_meta_label("reservationPeriod", reservation),
                     visible_in_checkout=True,
-                    ordinal=1,
+                    ordinal="1",
                 ),
                 OrderItemMetaParams(
                     key="reservationNumber",
                     value=reservation.pk,
                     label=get_meta_label("reservationNumber", reservation),
                     visible_in_checkout=True,
-                    ordinal=2,
+                    ordinal="2",
                 ),
             ],
         )
@@ -151,9 +151,9 @@ def _get_order_params(reservation: Reservation):
         user=reservation.user.uuid,
         language=reservation.reservee_language or "fi",
         items=items,
-        price_net=sum(item.row_price_net for item in items),
-        price_vat=sum(item.row_price_vat for item in items),
-        price_total=sum(item.row_price_total for item in items),
+        price_net=Decimal(sum(item.row_price_net for item in items)),
+        price_vat=Decimal(sum(item.row_price_vat for item in items)),
+        price_total=Decimal(sum(item.row_price_total for item in items)),
         customer=OrderCustomer(
             first_name=reservation.reservee_first_name,
             last_name=reservation.reservee_last_name,

@@ -365,9 +365,9 @@ class ApplicationDataExporter:
     @classmethod
     def _update_event_schedule_string(
         cls,
-        event_schedules: List[Dict[int, str]],
+        event_schedules: Dict[int, str],
         new_schedule: ApplicationEventSchedule,
-    ) -> List[Dict[int, str]]:
+    ) -> None:
         time_range_string = cls._get_time_range_string(
             new_schedule.begin.strftime("%H:%M"),
             new_schedule.end.strftime("%H:%M"),
