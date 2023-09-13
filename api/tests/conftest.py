@@ -848,14 +848,9 @@ def valid_unit_viewer_data(user, unit):
     return {"user_id": user.id, "role": "viewer", "unit_id": [unit.id]}
 
 
-@pytest.fixture(autouse=True)
-def enable_db_access_for_all_tests(db):
-    pass
-
-
 @pytest.fixture()
 def set_ical_secret(db):
-    settings.ICAL_HASH_SECRET = "qhoew923uqqwee"
+    settings.ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105
 
 
 @pytest.mark.django_db
