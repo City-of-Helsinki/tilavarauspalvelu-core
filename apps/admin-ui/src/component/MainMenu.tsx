@@ -282,8 +282,7 @@ const getFilteredMenu = (
     route: "/messaging",
     items: [
       {
-        // FIXME permission
-        permission: Permission.CAN_MANAGE_UNITS,
+        permission: Permission.CAN_MANAGE_BANNER_NOTIFICATIONS,
         title: "breadcrumb.notifications",
         route: "/messaging/notifications",
       },

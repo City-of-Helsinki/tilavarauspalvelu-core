@@ -1,16 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
+import { Link } from "react-router-dom";
+import { Button } from "hds-react";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import type { Query, BannerNotificationType } from "common/types/gql-types";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import Loader from "app/component/Loader";
-import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 import { valueForDateInput } from "../ReservationUnits/ReservationUnitEditor/DateTimeInput";
-import { Link } from "react-router-dom";
-import { Button } from "hds-react";
+import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 
@@ -19,14 +19,14 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("Notifications.headings.state"),
     key: "state",
-    isSortable: false,
+    isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
       t(`Notifications.state.${notification.state ?? "noState"}`),
   },
   {
     headerName: t("Notifications.headings.name"),
     key: "name",
-    isSortable: false,
+    isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
       notification.pk != null ? (
         <TableLink href={notificationUrl(notification.pk)}>
@@ -39,7 +39,7 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("Notifications.headings.activeFrom"),
     key: "activeFrom",
-    isSortable: false,
+    isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
       // TODO should have time also (not just the date)
       notification.activeFrom
@@ -49,7 +49,7 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("Notifications.headings.activeUntil"),
     key: "activeUntil",
-    isSortable: false,
+    isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
       // TODO should have time also (not just the date)
       notification.activeUntil
@@ -59,18 +59,23 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("Notifications.headings.targetGroup"),
     key: "targetGroup",
-    isSortable: false,
+    isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
       t(`Notifications.target.${notification.target ?? "noTarget"}`),
   },
   {
     headerName: t("Notifications.headings.level"),
     key: "level",
-    isSortable: false,
+    isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
       t(`Notifications.level.${notification.level ?? "noLevel"}`),
   },
 ];
+
+type Sort = {
+  field: string;
+  asc: boolean;
+};
 
 const NotificationsTable = ({
   notifications,
@@ -80,12 +85,21 @@ const NotificationsTable = ({
   const { t } = useTranslation();
   const cols = getColConfig(t);
 
-  // TODO sort
-  const onSortChanged = () => {
-    console.warn("TODO: implement sorting");
+  // TODO this should be list of sort keys
+  const [sort, setSort] = useState<Sort>({ field: "state", asc: false });
+
+  // TODO sort; all fields are sortable
+  // Default sort: state, activeUntil
+  // Oletuksena lista on järjestetty ensisijaisesti Tila-sarakkeen arvon mukaan [desc], toissijaisesti "Voimassa asti" mukaan, siten että tuorein ilmoitus on ensin [desc].
+  const onSortChanged = (key: string) => {
+    console.warn("TODO: implement sorting: ", key);
+    if (sort.field === key) {
+      setSort({ field: key, asc: !sort.asc });
+    } else {
+      setSort({ field: key, asc: true });
+    }
   };
 
-  console.log("notifications", notifications);
   return (
     <DataOrMessage
       filteredData={notifications}
@@ -96,12 +110,10 @@ const NotificationsTable = ({
         indexKey="pk"
         rows={notifications}
         cols={cols}
-        /*
         initialSortingColumnKey={sort === undefined ? undefined : sort.field}
         initialSortingOrder={
           sort === undefined ? undefined : (sort.asc && "asc") || "desc"
         }
-        */
       />
     </DataOrMessage>
   );
@@ -120,11 +132,12 @@ const Page = () => {
 
   const { t } = useTranslation();
 
+  // TODO add paging (100 elements per page, add load more button if there are more (test with 20 per page))
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h1>{t("Notifications.pageTitle")}</h1>
-        {/* TODO dont use nested button / lint use something like ButtonLikeLink but it needs primary variant */}
+        {/* TODO dont use nested button / link use something like ButtonLikeLink but it needs primary variant */}
         <Link to="/messaging/notifications/new">
           <Button variant="primary">
             {t("Notifications.newNotification")}

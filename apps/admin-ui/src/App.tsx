@@ -229,7 +229,10 @@ const App = () => {
           />
           <Route
             path="/messaging/notifications/*"
-            element={withAuthorization(<NotificationsRouter />)}
+            element={withAuthorization(
+              <NotificationsRouter />,
+              Permission.CAN_MANAGE_BANNER_NOTIFICATIONS
+            )}
           />
         </Routes>
       </PageWrapper>

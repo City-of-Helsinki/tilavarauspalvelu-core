@@ -18,6 +18,7 @@ export enum Permission {
   CAN_MANAGE_RESOURCES = "can_manage_resources",
   CAN_MANAGE_UNITS = "can_manage_units",
   CAN_VALIDATE_APPLICATIONS = "can_validate_applications",
+  CAN_MANAGE_BANNER_NOTIFICATIONS = "can_manage_notifications",
 }
 
 const hasGeneralPermission = (permissionName: string, user: UserType) =>

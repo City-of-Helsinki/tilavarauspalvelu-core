@@ -32,6 +32,7 @@ import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import { publicUrl } from "app/common/const";
 import Loader from "app/component/Loader";
+import { useNotification } from "app/context/NotificationContext";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import {
   valueForDateInput,
@@ -39,7 +40,6 @@ import {
   dateTime,
 } from "../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
-import { useNotification } from "app/context/NotificationContext";
 
 const RichTextInput = dynamic(() => import("app/component/RichTextInput"), {
   ssr: false,
@@ -544,9 +544,8 @@ const PageWrapped = ({ id }: Props) => {
 };
 
 const PageRouted = () => {
-  // TODO can_manage_notifications permission
-
   const { id } = useParams<{ id: string }>();
+
   if (!id || (id !== "new" && Number.isNaN(Number(id)))) {
     return <div>Invalid ID</div>;
   }
