@@ -24,6 +24,8 @@ import {
   type Query,
   type MutationUpdateBannerNotificationArgs,
   type MutationCreateBannerNotificationArgs,
+  type MutationDeleteBannerNotificationArgs,
+  ErrorType,
 } from "common/types/gql-types";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
@@ -62,6 +64,15 @@ const BANNER_NOTIFICATIONS_UPDATE = gql`
   mutation ($input: BannerNotificationUpdateMutationInput!) {
     updateBannerNotification(input: $input) {
       pk
+      errors {
+        messages
+      }
+    }
+  }
+`;
+const BANNER_NOTIFICATIONS_DELETE = gql`
+  mutation ($input: BannerNotificationDeleteMutationInput!) {
+    deleteBannerNotification(input: $input) {
       errors {
         messages
       }
@@ -169,16 +180,16 @@ const checkStartIsBeforeEnd = (
 
 const NotificationFormSchema = z
   .object({
-    name: z.string().min(1),
+    name: z.string().min(1).max(100),
     inFuture: z.boolean(),
     isDraft: z.boolean(),
     activeFrom: z.string(),
     activeFromTime: z.string(),
     activeUntil: z.string(),
     activeUntilTime: z.string(),
-    messageFi: z.string().min(1),
-    messageEn: z.string(),
-    messageSv: z.string(),
+    messageFi: z.string().min(1).max(500),
+    messageEn: z.string().max(500),
+    messageSv: z.string().max(500),
     // refinement is not empty for these two (not having empty as an option forces a default value)
     targetGroup: z.enum(["", "ALL", "STAFF", "USER"]).refine((x) => x !== "", {
       message: "Target group cannot be empty",
@@ -214,7 +225,13 @@ const GridForm = styled.form`
 `;
 
 /// @brief This is the create / edit page for a single notification.
-const Page = ({ notification }: { notification?: BannerNotificationType }) => {
+const Page = ({
+  notification,
+  refetch,
+}: {
+  notification?: BannerNotificationType;
+  refetch?: () => void;
+}) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
   // const activeFrom = data.activeFrom !== "" ? dateTime(data.activeFrom, data.activeFromTime) : undefined;
@@ -247,9 +264,8 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
       inFuture: notification
         ? notification?.state === BannerNotificationState.Scheduled
         : false,
-      isDraft: notification
-        ? notification?.state === BannerNotificationState.Draft
-        : false,
+      // draft mode is set separately on button press
+      isDraft: false,
       activeFrom,
       activeUntil,
       activeFromTime,
@@ -273,12 +289,12 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
   >(BANNER_NOTIFICATIONS_UPDATE);
 
   const { notifyError, notifySuccess } = useNotification();
-  // For now the errors are just strings, so print them out
+
   const handleError = (errorMsgs: string[]) => {
     // eslint-disable-next-line no-console
     console.error(errorMsgs);
-    // TODO add a generic error notification
-    notifyError(errorMsgs.join(", "));
+    // We haven't properly mapped error messages
+    notifyError(t("error.submit.generic"));
   };
 
   const navigate = useNavigate();
@@ -290,7 +306,7 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
         ? dateTime(data.activeFrom, data.activeFromTime)
         : undefined;
 
-    // TODO: hack, use schema refinement
+    // Schema checks this, but TS doesn't know
     if (data.targetGroup === "" || data.level === "") {
       notifyError(t("Notifications.error.empty"));
       return;
@@ -335,13 +351,14 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
             state: data.pk === 0 ? t("form.created") : t("form.updated"),
           })
         );
+        refetch?.();
         navigate("..");
       }
     } catch (e) {
       // TODO what is the format of these errors?
       // eslint-disable-next-line no-console
       console.error("error", e);
-      // handleError(e.graphQLErrors.map((err) => err.message));
+      handleError(["gql threw an error"]);
     }
   };
 
@@ -540,13 +557,14 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
       <ButtonContainer>
         {/* TODO don't nest Link and Button */}
         <Link to="..">
-          <Button variant="secondary" type="button">
+          <Button variant="secondary" type="button" theme="black">
             {t("form.cancel")}
           </Button>
         </Link>
         <Button
           style={{ marginLeft: "auto" }}
           variant="secondary"
+          theme="black"
           type="button"
           onClick={() => {
             setValue("isDraft", true);
@@ -564,15 +582,55 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
 // We don't have proper layouts yet, so just separate the container stuff here
 const PageWrapped = ({ id }: { id?: number }) => {
   // TODO there is neither singular version of this, nor a pk filter
-  const { data, loading: isLoading } = useQuery<Query>(
-    BANNER_NOTIFICATIONS_ADMIN_LIST,
-    { skip: !id }
-  );
+  const {
+    data,
+    loading: isLoading,
+    refetch,
+  } = useQuery<Query>(BANNER_NOTIFICATIONS_ADMIN_LIST, { skip: !id });
   const { t } = useTranslation();
 
   const notification = data?.bannerNotifications?.edges
     ?.map((edge) => edge?.node)
     .find((node) => node?.pk === id);
+
+  const { notifyError, notifySuccess } = useNotification();
+  const handleError = (errorMsgs: string[]) => {
+    // eslint-disable-next-line no-console
+    console.error(errorMsgs);
+    // We haven't properly mapped error messages
+    notifyError(t("Notifications.error.deleteFailed.generic"));
+  };
+
+  const [removeMutation] = useMutation<
+    Mutation,
+    MutationDeleteBannerNotificationArgs
+  >(BANNER_NOTIFICATIONS_DELETE);
+
+  const navigate = useNavigate();
+
+  const removeNotification = async () => {
+    const res = await removeMutation({
+      variables: {
+        input: {
+          pk: String(notification?.pk ?? 0),
+        },
+      },
+    });
+    if (res.errors) {
+      handleError(res.errors.map((e) => e.message));
+      return;
+    }
+    if (res.data?.deleteBannerNotification?.errors) {
+      const errs = res.data.deleteBannerNotification.errors
+        .filter((e): e is ErrorType => e != null)
+        .map((e) => e?.messages.join(", ") ?? "unknown error");
+      handleError(errs);
+      return;
+    }
+    notifySuccess(t("Notifications.success.removed"));
+    refetch();
+    navigate("..");
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -597,7 +655,18 @@ const PageWrapped = ({ id }: { id?: number }) => {
         ]}
       />
       <Container>
-        <Page notification={notification ?? undefined} />
+        <Page notification={notification ?? undefined} refetch={refetch} />
+        {notification && (
+          <ButtonContainer style={{ marginTop: "2rem" }}>
+            <Button
+              onClick={removeNotification}
+              variant="secondary"
+              theme="black"
+            >
+              {t("Notifications.deleteButton")}
+            </Button>
+          </ButtonContainer>
+        )}
       </Container>
     </>
   );

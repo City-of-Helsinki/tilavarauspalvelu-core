@@ -954,6 +954,18 @@ const translations: ITranslations = {
     noNotifications: ["Ei ilmoituksia"],
     newNotification: ["Uusi ilmoitus"],
     noName: ["(ei nimeä)"],
+    deleteButton: ["Poista"],
+    error: {
+      submit: {
+        generic: ["Ilmoituksen tallennus epäonnistui"],
+      },
+      deleteFailed: {
+        generic: ["Ilmoituksen poisto epäonnistui"],
+      },
+    },
+    success: {
+      removed: ["Ilmoitus poistettu"],
+    },
     form: {
       namePlaceholder: ["Nimi näkyy vain ilmoitusten yhteenvetosivulla"],
       selectionWhen: ["Ilmoituksen voimassaolo"],
