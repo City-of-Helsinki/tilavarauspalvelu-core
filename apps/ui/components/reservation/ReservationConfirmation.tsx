@@ -1,10 +1,5 @@
 import { ReservationState } from "common/types/common";
-import {
-  IconArrowRight,
-  IconCalendar,
-  IconLinkExternal,
-  IconSignout,
-} from "hds-react";
+import { IconCalendar, IconLinkExternal } from "hds-react";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { Trans, useTranslation } from "next-i18next";
@@ -27,6 +22,7 @@ import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
+import ReturnLinkList from "./ReturnLinkList";
 
 type Props = {
   reservation: Reservation | ReservationType;
@@ -54,16 +50,6 @@ const ActionContainer1 = styled.div`
   @media (min-width: ${breakpoints.l}) {
     flex-direction: row;
   }
-`;
-
-const ActionContainer2 = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const StyledLink = styled(IconButton)`
-  color: var(--color-black) !important;
 `;
 
 const InlineStyledLink = styled(Link)`
@@ -158,27 +144,12 @@ const ReservationConfirmation = ({
             </Paragraph>
           </>
         )}
-        <ActionContainer2
+        <ReturnLinkList
+          reservationUnitHome={reservationUnitPath(reservationUnit.pk)}
           style={{
             marginTop: "var(--spacing-3-xl)",
           }}
-        >
-          <StyledLink
-            href={reservationUnitPath(reservationUnit.pk)}
-            label={t("reservations:backToReservationUnit")}
-            icon={<IconArrowRight aria-hidden />}
-          />
-          <StyledLink
-            href="/"
-            label={t("common:gotoFrontpage")}
-            icon={<IconArrowRight aria-hidden />}
-          />
-          <StyledLink
-            icon={<IconSignout aria-hidden />}
-            onClick={signOut}
-            label={t("common:logout")}
-          />
-        </ActionContainer2>
+        />
       </div>
     </Wrapper>
   );

@@ -31,6 +31,8 @@ import { CenterSpinner } from "../common/common";
 import { BlackButton, MediumButton, Toast } from "../../styles/util";
 import ReservationInfoCard from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
+import { reservationUnitPath } from "@/modules/const";
+import ReturnLinkList from "@/components/reservation/ReturnLinkList";
 
 type Props = {
   id: number;
@@ -329,25 +331,14 @@ const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
                         {instructions}
                       </Paragraph>
                     )}
-                    <ButtonContainer>
-                      <StyledLink
-                        href="/"
-                        data-testid="reservation-cancel__button--back-front"
-                      >
-                        {t("common:gotoFrontpage")}
-                        <IconArrowRight size="m" aria-hidden />
-                      </StyledLink>
-                      {logout && (
-                        <StyledLink
-                          as="button"
-                          onClick={() => logout()}
-                          data-testid="reservation-cancel__button--logout"
-                        >
-                          {t("common:logout")}
-                          <IconSignout size="m" aria-hidden />
-                        </StyledLink>
+                    <ReturnLinkList
+                      reservationUnitHome={reservationUnitPath(
+                        reservationUnit.pk
                       )}
-                    </ButtonContainer>
+                      style={{
+                        marginTop: "var(--spacing-3-xl)",
+                      }}
+                    />
                   </>
                 )}
               </ContentContainer>
