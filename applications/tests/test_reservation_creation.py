@@ -33,13 +33,13 @@ response_mock = MagicMock()
 
 
 def get_opening_hour_data_single_day(*args, **kwargs):
-    id = args[0]
+    _id = args[0]
     start = kwargs.get("start_date")
     start_hour = kwargs.get("start_hour", 12)
     end_hour = kwargs.get("end_hour", 14)
     response = [
         {
-            "resource_id": id,
+            "resource_id": _id,
             "date": start,
             "times": [
                 TimeElement(
@@ -54,21 +54,21 @@ def get_opening_hour_data_single_day(*args, **kwargs):
 
 
 def get_opening_hour_data_not_open_that_day(*args, **kwargs):
-    id = args[0]
+    _id = args[0]
     start = kwargs.get("start_date") - datetime.timedelta(days=1)
     end = kwargs.get("end_date") - datetime.timedelta(days=1)
 
-    return get_opening_hour_data_single_day(id, start_date=start, end_date=end)
+    return get_opening_hour_data_single_day(_id, start_date=start, end_date=end)
 
 
 def get_opening_hour_data_for_multiple_days(*args, **kwargs):
-    id = args[0]
+    _id = args[0]
     start = kwargs.get("start_date")
     end = kwargs.get("end_date")
 
     response = [
         {
-            "resource_id": id,
+            "resource_id": _id,
             "date": start,
             "times": [
                 TimeElement(
@@ -79,7 +79,7 @@ def get_opening_hour_data_for_multiple_days(*args, **kwargs):
             ],
         },
         {
-            "resource_id": id,
+            "resource_id": _id,
             "date": end,
             "times": [
                 TimeElement(
