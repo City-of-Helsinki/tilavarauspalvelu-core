@@ -99,7 +99,7 @@ const NotificationsListItem = ({
           {notification && getTranslation(notification, "message")}
         </BannerNotificationText>
         <BannerCloseButton
-          onClick={() => handleCloseButtonClick(notification.id)}
+          onClick={() => handleCloseButtonClick(notification.id ?? "")}
         >
           <IconCross size="s" />
         </BannerCloseButton>
@@ -120,34 +120,36 @@ const BannerNotificationsList = ({
   centered,
 }: BannerNotificationListProps) => {
   const { data: notificationData } = useQuery<Query>(BANNER_NOTIFICATIONS_LIST);
-  const notificationsList = notificationData?.bannerNotifications?.edges.map(
-    (edge) => edge?.node
-  );
+  const notificationsList =
+    notificationData?.bannerNotifications?.edges
+      .map((edge) => edge?.node)
+      .filter((x): x is BannerNotificationType => x != null) ?? [];
 
   const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
     string[]
   >("tilavarausHKIClosedNotificationsList", []);
 
   // Separate notifications by level
-  const errorNotificationsList = notificationsList?.filter(
+  const errorNotificationsList = notificationsList.filter(
     (item) => item?.level === "WARNING"
   );
-  const alertNotificationsList = notificationsList?.filter(
+  const alertNotificationsList = notificationsList.filter(
     (item) => item?.level === "EXCEPTION"
   );
-  const infoNotificationsList = notificationsList?.filter(
+  const infoNotificationsList = notificationsList.filter(
     (item) => item?.level === "NORMAL"
   );
   // Merge grouped notifications prioritised by level
   const groupedNotificationsList = [
-    ...(errorNotificationsList || []),
-    ...(alertNotificationsList || []),
-    ...(infoNotificationsList || []),
+    ...errorNotificationsList,
+    ...alertNotificationsList,
+    ...infoNotificationsList,
   ];
   // Filter out notifications that have been closed by the user, or aren't targeted to them
-  const displayedNotificationsList = groupedNotificationsList?.filter(
+  const displayedNotificationsList = groupedNotificationsList.filter(
     (item) =>
-      !(closedNotificationsList as string[]).includes(String(item?.id)) &&
+      closedNotificationsList != null &&
+      !closedNotificationsList.includes(String(item?.id ?? 0)) &&
       targetList.map((t) => t === item?.target).includes(true)
   );
 
@@ -158,7 +160,7 @@ const BannerNotificationsList = ({
         .map((notification) => (
           <NotificationsListItem
             key={notification?.id}
-            notification={notification as BannerNotificationType}
+            notification={notification}
             closedArray={closedNotificationsList ?? []}
             closeFn={setClosedNotificationsList}
             centered={centered}
