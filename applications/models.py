@@ -993,26 +993,26 @@ class ApplicationEvent(models.Model):
             or event.application_event_schedule_result.accepted is False,
             self.application_event_schedules.all(),
         ):
-            occurences[event_shedule.id] = event_shedule.get_occurences()
+            occurences[event_shedule.id] = event_shedule.get_occurrences()
         return occurences
 
     def get_all_occurrences(self):
         occurences = {}
         for event_shedule in self.application_event_schedules.all():
-            occurences[event_shedule.id] = event_shedule.get_occurences()
+            occurences[event_shedule.id] = event_shedule.get_occurrences()
         return occurences
 
     def get_all_result_occurrences(self):
         occurrences = {}
 
         for schedule in self.application_event_schedules.all():
-            occurrences[schedule.id] = schedule.get_occurences()
+            occurrences[schedule.id] = schedule.get_occurrences()
 
     def create_aggregate_data(self):
         total_events = []
         total_events_durations = []
         for schedule in self.application_event_schedules.all():
-            events_count = len(schedule.get_occurences().occurrences)
+            events_count = len(schedule.get_occurrences().occurrences)
             total_events.append(events_count)
 
             total_events_durations.append((self.min_duration * events_count).total_seconds())
@@ -1160,7 +1160,7 @@ class ApplicationEventSchedule(models.Model):
         related_name="application_event_schedules",
     )
 
-    def get_occurences(self) -> List[EventOccurrence]:
+    def get_occurrences(self) -> EventOccurrence:
         first_matching_day = next_or_current_matching_weekday(self.application_event.begin, self.day)
         previous_match = previous_or_current_matching_weekday(self.application_event.end, self.day)
         myrule = recurrence.Rule(
@@ -1255,7 +1255,7 @@ class ApplicationEventScheduleResult(models.Model):
             ret_dict[row.name] = row.value
         return ret_dict
 
-    def get_result_occurrences(self) -> List[EventOccurrence]:
+    def get_result_occurrences(self) -> EventOccurrence:
         application_event = self.application_event_schedule.application_event
         begin = application_event.begin
         end = application_event.end

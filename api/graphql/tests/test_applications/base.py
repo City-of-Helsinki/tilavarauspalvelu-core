@@ -137,7 +137,7 @@ class ApplicationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         cls.api_client = APIClient()
 
-    def create_service_sector_admin(self):
+    def create_service_sector_admin(self, service_sector=None):
         service_sector_admin = get_user_model().objects.create(
             username="ss_admin",
             first_name="Amin",
@@ -173,7 +173,7 @@ class ApplicationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         return user
 
-    def create_unit_admin(self):
+    def create_unit_admin(self, unit=None):
         unit_group_admin = get_user_model().objects.create(
             username="ss_admin",
             first_name="Amin",
@@ -194,7 +194,7 @@ class ApplicationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         return unit_group_admin
 
-    def create_unit_group_admin(self):
+    def create_unit_group_admin(self, unit_group=None):
         unit_admin = get_user_model().objects.create(
             username="ss_admin",
             first_name="Amin",

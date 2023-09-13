@@ -183,7 +183,7 @@ class ApplicationEventPermissionsTestCaseBase(ApplicationEventTestCaseBase):
 
         return unit_group_admin
 
-    def create_unit_group_admin(self):
+    def create_unit_group_admin(self, unit_group=None):
         unit_admin = get_user_model().objects.create(
             username="ug_admin",
             first_name="Amin",

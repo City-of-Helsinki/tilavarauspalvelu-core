@@ -37,7 +37,7 @@ order_json = {
                     "value": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",
                     "label": "Varaus",
                     "visible_in_checkout": True,
-                    "ordinal": 1,
+                    "ordinal": "1",
                 }
             ],
             "periodFrequency": None,

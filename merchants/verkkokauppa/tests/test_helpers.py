@@ -75,6 +75,7 @@ class HelpersTestCase(TestCase):
         assert_that(get_validated_phone_number("+1 55 50 10 0")).is_equal_to("+1 55 50 10 0")
         assert_that(get_validated_phone_number("050 123 4567")).is_equal_to("")
         assert_that(get_validated_phone_number("(+358) 50 123 4567")).is_equal_to("")
+        assert_that(get_validated_phone_number("")).is_equal_to("")
 
     @patch("merchants.verkkokauppa.helpers.create_order")
     def test_create_verkkokauppa_order_phone_number_is_set(self, mock_create_order):

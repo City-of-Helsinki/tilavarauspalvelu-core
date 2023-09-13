@@ -13,7 +13,7 @@ from opening_hours.hauki_request import make_hauki_post_request, make_hauki_put_
 class Resource:
     """Represents Resource in hauki"""
 
-    id: int
+    id: int | None
     name: str
     description: Optional[str]
     address: Optional[str]

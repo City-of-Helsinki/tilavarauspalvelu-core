@@ -126,7 +126,7 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
         self.client.force_login(self.general_admin)
 
 
-def mock_create_product(*args, **kwargs):
+def mock_create_product():
     return Product(
         product_id=UUID("1018cabd-d693-41c1-8ddc-dc5c08829048"),
         namespace="tilanvaraus",
