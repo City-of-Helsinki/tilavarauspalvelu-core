@@ -1,5 +1,4 @@
 import pytest
-from assertpy import assert_that
 from rest_framework.reverse import reverse
 
 
@@ -11,8 +10,8 @@ def test_general_admin_can_create_cities(general_admin_api_client, application_r
         format="json",
     )
 
-    assert_that(response).has_status_code == 201
-    assert_that(response.data).has_name("Tampere")
+    assert response.status_code == 201
+    assert response.data["name"] == "Tampere"
 
 
 @pytest.mark.django_db
@@ -23,4 +22,4 @@ def test_normal_user_cant_create_cities(user_api_client, application_round):
         format="json",
     )
 
-    assert_that(response).has_status_code == 403
+    assert response.status_code == 403

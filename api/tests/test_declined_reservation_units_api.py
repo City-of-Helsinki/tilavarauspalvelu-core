@@ -1,5 +1,4 @@
 import pytest
-from assertpy import assert_that
 from rest_framework.reverse import reverse
 
 
@@ -15,5 +14,5 @@ def test_updating_declined_reservation_units(application_event, reservation_unit
         format="json",
     )
 
-    assert_that(response).has_status_code == 200
-    assert_that(response.data["declined_reservation_unit_ids"]).is_equal_to([reservation_unit.id])
+    assert response.status_code == 200
+    assert response.data["declined_reservation_unit_ids"] == [reservation_unit.id]

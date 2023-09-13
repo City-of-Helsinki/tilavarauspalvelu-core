@@ -36,10 +36,13 @@ def test_fetching_opening_hours_for_reservation_unit(
         format="json",
     )
 
-    assert_that(response).has_status_code == 201
-    assert_that(response.data["id"]).is_equal_to(reservation_unit.id)
+    assert response.status_code == 200
+    assert response.data["id"] == reservation_unit.id
+
     opening_hours = response.data["opening_hours"][0]
+
     assert_that(opening_hours).has_date("2021-01-01")
-    assert_that(opening_hours["times"][0]).has_start_time("10:00:00").has_end_time("22:00:00").has_end_time_on_next_day(
-        False
-    )
+    assert opening_hours["date"] == "2021-01-01"
+    assert opening_hours["times"][0]["start_time"] == "10:00:00"
+    assert opening_hours["times"][0]["end_time"] == "22:00:00"
+    assert opening_hours["times"][0]["end_time_on_next_day"] is False
