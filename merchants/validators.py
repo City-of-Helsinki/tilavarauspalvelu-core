@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 
 def is_numeric(value: str):
-    if len(value) > 0 and not re.match("^[0-9]*$", value):
+    if len(value) > 0 and not re.match(r"^\d*$", value):
         raise ValidationError("Value must be numeric")
 
 
