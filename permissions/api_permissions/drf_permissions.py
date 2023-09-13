@@ -257,10 +257,7 @@ class ApplicationEventStatusPermission(permissions.BasePermission):
 
 class CityPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, city):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        return can_modify_city(request.user)
+        return self.has_permission(request, view)
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:

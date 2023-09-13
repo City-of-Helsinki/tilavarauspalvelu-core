@@ -85,7 +85,7 @@ class ReservationMetadataFieldAdmin(admin.ModelAdmin):
 class ReservationMetadataSetForm(forms.ModelForm):
     class Meta:
         model = ReservationMetadataSet
-        exclude = ("id",)
+        fields = ("name", "supported_fields", "required_fields")
 
     def clean(self):
         supported = set(self.cleaned_data.get("supported_fields"))

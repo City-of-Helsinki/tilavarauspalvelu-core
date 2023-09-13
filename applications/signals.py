@@ -15,16 +15,13 @@ from .models import (
 def create_application_status(sender, instance, **kwargs):
     if kwargs.get("raw", False):
         return
-    if kwargs.get("created", False):
-        if not instance.statuses.all().exists():
-            ApplicationStatus.objects.create(application=instance, status=ApplicationStatus.DRAFT, user=None)
+    if kwargs.get("created", False) and not instance.statuses.all().exists():
+        ApplicationStatus.objects.create(application=instance, status=ApplicationStatus.DRAFT, user=None)
 
 
 @receiver(post_save, sender=ApplicationStatus, dispatch_uid="update_latest_application_status")
 def update_latest_application_status(sender, instance, **kwargs):
-    if kwargs.get("raw", False):
-        return
-    if not kwargs.get("created", False):
+    if kwargs.get("raw", False) or not kwargs.get("created", False):
         return
 
     instance.application.cached_latest_status = instance.status
@@ -35,26 +32,24 @@ def update_latest_application_status(sender, instance, **kwargs):
 def create_application_event_status(sender, instance, **kwargs):
     if kwargs.get("raw", False):
         return
-    if kwargs.get("created", False):
-        if not instance.statuses.all().exists():
-            ApplicationEventStatus.objects.create(
-                application_event=instance,
-                status=ApplicationEventStatus.CREATED,
-                user=None,
-            )
+    if kwargs.get("created", False) and not instance.statuses.all().exists():
+        ApplicationEventStatus.objects.create(
+            application_event=instance,
+            status=ApplicationEventStatus.CREATED,
+            user=None,
+        )
 
 
 @receiver(post_save, sender=ApplicationRound, dispatch_uid="create_application_round_status")
 def create_application_round_status(sender, instance, **kwargs):
     if kwargs.get("raw", False):
         return
-    if kwargs.get("created", False):
-        if not instance.statuses.all().exists():
-            ApplicationRoundStatus.objects.create(
-                application_round=instance,
-                status=ApplicationRoundStatus.DRAFT,
-                user=None,
-            )
+    if kwargs.get("created", False) and not instance.statuses.all().exists():
+        ApplicationRoundStatus.objects.create(
+            application_round=instance,
+            status=ApplicationRoundStatus.DRAFT,
+            user=None,
+        )
 
 
 @receiver(
@@ -76,10 +71,9 @@ def create_aggregate_data_for_application(sender, instance, **kwargs):
 def create_aggregate_data_for_application_round(sender, instance, **kwargs):
     if kwargs.get("raw", False):
         return
-    if kwargs.get("created", False):
-        if instance.status in (
-            ApplicationRoundStatus.DRAFT,
-            ApplicationRoundStatus.IN_REVIEW,
-            ApplicationRoundStatus.HANDLED,
-        ):
-            instance.application_round.create_aggregate_data()
+    if kwargs.get("created", False) and instance.status in (
+        ApplicationRoundStatus.DRAFT,
+        ApplicationRoundStatus.IN_REVIEW,
+        ApplicationRoundStatus.HANDLED,
+    ):
+        instance.application_round.create_aggregate_data()

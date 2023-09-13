@@ -51,9 +51,7 @@ def test_getting_reservation_unit_calendar(
     zip_content = io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
 
     expected_start = f"DTSTART:{reservation.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
-    unexpected_start = (
-        f"DTSTART:" f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
-    )
+    unexpected_start = f"DTSTART:{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
 
     assert_that(expected_start in zip_content).is_true()
     assert_that(unexpected_start in zip_content).is_false()
@@ -142,9 +140,7 @@ def test_getting_reservation_calendar(
     expected_summary = "SUMMARY:" + reservation.get_ical_summary().replace("\n", "\\n")
     expected_description = "DESCRIPTION:" + reservation.get_ical_description().replace("\n", "\\n")
     expected_start = f"DTSTART:{reservation.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
-    unexpected_start = (
-        f"DTSTART:" f"{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
-    )
+    unexpected_start = f"DTSTART:{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
 
     assert_that(zip_content).contains(expected_summary)
     assert_that(zip_content).contains(expected_description)

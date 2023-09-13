@@ -49,7 +49,7 @@ class ReservationUnitStateHelper:
         return (reservation_unit.publish_begins and now < reservation_unit.publish_begins) and (
             reservation_unit.publish_ends is None
             or reservation_unit.publish_ends <= now
-            or (reservation_unit.publish_ends > now and reservation_unit.publish_begins > reservation_unit.publish_ends)
+            or (now < reservation_unit.publish_ends < reservation_unit.publish_begins)
         )
 
     @staticmethod

@@ -111,7 +111,7 @@ def test_application_round_when_basket_orders_dont_overlap(
     )
 
     assert response.status_code == 201
-    order_numbers = list(map(lambda x: x["order_number"], response.data["application_round_baskets"]))
+    order_numbers = [x["order_number"] for x in response.data["application_round_baskets"]]
     assert len(order_numbers) == 2
     assert 1 in order_numbers and 2 in order_numbers
 
@@ -225,7 +225,7 @@ def test_normal_user_cannot_edit_application_rounds(user_api_client, application
 @pytest.mark.django_db
 def test_normal_user_can_see_application_rounds(user_api_client, application_round):
     response = user_api_client.get(reverse("application_round-list"), format="json")
-    assert application_round.id in map(lambda x: x["id"], response.data)
+    assert application_round.id in (x["id"] for x in response.data)
 
 
 @pytest.mark.django_db
@@ -389,7 +389,7 @@ def test_sent_application_round_cannot_change_to_previous_status(
     application_round,
     valid_application_round_data,
 ):
-    status_options = list(map(lambda option: option[0], ApplicationRoundStatus.STATUS_CHOICES))
+    status_options = [option[0] for option in ApplicationRoundStatus.STATUS_CHOICES]
 
     previous_status_options = list(
         filter(

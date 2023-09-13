@@ -436,7 +436,7 @@ class ApplicationRound(models.Model):
                     )
                 )
             )
-            if len(events) > 0 and declined_event_count == len(events):
+            if len(events) > 0 and len(events) == declined_event_count:
                 application.status = ApplicationStatus.ALLOCATED
             else:
                 application.status = ApplicationStatus.REVIEW_DONE
