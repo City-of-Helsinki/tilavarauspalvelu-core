@@ -6,6 +6,8 @@ import {
 
 import { addSeconds } from "date-fns";
 
+export * from "./date";
+
 export type CollisionInterval = {
   start: Date;
   end: Date;
