@@ -192,7 +192,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'pnpm'
 
       # Repository name needs to be lowercase
       # TODO remember to fix the image name after we can reuse the regular image (build-args)
