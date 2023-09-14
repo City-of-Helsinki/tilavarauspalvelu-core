@@ -10,7 +10,7 @@ from opening_hours.hauki_request import make_hauki_post_request, make_hauki_put_
 
 
 @dataclass(order=True, frozen=True)
-class Resource:
+class HaukiResource:
     """Represents Resource in hauki"""
 
     id: int | None
@@ -49,7 +49,7 @@ class Resource:
         }
 
 
-def send_resource_to_hauki(resource: Resource):
+def send_resource_to_hauki(resource: HaukiResource):
     if not (settings.HAUKI_API_URL and settings.HAUKI_API_KEY):
         raise HaukiConfigurationError("Both hauki api url and hauki api key need to be configured")
 
@@ -60,7 +60,7 @@ def send_resource_to_hauki(resource: Resource):
     response_data = make_hauki_post_request(resources_url, data)
 
     try:
-        resource_out = Resource(
+        resource_out = HaukiResource(
             id=response_data["id"],
             name=response_data["name"],
             description=response_data["description"],
@@ -79,7 +79,7 @@ def send_resource_to_hauki(resource: Resource):
     return resource_out
 
 
-def update_hauki_resource(resource: Resource):
+def update_hauki_resource(resource: HaukiResource):
     if not (settings.HAUKI_API_URL and settings.HAUKI_API_KEY):
         raise HaukiConfigurationError("Both hauki api url and hauki api key need to be configured")
     if not resource.id:
@@ -92,7 +92,7 @@ def update_hauki_resource(resource: Resource):
     response_data = make_hauki_put_request(resources_url, data)
 
     try:
-        resource_out = Resource(
+        resource_out = HaukiResource(
             id=response_data["id"],
             name=response_data["name"],
             description=response_data["description"],
