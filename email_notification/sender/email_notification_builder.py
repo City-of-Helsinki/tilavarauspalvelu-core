@@ -232,9 +232,9 @@ class ReservationEmailNotificationBuilder:
     def _init_context_attr_map(self):
         self.context_attr_map = {}
         for key in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
-            value = getattr(self, f"_get_{key}", False)
-            if not value:
-                raise EmailBuilderConfigError("Email context variable %s did not had _get method defined." % key)
+            value = getattr(self, f"_get_{key}", None)
+            if value is None:
+                raise EmailBuilderConfigError("Email context variable %s did not have _get method defined." % key)
             self.context_attr_map[key] = value()
 
     def validate_template(self):
