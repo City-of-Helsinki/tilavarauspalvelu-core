@@ -154,9 +154,9 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         type_priorities = ["MOBILE", "HOME", "WORK", "OTHER", "NONE"]
 
-        for type in type_priorities:
+        for _type in type_priorities:
             for phone in phones:
-                if phone.get("node", {}).get("phoneType") == type:
+                if phone.get("node", {}).get("phoneType") == _type:
                     return phone.get("node", {}).get("phone")
 
         return None
@@ -181,9 +181,9 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         addresses = self.data.get("addresses", {}).get("edges", [])
 
-        for type in type_priorities:
+        for _type in type_priorities:
             for address in addresses:
-                if address.get("node", {}).get("addressType") == type:
+                if address.get("node", {}).get("addressType") == _type:
                     return address.get("node", {})
         return None
 
@@ -225,9 +225,9 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         type_priorities = ["PERSONAL", "WORK", "OTHER", "NONE"]
 
-        for type in type_priorities:
+        for _type in type_priorities:
             for email in emails:
-                if email.get("node", {}).get("emailType") == type:
+                if email.get("node", {}).get("emailType") == _type:
                     return email.get("node", {}).get("email")
         return None
 

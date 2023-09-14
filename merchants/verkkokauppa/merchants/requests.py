@@ -53,13 +53,13 @@ def create_merchant(params: CreateMerchantParams, post=_post) -> Merchant:
         raise CreateMerchantError("Merchant creation failed") from e
 
 
-def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merchant:
+def update_merchant(merchant_uuid: UUID, params: UpdateMerchantParams, post=_post) -> Merchant:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/merchant/update/merchant/{namespace}") as metric:
             response = post(
                 url=urljoin(
                     _get_base_url(),
-                    f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}",
+                    f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(merchant_uuid)}",
                 ),
                 json=params.to_json(),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -69,7 +69,7 @@ def update_merchant(id: UUID, params: UpdateMerchantParams, post=_post) -> Merch
 
         json = response.json()
         if response.status_code == 404:
-            raise UpdateMerchantError(f"Merchant update failed: merchant {str(id)} not found")
+            raise UpdateMerchantError(f"Merchant update failed: merchant {str(merchant_uuid)} not found")
         if response.status_code != 200:
             raise UpdateMerchantError(f"Merchant update failed: {json.get('errors')}")
 
@@ -103,11 +103,11 @@ def get_merchants(get=_get) -> List[Merchant]:
         raise GetMerchantsError("Fetching merchants failed") from e
 
 
-def get_merchant(id: UUID, get=_get) -> Optional[MerchantInfo]:
+def get_merchant(merchant_uuid: UUID, get=_get) -> Optional[MerchantInfo]:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/merchant/{namespace}/{merchant_id}") as metric:
             response = get(
-                url=urljoin(_get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(id)}"),
+                url=urljoin(_get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(merchant_uuid)}"),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
                 timeout=REQUEST_TIMEOUT_SECONDS,
             )
@@ -119,8 +119,8 @@ def get_merchant(id: UUID, get=_get) -> Optional[MerchantInfo]:
             return None
 
         if response.status_code != 200:
-            raise GetMerchantError(f"Fetching merchant {str(id)} failed: {json.get('errors')}")
+            raise GetMerchantError(f"Fetching merchant {str(merchant_uuid)} failed: {json.get('errors')}")
 
         return MerchantInfo.from_json(json)
     except (RequestException, JSONDecodeError, ParseMerchantError) as e:
-        raise GetMerchantError(f"Fetching merchant {str(id)} failed: {e}") from e
+        raise GetMerchantError(f"Fetching merchant {str(merchant_uuid)} failed: {e}") from e

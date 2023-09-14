@@ -190,6 +190,6 @@ class ReservationUnitExporter:
             return path / file_name
 
     @staticmethod
-    def _write_header_row(writer):
+    def _write_header_row(reservations_writer):
         # Write header rows
-        writer.writerow(HEADER_ROW)
+        reservations_writer.writerow(HEADER_ROW)

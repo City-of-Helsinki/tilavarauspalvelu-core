@@ -213,9 +213,9 @@ class ApplicationDataExporter:
                 return path / file_name
 
     @staticmethod
-    def _write_header_row(writer, spaces_count):
+    def _write_header_row(applications_writer, spaces_count):
         # Write header rows
-        writer.writerow(
+        applications_writer.writerow(
             [
                 "",
                 "",
@@ -251,7 +251,7 @@ class ApplicationDataExporter:
                 "haetut ajat prioriteetilla LOW",
             ]
         )
-        writer.writerow(
+        applications_writer.writerow(
             [
                 "",
                 "",
@@ -287,7 +287,7 @@ class ApplicationDataExporter:
                 "KAIKKI TILAT",
             ]
         )
-        writer.writerow(
+        applications_writer.writerow(
             [
                 "hakemuksen numero",
                 "hakemuksen tila",

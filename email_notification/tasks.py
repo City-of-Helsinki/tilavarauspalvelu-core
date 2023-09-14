@@ -11,19 +11,19 @@ from users.models import ReservationNotification
 
 
 @app.task(name="send_reservation_email")
-def send_reservation_email_task(reservation_id: int, type: EmailType):
+def send_reservation_email_task(reservation_id: int, email_type: EmailType):
     if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
         return
     reservation = Reservation.objects.filter(id=reservation_id).first()
     if not reservation:
         return
-    send_reservation_email_notification(type, reservation, None)
+    send_reservation_email_notification(email_type, reservation, None)
 
 
 @app.task(name="send_staff_reservation_email")
 def send_staff_reservation_email_task(
     reservation_id: int,
-    type: EmailType,
+    email_type: EmailType,
     notification_settings: List[ReservationNotification],
 ):
     if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
@@ -33,4 +33,4 @@ def send_staff_reservation_email_task(
         return
 
     recipients = get_staff_notification_recipients(reservation, notification_settings)
-    send_reservation_email_notification(type, reservation, recipients)
+    send_reservation_email_notification(email_type, reservation, recipients)

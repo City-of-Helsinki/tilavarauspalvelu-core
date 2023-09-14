@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from graphql import GraphQLError
 
@@ -11,19 +11,19 @@ from ..models import PricingStatus, ReservationUnit, ReservationUnitPricing
 
 class ReservationUnitPricingHelper:
     @classmethod
-    def get_active_price(cls, reservation_unit: ReservationUnit) -> Optional[ReservationUnitPricing]:
+    def get_active_price(cls, reservation_unit: ReservationUnit) -> ReservationUnitPricing | None:
         return reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
 
     @classmethod
-    def get_future_price(cls, reservation_unit: ReservationUnit) -> Optional[ReservationUnitPricing]:
+    def get_future_price(cls, reservation_unit: ReservationUnit) -> ReservationUnitPricing | None:
         return reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
 
     @classmethod
     def get_price_by_date(
-        cls, reservation_unit: ReservationUnit, date: datetime.date
-    ) -> Optional[ReservationUnitPricing]:
+        cls, reservation_unit: ReservationUnit, by_date: datetime.date
+    ) -> ReservationUnitPricing | None:
         future_price = cls.get_future_price(reservation_unit)
-        if future_price and future_price.begins <= date:
+        if future_price and future_price.begins <= by_date:
             return future_price
 
         return cls.get_active_price(reservation_unit)
