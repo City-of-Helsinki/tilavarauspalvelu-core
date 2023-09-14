@@ -84,16 +84,17 @@ class OpeningHours:
 class OpeningHoursClient:
     def __init__(
         self,
-        resources: list[str],
+        resources: list[str] | str,
         start: datetime.date,
         end: datetime.date,
-        single=False,
         init_periods=False,
         init_opening_hours=True,
         hauki_origin_id=None,
     ):
-        if single:
+        # If resources is a single resource, convert it to a list.
+        if not isinstance(resources, list):
             resources = [str(resources)]
+
         self.start = start
         self.end = end
 
