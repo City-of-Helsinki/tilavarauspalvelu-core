@@ -39,9 +39,6 @@ class ReservationType(models.TextChoices):
 
 class AgeGroup(models.Model):
     minimum = models.fields.PositiveIntegerField(verbose_name=_("Minimum"), null=False, blank=False)
-
-    minimum = models.fields.PositiveIntegerField(verbose_name=_("Minimum"), null=False, blank=False)
-
     maximum = models.fields.PositiveIntegerField(verbose_name=_("Maximum"), null=True, blank=True)
 
     def __str__(self):
