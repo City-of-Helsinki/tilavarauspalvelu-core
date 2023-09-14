@@ -529,8 +529,8 @@ def customer_types_to_applicant_types(
         CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL: [APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL],
     }
 
-    for type in customer_types:
-        applicant_types += switcher[type]
+    for _type in customer_types:
+        applicant_types += switcher[_type]
     return applicant_types
 
 

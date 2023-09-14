@@ -40,8 +40,8 @@ class EmailTemplateValidator:
     def expression_lookup(self):
         return re.compile(r"{% *(\w+) *")
 
-    def _validate_tags(self, str: str):
-        tags_inside_brackets = re.findall(self.bracket_lookup, str)
+    def _validate_tags(self, string: str):
+        tags_inside_brackets = re.findall(self.bracket_lookup, string)
         variable_tags = []
 
         for strings in tags_inside_brackets:
@@ -53,24 +53,24 @@ class EmailTemplateValidator:
             if tag not in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
                 raise EmailTemplateValidationError(f"Tag {tag} not supported")
 
-    def _validate_illegals(self, str: str):
-        expressions = re.findall(self.expression_lookup, str)
+    def _validate_illegals(self, string: str):
+        expressions = re.findall(self.expression_lookup, string)
         for expression in expressions:
             if expression not in settings.EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS:
                 raise EmailTemplateValidationError("Illegal tags found: tag was '%s'" % expression)
 
     @staticmethod
-    def _validate_in_sandbox(str: str, context: Dict, env: SandboxedEnvironment):
+    def _validate_in_sandbox(string: str, context: Dict, env: SandboxedEnvironment):
         try:
-            env.from_string(str).render(context)
+            env.from_string(string).render(context)
         except TemplateError as e:
             raise EmailTemplateValidationError(e)
 
-    def validate_string(self, str: str, context_dict: Dict = (), env: SandboxedEnvironment = None) -> bool:
+    def validate_string(self, string: str, context_dict: Dict = (), env: SandboxedEnvironment = None) -> bool:
         env = env or get_sandboxed_environment()
-        self._validate_in_sandbox(str, context_dict, env)
-        self._validate_illegals(str)
-        self._validate_tags(str)
+        self._validate_in_sandbox(string, context_dict, env)
+        self._validate_illegals(string)
+        self._validate_tags(string)
 
         return True
 
