@@ -68,13 +68,13 @@ If you find using them alot locally add a docker-compose file.
 docker build -t tilavaraus-ui-mocked \
   -f ./Dockerfile \
   --build-arg APP=ui \
-  --build-arg NEXT_PUBLIC_TILAVARAUS_API_URL=http://localhost:4000 \
+  --build-arg NEXT_PUBLIC_TILAVARAUS_API_URL=http://127.0.0.1:4000 \
   --build-arg=NEXT_PUBLIC_MOCK_REQUESTS=true \
   --build-arg DISABLE_AUTH=true .
 
 docker run -e TZ=Europe/Helsinki \
   -e DISABLE_AUTH=true \
-  -e NEXT_PUBLIC_TILAVARAUS_API_URL=http://localhost:4000 \
+  -e NEXT_PUBLIC_TILAVARAUS_API_URL=http://127.0.0.1:4000 \
   -e PORT=4000 \
   -e NEXT_PUBLIC_MOCK_REQUESTS=true \
   -e NEXTAUTH_SECRET=not-a-good-secret \
