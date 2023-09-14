@@ -5,15 +5,17 @@ import { type TFunction } from "i18next";
 import { Link } from "react-router-dom";
 import { Button } from "hds-react";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
-import type { Query, BannerNotificationType } from "common/types/gql-types";
+import type {
+  Query,
+  BannerNotificationType,
+  PageInfo,
+} from "common/types/gql-types";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import Loader from "app/component/Loader";
-import {
-  valueForDateInput,
-  valueForTimeInput,
-} from "../ReservationUnits/ReservationUnitEditor/DateTimeInput";
-import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
+import { valueForDateInput, valueForTimeInput } from "app/helpers";
+import { GQL_MAX_RESULTS_PER_QUERY } from "app/common/const";
+import { CustomTable, TableLink } from "../lists/components";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 
@@ -44,7 +46,6 @@ const getColConfig = (t: TFunction) => [
     key: "activeFrom",
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
-      // TODO should have time also (not just the date)
       notification.activeFrom
         ? `${valueForDateInput(notification.activeFrom)} ${valueForTimeInput(
             notification.activeFrom
@@ -56,7 +57,6 @@ const getColConfig = (t: TFunction) => [
     key: "activeUntil",
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
-      // TODO should have time also (not just the date)
       notification.activeUntil
         ? `${valueForDateInput(notification.activeUntil)} ${valueForTimeInput(
             notification.activeUntil
@@ -81,66 +81,102 @@ const getColConfig = (t: TFunction) => [
 
 type Sort = {
   field: string;
-  asc: boolean;
+  order: "asc" | "desc";
+};
+
+// Transform the one sort key to the format that the table component expects
+// TODO proper way of doing this is to remap the Table sort keys in the ColConfig
+// so allow different index keys and sort keys for a column (requires refactoring Table).
+const transformSortKey = (key: string) => {
+  if (key === "targetGroup") {
+    return "target";
+  }
+  if (key === "activeFrom") {
+    return "starts";
+  }
+  if (key === "activeUntil") {
+    return "ends";
+  }
+  return key;
+};
+const transformToTableKey = (key: string) => {
+  if (key === "target") {
+    return "targetGroup";
+  }
+  if (key === "starts") {
+    return "activeFrom";
+  }
+  if (key === "ends") {
+    return "activeUntil";
+  }
+  return key;
 };
 
 const NotificationsTable = ({
   notifications,
+  onSortChanged,
+  sortKey,
 }: {
   notifications: BannerNotificationType[];
+  onSortChanged: (key: string) => void;
+  sortKey: Sort;
 }) => {
   const { t } = useTranslation();
   const cols = getColConfig(t);
 
-  // TODO this should be list of sort keys
-  const [sort, setSort] = useState<Sort>({ field: "state", asc: false });
-
-  // TODO sort; all fields are sortable
-  // Default sort: state, activeUntil
-  // Oletuksena lista on järjestetty ensisijaisesti Tila-sarakkeen arvon mukaan [desc], toissijaisesti "Voimassa asti" mukaan, siten että tuorein ilmoitus on ensin [desc].
-  const onSortChanged = (key: string) => {
-    // eslint-disable-next-line no-console
-    console.warn("TODO: implement sorting: ", key);
-    if (sort.field === key) {
-      setSort({ field: key, asc: !sort.asc });
-    } else {
-      setSort({ field: key, asc: true });
-    }
-  };
+  if (notifications.length === 0) {
+    return <p>{t("Notifications.noNotifications")}</p>;
+  }
 
   return (
-    <DataOrMessage
-      filteredData={notifications}
-      noFilteredData={t("Notifications.noNotifications")}
-    >
-      <CustomTable
-        setSort={onSortChanged}
-        indexKey="pk"
-        rows={notifications}
-        cols={cols}
-        initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-        initialSortingOrder={
-          sort === undefined ? undefined : (sort.asc && "asc") || "desc"
-        }
-      />
-    </DataOrMessage>
+    <CustomTable
+      setSort={(sortBy) => onSortChanged(transformSortKey(sortBy))}
+      indexKey="pk"
+      rows={notifications}
+      cols={cols}
+      initialSortingColumnKey={transformToTableKey(sortKey.field)}
+      initialSortingOrder={sortKey.order}
+    />
   );
 };
 
 /// @brief this is the listing page for all notifications.
 const Page = () => {
-  const { data, loading: isLoading } = useQuery<Query>(
-    BANNER_NOTIFICATIONS_ADMIN_LIST
-  );
+  // TODO the default sort should be ["state", "-ends"] but the frontend sort doesn't support multiple options
+  // so either leave it with just state or do some custom magic for the initial sort
+  const [sortKey, setSortKey] = useState<Sort>({
+    field: "state",
+    order: "asc" as const,
+  });
+
+  const {
+    data,
+    loading: isLoading,
+    fetchMore,
+  } = useQuery<Query>(BANNER_NOTIFICATIONS_ADMIN_LIST, {
+    variables: {
+      first: GQL_MAX_RESULTS_PER_QUERY,
+      offset: 0,
+      orderBy: `${sortKey.order === "desc" ? "-" : ""}${sortKey.field}`,
+    },
+  });
 
   const notifications =
     data?.bannerNotifications?.edges
       .map((edge) => edge?.node)
       .filter((n): n is BannerNotificationType => n != null) ?? [];
+  const totalCount = data?.bannerNotifications?.totalCount ?? 0;
 
   const { t } = useTranslation();
 
-  // TODO add paging (100 elements per page, add load more button if there are more (test with 20 per page))
+  const handleSortChange = (key: string) => {
+    if (sortKey.field === key && sortKey.order === "asc") {
+      setSortKey({ field: key, order: "desc" });
+    } else {
+      setSortKey({ field: key, order: "asc" });
+    }
+  };
+
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -156,7 +192,49 @@ const Page = () => {
       {isLoading ? (
         <Loader />
       ) : (
-        <NotificationsTable notifications={notifications} />
+        <>
+          <NotificationsTable
+            notifications={notifications}
+            onSortChanged={handleSortChange}
+            sortKey={sortKey}
+          />
+          {totalCount > notifications.length && (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                fetchMore({
+                  variables: {
+                    offset: notifications.length,
+                  },
+                  // FIXME calling this once, change sort order -> creates an extra ghost as the first element
+                  // (probably the next element for the previous sort order)
+                  updateQuery: (prev, { fetchMoreResult }) => {
+                    if (!fetchMoreResult) {
+                      return prev;
+                    }
+                    const pageInfo =
+                      fetchMoreResult.bannerNotifications?.pageInfo ??
+                      prev.bannerNotifications?.pageInfo;
+                    return {
+                      ...prev,
+                      bannerNotifications: {
+                        ...prev.bannerNotifications,
+                        edges: [
+                          ...(prev.bannerNotifications?.edges ?? []),
+                          ...(fetchMoreResult.bannerNotifications?.edges ?? []),
+                        ],
+                        // NOTE there is something funny with Apollo they disallowed pageInfo undefined in types
+                        pageInfo: pageInfo as PageInfo,
+                      },
+                    };
+                  },
+                });
+              }}
+            >
+              {t("Notifications.loadMore")}
+            </Button>
+          )}
+        </>
       )}
     </>
   );

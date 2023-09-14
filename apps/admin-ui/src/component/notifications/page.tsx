@@ -187,9 +187,10 @@ const NotificationFormSchema = z
     activeFromTime: z.string(),
     activeUntil: z.string(),
     activeUntilTime: z.string(),
-    messageFi: z.string().min(1).max(500),
-    messageEn: z.string().max(500),
-    messageSv: z.string().max(500),
+    // TODO max length doesn't account for the length of an url real max we want is 500 (without links)
+    messageFi: z.string().min(1).max(1000),
+    messageEn: z.string().max(1000),
+    messageSv: z.string().max(1000),
     // refinement is not empty for these two (not having empty as an option forces a default value)
     targetGroup: z.enum(["", "ALL", "STAFF", "USER"]).refine((x) => x !== "", {
       message: "Target group cannot be empty",
@@ -376,13 +377,6 @@ const Page = ({
     { value: "USER", label: t("target.USER") },
   ];
 
-  // TODO logic here
-  // draft always if selected (editing a draft, new ones can't be draft)
-  // scheduled if start is in future
-  // active otherwise (though if it's in the past only backend probably thinks of it as draft?)
-  const state = watch("isDraft")
-    ? BannerNotificationState.Draft
-    : BannerNotificationState.Active;
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <StatusTagContainer>
@@ -391,7 +385,9 @@ const Page = ({
             ? notification?.name ?? t("noName")
             : t("newNotification")}
         </H1>
-        {notification && <BannerNotificationStateTag state={state} />}
+        {notification && (
+          <BannerNotificationStateTag state={notification.state} />
+        )}
       </StatusTagContainer>
       <Controller
         control={control}

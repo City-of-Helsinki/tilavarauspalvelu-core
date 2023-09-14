@@ -16,8 +16,8 @@ export const BANNER_NOTIFICATION_COMMON = gql`
 
 export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
   ${BANNER_NOTIFICATION_COMMON}
-  query BannerNotificationsList {
-    bannerNotifications {
+  query BannerNotificationsList($first: Int, $offset: Int, $orderBy: String) {
+    bannerNotifications(first: $first, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
           pk
@@ -27,6 +27,12 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
           state
         }
       }
+      pageInfo {
+        hasNextPage
+        endCursor
+        hasNextPage
+      }
+      totalCount
     }
   }
 `;

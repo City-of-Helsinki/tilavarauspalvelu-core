@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { HeaderRow } from "./components/HeaderRow/HeaderRow";
 import { SortingHeaderCell } from "./components/SortingHeaderCell/SortingHeaderCell";
 import { TableBody } from "./components/TableBody/TableBody";
@@ -50,7 +50,6 @@ export interface TableCustomTheme {
 type SelectedRow = string | number;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Row = any;
-type Order = "asc" | "desc" | undefined;
 
 export type TableProps = React.ComponentPropsWithoutRef<"table"> & {
   /**
@@ -191,59 +190,6 @@ export type TableProps = React.ComponentPropsWithoutRef<"table"> & {
   zebra?: boolean;
 };
 
-const processRows = (
-  rows: Row[],
-  order: Order,
-  sorting: string | undefined,
-  cols: Header[]
-) => {
-  const sortingEnabled = cols.some((column) => {
-    return column.isSortable === true;
-  });
-
-  if (!sortingEnabled || !order || !sorting) {
-    return [...rows];
-  }
-
-  const sortColumn = cols.find((column) => {
-    return column.key === sorting;
-  });
-
-  const customSortCompareFunction = sortColumn
-    ? sortColumn.customSortCompareFunction
-    : undefined;
-
-  if (customSortCompareFunction) {
-    const sortedRows = [...rows].sort((a, b) => {
-      const aValue = a[sorting];
-      const bValue = b[sorting];
-
-      return customSortCompareFunction(aValue, bValue);
-    });
-
-    if (order === "asc") {
-      return sortedRows;
-    }
-    if (order === "desc") {
-      return sortedRows.reverse();
-    }
-  }
-
-  return [...rows].sort((a, b) => {
-    const aValue = a[sorting];
-    const bValue = b[sorting];
-
-    if (aValue < bValue) {
-      return order === "asc" ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return order === "asc" ? 1 : -1;
-    }
-
-    return 0;
-  });
-};
-
 export const Table = ({
   ariaLabelSortButtonAscending = "Järjestetty nousevaan järjestykseen",
   ariaLabelSortButtonDescending = "Järjestetty laskevaan järjestykseen",
@@ -301,13 +247,8 @@ export const Table = ({
     /* eslint-enable no-param-reassign */
   }
 
-  const [sorting] = useState<string | undefined>(initialSortingColumnKey);
-  const [order] = useState<"asc" | "desc" | undefined>(initialSortingOrder);
-
-  const processedRows = useMemo(
-    () => processRows(rows, order, sorting, cols),
-    [rows, sorting, order, cols]
-  );
+  const sorting = initialSortingColumnKey;
+  const order = initialSortingOrder;
 
   const hasCustomActionButtons =
     customActionButtons && customActionButtons.length > 0;
@@ -374,7 +315,7 @@ export const Table = ({
           </HeaderRow>
         </thead>
         <TableBody textAlignContentRight={textAlignContentRight}>
-          {processedRows.map((row, index) => (
+          {rows.map((row, index) => (
             <tr key={String(row[indexKey])}>
               {verticalHeaders && verticalHeaders.length && (
                 <th scope="row">{verticalHeaders[index].headerName}</th>
