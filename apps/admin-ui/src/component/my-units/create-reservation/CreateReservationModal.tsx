@@ -24,7 +24,7 @@ import { breakpoints } from "common/src/common/style";
 import { fromUIDate } from "common/src/common/util";
 import { setTimeOnDate } from "app/component/reservations/utils";
 import { useCheckCollisions } from "app/component/reservations/requested/hooks";
-import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
+import { dateTime } from "app/helpers";
 import { useModal } from "../../../context/ModalContext";
 import { CREATE_STAFF_RESERVATION } from "./queries";
 import Loader from "../../Loader";

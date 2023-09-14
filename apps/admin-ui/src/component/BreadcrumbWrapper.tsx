@@ -13,7 +13,7 @@ type Alias = {
 };
 
 type Props = {
-  route: string[];
+  route: string[] | Array<{ slug: string; alias?: string }>;
   aliases?: Alias[];
 };
 
@@ -35,6 +35,13 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
 
   const routes =
     route?.map((n) => {
+      if (typeof n === "object") {
+        return {
+          title: n.alias || t(`breadcrumb.${trim(n.slug, "/")}`) || "",
+          slug: n.slug,
+        };
+      }
+
       const title = n.split("/").pop();
       return {
         title:

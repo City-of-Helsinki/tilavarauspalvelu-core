@@ -12,6 +12,8 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  id?: string;
+  label?: string;
 }
 
 // NOTE string version because Date breaks keyboard input
@@ -21,6 +23,8 @@ const ControlledDateInput = <T extends FieldValues>({
   error,
   required,
   disabled,
+  id,
+  label,
 }: ControllerProps<T>) => {
   const {
     field: { value, onChange },
@@ -29,8 +33,8 @@ const ControlledDateInput = <T extends FieldValues>({
 
   return (
     <DateInput
-      id={`reservationDialog.${name}`}
-      label={t(`ReservationDialog.${name}`)}
+      id={id ?? `reservationDialog.${name}`}
+      label={label ?? t(`ReservationDialog.${name}`)}
       minDate={new Date()}
       maxDate={addYears(new Date(), 3)}
       disableConfirmation

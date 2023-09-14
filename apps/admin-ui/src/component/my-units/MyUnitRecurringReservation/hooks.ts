@@ -26,6 +26,7 @@ import {
   CollisionInterval,
   doesIntervalCollide,
   reservationToInterval,
+  dateTime,
 } from "app/helpers";
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "../../../context/NotificationContext";
@@ -36,7 +37,6 @@ import {
 } from "./queries";
 import { NewReservationListItem } from "../../ReservationsList";
 import { convertToDate } from "./utils";
-import { dateTime } from "../../ReservationUnits/ReservationUnitEditor/DateTimeInput";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
 import { flattenMetadata } from "../create-reservation/utils";

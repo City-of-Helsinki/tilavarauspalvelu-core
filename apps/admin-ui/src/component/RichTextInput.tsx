@@ -16,6 +16,8 @@ type Props = {
   onChange: (v: string) => void;
   errorText?: string;
   tooltipText?: string;
+  style?: React.CSSProperties;
+  className?: string;
 };
 
 const Container = styled.div<{ $disabled: boolean }>`
@@ -88,9 +90,16 @@ const RichTextInput = ({
   errorText,
   tooltipText,
   onChange,
+  style,
+  className,
 }: Props): JSX.Element => {
   return (
-    <Container $disabled={disabled} id={`${id}-container`}>
+    <Container
+      style={style}
+      className={className}
+      $disabled={disabled}
+      id={`${id}-container`}
+    >
       <HorisontalFlex style={{ justifyContent: "space-between" }}>
         <Label htmlFor={id}>
           {label} {required ? <Asterix>*</Asterix> : null}

@@ -277,6 +277,17 @@ const getFilteredMenu = (
       },
     ].filter((item) => hasPermission(item.permission)),
   },
+  {
+    title: "breadcrumb.messaging",
+    route: "/messaging",
+    items: [
+      {
+        permission: Permission.CAN_MANAGE_BANNER_NOTIFICATIONS,
+        title: "breadcrumb.notifications",
+        route: "/messaging/notifications",
+      },
+    ].filter((item) => hasPermission(item.permission)),
+  },
 ];
 
 const Items = ({
