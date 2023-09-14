@@ -51,7 +51,7 @@ format: {hostname}/{basePath}/api/auth/callback/tunnistamo
 
 NEXT_PUBLIC_TILAVARAUS_API_URL
 
-local core runs by default in http://localhost:8000 you can also use the development server that runs in Azure.
+local core runs by default in http://127.0.0.1:8000 you can also use the development server that runs in Azure.
 
 ## Available Scripts
 
