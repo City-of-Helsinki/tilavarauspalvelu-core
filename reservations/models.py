@@ -158,7 +158,7 @@ class RecurringReservation(models.Model):
 
     end_time = models.TimeField(verbose_name=_("End time"), null=True)
 
-    begin_date = models.DateField(verbose_name=("Begin date"), null=True)
+    begin_date = models.DateField(verbose_name=_("Begin date"), null=True)
 
     end_date = models.DateField(verbose_name=_("End date"), null=True)
 
