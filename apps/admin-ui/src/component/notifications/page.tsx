@@ -293,8 +293,12 @@ const Page = ({
 
   const handleError = (errorMsgs: string[]) => {
     // TODO improved filtering here
-    const alreadyExists = errorMsgs.find((x) => x === "banner notification jolla on tämä name, on jo olemassa.");
-    const isMissingMessage = errorMsgs.find((x) => x === "Non-draft notifications must have a message.");
+    const alreadyExists = errorMsgs.find(
+      (x) => x === "banner notification jolla on tämä name, on jo olemassa."
+    );
+    const isMissingMessage = errorMsgs.find(
+      (x) => x === "Non-draft notifications must have a message."
+    );
     if (alreadyExists) {
       notifyError(t("error.submit.alreadyExists"));
     } else if (isMissingMessage) {
