@@ -68,12 +68,12 @@ class OpeningHoursClientTestCase(TestCase):
 
     def test_client_inits_single_resource(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         assert_that(client).is_not_none()
 
     def test_get_opening_hours_for_resource(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         times = client.get_opening_hours_for_resource(str(self.reservation_unit.uuid), DATES[0])
         assert_that(len(times)).is_greater_than(0)
 
@@ -119,19 +119,19 @@ class OpeningHoursClientTestCase(TestCase):
 
     def test_refresh_opening_hours(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         client.refresh_opening_hours()
         assert_that(mock.call_count).is_equal_to(2)
 
     def test_get_opening_hours_for_resources_when_resource_not_listed(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         times = client.get_opening_hours_for_resource("non-existent", DATES[0])
         assert_that(times).is_empty()
 
     def test_is_resource_open_is_true(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00")
         is_open = client.is_resource_reservable(str(self.reservation_unit.uuid), begin, end)
@@ -139,7 +139,7 @@ class OpeningHoursClientTestCase(TestCase):
 
     def test_is_resource_open_is_false(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T21:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00")
         is_open = client.is_resource_reservable(str(self.reservation_unit.uuid), begin, end)
@@ -147,7 +147,7 @@ class OpeningHoursClientTestCase(TestCase):
 
     def test_is_resource_open_respects_timezone_is_true(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T21:00+04:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00+04:00")
 
@@ -175,7 +175,7 @@ class OpeningHoursClientTestCase(TestCase):
 
         mock.return_value = dates
 
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00")
         is_open = client.is_resource_reservable(str(self.reservation_unit.uuid), begin, end)
@@ -202,7 +202,7 @@ class OpeningHoursClientTestCase(TestCase):
 
         mock.return_value = dates
 
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00")
         is_open = client.is_resource_reservable(str(self.reservation_unit.uuid), begin, end)
@@ -220,7 +220,7 @@ class OpeningHoursClientTestCase(TestCase):
         ]
         mock.return_value = dates
 
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00")
         is_open = client.is_resource_reservable(str(self.reservation_unit.uuid), begin, end)
@@ -244,7 +244,7 @@ class OpeningHoursClientTestCase(TestCase):
         ]
         mock.return_value = dates
 
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00")
         is_open = client.is_resource_reservable(str(self.reservation_unit.uuid), begin, end)
@@ -267,7 +267,7 @@ class OpeningHoursClientTestCase(TestCase):
             ),
         ]
         mock.return_value = dates
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
 
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T15:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T16:00")
@@ -291,7 +291,7 @@ class OpeningHoursClientTestCase(TestCase):
             ),
         ]
         mock.return_value = dates
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T13:00")
         is_open = client.is_resource_reservable(str(self.reservation_unit.uuid), begin, end)
@@ -299,7 +299,7 @@ class OpeningHoursClientTestCase(TestCase):
 
     def test_is_resource_open_respects_timezone_is_false(self, mock):
         mock.return_value = self.get_mocked_opening_hours()
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
         begin = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T06:00+02:00")
         end = datetime.datetime.fromisoformat(f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T07:00+02:00")
 
@@ -312,7 +312,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
         date, times = client.next_opening_times(
             str(self.reservation_unit.uuid),
@@ -335,7 +334,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
         date, times = client.next_opening_times(
             str(self.reservation_unit.uuid),
@@ -350,7 +348,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[0],
-            single=True,
         )
         origin_id = mock.call_args.args[3]
         assert_that(origin_id).is_same_as(settings.HAUKI_ORIGIN_ID)
@@ -360,7 +357,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.unit.tprek_id),
             DATES[0],
             DATES[0],
-            single=True,
             hauki_origin_id=self.unit.hauki_resource_data_source_id,
         )
         origin_id = mock.call_args.args[3]
@@ -380,7 +376,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
         times = client.get_opening_hours_for_resource(
             str(self.reservation_unit.uuid),
@@ -404,7 +399,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin_1 = datetime.datetime.combine(
@@ -462,7 +456,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin_1 = datetime.datetime.combine(
@@ -515,7 +508,7 @@ class OpeningHoursClientTestCase(TestCase):
         )
         mock.return_value = data
 
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
 
         begin_1 = datetime.datetime.combine(DATES[0], datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
         end_1 = datetime.datetime.combine(DATES[0], datetime.time(15), tzinfo=DEFAULT_TIMEZONE)
@@ -562,7 +555,7 @@ class OpeningHoursClientTestCase(TestCase):
         ]
         mock.return_value = data
 
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
 
         begin_1 = datetime.datetime.combine(
             DATES[0],
@@ -670,7 +663,7 @@ class OpeningHoursClientTestCase(TestCase):
         )
         mock.return_value = data
 
-        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True)
+        client = OpeningHoursClient(str(self.reservation_unit.uuid), DATES[0], DATES[1])
 
         begin = datetime.datetime.combine(
             DATES[0],
@@ -708,7 +701,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin = datetime.datetime.combine(
@@ -749,7 +741,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin = datetime.datetime.combine(
@@ -790,7 +781,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin_1 = datetime.datetime.combine(
@@ -854,7 +844,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin = datetime.datetime.combine(
@@ -900,7 +889,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin = datetime.datetime.combine(
@@ -946,7 +934,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin_1 = datetime.datetime.combine(
@@ -1014,7 +1001,6 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid),
             DATES[0],
             DATES[1],
-            single=True,
         )
 
         begin_1 = datetime.datetime.combine(

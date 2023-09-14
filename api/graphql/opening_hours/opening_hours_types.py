@@ -122,7 +122,6 @@ class OpeningHoursMixin:
             self.hauki_resource_origin_id,
             start,
             end,
-            single=True,
             init_periods=init_periods,
             init_opening_hours=init_times,
             hauki_origin_id=self.hauki_resource_data_source_id,
