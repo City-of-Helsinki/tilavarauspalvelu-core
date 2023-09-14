@@ -9,7 +9,10 @@ import { createUploadLink } from "apollo-upload-client";
 import { onError } from "@apollo/client/link/error";
 import { uniqBy } from "lodash";
 import { GraphQLError } from "graphql/error/GraphQLError";
-import { ReservationTypeConnection } from "common/types/gql-types";
+import type {
+  ReservationTypeConnection,
+  BannerNotificationTypeConnection,
+} from "common/types/gql-types";
 
 import { SESSION_EXPIRED_ERROR, GRAPQL_API_URL, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
@@ -60,6 +63,27 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
+          bannerNotifications: {
+            keyArgs: ["orderBy"],
+            read(existing: BannerNotificationTypeConnection) {
+              return existing;
+            },
+            merge(
+              existing: BannerNotificationTypeConnection,
+              incoming: BannerNotificationTypeConnection
+            ) {
+              // TODO this should be optimized; using both spread and uniqBy creates a lot of copies
+              const merged = {
+                ...existing,
+                ...incoming,
+                edges: uniqBy(
+                  [...(existing?.edges ?? []), ...incoming.edges],
+                  (x) => x?.node?.pk
+                ),
+              };
+              return merged;
+            },
+          },
           reservations: {
             // Separate caches for all query params
             // causes a full refetch when anything changes which is bad (e.g. sorting)

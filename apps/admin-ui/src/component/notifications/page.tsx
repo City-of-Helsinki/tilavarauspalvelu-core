@@ -26,6 +26,7 @@ import {
   type MutationCreateBannerNotificationArgs,
   type MutationDeleteBannerNotificationArgs,
   type ErrorType,
+  type BannerNotificationTypeConnection,
 } from "common/types/gql-types";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
@@ -225,17 +226,25 @@ const GridForm = styled.form`
   gap: 1rem;
 `;
 
+// @brief inefficient way to destroy caches, normal INVALIDATE doesn't remove keys
+// @param cache is the apollo cache
+// @param matcher is the query name to destroy
+// Some other alternatives is to update cache based on mutation payload
+// only invalidate cache keys where the mutated object is in
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const deleteQueryFromCache = (cache: any, matcher: string | RegExp): void => {
+  const rootQuery = cache.data.data.ROOT_QUERY;
+  Object.keys(rootQuery).forEach((key) => {
+    if (key.match(matcher)) {
+      cache.evict({ id: "ROOT_QUERY", fieldName: key });
+    }
+  });
+};
+
 /// @brief This is the create / edit page for a single notification.
-const Page = ({
-  notification,
-  refetch,
-}: {
-  notification?: BannerNotificationType;
-  refetch?: () => void;
-}) => {
+const Page = ({ notification }: { notification?: BannerNotificationType }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
-  // const activeFrom = data.activeFrom !== "" ? dateTime(data.activeFrom, data.activeFromTime) : undefined;
   const today = new Date();
   const activeFrom = valueForDateInput(
     notification?.activeFrom ?? today.toISOString()
@@ -283,11 +292,19 @@ const Page = ({
   const [createMutation] = useMutation<
     Mutation,
     MutationCreateBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_CREATE);
+  >(BANNER_NOTIFICATIONS_CREATE, {
+    update(cache) {
+      deleteQueryFromCache(cache, "bannerNotifications");
+    },
+  });
   const [updateMutation] = useMutation<
     Mutation,
     MutationUpdateBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_UPDATE);
+  >(BANNER_NOTIFICATIONS_UPDATE, {
+    update(cache) {
+      deleteQueryFromCache(cache, "bannerNotifications");
+    },
+  });
 
   const { notifyError, notifySuccess } = useNotification();
 
@@ -365,7 +382,6 @@ const Page = ({
             state: data.pk === 0 ? t("form.created") : t("form.updated"),
           })
         );
-        refetch?.();
         navigate("..");
       }
     } catch (e) {
@@ -591,13 +607,10 @@ const Page = ({
 // We don't have proper layouts yet, so just separate the container stuff here
 const PageWrapped = ({ id }: { id?: number }) => {
   // TODO there is neither singular version of this, nor a pk filter
-  const {
-    data,
-    loading: isLoading,
-    // TODO refetch doesn't work with the loadMore cache so it's useless
-    // need to add proper cache to ApolloProvider and invalidate it on mutation
-    refetch,
-  } = useQuery<Query>(BANNER_NOTIFICATIONS_ADMIN_LIST, { skip: !id });
+  const { data, loading: isLoading } = useQuery<Query>(
+    BANNER_NOTIFICATIONS_ADMIN_LIST,
+    { skip: !id }
+  );
   const { t } = useTranslation();
 
   const notification = data?.bannerNotifications?.edges
@@ -615,7 +628,28 @@ const PageWrapped = ({ id }: { id?: number }) => {
   const [removeMutation] = useMutation<
     Mutation,
     MutationDeleteBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_DELETE);
+  >(BANNER_NOTIFICATIONS_DELETE, {
+    update(cache, { data: newData }) {
+      cache.modify({
+        fields: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore; TODO: typechecking broke after upgrading apollo
+          bannerNotifications(existing: BannerNotificationTypeConnection) {
+            const res = newData?.deleteBannerNotification;
+            if (res?.errors) {
+              return existing;
+            }
+
+            const pk = notification?.pk;
+            if (!pk) {
+              return existing;
+            }
+            return existing.edges.filter((x) => x?.node && x.node.pk !== pk);
+          },
+        },
+      });
+    },
+  });
 
   const navigate = useNavigate();
 
@@ -639,7 +673,6 @@ const PageWrapped = ({ id }: { id?: number }) => {
       return;
     }
     notifySuccess(t("Notifications.success.removed"));
-    refetch();
     navigate("..");
   };
 
@@ -666,7 +699,7 @@ const PageWrapped = ({ id }: { id?: number }) => {
         ]}
       />
       <Container>
-        <Page notification={notification ?? undefined} refetch={refetch} />
+        <Page notification={notification ?? undefined} />
         {notification && (
           <ButtonContainer style={{ marginTop: "2rem" }}>
             <Button

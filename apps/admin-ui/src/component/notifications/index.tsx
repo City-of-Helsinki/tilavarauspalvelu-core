@@ -5,11 +5,7 @@ import { type TFunction } from "i18next";
 import { Link } from "react-router-dom";
 import { Button } from "hds-react";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
-import type {
-  Query,
-  BannerNotificationType,
-  PageInfo,
-} from "common/types/gql-types";
+import type { Query, BannerNotificationType } from "common/types/gql-types";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import Loader from "app/component/Loader";
@@ -204,29 +200,7 @@ const Page = () => {
               onClick={() => {
                 fetchMore({
                   variables: {
-                    offset: notifications.length,
-                  },
-                  // FIXME calling this once, change sort order -> creates an extra ghost as the first element
-                  // (probably the next element for the previous sort order)
-                  updateQuery: (prev, { fetchMoreResult }) => {
-                    if (!fetchMoreResult) {
-                      return prev;
-                    }
-                    const pageInfo =
-                      fetchMoreResult.bannerNotifications?.pageInfo ??
-                      prev.bannerNotifications?.pageInfo;
-                    return {
-                      ...prev,
-                      bannerNotifications: {
-                        ...prev.bannerNotifications,
-                        edges: [
-                          ...(prev.bannerNotifications?.edges ?? []),
-                          ...(fetchMoreResult.bannerNotifications?.edges ?? []),
-                        ],
-                        // NOTE there is something funny with Apollo they disallowed pageInfo undefined in types
-                        pageInfo: pageInfo as PageInfo,
-                      },
-                    };
+                    offset: notifications.length + 1,
                   },
                 });
               }}
