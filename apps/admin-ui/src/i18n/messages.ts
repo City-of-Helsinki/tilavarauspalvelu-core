@@ -958,6 +958,8 @@ const translations: ITranslations = {
     error: {
       submit: {
         generic: ["Ilmoituksen tallennus epäonnistui"],
+        alreadyExists: ["Ilmoitus on jo olemassa"],
+        missingMessage: ["Ilmoituksen viesti puuttuu"],
       },
       deleteFailed: {
         generic: ["Ilmoituksen poisto epäonnistui"],

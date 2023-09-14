@@ -292,10 +292,19 @@ const Page = ({
   const { notifyError, notifySuccess } = useNotification();
 
   const handleError = (errorMsgs: string[]) => {
-    // eslint-disable-next-line no-console
-    console.error(errorMsgs);
-    // We haven't properly mapped error messages
-    notifyError(t("error.submit.generic"));
+    // TODO improved filtering here
+    const alreadyExists = errorMsgs.find((x) => x === "banner notification jolla on tämä name, on jo olemassa.");
+    const isMissingMessage = errorMsgs.find((x) => x === "Non-draft notifications must have a message.");
+    if (alreadyExists) {
+      notifyError(t("error.submit.alreadyExists"));
+    } else if (isMissingMessage) {
+      notifyError(t("error.submit.missingMessage"));
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(errorMsgs);
+      // We haven't properly mapped error messages
+      notifyError(t("error.submit.generic"));
+    }
   };
 
   const navigate = useNavigate();
@@ -318,7 +327,7 @@ const Page = ({
       activeFrom: start,
       activeUntil: end,
       draft: data.isDraft,
-      messageFi: data.messageFi,
+      message: data.messageFi,
       messageEn: data.messageEn,
       messageSv: data.messageSv,
       target: convertTarget(data.targetGroup),
@@ -385,7 +394,7 @@ const Page = ({
             ? notification?.name ?? t("noName")
             : t("newNotification")}
         </H1>
-        {notification && (
+        {notification?.state && (
           <BannerNotificationStateTag state={notification.state} />
         )}
       </StatusTagContainer>
@@ -581,6 +590,8 @@ const PageWrapped = ({ id }: { id?: number }) => {
   const {
     data,
     loading: isLoading,
+    // TODO refetch doesn't work with the loadMore cache so it's useless
+    // need to add proper cache to ApolloProvider and invalidate it on mutation
     refetch,
   } = useQuery<Query>(BANNER_NOTIFICATIONS_ADMIN_LIST, { skip: !id });
   const { t } = useTranslation();
