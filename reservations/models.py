@@ -508,7 +508,8 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         help_text="Type of reservation",
     )
 
-    def _requires_handling(self):
+    @property
+    def requires_handling(self) -> bool:
         return (
             self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
         )
