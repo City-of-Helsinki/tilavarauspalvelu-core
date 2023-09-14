@@ -69,7 +69,7 @@ class ReservationAdjustTimeSerializer(PrimaryKeyUpdateSerializer, ReservationPri
 
         self.check_and_handle_pricing(data)
 
-        if self.instance._requires_handling():
+        if self.instance.requires_handling:
             data["state"] = STATE_CHOICES.REQUIRES_HANDLING
 
         return data

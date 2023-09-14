@@ -73,7 +73,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS,
             )
 
-        if not self.instance._requires_handling():
+        if not self.instance.requires_handling:
             payment_type = data.get("payment_type", "").upper()
             reservation_unit = self.instance.reservation_unit.first()
 
@@ -101,7 +101,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         validated_data = super().validated_data
         payment_type = validated_data.get("payment_type", "").upper()
 
-        if self.instance._requires_handling():
+        if self.instance.requires_handling:
             validated_data["state"] = STATE_CHOICES.REQUIRES_HANDLING
         elif self.instance.price_net > 0 and payment_type != PaymentType.ON_SITE:
             validated_data["state"] = STATE_CHOICES.WAITING_FOR_PAYMENT
