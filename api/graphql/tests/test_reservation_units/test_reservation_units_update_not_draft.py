@@ -10,7 +10,7 @@ from api.graphql.tests.test_reservation_units.base import (
 )
 from merchants.models import PaymentType
 from opening_hours.errors import HaukiAPIError
-from opening_hours.resources import Resource as HaukiResource
+from opening_hours.resources import HaukiResource
 from reservation_units.models import ReservationUnit
 from tests.factories import ReservationUnitFactory
 

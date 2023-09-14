@@ -6,7 +6,7 @@ from snapshottest.django import TestCase
 
 from opening_hours.enums import ResourceType
 from opening_hours.resources import (
-    Resource,
+    HaukiResource,
     send_resource_to_hauki,
     update_hauki_resource,
 )
@@ -16,7 +16,7 @@ class SendResourceToHaukiTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.resource = Resource(
+        cls.resource = HaukiResource(
             id=None,
             name="Test Resource",
             description="",
@@ -65,7 +65,7 @@ class SendResourceToHaukiTestCase(TestCase):
     @mock.patch("opening_hours.resources.make_hauki_put_request")
     def test_update(self, put_mock):
         data = self.resource.convert_to_request_data()
-        resource = Resource(
+        resource = HaukiResource(
             id=1,
             name=data["name"],
             description=data["description"],

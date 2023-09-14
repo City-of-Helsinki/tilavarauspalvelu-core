@@ -6,7 +6,7 @@ from django.test.testcases import TestCase
 
 from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError
-from opening_hours.resources import Resource
+from opening_hours.resources import HaukiResource
 from reservation_units.utils.hauki_exporter import ReservationUnitHaukiExporter
 from tests.factories import ReservationUnitFactory, UnitFactory
 
@@ -66,7 +66,7 @@ class HaukiExporterTestCase(TestCase):
 
     @mock.patch("reservation_units.utils.hauki_exporter.send_resource_to_hauki")
     def test_send_reservation_unit_to_hauki_create_new_resource(self, send_mock, hauki_mock):
-        send_mock.return_value = Resource(
+        send_mock.return_value = HaukiResource(
             id=1,
             name="",
             description="",

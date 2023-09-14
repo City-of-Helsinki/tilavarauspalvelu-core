@@ -7,7 +7,7 @@ from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
 from opening_hours.hauki_request import make_hauki_get_request
 from opening_hours.resources import (
-    Resource,
+    HaukiResource,
     send_resource_to_hauki,
     update_hauki_resource,
 )
@@ -38,7 +38,7 @@ class ReservationUnitHaukiExporter:
 
         return resource_id
 
-    def _get_hauki_resource_object_from_reservation_unit(self) -> Resource:
+    def _get_hauki_resource_object_from_reservation_unit(self) -> HaukiResource:
         parent_id = self.reservation_unit.unit.hauki_resource_id or self._get_parent_id()
         if parent_id is None:
             raise ValueError("Unit did not have hauki resource id and could not get it from hauki.")
@@ -48,7 +48,7 @@ class ReservationUnitHaukiExporter:
             raise ValueError("Unit does not have a department id,")
         department_id = f"tprek:{department_id}"
 
-        return Resource(
+        return HaukiResource(
             id=self.reservation_unit.hauki_resource_id or None,
             name=self.reservation_unit.name,
             description=self.reservation_unit.description,
@@ -70,7 +70,7 @@ class ReservationUnitHaukiExporter:
         else:
             response_data = send_resource_to_hauki(hauki_resource_object)
 
-        if isinstance(response_data, Resource) and response_data.id:
+        if isinstance(response_data, HaukiResource) and response_data.id:
             self.reservation_unit.hauki_resource_id = response_data.id
             self.reservation_unit.save()
 
