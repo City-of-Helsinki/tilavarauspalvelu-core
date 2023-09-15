@@ -956,6 +956,7 @@ const translations: ITranslations = {
     noName: ["(ei nimeä)"],
     deleteButton: ["Poista"],
     error: {
+      notFound: ["Ilmoitusta ei löytynyt"],
       submit: {
         generic: ["Ilmoituksen tallennus epäonnistui"],
         alreadyExists: ["Ilmoitus on jo olemassa"],

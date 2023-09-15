@@ -726,15 +726,17 @@ const PageWrapped = ({ id }: { id?: number }) => {
       <Container>
         <StatusTagContainer>
           <H1 $legacy>
-            {notification
-              ? notification?.name ?? t("noName")
+            {id !== 0
+              ? notification?.name ?? t("Notifications.error.notFound")
               : t("Notifications.newNotification")}
           </H1>
           {notification?.state && (
             <BannerNotificationStateTag state={notification.state} />
           )}
         </StatusTagContainer>
-        <NotificationForm notification={notification ?? undefined} />
+        {(notification || id === 0) && (
+          <NotificationForm notification={notification ?? undefined} />
+        )}
         {notification && (
           <ButtonContainer
             style={{ marginTop: "2rem", justifyContent: "flex-start" }}
