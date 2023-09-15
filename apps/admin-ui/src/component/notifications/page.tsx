@@ -22,13 +22,14 @@ import {
   Target,
   type Mutation,
   type Query,
+  type QueryBannerNotificationArgs,
   type MutationUpdateBannerNotificationArgs,
   type MutationCreateBannerNotificationArgs,
   type MutationDeleteBannerNotificationArgs,
   type ErrorType,
   type BannerNotificationTypeConnection,
 } from "common/types/gql-types";
-import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
+import { BANNER_NOTIFICATIONS_ADMIN } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
@@ -48,6 +49,7 @@ import {
   dateTime,
   parseDateTimeSafe,
 } from "app/helpers";
+import { TFunction } from "i18next";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 
@@ -637,18 +639,44 @@ const NotificationForm = ({
   );
 };
 
-// We don't have proper layouts yet, so just separate the container stuff here
-const PageWrapped = ({ id }: { id?: number }) => {
+const getName = (
+  isNew: boolean,
+  isLoading: boolean,
+  name: string | undefined,
+  t: TFunction
+) => {
+  if (name) {
+    return name;
+  }
+  if (isLoading) {
+    return t("Notifications.isLoading");
+  }
+  if (isNew) {
+    return t("Notifications.newNotification");
+  }
+  return t("Notifications.error.notFound");
+};
+
+/// @param pk: primary key of the notification to edit, null for new notification, NaN for error
+/// Client only: uses hooks, window, and react-router-dom
+/// We don't have proper layouts yet, so just separate the container stuff here
+const PageWrapped = ({ pk }: { pk?: number }) => {
+  const typename = "BannerNotificationType";
+  const id = pk ? window?.btoa(`${typename}:${pk}`) : undefined;
+
   // TODO there is neither singular version of this, nor a pk filter
-  const { data, loading: isLoading } = useQuery<Query>(
-    BANNER_NOTIFICATIONS_ADMIN_LIST,
-    { skip: !id }
-  );
+  const { data, loading: isLoading } = useQuery<
+    Query,
+    QueryBannerNotificationArgs
+  >(BANNER_NOTIFICATIONS_ADMIN, {
+    skip: !id,
+    variables: {
+      id: String(id ?? ""),
+    },
+  });
   const { t } = useTranslation();
 
-  const notification = data?.bannerNotifications?.edges
-    ?.map((edge) => edge?.node)
-    .find((node) => node?.pk === id);
+  const notification = data?.bannerNotification;
 
   const { notifyError, notifySuccess } = useNotification();
   const handleError = (errorMsgs: string[]) => {
@@ -672,11 +700,13 @@ const PageWrapped = ({ id }: { id?: number }) => {
               return existing;
             }
 
-            const pk = notification?.pk;
-            if (!pk) {
+            const pkToDelete = notification?.pk;
+            if (!pkToDelete) {
               return existing;
             }
-            return existing.edges.filter((x) => x?.node && x.node.pk !== pk);
+            return existing.edges.filter(
+              (x) => x?.node && x.node.pk !== pkToDelete
+            );
           },
         },
       });
@@ -708,9 +738,8 @@ const PageWrapped = ({ id }: { id?: number }) => {
     navigate("..");
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  const isNew = pk === 0;
+  const name = getName(isNew, isLoading, notification?.name, t);
 
   return (
     <>
@@ -724,55 +753,53 @@ const PageWrapped = ({ id }: { id?: number }) => {
           },
           {
             slug: "",
-            alias: notification
-              ? notification.name
-              : t("breadcrumb.newNotification"),
+            alias: name,
           },
         ]}
       />
       <Container>
         <StatusTagContainer>
-          <H1 $legacy>
-            {id !== 0
-              ? notification?.name ?? t("Notifications.error.notFound")
-              : t("Notifications.newNotification")}
-          </H1>
+          <H1 $legacy>{name}</H1>
           {notification?.state && (
             <BannerNotificationStateTag state={notification.state} />
           )}
         </StatusTagContainer>
-        {(notification || id === 0) && (
-          <NotificationForm notification={notification ?? undefined} />
-        )}
-        {notification && (
-          <ButtonContainer
-            style={{ marginTop: "2rem", justifyContent: "flex-start" }}
-          >
-            <Button
-              onClick={removeNotification}
-              variant="secondary"
-              theme="black"
-            >
-              {t("Notifications.deleteButton")}
-            </Button>
-          </ButtonContainer>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <>
+            {(notification || isNew) && (
+              <NotificationForm notification={notification ?? undefined} />
+            )}
+            {notification && (
+              <ButtonContainer
+                style={{ marginTop: "2rem", justifyContent: "flex-start" }}
+              >
+                <Button
+                  onClick={removeNotification}
+                  variant="secondary"
+                  theme="black"
+                >
+                  {t("Notifications.deleteButton")}
+                </Button>
+              </ButtonContainer>
+            )}
+          </>
         )}
       </Container>
     </>
   );
 };
 
+// TODO this can be replaced with router match since we don't validate the pk here
 const PageRouted = () => {
-  const { id } = useParams<{ id: string }>();
+  const { pk } = useParams<{ pk: string }>();
 
-  if (!id || (id !== "new" && Number.isNaN(Number(id)))) {
-    return <div>Invalid ID</div>;
-  }
-  if (id === "new") {
-    return <PageWrapped id={0} />;
+  if (pk === "new") {
+    return <PageWrapped pk={0} />;
   }
 
-  return <PageWrapped id={Number(id)} />;
+  return <PageWrapped pk={Number(pk)} />;
 };
 
 export default PageRouted;

@@ -1,30 +1,48 @@
 import { gql } from "@apollo/client";
 
-// TODO remove the extras that I added to this query (the UI side)
 export const BANNER_NOTIFICATION_COMMON = gql`
   fragment BannerNotificationCommon on BannerNotificationType {
     level
-    message
     activeFrom
+    message
     messageEn
     messageFi
     messageSv
   }
 `;
 
-export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
+// TODO the list fragment doesn't need all the fields
+// it needs only the pk / id, name, target, activeUntil, activeFrom, state
+// so no draft or message*
+const BANNER_NOTIFICATION_ADMIN_FRAGMENT = gql`
   ${BANNER_NOTIFICATION_COMMON}
+  fragment BannerNotificationsAdminFragment on BannerNotificationType {
+    pk
+    ...BannerNotificationCommon
+    target
+    name
+    activeUntil
+    draft
+    state
+  }
+`;
+
+export const BANNER_NOTIFICATIONS_ADMIN = gql`
+  ${BANNER_NOTIFICATION_ADMIN_FRAGMENT}
+  query BannerNotificationsAdmin($id: ID!) {
+    bannerNotification(id: $id) {
+      ...BannerNotificationsAdminFragment
+    }
+  }
+`;
+
+export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
+  ${BANNER_NOTIFICATION_ADMIN_FRAGMENT}
   query BannerNotificationsList($first: Int, $offset: Int, $orderBy: String) {
     bannerNotifications(first: $first, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
-          pk
-          ...BannerNotificationCommon
-          target
-          name
-          activeUntil
-          draft
-          state
+          ...BannerNotificationsAdminFragment
         }
       }
       pageInfo {

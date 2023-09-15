@@ -31,7 +31,7 @@ const getColConfig = (t: TFunction) => [
     key: "name",
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
-      notification.pk != null ? (
+      notification.pk ? (
         <TableLink href={notificationUrl(notification.pk)}>
           {notification.name ?? t("Notifications.noName")}
         </TableLink>

@@ -951,6 +951,7 @@ const translations: ITranslations = {
     pageDescription: [
       "Alla näet yhteenvedon aiemmin luoduista ilmoituksista. Voit luoda uusia ilmoituksia Varaamon yläreunaan Luo ilmoitus -painikkeesta.",
     ],
+    isLoading: ["Ladataan ilmoitusta"],
     noNotifications: ["Ei ilmoituksia"],
     newNotification: ["Luo ilmoitus"],
     noName: ["(ei nimeä)"],
