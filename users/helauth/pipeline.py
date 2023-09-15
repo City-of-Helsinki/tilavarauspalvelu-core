@@ -74,14 +74,14 @@ ID_LETTER_TO_CENTURY: dict[str, int] = {
 
 
 def fetch_additional_info_for_user_from_helsinki_profile(
-    backend: TunnistamoOIDCAuth,  # NOSONAR
+    backend: TunnistamoOIDCAuth,
     details: UserDetails,  # NOSONAR
     user: Optional[User] = None,
     *args: Any,  # NOSONAR
     **kwargs: Any,  # NOSONAR
 ) -> dict[str, Any]:
     kwargs: ExtraKwargs  # NOSONAR
-    if not user.profile_id:
+    if not ad_login(backend) and user.profile_id == "":
         oidc_access_token = f"{kwargs['response']['token_type']} {kwargs['response']['access_token']}"
         try:
             update_user_from_profile(user, oidc_access_token)
@@ -89,6 +89,10 @@ def fetch_additional_info_for_user_from_helsinki_profile(
             capture_exception(error)
 
     return {"user": user}
+
+
+def ad_login(backend: TunnistamoOIDCAuth) -> bool:
+    return (backend.id_token or {}).get("amr") == "helsinkiazuread"
 
 
 def update_user_from_profile(user: User, oidc_access_token: str) -> None:
