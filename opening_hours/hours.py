@@ -69,6 +69,26 @@ class Period:
     resource_state: State = State.UNDEFINED
 
 
+def _build_hauki_resource_id(resource_id: Union[str, int, list], hauki_origin_id):
+    if not hauki_origin_id:
+        hauki_origin_id = settings.HAUKI_ORIGIN_ID
+
+    resource_prefix = f"{hauki_origin_id}"
+    if not (settings.HAUKI_API_URL and resource_prefix):
+        raise HaukiConfigurationError("Both hauki api url and hauki origin id need to be configured")
+
+    if isinstance(resource_id, list):
+        hauki_resource_id = [str(uuid) for uuid in resource_id]
+        hauki_resource_id = "%s:%s" % (
+            resource_prefix,
+            f",{resource_prefix}:".join(hauki_resource_id),
+        )
+    else:
+        hauki_resource_id = f"{resource_prefix}:{resource_id}"
+
+    return hauki_resource_id
+
+
 def get_opening_hours(
     resource_id: Union[str, int, list],
     start_date: Union[str, datetime.date],
@@ -76,26 +96,14 @@ def get_opening_hours(
     hauki_origin_id=None,
 ) -> List[dict]:
     """Get opening hours for Hauki resource"""
-    if not hauki_origin_id:
-        hauki_origin_id = settings.HAUKI_ORIGIN_ID
+    hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 
-    resource_prefix = f"{hauki_origin_id}"
-    if not (settings.HAUKI_API_URL and resource_prefix):
-        raise HaukiConfigurationError("Both hauki api url and hauki origin id need to be configured")
-    if isinstance(resource_id, list):
-        resource_id = [str(uuid) for uuid in resource_id]
-        resource_id = "%s:%s" % (
-            resource_prefix,
-            f",{resource_prefix}:".join(resource_id),
-        )
-    else:
-        resource_id = f"{resource_prefix}:{resource_id}"
     if isinstance(start_date, datetime.date):
         start_date = start_date.isoformat()
     if isinstance(end_date, datetime.date):
         end_date = end_date.isoformat()
 
-    resource_opening_hours_url = f"{settings.HAUKI_API_URL}/v1/opening_hours/?resource={resource_id}"
+    resource_opening_hours_url = f"{settings.HAUKI_API_URL}/v1/opening_hours/?resource={hauki_resource_id}"
     query_params = {
         "start_date": start_date,
         "end_date": end_date,
@@ -105,6 +113,7 @@ def get_opening_hours(
     days_data_out = []
     for day_data_in in days_data_in["results"]:
         timezone = ZoneInfo(day_data_in.get("resource", {}).get("timezone", DEFAULT_TIMEZONE.key))
+
         for opening_hours in day_data_in["opening_hours"]:
             day_data_out = {
                 "timezone": timezone,
@@ -113,6 +122,7 @@ def get_opening_hours(
                 "date": datetime.datetime.strptime(opening_hours["date"], "%Y-%m-%d").date(),
                 "times": [],
             }
+
             for time_data_in in opening_hours["times"]:
                 start_time = time_data_in.pop("start_time")
                 end_time = time_data_in.pop("end_time")
@@ -126,28 +136,17 @@ def get_opening_hours(
                         **time_data_in,
                     )
                 )
+
             days_data_out.append(day_data_out)
+
     return days_data_out
 
 
 def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id=None) -> List[Period]:
     """Get periods for Hauki resource"""
-    if not hauki_origin_id:
-        hauki_origin_id = settings.HAUKI_ORIGIN_ID
+    hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 
-    resource_prefix = f"{hauki_origin_id}"
-    if not (settings.HAUKI_API_URL and resource_prefix):
-        raise HaukiConfigurationError("Both hauki api url and hauki origin id need to be configured")
-    if isinstance(resource_id, list):
-        resource_id = [str(uuid) for uuid in resource_id]
-        resource_id = "%s:%s" % (
-            resource_prefix,
-            f",{resource_prefix}:".join(resource_id),
-        )
-    else:
-        resource_id = f"{resource_prefix}:{resource_id}"
-
-    resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/?resource={resource_id}"
+    resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/?resource={hauki_resource_id}"
 
     periods_data_in = make_hauki_get_request(resource_periods_url, None)
 
@@ -167,6 +166,7 @@ def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id
             "resource_state": period["resource_state"],
             "time_spans": [],
         }
+
         for time_span_group in period["time_span_groups"]:
             for time_data_in in time_span_group["time_spans"]:
                 start_time = time_data_in.pop("start_time")
@@ -179,5 +179,7 @@ def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id
                         **time_data_in,
                     )
                 )
+
             periods_data_out.append(Period(**period_data_out))
+
     return periods_data_out
