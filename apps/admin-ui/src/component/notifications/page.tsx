@@ -149,13 +149,17 @@ const StatusTagContainer = styled.div`
   justify-content: space-between;
 `;
 
-/* TODO mobile styling */
-const ButtonContainer = styled.div`
-  grid-column: 1 / -1;
+const ButtonContainerCommon = styled.div`
   display: flex;
-  width: 100%;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--spacing-l);
+`;
+const ButtonContainer = styled(ButtonContainerCommon)`
+  grid-column: 1 / -1;
+`;
+
+const InnerButtons = styled(ButtonContainerCommon)`
+  flex-grow: 1;
   flex-wrap: wrap;
 `;
 
@@ -596,25 +600,30 @@ const NotificationForm = ({
         )}
       />
       <ButtonContainer>
-        {/* TODO don't nest Link and Button */}
-        <Link to="..">
-          <Button variant="secondary" type="button" theme="black">
-            {t("form.cancel")}
+        <InnerButtons>
+          {/* TODO don't nest Link and Button */}
+          <Link to=".." style={{ marginRight: "auto" }}>
+            <Button variant="secondary" type="button" theme="black">
+              {t("form.cancel")}
+            </Button>
+          </Link>
+          <Button
+            variant="secondary"
+            theme="black"
+            type="button"
+            onClick={() => {
+              setValue("isDraft", true);
+              handleSubmit(onSubmit)();
+            }}
+          >
+            {t("form.saveDraft")}
           </Button>
-        </Link>
-        <Button
-          style={{ marginLeft: "auto" }}
-          variant="secondary"
-          theme="black"
-          type="button"
-          onClick={() => {
-            setValue("isDraft", true);
-            handleSubmit(onSubmit)();
-          }}
-        >
-          {t("form.saveDraft")}
-        </Button>
-        <Button type="submit">{t("form.save")}</Button>
+        </InnerButtons>
+        <div>
+          <Button style={{ marginLeft: "auto" }} type="submit">
+            {t("form.save")}
+          </Button>
+        </div>
       </ButtonContainer>
     </GridForm>
   );
@@ -727,7 +736,9 @@ const PageWrapped = ({ id }: { id?: number }) => {
         </StatusTagContainer>
         <NotificationForm notification={notification ?? undefined} />
         {notification && (
-          <ButtonContainer style={{ marginTop: "2rem" }}>
+          <ButtonContainer
+            style={{ marginTop: "2rem", justifyContent: "flex-start" }}
+          >
             <Button
               onClick={removeNotification}
               variant="secondary"
