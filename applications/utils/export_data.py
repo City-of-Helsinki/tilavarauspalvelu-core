@@ -5,7 +5,7 @@ from typing import Dict, List
 
 from _csv import QUOTE_ALL
 from django.conf import settings
-from django.db.models import Count, Max, OuterRef, Prefetch, Subquery
+from django.db.models import Count, Max, OuterRef, Prefetch, QuerySet, Subquery
 from django.utils import timezone
 
 from ..models import (
@@ -18,15 +18,18 @@ from ..models import (
 )
 
 
-class ApplicationDataExporter:
-    @classmethod
-    def export_application_data(cls, application_round: int) -> Path:
-        now = timezone.now()
-        root = settings.BASE_DIR
-        path = root / "exports" / "applications"
-        path.mkdir(parents=True, exist_ok=True)
+# This is for typing only
+class ApplicationEventWithAnnotations(ApplicationEvent):
+    current_status: ApplicationStatus
 
-        application_events: List[ApplicationEvent] = list(
+    class Meta:
+        abstract = True
+
+
+class ApplicationDataExporter:
+    @staticmethod
+    def get_base_queryset(application_round) -> QuerySet[ApplicationEventWithAnnotations]:
+        return (
             ApplicationEvent.objects.annotate(
                 current_status=Subquery(
                     Application.objects.filter(id=OuterRef("application__id")).values("latest_status")
@@ -42,6 +45,17 @@ class ApplicationDataExporter:
                 first_schedule_id__isnull=False,
             )
             .exclude(current_status=ApplicationStatus.DRAFT)
+        )
+
+    @classmethod
+    def export_application_data(cls, application_round: int) -> Path:
+        now = timezone.now()
+        root = settings.BASE_DIR
+        path = root / "exports" / "applications"
+        path.mkdir(parents=True, exist_ok=True)
+
+        application_events: List[ApplicationEventWithAnnotations] = list(
+            cls.get_base_queryset(application_round)
             .select_related(
                 "application",
                 "application__organisation",
@@ -56,12 +70,10 @@ class ApplicationDataExporter:
                     queryset=(ApplicationEventSchedule.objects.all().order_by("begin").only("begin", "end", "day")),
                 ),
             )
-            .order_by(
-                "application__organisation__name",
-            )
+            .order_by("application__organisation__name")
         )
 
-        cls.spaces_max_count = (
+        spaces_max_count = (
             ApplicationEvent.objects.filter(application__application_round=application_round)
             .annotate(spaces_count=Count("event_reservation_units"))
             .aggregate(spaces_max_count=Max("spaces_count"))
@@ -73,7 +85,7 @@ class ApplicationDataExporter:
             with open(path / file_name, "w", newline="") as applications_file:
                 applications_writer = writer(applications_file)
 
-                cls._write_header_row(applications_writer, cls.spaces_max_count)
+                cls._write_header_row(applications_writer, spaces_max_count)
 
                 for event in application_events:
                     application: Application = event.application
@@ -84,33 +96,9 @@ class ApplicationDataExporter:
                         cls._get_duration_string(event.max_duration.seconds) if event.max_duration else ""
                     )
                     duration_range_string = cls._get_time_range_string(min_duration_string, max_duration_string)
-                    event_schedules_prio_high = {
-                        0: "",
-                        1: "",
-                        2: "",
-                        3: "",
-                        4: "",
-                        5: "",
-                        6: "",
-                    }
-                    event_schedules_prio_medium = {
-                        0: "",
-                        1: "",
-                        2: "",
-                        3: "",
-                        4: "",
-                        5: "",
-                        6: "",
-                    }
-                    event_schedules_prio_low = {
-                        0: "",
-                        1: "",
-                        2: "",
-                        3: "",
-                        4: "",
-                        5: "",
-                        6: "",
-                    }
+                    event_schedules_prio_high = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
+                    event_schedules_prio_medium = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
+                    event_schedules_prio_low = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
                     reservation_units = []
                     contact_person_first_name = ""
                     contact_person_last_name = ""
@@ -127,8 +115,8 @@ class ApplicationDataExporter:
                         contact_person_email = getattr(application.contact_person, "email", "")
                         contact_person_phone = getattr(application.contact_person, "phone_number", "")
 
-                    if not applicant and application.contact_person:
-                        applicant = f"{contact_person_first_name} {contact_person_last_name}"
+                        if not applicant:
+                            applicant = f"{contact_person_first_name} {contact_person_last_name}"
 
                     # Loop through requested schedules and update
                     # the correct time range string depending on day integer
@@ -138,11 +126,9 @@ class ApplicationDataExporter:
 
                         if schedule.priority == PRIORITIES.PRIORITY_HIGH:
                             event_schedules = event_schedules_prio_high
-
-                        if schedule.priority == PRIORITIES.PRIORITY_MEDIUM:
+                        elif schedule.priority == PRIORITIES.PRIORITY_MEDIUM:
                             event_schedules = event_schedules_prio_medium
-
-                        if schedule.priority == PRIORITIES.PRIORITY_LOW:
+                        elif schedule.priority == PRIORITIES.PRIORITY_LOW:
                             event_schedules = event_schedules_prio_low
 
                         cls._update_event_schedule_string(event_schedules, schedule)
@@ -182,7 +168,7 @@ class ApplicationDataExporter:
                         duration_range_string,
                     ]
                     row.extend(reservation_units)
-                    row.extend(["" for _ in range(cls.spaces_max_count - len(reservation_units))])
+                    row.extend(["" for _ in range(spaces_max_count - len(reservation_units))])
                     row.extend(
                         [
                             event_schedules_prio_high[0],
@@ -391,21 +377,7 @@ class ApplicationDataExporter:
             export_writer.writerow(["Application ID", "Event name", "Status", "Reservation unit names"])
 
             for event_id, application_id, event_name, current_status in (
-                ApplicationEvent.objects.annotate(
-                    current_status=Subquery(
-                        Application.objects.filter(id=OuterRef("application__id")).values("latest_status")
-                    )
-                )
-                .alias(
-                    first_schedule_id=Subquery(
-                        ApplicationEventSchedule.objects.filter(application_event=OuterRef("id")).values("id")[:1]
-                    )
-                )
-                .filter(
-                    application__application_round=application_round,
-                    first_schedule_id__isnull=False,
-                )
-                .exclude(current_status=ApplicationStatus.DRAFT)
+                cls.get_base_queryset(application_round)
                 .values_list("id", "application__id", "name", "current_status")
                 .order_by("application__organisation__name", "application__id")
             ):
