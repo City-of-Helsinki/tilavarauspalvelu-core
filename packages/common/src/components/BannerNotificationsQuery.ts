@@ -3,14 +3,12 @@ import { gql } from "@apollo/client";
 // TODO remove the extras that I added to this query (the UI side)
 export const BANNER_NOTIFICATION_COMMON = gql`
   fragment BannerNotificationCommon on BannerNotificationType {
-    name
     level
     message
     activeFrom
     messageEn
     messageFi
     messageSv
-    target
   }
 `;
 
@@ -22,6 +20,8 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
         node {
           pk
           ...BannerNotificationCommon
+          target
+          name
           activeUntil
           draft
           state
