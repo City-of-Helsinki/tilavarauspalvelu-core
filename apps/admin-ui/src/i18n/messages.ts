@@ -960,6 +960,7 @@ const translations: ITranslations = {
         generic: ["Ilmoituksen tallennus epäonnistui"],
         alreadyExists: ["Ilmoitus on jo olemassa"],
         missingMessage: ["Ilmoituksen viesti puuttuu"],
+        noMutationPermission: ["Ei oikeutta muokata ilmoitusta"],
       },
       deleteFailed: {
         generic: ["Ilmoituksen poisto epäonnistui"],
@@ -990,14 +991,24 @@ const translations: ITranslations = {
       saveSuccessToast: ["Ilmoitus {{ name }} {{ state }}"],
       errors: {
         Required: ["Pakollinen"],
+        "Invalid date": ["Virheellinen päivämäärä"],
         "String must contain at least 1 character(s)": ["Pakollinen"],
         "Target group cannot be empty": ["Pakollinen"],
         "Level cannot be empty": ["Pakollinen"],
         "Date can't be in the past": ["Päivämäärä ei voi olla menneisyydessä"],
         "activeFromTime is not in time format.": ["Alkamisaika ei ole aika"],
         "activeUntilTime is not in time format.": ["Päättymisaika ei ole aika"],
+        "activeFromTime can't be more than 24 hours.": [
+          "Alkamisaika ei voi olla yli 24 tuntia",
+        ],
+        "activeUntilTime can't be more than 24 hours.": [
+          "Päättymisaika ei voi olla yli 24 tuntia",
+        ],
         "End time needs to be after start time.": [
           "Päättymisajan tulee olla alkamisajan jälkeen",
+        ],
+        "Date needs to be within three years.": [
+          "Päivämäärän tulee olla kolmen vuoden sisällä",
         ],
       },
     },

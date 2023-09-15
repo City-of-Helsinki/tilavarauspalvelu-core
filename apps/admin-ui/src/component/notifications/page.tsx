@@ -36,7 +36,11 @@ import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import { publicUrl } from "app/common/const";
 import Loader from "app/component/Loader";
 import { useNotification } from "app/context/NotificationContext";
-import { checkDate, checkTimeStringFormat } from "app/schemas";
+import {
+  checkValidDate,
+  checkValidFutureDate,
+  checkTimeStringFormat,
+} from "app/schemas";
 import {
   valueForDateInput,
   valueForTimeInput,
@@ -203,19 +207,28 @@ const NotificationFormSchema = z
       }),
     pk: z.number(),
   })
-  // TODO checkDate doesn't check for valid days or months i.e. 2024-02-31 and 2024-13-41 are valid
-  .superRefine((val, ctx) =>
-    checkDate(fromUIDate(val.activeFrom), ctx, "activeFrom")
-  )
-  .superRefine((val, ctx) =>
-    checkDate(fromUIDate(val.activeUntil), ctx, "activeUntil")
-  )
-  .superRefine((x, ctx) =>
-    checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime")
-  )
-  .superRefine((x, ctx) =>
-    checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime")
-  )
+  // skip date time validation for drafts (if the field is empty)
+  // if draft and no time or date input skip it
+  // if draft and time or date input check that both are valid (since we can't save them without both)
+  // if not draft and no time or date input check that both are valid
+  .superRefine((x, ctx) => {
+    if (!x.isDraft || x.activeFrom !== "" || x.activeFromTime !== "") {
+      checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime");
+      checkValidDate(fromUIDate(x.activeFrom), ctx, "activeFrom");
+    }
+  })
+  // End time can't be in the past unless it's a draft
+  // TODO date check is yesterday, but we don't check for today and time today e.g. if it's 8am today and 6am is fine
+  .superRefine((x, ctx) => {
+    if (!x.isDraft || x.activeUntil !== "" || x.activeUntilTime !== "") {
+      checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime");
+      if (!x.isDraft) {
+        checkValidFutureDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+      } else {
+        checkValidDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+      }
+    }
+  })
   .superRefine((val, ctx) => checkStartIsBeforeEnd(val, ctx));
 
 type NotificationFormType = z.infer<typeof NotificationFormSchema>;
@@ -316,10 +329,15 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
     const isMissingMessage = errorMsgs.find(
       (x) => x === "Non-draft notifications must have a message."
     );
+    const isPermissionError = errorMsgs.find(
+      (x) => x === "No permission to mutate."
+    );
     if (alreadyExists) {
       notifyError(t("error.submit.alreadyExists"));
     } else if (isMissingMessage) {
       notifyError(t("error.submit.missingMessage"));
+    } else if (isPermissionError) {
+      notifyError(t("error.submit.noMutationPermission"));
     } else {
       // eslint-disable-next-line no-console
       console.error(errorMsgs);
@@ -331,7 +349,7 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
   const navigate = useNavigate();
 
   const onSubmit = async (data: NotificationFormType) => {
-    const end = dateTime(data.activeUntil, data.activeUntilTime);
+    const end = parseDateTimeSafe(data.activeUntil, data.activeUntilTime);
     const start =
       data.activeFrom !== ""
         ? dateTime(data.activeFrom, data.activeFromTime)
@@ -345,8 +363,10 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
 
     const input = {
       name: data.name,
-      activeFrom: start,
-      activeUntil: end,
+      // either both needs to be defined or neither
+      // for drafts null is fine, published it's not (schema checks)
+      activeFrom: start != null && end != null ? start : null,
+      activeUntil: start != null && end != null ? end.toISOString() : null,
       draft: data.isDraft,
       message: data.messageFi,
       messageEn: data.messageEn,
@@ -367,8 +387,12 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
           handleError(e.graphQLErrors.map((err) => err.message));
         },
       });
-      if (res?.data?.createBannerNotification?.errors) {
-        const { errors: mutationErrors } = res.data.createBannerNotification;
+      const mutationData =
+        data.pk === 0
+          ? res?.data?.createBannerNotification
+          : res?.data?.updateBannerNotification;
+      const mutationErrors = mutationData?.errors;
+      if (mutationErrors && mutationErrors.length > 0) {
         // TODO error translations and logic
         handleError(
           mutationErrors.map(
