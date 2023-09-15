@@ -1,7 +1,9 @@
 from typing import Any, NamedTuple
 
 import pytest
+from graphql_relay import to_global_id
 
+from api.graphql.banner_notification.types import BannerNotificationType
 from common.choices import BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.helpers import load_content, parametrize_helper
@@ -215,3 +217,34 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
     content = load_content(response.content)
     notifications = content["data"]["bannerNotifications"]["edges"]
     assert notifications == expected, content
+
+
+def test_fetch_single_banner_notification_by_id(graphql):
+    # given:
+    # - There are two banner notifications in the system
+    # - Notification manager user is using the system
+    notification_1 = BannerNotificationFactory.create(name="foo")
+    BannerNotificationFactory.create(name="bar")
+    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    graphql.force_login(user)
+
+    global_id = to_global_id(BannerNotificationType.__name__, notification_1.pk)
+
+    # when:
+    # - The user requests a banner notification with the given id
+    response = graphql(
+        """
+        query ($id: ID!) {
+            bannerNotification(id: $id) {
+                name
+            }
+        }
+        """,
+        variables={"id": global_id},
+    )
+
+    # then:
+    # - The response contains the expected banner notification
+    content = load_content(response.content)
+    notifications = content["data"]["bannerNotification"]
+    assert notifications == {"name": "foo"}, content

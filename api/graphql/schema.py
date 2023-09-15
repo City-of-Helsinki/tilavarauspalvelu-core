@@ -424,6 +424,7 @@ class Query(graphene.ObjectType):
 
     order = Field(PaymentOrderType, order_uuid=graphene.String())
 
+    banner_notification = relay.Node.Field(BannerNotificationType)
     banner_notifications = BannerNotificationConnection(BannerNotificationType)
 
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
