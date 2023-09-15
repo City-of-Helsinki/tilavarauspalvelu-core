@@ -3,7 +3,6 @@ from typing import Any, NamedTuple
 from unittest.mock import patch
 
 import pytest
-from django.conf import settings
 
 from tests.factories import UserFactory
 from tests.helpers import ResponseMock, parametrize_helper
@@ -11,7 +10,7 @@ from users.helauth.pipeline import id_number_to_date, update_user_from_profile
 
 
 class ErrorParams(NamedTuple):
-    oidc_response: dict[str, Any]
+    token: str | None
     profile_response: dict[str, Any]
     error_message: str
 
@@ -27,12 +26,7 @@ def test_update_user_from_profile():
 
     # when:
     # - This user's info is updated from profile
-    response_1 = ResponseMock(
-        json_data={
-            settings.OPEN_CITY_PROFILE_SCOPE: "x",
-        },
-    )
-    response_2 = ResponseMock(
+    mock_1 = ResponseMock(
         json_data={
             "data": {
                 "myProfile": {
@@ -44,8 +38,8 @@ def test_update_user_from_profile():
             },
         },
     )
-    with patch("users.helauth.pipeline.requests.get", side_effect=[response_1, response_2]):
-        update_user_from_profile(user, oidc_access_token="")
+    with patch("users.helauth.pipeline.requests.get", return_value=mock_1):
+        update_user_from_profile(user, token="x")
 
     # then:
     # - The user's profile id and date of birth are updated
@@ -58,12 +52,12 @@ def test_update_user_from_profile():
     **parametrize_helper(
         {
             "JWT fetch failed": ErrorParams(
-                oidc_response={},
+                token=None,
                 profile_response={},
                 error_message="Could not fetch JWT from Tunnistamo for user",
             ),
             "Missing Profile ID": ErrorParams(
-                oidc_response={settings.OPEN_CITY_PROFILE_SCOPE: "x"},
+                token="x",
                 profile_response={
                     "data": {
                         "myProfile": {
@@ -74,7 +68,7 @@ def test_update_user_from_profile():
                 error_message="Profile ID not found for user",
             ),
             "Missing ID number": ErrorParams(
-                oidc_response={settings.OPEN_CITY_PROFILE_SCOPE: "x"},
+                token="x",
                 profile_response={
                     "data": {
                         "myProfile": {
@@ -88,7 +82,7 @@ def test_update_user_from_profile():
                 error_message="ID number not found for user",
             ),
             "Missing verifiedPersonalInformation": ErrorParams(
-                oidc_response={settings.OPEN_CITY_PROFILE_SCOPE: "x"},
+                token="x",
                 profile_response={
                     "data": {
                         "myProfile": {
@@ -100,7 +94,7 @@ def test_update_user_from_profile():
                 error_message="ID number not found for user",
             ),
             "Invalid ID number": ErrorParams(
-                oidc_response={settings.OPEN_CITY_PROFILE_SCOPE: "x"},
+                token="x",
                 profile_response={
                     "data": {
                         "myProfile": {
@@ -114,7 +108,7 @@ def test_update_user_from_profile():
                 error_message="ID number received from profile was not of correct format for user",
             ),
             "Unexpected Errors": ErrorParams(
-                oidc_response={settings.OPEN_CITY_PROFILE_SCOPE: "x"},
+                token="x",
                 profile_response={
                     "errors": [
                         {
@@ -127,7 +121,7 @@ def test_update_user_from_profile():
         },
     ),
 )
-def test_update_user_from_profile_logs_to_sentry_if_unsuccessful(oidc_response, profile_response, error_message):
+def test_update_user_from_profile_logs_to_sentry_if_unsuccessful(token, profile_response, error_message):
     # given:
     # - There is a user without profile info
     user = UserFactory.create(
@@ -139,12 +133,11 @@ def test_update_user_from_profile_logs_to_sentry_if_unsuccessful(oidc_response, 
 
     # when:
     # - This user's info is updated from profile
-    response_1 = ResponseMock(json_data=oidc_response)
-    response_2 = ResponseMock(json_data=profile_response)
-    mock_requests = patch("users.helauth.pipeline.requests.get", side_effect=[response_1, response_2])
+    response = ResponseMock(json_data=profile_response)
+    mock_requests = patch("users.helauth.pipeline.requests.get", return_value=response)
     mock_capture_message = patch("users.helauth.pipeline.capture_message")
     with mock_requests, mock_capture_message as mock:
-        update_user_from_profile(user, oidc_access_token="")
+        update_user_from_profile(user, token=token)
 
     # then:
     # - The user's profile id and date of birth are updated
