@@ -36,6 +36,7 @@ export const H1 = styled.h1<{ $legacy?: boolean }>`
   ${fontRegular}
   line-height: var(--lineheight-s);
   margin: var(--spacing-s) 0 var(--spacing-m);
+  word-break: break-word;
 
   @media (min-width: ${breakpoints.s}) {
     font-size: ${({ $legacy }) =>

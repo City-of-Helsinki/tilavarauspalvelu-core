@@ -31,6 +31,7 @@ import {
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
+import { breakpoints } from "common";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import { publicUrl } from "app/common/const";
@@ -147,6 +148,14 @@ const StatusTagContainer = styled.div`
   display: flex;
   gap: 0.5rem;
   justify-content: space-between;
+  align-items: flex-start;
+  margin-top: var(--spacing-s);
+  & > h1 {
+    margin-top: 0;
+  }
+  @media (width > ${breakpoints.s}) {
+    margin-top: var(--spacing-l);
+  }
 `;
 
 const ButtonContainerCommon = styled.div`
