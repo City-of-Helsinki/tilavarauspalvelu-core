@@ -144,11 +144,9 @@ function BannerNotificationStateTag({
 }
 
 const StatusTagContainer = styled.div`
-  display: grid;
-  justify-items: justify-between;
-  grid-column: 1 / -1;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
 `;
 
 /* TODO mobile styling */
@@ -236,7 +234,7 @@ type NotificationFormType = z.infer<typeof NotificationFormSchema>;
 const GridForm = styled.form`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--spacing-l);
 `;
 
 // @brief inefficient way to destroy caches, normal INVALIDATE doesn't remove keys
@@ -255,7 +253,11 @@ const deleteQueryFromCache = (cache: any, matcher: string | RegExp): void => {
 };
 
 /// @brief This is the create / edit page for a single notification.
-const Page = ({ notification }: { notification?: BannerNotificationType }) => {
+const NotificationForm = ({
+  notification,
+}: {
+  notification?: BannerNotificationType;
+}) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
   const today = new Date();
@@ -420,9 +422,9 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
     errorMsg ? t(`form.errors.${errorMsg}`) : "";
 
   const levelOptions = [
-    { value: "NORMAL", label: t("level.NORMAL") },
-    { value: "WARNING", label: t("level.WARNING") },
-    { value: "EXCEPTION", label: t("level.EXCEPTION") },
+    { value: "NORMAL", label: t("form.levelEnum.NORMAL") },
+    { value: "WARNING", label: t("form.levelEnum.WARNING") },
+    { value: "EXCEPTION", label: t("form.levelEnum.EXCEPTION") },
   ];
   const targetGroupOptions = [
     { value: "ALL", label: t("target.ALL") },
@@ -432,16 +434,6 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
 
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <StatusTagContainer>
-        <H1 $legacy style={{ gridColumn: "1 / span 5", gridRow: "1 / span 4" }}>
-          {notification
-            ? notification?.name ?? t("noName")
-            : t("newNotification")}
-        </H1>
-        {notification?.state && (
-          <BannerNotificationStateTag state={notification.state} />
-        )}
-      </StatusTagContainer>
       <Controller
         control={control}
         name="inFuture"
@@ -528,7 +520,7 @@ const Page = ({ notification }: { notification?: BannerNotificationType }) => {
             }
             value={{
               value,
-              label: value !== "" ? t(`level.${value}`) : "",
+              label: value !== "" ? t(`form.levelEnum.${value}`) : "",
             }}
             invalid={!!errors.level}
             error={translateError(errors.level?.message)}
@@ -723,7 +715,17 @@ const PageWrapped = ({ id }: { id?: number }) => {
         ]}
       />
       <Container>
-        <Page notification={notification ?? undefined} />
+        <StatusTagContainer>
+          <H1 $legacy>
+            {notification
+              ? notification?.name ?? t("noName")
+              : t("Notifications.newNotification")}
+          </H1>
+          {notification?.state && (
+            <BannerNotificationStateTag state={notification.state} />
+          )}
+        </StatusTagContainer>
+        <NotificationForm notification={notification ?? undefined} />
         {notification && (
           <ButtonContainer style={{ marginTop: "2rem" }}>
             <Button

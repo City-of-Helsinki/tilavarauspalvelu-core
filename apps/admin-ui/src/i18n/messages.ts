@@ -952,7 +952,7 @@ const translations: ITranslations = {
       "Alla näet yhteenvedon aiemmin luoduista ilmoituksista. Voit luoda uusia ilmoituksia Varaamon yläreunaan Luo ilmoitus -painikkeesta.",
     ],
     noNotifications: ["Ei ilmoituksia"],
-    newNotification: ["Uusi ilmoitus"],
+    newNotification: ["Luo ilmoitus"],
     noName: ["(ei nimeä)"],
     deleteButton: ["Poista"],
     error: {
@@ -984,11 +984,17 @@ const translations: ITranslations = {
       messageEn: ["Viesti en"],
       messageSv: ["Viesti sv"],
       cancel: ["Peruuta"],
-      saveDraft: ["Tallenna luonnoksena"],
+      saveDraft: ["Tallenna luonnos"],
       save: ["Julkaise"],
       created: ["luotu"],
       updated: ["päivitetty"],
       saveSuccessToast: ["Ilmoitus {{ name }} {{ state }}"],
+      levelEnum: {
+        noLevel: ["(ei tasoa)"],
+        EXCEPTION: ["Poikkeus (punainen)"],
+        WARNING: ["Varoitus (keltainen)"],
+        NORMAL: ["Normaali (sininen)"],
+      },
       errors: {
         Required: ["Pakollinen"],
         "Invalid date": ["Virheellinen päivämäärä"],
@@ -1022,7 +1028,7 @@ const translations: ITranslations = {
       noState: ["(ei tilaa)"],
       ACTIVE: ["Julkaistu"],
       DRAFT: ["Luonnos"],
-      SCHEDULED: ["Ajasitetu"],
+      SCHEDULED: ["Ajastettu"],
     },
     target: {
       noTarget: ["(ei kohderyhmää)"],

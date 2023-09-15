@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
+import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { Button } from "hds-react";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import type { Query, BannerNotificationType } from "common/types/gql-types";
+import { H1 } from "common/src/common/typography";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import Loader from "app/component/Loader";
@@ -136,6 +138,11 @@ const NotificationsTable = ({
   );
 };
 
+const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
 /// @brief this is the listing page for all notifications.
 const Page = () => {
   // TODO the default sort should be ["state", "-ends"] but the frontend sort doesn't support multiple options
@@ -175,15 +182,15 @@ const Page = () => {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>{t("Notifications.pageTitle")}</h1>
+      <HeaderContainer>
+        <H1 $legacy>{t("Notifications.pageTitle")}</H1>
         {/* TODO dont use nested button / link use something like ButtonLikeLink but it needs primary variant */}
         <Link to="/messaging/notifications/new">
           <Button variant="primary">
             {t("Notifications.newNotification")}
           </Button>
         </Link>
-      </div>
+      </HeaderContainer>
       <p>{t("Notifications.pageDescription")}</p>
       {isLoading ? (
         <Loader />
