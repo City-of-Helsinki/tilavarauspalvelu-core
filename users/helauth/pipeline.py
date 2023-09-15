@@ -4,6 +4,7 @@ from typing import Any, Optional, TypedDict
 
 import requests
 from django.conf import settings
+from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.wsgi import WSGIRequest
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 from sentry_sdk import capture_exception, capture_message
@@ -15,7 +16,6 @@ from common.utils import get_nested
 from ..models import User
 
 __all__ = [
-    "exchange_oidc_token_for_jwt",
     "fetch_additional_info_for_user_from_helsinki_profile",
     "id_number_to_date",
     "update_user_from_profile",
@@ -43,10 +43,10 @@ class OIDCResponse(TypedDict):
 
 
 class ExtraKwargs(TypedDict):
+    details: UserDetails
     is_new: bool
     new_association: bool
     pipeline_index: int
-    request: WSGIRequest
     response: OIDCResponse
     social: UserSocialAuth
     storage: DjangoStorage
@@ -75,29 +75,32 @@ ID_LETTER_TO_CENTURY: dict[str, int] = {
 
 def fetch_additional_info_for_user_from_helsinki_profile(
     backend: TunnistamoOIDCAuth,
-    details: UserDetails,  # NOSONAR
+    request: WSGIRequest,
     user: Optional[User] = None,
-    *args: Any,  # NOSONAR
     **kwargs: Any,  # NOSONAR
 ) -> dict[str, Any]:
     kwargs: ExtraKwargs  # NOSONAR
     if not ad_login(backend) and user.profile_id == "":
-        oidc_access_token = f"{kwargs['response']['token_type']} {kwargs['response']['access_token']}"
+        token = get_profile_token(request.session)
         try:
-            update_user_from_profile(user, oidc_access_token)
+            update_user_from_profile(user, token)
         except Exception as error:
             capture_exception(error)
 
     return {"user": user}
 
 
+def get_profile_token(session: SessionBase) -> Optional[str]:
+    # See what 'helusers.pipeline.fetch_api_tokens' adds in the session
+    return session["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
+
+
 def ad_login(backend: TunnistamoOIDCAuth) -> bool:
     return (backend.id_token or {}).get("amr") == "helsinkiazuread"
 
 
-def update_user_from_profile(user: User, oidc_access_token: str) -> None:
-    jwt_token = exchange_oidc_token_for_jwt(oidc_access_token)
-    if jwt_token is None:
+def update_user_from_profile(user: User, token: str | None) -> None:
+    if token is None:
         capture_message(f"Could not fetch JWT from Tunnistamo for user {user.pk!r}")
         return
 
@@ -114,7 +117,7 @@ def update_user_from_profile(user: User, oidc_access_token: str) -> None:
     response = requests.get(
         settings.OPEN_CITY_PROFILE_GRAPHQL_API,
         json={"query": query},
-        headers={"Authorization": f"Bearer {jwt_token}"},
+        headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
     data = response.json()
@@ -162,13 +165,3 @@ def id_number_to_date(id_number: str) -> Optional[date]:
         month=int(id_number[2:4]),
         day=int(id_number[0:2]),
     )
-
-
-def exchange_oidc_token_for_jwt(oidc_access_token: str) -> Optional[str]:
-    response = requests.get(
-        url=settings.TUNNISTAMO_ACCESS_TOKEN_ENDPOINT,
-        headers={"Authorization": oidc_access_token},
-        timeout=5,
-    )
-    data = response.json()
-    return data.get(settings.OPEN_CITY_PROFILE_SCOPE)
