@@ -787,7 +787,17 @@ class ReservationUnitPricing(models.Model):
         return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
 
 
-class ReservationUnitImage(models.Model):
+class PurgeImageCacheMixin:
+    def purge_previous_image_cache(self):
+        previous_data = self.__class__.objects.filter(pk=self.pk).first()
+        if settings.IMAGE_CACHE_ENABLED and previous_data and previous_data.image:
+            aliases = settings.THUMBNAIL_ALIASES[""]
+            for conf_key in list(aliases.keys()):
+                image_path = get_thumbnailer(previous_data.image)[conf_key].url
+                purge_image_cache.delay(image_path)
+
+
+class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
     TYPES = (
         ("main", _("Main image")),
         ("ground_plan", _("Ground plan")),
@@ -824,18 +834,9 @@ class ReservationUnitImage(models.Model):
         update_fields=None,
         update_urls=True,
     ):
-        previous_data = ReservationUnitImage.objects.filter(pk=self.pk).first()
-        if settings.IMAGE_CACHE_ENABLED and previous_data and previous_data.image:
-            aliases = settings.THUMBNAIL_ALIASES[""]
-            for conf_key in list(aliases.keys()):
-                image_path = get_thumbnailer(previous_data.image)[conf_key].url
-                purge_image_cache.delay(image_path)
-        super().save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields,
-        )
+        self.purge_previous_image_cache()
+
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
         if update_urls:
             self.update_image_urls()
@@ -844,7 +845,7 @@ class ReservationUnitImage(models.Model):
         update_urls.delay(self.pk)
 
 
-class Purpose(models.Model):
+class Purpose(models.Model, PurgeImageCacheMixin):
     name = models.CharField(max_length=200)
 
     image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True)
@@ -860,12 +861,7 @@ class Purpose(models.Model):
         ordering = ["rank"]
 
     def save(self, *args, **kwargs) -> None:
-        previous_data = Purpose.objects.filter(pk=self.pk).first()
-        if settings.IMAGE_CACHE_ENABLED and previous_data and previous_data.image:
-            aliases = settings.THUMBNAIL_ALIASES[""]
-            for conf_key in list(aliases.keys()):
-                image_path = get_thumbnailer(previous_data.image)[conf_key].url
-                purge_image_cache.delay(image_path)
+        self.purge_previous_image_cache()
         super().save(*args, **kwargs)
 
     def __str__(self):
