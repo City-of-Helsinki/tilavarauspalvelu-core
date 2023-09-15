@@ -4,7 +4,6 @@ from pathlib import Path
 import environ
 import graphql
 import sentry_sdk
-from corsheaders.defaults import default_headers
 from django.conf import global_settings
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
@@ -78,19 +77,18 @@ env = environ.Env(
     MEDIA_ROOT=(root, root("media")),
     MEDIA_URL=(str, "/media/"),
     MULTI_PROXY_HEADERS=(bool, False),
-    OIDC_LEEWAY=(int, 60 * 60),
+    OIDC_LEEWAY=(int, 3600),
     OPEN_CITY_PROFILE_GRAPHQL_API=(str, "https://profile-api.test.hel.ninja/graphql/"),
-    OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES=(list, ["substantial", "high"]),
     OPEN_CITY_PROFILE_SCOPE=(str, "https://api.hel.fi/auth/helsinkiprofile"),
     PREFILL_RESERVATION_WITH_PROFILE_DATA=(bool, False),
-    PRIMARY_MUNICIPALITY_NAME=(str, "Helsinki"),  # Default to Helsinki
-    PRIMARY_MUNICIPALITY_NUMBER=(str, "091"),  # Default to Helsinki
+    PRIMARY_MUNICIPALITY_NAME=(str, "Helsinki"),
+    PRIMARY_MUNICIPALITY_NUMBER=(str, "091"),
     REDIS_MASTER=(str, None),
     REDIS_PASSWORD=(str, None),
     REDIS_SENTINEL_SERVICE=(str, None),
     REDIS_URL=(str, None),
     RESOURCE_DEFAULT_TIMEZONE=(str, "Europe/Helsinki"),
-    SECONDARY_MUNICIPALITY_NAME=(str, "Other"),  # Default to Other
+    SECONDARY_MUNICIPALITY_NAME=(str, "Other"),
     SECRET_KEY=(str, ""),  # NOSONAR
     SECURE_PROXY_SSL_HEADER=(tuple, None),
     SEND_RESERVATION_NOTIFICATION_EMAILS=(str, False),
@@ -103,7 +101,6 @@ env = environ.Env(
     TOKEN_AUTH_SHARED_SECRET=(str, ""),
     TPREK_UNIT_URL=(str, "https://www.hel.fi/palvelukarttaws/rest/v4/unit/"),
     TRUST_X_FORWARDED_HOST=(bool, True),
-    TUNNISTAMO_ACCESS_TOKEN_ENDPOINT=(str, "https://tunnistamo.test.hel.ninja/api-tokens/"),
     TUNNISTAMO_ADMIN_KEY=(str, "tilavaraus-django-admin-dev"),
     TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://tunnistamo.test.hel.ninja/openid"),
     TUNNISTAMO_ADMIN_SECRET=(str, None),
@@ -144,11 +141,7 @@ else:
 
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
-# CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = list(default_headers) + [
-    "x-referrer",  # for authenticating requests from the frontend
-    "x-authorization",  # for passing Open City Profile API token from frontend
-]
+CORS_ALLOW_CREDENTIALS = True
 
 # Whether to trust X-Forwarded-Host headers for all purposes
 # where Django would need to make use of its own hostname
@@ -379,25 +372,24 @@ USE_TZ = True
 AUTHENTICATION_BACKENDS = [
     "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
     "django.contrib.auth.backends.ModelBackend",
-    "tilavarauspalvelu.graphql_api_token_authentication.GraphQLApiTokenAuthentication",
 ]
 
 LOGIN_REDIRECT_URL = "/admin/"
 LOGOUT_REDIRECT_URL = "/admin/"
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
 
+# See 'oidc_auth/settings.py'
 OIDC_AUTH = {
     "OIDC_LEEWAY": env("OIDC_LEEWAY"),
 }
 
+# See 'helusers/settings.py'
 OIDC_API_TOKEN_AUTH = {
     "AUDIENCE": env("TUNNISTAMO_JWT_AUDIENCE"),
     "ISSUER": env("TUNNISTAMO_JWT_ISSUER"),
-    # Use a custom resolve user for fetching date of birth.
-    "USER_RESOLVER": "users.utils.open_city_profile.resolve_user",
-    "API_SCOPE_PREFIX": "",
-    "TOKEN_AUTH_REQUIRE_SCOPE_PREFIX": True,
 }
+
+TUNNISTAMO_BASE_URL = env("TUNNISTAMO_BASE_URL")
 
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
@@ -408,16 +400,12 @@ SOCIAL_AUTH_TUNNISTAMO_PIPELINE = defaults.SOCIAL_AUTH_PIPELINE + (
     "users.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
 )
 
-TUNNISTAMO_BASE_URL = env("TUNNISTAMO_BASE_URL")
-TUNNISTAMO_ACCESS_TOKEN_ENDPOINT = env("TUNNISTAMO_ACCESS_TOKEN_ENDPOINT")
-
 HELUSERS_PASSWORD_LOGIN_DISABLED = False
 HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
 
 # Open city profile confs
 OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
 OPEN_CITY_PROFILE_SCOPE = env("OPEN_CITY_PROFILE_SCOPE")
-OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES = env("OPEN_CITY_PROFILE_LEVELS_OF_ASSURANCES")
 PREFILL_RESERVATION_WITH_PROFILE_DATA = env("PREFILL_RESERVATION_WITH_PROFILE_DATA")
 
 # GDPR API settings
