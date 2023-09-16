@@ -1,6 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -38,6 +38,7 @@ import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import { publicUrl } from "app/common/const";
 import Loader from "app/component/Loader";
 import { useNotification } from "app/context/NotificationContext";
+import { ButtonLikeLink } from "app/component/ButtonLikeLink";
 import {
   checkValidDate,
   checkValidFutureDate,
@@ -611,12 +612,14 @@ const NotificationForm = ({
       />
       <ButtonContainer>
         <InnerButtons>
-          {/* TODO don't nest Link and Button */}
-          <Link to=".." style={{ marginRight: "auto" }}>
-            <Button variant="secondary" type="button" theme="black">
-              {t("form.cancel")}
-            </Button>
-          </Link>
+          <ButtonLikeLink
+            variant="secondary"
+            size="large"
+            to=".."
+            style={{ marginRight: "auto" }}
+          >
+            {t("form.cancel")}
+          </ButtonLikeLink>
           <Button
             variant="secondary"
             theme="black"
@@ -664,7 +667,6 @@ const PageWrapped = ({ pk }: { pk?: number }) => {
   const typename = "BannerNotificationType";
   const id = pk ? window?.btoa(`${typename}:${pk}`) : undefined;
 
-  // TODO there is neither singular version of this, nor a pk filter
   const { data, loading: isLoading } = useQuery<
     Query,
     QueryBannerNotificationArgs

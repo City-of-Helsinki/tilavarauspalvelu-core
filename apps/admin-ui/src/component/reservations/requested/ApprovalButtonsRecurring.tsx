@@ -5,7 +5,7 @@ import {
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
-import { ButtonLikeLink } from "app/styles/util";
+import { ButtonLikeLink } from "app/component/ButtonLikeLink";
 import DenyDialog from "./DenyDialog";
 import { useModal } from "../../../context/ModalContext";
 import { useRecurringReservations } from "./hooks";
