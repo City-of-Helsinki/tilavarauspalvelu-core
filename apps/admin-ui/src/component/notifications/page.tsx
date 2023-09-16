@@ -218,10 +218,9 @@ const NotificationFormSchema = z
       }),
     pk: z.number(),
   })
-  // skip date time validation for drafts (if the field is empty)
-  // if draft and no time or date input skip it
-  // if draft and time or date input check that both are valid (since we can't save them without both)
-  // if not draft and no time or date input check that both are valid
+  // skip date time validation for drafts if both fields are empty
+  // if draft and time or date input validate both (can't construct date without both)
+  // published requires a DateTime (past is fine)
   .superRefine((x, ctx) => {
     if (!x.isDraft || x.activeFrom !== "" || x.activeFromTime !== "") {
       checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime");
@@ -229,7 +228,7 @@ const NotificationFormSchema = z
     }
   })
   // End time can't be in the past unless it's a draft
-  // TODO date check is yesterday, but we don't check for today and time today e.g. if it's 8am today and 6am is fine
+  // TODO future date check doesn't check for today time, so it's possible to set now() - 2h as the end time
   .superRefine((x, ctx) => {
     if (!x.isDraft || x.activeUntil !== "" || x.activeUntilTime !== "") {
       checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime");
@@ -254,7 +253,7 @@ const GridForm = styled.form`
 // @param cache is the apollo cache
 // @param matcher is the query name to destroy
 // Some other alternatives is to update cache based on mutation payload
-// only invalidate cache keys where the mutated object is in
+// only invalidate cache keys if needed (do a find on every key to check)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const deleteQueryFromCache = (cache: any, matcher: string | RegExp): void => {
   const rootQuery = cache.data.data.ROOT_QUERY;
@@ -666,7 +665,6 @@ const PageWrapped = ({ id }: { id?: number }) => {
     update(cache, { data: newData }) {
       cache.modify({
         fields: {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
           bannerNotifications(existing: BannerNotificationTypeConnection) {
             const res = newData?.deleteBannerNotification;

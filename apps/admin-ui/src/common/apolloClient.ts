@@ -26,7 +26,6 @@ const uploadLinkOptions = {
 
 // NOTE upload link typing is broken when updating apollo to 3.8
 // FIXME upload link is broken locally (it succeeds but no new image is available)
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions) as unknown as ApolloLink;
 const httpLink = new HttpLink({
