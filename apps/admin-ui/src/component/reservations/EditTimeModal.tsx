@@ -116,6 +116,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
       cache.modify({
         fields: {
           // find the pk => slice the array => replace the state variable in the slice
+          // @ts-expect-error: TODO: typechecks broke with ts or apollo-client upgrade
           reservations(existing: ReservationTypeConnection) {
             const queryRes = data?.staffAdjustReservationTime;
             if (queryRes?.errors) {

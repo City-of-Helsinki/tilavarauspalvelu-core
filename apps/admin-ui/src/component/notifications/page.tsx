@@ -667,7 +667,7 @@ const PageWrapped = ({ id }: { id?: number }) => {
       cache.modify({
         fields: {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore; TODO: typechecking broke after upgrading apollo
+          // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
           bannerNotifications(existing: BannerNotificationTypeConnection) {
             const res = newData?.deleteBannerNotification;
             if (res?.errors) {
