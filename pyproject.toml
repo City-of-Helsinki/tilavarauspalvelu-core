@@ -112,6 +112,7 @@ select = [
     "UP006",    # pyupgrade: Use {to} instead of {from} for type annotation
     "UP007",    # pyupgrade: Use X | Y for type annotations
     "UP008",    # pyupgrade: Use super() instead of super(__class__, self)
+    "UP017",    # pyupgrade: Use datetime.UTC alias
 ]
 ignore = [
     "S101",  # assert is fine.

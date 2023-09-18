@@ -1,7 +1,7 @@
 import math
 import random
 import uuid
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from enum import Enum
 from itertools import cycle
@@ -1256,7 +1256,7 @@ def _create_reservation_units(
             payment_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PAYMENT],
             pricing_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PRICING],
             rank=i,
-            reservation_begins=datetime(2021, 1, 1, tzinfo=timezone.utc),
+            reservation_begins=datetime(2021, 1, 1, tzinfo=UTC),
             reservation_cancelled_instructions=cancelled.fi,
             reservation_cancelled_instructions_en=cancelled.en,
             reservation_cancelled_instructions_fi=cancelled.fi,
@@ -1514,7 +1514,7 @@ def _create_reservations(  # NOSONAR (python:S3776)
     *,
     number: int = 200,
 ) -> list[Reservation]:
-    past_date_start = datetime(year=2021, month=1, day=1, tzinfo=timezone.utc)
+    past_date_start = datetime(year=2021, month=1, day=1, tzinfo=UTC)
     half = number // 2
 
     reservations: list[Reservation] = []
@@ -1650,18 +1650,18 @@ def _create_application_rounds(
         [
             # past
             (
-                datetime(2021, 1, 1, tzinfo=timezone.utc),
-                datetime(2023, 1, 1, tzinfo=timezone.utc),
+                datetime(2021, 1, 1, tzinfo=UTC),
+                datetime(2023, 1, 1, tzinfo=UTC),
             ),
             # current
             (
-                datetime(2022, 1, 1, tzinfo=timezone.utc),
-                datetime(2027, 1, 1, tzinfo=timezone.utc),
+                datetime(2022, 1, 1, tzinfo=UTC),
+                datetime(2027, 1, 1, tzinfo=UTC),
             ),
             # future
             (
-                datetime.now(tz=timezone.utc) + timedelta(days=365),
-                datetime(2027, 1, 1, tzinfo=timezone.utc),
+                datetime.now(tz=UTC) + timedelta(days=365),
+                datetime(2027, 1, 1, tzinfo=UTC),
             ),
         ]
     )
@@ -1683,8 +1683,8 @@ def _create_application_rounds(
             application_period_end=period[1],
             reservation_period_begin=period[0],
             reservation_period_end=period[1],
-            public_display_begin=datetime(2021, 1, 1, tzinfo=timezone.utc),
-            public_display_end=datetime(2027, 1, 1, tzinfo=timezone.utc),
+            public_display_begin=datetime(2021, 1, 1, tzinfo=UTC),
+            public_display_end=datetime(2027, 1, 1, tzinfo=UTC),
             service_sector=next(service_sectors_loop),
             criteria=criteria.fi,
             criteria_fi=criteria.fi,
@@ -1717,7 +1717,7 @@ def _create_application_round_statuses(
     user: User,
 ) -> list[ApplicationRoundStatus]:
     statuses: list[ApplicationRoundStatus] = []
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     for application_round in application_rounds:
         if application_round.application_period_end < now:
@@ -1755,7 +1755,7 @@ def _create_applications(
     billing_addresses = _create_addresses(number=number)
     organisations = _create_organisation(billing_addresses)
     applications: list[Application] = []
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     items: zip[tuple[Person, Address, tuple[str, Organisation | None]]]
     items = zip(contact_persons, billing_addresses, organisations, strict=True)
@@ -1800,7 +1800,7 @@ def _create_application_statuses(
     applications: list[Application],
 ) -> list[ApplicationStatus]:
     statuses: list[ApplicationStatus] = []
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     for application in applications:
         if application.application_round.application_period_end < now:
@@ -2005,7 +2005,7 @@ def _create_application_event_statuses(
     application_events: list[ApplicationEvent],
 ) -> list[ApplicationEventStatus]:
     statuses: list[ApplicationEventStatus] = []
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     for event in application_events:
         if event.application.application_round.application_period_end < now:
@@ -2072,8 +2072,8 @@ def _create_application_event_schedules(
 
             schedule = ApplicationEventSchedule(
                 day=weekday,
-                begin=time(hour=begin, tzinfo=timezone.utc),
-                end=time(hour=end, tzinfo=timezone.utc),
+                begin=time(hour=begin, tzinfo=UTC),
+                end=time(hour=end, tzinfo=UTC),
                 priority=random.choice(PRIORITIES.PRIORITY_CHOICES)[0],
                 application_event=application_event,
             )
