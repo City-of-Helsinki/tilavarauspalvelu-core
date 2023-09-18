@@ -7,7 +7,7 @@ from django.test import override_settings
 from django.test.testcases import TestCase
 from pytest import raises
 
-from ..email_notification_builder import EmailTemplateValidator
+from email_notification.sender.email_notification_builder import EmailTemplateValidator
 
 
 @override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)

@@ -3,14 +3,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from pytest import raises
 
-from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UnitFactory
-
-from ..email_notification_builder import (
+from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
     EmailTemplateValidationError,
     ReservationEmailNotificationBuilder,
     ReservationEmailNotificationBuilderException,
 )
+from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UnitFactory
 
 
 class EmailNotificationBuilderTestCase(TestCase):

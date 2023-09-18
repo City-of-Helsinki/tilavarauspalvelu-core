@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
+from api.graphql.tests.base import GrapheneTestCaseBase
 from applications.models import (
     Application,
     ApplicationEventStatus,
@@ -37,8 +38,6 @@ from tests.factories import (
     ReservationUnitTypeFactory,
     UnitGroupFactory,
 )
-
-from ..base import GrapheneTestCaseBase
 
 
 class ApplicationEventTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):

@@ -12,20 +12,13 @@ from django.test import RequestFactory
 from django.test.testcases import TestCase
 from factory.fuzzy import FuzzyChoice, FuzzyInteger
 
+from applications.admin import ApplicationRoundAdmin
+from applications.models import PRIORITIES, Application, ApplicationEvent, ApplicationRound, ApplicationStatus
 from tests.factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
     ApplicationStatusFactory,
     EventReservationUnitFactory,
-)
-
-from ..admin import ApplicationRoundAdmin
-from ..models import (
-    PRIORITIES,
-    Application,
-    ApplicationEvent,
-    ApplicationRound,
-    ApplicationStatus,
 )
 
 

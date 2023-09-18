@@ -6,7 +6,7 @@ from django.test import override_settings
 
 from users.models import PersonalInfoViewLog
 
-from .base import ApplicationTestCaseBase
+from api.graphql.tests.test_applications.base import ApplicationTestCaseBase
 
 
 @freezegun.freeze_time("2022-05-02T12:00:00Z")
