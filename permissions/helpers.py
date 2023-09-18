@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from datetime import datetime
-from typing import Iterable
 
 from django.db.models import Q, QuerySet
 from django.utils import timezone

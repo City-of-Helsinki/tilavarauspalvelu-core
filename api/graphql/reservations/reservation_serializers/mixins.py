@@ -1,7 +1,7 @@
 import datetime
 import math
+from collections.abc import Iterable
 from decimal import Decimal
-from typing import Iterable
 
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
