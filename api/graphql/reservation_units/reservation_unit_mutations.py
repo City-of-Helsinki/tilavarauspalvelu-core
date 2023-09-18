@@ -7,7 +7,6 @@ from graphene_file_upload.scalars import Upload
 from graphql import GraphQLError
 from rest_framework.generics import get_object_or_404
 
-import tilavarauspalvelu.utils.logging as logging
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.reservation_units.reservation_unit_serializers import (
     EquipmentCategoryCreateSerializer,
@@ -44,6 +43,7 @@ from reservation_units.models import (
     ReservationUnitImage,
 )
 from reservation_units.utils.hauki_exporter import ReservationUnitHaukiExporter
+from tilavarauspalvelu.utils import logging
 
 logger = logging.getLogger(__name__)
 

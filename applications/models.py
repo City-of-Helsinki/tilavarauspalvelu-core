@@ -15,7 +15,6 @@ from recurrence.fields import RecurrenceField
 from rest_framework.exceptions import ValidationError
 from sentry_sdk import capture_exception, push_scope
 
-import tilavarauspalvelu.utils.logging as logging
 from applications.base_models import ContactInformation
 from applications.utils.aggregate_data import (
     ApplicationAggregateDataCreator,
@@ -23,6 +22,7 @@ from applications.utils.aggregate_data import (
 )
 from reservation_units.models import ReservationUnit
 from spaces.models import Unit
+from tilavarauspalvelu.utils import logging
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 from tilavarauspalvelu.utils.date_util import (
     next_or_current_matching_weekday,
@@ -388,7 +388,7 @@ class ApplicationRound(models.Model):
         ApplicationRoundAggregateDataCreator(self).start()
 
     def update_application_status(self, new_status: ApplicationRoundStatus):
-        import applications.utils.status_manager as status_manager
+        from applications.utils import status_manager
 
         if new_status == ApplicationRoundStatus.IN_REVIEW:
             status_manager.handle_applications_on_in_review(self)

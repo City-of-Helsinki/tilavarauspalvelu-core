@@ -3,8 +3,8 @@ import json
 import requests
 from django.conf import settings
 
-import tilavarauspalvelu.utils.logging as logging
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
+from tilavarauspalvelu.utils import logging
 
 REQUESTS_TIMEOUT = 15
 

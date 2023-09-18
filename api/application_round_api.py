@@ -1,7 +1,6 @@
 from django.db.models import Case, Exists, OuterRef, Prefetch, Subquery, Sum, When
 from rest_framework import serializers, viewsets
 
-import tilavarauspalvelu.utils.logging as logging
 from applications.models import (
     Application,
     ApplicationEventAggregateData,
@@ -16,6 +15,7 @@ from permissions.helpers import can_manage_service_sectors_application_rounds
 from reservation_units.models import ReservationUnit
 from reservations.models import AgeGroup, ReservationPurpose
 from spaces.models import ServiceSector
+from tilavarauspalvelu.utils import logging
 
 logger = logging.getLogger(__name__)
 
