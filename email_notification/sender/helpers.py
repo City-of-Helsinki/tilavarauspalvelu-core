@@ -1,5 +1,3 @@
-from typing import List
-
 from django.db.models import Q
 
 from permissions.helpers import has_unit_permission
@@ -9,13 +7,13 @@ from users.models import ReservationNotification, User
 
 
 def get_staff_notification_recipients(
-    reservation: Reservation, notification_settings: List[ReservationNotification]
-) -> List[str]:
+    reservation: Reservation, notification_settings: list[ReservationNotification]
+) -> list[str]:
     """
     Get users with unit roles and notifications enabled, collect the ones that can manage relevant units,
     have matching notification setting are not the reservation creator
     """
-    notification_recipients: List[str] = []
+    notification_recipients: list[str] = []
     reservation_units = reservation.reservation_unit.all()
     units = Unit.objects.filter(reservationunit__in=reservation_units)
 
@@ -32,7 +30,7 @@ def get_staff_notification_recipients(
     return list(set(notification_recipients))
 
 
-def __user_has_notification_setting(user: User, notification_settings: List[ReservationNotification]):
+def __user_has_notification_setting(user: User, notification_settings: list[ReservationNotification]):
     for setting in notification_settings:
         if user.reservation_notification.upper() == setting.upper():
             return True

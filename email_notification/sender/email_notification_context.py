@@ -1,6 +1,5 @@
 import datetime
 from decimal import Decimal
-from typing import Dict
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -23,11 +22,11 @@ class EmailNotificationContext:
     non_subsidised_price: Decimal
     subsidised_price: Decimal
     tax_percentage: int
-    confirmed_instructions: Dict[str, str]
-    pending_instructions: Dict[str, str]
-    cancelled_instructions: Dict[str, str]
-    deny_reason: Dict[str, str]
-    cancel_reason: Dict[str, str]
+    confirmed_instructions: dict[str, str]
+    pending_instructions: dict[str, str]
+    cancelled_instructions: dict[str, str]
+    deny_reason: dict[str, str]
+    cancel_reason: dict[str, str]
     reservee_language: str
 
     @staticmethod

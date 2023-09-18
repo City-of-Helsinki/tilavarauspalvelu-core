@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List, Optional
+from typing import Optional
 
 import graphene
 from graphene import ResolveInfo
@@ -113,7 +113,7 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
 
         return self.application_event_id
 
-    def resolve_weekdays(self, info: ResolveInfo) -> List[graphene.List]:
+    def resolve_weekdays(self, info: ResolveInfo) -> list[graphene.List]:
         return self.weekday_list
 
 

@@ -1,5 +1,3 @@
-from typing import List
-
 from django.contrib.auth import get_user_model
 from helsinki_gdpr.models import SerializableMixin
 
@@ -20,7 +18,7 @@ class ProfileUser(SerializableMixin):
     )
 
     @property
-    def reservations(self) -> List[List]:
+    def reservations(self) -> list[list]:
         reservations = []
 
         for res in self.user.reservation_set.all():
@@ -54,7 +52,7 @@ class ProfileUser(SerializableMixin):
         return reservations
 
     @property
-    def applications(self) -> List:
+    def applications(self) -> list:
         applications = []
 
         for app in self.user.application_set.all():

@@ -1,5 +1,3 @@
-from typing import Dict
-
 import graphene
 from auditlog.models import LogEntry
 from django.conf import settings
@@ -182,7 +180,7 @@ class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, AuthSerializer
     permission_classes = (ReservationUnitPermission,)
 
     @classmethod
-    def remove_personal_data_and_logs_on_archive(cls, input: Dict):
+    def remove_personal_data_and_logs_on_archive(cls, input: dict):
         """
         When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
         Because all changes are stored to the audit log, we also need to delete old audit events related to the unit.

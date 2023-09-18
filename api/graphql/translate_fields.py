@@ -1,5 +1,3 @@
-from typing import List, Type
-
 from django.conf import settings
 from django.db import models
 from django.db.models import Model
@@ -8,7 +6,7 @@ from modeltranslation.manager import get_translatable_fields_for_model
 LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]
 
 
-def get_all_translatable_fields(model: Type[Model]) -> List[str]:
+def get_all_translatable_fields(model: type[Model]) -> list[str]:
     fields = []
 
     translatable_fields = get_translatable_fields_for_model(model) or []

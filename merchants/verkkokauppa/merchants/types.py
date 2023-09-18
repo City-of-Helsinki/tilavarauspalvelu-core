@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 from uuid import UUID
 
 from merchants.verkkokauppa.helpers import parse_datetime
@@ -21,7 +21,7 @@ class MerchantInfo:
     shop_id: str
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "MerchantInfo":
+    def from_json(cls, json: dict[str, Any]) -> "MerchantInfo":
         try:
             return MerchantInfo(
                 name=json.get("merchantName", ""),
@@ -57,7 +57,7 @@ class Merchant:
     shop_id: str
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "Merchant":
+    def from_json(cls, json: dict[str, Any]) -> "Merchant":
         try:
             configurations = json["configurations"]
             return Merchant(
@@ -80,7 +80,7 @@ class Merchant:
             raise ParseMerchantError(f"Could not parse merchant: {e}")
 
     @classmethod
-    def _parse_configuration(cls, key: str, configurations: List[Dict[str, Any]]) -> str:
+    def _parse_configuration(cls, key: str, configurations: list[dict[str, Any]]) -> str:
         for config in configurations:
             if config["key"] == key:
                 return config["value"]
@@ -100,7 +100,7 @@ class UpdateMerchantParams:
     business_id: str
     shop_id: str
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "merchantName": self.name,
             "merchantStreet": self.street,
@@ -119,7 +119,7 @@ class UpdateMerchantParams:
 class CreateMerchantParams(UpdateMerchantParams):
     paytrail_merchant_id: str
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         json = super().to_json()
         json["merchantPaytrailMerchantId"] = self.paytrail_merchant_id
         return json

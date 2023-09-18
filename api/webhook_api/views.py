@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Dict
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -38,7 +37,7 @@ class WebhookError(APIException):
         self.status_code = status_code
         self.detail = message
 
-    def to_json(self) -> Dict[str, any]:
+    def to_json(self) -> dict[str, any]:
         return {"status": self.status_code, "message": self.detail}
 
 

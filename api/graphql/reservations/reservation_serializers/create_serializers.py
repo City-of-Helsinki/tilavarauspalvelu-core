@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional
+from typing import Optional
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -221,7 +221,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer, ReservationPriceMixin, R
         return data
 
     def _get_biggest_buffer_time_from_reservation_units(
-        self, field: str, reservation_units: List[ReservationUnit]
+        self, field: str, reservation_units: list[ReservationUnit]
     ) -> [datetime.timedelta]:
         buffer_times = [
             getattr(res_unit, field) for res_unit in reservation_units if getattr(res_unit, field, None) is not None
@@ -289,7 +289,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer, ReservationPriceMixin, R
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
 
-    def check_reservation_type(self, user, reservation_unit_ids: List[int], reservation_type: Optional[str]):
+    def check_reservation_type(self, user, reservation_unit_ids: list[int], reservation_type: Optional[str]):
         if reservation_type is None or can_handle_reservation_with_units(user, reservation_unit_ids):
             return
 

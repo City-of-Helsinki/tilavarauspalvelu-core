@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 import graphene
 from django.db.models import Prefetch, QuerySet
@@ -79,8 +79,8 @@ class QueryPerformanceOptimizerMixin:
 
     @staticmethod
     def _optimize_query_with_selected_child_elements(  # noqa: C901
-        children: List[Any], optimizations: Dict[str, Any], queryset: QuerySet
-    ) -> List[Any]:
+        children: list[Any], optimizations: dict[str, Any], queryset: QuerySet
+    ) -> list[Any]:
         """Build and apply query optimization from graphql query selections"""
         annotations = []
         selects = []
@@ -144,8 +144,8 @@ class QueryPerformanceOptimizerMixin:
     @staticmethod
     def _compile_prefetch(
         field_name: str,
-        children: List[Any],
-        child_optimizations: Dict[str, Any],
+        children: list[Any],
+        child_optimizations: dict[str, Any],
         base_queryset: Union[QuerySet, None] = None,
     ):
         """Compile prefetch and other optimizations for parent query"""

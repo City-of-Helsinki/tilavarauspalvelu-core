@@ -1,5 +1,3 @@
-from typing import List
-
 from django.conf import settings
 
 from email_notification.models import EmailType
@@ -24,7 +22,7 @@ def send_reservation_email_task(reservation_id: int, email_type: EmailType):
 def send_staff_reservation_email_task(
     reservation_id: int,
     email_type: EmailType,
-    notification_settings: List[ReservationNotification],
+    notification_settings: list[ReservationNotification],
 ):
     if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
         return

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from uuid import UUID
 
 from django.conf import settings
@@ -49,7 +49,7 @@ class Payment:
     payment_method_label: str
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "Payment":
+    def from_json(cls, json: dict[str, Any]) -> "Payment":
         try:
             return Payment(
                 payment_id=json["paymentId"],
@@ -91,7 +91,7 @@ class Refund:
     refund_reason: Optional[str]
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "Refund":
+    def from_json(cls, json: dict[str, Any]) -> "Refund":
         from merchants.verkkokauppa.helpers import parse_datetime
 
         try:
@@ -126,7 +126,7 @@ class RefundStatusResult:
     created_at: datetime
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "RefundStatusResult":
+    def from_json(cls, json: dict[str, Any]) -> "RefundStatusResult":
         from merchants.verkkokauppa.helpers import parse_datetime
 
         try:

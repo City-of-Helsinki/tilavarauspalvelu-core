@@ -1,6 +1,6 @@
 import datetime
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 from zoneinfo import ZoneInfo
 
 from django.conf import settings
@@ -48,8 +48,8 @@ class TimeSpan:
     start_time: Optional[datetime.time]
     end_time: Optional[datetime.time]
     end_time_on_next_day: bool
-    name: Dict[str, str]
-    description: Dict[str, str]
+    name: dict[str, str]
+    description: dict[str, str]
     created: Optional[datetime.datetime]
     modified: Optional[datetime.datetime]
     resource_state: State = State.UNDEFINED
@@ -67,7 +67,7 @@ class Period:
     description: dict
     start_date: Optional[datetime.date]
     end_date: Optional[datetime.date]
-    time_spans: List[TimeSpan]
+    time_spans: list[TimeSpan]
     resource_state: State = State.UNDEFINED
 
 
@@ -96,7 +96,7 @@ def get_opening_hours(
     start_date: Union[str, datetime.date],
     end_date: Union[str, datetime.date],
     hauki_origin_id=None,
-) -> List[dict]:
+) -> list[dict]:
     """Get opening hours for Hauki resource"""
     hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 
@@ -144,7 +144,7 @@ def get_opening_hours(
     return days_data_out
 
 
-def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id=None) -> List[Period]:
+def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id=None) -> list[Period]:
     """Get periods for Hauki resource"""
     hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 

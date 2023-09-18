@@ -1,6 +1,5 @@
 import operator
 from functools import reduce
-from typing import List
 
 import django_filters
 from django.db.models import F, Q
@@ -172,14 +171,14 @@ class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBu
 
         return qs.filter(reservation_kind__icontains=value)
 
-    def get_state(self, qs, property, value: List[str]):
+    def get_state(self, qs, property, value: list[str]):
         queries = []
         for state in value:
             queries.append(ReservationUnitStateHelper.get_state_query(state))
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
 
-    def get_reservation_state(self, qs, property, value: List[str]):
+    def get_reservation_state(self, qs, property, value: list[str]):
         queries = []
         for state in value:
             queries.append(ReservationUnitReservationStateHelper.get_state_query(state))
