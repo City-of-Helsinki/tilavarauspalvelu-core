@@ -19,7 +19,8 @@ class ReservationUnitHaukiExporter:
         self.reservation_unit = reservation_unit
 
     def _get_parent_id(self) -> Optional[int]:
-        """Tries to get reservation_unit.unit hauki resource id from hauki.
+        """
+        Tries to get reservation_unit.unit hauki resource id from hauki.
         This is used when hauki_resource_id is not found from reservation unit's unit.
         """
         unit = self.reservation_unit.unit

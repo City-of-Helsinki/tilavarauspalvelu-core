@@ -840,7 +840,8 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
 
 
 class ApplicationAggregateData(AggregateDataBase):
-    """Model to store aggregated data from application events.
+    """
+    Model to store aggregated data from application events.
 
     Overall hour counts, application event counts etc.
     """
@@ -1096,7 +1097,8 @@ class ApplicationEvent(models.Model):
 
 
 class ApplicationEventAggregateData(AggregateDataBase):
-    """Model to store aggregated data for single application event.
+    """
+    Model to store aggregated data for single application event.
 
     Overall hour counts etc.
     """

@@ -67,7 +67,5 @@ class Command(BaseCommand):
         return f"Created: {importer.creation_counter} Updated: {importer.update_counter}"
 
     def get_version(self):
-        """
-        Custom version for devops etc scenarios to know which version running.
-        """
+        """Custom version for devops etc scenarios to know which version running."""
         return "0.0.2"

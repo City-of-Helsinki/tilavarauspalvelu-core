@@ -11,7 +11,8 @@ DEFAULT_TIMEZONE = timezone.get_default_timezone()
 
 
 def get_time_as_utc(time: datetime.time, date: datetime.date, tz_info: timezone):
-    """Gets utc time from given time, date and timezone information.
+    """
+    Gets utc time from given time, date and timezone information.
     Graphene seems to render time with offset info (e.g. 10:00:00+00:00) for localized to UTC only.
     So with e.g. time zone being 'Europe/Helsinki' just don't work for some reason not yet known.
     So for now we render all as UTC using this little helper.

@@ -55,7 +55,8 @@ class AuthDeleteMutation(AuthMutation):
 
     @classmethod
     def validate(cls, root, info, **input):
-        """Classes that ought to be overriding this method should raise django's
+        """
+        Classes that ought to be overriding this method should raise django's
         ValidationError if there's some validation problem. It gets caught in
         `mutate_and_get_payload` method and returned as an error.
         """
@@ -169,8 +170,10 @@ class ModelSerializerAuthMutation(BaseAuthMutation, ClientIDMutation):
 
     @classmethod
     def get_instance(cls, **kwargs: Any) -> TModel | None:
-        """Get the object to be updated or None if we're creating a new object.
-        Should raise a serializers.ValidationError if the object does not exist."""
+        """
+        Get the object to be updated or None if we're creating a new object.
+        Should raise a serializers.ValidationError if the object does not exist.
+        """
         return None
 
     @classmethod
@@ -255,7 +258,8 @@ class ModelAuthMutation(BaseAuthMutation, ClientIDMutation, GetInstanceMixin):
 
 # This should replace 'AuthSerializerMutation' in the future
 class CreateAuthMutation(ModelSerializerAuthMutation, Generic[TModel]):
-    """Mutation class for creating a model instance.
+    """
+    Mutation class for creating a model instance.
     Should set the `serializer_class` attribute in the Meta class
     to a ModelSerializer class for the model to be created.
     """
@@ -270,7 +274,8 @@ class CreateAuthMutation(ModelSerializerAuthMutation, Generic[TModel]):
 
 # This should replace 'AuthSerializerMutation' in the future
 class UpdateAuthMutation(GetInstanceMixin, ModelSerializerAuthMutation, Generic[TModel]):
-    """Mutation class for updating a model instance.
+    """
+    Mutation class for updating a model instance.
     Should set the `serializer_class` attribute in the Meta class
     to a ModelSerializer class for the model to be updated.
     Optionally, the `lookup_field` attribute can be set to specify which
@@ -289,7 +294,8 @@ class UpdateAuthMutation(GetInstanceMixin, ModelSerializerAuthMutation, Generic[
 
 # This should replace 'AuthDeleteMutation' in the future
 class DeleteAuthMutation(ModelAuthMutation, Generic[TModel]):
-    """Mutation class for deleting a model instance.
+    """
+    Mutation class for deleting a model instance.
     Should set the `model` attribute in the Meta class
     to a model class for the model to be deleted.
     Optionally, the `lookup_field` attribute can be set to specify which

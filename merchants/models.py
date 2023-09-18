@@ -186,9 +186,7 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
 
 
 class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models.Model):
-    """
-    Custom validation comes from requirements in SAP
-    """
+    """Custom validation comes from requirements in SAP"""
 
     name = models.CharField(verbose_name=_("Accounting name"), blank=False, null=False, max_length=128)
 

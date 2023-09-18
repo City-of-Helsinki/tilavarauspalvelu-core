@@ -40,7 +40,6 @@ class ReservationUnitStateHelper:
     # SCHEDULED_PUBLISHING
     def __is_scheduled_publishing(reservation_unit: ReservationUnit) -> bool:
         """Return True if reservation unit has publish_begins set in the future and end isn't specified."""
-
         now = datetime.datetime.now(tz=get_default_timezone())
 
         if ReservationUnitStateHelper.__draft_or_archived(reservation_unit):
@@ -129,7 +128,6 @@ class ReservationUnitStateHelper:
     @staticmethod
     def __is_hidden(reservation_unit: ReservationUnit) -> bool:
         """Returns True if reservation unit publish_ends has passed and is not going to be published in the future."""
-
         now = datetime.datetime.now(tz=get_default_timezone())
 
         if ReservationUnitStateHelper.__draft_or_archived(reservation_unit):

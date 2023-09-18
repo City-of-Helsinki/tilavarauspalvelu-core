@@ -315,7 +315,8 @@ class ReservationPurposePermission(BasePermission):
 class ReservationPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
-        """Authenticated users can see reservations.
+        """
+        Authenticated users can see reservations.
 
         The reservation fields has own permission checks.
         """
@@ -331,7 +332,8 @@ class ReservationPermission(BasePermission):
 
     @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:
-        """Authenticated users can see reservations.
+        """
+        Authenticated users can see reservations.
 
         The reservation fields has own permission checks.
         """

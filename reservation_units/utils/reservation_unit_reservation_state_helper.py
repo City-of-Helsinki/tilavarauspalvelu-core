@@ -33,10 +33,10 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __is_scheduled_period(cls, reservation_unit: ReservationUnit) -> bool:
-        """Returns True if reservation unit has both reservation_begins
+        """
+        Returns True if reservation unit has both reservation_begins
         and reservations_ends dates set to the future.
         """
-
         now = datetime.datetime.now(tz=get_default_timezone())
 
         return (
@@ -93,10 +93,10 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __is_scheduled_closing(cls, reservation_unit: ReservationUnit) -> bool:
-        """Returns True if reservation unit has reservation_begins set in the past
+        """
+        Returns True if reservation unit has reservation_begins set in the past
         and reservation_ends in the future.
         """
-
         now = datetime.datetime.now(tz=get_default_timezone())
 
         return (
@@ -116,7 +116,8 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __is_reservation_closed(cls, reservation_unit: ReservationUnit) -> bool:
-        """Returns True if reservation begins is in the past or none and if the reservation ends is in the past.
+        """
+        Returns True if reservation begins is in the past or none and if the reservation ends is in the past.
         Meaning the reservation is not scheduled to open anymore.
         """
         now = datetime.datetime.now(tz=get_default_timezone())

@@ -147,9 +147,10 @@ class PurposeUpdateMutation(AuthSerializerMutation, SerializerMutation):
 class ReservationUnitMutationMixin:
     @classmethod
     def perform_mutate(cls, serializer, info):
-        """After serializer is validated and save we check if the reservation unit
-        was published and thus should be sent to HAUKI and do it here."""
-
+        """
+        After serializer is validated and save we check if the reservation unit
+        was published and thus should be sent to HAUKI and do it here.
+        """
         mutation_response = super().perform_mutate(serializer, info)
         reservation_unit = serializer.instance
         if not settings.HAUKI_EXPORTS_ENABLED:
@@ -182,7 +183,8 @@ class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, AuthSerializer
 
     @classmethod
     def remove_personal_data_and_logs_on_archive(cls, input: Dict):
-        """When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
+        """
+        When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
         Because all changes are stored to the audit log, we also need to delete old audit events related to the unit.
         """
         if "is_archived" not in input.keys():

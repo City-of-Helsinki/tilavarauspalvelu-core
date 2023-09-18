@@ -53,9 +53,7 @@ class State(Enum):
 
     @classmethod
     def reservable_states(cls):
-        """
-        States indicating the space can be reserved in some way.
-        """
+        """States indicating the space can be reserved in some way."""
         return [
             cls.OPEN_AND_RESERVABLE,
             cls.WITH_KEY_AND_RESERVATION,
@@ -64,9 +62,7 @@ class State(Enum):
 
     @classmethod
     def closed_states(cls):
-        """
-        States indicating the space is closed and inaccessible.
-        """
+        """States indicating the space is closed and inaccessible."""
         return [
             None,
             cls.CLOSED,
