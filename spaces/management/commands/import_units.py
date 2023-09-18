@@ -58,11 +58,11 @@ class Command(BaseCommand):
             return
 
         if url[len(url) - 1] != "/":
-            url = "{}/".format(url)
+            url = f"{url}/"
         importer.single = True
 
         for id in ids:
-            importer.url = "{}{}".format(url, id)
+            importer.url = f"{url}{id}"
             importer.import_units(import_hauki_resource_ids=import_hauki_resource_ids)
         return f"Created: {importer.creation_counter} Updated: {importer.update_counter}"
 

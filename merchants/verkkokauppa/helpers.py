@@ -38,7 +38,7 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
 
     preferred_language = reservation.reservee_language or "fi"
     weekday = localized_short_weekday(begin.weekday(), preferred_language)
-    date = "{d.day}.{d.month}.{d.year}".format(d=begin)
+    date = f"{begin.day}.{begin.month}.{begin.year}"
     start_time = begin.strftime("%H:%M")
     end_time = end.strftime("%H:%M")
 

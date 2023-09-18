@@ -82,7 +82,7 @@ class KeywordCategory(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
 
     def __str__(self):
-        return "{}".format(self.name)
+        return f"{self.name}"
 
 
 class KeywordGroup(models.Model):
@@ -98,7 +98,7 @@ class KeywordGroup(models.Model):
     )
 
     def __str__(self):
-        return "{}".format(self.name)
+        return f"{self.name}"
 
 
 class Keyword(models.Model):
@@ -114,7 +114,7 @@ class Keyword(models.Model):
     )
 
     def __str__(self):
-        return "{}".format(self.name)
+        return f"{self.name}"
 
 
 class ReservationUnitCancellationRule(models.Model):
@@ -823,7 +823,7 @@ class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
     small_url = models.URLField(null=False, blank=True, max_length=255, default="")
 
     def __str__(self):
-        return "{} ({})".format(self.reservation_unit.name, self.get_image_type_display())
+        return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
 
     def save(
         self,
@@ -913,7 +913,7 @@ class Period(models.Model):
     closed = models.BooleanField(verbose_name=_("Closed"), default=False, editable=False)
 
     def __str__(self):
-        return "{}({} - {})".format(self.reservation_unit.name, self.start, self.end)
+        return f"{self.reservation_unit.name}({self.start} - {self.end})"
 
 
 class Day(models.Model):
@@ -935,7 +935,7 @@ class Day(models.Model):
     closes = models.TimeField(verbose_name=_("Time when closes"), null=True, blank=True)
 
     def __str__(self):
-        return "{}({})".format(self.get_weekday_display(), self.period.reservation_unit.name)
+        return f"{self.get_weekday_display()}({self.period.reservation_unit.name})"
 
 
 class DayPart(models.Model):
@@ -955,12 +955,7 @@ class DayPart(models.Model):
     day = models.ForeignKey(Day, verbose_name=_("Day"), on_delete=models.CASCADE)
 
     def __str__(self):
-        return "{} {} ({}-{})".format(
-            self.day.period.reservation_unit.name,
-            self.day.get_weekday_display(),
-            self.begin,
-            self.end,
-        )
+        return f"{self.day.period.reservation_unit.name} {self.day.get_weekday_display()} ({self.begin}-{self.end})"
 
 
 class Introduction(models.Model):
