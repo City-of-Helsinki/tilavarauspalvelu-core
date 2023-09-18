@@ -91,9 +91,7 @@ class UnitImporter:
         self.update_counter = 0
 
     @transaction.atomic
-    def import_units(self, import_hauki_resource_id=False):
-        self.import_hauki_resource_ids = import_hauki_resource_id
-
+    def import_units(self, import_hauki_resource_ids=False):
         resp = requests.get(self.url, timeout=REQUEST_TIMEOUT_SECONDS)
         resp.raise_for_status()
         unit_data = resp.json()
@@ -106,7 +104,7 @@ class UnitImporter:
             self._update_counters(created)
 
         logger.info("Created %s\nUpdated %s" % (self.creation_counter, self.update_counter))
-        if self.import_hauki_resource_ids:
+        if import_hauki_resource_ids:
             hauki_importer = UnitHaukiResourceIdImporter()
             logger.info("Importing from Hauki...")
             hauki_importer.import_hauki_resource_ids_for_units(unit_ids=self.imported_unit_ids)

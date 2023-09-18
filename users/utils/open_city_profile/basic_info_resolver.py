@@ -236,24 +236,25 @@ class ProfileNodeIdReader(ProfileReaderTokenMixin):
         self.request = request
 
     def get_user_profile_id(self) -> [str, None]:
-        self.response_data = self.__make_profile_request(self.token)
+        response_data = self.__make_profile_request(self.token)
 
-        self.__check_for_errors()
+        self.__check_for_errors(response_data)
 
-        my_profile_data = self.__get_my_profile_data()
-
+        my_profile_data = self.__get_my_profile_data(response_data)
         if not my_profile_data:
             return None
 
         return my_profile_data.get("id")
 
-    def __check_for_errors(self):
-        if self.response_data.get("errors"):
-            message = next(iter(self.response_data.get("errors"))).get("message")
+    @staticmethod
+    def __check_for_errors(response_data):
+        if response_data.get("errors"):
+            message = next(iter(response_data.get("errors"))).get("message")
             raise ProfileReadError(message)
 
-    def __get_my_profile_data(self):
-        data = self.response_data.get("data")
+    @staticmethod
+    def __get_my_profile_data(response_data):
+        data = response_data.get("data")
 
         if not data:
             return None

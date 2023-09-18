@@ -39,10 +39,14 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
         super().__init__(*args, **kwargs)
         self.application = application
 
-    def run(self) -> None:
         # Base queries
         self._base_query = self.application.application_events.values(
-            "id", "begin", "end", "events_per_week", "min_duration", "max_duration"
+            "id",
+            "begin",
+            "end",
+            "events_per_week",
+            "min_duration",
+            "max_duration",
         ).annotate(
             events_count=ExpressionWrapper(
                 (F("end") - F("begin")) / 7 * F("events_per_week"),
@@ -52,10 +56,16 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
 
         self.weekly_query = self._base_query.filter(biweekly=False)
 
-        self.bi_weekly_query = self._base_query.filter(biweekly=True).annotate(
-            events_count=ExpressionWrapper(F("events_count") / 2, output_field=DurationField())
+        self.bi_weekly_query = self._base_query.filter(
+            biweekly=True,
+        ).annotate(
+            events_count=ExpressionWrapper(
+                F("events_count") / 2,
+                output_field=DurationField(),
+            ),
         )
 
+    def run(self) -> None:
         self._create_event_based_aggregate_data()
         self._create_reservation_based_aggregate_data()
 

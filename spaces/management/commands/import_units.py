@@ -54,7 +54,7 @@ class Command(BaseCommand):
             importer = UnitImporter(url, single=options.get("single"))
 
         if not ids:
-            importer.import_units(import_hauki_resource_id=import_hauki_resource_ids)
+            importer.import_units(import_hauki_resource_ids=import_hauki_resource_ids)
             return
 
         if url[len(url) - 1] != "/":
@@ -63,7 +63,7 @@ class Command(BaseCommand):
 
         for id in ids:
             importer.url = "{}{}".format(url, id)
-            importer.import_units(import_hauki_resource_id=import_hauki_resource_ids)
+            importer.import_units(import_hauki_resource_ids=import_hauki_resource_ids)
         return f"Created: {importer.creation_counter} Updated: {importer.update_counter}"
 
     def get_version(self):
