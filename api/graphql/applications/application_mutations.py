@@ -89,7 +89,7 @@ class ApplicationEventDeleteMutation(AuthDeleteMutation, ClientIDMutation):
     model = ApplicationEvent
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         event = get_object_or_404(ApplicationEvent, pk=input.get("pk", None))
         if event.status != ApplicationEventStatus.CREATED:
             raise ValidationError("ApplicationEvent cannot be deleted anymore.")

@@ -363,7 +363,7 @@ response_mock = mock.MagicMock()
 @mock.patch("requests.get", return_value=response_mock)
 class ProfileNodeIdReaderTestCase(TestCase):
     @classmethod
-    def __get_profile_gql_response(self, century_code="-"):
+    def __get_profile_gql_response(cls, century_code="-"):
         return {
             "data": {
                 "myProfile": {

@@ -653,10 +653,10 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
 class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
     @classmethod
-    def setUp(self) -> None:
-        self.resource.refresh_from_db()
-        if not self.resource.pk:
-            self.resource.save()
+    def setUp(cls) -> None:
+        cls.resource.refresh_from_db()
+        if not cls.resource.pk:
+            cls.resource.save()
 
     def get_delete_query(self):
         return (
