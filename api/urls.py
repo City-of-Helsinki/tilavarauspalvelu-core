@@ -4,51 +4,41 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_file_upload.django import FileUploadGraphQLView
 from rest_framework import routers
 
-from api.webhook_api.views import (
-    WebhookOrderViewSet,
-    WebhookPaymentViewSet,
-    WebhookRefundViewSet,
-)
-
-from .allocation_results_api import AllocationResultViewSet
-from .application_round_api import ApplicationRoundViewSet
-from .applications_api.views import (
+from api.allocation_results_api import AllocationResultViewSet
+from api.application_round_api import ApplicationRoundViewSet
+from api.applications_api.views import (
     ApplicationEventStatusViewSet,
     ApplicationEventViewSet,
     ApplicationEventWeeklyAmountReductionViewSet,
     ApplicationStatusViewSet,
     ApplicationViewSet,
 )
-from .city_api import CityViewSet
-from .declined_reservation_units_api import DeclinedReservationUnitViewSet
-from .gdpr import TilavarauspalveluGDPRAPIView
-from .hauki_api import OpeningHoursViewSet
-from .ical_api import (
+from api.city_api import CityViewSet
+from api.declined_reservation_units_api import DeclinedReservationUnitViewSet
+from api.gdpr import TilavarauspalveluGDPRAPIView
+from api.hauki_api import OpeningHoursViewSet
+from api.ical_api import (
     ApplicationEventIcalViewset,
     ReservationIcalViewset,
     ReservationUnitCalendarUrlViewSet,
     ReservationUnitIcalViewset,
 )
-from .permissions_api import (
-    GeneralRoleViewSet,
-    ServiceSectorRoleViewSet,
-    UnitRoleViewSet,
-)
-from .reservation_units_api import (
+from api.permissions_api import GeneralRoleViewSet, ServiceSectorRoleViewSet, UnitRoleViewSet
+from api.reservation_units_api import (
     EquipmentCategoryViewSet,
     EquipmentViewSet,
     ReservationPurposeViewSet,
     ReservationUnitTypeViewSet,
     ReservationUnitViewSet,
 )
-from .reservations_api import (
-    AbilityGroupViewSet,
-    AgeGroupViewSet,
-    RecurringReservationViewSet,
-    ReservationViewSet,
+from api.reservations_api import AbilityGroupViewSet, AgeGroupViewSet, RecurringReservationViewSet, ReservationViewSet
+from api.resources_api import ResourceViewSet
+from api.users_api import UserViewSet
+from api.webhook_api.views import (
+    WebhookOrderViewSet,
+    WebhookPaymentViewSet,
+    WebhookRefundViewSet,
 )
-from .resources_api import ResourceViewSet
-from .users_api import UserViewSet
 
 router = routers.DefaultRouter()
 

@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from django.core.management.base import BaseCommand
 
-from ...utils.export_data import ReservationUnitExporter
+from reservation_units.utils.export_data import ReservationUnitExporter
 
 
 class Command(BaseCommand):

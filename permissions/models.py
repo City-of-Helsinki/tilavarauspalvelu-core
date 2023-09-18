@@ -2,9 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from permissions.base_models import BaseRole
 from spaces.models import ServiceSector, Unit, UnitGroup
-
-from .base_models import BaseRole
 
 User = get_user_model()
 

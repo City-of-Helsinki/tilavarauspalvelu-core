@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import GeneralRoleChoice, ServiceSectorRoleChoice, UnitRoleChoice
+from permissions.models import GeneralRoleChoice, ServiceSectorRoleChoice, UnitRoleChoice
 
 
 class UnitRoleChoiceTranslationOptions(TranslationOptions):

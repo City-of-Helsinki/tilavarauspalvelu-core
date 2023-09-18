@@ -6,9 +6,7 @@ from django.forms import CharField, ModelChoiceField, ModelForm
 from django.http import FileResponse
 from tinymce.widgets import TinyMCE
 
-from terms_of_use.models import TermsOfUse
-
-from .models import (
+from reservation_units.models import (
     Day,
     DayPart,
     Equipment,
@@ -27,7 +25,8 @@ from .models import (
     ReservationUnitType,
     TaxPercentage,
 )
-from .utils.export_data import ReservationUnitExporter
+from reservation_units.utils.export_data import ReservationUnitExporter
+from terms_of_use.models import TermsOfUse
 
 
 class ReservationUnitAdminForm(ModelForm):

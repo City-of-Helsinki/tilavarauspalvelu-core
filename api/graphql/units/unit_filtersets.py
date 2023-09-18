@@ -4,7 +4,7 @@ import django_filters
 from django.db.models import Count, Q
 from django.utils.timezone import get_default_timezone
 
-from .unit_types import Unit
+from api.graphql.units.unit_types import Unit
 
 
 class UnitsFilterSet(django_filters.FilterSet):

@@ -1,4 +1,4 @@
-from .banner_notification import BannerNotification
+from common.models.banner_notification import BannerNotification
 
 __all__ = [
     "BannerNotification",

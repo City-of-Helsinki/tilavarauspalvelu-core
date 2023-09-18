@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import Service
+from services.models import Service
 
 
 class ServiceTranslationOptions(TranslationOptions):

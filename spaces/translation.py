@@ -1,14 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import (
-    Building,
-    Location,
-    RealEstate,
-    ServiceSector,
-    Space,
-    Unit,
-    UnitGroup,
-)
+from spaces.models import Building, Location, RealEstate, ServiceSector, Space, Unit, UnitGroup
 
 
 class SpaceTranslationOptions(TranslationOptions):

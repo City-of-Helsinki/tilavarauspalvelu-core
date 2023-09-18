@@ -1,8 +1,7 @@
+from api.graphql.banner_notification.permissions import BannerNotificationPermission
+from api.graphql.banner_notification.serializers import BannerNotificationSerializer
 from api.graphql.base_mutations import CreateAuthMutation, DeleteAuthMutation, UpdateAuthMutation
 from common.models import BannerNotification
-
-from .permissions import BannerNotificationPermission
-from .serializers import BannerNotificationSerializer
 
 __all__ = [
     "BannerNotificationCreateMutation",

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Dict
 from uuid import UUID
 
-from .exceptions import ParseAccountingError, ParseProductError
+from merchants.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
 
 
 @dataclass(frozen=True)

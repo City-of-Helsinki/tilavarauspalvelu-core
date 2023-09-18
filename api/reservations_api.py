@@ -7,6 +7,8 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import filters as drf_filters
 from rest_framework import serializers, viewsets
 
+from api.common_filters import ModelInFilter
+from api.reservation_units_api import ReservationUnitSerializer
 from applications.models import Application, ApplicationEvent
 from permissions.api_permissions.drf_permissions import (
     AbilityGroupPermission,
@@ -28,9 +30,6 @@ from reservations.models import (
 )
 from resources.models import Resource
 from spaces.models import Space
-
-from .common_filters import ModelInFilter
-from .reservation_units_api import ReservationUnitSerializer
 
 User = get_user_model()
 

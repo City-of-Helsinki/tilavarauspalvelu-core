@@ -2,15 +2,14 @@ from merchants.models import PaymentOrder
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.payment.requests import refund_order
 from reservations.models import Reservation
-from tilavarauspalvelu.celery import app
-from tilavarauspalvelu.settings import VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
-
-from .pruning import (
+from reservations.pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
+from tilavarauspalvelu.celery import app
+from tilavarauspalvelu.settings import VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
 
 # The pruning task will be run periodically at every PRUNE_INTERVAL_SECONDS
 PRUNE_INTERVAL_SECONDS = 60 * 5

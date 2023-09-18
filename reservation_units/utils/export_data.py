@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
-from ..models import ReservationUnit
+from reservation_units.models import ReservationUnit
 
 HEADER_ROW: list[str] = [
     "Reservation unit ID",

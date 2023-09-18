@@ -1,11 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import (
-    AbilityGroup,
-    ReservationCancelReason,
-    ReservationDenyReason,
-    ReservationPurpose,
-)
+from reservations.models import AbilityGroup, ReservationCancelReason, ReservationDenyReason, ReservationPurpose
 
 
 class AbilityGroupTranslationOptions(TranslationOptions):

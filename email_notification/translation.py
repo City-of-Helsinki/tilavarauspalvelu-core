@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import EmailTemplate
+from email_notification.models import EmailTemplate
 
 
 class EmailTemplateTranslationOptions(TranslationOptions):

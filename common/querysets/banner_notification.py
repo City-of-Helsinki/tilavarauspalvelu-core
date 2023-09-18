@@ -6,9 +6,8 @@ from django.db import models
 from django.db.models.functions import Now
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
+from common.querysets._base import BaseQuerySet
 from permissions.helpers import can_manage_banner_notifications
-
-from ._base import BaseQuerySet
 
 User = get_user_model()
 
