@@ -213,8 +213,6 @@ class ReservationUnitManager(SearchDocumentManagerMixin):
 
 
 class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservation_unit"), models.Model):
-    objects = ReservationUnitManager.from_queryset(ReservationUnitQuerySet)()
-
     sku = models.CharField(verbose_name=_("SKU"), max_length=255, blank=True, default="")
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(verbose_name=_("Description"), blank=True, default="")
@@ -533,6 +531,8 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         help_text="Payment accounting information",
     )
 
+    objects = ReservationUnitManager.from_queryset(ReservationUnitQuerySet)()
+
     class Meta:
         ordering = (
             "rank",
@@ -541,6 +541,11 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
 
     def __str__(self):
         return "{}, {}".format(self.name, getattr(self.unit, "name", ""))
+
+    def save(self, *args, **kwargs) -> None:
+        super().save(*args, **kwargs)
+        if settings.UPDATE_PRODUCT_MAPPING:
+            refresh_reservation_unit_product_mapping.delay(self.pk)
 
     def get_location(self):
         # For now, we assume that if reservation has multiple spaces they all have same location
@@ -649,11 +654,6 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
 
         return ReservationUnitReservationStateHelper.get_state(self)
 
-    def save(self, *args, **kwargs) -> None:
-        super().save(*args, **kwargs)
-        if settings.UPDATE_PRODUCT_MAPPING:
-            refresh_reservation_unit_product_mapping.delay(self.pk)
-
     # ElasticSearch
     def as_search_document(self, *, index: str) -> dict | None:
         if index == "reservation_units":
@@ -700,8 +700,6 @@ class ReservationUnitPricingManager(models.QuerySet):
 
 
 class ReservationUnitPricing(models.Model):
-    objects = ReservationUnitPricingManager.as_manager()
-
     begins = models.DateField(
         verbose_name=_("Date when price is activated"),
         null=False,
@@ -782,6 +780,8 @@ class ReservationUnitPricing(models.Model):
         on_delete=models.CASCADE,
     )
 
+    objects = ReservationUnitPricingManager.as_manager()
+
     def __str__(self) -> str:
         return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
 
@@ -859,12 +859,12 @@ class Purpose(models.Model, PurgeImageCacheMixin):
     class Meta:
         ordering = ["rank"]
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs) -> None:
         self.purge_previous_image_cache()
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
 
 
 class Qualifier(models.Model):
@@ -968,6 +968,9 @@ class Introduction(models.Model):
     reservation_unit = models.ForeignKey(ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.CASCADE)
 
     completed_at = models.DateTimeField(verbose_name=_("Completed at"))
+
+    def __str__(self):
+        return f"Introduction - {self.user}, {self.reservation_unit} ({self.completed_at})"
 
 
 AuditLogger.register(ReservationUnit)

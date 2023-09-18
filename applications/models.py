@@ -60,11 +60,11 @@ class StatusMixin:
 
 
 class AggregateDataBase(models.Model):
-    class Meta:
-        abstract = True
-
     name = models.CharField(max_length=255, verbose_name=_("Name"))
     value = models.FloatField(max_length=255, verbose_name=_("Value"), null=True, default=0)
+
+    class Meta:
+        abstract = True
 
 
 class Address(models.Model):
@@ -229,12 +229,12 @@ class ApplicationRoundStatus(models.Model, StatusMixin):
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.get_status_display()} ({self.application_round.id})"
+
     @classmethod
     def get_statuses(cls):
         return [s[0] for s in cls.STATUS_CHOICES]
-
-    def __str__(self):
-        return f"{self.get_status_display()} ({self.application_round.id})"
 
 
 class ApplicationRoundManager(models.Manager):
@@ -577,6 +577,9 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
 
     order_number = models.PositiveSmallIntegerField(verbose_name=_("Order number"), default=1, null=False, blank=True)
 
+    def __str__(self):
+        return f"{self.name} ({self.application_round.name})"
+
     def get_application_events_in_basket(self):
         events = ApplicationEvent.objects.filter(application__application_round=self.application_round)
 
@@ -596,9 +599,6 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
         # TODO: Super scoring, needs to be defined how to use this properly.
         # Used for allocation scoring logic, so something is needed atm.
         return math.ceil(10 / self.order_number)
-
-    def __str__(self):
-        return f"{self.name} ({self.application_round.name})"
 
 
 class ApplicationStatus(models.Model, StatusMixin):
@@ -644,12 +644,12 @@ class ApplicationStatus(models.Model, StatusMixin):
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.get_status_display()} ({self.application.id})"
+
     @classmethod
     def get_statuses(cls):
         return [s[0] for s in cls.STATUS_CHOICES]
-
-    def __str__(self):
-        return f"{self.get_status_display()} ({self.application.id})"
 
 
 class ApplicationEventStatus(models.Model, StatusMixin):
@@ -686,6 +686,9 @@ class ApplicationEventStatus(models.Model, StatusMixin):
     )
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"ApplicationEventStatus {self.status} ({self.application_event.id})"
 
     @classmethod
     def get_statuses(cls):
@@ -778,6 +781,9 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
     last_modified_date = models.DateTimeField(auto_now=True)
 
     objects = ApplicationManager()
+
+    def __str__(self) -> str:
+        return f"Application {self.id}"
 
     def refresh_from_db(self, using=None, fields=None) -> None:
         super().refresh_from_db(using, fields)
@@ -944,6 +950,9 @@ class ApplicationEvent(models.Model):
 
     objects = ApplicationEventManager()
 
+    def __str__(self):
+        return self.name if self.name else super().__str__()
+
     def refresh_from_db(self, using=None, fields=None) -> None:
         super().refresh_from_db(using, fields)
 
@@ -983,9 +992,6 @@ class ApplicationEvent(models.Model):
     @property
     def is_approved(self):
         return self.statuses.filter(status=ApplicationEventStatus.APPROVED).exists()
-
-    def __str__(self):
-        return self.name if self.name else super().__str__()
 
     def get_not_scheduled_occurrences(self):
         occurences = {}
@@ -1122,6 +1128,9 @@ class EventReservationUnit(models.Model):
 
     reservation_unit = models.ForeignKey(ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.PROTECT)
 
+    def __str__(self) -> str:
+        return f"EventReservationUnit {self.priority} {self.id}"
+
 
 class EventOccurrence:
     def __init__(
@@ -1161,6 +1170,9 @@ class ApplicationEventSchedule(models.Model):
         on_delete=models.CASCADE,
         related_name="application_event_schedules",
     )
+
+    def __str__(self) -> str:
+        return f"ApplicationEventSchedule {self.day} {self.begin}-{self.end}"
 
     def get_occurrences(self) -> EventOccurrence:
         first_matching_day = next_or_current_matching_weekday(self.application_event.begin, self.day)
@@ -1214,6 +1226,9 @@ class Recurrence(models.Model):
         related_name="recurrences",
     )
 
+    def __str__(self) -> str:
+        return f"Recurrence {self.recurrence}"
+
 
 class ApplicationEventScheduleResult(models.Model):
     accepted = models.BooleanField(default=False, null=False)
@@ -1249,6 +1264,9 @@ class ApplicationEventScheduleResult(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+
+    def __str__(self) -> str:
+        return f"ApplicationEventScheduleResult {self.pk}"
 
     @property
     def aggregated_data_dict(self):
@@ -1335,6 +1353,9 @@ class ApplicationEventScheduleResultAggregateData(AggregateDataBase):
         related_name="aggregated_data",
     )
 
+    def __str__(self) -> str:
+        return f"ApplicationEventScheduleResultAggregateData {self.pk}"
+
 
 class ApplicationEventWeeklyAmountReduction(models.Model):
     application_event = models.ForeignKey(
@@ -1360,3 +1381,6 @@ class ApplicationEventWeeklyAmountReduction(models.Model):
     )
 
     created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"ApplicationEventWeeklyAmountReduction {self.pk}"

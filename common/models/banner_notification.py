@@ -21,31 +21,6 @@ class BannerNotification(models.Model):
 
     objects = BannerNotificationQuerySet.as_manager()
 
-    @property
-    def is_active(self) -> bool:
-        if self.draft or self.active_from is None or self.active_until is None:
-            return False
-
-        now = timezone.now()
-        return self.active_from <= now <= self.active_until
-
-    @property
-    def is_scheduled(self) -> bool:
-        if self.draft or self.active_from is None or self.active_until is None:
-            return False
-
-        return self.active_from > timezone.now()
-
-    @property
-    def state(self) -> BannerNotificationState:
-        if self.draft:
-            return BannerNotificationState.DRAFT
-        if self.is_active:
-            return BannerNotificationState.ACTIVE
-        if self.is_scheduled:
-            return BannerNotificationState.SCHEDULED
-        return BannerNotificationState.DRAFT  # past notifications are considered drafts
-
     class Meta:
         db_table = "banner_notification"
         base_manager_name = "objects"
@@ -94,3 +69,28 @@ class BannerNotification(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def is_active(self) -> bool:
+        if self.draft or self.active_from is None or self.active_until is None:
+            return False
+
+        now = timezone.now()
+        return self.active_from <= now <= self.active_until
+
+    @property
+    def is_scheduled(self) -> bool:
+        if self.draft or self.active_from is None or self.active_until is None:
+            return False
+
+        return self.active_from > timezone.now()
+
+    @property
+    def state(self) -> BannerNotificationState:
+        if self.draft:
+            return BannerNotificationState.DRAFT
+        if self.is_active:
+            return BannerNotificationState.ACTIVE
+        if self.is_scheduled:
+            return BannerNotificationState.SCHEDULED
+        return BannerNotificationState.DRAFT  # past notifications are considered drafts

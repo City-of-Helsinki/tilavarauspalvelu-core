@@ -95,18 +95,6 @@ class Unit(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def hauki_resource_origin_id(self):
-        return self.tprek_id
-
-    @property
-    def hauki_resource_data_source_id(self):
-        return "tprek"
-
-    @property
-    def hauki_department_id(self):
-        return f"tprek:{self.tprek_department_id}"
-
     def save(self, *args, **kwargs):
         old_values = Unit.objects.filter(pk=self.pk).first()
         result = super().save(*args, **kwargs)
@@ -122,6 +110,18 @@ class Unit(models.Model):
                 refresh_reservation_unit_product_mapping.delay(runit.pk)
 
         return result
+
+    @property
+    def hauki_resource_origin_id(self):
+        return self.tprek_id
+
+    @property
+    def hauki_resource_data_source_id(self):
+        return "tprek"
+
+    @property
+    def hauki_department_id(self):
+        return f"tprek:{self.tprek_department_id}"
 
 
 class RealEstate(models.Model):
@@ -261,6 +261,9 @@ class Location(models.Model):
         srid=COORDINATE_SYSTEM_ID,
     )
 
+    def __str__(self):
+        return f"{self.address_street}, {self.address_city} {self.address_zip}"
+
     @property
     def lat(self):
         return self.coordinates.y if self.coordinates else None
@@ -268,6 +271,3 @@ class Location(models.Model):
     @property
     def lon(self):
         return self.coordinates.x if self.coordinates else None
-
-    def __str__(self):
-        return f"{self.address_street}, {self.address_city} {self.address_zip}"

@@ -86,3 +86,6 @@ class PersonalInfoViewLog(models.Model):
     access_time = models.DateTimeField(auto_now=True, editable=False)
     viewer_user_email = models.CharField(max_length=255, default="", blank=True)
     viewer_user_full_name = models.CharField(max_length=255, default="", blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.viewer_username} viewed {self.user}'s {self.field} at {self.access_time}"

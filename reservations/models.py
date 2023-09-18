@@ -60,6 +60,9 @@ class ReservationCancelReason(models.Model):
         verbose_name=_("Reason for cancellation"),
     )
 
+    def __str__(self) -> str:
+        return self.reason
+
 
 class ReservationDenyReason(models.Model):
     reason = models.CharField(
@@ -68,6 +71,9 @@ class ReservationDenyReason(models.Model):
         blank=False,
         verbose_name=_("Reason for deny"),
     )
+
+    def __str__(self) -> str:
+        return self.reason
 
 
 class RecurringReservation(models.Model):
@@ -162,6 +168,9 @@ class RecurringReservation(models.Model):
 
     end_date = models.DateField(verbose_name=_("End date"), null=True)
 
+    def __str__(self) -> str:
+        return f"{self.name}"
+
     @property
     def denied_reservations(self):
         # Avoid a query to the database if we have fetched list already
@@ -254,8 +263,6 @@ class ReservationQuerySet(models.QuerySet):
 
 
 class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
-    objects = ReservationQuerySet.as_manager()
-
     reservee_type = models.CharField(
         max_length=50,
         choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
@@ -505,11 +512,10 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         help_text="Type of reservation",
     )
 
-    @property
-    def requires_handling(self) -> bool:
-        return (
-            self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
-        )
+    objects = ReservationQuerySet.as_manager()
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.type})"
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(
@@ -517,6 +523,12 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
             force_update=force_update,
             using=using,
             update_fields=update_fields,
+        )
+
+    @property
+    def requires_handling(self) -> bool:
+        return (
+            self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
         )
 
     def get_location_string(self):
@@ -829,6 +841,9 @@ class ReservationStatistic(models.Model):
     )
     primary_unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
 
+    def __str__(self) -> str:
+        return f"{self.reservee_uuid} - {self.begin} - {self.end}"
+
 
 class ReservationStatisticsReservationUnit(models.Model):
     reservation_statistics = models.ForeignKey(
@@ -844,6 +859,9 @@ class ReservationStatisticsReservationUnit(models.Model):
     )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
+
+    def __str__(self) -> str:
+        return f"{self.reservation_statistics} - {self.reservation_unit}"
 
 
 AuditLogger.register(Reservation)
