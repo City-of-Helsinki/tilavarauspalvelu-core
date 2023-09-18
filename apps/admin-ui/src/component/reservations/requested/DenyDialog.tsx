@@ -141,6 +141,7 @@ const DialogContent = ({
       cache.modify({
         fields: {
           // find the pk => slice the array => replace the state variable in the slice
+          // @ts-expect-error: TODO: broken with either typescript or apollo upgrade
           reservations(existing: ReservationTypeConnection) {
             const queryRes = data?.denyReservation;
             if (queryRes?.errors) {
@@ -210,7 +211,7 @@ const DialogContent = ({
     refundReservationMutation({ variables: { input } });
 
   const [handlingDetails, setHandlingDetails] = useState<string>(
-    reservations.length === 1 ? reservations[0].workingMemo ?? "" : ""
+    reservations?.[0].handlingDetails ?? ""
   );
   const [denyReasonPk, setDenyReason] = useState<number | null>(null);
   const [inProgress, setInProgress] = useState(false);
@@ -289,7 +290,7 @@ const DialogContent = ({
           <TextArea
             value={handlingDetails}
             onChange={(e) => setHandlingDetails(e.target.value)}
-            label={t("RequestedReservation.DenyDialog.handlingDetails")}
+            label={t("RequestedReservation.handlingDetails")}
             id="handlingDetails"
             helperText={t(
               "RequestedReservation.DenyDialog.handlingDetailsHelper"

@@ -76,12 +76,14 @@ const Summary = styled(ApplicationDatas)`
 const ApplicationProp = ({
   label,
   data,
+  wide,
 }: {
   label: string;
   data?: Maybe<string> | number;
+  wide?: boolean;
 }) =>
   data ? (
-    <div>
+    <div style={{ gridColumn: wide ? "1 / -1" : "" }}>
       {label}: <strong style={{ whiteSpace: "pre-wrap" }}>{data}</strong>
     </div>
   ) : null;
@@ -243,6 +245,9 @@ const ReservationSummary = ({
     ...(price != null ? [price] : []),
     ...(cancelReasonString != null ? [cancelReasonString] : []),
     ...(rejectionReasonString != null ? [rejectionReasonString] : []),
+    ...(reservation.handlingDetails != null
+      ? [{ l: "handlingDetails", v: reservation.handlingDetails }]
+      : []),
   ];
 
   if (summary.length === 0) {
@@ -256,6 +261,7 @@ const ReservationSummary = ({
           key={e.l}
           label={t(`RequestedReservation.${e.l}`)}
           data={e.v}
+          wide={e.l === "handlingDetails"}
         />
       ))}
     </Summary>
