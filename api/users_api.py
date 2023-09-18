@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django.contrib.auth import get_user_model
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
@@ -72,7 +70,7 @@ class UserSerializer(TranslatedModelSerializer):
             },
         }
 
-    def get_reservation_notification(self, user) -> Optional[str]:
+    def get_reservation_notification(self, user) -> str | None:
         if user.has_staff_permissions:
             return user.reservation_notification
         return None

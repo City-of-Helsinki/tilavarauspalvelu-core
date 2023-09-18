@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Iterable, Optional, Union
+from typing import Iterable
 
 from django.db.models import Q, QuerySet
 from django.utils import timezone
@@ -19,7 +19,7 @@ def is_superuser(user: User) -> bool:
     return user.is_superuser
 
 
-def has_unit_group_permission(user: User, unit_groups: Union[list[int], QuerySet], required_permission: str) -> bool:
+def has_unit_group_permission(user: User, unit_groups: list[int] | QuerySet, required_permission: str) -> bool:
     if not unit_groups:
         return False
 
@@ -29,7 +29,7 @@ def has_unit_group_permission(user: User, unit_groups: Union[list[int], QuerySet
     ).exists()
 
 
-def has_unit_permission(user: User, units: Union[list[int], QuerySet], required_permission: str) -> bool:
+def has_unit_permission(user: User, units: list[int] | QuerySet, required_permission: str) -> bool:
     if not units or user.is_anonymous:
         return False
 
@@ -41,9 +41,7 @@ def has_unit_permission(user: User, units: Union[list[int], QuerySet], required_
     ).exists()
 
 
-def has_service_sector_permission(
-    user: User, service_sectors: Union[list[int], QuerySet], required_permission: str
-) -> bool:
+def has_service_sector_permission(user: User, service_sectors: list[int] | QuerySet, required_permission: str) -> bool:
     if not service_sectors or user.is_anonymous:
         return False
     return user.service_sector_roles.filter(
@@ -72,7 +70,7 @@ def can_manage_service_sector_roles(user: User, service_sector: ServiceSector) -
     )
 
 
-def can_manage_unit_roles(user: User, units: Union[list[Unit], QuerySet]) -> bool:
+def can_manage_unit_roles(user: User, units: list[Unit] | QuerySet) -> bool:
     permission = "can_manage_unit_roles"
     service_sectors = ServiceSector.objects.filter(units__in=units)
     return (
@@ -95,7 +93,7 @@ def can_manage_units(user: User, unit: Unit) -> bool:
     )
 
 
-def can_manage_unit_group_roles(user: User, unit_group: Union[list[int], QuerySet]) -> bool:
+def can_manage_unit_group_roles(user: User, unit_group: list[int] | QuerySet) -> bool:
     permission = "can_manage_unit_roles"
     return (
         is_superuser(user)
@@ -462,7 +460,7 @@ def can_view_users(user: User):
     )
 
 
-def can_refresh_order(user: User, payment_order: Optional[PaymentOrder]) -> bool:
+def can_refresh_order(user: User, payment_order: PaymentOrder | None) -> bool:
     if not user.is_authenticated:
         return False
 

@@ -1,5 +1,4 @@
 from json import JSONDecodeError
-from typing import Optional
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -33,7 +32,7 @@ def _get_base_url():
     return f"{settings.VERKKOKAUPPA_PAYMENT_API_URL}/"
 
 
-def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
+def get_payment(order_id: UUID, namespace: str, get=_get) -> Payment | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/payment/admin/{order_id}") as metric:
             response = get(
@@ -66,7 +65,7 @@ def get_payment(order_id: UUID, namespace: str, get=_get) -> Optional[Payment]:
         raise GetPaymentError("Payment retrieval failed") from e
 
 
-def get_refund_status(order_id: UUID, namespace: str, get=_get) -> Optional[RefundStatusResult]:
+def get_refund_status(order_id: UUID, namespace: str, get=_get) -> RefundStatusResult | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/payment/admin/refund-payment/{order_id}") as metric:
             response = get(
@@ -101,7 +100,7 @@ def get_refund_status(order_id: UUID, namespace: str, get=_get) -> Optional[Refu
         raise GetRefundStatusError(f"Payment refund status retrieval failed: {str(e)}") from e
 
 
-def refund_order(order_id: UUID, post=_post) -> Optional[Refund]:
+def refund_order(order_id: UUID, post=_post) -> Refund | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", f"/refund/instant/{order_id}") as metric:
             response = post(

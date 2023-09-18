@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from uuid import UUID
 
 from sentry_sdk import capture_exception, push_scope
@@ -13,9 +13,9 @@ from merchants.verkkokauppa.order.exceptions import ParseOrderError
 class OrderItemMetaParams:
     key: str
     value: str
-    label: Optional[str]
-    visible_in_checkout: Optional[bool]
-    ordinal: Optional[str]
+    label: str | None
+    visible_in_checkout: bool | None
+    ordinal: str | None
 
 
 @dataclass(frozen=True)
@@ -25,9 +25,9 @@ class OrderItemMeta:
     order_id: UUID
     key: str
     value: str
-    label: Optional[str]
-    visible_in_checkout: Optional[bool]
-    ordinal: Optional[str]
+    label: str | None
+    visible_in_checkout: bool | None
+    ordinal: str | None
 
 
 @dataclass(frozen=True)
@@ -62,11 +62,11 @@ class OrderItem:
     price_vat: Decimal
     vat_percentage: Decimal
     meta: list[OrderItemMeta]
-    period_frequency: Optional[int]
-    period_unit: Optional[str]
-    period_count: Optional[int]
-    start_date: Optional[datetime]
-    billing_start_date: Optional[datetime]
+    period_frequency: int | None
+    period_unit: str | None
+    period_count: int | None
+    start_date: datetime | None
+    billing_start_date: datetime | None
 
 
 @dataclass(frozen=True)
@@ -87,14 +87,14 @@ class Order:
     user: str
     created_at: datetime
     items: list[OrderItem]
-    price_net: Optional[Decimal]
-    price_vat: Optional[Decimal]
-    price_total: Optional[Decimal]
-    checkout_url: Optional[str]
-    receipt_url: Optional[str]
-    customer: Optional[OrderCustomer]
-    status: Optional[str]
-    subscription_id: Optional[UUID]
+    price_net: Decimal | None
+    price_vat: Decimal | None
+    price_total: Decimal | None
+    checkout_url: str | None
+    receipt_url: str | None
+    customer: OrderCustomer | None
+    status: str | None
+    subscription_id: UUID | None
     type: OrderType
 
     @classmethod

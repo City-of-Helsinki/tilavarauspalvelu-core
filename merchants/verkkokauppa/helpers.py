@@ -1,7 +1,6 @@
 import re
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Optional
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -23,7 +22,7 @@ from tilavarauspalvelu.utils.date_util import localized_short_weekday
 from utils.decimal_utils import round_decimal
 
 
-def parse_datetime(string: Optional[str]) -> Optional[datetime]:
+def parse_datetime(string: str | None) -> datetime | None:
     if string is None:
         return None
     return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%f").astimezone(settings.VERKKOKAUPPA_TIMEZONE)

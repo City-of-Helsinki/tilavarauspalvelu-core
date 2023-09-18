@@ -1,6 +1,6 @@
 import re
 from datetime import date
-from typing import Any, Optional, TypedDict
+from typing import Any, TypedDict
 
 import requests
 from django.conf import settings
@@ -23,10 +23,10 @@ __all__ = [
 
 class UserDetails(TypedDict):
     email: str
-    first_name: Optional[str]
-    last_name: Optional[str]
-    fullname: Optional[str]
-    username: Optional[str]
+    first_name: str | None
+    last_name: str | None
+    fullname: str | None
+    username: str | None
 
 
 class OIDCResponse(TypedDict):
@@ -75,7 +75,7 @@ ID_LETTER_TO_CENTURY: dict[str, int] = {
 def fetch_additional_info_for_user_from_helsinki_profile(
     backend: TunnistamoOIDCAuth,
     request: WSGIRequest,
-    user: Optional[User] = None,
+    user: User | None = None,
     **kwargs: Any,  # NOSONAR
 ) -> dict[str, Any]:
     kwargs: ExtraKwargs  # NOSONAR
@@ -89,7 +89,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(
     return {"user": user}
 
 
-def get_profile_token(session: SessionBase) -> Optional[str]:
+def get_profile_token(session: SessionBase) -> str | None:
     # See what 'helusers.pipeline.fetch_api_tokens' adds in the session
     return session["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
 
@@ -154,7 +154,7 @@ def update_user_from_profile(user: User, token: str | None) -> None:
     user.save()
 
 
-def id_number_to_date(id_number: str) -> Optional[date]:
+def id_number_to_date(id_number: str) -> date | None:
     if ID_PATTERN.fullmatch(id_number) is None:
         return None
 

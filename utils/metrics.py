@@ -1,5 +1,4 @@
 from time import perf_counter
-from typing import Optional
 
 from prometheus_client import Counter, Histogram
 
@@ -41,7 +40,7 @@ class ExternalServiceMetric:
     service: str
     method: str
     path: str
-    response_status: Optional[int]
+    response_status: int | None
 
     def __init__(self, service: str, method: str, path: str) -> None:
         self.service = service

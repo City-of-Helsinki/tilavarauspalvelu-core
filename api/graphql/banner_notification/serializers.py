@@ -1,7 +1,7 @@
 from collections import defaultdict
 from datetime import datetime
 from types import NoneType
-from typing import Any, Optional
+from typing import Any
 
 from rest_framework import serializers
 
@@ -30,8 +30,8 @@ class BannerNotificationSerializer(TranslatedModelSerializer):
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         errors: dict[str, list[str]] = defaultdict(list)
 
-        active_from: Optional[datetime] = self.get_or_default("active_from", attrs)
-        active_until: Optional[datetime] = self.get_or_default("active_until", attrs)
+        active_from: datetime | None = self.get_or_default("active_from", attrs)
+        active_until: datetime | None = self.get_or_default("active_until", attrs)
         draft: bool = self.get_or_default("draft", attrs)
         message: str = self.get_or_default("message", attrs)
 

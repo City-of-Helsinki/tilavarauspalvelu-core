@@ -1,5 +1,4 @@
 from json import JSONDecodeError
-from typing import Optional
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -103,7 +102,7 @@ def get_merchants(get=_get) -> list[Merchant]:
         raise GetMerchantsError("Fetching merchants failed") from e
 
 
-def get_merchant(merchant_uuid: UUID, get=_get) -> Optional[MerchantInfo]:
+def get_merchant(merchant_uuid: UUID, get=_get) -> MerchantInfo | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/merchant/{namespace}/{merchant_id}") as metric:
             response = get(

@@ -1,4 +1,3 @@
-from typing import Optional
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -18,7 +17,7 @@ class ReservationUnitHaukiExporter:
     def __init__(self, reservation_unit: ReservationUnit):
         self.reservation_unit = reservation_unit
 
-    def _get_parent_id(self) -> Optional[int]:
+    def _get_parent_id(self) -> int | None:
         """
         Tries to get reservation_unit.unit hauki resource id from hauki.
         This is used when hauki_resource_id is not found from reservation unit's unit.

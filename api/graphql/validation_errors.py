@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 from graphql.error import GraphQLError
 
@@ -48,7 +47,7 @@ class ValidationErrorWithCode(GraphQLError):
         self,
         message: str,
         error_code: ValidationErrorCodes,
-        field: Optional[str] = None,
+        field: str | None = None,
     ) -> None:
         super().__init__(message, None, None, None, None, None)
         self.extensions = {

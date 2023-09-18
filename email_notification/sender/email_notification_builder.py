@@ -1,7 +1,6 @@
 import datetime
 import os
 import re
-from typing import Optional
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
@@ -258,7 +257,7 @@ class ReservationEmailNotificationBuilder:
         content = self._get_by_language(self.template, "content")
         return self.env.from_string(content).render(self.context_attr_map)
 
-    def get_html_content(self) -> Optional[str]:
+    def get_html_content(self) -> str | None:
         content = self._get_html_content(self.template)
         if content:
             return self.env.from_string(content).render(self.context_attr_map)

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 from django.conf import settings
@@ -42,7 +42,7 @@ class Payment:
     total_excl_tax: Decimal
     total: Decimal
     tax_amount: Decimal
-    description: Optional[str]
+    description: str | None
     additional_info: str
     token: str
     timestamp: datetime
@@ -84,11 +84,11 @@ class Refund:
     user: str
     created_at: datetime
     status: str
-    customer_first_name: Optional[str]
-    customer_last_name: Optional[str]
-    customer_email: Optional[str]
-    customer_phone: Optional[str]
-    refund_reason: Optional[str]
+    customer_first_name: str | None
+    customer_last_name: str | None
+    customer_email: str | None
+    customer_phone: str | None
+    refund_reason: str | None
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> "Refund":

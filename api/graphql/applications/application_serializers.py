@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from rest_framework import serializers
 
@@ -136,7 +136,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
         ]
 
     @staticmethod
-    def handle_person(contact_person_data: dict[Any, Any]) -> Union[Person, None]:
+    def handle_person(contact_person_data: dict[Any, Any]) -> Person | None:
         if contact_person_data is not None:
             # CASE: Create new person
             if "pk" not in contact_person_data or contact_person_data["pk"] is None:
@@ -150,7 +150,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
 
         return None
 
-    def handle_organisation(self, organisation_data: dict[Any, Any]) -> Union[Organisation, None]:
+    def handle_organisation(self, organisation_data: dict[Any, Any]) -> Organisation | None:
         if organisation_data is not None:
             # CASE: Create new organisation
             if "pk" not in organisation_data or organisation_data["pk"] is None:
@@ -167,7 +167,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
     def handle_events(
         self,
         application_instance: Application,
-        event_data: Union[list[dict[Any, Any]], None],
+        event_data: list[dict[Any, Any]] | None,
     ):
         event_ids = []
 

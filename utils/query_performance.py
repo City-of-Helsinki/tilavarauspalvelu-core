@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 import graphene
 from django.db.models import Prefetch, QuerySet
@@ -146,7 +146,7 @@ class QueryPerformanceOptimizerMixin:
         field_name: str,
         children: list[Any],
         child_optimizations: dict[str, Any],
-        base_queryset: Union[QuerySet, None] = None,
+        base_queryset: QuerySet | None = None,
     ):
         """Compile prefetch and other optimizations for parent query"""
         prefetch = None
@@ -202,7 +202,7 @@ class QueryPerformanceOptimizerMixin:
     @staticmethod
     def _handle_optimization(  # noqa: C901
         optimization_type: str,
-        optimization_value: Union[str, dict],
+        optimization_value: str | dict,
         child,
         annotations,
         selects,

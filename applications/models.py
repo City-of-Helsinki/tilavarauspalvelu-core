@@ -1,7 +1,7 @@
 import datetime
 import math
 import uuid
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 import recurrence
 from django.contrib.auth import get_user_model
@@ -36,7 +36,7 @@ User = get_user_model()
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-def year_not_in_future(year: Optional[int]):
+def year_not_in_future(year: int | None):
     if year is None:
         return
 

@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import hmac
 import io
-from typing import Any, Union
+from typing import Any
 from urllib.parse import urlsplit
 
 from django.conf import settings
@@ -33,7 +33,7 @@ def hmac_signature(value: Any) -> str:
     ).hexdigest()
 
 
-def get_host(request: Union[Request, None]):
+def get_host(request: Request | None):
     return request.get_host() if request else None
 
 

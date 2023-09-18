@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any, Optional
+from typing import Any
 
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +18,7 @@ class Duration(Scalar):
         return int(value.total_seconds())
 
     @staticmethod
-    def parse_value(value: Any) -> Optional[timedelta]:
+    def parse_value(value: Any) -> timedelta | None:
         try:
             return timedelta(seconds=value)
         except ValueError:
@@ -46,7 +46,7 @@ class DurationField(serializers.IntegerField):
     def to_representation(self, value) -> int:
         return int(value.total_seconds())
 
-    def get_attribute(self, instance: Any) -> Optional[int]:
+    def get_attribute(self, instance: Any) -> int | None:
         value = super().get_attribute(instance)
         if isinstance(value, timedelta):
             return int(value.total_seconds())

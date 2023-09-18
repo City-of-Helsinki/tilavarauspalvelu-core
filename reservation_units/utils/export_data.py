@@ -1,6 +1,5 @@
 from csv import QUOTE_ALL, writer
 from pathlib import Path
-from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
@@ -84,7 +83,7 @@ HEADER_ROW: list[str] = [
 
 class ReservationUnitExporter:
     @classmethod
-    def export_reservation_unit_data(cls, queryset=None) -> Optional[Path]:
+    def export_reservation_unit_data(cls, queryset=None) -> Path | None:
         now = timezone.now()
         root = settings.BASE_DIR
         path = root / "exports" / "reservation_unit_exports"

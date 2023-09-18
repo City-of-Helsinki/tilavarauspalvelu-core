@@ -110,6 +110,7 @@ select = [
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
     "UP004",    # pyupgrade: Class {name} inherits from object
     "UP006",    # pyupgrade: Use {to} instead of {from} for type annotation
+    "UP007",    # pyupgrade: Use X | Y for type annotations
 ]
 ignore = [
     "S101",  # assert is fine.

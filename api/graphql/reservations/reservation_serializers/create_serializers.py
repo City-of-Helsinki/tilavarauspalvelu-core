@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -289,7 +288,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer, ReservationPriceMixin, R
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
 
-    def check_reservation_type(self, user, reservation_unit_ids: list[int], reservation_type: Optional[str]):
+    def check_reservation_type(self, user, reservation_unit_ids: list[int], reservation_type: str | None):
         if reservation_type is None or can_handle_reservation_with_units(user, reservation_unit_ids):
             return
 
