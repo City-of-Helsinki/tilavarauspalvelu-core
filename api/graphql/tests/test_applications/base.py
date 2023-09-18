@@ -37,7 +37,7 @@ from tests.factories import (
     UnitGroupFactory,
 )
 
-from ..base import GrapheneTestCaseBase
+from api.graphql.tests.base import GrapheneTestCaseBase
 
 
 class ApplicationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):

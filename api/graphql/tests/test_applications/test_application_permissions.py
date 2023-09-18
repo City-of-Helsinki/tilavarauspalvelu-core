@@ -21,7 +21,7 @@ from tests.factories import (
     UnitGroupFactory,
 )
 
-from .base import ApplicationTestCaseBase
+from api.graphql.tests.test_applications.base import ApplicationTestCaseBase
 
 
 @freezegun.freeze_time("2022-05-02T12:00:00Z")

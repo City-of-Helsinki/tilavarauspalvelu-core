@@ -11,8 +11,7 @@ from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
 from merchants.verkkokauppa.merchants.exceptions import CreateMerchantError, GetMerchantsError, UpdateMerchantError
 from merchants.verkkokauppa.merchants.requests import create_merchant, get_merchant, get_merchants, update_merchant
 from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
-
-from .mocks import mock_get, mock_post
+from merchants.verkkokauppa.tests.mocks import mock_get, mock_post
 
 
 class MerchantRequestsBaseTestCase(TestCase):

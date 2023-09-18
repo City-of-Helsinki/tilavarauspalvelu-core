@@ -5,9 +5,8 @@ from assertpy import assert_that
 from django.test.testcases import TestCase
 from pytest import raises
 
+from reservations.tasks import refund_paid_reservation_task
 from tests.factories import PaymentOrderFactory, ReservationFactory
-
-from ..tasks import refund_paid_reservation_task
 
 
 class RefundPaidReservationTestCase(TestCase):

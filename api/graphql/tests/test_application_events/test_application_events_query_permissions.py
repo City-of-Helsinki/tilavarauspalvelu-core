@@ -21,7 +21,7 @@ from tests.factories import (
     UnitGroupFactory,
 )
 
-from .base import ApplicationEventPermissionsTestCaseBase
+from api.graphql.tests.test_application_events.base import ApplicationEventPermissionsTestCaseBase
 
 
 class ApplicationEventsGraphQLPermissionsTestCase(ApplicationEventPermissionsTestCaseBase):
