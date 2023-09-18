@@ -59,7 +59,8 @@ class EmailTemplateValidator:
             if expression not in settings.EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS:
                 raise EmailTemplateValidationError("Illegal tags found: tag was '%s'" % expression)
 
-    def _validate_in_sandbox(self, str: str, context: Dict, env: SandboxedEnvironment):
+    @staticmethod
+    def _validate_in_sandbox(str: str, context: Dict, env: SandboxedEnvironment):
         try:
             env.from_string(str).render(context)
         except TemplateError as e:
@@ -164,7 +165,8 @@ class ReservationEmailNotificationBuilder:
     def _get_confirmed_instructions(self):
         return self.context.confirmed_instructions[self.language]
 
-    def _get_current_year(self):
+    @staticmethod
+    def _get_current_year():
         return datetime.datetime.now(get_default_timezone()).year
 
     def _get_pending_instructions(self):

@@ -30,7 +30,8 @@ class EmailNotificationContext:
     cancel_reason: Dict[str, str]
     reservee_language: str
 
-    def _get_by_language(self, instance, field, language):
+    @staticmethod
+    def _get_by_language(instance, field, language):
         return getattr(instance, f"{field}_{language}", getattr(instance, field, ""))
 
     def _get_reservation_unit_instruction_field(self, reservation, name, language):

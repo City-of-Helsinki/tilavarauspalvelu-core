@@ -24,7 +24,8 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
         self.data = None
         self.__read_fields()
 
-    def __get_query(self):
+    @staticmethod
+    def __get_query():
         return """query {
             myProfile {
                 firstName
@@ -261,7 +262,8 @@ class ProfileNodeIdReader(ProfileReaderTokenMixin):
 
         return data.get("myProfile")
 
-    def __make_profile_request(self, token) -> dict:
+    @staticmethod
+    def __make_profile_request(token) -> dict:
         query = """
                     query {
                         myProfile {
