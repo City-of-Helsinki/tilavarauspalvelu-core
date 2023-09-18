@@ -5,7 +5,8 @@ from django.db.models import Prefetch, QuerySet
 
 
 class QueryPerformanceOptimizerMixin:
-    """Mixin for GraphQL database query optimization
+    """
+    Mixin for GraphQL database query optimization
 
     Inherit from this class and add "QueryOptimization" to class.
 
@@ -210,7 +211,6 @@ class QueryPerformanceOptimizerMixin:
         parent_prefetches,
     ):
         """Add optimization to correct list of parent optimizations"""
-
         if optimization_type == "select":
             selects.append(optimization_value)
 

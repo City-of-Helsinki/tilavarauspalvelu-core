@@ -6,7 +6,8 @@ __all__ = [
 
 
 def get_nested(obj: Optional[dict | list], /, *args: str | int, default: Any = None) -> Any:
-    """Get value from a nested structure containing dicts with string keys or lists,
+    """
+    Get value from a nested structure containing dicts with string keys or lists,
     where the keys and list indices might not exist.
 
     1) `data["foo"][0]["bar"]["baz"]`

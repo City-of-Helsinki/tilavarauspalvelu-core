@@ -19,12 +19,14 @@ logger = logging.getLogger(__name__)
 
 @dataclass(order=True, frozen=True)
 class TimeElement:
-    """Represents one time span in a days opening hours
+    """
+    Represents one time span in a days opening hours
 
     The "end_time_on_next_day"-attribute is declared between the start and end time to
     allow TimeElements to sort correctly.
 
-    The name, description, and periods attributes are ignored when comparing."""
+    The name, description, and periods attributes are ignored when comparing.
+    """
 
     start_time: Optional[datetime.time]
     end_time_on_next_day: bool

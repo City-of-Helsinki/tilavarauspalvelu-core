@@ -121,7 +121,8 @@ class OpeningHoursClient:
                     self.periods[resource].append(period)
 
     def _init_opening_hours_structure(self):
-        """Opening hours structure is:
+        """
+        Opening hours structure is:
         opening_hours = {
             resource_id: {
                             datetime.date: [OpeningHours, OpeningHours, ...],

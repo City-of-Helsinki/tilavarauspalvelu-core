@@ -15,7 +15,8 @@ REQUEST_TIMEOUT_SECONDS = 15
 
 
 class UnitImporter:
-    """Imports units from given json data source url.
+    """
+    Imports units from given json data source url.
 
     Unit importer uses field map dict to map django db fields
     and the data source's fields. Field map also should define the default values
