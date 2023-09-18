@@ -199,7 +199,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         }
 
     def __init__(self, *args, display=False, **kwargs):
-        super(ReservationUnitSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if display:
             self.fields.pop("id")
 

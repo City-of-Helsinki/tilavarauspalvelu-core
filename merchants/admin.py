@@ -35,7 +35,7 @@ class PaymentMerchantForm(forms.ModelForm):
     tos_url = forms.CharField(label=_("Terms of service URL"), max_length=256, required=True)
 
     def __init__(self, *args, **kwargs):
-        super(PaymentMerchantForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         instance = kwargs.get("instance", None)
         if instance and instance.id:
             merchant_info = get_merchant(instance.id)
@@ -83,7 +83,7 @@ class PaymentMerchantForm(forms.ModelForm):
                 params = UpdateMerchantParams(**params)
                 update_merchant(self.instance.id, params)
 
-        return super(PaymentMerchantForm, self).save(commit=commit)
+        return super().save(commit=commit)
 
 
 @admin.register(PaymentMerchant)
