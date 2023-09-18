@@ -56,10 +56,9 @@ const BannerNotificationDate = styled.span`
 const BannerCloseButton = styled.button`
   position: absolute;
   top: var(--spacing-m);
-  right: var(--spacing-m);
+  right: 0;
   transform: translateY(-50%);
   padding: var(--spacing-xs);
-  padding-right: 0;
   background-color: transparent;
   border: none;
   cursor: pointer;
