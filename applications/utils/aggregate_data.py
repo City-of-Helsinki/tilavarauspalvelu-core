@@ -6,12 +6,12 @@ from django.conf import settings
 from django.db import Error
 from django.db.models import DurationField, ExpressionWrapper, F
 
-import tilavarauspalvelu.utils.logging as logging
 from applications.utils.aggregate_tasks import (
     _celery_application_event_schedule_result_aggregate_data_create,
 )
 from opening_hours.hours import HaukiConfigurationError
 from opening_hours.utils.summaries import get_resources_total_hours
+from tilavarauspalvelu.utils import logging
 
 logger = logging.getLogger(__name__)
 

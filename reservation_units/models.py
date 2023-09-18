@@ -1,5 +1,5 @@
 import datetime
-import uuid as uuid
+import uuid
 from decimal import Decimal
 
 from django.conf import settings

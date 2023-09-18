@@ -3,7 +3,6 @@ import datetime
 from django.db import Error
 from django.utils.timezone import get_default_timezone
 
-import tilavarauspalvelu.utils.logging as logging
 from applications.models import ApplicationEvent
 from applications.utils.aggregate_data import (
     ApplicationAggregateDataCreator,
@@ -11,6 +10,7 @@ from applications.utils.aggregate_data import (
 )
 from opening_hours.hours import get_opening_hours
 from reservations.models import STATE_CHOICES, RecurringReservation, Reservation
+from tilavarauspalvelu.utils import logging
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
 logger = logging.getLogger(__name__)
