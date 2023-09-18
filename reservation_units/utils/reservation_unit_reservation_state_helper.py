@@ -171,7 +171,7 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def get_state(cls, reservation_unit: ReservationUnit) -> ReservationState:
+    def get_state(cls, reservation_unit: ReservationUnit) -> ReservationState | None:
         if cls.__is_scheduled_reservation(reservation_unit):
             return ReservationState.SCHEDULED_RESERVATION
         if cls.__is_scheduled_period(reservation_unit):
@@ -182,6 +182,7 @@ class ReservationUnitReservationStateHelper:
             return ReservationState.SCHEDULED_CLOSING
         if cls.__is_reservation_closed(reservation_unit):
             return ReservationState.RESERVATION_CLOSED
+        return None
 
     @classmethod
     def get_state_query(cls, state: str) -> Q:

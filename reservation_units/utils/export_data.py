@@ -187,6 +187,7 @@ class ReservationUnitExporter:
                         ]
                     )
             return path / file_name
+        return None
 
     @staticmethod
     def _write_header_row(reservations_writer):
