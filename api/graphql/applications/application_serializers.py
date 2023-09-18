@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 from rest_framework import serializers
 
@@ -136,7 +136,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
         ]
 
     @staticmethod
-    def handle_person(contact_person_data: Dict[Any, Any]) -> Union[Person, None]:
+    def handle_person(contact_person_data: dict[Any, Any]) -> Union[Person, None]:
         if contact_person_data is not None:
             # CASE: Create new person
             if "pk" not in contact_person_data or contact_person_data["pk"] is None:
@@ -150,7 +150,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
 
         return None
 
-    def handle_organisation(self, organisation_data: Dict[Any, Any]) -> Union[Organisation, None]:
+    def handle_organisation(self, organisation_data: dict[Any, Any]) -> Union[Organisation, None]:
         if organisation_data is not None:
             # CASE: Create new organisation
             if "pk" not in organisation_data or organisation_data["pk"] is None:
@@ -167,7 +167,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
     def handle_events(
         self,
         application_instance: Application,
-        event_data: Union[List[Dict[Any, Any]], None],
+        event_data: Union[list[dict[Any, Any]], None],
     ):
         event_ids = []
 
@@ -196,7 +196,7 @@ class ApplicationCreateSerializer(ApplicationSerializer, PrimaryKeySerializer):
         # Delete events that were not created or modified
         ApplicationEvent.objects.filter(application=application_instance).exclude(id__in=event_ids).delete()
 
-    def handle_billing_address(self, billing_address_data: Dict[Any, Any]):
+    def handle_billing_address(self, billing_address_data: dict[Any, Any]):
         if "pk" not in billing_address_data or billing_address_data["pk"] is None:
             billing_address = AddressSerializer(data=billing_address_data).create(validated_data=billing_address_data)
 

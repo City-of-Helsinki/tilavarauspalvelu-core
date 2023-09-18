@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any
 from uuid import UUID
 
 from merchants.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
@@ -11,7 +11,7 @@ class CreateProductParams:
     namespace_entity_id: str
     merchant_id: str
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "namespace": self.namespace,
             "namespaceEntityId": str(self.namespace_entity_id),
@@ -27,7 +27,7 @@ class Product:
     merchant_id: UUID
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "Product":
+    def from_json(cls, json: dict[str, Any]) -> "Product":
         try:
             return Product(
                 product_id=UUID(json["productId"]),
@@ -50,7 +50,7 @@ class CreateOrUpdateAccountingParams:
     main_ledger_account: str
     balance_profit_center: str
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         json = {
             "vatCode": self.vat_code,
             "companyCode": self.company_code,
@@ -88,7 +88,7 @@ class Accounting:
     balance_profit_center: str
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "Accounting":
+    def from_json(cls, json: dict[str, Any]) -> "Accounting":
         try:
             return Accounting(
                 product_id=json["productId"],

@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Dict, List
+from typing import Any
 
 from graphql import GraphQLError
 
@@ -28,22 +28,22 @@ class ReservationUnitPricingHelper:
         return cls.get_active_price(reservation_unit)
 
     @classmethod
-    def is_active(cls, pricing: Dict[str, Any]) -> bool:
+    def is_active(cls, pricing: dict[str, Any]) -> bool:
         return pricing.get("status") == PricingStatus.PRICING_STATUS_ACTIVE
 
     @classmethod
-    def is_future(cls, pricing: Dict[str, Any]) -> bool:
+    def is_future(cls, pricing: dict[str, Any]) -> bool:
         return pricing.get("status") == PricingStatus.PRICING_STATUS_FUTURE
 
     @classmethod
-    def check_pricing_required(cls, is_draft: bool, data: Dict[str, Any]):
+    def check_pricing_required(cls, is_draft: bool, data: dict[str, Any]):
         pricings = data.get("pricings", [])
 
         if not is_draft and not pricings:
             raise GraphQLError("pricings is required and must have one ACTIVE and one optional FUTURE pricing")
 
     @classmethod
-    def check_pricing_dates(cls, data: Dict[str, Any]):
+    def check_pricing_dates(cls, data: dict[str, Any]):
         pricings = data.get("pricings", [])
         for pricing in pricings:
             if cls.is_active(pricing):
@@ -54,7 +54,7 @@ class ReservationUnitPricingHelper:
                     raise GraphQLError("FUTURE pricing must be in the future")
 
     @classmethod
-    def check_pricing_counts(cls, is_draft: bool, data: Dict[str, Any]):
+    def check_pricing_counts(cls, is_draft: bool, data: dict[str, Any]):
         pricings = data.get("pricings", [])
 
         active_count = 0
@@ -77,7 +77,7 @@ class ReservationUnitPricingHelper:
             raise GraphQLError("only ACTIVE and FUTURE pricings can be mutated")
 
     @classmethod
-    def calculate_vat_prices(cls, data: Dict[str, Any]) -> Dict[str, Any]:
+    def calculate_vat_prices(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Calculates vat prices from net prices and returns a dict of pricing data."""
         pricings = data.get("pricings", [])
 
@@ -100,7 +100,7 @@ class ReservationUnitPricingHelper:
         return pricings
 
     @classmethod
-    def contains_status(cls, status: PricingStatus, pricings: List[Dict[Any, Any]]) -> bool:
+    def contains_status(cls, status: PricingStatus, pricings: list[dict[Any, Any]]) -> bool:
         for pricing in pricings:
             if pricing.get("status", "") == status:
                 return True

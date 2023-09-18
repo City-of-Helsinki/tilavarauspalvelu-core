@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -332,7 +332,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         return data
 
     @staticmethod
-    def handle_event_schedules(schedule_data: List[Dict[Any, Any]], application_event: ApplicationEvent) -> None:
+    def handle_event_schedules(schedule_data: list[dict[Any, Any]], application_event: ApplicationEvent) -> None:
         event_ids = []
 
         for schedule in schedule_data:
@@ -343,7 +343,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         ApplicationEventSchedule.objects.filter(application_event=application_event).exclude(id__in=event_ids).delete()
 
     @staticmethod
-    def handle_units(event_unit_data: List[Dict[Any, Any]], application_event: ApplicationEvent) -> None:
+    def handle_units(event_unit_data: list[dict[Any, Any]], application_event: ApplicationEvent) -> None:
         event_unit_ids = []
 
         for event_unit in event_unit_data:
@@ -452,7 +452,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ]
 
     @staticmethod
-    def handle_person(contact_person_data: Dict[Any, Any]) -> Union[Person, None]:
+    def handle_person(contact_person_data: dict[Any, Any]) -> Union[Person, None]:
         if contact_person_data is not None:
             # CASE: Create new person
             if "id" not in contact_person_data or contact_person_data["id"] is None:
@@ -466,7 +466,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         return None
 
-    def handle_organisation(self, organisation_data: Dict[Any, Any]) -> Union[Organisation, None]:
+    def handle_organisation(self, organisation_data: dict[Any, Any]) -> Union[Organisation, None]:
         if organisation_data is not None:
             # CASE: Create new organisation
             if "id" not in organisation_data or organisation_data["id"] is None:
@@ -478,7 +478,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 validated_data=organisation_data,
             )
 
-    def handle_billing_address(self, billing_address_data: Dict[Any, Any]):
+    def handle_billing_address(self, billing_address_data: dict[Any, Any]):
         if "id" not in billing_address_data or billing_address_data["id"] is None:
             billing_address = AddressSerializer(data=billing_address_data).create(validated_data=billing_address_data)
 
@@ -540,7 +540,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     def handle_events(
         self,
         application_instance: Application,
-        event_data: Union[List[Dict[Any, Any]], None],
+        event_data: Union[list[dict[Any, Any]], None],
     ):
         event_ids = []
 

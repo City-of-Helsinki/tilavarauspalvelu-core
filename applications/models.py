@@ -1,7 +1,7 @@
 import datetime
 import math
 import uuid
-from typing import Dict, List, Optional, TypeVar
+from typing import Optional, TypeVar
 
 import recurrence
 from django.contrib.auth import get_user_model
@@ -379,7 +379,7 @@ class ApplicationRound(models.Model):
         return status
 
     def get_application_events_by_basket(self):
-        matching_application_events: Dict[int, List[ApplicationEvent]] = {}
+        matching_application_events: dict[int, list[ApplicationEvent]] = {}
         for basket in self.application_round_baskets.order_by("order_number").all():
             matching_application_events[basket.id] = basket.get_application_events_in_basket()
         return matching_application_events
@@ -517,8 +517,8 @@ _ApplicantTypes = TypeVar("_ApplicantTypes", *[name for name, _ in APPLICANT_TYP
 
 
 def customer_types_to_applicant_types(
-    customer_types: List[_CustomerTypes],
-) -> List[_ApplicantTypes]:
+    customer_types: list[_CustomerTypes],
+) -> list[_ApplicantTypes]:
     applicant_types = []
     switcher = {
         CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS: [APPLICANT_TYPES.APPLICANT_TYPE_COMPANY],
@@ -1129,7 +1129,7 @@ class EventOccurrence:
         weekday: int,
         begin: datetime.time,
         end: datetime.time,
-        occurrences: List[datetime.datetime],
+        occurrences: list[datetime.datetime],
     ):
         self.weekday = weekday
         self.begin = begin

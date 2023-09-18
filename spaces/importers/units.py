@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import List, Optional
+from typing import Optional
 from urllib.parse import urljoin
 
 import requests
@@ -161,8 +161,8 @@ class UnitHaukiResourceIdImporter:
     @transaction.atomic
     def import_hauki_resource_ids_for_units(
         self,
-        unit_ids: Optional[List[int]] = None,
-        tprek_ids: Optional[List[str]] = None,
+        unit_ids: Optional[list[int]] = None,
+        tprek_ids: Optional[list[str]] = None,
     ):
         if not unit_ids and not tprek_ids:
             raise ValueError("Either unit_ids or tprek_ids is required.")

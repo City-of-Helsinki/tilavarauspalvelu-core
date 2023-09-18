@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional
+from typing import Optional
 
 import graphene
 from django.db.models import Q, QuerySet, Sum
@@ -69,7 +69,7 @@ from utils.query_performance import QueryPerformanceOptimizerMixin
 TIMEZONE = get_default_timezone()
 
 
-def get_payment_type_codes() -> List[str]:
+def get_payment_type_codes() -> list[str]:
     return [payment_type.code for payment_type in ReservationUnitPaymentType.objects.all()]
 
 
@@ -169,7 +169,7 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         self,
         *args,
         instance: ReservationUnit = None,
-        include_reservation_units: List[int] = None,
+        include_reservation_units: list[int] = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -358,7 +358,7 @@ class ReservationUnitWithReservationsMixin:
         info: ResolveInfo,
         from_: Optional[datetime.date] = None,
         to: Optional[datetime.date] = None,
-        state: Optional[List[str]] = None,
+        state: Optional[list[str]] = None,
         include_with_same_components: Optional[bool] = None,
     ) -> QuerySet:
         from_ = start_of_day(from_)

@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Optional
 
 import requests
 from django.conf import settings
@@ -161,7 +161,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         return None
 
-    def get_address(self) -> Optional[Dict]:
+    def get_address(self) -> Optional[dict]:
         primary_address = self.data.get("primaryAddress")
         if primary_address:
             return primary_address

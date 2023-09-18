@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, Optional, Union
 
 from django.db.models import Q, QuerySet
 from django.utils import timezone
@@ -19,7 +19,7 @@ def is_superuser(user: User) -> bool:
     return user.is_superuser
 
 
-def has_unit_group_permission(user: User, unit_groups: Union[List[int], QuerySet], required_permission: str) -> bool:
+def has_unit_group_permission(user: User, unit_groups: Union[list[int], QuerySet], required_permission: str) -> bool:
     if not unit_groups:
         return False
 
@@ -29,7 +29,7 @@ def has_unit_group_permission(user: User, unit_groups: Union[List[int], QuerySet
     ).exists()
 
 
-def has_unit_permission(user: User, units: Union[List[int], QuerySet], required_permission: str) -> bool:
+def has_unit_permission(user: User, units: Union[list[int], QuerySet], required_permission: str) -> bool:
     if not units or user.is_anonymous:
         return False
 
@@ -42,7 +42,7 @@ def has_unit_permission(user: User, units: Union[List[int], QuerySet], required_
 
 
 def has_service_sector_permission(
-    user: User, service_sectors: Union[List[int], QuerySet], required_permission: str
+    user: User, service_sectors: Union[list[int], QuerySet], required_permission: str
 ) -> bool:
     if not service_sectors or user.is_anonymous:
         return False
@@ -72,7 +72,7 @@ def can_manage_service_sector_roles(user: User, service_sector: ServiceSector) -
     )
 
 
-def can_manage_unit_roles(user: User, units: Union[List[Unit], QuerySet]) -> bool:
+def can_manage_unit_roles(user: User, units: Union[list[Unit], QuerySet]) -> bool:
     permission = "can_manage_unit_roles"
     service_sectors = ServiceSector.objects.filter(units__in=units)
     return (
@@ -95,7 +95,7 @@ def can_manage_units(user: User, unit: Unit) -> bool:
     )
 
 
-def can_manage_unit_group_roles(user: User, unit_group: Union[List[int], QuerySet]) -> bool:
+def can_manage_unit_group_roles(user: User, unit_group: Union[list[int], QuerySet]) -> bool:
     permission = "can_manage_unit_roles"
     return (
         is_superuser(user)
@@ -334,7 +334,7 @@ def can_comment_reservation(user: User, reservation: Reservation) -> bool:
     )
 
 
-def can_handle_reservation_with_units(user: User, reservation_unit_ids: List[int]) -> bool:
+def can_handle_reservation_with_units(user: User, reservation_unit_ids: list[int]) -> bool:
     permission = "can_manage_reservations"
     reservation_units = ReservationUnit.objects.filter(pk__in=reservation_unit_ids)
 

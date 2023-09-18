@@ -1,5 +1,5 @@
 from json import JSONDecodeError
-from typing import List, Optional
+from typing import Optional
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -78,7 +78,7 @@ def update_merchant(merchant_uuid: UUID, params: UpdateMerchantParams, post=_pos
         raise UpdateMerchantError("Merchant update failed") from e
 
 
-def get_merchants(get=_get) -> List[Merchant]:
+def get_merchants(get=_get) -> list[Merchant]:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/merchant/list/merchants/{namespace}") as metric:
             response = get(

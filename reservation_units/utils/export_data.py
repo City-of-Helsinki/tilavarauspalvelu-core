@@ -1,6 +1,6 @@
 from csv import QUOTE_ALL, writer
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
@@ -89,7 +89,7 @@ class ReservationUnitExporter:
         root = settings.BASE_DIR
         path = root / "exports" / "reservation_unit_exports"
         path.mkdir(parents=True, exist_ok=True)
-        reservation_units: List[ReservationUnit] = list(queryset) if queryset else list(ReservationUnit.objects.all())
+        reservation_units: list[ReservationUnit] = list(queryset) if queryset else list(ReservationUnit.objects.all())
 
         if reservation_units:
             file_name = f"reservation_units__{now.strftime('%d-%m-%Y')}.csv"

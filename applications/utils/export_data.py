@@ -1,7 +1,6 @@
 from csv import writer
 from functools import reduce
 from pathlib import Path
-from typing import Dict, List
 
 from _csv import QUOTE_ALL
 from django.conf import settings
@@ -54,7 +53,7 @@ class ApplicationDataExporter:
         path = root / "exports" / "applications"
         path.mkdir(parents=True, exist_ok=True)
 
-        application_events: List[ApplicationEventWithAnnotations] = list(
+        application_events: list[ApplicationEventWithAnnotations] = list(
             cls.get_base_queryset(application_round)
             .select_related(
                 "application",
@@ -351,7 +350,7 @@ class ApplicationDataExporter:
     @classmethod
     def _update_event_schedule_string(
         cls,
-        event_schedules: Dict[int, str],
+        event_schedules: dict[int, str],
         new_schedule: ApplicationEventSchedule,
     ) -> None:
         time_range_string = cls._get_time_range_string(

@@ -1,7 +1,7 @@
 import datetime
 import os
 import re
-from typing import Dict, Optional
+from typing import Optional
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
@@ -60,13 +60,13 @@ class EmailTemplateValidator:
                 raise EmailTemplateValidationError("Illegal tags found: tag was '%s'" % expression)
 
     @staticmethod
-    def _validate_in_sandbox(string: str, context: Dict, env: SandboxedEnvironment):
+    def _validate_in_sandbox(string: str, context: dict, env: SandboxedEnvironment):
         try:
             env.from_string(string).render(context)
         except TemplateError as e:
             raise EmailTemplateValidationError(e)
 
-    def validate_string(self, string: str, context_dict: Dict = (), env: SandboxedEnvironment = None) -> bool:
+    def validate_string(self, string: str, context_dict: dict = (), env: SandboxedEnvironment = None) -> bool:
         env = env or get_sandboxed_environment()
         self._validate_in_sandbox(string, context_dict, env)
         self._validate_illegals(string)

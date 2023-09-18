@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -20,7 +20,7 @@ class SendReservationEmailNotificationException(Exception):
 def send_reservation_email_notification(
     email_type: EmailType,
     reservation: Optional[Reservation],
-    recipients: Optional[List[str]] = None,
+    recipients: Optional[list[str]] = None,
     context: Optional[EmailNotificationContext] = None,
 ):
     if recipients is not None and len(recipients) > settings.EMAIL_MAX_RECIPIENTS:

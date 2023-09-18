@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from admin_extra_buttons.api import ExtraButtonsMixin, button
 from django.contrib import admin
@@ -18,7 +18,7 @@ from email_notification.sender.senders import send_test_emails
 from reservation_units.models import ReservationUnit
 
 
-def get_initial_values(request) -> Dict[str, Any]:
+def get_initial_values(request) -> dict[str, Any]:
     recipient = request.user.email if request.user else ""
     initial_values = {"recipient": recipient}
 

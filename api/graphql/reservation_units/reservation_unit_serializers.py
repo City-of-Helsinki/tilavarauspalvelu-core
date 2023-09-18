@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from django.core import validators
 from graphene.utils.str_converters import to_camel_case
@@ -436,7 +436,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         return data
 
     @staticmethod
-    def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
+    def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit):
         for pricing in pricings:
             ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
@@ -463,7 +463,7 @@ class ReservationUnitUpdateSerializer(PrimaryKeyUpdateSerializer, ReservationUni
         self.validate_pricing(data)
         return data
 
-    def validate_pricing(self, data) -> Dict[str, Any]:
+    def validate_pricing(self, data) -> dict[str, Any]:
         current_active_pricing = ReservationUnitPricingHelper.get_active_price(self.instance)
         current_future_pricing = ReservationUnitPricingHelper.get_future_price(self.instance)
 
@@ -479,7 +479,7 @@ class ReservationUnitUpdateSerializer(PrimaryKeyUpdateSerializer, ReservationUni
         return data
 
     @staticmethod
-    def handle_pricings(pricings: List[Dict[Any, Any]], reservation_unit):
+    def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit):
         # Delete pricings that are not in the payload
         if not ReservationUnitPricingHelper.contains_status(PricingStatus.PRICING_STATUS_ACTIVE, pricings):
             ReservationUnitPricing.objects.filter(

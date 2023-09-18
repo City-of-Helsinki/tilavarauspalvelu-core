@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal, Optional
 from uuid import UUID
 
 from sentry_sdk import capture_exception, push_scope
@@ -43,7 +43,7 @@ class OrderItemParams:
     price_gross: Decimal
     price_vat: Decimal
     vat_percentage: Decimal
-    meta: List[OrderItemMetaParams]
+    meta: list[OrderItemMetaParams]
 
 
 @dataclass(frozen=True)
@@ -61,7 +61,7 @@ class OrderItem:
     price_gross: Decimal
     price_vat: Decimal
     vat_percentage: Decimal
-    meta: List[OrderItemMeta]
+    meta: list[OrderItemMeta]
     period_frequency: Optional[int]
     period_unit: Optional[str]
     period_count: Optional[int]
@@ -86,7 +86,7 @@ class Order:
     namespace: str
     user: str
     created_at: datetime
-    items: List[OrderItem]
+    items: list[OrderItem]
     price_net: Optional[Decimal]
     price_vat: Optional[Decimal]
     price_total: Optional[Decimal]
@@ -98,7 +98,7 @@ class Order:
     type: OrderType
 
     @classmethod
-    def from_json(cls, json: Dict[str, Any]) -> "Order":
+    def from_json(cls, json: dict[str, Any]) -> "Order":
         from merchants.verkkokauppa.helpers import parse_datetime
 
         subscription_id = json.get("subscriptionId")
@@ -177,14 +177,14 @@ class CreateOrderParams:
     namespace: str
     user: UUID
     language: str
-    items: List[OrderItemParams]
+    items: list[OrderItemParams]
     customer: OrderCustomer
     price_net: Decimal
     price_vat: Decimal
     price_total: Decimal
     last_valid_purchase_datetime: datetime
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "namespace": self.namespace,
             "user": str(self.user),
