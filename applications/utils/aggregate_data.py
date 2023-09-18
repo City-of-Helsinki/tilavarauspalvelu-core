@@ -24,7 +24,7 @@ class BaseAggregateDataCreator(Thread):
         super().run()
 
 
-class CeleryRunner(object):
+class CeleryRunner:
     _task: celery.Task
 
     def run_celery_task(self, *args, **kwargs):
@@ -125,7 +125,7 @@ class EventAggregateDataCreator(BaseAggregateDataCreator):
         return self.event.create_aggregate_data()
 
 
-class _ApplicationEventScheduleResultAggregateDataCreator(object):
+class _ApplicationEventScheduleResultAggregateDataCreator:
     def __init__(self, event):
         self.event = event
 

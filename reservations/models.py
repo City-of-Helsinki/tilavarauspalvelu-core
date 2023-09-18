@@ -177,7 +177,7 @@ class RecurringReservation(models.Model):
         return []
 
 
-class STATE_CHOISE_CONST(object):
+class STATE_CHOISE_CONST:
     __slots__ = ()
 
     CREATED = "created"
