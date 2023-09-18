@@ -75,7 +75,7 @@ def test_application_round_should_not_allow_order_number_overlap(
     valid_application_round_basket_data,
 ):
     baskets = []
-    for i in range(2):
+    for _ in range(2):
         data = valid_application_round_basket_data.copy()
         data["order_number"] = 1
         baskets.append(data)

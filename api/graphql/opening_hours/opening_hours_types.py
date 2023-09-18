@@ -110,7 +110,7 @@ class OpeningHoursMixin:
         end_date=graphene.Date(),
     )
 
-    def resolve_opening_hours(self, info, **kwargs):
+    def resolve_opening_hours(self, *_, **kwargs):
         start = kwargs.get("start_date")
         end = kwargs.get("end_date")
         init_periods = kwargs.get("periods", False)

@@ -139,7 +139,7 @@ class UnitImporter:
 
         location_data["coordinates"] = point
 
-        location, _ = Location.objects.update_or_create(unit=unit, defaults=location_data)
+        Location.objects.update_or_create(unit=unit, defaults=location_data)
 
         self.imported_unit_ids.append(unit.id)
 

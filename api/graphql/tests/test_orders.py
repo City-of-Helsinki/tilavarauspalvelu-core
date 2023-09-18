@@ -159,11 +159,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             reservation_user_uuid=cls.regular_joe.uuid,
         )
 
-    @classmethod
-    def get_refresh_order_query(cls, order_uuid: Optional[str] = None) -> str:
-        if not order_uuid:
-            order_uuid = cls.payment_order.remote_id
-
+    @staticmethod
+    def get_refresh_order_query() -> str:
         return """
             mutation refreshOrderMutation($input: RefreshOrderMutationInput!){
                 refreshOrder(input: $input) {
