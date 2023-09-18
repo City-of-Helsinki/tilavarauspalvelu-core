@@ -192,7 +192,8 @@ class ReservationUnitAdmin(ExtraButtonsMixin, SortableAdminMixin, admin.ModelAdm
                 level=messages.ERROR,
             )
         else:
-            return FileResponse(open(path, "rb"))
+            with open(path, "rb") as file:
+                return FileResponse(file)
 
 
 @admin.register(ReservationUnitImage)

@@ -435,7 +435,7 @@ class OpeningHoursClient:
 
         running_date = date
         while not times:
-            dates = [dt for dt in times_for_resource.keys() if dt > running_date]
+            dates = [dt for dt in times_for_resource if dt > running_date]
             running_date = min(dates) if dates else None
             if not running_date:
                 break

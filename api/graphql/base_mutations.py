@@ -65,7 +65,7 @@ class AuthDeleteMutation(AuthMutation):
     @classmethod
     def is_valid(cls, root, info, **input):
         errors = cls.validate(root, info, **input)
-        is_valid = False if errors else True
+        is_valid = not errors
         return is_valid
 
 

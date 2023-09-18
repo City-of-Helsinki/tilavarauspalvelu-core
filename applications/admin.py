@@ -140,7 +140,8 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
             capture_exception(e)
         else:
             if path:
-                return FileResponse(open(path, "rb"))
+                with open(path, "rb") as file:
+                    return FileResponse(file)
 
             self.message_user(
                 request,

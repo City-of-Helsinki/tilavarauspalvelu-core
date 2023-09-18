@@ -233,5 +233,5 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer, PrimaryKeyUpdateS
         fields = dict(self.fields)
         fields.pop("pk")
 
-        for key, _value in fields.items():
+        for key in fields:
             self.fields[key].required = False

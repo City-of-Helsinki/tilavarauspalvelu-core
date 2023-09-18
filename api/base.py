@@ -52,10 +52,7 @@ class TranslatedFieldSerializer(serializers.Serializer):
             translated_field_name = f"{original_field_name}_{language_code}"
             field_kwargs = kwargs.copy()
             field_kwargs["source"] = translated_field_name
-            if original_field_class is not None:
-                field_class = original_field_class
-            else:
-                field_class = serializers.CharField
+            field_class = original_field_class if original_field_class is not None else serializers.CharField
             translated_field = field_class(**field_kwargs)
             setattr(self, language_code, translated_field)
             # Dynamically add the translated fields to serializer fields.

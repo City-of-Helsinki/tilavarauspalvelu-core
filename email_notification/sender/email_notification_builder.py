@@ -44,7 +44,7 @@ class EmailTemplateValidator:
         variable_tags = []
 
         for strings in tags_inside_brackets:
-            strings_list = [tag for tag in strings if tag and tag not in FILTERS_MAP.keys()]
+            strings_list = [tag for tag in strings if tag and tag not in FILTERS_MAP]
 
             variable_tags.append(strings_list[0])
 

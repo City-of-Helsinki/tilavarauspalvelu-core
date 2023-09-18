@@ -31,8 +31,4 @@ def get_staff_notification_recipients(
 
 
 def __user_has_notification_setting(user: User, notification_settings: list[ReservationNotification]):
-    for setting in notification_settings:
-        if user.reservation_notification.upper() == setting.upper():
-            return True
-
-    return False
+    return any(user.reservation_notification.upper() == setting.upper() for setting in notification_settings)
