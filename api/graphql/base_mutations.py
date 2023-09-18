@@ -54,7 +54,7 @@ class AuthDeleteMutation(AuthMutation):
         return cls(deleted=False)
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         """Classes that ought to be overriding this method should raise django's
         ValidationError if there's some validation problem. It gets caught in
         `mutate_and_get_payload` method and returned as an error.

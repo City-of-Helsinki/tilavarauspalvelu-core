@@ -174,7 +174,7 @@ class ReservationFilterSet(django_filters.FilterSet):
             return qs
         return qs.filter(reservation_unit__reservation_unit_type__in=value)
 
-    def get_text_search(serlf, qs, property, value: str):
+    def get_text_search(self, qs, property, value: str):
         if not value:
             return qs
 

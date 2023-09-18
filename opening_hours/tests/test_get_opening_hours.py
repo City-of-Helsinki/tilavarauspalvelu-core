@@ -12,14 +12,14 @@ from opening_hours.hours import get_opening_hours
 @override_settings(HAUKI_API_URL="url")
 class GetOpeningHoursTestCase(TestCase):
     @classmethod
-    def get_opening_hours(self):
+    def get_opening_hours(cls):
         with open("opening_hours/tests/fixtures/hauki_opening_hours_response.json") as data:
             response = json.load(data)
 
         return response
 
     @classmethod
-    def get_opening_hours_closed(self):
+    def get_opening_hours_closed(cls):
         with open("opening_hours/tests/fixtures/hauki_opening_hours_response_resource_closed.json") as data:
             response = json.load(data)
 

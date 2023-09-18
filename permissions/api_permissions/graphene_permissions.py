@@ -330,7 +330,7 @@ class ReservationPermission(BasePermission):
         return can_create_reservation(info.context.user)
 
     @classmethod
-    def has_filter_permission(self, info: ResolveInfo) -> bool:
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
         """Authenticated users can see reservations.
 
         The reservation fields has own permission checks.
@@ -576,7 +576,7 @@ class KeywordPermission(BasePermission):
 
 class EquipmentCategoryPermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -586,7 +586,7 @@ class EquipmentCategoryPermission(BasePermission):
 
 class EquipmentPermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -610,7 +610,7 @@ class ReservationUnitCancellationRulePermission(BasePermission):
 
 class TermsOfUsePermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -620,7 +620,7 @@ class TermsOfUsePermission(BasePermission):
 
 class TaxPercentagePermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -630,7 +630,7 @@ class TaxPercentagePermission(BasePermission):
 
 class CityPermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -640,7 +640,7 @@ class CityPermission(BasePermission):
 
 class ReservationMetadataSetPermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -650,7 +650,7 @@ class ReservationMetadataSetPermission(BasePermission):
 
 class ServiceSectorPermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -660,7 +660,7 @@ class ServiceSectorPermission(BasePermission):
 
 class PaymentOrderPermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return info.context.user.is_authenticated
 
     @classmethod
@@ -705,7 +705,7 @@ class UserPermission(BasePermission):
 
 class GeneralRolePermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -715,7 +715,7 @@ class GeneralRolePermission(BasePermission):
 
 class ServiceSectorRolePermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod
@@ -725,7 +725,7 @@ class ServiceSectorRolePermission(BasePermission):
 
 class UnitRolePermission(BasePermission):
     @classmethod
-    def has_permission(self, info: ResolveInfo) -> bool:
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return True
 
     @classmethod

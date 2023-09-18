@@ -12,7 +12,7 @@ response_mock = MagicMock()
 
 class UnitImporterBaseTestCase(TestCase):
     @classmethod
-    def get_response_data(self):
+    def get_response_data(cls):
         data = [
             {
                 "id": 1,
@@ -170,7 +170,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
 @mock.patch("requests.get", return_value=response_mock)
 class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
     @classmethod
-    def get_field_map(self):
+    def get_field_map(cls):
         field_map = {
             "unit": {
                 "tprek_id": "id",
