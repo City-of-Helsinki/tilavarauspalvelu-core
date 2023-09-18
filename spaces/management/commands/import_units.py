@@ -55,7 +55,7 @@ class Command(BaseCommand):
 
         if not ids:
             importer.import_units(import_hauki_resource_ids=import_hauki_resource_ids)
-            return
+            return None
 
         if url[len(url) - 1] != "/":
             url = f"{url}/"
