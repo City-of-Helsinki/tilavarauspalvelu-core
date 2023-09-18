@@ -2,10 +2,10 @@ from datetime import datetime
 from unittest import mock
 from uuid import UUID
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test import TestCase
-from pytest import raises
 
 from merchants.verkkokauppa.payment.exceptions import ParseRefundStatusError
 from merchants.verkkokauppa.payment.types import RefundStatusResult
@@ -48,9 +48,9 @@ class RefundStatusFromJsonTestCase(TestCase):
 
     @mock.patch("merchants.verkkokauppa.payment.types.capture_exception")
     def test_parsing_fails(self, mock_capture_exception):
-        with raises(ParseRefundStatusError) as ex:
-            data = refund_status_json.copy()
-            data["orderId"] = "not-a-uuid"
+        data = refund_status_json.copy()
+        data["orderId"] = "not-a-uuid"
+        with pytest.raises(ParseRefundStatusError) as ex:
             RefundStatusResult.from_json(data)
 
         assert_that(str(ex.value)).is_equal_to("Could not parse refund status: badly formed hexadecimal UUID string")
