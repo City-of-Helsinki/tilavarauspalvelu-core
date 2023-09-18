@@ -31,7 +31,7 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
     def _delete(self):
         profile_user = self.get_object()
         if not self._check_user_can_be_anonymized(profile_user.user):
-            raise AnonymizationNotAllowedError()
+            raise AnonymizationNotAllowedError
         anonymize_user_data(profile_user.user)
 
     def _check_user_can_be_anonymized(self, user):
