@@ -263,6 +263,9 @@ class ServiceSectorRolePermission(models.Model):
     )
     permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=SERVICE_SECTOR_PERMISSIONS)
 
+    def __str__(self) -> str:
+        return f"ServiceSectorRolePermission {self.role.verbose_name} ({self.permission})"
+
 
 class UnitRolePermission(models.Model):
     role = models.ForeignKey(
@@ -273,6 +276,9 @@ class UnitRolePermission(models.Model):
     )
     permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=UNIT_PERMISSIONS)
 
+    def __str__(self) -> str:
+        return f"UnitRolePermission {self.role.verbose_name} ({self.permission})"
+
 
 class GeneralRolePermission(models.Model):
     role = models.ForeignKey(
@@ -282,6 +288,9 @@ class GeneralRolePermission(models.Model):
         on_delete=models.CASCADE,
     )
     permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=GENERAL_PERMISSIONS)
+
+    def __str__(self) -> str:
+        return f"GeneralRolePermission {self.role.verbose_name} ({self.permission})"
 
 
 class UnitRole(BaseRole):

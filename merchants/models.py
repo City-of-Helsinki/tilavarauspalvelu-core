@@ -24,11 +24,11 @@ class PaymentMerchant(ExportModelOperationsMixin("payment_merchant"), models.Mod
     )
     name = models.CharField(verbose_name=_("Merchant name"), blank=False, null=False, max_length=128)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        return super().save(force_insert, force_update, using, update_fields)
-
     def __str__(self) -> str:
         return self.name
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        return super().save(force_insert, force_update, using, update_fields)
 
 
 class PaymentProduct(ExportModelOperationsMixin("payment_product"), models.Model):
@@ -164,6 +164,13 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
         max_length=512,
     )
 
+    def __str__(self) -> str:
+        return f"PaymentOrder {self.pk}"
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
     def clean(self):
         validation_errors = {}
 
@@ -179,10 +186,6 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
 
         if validation_errors:
             raise ValidationError(validation_errors)
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        return super().save(*args, **kwargs)
 
 
 class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models.Model):
@@ -244,16 +247,8 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
         verbose_name=_("Balance profit center"), blank=False, null=False, max_length=10
     )
 
-    def clean(self) -> None:
-        if not self.project and not self.profit_center and not self.internal_order:
-            error_message = _("One of the following fields must be given: internal_order, profit_center, project")
-            raise ValidationError(
-                {
-                    "internal_order": [error_message],
-                    "profit_center": [error_message],
-                    "project": [error_message],
-                }
-            )
+    def __str__(self) -> str:
+        return self.name
 
     def save(self, *args, **kwargs) -> None:
         from reservation_units.models import ReservationUnit
@@ -266,5 +261,13 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
             for runit in runits:
                 refresh_reservation_unit_accounting.delay(runit.pk)
 
-    def __str__(self) -> str:
-        return self.name
+    def clean(self) -> None:
+        if not self.project and not self.profit_center and not self.internal_order:
+            error_message = _("One of the following fields must be given: internal_order, profit_center, project")
+            raise ValidationError(
+                {
+                    "internal_order": [error_message],
+                    "profit_center": [error_message],
+                    "project": [error_message],
+                }
+            )
