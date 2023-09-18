@@ -259,7 +259,7 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
         from reservation_units.models import ReservationUnit
         from reservation_units.tasks import refresh_reservation_unit_accounting
 
-        super(PaymentAccounting, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         if settings.UPDATE_ACCOUNTING:
             runits_from_units = ReservationUnit.objects.filter(unit__in=self.units.all())
             runits = runits_from_units.union(self.reservation_units.all())

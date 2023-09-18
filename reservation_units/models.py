@@ -650,7 +650,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return ReservationUnitReservationStateHelper.get_state(self)
 
     def save(self, *args, **kwargs) -> None:
-        super(ReservationUnit, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         if settings.UPDATE_PRODUCT_MAPPING:
             refresh_reservation_unit_product_mapping.delay(self.pk)
 

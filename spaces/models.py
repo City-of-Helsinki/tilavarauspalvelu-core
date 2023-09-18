@@ -109,7 +109,7 @@ class Unit(models.Model):
 
     def save(self, *args, **kwargs):
         old_values = Unit.objects.filter(pk=self.pk).first()
-        result = super(Unit, self).save(*args, **kwargs)
+        result = super().save(*args, **kwargs)
 
         # When merchant changes, update reservation_units that are using
         # the merchant information from the Unit. This will update their
