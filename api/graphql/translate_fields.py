@@ -3,7 +3,6 @@ from typing import List, Type
 from django.conf import settings
 from django.db import models
 from django.db.models import Model
-from graphene import ResolveInfo
 from modeltranslation.manager import get_translatable_fields_for_model
 
 LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]
@@ -31,7 +30,3 @@ def get_translatable_field(model: models.Model, field_name: str):
         for language in LANGUAGE_CODES:
             fields.append(f"{field}_{language}")
     return fields
-
-
-def django_type_self_resolver(model: Model, info: ResolveInfo):
-    return model

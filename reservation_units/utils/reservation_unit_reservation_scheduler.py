@@ -77,9 +77,7 @@ class ReservationUnitReservationScheduler:
     def _get_next_matching_opening_hour_start_time(self, start: datetime.datetime):
         matching = None
         while not matching:
-            open_date, times = self.opening_hours_client.next_opening_times(
-                str(self.reservation_unit.uuid), start.date()
-            )
+            _, times = self.opening_hours_client.next_opening_times(str(self.reservation_unit.uuid), start.date())
             if not times:
                 break
             try:

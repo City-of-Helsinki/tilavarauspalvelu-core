@@ -894,7 +894,7 @@ def test_creating_weekly_amount_reduction_should_mark_declined(
 def test_cant_create_more_reductions_than_events_per_week(
     application_event, general_admin_api_client, result_scheduled_for_monday
 ):
-    for i in range(application_event.events_per_week):
+    for _ in range(application_event.events_per_week):
         ApplicationEventWeeklyAmountReduction.objects.create(application_event=application_event)
     assert_that(ApplicationEventWeeklyAmountReduction.objects.count()).is_equal_to(2)
 

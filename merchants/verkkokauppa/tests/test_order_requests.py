@@ -320,9 +320,8 @@ class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
 class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
     def test_get_order_makes_valid_request(self):
         order_id = UUID(self.get_order_response["orderId"])
-        user = self.get_order_response["user"]
         get = mock_get(self.get_order_response)
-        get_order(order_id, user, get)
+        get_order(order_id, get)
         get.assert_called_with(
             url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"admin/{order_id}"),
             headers={
@@ -334,17 +333,18 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
 
     def test_get_order_returns_order(self):
         order_id = UUID(self.get_order_response["orderId"])
-        user = self.get_order_response["user"]
-        order = get_order(order_id, user, mock_get(self.get_order_response))
+        order = get_order(order_id, mock_get(self.get_order_response))
         expected = Order.from_json(self.get_order_response)
         assert_that(order).is_equal_to(expected)
 
     def test_get_order_raises_exception_if_order_id_is_missing(self):
         response = self.get_order_response.copy()
         order_id = UUID(response.pop("orderId"))
-        user = self.get_order_response["user"]
         with raises(GetOrderError):
-            get_order(order_id, user, mock_get(response))
+            get_order(
+                order_id,
+                mock_get(response),
+            )
 
     def test_get_order_raises_exception_if_checkout_url_is_missing(self):
         response = self.get_order_response.copy()
@@ -352,7 +352,6 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
         with raises(GetOrderError):
             get_order(
                 UUID(response["orderId"]),
-                response["user"],
                 mock_get(response),
             )
 
@@ -360,18 +359,13 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
         with raises(GetOrderError):
             get_order(
                 UUID(self.get_order_response["orderId"]),
-                self.get_order_response["user"],
                 Mock(side_effect=Timeout()),
             )
 
     def test_get_order_raises_exception_on_404(self):
         get = mock_get(self.get_order_404_response, status_code=404)
         with raises(GetOrderError) as e:
-            get_order(
-                UUID(self.get_order_response["orderId"]),
-                self.get_order_response["user"],
-                get,
-            )
+            get_order(UUID(self.get_order_response["orderId"]), get)
         assert_that(str(e.value)).is_equal_to(
             "Order not found: [{'code': 'order-not-found', 'message': 'Order not found'}]"
         )

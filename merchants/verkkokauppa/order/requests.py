@@ -57,7 +57,7 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
         raise CreateOrderError(f"Order creation failed: {str(err)}") from err
 
 
-def get_order(order_id: UUID, user: str, get=_get) -> Order:
+def get_order(order_id: UUID, get=_get) -> Order:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/order/admin/{order_id}") as metric:
             response = get(

@@ -451,16 +451,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "additional_information",
         ]
 
-    def set_home_city(self, obj: Application):
-        if obj.home_city is not None:
-            return City.objects.get(name=obj.home_city.name).name
-        return None
-
-    def get_home_city(self, obj: Application):
-        if obj.home_city is not None:
-            return City.objects.get(name=obj.home_city.name).name
-        return None
-
     @staticmethod
     def handle_person(contact_person_data: Dict[Any, Any]) -> Union[Person, None]:
         if contact_person_data is not None:
