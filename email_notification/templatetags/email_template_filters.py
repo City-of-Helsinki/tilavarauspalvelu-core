@@ -9,7 +9,7 @@ register = template.Library()
 
 def format_currency(price: Decimal):
     price = round_decimal(Decimal(price), 2)
-    return "{:,.2f}".format(price).replace(",", " ").replace(".", ",")
+    return f"{price:,.2f}".replace(",", " ").replace(".", ",")
 
 
 register.filter("currency", format_currency)

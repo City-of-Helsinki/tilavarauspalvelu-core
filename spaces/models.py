@@ -136,7 +136,7 @@ class RealEstate(models.Model):
     )
 
     def __str__(self):
-        return "{}".format(self.name)
+        return f"{self.name}"
 
 
 class Building(models.Model):
@@ -160,7 +160,7 @@ class Building(models.Model):
     )
 
     def __str__(self):
-        return "{}".format(self.name)
+        return f"{self.name}"
 
 
 class Space(MPTTModel):
@@ -270,4 +270,4 @@ class Location(models.Model):
         return self.coordinates.x if self.coordinates else None
 
     def __str__(self):
-        return "{}, {} {}".format(self.address_street, self.address_city, self.address_zip)
+        return f"{self.address_street}, {self.address_city} {self.address_zip}"

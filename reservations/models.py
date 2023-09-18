@@ -42,7 +42,7 @@ class AgeGroup(models.Model):
     maximum = models.fields.PositiveIntegerField(verbose_name=_("Maximum"), null=True, blank=True)
 
     def __str__(self):
-        return "{} - {}".format(self.minimum, self.maximum)
+        return f"{self.minimum} - {self.maximum}"
 
 
 class AbilityGroup(models.Model):

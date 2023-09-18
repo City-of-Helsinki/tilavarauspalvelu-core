@@ -48,7 +48,7 @@ class User(AbstractUser):
         return default
 
     def get_display_name(self):
-        return "{0} {1}".format(self.first_name, self.last_name).strip()
+        return f"{self.first_name} {self.last_name}".strip()
 
     def get_preferred_language(self):
         if not self.preferred_language:

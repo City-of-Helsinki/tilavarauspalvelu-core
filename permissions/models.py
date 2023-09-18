@@ -307,7 +307,7 @@ class UnitRole(BaseRole):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.role.verbose_name, self.user.email)
+        return f"{self.role.verbose_name} ({self.user.email})"
 
 
 class ServiceSectorRole(BaseRole):
@@ -328,7 +328,7 @@ class ServiceSectorRole(BaseRole):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.role.verbose_name, self.user.email)
+        return f"{self.role.verbose_name} ({self.user.email})"
 
 
 class GeneralRole(BaseRole):
@@ -341,4 +341,4 @@ class GeneralRole(BaseRole):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.role.verbose_name, self.user.email)
+        return f"{self.role.verbose_name} ({self.user.email})"

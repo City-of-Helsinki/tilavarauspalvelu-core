@@ -234,7 +234,7 @@ class ApplicationRoundStatus(models.Model, StatusMixin):
         return [s[0] for s in cls.STATUS_CHOICES]
 
     def __str__(self):
-        return "{} ({})".format(self.get_status_display(), self.application_round.id)
+        return f"{self.get_status_display()} ({self.application_round.id})"
 
 
 class ApplicationRoundManager(models.Manager):
@@ -323,7 +323,7 @@ class ApplicationRound(models.Model):
     objects = ApplicationRoundManager()
 
     def __str__(self):
-        return "{} ({} - {})".format(self.name, self.reservation_period_begin, self.reservation_period_end)
+        return f"{self.name} ({self.reservation_period_begin} - {self.reservation_period_end})"
 
     def refresh_from_db(self, using=None, fields=None) -> None:
         super().refresh_from_db(using, fields)
@@ -598,7 +598,7 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
         return math.ceil(10 / self.order_number)
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.application_round.name)
+        return f"{self.name} ({self.application_round.name})"
 
 
 class ApplicationStatus(models.Model, StatusMixin):
@@ -649,7 +649,7 @@ class ApplicationStatus(models.Model, StatusMixin):
         return [s[0] for s in cls.STATUS_CHOICES]
 
     def __str__(self):
-        return "{} ({})".format(self.get_status_display(), self.application.id)
+        return f"{self.get_status_display()} ({self.application.id})"
 
 
 class ApplicationEventStatus(models.Model, StatusMixin):
@@ -1041,7 +1041,7 @@ class ApplicationEvent(models.Model):
                 scope.set_extra("details", "Caught an error while saving event aggregate data")
                 capture_exception(err)
         else:
-            logger.info("Event #{} aggregate data created.".format(self.id))
+            logger.info(f"Event #{self.id} aggregate data created.")
 
     def create_schedule_result_aggregated_data(self):
         total_amount_of_events = []
@@ -1086,7 +1086,7 @@ class ApplicationEvent(models.Model):
                 )
                 capture_exception(err)
         else:
-            logger.info("Event schedule result #{} aggregate data created.".format(self.pk))
+            logger.info(f"Event schedule result #{self.pk} aggregate data created.")
 
     @property
     def aggregated_data_dict(self):
@@ -1325,7 +1325,7 @@ class ApplicationEventScheduleResult(models.Model):
                 )
                 capture_exception(err)
         else:
-            logger.info("Schedule result #{} aggregate data created.".format(self.pk))
+            logger.info(f"Schedule result #{self.pk} aggregate data created.")
 
 
 class ApplicationEventScheduleResultAggregateData(AggregateDataBase):
