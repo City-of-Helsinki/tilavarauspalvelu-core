@@ -544,12 +544,12 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return "{}, {}".format(self.name, getattr(self.unit, "name", ""))
 
     def get_location(self):
-        # For now we assume that if reservation has multiple spaces they all have same location
+        # For now, we assume that if reservation has multiple spaces they all have same location
         spaces = self.spaces.all()
         return next((space.location for space in spaces if hasattr(space, "location")), None)
 
     def get_building(self):
-        # For now we assume that if reservation has multiple spaces they all have same building
+        # For now, we assume that if reservation has multiple spaces they all have same building
         spaces = self.spaces.all()
         return next((space.building for space in spaces if hasattr(space, "building")), None)
 

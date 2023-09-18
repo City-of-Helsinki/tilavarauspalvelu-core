@@ -51,7 +51,7 @@ class Unit(models.Model):
         max_length=255,
         unique=True,
         blank=True,
-        null=True,  # If some units needs to be created manually.
+        null=True,  # If some units need to be created manually.
     )
     tprek_department_id = models.CharField(verbose_name=_("TPREK department id"), max_length=255, blank=True, null=True)
     name = models.CharField(verbose_name=_("Name"), max_length=255)
@@ -216,7 +216,7 @@ class Space(MPTTModel):
 
 class Location(models.Model):
     """
-    Location is used for classes needing for location data. E.g address or coordinates.
+    Location is used for classes needing for location data. e.g. address or coordinates.
     Relations are defined in OneToOne relations and can be added when needed.
     """
 

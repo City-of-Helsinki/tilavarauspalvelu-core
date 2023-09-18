@@ -59,7 +59,7 @@ class TranslatedFieldSerializer(serializers.Serializer):
             translated_field = field_class(**field_kwargs)
             setattr(self, language_code, translated_field)
             # Dynamically add the translated fields to serializer fields.
-            # Note; not using _declared_fields since its a class based variable.
+            # Note; not using _declared_fields since it's a class based variable.
             # So it changes the class not the instance, thus fields.
             if language_code not in self.fields:
                 self.fields[language_code] = translated_field

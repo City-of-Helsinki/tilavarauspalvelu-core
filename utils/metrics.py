@@ -34,8 +34,8 @@ class ExternalServiceMetric:
     """
     Wrapper for monitoring external service calls.
 
-    Collects number of calls and latencies. If response_status is
-    set during the call, it also collect response status codes.
+    Collects number of calls and latencies.
+    If response_status is set during the call, it also collects response status codes.
     """
 
     service: str
