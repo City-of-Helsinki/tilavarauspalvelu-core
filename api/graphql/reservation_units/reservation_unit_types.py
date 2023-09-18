@@ -168,7 +168,7 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         self,
         *args,
         instance: ReservationUnit = None,
-        include_reservation_units: list[int] = None,
+        include_reservation_units: list[int] | None = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)

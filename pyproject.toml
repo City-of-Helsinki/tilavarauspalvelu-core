@@ -115,6 +115,7 @@ select = [
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
     "RUF010",   # Ruff-specific rules: Use explicit conversion flag
+    "RUF013",   # Ruff-specific rules: PEP 484 prohibits implicit Optional
 ]
 ignore = [
     "S101",  # assert is fine.
