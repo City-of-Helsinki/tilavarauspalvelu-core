@@ -13,7 +13,7 @@ class ReservationUnitReservationScheduler:
     def __init__(
         self,
         reservation_unit,
-        opening_hours_end: datetime.date = None,
+        opening_hours_end: datetime.date | None = None,
     ):
         self.reservation_unit = reservation_unit
 

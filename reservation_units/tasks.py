@@ -111,7 +111,7 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
 
 
 @app.task(name="update_reservation_unit_image_urls")
-def update_urls(pk: int = None):
+def update_urls(pk: int | None = None):
     from reservation_units.models import ReservationUnitImage
 
     images = ReservationUnitImage.objects.filter(image__isnull=False)

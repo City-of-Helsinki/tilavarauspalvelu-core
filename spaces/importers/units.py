@@ -80,7 +80,7 @@ class UnitImporter:
         },
     }
 
-    def __init__(self, url: str, single: bool = False, field_map: dict = None):
+    def __init__(self, url: str, single: bool = False, field_map: dict | None = None):
         self.url = url
         self.single = single
         if field_map:
