@@ -98,7 +98,9 @@ const NotificationsListItem = ({
     <BannerNotificationBackground>
       <NotificationWrapper type={notificationType} centered={centered}>
         {notification.activeFrom && (
-          <BannerNotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</BannerNotificationDate>
+          <BannerNotificationDate>
+            {`${displayDate.getDate()}.${displayDate.getMonth() + 1}.`}
+          </BannerNotificationDate>
         )}
         {notification && (
           <BannerNotificationText
