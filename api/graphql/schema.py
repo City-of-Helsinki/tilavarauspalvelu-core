@@ -388,11 +388,11 @@ class Query(graphene.ObjectType):
     resource_by_pk = Field(ResourceType, pk=graphene.Int())
 
     equipments = EquipmentFilter(EquipmentType, filterset_class=EquipmentFilterSet)
-    equipment = relay.Node.Field((EquipmentType))
+    equipment = relay.Node.Field(EquipmentType)
     equipment_by_pk = Field(EquipmentType, pk=graphene.Int())
 
     equipment_categories = EquipmentCategoryFilter(EquipmentCategoryType)
-    equipment_category = relay.Node.Field((EquipmentCategoryType))
+    equipment_category = relay.Node.Field(EquipmentCategoryType)
     equipment_category_by_pk = Field(EquipmentCategoryType, pk=graphene.Int())
 
     spaces = SpacesFilter(SpaceType, filterset_class=SpaceFilterSet)

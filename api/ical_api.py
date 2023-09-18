@@ -225,6 +225,6 @@ def export(application_event: ApplicationEvent, site_name: str, cal: Calendar) -
         ical_event.add("dtstamp", datetime.datetime.now(tz=get_default_timezone()))
         ical_event.add("description", reservation.get_ical_description())
         ical_event.add("location", reservation.get_location_string())
-        ical_event["uid"] = "%s.event.events.%s" % (reservation.id, site_name)
+        ical_event["uid"] = f"{reservation.id}.event.events.{site_name}"
         cal.add_component(ical_event)
     return cal
