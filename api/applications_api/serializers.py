@@ -116,7 +116,7 @@ class PersonSerializer(serializers.ModelSerializer):
 # TODO: Should move to using serializers.CurrentUserDefault when we have actual security in place.
 #  Now you can call stuff without authenticating and it'll fail with nasty AnonymousUser error,
 #  if not setting user to None instead.
-class NullableCurrentUserDefault(object):
+class NullableCurrentUserDefault:
     def __init__(self):
         self.user = None
 

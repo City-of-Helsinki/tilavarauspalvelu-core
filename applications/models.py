@@ -160,7 +160,7 @@ class Organisation(models.Model):
         return self.name
 
 
-class PRIORITY_CONST(object):
+class PRIORITY_CONST:
     __slots__ = ()
 
     PRIORITY_LOW = 100
@@ -480,7 +480,7 @@ class City(models.Model):
         return self.name
 
 
-class CUSTOMER_TYPE_CONST(object):
+class CUSTOMER_TYPE_CONST:
     __slots__ = ()
 
     CUSTOMER_TYPE_BUSINESS = "business"
@@ -497,7 +497,7 @@ CUSTOMER_TYPES = CUSTOMER_TYPE_CONST()
 _CustomerTypes = TypeVar("_CustomerTypes", *[name for name, _ in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES])
 
 
-class APPLICANT_TYPE_CONST(object):
+class APPLICANT_TYPE_CONST:
     __slots__ = ()
     APPLICANT_TYPE_INDIVIDUAL = "individual"
     APPLICANT_TYPE_ASSOCIATION = "association"
@@ -1123,7 +1123,7 @@ class EventReservationUnit(models.Model):
     reservation_unit = models.ForeignKey(ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.PROTECT)
 
 
-class EventOccurrence(object):
+class EventOccurrence:
     def __init__(
         self,
         weekday: int,

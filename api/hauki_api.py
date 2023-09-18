@@ -6,7 +6,7 @@ from opening_hours.hours import get_opening_hours
 from reservation_units.models import ReservationUnit
 
 
-class OpeningHours(object):
+class OpeningHours:
     def __init__(self, id: int, start_date: datetime, end_date: datetime):
         self.id = id
         self.opening_hours = self.get_hours(start_date, end_date)
