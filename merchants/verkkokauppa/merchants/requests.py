@@ -58,7 +58,7 @@ def update_merchant(merchant_uuid: UUID, params: UpdateMerchantParams, post=_pos
             response = post(
                 url=urljoin(
                     _get_base_url(),
-                    f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{str(merchant_uuid)}",
+                    f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{merchant_uuid!s}",
                 ),
                 json=params.to_json(),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -68,7 +68,7 @@ def update_merchant(merchant_uuid: UUID, params: UpdateMerchantParams, post=_pos
 
         json = response.json()
         if response.status_code == 404:
-            raise UpdateMerchantError(f"Merchant update failed: merchant {str(merchant_uuid)} not found")
+            raise UpdateMerchantError(f"Merchant update failed: merchant {merchant_uuid!s} not found")
         if response.status_code != 200:
             raise UpdateMerchantError(f"Merchant update failed: {json.get('errors')}")
 
@@ -106,7 +106,7 @@ def get_merchant(merchant_uuid: UUID, get=_get) -> MerchantInfo | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/merchant/{namespace}/{merchant_id}") as metric:
             response = get(
-                url=urljoin(_get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{str(merchant_uuid)}"),
+                url=urljoin(_get_base_url(), f"{settings.VERKKOKAUPPA_NAMESPACE}/{merchant_uuid!s}"),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
                 timeout=REQUEST_TIMEOUT_SECONDS,
             )
@@ -118,8 +118,8 @@ def get_merchant(merchant_uuid: UUID, get=_get) -> MerchantInfo | None:
             return None
 
         if response.status_code != 200:
-            raise GetMerchantError(f"Fetching merchant {str(merchant_uuid)} failed: {json.get('errors')}")
+            raise GetMerchantError(f"Fetching merchant {merchant_uuid!s} failed: {json.get('errors')}")
 
         return MerchantInfo.from_json(json)
     except (RequestException, JSONDecodeError, ParseMerchantError) as e:
-        raise GetMerchantError(f"Fetching merchant {str(merchant_uuid)} failed: {e}") from e
+        raise GetMerchantError(f"Fetching merchant {merchant_uuid!s} failed: {e}") from e

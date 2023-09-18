@@ -40,7 +40,7 @@ class PaymentMerchantForm(forms.ModelForm):
         if instance and instance.id:
             merchant_info = get_merchant(instance.id)
             if merchant_info is None:
-                raise GetMerchantsError(f"Merchant info for {str(instance.id)} not found from Merchant API")
+                raise GetMerchantsError(f"Merchant info for {instance.id!s} not found from Merchant API")
 
             self.fields["shop_id"].initial = merchant_info.shop_id
             self.fields["name"].initial = merchant_info.name

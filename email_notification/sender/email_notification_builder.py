@@ -90,7 +90,7 @@ class EmailTemplateValidator:
         except EmailTemplateValidationError as err:
             raise ValidationError(err.message)
         except Exception as err:
-            raise ValidationError(f"Unable to read the HTML file: {str(err)}")
+            raise ValidationError(f"Unable to read the HTML file: {err!s}")
 
 
 class ReservationEmailNotificationBuilderException(Exception):

@@ -294,7 +294,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             return Response(data=err.to_json(), status=err.status_code)
         except GetRefundStatusError as err:
             with push_scope() as scope:
-                scope.set_extra("details", f"Fetching refund status failed: {str(err)}")
+                scope.set_extra("details", f"Fetching refund status failed: {err!s}")
                 scope.set_extra("data", request.data)
                 capture_exception(err)
             return Response(

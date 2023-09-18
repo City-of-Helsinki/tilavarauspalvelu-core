@@ -169,7 +169,7 @@ class Order:
                 scope.set_extra("details", "Parsing order failed")
                 scope.set_extra("json", json)
                 capture_exception(err)
-            raise ParseOrderError(f"Could not parse order: {str(err)}") from err
+            raise ParseOrderError(f"Could not parse order: {err!s}") from err
 
 
 @dataclass(frozen=True)

@@ -97,7 +97,7 @@ def get_refund_status(order_id: UUID, namespace: str, get=_get) -> RefundStatusR
             raise GetRefundStatusError(f"Payment refund status retrieval failed: {json.get('errors')}")
         return RefundStatusResult.from_json(json)
     except (RequestException, JSONDecodeError, ParseRefundStatusError) as e:
-        raise GetRefundStatusError(f"Payment refund status retrieval failed: {str(e)}") from e
+        raise GetRefundStatusError(f"Payment refund status retrieval failed: {e!s}") from e
 
 
 def refund_order(order_id: UUID, post=_post) -> Refund | None:
@@ -137,4 +137,4 @@ def refund_order(order_id: UUID, post=_post) -> Refund | None:
             scope.set_extra("details", "Payment refund failed")
             scope.set_extra("order-id", order_id)
             capture_exception(err)
-        raise RefundPaymentError(f"Payment refund failed: {str(err)}") from err
+        raise RefundPaymentError(f"Payment refund failed: {err!s}") from err
