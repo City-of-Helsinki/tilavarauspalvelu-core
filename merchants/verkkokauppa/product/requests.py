@@ -27,7 +27,7 @@ from utils.metrics import ExternalServiceMetric
 
 def _get_base_url():
     if not settings.VERKKOKAUPPA_PRODUCT_API_URL or not settings.VERKKOKAUPPA_API_KEY:
-        raise VerkkokauppaConfigurationError()
+        raise VerkkokauppaConfigurationError
 
     if settings.VERKKOKAUPPA_PRODUCT_API_URL.endswith("/"):
         return settings.VERKKOKAUPPA_PRODUCT_API_URL
