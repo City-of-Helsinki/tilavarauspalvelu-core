@@ -105,6 +105,7 @@ select = [
     "TID",      # flake8-tidy-imports
     "PT",       # flake8-pytest-style
     "RSE",      # flake8-raise
+    "SIM",      # flake8-simplify
     "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
     "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
     "D200",     # pydocstyle: One-line docstring should fit on one line

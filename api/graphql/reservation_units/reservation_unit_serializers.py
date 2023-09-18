@@ -378,7 +378,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         if not is_draft:
             self.validate_for_publish(data)
 
-        if "name_fi" in data.keys():
+        if "name_fi" in data:
             name = data.get("name_fi")
             if not name or name.isspace():
                 raise GraphQLError("nameFi is required for draft reservation units.")
@@ -468,12 +468,18 @@ class ReservationUnitUpdateSerializer(PrimaryKeyUpdateSerializer, ReservationUni
         current_future_pricing = ReservationUnitPricingHelper.get_future_price(self.instance)
 
         for pricing in data.get("pricings"):
-            if ReservationUnitPricingHelper.is_active(pricing):
-                if current_active_pricing and current_active_pricing.pk != pricing.get("pk", 0):
-                    raise GraphQLError("ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed")
-            elif ReservationUnitPricingHelper.is_future(pricing):
-                if current_future_pricing and current_future_pricing.pk != pricing.get("pk", 0):
-                    raise GraphQLError("FUTURE pricing is already defined. Only one FUTURE pricing is allowed")
+            if (
+                ReservationUnitPricingHelper.is_active(pricing)
+                and current_active_pricing
+                and current_active_pricing.pk != pricing.get("pk", 0)
+            ):
+                raise GraphQLError("ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed")
+            elif (
+                ReservationUnitPricingHelper.is_future(pricing)
+                and current_future_pricing
+                and current_future_pricing.pk != pricing.get("pk", 0)
+            ):
+                raise GraphQLError("FUTURE pricing is already defined. Only one FUTURE pricing is allowed")
 
         data = ReservationUnitPricingHelper.calculate_vat_prices(data)
         return data

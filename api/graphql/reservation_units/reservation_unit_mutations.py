@@ -185,7 +185,7 @@ class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, AuthSerializer
         When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
         Because all changes are stored to the audit log, we also need to delete old audit events related to the unit.
         """
-        if "is_archived" not in input.keys():
+        if "is_archived" not in input:
             return
 
         reservation_unit_pk = input["pk"]

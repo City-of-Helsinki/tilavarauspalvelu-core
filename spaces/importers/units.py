@@ -166,10 +166,7 @@ class UnitHaukiResourceIdImporter:
         if not unit_ids and not tprek_ids:
             raise ValueError("Either unit_ids or tprek_ids is required.")
 
-        if unit_ids:
-            units = Unit.objects.filter(id__in=unit_ids)
-        else:
-            units = Unit.objects.filter(tprek_id__in=tprek_ids)
+        units = Unit.objects.filter(id__in=unit_ids) if unit_ids else Unit.objects.filter(tprek_id__in=tprek_ids)
 
         url = settings.HAUKI_API_URL
         url = urljoin(url, "/v1/resource/")

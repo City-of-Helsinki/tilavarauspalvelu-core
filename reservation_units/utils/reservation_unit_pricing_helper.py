@@ -49,9 +49,8 @@ class ReservationUnitPricingHelper:
             if cls.is_active(pricing):
                 if pricing.get("begins") > date.today():
                     raise GraphQLError("ACTIVE pricing must be in the past or today")
-            elif ReservationUnitPricingHelper.is_future(pricing):
-                if pricing.get("begins") <= date.today():
-                    raise GraphQLError("FUTURE pricing must be in the future")
+            elif ReservationUnitPricingHelper.is_future(pricing) and pricing.get("begins") <= date.today():
+                raise GraphQLError("FUTURE pricing must be in the future")
 
     @classmethod
     def check_pricing_counts(cls, is_draft: bool, data: dict[str, Any]):
@@ -101,8 +100,4 @@ class ReservationUnitPricingHelper:
 
     @classmethod
     def contains_status(cls, status: PricingStatus, pricings: list[dict[Any, Any]]) -> bool:
-        for pricing in pricings:
-            if pricing.get("status", "") == status:
-                return True
-
-        return False
+        return any(pricing.get("status", "") == status for pricing in pricings)
