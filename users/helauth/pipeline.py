@@ -12,8 +12,7 @@ from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
 from common.utils import get_nested
-
-from ..models import User
+from users.models import User
 
 __all__ = [
     "fetch_additional_info_for_user_from_helsinki_profile",

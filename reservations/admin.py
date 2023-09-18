@@ -6,7 +6,7 @@ from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV
 from rangefilter.filters import DateRangeFilter
 
-from .models import (
+from reservations.models import (
     AbilityGroup,
     AgeGroup,
     RecurringReservation,

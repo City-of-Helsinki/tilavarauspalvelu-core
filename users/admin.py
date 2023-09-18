@@ -3,8 +3,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.utils.anonymisation import anonymize_user_data
-
-from .models import User
+from users.models import User
 
 
 @admin.register(User)

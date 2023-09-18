@@ -1,4 +1,4 @@
-from .banner_notification import BannerNotificationQuerySet
+from common.querysets.banner_notification import BannerNotificationQuerySet
 
 __all__ = [
     "BannerNotificationQuerySet",

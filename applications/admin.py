@@ -5,7 +5,7 @@ from django.http import FileResponse
 from sentry_sdk import capture_exception
 from tinymce.widgets import TinyMCE
 
-from .models import (
+from applications.models import (
     Address,
     Application,
     ApplicationEvent,
@@ -21,7 +21,7 @@ from .models import (
     Person,
     Recurrence,
 )
-from .utils.export_data import ApplicationDataExporter
+from applications.utils.export_data import ApplicationDataExporter
 
 
 class ApplicationStatusInline(admin.TabularInline):

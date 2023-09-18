@@ -2,8 +2,10 @@ import graphene
 from django.db.models import Sum
 from graphene_permissions.mixins import AuthNode
 
+from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
+from api.graphql.reservations.reservation_types import ReservationPurposeType
 from api.graphql.spaces.space_types import ServiceSectorType
 from api.graphql.translate_fields import get_all_translatable_fields
 from applications.models import (
@@ -14,9 +16,6 @@ from applications.models import (
     ApplicationStatus,
 )
 from permissions.api_permissions.graphene_permissions import ApplicationRoundPermission
-
-from ..base_connection import TilavarausBaseConnection
-from ..reservations.reservation_types import ReservationPurposeType
 
 
 class ApplicationRoundAggregatedDataType(graphene.ObjectType):

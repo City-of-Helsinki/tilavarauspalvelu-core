@@ -7,14 +7,13 @@ from graphene import relay
 from graphene_permissions.mixins import AuthMutation
 from sentry_sdk import capture_exception, capture_message, push_scope
 
+from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
 from permissions.api_permissions.graphene_permissions import OrderRefreshPermission
 from reservations.email_utils import send_confirmation_email
 from reservations.models import STATE_CHOICES
-
-from ..validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 
 TIMEZONE = get_default_timezone()
 

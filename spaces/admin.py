@@ -4,15 +4,7 @@ from django.contrib import admin, messages
 from django.core.management import call_command
 from mptt.admin import MPTTModelAdmin
 
-from .models import (
-    Building,
-    Location,
-    RealEstate,
-    ServiceSector,
-    Space,
-    Unit,
-    UnitGroup,
-)
+from spaces.models import Building, Location, RealEstate, ServiceSector, Space, Unit, UnitGroup
 
 
 class LocationInline(admin.TabularInline):

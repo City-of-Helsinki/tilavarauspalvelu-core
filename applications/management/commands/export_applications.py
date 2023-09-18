@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from django.core.management.base import BaseCommand
 
-from ...utils.export_data import ApplicationDataExporter
+from applications.utils.export_data import ApplicationDataExporter
 
 
 class Command(BaseCommand):

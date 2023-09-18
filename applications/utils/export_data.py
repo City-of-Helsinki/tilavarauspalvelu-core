@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db.models import Count, Max, OuterRef, Prefetch, QuerySet, Subquery
 from django.utils import timezone
 
-from ..models import (
+from applications.models import (
     PRIORITIES,
     Application,
     ApplicationEvent,

@@ -30,6 +30,19 @@ from applications.models import (
     Organisation,
     Person,
 )
+from common.choices import BannerNotificationLevel, BannerNotificationTarget
+from common.management.commands._utils import (
+    batched,
+    faker_en,
+    faker_fi,
+    faker_sv,
+    get_paragraphs,
+    pascal_case_to_snake_case,
+    random_subset,
+    weighted_choice,
+    with_logs,
+)
+from common.models import BannerNotification
 from permissions.models import (
     GENERAL_PERMISSIONS,
     SERVICE_SECTOR_PERMISSIONS,
@@ -83,20 +96,6 @@ from spaces.models import (
 from terms_of_use.models import TermsOfUse
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 from users.models import User
-
-from ...choices import BannerNotificationLevel, BannerNotificationTarget
-from ...models import BannerNotification
-from ._utils import (
-    batched,
-    faker_en,
-    faker_fi,
-    faker_sv,
-    get_paragraphs,
-    pascal_case_to_snake_case,
-    random_subset,
-    weighted_choice,
-    with_logs,
-)
 
 
 class Command(BaseCommand):

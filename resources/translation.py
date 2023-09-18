@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import Resource
+from resources.models import Resource
 
 
 class ResourceTranslationOptions(TranslationOptions):

@@ -1,13 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import (
-    Address,
-    ApplicationEvent,
-    ApplicationRound,
-    ApplicationRoundBasket,
-    City,
-    Organisation,
-)
+from applications.models import Address, ApplicationEvent, ApplicationRound, ApplicationRoundBasket, City, Organisation
 
 
 class AddressTranslationOptions(TranslationOptions):

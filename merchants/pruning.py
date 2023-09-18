@@ -4,15 +4,14 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from sentry_sdk import capture_exception, push_scope
 
+from merchants.models import OrderStatus, PaymentOrder
+from merchants.verkkokauppa.order.exceptions import CancelOrderError
+from merchants.verkkokauppa.order.requests import cancel_order
+from merchants.verkkokauppa.payment.exceptions import GetPaymentError
+from merchants.verkkokauppa.payment.requests import get_payment
+from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
 from reservations.email_utils import send_confirmation_email
 from reservations.models import STATE_CHOICES, Reservation
-
-from .models import OrderStatus, PaymentOrder
-from .verkkokauppa.order.exceptions import CancelOrderError
-from .verkkokauppa.order.requests import cancel_order
-from .verkkokauppa.payment.exceptions import GetPaymentError
-from .verkkokauppa.payment.requests import get_payment
-from .verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
 
 TIMEZONE = get_default_timezone()
 

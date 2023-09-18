@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import (
+from reservation_units.models import (
     Equipment,
     EquipmentCategory,
     Keyword,

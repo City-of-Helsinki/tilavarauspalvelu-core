@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, register
 
-from .models import TermsOfUse
+from terms_of_use.models import TermsOfUse
 
 
 @register(TermsOfUse)

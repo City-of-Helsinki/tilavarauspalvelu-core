@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy
 from tinymce.widgets import TinyMCE
 
-from ...models import BannerNotification
+from common.models import BannerNotification
 
 
 class BannerNotificationAdminForm(forms.ModelForm):
