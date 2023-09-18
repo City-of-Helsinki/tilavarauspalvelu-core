@@ -119,7 +119,7 @@ class UnitImporter:
         self.update_counter += 1
 
     def create_unit(self, importer_data: dict) -> bool:
-        """Creates or updates an Unit object"""
+        """Creates or updates a Unit object"""
         unit_data = {}
         for model_field, data_field in self.field_map["unit"].items():
             unit_data[model_field] = importer_data.get(data_field, self.field_map["defaults"].get(model_field))

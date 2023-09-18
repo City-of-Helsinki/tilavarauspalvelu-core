@@ -11,9 +11,9 @@ from reservation_units.models import PricingStatus, PricingType, ReservationUnit
 
 
 class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBase):
-    def get_valid_data(self, isDraft: bool) -> Dict[str, Any]:
+    def get_valid_data(self, is_draft: bool) -> Dict[str, Any]:
         return {
-            "isDraft": isDraft,
+            "isDraft": is_draft,
             "nameFi": "Pricing test unit FI",
             "nameEn": "Pricing test unit EN",
             "nameSv": "Pricing test unit SV",

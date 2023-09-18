@@ -223,7 +223,7 @@ def get_units_where_can_view_reservations(user: User) -> QuerySet:
 
 
 def get_units_with_permission(user: User, permission: str) -> QuerySet:
-    "Given a permission, returns units that match to that permission on different levels"
+    """Given a permission, returns units that match to that permission on different levels"""
     service_sector_ids = user.service_sector_roles.filter(role__permissions__permission=permission).values_list(
         "service_sector", flat=True
     )

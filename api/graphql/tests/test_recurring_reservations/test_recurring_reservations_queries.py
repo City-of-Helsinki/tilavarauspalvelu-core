@@ -379,13 +379,13 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_order_by_reservation_unit_name(self):
-        resunitA = ReservationUnitFactory(name_fi="a Unit", name_en="d Unit", name_sv="g unit")
-        resunitB = ReservationUnitFactory(name_fi="b Unit", name_en="e Unit", name_sv="h unit")
-        resunitC = ReservationUnitFactory(name_fi="c Unit", name_en="f Unit", name_sv="i unit")
+        res_unit_a = ReservationUnitFactory(name_fi="a Unit", name_en="d Unit", name_sv="g unit")
+        res_unit_b = ReservationUnitFactory(name_fi="b Unit", name_en="e Unit", name_sv="h unit")
+        res_unit_c = ReservationUnitFactory(name_fi="c Unit", name_en="f Unit", name_sv="i unit")
 
-        RecurringReservationFactory(name="this should be 1st", reservation_unit=resunitA)
-        RecurringReservationFactory(name="this should be 2nd", reservation_unit=resunitB)
-        RecurringReservationFactory(name="this should be 3rd", reservation_unit=resunitC)
+        RecurringReservationFactory(name="this should be 1st", reservation_unit=res_unit_a)
+        RecurringReservationFactory(name="this should be 2nd", reservation_unit=res_unit_b)
+        RecurringReservationFactory(name="this should be 3rd", reservation_unit=res_unit_c)
 
         self.client.force_login(self.general_admin)
         test_data = ["Fi", "En", "Sv"]
@@ -413,17 +413,17 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             self.assertMatchSnapshot(content)
 
     def test_order_by_unit_name(self):
-        unitA = UnitFactory(name_fi="a Unit", name_en="d Unit", name_sv="g unit")
-        unitB = UnitFactory(name_fi="b Unit", name_en="e Unit", name_sv="h unit")
-        unitC = UnitFactory(name_fi="c Unit", name_en="f Unit", name_sv="i unit")
+        unit_a = UnitFactory(name_fi="a Unit", name_en="d Unit", name_sv="g unit")
+        unit_b = UnitFactory(name_fi="b Unit", name_en="e Unit", name_sv="h unit")
+        unit_c = UnitFactory(name_fi="c Unit", name_en="f Unit", name_sv="i unit")
 
-        resunitA = ReservationUnitFactory(name="1st resunit", unit=unitA)
-        resunitB = ReservationUnitFactory(name="2nd resunit", unit=unitB)
-        resunitC = ReservationUnitFactory(name="3nd resunit", unit=unitC)
+        res_unit_a = ReservationUnitFactory(name="1st resunit", unit=unit_a)
+        res_unit_b = ReservationUnitFactory(name="2nd resunit", unit=unit_b)
+        res_unit_c = ReservationUnitFactory(name="3nd resunit", unit=unit_c)
 
-        RecurringReservationFactory(name="this should be 1st", reservation_unit=resunitA)
-        RecurringReservationFactory(name="this should be 2nd", reservation_unit=resunitB)
-        RecurringReservationFactory(name="this should be 3rd", reservation_unit=resunitC)
+        RecurringReservationFactory(name="this should be 1st", reservation_unit=res_unit_a)
+        RecurringReservationFactory(name="this should be 2nd", reservation_unit=res_unit_b)
+        RecurringReservationFactory(name="this should be 3rd", reservation_unit=res_unit_c)
 
         self.client.force_login(self.general_admin)
         test_data = ["Fi", "En", "Sv"]
