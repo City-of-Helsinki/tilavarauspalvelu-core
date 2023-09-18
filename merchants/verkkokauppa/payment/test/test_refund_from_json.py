@@ -28,7 +28,8 @@ refund_json = {
 
 
 class RefundFromJsonTestCase(TestCase):
-    def test_refund_from_json(self):
+    @staticmethod
+    def test_refund_from_json():
         refund = Refund.from_json(refund_json)
         assert_that(refund.refund_id).is_equal_to(UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"))
         assert_that(refund.order_id).is_equal_to(UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"))
@@ -44,7 +45,8 @@ class RefundFromJsonTestCase(TestCase):
         assert_that(refund.customer_phone).is_equal_to("+358 50 123 4567")
         assert_that(refund.refund_reason).is_equal_to("Test reason")
 
-    def test_optional_fields_not_included(self):
+    @staticmethod
+    def test_optional_fields_not_included():
         data = refund_json.copy()
         data.pop("customerFirstName")
         data.pop("customerLastName")

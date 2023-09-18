@@ -30,7 +30,8 @@ refund_status_json = {
 
 
 class RefundStatusFromJsonTestCase(TestCase):
-    def test_refund_status_from_json(self):
+    @staticmethod
+    def test_refund_status_from_json():
         refund_status = RefundStatusResult.from_json(refund_status_json)
 
         assert_that(refund_status.order_id).is_equal_to(UUID("63c0e5b7-a460-38f1-97d8-2ffce25cce31"))

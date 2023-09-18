@@ -60,7 +60,8 @@ order_json = {
 
 
 class OrderFromJsonTestCase(TestCase):
-    def test_order_from_json(self):
+    @staticmethod
+    def test_order_from_json():
         order = Order.from_json(order_json)
         assert_that(order.order_id).is_equal_to(UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"))
         assert_that(order.namespace).is_equal_to("tilavaraus")
@@ -88,14 +89,16 @@ class OrderFromJsonTestCase(TestCase):
             UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"),
         )
 
-    def test_phone_not_included(self):
+    @staticmethod
+    def test_phone_not_included():
         data = order_json.copy()
         data["customer"].pop("phone")
         order = Order.from_json(data)
 
         assert_that(order.customer.phone).is_equal_to("")
 
-    def test_subscription_id_not_included(self):
+    @staticmethod
+    def test_subscription_id_not_included():
         data = order_json.copy()
         data.pop("subscriptionId")
         order = Order.from_json(data)
