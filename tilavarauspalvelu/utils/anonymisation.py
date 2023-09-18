@@ -1,5 +1,4 @@
 import uuid
-from typing import Optional
 
 from auditlog.models import LogEntry
 
@@ -17,7 +16,7 @@ def get_last_name():
     return "ANONYMIZED"
 
 
-def anonymize_string(s: Optional[str], replacement: str = "Anonymized"):
+def anonymize_string(s: str | None, replacement: str = "Anonymized"):
     return replacement if s and s.strip() else s
 
 

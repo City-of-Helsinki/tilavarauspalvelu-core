@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 
 import graphene
 from django.conf import settings
@@ -68,13 +67,13 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
 
-    def resolve_order_uuid(self, info) -> Optional[str]:
+    def resolve_order_uuid(self, info) -> str | None:
         return self.remote_id
 
     def resolve_reservation_pk(self, info) -> str:
         return self.reservation.pk
 
-    def resolve_checkout_url(self, info) -> Optional[str]:
+    def resolve_checkout_url(self, info) -> str | None:
         if self.status != OrderStatus.DRAFT:
             return None
 

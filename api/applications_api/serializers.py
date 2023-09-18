@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -80,7 +80,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
             },
         }
 
-    def handle_address(self, address_data) -> Union[Address, None]:
+    def handle_address(self, address_data) -> Address | None:
         if address_data is None:
             return None
         elif "id" not in address_data or address_data["id"] is None:
@@ -452,7 +452,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ]
 
     @staticmethod
-    def handle_person(contact_person_data: dict[Any, Any]) -> Union[Person, None]:
+    def handle_person(contact_person_data: dict[Any, Any]) -> Person | None:
         if contact_person_data is not None:
             # CASE: Create new person
             if "id" not in contact_person_data or contact_person_data["id"] is None:
@@ -466,7 +466,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         return None
 
-    def handle_organisation(self, organisation_data: dict[Any, Any]) -> Union[Organisation, None]:
+    def handle_organisation(self, organisation_data: dict[Any, Any]) -> Organisation | None:
         if organisation_data is not None:
             # CASE: Create new organisation
             if "id" not in organisation_data or organisation_data["id"] is None:
@@ -540,7 +540,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     def handle_events(
         self,
         application_instance: Application,
-        event_data: Union[list[dict[Any, Any]], None],
+        event_data: list[dict[Any, Any]] | None,
     ):
         event_ids = []
 

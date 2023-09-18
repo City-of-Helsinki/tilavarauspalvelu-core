@@ -1,6 +1,6 @@
 import datetime
 from copy import copy
-from typing import Any, Optional
+from typing import Any
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -16,7 +16,7 @@ class OpeningHours:
     start_time: datetime.datetime
     end_time: datetime.datetime
     resource_state: str
-    periods: Optional[list[int]]
+    periods: list[int] | None
     end_time_on_next_day: bool
 
     def __init__(
@@ -162,8 +162,8 @@ class OpeningHoursClient:
 
         chronological_opening_hours = sorted(opening_hours, key=lambda x: x.start_time)
 
-        tracked_accessible_hours: dict[ResourceState, Optional[OpeningHours]] = {}
-        tracked_closed_hours: dict[ResourceState, Optional[OpeningHours]] = {}
+        tracked_accessible_hours: dict[ResourceState, OpeningHours | None] = {}
+        tracked_closed_hours: dict[ResourceState, OpeningHours | None] = {}
 
         # Go through all given accessible and closed hours in chronological order.
         # Keep track of them, and slice them appropriately.
@@ -229,8 +229,8 @@ class OpeningHoursClient:
     def _handle_accessible_hours_split(
         opening_hour: OpeningHours,
         resource_state: ResourceState,
-        tracked_closed_hours: dict[ResourceState, Optional[OpeningHours]],
-        tracked_accessible_hours: dict[ResourceState, Optional[OpeningHours]],
+        tracked_closed_hours: dict[ResourceState, OpeningHours | None],
+        tracked_accessible_hours: dict[ResourceState, OpeningHours | None],
     ) -> None:
         accessible_hours = tracked_accessible_hours.get(resource_state)
 
@@ -292,8 +292,8 @@ class OpeningHoursClient:
         hours: list[OpeningHours],
         opening_hour: OpeningHours,
         resource_state: ResourceState,
-        tracked_closed_hours: dict[ResourceState, Optional[OpeningHours]],
-        tracked_accessible_hours: dict[ResourceState, Optional[OpeningHours]],
+        tracked_closed_hours: dict[ResourceState, OpeningHours | None],
+        tracked_accessible_hours: dict[ResourceState, OpeningHours | None],
     ) -> None:
         closed_hours = tracked_closed_hours.get(resource_state)
 
@@ -328,7 +328,7 @@ class OpeningHoursClient:
         #     xxxxx   ->    xxxxx
         # ---------------------------
         for state, tracked_hours in tracked_accessible_hours.items():
-            new_open_hours: Optional[OpeningHours] = None
+            new_open_hours: OpeningHours | None = None
             if tracked_hours.end_time > opening_hour.end_time:
                 new_open_hours = copy(tracked_hours)
                 new_open_hours.start_time = opening_hour.end_time
@@ -359,7 +359,7 @@ class OpeningHoursClient:
 
     @staticmethod
     def _remove_past_tracked_hours(
-        tracked_hours: dict[ResourceState, Optional[OpeningHours]],
+        tracked_hours: dict[ResourceState, OpeningHours | None],
         current_time: datetime.datetime,
     ) -> list[OpeningHours]:
         to_remove: list[ResourceState] = []

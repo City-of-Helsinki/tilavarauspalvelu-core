@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 import graphene
 from django.db.models import Q, QuerySet, Sum
@@ -356,10 +355,10 @@ class ReservationUnitWithReservationsMixin:
     def resolve_reservations(
         self,
         info: ResolveInfo,
-        from_: Optional[datetime.date] = None,
-        to: Optional[datetime.date] = None,
-        state: Optional[list[str]] = None,
-        include_with_same_components: Optional[bool] = None,
+        from_: datetime.date | None = None,
+        to: datetime.date | None = None,
+        state: list[str] | None = None,
+        include_with_same_components: bool | None = None,
     ) -> QuerySet:
         from_ = start_of_day(from_)
         to = end_of_day(to)
@@ -597,7 +596,7 @@ class ReservationUnitType(
     def resolve_payment_types(self, info):
         return self.payment_types.all()
 
-    def resolve_application_rounds(self, info: ResolveInfo, active: Optional[bool] = None) -> QuerySet:
+    def resolve_application_rounds(self, info: ResolveInfo, active: bool | None = None) -> QuerySet:
         application_rounds = self.application_rounds.all()
         if active is None:
             return application_rounds

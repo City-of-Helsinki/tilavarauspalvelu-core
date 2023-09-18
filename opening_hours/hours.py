@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass, field
-from typing import Optional, Union
 from zoneinfo import ZoneInfo
 
 from django.conf import settings
@@ -28,15 +27,15 @@ class TimeElement:
     The name, description, and periods attributes are ignored when comparing.
     """
 
-    start_time: Optional[datetime.time]
+    start_time: datetime.time | None
     end_time_on_next_day: bool
-    end_time: Optional[datetime.time]
+    end_time: datetime.time | None
     resource_state: State = State.UNDEFINED
     override: bool = False
     full_day: bool = False
     name: str = field(default="", compare=False)
     description: str = field(default="", compare=False)
-    periods: Optional[list] = field(default=None, compare=False)
+    periods: list | None = field(default=None, compare=False)
 
 
 @dataclass(order=True, frozen=True)
@@ -45,16 +44,16 @@ class TimeSpan:
 
     id: int
     group: int
-    start_time: Optional[datetime.time]
-    end_time: Optional[datetime.time]
+    start_time: datetime.time | None
+    end_time: datetime.time | None
     end_time_on_next_day: bool
     name: dict[str, str]
     description: dict[str, str]
-    created: Optional[datetime.datetime]
-    modified: Optional[datetime.datetime]
+    created: datetime.datetime | None
+    modified: datetime.datetime | None
     resource_state: State = State.UNDEFINED
     full_day: bool = False
-    weekdays: Optional[list] = field(default=None, compare=False)
+    weekdays: list | None = field(default=None, compare=False)
 
 
 @dataclass(order=True, frozen=True)
@@ -65,13 +64,13 @@ class Period:
     resource: str
     name: dict
     description: dict
-    start_date: Optional[datetime.date]
-    end_date: Optional[datetime.date]
+    start_date: datetime.date | None
+    end_date: datetime.date | None
     time_spans: list[TimeSpan]
     resource_state: State = State.UNDEFINED
 
 
-def _build_hauki_resource_id(resource_id: Union[str, int, list], hauki_origin_id):
+def _build_hauki_resource_id(resource_id: str | (int | list), hauki_origin_id):
     if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
 
@@ -92,9 +91,9 @@ def _build_hauki_resource_id(resource_id: Union[str, int, list], hauki_origin_id
 
 
 def get_opening_hours(
-    resource_id: Union[str, int, list],
-    start_date: Union[str, datetime.date],
-    end_date: Union[str, datetime.date],
+    resource_id: str | (int | list),
+    start_date: str | datetime.date,
+    end_date: str | datetime.date,
     hauki_origin_id=None,
 ) -> list[dict]:
     """Get opening hours for Hauki resource"""
@@ -144,7 +143,7 @@ def get_opening_hours(
     return days_data_out
 
 
-def get_periods_for_resource(resource_id: Union[str, int, list], hauki_origin_id=None) -> list[Period]:
+def get_periods_for_resource(resource_id: str | (int | list), hauki_origin_id=None) -> list[Period]:
     """Get periods for Hauki resource"""
     hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 

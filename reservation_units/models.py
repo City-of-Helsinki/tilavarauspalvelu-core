@@ -1,7 +1,6 @@
 import datetime
 import uuid as uuid
 from decimal import Decimal
-from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -656,7 +655,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
             refresh_reservation_unit_product_mapping.delay(self.pk)
 
     # ElasticSearch
-    def as_search_document(self, *, index: str) -> Optional[dict]:
+    def as_search_document(self, *, index: str) -> dict | None:
         if index == "reservation_units":
             return {
                 "pk": self.pk,

@@ -1,5 +1,4 @@
 from json import JSONDecodeError
-from typing import Optional
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -55,7 +54,7 @@ def create_product(params: CreateProductParams, post=_post) -> Product:
         raise CreateProductError(f"Product creation failed: {e}")
 
 
-def get_product_mapping(product_id: UUID, get=_get) -> Optional[Product]:
+def get_product_mapping(product_id: UUID, get=_get) -> Product | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/product/{product_id}/mapping") as metric:
             response = get(

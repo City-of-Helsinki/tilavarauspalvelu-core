@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.core.management.base import BaseCommand
 
@@ -16,7 +16,7 @@ class Command(BaseCommand):
             help="an integer or several representing the ID of the application round(s) to export",
         )
 
-    def handle(self, *args: Any, **options: Any) -> Optional[str]:
+    def handle(self, *args: Any, **options: Any) -> str | None:
         application_rounds = options.get("application_round")
 
         for application_round in application_rounds:

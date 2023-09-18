@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -15,8 +14,8 @@ class HaukiResource:
 
     id: int | None
     name: str
-    description: Optional[str]
-    address: Optional[str]
+    description: str | None
+    address: str | None
     children: list[int]
     parents: list[int]
     organization: str

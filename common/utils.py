@@ -1,11 +1,11 @@
-from typing import Any, Optional
+from typing import Any
 
 __all__ = [
     "get_nested",
 ]
 
 
-def get_nested(obj: Optional[dict | list], /, *args: str | int, default: Any = None) -> Any:
+def get_nested(obj: dict | list | None, /, *args: str | int, default: Any = None) -> Any:
     """
     Get value from a nested structure containing dicts with string keys or lists,
     where the keys and list indices might not exist.

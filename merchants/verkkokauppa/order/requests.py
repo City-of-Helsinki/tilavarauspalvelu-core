@@ -1,5 +1,4 @@
 from json import JSONDecodeError
-from typing import Optional
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -84,7 +83,7 @@ def get_order(order_id: UUID, get=_get) -> Order:
         raise GetOrderError(f"Order retrieval failed: {str(err)}") from err
 
 
-def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Optional[Order]:
+def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Order | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/order/{order_id}/cancel") as metric:
             response = post(

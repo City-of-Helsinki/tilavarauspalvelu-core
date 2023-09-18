@@ -1,7 +1,7 @@
 import datetime
 import math
 from decimal import Decimal
-from typing import Iterable, Optional
+from typing import Iterable
 
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
@@ -277,9 +277,9 @@ class ReservationSchedulingMixin:
         reservation_unit: ReservationUnit,
         begin,
         end,
-        reservation_type: Optional[ReservationType] = None,
-        buffer_before: Optional[datetime.timedelta] = None,
-        buffer_after: Optional[datetime.timedelta] = None,
+        reservation_type: ReservationType | None = None,
+        buffer_before: datetime.timedelta | None = None,
+        buffer_after: datetime.timedelta | None = None,
     ):
         current_type = getattr(self.instance, "type", reservation_type)
         if current_type == ReservationType.BLOCKED:

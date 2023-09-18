@@ -1,5 +1,3 @@
-from typing import Optional
-
 import requests
 from django.conf import settings
 from simplejson.errors import JSONDecodeError
@@ -125,7 +123,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         self.vp_info = self.data.get("verifiedPersonalInformation", {})
 
-    def get_user_home_city(self) -> Optional[City]:
+    def get_user_home_city(self) -> City | None:
         if not self.vp_info:
             return None
 
@@ -145,7 +143,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         return city
 
-    def get_phone(self) -> Optional[str]:
+    def get_phone(self) -> str | None:
         primary_phone = self.data.get("primaryPhone")
         if primary_phone:
             return primary_phone.get("phone")
@@ -161,7 +159,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         return None
 
-    def get_address(self) -> Optional[dict]:
+    def get_address(self) -> dict | None:
         primary_address = self.data.get("primaryAddress")
         if primary_address:
             return primary_address
@@ -210,13 +208,13 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
         return None
 
-    def get_first_name(self) -> Optional[str]:
+    def get_first_name(self) -> str | None:
         return self.data.get("firstName")
 
-    def get_last_name(self) -> Optional[str]:
+    def get_last_name(self) -> str | None:
         return self.data.get("lastName")
 
-    def get_email(self) -> Optional[str]:
+    def get_email(self) -> str | None:
         primary_email = self.data.get("primaryEmail")
         if primary_email:
             return primary_email.get("email")

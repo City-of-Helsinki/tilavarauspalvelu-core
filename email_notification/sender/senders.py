@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from sentry_sdk import capture_message
@@ -19,9 +17,9 @@ class SendReservationEmailNotificationException(Exception):
 
 def send_reservation_email_notification(
     email_type: EmailType,
-    reservation: Optional[Reservation],
-    recipients: Optional[list[str]] = None,
-    context: Optional[EmailNotificationContext] = None,
+    reservation: Reservation | None,
+    recipients: list[str] | None = None,
+    context: EmailNotificationContext | None = None,
 ):
     if recipients is not None and len(recipients) > settings.EMAIL_MAX_RECIPIENTS:
         raise SendReservationEmailNotificationException(
