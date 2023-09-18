@@ -58,7 +58,7 @@ def get_product_mapping(product_id: UUID, get=_get) -> Product | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/product/{product_id}/mapping") as metric:
             response = get(
-                url=urljoin(_get_base_url(), f"{str(product_id)}/mapping"),
+                url=urljoin(_get_base_url(), f"{product_id!s}/mapping"),
                 headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
                 timeout=REQUEST_TIMEOUT_SECONDS,
             )

@@ -113,7 +113,7 @@ class Refund:
                 scope.set_extra("details", "Parsing refund failed")
                 scope.set_extra("json", json)
                 capture_exception(err)
-            raise ParseRefundError(f"Could not parse refund: {str(err)}") from err
+            raise ParseRefundError(f"Could not parse refund: {err!s}") from err
 
 
 @dataclass(frozen=True)
@@ -143,4 +143,4 @@ class RefundStatusResult:
                 scope.set_extra("details", "Parsing refund status failed")
                 scope.set_extra("json", json)
                 capture_exception(err)
-            raise ParseRefundStatusError(f"Could not parse refund status: {str(err)}") from err
+            raise ParseRefundStatusError(f"Could not parse refund status: {err!s}") from err

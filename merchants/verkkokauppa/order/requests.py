@@ -53,7 +53,7 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
             scope.set_extra("details", "Order creation failed")
             scope.set_extra("params", params)
             capture_exception(err)
-        raise CreateOrderError(f"Order creation failed: {str(err)}") from err
+        raise CreateOrderError(f"Order creation failed: {err!s}") from err
 
 
 def get_order(order_id: UUID, get=_get) -> Order:
@@ -80,14 +80,14 @@ def get_order(order_id: UUID, get=_get) -> Order:
             scope.set_extra("details", "Order retrieval failed")
             scope.set_extra("order-id", order_id)
             capture_exception(err)
-        raise GetOrderError(f"Order retrieval failed: {str(err)}") from err
+        raise GetOrderError(f"Order retrieval failed: {err!s}") from err
 
 
 def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Order | None:
     try:
         with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/order/{order_id}/cancel") as metric:
             response = post(
-                url=urljoin(_get_base_url(), f"{str(order_id)}/cancel"),
+                url=urljoin(_get_base_url(), f"{order_id!s}/cancel"),
                 headers={
                     "api-key": settings.VERKKOKAUPPA_API_KEY,
                     "user": str(user_uuid),
@@ -118,4 +118,4 @@ def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Order | None:
             scope.set_extra("details", "Order cancellation failed")
             scope.set_extra("order-id", order_id)
             capture_exception(err)
-        raise CancelOrderError(f"Order cancellation failed: {str(err)}") from err
+        raise CancelOrderError(f"Order cancellation failed: {err!s}") from err

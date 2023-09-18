@@ -97,6 +97,7 @@ select = [
     "E",        # pycodestyle errors
     "W",        # pycodestyle warnings
     "I",        # isort
+    "UP",       # pyupgrade
     "ISC",      # flake8-implicit-str-concat
     "S",        # flake8-bandit
     "C4",       # flake8-comprehensions
@@ -113,7 +114,7 @@ select = [
     "D202",     # pydocstyle: No blank lines allowed after function docstring (found {num_lines})
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
-    "UP",       # pyupgrade
+    "RUF010",   # Ruff-specific rules: Use explicit conversion flag
 ]
 ignore = [
     "S101",  # assert is fine.
