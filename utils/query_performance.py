@@ -78,8 +78,10 @@ class QueryPerformanceOptimizerMixin:
         return query
 
     @staticmethod
-    def _optimize_query_with_selected_child_elements(  # noqa: C901
-        children: list[Any], optimizations: dict[str, Any], queryset: QuerySet
+    def _optimize_query_with_selected_child_elements(
+        children: list[Any],
+        optimizations: dict[str, Any],
+        queryset: QuerySet,
     ) -> list[Any]:
         """Build and apply query optimization from graphql query selections"""
         annotations = []
@@ -200,7 +202,7 @@ class QueryPerformanceOptimizerMixin:
         )
 
     @staticmethod
-    def _handle_optimization(  # noqa: C901
+    def _handle_optimization(
         optimization_type: str,
         optimization_value: str | dict,
         child,

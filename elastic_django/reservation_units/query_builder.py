@@ -25,7 +25,7 @@ class ReservationUnitQueryBuilderMixin:
 
         q_str = f"((*{words[0].strip()}) "
 
-        for w in words[1 : len(words) - 1]:  # noqa: E203
+        for w in words[1 : len(words) - 1]:
             w.strip()
             q_str += f"AND ({w}) "
 
