@@ -103,7 +103,7 @@ class UnitImporter:
             created = self.create_unit(row)
             self._update_counters(created)
 
-        logger.info("Created %s\nUpdated %s" % (self.creation_counter, self.update_counter))
+        logger.info(f"Created {self.creation_counter}\nUpdated {self.update_counter}")
         if import_hauki_resource_ids:
             hauki_importer = UnitHaukiResourceIdImporter()
             logger.info("Importing from Hauki...")

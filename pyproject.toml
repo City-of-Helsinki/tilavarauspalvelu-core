@@ -108,13 +108,7 @@ select = [
     "D202",     # pydocstyle: No blank lines allowed after function docstring (found {num_lines})
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
-    "UP004",    # pyupgrade: Class {name} inherits from object
-    "UP006",    # pyupgrade: Use {to} instead of {from} for type annotation
-    "UP007",    # pyupgrade: Use X | Y for type annotations
-    "UP008",    # pyupgrade: Use super() instead of super(__class__, self)
-    "UP017",    # pyupgrade: Use datetime.UTC alias
-    "UP032",    # pyupgrade: Use f-string instead of format call
-    "UP035",    # pyupgrade: Import from {target} instead:
+    "UP",       # pyupgrade
 ]
 ignore = [
     "S101",  # assert is fine.

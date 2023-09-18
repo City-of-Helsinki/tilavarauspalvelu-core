@@ -22,7 +22,7 @@ class Paragraphs(NamedTuple):
 
 
 def pascal_case_to_snake_case(string: str) -> str:
-    return "".join(("_" + char.lower() if char.isupper() else char for char in string)).lstrip("_")
+    return "".join("_" + char.lower() if char.isupper() else char for char in string).lstrip("_")
 
 
 def as_p_tags(texts: list[str]) -> str:
