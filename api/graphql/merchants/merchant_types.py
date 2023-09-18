@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import graphene
 from django.conf import settings
@@ -77,7 +77,7 @@ class PaymentOrderType(AuthNode, PrimaryKeyObjectType):
         if self.status != OrderStatus.DRAFT:
             return None
 
-        now = datetime.now(tz=timezone.utc).astimezone(get_default_timezone())
+        now = datetime.now(tz=UTC).astimezone(get_default_timezone())
         expired = now - timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
 
         if self.created_at > expired:
