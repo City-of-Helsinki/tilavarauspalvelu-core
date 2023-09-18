@@ -78,10 +78,10 @@ const NotificationsListItem = ({
   let notificationType: NotificationType = "info" as const;
   switch (notification.level) {
     case "EXCEPTION":
-      notificationType = "alert";
+      notificationType = "error";
       break;
     case "WARNING":
-      notificationType = "error";
+      notificationType = "alert";
       break;
     default:
       notificationType = "info";
@@ -131,10 +131,10 @@ const BannerNotificationsList = ({
 
   // Separate notifications by level
   const errorNotificationsList = notificationsList.filter(
-    (item) => item?.level === "WARNING"
+    (item) => item?.level === "EXCEPTION"
   );
   const alertNotificationsList = notificationsList.filter(
-    (item) => item?.level === "EXCEPTION"
+    (item) => item?.level === "WARNING"
   );
   const infoNotificationsList = notificationsList.filter(
     (item) => item?.level === "NORMAL"
