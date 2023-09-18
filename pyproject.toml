@@ -114,6 +114,7 @@ select = [
     "UP008",    # pyupgrade: Use super() instead of super(__class__, self)
     "UP017",    # pyupgrade: Use datetime.UTC alias
     "UP032",    # pyupgrade: Use f-string instead of format call
+    "UP035",    # pyupgrade: Import from {target} instead:
 ]
 ignore = [
     "S101",  # assert is fine.

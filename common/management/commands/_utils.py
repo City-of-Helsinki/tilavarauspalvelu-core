@@ -1,6 +1,7 @@
 import random
+from collections.abc import Callable, Generator, Sequence
 from functools import wraps
-from typing import Any, Callable, Generator, NamedTuple, ParamSpec, Sequence, TypeVar
+from typing import Any, NamedTuple, ParamSpec, TypeVar
 
 from faker import Faker
 
