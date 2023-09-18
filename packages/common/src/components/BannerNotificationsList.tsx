@@ -42,6 +42,12 @@ const BannerNotificationBackground = styled.div`
 
 const BannerNotificationText = styled.span`
   font-size: var(--fontsize-body-m);
+  p {
+    display: inline;
+  }
+  a {
+    text-decoration: underline;
+  }
   @media (width < ${breakpoints.xl}) {
     padding-right: var(--spacing-l);
   }
@@ -94,9 +100,14 @@ const NotificationsListItem = ({
         {notification.activeFrom && (
           <BannerNotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</BannerNotificationDate>
         )}
-        <BannerNotificationText>
-          {notification && getTranslation(notification, "message")}
-        </BannerNotificationText>
+        {notification && (
+          <BannerNotificationText
+            dangerouslySetInnerHTML={{
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              __html: getTranslation(notification, "message"),
+            }}
+          />
+        )}
         <BannerCloseButton
           onClick={() => handleCloseButtonClick(notification.id ?? "")}
         >
