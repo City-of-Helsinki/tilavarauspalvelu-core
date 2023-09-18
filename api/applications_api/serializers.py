@@ -318,10 +318,12 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
     def get_purpose_name(self, obj):
         if obj.purpose:
             return obj.purpose.name
+        return None
 
     def get_ability_group_name(self, obj):
         if obj.ability_group:
             return obj.ability_group.name
+        return None
 
     def validate(self, data):
         min_duration = data["min_duration"]
@@ -477,6 +479,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 instance=Organisation.objects.get(pk=organisation_data["id"]),
                 validated_data=organisation_data,
             )
+        return None
 
     def handle_billing_address(self, billing_address_data: dict[Any, Any]):
         if "id" not in billing_address_data or billing_address_data["id"] is None:

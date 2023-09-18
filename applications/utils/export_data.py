@@ -47,7 +47,7 @@ class ApplicationDataExporter:
         )
 
     @classmethod
-    def export_application_data(cls, application_round: int) -> Path:
+    def export_application_data(cls, application_round: int) -> Path | None:
         now = timezone.now()
         root = settings.BASE_DIR
         path = root / "exports" / "applications"
@@ -196,6 +196,7 @@ class ApplicationDataExporter:
                     applications_writer.writerow(row)
 
                 return path / file_name
+        return None
 
     @staticmethod
     def _write_header_row(applications_writer, spaces_count):

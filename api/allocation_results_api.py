@@ -110,6 +110,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
     def get_applicant_name(self, instance):
         if instance.application_event_schedule.application_event.application.user:
             return instance.application_event_schedule.application_event.application.user.get_full_name()
+        return None
 
     def get_basket_name(self, instance):
         if instance.basket:

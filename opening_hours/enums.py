@@ -122,6 +122,7 @@ class Weekday(Enum):
         for member in cls.__members__.values():
             if member.value == iso_weekday_num:
                 return member
+        return None
 
 
 class ResourceType(Enum):

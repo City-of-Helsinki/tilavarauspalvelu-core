@@ -159,6 +159,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     def get_application_event_name(self, instance):
         if instance.recurring_reservation:
             return instance.recurring_reservation.application_event.name
+        return None
 
     def get_reservation_user(self, instance):
         if not instance.recurring_reservation:
@@ -355,6 +356,7 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
         purpose = instance.application_event.purpose
         if purpose:
             return purpose.name
+        return None
 
     def get_group_size(self, instance):
         return instance.application_event.num_persons
