@@ -262,7 +262,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         : null;
     const input = pick(
       {
-        ...omitBy(state.reservationUnitEdit, (v) => v === ""),
+        ...state.reservationUnitEdit,
         surfaceArea,
         ...(publish != null ? { isDraft: !publish } : {}),
         reservationStartInterval:
