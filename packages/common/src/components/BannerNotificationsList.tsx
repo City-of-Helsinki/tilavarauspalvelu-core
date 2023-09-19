@@ -111,7 +111,11 @@ const NotificationsListItem = ({
           />
         )}
         <BannerCloseButton
-          onClick={() => handleCloseButtonClick(notification.id ?? "")}
+          onClick={() =>
+            handleCloseButtonClick(
+              notification.id + (notification.activeFrom ?? "")
+            )
+          }
         >
           <IconCross size="s" />
         </BannerCloseButton>
@@ -161,7 +165,7 @@ const BannerNotificationsList = ({
   const displayedNotificationsList = groupedNotificationsList.filter(
     (item) =>
       closedNotificationsList != null &&
-      !closedNotificationsList.includes(String(item?.id ?? 0)) &&
+      !closedNotificationsList.includes(String(item.id + item.activeFrom)) &&
       targetList.map((t) => t === item?.target).includes(true)
   );
 
