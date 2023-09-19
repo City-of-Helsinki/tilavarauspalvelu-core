@@ -6,6 +6,7 @@ export const CURRENT_USER = gql`
       pk
       firstName
       lastName
+      email
     }
   }
 `;
@@ -16,6 +17,7 @@ export const CURRENT_USER_GLOBAL = gql`
       pk
       firstName
       lastName
+      email
     }
   }
 `;

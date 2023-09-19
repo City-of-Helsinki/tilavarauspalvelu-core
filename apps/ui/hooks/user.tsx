@@ -9,9 +9,9 @@ type Props = {
 
 export const useCurrentUser = ({
   global,
-}: Props): {
-  currentUser: UserType | null;
-  error: ApolloError;
+}: Props = { global: false }): {
+  currentUser: UserType | undefined;
+  error: ApolloError | undefined;
   loading: boolean;
 } => {
   const query = global ? CURRENT_USER_GLOBAL : CURRENT_USER;
@@ -28,7 +28,7 @@ export const useCurrentUser = ({
   });
 
   return {
-    currentUser: data?.currentUser,
+    currentUser: data?.currentUser ?? undefined,
     error,
     loading,
   };
