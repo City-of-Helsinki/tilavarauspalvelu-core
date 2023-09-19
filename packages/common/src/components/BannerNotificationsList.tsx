@@ -34,6 +34,9 @@ const BannerNotificationBackground = styled.div`
   display: flex;
   section {
     border-bottom: 1px solid var(--notification-border-color);
+    [class*="PageWrapper__Content"] & {
+      padding-right: var(--spacing-2-xl);
+    }
   }
   > div {
     width: 100%;
@@ -42,6 +45,12 @@ const BannerNotificationBackground = styled.div`
 
 const BannerNotificationText = styled.span`
   font-size: var(--fontsize-body-m);
+  p {
+    display: inline;
+  }
+  a {
+    text-decoration: underline;
+  }
   @media (width < ${breakpoints.xl}) {
     padding-right: var(--spacing-l);
   }
@@ -56,10 +65,9 @@ const BannerNotificationDate = styled.span`
 const BannerCloseButton = styled.button`
   position: absolute;
   top: var(--spacing-m);
-  right: var(--spacing-m);
+  right: 0;
   transform: translateY(-50%);
   padding: var(--spacing-xs);
-  padding-right: 0;
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -78,10 +86,10 @@ const NotificationsListItem = ({
   let notificationType: NotificationType = "info" as const;
   switch (notification.level) {
     case "EXCEPTION":
-      notificationType = "alert";
+      notificationType = "error";
       break;
     case "WARNING":
-      notificationType = "error";
+      notificationType = "alert";
       break;
     default:
       notificationType = "info";
@@ -93,13 +101,24 @@ const NotificationsListItem = ({
     <BannerNotificationBackground>
       <NotificationWrapper type={notificationType} centered={centered}>
         {notification.activeFrom && (
-          <BannerNotificationDate>{`${displayDate.getDate()}.${displayDate.getMonth()}.`}</BannerNotificationDate>
+          <BannerNotificationDate>
+            {`${displayDate.getDate()}.${displayDate.getMonth() + 1}.`}
+          </BannerNotificationDate>
         )}
-        <BannerNotificationText>
-          {notification && getTranslation(notification, "message")}
-        </BannerNotificationText>
+        {notification && (
+          <BannerNotificationText
+            dangerouslySetInnerHTML={{
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              __html: getTranslation(notification, "message"),
+            }}
+          />
+        )}
         <BannerCloseButton
-          onClick={() => handleCloseButtonClick(notification.id ?? "")}
+          onClick={() =>
+            handleCloseButtonClick(
+              notification.id + (notification.activeFrom ?? "")
+            )
+          }
         >
           <IconCross size="s" />
         </BannerCloseButton>
@@ -131,10 +150,10 @@ const BannerNotificationsList = ({
 
   // Separate notifications by level
   const errorNotificationsList = notificationsList.filter(
-    (item) => item?.level === "WARNING"
+    (item) => item?.level === "EXCEPTION"
   );
   const alertNotificationsList = notificationsList.filter(
-    (item) => item?.level === "EXCEPTION"
+    (item) => item?.level === "WARNING"
   );
   const infoNotificationsList = notificationsList.filter(
     (item) => item?.level === "NORMAL"
@@ -149,7 +168,7 @@ const BannerNotificationsList = ({
   const displayedNotificationsList = groupedNotificationsList.filter(
     (item) =>
       closedNotificationsList != null &&
-      !closedNotificationsList.includes(String(item?.id ?? 0)) &&
+      !closedNotificationsList.includes(String(item.id + item.activeFrom)) &&
       targetList.map((t) => t === item?.target).includes(true)
   );
 
