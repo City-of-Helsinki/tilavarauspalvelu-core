@@ -61,7 +61,7 @@ class EmailTemplateAdminForm(ModelForm):
             existing_types = existing_types.exclude(type=self.instance.type)
 
         available_types = [(value, label) for value, label in EmailType.choices if value not in existing_types]
-        self.fields["type"].choices = [(value, label) for value, label in available_types]
+        self.fields["type"].choices = list(available_types)
         self.test_context = EmailNotificationContext.with_mock_data().__dict__
 
     def get_validated_field(self, field):
