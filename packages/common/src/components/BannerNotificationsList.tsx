@@ -34,6 +34,9 @@ const BannerNotificationBackground = styled.div`
   display: flex;
   section {
     border-bottom: 1px solid var(--notification-border-color);
+    [class*="PageWrapper__Content"] & {
+      padding-right: var(--spacing-2-xl);
+    }
   }
   > div {
     width: 100%;
