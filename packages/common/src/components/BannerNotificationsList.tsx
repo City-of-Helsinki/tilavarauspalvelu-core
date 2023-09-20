@@ -6,7 +6,6 @@ import { useQuery } from "@apollo/client";
 import NotificationWrapper from "./NotificationWrapper";
 import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
-import { fontBold } from "../common/typography";
 import { BannerNotificationType, Query } from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
@@ -56,12 +55,6 @@ const BannerNotificationText = styled.span`
   }
 `;
 
-const BannerNotificationDate = styled.span`
-  margin-right: 0.25rem;
-  font-size: var(--fontsize-body-m);
-  ${fontBold}
-`;
-
 const BannerCloseButton = styled.button`
   position: absolute;
   top: var(--spacing-m);
@@ -82,7 +75,6 @@ const NotificationsListItem = ({
   closedArray,
   centered,
 }: BannerNotificationItemProps) => {
-  const displayDate = new Date(notification.activeFrom || "");
   let notificationType: NotificationType = "info" as const;
   switch (notification.level) {
     case "EXCEPTION":
@@ -100,11 +92,6 @@ const NotificationsListItem = ({
   return (
     <BannerNotificationBackground>
       <NotificationWrapper type={notificationType} centered={centered}>
-        {notification.activeFrom && (
-          <BannerNotificationDate>
-            {`${displayDate.getDate()}.${displayDate.getMonth() + 1}.`}
-          </BannerNotificationDate>
-        )}
         {notification && (
           <BannerNotificationText
             dangerouslySetInnerHTML={{
