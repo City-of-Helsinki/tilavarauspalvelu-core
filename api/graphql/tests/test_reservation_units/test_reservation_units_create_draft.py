@@ -113,7 +113,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(content.get("data").get("createReservationUnit").get("pk")).is_not_none()
 
         created_unit = ReservationUnit.objects.get(pk=content.get("data").get("createReservationUnit").get("pk"))
-        unit_payment_type_codes = list(map(lambda ptype: ptype.code, created_unit.payment_types.all()))
+        unit_payment_type_codes = [ptype.code for ptype in created_unit.payment_types.all()]
         assert_that(created_unit).is_not_none()
         assert_that(unit_payment_type_codes).contains_only(PaymentType.ON_SITE.value, PaymentType.INVOICE.value)
 
