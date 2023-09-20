@@ -87,11 +87,11 @@ class UnitImporterBaseTestCase(TestCase):
 class UnitImporterTestCase(UnitImporterBaseTestCase):
     def test_importer_creates_units(self, mock_response):
         self.importer.import_units()
-        assert 2 == Unit.objects.count()
+        assert Unit.objects.count() == 2
 
     def test_importer_creates_locations(self, mock_response):
         self.importer.import_units()
-        assert 2 == Location.objects.count()
+        assert Location.objects.count() == 2
 
     def test_importer_creates_a_units_with_correct_values(self, mock_response):
         self.importer.import_units()
@@ -109,7 +109,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
 
     def test_importer_updates_existing_unit(self, mock_response):
         self.importer.import_units()
-        assert 2 == Unit.objects.count()
+        assert Unit.objects.count() == 2
 
         unit = Unit.objects.get(tprek_id=1)
         location = Location.objects.get(unit=unit)
@@ -137,7 +137,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
         mock_response.return_value = mocked_response
 
         self.importer.import_units()
-        assert 2 == Unit.objects.count()
+        assert Unit.objects.count() == 2
 
         unit.refresh_from_db()
         location.refresh_from_db()
