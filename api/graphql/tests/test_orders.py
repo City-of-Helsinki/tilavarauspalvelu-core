@@ -1,6 +1,5 @@
 import json
-from datetime import datetime, timedelta, timezone
-from typing import Dict, Optional
+from datetime import UTC, datetime, timedelta
 from unittest import mock
 from uuid import UUID
 
@@ -18,7 +17,7 @@ from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from reservations.models import STATE_CHOICES
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 
-NOW = datetime(2023, 5, 10, 13, 0, 0, tzinfo=timezone.utc).astimezone(get_default_timezone())
+NOW = datetime(2023, 5, 10, 13, 0, 0, tzinfo=UTC).astimezone(get_default_timezone())
 
 
 @freezegun.freeze_time(NOW)
@@ -39,7 +38,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
 
     @classmethod
-    def get_order_query(cls, order_uuid: Optional[str] = None) -> str:
+    def get_order_query(cls, order_uuid: str | None = None) -> str:
         if not order_uuid:
             order_uuid = cls.order.remote_id
 
@@ -171,7 +170,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             """
 
     @classmethod
-    def get_valid_data(cls) -> Dict[str, str]:
+    def get_valid_data(cls) -> dict[str, str]:
         return {"orderUuid": str(cls.payment_order.remote_id)}
 
     def test_payment_order_not_found_returns_error(self):

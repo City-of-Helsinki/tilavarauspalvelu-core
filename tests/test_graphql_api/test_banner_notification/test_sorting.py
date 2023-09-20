@@ -71,19 +71,18 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
     # when:
     # - User requests all banner notifications in the given order
     response = graphql(
-        """
-        query {
-          bannerNotifications(orderBy: "%s") {
-            edges {
-              node {
+        f"""
+        query {{
+          bannerNotifications(orderBy: "{order_by}") {{
+            edges {{
+              node {{
                 message
                 state
-              }
-            }
-          }
-        }
-        """
-        % (order_by,),
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:
@@ -133,19 +132,18 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
     # when:
     # - User requests all banner notifications in the given order
     response = graphql(
-        """
-        query {
-          bannerNotifications(orderBy: "%s") {
-            edges {
-              node {
+        f"""
+        query {{
+          bannerNotifications(orderBy: "{order_by}") {{
+            edges {{
+              node {{
                 message
                 name
-              }
-            }
-          }
-        }
-        """
-        % (order_by,),
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:
@@ -204,19 +202,18 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
     # when:
     # - User requests all banner notifications in the given order
     response = graphql(
-        """
-        query {
-          bannerNotifications(orderBy: "%s") {
-            edges {
-              node {
+        f"""
+        query {{
+          bannerNotifications(orderBy: "{order_by}") {{
+            edges {{
+              node {{
                 message
                 activeFrom
-              }
-            }
-          }
-        }
-        """
-        % (order_by,),
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:
@@ -275,19 +272,18 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
     # when:
     # - User requests all banner notifications in the given order
     response = graphql(
-        """
-        query {
-          bannerNotifications(orderBy: "%s") {
-            edges {
-              node {
+        f"""
+        query {{
+          bannerNotifications(orderBy: "{order_by}") {{
+            edges {{
+              node {{
                 message
                 activeUntil
-              }
-            }
-          }
-        }
-        """
-        % (order_by,),
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:
@@ -341,19 +337,18 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
     # when:
     # - User requests all banner notifications in the given order
     response = graphql(
-        """
-        query {
-          bannerNotifications(orderBy: "%s") {
-            edges {
-              node {
+        f"""
+        query {{
+          bannerNotifications(orderBy: "{order_by}") {{
+            edges {{
+              node {{
                 message
                 target
-              }
-            }
-          }
-        }
-        """
-        % (order_by,),
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:
@@ -407,19 +402,18 @@ def test_sort_banner_notifications_by_level(graphql, order_by, expected):
     # when:
     # - User requests all banner notifications in the given order
     response = graphql(
-        """
-        query {
-          bannerNotifications(orderBy: "%s") {
-            edges {
-              node {
+        f"""
+        query {{
+          bannerNotifications(orderBy: "{order_by}") {{
+            edges {{
+              node {{
                 message
                 level
-              }
-            }
-          }
-        }
-        """
-        % (order_by,),
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:

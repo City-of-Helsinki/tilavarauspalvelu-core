@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 from uuid import UUID
 
 from assertpy import assert_that
@@ -16,7 +16,7 @@ from merchants.verkkokauppa.merchants.types import (
 
 
 class MerchantTypesBaseTestCase(TestCase):
-    mutation_merchant_response: Dict[str, Any] = {
+    mutation_merchant_response: dict[str, Any] = {
         "merchantId": "7107df38-5985-39c9-8c83-ffe18bff24f5",
         "namespace": "tilanvaraus",
         "createdAt": "2022-09-26T10:11:12.000",
@@ -49,7 +49,7 @@ class MerchantTypesBaseTestCase(TestCase):
         ],
     }
 
-    get_merchant_response: Dict[str, Any] = {
+    get_merchant_response: dict[str, Any] = {
         "merchantName": "Test Merchant",
         "merchantStreet": "Test Street 1",
         "merchantZip": "00112",

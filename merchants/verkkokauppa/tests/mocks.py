@@ -1,21 +1,21 @@
 from functools import partial
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import Mock
 
 from requests import Response
 
 
 class MockResponse(Response):
-    def __init__(self, json: Dict[str, Any], status_code: int) -> None:
+    def __init__(self, json: dict[str, Any], status_code: int) -> None:
         super().__init__()
         self._json = json
         self.status_code = status_code
 
-    def json(self, *args, **kwargs) -> Dict[str, Any]:
+    def json(self, *args, **kwargs) -> dict[str, Any]:
         return self._json
 
 
-def _mock_response(json: Dict[str, Any], status_code: int) -> Mock:
+def _mock_response(json: dict[str, Any], status_code: int) -> Mock:
     return Mock(return_value=MockResponse(json, status_code))
 
 

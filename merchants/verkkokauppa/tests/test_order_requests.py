@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict
+from typing import Any
 from unittest import mock
 from unittest.mock import Mock
 from urllib.parse import urljoin
@@ -74,7 +74,7 @@ class OrderRequestsTestCaseBase(TestCase):
         ),
     )
 
-    create_order_response: Dict[str, Any] = {
+    create_order_response: dict[str, Any] = {
         "orderId": "79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "createdAt": "2021-11-12T12:40:41.873597",
         "namespace": "test-namespace",
@@ -129,7 +129,7 @@ class OrderRequestsTestCaseBase(TestCase):
         "priceTotal": "124",
     }
 
-    get_order_response: Dict[str, Any] = {
+    get_order_response: dict[str, Any] = {
         "orderId": "79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "namespace": "test-namespace",
         "user": "test-user",
@@ -186,9 +186,9 @@ class OrderRequestsTestCaseBase(TestCase):
         "merchant": {},
     }
 
-    get_order_404_response: Dict[str, Any] = {"errors": [{"code": "order-not-found", "message": "Order not found"}]}
+    get_order_404_response: dict[str, Any] = {"errors": [{"code": "order-not-found", "message": "Order not found"}]}
 
-    cancel_order_response: Dict[str, Any] = {
+    cancel_order_response: dict[str, Any] = {
         "order": {
             "orderId": "f8477bab-26c6-38de-a74b-692e729bae05",
             "namespace": "tilanvaraus",

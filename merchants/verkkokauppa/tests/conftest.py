@@ -1,5 +1,3 @@
-from typing import Dict
-
 from pytest import fixture
 
 from merchants.verkkokauppa.product.types import CreateProductParams
@@ -25,7 +23,7 @@ def create_product_params() -> CreateProductParams:
 
 
 @fixture
-def response() -> Dict[str, str]:
+def response() -> dict[str, str]:
     return {
         "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
         "namespace": "test-namespace",

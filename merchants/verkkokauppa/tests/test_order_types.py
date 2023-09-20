@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict
+from typing import Any
 from uuid import UUID
 
 from assertpy import assert_that
@@ -69,7 +69,7 @@ class OrderTypesTestCase(TestCase):
         ),
     )
 
-    create_order_response: Dict[str, Any] = {
+    create_order_response: dict[str, Any] = {
         "orderId": "79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "createdAt": "2021-11-12T12:40:41.873597",
         "namespace": "test-namespace",

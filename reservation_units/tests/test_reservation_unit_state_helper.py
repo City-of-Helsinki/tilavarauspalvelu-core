@@ -16,7 +16,7 @@ class ReservationUnitStateHelperTestCase(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.reservation_unit: ReservationUnit = ReservationUnitFactory()
-        cls.now = datetime.datetime.now(tz=datetime.timezone.utc)
+        cls.now = datetime.datetime.now(tz=datetime.UTC)
 
     def test_get_state_with_archived(self):
         self.reservation_unit.is_archived = True

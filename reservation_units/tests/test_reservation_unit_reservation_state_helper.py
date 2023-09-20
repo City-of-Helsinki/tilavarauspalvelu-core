@@ -16,7 +16,7 @@ class ReservationUnitReservationStateHelperTestCase(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.reservation_unit: ReservationUnit = ReservationUnitFactory()
-        cls.now = datetime.datetime.now(tz=datetime.timezone.utc)
+        cls.now = datetime.datetime.now(tz=datetime.UTC)
 
     def test_get_state_with_scheduled_reservation(self):
         self.reservation_unit.reservation_begins = self.now + datetime.timedelta(days=1)

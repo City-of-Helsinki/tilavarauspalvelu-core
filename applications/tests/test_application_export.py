@@ -1,7 +1,7 @@
 import csv
 import shutil
 from datetime import datetime, time, timedelta
-from typing import Any, List
+from typing import Any
 
 import pytest
 from assertpy import assert_that
@@ -96,8 +96,8 @@ class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
         return f"application_data_round_{round}_{datetime.now().strftime('%d-%m-%Y')}.csv"
 
     @classmethod
-    def _test_first_data_line(cls, file_name: str, expected_row: List[Any]):
-        with open(cls.export_dir / file_name, "r") as data_file:
+    def _test_first_data_line(cls, file_name: str, expected_row: list[Any]):
+        with open(cls.export_dir / file_name) as data_file:
             data_reader = csv.reader(data_file)
 
             for i, line in enumerate(data_reader):

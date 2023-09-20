@@ -23,7 +23,7 @@ class ReservationUnitImageCreateTestCase(GrapheneTestCaseBase, GraphQLFileUpload
         super().setUpTestData()
         cls.file_to_upload = SimpleUploadedFile(
             name="eltest.png",
-            content="lostest".encode("utf-8"),
+            content=b"lostest",
             content_type="image/png",
         )
 
@@ -72,7 +72,7 @@ class ReservationUnitImageCreateTestCase(GrapheneTestCaseBase, GraphQLFileUpload
     def test_upload_file_not_an_image_fails(self):
         file_to_upload = SimpleUploadedFile(
             name="eltest.xsl",
-            content="lostest".encode("utf-8"),
+            content=b"lostest",
             content_type="application/pdf",
         )
 

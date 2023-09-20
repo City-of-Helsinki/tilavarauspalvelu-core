@@ -1,6 +1,7 @@
+from collections.abc import Iterable
 from datetime import date
 from decimal import Decimal
-from typing import Any, Iterable, Optional
+from typing import Any
 
 import factory
 from factory import fuzzy
@@ -55,7 +56,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     unit = factory.SubFactory("tests.factories.UnitFactory")
 
     @factory.post_generation
-    def spaces(self, create: bool, spaces: Optional[Iterable[Space]], **kwargs: Any) -> None:
+    def spaces(self, create: bool, spaces: Iterable[Space] | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -66,7 +67,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
             self.spaces.add(space)
 
     @factory.post_generation
-    def resources(self, create: bool, resources: Optional[Iterable[Resource]], **kwargs: Any) -> None:
+    def resources(self, create: bool, resources: Iterable[Resource] | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -77,7 +78,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
             self.resources.add(resource)
 
     @factory.post_generation
-    def services(self, create: bool, services: Optional[Iterable[Service]], **kwargs: Any) -> None:
+    def services(self, create: bool, services: Iterable[Service] | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -88,7 +89,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
             self.services.add(service)
 
     @factory.post_generation
-    def purposes(self, create: bool, purposes: Optional[Iterable[Purpose]], **kwargs: Any) -> None:
+    def purposes(self, create: bool, purposes: Iterable[Purpose] | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -99,7 +100,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
             self.purposes.add(purpose)
 
     @factory.post_generation
-    def equipments(self, create: bool, equipments: Optional[Iterable[Equipment]], **kwargs: Any) -> None:
+    def equipments(self, create: bool, equipments: Iterable[Equipment] | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -110,7 +111,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
             self.equipments.add(equipment)
 
     @factory.post_generation
-    def qualifiers(self, create: bool, qualifiers: Optional[Iterable[Qualifier]], **kwargs: Any) -> None:
+    def qualifiers(self, create: bool, qualifiers: Iterable[Qualifier] | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -121,7 +122,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
             self.qualifiers.add(qualifier)
 
     @factory.post_generation
-    def pricings(self, create: bool, pricings: Optional[Iterable[ReservationUnitPricing]], **kwargs: Any) -> None:
+    def pricings(self, create: bool, pricings: Iterable[ReservationUnitPricing] | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -135,7 +136,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     def payment_types(
         self,
         create: bool,
-        payment_types: Optional[Iterable[ReservationUnitPaymentType]],
+        payment_types: Iterable[ReservationUnitPaymentType] | None,
         **kwargs: Any,
     ) -> None:
         if not create:
@@ -150,7 +151,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     # TODO: These should be SubFactories but some test might be expecting None for the respective fields
 
     @factory.post_generation
-    def payment_terms(self, create: bool, terms: Optional[TermsOfUse], **kwargs: Any) -> None:
+    def payment_terms(self, create: bool, terms: TermsOfUse | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -161,7 +162,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         self.payment_terms = terms
 
     @factory.post_generation
-    def cancellation_terms(self, create: bool, terms: Optional[TermsOfUse], **kwargs: Any) -> None:
+    def cancellation_terms(self, create: bool, terms: TermsOfUse | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -172,7 +173,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         self.cancellation_terms = terms
 
     @factory.post_generation
-    def service_specific_terms(self, create: bool, terms: Optional[TermsOfUse], **kwargs: Any) -> None:
+    def service_specific_terms(self, create: bool, terms: TermsOfUse | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -183,7 +184,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         self.service_specific_terms = terms
 
     @factory.post_generation
-    def pricing_terms(self, create: bool, terms: Optional[TermsOfUse], **kwargs: Any) -> None:
+    def pricing_terms(self, create: bool, terms: TermsOfUse | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -194,7 +195,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         self.pricing_terms = terms
 
     @factory.post_generation
-    def cancellation_rule(self, create: bool, rule: Optional[ReservationUnitCancellationRule], **kwargs: Any) -> None:
+    def cancellation_rule(self, create: bool, rule: ReservationUnitCancellationRule | None, **kwargs: Any) -> None:
         if not create:
             return
 
@@ -204,7 +205,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         self.cancellation_rule = rule
 
     @factory.post_generation
-    def metadata_set(self, create: bool, meta: Optional[ReservationMetadataSet], **kwargs: Any) -> None:
+    def metadata_set(self, create: bool, meta: ReservationMetadataSet | None, **kwargs: Any) -> None:
         if not create:
             return
 

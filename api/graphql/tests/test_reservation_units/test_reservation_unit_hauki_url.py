@@ -46,16 +46,13 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         res_unit_id = res_unit_id or self.reservation_unit.id
 
-        return """
-            query {
-                reservationUnitHaukiUrl(pk: %s reservationUnits: [%s]) {
+        return f"""
+            query {{
+                reservationUnitHaukiUrl(pk: {res_unit_id} reservationUnits: [{target_res_units}]) {{
                     url
-                }
-            }
-        """ % (
-            res_unit_id,
-            target_res_units,
-        )
+                }}
+            }}
+        """
 
     def test_admin_can_get_the_url(self):
         self.maxDiff = None

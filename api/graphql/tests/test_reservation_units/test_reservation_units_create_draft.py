@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any
 from unittest import mock
 
 from assertpy import assert_that
@@ -12,7 +12,7 @@ from reservation_units.models import PaymentType, ReservationUnit
 
 
 class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase):
-    def get_valid_data(self) -> Dict[str, Any]:
+    def get_valid_data(self) -> dict[str, Any]:
         return {
             "isDraft": True,
             "nameFi": "Resunit name",
