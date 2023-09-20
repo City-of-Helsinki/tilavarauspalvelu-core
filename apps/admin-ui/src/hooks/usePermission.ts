@@ -1,17 +1,11 @@
-import { useSuspenseQuery, useQuery } from "@apollo/client";
 import { useSession } from "app/hooks/auth";
-import {
-  type Query,
-  type ReservationType,
-  type UserType,
-} from "common/types/gql-types";
+import { type ReservationType, type UserType } from "common/types/gql-types";
 import {
   hasPermission as baseHasPermission,
   hasSomePermission as baseHasSomePermission,
   hasAnyPermission as baseHasAnyPermission,
   Permission,
 } from "app/modules/permissionHelper";
-import { CURRENT_USER } from "app/context/queries";
 
 const hasPermission = (
   user: UserType | undefined,
@@ -49,20 +43,15 @@ const hasPermission = (
 
 /// @returns {user, hasPermission, hasSomePermission, hasAnyPermission}
 const usePermission = () => {
-  const { isAuthenticated } = useSession();
-  const { data, error } = useQuery<Query>(CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
-
-  const user = data?.currentUser ?? undefined;
+  const { user } = useSession();
 
   const hasSomePermission = (permissionName: Permission) => {
-    if (!isAuthenticated || error || !user) return false;
+    if (!user) return false;
     return baseHasSomePermission(user, permissionName);
   };
 
   const hasAnyPermission = () => {
-    if (!isAuthenticated || error || !user) return false;
+    if (!user) return false;
     return baseHasAnyPermission(user);
   };
 
@@ -82,19 +71,16 @@ const usePermission = () => {
 // Suspended version should be used sparingly because it has to be wrapped in a Suspense component
 // and if not it can go to infinite loops or crash.
 const usePermissionSuspended = () => {
-  const { isAuthenticated } = useSession();
-  const { data, error } = useSuspenseQuery<Query>(CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
+  // TODO should this be suspended? doesn't seem to need it
+  const { user } = useSession();
 
-  const user = data?.currentUser ?? undefined;
   const hasSomePermission = (permissionName: Permission) => {
-    if (!isAuthenticated || error || !user) return false;
+    if (!user) return false;
     return baseHasSomePermission(user, permissionName);
   };
 
   const hasAnyPermission = () => {
-    if (!isAuthenticated || error || !user) return false;
+    if (!user) return false;
     return baseHasAnyPermission(user);
   };
 

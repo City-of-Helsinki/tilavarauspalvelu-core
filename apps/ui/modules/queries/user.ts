@@ -11,13 +11,3 @@ export const CURRENT_USER = gql`
   }
 `;
 
-export const CURRENT_USER_GLOBAL = gql`
-  query getCurrentUserGlobal {
-    currentUser {
-      pk
-      firstName
-      lastName
-      email
-    }
-  }
-`;

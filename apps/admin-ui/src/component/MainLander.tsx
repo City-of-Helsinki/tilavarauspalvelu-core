@@ -67,9 +67,7 @@ function MainLander() {
     <>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{t("common.applicationName")}</Heading>
-        <LoginBtn onClick={signIn}>
-          {t("Navigation.login")}
-        </LoginBtn>
+        <LoginBtn onClick={signIn}>{t("Navigation.login")}</LoginBtn>
       </KorosHeading>
       <Content>
         <Ingress>{t("MainLander.ingress")}</Ingress>

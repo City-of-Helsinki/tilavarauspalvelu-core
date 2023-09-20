@@ -3,6 +3,7 @@ import camelCase from "lodash/camelCase";
 import { secondsToHms } from "common/src/common/util";
 import {
   ApplicationRound,
+  Language,
   OptionType,
   PendingReservation,
 } from "common/types/common";
@@ -352,7 +353,7 @@ export const getReservationValue = (
     case "homeCity":
       return (
         getTranslation(reservation.homeCity, "name") ||
-        reservation.homeCity.name
+        reservation.homeCity?.name || null
       );
     default:
       return reservation[key] ?? null;
@@ -360,24 +361,24 @@ export const getReservationValue = (
 };
 
 export const getCheckoutUrl = (
-  order: PaymentOrderType,
-  lang: string
-): string | null => {
+  order?: PaymentOrderType,
+  lang: string = "fi"
+): string | undefined => {
   const { checkoutUrl } = order ?? {};
 
-  if (!checkoutUrl) return null;
+  if (!checkoutUrl) {
+    return undefined;
+  }
 
   try {
     const { origin, pathname, searchParams } = new URL(checkoutUrl) || {};
     const userId = searchParams?.get("user");
 
-    if (checkoutUrl && userId && origin && pathname && lang) {
+    if (userId && lang) {
       const baseUrl = `${origin}${pathname}`;
       return `${baseUrl}/paymentmethod?user=${userId}&lang=${lang}`;
     }
-
-    return null;
   } catch (e) {
-    return null;
   }
+  return undefined;
 };

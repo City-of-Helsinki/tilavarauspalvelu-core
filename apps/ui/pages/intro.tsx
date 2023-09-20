@@ -1,5 +1,5 @@
 import { Notification, Select } from "hds-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { Application, OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryApplicationRoundsArgs } from "common/types/gql-types";
-import { signIn, useSession } from "~/hooks/auth";
+import { useSession } from "~/hooks/auth";
 import { saveApplication } from "../modules/api";
 import { applicationRoundState, deepCopy } from "../modules/util";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
@@ -72,21 +72,23 @@ const IntroPage = (): JSX.Element => {
     fetchPolicy: "no-cache",
     onCompleted: (data) => {
       const now = new Date();
-      const ars = data?.applicationRounds?.edges
-        ?.map((n) => n.node)
-        .filter(
-          (ar) =>
-            new Date(ar.publicDisplayBegin) <= now &&
-            new Date(ar.publicDisplayEnd) >= now &&
-            applicationRoundState(
-              ar.applicationPeriodBegin,
-              ar.applicationPeriodEnd
-            ) === "active"
-        )
-        .map((ar) => ({
-          value: ar.pk,
-          label: getApplicationRoundName(ar),
-        }));
+      const ars =
+        data?.applicationRounds?.edges
+          ?.map((n) => n?.node)
+          .filter((n): n is NonNullable<typeof n> => !!n)
+          .filter(
+            (ar) =>
+              new Date(ar.publicDisplayBegin) <= now &&
+              new Date(ar.publicDisplayEnd) >= now &&
+              applicationRoundState(
+                ar.applicationPeriodBegin,
+                ar.applicationPeriodEnd
+              ) === "active"
+          )
+          .map((ar) => ({
+            value: ar.pk ?? 0,
+            label: getApplicationRoundName(ar),
+          })) ?? [];
       setApplicationRounds(ars);
     },
   });

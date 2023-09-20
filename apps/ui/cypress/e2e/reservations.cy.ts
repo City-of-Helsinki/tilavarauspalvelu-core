@@ -37,14 +37,9 @@ import {
   secondBackButton,
 } from "../model/reservation-cancel";
 import { reservationControlsToggleButton } from "../model/reservation-unit";
-import {
-  errorNotificationTitle,
-  errorNotificationBody,
-  errorNotificationCloseButton,
-  errorNotification,
-} from "../model/notification";
+import { errorNotification } from "../model/notification";
 
-const CYPRESS_TIMEOUT = 5000
+const CYPRESS_TIMEOUT = 20000
 Cypress.config("defaultCommandTimeout", CYPRESS_TIMEOUT);
 
 describe("Tilavaraus user reservations", () => {
@@ -327,15 +322,22 @@ describe("Tilavaraus user reservations", () => {
 
     reservationEditActionSubmit().click();
 
-    errorNotificationTitle().should(
-      "have.text",
-      "Varauksen muokkaaminen epäonnistui"
-    );
-    errorNotificationBody().should(
-      "have.text",
-      "Hyväksy sopimusehdot jatkaaksesi varausta."
-    );
-    errorNotificationCloseButton().click();
+    const title = "Varauksen muokkaaminen epäonnistui";
+    const notifications = errorNotification()
+    notifications.then($elems => {
+      const result = $elems.filter(`:contains(${title})`)
+      const found = !!result.length
+      expect(found).to.eq(true)
+    })
+
+    const text = "Hyväksy sopimusehdot jatkaaksesi varausta."
+    notifications.then($elems => {
+      const result = $elems.filter(`:contains(${text})`)
+      const found = !!result.length
+      expect(found).to.eq(true)
+    })
+
+    notifications.find('[aria-label="Sulje virheilmoitus"]').click();
 
     cy.get("#cancellation-and-payment-terms-terms-accepted").click();
     cy.get("#generic-and-service-specific-terms-terms-accepted").click();

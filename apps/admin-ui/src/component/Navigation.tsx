@@ -3,11 +3,10 @@ import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { UserInfo } from "common";
-import { signIn, signOut, useSession } from "app/hooks/auth";
 import { breakpoints } from "common/src/common/style";
 import { useNavigate } from "react-router-dom";
+import { signIn, signOut, useSession } from "app/hooks/auth";
 import { publicUrl } from "app/common/const";
-import usePermission from "app/hooks/usePermission";
 import MainMenu from "./MainMenu";
 import { StyledHDSNavigation } from "../styles/util";
 
@@ -40,9 +39,8 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
 
   const [isMenuOpen, setMenuState] = useState(false);
 
-  const { isAuthenticated } = useSession();
   // NOTE have to construct the name from GQL query because most users don't have names in oidc profile
-  const { user } = usePermission();
+  const { user } = useSession();
   const firstName = user?.firstName?.trim() ?? "";
   const lastName = user?.lastName?.trim() ?? "";
   const name = `${firstName} ${lastName}`.trim() || t("Navigation.noName");

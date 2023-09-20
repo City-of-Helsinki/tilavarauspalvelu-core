@@ -15,21 +15,20 @@ import {
   QueryApplicationRoundsArgs,
   QueryApplicationsArgs,
 } from "common/types/gql-types";
-import { signIn, useSession } from "~/hooks/auth";
+import { useSession } from "~/hooks/auth";
 import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import { CenterSpinner } from "../components/common/common";
 import { APPLICATIONS } from "../modules/queries/application";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { getReducedApplicationStatus } from "../modules/util";
-import { CURRENT_USER } from "../modules/queries/user";
-import { authEnabled, authenticationIssuer } from "../modules/const";
+import { authEnabled } from "../modules/const";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       overrideBackgroundColor: "var(--tilavaraus-gray)",
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
     revalidate: 100, // In seconds
   };
@@ -78,7 +77,7 @@ const ApplicationGroups = ({
   );
 };
 
-const ApplicationsPage = (): JSX.Element => {
+const ApplicationsPage = (): JSX.Element | null => {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useSession();
 
@@ -96,8 +95,6 @@ const ApplicationsPage = (): JSX.Element => {
   const [cancelled, setCancelled] = useState(false);
   const [cancelError, setCancelError] = useState(false);
 
-  const currentUser = user;
-
   const { data: roundsData, error: roundsError } = useQuery<
     Query,
     QueryApplicationRoundsArgs
@@ -106,7 +103,8 @@ const ApplicationsPage = (): JSX.Element => {
   const rounds = useMemo(
     () =>
       roundsData?.applicationRounds?.edges
-        ?.map((n) => n.node)
+        ?.map((n) => n?.node)
+        .filter((n): n is ApplicationRoundType => !!n)
         .reduce(
           (prev, current) => ({ ...prev, [current.pk]: current }),
           {} as { [key: number]: ApplicationRoundType }
@@ -120,9 +118,9 @@ const ApplicationsPage = (): JSX.Element => {
     refetch,
   } = useQuery<Query, QueryApplicationsArgs>(APPLICATIONS, {
     fetchPolicy: "no-cache",
-    skip: !currentUser?.pk,
+    skip: !user?.pk,
     variables: {
-      user: currentUser?.pk?.toString(),
+      user: user?.pk?.toString(),
       status: [
         ApplicationStatus.Draft,
         ApplicationStatus.Sent,
@@ -138,8 +136,8 @@ const ApplicationsPage = (): JSX.Element => {
   const applications: Dictionary<ApplicationType[]> = useMemo(
     () =>
       groupBy(
-        appData?.applications?.edges?.map((n) => n.node),
-        (a) => getReducedApplicationStatus(a.status)
+        appData?.applications?.edges?.map((n) => n?.node),
+        (a) => getReducedApplicationStatus(a?.status)
       ),
     [appData]
   );
@@ -173,12 +171,13 @@ const ApplicationsPage = (): JSX.Element => {
     }
   };
 
-  if (isUserUnauthenticated) return null;
+  if (isUserUnauthenticated) {
+    return null;
+  }
 
   return (
     <>
       <Head />
-
       <Container>
         {state === "done" ? (
           <ApplicationGroups

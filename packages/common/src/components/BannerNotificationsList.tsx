@@ -142,7 +142,7 @@ const BannerNotificationsList = ({
     (item) =>
       closedNotificationsList != null &&
       !closedNotificationsList.includes(String(item.id + item.activeFrom)) &&
-      targetList.map((t) => t === item?.target).includes(true)
+      targetList.map((x) => x === item?.target).includes(true)
   );
 
   return (

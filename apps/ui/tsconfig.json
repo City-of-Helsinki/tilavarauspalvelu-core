@@ -4,9 +4,9 @@
     "plugins": [{ "name": "next" }],
     "types": ["cypress", "cypress-axe"],
     "paths": {
+      "@/*": ["./*"],
       // ~ is old prefer the @ as base path
-      "~/*": ["./*"],
-      "@/*": ["./*"]
+      "~/*": ["./*"]
     }
   },
   "include": [

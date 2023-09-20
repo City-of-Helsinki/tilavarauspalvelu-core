@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Container } from "common";
-import { signIn, useSession } from "~/hooks/auth";
+import { useSession } from "~/hooks/auth";
 
 import ReservationFail from "../components/reservation/ReservationFail";
 import { authEnabled } from "../modules/const";

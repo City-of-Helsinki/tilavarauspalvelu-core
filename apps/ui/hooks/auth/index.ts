@@ -13,8 +13,6 @@ export function signOut() {
   window.location.href = getSignOutUrl();
 };
 
-// TODO state things like authenticating and error
-// should do a GQL current user query to check if user is authenticated
 export function useSession() {
   const { currentUser, loading, error } = useCurrentUser()
   return { isAuthenticated: currentUser != null, user: currentUser, loading, error };

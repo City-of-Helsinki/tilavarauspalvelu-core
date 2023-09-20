@@ -11,12 +11,10 @@ import { uniqBy } from "lodash";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import { ReservationTypeConnection } from "common/types/gql-types";
 
-import { SESSION_EXPIRED_ERROR, publicUrl, isBrowser } from "./const";
+import { SESSION_EXPIRED_ERROR, GRAPQL_API_URL, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
-// const uri = `${publicUrl}/api/graphql`;
-// const uri = `/api/graphql/`;
-const uri = `http://localhost:8000/graphql/`;
+const uri = GRAPQL_API_URL;
 const uploadLinkOptions = {
   uri,
   credentials: "include",

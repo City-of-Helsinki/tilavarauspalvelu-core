@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
-import { camelCase, capitalize, get, isFinite, trim } from "lodash";
+import { camelCase, capitalize, isFinite, trim } from "lodash";
 import {
   IconArrowRight,
   IconCalendar,
@@ -24,7 +24,7 @@ import {
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
-import { signIn, useSession } from "~/hooks/auth";
+import { useSession } from "~/hooks/auth";
 
 import apolloClient from "../../modules/apolloClient";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
@@ -52,11 +52,7 @@ import ReservationStatus from "../../components/reservation/ReservationStatus";
 import Address from "../../components/reservation-unit/Address";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import ReservationOrderStatus from "../../components/reservation/ReservationOrderStatus";
-import {
-  reservationUnitPath,
-  authEnabled,
-  authenticationIssuer,
-} from "../../modules/const";
+import { reservationUnitPath, authEnabled } from "../../modules/const";
 import { useReservation, useOrder } from "../../hooks/reservation";
 
 type Props = {
@@ -68,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale,
   params,
 }) => {
-  const id = Number(params.id);
+  const id = Number(params?.id);
 
   if (isFinite(id)) {
     const { data: genericTermsData } = await apolloClient.query<
@@ -85,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         key: `${id}-${locale}`,
-        ...(await serverSideTranslations(locale)),
+        ...(await serverSideTranslations(locale ?? "fi")),
         overrideBackgroundColor: "var(--tilavaraus-white)",
         termsOfUse: {
           genericTerms,

@@ -16,7 +16,7 @@ import {
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
 } from "./types";
-import { API_BASE_URL  } from "./const";
+import { API_BASE_URL } from "./const";
 
 const axiosOptions = {
   headers: {
@@ -25,9 +25,9 @@ const axiosOptions = {
   },
 };
 const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
-axiosClient.defaults.withCredentials = true
+axiosClient.defaults.withCredentials = true;
 
-const apiBaseUrl = API_BASE_URL
+const apiBaseUrl = API_BASE_URL;
 
 const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
