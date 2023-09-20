@@ -15,7 +15,8 @@ def graphql() -> GraphQLClient:
 
 @pytest.fixture()
 def _disable_elasticsearch(settings):
-    """Disable syncing to Elasticsearch for the duration of the test.
+    """
+    Disable syncing to Elasticsearch for the duration of the test.
     Use with '@pytest.mark.usefixtures' decorator.
     """
     original = settings.SEARCH_SETTINGS["settings"]["auto_sync"]
