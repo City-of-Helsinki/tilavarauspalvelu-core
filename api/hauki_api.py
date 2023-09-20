@@ -25,14 +25,14 @@ class OpenTimeSerializer(serializers.Serializer):
     end_time_on_next_day = serializers.BooleanField(read_only=True)
 
 
-class OpeningHourDateSerialiser(serializers.Serializer):
+class OpeningHourDateSerializer(serializers.Serializer):
     date = serializers.DateField(read_only=True)
     times = OpenTimeSerializer(read_only=True, many=True)
 
 
 class OpeningHoursSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    opening_hours = OpeningHourDateSerialiser(read_only=True, many=True)
+    opening_hours = OpeningHourDateSerializer(read_only=True, many=True)
 
 
 class OpeningHoursViewSet(viewsets.ViewSet):
