@@ -163,7 +163,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
         assert_that(errors[0].get("message")).is_equal_to("Unable to check order payment")
         assert_that(errors[0].get("extensions").get("error_code")).is_equal_to(ValidationErrorCodes.NOT_FOUND.value)
 
-        assert_that(mock_capture_message.called).is_true
+        assert mock_capture_message.called is True
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.DRAFT)
