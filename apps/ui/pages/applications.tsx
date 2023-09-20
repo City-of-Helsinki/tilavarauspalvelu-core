@@ -4,7 +4,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation, TFunction } from "next-i18next";
-import { signIn, useSession } from "next-auth/react";
 import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
 import { ReducedApplicationStatus } from "common/types/common";
@@ -16,6 +15,7 @@ import {
   QueryApplicationRoundsArgs,
   QueryApplicationsArgs,
 } from "common/types/gql-types";
+import { signIn, useSession } from "~/hooks/auth";
 import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import { CenterSpinner } from "../components/common/common";
@@ -80,29 +80,23 @@ const ApplicationGroups = ({
 
 const ApplicationsPage = (): JSX.Element => {
   const { t } = useTranslation();
-  const session = useSession();
+  const { isAuthenticated, user } = useSession();
 
-  const isUserUnauthenticated =
-    authEnabled && session?.status === "unauthenticated";
+  const isUserUnauthenticated = !isAuthenticated && authEnabled;
 
+  /*
   useEffect(() => {
     if (isUserUnauthenticated) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
+      signIn();
     }
   }, [isUserUnauthenticated]);
+  */
 
   const [state, setState] = useState<"loading" | "error" | "done">("loading");
   const [cancelled, setCancelled] = useState(false);
   const [cancelError, setCancelError] = useState(false);
 
-  const { data: userData } = useQuery<Query>(CURRENT_USER, {
-    fetchPolicy: "no-cache",
-    onError: () => setState("error"),
-  });
-
-  const currentUser = useMemo(() => userData?.currentUser, [userData]);
+  const currentUser = user;
 
   const { data: roundsData, error: roundsError } = useQuery<
     Query,

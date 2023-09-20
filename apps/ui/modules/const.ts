@@ -129,3 +129,30 @@ export const authEnabled = isBrowser
 export const authenticationIssuer = "tunnistamo";
 export const authenticationApiRoute = "/api/auth";
 export const authenticationLogoutApiRoute = "/api/auth/logout";
+
+const AUTH_URL = apiBaseUrl != null ? `${apiBaseUrl}/helauth` : '/helauth';
+const PUBLIC_URL: string = "";
+
+const getCleanPublicUrl = () => {
+  const hasPublicUrl = PUBLIC_URL != null && PUBLIC_URL !== '/' && PUBLIC_URL !== '';
+  const publicUrlNoSlash = PUBLIC_URL && hasPublicUrl ? PUBLIC_URL.replace(/\/$/, '') : '';
+  const cleanPublicUrl  = publicUrlNoSlash.startsWith('/') ? publicUrlNoSlash : `/${publicUrlNoSlash}`;
+  return cleanPublicUrl;
+}
+// Returns href url for sign in dialog when given redirect url as parameter
+export const getSignInUrl = (callBackUrl: string): string => {
+  if (callBackUrl.includes(`/logout`)) {
+    const baseUrl = new URL(callBackUrl).origin;
+    const cleanPublicUrl = getCleanPublicUrl();
+    return `${AUTH_URL}/login?next=${baseUrl}${cleanPublicUrl}`;
+  }
+  return `${AUTH_URL}/login?next=${callBackUrl}`;
+};
+
+// Returns href url for logging out with redirect url to /logout
+export const getSignOutUrl = (): string => {
+  const baseUrl = new URL(window.location.href).origin;
+  const cleanPublicUrl = getCleanPublicUrl();
+  const callBackUrl = `${baseUrl}${cleanPublicUrl}/logout`;
+  return `${AUTH_URL}/logout?next=${callBackUrl}`;
+};

@@ -5,12 +5,11 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import Link from "next/link";
 import { IconArrowRight, IconSignout } from "hds-react";
-import { useSession } from "next-auth/react";
 import { Container } from "common";
+import { useSession, signOut } from "~/hooks/auth";
 import { Paragraph } from "./styles";
 import { LinkButton } from "../../styles/util";
 import { singleSearchUrl } from "../../modules/util";
-import { signOut } from "../../modules/auth";
 
 type Props = {
   reservationPk: string;
@@ -98,7 +97,7 @@ const DeleteCancelled = ({ reservationPk, error }: Props) => {
               {t("common:gotoFrontpage")}
               <IconArrowRight aria-hidden size="m" />
             </StyledLink>
-            <LinkButton onClick={() => signOut({ session })}>
+            <LinkButton onClick={signOut}>
               {t("common:logout")} <IconSignout size="m" aria-hidden />
             </LinkButton>
           </ActionContainer>

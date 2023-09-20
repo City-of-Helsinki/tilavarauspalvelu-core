@@ -1,4 +1,5 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import applyCaseMiddleware from "axios-case-converter";
 import {
   Application,
   ApplicationRound,
@@ -7,7 +8,6 @@ import {
   ReservationUnit,
 } from "common/types/common";
 import { apiBaseUrl } from "./const";
-import axiosClient from "./auth/axiosClient";
 import { ApiError } from "./ApiError";
 
 const applicationRoundBasePath = "application_round";
@@ -15,6 +15,16 @@ const recurringReservationBasePath = "recurring_reservation";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
 const applicationEventFeedBasePath = "application_event_calendar";
+
+const axiosOptions = {
+  timeout: 20000,
+  headers: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "Content-Type": "application/json",
+  },
+};
+const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
+axiosClient.defaults.withCredentials = true
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}

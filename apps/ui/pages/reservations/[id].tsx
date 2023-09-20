@@ -13,7 +13,6 @@ import {
 import { useTranslation } from "next-i18next";
 import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { signIn, useSession } from "next-auth/react";
 import {
   Query,
   QueryTermsOfUseArgs,
@@ -25,6 +24,7 @@ import {
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
+import { signIn, useSession } from "~/hooks/auth";
 
 import apolloClient from "../../modules/apolloClient";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
@@ -258,27 +258,26 @@ const Terms = styled.div`
   margin-bottom: var(--spacing-xl);
 `;
 
-const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
+const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
-  const session = useSession();
+  const { isAuthenticated } = useSession();
 
-  const isUserUnauthenticated =
-    authEnabled && session?.status === "unauthenticated";
+  const isUserUnauthenticated = authEnabled && !isAuthenticated;
 
+  /*
   useEffect(() => {
     if (isUserUnauthenticated) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
+      signIn();
     }
   }, [isUserUnauthenticated]);
+  */
 
   const { reservation, loading, error } = useReservation({ reservationPk: id });
   const { order, loading: orderLoading } = useOrder({
-    orderUuid: reservation?.orderUuid,
+    orderUuid: reservation?.orderUuid ?? "",
   });
 
-  const reservationUnit = get(reservation?.reservationUnits, "0");
+  const reservationUnit = reservation?.reservationUnits?.[0];
 
   const instructionsKey = useMemo(
     () => getReservationUnitInstructionsKey(reservation?.state),
@@ -289,7 +288,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
   const isBeingHandled = reservation?.state === "REQUIRES_HANDLING";
 
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
-    if (!reservation || !reservationUnit) return false;
+    if (!reservation || !reservationUnit) {
+      return false;
+    }
 
     const reservationUnitPrice = getReservationUnitPrice({
       reservationUnit,
@@ -392,7 +393,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     }
   }, [reservation]);
 
-  if (isUserUnauthenticated) return null;
+  if (isUserUnauthenticated) {
+    return null;
+  }
 
   if (error) {
     return (

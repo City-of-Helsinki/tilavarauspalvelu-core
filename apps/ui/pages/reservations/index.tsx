@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isAfter } from "date-fns";
@@ -8,7 +8,6 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { fontMedium } from "common/src/common/typography";
-import { signIn, useSession } from "next-auth/react";
 import { breakpoints } from "common/src/common/style";
 import {
   Query,
@@ -17,24 +16,22 @@ import {
   ReservationType,
 } from "common/types/gql-types";
 import { Container } from "common";
+import { useSession } from "~/hooks/auth";
 
 import { LIST_RESERVATIONS } from "../../modules/queries/reservation";
 import ReservationCard from "../../components/reservation/ReservationCard";
 import Head from "../../components/reservations/Head";
 import { CenterSpinner } from "../../components/common/common";
-import { CURRENT_USER } from "../../modules/queries/user";
 import { Toast } from "../../styles/util";
-import { authEnabled, authenticationIssuer } from "../../modules/const";
+import { authEnabled } from "../../modules/const";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
-
-const Wrapper = styled(Container)``;
 
 const Heading = styled.div`
   margin-bottom: var(--spacing-layout-l);
@@ -78,25 +75,21 @@ const EmptyMessage = styled.div`
   margin-left: var(--spacing-xl);
 `;
 
-const Reservations = (): JSX.Element => {
+const Reservations = (): JSX.Element | null => {
   const router = useRouter();
-  const session = useSession();
-
+  const { t } = useTranslation();
+  const { isAuthenticated, user: currentUser } = useSession();
   const { error: routerError } = router.query;
 
-  const [error, setError] = useState(false);
-  const { t } = useTranslation();
+  const isUserUnauthenticated = !isAuthenticated && authEnabled;
 
-  const isUserUnauthenticated =
-    authEnabled && session?.status === "unauthenticated";
-
+  /*
   useEffect(() => {
     if (isUserUnauthenticated) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
+      signIn();
     }
   }, [isUserUnauthenticated]);
+  */
 
   const [upcomingReservations, setUpcomingReservations] = useState<
     ReservationType[]
@@ -109,12 +102,6 @@ const Reservations = (): JSX.Element => {
   >([]);
   const [isLoadingReservations, setIsLoadingReservations] =
     useState<boolean>(true);
-
-  const { data: userData } = useQuery<Query>(CURRENT_USER, {
-    fetchPolicy: "no-cache",
-  });
-
-  const currentUser = useMemo(() => userData?.currentUser, [userData]);
 
   const { data: reservationData, error: reservationError } = useQuery<
     Query,
@@ -130,29 +117,32 @@ const Reservations = (): JSX.Element => {
         ReservationsReservationStateChoices.Denied,
       ],
       orderBy: "-begin",
-      user: currentUser?.pk.toString(),
+      user: currentUser?.pk?.toString(),
     },
     fetchPolicy: "no-cache",
   });
 
   useEffect(() => {
-    const reservations = reservationData?.reservations?.edges
-      ?.map((edge) => edge?.node)
-      .reduce(
-        (acc, reservation) => {
-          if (
-            reservation.state === ReservationsReservationStateChoices.Cancelled
-          ) {
-            acc[2].push(reservation);
-          } else if (isAfter(new Date(reservation?.begin), new Date())) {
-            acc[0].push(reservation);
-          } else {
-            acc[1].push(reservation);
-          }
-          return acc;
-        },
-        [[], [], []] as ReservationType[][]
-      );
+    const reservations =
+      reservationData?.reservations?.edges
+        ?.map((edge) => edge?.node)
+        .filter((reservation): reservation is ReservationType => !!reservation)
+        .reduce(
+          (acc, reservation) => {
+            if (
+              reservation.state ===
+              ReservationsReservationStateChoices.Cancelled
+            ) {
+              acc[2].push(reservation);
+            } else if (isAfter(new Date(reservation?.begin), new Date())) {
+              acc[0].push(reservation);
+            } else {
+              acc[1].push(reservation);
+            }
+            return acc;
+          },
+          [[], [], []] as ReservationType[][]
+        ) ?? [];
     if (reservations?.length > 0) {
       setUpcomingReservations([...reservations[0]].reverse());
       setPastReservations(reservations[1]);
@@ -163,18 +153,14 @@ const Reservations = (): JSX.Element => {
     }
   }, [reservationData]);
 
-  useEffect(() => {
-    if (userData?.currentUser === null || reservationError) {
-      setError(true);
-    }
-  }, [userData, reservationError]);
-
-  if (isUserUnauthenticated) return null;
+  if (isUserUnauthenticated) {
+    return null;
+  }
 
   return (
     <>
       <Head />
-      <Wrapper>
+      <Container>
         <Heading>
           <Tabs>
             <StyledTabList>
@@ -183,7 +169,9 @@ const Reservations = (): JSX.Element => {
               <StyledTab>{t("reservations:cancelledReservations")}</StyledTab>
             </StyledTabList>
             <StyledTabPanel>
-              {error ? null : isLoadingReservations && <CenterSpinner />}
+              {reservationError
+                ? null
+                : isLoadingReservations && <CenterSpinner />}
               {upcomingReservations.length > 0
                 ? upcomingReservations?.map((reservation) => (
                     <ReservationCard
@@ -232,7 +220,7 @@ const Reservations = (): JSX.Element => {
             </StyledTabPanel>
           </Tabs>
         </Heading>
-        {error && (
+        {reservationError && (
           <Toast
             type="error"
             label={t("common:error.error")}
@@ -252,7 +240,7 @@ const Reservations = (): JSX.Element => {
             {t("reservations:confirmationError.body")}
           </Toast>
         )}
-      </Wrapper>
+      </Container>
     </>
   );
 };

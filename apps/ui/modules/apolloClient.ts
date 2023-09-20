@@ -1,46 +1,11 @@
-import { setContext } from "@apollo/client/link/context";
 import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
-import { getSession, signOut } from "next-auth/react";
 import { GraphQLError } from "graphql";
-
-import {
-  apiBaseUrl,
-  isBrowser,
-  SESSION_EXPIRED_ERROR,
-} from "./const";
-
-const authLink = setContext(
-  async (notUsed, { headers }: { headers: Headers }) => {
-    const session = (await getSession());
-
-    const modifiedHeader = {
-      headers: {
-        ...headers,
-        authorization: session?.apiTokens?.tilavaraus
-          ? `Bearer ${session.apiTokens.tilavaraus}`
-          : "",
-      },
-    };
-    return modifiedHeader;
-  }
-);
-
-const handleSignOut = async () => {
-  await signOut();
-};
+import { apiBaseUrl, isBrowser } from "./const";
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    const isSessionExpired = graphQLErrors.some((error) =>
-      error.message.includes(SESSION_EXPIRED_ERROR)
-    );
-
-    if (isSessionExpired) {
-      handleSignOut();
-    }
-
     graphQLErrors.forEach(async (error: GraphQLError) => {
       console.error(`GQL_ERROR: ${error.message}`);
     });
@@ -51,7 +16,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/` });
+const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/`, credentials: "include" });
 
 const client = new ApolloClient({
   cache: new InMemoryCache({
@@ -63,7 +28,7 @@ const client = new ApolloClient({
       },
     },
   }),
-  link: isBrowser ? from([errorLink, authLink, httpLink]) : from([httpLink]),
+  link: isBrowser ? from([errorLink, httpLink]) : from([httpLink]),
   ssrMode: !isBrowser,
   defaultOptions: {
     watchQuery: {

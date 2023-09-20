@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { signIn, useSession } from "next-auth/react";
 import { isFinite } from "lodash";
+import { signIn, useSession } from "~/hooks/auth";
 import ReservationCancellation from "../../components/reservation/ReservationCancellation";
 import ReservationEdit from "../../components/reservation/ReservationEdit";
-import { authEnabled, authenticationIssuer } from "../../modules/const";
+import { authEnabled } from "../../modules/const";
 
 type Props = {
   id: number;
@@ -16,13 +16,13 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale,
   query,
 }) => {
-  const id = Number(query.params[0]);
-  const slug = query.params[1];
+  const id = Number(query.params?.[0]);
+  const slug = query.params?.[1];
 
-  if (isFinite(id) && ["cancel", "edit"].includes(slug)) {
+  if (isFinite(id) && slug != null && ["cancel", "edit"].includes(slug)) {
     return {
       props: {
-        ...(await serverSideTranslations(locale)),
+        ...(await serverSideTranslations(locale ?? "fi")),
         key: `${id}${slug}${locale}`,
         id,
         mode: slug,
@@ -35,22 +35,23 @@ export const getServerSideProps: GetServerSideProps = async ({
   };
 };
 
-const ReservationParams = (props: Props): JSX.Element => {
+const ReservationParams = (props: Props): JSX.Element | null => {
   const { mode } = props;
-  const session = useSession();
+  const { isAuthenticated } = useSession();
 
-  const isUserUnauthenticated =
-    authEnabled && session?.status === "unauthenticated";
+  const isUserUnauthenticated = authEnabled && !isAuthenticated;
 
+  /*
   useEffect(() => {
     if (isUserUnauthenticated) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
+      signIn();
     }
   }, [isUserUnauthenticated]);
+  */
 
-  if (isUserUnauthenticated) return null;
+  if (isUserUnauthenticated) {
+    return null;
+  }
 
   const Component =
     mode === "cancel" ? ReservationCancellation : ReservationEdit;

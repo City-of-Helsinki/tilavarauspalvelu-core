@@ -3,7 +3,6 @@ import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation, UserConfig } from "next-i18next";
 import type { AppProps } from "next/app";
 import { fi } from "date-fns/locale";
-import { SessionProvider } from "next-auth/react";
 import { format, isValid } from "date-fns";
 import { ThemeProvider } from "styled-components";
 import { theme } from "common";
@@ -11,11 +10,7 @@ import PageWrapper from "../components/common/PageWrapper";
 import ExternalScripts from "../components/ExternalScripts";
 import { DataContextProvider } from "../context/DataContext";
 import apolloClient from "../modules/apolloClient";
-import {
-  authenticationApiRoute,
-  isBrowser,
-  mockRequests,
-} from "../modules/const";
+import { isBrowser, mockRequests } from "../modules/const";
 import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
@@ -31,18 +26,13 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     <>
       <DataContextProvider>
         <TrackingWrapper>
-          <SessionProvider
-            session={pageProps.session}
-            basePath={authenticationApiRoute}
-          >
-            <ApolloProvider client={apolloClient}>
-              <ThemeProvider theme={theme}>
-                <PageWrapper {...pageProps}>
-                  <Component {...pageProps} />
-                </PageWrapper>
-              </ThemeProvider>
-            </ApolloProvider>
-          </SessionProvider>
+          <ApolloProvider client={apolloClient}>
+            <ThemeProvider theme={theme}>
+              <PageWrapper {...pageProps}>
+                <Component {...pageProps} />
+              </PageWrapper>
+            </ThemeProvider>
+          </ApolloProvider>
         </TrackingWrapper>
       </DataContextProvider>
       {isBrowser && <ExternalScripts />}
