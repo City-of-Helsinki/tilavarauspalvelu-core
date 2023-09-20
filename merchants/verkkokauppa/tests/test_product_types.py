@@ -1,8 +1,8 @@
 from uuid import UUID
 
+import pytest
 from assertpy import assert_that
 from django.test.testcases import TestCase
-from pytest import raises
 
 from merchants.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
 from merchants.verkkokauppa.product.types import (
@@ -45,7 +45,7 @@ class ProductTypesTestCase(TestCase):
         assert_that(product).is_equal_to(expected)
 
     def test_product_from_json_raises_exception_if_key_is_missing(self):
-        with raises(ParseProductError):
+        with pytest.raises(ParseProductError):
             Product.from_json(
                 {
                     "namespace": "some-namespace",
@@ -54,7 +54,7 @@ class ProductTypesTestCase(TestCase):
             )
 
     def test_product_from_json_raises_exception_if_value_is_invalid(self):
-        with raises(ParseProductError):
+        with pytest.raises(ParseProductError):
             Product.from_json(
                 {
                     "productId": "invalid-product-id",
@@ -135,7 +135,7 @@ class ProductTypesTestCase(TestCase):
         assert_that(accounting).is_equal_to(expected)
 
     def test_accounting_from_json_raises_exception_if_key_is_missing(self):
-        with raises(ParseAccountingError):
+        with pytest.raises(ParseAccountingError):
             Accounting.from_json(
                 {
                     "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",

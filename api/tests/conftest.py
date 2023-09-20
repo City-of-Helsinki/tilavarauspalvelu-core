@@ -42,12 +42,12 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @pytest.fixture(autouse=True)
-def setup_audit_log(settings):
+def _setup_audit_log(settings):
     settings.AUDIT_LOGGING_ENABLED = False
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def user():
     return get_user_model().objects.create(
         username="test_user",
@@ -57,8 +57,8 @@ def user():
     )
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def user_2():
     return get_user_model().objects.create(
         username="test_user_2",
@@ -68,67 +68,67 @@ def user_2():
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def api_client():
     return APIClient()
 
 
-@pytest.fixture
+@pytest.fixture()
 def user_api_client(user):
     api_client = APIClient()
     api_client.force_authenticate(user)
     return api_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def user_2_api_client(user_2):
     api_client = APIClient()
     api_client.force_authenticate(user_2)
     return api_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def resource():
     return Resource.objects.create(name="Test resource")
 
 
-@pytest.fixture
+@pytest.fixture()
 def unit(service_sector):
     test_unit = Unit.objects.create(name="Test unit")
     test_unit.service_sectors.set([service_sector])
     return test_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def unit_too(service_sector):
     test_unit = Unit.objects.create(name="Test unit too")
     test_unit.service_sectors.set([service_sector])
     return test_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def unit_group(unit):
     unit_group = UnitGroup.objects.create(name="Test group")
     unit_group.units.add(unit)
     return unit_group
 
 
-@pytest.fixture
+@pytest.fixture()
 def parent_space(location):
     return Space.objects.create(name="Parent space", location=location)
 
 
-@pytest.fixture
+@pytest.fixture()
 def space(location, parent_space):
     return Space.objects.create(name="Space", location=location, parent=parent_space)
 
 
-@pytest.fixture
+@pytest.fixture()
 def child_space(location, space):
     return Space.objects.create(name="Child space", location=location, parent=space)
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_unit_with_parent_space(resource, parent_space):
     reservation_unit = ReservationUnit.objects.create(
         name="Parent space test reservation unit", require_introduction=False
@@ -138,7 +138,7 @@ def reservation_unit_with_parent_space(resource, parent_space):
     return reservation_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_unit(resource, space, unit):
     reservation_unit = ReservationUnit.objects.create(
         name_en="Test reservation unit", require_introduction=False, unit=unit
@@ -148,7 +148,7 @@ def reservation_unit(resource, space, unit):
     return reservation_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_unit_too(resource, unit_too):
     reservation_unit = ReservationUnit.objects.create(
         name_en="Test reservation unit too", require_introduction=False, unit=unit_too
@@ -156,7 +156,7 @@ def reservation_unit_too(resource, unit_too):
     return reservation_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_unit_with_child_space(resource, child_space):
     reservation_unit = ReservationUnit.objects.create(
         name="Child space test reservation unit", require_introduction=False
@@ -165,7 +165,7 @@ def reservation_unit_with_child_space(resource, child_space):
     return reservation_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_unit_with_resource(resource, space):
     reservation_unit = ReservationUnit.objects.create(
         name="Test reservation unit with resource", require_introduction=False
@@ -174,29 +174,29 @@ def reservation_unit_with_resource(resource, space):
     return reservation_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def location():
     return Location.objects.create(address_street="Osoitetienkatu 13b", address_zip="33540", address_city="Tampere")
 
 
-@pytest.fixture
+@pytest.fixture()
 def service_sector():
     return ServiceSector.objects.create(name="Test service sector")
 
 
-@pytest.fixture
+@pytest.fixture()
 def service_sector_2():
     return ServiceSector.objects.create(name="Test service sector 2")
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_unit2(resource):
     reservation_unit = ReservationUnit.objects.create(name="Test reservation unit no. 2", require_introduction=False)
     reservation_unit.resources.set([resource])
     return reservation_unit
 
 
-@pytest.fixture
+@pytest.fixture()
 def application_round(reservation_unit, purpose, service_sector) -> ApplicationRound:
     application_round = ApplicationRound.objects.create(
         name="Nuorten liikuntavuorot kevät 2021",
@@ -215,7 +215,7 @@ def application_round(reservation_unit, purpose, service_sector) -> ApplicationR
     return application_round
 
 
-@pytest.fixture
+@pytest.fixture()
 def application_round_2(reservation_unit, purpose, service_sector_2) -> ApplicationRound:
     application_round = ApplicationRound.objects.create(
         name="Nuorten liikuntavuorot kevät 2021",
@@ -234,7 +234,7 @@ def application_round_2(reservation_unit, purpose, service_sector_2) -> Applicat
     return application_round
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation(reservation_unit, user) -> Reservation:
     begin_time = timezone.datetime(2021, 12, 1, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
@@ -250,7 +250,7 @@ def reservation(reservation_unit, user) -> Reservation:
     return reservation
 
 
-@pytest.fixture
+@pytest.fixture()
 def confirmed_reservation(reservation_unit, user) -> Reservation:
     begin_time = timezone.datetime(2020, 12, 1, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
@@ -259,7 +259,7 @@ def confirmed_reservation(reservation_unit, user) -> Reservation:
     return reservation
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_in_second_unit(reservation_unit2, user) -> Reservation:
     begin_time = timezone.datetime(2020, 12, 2, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
@@ -268,7 +268,7 @@ def reservation_in_second_unit(reservation_unit2, user) -> Reservation:
     return reservation
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_reservation_data(reservation_unit):
     """Valid JSON data for creating a new Reservation"""
     return {
@@ -280,7 +280,7 @@ def valid_reservation_data(reservation_unit):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_application_round_basket_data(purpose, ten_to_15_age_group, helsinki):
     return {
         "name": "Yleishyödylliset yhdistykset",
@@ -294,7 +294,7 @@ def valid_application_round_basket_data(purpose, ten_to_15_age_group, helsinki):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_application_round_data(
     reservation_unit,
     reservation_unit2,
@@ -320,7 +320,7 @@ def valid_application_round_data(
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_resource_data(space):
     """Valid JSON data for creating a new Resource"""
     return {
@@ -336,7 +336,7 @@ def valid_resource_data(space):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_reservation_unit_data(unit, equipment_hammer):
     """Valid JSON data for creating a new ReservationUnit"""
     return {
@@ -362,32 +362,32 @@ def valid_reservation_unit_data(unit, equipment_hammer):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def purpose() -> ReservationPurpose:
     return ReservationPurpose.objects.create(name="Exercise")
 
 
-@pytest.fixture
+@pytest.fixture()
 def purpose2() -> ReservationPurpose:
     return ReservationPurpose.objects.create(name="Playing sports")
 
 
-@pytest.fixture
+@pytest.fixture()
 def organisation() -> Organisation:
     return Organisation.objects.create(name="Exercise organisation", identifier="ex-org-id")
 
 
-@pytest.fixture
+@pytest.fixture()
 def person() -> Person:
     return Person.objects.create(first_name="John", last_name="Legend")
 
 
-@pytest.fixture
+@pytest.fixture()
 def billing_address() -> Address:
     return Address.objects.create(street_address="Billing street 666b", post_code="00100", city="Helsinki")
 
 
-@pytest.fixture
+@pytest.fixture()
 def application(purpose, organisation, person, application_round, user, billing_address) -> Application:
     application = Application.objects.create(
         organisation=organisation,
@@ -399,7 +399,7 @@ def application(purpose, organisation, person, application_round, user, billing_
     return application
 
 
-@pytest.fixture
+@pytest.fixture()
 def application2(purpose, organisation, person, application_round, user, billing_address) -> Application:
     application = Application.objects.create(
         organisation=organisation,
@@ -411,7 +411,7 @@ def application2(purpose, organisation, person, application_round, user, billing
     return application
 
 
-@pytest.fixture
+@pytest.fixture()
 def application_event(application, purpose, ten_to_15_age_group, hobbyist_ability_group) -> ApplicationEvent:
     return ApplicationEvent.objects.create(
         application=application,
@@ -429,7 +429,7 @@ def application_event(application, purpose, ten_to_15_age_group, hobbyist_abilit
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def application_event_too(application2, purpose, ten_to_15_age_group, hobbyist_ability_group) -> ApplicationEvent:
     return ApplicationEvent.objects.create(
         application=application2,
@@ -447,26 +447,26 @@ def application_event_too(application2, purpose, ten_to_15_age_group, hobbyist_a
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def event_reservation_unit(application_event, reservation_unit):
     return EventReservationUnit.objects.create(application_event=application_event, reservation_unit=reservation_unit)
 
 
-@pytest.fixture
+@pytest.fixture()
 def event_reservation_unit_too(application_event_too, reservation_unit_too):
     return EventReservationUnit.objects.create(
         application_event=application_event_too, reservation_unit=reservation_unit_too
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def event_reduction(application_event):
     return ApplicationEventWeeklyAmountReduction.objects.create(
         application_event=application_event,
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> ApplicationEvent:
     return Recurrence.objects.create(
         application_event=application_event,
@@ -480,14 +480,14 @@ def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> Application
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def scheduled_for_monday(application_event) -> ApplicationEventSchedule:
     return ApplicationEventSchedule.objects.create(
         day=0, begin="10:00", end="12:00", application_event=application_event
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def result_scheduled_for_monday(scheduled_for_monday, reservation_unit):
     return ApplicationEventScheduleResult.objects.create(
         application_event_schedule=scheduled_for_monday,
@@ -499,32 +499,32 @@ def result_scheduled_for_monday(scheduled_for_monday, reservation_unit):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def ten_to_15_age_group() -> AgeGroup:
     return AgeGroup.objects.create(minimum=10, maximum=15)
 
 
-@pytest.fixture
+@pytest.fixture()
 def hobbyist_ability_group() -> AbilityGroup:
     return AbilityGroup.objects.create(name="Hobbyist level")
 
 
-@pytest.fixture
+@pytest.fixture()
 def helsinki() -> City:
     return City.objects.create(name="Helsinki")
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_application_event_schedule_data():
     return {"day": 1, "begin": "10:40", "end": "16:30"}
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_event_reservation_unit_data(reservation_unit):
     return {"priority": 22, "reservation_unit_id": reservation_unit.id}
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_application_data(application_round, helsinki):
     return {
         "applicant_type": "company",
@@ -557,7 +557,7 @@ def valid_application_data(application_round, helsinki):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_application_event_data(
     reservation_unit,
     ten_to_15_age_group,
@@ -587,18 +587,18 @@ def valid_application_event_data(
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def tools_equipment_category() -> EquipmentCategory:
     return EquipmentCategory.objects.create(name="Household tools")
 
 
-@pytest.fixture
+@pytest.fixture()
 def equipment_hammer(tools_equipment_category) -> Equipment:
     return Equipment.objects.create(name="Hammer", category=tools_equipment_category)
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def service_sector_admin(service_sector):
     user = get_user_model().objects.create(
         username="ss_admin",
@@ -616,15 +616,15 @@ def service_sector_admin(service_sector):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def service_sector_admin_api_client(service_sector_admin):
     api_client = APIClient()
     api_client.force_authenticate(service_sector_admin)
     return api_client
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def service_sector_2_admin(service_sector_2):
     user = get_user_model().objects.create(
         username="ss_admin_2",
@@ -642,15 +642,15 @@ def service_sector_2_admin(service_sector_2):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def service_sector_2_admin_api_client(service_sector_2_admin):
     api_client = APIClient()
     api_client.force_authenticate(service_sector_2_admin)
     return api_client
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def service_sector_application_manager(service_sector):
     user = get_user_model().objects.create(
         username="ss_app_man",
@@ -668,15 +668,15 @@ def service_sector_application_manager(service_sector):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def service_sector_application_manager_api_client(service_sector_application_manager):
     api_client = APIClient()
     api_client.force_authenticate(service_sector_application_manager)
     return api_client
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def unit_admin(unit):
     user = get_user_model().objects.create(
         username="u_admin",
@@ -693,15 +693,15 @@ def unit_admin(unit):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def unit_admin_api_client(unit_admin):
     api_client = APIClient()
     api_client.force_authenticate(unit_admin)
     return api_client
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def unit_manager(unit):
     user = get_user_model().objects.create(
         username="u_manager",
@@ -719,15 +719,15 @@ def unit_manager(unit):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def unit_manager_api_client(unit_manager):
     api_client = APIClient()
     api_client.force_authenticate(unit_manager)
     return api_client
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def unit_viewer(unit):
     user = get_user_model().objects.create(
         username="u_viewer",
@@ -742,15 +742,15 @@ def unit_viewer(unit):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def unit_viewer_api_client(unit_viewer):
     api_client = APIClient()
     api_client.force_authenticate(unit_viewer)
     return api_client
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def unit_group_admin(unit_group):
     user = get_user_model().objects.create(
         username="ug_admin",
@@ -768,15 +768,15 @@ def unit_group_admin(unit_group):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def unit_group_admin_api_client(unit_group_admin):
     api_client = APIClient()
     api_client.force_authenticate(unit_group_admin)
     return api_client
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def general_admin(service_sector):
     user = get_user_model().objects.create(
         username="gen_admin",
@@ -793,20 +793,20 @@ def general_admin(service_sector):
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def general_admin_api_client(general_admin):
     api_client = APIClient()
     api_client.force_authenticate(general_admin)
     return api_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def unauthenticated_api_client():
     api_client = APIClient()
     return api_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_general_admin_data(user):
     return {
         "user_id": user.id,
@@ -814,12 +814,12 @@ def valid_general_admin_data(user):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_service_sector_admin_data(user, service_sector):
     return {"user_id": user.id, "role": "admin", "service_sector_id": service_sector.id}
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_service_sector_application_manager_data(user, service_sector):
     return {
         "user_id": user.id,
@@ -828,33 +828,33 @@ def valid_service_sector_application_manager_data(user, service_sector):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_unit_admin_data(user, unit):
     return {"user_id": user.id, "role": "admin", "unit_id": [unit.id]}
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_unit_group_admin_data(user, unit_group):
     return {"user_id": user.id, "role": "admin", "unit_group_id": [unit_group.id]}
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_unit_manager_data(user, unit):
     return {"user_id": user.id, "role": "manager", "unit_id": [unit.id]}
 
 
-@pytest.fixture
+@pytest.fixture()
 def valid_unit_viewer_data(user, unit):
     return {"user_id": user.id, "role": "viewer", "unit_id": [unit.id]}
 
 
 @pytest.fixture()
-def set_ical_secret(db):
+def _set_ical_secret(db):
     settings.ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105
 
 
-@pytest.mark.django_db
-@pytest.fixture
+@pytest.mark.django_db()
+@pytest.fixture()
 def staff_user():
     user = get_user_model().objects.create(
         username="gen_admin",
@@ -871,7 +871,7 @@ def staff_user():
     return user
 
 
-@pytest.fixture
+@pytest.fixture()
 def staff_user_api_client(staff_user):
     api_client = APIClient()
     api_client.force_authenticate(staff_user)

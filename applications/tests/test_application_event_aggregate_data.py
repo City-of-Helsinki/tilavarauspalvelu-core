@@ -38,7 +38,7 @@ class ApplicationEventAggregateDataCreatorTestCase(ApplicationEventAggregateData
         assert_that(mock.called).is_false()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freezegun.freeze_time("2020-01-01")
 class ApplicationEventAggregateDataTestCase(ApplicationEventAggregateDataBaseTestCase):
     def test_application_event_aggregate_data_is_creates_correct_amount(

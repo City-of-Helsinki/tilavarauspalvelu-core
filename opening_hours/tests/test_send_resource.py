@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from snapshottest.django import TestCase
@@ -91,5 +92,5 @@ class SendResourceToHaukiTestCase(TestCase):
         put_mock.return_value = self.get_send_response()
         settings.HAUKI_API_URL = "themagicapiurl"
         settings.HAUKI_API_KEY = "verysecretcode"
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             update_hauki_resource(self.resource)

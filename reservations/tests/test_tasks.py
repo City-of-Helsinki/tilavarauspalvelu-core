@@ -1,9 +1,9 @@
 from unittest import mock
 from uuid import uuid4
 
+import pytest
 from assertpy import assert_that
 from django.test.testcases import TestCase
-from pytest import raises
 
 from reservations.tasks import refund_paid_reservation_task
 from tests.factories import PaymentOrderFactory, ReservationFactory
@@ -39,7 +39,7 @@ class RefundPaidReservationTestCase(TestCase):
 
         mock_refund_order.side_effect = Exception("Test exception")
 
-        with raises(Exception) as ex:
+        with pytest.raises(Exception) as ex:  # noqa: PT011
             refund_paid_reservation_task(reservation.pk)
         assert_that(str(ex.value)).is_equal_to("Test exception")
 

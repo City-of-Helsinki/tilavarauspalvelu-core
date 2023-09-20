@@ -5,7 +5,7 @@ from reservation_units.models import Equipment, EquipmentCategory, ReservationUn
 from tests.factories import PurposeFactory
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_exists(user_api_client, reservation_unit):
     reservation_unit.name_en = "Studio complex"
     reservation_unit.save()
@@ -14,7 +14,7 @@ def test_reservation_unit_exists(user_api_client, reservation_unit):
     assert response.data[0]["name"]["en"] == "Studio complex"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_purpose_filter(user_api_client, reservation_unit, reservation_unit2):
     purpose = PurposeFactory()
     purpose2 = PurposeFactory()
@@ -37,7 +37,7 @@ def test_reservation_unit_purpose_filter(user_api_client, reservation_unit, rese
     assert len(filtered_response.data) == 2
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_application_round_filter(
     user_api_client, reservation_unit, reservation_unit2, application_round
 ):
@@ -55,7 +55,7 @@ def test_reservation_unit_application_round_filter(
     assert response.data[0]["name"]["en"] == reservation_unit.name_en
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_search_filter(user_api_client, reservation_unit, reservation_unit2):
     response = user_api_client.get(reverse("reservationunit-list"))
     assert len(response.data) == 2
@@ -78,7 +78,7 @@ def test_reservation_unit_search_filter(user_api_client, reservation_unit, reser
     assert response.data[0]["name"]["fi"] == reservation_unit2.name
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_max_persons_filter(user_api_client, reservation_unit, reservation_unit2):
     response = user_api_client.get(reverse("reservationunit-list"))
     assert response.status_code == 200
@@ -96,7 +96,7 @@ def test_reservation_unit_max_persons_filter(user_api_client, reservation_unit, 
     assert response.data[0]["name"]["en"] == reservation_unit.name_en
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_is_draft_filter_true(user_api_client, reservation_unit, reservation_unit2):
     response = user_api_client.get(reverse("reservationunit-list"))
     assert response.status_code == 200
@@ -109,7 +109,7 @@ def test_reservation_unit_is_draft_filter_true(user_api_client, reservation_unit
     assert len(response.data) == 0
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_is_draft_filter_false(user_api_client, reservation_unit, reservation_unit2):
     response = user_api_client.get(reverse("reservationunit-list"))
     assert response.status_code == 200
@@ -122,7 +122,7 @@ def test_reservation_unit_is_draft_filter_false(user_api_client, reservation_uni
     assert len(response.data) == 2
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_unit_create(user, user_api_client, equipment_hammer, valid_reservation_unit_data):
     assert ReservationUnit.objects.count() == 0
 
@@ -142,7 +142,7 @@ def test_reservation_unit_create(user, user_api_client, equipment_hammer, valid_
     assert [x.id for x in unit.equipments.all()] == [equipment_hammer.id]
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_equipment_category_create(user_api_client, general_admin_api_client):
     assert EquipmentCategory.objects.count() == 0
     response = user_api_client.post(reverse("equipment_category-list"), data={"name": "New category"}, format="json")
@@ -154,7 +154,7 @@ def test_equipment_category_create(user_api_client, general_admin_api_client):
     assert EquipmentCategory.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_equipment_category_fetch(user_api_client, tools_equipment_category):
     response = user_api_client.get(reverse("equipment_category-list"), format="json")
     assert response.status_code == 200
@@ -162,7 +162,7 @@ def test_equipment_category_fetch(user_api_client, tools_equipment_category):
     assert response.data[0].get("name") == "Household tools"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_equipment_create(user_api_client, general_admin_api_client, tools_equipment_category):
     assert Equipment.objects.count() == 0
     response = user_api_client.post(
@@ -180,7 +180,7 @@ def test_equipment_create(user_api_client, general_admin_api_client, tools_equip
     assert Equipment.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_equipment_fetch(user_api_client, equipment_hammer):
     response = user_api_client.get(reverse("equipment-list"), format="json")
     assert response.status_code == 200
@@ -189,7 +189,7 @@ def test_equipment_fetch(user_api_client, equipment_hammer):
 
 
 # Permission tests starts here
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unauthenticated_cannot_create_reservation_unit(unauthenticated_api_client, valid_reservation_unit_data):
     response = unauthenticated_api_client.post(
         reverse("reservationunit-list"), valid_reservation_unit_data, format="json"
@@ -197,13 +197,13 @@ def test_unauthenticated_cannot_create_reservation_unit(unauthenticated_api_clie
     assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_normal_user_cannot_create_reservation_unit(user_api_client, valid_reservation_unit_data):
     response = user_api_client.post(reverse("reservationunit-list"), valid_reservation_unit_data, format="json")
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_normal_user_cannot_update_reservation_unit(user_api_client, valid_reservation_unit_data, reservation_unit):
     response = user_api_client.put(
         reverse("reservationunit-detail", kwargs={"pk": reservation_unit.id}),
@@ -213,7 +213,7 @@ def test_normal_user_cannot_update_reservation_unit(user_api_client, valid_reser
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_create_reservation(general_admin_api_client, valid_reservation_unit_data):
     response = general_admin_api_client.post(
         reverse("reservationunit-list"), valid_reservation_unit_data, format="json"
@@ -221,7 +221,7 @@ def test_general_admin_can_create_reservation(general_admin_api_client, valid_re
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_group_admin_can_create_reservation_unit(unit_group_admin_api_client, valid_reservation_unit_data):
     response = unit_group_admin_api_client.post(
         reverse("reservationunit-list"),
@@ -231,7 +231,7 @@ def test_unit_group_admin_can_create_reservation_unit(unit_group_admin_api_clien
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_group_admin_can_update_reservation_unit(
     unit_group_admin_api_client, valid_reservation_unit_data, reservation_unit
 ):
@@ -243,7 +243,7 @@ def test_unit_group_admin_can_update_reservation_unit(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_admin_can_create_reservation_unit(unit_admin_api_client, valid_reservation_unit_data):
     response = unit_admin_api_client.post(
         reverse("reservationunit-list"),
@@ -253,7 +253,7 @@ def test_unit_admin_can_create_reservation_unit(unit_admin_api_client, valid_res
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_admin_can_update_reservation_unit(unit_admin_api_client, valid_reservation_unit_data, reservation_unit):
     response = unit_admin_api_client.put(
         reverse("reservationunit-detail", kwargs={"pk": reservation_unit.id}),
@@ -263,7 +263,7 @@ def test_unit_admin_can_update_reservation_unit(unit_admin_api_client, valid_res
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_manager_can_create_reservation_unit(unit_manager_api_client, valid_reservation_unit_data):
     response = unit_manager_api_client.post(
         reverse("reservationunit-list"),
@@ -273,7 +273,7 @@ def test_unit_manager_can_create_reservation_unit(unit_manager_api_client, valid
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_manager_can_update_reservation_unit(
     unit_manager_api_client, valid_reservation_unit_data, reservation_unit
 ):
@@ -285,7 +285,7 @@ def test_unit_manager_can_update_reservation_unit(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_viewer_cannot_update_reservation_unit(
     unit_viewer_api_client, valid_reservation_unit_data, reservation_unit
 ):
@@ -297,7 +297,7 @@ def test_unit_viewer_cannot_update_reservation_unit(
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_admin_can_create_reservation_unit(service_sector_admin_api_client, valid_reservation_unit_data):
     response = service_sector_admin_api_client.post(
         reverse("reservationunit-list"),
@@ -307,7 +307,7 @@ def test_service_sector_admin_can_create_reservation_unit(service_sector_admin_a
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_admin_can_update_reservation_unit(
     service_sector_admin_api_client, valid_reservation_unit_data, reservation_unit
 ):
@@ -319,7 +319,7 @@ def test_service_sector_admin_can_update_reservation_unit(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_application_manager_cannot_update_reservation_unit(
     service_sector_application_manager_api_client,
     valid_reservation_unit_data,
@@ -333,7 +333,7 @@ def test_service_sector_application_manager_cannot_update_reservation_unit(
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_wrong_service_sectors_admin_cannot_update_reservation_unit(
     service_sector_2_admin_api_client, valid_reservation_unit_data, reservation_unit
 ):

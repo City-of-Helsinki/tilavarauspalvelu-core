@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
+import pytest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest import raises
 
 from applications.models import CUSTOMER_TYPES
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
@@ -178,6 +178,6 @@ class HelpersTestCase(TestCase):
         assert_that(number_label).is_equal_to("Varausnumero")
 
     def test_get_meta_label_raises_exception_with_unsupported_key(self):
-        with raises(UnsupportedMetaKey) as err:
+        with pytest.raises(UnsupportedMetaKey) as err:
             get_meta_label("unsupported", self.reservation)
         assert_that(str(err.value)).is_equal_to("Invalid meta label key 'unsupported'")

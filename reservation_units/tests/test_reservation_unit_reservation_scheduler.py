@@ -22,7 +22,7 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @pytest.mark.skipif(skip_long_running(), reason="Slow test")
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2022-01-01")
 @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
 class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):

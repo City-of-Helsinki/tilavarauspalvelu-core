@@ -6,7 +6,7 @@ from django.urls import reverse
 from reservations.models import AbilityGroup, AgeGroup, Reservation
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_create(user_api_client, valid_reservation_data, user):
     assert Reservation.objects.count() == 0
     response = user_api_client.post(reverse("reservation-list"), data=valid_reservation_data, format="json")
@@ -15,7 +15,7 @@ def test_reservation_create(user_api_client, valid_reservation_data, user):
     assert Reservation.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_overlapping(user_api_client, reservation, valid_reservation_data):
     """
     Reservation begins 5 minutes before the initial reservation ends,
@@ -27,7 +27,7 @@ def test_reservation_overlapping(user_api_client, reservation, valid_reservation
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_overlapping_with_child_space(
     user_api_client,
     confirmed_reservation,
@@ -45,7 +45,7 @@ def test_reservation_overlapping_with_child_space(
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_overlapping_with_parent_space(
     user_api_client,
     confirmed_reservation,
@@ -63,7 +63,7 @@ def test_reservation_overlapping_with_parent_space(
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_overlapping_with_same_resource(
     user_api_client,
     confirmed_reservation,
@@ -81,7 +81,7 @@ def test_reservation_overlapping_with_same_resource(
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_fetch_should_filter_by_status(user_api_client, reservation):
     url = f"{reverse('reservation-list')}?state=created&state=cancelled"
 
@@ -97,7 +97,7 @@ def test_reservation_fetch_should_filter_by_status(user_api_client, reservation)
     assert len(response.data) == 0
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_fetch_effectively_active_reservations(user_api_client, reservation, confirmed_reservation):
     url = f"{reverse('reservation-list')}?active=true"
 
@@ -114,7 +114,7 @@ def test_reservation_fetch_effectively_active_reservations(user_api_client, rese
     assert response.data[0].get("state") == "created"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_reservation_fetch_filtering_by_reservation_unit(
     user_api_client,
     reservation_unit,
@@ -151,7 +151,7 @@ def test_reservation_fetch_filtering_by_reservation_unit(
     assert to_reservation_unit_ids(response.data) == [reservation_unit2.id]
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_age_group_create(user_api_client, general_admin_api_client):
     assert AgeGroup.objects.count() == 0
 
@@ -166,7 +166,7 @@ def test_age_group_create(user_api_client, general_admin_api_client):
     assert AgeGroup.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_age_group_create_invalid_maximum(general_admin_api_client):
     assert AgeGroup.objects.count() == 0
     response = general_admin_api_client.post(
@@ -176,7 +176,7 @@ def test_age_group_create_invalid_maximum(general_admin_api_client):
     assert "Maximum age should be larger than minimum age" in response.data["non_field_errors"]
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_age_group_fetch(user_api_client, ten_to_15_age_group):
     response = user_api_client.get(reverse("age_group-list"))
     assert response.status_code == 200
@@ -185,7 +185,7 @@ def test_age_group_fetch(user_api_client, ten_to_15_age_group):
     assert response.data[0].get("maximum") == 15
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_ability_group_create(user_api_client, general_admin_api_client):
     assert AbilityGroup.objects.count() == 0
 
@@ -198,7 +198,7 @@ def test_ability_group_create(user_api_client, general_admin_api_client):
     assert AbilityGroup.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_ability_group_fetch(user_api_client, hobbyist_ability_group):
     response = user_api_client.get(reverse("ability_group-list"))
     assert response.status_code == 200
@@ -206,19 +206,19 @@ def test_ability_group_fetch(user_api_client, hobbyist_ability_group):
     assert response.data[0].get("name") == "Hobbyist level"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unauthenticated_cannot_create_reservation(unauthenticated_api_client, valid_reservation_data):
     response = unauthenticated_api_client.post(reverse("reservation-list"), valid_reservation_data, format="json")
     assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_user_can_create_reservation(user_api_client, valid_reservation_data):
     response = user_api_client.post(reverse("reservation-list"), valid_reservation_data, format="json")
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_user_can_update_own_reservation(user_api_client, valid_reservation_data, reservation):
     response = user_api_client.put(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
@@ -228,7 +228,7 @@ def test_user_can_update_own_reservation(user_api_client, valid_reservation_data
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_user_cannot_view_or_update_other_users_reservation(user_2_api_client, valid_reservation_data, reservation):
     response = user_2_api_client.get(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
@@ -244,7 +244,7 @@ def test_user_cannot_view_or_update_other_users_reservation(user_2_api_client, v
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_update_users_reservation(general_admin_api_client, valid_reservation_data, reservation):
     response = general_admin_api_client.put(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
@@ -254,7 +254,7 @@ def test_general_admin_can_update_users_reservation(general_admin_api_client, va
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_admin_can_update_users_reservation(unit_admin_api_client, valid_reservation_data, reservation):
     response = unit_admin_api_client.put(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
@@ -264,7 +264,7 @@ def test_unit_admin_can_update_users_reservation(unit_admin_api_client, valid_re
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_manager_can_update_users_reservation(unit_manager_api_client, valid_reservation_data, reservation):
     response = unit_manager_api_client.put(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
@@ -274,7 +274,7 @@ def test_unit_manager_can_update_users_reservation(unit_manager_api_client, vali
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_viewer_cannot_update_users_reservation(unit_viewer_api_client, valid_reservation_data, reservation):
     response = unit_viewer_api_client.put(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
@@ -284,7 +284,7 @@ def test_unit_viewer_cannot_update_users_reservation(unit_viewer_api_client, val
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_viewer_can_view_users_reservation(unit_viewer_api_client, reservation):
     response = unit_viewer_api_client.get(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
@@ -293,7 +293,7 @@ def test_unit_viewer_can_view_users_reservation(unit_viewer_api_client, reservat
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_admin_can_update_users_reservation(
     service_sector_admin_api_client, valid_reservation_data, reservation
 ):
@@ -305,7 +305,7 @@ def test_service_sector_admin_can_update_users_reservation(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_application_manager_cannot_view_or_update_users_reservation(
     service_sector_application_manager_api_client, valid_reservation_data, reservation
 ):
@@ -323,7 +323,7 @@ def test_service_sector_application_manager_cannot_view_or_update_users_reservat
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_wrong_service_sectors_admin_cannot_view_or_update_users_reservation(
     service_sector_2_admin_api_client, valid_reservation_data, reservation
 ):

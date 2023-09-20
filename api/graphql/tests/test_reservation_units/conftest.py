@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def setup_hauki_env_variables(settings):
+def _setup_hauki_env_variables(settings):
     settings.HAUKI_API_URL = "url"
     settings.HAUKI_EXPORTS_ENABLED = None
     settings.HAUKI_ORIGIN_ID = "origin"

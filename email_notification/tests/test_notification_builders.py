@@ -1,6 +1,7 @@
 import datetime
 from decimal import Decimal
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
@@ -214,7 +215,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     @override_settings(EMAIL_TEMPLATE_CONTEXT_VARIABLES=settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES + ["imnotdefined"])
     def test_context_attr_map_fails_on_undefined_methods(self):
-        with self.assertRaises(EmailBuilderConfigError):
+        with pytest.raises(EmailBuilderConfigError):
             ReservationEmailNotificationBuilder(self.reservation, self.email_template)
 
     def test_validate_fails_on_init_when_unsupported_tag(self):
@@ -223,7 +224,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             subject="test",
             type=EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
         )
-        with self.assertRaises(EmailTemplateValidationError):
+        with pytest.raises(EmailTemplateValidationError):
             ReservationEmailNotificationBuilder(self.reservation, template)
 
     def test_validate_fails_on_init_when_illegal_tag(self):
@@ -232,7 +233,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
             subject="test",
             type=EmailType.HANDLING_REQUIRED_RESERVATION,
         )
-        with self.assertRaises(EmailTemplateValidationError):
+        with pytest.raises(EmailTemplateValidationError):
             ReservationEmailNotificationBuilder(self.reservation, template)
 
     def test_get_subject(self):
@@ -410,7 +411,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
                     {% endmacro %}
                 """
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
-        with self.assertRaises(EmailTemplateValidationError):
+        with pytest.raises(EmailTemplateValidationError):
             ReservationEmailNotificationBuilder(self.reservation, template)
 
     def test_currency_filter_comma_separator(self):

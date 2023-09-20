@@ -3,10 +3,10 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
-from pytest import raises
 
 from merchants.verkkokauppa.payment.exceptions import ParsePaymentError
 from merchants.verkkokauppa.payment.types import Payment
@@ -56,11 +56,11 @@ class PaymentTestCase(TestCase):
     def test_product_from_json_raises_exception_if_key_is_missing(self):
         response = self.get_payment_response.copy()
         response.pop("paymentId")
-        with raises(ParsePaymentError):
+        with pytest.raises(ParsePaymentError):
             Payment.from_json(response)
 
     def test_product_from_json_raises_exception_if_value_is_invalid(self):
         response = self.get_payment_response.copy()
         response["orderId"] = "invalid-id"
-        with raises(ParsePaymentError):
+        with pytest.raises(ParsePaymentError):
             Payment.from_json(response)

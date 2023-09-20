@@ -49,7 +49,7 @@ class GetNotificationRecipientsTestCase(TestCase):
 
         UnitRolePermission.objects.create(role=cls.unit_role_choice, permission="can_manage_reservations")
 
-    @pytest.mark.django_db
+    @pytest.mark.django_db()
     def test_get_staff_get_notification_recipients(self):
         result = get_staff_notification_recipients(
             self.reservation,
@@ -61,13 +61,13 @@ class GetNotificationRecipientsTestCase(TestCase):
         assert_that(result).contains(self.manager1.email, self.manager2.email)
         assert_that(result).does_not_contain(self.normal_user.email)
 
-    @pytest.mark.django_db
+    @pytest.mark.django_db()
     def test_get_staff_notification_recipients_matching_settings(self):
         result = get_staff_notification_recipients(self.reservation, [ReservationNotification.ONLY_HANDLING_REQUIRED])
         assert_that(result).contains(self.manager2.email)
         assert_that(result).does_not_contain(self.manager1.email, self.normal_user.email)
 
-    @pytest.mark.django_db
+    @pytest.mark.django_db()
     def test_get_staff_notification_recipients_without_reservation_user(self):
         self.reservation.user = self.manager1
         self.reservation.save()

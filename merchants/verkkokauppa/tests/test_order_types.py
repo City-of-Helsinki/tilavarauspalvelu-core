@@ -3,11 +3,11 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.utils.timezone import utc
-from pytest import raises
 
 from merchants.verkkokauppa.order.exceptions import ParseOrderError
 from merchants.verkkokauppa.order.types import (
@@ -246,11 +246,11 @@ class OrderTypesTestCase(TestCase):
     def test_order_from_json_raises_exception_if_key_is_missing(self):
         response = self.create_order_response.copy()
         response.pop("orderId")
-        with raises(ParseOrderError):
+        with pytest.raises(ParseOrderError):
             Order.from_json(response)
 
     def test_order_from_json_raises_exception_if_value_is_invalid(self):
         response = self.create_order_response.copy()
         response["orderId"] = "invalid-order-id"
-        with raises(ParseOrderError):
+        with pytest.raises(ParseOrderError):
             Order.from_json(response)

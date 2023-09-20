@@ -2,10 +2,10 @@ from contextlib import suppress
 from unittest.mock import Mock
 from uuid import UUID
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
-from pytest import raises
 from requests import Timeout
 
 from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
@@ -97,28 +97,28 @@ class CreateProductTestCase(ProductRequestsTestCaseBase):
         response = self.create_product_response()
         params = self.create_product_params()
         response.pop("productId")
-        with raises(CreateProductError):
+        with pytest.raises(CreateProductError):
             create_product(params, mock_post(response))
 
     def test_create_product_raises_exception_if_product_id_is_invalid(self):
         response = self.create_product_response()
         params = self.create_product_params()
         response["productId"] = "invalid-id"
-        with raises(CreateProductError):
+        with pytest.raises(CreateProductError):
             create_product(params, mock_post(response))
 
     def test_create_product_raises_exception_if_status_code_is_not_201(self):
         response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
         params = self.create_product_params()
         post = mock_post(response, status_code=500)
-        with raises(CreateProductError) as e:
+        with pytest.raises(CreateProductError) as e:
             create_product(params, post)
 
         assert_that(str(e.value)).contains("mock-error")
 
     def test_create_product_raises_exception_on_timeout(self):
         params = self.create_product_params()
-        with raises(CreateProductError):
+        with pytest.raises(CreateProductError):
             create_product(params, Mock(side_effect=Timeout()))
 
 
@@ -157,7 +157,7 @@ class GetProductMappingTestCase(ProductRequestsTestCaseBase):
     def test_get_product_mapping_raises_exception_on_server_error(self):
         response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
         get = mock_get(response, status_code=500)
-        with raises(GetProductMappingError) as e:
+        with pytest.raises(GetProductMappingError) as e:
             get_product_mapping(self.product_id, get)
 
         assert_that(str(e.value)).contains("mock-error")
@@ -166,7 +166,7 @@ class GetProductMappingTestCase(ProductRequestsTestCaseBase):
         response = self.get_product_mapping_response()
         response.pop("merchantId")
         get = mock_get(response)
-        with raises(GetProductMappingError):
+        with pytest.raises(GetProductMappingError):
             get_product_mapping(self.product_id, get)
 
 
@@ -192,14 +192,14 @@ class CreateOrUpdateAccountingTestCase(ProductRequestsTestCaseBase):
         response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
         params = self.create_or_update_account_params()
         post = mock_post(response, status_code=500)
-        with raises(CreateOrUpdateAccountingError) as e:
+        with pytest.raises(CreateOrUpdateAccountingError) as e:
             create_or_update_accounting("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post)
 
         assert_that(str(e.value)).contains("mock-error")
 
     def test_create_or_update_accounting_raises_exception_on_timeout(self):
         params = self.create_or_update_account_params()
-        with raises(CreateOrUpdateAccountingError):
+        with pytest.raises(CreateOrUpdateAccountingError):
             create_or_update_accounting(
                 "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
                 params,

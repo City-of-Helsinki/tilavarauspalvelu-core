@@ -9,7 +9,7 @@ from applications.models import ApplicationStatus
     "affect_sent_status",
     [ApplicationStatus.IN_REVIEW, ApplicationStatus.REVIEW_DONE],
 )
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_not_be_sent_when_one_in_sent_status_affecting_status(
     affect_sent_status, application_round, application, application2
 ):
@@ -29,7 +29,7 @@ def test_should_not_be_sent_when_one_in_sent_status_affecting_status(
         ApplicationStatus.SENT,
     ],
 )
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_be_sent_when_in_not_affecting_status(
     does_not_affect_sent_status, application_round, application, application2
 ):
