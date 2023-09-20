@@ -88,18 +88,17 @@ def test_filter_banner_notifications_by_target(graphql, value, expected):
     # when:
     # - The user requests banner notifications filtered by is_active
     response = graphql(
-        """
-        query {
-            bannerNotifications(target:%s) {
-                edges {
-                    node {
+        f"""
+        query {{
+            bannerNotifications(target:{value}) {{
+                edges {{
+                    node {{
                         name
-                    }
-                }
-            }
-        }
-        """
-        % (value,),
+                    }}
+                }}
+            }}
+        }}
+        """,
     )
 
     # then:

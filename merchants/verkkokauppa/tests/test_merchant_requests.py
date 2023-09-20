@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import Mock
 from uuid import UUID
 
@@ -42,7 +42,7 @@ class MerchantRequestsBaseTestCase(TestCase):
         shop_id="test-shop-id",
     )
 
-    mutation_merchant_response: Dict[str, Any] = {
+    mutation_merchant_response: dict[str, Any] = {
         "merchantId": "7107df38-5985-39c9-8c83-ffe18bff24f5",
         "namespace": "tilanvaraus",
         "createdAt": "2022-09-26T10:11:12.000",
@@ -75,7 +75,7 @@ class MerchantRequestsBaseTestCase(TestCase):
         ],
     }
 
-    get_merchant_response: Dict[str, Any] = {
+    get_merchant_response: dict[str, Any] = {
         "merchantName": "Test Merchant",
         "merchantStreet": "Test Street 1",
         "merchantZip": "00112",
@@ -90,7 +90,7 @@ class MerchantRequestsBaseTestCase(TestCase):
         "merchantShopId": "test-shop-id",
     }
 
-    get_merchants_response: Dict[str, Any] = {
+    get_merchants_response: dict[str, Any] = {
         "0": {
             "merchantId": "7107df38-5985-39c9-8c83-ffe18bff24f5",
             "namespace": "tilanvaraus",

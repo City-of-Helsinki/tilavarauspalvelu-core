@@ -92,7 +92,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")
 
@@ -131,7 +131,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")
 
@@ -150,7 +150,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_zero()
 
     def test_wrong_state_fails(self):
@@ -222,7 +222,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_zero()  # End is passed should not send email.
 
     @freezegun.freeze_time("2021-10-13T12:00:00Z")

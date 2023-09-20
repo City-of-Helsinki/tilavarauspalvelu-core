@@ -1,4 +1,3 @@
-from typing import Dict, List
 from unittest import mock
 from unittest.mock import MagicMock, patch
 
@@ -16,7 +15,7 @@ from users.utils.open_city_profile.basic_info_resolver import (
 )
 
 
-def get_email_nodes() -> List:
+def get_email_nodes() -> list:
     return [
         {
             "node": {
@@ -45,7 +44,7 @@ def get_email_nodes() -> List:
     ]
 
 
-def get_address_nodes() -> List:
+def get_address_nodes() -> list:
     return [
         {
             "node": {
@@ -82,7 +81,7 @@ def get_address_nodes() -> List:
     ]
 
 
-def get_phone_nodes() -> List:
+def get_phone_nodes() -> list:
     return [
         {
             "node": {
@@ -117,7 +116,7 @@ def get_phone_nodes() -> List:
     ]
 
 
-def get_profile_gql_response(addresses=None, phones=None, emails=None) -> Dict:
+def get_profile_gql_response(addresses=None, phones=None, emails=None) -> dict:
     addresses = addresses if isinstance(addresses, list) else get_address_nodes()
     phones = phones if isinstance(phones, list) else get_phone_nodes()
     emails = emails if isinstance(emails, list) else get_email_nodes()

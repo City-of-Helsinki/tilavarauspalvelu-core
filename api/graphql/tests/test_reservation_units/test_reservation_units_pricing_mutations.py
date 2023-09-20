@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, Dict
+from typing import Any
 
 from assertpy import assert_that
 
@@ -11,7 +11,7 @@ from reservation_units.models import PricingStatus, PricingType, ReservationUnit
 
 
 class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBase):
-    def get_valid_data(self, is_draft: bool) -> Dict[str, Any]:
+    def get_valid_data(self, is_draft: bool) -> dict[str, Any]:
         return {
             "isDraft": is_draft,
             "nameFi": "Pricing test unit FI",

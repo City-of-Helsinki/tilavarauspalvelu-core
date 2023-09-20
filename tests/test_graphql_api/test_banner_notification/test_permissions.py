@@ -238,18 +238,17 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
     # when:
     # - User requests banner notifications visible for them in the given target audience
     response = graphql(
-        """
-        query {
-          bannerNotifications (isVisible: true, target: %s){
-            edges {
-              node {
+        f"""
+        query {{
+          bannerNotifications (isVisible: true, target: {target}){{
+            edges {{
+              node {{
                 message
-              }
-            }
-          }
-        }
-        """
-        % (target,),
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:
@@ -384,18 +383,17 @@ def test_field_permissions_on_banner_notifications(graphql, field, user_type, ex
     # when:
     # - User requests given fields in banner notifications
     response = graphql(
-        """
-        query {
-          bannerNotifications (isVisible: true){
-            edges {
-              node {
-                %s
-              }
-            }
-          }
-        }
-        """
-        % (field,),
+        f"""
+        query {{
+          bannerNotifications (isVisible: true){{
+            edges {{
+              node {{
+                {field}
+              }}
+            }}
+          }}
+        }}
+        """,
     )
 
     # then:

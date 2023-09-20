@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 import pytest
 from django.urls import reverse
@@ -124,7 +123,7 @@ def test_reservation_fetch_filtering_by_reservation_unit(
     confirmed_reservation,
     reservation_in_second_unit,
 ):
-    def to_reservation_unit_ids(data: List[Reservation]) -> List[int]:
+    def to_reservation_unit_ids(data: list[Reservation]) -> list[int]:
         unit_ids = []
         for res in data:
             for unit in res["reservation_unit"]:

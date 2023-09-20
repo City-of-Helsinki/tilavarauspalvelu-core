@@ -1,5 +1,4 @@
 from contextlib import suppress
-from typing import Dict
 from unittest.mock import Mock
 from uuid import UUID
 
@@ -43,7 +42,7 @@ class ProductRequestsTestCaseBase(TestCase):
         )
 
     @classmethod
-    def create_product_response(cls) -> Dict[str, str]:
+    def create_product_response(cls) -> dict[str, str]:
         return {
             "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
             "namespace": "test-namespace",
@@ -52,7 +51,7 @@ class ProductRequestsTestCaseBase(TestCase):
         }
 
     @classmethod
-    def get_product_mapping_response(cls) -> Dict[str, str]:
+    def get_product_mapping_response(cls) -> dict[str, str]:
         return {
             "productId": "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
             "namespace": "test-namespace",
@@ -61,7 +60,7 @@ class ProductRequestsTestCaseBase(TestCase):
         }
 
     @classmethod
-    def create_or_update_accounting_response(cls) -> Dict[str, str]:
+    def create_or_update_accounting_response(cls) -> dict[str, str]:
         return {
             "productId": "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
             "vatCode": "AB",

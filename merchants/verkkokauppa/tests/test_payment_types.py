@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict
+from typing import Any
 from uuid import UUID
 
 from assertpy import assert_that
@@ -13,7 +13,7 @@ from merchants.verkkokauppa.payment.types import Payment
 
 
 class PaymentTestCase(TestCase):
-    get_payment_response: Dict[str, Any] = {
+    get_payment_response: dict[str, Any] = {
         "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
         "namespace": "tilavarauspalvelu",
         "orderId": "08c2d282-eb98-3271-a3fc-81fe200f129b",

@@ -781,22 +781,21 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ]
         for filter_name, filter_value, field_name in test_cases:
             response = self.query(
-                """
-                query {
-                    reservations(%s: "%s") {
+                f"""
+                query {{
+                    reservations({filter_name}: "{filter_value}") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnits {
-                                    %s
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnits {{
+                                    {field_name}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (filter_name, filter_value, field_name)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -826,22 +825,21 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ]
         for filter_name, filter_value, field_name in test_cases:
             response = self.query(
-                """
-                query {
-                    reservations(%s: "%s", orderBy:"name") {
+                f"""
+                query {{
+                    reservations({filter_name}: "{filter_value}", orderBy:"name") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnits {
-                                    %s
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnits {{
+                                    {field_name}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (filter_name, filter_value, field_name)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -881,25 +879,24 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.general_admin)
         response = self.query(
-            """
-            query {
-                reservations(unit:[%s, %s], orderBy:"name") {
+            f"""
+            query {{
+                reservations(unit:[{self.unit.pk}, {unit.pk}], orderBy:"name") {{
                     totalCount
-                    edges {
-                        node {
+                    edges {{
+                        node {{
                             name
-                            reservationUnits {
+                            reservationUnits {{
                                 nameFi
-                                unit {
+                                unit {{
                                     nameFi
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }}
             """
-            % (self.unit.pk, unit.pk)
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -1035,23 +1032,24 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         response = self.query(
             """
-            query {
-                reservations(reservationUnitType: [%s, %s], orderBy:"name") {
+            query {{
+                reservations(reservationUnitType: [{}, {}], orderBy:"name") {{
                     totalCount
-                    edges {
-                        node {
+                    edges {{
+                        node {{
                             name
-                            reservationUnits {
-                                reservationUnitType {
+                            reservationUnits {{
+                                reservationUnitType {{
                                     nameFi
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            """
-            % (self.reservation_unit_type.pk, reservation_unit_type.pk)
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """.format(
+                self.reservation_unit_type.pk, reservation_unit_type.pk
+            )
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -1203,22 +1201,21 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         test_data = ["Fi", "En", "Sv"]
         for lang in test_data:
             response = self.query(
-                """
-                query {
-                    reservations(orderBy:"reservationUnitName%s") {
+                f"""
+                query {{
+                    reservations(orderBy:"reservationUnitName{lang}") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnits {
-                                    name%s
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnits {{
+                                    name{lang}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (lang, lang)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -1291,24 +1288,23 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         test_data = ["Fi", "En", "Sv"]
         for lang in test_data:
             response = self.query(
-                """
-                query {
-                    reservations(orderBy:"unitName%s") {
+                f"""
+                query {{
+                    reservations(orderBy:"unitName{lang}") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnits {
-                                    unit {
-                                        name%s
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnits {{
+                                    unit {{
+                                        name{lang}
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (lang, lang)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -1475,24 +1471,23 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.general_admin)
         response = self.query(
-            """
-            query {
-                reservations(reservationUnit: [%s, %s], orderBy:"name") {
+            f"""
+            query {{
+                reservations(reservationUnit: [{self.reservation_unit.pk}, {other_unit.pk}], orderBy:"name") {{
                     totalCount
-                    edges {
-                        node {
+                    edges {{
+                        node {{
                             name
                             reserveeFirstName
                             reserveeLastName
-                            reservationUnits {
+                            reservationUnits {{
                                 nameFi
-                            }
-                        }
-                    }
-                }
-            }
+                            }}
+                        }}
+                    }}
+                }}
+            }}
             """
-            % (self.reservation_unit.pk, other_unit.pk)
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

@@ -1,5 +1,4 @@
 import datetime
-from typing import Dict, List, Optional
 
 import snapshottest
 from django.conf import settings
@@ -82,11 +81,11 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def get_mocked_opening_hours(
         self,
-        reservation_unit: Optional[ReservationUnit] = None,
-        date: Optional[datetime.date] = None,
+        reservation_unit: ReservationUnit | None = None,
+        date: datetime.date | None = None,
         start_hour: int = 6,
         end_hour: int = 22,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         if not reservation_unit:
             reservation_unit = self.reservation_unit
         if not date:

@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 from unittest import mock
 from uuid import uuid4
 
@@ -28,7 +28,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
         self.client.force_login(self.general_admin)
 
     @staticmethod
-    def get_valid_data(order_uuid: str) -> Dict[str, Any]:
+    def get_valid_data(order_uuid: str) -> dict[str, Any]:
         return {
             "orderUuid": order_uuid,
         }

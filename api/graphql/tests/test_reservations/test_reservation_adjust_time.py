@@ -104,7 +104,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")
 
@@ -499,7 +499,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
@@ -522,7 +522,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(self.reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
 
         assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")

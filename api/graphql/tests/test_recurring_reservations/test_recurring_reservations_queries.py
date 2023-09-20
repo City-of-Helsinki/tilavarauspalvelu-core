@@ -190,22 +190,21 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ]
         for filter_name, filter_value, field_name in test_cases:
             response = self.query(
-                """
-                query {
-                    recurringReservations(%s: "%s") {
+                f"""
+                query {{
+                    recurringReservations({filter_name}: "{filter_value}") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnit {
-                                    %s
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnit {{
+                                    {field_name}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (filter_name, filter_value, field_name)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -235,22 +234,21 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ]
         for filter_name, filter_value, field_name in test_cases:
             response = self.query(
-                """
-                query {
-                    recurringReservations(%s: "%s", orderBy:"name") {
+                f"""
+                query {{
+                    recurringReservations({filter_name}: "{filter_value}", orderBy:"name") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnit {
-                                    %s
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnit {{
+                                    {field_name}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (filter_name, filter_value, field_name)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -290,25 +288,24 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.general_admin)
         response = self.query(
-            """
-            query {
-                recurringReservations(unit:[%s, %s], orderBy:"name") {
+            f"""
+            query {{
+                recurringReservations(unit:[{self.unit.pk}, {unit.pk}], orderBy:"name") {{
                     totalCount
-                    edges {
-                        node {
+                    edges {{
+                        node {{
                             name
-                            reservationUnit {
+                            reservationUnit {{
                                 nameFi
-                                unit {
+                                unit {{
                                     nameFi
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }}
             """
-            % (self.unit.pk, unit.pk)
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -356,23 +353,24 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         response = self.query(
             """
-            query {
-                recurringReservations(reservationUnitType: [%s, %s], orderBy:"name") {
+            query {{
+                recurringReservations(reservationUnitType: [{}, {}], orderBy:"name") {{
                     totalCount
-                    edges {
-                        node {
+                    edges {{
+                        node {{
                             name
-                            reservationUnit {
-                                reservationUnitType {
+                            reservationUnit {{
+                                reservationUnitType {{
                                     nameFi
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            """
-            % (self.reservation_unit_type.pk, reservation_unit_type.pk)
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """.format(
+                self.reservation_unit_type.pk, reservation_unit_type.pk
+            )
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -391,22 +389,21 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         test_data = ["Fi", "En", "Sv"]
         for lang in test_data:
             response = self.query(
-                """
-                query {
-                    recurringReservations(orderBy:"reservationUnitName%s") {
+                f"""
+                query {{
+                    recurringReservations(orderBy:"reservationUnitName{lang}") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnit {
-                                    name%s
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnit {{
+                                    name{lang}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (lang, lang)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -429,24 +426,23 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         test_data = ["Fi", "En", "Sv"]
         for lang in test_data:
             response = self.query(
-                """
-                query {
-                    recurringReservations(orderBy:"unitName%s") {
+                f"""
+                query {{
+                    recurringReservations(orderBy:"unitName{lang}") {{
                         totalCount
-                        edges {
-                            node {
+                        edges {{
+                            node {{
                                 name
-                                reservationUnit {
-                                    unit {
-                                        name%s
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                reservationUnit {{
+                                    unit {{
+                                        name{lang}
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
                 """
-                % (lang, lang)
             )
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
@@ -544,22 +540,21 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
         self.client.force_login(self.general_admin)
         response = self.query(
-            """
-            query {
-                recurringReservations(reservationUnit: [%s, %s], orderBy:"name") {
+            f"""
+            query {{
+                recurringReservations(reservationUnit: [{self.reservation_unit.pk}, {other_unit.pk}], orderBy:"name") {{
                     totalCount
-                    edges {
-                        node {
+                    edges {{
+                        node {{
                             name
-                            reservationUnit {
+                            reservationUnit {{
                                 nameFi
-                            }
-                        }
-                    }
-                }
-            }
+                            }}
+                        }}
+                    }}
+                }}
+            }}
             """
-            % (self.reservation_unit.pk, other_unit.pk)
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

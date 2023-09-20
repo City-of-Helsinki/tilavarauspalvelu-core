@@ -1,6 +1,5 @@
 import datetime
 from decimal import Decimal
-from typing import Optional
 
 from assertpy import assert_that
 from django.conf import settings
@@ -20,7 +19,7 @@ from tilavarauspalvelu.utils.commons import LANGUAGES
 
 
 class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
-    def get_builder(self, language: Optional[LANGUAGES] = None) -> ReservationEmailNotificationBuilder:
+    def get_builder(self, language: LANGUAGES | None = None) -> ReservationEmailNotificationBuilder:
         builder = ReservationEmailNotificationBuilder(self.reservation, self.email_template)
         if language:
             builder._set_language(language)

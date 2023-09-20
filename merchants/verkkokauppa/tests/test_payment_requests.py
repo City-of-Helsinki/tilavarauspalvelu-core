@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any
 from unittest import mock
 from unittest.mock import Mock
 from urllib.parse import urljoin
@@ -19,7 +19,7 @@ from merchants.verkkokauppa.tests.mocks import mock_get, mock_post
 
 
 class GetPaymentRequestsTestCase(TestCase):
-    get_payment_response: Dict[str, Any] = {
+    get_payment_response: dict[str, Any] = {
         "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
         "namespace": "tilavarauspalvelu",
         "orderId": "08c2d282-eb98-3271-a3fc-81fe200f129b",
@@ -95,7 +95,7 @@ class GetPaymentRequestsTestCase(TestCase):
 
 
 class RefundPaymentRequestsTestCase(TestCase):
-    refund_response: Dict[str, Any] = {
+    refund_response: dict[str, Any] = {
         "refunds": [
             {
                 "refundId": "6a8f7829-b6c7-4bbd-add2-0a200298a691",
@@ -168,7 +168,7 @@ class RefundPaymentRequestsTestCase(TestCase):
 
 
 class GetRefundStatusRequestsTestCase(TestCase):
-    refund_status_response: Dict[str, Any] = {
+    refund_status_response: dict[str, Any] = {
         "refundPaymentId": "ea0f16e8-14d7-4510-b83f-1a29494756f0_at_20230329-073612",
         "refundTransactionId": "61b2d842-ce04-11ed-9991-c7842594818f",
         "namespace": "tilanvaraus",

@@ -96,7 +96,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(reservation.priority).is_equal_to(self.get_valid_update_data()["priority"])
         assert_that(reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
 
     def test_updating_reservation_reservee_language_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -947,5 +947,5 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(reservation.priority).is_equal_to(self.get_valid_update_data()["priority"])
         assert_that(reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
-        assert_that(reservation.end).is_equal_to((self.reservation_end + datetime.timedelta(hours=1)))
+        assert_that(reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(reservation.reservee_first_name).is_not_equal_to("John")

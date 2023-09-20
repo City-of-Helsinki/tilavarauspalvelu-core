@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from assertpy import assert_that
 from django.test import TestCase
@@ -16,7 +16,7 @@ class GetPreviousReservationTestCase(TestCase):
         super().setUp()
         self.space: Space = SpaceFactory()
         self.reservation_unit: ReservationUnit = ReservationUnitFactory(spaces=[self.space])
-        self.now = datetime.now(tz=timezone.utc)
+        self.now = datetime.now(tz=UTC)
         self.reservation_blocked = ReservationFactory(
             begin=(self.now - timedelta(hours=2)),
             end=(self.now - timedelta(hours=1)),
@@ -55,7 +55,7 @@ class GetNextReservationTestCase(TestCase):
         super().setUp()
         self.space: Space = SpaceFactory()
         self.reservation_unit: ReservationUnit = ReservationUnitFactory(spaces=[self.space])
-        self.now = datetime.now(tz=timezone.utc)
+        self.now = datetime.now(tz=UTC)
         self.reservation_blocked = ReservationFactory(
             begin=(self.now + timedelta(hours=1)),
             end=(self.now + timedelta(hours=2)),
