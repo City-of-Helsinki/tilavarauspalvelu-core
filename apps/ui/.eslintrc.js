@@ -18,6 +18,17 @@ module.exports = {
   },
   rules: {
     "global-require": 0,
+    "import/no-unresolved": "off",
+    // mixing mjs with ts in nextjs causes issues
+    "import/extensions": [
+      "error",
+      "never",
+      {
+        "mjs": "always",
+        "cjs": "always",
+        "json": "always",
+      },
+    ],
     "import/no-extraneous-dependencies": [
       "error",
       {

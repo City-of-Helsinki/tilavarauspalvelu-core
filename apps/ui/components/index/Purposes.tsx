@@ -110,13 +110,13 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
           alignButton="right"
           data-testid="front-page__purposes"
         >
-          {purposes.map((item) => (
+          {purposes?.map((item) => (
             <Link
               key={item.pk}
               href={`${singleSearchPrefix}?purposes=${item.pk}#content`}
             >
               <PurposeItem data-testid="front-page__purposes--purpose">
-                <Image src={item.smallUrl} alt="" aria-hidden />
+                <Image src={item.smallUrl ?? ""} alt="" aria-hidden />
                 <Title>
                   <span>{getTranslation(item, "name")}</span>
                   <IconArrowRight size="s" aria-hidden />
