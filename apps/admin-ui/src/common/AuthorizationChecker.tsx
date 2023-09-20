@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "app/hooks/auth";
 import { Permission } from "app/modules/permissionHelper";
 import { usePermissionSuspended } from "app/hooks/usePermission";
 import MainLander from "app/component/MainLander";
@@ -16,8 +16,8 @@ const AuthorisationChecker = ({
 }) => {
   const { hasAnyPermission, hasSomePermission } = usePermissionSuspended();
 
-  const { data: session } = useSession();
-  if (!session?.user) {
+  const { isAuthenticated } = useSession();
+  if (!isAuthenticated) {
     return <MainLander />;
   }
 

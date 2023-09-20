@@ -5,7 +5,6 @@ import {
   InMemoryCache,
   from,
 } from "@apollo/client";
-import { signOut } from "next-auth/react";
 import { createUploadLink } from "apollo-upload-client";
 import { onError } from "@apollo/client/link/error";
 import { uniqBy } from "lodash";
@@ -15,9 +14,12 @@ import { ReservationTypeConnection } from "common/types/gql-types";
 import { SESSION_EXPIRED_ERROR, publicUrl, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
-const uri = `${publicUrl}/api/graphql`;
+// const uri = `${publicUrl}/api/graphql`;
+// const uri = `/api/graphql/`;
+const uri = `http://localhost:8000/graphql/`;
 const uploadLinkOptions = {
   uri,
+  credentials: "include",
   FormData: CustomFormData,
 };
 
@@ -26,7 +28,10 @@ const uploadLinkOptions = {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions) as unknown as ApolloLink;
-const httpLink = new HttpLink({ uri });
+const httpLink = new HttpLink({
+  uri,
+  credentials: "include",
+});
 
 // eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -38,7 +43,6 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (isSessionExpired) {
       // eslint-disable-next-line no-console
       console.warn("Session expired, signing out");
-      signOut();
     }
 
     graphQLErrors.forEach(async (error: GraphQLError) => {

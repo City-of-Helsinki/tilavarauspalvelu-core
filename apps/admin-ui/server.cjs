@@ -19,6 +19,11 @@ var options = {
   cert: fs.readFileSync(SSL_CRT_FILE),
 };
 
+// TODO add rewrite for /graphql/ and /api/ to the backend url (localhost:8000)
+// this is because otherwise we lose the session cookie
+// in production we don't need this
+// and this server can be deprecated after we change dev to use http (instead of ssl)
+
 app.prepare().then(() => {
   https
     .createServer(options, (req, res) => {

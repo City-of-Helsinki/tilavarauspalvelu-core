@@ -1,5 +1,5 @@
 import { useSuspenseQuery, useQuery } from "@apollo/client";
-import { useSession } from "next-auth/react";
+import { useSession } from "app/hooks/auth";
 import {
   type Query,
   type ReservationType,
@@ -49,8 +49,7 @@ const hasPermission = (
 
 /// @returns {user, hasPermission, hasSomePermission, hasAnyPermission}
 const usePermission = () => {
-  const { status } = useSession();
-  const isAuthenticated = status === "authenticated";
+  const { isAuthenticated } = useSession();
   const { data, error } = useQuery<Query>(CURRENT_USER, {
     skip: !isAuthenticated,
   });
@@ -83,8 +82,7 @@ const usePermission = () => {
 // Suspended version should be used sparingly because it has to be wrapped in a Suspense component
 // and if not it can go to infinite loops or crash.
 const usePermissionSuspended = () => {
-  const { status } = useSession();
-  const isAuthenticated = status === "authenticated";
+  const { isAuthenticated } = useSession();
   const { data, error } = useSuspenseQuery<Query>(CURRENT_USER, {
     skip: !isAuthenticated,
   });

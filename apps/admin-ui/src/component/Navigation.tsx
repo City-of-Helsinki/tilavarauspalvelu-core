@@ -3,7 +3,7 @@ import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { UserInfo } from "common";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "app/hooks/auth";
 import { breakpoints } from "common/src/common/style";
 import { useNavigate } from "react-router-dom";
 import { publicUrl } from "app/common/const";
@@ -40,7 +40,7 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
 
   const [isMenuOpen, setMenuState] = useState(false);
 
-  const { data: session } = useSession();
+  const { isAuthenticated } = useSession();
   // NOTE have to construct the name from GQL query because most users don't have names in oidc profile
   const { user } = usePermission();
   const firstName = user?.firstName?.trim() ?? "";
@@ -75,23 +75,18 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
           userName={name}
           authenticated={user != null}
           label={t(user != null ? "Navigation.logging" : "Navigation.login")}
-          onSignIn={() => {
-            const callbackUrl = window.location.href.match(/logout/)
-              ? publicUrl
-              : window.location.href;
-            signIn("tunnistamo", { callbackUrl });
-          }}
+          onSignIn={signIn}
         >
           {user && (
             <UserInfo
               name={name}
-              email={session?.user?.email || t("Navigation.noEmail")}
+              email={user?.email || t("Navigation.noEmail")}
             />
           )}
           <HDSNavigation.Item
             className="btn-logout"
             label={t("Navigation.logout")}
-            onClick={() => signOut({ callbackUrl: `${publicUrl}/auth/logout` })}
+            onClick={signOut}
             variant="primary"
           />
         </UserMenu>
