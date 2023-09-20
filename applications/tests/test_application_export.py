@@ -1297,7 +1297,7 @@ class ApplicationDataExporterTestCase(ApplicationDataExportTestCaseBase):
         assert_that(not_existing_file_high.is_file()).is_false()
 
     def test_empty_arguments_throw_error(self):
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(Exception):  # noqa: B017, PT011
             call_command("export_applications")
 
     def test_spaces_columns_are_added_dynamically(self):

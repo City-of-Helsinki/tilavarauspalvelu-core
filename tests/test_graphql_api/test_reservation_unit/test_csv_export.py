@@ -14,7 +14,7 @@ from tests.helpers import parametrize_helper
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("disable_elasticsearch"),
+    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

@@ -5,10 +5,10 @@ from unittest.mock import Mock
 from urllib.parse import urljoin
 from uuid import UUID
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
-from pytest import raises
 from requests import Timeout
 
 from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
@@ -76,7 +76,7 @@ class GetPaymentRequestsTestCase(TestCase):
         response = self.get_payment_response.copy()
         order_id = UUID(response.pop("orderId"))
         namespace = self.get_payment_response["namespace"]
-        with raises(GetPaymentError):
+        with pytest.raises(GetPaymentError):
             get_payment(order_id, namespace, mock_get(response))
 
     def test_get_payment_raises_exception_if_value_is_invalid(self):
@@ -84,13 +84,13 @@ class GetPaymentRequestsTestCase(TestCase):
         order_id = UUID(response["orderId"])
         response["orderId"] = "invalid-id"
         namespace = response["namespace"]
-        with raises(GetPaymentError):
+        with pytest.raises(GetPaymentError):
             get_payment(order_id, namespace, mock_get(response))
 
     def test_get_payment_raises_exception_on_timeout(self):
         order_id = UUID(self.get_payment_response["orderId"])
         namespace = self.get_payment_response["namespace"]
-        with raises(GetPaymentError):
+        with pytest.raises(GetPaymentError):
             get_payment(order_id, namespace, Mock(side_effect=Timeout()))
 
 
@@ -128,7 +128,7 @@ class RefundPaymentRequestsTestCase(TestCase):
         order_id = UUID(self.refund_response["refunds"][0]["orderId"])
         post = mock_post({}, status_code=500)
 
-        with raises(RefundPaymentError) as ex:
+        with pytest.raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
         assert_that(str(ex.value)).is_equal_to("Payment refund failed: problem with upstream service")
@@ -143,7 +143,7 @@ class RefundPaymentRequestsTestCase(TestCase):
 
         post = mock_post(response, status_code=200)
 
-        with raises(RefundPaymentError) as ex:
+        with pytest.raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
         assert_that(str(ex.value)).is_equal_to("Refund response refund count expected to be 1 but was 2")
@@ -158,7 +158,7 @@ class RefundPaymentRequestsTestCase(TestCase):
 
         post = mock_post(response, status_code=200)
 
-        with raises(RefundPaymentError) as ex:
+        with pytest.raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
         assert_that(str(ex.value)).is_equal_to(

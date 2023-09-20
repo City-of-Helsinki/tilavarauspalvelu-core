@@ -1,7 +1,7 @@
+import pytest
 from assertpy import assert_that
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from pytest import raises
 
 from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
@@ -20,7 +20,7 @@ class EmailNotificationBuilderTestCase(TestCase):
 
     def test_constructor_raises_error_on_invalid_text_content(self):
         template = EmailTemplateFactory(name="Test template", content_fi="Text content FI {{invalid_tag}}")
-        with raises(EmailTemplateValidationError) as err:
+        with pytest.raises(EmailTemplateValidationError) as err:
             ReservationEmailNotificationBuilder(self.reservation, template, "fi")
         assert_that(err.value.message).is_equal_to("Tag invalid_tag not supported")
 
@@ -31,14 +31,14 @@ class EmailNotificationBuilderTestCase(TestCase):
             content_fi="Text content FI",
             html_content_fi=html_file,
         )
-        with raises(EmailTemplateValidationError) as err:
+        with pytest.raises(EmailTemplateValidationError) as err:
             ReservationEmailNotificationBuilder(self.reservation, template, "fi")
         assert_that(err.value.message).is_equal_to("Tag invalid_tag not supported")
 
     def test_constructor_raises_error_when_reservation_and_context_are_given(self):
         template = EmailTemplateFactory(name="Test template", content_fi="Text content FI {{invalid_tag}}")
         context = EmailNotificationContext.from_reservation(self.reservation)
-        with raises(ReservationEmailNotificationBuilderException) as err:
+        with pytest.raises(ReservationEmailNotificationBuilderException) as err:
             ReservationEmailNotificationBuilder(self.reservation, template, "fi", context=context)
         assert_that(str(err.value)).is_equal_to(
             "Reservation and context cannot be used at the same time. Provide only one of them."

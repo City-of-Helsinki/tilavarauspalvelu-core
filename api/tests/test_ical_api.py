@@ -9,13 +9,13 @@ from rest_framework.reverse import reverse
 from api.ical_api import hmac_signature
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_regular_user_cant_get_url(user_api_client, reservation_unit):
     response = user_api_client.get(reverse("reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id}))
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_group_admin_can_get_calendar_url(unit_group_admin_api_client, reservation_unit):
     response = unit_group_admin_api_client.get(
         reverse("reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id})
@@ -28,7 +28,7 @@ def test_unit_group_admin_can_get_calendar_url(unit_group_admin_api_client, rese
     )
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_manager_can_get_calendar_url(unit_manager_api_client, reservation_unit):
     response = unit_manager_api_client.get(
         reverse("reservation_unit_calendar_url-detail", kwargs={"pk": reservation_unit.id})
@@ -36,13 +36,13 @@ def test_unit_manager_can_get_calendar_url(unit_manager_api_client, reservation_
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.usefixtures("_set_ical_secret")
+@pytest.mark.django_db()
 def test_getting_reservation_unit_calendar(
     user_api_client,
     reservation_unit,
     reservation,
     reservation_in_second_unit,
-    set_ical_secret,
 ):
     base_url = reverse("reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id})
     url = f"{base_url}?hash={hmac_signature(reservation_unit.uuid)}"
@@ -57,25 +57,25 @@ def test_getting_reservation_unit_calendar(
     assert_that(unexpected_start in zip_content).is_false()
 
 
-@pytest.mark.django_db
+@pytest.mark.usefixtures("_set_ical_secret")
+@pytest.mark.django_db()
 def test_getting_reservation_unit_calendar_without_hash(
     user_api_client,
     reservation_unit,
     reservation,
     reservation_in_second_unit,
-    set_ical_secret,
 ):
     response = user_api_client.get(reverse("reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id}))
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.usefixtures("_set_ical_secret")
+@pytest.mark.django_db()
 def test_getting_reservation_unit_calendar_with_invalid_hash(
     user_api_client,
     reservation_unit,
     reservation,
     reservation_in_second_unit,
-    set_ical_secret,
 ):
     base_url = reverse("reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id})
     url = f"{base_url}?hash={hmac_signature(uuid.uuid4())}"
@@ -83,7 +83,7 @@ def test_getting_reservation_unit_calendar_with_invalid_hash(
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_getting_application_event_calendar_name_for_organisation(
     user_api_client,
     application_event,
@@ -98,7 +98,7 @@ def test_getting_application_event_calendar_name_for_organisation(
     assert_that(organisation.name in zip_content).is_true()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_getting_application_event_calendar_name_for_contact_person(user_api_client, application_event, person):
     application_event.application.contact_person = person
     application_event.application.organisation = None
@@ -112,7 +112,7 @@ def test_getting_application_event_calendar_name_for_contact_person(user_api_cli
     assert_that(person.last_name in zip_content).is_true()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_getting_application_event_should_give_404_when_not_found(user_api_client, application_event, person):
     response = user_api_client.get(
         reverse(
@@ -124,12 +124,12 @@ def test_getting_application_event_should_give_404_when_not_found(user_api_clien
     assert_that(response.status_code).is_equal_to(404)
 
 
-@pytest.mark.django_db
+@pytest.mark.usefixtures("_set_ical_secret")
+@pytest.mark.django_db()
 def test_getting_reservation_calendar(
     user_api_client,
     reservation,
     reservation_in_second_unit,
-    set_ical_secret,
 ):
     base_url = reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
     url = f"{base_url}?hash={hmac_signature(f'reservation-{reservation.pk}')}"
@@ -148,21 +148,21 @@ def test_getting_reservation_calendar(
     assert_that(zip_content).does_not_contain(unexpected_start)
 
 
-@pytest.mark.django_db
+@pytest.mark.usefixtures("_set_ical_secret")
+@pytest.mark.django_db()
 def test_getting_reservation_calendar_without_hash(
     user_api_client,
     reservation,
-    set_ical_secret,
 ):
     response = user_api_client.get(reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk}))
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.usefixtures("_set_ical_secret")
+@pytest.mark.django_db()
 def test_getting_reservation_calendar_with_invalid_hash(
     user_api_client,
     reservation,
-    set_ical_secret,
 ):
     base_url = reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
     url = f"{base_url}?hash={hmac_signature('this-does-not-exist')}"

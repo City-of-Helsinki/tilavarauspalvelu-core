@@ -4,7 +4,7 @@ from django.urls import reverse
 from resources.models import Resource
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_resource_create(general_admin_api_client, user_api_client, valid_resource_data):
     assert Resource.objects.count() == 0
     response = user_api_client.post(reverse("resource-list"), data=valid_resource_data, format="json")
@@ -15,7 +15,7 @@ def test_resource_create(general_admin_api_client, user_api_client, valid_resour
     assert Resource.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_translatedmodelserializer(general_admin_api_client, valid_resource_data):
     assert Resource.objects.count() == 0
     # POST should be able to create a resource with nested name structure from valid_resource_data

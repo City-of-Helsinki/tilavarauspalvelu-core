@@ -6,11 +6,11 @@ from unittest.mock import Mock
 from urllib.parse import urljoin
 from uuid import UUID
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.utils.timezone import utc
-from pytest import raises
 from requests import Timeout
 
 from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
@@ -285,35 +285,35 @@ class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
     def test_create_order_raises_exception_if_order_id_is_missing(self):
         response = self.create_order_response.copy()
         response.pop("orderId")
-        with raises(CreateOrderError):
+        with pytest.raises(CreateOrderError):
             create_order(self.create_order_params, mock_post(response))
 
     def test_create_order_raises_exception_if_checkout_url_is_missing(self):
         response = self.create_order_response.copy()
         response.pop("checkoutUrl")
-        with raises(CreateOrderError):
+        with pytest.raises(CreateOrderError):
             create_order(self.create_order_params, mock_post(response))
 
     def test_create_order_raises_exception_if_order_id_is_invalid(self):
         response = self.create_order_response.copy()
         response["orderId"] = "invalid-id"
-        with raises(CreateOrderError):
+        with pytest.raises(CreateOrderError):
             create_order(self.create_order_params, mock_post(response))
 
     def test_create_order_raises_exception_on_timeout(self):
-        with raises(CreateOrderError):
+        with pytest.raises(CreateOrderError):
             create_order(self.create_order_params, Mock(side_effect=Timeout()))
 
     def test_create_order_raises_exception_if_status_is_500(self):
         post = mock_post(self.create_order_response, status_code=500)
-        with raises(CreateOrderError) as ex:
+        with pytest.raises(CreateOrderError) as ex:
             create_order(self.create_order_params, post)
 
         assert_that(str(ex.value)).is_equal_to("Order creation failed: problem with upstream service")
 
     def test_create_order_raises_exception_if_status_code_is_not_201(self):
         post = mock_post(self.create_order_response, status_code=400)
-        with raises(CreateOrderError):
+        with pytest.raises(CreateOrderError):
             create_order(self.create_order_params, post)
 
 
@@ -340,7 +340,7 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
     def test_get_order_raises_exception_if_order_id_is_missing(self):
         response = self.get_order_response.copy()
         order_id = UUID(response.pop("orderId"))
-        with raises(GetOrderError):
+        with pytest.raises(GetOrderError):
             get_order(
                 order_id,
                 mock_get(response),
@@ -349,14 +349,14 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
     def test_get_order_raises_exception_if_checkout_url_is_missing(self):
         response = self.get_order_response.copy()
         response.pop("checkoutUrl")
-        with raises(GetOrderError):
+        with pytest.raises(GetOrderError):
             get_order(
                 UUID(response["orderId"]),
                 mock_get(response),
             )
 
     def test_get_order_raises_exception_on_timeout(self):
-        with raises(GetOrderError):
+        with pytest.raises(GetOrderError):
             get_order(
                 UUID(self.get_order_response["orderId"]),
                 Mock(side_effect=Timeout()),
@@ -364,7 +364,7 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
 
     def test_get_order_raises_exception_on_404(self):
         get = mock_get(self.get_order_404_response, status_code=404)
-        with raises(GetOrderError) as e:
+        with pytest.raises(GetOrderError) as e:
             get_order(UUID(self.get_order_response["orderId"]), get)
         assert_that(str(e.value)).is_equal_to(
             "Order not found: [{'code': 'order-not-found', 'message': 'Order not found'}]"
@@ -407,7 +407,7 @@ class CancelOrderRequestsTestCase(OrderRequestsTestCaseBase):
         user = self.cancel_order_response["order"]["user"]
         post = mock_post({}, status_code=500)
 
-        with raises(CancelOrderError) as ex:
+        with pytest.raises(CancelOrderError) as ex:
             cancel_order(order_id, user, post)
 
         assert_that(str(ex.value)).is_equal_to("Order cancellation failed: problem with upstream service")

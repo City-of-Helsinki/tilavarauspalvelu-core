@@ -1,9 +1,9 @@
 from unittest import mock
 
+import pytest
 from assertpy import assert_that
 from django.test import override_settings
 from django.test.testcases import TestCase
-from pytest import raises
 
 from utils import image_cache
 
@@ -23,7 +23,7 @@ class ImageCacheTestCase(TestCase):
 
     @override_settings(IMAGE_CACHE_VARNISH_HOST=None)
     def test_purge_error_if_cache_root_url_missing(self):
-        with raises(image_cache.ImageCacheConfigurationError) as err:
+        with pytest.raises(image_cache.ImageCacheConfigurationError) as err:
             image_cache.purge("foo/bar.jpg")
 
         assert_that(str(err.value)).is_equal_to(
@@ -32,7 +32,7 @@ class ImageCacheTestCase(TestCase):
 
     @override_settings(IMAGE_CACHE_PURGE_KEY=None)
     def test_purge_error_if_cache_purge_key_missing(self):  # NOSONAR python:S4144
-        with raises(image_cache.ImageCacheConfigurationError) as err:
+        with pytest.raises(image_cache.ImageCacheConfigurationError) as err:
             image_cache.purge("foo/bar.jpg")
 
         assert_that(str(err.value)).is_equal_to(

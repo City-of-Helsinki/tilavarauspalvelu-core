@@ -15,7 +15,7 @@ from tests.factories import RecurringReservationFactory, ReservationFactory
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_aggregate_data_creates_when_status_in_review(
     recurring_application_event,
 ):
@@ -24,7 +24,7 @@ def test_application_aggregate_data_creates_when_status_in_review(
     assert ApplicationAggregateData.objects.count() == 4
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_aggregate_data_does_not_create_when_status_not_in_review(
     recurring_application_event,
 ):
@@ -32,7 +32,7 @@ def test_application_aggregate_data_does_not_create_when_status_not_in_review(
     assert ApplicationAggregateData.objects.exists() is False
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_aggregate_data_contains_min_duration_total(
     recurring_application_event,
 ):
@@ -59,7 +59,7 @@ def test_application_aggregate_data_contains_min_duration_total(
     assert min_dur_tot.value == (12 * 3600) + (16 * 3600)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_aggregate_data_contains_reservations_total(
     recurring_application_event,
 ):
@@ -86,7 +86,7 @@ def test_application_aggregate_data_contains_reservations_total(
     assert res_tot.value == (12) + (16)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_aggregate_data_creates_data_per_application(
     recurring_application_event, application_in_second_application_round
 ):
@@ -112,7 +112,7 @@ def test_aggregate_data_creates_data_per_application(
     assert ApplicationAggregateData.objects.filter(application=application_in_second_application_round).count() == 4
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_aggregate_data_creates_data_per_application_reservations_total(
     recurring_application_event, application_in_second_application_round
 ):
@@ -142,7 +142,7 @@ def test_aggregate_data_creates_data_per_application_reservations_total(
     assert two_res.value == 8
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_aggregate_data_creates_data_per_application_min_duration_total(
     recurring_application_event, application_in_second_application_round
 ):
@@ -172,7 +172,7 @@ def test_aggregate_data_creates_data_per_application_min_duration_total(
     assert two_res.value == 8 * 3600
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_aggregate_data_creates_data_per_application_reservations_duration_total(
     recurring_application_event, application_in_second_application_round
 ):
@@ -213,7 +213,7 @@ def test_aggregate_data_creates_data_per_application_reservations_duration_total
     assert_that(two_res.value).is_equal_to(3600 * 3)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_aggregate_data_creates_data_per_application_created_reservations_total(
     recurring_application_event, application_in_second_application_round
 ):

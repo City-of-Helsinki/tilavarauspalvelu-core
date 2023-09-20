@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from applications.models import ApplicationEventScheduleResult
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_accepting_allocation_result(result_scheduled_for_monday, general_admin_api_client):
     response = general_admin_api_client.put(
         reverse(
@@ -20,7 +20,7 @@ def test_accepting_allocation_result(result_scheduled_for_monday, general_admin_
     assert response.data["accepted"] is True
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_deleting_allocation_result(result_scheduled_for_monday, general_admin_api_client):
     assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
     response = general_admin_api_client.delete(

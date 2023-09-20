@@ -1,6 +1,7 @@
 from unittest import mock
 from unittest.mock import MagicMock, patch
 
+import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -343,7 +344,7 @@ class ProfileUserInfoReaderTestCase(TestCase):
         ret_val.status_code = 400
         mock_get.return_value = ret_val
 
-        with self.assertRaises(ProfileReadError):
+        with pytest.raises(ProfileReadError):
             ProfileUserInfoReader(self.user, self.request)
 
     @patch("requests.get")
@@ -352,7 +353,7 @@ class ProfileUserInfoReaderTestCase(TestCase):
         ret_val.status_code = 500
         mock_get.return_value = ret_val
 
-        with self.assertRaises(ProfileReadError):
+        with pytest.raises(ProfileReadError):
             ProfileUserInfoReader(self.user, self.request)
 
 
@@ -391,7 +392,7 @@ class ProfileNodeIdReaderTestCase(TestCase):
     def test_gql_response_has_errors_raises(self, gql_mock):
         response_mock.json.return_value = {"errors": [{"message": "Error!"}]}
 
-        with self.assertRaises(ProfileReadError):
+        with pytest.raises(ProfileReadError):
             self.reader.get_user_profile_id()
 
     def test_cannot_parse_json_raises(self, gql_mock):
@@ -399,7 +400,7 @@ class ProfileNodeIdReaderTestCase(TestCase):
         ret_val.status_code = 400
         gql_mock.return_value = ret_val
 
-        with self.assertRaises(ProfileReadError):
+        with pytest.raises(ProfileReadError):
             self.reader.get_user_profile_id()
 
     def test_getting_500_from_profile_raises(self, gql_mock):
@@ -407,5 +408,5 @@ class ProfileNodeIdReaderTestCase(TestCase):
         ret_val.status_code = 500
         gql_mock.return_value = ret_val
 
-        with self.assertRaises(ProfileReadError):
+        with pytest.raises(ProfileReadError):
             self.reader.get_user_profile_id()

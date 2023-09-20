@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from assertpy import assert_that
 from django.test import override_settings
 from django.test.testcases import TestCase
@@ -61,7 +62,7 @@ class HaukiExporterTestCase(TestCase):
         self.reservation_unit.unit.hauki_resource_id = None
         hauki_mock.return_value = hauki_mock.return_value = {"results": []}
         exporter = ReservationUnitHaukiExporter(self.reservation_unit)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             exporter._get_hauki_resource_object_from_reservation_unit()
 
     @mock.patch("reservation_units.utils.hauki_exporter.send_resource_to_hauki")

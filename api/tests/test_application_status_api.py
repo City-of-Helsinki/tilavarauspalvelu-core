@@ -48,7 +48,7 @@ class MockedScheduler:
 
 
 @freeze_time("2021-05-03")
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @mock.patch("applications.signals")
 class ApplicationStatusBaseTestCase(TestCase):
     @classmethod
@@ -114,7 +114,7 @@ class ApplicationStatusBaseTestCase(TestCase):
         cls.unit_handler_client.force_authenticate(cls.unit_handler_user)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class ApplicationStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase):
     def test_service_sector_manager_cant_modify_status(self):
         response = self.manager_api_client.post(
@@ -169,7 +169,7 @@ class ApplicationStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase):
         )
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase):
     def test_user_cant_create_status(self):
         response = self.applicant_api_client.post(

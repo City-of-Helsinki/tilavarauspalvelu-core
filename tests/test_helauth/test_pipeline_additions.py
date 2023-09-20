@@ -15,7 +15,7 @@ class ErrorParams(NamedTuple):
     error_message: str
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_update_user_from_profile():
     # given:
     # - There is a user without profile info
@@ -47,7 +47,7 @@ def test_update_user_from_profile():
     assert user.date_of_birth == date(2001, 1, 1)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
@@ -147,7 +147,7 @@ def test_update_user_from_profile_logs_to_sentry_if_unsuccessful(token, profile_
 
 
 @pytest.mark.parametrize(
-    ["id_number", "expected"],
+    ("id_number", "expected"),
     [
         ("010101+1234", date(1801, 1, 1)),
         ("020201-1234", date(1901, 2, 2)),

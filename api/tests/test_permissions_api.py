@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_normal_user_cannot_grant_general_roles(user_api_client, valid_general_admin_data):
     response = user_api_client.post(
         reverse("general_role-list"),
@@ -12,7 +12,7 @@ def test_normal_user_cannot_grant_general_roles(user_api_client, valid_general_a
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_grant_general_roles(general_admin_api_client, valid_general_admin_data, user):
     response = general_admin_api_client.post(
         reverse("general_role-list"),
@@ -25,7 +25,7 @@ def test_general_admin_can_grant_general_roles(general_admin_api_client, valid_g
     assert user.general_roles.filter(role="admin").exists()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_normal_user_cannot_grant_service_sector_roles(user_api_client, valid_service_sector_application_manager_data):
     response = user_api_client.post(
         reverse("service_sector_role-list"),
@@ -35,7 +35,7 @@ def test_normal_user_cannot_grant_service_sector_roles(user_api_client, valid_se
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_admin_can_grant_application_manager_role(
     user,
     service_sector_admin_api_client,
@@ -55,7 +55,7 @@ def test_service_sector_admin_can_grant_application_manager_role(
     ).exists()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_grant_service_sector_roles(
     general_admin_api_client, valid_service_sector_admin_data, user, service_sector
 ):
@@ -71,7 +71,7 @@ def test_general_admin_can_grant_service_sector_roles(
     ).exists()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_normal_user_cannot_grant_unit_admin_role(user_api_client, valid_unit_admin_data):
     response = user_api_client.post(
         reverse("unit_role-list"),
@@ -81,7 +81,7 @@ def test_normal_user_cannot_grant_unit_admin_role(user_api_client, valid_unit_ad
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_manager_cannot_grant_unit_roles(unit_manager_api_client, valid_unit_viewer_data):
     response = unit_manager_api_client.post(
         reverse("unit_role-list"),
@@ -91,7 +91,7 @@ def test_unit_manager_cannot_grant_unit_roles(unit_manager_api_client, valid_uni
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_admin_can_grant_unit_admin_role(
     service_sector_admin_api_client,
     valid_unit_admin_data,
@@ -109,7 +109,7 @@ def test_service_sector_admin_can_grant_unit_admin_role(
     assert user.unit_roles.filter(unit=unit, role=valid_unit_admin_data["role"], assigner=service_sector_admin).exists()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_grant_unit_group_admin_role(
     general_admin_api_client,
     valid_unit_group_admin_data,
@@ -131,7 +131,7 @@ def test_general_admin_can_grant_unit_group_admin_role(
     ).exists()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_group_admin_can_grant_unit_admin_role(
     unit_group_admin_api_client, valid_unit_admin_data, user, unit, unit_group_admin
 ):
@@ -145,7 +145,7 @@ def test_unit_group_admin_can_grant_unit_admin_role(
     assert user.unit_roles.filter(unit=unit, role=valid_unit_admin_data["role"], assigner=unit_group_admin).exists()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_admin_can_grant_unit_manager_role(unit_admin_api_client, valid_unit_manager_data, user, unit, unit_admin):
     response = unit_admin_api_client.post(
         reverse("unit_role-list"),
@@ -156,7 +156,7 @@ def test_unit_admin_can_grant_unit_manager_role(unit_admin_api_client, valid_uni
     assert user.unit_roles.filter(unit=unit, role=valid_unit_manager_data["role"], assigner=unit_admin).exists()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_grant_unit_viewer_role(
     general_admin_api_client, valid_unit_viewer_data, user, unit, general_admin
 ):

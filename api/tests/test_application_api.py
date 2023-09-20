@@ -14,7 +14,7 @@ from applications.models import (
 )
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create(
     valid_application_data,
     user_api_client,
@@ -31,7 +31,7 @@ def test_application_create(
     assert Application.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_identifier_can_be_null(
     valid_application_data,
     user_api_client,
@@ -46,7 +46,7 @@ def test_application_create_organization_identifier_can_be_null(
     assert_that(Application.objects.count()).is_equal_to(1)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_identifier_cannot_be_empty(
     valid_application_data,
     user_api_client,
@@ -58,7 +58,7 @@ def test_application_create_organization_identifier_cannot_be_empty(
     assert_that(response.status_code).is_equal_to(400)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_address_cannot_be_empty(
     valid_application_data,
     user_api_client,
@@ -70,7 +70,7 @@ def test_application_create_organization_address_cannot_be_empty(
     assert_that(response.status_code).is_equal_to(400)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_address_cannot_be_null(
     valid_application_data,
     user_api_client,
@@ -83,7 +83,7 @@ def test_application_create_organization_address_cannot_be_null(
     assert_that(response.status_code).is_equal_to(400)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_address_not_included(
     valid_application_data,
     user_api_client,
@@ -95,7 +95,7 @@ def test_application_create_organization_address_not_included(
     assert_that(response.status_code).is_equal_to(400)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_can_be_null(
     valid_application_data,
     user_api_client,
@@ -107,7 +107,7 @@ def test_application_create_organization_can_be_null(
     assert_that(response.status_code).is_equal_to(201)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_email_can_be_empty(valid_application_data, user_api_client):
     valid_application_data["organisation"].update({"email": ""})
 
@@ -120,7 +120,7 @@ def test_application_create_organization_email_can_be_empty(valid_application_da
     assert_that(response.status_code).is_equal_to(201)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_create_organization_email_cannot_be_null(valid_application_data, user_api_client):
     valid_application_data["organisation"].update({"email": None})
 
@@ -133,7 +133,7 @@ def test_application_create_organization_email_cannot_be_null(valid_application_
     assert_that(response.status_code).is_equal_to(400)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_should_update_organisation_and_contact_person(
     user_api_client, application, organisation, person, purpose, application_round
@@ -180,7 +180,7 @@ def test_application_update_should_update_organisation_and_contact_person(
     assert response.data.get("organisation")["name"] == "Super organisation modified"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_should_handle_patch_requests(user_api_client, application, organisation, person, purpose, application_round):
     assert Application.objects.count() == 1
@@ -199,7 +199,7 @@ def test_should_handle_patch_requests(user_api_client, application, organisation
     assert response.data.get("status") == "cancelled"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_should_null_organisation_and_contact_person_for_draft(
     user_api_client, application, organisation, person, purpose, application_round
@@ -229,7 +229,7 @@ def test_application_update_should_null_organisation_and_contact_person_for_draf
     assert application.contact_person is None
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_should_force_contact_person_for_in_review(
     user_api_client,
@@ -261,7 +261,7 @@ def test_application_update_should_force_contact_person_for_in_review(
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_updating_and_adding_application_events(
     user_api_client,
@@ -319,7 +319,7 @@ def test_application_update_updating_and_adding_application_events(
     )
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_should_remove_application_events_if_no_longer_in_data(
     user_api_client,
@@ -363,7 +363,7 @@ def test_application_update_should_remove_application_events_if_no_longer_in_dat
     assert response.data.get("application_events")[0].get("name") == "New event name"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_fetch(user_api_client, application):
     response = user_api_client.get(reverse("application-list"))
     assert response.status_code == 200
@@ -372,7 +372,7 @@ def test_application_fetch(user_api_client, application):
     assert response.data[0].get("contact_person")["last_name"] == "Legend"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_event_save(user_api_client, valid_application_event_data):
     assert ApplicationEvent.objects.count() == 0
@@ -387,7 +387,7 @@ def test_application_event_save(user_api_client, valid_application_event_data):
     assert ApplicationEvent.objects.count() == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_event_reduction_count(user_api_client, application_event, event_reduction):
     response = user_api_client.get(
@@ -399,7 +399,7 @@ def test_application_event_reduction_count(user_api_client, application_event, e
     assert response.data.get("weekly_amount_reductions_count") == 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_event_invalid_durations(user_api_client, valid_application_event_data):
     assert ApplicationEvent.objects.count() == 0
@@ -412,7 +412,7 @@ def test_application_event_invalid_durations(user_api_client, valid_application_
     assert "Maximum duration should be larger than minimum duration" in response.data["non_field_errors"]
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_review_valid(
     user_api_client,
@@ -459,7 +459,7 @@ def test_application_update_review_valid(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_review_invalid(
     purpose,
@@ -488,7 +488,7 @@ def test_application_review_invalid(
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_should_update_contact_person_and_billing_address(
     user_api_client,
@@ -530,7 +530,7 @@ def test_application_update_should_update_contact_person_and_billing_address(
     assert response.data.get("billing_address")["street_address"] == "No bills please"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_application_update_should_create_new_contact_person_and_billing_address(
     user_api_client,
@@ -570,19 +570,19 @@ def test_application_update_should_create_new_contact_person_and_billing_address
     assert response.data.get("billing_address")["street_address"] == "Bill me"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unauthenticated_cannot_create_application(unauthenticated_api_client, valid_application_data):
     response = unauthenticated_api_client.post(reverse("application-list"), valid_application_data, format="json")
     assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_user_can_create_application(user_api_client, valid_application_data):
     response = user_api_client.post(reverse("application-list"), valid_application_data, format="json")
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_user_can_update_own_application(user_api_client, application, valid_application_data):
     response = user_api_client.put(
@@ -593,7 +593,7 @@ def test_user_can_update_own_application(user_api_client, application, valid_app
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_user_cannot_update_own_application_status_to_review_done(user_api_client, application, valid_application_data):
     valid_application_data["status"] = ApplicationStatus.REVIEW_DONE
@@ -605,7 +605,7 @@ def test_user_cannot_update_own_application_status_to_review_done(user_api_clien
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-02-01")
 def test_user_cannot_update_own_application_after_period_end(user_api_client, application, valid_application_data):
     response = user_api_client.put(
@@ -616,7 +616,7 @@ def test_user_cannot_update_own_application_after_period_end(user_api_client, ap
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_user_cannot_see_or_update_other_users_application(user_2_api_client, application, valid_application_data):
     response = user_2_api_client.get(
         reverse("application-detail", kwargs={"pk": application.id}),
@@ -632,7 +632,7 @@ def test_user_cannot_see_or_update_other_users_application(user_2_api_client, ap
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_update_users_application(general_admin_api_client, application, valid_application_data):
     response = general_admin_api_client.put(
         reverse("application-detail", kwargs={"pk": application.id}),
@@ -642,7 +642,7 @@ def test_general_admin_can_update_users_application(general_admin_api_client, ap
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_admin_can_update_users_application(
     service_sector_admin_api_client, application, valid_application_data
 ):
@@ -654,7 +654,7 @@ def test_service_sector_admin_can_update_users_application(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_application_manager_can_update_users_application(
     service_sector_application_manager_api_client, application, valid_application_data
 ):
@@ -666,7 +666,7 @@ def test_service_sector_application_manager_can_update_users_application(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_wrong_service_sector_admin_cannot_create_or_update_application(
     service_sector_2_admin_api_client, application, valid_application_data
 ):
@@ -684,7 +684,7 @@ def test_wrong_service_sector_admin_cannot_create_or_update_application(
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_admin_can_view_application(unit_admin_api_client, application, event_reservation_unit):
     response = unit_admin_api_client.get(
         reverse("application-detail", kwargs={"pk": application.id}),
@@ -693,7 +693,7 @@ def test_unit_admin_can_view_application(unit_admin_api_client, application, eve
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_group_admin_can_view_application(unit_group_admin_api_client, application, event_reservation_unit):
     response = unit_group_admin_api_client.get(
         reverse("application-detail", kwargs={"pk": application.id}),
@@ -702,7 +702,7 @@ def test_unit_group_admin_can_view_application(unit_group_admin_api_client, appl
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_admin_cant_view_application_not_for_unit(unit_admin_api_client, application2, event_reservation_unit_too):
     response = unit_admin_api_client.get(
         reverse("application-detail", kwargs={"pk": application2.id}),
@@ -711,7 +711,7 @@ def test_unit_admin_cant_view_application_not_for_unit(unit_admin_api_client, ap
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_group_admin_cant_view_application_not_for_unit_group(
     unit_group_admin_api_client, application2, event_reservation_unit_too
 ):
@@ -722,7 +722,7 @@ def test_unit_group_admin_cant_view_application_not_for_unit_group(
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_admin_sees_only_application_for_unit(
     unit_admin_api_client,
     application,
@@ -740,7 +740,7 @@ def test_unit_admin_sees_only_application_for_unit(
     assert data[0]["id"] == application.id
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_unit_group_admin_sees_only_application_for_unit(
     unit_group_admin_api_client,
     application,
@@ -758,7 +758,7 @@ def test_unit_group_admin_sees_only_application_for_unit(
     assert data[0]["id"] == application.id
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_sector_admin_sees_all_applications(
     service_sector_admin_api_client,
     application,
@@ -775,7 +775,7 @@ def test_sector_admin_sees_all_applications(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_user_can_create_application_event(user_api_client, valid_application_event_data):
     response = user_api_client.post(
@@ -786,7 +786,7 @@ def test_user_can_create_application_event(user_api_client, valid_application_ev
     assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @freeze_time("2021-01-15")
 def test_user_can_update_application_event(user_api_client, valid_application_event_data, application_event):
     response = user_api_client.put(
@@ -797,7 +797,7 @@ def test_user_can_update_application_event(user_api_client, valid_application_ev
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_user_cannot_view_other_users_application_event(user_2_api_client, application_event):
     response = user_2_api_client.get(
         reverse("application_event-detail", kwargs={"pk": application_event.id}),
@@ -806,7 +806,7 @@ def test_user_cannot_view_other_users_application_event(user_2_api_client, appli
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_user_cannot_update_other_users_application_event(
     user_2_api_client, application_event, valid_application_event_data
 ):
@@ -818,7 +818,7 @@ def test_user_cannot_update_other_users_application_event(
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_general_admin_can_update_users_application_event(
     general_admin_api_client, application_event, valid_application_event_data
 ):
@@ -831,7 +831,7 @@ def test_general_admin_can_update_users_application_event(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_admin_can_update_users_application_event(
     service_sector_admin_api_client, application_event, valid_application_event_data
 ):
@@ -843,7 +843,7 @@ def test_service_sector_admin_can_update_users_application_event(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_service_sector_application_manager_can_update_users_application_event(
     service_sector_application_manager_api_client,
     application_event,
@@ -857,7 +857,7 @@ def test_service_sector_application_manager_can_update_users_application_event(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_wrong_service_sector_admin_cannot_view_or_update_users_application_event(
     service_sector_2_admin_api_client, application_event, valid_application_event_data
 ):
@@ -869,7 +869,7 @@ def test_wrong_service_sector_admin_cannot_view_or_update_users_application_even
     assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_creating_weekly_amount_reduction_should_mark_declined(
     result_scheduled_for_monday,
     general_admin_api_client,
@@ -890,7 +890,7 @@ def test_creating_weekly_amount_reduction_should_mark_declined(
     ).is_true()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_cant_create_more_reductions_than_events_per_week(
     application_event, general_admin_api_client, result_scheduled_for_monday
 ):
@@ -911,7 +911,7 @@ def test_cant_create_more_reductions_than_events_per_week(
     ).is_false()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_cant_reduce_with_accepted_result(application_event, general_admin_api_client, result_scheduled_for_monday):
     result_scheduled_for_monday.accepted = True
     result_scheduled_for_monday.save()
@@ -932,7 +932,7 @@ def test_cant_reduce_with_accepted_result(application_event, general_admin_api_c
     ).is_false()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_regular_user_cant_create_reductions(
     result_scheduled_for_monday,
     user_api_client,
@@ -943,7 +943,7 @@ def test_regular_user_cant_create_reductions(
     assert_that(response.status_code).is_equal_to(403)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_wrong_service_sector_admin_cant_create_reductions(
     result_scheduled_for_monday,
     service_sector_2_admin_api_client,
@@ -956,7 +956,7 @@ def test_wrong_service_sector_admin_cant_create_reductions(
     assert_that(response.status_code).is_equal_to(403)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_deleting_weekly_reductions(
     event_reduction,
     general_admin_api_client,
@@ -974,7 +974,7 @@ def test_deleting_weekly_reductions(
     assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(0)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_status_set_sent_from_in_review_fails(
     general_admin_api_client, application, valid_application_data
 ):
@@ -993,7 +993,7 @@ def test_application_status_set_sent_from_in_review_fails(
     assert application.status == ApplicationStatus.IN_REVIEW
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_status_set_sent_from_draft_fails(general_admin_api_client, application, valid_application_data):
     assert Application.objects.count() == 1
     application.set_status(ApplicationStatus.DRAFT)
@@ -1011,7 +1011,7 @@ def test_application_status_set_sent_from_draft_fails(general_admin_api_client, 
 
 
 @freeze_time("2021-01-29")
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_status_set_draft_from_in_review_success(user_api_client, application, valid_application_data):
     assert Application.objects.count() == 1
     application.set_status(ApplicationStatus.IN_REVIEW)
@@ -1029,7 +1029,7 @@ def test_application_status_set_draft_from_in_review_success(user_api_client, ap
     assert application.status == ApplicationStatus.DRAFT
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_status_set_sent_assigns_when_not_in_review_nor_draft(
     general_admin_api_client, application, valid_application_data
 ):
@@ -1048,7 +1048,7 @@ def test_application_status_set_sent_assigns_when_not_in_review_nor_draft(
     assert application.status == ApplicationStatus.SENT
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_filter_by_units(event_reservation_unit, event_reservation_unit_too, user_api_client):
     unit_id_one = event_reservation_unit.reservation_unit.unit.id
     unit_id_two = event_reservation_unit_too.reservation_unit.unit.id
@@ -1062,7 +1062,7 @@ def test_application_filter_by_units(event_reservation_unit, event_reservation_u
     assert_that(response.data[1]["id"] in [application_id_one, application_id_too]).is_true()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_application_filter_by_user(general_admin_api_client, application, user, user_2):
     response = general_admin_api_client.get(f"{reverse('application-list')}?user={user.id}", format="json")
     assert_that(response.data).is_length(1)

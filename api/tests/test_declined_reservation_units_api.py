@@ -2,7 +2,7 @@ import pytest
 from rest_framework.reverse import reverse
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_updating_declined_reservation_units(application_event, reservation_unit, service_sector_admin_api_client):
     data = {"declined_reservation_unit_ids": [reservation_unit.id]}
     response = service_sector_admin_api_client.put(

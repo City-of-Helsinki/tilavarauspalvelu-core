@@ -63,35 +63,35 @@ class UnitImporterBaseTestCase(TestCase):
 
     def check_unit_values_vs_data_values(self, unit, expected_values):
         """Helper method to assert the unit values against expected values"""
-        self.assertEqual(unit.name, expected_values["name_fi"])
-        self.assertEqual(unit.description, expected_values["desc_fi"])
-        self.assertEqual(unit.web_page, expected_values["www_fi"])
-        self.assertEqual(unit.email, expected_values["email"])
-        self.assertEqual(unit.phone, expected_values["phone"])
+        assert unit.name == expected_values["name_fi"]
+        assert unit.description == expected_values["desc_fi"]
+        assert unit.web_page == expected_values["www_fi"]
+        assert unit.email == expected_values["email"]
+        assert unit.phone == expected_values["phone"]
 
     def check_location_values_vs_data_values(self, location, expected_values):
         """Helper method to assert the location values against expected values"""
-        self.assertEqual(location.address_street_fi, expected_values["street_address_fi"])
-        self.assertEqual(location.address_street_en, expected_values["street_address_en"])
-        self.assertEqual(location.address_street_sv, expected_values["street_address_sv"])
-        self.assertEqual(location.address_zip, expected_values["address_zip"])
-        self.assertEqual(location.address_city_fi, expected_values["address_city_fi"])
-        self.assertEqual(location.address_city_en, expected_values["address_city_en"])
-        self.assertEqual(location.address_city_sv, expected_values["address_city_sv"])
-        self.assertEqual(location.coordinates.x, expected_values["longitude"])
-        self.assertEqual(location.coordinates.y, expected_values["latitude"])
+        assert location.address_street_fi == expected_values["street_address_fi"]
+        assert location.address_street_en == expected_values["street_address_en"]
+        assert location.address_street_sv == expected_values["street_address_sv"]
+        assert location.address_zip == expected_values["address_zip"]
+        assert location.address_city_fi == expected_values["address_city_fi"]
+        assert location.address_city_en == expected_values["address_city_en"]
+        assert location.address_city_sv == expected_values["address_city_sv"]
+        assert location.coordinates.x == expected_values["longitude"]
+        assert location.coordinates.y == expected_values["latitude"]
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @mock.patch("requests.get", return_value=response_mock)
 class UnitImporterTestCase(UnitImporterBaseTestCase):
     def test_importer_creates_units(self, mock_response):
         self.importer.import_units()
-        self.assertEqual(2, Unit.objects.count())
+        assert 2 == Unit.objects.count()
 
     def test_importer_creates_locations(self, mock_response):
         self.importer.import_units()
-        self.assertEqual(2, Location.objects.count())
+        assert 2 == Location.objects.count()
 
     def test_importer_creates_a_units_with_correct_values(self, mock_response):
         self.importer.import_units()
@@ -109,7 +109,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
 
     def test_importer_updates_existing_unit(self, mock_response):
         self.importer.import_units()
-        self.assertEqual(2, Unit.objects.count())
+        assert 2 == Unit.objects.count()
 
         unit = Unit.objects.get(tprek_id=1)
         location = Location.objects.get(unit=unit)
@@ -137,7 +137,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
         mock_response.return_value = mocked_response
 
         self.importer.import_units()
-        self.assertEqual(2, Unit.objects.count())
+        assert 2 == Unit.objects.count()
 
         unit.refresh_from_db()
         location.refresh_from_db()
@@ -166,7 +166,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
         mock_response.return_value = mocked_response
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @mock.patch("requests.get", return_value=response_mock)
 class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
     @classmethod
@@ -232,11 +232,11 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
         field_map["defaults"] = {}
         importer = UnitImporter("", field_map=field_map)
 
-        with self.assertRaises(Exception):  # noqa: B017
+        with pytest.raises(Exception):  # noqa: B017, PT011
             importer.import_units()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @mock.patch("requests.get", return_value=response_mock)
 class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
     def test_importer_giving_custom_field_map_creates_units_and_locations(self, mock_response):
@@ -288,17 +288,17 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
         importer.import_units()
 
         unit = Unit.objects.get(tprek_id=1)
-        self.assertEqual(unit.name, data[0]["name"])
-        self.assertEqual(unit.web_page, data[0]["www"])
-        self.assertEqual(unit.email, data[0]["mail"])
-        self.assertEqual(unit.phone, data[0]["tel"])
+        assert unit.name == data[0]["name"]
+        assert unit.web_page == data[0]["www"]
+        assert unit.email == data[0]["mail"]
+        assert unit.phone == data[0]["tel"]
 
         location = Location.objects.get(unit=unit)
-        self.assertEqual(location.address_street, data[0]["address"])
-        self.assertEqual(location.address_zip, data[0]["zip"])
-        self.assertEqual(location.address_city, data[0]["city"])
-        self.assertEqual(location.coordinates.x, data[0]["lon"])
-        self.assertEqual(location.coordinates.y, data[0]["lat"])
+        assert location.address_street == data[0]["address"]
+        assert location.address_zip == data[0]["zip"]
+        assert location.address_city == data[0]["city"]
+        assert location.coordinates.x == data[0]["lon"]
+        assert location.coordinates.y == data[0]["lat"]
 
     def test_importer_fails_with_mismatching_data_in_field_map(self, mock_response):
         importer = UnitImporter(
@@ -328,7 +328,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
             },
         )
 
-        with self.assertRaises(Exception):  # noqa: B017
+        with pytest.raises(Exception):  # noqa: B017, PT011
             importer.import_units()
 
     def test_importer_giving_custom_field_map_with_empty_defaults_creates_units_and_locations(self, mock_response):
@@ -372,13 +372,13 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
         importer.import_units()
 
         unit = Unit.objects.get(tprek_id=1)
-        self.assertEqual(unit.name, data[0]["name"])
-        self.assertEqual(unit.web_page, data[0]["www"])
-        self.assertEqual(unit.email, data[0]["mail"])
-        self.assertEqual(unit.phone, data[0]["tel"])
+        assert unit.name == data[0]["name"]
+        assert unit.web_page == data[0]["www"]
+        assert unit.email == data[0]["mail"]
+        assert unit.phone == data[0]["tel"]
 
         location = Location.objects.get(unit=unit)
-        self.assertEqual(location.address_street, data[0]["address"])
-        self.assertEqual(location.address_zip, data[0]["zip"])
-        self.assertEqual(location.address_city, data[0]["city"])
-        self.assertIsNone(location.coordinates)
+        assert location.address_street == data[0]["address"]
+        assert location.address_zip == data[0]["zip"]
+        assert location.address_city == data[0]["city"]
+        assert location.coordinates is None

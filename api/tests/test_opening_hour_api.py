@@ -24,7 +24,7 @@ from opening_hours.hours import TimeElement
         }
     ],
 )
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_fetching_opening_hours_for_reservation_unit(
     mocked_opening_hours,
     user_api_client,

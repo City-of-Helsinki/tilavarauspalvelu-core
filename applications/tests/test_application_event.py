@@ -9,7 +9,7 @@ from applications.models import APPLICANT_TYPES, CUSTOMER_TYPES
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_getting_occurences(recurring_application_event, scheduled_for_tuesday):
     occurrences = recurring_application_event.get_all_occurrences()
     dates = []
@@ -22,7 +22,7 @@ def test_getting_occurences(recurring_application_event, scheduled_for_tuesday):
     assert occurrences[scheduled_for_tuesday.id].weekday == scheduled_for_tuesday.day
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_getting_not_scheduled_occurrences_for_not_accepted_result(
     recurring_application_event, scheduled_for_tuesday, result_scheduled_for_tuesday
 ):
@@ -32,7 +32,7 @@ def test_getting_not_scheduled_occurrences_for_not_accepted_result(
     assert_that(occurrences[scheduled_for_tuesday.id].occurrences).is_length(8)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_getting_not_scheduled_occurrences_for_accepted_result(
     recurring_application_event, scheduled_for_tuesday, result_scheduled_for_tuesday
 ):
@@ -43,14 +43,14 @@ def test_getting_not_scheduled_occurrences_for_accepted_result(
     assert_that(hasattr(occurrences, f"{scheduled_for_tuesday.id}")).is_false()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_getting_not_scheduled_occurrences_without_schedule_result(recurring_application_event, scheduled_for_tuesday):
     occurrences = recurring_application_event.get_not_scheduled_occurrences()
 
     assert_that(hasattr(occurrences, f"{scheduled_for_tuesday.id}")).is_false()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_filter_to_baskets_by_purpose(
     default_application_round, application_round_basket_one, recurring_application_event
 ):
@@ -59,7 +59,7 @@ def test_should_filter_to_baskets_by_purpose(
     assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_exclude_if_purpose_does_not_match(
     default_application_round,
     application_round_basket_one,
@@ -74,7 +74,7 @@ def test_should_exclude_if_purpose_does_not_match(
     assert events_by_baskets == {application_round_basket_one.id: []}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_include_if_basket_has_no_purposes(
     default_application_round,
     application_round_basket_one,
@@ -89,7 +89,7 @@ def test_should_include_if_basket_has_no_purposes(
     assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_filter_by_age_group(
     default_application_round,
     application_round_basket_one,
@@ -106,7 +106,7 @@ def test_should_filter_by_age_group(
     assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_test_should_exclude_if_age_group_does_not_match(
     default_application_round,
     application_round_basket_one,
@@ -125,7 +125,7 @@ def test_should_test_should_exclude_if_age_group_does_not_match(
     assert events_by_baskets == {application_round_basket_one.id: []}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_event_can_belong_to_multiple_baskets(
     default_application_round,
     application_round_basket_one,
@@ -140,7 +140,7 @@ def test_event_can_belong_to_multiple_baskets(
     }
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_exclude_events_not_matching_application_round(
     default_application_round,
     second_application_round,
@@ -156,7 +156,7 @@ def test_should_exclude_events_not_matching_application_round(
     assert events_by_baskets == {application_round_basket_one.id: []}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_filter_to_baskets_by_home_city(
     default_application_round,
     application_round_basket_one,
@@ -173,7 +173,7 @@ def test_should_filter_to_baskets_by_home_city(
     assert events_by_baskets == {application_round_basket_one.id: [recurring_application_event]}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_exclude_if_city_does_not_match(
     default_application_round,
     application_round_basket_one,
@@ -191,7 +191,7 @@ def test_should_exclude_if_city_does_not_match(
     assert events_by_baskets == {application_round_basket_one.id: []}
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_include_if_basket_has_no_home_city(
     default_application_round,
     application_round_basket_one,
@@ -224,7 +224,7 @@ def test_should_include_if_basket_has_no_home_city(
         ),
     ],
 )
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_filter_to_baskets_by_customer_type(
     applicant_customer_type,
     default_application_round,
@@ -275,7 +275,7 @@ def test_should_filter_to_baskets_by_customer_type(
         ),
     ],
 )
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_exclude_if_customer_type_does_not_match(
     applicant_customer_type,
     default_application_round,
@@ -302,7 +302,7 @@ def test_should_exclude_if_customer_type_does_not_match(
         APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL,
     ],
 )
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_should_include_if_no_customer_type(
     applicant_type,
     default_application_round,
