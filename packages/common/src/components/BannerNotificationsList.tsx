@@ -62,7 +62,7 @@ const NotificationsListItem = ({
   closedArray,
   centered,
 }: BannerNotificationItemProps) => {
-  let notificationType: NotificationType = "info" as const;
+  let notificationType: NotificationType;
   switch (notification.level) {
     case "EXCEPTION":
       notificationType = "error";
