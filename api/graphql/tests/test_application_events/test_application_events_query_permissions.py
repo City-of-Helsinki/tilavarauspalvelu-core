@@ -3,6 +3,7 @@ import json
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 
+from api.graphql.tests.test_application_events.base import ApplicationEventPermissionsTestCaseBase
 from applications.models import Application
 from permissions.models import (
     ServiceSectorRole,
@@ -20,8 +21,6 @@ from tests.factories import (
     ReservationUnitFactory,
     UnitGroupFactory,
 )
-
-from api.graphql.tests.test_application_events.base import ApplicationEventPermissionsTestCaseBase
 
 
 class ApplicationEventsGraphQLPermissionsTestCase(ApplicationEventPermissionsTestCaseBase):
