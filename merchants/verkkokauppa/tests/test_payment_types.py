@@ -47,7 +47,7 @@ class PaymentTestCase(TestCase):
                 tax_amount=Decimal("24"),
                 description="Test description",
                 additional_info='{"payment_method": nordea}',
-                token="354477a1a009a1514fa3cc1132179a60163f5650aaf27ec98bb98158b04e0a63",  # noqa: S106
+                token="354477a1a009a1514fa3cc1132179a60163f5650aaf27ec98bb98158b04e0a63",
                 timestamp=datetime(2021, 11, 15, 12, 26, 45, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
                 payment_method_label="Nordea",
             )

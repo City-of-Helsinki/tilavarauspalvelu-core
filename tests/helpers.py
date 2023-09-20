@@ -50,7 +50,7 @@ def parametrize_helper(__tests: dict[str, TNamedTuple], /) -> ParametrizeArgs:
             argvalues=values,
             ids=list(__tests),
         )
-    except Exception as error:  # noqa
+    except Exception as error:
         raise RuntimeError("Improper configuration. Did you use a NamedTuple for TNamedTuple?") from error
 
 
