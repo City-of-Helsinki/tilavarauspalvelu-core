@@ -834,7 +834,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0].get("message")).is_equal_to("No permission to mutate")
 
     def test_create_success_when_reservation_date_over_next_spring(self, mock_periods, mock_opening_hours):
-        """In reservation creation it is needed to use opening_hours_end date
+        """
+        In reservation creation it is needed to use opening_hours_end date
         parameter in ReservationUnitReservationScheduler initialization to get
         the possible opening hours from beyond next spring which is what the scheduler
         class defaults to.
