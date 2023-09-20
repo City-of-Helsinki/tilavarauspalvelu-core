@@ -88,7 +88,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         assert_that(refund_data).is_none()
 
         self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.refund_id).is_none
+        assert self.payment_order.refund_id is None
 
     def test_cant_refund_if_invalid_state_and_not_in_the_past(self):
         self.client.force_login(self.general_admin)
@@ -109,7 +109,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         assert_that(refund_data).is_none()
 
         self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.refund_id).is_none
+        assert self.payment_order.refund_id is None
 
     @mock.patch("reservations.tasks.refund_order")
     def test_refund_success_when_correct_state_and_not_in_the_past(self, mock_refund_order):
@@ -195,7 +195,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         assert_that(refund_data).is_none()
 
         self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.refund_id).is_none
+        assert self.payment_order.refund_id is None
 
     def test_cant_refund_if_payment_order_is_waiting_for_refund(self):
         self.client.force_login(self.general_admin)
@@ -207,15 +207,10 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "Only reservations with paid order can be refunded."
-        )
-        refund_data = content.get("data").get("refundReservation")
-        assert_that(refund_data).is_none()
+        assert content.get("errors")[0].get("message") == "Only reservations with paid order can be refunded."
 
-        self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.refund_id).is_none
+        refund_data = content.get("data").get("refundReservation")
+        assert refund_data is None
 
     def test_cant_refund_if_reservation_price_is_zero(self):
         self.client.force_login(self.general_admin)
@@ -235,4 +230,4 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         assert_that(refund_data).is_none()
 
         self.payment_order.refresh_from_db()
-        assert_that(self.payment_order.refund_id).is_none
+        assert self.payment_order.refund_id is None

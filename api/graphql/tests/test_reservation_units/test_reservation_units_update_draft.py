@@ -192,8 +192,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         content_type_id = ContentType.objects.get(app_label="reservation_units", model="reservationunit").id
         log_entry_count = LogEntry.objects.filter(content_type_id=content_type_id, object_id=self.res_unit.pk).count()
 
-        print(LogEntry.objects.filter(content_type_id=content_type_id, object_id=self.res_unit.pk).all())
-
         assert_that(log_entry_count).is_greater_than(1)
 
         data = self.get_valid_update_data()

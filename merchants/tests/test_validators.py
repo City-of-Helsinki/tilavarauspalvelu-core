@@ -1,5 +1,4 @@
 import pytest
-from assertpy import assert_that
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -13,16 +12,16 @@ class ValidatorTestCase(TestCase):
         is_numeric("00000")
 
         with pytest.raises(ValidationError):
-            assert_that(is_numeric("A2356")).is_false
+            is_numeric("A2356")
 
         with pytest.raises(ValidationError):
-            assert_that(is_numeric("12A56")).is_false
+            is_numeric("12A56")
 
         with pytest.raises(ValidationError):
-            assert_that(is_numeric("12A56")).is_false
+            is_numeric("12A56")
 
         with pytest.raises(ValidationError):
-            assert_that(is_numeric("12356⁰")).is_false
+            is_numeric("12356⁰")
 
     def validate_accounting_project(self):
         validate_accounting_project("1234567")

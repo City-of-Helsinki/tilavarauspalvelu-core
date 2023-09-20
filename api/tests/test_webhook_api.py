@@ -138,7 +138,7 @@ class WebhookPaymentAPITestCase(WebhookAPITestCaseBase):
 
         expected_error = {"status": 400, "message": "Required field missing: eventType"}
         assert_that(response.data).is_equal_to(expected_error)
-        assert_that(mock_capture_exception.called).is_true
+        assert mock_capture_exception.called is True
 
     @mock.patch("api.webhook_api.views.capture_exception")
     def test_returns_400_with_error_on_invalid_namespace(self, mock_capture_exception, mock_get_payment):
