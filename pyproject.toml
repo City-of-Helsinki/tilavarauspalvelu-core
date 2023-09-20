@@ -133,6 +133,12 @@ ignore = [
 "common/management/commands/_utils.py" = [
     "S311",  # pseudo-random generators are fine here.
 ]
+"test_*.py" = [
+    "S105",  # Hardcoded passwords are fine in tests
+    "S106",  # Hardcoded passwords are fine in tests
+    "S108",  # No need to care about insecure temp file usages in tests
+    "S311",  # Pseudo-random generators are fine here.
+]
 
 [tool.ruff.isort]
 combine-as-imports = false
