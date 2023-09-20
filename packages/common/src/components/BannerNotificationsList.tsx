@@ -1,8 +1,9 @@
 import React from "react";
-import { IconCross, NotificationType } from "hds-react";
+import { NotificationType } from "hds-react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
 import { useQuery } from "@apollo/client";
+import { t } from "i18next";
 import NotificationWrapper from "./NotificationWrapper";
 import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
@@ -55,20 +56,6 @@ const BannerNotificationText = styled.span`
   }
 `;
 
-const BannerCloseButton = styled.button`
-  position: absolute;
-  top: var(--spacing-m);
-  right: 0;
-  transform: translateY(-50%);
-  padding: var(--spacing-xs);
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  &:hover {
-    color: var(--color-black-50);
-  }
-`;
-
 const NotificationsListItem = ({
   notification,
   closeFn,
@@ -86,12 +73,20 @@ const NotificationsListItem = ({
     default:
       notificationType = "info";
   }
-  const handleCloseButtonClick = (closedId: string) => {
-    closeFn([...closedArray, closedId]);
-  };
   return (
     <BannerNotificationBackground>
-      <NotificationWrapper type={notificationType} centered={centered}>
+      <NotificationWrapper
+        type={notificationType}
+        centered={centered}
+        dismissible
+        closeButtonLabelText={t("common:close")}
+        onClose={() =>
+          closeFn([
+            ...closedArray,
+            notification.id + (notification.activeFrom ?? ""),
+          ])
+        }
+      >
         {notification && (
           <BannerNotificationText
             dangerouslySetInnerHTML={{
@@ -100,15 +95,6 @@ const NotificationsListItem = ({
             }}
           />
         )}
-        <BannerCloseButton
-          onClick={() =>
-            handleCloseButtonClick(
-              notification.id + (notification.activeFrom ?? "")
-            )
-          }
-        >
-          <IconCross size="s" />
-        </BannerCloseButton>
       </NotificationWrapper>
     </BannerNotificationBackground>
   );
