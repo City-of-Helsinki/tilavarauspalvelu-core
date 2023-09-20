@@ -4,6 +4,7 @@ import freezegun
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 
+from api.graphql.tests.test_applications.base import ApplicationTestCaseBase
 from applications.models import Application
 from permissions.models import (
     ServiceSectorRole,
@@ -20,8 +21,6 @@ from tests.factories import (
     ReservationUnitFactory,
     UnitGroupFactory,
 )
-
-from api.graphql.tests.test_applications.base import ApplicationTestCaseBase
 
 
 @freezegun.freeze_time("2022-05-02T12:00:00Z")

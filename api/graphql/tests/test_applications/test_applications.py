@@ -4,9 +4,8 @@ import freezegun
 from assertpy import assert_that
 from django.test import override_settings
 
-from users.models import PersonalInfoViewLog
-
 from api.graphql.tests.test_applications.base import ApplicationTestCaseBase
+from users.models import PersonalInfoViewLog
 
 
 @freezegun.freeze_time("2022-05-02T12:00:00Z")
