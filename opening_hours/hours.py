@@ -80,10 +80,7 @@ def _build_hauki_resource_id(resource_id: str | (int | list), hauki_origin_id):
 
     if isinstance(resource_id, list):
         hauki_resource_id = [str(uuid) for uuid in resource_id]
-        hauki_resource_id = "{}:{}".format(
-            resource_prefix,
-            f",{resource_prefix}:".join(hauki_resource_id),
-        )
+        hauki_resource_id = f"{resource_prefix}:{f',{resource_prefix}:'.join(hauki_resource_id)}"
     else:
         hauki_resource_id = f"{resource_prefix}:{resource_id}"
 

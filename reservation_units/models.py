@@ -540,7 +540,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         )
 
     def __str__(self):
-        return "{}, {}".format(self.name, getattr(self.unit, "name", ""))
+        return f"{self.name}, {getattr(self.unit, 'name', '')}"
 
     def save(self, *args, **kwargs) -> None:
         super().save(*args, **kwargs)

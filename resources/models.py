@@ -16,4 +16,4 @@ class Resource(models.Model):
     buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.space.name if self.space else "")
+        return f"{self.name} ({getattr(self.space, 'name', '')})"

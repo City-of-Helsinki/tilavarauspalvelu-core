@@ -205,7 +205,7 @@ class Space(MPTTModel):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.building.name if self.building else "")
+        return f"{self.name} ({getattr(self.building, 'name', '')})"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
