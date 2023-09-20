@@ -764,16 +764,13 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.non_subsidised_price_net).is_equal_to(self.reservation.price_net)
 
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler"
-        + ".ReservationUnitReservationScheduler.is_reservation_unit_open"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.is_reservation_unit_open"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler."
-        + "ReservationUnitReservationScheduler.get_conflicting_open_application_round"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_conflicting_open_application_round"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler."
-        + "ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
     )
     def test_update_reservation_price_calculation_when_unit_changes(
         self,

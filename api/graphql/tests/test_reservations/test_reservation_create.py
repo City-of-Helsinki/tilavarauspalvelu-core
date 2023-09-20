@@ -271,16 +271,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.reservee_language).is_equal_to("fi")
 
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler"
-        + ".ReservationUnitReservationScheduler.is_reservation_unit_open"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.is_reservation_unit_open"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler."
-        + "ReservationUnitReservationScheduler.get_conflicting_open_application_round"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_conflicting_open_application_round"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler."
-        + "ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
     )
     def test_creating_reservation_copies_max_buffer_times_from_multiple_reservation_units(
         self,
@@ -1226,16 +1223,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
 
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler"
-        + ".ReservationUnitReservationScheduler.is_reservation_unit_open"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.is_reservation_unit_open"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler."
-        + "ReservationUnitReservationScheduler.get_conflicting_open_application_round"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_conflicting_open_application_round"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler."
-        + "ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
+        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
     )
     def test_create_price_calculation_with_multiple_units(
         self,
