@@ -8,8 +8,6 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationUnitReservationScheduler:
-    APRIL = 4
-
     def __init__(
         self,
         reservation_unit,
@@ -71,22 +69,6 @@ class ReservationUnitReservationScheduler:
         end = (datetime.datetime.now() + datetime.timedelta(days=delta)).astimezone(DEFAULT_TIMEZONE)
 
         return end.date()
-
-    def _get_next_matching_opening_hour_start_time(self, start: datetime.datetime):
-        matching = None
-        while not matching:
-            _, times = self.opening_hours_client.next_opening_times(str(self.reservation_unit.uuid), start.date())
-            if not times:
-                break
-            try:
-                opening_hours = sorted([time.start_time for time in times])
-                for start_time in [start_time for start_time in opening_hours if start_time >= start]:
-                    matching = start_time
-            except ValueError:
-                continue
-            start = datetime.timedelta(days=1)
-
-        return matching
 
     def is_reservation_unit_open(self, start: datetime.datetime, end: datetime.datetime):
         return self.opening_hours_client.is_resource_reservable(str(self.reservation_unit.uuid), start, end)
