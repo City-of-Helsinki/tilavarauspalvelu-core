@@ -91,21 +91,16 @@ class OpeningHoursClient:
         init_opening_hours=True,
         hauki_origin_id=None,
     ):
-        # If resources is a single resource, convert it to a list.
-        if not isinstance(resources, list):
-            resources = [str(resources)]
-
         self.start = start
         self.end = end
 
-        if hauki_origin_id:
-            self.hauki_origin_id = hauki_origin_id
-        else:
-            self.hauki_origin_id = settings.HAUKI_ORIGIN_ID
+        self.hauki_origin_id = hauki_origin_id or settings.HAUKI_ORIGIN_ID
 
-        self.resources = {}
-
+        # If resources is a single resource, convert it to a list.
+        if not isinstance(resources, list):
+            resources = [str(resources)]
         self.resources = resources
+
         self.opening_hours = {}
         if init_opening_hours:
             self._init_opening_hours_structure()
@@ -154,10 +149,7 @@ class OpeningHoursClient:
 
             self.opening_hours[res_id][date].extend(opening_hours)
 
-    def _split_opening_hours_based_on_closed_states(
-        self,
-        opening_hours: list[OpeningHours],
-    ) -> list[OpeningHours]:
+    def _split_opening_hours_based_on_closed_states(self, opening_hours: list[OpeningHours]) -> list[OpeningHours]:
         hours: list[OpeningHours] = []
 
         chronological_opening_hours = sorted(opening_hours, key=lambda x: x.start_time)
@@ -272,7 +264,6 @@ class OpeningHoursClient:
         # of this state yet, start tracking the current one.
         if accessible_hours is None:
             tracked_accessible_hours[resource_state] = opening_hour
-            return
 
         # If any of the tracked accessible hours have the same state as
         # the current accessible hours, and they end before the current
@@ -342,7 +333,6 @@ class OpeningHoursClient:
         # start tracking the current one.
         if closed_hours is None:
             tracked_closed_hours[resource_state] = opening_hour
-            return
 
         # If any of the tracked closed hours have the same state as
         # the current closed hours, and they end before the current

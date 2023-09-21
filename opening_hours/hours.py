@@ -70,29 +70,29 @@ class Period:
     resource_state: State = State.UNDEFINED
 
 
-def _build_hauki_resource_id(resource_id: str | (int | list), hauki_origin_id):
+def _build_hauki_resource_id(
+    resource_id: str | list[str],
+    hauki_origin_id: str | None,
+):
     if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
 
-    resource_prefix = f"{hauki_origin_id}"
-    if not (settings.HAUKI_API_URL and resource_prefix):
+    if not (settings.HAUKI_API_URL and hauki_origin_id):
         raise HaukiConfigurationError("Both hauki api url and hauki origin id need to be configured")
 
-    if isinstance(resource_id, list):
-        hauki_resource_id = [str(uuid) for uuid in resource_id]
-        hauki_resource_id = f"{resource_prefix}:{f',{resource_prefix}:'.join(hauki_resource_id)}"
-    else:
-        hauki_resource_id = f"{resource_prefix}:{resource_id}"
+    # If resources is a single resource, convert it to a list.
+    if not isinstance(resource_id, list):
+        resource_id = [resource_id]
 
-    return hauki_resource_id
+    return f"{hauki_origin_id}:{f',{hauki_origin_id}:'.join(resource_id)}"
 
 
 def get_opening_hours(
-    resource_id: str | (int | list),
+    resource_id: str | list[str],
     start_date: str | datetime.date,
     end_date: str | datetime.date,
     hauki_origin_id=None,
-) -> list[dict]:
+) -> list[dict[str, list[TimeElement]]]:
     """Get opening hours for Hauki resource"""
     hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 
@@ -140,13 +140,16 @@ def get_opening_hours(
     return days_data_out
 
 
-def get_periods_for_resource(resource_id: str | (int | list), hauki_origin_id=None) -> list[Period]:
-    """Get periods for Hauki resource"""
+def get_periods_for_resource(
+    resource_id: str,
+    hauki_origin_id=None,
+) -> list[Period]:
+    """Get periods for a single Hauki resource"""
     hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 
     resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/?resource={hauki_resource_id}"
 
-    periods_data_in = make_hauki_get_request(resource_periods_url, None)
+    periods_data_in = make_hauki_get_request(resource_periods_url)
 
     periods_data_out = []
     for period in periods_data_in:

@@ -13,7 +13,7 @@ class OpeningHours:
 
     def get_hours(self, start_date: datetime, end_date: datetime):
         return get_opening_hours(
-            resource_id=f"{self.id}",
+            resource_id=str(self.id),
             start_date=start_date,
             end_date=end_date,
         )

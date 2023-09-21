@@ -80,7 +80,12 @@ class UnitImporter:
         },
     }
 
-    def __init__(self, url: str, single: bool = False, field_map: dict | None = None):
+    def __init__(
+        self,
+        url: str,
+        single: bool = False,
+        field_map: dict | None = None,
+    ):
         self.url = url
         self.single = single
         if field_map:
@@ -91,7 +96,7 @@ class UnitImporter:
         self.update_counter = 0
 
     @transaction.atomic
-    def import_units(self, import_hauki_resource_ids=False):
+    def import_units(self, import_hauki_resource_ids: bool = False):
         resp = requests.get(self.url, timeout=REQUEST_TIMEOUT_SECONDS)
         resp.raise_for_status()
         unit_data = resp.json()
@@ -166,10 +171,10 @@ class UnitHaukiResourceIdImporter:
         if not unit_ids and not tprek_ids:
             raise ValueError("Either unit_ids or tprek_ids is required.")
 
+        # Use `unit_ids` if given, otherwise use `tprek_ids`.
         units = Unit.objects.filter(id__in=unit_ids) if unit_ids else Unit.objects.filter(tprek_id__in=tprek_ids)
 
-        url = settings.HAUKI_API_URL
-        url = urljoin(url, "/v1/resource/")
+        url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
 
         logger.info(f"Importing units {units} resource ids from url {url}")
 
@@ -179,10 +184,11 @@ class UnitHaukiResourceIdImporter:
             "page_size": 50000,
         }
 
+        # Keep fetching results until there are no more pages.
         while url:
             data = make_hauki_get_request(url, params)
             self.read_response(data)
-            url = data.get("next", False)
+            url = data.get("next", None)
 
         resource_ids_updated = []
         for unit in units:
@@ -192,4 +198,4 @@ class UnitHaukiResourceIdImporter:
                 unit.save()
                 resource_ids_updated.append(unit.tprek_id)
 
-        print(f"Updated resource ids for {len(resource_ids_updated)} units.")  # noqa: T201
+        logger.info(f"Updated resource ids for {len(resource_ids_updated)} units.")

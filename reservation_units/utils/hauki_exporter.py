@@ -31,7 +31,7 @@ class ReservationUnitHaukiExporter:
             f"/v1/resource/{unit_resource_id}",
         )
         try:
-            resource_data = make_hauki_get_request(url, params={})
+            resource_data = make_hauki_get_request(url)
             resource_id = resource_data["id"]
         except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
             resource_id = None
