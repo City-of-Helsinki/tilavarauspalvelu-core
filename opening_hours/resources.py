@@ -48,16 +48,7 @@ class HaukiResource:
         }
 
 
-def send_resource_to_hauki(resource: HaukiResource):
-    if not (settings.HAUKI_API_URL and settings.HAUKI_API_KEY):
-        raise HaukiConfigurationError("Both hauki api url and hauki api key need to be configured")
-
-    resources_url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
-
-    data = resource.convert_to_request_data()
-
-    response_data = make_hauki_post_request(resources_url, data)
-
+def _parse_response_data_to_hauki_resource(response_data) -> HaukiResource:
     try:
         resource_out = HaukiResource(
             id=response_data["id"],
@@ -74,8 +65,20 @@ def send_resource_to_hauki(resource: HaukiResource):
         )
     except (KeyError, ValueError, IndexError):
         resource_out = response_data
-
     return resource_out
+
+
+def send_resource_to_hauki(resource: HaukiResource):
+    if not (settings.HAUKI_API_URL and settings.HAUKI_API_KEY):
+        raise HaukiConfigurationError("Both hauki api url and hauki api key need to be configured")
+
+    resources_url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
+
+    data = resource.convert_to_request_data()
+
+    response_data = make_hauki_post_request(resources_url, data)
+
+    return _parse_response_data_to_hauki_resource(response_data)
 
 
 def update_hauki_resource(resource: HaukiResource):
@@ -90,21 +93,4 @@ def update_hauki_resource(resource: HaukiResource):
 
     response_data = make_hauki_put_request(resources_url, data)
 
-    try:
-        resource_out = HaukiResource(
-            id=response_data["id"],
-            name=response_data["name"],
-            description=response_data["description"],
-            address=response_data["address"],
-            resource_type=response_data["resource_type"],
-            children=response_data["children"],
-            parents=response_data["parents"],
-            organization=response_data["organization"],
-            origin_id=response_data["origins"][0]["origin_id"],
-            origin_data_source_name=response_data["origins"][0]["data_source"]["name"],
-            origin_data_source_id=response_data["origins"][0]["data_source"]["id"],
-        )
-    except (KeyError, ValueError, IndexError):
-        resource_out = response_data
-
-    return resource_out
+    return _parse_response_data_to_hauki_resource(response_data)

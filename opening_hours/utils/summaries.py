@@ -1,12 +1,19 @@
+import datetime
+
 from opening_hours.hours import get_opening_hours
 
 
-def get_resources_total_hours(resource_ids, period_start, period_end):
+def get_resources_total_hours(
+    resource_ids: str | list[str],
+    period_start: str | datetime.date,
+    period_end: str | datetime.date,
+):
     opening_hours = get_opening_hours(
         resource_ids,
         period_start,
         period_end,
     )
+
     hours_in_day = 24
     total_opening_hours = 0
     for opening_hour in opening_hours:
@@ -24,12 +31,17 @@ def get_resources_total_hours(resource_ids, period_start, period_end):
     return total_opening_hours
 
 
-def get_resources_total_hours_per_resource(resource_ids, period_start, period_end):
+def get_resources_total_hours_per_resource(
+    resource_ids: str | list[str],
+    period_start: str | datetime.date,
+    period_end: str | datetime.date,
+):
     opening_hours = get_opening_hours(
         resource_ids,
         period_start,
         period_end,
     )
+
     hours_in_day = 24
     total_opening_hours = {}
     for opening_hour in opening_hours:
