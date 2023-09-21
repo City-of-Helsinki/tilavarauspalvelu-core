@@ -24,7 +24,6 @@ from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 
-Q = models.Q
 User = get_user_model()
 
 RESERVEE_LANGUAGE_CHOICES = settings.LANGUAGES + (("", ""),)
