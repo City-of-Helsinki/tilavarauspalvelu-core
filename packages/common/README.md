@@ -12,12 +12,6 @@ pnpm update-schema
 pnpm generate-gql-types
 ```
 
-### Generate dummy certificates for local ui
-
-```
-pnpm generate-certificate
-```
-
 ### Generate email .html templates
 
 ```

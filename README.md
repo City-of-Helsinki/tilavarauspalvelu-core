@@ -1,7 +1,7 @@
 # tilavarauspalvelu-ui
-- [End user UI](ui/)
-- [Admin UI](admin-ui/)
-- [Common UI components](common/)
+- [End user UI](apps/ui/)
+- [Admin UI](apps/admin-ui/)
+- [Common UI components](packages/common/)
 
 ## Making a release
 
@@ -61,11 +61,6 @@ Test all packages
 pnpm test
 ```
 
-Generate SSL certificates for localhost
-```
-pnpm generate-certificate
-```
-
 ## Repo structure
 
 Main applications that don't depend on each other, can be built, and ran.
@@ -87,40 +82,20 @@ and follow it's instructions.
 
 Alternatively you can use an Azure development backend by changing the environment variable.
 
-### https
-
-Because we use tunnistamo SSO we require https and a valid domain (not localhost).
-
-Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
-
-```
-127.0.0.1       local-tilavaraus.hel.fi
-```
-
-Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
-
-```sh
-# in the repo root
-pnpm generate-certificate
-```
-
-### set environment variables
-
-These are done app by app so you need to go to `apps/admin-ui` and `apps/ui` and follow their instructions.
-
 ### access
 
 If you run all the apps using `pnpm dev` in the root.
 
-Admin-ui: https://local-tilavaraus.hel.fi:3001/kasittely
-UI: https://local-tilavaraus.hel.fi:3000
+Admin-ui: [http://localhost:3001/kasittely]/(http://localhost:3001/kasittely)
+
+UI: [http://localhost:3000]/(http://localhost:3000)
 
 ## GraphQL
 
 Assuming you are using local backend.
 Interactive graphql: `http://localhost:8000/graphql/`
 
-Using the graphql console qequires login in to django at `http://localhost:8000/admin/`
+Using the graphql console requires login to django at `http://localhost:8000/admin/`
 
 ### Updates to graphql schema
 

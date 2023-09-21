@@ -27,7 +27,7 @@ In the project directory, you can run:
 
 ### `pnpm dev`
 
-With the standard env the admin-ui is accessible from: https://local-tilavaraus.hel.fi:3001/kasittely
+With the standard env the admin-ui [http://localhost:3001/kasittely]/(http://localhost:3001/kasittely) to view it in the browser.
 
 ### `pnpm test`
 

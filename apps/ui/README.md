@@ -2,11 +2,6 @@
 
 Follow the instructions on the main README before this.
 
-### Access with browser
-
-UI is at https://local-tilavaraus.hel.fi:3000/
-Backend is at http://127.0.0.1:8000/v1/
-
 ### Graphql workflow
 
 ## Available Scripts
@@ -16,10 +11,7 @@ In the project directory, you can run:
 ### `pnpm dev`
 
 Runs the app in the development mode.\
-Open [https://local-tilavaraus.hel.fi:3000]/(https://local-tilavaraus.hel.fi:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Open [http://localhost:3000]/(http://locahost:3000) to view it in the browser.
 
 ### `pnpm dev:test`
 
