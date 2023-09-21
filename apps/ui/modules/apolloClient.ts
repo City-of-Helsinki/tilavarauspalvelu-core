@@ -4,6 +4,7 @@ import { onError } from "@apollo/client/link/error";
 import { GraphQLError } from "graphql";
 import { apiBaseUrl, isBrowser } from "./const";
 
+const uri = `${apiBaseUrl}/graphql/`;
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(async (error: GraphQLError) => {
@@ -16,7 +17,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const httpLink = new HttpLink({ uri: `${apiBaseUrl}/graphql/`, credentials: "include" });
+const httpLink = new HttpLink({ uri: uri, credentials: "include" });
 
 const client = new ApolloClient({
   cache: new InMemoryCache({

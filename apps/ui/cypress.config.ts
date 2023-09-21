@@ -1,4 +1,6 @@
 import { defineConfig } from "cypress";
+import dns from 'node:dns';
+dns.setDefaultResultOrder('ipv4first');
 
 export default defineConfig({
   chromeWebSecurity: false,

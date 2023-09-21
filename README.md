@@ -126,10 +126,11 @@ unlike browser APIs.
 
 ### Node 18 fetch failed server side
 
-Using Node 18+ and getting Apollo fetch failed error or some other server side fetch exception?
-Using http://localhost:XXXX as a backend?
+Node 18 fetch is a buggy mess that doesn't understand IPv4.
 
-Replace localhost with 127.0.0.1
+Use Node 20 (or remap localhost to 127.0.0.1 in /etc/hosts)
+
+Can't use the prefered solution of replacing localhost with 127.0.0.1 because backend doesn't understand return addresses then.
 
 #### Explanation
 
@@ -139,7 +140,7 @@ tell it that we are connecting to IPv4 address and not to :1.
 127.0.0.1 is the prefered solution because it's not brittle unlike using dns resolution or env flags.
 No module or node update should ever break it untill IPv4 is no longer supported.
 
-### Other fetch problems with Node18+
+### Other fetch problems with Node 18
 
 Prefer 127.0.0.1 over localhost if that doesn't help then:
 

@@ -69,7 +69,6 @@ docker run -e TZ=Europe/Helsinki \
   -e NEXT_PUBLIC_TILAVARAUS_API_URL=http://127.0.0.1:4000 \
   -e PORT=4000 \
   -e NEXT_PUBLIC_MOCK_REQUESTS=true \
-  -e NEXTAUTH_SECRET=not-a-good-secret \
   -p 4000:4000 -d --ipc=host --name tilavaraus-ui-test \
   tilavaraus-ui-mocked
 

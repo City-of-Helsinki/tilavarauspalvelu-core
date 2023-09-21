@@ -17,7 +17,8 @@ import "../styles/global.scss";
 import { initMocks } from "../mocks";
 
 if (mockRequests) {
-  initMocks();
+  // await required otherwise the MSW is reqistered after the fetches are made
+  await initMocks();
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
