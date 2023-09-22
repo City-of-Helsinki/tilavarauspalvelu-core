@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, gql } from "@apollo/client";
@@ -660,26 +660,12 @@ const getName = (
   return t("Notifications.error.notFound");
 };
 
-/// @param pk: primary key of the notification to edit, null for new notification, NaN for error
-/// Client only: uses hooks, window, and react-router-dom
-/// We don't have proper layouts yet, so just separate the container stuff here
-const PageWrapped = ({ pk }: { pk?: number }) => {
-  const typename = "BannerNotificationType";
-  const id = pk ? window?.btoa(`${typename}:${pk}`) : undefined;
-
-  const { data, loading: isLoading } = useQuery<
-    Query,
-    QueryBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_ADMIN, {
-    skip: !id,
-    variables: {
-      id: String(id ?? ""),
-    },
-  });
+const useRemoveNotification = ({
+  notification,
+}: {
+  notification?: BannerNotificationType;
+}) => {
   const { t } = useTranslation();
-
-  const notification = data?.bannerNotification;
-
   const { notifyError, notifySuccess } = useNotification();
   const handleError = (errorMsgs: string[]) => {
     // eslint-disable-next-line no-console
@@ -740,6 +726,72 @@ const PageWrapped = ({ pk }: { pk?: number }) => {
     navigate("..");
   };
 
+  return removeNotification;
+};
+
+function LoadedContent({
+  isNew,
+  notification,
+  children,
+}: {
+  isNew: boolean;
+  notification?: BannerNotificationType;
+  children?: ReactNode;
+}) {
+  const { t } = useTranslation();
+
+  const removeNotification = useRemoveNotification({ notification });
+
+  const name = getName(isNew, false, notification?.name, t);
+  return (
+    <>
+      <StatusTagContainer>
+        <H1 $legacy>{name}</H1>
+        {notification?.state && (
+          <BannerNotificationStateTag state={notification.state} />
+        )}
+      </StatusTagContainer>
+      {(notification || isNew) && (
+        <NotificationForm notification={notification ?? undefined} />
+      )}
+      {notification && (
+        <ButtonContainer
+          style={{ marginTop: "2rem", justifyContent: "flex-start" }}
+        >
+          <Button
+            onClick={removeNotification}
+            variant="secondary"
+            theme="black"
+          >
+            {t("Notifications.deleteButton")}
+          </Button>
+        </ButtonContainer>
+      )}
+      ){children}
+    </>
+  );
+}
+
+/// @param pk: primary key of the notification to edit, null for new notification, NaN for error
+/// Client only: uses hooks, window, and react-router-dom
+/// We don't have proper layouts yet, so just separate the container stuff here
+const PageWrapped = ({ pk }: { pk?: number }) => {
+  const typename = "BannerNotificationType";
+  const id = pk ? window?.btoa(`${typename}:${pk}`) : undefined;
+
+  const { data, loading: isLoading } = useQuery<
+    Query,
+    QueryBannerNotificationArgs
+  >(BANNER_NOTIFICATIONS_ADMIN, {
+    skip: !id,
+    variables: {
+      id: String(id ?? ""),
+    },
+  });
+  const { t } = useTranslation();
+
+  const notification = data?.bannerNotification ?? undefined;
+
   const isNew = pk === 0;
   const name = getName(isNew, isLoading, notification?.name, t);
 
@@ -760,33 +812,10 @@ const PageWrapped = ({ pk }: { pk?: number }) => {
         ]}
       />
       <Container>
-        <StatusTagContainer>
-          <H1 $legacy>{name}</H1>
-          {notification?.state && (
-            <BannerNotificationStateTag state={notification.state} />
-          )}
-        </StatusTagContainer>
         {isLoading ? (
           <Loader />
         ) : (
-          <>
-            {(notification || isNew) && (
-              <NotificationForm notification={notification ?? undefined} />
-            )}
-            {notification && (
-              <ButtonContainer
-                style={{ marginTop: "2rem", justifyContent: "flex-start" }}
-              >
-                <Button
-                  onClick={removeNotification}
-                  variant="secondary"
-                  theme="black"
-                >
-                  {t("Notifications.deleteButton")}
-                </Button>
-              </ButtonContainer>
-            )}
-          </>
+          <LoadedContent isNew={isNew} notification={notification} />
         )}
       </Container>
     </>
