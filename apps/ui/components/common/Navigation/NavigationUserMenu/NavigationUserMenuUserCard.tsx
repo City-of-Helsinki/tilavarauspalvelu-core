@@ -41,8 +41,8 @@ const NavigationUserMenuUserCard = ({
   user: { name = "Anon", email = " - " },
 }: Props): JSX.Element => (
   <StyledUserInfo>
-    <Name>{name}</Name>
-    <Email>{email}</Email>
+    <Name data-testid="navigation-user-menu-user-card-name">{name}</Name>
+    <Email data-testid="navigation-user-menu-user-card-email">{email}</Email>
   </StyledUserInfo>
 );
 
