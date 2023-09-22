@@ -23,15 +23,15 @@ import {
 } from "../modules/queries/reservation";
 
 type UseOrderProps = {
-  orderUuid: string;
+  orderUuid?: string;
 };
 
 export const useOrder = ({
   orderUuid,
 }: UseOrderProps): {
-  order: PaymentOrderType | null;
+  order?: PaymentOrderType;
   error: boolean;
-  refreshError: ApolloError;
+  refreshError?: ApolloError;
   loading: boolean;
   refresh: () => void;
   called: boolean;
@@ -47,7 +47,7 @@ export const useOrder = ({
       variables: { orderUuid },
       onCompleted: (res) => {
         setCalled(true);
-        setData(res.order);
+        setData(res?.order ?? null);
       },
       onError: () => {
         setCalled(true);
@@ -61,15 +61,18 @@ export const useOrder = ({
       { input: RefreshOrderMutationInput }
     >(REFRESH_ORDER, {
       fetchPolicy: "no-cache",
-      variables: { input: { orderUuid } },
+      variables: { input: { orderUuid: orderUuid ?? "" } },
       onCompleted: (res) => {
-        setData({ ...data, status: res.refreshOrder.status });
+        const newData = data != null ? { ...data, status: res.refreshOrder.status } : null
+        setData(newData);
       },
+      // catch all thrown errors so we don't crash
+      // particularly there is an EXTERNAL_SERVICE_ERROR that happens occasionally
       onError: () => {},
     });
 
   return {
-    order: data,
+    order: data ?? undefined,
     error: error != null,
     refreshError,
     loading: orderLoading || refreshLoading,
@@ -85,13 +88,13 @@ type UseReservationProps = {
 export const useReservation = ({
   reservationPk,
 }: UseReservationProps): {
-  reservation: ReservationType;
-  error: ApolloError;
+  reservation?: ReservationType;
+  error?: ApolloError;
   loading: boolean;
   deleteReservation: (
     arg: Record<"variables", Record<"input", Record<"pk", number>>>
   ) => void;
-  deleteError: ApolloError;
+  deleteError?: ApolloError;
   deleteLoading: boolean;
   deleted: boolean;
 } => {
@@ -102,12 +105,12 @@ export const useReservation = ({
       { deleteReservation: ReservationDeleteMutationPayload },
       { input: ReservationDeleteMutationInput }
     >(DELETE_RESERVATION, {
-      fetchPolicy: "no-cache",
       onCompleted: (res) => {
         if (res.deleteReservation.deleted) {
           setDeleted(true);
         }
       },
+      // catch all thrown errors so we don't crash
       onError: () => {},
     });
 
@@ -120,8 +123,10 @@ export const useReservation = ({
     }
   );
 
+  const reservation = data?.reservationByPk ?? undefined;
+
   return {
-    reservation: data?.reservationByPk,
+    reservation,
     error,
     loading,
     deleteReservation,
@@ -132,7 +137,7 @@ export const useReservation = ({
 };
 
 type UseReservationsProps = {
-  currentUser: UserType;
+  currentUser?: UserType;
   states?: ReservationsReservationStateChoices[];
   orderBy?: string;
 };
@@ -143,7 +148,7 @@ export const useReservations = ({
   orderBy,
 }: UseReservationsProps): {
   reservations: ReservationType[];
-  error: ApolloError;
+  error?: ApolloError;
   loading: boolean;
 } => {
   const { data, error, loading } = useQuery<Query, QueryReservationsArgs>(
@@ -151,7 +156,7 @@ export const useReservations = ({
     {
       skip: !currentUser?.pk,
       variables: {
-        ...(states?.length > 0 && { state: states }),
+        ...(states != null && states?.length > 0 && { state: states }),
         ...(orderBy && { orderBy }),
         user: currentUser?.pk?.toString(),
       },
@@ -159,8 +164,12 @@ export const useReservations = ({
     }
   );
 
+  const reservations = data?.reservations?.edges.map((edge) => edge?.node)
+    .filter((n): n is ReservationType => n != null)
+    ?? [];
+
   return {
-    reservations: data?.reservations.edges.map((edge) => edge.node) ?? [],
+    reservations,
     error,
     loading,
   };

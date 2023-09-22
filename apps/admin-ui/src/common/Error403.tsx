@@ -1,7 +1,7 @@
 import { Button, Link } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "app/hooks/auth";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -36,13 +36,9 @@ const ButtonContainer = styled.div`
 `;
 
 const LogoutSection = (): JSX.Element => {
-  const { data: session } = useSession();
+  const { isAuthenticated } = useSession();
 
   const { t } = useTranslation();
-
-  const isAuthenticated = (): boolean => {
-    return session?.user !== null;
-  };
 
   return (
     <>
@@ -55,13 +51,9 @@ const LogoutSection = (): JSX.Element => {
       >
         {t("errorPages.accessForbidden.giveFeedback")}
       </Link>
-      {isAuthenticated() && (
+      {isAuthenticated && (
         <ButtonContainer>
-          <Button
-            onClick={() => signOut({ callbackUrl: `${publicUrl}/auth/logout` })}
-          >
-            {t("Navigation.logout")}
-          </Button>
+          <Button onClick={() => signOut()}>{t("Navigation.logout")}</Button>
         </ButtonContainer>
       )}
     </>

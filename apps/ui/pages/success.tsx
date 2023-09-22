@@ -1,22 +1,22 @@
 import { breakpoints } from "common/src/common/style";
 import { ReservationsReservationStateChoices } from "common/types/gql-types";
 import { LoadingSpinner } from "hds-react";
-import { signIn, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Container } from "common";
+import { useSession } from "~/hooks/auth";
 
 import ReservationFail from "../components/reservation/ReservationFail";
-import { authEnabled, authenticationIssuer } from "../modules/const";
+import { authEnabled } from "../modules/const";
 import { useOrder, useReservation } from "../hooks/reservation";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -35,7 +35,7 @@ const StyledContainer = styled(Container)`
 `;
 
 const ReservationSuccess = () => {
-  const session = useSession();
+  const { isAuthenticated } = useSession();
   const router = useRouter();
   const { orderId } = router.query as { orderId: string };
 
@@ -43,16 +43,15 @@ const ReservationSuccess = () => {
     useState<boolean>(false);
   const [refreshRetries, setRefreshRetries] = useState<number>(0);
 
-  const isCheckingAuth = session?.status === "loading";
-  const isLoggedOut = authEnabled && session?.status === "unauthenticated";
+  const isLoggedOut = authEnabled && !isAuthenticated;
 
+  /*
   useEffect(() => {
     if (isLoggedOut) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
+      signIn();
     }
   }, [isLoggedOut]);
+  */
 
   const {
     order,
@@ -70,7 +69,7 @@ const ReservationSuccess = () => {
   } = useReservation({
     reservationPk: order?.reservationPk
       ? parseInt(order?.reservationPk, 10)
-      : null,
+      : 0,
   });
 
   useEffect(() => {
@@ -111,8 +110,7 @@ const ReservationSuccess = () => {
   const isOrderValid = isOrderFetched && order?.status === "PAID";
   const isReservationValid = !reservationError && !isReservationInvalid;
 
-  const readyToReport =
-    !isLoggedOut && !isCheckingAuth && !orderLoading && !reservationLoading;
+  const readyToReport = !isLoggedOut && !orderLoading && !reservationLoading;
 
   useEffect(() => {
     if (!reservation?.state || !isOrderValid || reservationError) return;

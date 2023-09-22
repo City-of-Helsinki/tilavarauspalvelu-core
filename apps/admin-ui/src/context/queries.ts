@@ -6,6 +6,7 @@ export const CURRENT_USER = gql`
       username
       firstName
       lastName
+      email
       isSuperuser
       username
       pk

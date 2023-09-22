@@ -25,6 +25,7 @@ import { PendingReservation } from "common/types/common";
 import { toApiDate } from "common/src/common/util";
 import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
+import { useCurrentUser } from "@/hooks/user";
 
 import {
   ADJUST_RESERVATION_TIME,
@@ -35,7 +36,6 @@ import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
-import { CURRENT_USER } from "../../modules/queries/user";
 import {
   RESERVATION_UNIT,
   OPENING_HOURS,
@@ -127,11 +127,12 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [reservation, setReservation] = useState<ReservationType>(null);
+  const [reservation, setReservation] = useState<ReservationType | null>(null);
   const [reservationUnit, setReservationUnit] =
-    useState<ReservationUnitByPkType>(null);
-  const [activeApplicationRounds, setActiveApplicationRounds] =
-    useState<ApplicationRoundType[]>(null);
+    useState<ReservationUnitByPkType | null>(null);
+  const [activeApplicationRounds, setActiveApplicationRounds] = useState<
+    ApplicationRoundType[]
+  >([]);
   const [step, setStep] = useState(0);
 
   const [initialReservation, setInitialReservation] =
@@ -139,16 +140,11 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   const [userReservations, setUserReservations] = useState<
     ReservationType[] | null
   >(null);
-  const [showSuccessMsg, setShowSuccessMsg] = useState<boolean>(null);
+  const [showSuccessMsg, setShowSuccessMsg] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const now = useMemo(() => new Date().toISOString(), []);
-
-  const { data: userData } = useQuery<Query>(CURRENT_USER, {
-    fetchPolicy: "no-cache",
-  });
-
-  const currentUser = useMemo(() => userData?.currentUser, [userData]);
+  const { currentUser } = useCurrentUser();
 
   useQuery(GET_RESERVATION, {
     fetchPolicy: "no-cache",
@@ -165,10 +161,10 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     QueryReservationUnitByPkArgs
   >(RESERVATION_UNIT, {
     fetchPolicy: "no-cache",
+    skip: !reservation?.reservationUnits?.[0]?.pk,
     variables: {
-      pk: reservation?.reservationUnits[0]?.pk,
+      pk: reservation?.reservationUnits?.[0]?.pk ?? 0,
     },
-    skip: !reservation,
   });
 
   const [fetchAdditionalData, { data: additionalData }] = useLazyQuery<

@@ -49,6 +49,11 @@ const nextConfig = {
       displayName: true,
     },
   },
+  webpack: (config) => {
+    // required otherwise the MSW is reqistered after the fetches are made
+    config.experiments = { topLevelAwait: true };
+    return config;
+  },
 };
 
 const sentryWebpackPluginOptions = {

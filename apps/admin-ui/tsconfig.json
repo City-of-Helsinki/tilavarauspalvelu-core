@@ -3,7 +3,9 @@
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
     "paths": {
-      "app/*": ["./src/*"]
+      // old version
+      "app/*": ["./src/*"],
+      "@/*": ["./src/*"]
     }
   },
   "exclude": ["node_modules"],

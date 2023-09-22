@@ -5,7 +5,7 @@ import { breakpoints } from "../common/style";
 type Size = "s" | "l";
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[];
+  children: React.ReactNode;
   size?: Size;
 };
 

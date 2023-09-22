@@ -98,7 +98,6 @@ import {
 } from "../../modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import { CURRENT_USER } from "../../modules/queries/user";
 import { isReservationReservable } from "../../modules/reservation";
 import SubventionSuffix from "../../components/reservation/SubventionSuffix";
 import InfoDialog from "../../components/common/InfoDialog";
@@ -121,6 +120,7 @@ import QuickReservation, {
   QuickReservationSlotProps,
 } from "../../components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
+import { useCurrentUser } from "~/hooks/user";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -458,11 +458,7 @@ const ReservationUnit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialReservation]);
 
-  const { data: userData } = useQuery<Query>(CURRENT_USER, {
-    fetchPolicy: "no-cache",
-  });
-
-  const currentUser = useMemo(() => userData?.currentUser, [userData]);
+  const { currentUser } = useCurrentUser();
 
   const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
     LIST_RESERVATIONS,

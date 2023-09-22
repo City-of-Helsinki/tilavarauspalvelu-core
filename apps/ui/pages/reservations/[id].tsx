@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
-import { camelCase, capitalize, get, isFinite, trim } from "lodash";
+import { camelCase, capitalize, isFinite, trim } from "lodash";
 import {
   IconArrowRight,
   IconCalendar,
@@ -13,7 +13,6 @@ import {
 import { useTranslation } from "next-i18next";
 import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { signIn, useSession } from "next-auth/react";
 import {
   Query,
   QueryTermsOfUseArgs,
@@ -25,6 +24,7 @@ import {
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
+import { useSession } from "~/hooks/auth";
 
 import apolloClient from "../../modules/apolloClient";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
@@ -52,11 +52,7 @@ import ReservationStatus from "../../components/reservation/ReservationStatus";
 import Address from "../../components/reservation-unit/Address";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import ReservationOrderStatus from "../../components/reservation/ReservationOrderStatus";
-import {
-  reservationUnitPath,
-  authEnabled,
-  authenticationIssuer,
-} from "../../modules/const";
+import { reservationUnitPath, authEnabled } from "../../modules/const";
 import { useReservation, useOrder } from "../../hooks/reservation";
 
 type Props = {
@@ -68,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale,
   params,
 }) => {
-  const id = Number(params.id);
+  const id = Number(params?.id);
 
   if (isFinite(id)) {
     const { data: genericTermsData } = await apolloClient.query<
@@ -85,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         key: `${id}-${locale}`,
-        ...(await serverSideTranslations(locale)),
+        ...(await serverSideTranslations(locale ?? "fi")),
         overrideBackgroundColor: "var(--tilavaraus-white)",
         termsOfUse: {
           genericTerms,
@@ -258,27 +254,26 @@ const Terms = styled.div`
   margin-bottom: var(--spacing-xl);
 `;
 
-const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
+const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
-  const session = useSession();
+  const { isAuthenticated } = useSession();
 
-  const isUserUnauthenticated =
-    authEnabled && session?.status === "unauthenticated";
+  const isUserUnauthenticated = authEnabled && !isAuthenticated;
 
+  /*
   useEffect(() => {
     if (isUserUnauthenticated) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
+      signIn();
     }
   }, [isUserUnauthenticated]);
+  */
 
   const { reservation, loading, error } = useReservation({ reservationPk: id });
   const { order, loading: orderLoading } = useOrder({
-    orderUuid: reservation?.orderUuid,
+    orderUuid: reservation?.orderUuid ?? "",
   });
 
-  const reservationUnit = get(reservation?.reservationUnits, "0");
+  const reservationUnit = reservation?.reservationUnits?.[0];
 
   const instructionsKey = useMemo(
     () => getReservationUnitInstructionsKey(reservation?.state),
@@ -289,7 +284,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
   const isBeingHandled = reservation?.state === "REQUIRES_HANDLING";
 
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
-    if (!reservation || !reservationUnit) return false;
+    if (!reservation || !reservationUnit) {
+      return false;
+    }
 
     const reservationUnitPrice = getReservationUnitPrice({
       reservationUnit,
@@ -392,7 +389,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
     }
   }, [reservation]);
 
-  if (isUserUnauthenticated) return null;
+  if (isUserUnauthenticated) {
+    return null;
+  }
 
   if (error) {
     return (

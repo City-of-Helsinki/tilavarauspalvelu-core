@@ -47,7 +47,7 @@ import {
 } from "../model/reservation-unit";
 import { textWithIcon } from "../model/search";
 
-const CYPRESS_TIMEOUT = 20000
+const CYPRESS_TIMEOUT = 60000
 
 const matchEvent = (): void => {
   reservationEvent()

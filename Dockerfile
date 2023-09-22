@@ -1,4 +1,4 @@
-FROM node:18-bullseye-slim AS base
+FROM node:20-bullseye-slim AS base
 
 # Generates a trimmed down version of the package list for installer
 # doesn't invalidate layer cache if the result from turbo prune stays the same.

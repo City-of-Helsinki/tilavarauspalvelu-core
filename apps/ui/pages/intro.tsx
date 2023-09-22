@@ -1,6 +1,5 @@
 import { Notification, Select } from "hds-react";
-import React, { useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -10,6 +9,7 @@ import styled from "styled-components";
 import { Application, OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryApplicationRoundsArgs } from "common/types/gql-types";
+import { useSession } from "~/hooks/auth";
 import { saveApplication } from "../modules/api";
 import { applicationRoundState, deepCopy } from "../modules/util";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
@@ -18,13 +18,13 @@ import Head from "../components/application/Head";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { CenterSpinner } from "../components/common/common";
 import { getApplicationRoundName } from "../modules/applicationRound";
-import { authEnabled, authenticationIssuer } from "../modules/const";
+import { authEnabled } from "../modules/const";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       overrideBackgroundColor: "white",
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -48,7 +48,7 @@ const Container = styled.div`
 `;
 
 const IntroPage = (): JSX.Element => {
-  const session = useSession();
+  const { isAuthenticated } = useSession();
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
@@ -58,36 +58,37 @@ const IntroPage = (): JSX.Element => {
   const history = useRouter();
   const { t } = useTranslation();
 
-  const isUserUnauthenticated =
-    authEnabled && session?.status === "unauthenticated";
+  const isUserUnauthenticated = authEnabled && !isAuthenticated;
 
+  /*
   useEffect(() => {
     if (isUserUnauthenticated) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
+      signIn();
     }
   }, [isUserUnauthenticated]);
+  */
 
   useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS, {
     fetchPolicy: "no-cache",
     onCompleted: (data) => {
       const now = new Date();
-      const ars = data?.applicationRounds?.edges
-        ?.map((n) => n.node)
-        .filter(
-          (ar) =>
-            new Date(ar.publicDisplayBegin) <= now &&
-            new Date(ar.publicDisplayEnd) >= now &&
-            applicationRoundState(
-              ar.applicationPeriodBegin,
-              ar.applicationPeriodEnd
-            ) === "active"
-        )
-        .map((ar) => ({
-          value: ar.pk,
-          label: getApplicationRoundName(ar),
-        }));
+      const ars =
+        data?.applicationRounds?.edges
+          ?.map((n) => n?.node)
+          .filter((n): n is NonNullable<typeof n> => !!n)
+          .filter(
+            (ar) =>
+              new Date(ar.publicDisplayBegin) <= now &&
+              new Date(ar.publicDisplayEnd) >= now &&
+              applicationRoundState(
+                ar.applicationPeriodBegin,
+                ar.applicationPeriodEnd
+              ) === "active"
+          )
+          .map((ar) => ({
+            value: ar.pk ?? 0,
+            label: getApplicationRoundName(ar),
+          })) ?? [];
       setApplicationRounds(ars);
     },
   });

@@ -1,13 +1,10 @@
 import React from "react";
 import { IconSignout, Navigation as HDSNavigation } from "hds-react";
-import { signIn, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
-import { useCurrentUser } from "@/hooks/user";
+import { signIn, signOut, useSession } from "~/hooks/auth";
 import { NavigationUserMenuUserCard } from "./NavigationUserMenuUserCard";
-import { authenticationIssuer } from "../../../../modules/const";
-import { signOut } from "../../../../modules/auth";
 import { MenuItem } from "../types";
 
 const StyledUserMenu = styled(HDSNavigation.User)<{
@@ -101,40 +98,26 @@ const constructName = (firstName?: string, lastName?: string) =>
 
 const NavigationUserMenu = () => {
   const router = useRouter();
-  const session = useSession();
+  const { isAuthenticated, user } = useSession();
   const { t } = useTranslation();
 
   const isActive = userMenuItems
     .map((item) => item.path)
     .includes(router.pathname);
 
-  const { currentUser } = useCurrentUser();
-
-  const handleSignIn = () => {
-    signIn(authenticationIssuer, {
-      callbackUrl: window.location.href,
-    });
-  };
-
-  const handleSignOut = () => {
-    signOut({ session: session?.data ?? undefined });
-  };
-
-  const { firstName, lastName } = currentUser ?? {};
-
+  const { firstName, lastName } = user ?? {};
   const userName = constructName(firstName, lastName);
-
   return (
     <StyledUserMenu
       userName={userName}
-      authenticated={session.status === "authenticated"}
+      authenticated={isAuthenticated}
       label={t("common:login")}
-      onSignIn={handleSignIn}
+      onSignIn={signIn}
       closeOnItemClick
       $active={isActive}
     >
       <NavigationUserMenuUserCard
-        user={{ name: userName, email: currentUser?.email }}
+        user={{ name: userName, email: user?.email }}
       />
       {userMenuItems.map((item) => (
         <NavigationUserMenuItem
@@ -149,7 +132,7 @@ const NavigationUserMenu = () => {
       ))}
       <NavigationUserMenuItem
         href="#"
-        onClick={handleSignOut}
+        onClick={signOut}
         icon={<IconSignout aria-hidden />}
         label={t("common:logout")}
         $divider

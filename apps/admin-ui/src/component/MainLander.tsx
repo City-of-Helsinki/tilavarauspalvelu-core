@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { signIn } from "next-auth/react";
+import { signIn } from "app/hooks/auth";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -67,15 +67,7 @@ function MainLander() {
     <>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{t("common.applicationName")}</Heading>
-        <LoginBtn
-          onClick={() => {
-            signIn("tunnistamo", {
-              callbackUrl: window.location.href,
-            });
-          }}
-        >
-          {t("Navigation.login")}
-        </LoginBtn>
+        <LoginBtn onClick={signIn}>{t("Navigation.login")}</LoginBtn>
       </KorosHeading>
       <Content>
         <Ingress>{t("MainLander.ingress")}</Ingress>

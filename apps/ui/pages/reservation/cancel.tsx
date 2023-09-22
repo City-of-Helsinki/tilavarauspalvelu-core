@@ -1,4 +1,3 @@
-import { signIn, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -7,8 +6,9 @@ import { breakpoints } from "common/src/common/style";
 import { LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { Container } from "common";
+import { useSession } from "~/hooks/auth";
 
-import { authEnabled, authenticationIssuer } from "../../modules/const";
+import { authEnabled } from "../../modules/const";
 import { useOrder, useReservation } from "../../hooks/reservation";
 import DeleteCancelled from "../../components/reservation/DeleteCancelled";
 import ReservationFail from "../../components/reservation/ReservationFail";
@@ -16,7 +16,7 @@ import ReservationFail from "../../components/reservation/ReservationFail";
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -32,28 +32,20 @@ const StyledContainer = styled(Container)`
   }
 `;
 const Cancel = () => {
-  const session = useSession();
+  const { isAuthenticated } = useSession();
   const router = useRouter();
-  const { orderId } = router.query as { orderId: string };
+  const { orderId } = router.query;
 
-  const isCheckingAuth = session?.status === "loading";
-  const isLoggedOut = authEnabled && session?.status === "unauthenticated";
+  const isLoggedOut = authEnabled && !isAuthenticated;
 
-  useEffect(() => {
-    if (isLoggedOut) {
-      signIn(authenticationIssuer, {
-        callbackUrl: window.location.href,
-      });
-    }
-  }, [isLoggedOut]);
-
-  const { order, loading, called } = useOrder({ orderUuid: orderId });
+  const uuid = Array.isArray(orderId) ? orderId[0] : orderId;
+  const { order, loading, called } = useOrder({ orderUuid: uuid });
 
   const { deleteReservation, deleteError, deleteLoading, deleted } =
     useReservation({
       reservationPk: order?.reservationPk
         ? parseInt(order?.reservationPk, 10)
-        : null,
+        : 0,
     });
 
   useEffect(() => {
@@ -65,7 +57,7 @@ const Cancel = () => {
     }
   }, [deleteReservation, order]);
 
-  if (loading || deleteLoading || isCheckingAuth || !called || isLoggedOut) {
+  if (loading || deleteLoading || !called || isLoggedOut) {
     return (
       <StyledContainer>
         <LoadingSpinner />

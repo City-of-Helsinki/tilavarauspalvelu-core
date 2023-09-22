@@ -41,16 +41,16 @@ describe("getDurationOptions", () => {
   test("empty inputs", () => {
     expect(
       getDurationOptions(
-        null,
+        0,
         5400,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
       )
     ).toEqual([]);
-    expect(getDurationOptions(5400, null, null)).toEqual([]);
+    expect(getDurationOptions(5400, 0, ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins)).toEqual([]);
     expect(
       getDurationOptions(
-        null,
-        null,
+        0,
+        0,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
       )
     ).toEqual([]);
@@ -738,31 +738,21 @@ describe("getCheckoutUrl", () => {
     );
   });
 
-  test("returns null with falsy input", () => {
-    expect(getCheckoutUrl(order, null as unknown as Language)).toBe(null);
-
-    expect(getCheckoutUrl({ ...order, checkoutUrl: undefined }, "fi")).toBe(
-      null
-    );
+  test("returns undefined with falsy input", () => {
+    expect(getCheckoutUrl({ ...order, checkoutUrl: undefined })).not.toBeDefined();
 
     expect(
-      getCheckoutUrl(
-        {
-          ...order,
-          checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
-        },
-        "fi"
-      )
-    ).toBe(null);
+      getCheckoutUrl({
+        ...order,
+        checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
+      })
+    ).not.toBeDefined();
 
     expect(
-      getCheckoutUrl(
-        {
-          ...order,
-          checkoutUrl: "https://checkout.url/path",
-        },
-        "fi"
-      )
-    ).toBe(null);
+      getCheckoutUrl({
+        ...order,
+        checkoutUrl: "https://checkout.url/path",
+      })
+    ).not.toBeDefined();
   });
 });

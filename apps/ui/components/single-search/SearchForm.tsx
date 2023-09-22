@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import {
   Select,
@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
-import { OptionType, StringParameter } from "common/types/common";
+import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryUnitsArgs } from "common/types/gql-types";
 import {
@@ -94,7 +94,7 @@ const Filters = styled.div<{ $areFiltersVisible: boolean }>`
   }
 `;
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled(Select<OptionType>)`
   button {
     display: grid;
     text-align: left;
@@ -195,55 +195,62 @@ const SearchForm = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const [unitOptions, setUnitOptions] = useState<OptionType[]>([]);
-  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
-  const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
-    OptionType[]
-  >([]);
   const [reservationTypeSearchInput, setReservationTypeSearchInput] =
     useState<string>("");
   const [unitSearchInput, setUnitSearchInput] = useState<string>("");
   const [purposeSearchInput, setPurposeSearchInput] = useState<string>("");
   const [areFiltersVisible, setAreFiltersVisible] = useState(false);
 
-  useQuery<Query, QueryUnitsArgs>(SEARCH_FORM_PARAMS_UNIT, {
+  const { data: unitQueryData, loading: unitsLoading } = useQuery<
+    Query,
+    QueryUnitsArgs
+  >(SEARCH_FORM_PARAMS_UNIT, {
     variables: {
       publishedReservationUnits: true,
     },
-    onCompleted: (res) => {
-      const units = res?.units?.edges?.map(({ node }) => ({
+  });
+  const units =
+    unitQueryData?.units?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n != null)
+      .map((node) => ({
         id: String(node.pk),
         name: getUnitName(node),
-      }));
-      setUnitOptions(mapOptions(sortBy(units, "name") as StringParameter[]));
-    },
-  });
+      })) ?? [];
+  const unitOptions = mapOptions(sortBy(units, "name"));
 
-  useQuery<Query>(SEARCH_FORM_PARAMS_PURPOSE, {
-    onCompleted: (res) => {
-      const purposes = res?.purposes?.edges?.map(({ node }) => ({
+  const { data: purposesQueryData, loading: purposesLoading } = useQuery<Query>(
+    SEARCH_FORM_PARAMS_PURPOSE
+  );
+  const purposes =
+    purposesQueryData?.purposes?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n != null)
+      .map((node) => ({
         id: String(node.pk),
         name: getTranslation(node, "name"),
-      }));
-      setPurposeOptions(
-        mapOptions(sortBy(purposes, "name") as StringParameter[])
-      );
-    },
-  });
+      })) ?? [];
+  const purposeOptions = mapOptions(sortBy(purposes, "name"));
 
-  useQuery<Query>(RESERVATION_UNIT_TYPES, {
-    onCompleted: (res) => {
-      const types = res?.reservationUnitTypes?.edges?.map(({ node }) => ({
+  const { data: unitTypeQueryData, loading: typesLoading } = useQuery<Query>(
+    RESERVATION_UNIT_TYPES
+  );
+  const unitTypes =
+    unitTypeQueryData?.reservationUnitTypes?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n != null)
+      .map((node) => ({
         id: String(node.pk),
         name: getTranslation(node, "name"),
-      }));
-      setReservationUnitTypeOptions(mapOptions(sortBy(types, "name")));
-    },
-  });
+      })) ?? [];
+  const reservationUnitTypeOptions = mapOptions(sortBy(unitTypes, "name"));
 
   const { register, watch, handleSubmit, setValue, getValues } = useForm();
 
-  const getFormSubValueLabel = (key: string, value: string): string => {
+  const getFormSubValueLabel = (
+    key: string,
+    value: string
+  ): string | undefined => {
     switch (key) {
       case "unit":
         return unitOptions.find((n) => n.value === value)?.label;
@@ -266,6 +273,7 @@ const SearchForm = ({
     register("purposes");
   }, [register]);
 
+  // TODO this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
   useEffect(() => {
     Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
   }, [formValues, setValue]);
@@ -274,14 +282,7 @@ const SearchForm = ({
     onSearch(criteria);
   };
 
-  const areOptionsLoaded = useMemo(
-    () =>
-      reservationUnitTypeOptions.length > 0 &&
-      unitOptions.length > 0 &&
-      purposeOptions.length > 0,
-    [reservationUnitTypeOptions, unitOptions, purposeOptions]
-  );
-
+  const areOptionsLoaded = !unitsLoading && !purposesLoading && !typesLoading;
   const formValueKeys = Object.keys(formValues);
 
   return (

@@ -5,14 +5,10 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { ReservationsReservationStateChoices } from "common/types/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
-import { BlackButton, Toast } from "../../styles/util";
-import {
-  useReservations,
-  useReservation,
-  useOrder,
-} from "../../hooks/reservation";
-import { useCurrentUser } from "../../hooks/user";
-import { getCheckoutUrl } from "../../modules/reservation";
+import { useCurrentUser } from "@/hooks/user";
+import { BlackButton, Toast } from "@/styles/util";
+import { useReservations, useReservation, useOrder } from "@/hooks/reservation";
+import { getCheckoutUrl } from "@/modules/reservation";
 
 const NotificationContent = styled.div`
   display: flex;
@@ -42,7 +38,7 @@ const ReservationNotification = () => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const { currentUser } = useCurrentUser({ global: true });
+  const { currentUser } = useCurrentUser();
   const { reservations } = useReservations({
     currentUser,
     states: [ReservationsReservationStateChoices.WaitingForPayment],
@@ -53,10 +49,12 @@ const ReservationNotification = () => {
     (r) => r.state === ReservationsReservationStateChoices.WaitingForPayment
   );
 
-  const { order } = useOrder({ orderUuid: reservation?.orderUuid });
+  const { order } = useOrder({
+    orderUuid: reservation?.orderUuid ?? undefined,
+  });
 
   const { deleteReservation, deleteLoading, deleteError, deleted } =
-    useReservation({ reservationPk: reservation?.pk });
+    useReservation({ reservationPk: reservation?.pk ?? 0 });
 
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
@@ -86,7 +84,10 @@ const ReservationNotification = () => {
     );
   }
 
-  return checkoutUrl ? (
+  if (!checkoutUrl) {
+    return null;
+  }
+  return (
     <NotificationWrapper
       type="alert"
       dismissible
@@ -127,7 +128,7 @@ const ReservationNotification = () => {
         </NotificationButtons>
       </NotificationContent>
     </NotificationWrapper>
-  ) : null;
+  );
 };
 
 const UnpaidReservationNotification = () => {
