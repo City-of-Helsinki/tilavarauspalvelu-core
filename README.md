@@ -124,25 +124,36 @@ On the server it uses Node, on the client it uses the browser.
 Especially for fetch this is an issue since the native fetch in Node is rather quirky,
 unlike browser APIs.
 
-### Node 18 fetch failed server side
+### Node 18 / 20 fetch failed server side
 
-Node 18 fetch is a buggy mess that doesn't understand IPv4.
+Check that your `/etc/hosts` has
+```
+127.0.0.1       localhost
+# IMPORTANT! ipv6 address after ipv4
+::1             localhost
+```
 
-Use Node 20 (or remap localhost to 127.0.0.1 in /etc/hosts)
+Other possible solutions replace localhost with 127.0.0.1
+This should fix the issue, but the backend authentication to tunnistamo doesn't work because it expects localhost as a callback address.
 
-Can't use the prefered solution of replacing localhost with 127.0.0.1 because backend doesn't understand return addresses then.
+Try disabling node fetch api
+``` sh
+node --no-experimental-fetch
+# e.g.
+NODE_OPTIONS="--no-experimental-fetch" pnpm dev
+# or
+cd apps/ui
+NODE_OPTIONS="--no-experimental-fetch" next dev
+```
 
 #### Explanation
 
-Node18 uses IPv6 as default so either we have to tell it to use IPv4 or change to 127.0.0.1 to explicitly
+Node 18+ uses IPv6 as default so either we have to tell it to use IPv4 or change to 127.0.0.1 to explicitly
 tell it that we are connecting to IPv4 address and not to :1.
 
-127.0.0.1 is the prefered solution because it's not brittle unlike using dns resolution or env flags.
-No module or node update should ever break it untill IPv4 is no longer supported.
+127.0.0.1 would be the prefered solution except it breaks callback addresses that are configured to use localhost.
 
-### Other fetch problems with Node 18
-
-Prefer 127.0.0.1 over localhost if that doesn't help then:
+### Disable node fetch api
 
 Turn off experimental fetch in the start script.
 For example MSW requires this for local testing (non Docker), might help with other libraries also,
@@ -150,6 +161,12 @@ primarily those that manipulate or intercept requests.
 
 ```
 "NODE_OPTIONS='--no-experimental-fetch' {cmd} ...
+```
+
+Or add this code before making a network request. DON'T use it on the client (only node server).
+``` js
+const dns = await import('node:dns');
+dns.setDefaultResultOrder('ipv4first');
 ```
 
 ### Other server issues
