@@ -82,6 +82,13 @@ class OpeningHours:
 
 
 class OpeningHoursClient:
+    resources: list[str]
+    start: datetime.date
+    end: datetime.date
+    hauki_origin_id: str
+    opening_hours: dict[str, dict[datetime.date, list[OpeningHours]]]
+    periods: dict[str, list[Period]]
+
     def __init__(
         self,
         resources: list[str] | str,
@@ -138,16 +145,16 @@ class OpeningHoursClient:
         for hour in get_opening_hours(self.resources, start, end, self.hauki_origin_id):
             res_id = hour["origin_id"]
             timezone = hour["timezone"]
-            date = hour["date"]
+            date_ = hour["date"]
             opening_hours = []
             for time in hour["times"]:
-                opening_times = OpeningHours.get_opening_hours_class_from_time_element(time, date, timezone)
+                opening_times = OpeningHours.get_opening_hours_class_from_time_element(time, date_, timezone)
                 if opening_times:
                     opening_hours.append(opening_times)
 
             opening_hours = self._split_opening_hours_based_on_closed_states(opening_hours)
 
-            self.opening_hours[res_id][date].extend(opening_hours)
+            self.opening_hours[res_id][date_].extend(opening_hours)
 
     def _split_opening_hours_based_on_closed_states(self, opening_hours: list[OpeningHours]) -> list[OpeningHours]:
         hours: list[OpeningHours] = []
@@ -373,8 +380,12 @@ class OpeningHoursClient:
         self._init_opening_hours_structure()
         self._fetch_opening_hours(self.start, self.end)
 
-    def get_opening_hours_for_resource(self, resource, date) -> list[OpeningHours]:
-        resource = self.opening_hours.get(resource, {})
+    def get_opening_hours_for_resource(
+        self,
+        resource_id: str,
+        date: datetime.date,
+    ) -> list[OpeningHours]:
+        resource = self.opening_hours.get(resource_id, {})
         times = resource.get(date, [])
         return times
 

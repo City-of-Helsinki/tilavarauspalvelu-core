@@ -14,7 +14,7 @@ from api.graphql.tests.test_reservations.base import (
 )
 from api.graphql.validation_errors import ValidationErrorCodes
 from applications.models import PRIORITY_CONST, City
-from opening_hours.tests.test_get_periods import get_mocked_periods
+from opening_hours.tests.test_get_periods import mocked_get_resource_periods_response_data
 from reservation_units.models import (
     PriceUnit,
     PricingStatus,
@@ -39,7 +39,7 @@ def get_profile_data():
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 @patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-@patch("opening_hours.hours.get_periods_for_resource", return_value=get_mocked_periods())
+@patch("opening_hours.hours.get_periods_for_resource", return_value=mocked_get_resource_periods_response_data)
 class ReservationCreateTestCase(ReservationTestCaseBase):
     def get_create_query(self):
         return """

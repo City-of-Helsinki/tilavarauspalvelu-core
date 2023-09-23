@@ -2,59 +2,61 @@ import hmac
 from urllib import parse
 
 import pytest
-from assertpy import assert_that
 from django.conf import settings
 from freezegun import freeze_time
 
 from opening_hours.hauki_link_generator import generate_hauki_link
 
-valid_signature = "3a8841996f4635970cc5a1d5dda58aaad4e2dd3cbb2857720939362792905b31"
 VALID_SIGNATURE = "1e52776ccc95118a29835938593c277bbddca384317820eb5e59835f36307ba6"
 ORGANIZATION = "parent-organisation"
 
 
-@pytest.mark.usefixtures("_enable_hauki_admin_ui")
+@pytest.mark.usefixtures("_use_hauki_env_variables")
 @freeze_time("2021-01-01 12:00:00", tz_offset=2)
-def test_hauki_link_generation_signature():
+def test__hauki__link_generation__signature():
     link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
     params = dict(parse.parse_qsl(link))
-    assert_that(hmac.compare_digest(VALID_SIGNATURE, params["hsa_signature"])).is_true()
+
+    assert hmac.compare_digest(VALID_SIGNATURE, params["hsa_signature"]) is True
 
 
-@pytest.mark.usefixtures("_enable_hauki_admin_ui")
+@pytest.mark.usefixtures("_use_hauki_env_variables")
 @freeze_time("2021-01-01 14:00:00", tz_offset=2)
-def test_comparing_signature_with_different_date():
+def test__hauki__link_generation__signature_with_incorrect_datetime():
     link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
     params = dict(parse.parse_qsl(link))
-    assert_that(hmac.compare_digest(VALID_SIGNATURE, params["hsa_signature"])).is_false()
+
+    assert hmac.compare_digest(VALID_SIGNATURE, params["hsa_signature"]) is False
 
 
-@pytest.mark.usefixtures("_enable_hauki_admin_ui")
+@pytest.mark.usefixtures("_use_hauki_env_variables")
 @freeze_time("2021-01-01 12:00:00", tz_offset=2)
-def test_hauki_link_params():
+def test__hauki__link_generation__params():
     link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
     params = dict(parse.parse_qsl(link))
-    assert_that(params["hsa_organization"]).is_equal_to(settings.HAUKI_ORGANISATION_ID)
-    assert_that(params["hsa_resource"]).is_equal_to(f"{settings.HAUKI_ORIGIN_ID}:123")
-    assert_that(params["hsa_username"]).is_equal_to("foo@bar.com")
-    assert_that(params["hsa_username"]).is_equal_to("foo@bar.com")
+
+    assert params["hsa_organization"] == settings.HAUKI_ORGANISATION_ID
+    assert params["hsa_resource"] == f"{settings.HAUKI_ORIGIN_ID}:123"
+    assert params["hsa_username"] == "foo@bar.com"
 
 
-@pytest.mark.usefixtures("_enable_hauki_admin_ui")
-@freeze_time("2021-01-01 12:00:00", tz_offset=2)
+@pytest.mark.usefixtures("_use_hauki_env_variables")
 @pytest.mark.parametrize(
     "setting",
     ["HAUKI_ADMIN_UI_URL", "HAUKI_SECRET", "HAUKI_ORIGIN_ID"],
 )
-def test_hauki_link_with_missing_settings(setting):
+@freeze_time("2021-01-01 12:00:00", tz_offset=2)
+def test__hauki__link_generation__missing_settings_values(setting):
     setattr(settings, setting, None)
+
     link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
 
-    assert_that(link).is_none()
+    assert link is None
 
 
-@pytest.mark.usefixtures("_enable_hauki_admin_ui")
+@pytest.mark.usefixtures("_use_hauki_env_variables")
 @freeze_time("2021-01-01 12:00:00", tz_offset=2)
-def test_hauki_link_generation_when_organization_none():
+def test__hauki__link_generation__organization_none():
     link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=None)
-    assert_that(link).is_none()
+
+    assert link is None

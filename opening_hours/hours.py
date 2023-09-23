@@ -70,6 +70,18 @@ class Period:
     resource_state: State = State.UNDEFINED
 
 
+@dataclass()
+class OpeningHoursDayData:
+    timezone: ZoneInfo
+    resource_id: str
+    origin_id: str
+    date: datetime.date
+    times: list[TimeElement]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
 def _build_hauki_resource_id(
     resource_id: str | list[str],
     hauki_origin_id: str | None,
@@ -92,7 +104,7 @@ def get_opening_hours(
     start_date: str | datetime.date,
     end_date: str | datetime.date,
     hauki_origin_id=None,
-) -> list[dict[str, list[TimeElement]]]:
+) -> list[OpeningHoursDayData]:
     """Get opening hours for Hauki resource"""
     hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
 
@@ -113,13 +125,13 @@ def get_opening_hours(
         timezone = ZoneInfo(day_data_in.get("resource", {}).get("timezone", DEFAULT_TIMEZONE.key))
 
         for opening_hours in day_data_in["opening_hours"]:
-            day_data_out = {
-                "timezone": timezone,
-                "resource_id": day_data_in["resource"]["id"],
-                "origin_id": day_data_in["resource"]["origins"][0]["origin_id"],
-                "date": datetime.datetime.strptime(opening_hours["date"], "%Y-%m-%d").date(),
-                "times": [],
-            }
+            day_data_out = OpeningHoursDayData(
+                timezone=timezone,
+                resource_id=day_data_in["resource"]["id"],
+                origin_id=day_data_in["resource"]["origins"][0]["origin_id"],
+                date=datetime.datetime.strptime(opening_hours["date"], "%Y-%m-%d").date(),
+                times=[],
+            )
 
             for time_data_in in opening_hours["times"]:
                 start_time = time_data_in.pop("start_time")

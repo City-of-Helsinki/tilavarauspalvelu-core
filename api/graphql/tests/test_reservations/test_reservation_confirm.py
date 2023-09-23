@@ -14,7 +14,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
 from merchants.models import OrderStatus, PaymentOrder, PaymentType
-from opening_hours.tests.test_get_periods import get_mocked_periods
+from opening_hours.tests.test_get_periods import mocked_get_resource_periods_response_data
 from reservation_units.models import PricingType
 from reservations.models import STATE_CHOICES, AgeGroup
 from tests.factories import (
@@ -28,7 +28,7 @@ from tests.factories import (
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 @patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-@patch("opening_hours.hours.get_periods_for_resource", return_value=get_mocked_periods())
+@patch("opening_hours.hours.get_periods_for_resource", return_value=mocked_get_resource_periods_response_data)
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationConfirmTestCase(ReservationTestCaseBase):
     def setUp(self):

@@ -1,62 +1,110 @@
-import json
 from unittest import mock
-
-from assertpy import assert_that
-from django.test import TestCase, override_settings
 
 from opening_hours.enums import State
 from opening_hours.hours import get_opening_hours
 
 
-@mock.patch("opening_hours.hours.make_hauki_get_request")
-@override_settings(HAUKI_API_URL="url")
-class GetOpeningHoursTestCase(TestCase):
-    @classmethod
-    def get_opening_hours(cls):
-        with open("opening_hours/tests/fixtures/hauki_opening_hours_response.json") as data:
-            response = json.load(data)
+def _get_mocked_opening_hours(opening_time_variables: dict | None = None):
+    if opening_time_variables is None:
+        opening_time_variables = {}
 
-        return response
+    return {
+        "count": 1,
+        "next": None,
+        "previous": None,
+        "results": [
+            {
+                "resource": {
+                    "id": 1234,
+                    "name": {"fi": "Test resource", "sv": None, "en": None},
+                    "timezone": "Europe/Helsinki",
+                    "origins": [
+                        {
+                            "data_source": {"id": "tvp", "name": {"fi": "Tilavarauspalvelu", "sv": None, "en": None}},
+                            "origin_id": "proper-uuid",
+                        }
+                    ],
+                },
+                "opening_hours": [
+                    {
+                        "date": "2022-12-12",
+                        "times": [
+                            {
+                                "name": "",
+                                "description": "",
+                                "start_time": "08:00:00",
+                                "end_time": "17:00:00",
+                                "end_time_on_next_day": False,
+                                "full_day": False,
+                                "resource_state": "open",
+                                "periods": [1234, 1234],
+                                **opening_time_variables,  # Override default values with passed values
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
 
-    @classmethod
-    def get_opening_hours_closed(cls):
-        with open("opening_hours/tests/fixtures/hauki_opening_hours_response_resource_closed.json") as data:
-            response = json.load(data)
 
-        return response
+@mock.patch(
+    "opening_hours.hours.make_hauki_get_request",
+    return_value=_get_mocked_opening_hours(),
+)
+def test__hauki__get_opening_hours(mocked_make_hauki_get_request):
+    data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
 
-    def test_get_opening_hours(self, mock):
-        mock.return_value = self.get_opening_hours()
+    assert len(data) == 1
+    assert len(data[0]["times"]) == 1
 
-        data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
-        assert_that(data).is_not_empty()
-        assert_that(data[0]["times"]).is_not_empty()
 
-    def test_get_opening_hours_null_start_end_ok(self, mock):
-        mock.return_value = self.get_opening_hours_closed()
+@mock.patch(
+    "opening_hours.hours.make_hauki_get_request",
+    return_value=_get_mocked_opening_hours(
+        opening_time_variables={
+            "start_time": None,
+            "end_time": None,
+            "resource_state": "closed",
+        }
+    ),
+)
+def test__hauki__get_opening_hours__null_start_and_end_times(mocked_make_hauki_get_request):
+    data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
 
-        data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
-        assert_that(data).is_not_empty()
-        assert_that(data[0]["times"]).is_not_empty()
-        assert_that(data[0]["times"][0].start_time).is_none()
-        assert_that(data[0]["times"][0].end_time).is_none()
+    assert len(data) == 1
+    assert len(data[0]["times"]) == 1
+    assert data[0]["times"][0].start_time is None
+    assert data[0]["times"][0].end_time is None
 
-    def test_get_opening_hours_with_non_defined_state_is_undefined(self, mock):
-        hours_data = self.get_opening_hours()
-        hours_data["results"][0]["opening_hours"][0]["times"][0]["resource_state"] = "some_funky_state"
-        mock.return_value = hours_data
 
-        data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
-        assert_that(data).is_not_empty()
-        assert_that(data[0]["times"]).is_not_empty()
-        assert_that(data[0]["times"][0].resource_state).is_equal_to(State.UNDEFINED)
+@mock.patch(
+    "opening_hours.hours.make_hauki_get_request",
+    return_value=_get_mocked_opening_hours(
+        opening_time_variables={
+            "resource_state": "some_funky_state",
+        }
+    ),
+)
+def test__hauki__get_opening_hours__resource_state_is_non_defined_is_undefined(mocked_make_hauki_get_request):
+    data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
 
-    def test_get_opening_hours_with_resource_state_is_none_is_undefined(self, mock):
-        hours_data = self.get_opening_hours()
-        hours_data["results"][0]["opening_hours"][0]["times"][0]["resource_state"] = None
-        mock.return_value = hours_data
+    assert len(data) == 1
+    assert len(data[0]["times"]) == 1
+    assert data[0]["times"][0].resource_state == State.UNDEFINED
 
-        data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
-        assert_that(data).is_not_empty()
-        assert_that(data[0]["times"]).is_not_empty()
-        assert_that(data[0]["times"][0].resource_state).is_equal_to(State.UNDEFINED)
+
+@mock.patch(
+    "opening_hours.hours.make_hauki_get_request",
+    return_value=_get_mocked_opening_hours(
+        opening_time_variables={
+            "resource_state": None,
+        }
+    ),
+)
+def test__hauki__get_opening_hours__resource_state_is_none_is_undefined(mocked_make_hauki_get_request):
+    data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
+
+    assert len(data) == 1
+    assert len(data[0]["times"]) == 1
+    assert data[0]["times"][0].resource_state == State.UNDEFINED
