@@ -31,7 +31,7 @@ SECOND_RET_VAL = {
 RETURN_VALUES = [RET_VAL, SECOND_RET_VAL]
 
 
-@mock.patch("spaces.importers.units.make_hauki_get_request", side_effect=RETURN_VALUES)
+@mock.patch("spaces.importers.units.HaukiAPIClient.get", side_effect=RETURN_VALUES)
 class HaukiResourceIdImporterTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

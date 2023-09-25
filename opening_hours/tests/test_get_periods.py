@@ -61,16 +61,16 @@ mocked_get_resource_periods_response_data = [
 ]
 
 
-@mock.patch("opening_hours.hours.make_hauki_get_request", return_value=mocked_get_resource_periods_response_data)
-def test__hauki__get_periods_for_resource(mocked_make_hauki_get_request):
+@mock.patch("opening_hours.hours.HaukiAPIClient.get", return_value=mocked_get_resource_periods_response_data)
+def test__hauki__get_periods_for_resource(mocked_haukiapiclient_get):
     data = get_periods_for_resource("1234")
 
     assert len(data) == 1
     assert len(data[0].time_spans) == 2
 
 
-@mock.patch("opening_hours.hours.make_hauki_get_request", return_value=[])
-def test__hauki__get_periods_for_resource__no_periods(mocked_make_hauki_get_request):
+@mock.patch("opening_hours.hours.HaukiAPIClient.get", return_value=[])
+def test__hauki__get_periods_for_resource__no_periods(mocked_haukiapiclient_get):
     data = get_periods_for_resource("1234")
 
     assert len(data) == 0
