@@ -66,7 +66,8 @@ const Navigation = () => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const handleNavigationTitleClick = () => router.push("/");
+  const handleNavigationTitleClick = () =>
+    router.push("/", "/", { locale: router.locale });
 
   const handleLanguageChange = (
     e: MouseEvent<HTMLAnchorElement>,
