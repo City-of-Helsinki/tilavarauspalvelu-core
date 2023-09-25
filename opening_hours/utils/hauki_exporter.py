@@ -55,14 +55,14 @@ class ReservationUnitHaukiExporter:
 
     def _get_parent_id(self) -> int | None:
         """
-        Tries to get reservation_unit.unit hauki resource id from hauki.
-        This is used when hauki_resource_id is not found from reservation unit's unit.
+        Tries to get reservation_unit.unit `hauki_resource_id` from hauki.
+        This is used when hauki_resource_id is not found from reservation_unit's unit.
         """
         unit = self.reservation_unit.unit
-        if not unit:
+        if not unit or unit.tprek_id is None:
             return None
 
-        unit_resource_id = f"{unit.hauki_resource_data_source_id}:{unit.hauki_resource_origin_id}"
+        unit_resource_id = f"{unit.hauki_resource_data_source_id}:{unit.tprek_id}"
         url = urljoin(
             settings.HAUKI_API_URL,
             f"/v1/resource/{unit_resource_id}",
@@ -70,11 +70,9 @@ class ReservationUnitHaukiExporter:
 
         try:
             resource_data = HaukiAPIClient.get(url=url)
-            resource_id = resource_data["id"]
+            return resource_data["id"]
         except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
-            resource_id = None
-
-        return resource_id
+            return None
 
     def _convert_reservation_unit_to_hauki_resource(self) -> HaukiResource:
         parent_id = self.reservation_unit.unit.hauki_resource_id or self._get_parent_id()

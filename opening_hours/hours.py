@@ -82,10 +82,7 @@ class OpeningHoursDayData:
         return getattr(self, item)
 
 
-def _build_hauki_resource_id(
-    resource_id: str | list[str],
-    hauki_origin_id: str | None,
-):
+def _build_hauki_resource_id(resource_id: str | list[str], hauki_origin_id: str | None) -> str:
     if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
 
@@ -96,6 +93,7 @@ def _build_hauki_resource_id(
     if not isinstance(resource_id, list):
         resource_id = [resource_id]
 
+    # Build the resource id string, e.g. 'tprek:123,tprek:456'.
     return f"{hauki_origin_id}:{f',{hauki_origin_id}:'.join(resource_id)}"
 
 
@@ -103,20 +101,14 @@ def get_opening_hours(
     resource_id: str | list[str],
     start_date: str | datetime.date,
     end_date: str | datetime.date,
-    hauki_origin_id=None,
+    hauki_origin_id: str | None = None,
 ) -> list[OpeningHoursDayData]:
     """Get opening hours for Hauki resource"""
-    hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
-
-    if isinstance(start_date, datetime.date):
-        start_date = start_date.isoformat()
-    if isinstance(end_date, datetime.date):
-        end_date = end_date.isoformat()
-
-    resource_opening_hours_url = f"{settings.HAUKI_API_URL}/v1/opening_hours/?resource={hauki_resource_id}"
+    resource_opening_hours_url = f"{settings.HAUKI_API_URL}/v1/opening_hours/"
     query_params = {
-        "start_date": start_date,
-        "end_date": end_date,
+        "resource": _build_hauki_resource_id(resource_id, hauki_origin_id),
+        "start_date": start_date.isoformat() if isinstance(start_date, datetime.date) else start_date,
+        "end_date": end_date.isoformat() if isinstance(end_date, datetime.date) else end_date,
     }
     days_data_in = HaukiAPIClient.get(url=resource_opening_hours_url, params=query_params)
 
@@ -154,14 +146,16 @@ def get_opening_hours(
 
 def get_periods_for_resource(
     resource_id: str,
-    hauki_origin_id=None,
+    hauki_origin_id: str | None = None,
 ) -> list[Period]:
     """Get periods for a single Hauki resource"""
-    hauki_resource_id = _build_hauki_resource_id(resource_id, hauki_origin_id)
-
-    resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/?resource={hauki_resource_id}"
-
-    periods_data_in = HaukiAPIClient.get(url=resource_periods_url)
+    resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/"
+    periods_data_in = HaukiAPIClient.get(
+        url=resource_periods_url,
+        params={
+            "resource": _build_hauki_resource_id(resource_id, hauki_origin_id),
+        },
+    )
 
     periods_data_out = []
     for period in periods_data_in:
