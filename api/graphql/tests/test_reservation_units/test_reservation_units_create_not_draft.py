@@ -154,7 +154,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(pricing.tax_percentage).is_equal_to(tax_percentage)
         assert_that(pricing.status).is_equal_to(pricing_data["status"])
 
-    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called(self, send_resource_mock):
         res = HaukiResource(
@@ -183,7 +183,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
-    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     def test_send_resource_to_hauki_errors_returns_error_message(self, send_resource_mock):
         send_resource_mock.side_effect = HaukiAPIError()
 
