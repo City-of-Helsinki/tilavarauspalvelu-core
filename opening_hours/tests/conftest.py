@@ -1,7 +1,5 @@
 import pytest
 
-from opening_hours.enums import ResourceType
-from opening_hours.resources import HaukiResource
 from reservation_units.models import ReservationUnit
 from tests.factories import ReservationUnitFactory
 
@@ -15,23 +13,6 @@ def _use_hauki_env_variables(settings):
     settings.HAUKI_SECRET = "super_secret"  # noqa: S105
     settings.HAUKI_ORGANISATION_ID = "parent-organisation"
     settings.HAUKI_ADMIN_UI_URL = "http://test.com/admin"
-
-
-@pytest.fixture()
-def hauki_resource() -> HaukiResource:
-    return HaukiResource(
-        id=None,
-        name="Test Resource",
-        description="",
-        address="",
-        children=[],
-        parents=[1],
-        organization="1234",
-        origin_id="4321",
-        origin_data_source_name="DataSource",
-        origin_data_source_id="dts",
-        resource_type=ResourceType.RESERVABLE,
-    )
 
 
 @pytest.fixture()
