@@ -28,9 +28,9 @@ class ReservationUnitReservationScheduler:
             opening_hours_end = self.reservation_date_end
 
         self.opening_hours_client = OpeningHoursClient(
-            str(self.reservation_unit.uuid),
-            self.start_time.date(),
-            opening_hours_end or self.reservation_date_end,
+            resources=str(self.reservation_unit.uuid),
+            start_date=self.start_time.date(),
+            end_date=opening_hours_end or self.reservation_date_end,
         )
 
     def get_conflicting_open_application_round(self, start: datetime.date, end: datetime.date):

@@ -29,7 +29,12 @@ def create_datetime(*, hour, tzinfo=DEFAULT_TIMEZONE):
 
 def get_opening_hours_client(reservation_unit: ReservationUnit, **kwargs) -> OpeningHoursClient:
     """Helper function to get OpeningHoursClient instance with predefined dates."""
-    return OpeningHoursClient(str(reservation_unit.uuid), DATES[0], DATES[1], **kwargs)
+    return OpeningHoursClient(
+        resources=str(reservation_unit.uuid),
+        start_date=DATES[0],
+        end_date=DATES[1],
+        **kwargs,
+    )
 
 
 def _get_mocked_opening_hours(reservation_unit, *, first_day_times: list[TimeElement] | None = None):
@@ -78,7 +83,7 @@ def _get_mocked_opening_hours(reservation_unit, *, first_day_times: list[TimeEle
 def test__opening_hours_client__init__resources_is_string(mocked_get_opening_hours, reservation_unit):
     mocked_get_opening_hours.return_value = _get_mocked_opening_hours(reservation_unit)
 
-    OpeningHoursClient(str(reservation_unit.uuid), DATES[0], DATES[1])
+    OpeningHoursClient(resources=str(reservation_unit.uuid), start_date=DATES[0], end_date=DATES[1])
 
 
 @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
@@ -86,7 +91,7 @@ def test__opening_hours_client__init__resources_is_string(mocked_get_opening_hou
 def test__opening_hours_client__init__resources_is_list(mocked_get_opening_hours, reservation_unit):
     mocked_get_opening_hours.return_value = _get_mocked_opening_hours(reservation_unit)
 
-    OpeningHoursClient([str(reservation_unit.uuid)], DATES[0], DATES[1])
+    OpeningHoursClient(resources=[str(reservation_unit.uuid)], start_date=DATES[0], end_date=DATES[1])
 
 
 # refresh_opening_hours

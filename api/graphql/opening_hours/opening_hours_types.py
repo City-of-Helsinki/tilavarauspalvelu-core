@@ -120,9 +120,9 @@ class OpeningHoursMixin:
             init_times = False
 
         opening_hours_client = OpeningHoursClient(
-            self.hauki_resource_origin_id,
-            start,
-            end,
+            resources=self.hauki_resource_origin_id,
+            start_date=start,
+            end_date=end,
             init_periods=init_periods,
             init_opening_hours=init_times,
             hauki_origin_id=self.hauki_resource_data_source_id,

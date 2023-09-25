@@ -62,20 +62,21 @@ class OpeningHours:
         end_time_on_next_day = time_element.end_time_on_next_day or full_day
 
         start = datetime.time(0) if full_day or not time_element.start_time else time_element.start_time
-        end = datetime.time(0) if full_day or not time_element.end_time else time_element.end_time
-        start_time = datetime.datetime(date.year, date.month, date.day, start.hour, start.minute, tzinfo=timezone)
+        start_date = datetime.datetime.combine(date, start, tzinfo=timezone)
 
         if end_time_on_next_day:
             date += datetime.timedelta(days=1)
-        end_time = datetime.datetime(date.year, date.month, date.day, end.hour, end.minute, tzinfo=timezone)
+
+        end_time = datetime.time(0) if full_day or not time_element.end_time else time_element.end_time
+        end_date = datetime.datetime.combine(date, end_time, tzinfo=timezone)
 
         # If the length of opening is zero, return None for helping the UI.
-        if not end_time_on_next_day and (end_time - start_time) == datetime.timedelta(seconds=0):
+        if not end_time_on_next_day and (end_date - start_date) == datetime.timedelta(seconds=0):
             return None
 
         return OpeningHours(
-            start_time=start_time.astimezone(TIMEZONE),
-            end_time=end_time.astimezone(TIMEZONE),
+            start_time=start_date.astimezone(TIMEZONE),
+            end_time=end_date.astimezone(TIMEZONE),
             resource_state=time_element.resource_state,
             periods=time_element.periods,
         )
@@ -83,8 +84,8 @@ class OpeningHours:
 
 class OpeningHoursClient:
     resources: list[str]
-    start: datetime.date
-    end: datetime.date
+    start_date: datetime.date
+    end_date: datetime.date
     hauki_origin_id: str
     opening_hours: dict[str, dict[datetime.date, list[OpeningHours]]]
     periods: dict[str, list[Period]]
@@ -92,14 +93,14 @@ class OpeningHoursClient:
     def __init__(
         self,
         resources: list[str] | str,
-        start: datetime.date,
-        end: datetime.date,
+        start_date: datetime.date,
+        end_date: datetime.date,
         init_periods=False,
         init_opening_hours=True,
         hauki_origin_id=None,
     ):
-        self.start = start
-        self.end = end
+        self.start_date = start_date
+        self.end_date = end_date
 
         self.hauki_origin_id = hauki_origin_id or settings.HAUKI_ORIGIN_ID
 
@@ -111,7 +112,7 @@ class OpeningHoursClient:
         self.opening_hours = {}
         if init_opening_hours:
             self._init_opening_hours_structure()
-            self._fetch_opening_hours(start, end)
+            self._fetch_opening_hours(start_date, end_date)
 
         self.periods = {}
         for resource in resources:
@@ -135,14 +136,14 @@ class OpeningHoursClient:
         }
         """
         self.opening_hours = {res_id: {} for res_id in self.resources}
-        running_date = self.start
-        while running_date <= self.end:
+        running_date = self.start_date
+        while running_date <= self.end_date:
             for res_id in self.resources:
                 self.opening_hours[res_id].update({running_date: []})
             running_date += datetime.timedelta(days=1)
 
-    def _fetch_opening_hours(self, start: datetime.date, end: datetime.date):
-        for hour in get_opening_hours(self.resources, start, end, self.hauki_origin_id):
+    def _fetch_opening_hours(self, start_date: datetime.date, end_date: datetime.date):
+        for hour in get_opening_hours(self.resources, start_date, end_date, self.hauki_origin_id):
             res_id = hour["origin_id"]
             timezone = hour["timezone"]
             date_ = hour["date"]
@@ -378,7 +379,7 @@ class OpeningHoursClient:
 
     def refresh_opening_hours(self):
         self._init_opening_hours_structure()
-        self._fetch_opening_hours(self.start, self.end)
+        self._fetch_opening_hours(self.start_date, self.end_date)
 
     def get_opening_hours_for_resource(
         self,
