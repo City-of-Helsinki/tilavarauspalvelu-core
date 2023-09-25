@@ -28,6 +28,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     ReservationUnitType,
 )
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
+from opening_hours.utils.hauki_exporter import ReservationUnitHaukiExporter
 from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
@@ -42,7 +43,6 @@ from reservation_units.models import (
     ReservationUnit,
     ReservationUnitImage,
 )
-from reservation_units.utils.hauki_exporter import ReservationUnitHaukiExporter
 from tilavarauspalvelu.utils import logging
 
 logger = logging.getLogger(__name__)

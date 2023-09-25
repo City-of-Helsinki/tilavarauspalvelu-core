@@ -45,7 +45,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
 
-    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORT_ENABLED=True)
     def test_send_resource_to_hauki_is_not_called(self, send_resource_mock):
         response = self.query(self.get_create_query(), input_data=self.get_valid_data())

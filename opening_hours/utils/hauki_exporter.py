@@ -5,11 +5,7 @@ from django.conf import settings
 from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
 from opening_hours.hauki_request import make_hauki_get_request
-from opening_hours.resources import (
-    HaukiResource,
-    send_resource_to_hauki,
-    update_hauki_resource,
-)
+from opening_hours.resources import HaukiResource, send_resource_to_hauki, update_hauki_resource
 from reservation_units.models import ReservationUnit
 
 

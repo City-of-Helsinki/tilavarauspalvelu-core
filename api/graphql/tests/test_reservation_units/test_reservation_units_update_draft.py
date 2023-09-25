@@ -146,7 +146,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name).is_equal_to("Resunit name")
 
-    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called_when_resource_id_exists(self, send_resource_mock):
         self.res_unit.hauki_resource_id = "1"
@@ -160,7 +160,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(content.get("errors")).is_none()
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
-    @mock.patch("reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORTS_ENABLED=False)
     def test_send_resource_to_hauki_not_called_when_exports_disabled(self, send_resource_mock):
         data = self.get_valid_update_data()
