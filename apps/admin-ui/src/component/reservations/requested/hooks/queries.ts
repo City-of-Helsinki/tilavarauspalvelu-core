@@ -56,6 +56,7 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
     denyReason {
       reasonFi
     }
+    handlingDetails
     user {
       firstName
       lastName

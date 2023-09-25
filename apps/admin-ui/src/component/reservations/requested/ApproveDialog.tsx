@@ -86,7 +86,7 @@ const DialogContent = ({
 
   const [price, setPrice] = useState<string>(String(reservation.price || 0));
   const [handlingDetails, setHandlingDetails] = useState<string>(
-    reservation.workingMemo || ""
+    reservation.handlingDetails
   );
   const hasPrice = Boolean(reservation.price !== undefined);
   const priceIsValid = !hasPrice || !Number.isNaN(parseNumber(price));
@@ -157,7 +157,7 @@ const DialogContent = ({
           <TextArea
             value={handlingDetails}
             onChange={(e) => setHandlingDetails(e.target.value)}
-            label={t("RequestedReservation.ApproveDialog.handlingDetails")}
+            label={t("RequestedReservation.handlingDetails")}
             id="handlingDetails"
             helperText={t("RequestedReservation.workingMemoHelperText")}
           />

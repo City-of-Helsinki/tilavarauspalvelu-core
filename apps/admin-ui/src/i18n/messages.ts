@@ -1960,6 +1960,7 @@ const translations: ITranslations = {
     applyingForFreeOfCharge: ["Hakee subventiota"],
     freeOfChargeReason: ["Subvention perustelu"],
     paymentState: ["Maksutila"],
+    handlingDetails: ["Ratkaisun kommentti"],
     workingMemo: ["Kommentit"],
     workingMemoLabel: ["Kirjoita kommentti"],
     workingMemoHelperText: ["Kommentit näkyvät vain henkilökunnalle"],
@@ -1979,7 +1980,6 @@ const translations: ITranslations = {
       ],
       successNotify: ["Varaus hylätty"],
       title: ["Vahvista varauksen hylkäys"],
-      handlingDetails: ["Kommentti"],
       handlingDetailsHelper: ["Näytetään vain henkilökunnalle"],
       errorSaving: ["Hylkäys epäonnistui"],
       refund: {
@@ -2001,7 +2001,6 @@ const translations: ITranslations = {
       accept: ["Hyväksy varaus"],
       errorSaving: ["Hyväksyminen ei onnistunut. {{error}}"],
       approved: ["Varaus hyväksytty."],
-      handlingDetails: ["Henkilökunnan kommentti"],
       price: ["Varauksen hinta"],
       clearPrice: ["Aseta varaus maksuttomaksi"],
       missingPrice: ["Varauksen hinta puuttuu tai on virheellinen"],
