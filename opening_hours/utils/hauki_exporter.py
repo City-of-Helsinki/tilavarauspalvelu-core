@@ -1,12 +1,52 @@
+from dataclasses import dataclass
 from urllib.parse import urljoin
 
 from django.conf import settings
 
 from opening_hours.enums import ResourceType
-from opening_hours.errors import HaukiAPIError, HaukiRequestError
-from opening_hours.resources import HaukiResource, send_resource_to_hauki, update_hauki_resource
+from opening_hours.errors import HaukiAPIError, HaukiConfigurationError, HaukiRequestError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from reservation_units.models import ReservationUnit
+
+
+@dataclass(order=True, frozen=True)
+class HaukiResource:
+    """Represents Resource in hauki"""
+
+    id: int | None
+    name: str
+    description: str | None
+    address: str | None
+    children: list[int]
+    parents: list[int]
+    organization: str
+    origin_id: str
+    origin_data_source_name: str
+    origin_data_source_id: str
+    resource_type: ResourceType = ResourceType.RESERVABLE
+
+    def convert_to_request_data(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "address": self.address,
+            "resource_type": self.resource_type.value,
+            "children": self.children,
+            "parents": self.parents,
+            "organization": self.organization,
+            "origins": [
+                {
+                    "data_source": {
+                        "id": self.origin_data_source_id,
+                        "name": self.origin_data_source_name,
+                    },
+                    "origin_id": self.origin_id,
+                }
+            ],
+            "extra_data": {},
+            "is_public": True,
+            "timezone": "Europe/Helsinki",
+        }
 
 
 class ReservationUnitHaukiExporter:
@@ -21,11 +61,13 @@ class ReservationUnitHaukiExporter:
         unit = self.reservation_unit.unit
         if not unit:
             return None
+
         unit_resource_id = f"{unit.hauki_resource_data_source_id}:{unit.hauki_resource_origin_id}"
         url = urljoin(
             settings.HAUKI_API_URL,
             f"/v1/resource/{unit_resource_id}",
         )
+
         try:
             resource_data = HaukiAPIClient.get(url=url)
             resource_id = resource_data["id"]
@@ -34,7 +76,7 @@ class ReservationUnitHaukiExporter:
 
         return resource_id
 
-    def _get_hauki_resource_object_from_reservation_unit(self) -> HaukiResource:
+    def _convert_reservation_unit_to_hauki_resource(self) -> HaukiResource:
         parent_id = self.reservation_unit.unit.hauki_resource_id or self._get_parent_id()
         if parent_id is None:
             raise ValueError("Unit did not have hauki resource id and could not get it from hauki.")
@@ -58,13 +100,40 @@ class ReservationUnitHaukiExporter:
             resource_type=ResourceType.RESERVABLE,
         )
 
+    @staticmethod
+    def _parse_response_data_to_hauki_resource(response_data: dict) -> HaukiResource:
+        try:
+            resource_out = HaukiResource(
+                id=response_data["id"],
+                name=response_data["name"],
+                description=response_data["description"],
+                address=response_data["address"],
+                resource_type=response_data["resource_type"],
+                children=response_data["children"],
+                parents=response_data["parents"],
+                organization=response_data["organization"],
+                origin_id=response_data["origins"][0]["origin_id"],
+                origin_data_source_name=response_data["origins"][0]["data_source"]["name"],
+                origin_data_source_id=response_data["origins"][0]["data_source"]["id"],
+            )
+        except (KeyError, ValueError, IndexError):
+            resource_out = response_data
+        return resource_out
+
     def send_reservation_unit_to_hauki(self):
-        hauki_resource_object = self._get_hauki_resource_object_from_reservation_unit()
+        if not (settings.HAUKI_API_URL and settings.HAUKI_API_KEY):
+            raise HaukiConfigurationError("Both hauki api url and hauki api key need to be configured")
+
+        resources_url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
+        hauki_resource_object: HaukiResource = self._convert_reservation_unit_to_hauki_resource()
+        data = hauki_resource_object.convert_to_request_data()
 
         if self.reservation_unit.hauki_resource_id:
-            response_data = update_hauki_resource(hauki_resource_object)
+            response_data = HaukiAPIClient.put(url=f"{resources_url}/{hauki_resource_object.id}/", data=data)
         else:
-            response_data = send_resource_to_hauki(hauki_resource_object)
+            response_data = HaukiAPIClient.post(url=resources_url, data=data)
+
+        response_data = self._parse_response_data_to_hauki_resource(response_data)
 
         if isinstance(response_data, HaukiResource) and response_data.id:
             self.reservation_unit.hauki_resource_id = response_data.id
