@@ -85,9 +85,8 @@ class OpeningHoursDayData:
 def _build_hauki_resource_id(resource_id: str | list[str], hauki_origin_id: str | None) -> str:
     if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
-
-    if not (settings.HAUKI_API_URL and hauki_origin_id):
-        raise HaukiConfigurationError("Both hauki api url and hauki origin id need to be configured")
+    if not hauki_origin_id:
+        raise HaukiConfigurationError("HAUKI_ORIGIN_ID environment variable must to be configured.")
 
     # If resources is a single resource, convert it to a list.
     if not isinstance(resource_id, list):
@@ -104,7 +103,7 @@ def get_opening_hours(
     hauki_origin_id: str | None = None,
 ) -> list[OpeningHoursDayData]:
     """Get opening hours for Hauki resource"""
-    resource_opening_hours_url = f"{settings.HAUKI_API_URL}/v1/opening_hours/"
+    resource_opening_hours_url = HaukiAPIClient.build_url(endpoint="opening_hours")
     query_params = {
         "resource": _build_hauki_resource_id(resource_id, hauki_origin_id),
         "start_date": start_date.isoformat() if isinstance(start_date, datetime.date) else start_date,
@@ -149,7 +148,7 @@ def get_periods_for_resource(
     hauki_origin_id: str | None = None,
 ) -> list[Period]:
     """Get periods for a single Hauki resource"""
-    resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/"
+    resource_periods_url = HaukiAPIClient.build_url(endpoint="date_period")
     periods_data_in = HaukiAPIClient.get(
         url=resource_periods_url,
         params={

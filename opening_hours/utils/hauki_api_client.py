@@ -1,9 +1,11 @@
 import json
+from typing import Literal
+from urllib.parse import urljoin
 
 from django.conf import settings
 from requests import Response, request
 
-from opening_hours.errors import HaukiAPIError, HaukiRequestError
+from opening_hours.errors import HaukiAPIError, HaukiConfigurationError, HaukiRequestError
 from tilavarauspalvelu.utils import logging
 
 REQUESTS_TIMEOUT = 15
@@ -12,6 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 class HaukiAPIClient:
+    @staticmethod
+    def build_url(endpoint: Literal["resource", "opening_hours", "date_period"], resource_id: str | None = None) -> str:
+        if not settings.HAUKI_API_URL:
+            raise HaukiConfigurationError("HAUKI_API_URL environment variable must to be configured.")
+
+        url = urljoin(settings.HAUKI_API_URL, f"/v1/{endpoint}/")
+        if resource_id:
+            url = urljoin(url, f"{resource_id}/")
+
+        return url
+
     @staticmethod
     def _hauki_response_json(response: Response) -> dict:
         """
@@ -53,6 +66,9 @@ class HaukiAPIClient:
 
     @classmethod
     def post(cls, url: str, data: dict) -> dict:
+        if not settings.HAUKI_API_KEY:
+            raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
+
         return cls.generic(
             "post",
             url,
@@ -65,6 +81,9 @@ class HaukiAPIClient:
 
     @classmethod
     def put(cls, url: str, data: dict) -> dict:
+        if not settings.HAUKI_API_KEY:
+            raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
+
         return cls.generic(
             "put",
             url,
