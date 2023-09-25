@@ -325,6 +325,7 @@ const NotificationForm = ({
   >(BANNER_NOTIFICATIONS_CREATE, {
     update(cache) {
       deleteQueryFromCache(cache, "bannerNotifications");
+      deleteQueryFromCache(cache, "bannerNotification");
     },
   });
   const [updateMutation] = useMutation<
@@ -333,6 +334,7 @@ const NotificationForm = ({
   >(BANNER_NOTIFICATIONS_UPDATE, {
     update(cache) {
       deleteQueryFromCache(cache, "bannerNotifications");
+      deleteQueryFromCache(cache, "bannerNotification");
     },
   });
 
@@ -767,7 +769,7 @@ function LoadedContent({
           </Button>
         </ButtonContainer>
       )}
-      ){children}
+      {children}
     </>
   );
 }
