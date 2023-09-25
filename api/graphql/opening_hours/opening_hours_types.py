@@ -6,6 +6,8 @@ from django.utils import timezone
 
 from opening_hours.enums import State as ResourceState
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
+from reservation_units.models import ReservationUnit
+from spaces.models import Unit
 
 DEFAULT_TIMEZONE = timezone.get_default_timezone()
 
@@ -111,7 +113,7 @@ class OpeningHoursMixin:
         end_date=graphene.Date(),
     )
 
-    def resolve_opening_hours(self, *_, **kwargs):
+    def resolve_opening_hours(self: ReservationUnit | Unit, *_, **kwargs):
         start = kwargs.get("start_date")
         end = kwargs.get("end_date")
         init_periods = kwargs.get("periods", False)

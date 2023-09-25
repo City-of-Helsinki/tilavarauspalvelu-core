@@ -1,8 +1,9 @@
 from unittest import mock
 
 from opening_hours.hours import get_periods_for_resource
+from opening_hours.utils.hauki_api_types import HaukiAPIDatePeriod
 
-mocked_get_resource_periods_response_data = [
+mocked_get_resource_periods_response_data: list[HaukiAPIDatePeriod] = [
     {
         "id": 4321,
         "resource": 1234,

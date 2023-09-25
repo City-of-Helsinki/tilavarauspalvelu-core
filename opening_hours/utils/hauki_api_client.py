@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class HaukiAPIClient:
+    """Hauki API client, minimal functionality implemented."""
+
     @staticmethod
     def build_url(endpoint: Literal["resource", "opening_hours", "date_period"], resource_id: str | None = None) -> str:
         if not settings.HAUKI_API_URL:
@@ -26,7 +28,7 @@ class HaukiAPIClient:
         return url
 
     @staticmethod
-    def _hauki_response_json(response: Response) -> dict:
+    def _hauki_response_json(response: Response):
         """
         Parse a response from Hauki API as json
         Raises an appropriate error if parsing fails or response is not ok
@@ -57,7 +59,7 @@ class HaukiAPIClient:
         return cls._hauki_response_json(response)
 
     @classmethod
-    def get(cls, url: str, params: dict | None = None) -> dict:
+    def get(cls, url: str, params: dict | None = None):
         return cls.generic(
             "get",
             url,
@@ -65,7 +67,7 @@ class HaukiAPIClient:
         )
 
     @classmethod
-    def post(cls, url: str, data: dict) -> dict:
+    def post(cls, url: str, data: dict):
         if not settings.HAUKI_API_KEY:
             raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
 
@@ -80,7 +82,7 @@ class HaukiAPIClient:
         )
 
     @classmethod
-    def put(cls, url: str, data: dict) -> dict:
+    def put(cls, url: str, data: dict):
         if not settings.HAUKI_API_KEY:
             raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
 
