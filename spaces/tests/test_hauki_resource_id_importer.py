@@ -1,6 +1,7 @@
 from unittest import mock
 
 from assertpy import assert_that
+from django.test import override_settings
 from django.test.testcases import TestCase
 
 from spaces.importers.units import UnitHaukiResourceIdImporter
@@ -31,6 +32,7 @@ SECOND_RET_VAL = {
 RETURN_VALUES = [RET_VAL, SECOND_RET_VAL]
 
 
+@override_settings(HAUKI_API_URL="url")
 @mock.patch("spaces.importers.units.HaukiAPIClient.get", side_effect=RETURN_VALUES)
 class HaukiResourceIdImporterTestCase(TestCase):
     @classmethod

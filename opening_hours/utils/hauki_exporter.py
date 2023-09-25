@@ -1,10 +1,7 @@
 from dataclasses import dataclass
-from urllib.parse import urljoin
-
-from django.conf import settings
 
 from opening_hours.enums import ResourceType
-from opening_hours.errors import HaukiAPIError, HaukiConfigurationError, HaukiRequestError
+from opening_hours.errors import HaukiAPIError, HaukiRequestError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from reservation_units.models import ReservationUnit
 
@@ -63,10 +60,7 @@ class ReservationUnitHaukiExporter:
             return None
 
         unit_resource_id = f"{unit.hauki_resource_data_source_id}:{unit.tprek_id}"
-        url = urljoin(
-            settings.HAUKI_API_URL,
-            f"/v1/resource/{unit_resource_id}",
-        )
+        url = HaukiAPIClient.build_url(endpoint="resource", resource_id=unit_resource_id)
 
         try:
             resource_data = HaukiAPIClient.get(url=url)
@@ -119,17 +113,15 @@ class ReservationUnitHaukiExporter:
         return resource_out
 
     def send_reservation_unit_to_hauki(self):
-        if not (settings.HAUKI_API_URL and settings.HAUKI_API_KEY):
-            raise HaukiConfigurationError("Both hauki api url and hauki api key need to be configured")
-
-        resources_url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
         hauki_resource_object: HaukiResource = self._convert_reservation_unit_to_hauki_resource()
         data = hauki_resource_object.convert_to_request_data()
 
         if self.reservation_unit.hauki_resource_id:
-            response_data = HaukiAPIClient.put(url=f"{resources_url}/{hauki_resource_object.id}/", data=data)
+            url = HaukiAPIClient.build_url(endpoint="resource", resource_id=hauki_resource_object.id)
+            response_data = HaukiAPIClient.put(url=url, data=data)
         else:
-            response_data = HaukiAPIClient.post(url=resources_url, data=data)
+            url = HaukiAPIClient.build_url(endpoint="resource")
+            response_data = HaukiAPIClient.post(url=url, data=data)
 
         response_data = self._parse_response_data_to_hauki_resource(response_data)
 

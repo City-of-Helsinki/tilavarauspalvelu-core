@@ -1,8 +1,6 @@
 from logging import getLogger
-from urllib.parse import urljoin
 
 import requests
-from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.db import transaction
 
@@ -174,7 +172,7 @@ class UnitHaukiResourceIdImporter:
         # Use `unit_ids` if given, otherwise use `tprek_ids`.
         units = Unit.objects.filter(id__in=unit_ids) if unit_ids else Unit.objects.filter(tprek_id__in=tprek_ids)
 
-        url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
+        url = HaukiAPIClient.build_url(endpoint="resource")
 
         logger.info(f"Importing units {units} resource ids from url {url}")
 
