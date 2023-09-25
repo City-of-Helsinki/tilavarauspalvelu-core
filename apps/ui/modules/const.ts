@@ -70,14 +70,14 @@ const option = (label: string, value: string): OptionType => {
 const formatNumber = (n: number): string => `00${n}`.slice(-2);
 
 export const getDurationOptions = (): OptionType[] => {
-  const result = [] as OptionType[];
+  const result: OptionType[] = [];
   let h = 1;
   let m = 0;
   for (let i = 0; i < 45; i += 1) {
     result.push(
       option(
-        `${i18n.t("common:abbreviations.hour", { count: h })} ${
-          m ? `${i18n.t("common:abbreviations.minute", { count: m })}` : ""
+        `${i18n?.t("common:abbreviations.hour", { count: h })} ${
+          m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
         }`,
         `${formatNumber(h)}:${formatNumber(m)}:00`
       )
@@ -106,8 +106,6 @@ export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";
 
-export const SESSION_EXPIRED_ERROR = "JWT too old";
-
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 export const {
@@ -119,16 +117,12 @@ export const {
   baseUrl,
 } = publicRuntimeConfig;
 
-export const apiBaseUrl = isBrowser
+export const apiBaseUrl: string | undefined = isBrowser
   ? publicRuntimeConfig.apiBaseUrl
   : serverRuntimeConfig.apiBaseUrl;
-export const authEnabled = isBrowser
+export const authEnabled: boolean | undefined = isBrowser
   ? publicRuntimeConfig.authEnabled
   : serverRuntimeConfig.authEnabled;
-
-export const authenticationIssuer = "tunnistamo";
-export const authenticationApiRoute = "/api/auth";
-export const authenticationLogoutApiRoute = "/api/auth/logout";
 
 const AUTH_URL = apiBaseUrl != null ? `${apiBaseUrl}/helauth` : '/helauth';
 const PUBLIC_URL: string = "";

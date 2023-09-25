@@ -133,6 +133,11 @@ Check that your `/etc/hosts` has
 ::1             localhost
 ```
 
+Use `ENABLE_FETCH_HACK=true` env for UI app. That changes SSR fetches to 127.0.0.1 instead of localhost.
+This will break authenticated queries for SSR though (not used currently) because it can't include credentials.
+
+#### other possible solutions
+
 Other possible solutions replace localhost with 127.0.0.1
 This should fix the issue, but the backend authentication to tunnistamo doesn't work because it expects localhost as a callback address.
 

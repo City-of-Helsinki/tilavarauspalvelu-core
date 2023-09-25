@@ -14,7 +14,7 @@ import type {
   BannerNotificationTypeConnection,
 } from "common/types/gql-types";
 
-import { SESSION_EXPIRED_ERROR, GRAPQL_API_URL, isBrowser } from "./const";
+import { GRAPQL_API_URL, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
 const uri = GRAPQL_API_URL;
@@ -28,23 +28,11 @@ const uploadLinkOptions = {
 // FIXME upload link is broken locally (it succeeds but no new image is available)
 // @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions) as unknown as ApolloLink;
-const httpLink = new HttpLink({
-  uri,
-  credentials: "include",
-});
+const httpLink = new HttpLink({ uri, credentials: "include" });
 
 // eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    const isSessionExpired = graphQLErrors.some((error) =>
-      error.message.includes(SESSION_EXPIRED_ERROR)
-    );
-
-    if (isSessionExpired) {
-      // eslint-disable-next-line no-console
-      console.warn("Session expired, signing out");
-    }
-
     graphQLErrors.forEach(async (error: GraphQLError) => {
       // eslint-disable-next-line no-console
       console.error(`GQL_ERROR: ${error.message}`);

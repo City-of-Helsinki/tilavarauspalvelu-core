@@ -69,7 +69,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Build ui
-        run: pnpm build --filter ui...
+        run: pnpm build --filter admin-ui...
 
   test-admin-ui:
     name: Test admin ui
@@ -122,6 +122,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [changed-packages]
     if: needs.changed-packages.outputs.ui_changed == 'true'
+    env:
+      SKIP_ENV_VALIDATION: 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -143,6 +145,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [changed-packages]
     if: needs.changed-packages.outputs.ui_changed == 'true'
+    env:
+      SKIP_ENV_VALIDATION: 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
