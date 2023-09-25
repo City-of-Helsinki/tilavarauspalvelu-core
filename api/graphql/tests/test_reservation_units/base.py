@@ -11,6 +11,7 @@ from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.verkkokauppa.product.types import Product
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
+from opening_hours.utils.hauki_api_types import HaukiAPIDatePeriod
 from reservation_units.models import PaymentType, ReservationUnit, TaxPercentage
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -173,7 +174,7 @@ def get_mocked_opening_hours(uuid, state: State = State.WITH_RESERVATION):
     ]
 
 
-def get_mocked_periods():
+def get_mocked_periods() -> list[HaukiAPIDatePeriod]:
     data = [
         {
             "id": 38600,

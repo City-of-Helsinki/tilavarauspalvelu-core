@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
+from opening_hours.utils.hauki_api_types import HaukiAPIResource
 from reservation_units.models import ReservationUnit
 
 
@@ -63,7 +64,7 @@ class ReservationUnitHaukiExporter:
         url = HaukiAPIClient.build_url(endpoint="resource", resource_id=unit_resource_id)
 
         try:
-            resource_data = HaukiAPIClient.get(url=url)
+            resource_data: HaukiAPIResource = HaukiAPIClient.get(url=url)
             return resource_data["id"]
         except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
             return None
@@ -93,7 +94,7 @@ class ReservationUnitHaukiExporter:
         )
 
     @staticmethod
-    def _parse_response_data_to_hauki_resource(response_data: dict) -> HaukiResource:
+    def _parse_response_data_to_hauki_resource(response_data: HaukiAPIResource) -> HaukiResource | HaukiAPIResource:
         try:
             resource_out = HaukiResource(
                 id=response_data["id"],
@@ -112,16 +113,16 @@ class ReservationUnitHaukiExporter:
             resource_out = response_data
         return resource_out
 
-    def send_reservation_unit_to_hauki(self):
+    def send_reservation_unit_to_hauki(self) -> HaukiAPIResource:
         hauki_resource_object: HaukiResource = self._convert_reservation_unit_to_hauki_resource()
         data = hauki_resource_object.convert_to_request_data()
 
         if self.reservation_unit.hauki_resource_id:
             url = HaukiAPIClient.build_url(endpoint="resource", resource_id=hauki_resource_object.id)
-            response_data = HaukiAPIClient.put(url=url, data=data)
+            response_data: HaukiAPIResource = HaukiAPIClient.put(url=url, data=data)
         else:
             url = HaukiAPIClient.build_url(endpoint="resource")
-            response_data = HaukiAPIClient.post(url=url, data=data)
+            response_data: HaukiAPIResource = HaukiAPIClient.post(url=url, data=data)
 
         response_data = self._parse_response_data_to_hauki_resource(response_data)
 
