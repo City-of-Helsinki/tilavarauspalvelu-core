@@ -35,18 +35,18 @@ def _get_mocked_send_response_data(hauki_resource):
     }
 
 
-@mock.patch("opening_hours.resources.make_hauki_post_request")
-def test__hauki__send_resource_to_hauki__send(mocked_make_hauki_post_request, hauki_resource):
-    mocked_make_hauki_post_request.return_value = _get_mocked_send_response_data(hauki_resource)
+@mock.patch("opening_hours.resources.HaukiAPIClient.post")
+def test__hauki__send_resource_to_hauki__send(mocked_haukiapiclient_post, hauki_resource):
+    mocked_haukiapiclient_post.return_value = _get_mocked_send_response_data(hauki_resource)
 
     data = send_resource_to_hauki(hauki_resource)
     assert data is not None
     assert data.id is not None
 
 
-@mock.patch("opening_hours.resources.make_hauki_put_request")
-def test__hauki__send_resource_to_hauki__update(mocked_make_hauki_post_request, hauki_resource):
-    mocked_make_hauki_post_request.return_value = _get_mocked_send_response_data(hauki_resource)
+@mock.patch("opening_hours.resources.HaukiAPIClient.put")
+def test__hauki__send_resource_to_hauki__update(mocked_haukiapiclient_post, hauki_resource):
+    mocked_haukiapiclient_post.return_value = _get_mocked_send_response_data(hauki_resource)
 
     # Convert an existing resource to a format that can be sent to the Hauki API
     data = hauki_resource.convert_to_request_data()
@@ -69,9 +69,9 @@ def test__hauki__send_resource_to_hauki__update(mocked_make_hauki_post_request, 
     assert data.id is not None
 
 
-@mock.patch("opening_hours.resources.make_hauki_put_request")
-def test__hauki__send_resource_to_hauki__update__resource_has_no_id(mocked_make_hauki_post_request, hauki_resource):
-    mocked_make_hauki_post_request.return_value = _get_mocked_send_response_data(hauki_resource)
+@mock.patch("opening_hours.resources.HaukiAPIClient.put")
+def test__hauki__send_resource_to_hauki__update__resource_has_no_id(mocked_haukiapiclient_post, hauki_resource):
+    mocked_haukiapiclient_post.return_value = _get_mocked_send_response_data(hauki_resource)
 
     with pytest.raises(ValueError):  # noqa: PT011
         update_hauki_resource(hauki_resource)

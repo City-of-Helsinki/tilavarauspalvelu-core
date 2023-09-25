@@ -5,7 +5,7 @@ from django.conf import settings
 
 from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiConfigurationError
-from opening_hours.hauki_request import make_hauki_post_request, make_hauki_put_request
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 
 
 @dataclass(order=True, frozen=True)
@@ -76,7 +76,7 @@ def send_resource_to_hauki(resource: HaukiResource):
 
     data = resource.convert_to_request_data()
 
-    response_data = make_hauki_post_request(resources_url, data)
+    response_data = HaukiAPIClient.post(url=resources_url, data=data)
 
     return _parse_response_data_to_hauki_resource(response_data)
 
@@ -91,6 +91,6 @@ def update_hauki_resource(resource: HaukiResource):
 
     data = resource.convert_to_request_data()
 
-    response_data = make_hauki_put_request(resources_url, data)
+    response_data = HaukiAPIClient.put(url=resources_url, data=data)
 
     return _parse_response_data_to_hauki_resource(response_data)

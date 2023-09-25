@@ -7,7 +7,7 @@ from django.utils.timezone import get_default_timezone
 
 from opening_hours.enums import State
 from opening_hours.errors import HaukiConfigurationError
-from opening_hours.hauki_request import make_hauki_get_request
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils import logging
 
 REQUESTS_TIMEOUT = 15
@@ -118,7 +118,7 @@ def get_opening_hours(
         "start_date": start_date,
         "end_date": end_date,
     }
-    days_data_in = make_hauki_get_request(resource_opening_hours_url, query_params)
+    days_data_in = HaukiAPIClient.get(url=resource_opening_hours_url, params=query_params)
 
     days_data_out = []
     for day_data_in in days_data_in["results"]:
@@ -161,7 +161,7 @@ def get_periods_for_resource(
 
     resource_periods_url = f"{settings.HAUKI_API_URL}/v1/date_period/?resource={hauki_resource_id}"
 
-    periods_data_in = make_hauki_get_request(resource_periods_url)
+    periods_data_in = HaukiAPIClient.get(url=resource_periods_url)
 
     periods_data_out = []
     for period in periods_data_in:

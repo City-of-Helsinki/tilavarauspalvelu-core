@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.db import transaction
 
-from opening_hours.hauki_request import make_hauki_get_request
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from spaces.models import Location, Unit
 
 logger = getLogger(__name__)
@@ -186,7 +186,7 @@ class UnitHaukiResourceIdImporter:
 
         # Keep fetching results until there are no more pages.
         while url:
-            data = make_hauki_get_request(url, params)
+            data = HaukiAPIClient.get(url=url, params=params)
             self.read_response(data)
             url = data.get("next", None)
 

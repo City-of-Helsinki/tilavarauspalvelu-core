@@ -4,8 +4,8 @@ from django.conf import settings
 
 from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
-from opening_hours.hauki_request import make_hauki_get_request
 from opening_hours.resources import HaukiResource, send_resource_to_hauki, update_hauki_resource
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from reservation_units.models import ReservationUnit
 
 
@@ -27,7 +27,7 @@ class ReservationUnitHaukiExporter:
             f"/v1/resource/{unit_resource_id}",
         )
         try:
-            resource_data = make_hauki_get_request(url)
+            resource_data = HaukiAPIClient.get(url=url)
             resource_id = resource_data["id"]
         except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
             resource_id = None

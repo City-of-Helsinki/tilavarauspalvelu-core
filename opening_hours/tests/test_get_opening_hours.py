@@ -49,10 +49,10 @@ def _get_mocked_opening_hours(opening_time_variables: dict | None = None):
 
 
 @mock.patch(
-    "opening_hours.hours.make_hauki_get_request",
+    "opening_hours.hours.HaukiAPIClient.get",
     return_value=_get_mocked_opening_hours(),
 )
-def test__hauki__get_opening_hours(mocked_make_hauki_get_request):
+def test__hauki__get_opening_hours(mocked_haukiapiclient_get):
     data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
 
     assert len(data) == 1
@@ -60,7 +60,7 @@ def test__hauki__get_opening_hours(mocked_make_hauki_get_request):
 
 
 @mock.patch(
-    "opening_hours.hours.make_hauki_get_request",
+    "opening_hours.hours.HaukiAPIClient.get",
     return_value=_get_mocked_opening_hours(
         opening_time_variables={
             "start_time": None,
@@ -69,7 +69,7 @@ def test__hauki__get_opening_hours(mocked_make_hauki_get_request):
         }
     ),
 )
-def test__hauki__get_opening_hours__null_start_and_end_times(mocked_make_hauki_get_request):
+def test__hauki__get_opening_hours__null_start_and_end_times(mocked_haukiapiclient_get):
     data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
 
     assert len(data) == 1
@@ -79,14 +79,14 @@ def test__hauki__get_opening_hours__null_start_and_end_times(mocked_make_hauki_g
 
 
 @mock.patch(
-    "opening_hours.hours.make_hauki_get_request",
+    "opening_hours.hours.HaukiAPIClient.get",
     return_value=_get_mocked_opening_hours(
         opening_time_variables={
             "resource_state": "some_funky_state",
         }
     ),
 )
-def test__hauki__get_opening_hours__resource_state_is_non_defined_is_undefined(mocked_make_hauki_get_request):
+def test__hauki__get_opening_hours__resource_state_is_non_defined_is_undefined(mocked_haukiapiclient_get):
     data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
 
     assert len(data) == 1
@@ -95,14 +95,14 @@ def test__hauki__get_opening_hours__resource_state_is_non_defined_is_undefined(m
 
 
 @mock.patch(
-    "opening_hours.hours.make_hauki_get_request",
+    "opening_hours.hours.HaukiAPIClient.get",
     return_value=_get_mocked_opening_hours(
         opening_time_variables={
             "resource_state": None,
         }
     ),
 )
-def test__hauki__get_opening_hours__resource_state_is_none_is_undefined(mocked_make_hauki_get_request):
+def test__hauki__get_opening_hours__resource_state_is_none_is_undefined(mocked_haukiapiclient_get):
     data = get_opening_hours("resource_id", "2020-01-01", "2020-01-01")
 
     assert len(data) == 1
