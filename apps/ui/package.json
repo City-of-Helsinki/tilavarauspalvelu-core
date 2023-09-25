@@ -31,7 +31,7 @@
     "common": "workspace:*",
     "date-fns": "^2.30.0",
     "focus-trap-react": "^10.2.1",
-    "graphql": "^16.8.0",
+    "graphql": "^16.8.1",
     "hds-core": "^2.16.0",
     "hds-design-tokens": "^2.16.0",
     "hds-react": "^2.16.0",
