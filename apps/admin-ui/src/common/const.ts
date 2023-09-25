@@ -35,8 +35,6 @@ export const GRAPQL_API_URL =
 export const previewUrlPrefix =
   env.NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
 
-export const SESSION_EXPIRED_ERROR = "JWT too old";
-
 export const LIST_PAGE_SIZE = 50;
 export const LARGE_LIST_PAGE_SIZE = 100;
 
@@ -82,6 +80,6 @@ export const getSignInUrl = (callBackUrl: string): string => {
 export const getSignOutUrl = (): string => {
   const baseUrl = new URL(window.location.href).origin;
   const cleanPublicUrl = getCleanPublicUrl();
-  const callBackUrl = `${baseUrl}${cleanPublicUrl}/logout`;
+  const callBackUrl = `${baseUrl}${cleanPublicUrl}/auth/logout`;
   return `${AUTH_URL}/logout?next=${callBackUrl}`;
 };

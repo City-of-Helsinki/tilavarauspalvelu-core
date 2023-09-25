@@ -101,3 +101,5 @@ See `.env.local.example` and Azure DevOps library for values.
 | NEXT_PUBLIC_MATOMO_ENABLED     | 'true' enables matomo tracking                                  |
 | NEXT_PUBLIC_COOKIEHUB_ENABLED  | 'true' enables cookiehub consent module                         |
 | NEXT_PUBLIC_HOTJAR_ENABLED     | 'true' enables hotjar tracking                                  |
+| ENABLE_FETCH_HACK              | 'true' to fix localhost dns problem                             |
+| SKIP_ENV_VALIDATION            | 'true' to allow empty env values (especially for build / test)  |

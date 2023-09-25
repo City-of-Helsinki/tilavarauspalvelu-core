@@ -18,6 +18,7 @@ const ServerSchema = z.object({
 const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string(),
   NEXT_PUBLIC_TILAVARAUS_API_URL: z.string(),
+  NEXT_PUBLIC_TUNNISTAMO_URL: z.string().optional(),
   NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX: z.string().optional(),
   NEXT_PUBLIC_COOKIEHUB_ENABLED: coerceBoolean.optional(),
   NEXT_PUBLIC_HOTJAR_ENABLED: coerceBoolean.optional(),
@@ -39,6 +40,9 @@ if (!process.env.SKIP_ENV_VALIDATION) {
   const clientConfig = ClientSchema.safeParse({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_TILAVARAUS_API_URL: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
+    NEXT_PUBLIC_TUNNISTAMO_URL: process.env.NEXT_PUBLIC_TUNNISTAMO_URL,
+    NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX:
+      process.env.NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX,
     NEXT_PUBLIC_COOKIEHUB_ENABLED: process.env.NEXT_PUBLIC_COOKIEHUB_ENABLED,
     NEXT_PUBLIC_HOTJAR_ENABLED: process.env.NEXT_PUBLIC_HOTJAR_ENABLED,
   });
