@@ -3,13 +3,15 @@ import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "
 import { fromUIDate } from "common/src/common/util";
 import {
   ReservationTypeSchema,
-  checkDate,
   checkReservationInterval,
   checkStartEndTime,
-  checkTimeStringFormat,
 } from "./reservation";
+import {
+  checkDateNotInPast,
+  checkTimeStringFormat,
+  OptionSchema,
+} from "./schemaCommon";
 import { intervalToNumber } from "./utils";
-import { OptionSchema } from "./schemaCommon";
 
 // TODO handle metadata (variable form fields) instead of using .passthrough
 // It should be it's own schema object that is included in both forms
@@ -70,10 +72,10 @@ export const timeSelectionSchema = (
   timeSelectionSchemaBase
     .partial()
     .superRefine((val, ctx) =>
-      checkDate(convertToDate(val.startingDate), ctx, "startingDate")
+      checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate")
     )
     .superRefine((val, ctx) =>
-      checkDate(convertToDate(val.endingDate), ctx, "endingDate")
+      checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate")
     )
     .refine(
       (s) =>

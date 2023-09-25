@@ -2,17 +2,15 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
-import { Link } from "react-router-dom";
+import styled from "styled-components";
 import { Button } from "hds-react";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
-import type {
-  Query,
-  BannerNotificationType,
-  PageInfo,
-} from "common/types/gql-types";
+import type { Query, BannerNotificationType } from "common/types/gql-types";
+import { H1 } from "common/src/common/typography";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import Loader from "app/component/Loader";
+import { ButtonLikeLink } from "app/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "app/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "app/common/const";
 import { CustomTable, TableLink } from "../lists/components";
@@ -33,7 +31,7 @@ const getColConfig = (t: TFunction) => [
     key: "name",
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationType>) =>
-      notification.pk != null ? (
+      notification.pk ? (
         <TableLink href={notificationUrl(notification.pk)}>
           {notification.name ?? t("Notifications.noName")}
         </TableLink>
@@ -140,6 +138,11 @@ const NotificationsTable = ({
   );
 };
 
+const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
 /// @brief this is the listing page for all notifications.
 const Page = () => {
   // TODO the default sort should be ["state", "-ends"] but the frontend sort doesn't support multiple options
@@ -179,15 +182,16 @@ const Page = () => {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>{t("Notifications.pageTitle")}</h1>
-        {/* TODO dont use nested button / link use something like ButtonLikeLink but it needs primary variant */}
-        <Link to="/messaging/notifications/new">
-          <Button variant="primary">
-            {t("Notifications.newNotification")}
-          </Button>
-        </Link>
-      </div>
+      <HeaderContainer>
+        <H1 $legacy>{t("Notifications.pageTitle")}</H1>
+        <ButtonLikeLink
+          variant="primary"
+          size="large"
+          to="/messaging/notifications/new"
+        >
+          {t("Notifications.newNotification")}
+        </ButtonLikeLink>
+      </HeaderContainer>
       <p>{t("Notifications.pageDescription")}</p>
       {isLoading ? (
         <Loader />
@@ -204,29 +208,7 @@ const Page = () => {
               onClick={() => {
                 fetchMore({
                   variables: {
-                    offset: notifications.length,
-                  },
-                  // FIXME calling this once, change sort order -> creates an extra ghost as the first element
-                  // (probably the next element for the previous sort order)
-                  updateQuery: (prev, { fetchMoreResult }) => {
-                    if (!fetchMoreResult) {
-                      return prev;
-                    }
-                    const pageInfo =
-                      fetchMoreResult.bannerNotifications?.pageInfo ??
-                      prev.bannerNotifications?.pageInfo;
-                    return {
-                      ...prev,
-                      bannerNotifications: {
-                        ...prev.bannerNotifications,
-                        edges: [
-                          ...(prev.bannerNotifications?.edges ?? []),
-                          ...(fetchMoreResult.bannerNotifications?.edges ?? []),
-                        ],
-                        // NOTE there is something funny with Apollo they disallowed pageInfo undefined in types
-                        pageInfo: pageInfo as PageInfo,
-                      },
-                    };
+                    offset: notifications.length + 1,
                   },
                 });
               }}

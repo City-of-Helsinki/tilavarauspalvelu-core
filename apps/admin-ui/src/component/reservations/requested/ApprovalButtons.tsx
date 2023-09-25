@@ -6,11 +6,11 @@ import {
 import { useTranslation } from "react-i18next";
 import { addHours, isToday } from "date-fns";
 import { Button } from "hds-react";
+import { ButtonLikeLink } from "app/component/ButtonLikeLink";
 import DenyDialog from "./DenyDialog";
 import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
 import { useModal } from "../../../context/ModalContext";
-import { ButtonLikeLink } from "../../../styles/util";
 
 /* Rules
  * Approve only if REQUIRES_HANDLING

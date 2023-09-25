@@ -1,6 +1,6 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -22,26 +22,35 @@ import {
   Target,
   type Mutation,
   type Query,
+  type QueryBannerNotificationArgs,
   type MutationUpdateBannerNotificationArgs,
   type MutationCreateBannerNotificationArgs,
   type MutationDeleteBannerNotificationArgs,
   type ErrorType,
+  type BannerNotificationTypeConnection,
 } from "common/types/gql-types";
-import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
+import { BANNER_NOTIFICATIONS_ADMIN } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
+import { breakpoints } from "common";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import { publicUrl } from "app/common/const";
 import Loader from "app/component/Loader";
 import { useNotification } from "app/context/NotificationContext";
-import { checkDate, checkTimeStringFormat } from "app/schemas";
+import { ButtonLikeLink } from "app/component/ButtonLikeLink";
+import {
+  checkValidDate,
+  checkValidFutureDate,
+  checkTimeStringFormat,
+} from "app/schemas";
 import {
   valueForDateInput,
   valueForTimeInput,
   dateTime,
   parseDateTimeSafe,
 } from "app/helpers";
+import { TFunction } from "i18next";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 
@@ -139,20 +148,30 @@ function BannerNotificationStateTag({
 }
 
 const StatusTagContainer = styled.div`
-  display: grid;
-  justify-items: justify-between;
-  grid-column: 1 / -1;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: var(--spacing-s);
+  & > h1 {
+    margin-top: 0;
+  }
+  @media (width > ${breakpoints.s}) {
+    margin-top: var(--spacing-l);
+  }
 `;
 
-/* TODO mobile styling */
-const ButtonContainer = styled.div`
-  grid-column: 1 / -1;
+const ButtonContainerCommon = styled.div`
   display: flex;
-  width: 100%;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--spacing-l);
+`;
+const ButtonContainer = styled(ButtonContainerCommon)`
+  grid-column: 1 / -1;
+`;
+
+const InnerButtons = styled(ButtonContainerCommon)`
+  flex-grow: 1;
   flex-wrap: wrap;
 `;
 
@@ -202,19 +221,27 @@ const NotificationFormSchema = z
       }),
     pk: z.number(),
   })
-  // TODO checkDate doesn't check for valid days or months i.e. 2024-02-31 and 2024-13-41 are valid
-  .superRefine((val, ctx) =>
-    checkDate(fromUIDate(val.activeFrom), ctx, "activeFrom")
-  )
-  .superRefine((val, ctx) =>
-    checkDate(fromUIDate(val.activeUntil), ctx, "activeUntil")
-  )
-  .superRefine((x, ctx) =>
-    checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime")
-  )
-  .superRefine((x, ctx) =>
-    checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime")
-  )
+  // skip date time validation for drafts if both fields are empty
+  // if draft and time or date input validate both (can't construct date without both)
+  // published requires a DateTime (past is fine)
+  .superRefine((x, ctx) => {
+    if (!x.isDraft || x.activeFrom !== "" || x.activeFromTime !== "") {
+      checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime");
+      checkValidDate(fromUIDate(x.activeFrom), ctx, "activeFrom");
+    }
+  })
+  // End time can't be in the past unless it's a draft
+  // TODO future date check doesn't check for today time, so it's possible to set now() - 2h as the end time
+  .superRefine((x, ctx) => {
+    if (!x.isDraft || x.activeUntil !== "" || x.activeUntilTime !== "") {
+      checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime");
+      if (!x.isDraft) {
+        checkValidFutureDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+      } else {
+        checkValidDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+      }
+    }
+  })
   .superRefine((val, ctx) => checkStartIsBeforeEnd(val, ctx));
 
 type NotificationFormType = z.infer<typeof NotificationFormSchema>;
@@ -222,20 +249,32 @@ type NotificationFormType = z.infer<typeof NotificationFormSchema>;
 const GridForm = styled.form`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--spacing-l);
 `;
 
+// @brief inefficient way to destroy caches, normal INVALIDATE doesn't remove keys
+// @param cache is the apollo cache
+// @param matcher is the query name to destroy
+// Some other alternatives is to update cache based on mutation payload
+// only invalidate cache keys if needed (do a find on every key to check)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const deleteQueryFromCache = (cache: any, matcher: string | RegExp): void => {
+  const rootQuery = cache.data.data.ROOT_QUERY;
+  Object.keys(rootQuery).forEach((key) => {
+    if (key.match(matcher)) {
+      cache.evict({ id: "ROOT_QUERY", fieldName: key });
+    }
+  });
+};
+
 /// @brief This is the create / edit page for a single notification.
-const Page = ({
+const NotificationForm = ({
   notification,
-  refetch,
 }: {
   notification?: BannerNotificationType;
-  refetch?: () => void;
 }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
-  // const activeFrom = data.activeFrom !== "" ? dateTime(data.activeFrom, data.activeFromTime) : undefined;
   const today = new Date();
   const activeFrom = valueForDateInput(
     notification?.activeFrom ?? today.toISOString()
@@ -283,11 +322,19 @@ const Page = ({
   const [createMutation] = useMutation<
     Mutation,
     MutationCreateBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_CREATE);
+  >(BANNER_NOTIFICATIONS_CREATE, {
+    update(cache) {
+      deleteQueryFromCache(cache, "bannerNotifications");
+    },
+  });
   const [updateMutation] = useMutation<
     Mutation,
     MutationUpdateBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_UPDATE);
+  >(BANNER_NOTIFICATIONS_UPDATE, {
+    update(cache) {
+      deleteQueryFromCache(cache, "bannerNotifications");
+    },
+  });
 
   const { notifyError, notifySuccess } = useNotification();
 
@@ -299,10 +346,15 @@ const Page = ({
     const isMissingMessage = errorMsgs.find(
       (x) => x === "Non-draft notifications must have a message."
     );
+    const isPermissionError = errorMsgs.find(
+      (x) => x === "No permission to mutate."
+    );
     if (alreadyExists) {
       notifyError(t("error.submit.alreadyExists"));
     } else if (isMissingMessage) {
       notifyError(t("error.submit.missingMessage"));
+    } else if (isPermissionError) {
+      notifyError(t("error.submit.noMutationPermission"));
     } else {
       // eslint-disable-next-line no-console
       console.error(errorMsgs);
@@ -314,7 +366,7 @@ const Page = ({
   const navigate = useNavigate();
 
   const onSubmit = async (data: NotificationFormType) => {
-    const end = dateTime(data.activeUntil, data.activeUntilTime);
+    const end = parseDateTimeSafe(data.activeUntil, data.activeUntilTime);
     const start =
       data.activeFrom !== ""
         ? dateTime(data.activeFrom, data.activeFromTime)
@@ -328,8 +380,10 @@ const Page = ({
 
     const input = {
       name: data.name,
-      activeFrom: start,
-      activeUntil: end,
+      // either both needs to be defined or neither
+      // for drafts null is fine, published it's not (schema checks)
+      activeFrom: start != null && end != null ? start : null,
+      activeUntil: start != null && end != null ? end.toISOString() : null,
       draft: data.isDraft,
       message: data.messageFi,
       messageEn: data.messageEn,
@@ -350,8 +404,12 @@ const Page = ({
           handleError(e.graphQLErrors.map((err) => err.message));
         },
       });
-      if (res?.data?.createBannerNotification?.errors) {
-        const { errors: mutationErrors } = res.data.createBannerNotification;
+      const mutationData =
+        data.pk === 0
+          ? res?.data?.createBannerNotification
+          : res?.data?.updateBannerNotification;
+      const mutationErrors = mutationData?.errors;
+      if (mutationErrors && mutationErrors.length > 0) {
         // TODO error translations and logic
         handleError(
           mutationErrors.map(
@@ -365,7 +423,6 @@ const Page = ({
             state: data.pk === 0 ? t("form.created") : t("form.updated"),
           })
         );
-        refetch?.();
         navigate("..");
       }
     } catch (e) {
@@ -380,9 +437,9 @@ const Page = ({
     errorMsg ? t(`form.errors.${errorMsg}`) : "";
 
   const levelOptions = [
-    { value: "NORMAL", label: t("level.NORMAL") },
-    { value: "WARNING", label: t("level.WARNING") },
-    { value: "EXCEPTION", label: t("level.EXCEPTION") },
+    { value: "NORMAL", label: t("form.levelEnum.NORMAL") },
+    { value: "WARNING", label: t("form.levelEnum.WARNING") },
+    { value: "EXCEPTION", label: t("form.levelEnum.EXCEPTION") },
   ];
   const targetGroupOptions = [
     { value: "ALL", label: t("target.ALL") },
@@ -392,16 +449,6 @@ const Page = ({
 
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <StatusTagContainer>
-        <H1 $legacy style={{ gridColumn: "1 / span 5", gridRow: "1 / span 4" }}>
-          {notification
-            ? notification?.name ?? t("noName")
-            : t("newNotification")}
-        </H1>
-        {notification?.state && (
-          <BannerNotificationStateTag state={notification.state} />
-        )}
-      </StatusTagContainer>
       <Controller
         control={control}
         name="inFuture"
@@ -488,7 +535,7 @@ const Page = ({
             }
             value={{
               value,
-              label: value !== "" ? t(`level.${value}`) : "",
+              label: value !== "" ? t(`form.levelEnum.${value}`) : "",
             }}
             invalid={!!errors.level}
             error={translateError(errors.level?.message)}
@@ -564,46 +611,61 @@ const Page = ({
         )}
       />
       <ButtonContainer>
-        {/* TODO don't nest Link and Button */}
-        <Link to="..">
-          <Button variant="secondary" type="button" theme="black">
+        <InnerButtons>
+          <ButtonLikeLink
+            variant="secondary"
+            size="large"
+            to=".."
+            style={{ marginRight: "auto" }}
+          >
             {t("form.cancel")}
+          </ButtonLikeLink>
+          <Button
+            variant="secondary"
+            theme="black"
+            type="button"
+            onClick={() => {
+              setValue("isDraft", true);
+              handleSubmit(onSubmit)();
+            }}
+          >
+            {t("form.saveDraft")}
           </Button>
-        </Link>
-        <Button
-          style={{ marginLeft: "auto" }}
-          variant="secondary"
-          theme="black"
-          type="button"
-          onClick={() => {
-            setValue("isDraft", true);
-            handleSubmit(onSubmit)();
-          }}
-        >
-          {t("form.saveDraft")}
-        </Button>
-        <Button type="submit">{t("form.save")}</Button>
+        </InnerButtons>
+        <div>
+          <Button style={{ marginLeft: "auto" }} type="submit">
+            {t("form.save")}
+          </Button>
+        </div>
       </ButtonContainer>
     </GridForm>
   );
 };
 
-// We don't have proper layouts yet, so just separate the container stuff here
-const PageWrapped = ({ id }: { id?: number }) => {
-  // TODO there is neither singular version of this, nor a pk filter
-  const {
-    data,
-    loading: isLoading,
-    // TODO refetch doesn't work with the loadMore cache so it's useless
-    // need to add proper cache to ApolloProvider and invalidate it on mutation
-    refetch,
-  } = useQuery<Query>(BANNER_NOTIFICATIONS_ADMIN_LIST, { skip: !id });
+const getName = (
+  isNew: boolean,
+  isLoading: boolean,
+  name: string | undefined,
+  t: TFunction
+) => {
+  if (name) {
+    return name;
+  }
+  if (isLoading) {
+    return t("Notifications.isLoading");
+  }
+  if (isNew) {
+    return t("Notifications.newNotification");
+  }
+  return t("Notifications.error.notFound");
+};
+
+const useRemoveNotification = ({
+  notification,
+}: {
+  notification?: BannerNotificationType;
+}) => {
   const { t } = useTranslation();
-
-  const notification = data?.bannerNotifications?.edges
-    ?.map((edge) => edge?.node)
-    .find((node) => node?.pk === id);
-
   const { notifyError, notifySuccess } = useNotification();
   const handleError = (errorMsgs: string[]) => {
     // eslint-disable-next-line no-console
@@ -615,7 +677,29 @@ const PageWrapped = ({ id }: { id?: number }) => {
   const [removeMutation] = useMutation<
     Mutation,
     MutationDeleteBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_DELETE);
+  >(BANNER_NOTIFICATIONS_DELETE, {
+    update(cache, { data: newData }) {
+      cache.modify({
+        fields: {
+          // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
+          bannerNotifications(existing: BannerNotificationTypeConnection) {
+            const res = newData?.deleteBannerNotification;
+            if (res?.errors) {
+              return existing;
+            }
+
+            const pkToDelete = notification?.pk;
+            if (!pkToDelete) {
+              return existing;
+            }
+            return existing.edges.filter(
+              (x) => x?.node && x.node.pk !== pkToDelete
+            );
+          },
+        },
+      });
+    },
+  });
 
   const navigate = useNavigate();
 
@@ -639,13 +723,77 @@ const PageWrapped = ({ id }: { id?: number }) => {
       return;
     }
     notifySuccess(t("Notifications.success.removed"));
-    refetch();
     navigate("..");
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  return removeNotification;
+};
+
+function LoadedContent({
+  isNew,
+  notification,
+  children,
+}: {
+  isNew: boolean;
+  notification?: BannerNotificationType;
+  children?: ReactNode;
+}) {
+  const { t } = useTranslation();
+
+  const removeNotification = useRemoveNotification({ notification });
+
+  const name = getName(isNew, false, notification?.name, t);
+  return (
+    <>
+      <StatusTagContainer>
+        <H1 $legacy>{name}</H1>
+        {notification?.state && (
+          <BannerNotificationStateTag state={notification.state} />
+        )}
+      </StatusTagContainer>
+      {(notification || isNew) && (
+        <NotificationForm notification={notification ?? undefined} />
+      )}
+      {notification && (
+        <ButtonContainer
+          style={{ marginTop: "2rem", justifyContent: "flex-start" }}
+        >
+          <Button
+            onClick={removeNotification}
+            variant="secondary"
+            theme="black"
+          >
+            {t("Notifications.deleteButton")}
+          </Button>
+        </ButtonContainer>
+      )}
+      ){children}
+    </>
+  );
+}
+
+/// @param pk: primary key of the notification to edit, null for new notification, NaN for error
+/// Client only: uses hooks, window, and react-router-dom
+/// We don't have proper layouts yet, so just separate the container stuff here
+const PageWrapped = ({ pk }: { pk?: number }) => {
+  const typename = "BannerNotificationType";
+  const id = pk ? window?.btoa(`${typename}:${pk}`) : undefined;
+
+  const { data, loading: isLoading } = useQuery<
+    Query,
+    QueryBannerNotificationArgs
+  >(BANNER_NOTIFICATIONS_ADMIN, {
+    skip: !id,
+    variables: {
+      id: String(id ?? ""),
+    },
+  });
+  const { t } = useTranslation();
+
+  const notification = data?.bannerNotification ?? undefined;
+
+  const isNew = pk === 0;
+  const name = getName(isNew, isLoading, notification?.name, t);
 
   return (
     <>
@@ -659,41 +807,30 @@ const PageWrapped = ({ id }: { id?: number }) => {
           },
           {
             slug: "",
-            alias: notification
-              ? notification.name
-              : t("breadcrumb.newNotification"),
+            alias: name,
           },
         ]}
       />
       <Container>
-        <Page notification={notification ?? undefined} refetch={refetch} />
-        {notification && (
-          <ButtonContainer style={{ marginTop: "2rem" }}>
-            <Button
-              onClick={removeNotification}
-              variant="secondary"
-              theme="black"
-            >
-              {t("Notifications.deleteButton")}
-            </Button>
-          </ButtonContainer>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <LoadedContent isNew={isNew} notification={notification} />
         )}
       </Container>
     </>
   );
 };
 
+// TODO this can be replaced with router match since we don't validate the pk here
 const PageRouted = () => {
-  const { id } = useParams<{ id: string }>();
+  const { pk } = useParams<{ pk: string }>();
 
-  if (!id || (id !== "new" && Number.isNaN(Number(id)))) {
-    return <div>Invalid ID</div>;
-  }
-  if (id === "new") {
-    return <PageWrapped id={0} />;
+  if (pk === "new") {
+    return <PageWrapped pk={0} />;
   }
 
-  return <PageWrapped id={Number(id)} />;
+  return <PageWrapped pk={Number(pk)} />;
 };
 
 export default PageRouted;

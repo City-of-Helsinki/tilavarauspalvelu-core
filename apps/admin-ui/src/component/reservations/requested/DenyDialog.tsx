@@ -141,7 +141,7 @@ const DialogContent = ({
       cache.modify({
         fields: {
           // find the pk => slice the array => replace the state variable in the slice
-          // @ts-expect-error: TODO: broken with either typescript or apollo upgrade
+          // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
           reservations(existing: ReservationTypeConnection) {
             const queryRes = data?.denyReservation;
             if (queryRes?.errors) {

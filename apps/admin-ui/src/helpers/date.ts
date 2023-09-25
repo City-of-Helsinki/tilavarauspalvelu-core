@@ -12,16 +12,20 @@ export const valueForTimeInput = (from: string): string => {
 };
 
 /* Construct date from dateinput + timeinput */
-// TODO move this to common/util and rename
 export const dateTime = (date: string, time: string): string => {
   return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date()).toISOString();
 };
+
 export const parseDateTimeSafe = (
   date: string,
   time: string
 ): Date | undefined => {
   try {
-    return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date());
+    const d = parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date());
+    if (Number.isNaN(d.getTime())) {
+      return undefined;
+    }
+    return d;
   } catch (e) {
     return undefined;
   }

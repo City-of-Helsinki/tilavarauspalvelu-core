@@ -951,15 +951,18 @@ const translations: ITranslations = {
     pageDescription: [
       "Alla näet yhteenvedon aiemmin luoduista ilmoituksista. Voit luoda uusia ilmoituksia Varaamon yläreunaan Luo ilmoitus -painikkeesta.",
     ],
+    isLoading: ["Ladataan ilmoitusta"],
     noNotifications: ["Ei ilmoituksia"],
-    newNotification: ["Uusi ilmoitus"],
+    newNotification: ["Luo ilmoitus"],
     noName: ["(ei nimeä)"],
     deleteButton: ["Poista"],
     error: {
+      notFound: ["Ilmoitusta ei löytynyt"],
       submit: {
         generic: ["Ilmoituksen tallennus epäonnistui"],
         alreadyExists: ["Ilmoitus on jo olemassa"],
         missingMessage: ["Ilmoituksen viesti puuttuu"],
+        noMutationPermission: ["Ei oikeutta muokata ilmoitusta"],
       },
       deleteFailed: {
         generic: ["Ilmoituksen poisto epäonnistui"],
@@ -983,21 +986,37 @@ const translations: ITranslations = {
       messageEn: ["Viesti en"],
       messageSv: ["Viesti sv"],
       cancel: ["Peruuta"],
-      saveDraft: ["Tallenna luonnoksena"],
+      saveDraft: ["Tallenna luonnos"],
       save: ["Julkaise"],
       created: ["luotu"],
       updated: ["päivitetty"],
       saveSuccessToast: ["Ilmoitus {{ name }} {{ state }}"],
+      levelEnum: {
+        noLevel: ["(ei tasoa)"],
+        EXCEPTION: ["Poikkeus (punainen)"],
+        WARNING: ["Varoitus (keltainen)"],
+        NORMAL: ["Normaali (sininen)"],
+      },
       errors: {
         Required: ["Pakollinen"],
+        "Invalid date": ["Virheellinen päivämäärä"],
         "String must contain at least 1 character(s)": ["Pakollinen"],
         "Target group cannot be empty": ["Pakollinen"],
         "Level cannot be empty": ["Pakollinen"],
         "Date can't be in the past": ["Päivämäärä ei voi olla menneisyydessä"],
         "activeFromTime is not in time format.": ["Alkamisaika ei ole aika"],
         "activeUntilTime is not in time format.": ["Päättymisaika ei ole aika"],
+        "activeFromTime can't be more than 24 hours.": [
+          "Alkamisaika ei voi olla yli 24 tuntia",
+        ],
+        "activeUntilTime can't be more than 24 hours.": [
+          "Päättymisaika ei voi olla yli 24 tuntia",
+        ],
         "End time needs to be after start time.": [
           "Päättymisajan tulee olla alkamisajan jälkeen",
+        ],
+        "Date needs to be within three years.": [
+          "Päivämäärän tulee olla kolmen vuoden sisällä",
         ],
       },
     },
@@ -1011,7 +1030,7 @@ const translations: ITranslations = {
       noState: ["(ei tilaa)"],
       ACTIVE: ["Julkaistu"],
       DRAFT: ["Luonnos"],
-      SCHEDULED: ["Ajasitetu"],
+      SCHEDULED: ["Ajastettu"],
     },
     target: {
       noTarget: ["(ei kohderyhmää)"],

@@ -1728,6 +1728,7 @@ export type Query = {
   applicationEvents?: Maybe<ApplicationEventTypeConnection>;
   applicationRounds?: Maybe<ApplicationRoundTypeConnection>;
   applications?: Maybe<ApplicationTypeConnection>;
+  bannerNotification?: Maybe<BannerNotificationType>;
   bannerNotifications?: Maybe<BannerNotificationTypeConnection>;
   cities?: Maybe<CityTypeConnection>;
   currentUser?: Maybe<UserType>;
@@ -1824,6 +1825,10 @@ export type QueryApplicationsArgs = {
   status?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
   user?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type QueryBannerNotificationArgs = {
+  id: Scalars["ID"]["input"];
 };
 
 export type QueryBannerNotificationsArgs = {

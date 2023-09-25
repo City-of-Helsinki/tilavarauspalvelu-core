@@ -6,7 +6,7 @@ import Page from "./page";
 const MyUnitsRouter = (): JSX.Element => (
   <Routes>
     <Route index element={<Index />} />
-    <Route path=":id" element={<Page />} />
+    <Route path=":pk" element={<Page />} />
   </Routes>
 );
 

@@ -22,7 +22,7 @@ const PageWrapper = (props: Props): JSX.Element => {
     <>
       <Title>Tilavarauspalvelu</Title>
       <Navigation />
-      <BannerNotificationsList targetList={["USER", "ALL"]} centered />
+      <BannerNotificationsList centered />
       <UnpaidReservationNotification />
       <Main
         $bgColor={props.overrideBackgroundColor}
