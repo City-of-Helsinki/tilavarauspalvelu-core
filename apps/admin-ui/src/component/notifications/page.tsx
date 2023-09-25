@@ -767,7 +767,7 @@ function LoadedContent({
           </Button>
         </ButtonContainer>
       )}
-      ){children}
+      {children}
     </>
   );
 }
