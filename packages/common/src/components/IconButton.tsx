@@ -83,7 +83,6 @@ const IconButton = ({
   icon,
   label,
   onClick,
-  // eslint-disable-next-line no-script-url
   href = "#",
   openInNewTab = !!href && href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest

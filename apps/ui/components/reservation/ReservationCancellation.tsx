@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useMutation, useQuery } from "@apollo/client";
 import router from "next/router";
 import { Controller, useForm } from "react-hook-form";
-import { IconArrowRight, IconCross, IconSignout, Select } from "hds-react";
+import { IconCross, Select } from "hds-react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { OptionType } from "common/types/common";
@@ -31,12 +31,11 @@ import { CenterSpinner } from "../common/common";
 import { BlackButton, MediumButton, Toast } from "../../styles/util";
 import ReservationInfoCard from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
-import { reservationUnitPath } from "@/modules/const";
-import ReturnLinkList from "@/components/reservation/ReturnLinkList";
+import { reservationUnitPath } from "../../modules/const";
+import ReturnLinkList from "./ReturnLinkList";
 
 type Props = {
   id: number;
-  logout?: () => void;
 };
 
 const Spinner = styled(CenterSpinner)`
@@ -126,26 +125,7 @@ const StyledSelect = styled(Select)`
   }
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
-  align-items: flex-start;
-  font-size: var(--fontsize-body-m);
-  margin-top: var(--spacing-layout-m);
-`;
-
-const StyledLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  text-decoration: underline;
-  color: var(--color-black) !important;
-  ${fontMedium}
-  cursor: pointer;
-`;
-
-const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {
+const ReservationCancellation = ({ id }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);

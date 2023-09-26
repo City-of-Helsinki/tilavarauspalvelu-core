@@ -1,7 +1,7 @@
+import React, { useMemo } from "react";
 import { ReservationState } from "common/types/common";
 import { IconCalendar, IconLinkExternal } from "hds-react";
 import { useRouter } from "next/router";
-import React, { useMemo } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
@@ -15,8 +15,6 @@ import {
 } from "common/types/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
-import { IconButton } from "common/src/components";
-import { signOut } from "~/hooks/auth";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
