@@ -9,7 +9,6 @@ import {
   Query,
 } from "common/types/gql-types";
 import {
-  AllocationResult,
   ApplicationEventSchedule,
   ApplicationEventStatus,
   ApplicationRound,
@@ -88,26 +87,6 @@ export const getNormalizedApplicationEventStatus = (
   }
 
   return normalizedStatus;
-};
-
-export const normalizeApplicationEventStatus = (
-  allocationResult: AllocationResult
-): ApplicationEventStatus => {
-  let { status } = allocationResult.applicationEvent;
-
-  if (
-    allocationResult.allocatedReservationUnitId &&
-    allocationResult.applicationEvent.declinedReservationUnitIds.includes(
-      allocationResult.allocatedReservationUnitId
-    )
-  ) {
-    status = "ignored";
-  } else if (allocationResult.declined) {
-    status = "declined";
-  } else if (allocationResult.accepted) {
-    status = "validated";
-  }
-  return status;
 };
 
 export const getNormalizedApplicationRoundStatus = (
