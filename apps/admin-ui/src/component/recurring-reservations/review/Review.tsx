@@ -6,12 +6,12 @@ import styled from "styled-components";
 import { gql, useQuery } from "@apollo/client";
 import { H2 } from "common/src/common/typography";
 import { ApplicationRoundType, Query } from "common/types/gql-types";
+import { BasicLink } from "@/styles/util";
 import { ApplicationRound as RestApplicationRoundType } from "../../../common/types";
 import { applicationRoundUrl } from "../../../common/urls";
 import { Container } from "../../../styles/layout";
 import StatusRecommendation from "../../applications/StatusRecommendation";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
-import { NaviItem } from "../ApplicationRoundNavi";
 import ApplicationRoundStatusTag from "../ApplicationRoundStatusTag";
 import TimeframeStatus from "../TimeframeStatus";
 import ApplicationDataLoader from "./ApplicationDataLoader";
@@ -50,6 +50,14 @@ const TabContent = styled.div`
   gap: var(--spacing-m);
   margin-top: var(--spacing-s);
   line-height: 1;
+`;
+
+export const NaviItem = styled(BasicLink)`
+  &:first-of-type {
+    margin-left: 0;
+  }
+
+  margin-left: 2rem;
 `;
 
 const APPLICATION_RESERVATION_UNITS_QUERY = gql`

@@ -252,6 +252,7 @@ const getCellConfig = (
     index: "applicationEventScheduleId",
     sorting: "organisation.name",
     order: "asc",
+    /*
     rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
       return applicationEventScheduleId && applicationRound
         ? `${applicationRoundUrl(
@@ -259,6 +260,7 @@ const getCellConfig = (
           )}/recommendation/${applicationEventScheduleId}`
         : "";
     },
+    */
   };
 };
 

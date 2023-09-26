@@ -50,9 +50,6 @@ const ReservationUnitEditor = dynamic(
 );
 
 const RECURRING_PATH = "./component/recurring-reservations";
-const Recommendation = dynamic(
-  () => import(`${RECURRING_PATH}/Recommendation`)
-);
 const RecommendationsByApplicant = dynamic(
   () => import(`${RECURRING_PATH}/RecommendationsByApplicant`)
 );
@@ -65,9 +62,6 @@ const AllApplicationRounds = dynamic(
 const Criteria = dynamic(() => import(`${RECURRING_PATH}/Criteria`));
 const RecommendationsByReservationUnit = dynamic(
   () => import(`${RECURRING_PATH}/RecommendationsByReservationUnit`)
-);
-const ResolutionReport = dynamic(
-  () => import(`${RECURRING_PATH}/ResolutionReport`)
 );
 const ReservationsByReservationUnit = dynamic(
   () => import(`${RECURRING_PATH}/ReservationsByReservationUnit`)
@@ -122,34 +116,25 @@ const ApplicationRoundsRouter = () => (
   <Routes>
     <Route index element={<AllApplicationRounds />} />
     <Route path=":applicationRoundId/applications" element={<Applications />} />
-    <Route
-      path=":applicationRoundId/resolution"
-      element={<ResolutionReport />}
-    />
     <Route path=":applicationRoundId/criteria" element={<Criteria />} />
     <Route
       path=":applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
       element={<ReservationSummariesByReservationUnit />}
     />
+    {/* TODO is this in use? */}
     <Route
       path=":applicationRoundId/reservationUnit/:reservationUnitId/reservations"
       element={<ReservationsByReservationUnit />}
     />
+    {/* TODO is this in use? */}
     <Route
       path=":applicationRoundId/reservationUnit/:reservationUnitId"
       element={<RecommendationsByReservationUnit />}
     />
+    {/* TODO is this in use? */}
     <Route
       path=":applicationRoundId/applicant/:applicantId"
       element={<RecommendationsByApplicant />}
-    />
-    <Route
-      path=":applicationRoundId/organisation/:organisationId"
-      element={<RecommendationsByApplicant />}
-    />
-    <Route
-      path=":applicationRoundId/recommendation/:applicationEventScheduleId"
-      element={<Recommendation />}
     />
     <Route
       path=":applicationRoundId/allocation"
