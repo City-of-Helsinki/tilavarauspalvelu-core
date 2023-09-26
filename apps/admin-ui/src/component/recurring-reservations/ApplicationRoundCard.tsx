@@ -5,9 +5,10 @@ import styled from "styled-components";
 import { Card, IconArrowRight } from "hds-react";
 import { ApplicationRoundType } from "common/types/gql-types";
 import { breakpoints } from "common/src/common/style";
+import { IconCalendar } from "hds-react";
+import { formatDate } from "../../common/util";
 import { applicationRoundUrl } from "../../common/urls";
 import ApplicationRoundStatusTag from "./ApplicationRoundStatusTag";
-import ReservationPeriod from "./ReservationPeriod";
 import TimeframeStatus from "./TimeframeStatus";
 
 interface IProps {
@@ -89,6 +90,27 @@ const StyledCard = styled(Card)`
     background: var(--color-black-5);
   }
 `;
+
+const ReservationPeriodContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3-xs);
+`;
+
+function ReservationPeriod({
+  reservationPeriodBegin,
+  reservationPeriodEnd,
+}: {
+  reservationPeriodBegin: string;
+  reservationPeriodEnd: string;
+}): JSX.Element {
+  return (
+    <ReservationPeriodContainer>
+      <IconCalendar size="xs" />
+      {formatDate(reservationPeriodBegin)}-{formatDate(reservationPeriodEnd)}
+    </ReservationPeriodContainer>
+  );
+}
 
 function Stat({ value, label }: { value: number; label: string }): JSX.Element {
   return (

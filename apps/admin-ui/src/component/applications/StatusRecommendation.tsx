@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useModal } from "../../context/ModalContext";
 import InfoBubble from "../InfoBubble";
-import StageInfo from "../recurring-reservations/StageInfo";
+import StageInfo from "./StageInfo";
 import { ApplicationRound } from "../../common/types";
 
 interface IProps {

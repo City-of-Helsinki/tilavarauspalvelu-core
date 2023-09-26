@@ -13,7 +13,7 @@ import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import { getApplicationRoundStatus } from "./ApplicationRoundStatusTag";
-import { TableLink, CustomTable } from "./components";
+import { TableLink, CustomTable } from "./CustomTable";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 import { truncate } from "./util";
 import { Accordion } from "../../common/hds-fork/Accordion";

@@ -47,8 +47,6 @@ export const CustomTable = (props: TableProps): JSX.Element => (
   </TableWrapper>
 );
 
-export default CustomTable;
-
 export const TableLink = styled(Link)`
   color: black;
 `;
