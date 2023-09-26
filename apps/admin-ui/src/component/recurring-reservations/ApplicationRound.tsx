@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { type AxiosError } from "axios";
 import Review from "./review/Review";
-import Allocation from "./Allocation";
 import Handling from "./Handling";
 import PreApproval from "./PreApproval";
 import { ApplicationRoundStatus } from "../../common/types";
@@ -60,15 +59,6 @@ function ApplicationRound({
   }
 
   switch (applicationRound?.status) {
-    case "review_done":
-      return (
-        <Allocation
-          applicationRound={applicationRound}
-          setApplicationRoundStatus={(status) =>
-            mutation.mutateAsync({ status })
-          }
-        />
-      );
     case "allocated":
     case "approved":
       return (
@@ -94,7 +84,13 @@ function ApplicationRound({
       return <Review applicationRound={applicationRound} />;
 
     default:
-      return <> </>;
+      return (
+        <div>
+          {t("errors.applicationRoundStatusNotSupported", {
+            status: applicationRound?.status,
+          })}
+        </div>
+      );
   }
 }
 

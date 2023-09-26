@@ -34,7 +34,6 @@ const ResourceEditorView = dynamic(
 );
 
 const APPLICATIONS_PATH = "./component/applications";
-const Application = dynamic(() => import(`${APPLICATIONS_PATH}/Application`));
 const Applications = dynamic(() => import(`${APPLICATIONS_PATH}/Applications`));
 const ApplicationDetails = dynamic(
   () => import(`${APPLICATIONS_PATH}/ApplicationDetails`)
@@ -113,7 +112,7 @@ const UnitsRouter = () => (
 
 const ApplicationRouter = () => (
   <Routes>
-    <Route path=":applicationId" element={<Application />} />
+    <Route path=":applicationId" element={<ApplicationDetails />} />
     <Route path=":applicationId/details" element={<ApplicationDetails />} />
     <Route
       path=":applicationId/recurringReservation/:recurringReservationId"
