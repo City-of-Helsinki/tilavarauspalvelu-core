@@ -5,10 +5,6 @@ import {
   ApplicationRound,
   ReservationUnit,
   Parameter,
-  Reservation,
-  RecurringReservation,
-  ApplicationStatus,
-  ReservationStatus,
 } from "./types";
 import { API_BASE_URL } from "./const";
 
@@ -27,8 +23,6 @@ const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
-const reservationBasePath = "reservation";
-const recurringReservationPath = "recurring_reservation";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -78,15 +72,15 @@ async function apiGet<T>({
   });
 }
 
-export function getApplicationRound(
-  params: IDParameter
-): Promise<ApplicationRound> {
+export function getApplicationRound(params: {
+  id: number;
+}): Promise<ApplicationRound> {
   return apiGet<ApplicationRound>({
     path: `v1/${applicationRoundsBasePath}/${params.id}`,
   });
 }
 
-export interface ReservationUnitsParameters {
+interface ReservationUnitsParameters {
   applicationRound?: number;
   search?: string;
   purpose?: number;
@@ -102,17 +96,7 @@ export function getReservationUnits(
   });
 }
 
-interface IDParameter {
-  id: number;
-}
-
-export function getReservationUnit(id: number): Promise<ReservationUnit> {
-  return apiGet<ReservationUnit>({
-    path: `v1/${reservationUnitsBasePath}/${id}`,
-  });
-}
-
-export type ParameterNames =
+type ParameterNames =
   | "purpose"
   | "age_group"
   | "ability_group"
@@ -128,63 +112,5 @@ export function getParameters(name: ParameterNames): Promise<Parameter[]> {
 export function getApplication(id: number): Promise<Application> {
   return apiGet<Application>({
     path: `v1/${applicationBasePath}/${id}`,
-  });
-}
-
-export interface ApplicationParameters {
-  applicationRound?: number;
-  status?: string;
-}
-
-export interface ApplicationStatusPayload {
-  status: ApplicationStatus;
-  applicationId: number;
-}
-
-interface IRecurringReservationParams {
-  application?: number;
-  applicationEvent?: number;
-  ordering?: string;
-  reservationUnit?: string;
-  search?: string;
-}
-
-interface IReservationParams {
-  active?: boolean;
-  ordering?: string;
-  reservationUnit?: string;
-  search?: string;
-  state?: ReservationStatus;
-}
-
-export function getRecurringReservations(
-  parameters: IRecurringReservationParams
-): Promise<RecurringReservation[]> {
-  return apiGet({
-    path: `v1/${recurringReservationPath}`,
-    parameters,
-  });
-}
-
-export function getRecurringReservation(
-  id: number
-): Promise<RecurringReservation> {
-  return apiGet({
-    path: `v1/${recurringReservationPath}/${id}`,
-  });
-}
-
-export function getReservations(
-  parameters: IReservationParams
-): Promise<Reservation[]> {
-  return apiGet({
-    path: `v1/${reservationBasePath}`,
-    parameters,
-  });
-}
-
-export function getReservation(id: number): Promise<Reservation> {
-  return apiGet({
-    path: `v1/${reservationBasePath}/${id}`,
   });
 }
