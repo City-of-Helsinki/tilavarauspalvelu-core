@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -49,32 +49,32 @@ const ApplicationRoundsContainer = styled.div`
 function ApplicationRounds(): JSX.Element {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
-  const [applicationRounds, setApplicationRounds] = useState<
-    ApplicationRoundType[]
-  >([]);
 
   const { user } = usePermission();
 
   // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
   // TODO include the filter (below) into the query (state); requires backend changes
-  useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS_QUERY, {
-    skip: user == null,
-    onCompleted: (data) => {
-      const result = (data?.applicationRounds?.edges || []).map(
-        (ar) => ar?.node as ApplicationRoundType
-      );
-      setApplicationRounds(result);
-    },
-    onError: (err: ApolloError) => {
-      notifyError(err.message);
-    },
-  });
-
-  const handleRounds = applicationRounds?.filter((applicationRound) =>
-    ["draft", "in_review", "review_done", "allocated", "handled"].includes(
-      applicationRound.status as ApplicationRoundStatus
-    )
+  const { data } = useQuery<Query, QueryApplicationRoundsArgs>(
+    APPLICATION_ROUNDS_QUERY,
+    {
+      skip: user == null,
+      onError: (err: ApolloError) => {
+        notifyError(err.message);
+      },
+    }
   );
+  const applicationRounds =
+    data?.applicationRounds?.edges
+      ?.map((ar) => ar?.node)
+      .filter((ar): ar is ApplicationRoundType => ar != null)
+      .filter(
+        (ar) =>
+          ar.status === ApplicationRoundStatus.Draft ||
+          ar.status === ApplicationRoundStatus.InReview ||
+          ar.status === ApplicationRoundStatus.ReviewDone ||
+          ar.status === ApplicationRoundStatus.Allocated ||
+          ar.status === ApplicationRoundStatus.Handled
+      ) ?? [];
 
   let headingStr = t("User.welcome");
   const name = user?.firstName;
@@ -88,39 +88,34 @@ function ApplicationRounds(): JSX.Element {
         <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
       </KorosHeading>
       <Ingress>{t("MainLander.ingress")}</Ingress>
-      {handleRounds && (
-        <Deck>
-          <IngressContainer>
-            <Heading>{t("ApplicationRound.listHandlingTitle")}</Heading>
-            <RoundTypeIngress>
-              {t(
-                `ApplicationRound.listHandlingIngress${
-                  handleRounds.length === 0 ? "Empty" : ""
-                }`,
-                {
-                  count: handleRounds.length,
-                }
-              )}
-            </RoundTypeIngress>
-          </IngressContainer>
-          <WideContainer>
-            <ApplicationRoundsContainer>
-              {handleRounds.length > 0 ? (
-                handleRounds.map((applicationRound) => (
-                  <ApplicationRoundCard
-                    applicationRound={applicationRound}
-                    key={applicationRound.pk}
-                  />
-                ))
-              ) : (
-                <NotificationBox>
-                  {t("ApplicationRound.listHandlingPlaceholder")}
-                </NotificationBox>
-              )}
-            </ApplicationRoundsContainer>
-          </WideContainer>
-        </Deck>
-      )}
+      <Deck>
+        <IngressContainer>
+          <Heading>{t("ApplicationRound.listHandlingTitle")}</Heading>
+          <RoundTypeIngress>
+            {t(
+              `ApplicationRound.listHandlingIngress${
+                applicationRounds.length === 0 ? "Empty" : ""
+              }`,
+              {
+                count: applicationRounds.length,
+              }
+            )}
+          </RoundTypeIngress>
+        </IngressContainer>
+        <WideContainer>
+          <ApplicationRoundsContainer>
+            {applicationRounds.length > 0 ? (
+              applicationRounds.map((ar) => (
+                <ApplicationRoundCard applicationRound={ar} key={ar.pk} />
+              ))
+            ) : (
+              <NotificationBox>
+                {t("ApplicationRound.listHandlingPlaceholder")}
+              </NotificationBox>
+            )}
+          </ApplicationRoundsContainer>
+        </WideContainer>
+      </Deck>
     </Wrapper>
   );
 }

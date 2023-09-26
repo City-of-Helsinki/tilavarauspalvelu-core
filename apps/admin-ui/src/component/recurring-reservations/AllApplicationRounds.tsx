@@ -71,7 +71,7 @@ function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
+  // TODO pagination
   const { data, loading } = useQuery<Query>(APPLICATION_ROUNDS_QUERY, {
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -99,7 +99,6 @@ function AllApplicationRounds(): JSX.Element | null {
       <BreadcrumbWrapper
         route={["recurring-reservations", "application-rounds"]}
       />
-
       <Container>
         <StyledH1>{t("MainMenu.applicationRounds")}</StyledH1>
         <RoundsAccordion
