@@ -206,7 +206,9 @@ const EditStep1 = ({
                         <PreviewLabel>
                           {t(`reservationApplication:label.common.${key}`)}
                         </PreviewLabel>
-                        <PreviewValue>{value}</PreviewValue>
+                        <PreviewValue data-testid={`edit_${key}`}>
+                          {value}
+                        </PreviewValue>
                       </ParagraphAlt>
                     );
                   })}
@@ -222,7 +224,7 @@ const EditStep1 = ({
                 <PreviewLabel>
                   {t("reservationApplication:reserveeTypePrefix")}
                 </PreviewLabel>
-                <PreviewValue>
+                <PreviewValue data-testid="edit_reserveeType">
                   {capitalize(
                     t(
                       `reservationApplication:reserveeTypes.labels.${reservation.reserveeType.toLowerCase()}`
@@ -250,7 +252,9 @@ const EditStep1 = ({
                         }.${key}`
                       )}
                     </PreviewLabel>
-                    <PreviewValue>{value}</PreviewValue>
+                    <PreviewValue data-testid={`edit_${key}`}>
+                      {value}
+                    </PreviewValue>
                   </ParagraphAlt>
                 );
               })}
