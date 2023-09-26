@@ -13,7 +13,6 @@ import Loader from "../Loader";
 import {
   AllocationResult,
   ApplicationRound as ApplicationRoundType,
-  ApplicationRoundStatus,
   DataFilterConfig,
   GroupedAllocationResult,
 } from "../../common/types";
@@ -54,9 +53,6 @@ import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (
-    status: ApplicationRoundStatus
-  ) => Promise<ApplicationRoundType>;
 }
 
 const Wrapper = styled.div`
@@ -323,7 +319,7 @@ const renderGroup = (
     selection: number[],
     method?: "add" | "remove" | undefined
   ) => void,
-  children: React.ReactChild
+  children: React.ReactNode
 ): JSX.Element => (
   <RecommendationDataTableGroup
     group={group}
@@ -349,10 +345,7 @@ const renderGroup = (
   </RecommendationDataTableGroup>
 );
 
-function Handling({
-  applicationRound,
-  setApplicationRoundStatus,
-}: IProps): JSX.Element {
+function Handling({ applicationRound }: IProps): JSX.Element {
   const isApplicationRoundApproved = ["approved"].includes(
     applicationRound.status
   );
@@ -469,10 +462,8 @@ function Handling({
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => {
-                    setApplicationRoundStatus("handled");
-                  }}
-                  disabled={unhandledRecommendationCount > 0 || isSaving}
+                  disabled
+                  // disabled={unhandledRecommendationCount > 0 || isSaving}
                 >
                   {t("ApplicationRound.navigateToApprovalPreparation")}
                 </Button>
@@ -567,10 +558,7 @@ function Handling({
   );
 }
 
-const PageWrapper = ({
-  applicationRound,
-  setApplicationRoundStatus,
-}: IProps) => (
+const PageWrapper = ({ applicationRound }: IProps) => (
   <Wrapper>
     <BreadcrumbWrapper
       route={[
@@ -580,10 +568,7 @@ const PageWrapper = ({
       ]}
       aliases={[{ slug: "application-round", title: applicationRound.name }]}
     />
-    <Handling
-      applicationRound={applicationRound}
-      setApplicationRoundStatus={setApplicationRoundStatus}
-    />
+    <Handling applicationRound={applicationRound} />
   </Wrapper>
 );
 

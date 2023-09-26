@@ -1,16 +1,12 @@
 import React from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { type AxiosError } from "axios";
 import Review from "./review/Review";
 import Handling from "./Handling";
 import PreApproval from "./PreApproval";
-import { ApplicationRoundStatus } from "../../common/types";
-import {
-  getApplicationRound,
-  patchApplicationRoundStatus,
-} from "../../common/api";
+import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import { useNotification } from "../../context/NotificationContext";
 
@@ -27,11 +23,7 @@ function ApplicationRound({
   const { t } = useTranslation();
 
   // TODO converting this to graphql requires translating the State type
-  const {
-    data: applicationRound,
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data: applicationRound, isLoading } = useQuery({
     queryKey: ["applicationRound", applicationRoundId],
     queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
     onError: (error: AxiosError) => {
@@ -43,17 +35,6 @@ function ApplicationRound({
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: ({ status }: { status: ApplicationRoundStatus }) =>
-      patchApplicationRoundStatus(applicationRoundId, status),
-    onSuccess: () => {
-      refetch();
-    },
-    onError: () => {
-      notifyError(t("errors.errorSavingData"));
-    },
-  });
-
   if (isLoading) {
     return <Loader />;
   }
@@ -61,24 +42,10 @@ function ApplicationRound({
   switch (applicationRound?.status) {
     case "allocated":
     case "approved":
-      return (
-        <Handling
-          applicationRound={applicationRound}
-          setApplicationRoundStatus={(status) =>
-            mutation.mutateAsync({ status })
-          }
-        />
-      );
+      return <Handling applicationRound={applicationRound} />;
     case "handled":
     case "validated":
-      return (
-        <PreApproval
-          applicationRound={applicationRound}
-          setApplicationRoundStatus={(status) =>
-            mutation.mutateAsync({ status })
-          }
-        />
-      );
+      return <PreApproval applicationRound={applicationRound} />;
     case "draft":
     case "in_review":
       return <Review applicationRound={applicationRound} />;

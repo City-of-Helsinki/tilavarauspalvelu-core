@@ -11,7 +11,6 @@ import {
   ApplicationEventsDeclinedReservationUnits,
   Reservation,
   RecurringReservation,
-  ApplicationRoundStatus,
   ApplicationStatus,
   ReservationStatus,
   ReservationUnitCapacity,
@@ -157,16 +156,6 @@ export function getApplicationRound(
 ): Promise<ApplicationRound> {
   return apiGet<ApplicationRound>({
     path: `v1/${applicationRoundsBasePath}/${params.id}`,
-  });
-}
-
-export function patchApplicationRoundStatus(
-  id: number,
-  status: ApplicationRoundStatus
-): Promise<ApplicationRound> {
-  return apiPatch<ApplicationRound>({
-    data: { status },
-    path: `v1/${applicationRoundsBasePath}/${id}/`,
   });
 }
 

@@ -25,7 +25,6 @@ import {
   AllocationResult,
   Application as ApplicationTypeRest,
   ApplicationRound as ApplicationRoundType,
-  ApplicationRoundStatus,
   DataFilterConfig,
 } from "../../common/types";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "./queries";
@@ -52,9 +51,6 @@ import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (
-    status: ApplicationRoundStatus
-  ) => Promise<ApplicationRoundType>;
 }
 
 const Wrapper = styled.div`
@@ -345,10 +341,7 @@ const getFilterConfig = (
   }
 };
 
-function PreApproval({
-  applicationRound,
-  setApplicationRoundStatus,
-}: IProps): JSX.Element {
+function PreApproval({ applicationRound }: IProps): JSX.Element {
   const { notifyError } = useNotification();
   const [isConfirmationDialogVisible, setConfirmationDialogVisibility] =
     useState<boolean>(false);
@@ -506,9 +499,12 @@ function PreApproval({
             <Button
               type="button"
               variant="secondary"
+              /*
               onClick={() => {
                 setApplicationRoundStatus("allocated");
               }}
+              */
+              disabled
             >
               {t("ApplicationRound.navigateBackToHandling")}
             </Button>
@@ -638,10 +634,13 @@ function PreApproval({
             <Button
               type="submit"
               variant="primary"
+              /*
               onClick={() => {
                 setApplicationRoundStatus("validated");
                 setConfirmationDialogVisibility(false);
               }}
+              */
+              disabled
             >
               {t("ApplicationRound.deliverAction")}
             </Button>
@@ -652,10 +651,7 @@ function PreApproval({
   );
 }
 
-const PageWrapper = ({
-  applicationRound,
-  setApplicationRoundStatus,
-}: IProps): JSX.Element => (
+const PageWrapper = ({ applicationRound }: IProps): JSX.Element => (
   <Wrapper>
     <BreadcrumbWrapper
       route={[
@@ -665,10 +661,7 @@ const PageWrapper = ({
       ]}
       aliases={[{ slug: "application-round", title: applicationRound.name }]}
     />
-    <PreApproval
-      applicationRound={applicationRound}
-      setApplicationRoundStatus={setApplicationRoundStatus}
-    />
+    <PreApproval applicationRound={applicationRound} />
   </Wrapper>
 );
 
