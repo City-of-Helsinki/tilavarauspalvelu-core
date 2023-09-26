@@ -1,20 +1,14 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
 import applyCaseMiddleware from "axios-case-converter";
-import { getCookie } from "typescript-cookie";
-import omit from "lodash/omit";
 import {
   Application,
   ApplicationRound,
   ReservationUnit,
   Parameter,
-  AllocationResult,
-  ApplicationEventsDeclinedReservationUnits,
   Reservation,
   RecurringReservation,
   ApplicationStatus,
   ReservationStatus,
-  ReservationUnitCapacity,
-  ReservationUnitCalendarUrl,
 } from "./types";
 import { API_BASE_URL } from "./const";
 
@@ -33,16 +27,8 @@ const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
-const allocationResultBasePath = "allocation_results";
-const declinedApplicationEventReservationUnitsBasePath =
-  "application_event_declined_reservation_unit";
-const applicationEventWeeklyAmountReductionBasePath =
-  "application_event_weekly_amount_reduction";
 const reservationBasePath = "reservation";
 const recurringReservationPath = "recurring_reservation";
-const reservationUnitCapacityBasePath = "reservation_unit/capacity";
-const applicationStatusBasePath = "application_status";
-const reservationUnitCalendarUrlBasePath = "reservation_unit_calendar_url";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -61,8 +47,6 @@ enum ApiResponseFormat {
 interface ApiParameters extends QueryParameters {
   format: ApiResponseFormat;
 }
-
-// TODO JWT token
 
 // TODO replace with fetch
 async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
@@ -91,63 +75,6 @@ async function apiGet<T>({
     },
     method: "get",
     params: apiParameters,
-  });
-}
-
-const validateStatus = (status: number): boolean => status < 300;
-
-async function apiPut<T>({ path, data }: RequestParameters): Promise<T> {
-  const csrfToken = getCookie("csrftoken");
-  return request<T>({
-    url: `${apiBaseUrl}/${path}`,
-    headers: {
-      "Content-Type": "application/json",
-      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-    },
-    method: "put",
-    data,
-    validateStatus,
-  });
-}
-
-async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
-  const csrfToken = getCookie("csrftoken");
-  return request<T>({
-    url: `${apiBaseUrl}/${path}`,
-    headers: {
-      "Content-Type": "application/json",
-      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-    },
-    method: "post",
-    data,
-    validateStatus,
-  });
-}
-
-async function apiDelete<T>({ path }: RequestParameters): Promise<T> {
-  const csrfToken = getCookie("csrftoken");
-  return request<T>({
-    url: `${apiBaseUrl}/${path}`,
-    headers: {
-      "Content-Type": "application/json",
-      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-    },
-    method: "delete",
-    validateStatus,
-  });
-}
-
-async function apiPatch<T>({ path, data }: RequestParameters): Promise<T> {
-  const csrfToken = getCookie("csrftoken");
-  return request<T>({
-    url: `${apiBaseUrl}/${path}`,
-    headers: {
-      "Content-Type": "application/json",
-      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-    },
-    method: "patch",
-    data,
-    validateStatus,
   });
 }
 
@@ -209,89 +136,9 @@ export interface ApplicationParameters {
   status?: string;
 }
 
-export function setApplicationStatus(
-  applicationId: number,
-  status: ApplicationStatus
-): Promise<Application> {
-  return apiPost<Application>({
-    data: { applicationId, status },
-    path: `v1/${applicationStatusBasePath}/`,
-  });
-}
-
-interface AllocationResultsParams {
-  applicant?: number;
-  applicationRoundId: number;
-  serviceSectorId?: number;
-  applicationEvent?: string;
-  reservationUnit?: number;
-}
-
-export function getAllocationResults(
-  params: AllocationResultsParams
-): Promise<AllocationResult[]> {
-  return apiGet({
-    parameters: params,
-    path: `v1/${allocationResultBasePath}`,
-  });
-}
-
-interface AllocationResultParams {
-  id: number;
-  serviceSectorId?: number;
-}
-
-export function getAllocationResult(
-  params: AllocationResultParams
-): Promise<AllocationResult> {
-  return apiGet({
-    parameters: omit(params, "id"),
-    path: `v1/${allocationResultBasePath}/${params.id}`,
-  });
-}
-
-export function deleteAllocationResult(id: number): Promise<void> {
-  return apiDelete({
-    path: `v1/${allocationResultBasePath}/${id}`,
-  });
-}
-
 export interface ApplicationStatusPayload {
   status: ApplicationStatus;
   applicationId: number;
-}
-
-export function setDeclinedApplicationEventReservationUnits(
-  applicationEventId: number,
-  reservationUnitIds: number[]
-): Promise<ApplicationEventsDeclinedReservationUnits> {
-  return apiPut({
-    data: {
-      declinedReservationUnitIds: reservationUnitIds,
-    },
-    path: `v1/${declinedApplicationEventReservationUnitsBasePath}/${applicationEventId}/`,
-  });
-}
-
-export function setApplicationEventScheduleResultStatus(
-  id: number,
-  accepted: boolean
-): Promise<AllocationResult> {
-  return apiPatch({
-    path: `v1/${allocationResultBasePath}/${id}/`,
-    data: {
-      accepted,
-    },
-  });
-}
-
-export function rejectApplicationEventSchedule(
-  applicationEventScheduleResultId: number
-): Promise<void> {
-  return apiPost({
-    path: `v1/${applicationEventWeeklyAmountReductionBasePath}/`,
-    data: { applicationEventScheduleResultId },
-  });
 }
 
 interface IRecurringReservationParams {
@@ -339,28 +186,5 @@ export function getReservations(
 export function getReservation(id: number): Promise<Reservation> {
   return apiGet({
     path: `v1/${reservationBasePath}/${id}`,
-  });
-}
-
-interface IReservationUnitCapacityParams {
-  reservationUnit: number;
-  periodStart: string;
-  periodEnd: string;
-}
-
-export function getReservationUnitCapacity(
-  parameters: IReservationUnitCapacityParams
-): Promise<ReservationUnitCapacity> {
-  return apiGet({
-    path: `v1/${reservationUnitCapacityBasePath}`,
-    parameters,
-  });
-}
-
-export function getReservationUnitCalendarUrl(
-  reservationUnitId: number
-): Promise<ReservationUnitCalendarUrl> {
-  return apiGet({
-    path: `v1/${reservationUnitCalendarUrlBasePath}/${reservationUnitId}`,
   });
 }
