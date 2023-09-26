@@ -38,9 +38,6 @@ const Applications = dynamic(() => import(`${APPLICATIONS_PATH}/Applications`));
 const ApplicationDetails = dynamic(
   () => import(`${APPLICATIONS_PATH}/ApplicationDetails`)
 );
-const ReservationByApplicationEvent = dynamic(
-  () => import(`${APPLICATIONS_PATH}/ReservationByApplicationEvent`)
-);
 
 const ReservationUnits = dynamic(
   () => import("./component/reservation-units/ReservationUnits")
@@ -116,7 +113,7 @@ const ApplicationRouter = () => (
     <Route path=":applicationId/details" element={<ApplicationDetails />} />
     <Route
       path=":applicationId/recurringReservation/:recurringReservationId"
-      element={<ReservationByApplicationEvent />}
+      element={<div>This page has been removed: file a bug report</div>}
     />
   </Routes>
 );
