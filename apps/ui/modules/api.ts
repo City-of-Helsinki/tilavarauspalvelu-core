@@ -7,7 +7,7 @@ import {
   RecurringReservation,
   ReservationUnit,
 } from "common/types/common";
-import { apiBaseUrl } from "./const";
+import { REST_API_URL } from "./const";
 import { ApiError } from "./ApiError";
 
 const applicationRoundBasePath = "application_round";
@@ -79,7 +79,7 @@ async function apiGet<T>({
   };
 
   return request<T>({
-    url: `${apiBaseUrl}/${path}/`,
+    url: `${REST_API_URL}${path}/`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -92,7 +92,7 @@ const validateStatus = (status: number): boolean => status < 300;
 
 async function apiPut<T>({ path, data }: RequestParameters): Promise<T> {
   return request<T>({
-    url: `${apiBaseUrl}/${path}`,
+    url: `${REST_API_URL}${path}`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -104,7 +104,7 @@ async function apiPut<T>({ path, data }: RequestParameters): Promise<T> {
 
 async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
   return request<T>({
-    url: `${apiBaseUrl}/${path}`,
+    url: `${REST_API_URL}${path}`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -116,7 +116,7 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
 
 export function getApplicationRounds(): Promise<ApplicationRound[]> {
   return apiGet<ApplicationRound[]>({
-    path: `v1/${applicationRoundBasePath}`,
+    path: `${applicationRoundBasePath}`,
   });
 }
 
@@ -124,7 +124,7 @@ export function getApplicationRound(
   params: IDParameter
 ): Promise<ApplicationRound> {
   return apiGet<ApplicationRound>({
-    path: `v1/${applicationRoundBasePath}/${params.id}`,
+    path: `${applicationRoundBasePath}/${params.id}`,
   });
 }
 
@@ -143,7 +143,7 @@ export function getRecurringReservations(
   applicationId: number
 ): Promise<RecurringReservation[]> {
   return apiGet<RecurringReservation[]>({
-    path: `v1/${recurringReservationBasePath}`,
+    path: `${recurringReservationBasePath}`,
     parameters: { application: applicationId },
   });
 }
@@ -154,7 +154,7 @@ interface IDParameter {
 
 export function getReservationUnit(id: number): Promise<ReservationUnit> {
   return apiGet<ReservationUnit>({
-    path: `v1/reservation_unit/${id}`,
+    path: `reservation_unit/${id}`,
   });
 }
 
@@ -167,13 +167,13 @@ export function getParameters(
     | "city"
 ): Promise<Parameter[]> {
   return apiGet<Parameter[]>({
-    path: `v1/${parameterBasePath}/${name}`,
+    path: `${parameterBasePath}/${name}`,
   });
 }
 
 export function getApplication(id: number): Promise<Application> {
   return apiGet<Application>({
-    path: `v1/${applicationBasePath}/${id}`,
+    path: `${applicationBasePath}/${id}`,
   });
 }
 
@@ -183,12 +183,12 @@ export function saveApplication(
   if (application.id === undefined) {
     return apiPost<Application>({
       data: application,
-      path: `v1/${applicationBasePath}/`,
+      path: `${applicationBasePath}/`,
     });
   }
   return apiPut<Application>({
     data: application,
-    path: `v1/${applicationBasePath}/${application.id}/`,
+    path: `${applicationBasePath}/${application.id}/`,
   });
 }
 
@@ -202,4 +202,4 @@ export const cancelApplication = async (
 };
 
 export const applicationEventCalendarFeedUrl = (uuid: string): string =>
-  `${apiBaseUrl}/v1/${applicationEventFeedBasePath}/${uuid}`;
+  `${REST_API_URL}${applicationEventFeedBasePath}/${uuid}`;
