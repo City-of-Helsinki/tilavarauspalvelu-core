@@ -4,8 +4,6 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { type AxiosError } from "axios";
 import Review from "./review/Review";
-import Handling from "./Handling";
-import PreApproval from "./PreApproval";
 import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import { useNotification } from "../../context/NotificationContext";
@@ -42,10 +40,8 @@ function ApplicationRound({
   switch (applicationRound?.status) {
     case "allocated":
     case "approved":
-      return <Handling applicationRound={applicationRound} />;
     case "handled":
     case "validated":
-      return <PreApproval applicationRound={applicationRound} />;
     case "draft":
     case "in_review":
       return <Review applicationRound={applicationRound} />;

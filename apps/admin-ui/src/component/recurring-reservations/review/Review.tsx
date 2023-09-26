@@ -159,6 +159,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
           >
             <RecommendationValue>
               <StatusRecommendation
+                // FIXME this is not true anymore (all statuses use this component)
                 status="in_review"
                 applicationRound={applicationRound}
               />
