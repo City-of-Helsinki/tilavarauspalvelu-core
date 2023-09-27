@@ -37,24 +37,11 @@ function ApplicationRound({
     return <Loader />;
   }
 
-  switch (applicationRound?.status) {
-    case "allocated":
-    case "approved":
-    case "handled":
-    case "validated":
-    case "draft":
-    case "in_review":
-      return <Review applicationRound={applicationRound} />;
-
-    default:
-      return (
-        <div>
-          {t("errors.applicationRoundStatusNotSupported", {
-            status: applicationRound?.status,
-          })}
-        </div>
-      );
+  if (!applicationRound) {
+    return <div>{t("errors.applicationRoundNotFound")}</div>;
   }
+
+  return <Review applicationRound={applicationRound} />;
 }
 
 function ApplicationRoundRouted(): JSX.Element | null {
