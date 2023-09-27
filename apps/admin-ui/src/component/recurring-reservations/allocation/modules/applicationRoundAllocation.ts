@@ -1,16 +1,16 @@
 import { get, orderBy, padStart, sortBy, uniqBy } from "lodash";
 import {
-  ApplicationEventScheduleType,
-  ApplicationEventType,
+  type ApplicationEventScheduleType,
+  type ApplicationEventType,
   ApplicationsApplicationApplicantTypeChoices,
-  ApplicationType,
-  ReservationUnitType,
+  type ApplicationType,
+  type ReservationUnitType,
 } from "common/types/gql-types";
-import {
+import type {
   ApplicationEventSchedulePriority,
   OptionType,
-} from "../../../common/types";
-import { parseApplicationEventScheduleTime } from "../../../common/util";
+} from "@/common/types";
+import { parseApplicationEventScheduleTime } from "@/common/util";
 
 export const getFilteredApplicationEvents = (
   applications: ApplicationType[],
@@ -19,12 +19,13 @@ export const getFilteredApplicationEvents = (
   orderFilter: OptionType[],
   reservationUnitFilter: ReservationUnitType | null
 ): ApplicationEventType[] => {
-  if (applications?.length < 1 || !reservationUnitFilter) return [];
+  if (applications?.length < 1 || !reservationUnitFilter) {
+    return [];
+  }
 
-  let applicationEvents = applications.flatMap(
-    (application): ApplicationEventType[] =>
-      application.applicationEvents as ApplicationEventType[]
-  );
+  let applicationEvents = applications
+    .flatMap((application) => application.applicationEvents)
+    .filter((e): e is NonNullable<typeof e> => e != null);
 
   if (orderFilter?.length) {
     const order = orderFilter.map((n) => (n.value as number) - 1);
@@ -38,7 +39,7 @@ export const getFilteredApplicationEvents = (
 
   if (unitFilter) {
     applicationEvents = applicationEvents.filter((applicationEvent) =>
-      applicationEvent?.eventReservationUnits?.some((eventReservationUnit) => {
+      applicationEvent.eventReservationUnits?.some((eventReservationUnit) => {
         const unitId = eventReservationUnit?.reservationUnit?.unit?.pk || 0;
         return unitFilter.value === unitId;
       })
@@ -48,7 +49,7 @@ export const getFilteredApplicationEvents = (
   if (timeFilter.length) {
     const priorities = timeFilter.map((n) => n.value);
     applicationEvents = applicationEvents.filter((applicationEvent) =>
-      applicationEvent?.applicationEventSchedules?.some(
+      applicationEvent.applicationEventSchedules?.some(
         (applicationEventSchedule) =>
           applicationEventSchedule?.priority &&
           priorities.includes(applicationEventSchedule?.priority)
@@ -58,7 +59,7 @@ export const getFilteredApplicationEvents = (
 
   if (reservationUnitFilter) {
     applicationEvents = applicationEvents.filter((applicationEvent) =>
-      applicationEvent?.eventReservationUnits?.some(
+      applicationEvent.eventReservationUnits?.some(
         (eventReservationUnit) =>
           eventReservationUnit?.reservationUnit?.pk === reservationUnitFilter.pk
       )

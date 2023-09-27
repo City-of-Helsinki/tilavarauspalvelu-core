@@ -21,7 +21,7 @@ import { OptionType } from "../../../common/types";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
-import { getFilteredApplicationEvents } from "../modules/applicationRoundAllocation";
+import { getFilteredApplicationEvents } from "./modules/applicationRoundAllocation";
 import ApplicationEvents from "./ApplicationEvents";
 import LinkPrev from "../../LinkPrev";
 import { useAllocationContext } from "../../../context/AllocationContext";

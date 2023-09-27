@@ -15,7 +15,7 @@ import { ageGroup } from "../../reservations/requested/util";
 import {
   getApplicantName,
   getApplicationByApplicationEvent,
-} from "../modules/applicationRoundAllocation";
+} from "./modules/applicationRoundAllocation";
 
 type Props = {
   applicationEvent: ApplicationEventType;

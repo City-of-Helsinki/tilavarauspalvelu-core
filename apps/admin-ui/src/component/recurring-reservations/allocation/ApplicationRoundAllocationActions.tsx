@@ -18,7 +18,7 @@ import {
   getSelectedApplicationEvents,
   getSlotApplicationEvents,
   getTimeSlotOptions,
-} from "../modules/applicationRoundAllocation";
+} from "./modules/applicationRoundAllocation";
 import ApplicationEventScheduleCard from "./ApplicationEventScheduleCard";
 
 type Props = {

@@ -19,7 +19,7 @@ import {
   timeSlotKeyToTime,
   ApplicationEventScheduleResultStatuses,
   areSlotsOnStatus,
-} from "../modules/applicationRoundAllocation";
+} from "./modules/applicationRoundAllocation";
 
 type Props = {
   applicationEvents: ApplicationEventType[] | null;

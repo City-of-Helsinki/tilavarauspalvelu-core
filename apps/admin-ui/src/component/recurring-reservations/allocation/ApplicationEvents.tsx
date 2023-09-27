@@ -9,7 +9,7 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import Accordion from "../../Accordion";
-import { getApplicationEventScheduleResultStatuses } from "../modules/applicationRoundAllocation";
+import { getApplicationEventScheduleResultStatuses } from "./modules/applicationRoundAllocation";
 import { AllocationApplicationEventCardType } from "../../../common/types";
 import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";

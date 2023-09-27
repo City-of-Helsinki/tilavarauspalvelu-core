@@ -23,7 +23,7 @@ import {
   getApplicationEventScheduleTimeString,
   getMatchingApplicationEventSchedules,
   timeSlotKeyToScheduleTime,
-} from "../modules/applicationRoundAllocation";
+} from "./modules/applicationRoundAllocation";
 import {
   CREATE_APPLICATION_EVENT_SCHEDULE_RESULT,
   UPDATE_APPLICATION_EVENT_SCHEDULE_RESULT,
