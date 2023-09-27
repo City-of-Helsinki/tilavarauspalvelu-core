@@ -1,16 +1,31 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, gql } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { type AxiosError } from "axios";
+import { type Query } from "common/types/gql-types";
 import Review from "./review/Review";
-import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import { useNotification } from "../../context/NotificationContext";
 
-type IParams = {
-  applicationRoundId: string;
-};
+// TODO pick the fields we need
+const APPLICATION_ROUD_QUERY = gql`
+  query ApplicationRoundCriteria($pk: [ID]!) {
+    applicationRounds(pk: $pk) {
+      edges {
+        node {
+          pk
+          nameFi
+          status
+          applicationPeriodBegin
+          applicationPeriodEnd
+          reservationUnits {
+            pk
+          }
+        }
+      }
+    }
+  }
+`;
 
 function ApplicationRound({
   applicationRoundId,
@@ -20,18 +35,16 @@ function ApplicationRound({
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  // TODO converting this to graphql requires translating the State type
-  const { data: applicationRound, isLoading } = useQuery({
-    queryKey: ["applicationRound", applicationRoundId],
-    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
-    onError: (error: AxiosError) => {
-      const msg =
-        (error as AxiosError).response?.status === 404
-          ? "errors.applicationRoundNotFound"
-          : "errors.errorFetchingData";
-      notifyError(t(msg));
+  const { data, loading: isLoading } = useQuery<Query>(APPLICATION_ROUD_QUERY, {
+    skip: !applicationRoundId,
+    variables: {
+      pk: [applicationRoundId],
+    },
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
     },
   });
+  const applicationRound = data?.applicationRounds?.edges?.[0]?.node;
 
   if (isLoading) {
     return <Loader />;
@@ -43,6 +56,10 @@ function ApplicationRound({
 
   return <Review applicationRound={applicationRound} />;
 }
+
+type IParams = {
+  applicationRoundId: string;
+};
 
 function ApplicationRoundRouted(): JSX.Element | null {
   const { t } = useTranslation();

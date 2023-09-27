@@ -10,9 +10,9 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
-import { ALLOCATION_CALENDAR_TIMES } from "../../../common/const";
-import { OptionType } from "../../../common/types";
-import Accordion from "../../Accordion";
+import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
+import { OptionType } from "@/common/types";
+import Accordion from "@/component/Accordion";
 import {
   ApplicationEventScheduleResultStatuses,
   getSelectedApplicationEvents,

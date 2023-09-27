@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useQuery as useApolloQuery } from "@apollo/client";
 import { Select, Tabs } from "hds-react";
-import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
 import { useParams } from "react-router-dom";
@@ -16,48 +14,23 @@ import {
   ReservationUnitType,
   ApplicationStatus,
 } from "common/types/gql-types";
-import { getApplicationRound } from "../../../common/api";
-import { OptionType } from "../../../common/types";
-import { useNotification } from "../../../context/NotificationContext";
-import Loader from "../../Loader";
+import { AutoGrid, Container } from "@/styles/layout";
+import { OptionType } from "@/common/types";
+import { useNotification } from "@/context/NotificationContext";
+import { useAllocationContext } from "@/context/AllocationContext";
+import Loader from "@/component/Loader";
+import LinkPrev from "@/component/LinkPrev";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
 import { getFilteredApplicationEvents } from "./modules/applicationRoundAllocation";
 import ApplicationEvents from "./ApplicationEvents";
-import LinkPrev from "../../LinkPrev";
-import { useAllocationContext } from "../../../context/AllocationContext";
 
 type IParams = {
   applicationRoundId: string;
 };
 
-const Wrapper = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--spacing-m) 0 var(--spacing-layout-xl);
-`;
-
-const Heading = styled(H1).attrs({ $legacy: true })`
-  margin-top: var(--spacing-xl);
-  margin-bottom: var(--spacing-s);
-`;
-
 const Ingress = styled.p`
   font-size: var(--fontsize-body-xl);
   margin-bottom: var(--spacing-xl);
-`;
-
-const Filters = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--spacing-l);
-  margin-bottom: var(--spacing-l);
-  padding-bottom: var(--spacing-l);
-  border-bottom: 1px solid var(--color-black-30);
-
-  label {
-    ${Strongish};
-  }
 `;
 
 const ReservationUnits = styled(Tabs.TabList)`
@@ -87,20 +60,7 @@ function ApplicationRoundAllocation({
 
   const { t } = useTranslation();
 
-  const { data: applicationRound, isLoading: isRoundLoading } = useQuery({
-    queryKey: ["applicationRound", { id: Number(applicationRoundId) }],
-    queryFn: () => getApplicationRound({ id: Number(applicationRoundId) }),
-    enabled: !!applicationRoundId,
-    onError: (error: AxiosError) => {
-      const msg =
-        error.response?.status === 404
-          ? "errors.applicationRoundNotFound"
-          : "errors.errorFetchingData";
-      notifyError(t(msg));
-    },
-  });
-
-  // TODO autoload 2000 elements by default (same as in ReservationUnitFilter) or provide pagination
+  // TODO pagination
   const {
     loading: loadingApplications,
     data: applicationsData,
@@ -108,6 +68,7 @@ function ApplicationRoundAllocation({
   } = useApolloQuery<Query, QueryApplicationsArgs>(
     APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
     {
+      skip: !applicationRoundId,
       variables: {
         applicationRound: String(applicationRoundId),
         status: [
@@ -120,6 +81,9 @@ function ApplicationRoundAllocation({
           ApplicationStatus.Sent,
         ],
       },
+      onError: () => {
+        notifyError(t("errors.errorFetchingData"));
+      },
     }
   );
 
@@ -128,19 +92,14 @@ function ApplicationRoundAllocation({
       .map((e) => e?.node)
       ?.filter((x): x is ApplicationType => x != null) ?? [];
 
-  const units = uniqBy(
-    applications.flatMap((application) =>
-      application?.applicationEvents?.flatMap((applicationEvent) =>
-        applicationEvent?.eventReservationUnits
-          ?.flatMap(
-            (eventReservationUnit) =>
-              eventReservationUnit?.reservationUnit?.unit
-          )
-          .filter((n) => !!n)
-      )
-    ),
-    "pk"
+  const unitData = applications.flatMap((application) =>
+    application?.applicationEvents?.flatMap((ae) =>
+      ae?.eventReservationUnits
+        ?.flatMap((eru) => eru?.reservationUnit?.unit)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+    )
   );
+  const units = uniqBy(unitData, "pk");
 
   const unitOptions = units.map((unit) => ({
     value: unit?.pk,
@@ -201,16 +160,16 @@ function ApplicationRoundAllocation({
       selectedReservationUnit || reservationUnits[0]
     );
 
-  if (isRoundLoading || loadingApplications) {
+  if (loadingApplications) {
     return <Loader />;
   }
 
   return (
-    <Wrapper>
+    <Container>
       <LinkPrev />
-      <Heading>{t("Allocation.allocationTitle")}</Heading>
-      <Ingress>{applicationRound?.name}</Ingress>
-      <Filters>
+      <H1 $legacy>{t("Allocation.allocationTitle")}</H1>
+      <Ingress>{applications[0]?.applicationRound?.nameFi}</Ingress>
+      <AutoGrid>
         <Select
           clearButtonAriaLabel={t("common.clearAllSelections")}
           label={t("Allocation.filters.unit")}
@@ -247,7 +206,7 @@ function ApplicationRoundAllocation({
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-      </Filters>
+      </AutoGrid>
       <Tabs>
         <ReservationUnits>
           {reservationUnits?.map((reservationUnit) => (
@@ -269,7 +228,7 @@ function ApplicationRoundAllocation({
           reservationUnit={selectedReservationUnit || reservationUnits[0]}
         />
       ) : null}
-    </Wrapper>
+    </Container>
   );
 }
 

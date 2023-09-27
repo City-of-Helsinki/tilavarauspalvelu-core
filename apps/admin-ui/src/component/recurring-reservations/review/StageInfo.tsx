@@ -3,13 +3,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ApplicationRound } from "../../common/types";
-import { formatDate } from "../../common/util";
-
-interface IProps {
-  activeStage: number;
-  applicationRound: ApplicationRound;
-}
+import { formatDate } from "@/common/util";
 
 interface Stage {
   id: number;
@@ -74,19 +68,23 @@ const Stage = styled.div<{ $active: boolean }>`
   }
 `;
 
-function StageInfo({ activeStage, applicationRound }: IProps): JSX.Element {
+interface IProps {
+  activeStage: number;
+  name: string;
+  reservationPeriodEnd: string;
+}
+
+function StageInfo({
+  activeStage,
+  name,
+  reservationPeriodEnd,
+}: IProps): JSX.Element {
   const { t } = useTranslation();
 
-  const stages: Stage[] = [1, 2, 3, 4, 5, 6].map((stage) => {
-    let data;
-    if (stage === 1) {
-      data = formatDate(applicationRound.reservationPeriodEnd);
-    }
-    return {
-      id: stage,
-      data,
-    };
-  });
+  const stages: Stage[] = [1, 2, 3, 4, 5, 6].map((stage) => ({
+    id: stage,
+    data: stage === 1 ? formatDate(reservationPeriodEnd) : null,
+  }));
 
   useEffect(() => {
     const goToAnchor = setTimeout(() => {
@@ -102,7 +100,7 @@ function StageInfo({ activeStage, applicationRound }: IProps): JSX.Element {
 
   return (
     <Wrapper>
-      <Title>{applicationRound.name}</Title>
+      <Title>{name}</Title>
       <H1 $legacy>{t("StageInfo.stagesOfHandling")}</H1>
       <Stages>
         {stages.map((stage) => (

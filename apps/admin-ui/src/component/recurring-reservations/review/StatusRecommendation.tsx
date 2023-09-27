@@ -1,14 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { useModal } from "../../context/ModalContext";
-import InfoBubble from "../InfoBubble";
+import { ApplicationRoundStatus } from "common/types/gql-types";
+import { useModal } from "@/context/ModalContext";
+import InfoBubble from "./InfoBubble";
 import StageInfo from "./StageInfo";
-import { ApplicationRound } from "../../common/types";
 
 interface IProps {
-  status: string;
-  applicationRound: ApplicationRound;
+  status: ApplicationRoundStatus;
+  name: string;
+  reservationPeriodEnd: string;
   className?: string;
 }
 
@@ -24,7 +25,8 @@ const StyledInfoBubble = styled(InfoBubble)`
 
 function StatusRecommendation({
   status,
-  applicationRound,
+  name,
+  reservationPeriodEnd,
   className,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
@@ -33,22 +35,28 @@ function StatusRecommendation({
   let activeState: number;
   let modal = true;
   switch (status) {
-    case "in_review":
+    case ApplicationRoundStatus.Draft:
+      activeState = 1;
+      break;
+    case ApplicationRoundStatus.InReview:
       activeState = 2;
       break;
+    case ApplicationRoundStatus.ReviewDone:
     case "review_done":
       activeState = 3;
       break;
-    case "allocated":
+    case ApplicationRoundStatus.Allocated:
       activeState = 4;
       break;
-    case "approvalPreparation":
+    case ApplicationRoundStatus.Reserving:
       activeState = 5;
       break;
-    case "approval":
+    case ApplicationRoundStatus.Handled:
+    case ApplicationRoundStatus.Sending:
       activeState = 6;
       break;
-    case "supervisorApproval":
+    case ApplicationRoundStatus.Sent:
+    case ApplicationRoundStatus.Archived:
       activeState = 7;
       modal = false;
       break;
@@ -65,7 +73,8 @@ function StatusRecommendation({
             setModalContent(
               <StageInfo
                 activeStage={activeState}
-                applicationRound={applicationRound}
+                name={name}
+                reservationPeriodEnd={reservationPeriodEnd}
               />
             )
           }

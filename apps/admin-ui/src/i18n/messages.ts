@@ -495,14 +495,12 @@ const translations: ITranslations = {
     contactPersonEmail: ["Sähköpostiosoite"],
     contactPersonPhoneNumber: ["Puhelinnumero"],
     organisationCoreActivity: ["Yhdistyksen tai seuran ydintoiminta"],
-
     contactInformation: ["Yhteystiedot"],
-
     applicantTypes: {
-      individual: ["Yksityishenkilö"],
-      company: ["Yritys"],
-      community: ["Yhdistys, rekisteröimäton"],
-      association: ["Yhdistys, rekisteröity"],
+      INDIVIDUAL: ["Yksityishenkilö"],
+      COMPANY: ["Yritys"],
+      COMMUNITY: ["Yhdistys, rekisteröimäton"],
+      ASSOCIATION: ["Yhdistys, rekisteröity"],
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Y-tunnus"],

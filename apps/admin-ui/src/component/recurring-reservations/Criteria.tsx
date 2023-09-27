@@ -1,46 +1,32 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { gql, useQuery as useApolloQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconGroup } from "hds-react";
 import styled from "styled-components";
-import { AxiosError } from "axios";
 import trim from "lodash/trim";
 import sortBy from "lodash/sortBy";
 import { H1, H2, H3, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ContentContainer, IngressContainer } from "../../styles/layout";
 import {
-  getApplicationRound,
-  getParameters,
-  getReservationUnits,
-} from "../../common/api";
-import {
-  ReservationUnit as ReservationUnitType,
-  ApplicationRound,
-} from "../../common/types";
-import Loader from "../Loader";
-import TimeframeStatus from "./TimeframeStatus";
+  ApplicationRoundType,
+  Query,
+  ReservationUnitType,
+} from "common/types/gql-types";
+import { ContentContainer, IngressContainer } from "@/styles/layout";
+import { formatDate, parseAgeGroups } from "@/common/util";
+import { publicUrl } from "@/common/const";
+import { useNotification } from "@/context/NotificationContext";
+import Loader from "@/component/Loader";
+import Accordion from "@/component/Accordion";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import RecurringReservationIcon from "../../images/icon_recurring-reservation.svg";
-import Accordion from "../Accordion";
-import { formatDate, localizedValue, parseAgeGroups } from "../../common/util";
-import i18n from "../../i18n";
-import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import { useNotification } from "../../context/NotificationContext";
-import { publicUrl } from "../../common/const";
+import TimeframeStatus from "./TimeframeStatus";
 
 interface IRouteParams {
   [key: string]: string;
   applicationRoundId: string;
 }
-
-const Wrapper = styled.div`
-  width: 100%;
-`;
-
-const Title = styled(H1).attrs({ $legacy: true })`
-  margin: var(--spacing-layout-xl) 0 var(--spacing-layout-xl);
-`;
 
 const Details = styled.div`
   max-width: ${breakpoints.l};
@@ -67,7 +53,6 @@ const Details = styled.div`
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--spacing-m);
-    padding-left: var(--spacing-layout-m);
   }
 `;
 
@@ -173,36 +158,68 @@ const ReservationUnit = styled.div`
   }
 `;
 
+const PARAMS = gql`
+  query Params {
+    reservationPurposes {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+    ageGroups {
+      edges {
+        node {
+          pk
+          minimum
+          maximum
+        }
+      }
+    }
+    cities {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+  }
+`;
+
 function Baskets({
   applicationRound,
 }: {
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
 }): JSX.Element {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const { data: ageGroups, isLoading: isLoadingAgeGroups } = useQuery({
-    queryKey: ["age_group"],
-    queryFn: () => getParameters("age_group"),
+  const { data, loading: isLoading } = useApolloQuery<Query>(PARAMS, {
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
     },
   });
 
-  const { data: purposes, isLoading: isLoadingPurposes } = useQuery({
-    queryKey: ["purpose"],
-    queryFn: () => getParameters("purpose"),
-    onError: () => {
-      notifyError(t("errors.errorFetchingData"));
-    },
-  });
+  const ageGroups =
+    data?.ageGroups?.edges
+      ?.map((edge) => edge?.node)
+      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  const purposes =
+    data?.reservationPurposes?.edges
+      ?.map((edge) => edge?.node)
+      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  const cities =
+    data?.cities?.edges
+      ?.map((edge) => edge?.node)
+      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
 
-  const { data: cities, isLoading: isLoadingCities } = useQuery({
-    queryKey: ["city"],
-    queryFn: () => getParameters("city"),
-  });
-
-  if (isLoadingAgeGroups || isLoadingPurposes || isLoadingCities) {
+  if (isLoading) {
     return <Loader />;
   }
 
@@ -221,33 +238,46 @@ function Baskets({
       {baskets.map((basket) => {
         const getPurposesStr = (): string => {
           let result = "";
-          basket?.purposeIds?.forEach((pId: number): void => {
-            const purpose = purposes?.find((n) => n.id === pId);
-            result += purpose ? `${purpose.name}, ` : "";
-          });
+          basket?.purposeIds
+            ?.filter((p): p is NonNullable<typeof p> => p !== null)
+            .forEach((pId: number): void => {
+              const purpose = purposes?.find((n) => n.pk === pId);
+              result += purpose ? `${purpose.nameFi}, ` : "";
+            });
           return result ? trim(result, ", ") : "-";
         };
 
         const getCustomerTypeStr = (): string => {
           let result = "";
-          basket?.customerType?.forEach((type: string): void => {
-            result += `${t(`Application.applicantTypes.${type}`)}, `;
-          });
+          basket?.customerType
+            ?.filter((p): p is NonNullable<typeof p> => p !== null)
+            .forEach((type: string): void => {
+              result += `${t(`Application.applicantTypes.${type}`)}, `;
+            });
           return result ? trim(result, ", ") : "-";
         };
 
         const getAgeGroupsStr = (): string => {
           let result = "";
-          basket?.ageGroupIds?.forEach((aId: number): void => {
-            const ageGroup = ageGroups?.find((n) => n.id === aId);
-            result += ageGroup ? `${parseAgeGroups(ageGroup)}, ` : "";
-          });
+          basket?.ageGroupIds
+            ?.filter((p): p is NonNullable<typeof p> => p !== null)
+            .forEach((aId: number): void => {
+              const ageGroup = ageGroups?.find((n) => n.pk === aId);
+              result += ageGroup
+                ? `${parseAgeGroups({
+                    minimum: ageGroup.minimum,
+                    maximum: ageGroup.maximum ?? undefined,
+                  })}, `
+                : "";
+            });
 
           return result ? trim(result, ", ") : "-";
         };
 
         const getCityStr = (): string | undefined => {
-          const city = cities?.find((n) => n.id === basket.homeCityId);
+          const city = cities
+            ?.filter((p): p is NonNullable<typeof p> => p !== null)
+            .find((n) => n.pk === basket.homeCityId);
           return city ? city.name : "-";
         };
 
@@ -281,6 +311,52 @@ function Baskets({
   );
 }
 
+const APPLICATION_ROUND_QUERY = gql`
+  query ApplicationRoundCriteria($pk: [ID]!) {
+    applicationRounds(pk: $pk) {
+      edges {
+        node {
+          pk
+          nameFi
+          reservationUnitCount
+          applicationPeriodBegin
+          applicationPeriodEnd
+          reservationPeriodBegin
+          reservationPeriodEnd
+          applicationRoundBaskets {
+            name
+            ageGroupIds
+            homeCityId
+            purposeIds
+            customerType
+            orderNumber
+          }
+        }
+      }
+    }
+  }
+`;
+
+// TODO combine with APPLICATION_RESERVATION_UNITS_QUERY
+const RESERVATION_UNIT_QUERY = gql`
+  query ReservationUnit($applicationRound: [ID]!) {
+    reservationUnits(applicationRound: $applicationRound) {
+      edges {
+        node {
+          pk
+          nameFi
+          spaces {
+            nameFi
+          }
+          unit {
+            nameFi
+          }
+        }
+      }
+    }
+  }
+`;
+
 function Criteria({
   applicationRoundId,
 }: {
@@ -289,25 +365,30 @@ function Criteria({
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const { data: applicationRound, isLoading: isLoadingApplicationRound } =
-    useQuery({
-      queryKey: ["application_round", { id: applicationRoundId }],
-      queryFn: () => getApplicationRound({ id: applicationRoundId }),
-      onError: (error: AxiosError) => {
-        const msg =
-          error.response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        notifyError(t(msg));
+  const { data: applicationRoundData, loading: isLoadingApplicationRound } =
+    useApolloQuery<Query>(APPLICATION_ROUND_QUERY, {
+      variables: { pk: [applicationRoundId] },
+      onError: () => {
+        notifyError(t("errors.errorFetchingData"));
       },
     });
+  const applicationRounds =
+    applicationRoundData?.applicationRounds?.edges
+      ?.map((edge) => edge?.node)
+      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  const applicationRound = applicationRounds[0];
 
-  const { data: reservationUnits, isLoading: isLoadingReservationUnits } =
-    useQuery({
-      queryKey: ["reservation_unit", { applicationRound: applicationRoundId }],
-      queryFn: () =>
-        getReservationUnits({ applicationRound: applicationRoundId }),
+  const { data: resUnitData, loading: isLoadingReservationUnits } =
+    useApolloQuery<Query>(RESERVATION_UNIT_QUERY, {
+      variables: { applicationRound: [applicationRoundId] },
+      onError: () => {
+        notifyError(t("errors.errorFetchingData"));
+      },
     });
+  const reservationUnits =
+    resUnitData?.reservationUnits?.edges
+      ?.map((edge) => edge?.node)
+      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
 
   const isLoading = isLoadingApplicationRound || isLoadingReservationUnits;
   if (isLoading) {
@@ -317,27 +398,23 @@ function Criteria({
     return <div>Error: failed to load application round</div>;
   }
 
+  const title = applicationRound.nameFi ?? "-";
   return (
-    <Wrapper>
-      <ContentContainer>
-        <BreadcrumbWrapper
-          route={[
-            "recurring-reservations",
-            `${publicUrl}/recurring-reservations/application-rounds`,
-            `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.id}`,
-            "criteria",
-          ]}
-          aliases={[
-            { slug: "application-round", title: applicationRound.name },
-            {
-              slug: `${applicationRound.id}`,
-              title: applicationRound.name,
-            },
-          ]}
-        />
-      </ContentContainer>
+    <>
+      <BreadcrumbWrapper
+        route={[
+          "recurring-reservations",
+          `${publicUrl}/recurring-reservations/application-rounds`,
+          `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.pk}`,
+          "criteria",
+        ]}
+        aliases={[
+          { slug: "application-round", title },
+          { slug: `${applicationRound.pk}`, title },
+        ]}
+      />
       <IngressContainer>
-        <Title>{applicationRound.name}</Title>
+        <H1 $legacy>{applicationRound.nameFi}</H1>
         <Details>
           <div>
             <TimeframeStatus
@@ -349,9 +426,9 @@ function Criteria({
             <RecurringReservationIcon aria-hidden />{" "}
             <Strong>{t("HeadingMenu.recurringReservations")}</Strong>
           </div>
-          <div className="block">
+          <div>
             <ReservationUnitCount>
-              {applicationRound.reservationUnitIds.length}
+              {applicationRound.reservationUnitCount}
             </ReservationUnitCount>
             <div>{t("ApplicationRound.attachedReservationUnits")}</div>
           </div>
@@ -405,23 +482,20 @@ function Criteria({
               {reservationUnits?.map((reservationUnit) => {
                 const getSpaceNames = (ru: ReservationUnitType): string => {
                   let result = "";
-                  ru.spaces.forEach((space) => {
-                    const name = localizedValue(space.name, i18n.language);
-                    result += `${name}, `;
-                  });
+                  ru?.spaces
+                    ?.filter((s): s is NonNullable<typeof s> => s != null)
+                    .forEach((space) => {
+                      const name = space.nameFi;
+                      result += `${name}, `;
+                    });
 
                   return result ? trim(result, ", ") : "-";
                 };
 
                 return (
-                  <ReservationUnit key={reservationUnit.id}>
+                  <ReservationUnit key={reservationUnit.pk}>
                     <div>
-                      <Strong>
-                        {localizedValue(
-                          reservationUnit.unit?.name.fi,
-                          i18n.language
-                        )}
-                      </Strong>
+                      <Strong>{reservationUnit.unit?.nameFi ?? "-"}</Strong>
                     </div>
                     <div>{getSpaceNames(reservationUnit)}</div>
                   </ReservationUnit>
@@ -431,7 +505,7 @@ function Criteria({
           </AccordionContent>
         </StyledAccordion>
       </ContentContainer>
-    </Wrapper>
+    </>
   );
 }
 
@@ -439,10 +513,11 @@ function CriteriaRouted(): JSX.Element {
   const { applicationRoundId } = useParams<IRouteParams>();
   const { t } = useTranslation();
 
-  if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
+  const applicationRoundPk = Number(applicationRoundId);
+  if (!applicationRoundId || Number.isNaN(applicationRoundPk)) {
     return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
-  return <Criteria applicationRoundId={Number(applicationRoundId)} />;
+  return <Criteria applicationRoundId={applicationRoundPk} />;
 }
 
 export default CriteriaRouted;

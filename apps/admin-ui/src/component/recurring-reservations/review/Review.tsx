@@ -1,49 +1,39 @@
-import { Button, Tabs } from "hds-react";
-import { debounce, uniqBy } from "lodash";
 import React, { useState } from "react";
+import { Tabs } from "hds-react";
+import { debounce, uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { H2 } from "common/src/common/typography";
-import { Query } from "common/types/gql-types";
-import { applicationRoundStatusFromRestToGql } from "app/component/applications/util";
-import { BasicLink } from "@/styles/util";
-import { ApplicationRound as RestApplicationRoundType } from "../../../common/types";
-import { applicationRoundUrl } from "../../../common/urls";
-import { Container } from "../../../styles/layout";
-import StatusRecommendation from "../../applications/StatusRecommendation";
-import BreadcrumbWrapper from "../../BreadcrumbWrapper";
+import { type Query, type ApplicationRoundType } from "common/types/gql-types";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { Container } from "@/styles/layout";
+import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
+import StatusRecommendation from "./StatusRecommendation";
 import ApplicationRoundStatusTag from "../ApplicationRoundStatusTag";
 import TimeframeStatus from "../TimeframeStatus";
 import ApplicationDataLoader from "./ApplicationDataLoader";
-import { Sort } from "./ApplicationsTable";
+import { type Sort } from "./ApplicationsTable";
 import Filters, {
   emptyFilterState,
-  FilterArguments,
+  type FilterArguments,
   type UnitPkName,
 } from "./Filters";
 import ApplicationEventDataLoader from "./ApplicationEventDataLoader";
-import { GQL_MAX_RESULTS_PER_QUERY } from "../../../common/const";
-
-interface IProps {
-  applicationRound: RestApplicationRoundType;
-}
 
 const Header = styled.div`
   margin-top: var(--spacing-l);
 `;
 
-const RecommendationValue = styled.div`
+const SpaceBetweenContainer = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-top: var(--spacing-layout-m);
-  margin-bottom: var(--spacing-l);
+  justify-content: space-between;
 `;
 
-const StyledH2 = styled(H2).attrs({ $legacy: true })`
-  margin: 0 0 var(--spacing-xs) 0;
-  line-height: 1;
+const AlignEndContainer = styled(SpaceBetweenContainer)`
+  align-items: end;
 `;
 
 const TabContent = styled.div`
@@ -51,14 +41,6 @@ const TabContent = styled.div`
   gap: var(--spacing-m);
   margin-top: var(--spacing-s);
   line-height: 1;
-`;
-
-export const NaviItem = styled(BasicLink)`
-  &:first-of-type {
-    margin-left: 0;
-  }
-
-  margin-left: 2rem;
 `;
 
 const APPLICATION_RESERVATION_UNITS_QUERY = gql`
@@ -82,11 +64,14 @@ const APPLICATION_RESERVATION_UNITS_QUERY = gql`
   }
 `;
 
-function Review({ applicationRound }: IProps): JSX.Element | null {
+interface ReviewProps {
+  applicationRound: ApplicationRoundType;
+}
+
+function Review({ applicationRound }: ReviewProps): JSX.Element | null {
   const [search, setSearch] = useState<FilterArguments>(emptyFilterState);
   const [sort, setSort] = useState<Sort>();
   const debouncedSearch = debounce((value) => setSearch(value), 300);
-  const [unitPks, setUnitPks] = useState<UnitPkName[]>([]);
 
   const onSortChanged = (sortField: string) => {
     setSort({
@@ -97,29 +82,32 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
 
   const { t } = useTranslation();
 
+  // TODO this should not require an extra graphql call pass them directly here instead
+  // TODO this doesn't fetch more than 100 elements
+  const ruPks =
+    applicationRound.reservationUnits
+      ?.map((x) => x?.pk)
+      .filter((x): x is NonNullable<typeof x> => x != null) ?? [];
+
   // Copy-paste from ReservationUnitFilter (same issues etc.)
-  useQuery<Query>(APPLICATION_RESERVATION_UNITS_QUERY, {
+  const { data } = useQuery<Query>(APPLICATION_RESERVATION_UNITS_QUERY, {
     variables: {
-      offset: unitPks.length,
+      offset: 0,
       count: GQL_MAX_RESULTS_PER_QUERY,
-      pks: applicationRound.reservationUnitIds,
-    },
-    onCompleted: (data) => {
-      const qd = data?.reservationUnits;
-      if (qd?.edges.length != null && qd?.totalCount && qd?.edges.length > 0) {
-        const ds =
-          data?.reservationUnits?.edges
-            ?.map((x) => x?.node?.unit)
-            ?.map((x) =>
-              x?.pk != null && x.nameFi != null
-                ? { pk: x.pk, nameFi: x.nameFi }
-                : null
-            )
-            ?.filter((x): x is UnitPkName => x != null) ?? [];
-        setUnitPks(uniqBy([...unitPks, ...ds], (unit) => unit.pk));
-      }
+      pks: ruPks,
     },
   });
+
+  const ds =
+    data?.reservationUnits?.edges
+      ?.map((x) => x?.node?.unit)
+      .map((x) =>
+        x?.pk != null && x.nameFi != null
+          ? { pk: x.pk, nameFi: x.nameFi }
+          : null
+      )
+      .filter((x): x is UnitPkName => x != null) ?? [];
+  const unitPks = uniqBy(ds, (unit) => unit.pk);
 
   return (
     <>
@@ -129,58 +117,39 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
           "/recurring-reservations/application-rounds",
           "application-round",
         ]}
-        aliases={[{ slug: "application-round", title: applicationRound.name }]}
+        aliases={[
+          { slug: "application-round", title: applicationRound.nameFi ?? "-" },
+        ]}
       />
       <Container>
         <Header>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              paddingBottom: "var(--spacing-m)",
-            }}
-          >
-            <ApplicationRoundStatusTag
-              status={applicationRoundStatusFromRestToGql(
-                applicationRound.status
-              )}
-              start={new Date(applicationRound.applicationPeriodBegin)}
-              end={new Date(applicationRound.applicationPeriodEnd)}
-            />
-            <div>
-              <NaviItem
-                to={`${applicationRoundUrl(applicationRound.id)}/criteria`}
-              >
-                {t("ApplicationRound.roundCriteria")}
-              </NaviItem>
-            </div>
-          </div>
-
-          <StyledH2>{applicationRound.name}</StyledH2>
+          <SpaceBetweenContainer>
+            {applicationRound.status != null && (
+              <ApplicationRoundStatusTag
+                status={applicationRound.status}
+                start={new Date(applicationRound.applicationPeriodBegin)}
+                end={new Date(applicationRound.applicationPeriodEnd)}
+              />
+            )}
+            <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
+          </SpaceBetweenContainer>
+          <H2>{applicationRound.nameFi}</H2>
           <TimeframeStatus
             applicationPeriodBegin={applicationRound.applicationPeriodBegin}
             applicationPeriodEnd={applicationRound.applicationPeriodEnd}
           />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "end",
-            }}
-          >
-            <RecommendationValue>
+          <AlignEndContainer>
+            {applicationRound.status != null && (
               <StatusRecommendation
                 status={applicationRound.status}
-                applicationRound={applicationRound}
+                name={applicationRound.nameFi ?? "-"}
+                reservationPeriodEnd={applicationRound.reservationPeriodEnd}
               />
-            </RecommendationValue>
-            <Button
-              onClick={() => window.open(`${window.location}/allocation`)}
-              disabled
-            >
+            )}
+            <ButtonLikeLink to="allocation" variant="primary" size="large">
               {t("ApplicationRound.allocate")}
-            </Button>
-          </div>
+            </ButtonLikeLink>
+          </AlignEndContainer>
         </Header>
         <Tabs>
           <Tabs.TabList>

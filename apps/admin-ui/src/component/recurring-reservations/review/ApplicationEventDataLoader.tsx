@@ -2,18 +2,17 @@ import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import {
   ApplicationEventType,
+  ApplicationRoundType,
   Query,
   QueryApplicationEventsArgs,
 } from "common/types/gql-types";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { combineResults } from "@/common/util";
-import { ApplicationRound } from "@/common/types";
 import { useNotification } from "@/context/NotificationContext";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
 import Loader from "../../Loader";
 import { More } from "../../lists/More";
-import { appEventMapper } from "./util";
 import ApplicationEventsTable from "./ApplicationEventsTable";
 
 export type Sort = {
@@ -22,7 +21,7 @@ export type Sort = {
 };
 
 type Props = {
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
   filters: FilterArguments;
   sort?: Sort;
   sortChanged: (field: string) => void;
@@ -61,9 +60,10 @@ const ApplicationEventDataLoader = ({
     Query,
     QueryApplicationEventsArgs
   >(APPLICATIONS_EVENTS_QUERY, {
+    skip: !applicationRound.pk,
     variables: {
       ...mapFilterParams(filters),
-      applicationRound: String(applicationRound.id),
+      applicationRound: String(applicationRound.pk),
       offset: 0,
       first: LIST_PAGE_SIZE,
       orderBy: sortString,
@@ -78,9 +78,10 @@ const ApplicationEventDataLoader = ({
     return <Loader />;
   }
 
-  const applicationEvents = (data?.applicationEvents?.edges || []).map((edge) =>
-    appEventMapper(applicationRound, edge?.node as ApplicationEventType)
-  );
+  const applicationEvents =
+    data?.applicationEvents?.edges
+      .map((edge) => edge?.node)
+      .filter((n): n is ApplicationEventType => n != null) ?? [];
 
   return (
     <>

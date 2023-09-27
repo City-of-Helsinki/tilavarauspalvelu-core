@@ -49,9 +49,9 @@ const StatusCell = ({
       linkText = "ApplicationEvent.gotoLink";
       break;
     case "application":
-      if (["sent"].includes(status as ApplicationStatus)) {
+      if (status === "sent") {
         icon = <IconEnvelope aria-hidden />;
-      } else if (["approved"].includes(status as ApplicationStatus)) {
+      } else if (status === "approved") {
         icon = (
           <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
         );

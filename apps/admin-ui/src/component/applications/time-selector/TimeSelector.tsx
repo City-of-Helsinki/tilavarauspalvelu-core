@@ -1,13 +1,66 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "common/src/common/style";
-import { weekdays } from "../../../common/const";
 import {
-  ApplicationEvent,
-  ApplicationEventSchedulePriority,
-} from "../../../common/types";
-import { applicationEventSchedulesToCells, Cell } from "./util";
+  ApplicationEventType,
+  ApplicationEventScheduleType,
+} from "common/types/gql-types";
+import { weekdays } from "../../../common/const";
+
+type Cell = {
+  hour: number;
+  label: string;
+  priority: 100 | 200 | 300;
+  key: string;
+};
+const cellLabel = (row: number): string => {
+  return `${row} - ${row + 1}`;
+};
+
+export const applicationEventSchedulesToCells = (
+  applicationEventSchedules: ApplicationEventScheduleType[]
+): Cell[][] => {
+  const firstSlotStart = 7;
+  const lastSlotStart = 23;
+
+  const cells = [] as Cell[][];
+
+  for (let j = 0; j < 7; j += 1) {
+    const day = [];
+    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
+      day.push({
+        key: `${i}-${j}`,
+        hour: i,
+        label: cellLabel(i),
+      } as Cell);
+    }
+    cells.push(day);
+  }
+
+  applicationEventSchedules.forEach((applicationEventSchedule) => {
+    const { day } = applicationEventSchedule;
+    if (day == null) return;
+    const hourBegin =
+      Number(applicationEventSchedule.begin.substring(0, 2)) - firstSlotStart;
+
+    const hourEnd =
+      (Number(applicationEventSchedule.end.substring(0, 2)) || 24) -
+      firstSlotStart;
+
+    for (let h = hourBegin; h < hourEnd; h += 1) {
+      const cell = cells[day][h];
+      const { priority } = applicationEventSchedule;
+      if (priority === 200 || priority === 300) {
+        cell.priority = priority;
+      } else {
+        cell.priority = 100;
+      }
+    }
+  });
+
+  return cells;
+};
 
 const arrowUp = css`
   content: "";
@@ -29,10 +82,6 @@ const arrowDown = css`
   border-top: 8px solid var(--color-white);
 `;
 
-type Props = {
-  applicationEvent: ApplicationEvent;
-};
-
 const CalendarHead = styled.div`
   font-family: var(--font-bold);
   font-size: var(--fontsize-body-m);
@@ -41,8 +90,8 @@ const CalendarHead = styled.div`
 `;
 
 const TimeSelectionButton = styled.div<{
-  state?: ApplicationEventSchedulePriority;
-  firstRow: boolean;
+  $priority?: 100 | 200 | 300;
+  $firstRow: boolean;
 }>`
   /* stylelint-disable csstools/value-no-unknown-custom-properties */
   --border-color: var(--color-black-50);
@@ -50,14 +99,14 @@ const TimeSelectionButton = styled.div<{
   text-align: center;
   font-family: var(--font-bold);
   font-weight: bold;
-  color: ${(props) =>
-    props.state ? "var(--color-white)" : "var(--color-black)"};
+  color: ${({ $priority }) =>
+    $priority != null ? "var(--color-white)" : "var(--color-black)"};
   padding: 0.24em 0.5em;
   border: 1px solid var(--border-color);
-  border-top: ${(props) =>
-    props.firstRow ? "1px solid var(--border-color)" : "none"};
-  ${(props) =>
-    props.state === 300
+  border-top: ${({ $firstRow }) =>
+    $firstRow ? "1px solid var(--border-color)" : "none"};
+  ${({ $priority }) =>
+    $priority === 300
       ? `
     &:after {
       ${arrowUp}
@@ -69,7 +118,7 @@ const TimeSelectionButton = styled.div<{
     color: var(--color-white);
     border-bottom-color: var(--color-black-60);
   `
-      : props.state === 200
+      : $priority === 200
       ? `
     &:after {
       ${arrowDown}
@@ -96,8 +145,8 @@ const Day = ({ head, cells }: { head: string; cells: Cell[] }): JSX.Element => {
         return (
           <TimeSelectionButton
             key={cell.key}
-            state={cell.state}
-            firstRow={cellIndex === 0}
+            $priority={cell.priority}
+            $firstRow={cellIndex === 0}
             data-testid={`time-selector__button--${cell.key}`}
           >
             {cell.label}
@@ -193,29 +242,27 @@ const LegendLabel = styled.div`
   white-space: nowrap;
 `;
 
-const TimeSelector = ({ applicationEvent }: Props): JSX.Element => {
-  const [cells] = useState(
-    applicationEventSchedulesToCells(applicationEvent.applicationEventSchedules)
-  );
+type TimeSelectorProps = {
+  applicationEvent: ApplicationEventType;
+};
+const TimeSelector = ({ applicationEvent }: TimeSelectorProps): JSX.Element => {
+  const schedules =
+    applicationEvent.applicationEventSchedules?.filter(
+      (x): x is NonNullable<typeof x> => x != null
+    ) ?? [];
+  const cells = applicationEventSchedulesToCells(schedules);
   const { t } = useTranslation();
 
-  const cellTypes = useMemo(
-    () => [
-      // {
-      //   type: "unavailable",
-      //   label: t("application:Page2.legend.unavailable"),
-      // },
-      {
-        type: "selected-1",
-        label: t("TimeSelector.primary"),
-      },
-      {
-        type: "selected-2",
-        label: t("TimeSelector.secondary"),
-      },
-    ],
-    [t]
-  );
+  const cellTypes = [
+    {
+      type: "selected-1",
+      label: t("TimeSelector.primary"),
+    },
+    {
+      type: "selected-2",
+      label: t("TimeSelector.secondary"),
+    },
+  ];
 
   return (
     <div>
@@ -239,4 +286,4 @@ const TimeSelector = ({ applicationEvent }: Props): JSX.Element => {
   );
 };
 
-export default TimeSelector;
+export { TimeSelector };

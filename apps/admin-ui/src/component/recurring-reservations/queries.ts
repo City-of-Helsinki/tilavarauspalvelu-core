@@ -76,6 +76,9 @@ export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
             name
             organisationType
           }
+          applicationRound {
+            nameFi
+          }
           applicationEvents {
             pk
             eventsPerWeek

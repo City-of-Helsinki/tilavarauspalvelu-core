@@ -1,32 +1,23 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import { useTranslation } from "react-i18next";
 import {
-  ApplicationType,
-  Query,
-  QueryApplicationsArgs,
+  type ApplicationRoundType,
+  type ApplicationType,
+  type Query,
+  type QueryApplicationsArgs,
 } from "common/types/gql-types";
+import { LIST_PAGE_SIZE } from "@/common/const";
+import { combineResults } from "@/common/util";
+import { useNotification } from "@/context/NotificationContext";
+import Loader from "@/component/Loader";
+import { More } from "@/component/lists/More";
 import { APPLICATIONS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
-import { useNotification } from "../../../context/NotificationContext";
-import Loader from "../../Loader";
 import ApplicationsTable from "./ApplicationsTable";
-import { More } from "../../lists/More";
-import { LIST_PAGE_SIZE } from "../../../common/const";
-import { combineResults } from "../../../common/util";
-import { appMapper } from "./util";
-import { ApplicationRound } from "../../../common/types";
 
 export type Sort = {
   field: string;
   sort: boolean;
-};
-
-type Props = {
-  applicationRound: ApplicationRound;
-  filters: FilterArguments;
-  sort?: Sort;
-  sortChanged: (field: string) => void;
 };
 
 const mapFilterParams = (params: FilterArguments) => ({
@@ -45,6 +36,13 @@ const updateQuery = (
   return combineResults(previousResult, fetchMoreResult, "applications");
 };
 
+type Props = {
+  applicationRound: ApplicationRoundType;
+  filters: FilterArguments;
+  sort?: Sort;
+  sortChanged: (field: string) => void;
+};
+
 const ApplicationDataLoader = ({
   applicationRound,
   filters,
@@ -52,7 +50,6 @@ const ApplicationDataLoader = ({
   sortChanged: onSortChanged,
 }: Props): JSX.Element => {
   const { notifyError } = useNotification();
-  const { t } = useTranslation();
 
   let sortString = "";
   if (sort) {
@@ -64,7 +61,7 @@ const ApplicationDataLoader = ({
     {
       variables: {
         ...mapFilterParams(filters),
-        applicationRound: String(applicationRound.id),
+        applicationRound: String(applicationRound.pk),
         offset: 0,
         first: LIST_PAGE_SIZE,
         orderBy: sortString,
@@ -82,8 +79,7 @@ const ApplicationDataLoader = ({
 
   const applications = (data?.applications?.edges || [])
     .map((edge) => edge?.node)
-    .filter((node): node is ApplicationType => node != null)
-    .map((application) => appMapper(applicationRound, application, t));
+    .filter((node): node is ApplicationType => node != null);
 
   return (
     <>

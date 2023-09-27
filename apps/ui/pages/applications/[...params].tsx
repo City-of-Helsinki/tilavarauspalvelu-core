@@ -84,6 +84,7 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
   const fetchData = async (appId: number) => {
     try {
       const applicationResult = await getApplication(appId);
+      // FIXME replace with graphql
       const applicationRoundResult = await getApplicationRound({
         id: applicationResult.applicationRoundId,
       });
