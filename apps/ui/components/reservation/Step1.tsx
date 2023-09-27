@@ -178,7 +178,9 @@ const Step1 = ({
                       <PreviewLabel>
                         {t(`reservationApplication:label.common.${key}`)}
                       </PreviewLabel>
-                      <PreviewValue>{value}</PreviewValue>
+                      <PreviewValue data-testid={`confirm_${key}`}>
+                        {value}
+                      </PreviewValue>
                     </ParagraphAlt>
                   );
                 })}
@@ -194,7 +196,7 @@ const Step1 = ({
               <PreviewLabel>
                 {t("reservationApplication:reserveeTypePrefix")}
               </PreviewLabel>
-              <PreviewValue>
+              <PreviewValue data-testid="confirm_reserveeType">
                 {capitalize(
                   t(
                     `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`
@@ -225,7 +227,9 @@ const Step1 = ({
                       }.${key}`
                     )}
                   </PreviewLabel>
-                  <PreviewValue>{value}</PreviewValue>
+                  <PreviewValue data-testid={`confirm_${key}`}>
+                    {value}
+                  </PreviewValue>
                 </ParagraphAlt>
               );
             })}
