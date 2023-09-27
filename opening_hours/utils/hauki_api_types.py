@@ -1,10 +1,10 @@
 from typing import Any, Literal, TypedDict
 
-from opening_hours.enums import State
+from opening_hours.enums import ResourceType, State
 
 
 class HaukiTranslatedField(TypedDict):
-    fi: str
+    fi: str | None
     sv: str | None
     en: str | None
 
@@ -23,7 +23,7 @@ class HaukiAPIResource(TypedDict):
     name: HaukiTranslatedField
     description: HaukiTranslatedField
     address: HaukiTranslatedField
-    resource_type: str
+    resource_type: ResourceType
     children: list[int]
     parents: list[int]
     organization: str

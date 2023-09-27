@@ -9,6 +9,7 @@ from django.test import override_settings
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
+from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError
 from opening_hours.utils.hauki_exporter import HaukiResource
 from reservation_units.models import (
@@ -159,8 +160,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
     def test_send_resource_to_hauki_called(self, send_resource_mock):
         res = HaukiResource(
             id=1,
-            name="",
-            description="",
+            name={"fi": "name", "sv": "name", "en": "name"},
+            description={"fi": "desc", "sv": "desc", "en": "desc"},
             address=None,
             origin_data_source_name="Tilavarauspalvelu",
             origin_data_source_id="tvp",
@@ -168,7 +169,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             organization="department_id",
             parents=[],
             children=[],
-            resource_type="",
+            resource_type=ResourceType.RESERVABLE,
         )
         send_resource_mock.return_value = res
 

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIResource
+from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from reservation_units.models import ReservationUnit
 
 
@@ -12,9 +12,9 @@ class HaukiResource:
     """Represents Resource in hauki"""
 
     id: int | None
-    name: str
-    description: str | None
-    address: str | None
+    name: HaukiTranslatedField
+    description: HaukiTranslatedField
+    address: HaukiTranslatedField | None
     children: list[int]
     parents: list[int]
     organization: str
@@ -81,8 +81,16 @@ class ReservationUnitHaukiExporter:
 
         return HaukiResource(
             id=self.reservation_unit.hauki_resource_id or None,
-            name=self.reservation_unit.name,
-            description=self.reservation_unit.description,
+            name=HaukiTranslatedField(
+                fi=self.reservation_unit.name_fi,
+                sv=self.reservation_unit.name_sv,
+                en=self.reservation_unit.name_en,
+            ),
+            description=HaukiTranslatedField(
+                fi=self.reservation_unit.description,
+                sv=self.reservation_unit.description,
+                en=self.reservation_unit.description,
+            ),
             address=None,
             origin_data_source_name="Tilavarauspalvelu",
             origin_data_source_id="tvp",
