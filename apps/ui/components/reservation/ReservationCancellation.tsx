@@ -139,8 +139,8 @@ const StyledLink = styled(Link)`
   gap: var(--spacing-2-xs);
   text-decoration: underline;
   color: var(--color-black) !important;
-  ${fontMedium}
   cursor: pointer;
+  ${fontMedium}
 `;
 
 const ReservationCancellation = ({ id, logout }: Props): JSX.Element => {

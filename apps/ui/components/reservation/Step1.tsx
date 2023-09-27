@@ -196,7 +196,7 @@ const Step1 = ({
               <PreviewLabel>
                 {t("reservationApplication:reserveeTypePrefix")}
               </PreviewLabel>
-              <PreviewValue data-testid={`confirm_reserveeType`}>
+              <PreviewValue data-testid="confirm_reserveeType">
                 {capitalize(
                   t(
                     `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`

@@ -98,6 +98,7 @@ const Navigation = () => {
               router.push(item.path, item.path, { locale: router.locale })
             }
             className={router.pathname === item.path ? "active" : ""}
+            data-testid={`navigation__${item.title}`}
           >
             {t(`navigation:Item.${item.title}`)}
           </NavigationMenuItem>
