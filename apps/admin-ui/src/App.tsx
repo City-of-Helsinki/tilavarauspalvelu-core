@@ -14,6 +14,7 @@ import AuthorizationChecker from "./common/AuthorizationChecker";
 import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
 import NotificationsRouter from "./component/notifications/router";
+import Error404 from "./common/Error404";
 
 const UNIT_PATH = "./component/Unit";
 const Units = dynamic(() => import(`${UNIT_PATH}/Units`));
@@ -93,10 +94,6 @@ const ApplicationRouter = () => (
   <Routes>
     <Route path=":applicationId" element={<ApplicationDetails />} />
     <Route path=":applicationId/details" element={<ApplicationDetails />} />
-    <Route
-      path=":applicationId/recurringReservation/:recurringReservationId"
-      element={<div>This page has been removed: file a bug report</div>}
-    />
   </Routes>
 );
 
@@ -145,6 +142,7 @@ const App = () => {
     <BrowserRouter basename={publicUrl}>
       <PageWrapper>
         <Routes>
+          <Route path="*" element={<Error404 />} />
           <Route path="/" element={withAuthorization(<ApplicationRounds />)} />
 
           <Route
