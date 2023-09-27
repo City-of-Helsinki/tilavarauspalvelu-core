@@ -14,7 +14,7 @@ import ApplicationsTable from "./ApplicationsTable";
 import { More } from "../../lists/More";
 import { LIST_PAGE_SIZE } from "../../../common/const";
 import { combineResults } from "../../../common/util";
-import { appMapper } from "../util";
+import { appMapper } from "./util";
 import { ApplicationRound } from "../../../common/types";
 
 export type Sort = {

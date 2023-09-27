@@ -62,3 +62,6 @@ export const reservationToInterval = (
     type: x.type ?? undefined,
   };
 };
+
+export const truncate = (val: string, maxLen: number): string =>
+  val.length > maxLen ? `${val.substring(0, maxLen)}…` : val;

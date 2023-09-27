@@ -5,15 +5,15 @@ import {
   Query,
   QueryApplicationEventsArgs,
 } from "common/types/gql-types";
+import { LIST_PAGE_SIZE } from "@/common/const";
+import { combineResults } from "@/common/util";
+import { ApplicationRound } from "@/common/types";
+import { useNotification } from "@/context/NotificationContext";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
-import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import { More } from "../../lists/More";
-import { LIST_PAGE_SIZE } from "../../../common/const";
-import { combineResults } from "../../../common/util";
-import { appEventMapper } from "../util";
-import { ApplicationRound } from "../../../common/types";
+import { appEventMapper } from "./util";
 import ApplicationEventsTable from "./ApplicationEventsTable";
 
 export type Sort = {

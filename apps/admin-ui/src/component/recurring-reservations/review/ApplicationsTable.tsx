@@ -3,14 +3,15 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import { publicUrl } from "app/common/const";
+import { publicUrl } from "@/common/const";
+import { applicationDetailsUrl } from "@/common/urls";
+import { truncate } from "@/helpers";
 import {
   CustomTable,
   DataOrMessage,
   ExternalTableLink,
 } from "../../lists/components";
-import { ApplicationView, truncate } from "../util";
-import { applicationDetailsUrl } from "../../../common/urls";
+import { ApplicationView } from "./util";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;

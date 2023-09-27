@@ -15,7 +15,7 @@ import ApplicationRoundCard from "./ApplicationRoundCard";
 import { getApplicationRoundStatus } from "./ApplicationRoundStatusTag";
 import { TableLink, CustomTable } from "./CustomTable";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
-import { truncate } from "./util";
+import { truncate } from "@/helpers";
 import { Accordion } from "../../common/hds-fork/Accordion";
 
 const AccordionContainer = styled.div`

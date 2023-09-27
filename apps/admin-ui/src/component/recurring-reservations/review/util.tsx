@@ -13,15 +13,15 @@ import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   ApplicationStatus,
-} from "../../common/types";
+} from "@/common/types";
 import {
   appEventHours,
   applicantName,
   getNormalizedApplicationStatus,
   numTurns,
-} from "../applications/util";
-import StatusCell from "../StatusCell";
-import { formatNumber } from "../../common/util";
+} from "@/component/applications/util";
+import StatusCell from "@/component/StatusCell";
+import { formatNumber } from "@/common/util";
 
 export type ApplicationView = {
   id: number;
@@ -203,6 +203,3 @@ export const appEventMapper = (
     ),
   };
 };
-
-export const truncate = (val: string, maxLen: number): string =>
-  val.length > maxLen ? `${val.substring(0, maxLen)}…` : val;

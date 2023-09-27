@@ -4,13 +4,14 @@ import { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { publicUrl } from "app/common/const";
 import { IconLinkExternal } from "hds-react";
+import { truncate } from "@/helpers";
+import { applicationDetailsUrl } from "@/common/urls";
 import {
   CustomTable,
   DataOrMessage,
   ExternalTableLink,
 } from "../../lists/components";
-import { ApplicationEventView, truncate } from "../util";
-import { applicationDetailsUrl } from "../../../common/urls";
+import { ApplicationEventView } from "./util";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
