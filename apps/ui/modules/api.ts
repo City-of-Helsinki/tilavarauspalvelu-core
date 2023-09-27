@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
 import applyCaseMiddleware from "axios-case-converter";
+import { getCookie } from "typescript-cookie";
 import {
   Application,
   ApplicationRound,
@@ -91,10 +92,12 @@ async function apiGet<T>({
 const validateStatus = (status: number): boolean => status < 300;
 
 async function apiPut<T>({ path, data }: RequestParameters): Promise<T> {
+  const csrfToken = getCookie("csrftoken");
   return request<T>({
     url: `${REST_API_URL}${path}`,
     headers: {
       "Content-Type": "application/json",
+      ...(csrfToken != null ? {"X-Csrftoken": csrfToken} : {}),
     },
     method: "put",
     data,
@@ -103,10 +106,12 @@ async function apiPut<T>({ path, data }: RequestParameters): Promise<T> {
 }
 
 async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
+  const csrfToken = getCookie("csrftoken");
   return request<T>({
     url: `${REST_API_URL}${path}`,
     headers: {
       "Content-Type": "application/json",
+      ...(csrfToken != null ? {"X-Csrftoken": csrfToken} : {}),
     },
     method: "post",
     data,
