@@ -78,8 +78,5 @@ export const getSignInUrl = (callBackUrl: string): string => {
 
 // Returns href url for logging out with redirect url to /logout
 export const getSignOutUrl = (): string => {
-  const baseUrl = new URL(window.location.href).origin;
-  const cleanPublicUrl = getCleanPublicUrl();
-  const callBackUrl = `${baseUrl}${cleanPublicUrl}/auth/logout`;
-  return `${AUTH_URL}/logout?next=${callBackUrl}`;
+  return `${AUTH_URL}/logout`;
 };
