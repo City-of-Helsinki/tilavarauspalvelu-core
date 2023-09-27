@@ -148,7 +148,6 @@ const appMapper = (
       : "",
     unitsSort: units.find(() => true)?.nameFi || "",
     units,
-    // FIXME dangerous coercion: rewrite the normalization function to work on GQL types
     status: getNormalizedApplicationStatus(
       applicationStatusFromGqlToRest(app.status ?? undefined),
       applicationStatusView

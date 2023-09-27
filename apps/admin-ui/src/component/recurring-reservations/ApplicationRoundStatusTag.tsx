@@ -1,14 +1,7 @@
 import { Tag } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {
-  ApplicationRoundStatus,
-  ApplicationRoundType,
-} from "common/types/gql-types";
-
-interface IProps {
-  applicationRound: ApplicationRoundType;
-}
+import { ApplicationRoundStatus } from "common/types/gql-types";
 
 type RoundStatus = {
   color: string;
@@ -17,10 +10,13 @@ type RoundStatus = {
 };
 
 export const getApplicationRoundStatus = (
-  applicationRound: ApplicationRoundType
+  status: ApplicationRoundStatus | undefined,
+  start: Date,
+  end: Date
 ): RoundStatus => {
   const cutOffDate = new Date();
-  switch (applicationRound.status) {
+
+  switch (status) {
     case ApplicationRoundStatus.InReview:
       return {
         group: "g1",
@@ -37,7 +33,7 @@ export const getApplicationRoundStatus = (
     case ApplicationRoundStatus.Handled:
       return { group: "g2", color: "var(--color-bus-light)", label: "handled" };
     case ApplicationRoundStatus.Draft: {
-      if (cutOffDate < new Date(applicationRound.applicationPeriodBegin)) {
+      if (cutOffDate < start) {
         return {
           group: "g4",
           color: "var(--color-engel-light)",
@@ -45,7 +41,7 @@ export const getApplicationRoundStatus = (
         };
       }
 
-      if (cutOffDate > new Date(applicationRound.applicationPeriodEnd)) {
+      if (cutOffDate > end) {
         return {
           group: "g1",
           color: "var(--color-info-light)",
@@ -61,24 +57,33 @@ export const getApplicationRoundStatus = (
       return {
         group: "g5",
         color: "white",
-        label: applicationRound.status as string,
+        label: status ?? "-",
       };
   }
 };
 
-function ApplicationRoundStatusTag({ applicationRound }: IProps): JSX.Element {
+function ApplicationRoundStatusTag({
+  status,
+  start,
+  end,
+}: {
+  status: ApplicationRoundStatus;
+  start: Date;
+  end: Date;
+}): JSX.Element {
   const { t } = useTranslation();
+  if (!status) {
+    return <Tag>{t("ApplicationRound.statuses.unknown")}</Tag>;
+  }
+
+  const convertedStatus = getApplicationRoundStatus(status, start, end);
   return (
     <Tag
       theme={{
-        "--tag-background": getApplicationRoundStatus(applicationRound).color,
+        "--tag-background": convertedStatus.color,
       }}
     >
-      {t(
-        `ApplicationRound.statuses.${
-          getApplicationRoundStatus(applicationRound).label
-        }`
-      )}
+      {t(`ApplicationRound.statuses.${convertedStatus.label}`)}
     </Tag>
   );
 }

@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { gql, useQuery } from "@apollo/client";
 import { H2 } from "common/src/common/typography";
-import { ApplicationRoundType, Query } from "common/types/gql-types";
+import { Query } from "common/types/gql-types";
+import { applicationRoundStatusFromRestToGql } from "app/component/applications/util";
 import { BasicLink } from "@/styles/util";
 import { ApplicationRound as RestApplicationRoundType } from "../../../common/types";
 import { applicationRoundUrl } from "../../../common/urls";
@@ -140,9 +141,11 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
             }}
           >
             <ApplicationRoundStatusTag
-              applicationRound={
-                applicationRound as unknown as ApplicationRoundType
-              }
+              status={applicationRoundStatusFromRestToGql(
+                applicationRound.status
+              )}
+              start={new Date(applicationRound.applicationPeriodBegin)}
+              end={new Date(applicationRound.applicationPeriodEnd)}
             />
             <div>
               <NaviItem
@@ -167,8 +170,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
           >
             <RecommendationValue>
               <StatusRecommendation
-                // FIXME this is not true anymore (all statuses use this component)
-                status="in_review"
+                status={applicationRound.status}
                 applicationRound={applicationRound}
               />
             </RecommendationValue>

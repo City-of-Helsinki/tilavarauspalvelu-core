@@ -83,7 +83,12 @@ function AllApplicationRounds(): JSX.Element | null {
     ?.filter((ar): ar is ApplicationRoundType => ar !== null);
   const applicationRounds = groupBy(
     allApplicationRounds,
-    (round) => getApplicationRoundStatus(round).group
+    (round) =>
+      getApplicationRoundStatus(
+        round.status ?? undefined,
+        new Date(round.applicationPeriodBegin),
+        new Date(round.applicationPeriodEnd)
+      ).group
   );
 
   if (loading) {

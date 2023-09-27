@@ -141,7 +141,13 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
           />
         </Times>
         <StatusTagContainer>
-          <ApplicationRoundStatusTag applicationRound={applicationRound} />
+          {applicationRound.status != null && (
+            <ApplicationRoundStatusTag
+              status={applicationRound.status}
+              start={new Date(applicationRound.applicationPeriodBegin)}
+              end={new Date(applicationRound.applicationPeriodEnd)}
+            />
+          )}
         </StatusTagContainer>
         <BottomContainer>
           <Stats>

@@ -75,6 +75,22 @@ export const applicationRoundStatusFromGqlToRest = (
   }
 };
 
+export const applicationRoundStatusFromRestToGql = (
+  t?: ApplicationRoundStatus
+): ApplicationRoundStatusGql => {
+  switch (t) {
+    case "handled":
+      return ApplicationRoundStatusGql.Handled;
+    case "review_done":
+      return ApplicationRoundStatusGql.ReviewDone;
+    case "in_review":
+      return ApplicationRoundStatusGql.InReview;
+    case "draft":
+    default:
+      return ApplicationRoundStatusGql.Draft;
+  }
+};
+
 export const applicationStatusFromGqlToRest = (
   t?: ApplicationStatusGql
 ): ApplicationStatus => {
