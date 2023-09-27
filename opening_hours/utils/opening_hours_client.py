@@ -128,10 +128,9 @@ class OpeningHoursClient:
         Opening hours structure is:
         opening_hours = {
             resource_id: {
-                            datetime.date: [OpeningHours, OpeningHours, ...],
-                            ....
-                        },
-            resource_id: { datetime.date: [OpeningHours, ...
+                datetime.date: [OpeningHours, OpeningHours, ...],
+                ...
+            },
             ...
         }
         """
