@@ -10,15 +10,10 @@ import {
 } from "common/types/gql-types";
 import Accordion from "../../Accordion";
 import { getApplicationEventScheduleResultStatuses } from "../modules/applicationRoundAllocation";
+import { AllocationApplicationEventCardType } from "../../../common/types";
 import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";
-import ApplicationRoundApplicationApplicationEventGroupList from "./ApplicationRoundApplicationApplicationEventGroupList";
-
-type Props = {
-  applications: ApplicationType[];
-  applicationEvents: ApplicationEventType[] | null;
-  reservationUnit: ReservationUnitType;
-};
+import ApplicationEventCard from "./ApplicationEventCard";
 
 const Wrapper = styled.div`
   font-size: var(--fontsize-body-s);
@@ -37,13 +32,11 @@ const ApplicationEventList = styled.div`
   margin-top: var(--spacing-s);
 `;
 
-const Heading = styled.div``;
-
 const StyledH5 = styled(H5)`
   font-size: var(--fontsize-heading-xs);
 `;
 
-const ApplicationEvents = styled.div`
+const ApplicationEventsContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -59,11 +52,56 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
-const ApplicationRoundAllocationApplicationEvents = ({
+const EventGroupList = ({
+  applicationEvents,
+  selectedApplicationEvent,
+  setSelectedApplicationEvent,
+  applications,
+  reservationUnit,
+  type,
+}: {
+  applicationEvents: ApplicationEventType[];
+  selectedApplicationEvent?: ApplicationEventType;
+  setSelectedApplicationEvent: (
+    applicationEvent?: ApplicationEventType
+  ) => void;
+  applications: ApplicationType[];
+  reservationUnit: ReservationUnitType;
+  type: AllocationApplicationEventCardType;
+}): JSX.Element => {
+  if (applicationEvents.length < 1) {
+    return <div>-</div>;
+  }
+  return (
+    <div>
+      {applicationEvents.map((applicationEvent) => {
+        return (
+          <ApplicationEventCard
+            key={`${applicationEvent.pk}-${reservationUnit.pk}`}
+            applicationEvent={applicationEvent}
+            selectedApplicationEvent={selectedApplicationEvent}
+            setSelectedApplicationEvent={setSelectedApplicationEvent}
+            applications={applications}
+            reservationUnit={reservationUnit}
+            type={type}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+type ApplicationEventsProps = {
+  applications: ApplicationType[];
+  applicationEvents: ApplicationEventType[] | null;
+  reservationUnit: ReservationUnitType;
+};
+
+function ApplicationEvents({
   applications,
   applicationEvents,
   reservationUnit,
-}: Props): JSX.Element | null => {
+}: ApplicationEventsProps): JSX.Element | null {
   const { t } = useTranslation();
 
   const [isSelecting, setIsSelecting] = useState(false);
@@ -135,12 +173,12 @@ const ApplicationRoundAllocationApplicationEvents = ({
     <Wrapper>
       <Content>
         <ApplicationEventList>
-          <Heading>
+          <div>
             <StyledH5>{t("Allocation.applicants")}</StyledH5>
             <p>{t("Allocation.selectApplicant")}</p>
-          </Heading>
-          <ApplicationEvents>
-            <ApplicationRoundApplicationApplicationEventGroupList
+          </div>
+          <ApplicationEventsContainer>
+            <EventGroupList
               applicationEvents={unallocatedApplicationEvents}
               selectedApplicationEvent={selectedApplicationEvent}
               setSelectedApplicationEvent={setSelectedApplicationEvent}
@@ -150,7 +188,7 @@ const ApplicationRoundAllocationApplicationEvents = ({
             />
             <StyledAccordion heading={t("Allocation.otherApplicants")}>
               <p>{t("Allocation.allocatedApplicants")}</p>
-              <ApplicationRoundApplicationApplicationEventGroupList
+              <EventGroupList
                 applicationEvents={allocatedApplicationEvents}
                 selectedApplicationEvent={selectedApplicationEvent}
                 setSelectedApplicationEvent={setSelectedApplicationEvent}
@@ -159,7 +197,7 @@ const ApplicationRoundAllocationApplicationEvents = ({
                 type="allocated"
               />
               <p>{t("Allocation.declinedApplicants")}</p>
-              <ApplicationRoundApplicationApplicationEventGroupList
+              <EventGroupList
                 applicationEvents={declinedApplicationEvents}
                 selectedApplicationEvent={selectedApplicationEvent}
                 setSelectedApplicationEvent={setSelectedApplicationEvent}
@@ -168,7 +206,7 @@ const ApplicationRoundAllocationApplicationEvents = ({
                 type="declined"
               />
             </StyledAccordion>
-          </ApplicationEvents>
+          </ApplicationEventsContainer>
         </ApplicationEventList>
         <AllocationCalendar
           applicationEvents={applicationEvents}
@@ -198,6 +236,6 @@ const ApplicationRoundAllocationApplicationEvents = ({
       </Content>
     </Wrapper>
   );
-};
+}
 
-export default ApplicationRoundAllocationApplicationEvents;
+export default ApplicationEvents;

@@ -22,7 +22,7 @@ import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
 import { getFilteredApplicationEvents } from "../modules/applicationRoundAllocation";
-import ApplicationRoundAllocationApplicationEvents from "./ApplicationRoundAllocationApplicationEvents";
+import ApplicationEvents from "./ApplicationEvents";
 import LinkPrev from "../../LinkPrev";
 import { useAllocationContext } from "../../../context/AllocationContext";
 
@@ -263,7 +263,7 @@ function ApplicationRoundAllocation({
         </ReservationUnits>
       </Tabs>
       {applicationEvents && applicationEvents.length && unitFilter ? (
-        <ApplicationRoundAllocationApplicationEvents
+        <ApplicationEvents
           applications={applications}
           applicationEvents={applicationEvents}
           reservationUnit={selectedReservationUnit || reservationUnits[0]}
