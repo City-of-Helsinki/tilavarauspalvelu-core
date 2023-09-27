@@ -4,7 +4,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import router from "next/router";
 import { Controller, useForm } from "react-hook-form";
 import { IconCross, Select } from "hds-react";
-import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
