@@ -166,9 +166,6 @@ const Step1 = ({
                     : typeof rawValue === "boolean"
                     ? t(`common:${String(rawValue)}`)
                     : rawValue;
-                  console.log(
-                    `${t(`reservationApplication:label.common.${key}`)} ${key}`
-                  );
                   return (
                     <ParagraphAlt
                       key={`summary_${key}`}
@@ -221,9 +218,6 @@ const Step1 = ({
                 : typeof rawValue === "boolean"
                 ? t(`common:${String(rawValue)}`)
                 : rawValue;
-              console.log(
-                `${t(`reservationApplication:label.common.${key}`)} ${key}`
-              );
               return (
                 <ParagraphAlt key={`summary_${key}`}>
                   <PreviewLabel>

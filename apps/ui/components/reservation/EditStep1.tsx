@@ -143,7 +143,10 @@ const EditStep1 = ({
       }
 
       if (key === "ageGroup") {
-        const { minimum, maximum } = reservation[key] ?? {};
+        const { minimum, maximum } = reservation[key] ?? {
+          minimum: "1",
+          maximum: "",
+        };
         return `${minimum} - ${maximum}`;
       }
 
