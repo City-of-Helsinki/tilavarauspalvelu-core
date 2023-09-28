@@ -12,7 +12,7 @@ import {
 import { H2 } from "common/src/common/typography";
 import { Container } from "common";
 
-import apolloClient from "../../../modules/apolloClient";
+import { createApolloClient } from "../../../modules/apolloClient";
 import Sanitize from "../../../components/common/Sanitize";
 import { getTranslation } from "../../../modules/util";
 import { TERMS_OF_USE } from "../../../modules/queries/reservationUnit";
@@ -21,7 +21,9 @@ type Props = {
   genericTerms: TermsOfUseType;
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
+  const apolloClient = createApolloClient(ctx);
   const { data: genericTermsData } = await apolloClient.query<
     Query,
     QueryTermsOfUseArgs
@@ -33,13 +35,13 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   });
   const genericTerms =
     genericTermsData.termsOfUse?.edges
-      ?.map((n) => n.node)
-      .find((n) => ["generic1"].includes(n.pk)) || {};
+      ?.map((n) => n?.node)
+      .find((n) => n?.pk && ["generic1"].includes(n.pk)) || {};
 
   return {
     props: {
       genericTerms,
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };

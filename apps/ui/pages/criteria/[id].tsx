@@ -10,7 +10,7 @@ import {
 } from "common/types/gql-types";
 import { Container } from "common";
 
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import Sanitize from "../../components/common/Sanitize";
 import KorosDefault from "../../components/common/KorosDefault";
 import { getTranslation } from "../../modules/util";
@@ -22,24 +22,24 @@ type Props = {
   applicationRound: ApplicationRoundType;
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  locale,
-  params,
-}) => {
-  const id = Number(params.id);
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale, params } = ctx;
+  const id = Number(params?.id);
+
+  const apolloClient = createApolloClient(ctx);
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     fetchPolicy: "no-cache",
     query: APPLICATION_ROUNDS,
   });
   const applicationRound = data?.applicationRounds?.edges
-    .map((n) => n.node)
-    .find((n) => n.pk === id);
+    .map((n) => n?.node)
+    .find((n) => n?.pk === id);
 
   return {
     props: {
       key: `${id}${locale}`,
       applicationRound,
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };

@@ -65,7 +65,7 @@ import Address from "../../components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";
 import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import Map from "../../components/Map";
 import Legend from "../../components/calendar/Legend";
 import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
@@ -140,14 +140,12 @@ const allowedReservationStates: ReservationsReservationStateChoices[] = [
   ReservationsReservationStateChoices.WaitingForPayment,
 ];
 
-export const getServerSideProps: GetServerSideProps = async ({
-  locale,
-  params,
-  query,
-}) => {
-  const id = Number(params.id);
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { params, query, locale } = ctx;
+  const id = Number(params?.id);
   const uuid = query.ru;
-  const today: string = toApiDate(new Date());
+  const today = toApiDate(new Date());
+  const apolloClient = createApolloClient(ctx);
 
   let relatedReservationUnits = [] as ReservationUnitType[];
 

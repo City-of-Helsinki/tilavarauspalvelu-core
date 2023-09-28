@@ -15,7 +15,7 @@ import { HeroSubheading } from "../../modules/style/typography";
 import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
 import { applicationRoundState } from "../../modules/util";
 import KorosDefault from "../../components/common/KorosDefault";
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 
@@ -23,8 +23,10 @@ type Props = {
   applicationRounds: ApplicationRoundType[];
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const now = new Date();
+  const { locale } = ctx;
+  const apolloClient = createApolloClient(ctx);
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     query: APPLICATION_ROUNDS,
     fetchPolicy: "no-cache",

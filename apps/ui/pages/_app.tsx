@@ -9,7 +9,7 @@ import { theme } from "common";
 import PageWrapper from "../components/common/PageWrapper";
 import ExternalScripts from "../components/ExternalScripts";
 import { DataContextProvider } from "../context/DataContext";
-import apolloClient from "../modules/apolloClient";
+import { createApolloClient } from "../modules/apolloClient";
 import { isBrowser, mockRequests } from "../modules/const";
 import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
@@ -27,7 +27,8 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     <>
       <DataContextProvider>
         <TrackingWrapper>
-          <ApolloProvider client={apolloClient}>
+          {/* TODO is this ever called on the server? then the ctx is not undefined */}
+          <ApolloProvider client={createApolloClient(undefined)}>
             <ThemeProvider theme={theme}>
               <PageWrapper {...pageProps}>
                 <Component {...pageProps} />

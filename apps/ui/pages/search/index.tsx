@@ -34,7 +34,7 @@ import { isBrowser } from "../../modules/const";
 import { HeroSubheading } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 import ReservationUnitCard from "../../components/search/ReservationUnitCard";
@@ -46,11 +46,10 @@ type Props = {
   applicationRounds: ApplicationRoundType[];
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  locale,
-  query,
-}) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const now = new Date();
+  const { locale, query } = ctx;
+  const apolloClient = createApolloClient(ctx);
 
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     fetchPolicy: "no-cache",

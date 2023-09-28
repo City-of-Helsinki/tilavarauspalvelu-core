@@ -6,6 +6,7 @@ import {
   from,
 } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
+import { getCookie } from "typescript-cookie";
 import { onError } from "@apollo/client/link/error";
 import { uniqBy } from "lodash";
 import { GraphQLError } from "graphql/error/GraphQLError";
@@ -24,11 +25,31 @@ const uploadLinkOptions = {
   FormData: CustomFormData,
 };
 
+// TODO replace most of this code with the one in ui (that includes server context)
+// why isn't it done yet? because this uses UploadLink and it uses plain HttpLink
+// and SSR isn't used on admin side so it's not a priority
+
 // NOTE upload link typing is broken when updating apollo to 3.8
 // FIXME upload link is broken locally (it succeeds but no new image is available)
 // @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions) as unknown as ApolloLink;
 const httpLink = new HttpLink({ uri, credentials: "include" });
+const authLink = new ApolloLink((operation, forward) => {
+  // TODO this doesn't work with SSR (use the ui implementation when we add SSR requests)
+  if (!isBrowser) {
+    throw new Error("authLink doesn't work with SSR");
+  }
+  const csrfToken = getCookie("csrftoken");
+
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
+    },
+  }));
+
+  return forward(operation);
+});
 
 // eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -113,7 +134,9 @@ const client = new ApolloClient({
       },
     },
   }),
-  link: isBrowser ? from([errorLink, uploadLink]) : from([errorLink, httpLink]),
+  link: isBrowser
+    ? from([authLink, errorLink, uploadLink])
+    : from([authLink, errorLink, httpLink]),
   ssrMode: !isBrowser,
 });
 
