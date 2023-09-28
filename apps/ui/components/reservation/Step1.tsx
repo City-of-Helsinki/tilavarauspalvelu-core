@@ -166,6 +166,9 @@ const Step1 = ({
                     : typeof rawValue === "boolean"
                     ? t(`common:${String(rawValue)}`)
                     : rawValue;
+                  console.log(
+                    `${t(`reservationApplication:label.common.${key}`)} ${key}`
+                  );
                   return (
                     <ParagraphAlt
                       key={`summary_${key}`}
@@ -218,6 +221,9 @@ const Step1 = ({
                 : typeof rawValue === "boolean"
                 ? t(`common:${String(rawValue)}`)
                 : rawValue;
+              console.log(
+                `${t(`reservationApplication:label.common.${key}`)} ${key}`
+              );
               return (
                 <ParagraphAlt key={`summary_${key}`}>
                   <PreviewLabel>
@@ -253,9 +259,11 @@ const Step1 = ({
         accepted={areServiceSpecificTermsAccepted}
         setAccepted={setAreServiceSpecificTermsAccepted}
         errorText={
-          isSubmitted &&
-          !areServiceSpecificTermsAccepted &&
-          `${t("forms:prefix.approve")} ${box[0].heading.toLocaleLowerCase()}`
+          isSubmitted && !areServiceSpecificTermsAccepted
+            ? `${t(
+                "forms:prefix.approve"
+              )} ${box[0].heading.toLocaleLowerCase()}`
+            : undefined
         }
       />
       <TermsBox
@@ -278,9 +286,11 @@ const Step1 = ({
         accepted={areTermsSpaceAccepted}
         setAccepted={setAreTermsSpaceAccepted}
         errorText={
-          isSubmitted &&
-          !areTermsSpaceAccepted &&
-          `${t("forms:prefix.approve")} ${box[1].heading.toLocaleLowerCase()}`
+          isSubmitted && !areTermsSpaceAccepted
+            ? `${t(
+                "forms:prefix.approve"
+              )} ${box[1].heading.toLocaleLowerCase()}`
+            : undefined
         }
       />
       {termsOfUseContent && (
