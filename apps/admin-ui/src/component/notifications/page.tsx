@@ -43,6 +43,7 @@ import {
   checkValidDate,
   checkValidFutureDate,
   checkTimeStringFormat,
+  checkLengthWithoutHtml,
 } from "app/schemas";
 import {
   valueForDateInput,
@@ -206,8 +207,8 @@ const NotificationFormSchema = z
     activeFromTime: z.string(),
     activeUntil: z.string(),
     activeUntilTime: z.string(),
-    // TODO max length doesn't account for the length of an url real max we want is 500 (without links)
-    messageFi: z.string().min(1).max(1000),
+    // NOTE max length is because backend doesn't allow over 1000 characters
+    messageFi: z.string().max(1000),
     messageEn: z.string().max(1000),
     messageSv: z.string().max(1000),
     // refinement is not empty for these two (not having empty as an option forces a default value)
@@ -220,6 +221,17 @@ const NotificationFormSchema = z
         message: "Level cannot be empty",
       }),
     pk: z.number(),
+  })
+  // strip HTML when validating string length
+  // for now only finnish is mandatory but all have max length
+  .superRefine((x, ctx) => {
+    checkLengthWithoutHtml(x.messageFi, ctx, "messageFi", 1, 500);
+  })
+  .superRefine((x, ctx) => {
+    checkLengthWithoutHtml(x.messageEn, ctx, "messageEn", 0, 500);
+  })
+  .superRefine((x, ctx) => {
+    checkLengthWithoutHtml(x.messageSv, ctx, "messageSv", 0, 500);
   })
   // skip date time validation for drafts if both fields are empty
   // if draft and time or date input validate both (can't construct date without both)

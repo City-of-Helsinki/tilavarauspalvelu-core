@@ -99,3 +99,28 @@ export const checkTimeStringFormat = (
     });
   }
 };
+
+export const checkLengthWithoutHtml = (
+  str: string,
+  ctx: z.RefinementCtx,
+  path: string,
+  min?: number,
+  max?: number
+) => {
+  const stripped = str.replaceAll(/<[^>]*>/g, "");
+
+  if (min != null && stripped.length < min) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [path],
+      message: `Message cannot be shorter than ${min} characters`,
+    });
+  }
+  if (max != null && stripped.length > max) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [path],
+      message: `Message cannot be longer than ${max} characters`,
+    });
+  }
+};

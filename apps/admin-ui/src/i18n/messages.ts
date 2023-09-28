@@ -1018,6 +1018,15 @@ const translations: ITranslations = {
         "Date needs to be within three years.": [
           "Päivämäärän tulee olla kolmen vuoden sisällä",
         ],
+        "Message cannot be shorter than 1 characters": [
+          "Viesti ei saa olla tyhjä",
+        ],
+        "Message cannot be longer than 500 characters": [
+          "Viesti ei saa olla yli 500 merkkiä",
+        ],
+        "String must contain at most 1000 character(s)": [
+          "Viesti ei saa olla yli 1000 merkkiä",
+        ],
       },
     },
     level: {
