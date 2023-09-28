@@ -178,7 +178,7 @@ const Step1 = ({
                       <PreviewLabel>
                         {t(`reservationApplication:label.common.${key}`)}
                       </PreviewLabel>
-                      <PreviewValue data-testid={`confirm_${key}`}>
+                      <PreviewValue data-testid={`reservation-confirm__${key}`}>
                         {value}
                       </PreviewValue>
                     </ParagraphAlt>
@@ -196,7 +196,7 @@ const Step1 = ({
               <PreviewLabel>
                 {t("reservationApplication:reserveeTypePrefix")}
               </PreviewLabel>
-              <PreviewValue data-testid="confirm_reserveeType">
+              <PreviewValue data-testid="reservation-confirm__reserveeType">
                 {capitalize(
                   t(
                     `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`
@@ -253,9 +253,11 @@ const Step1 = ({
         accepted={areServiceSpecificTermsAccepted}
         setAccepted={setAreServiceSpecificTermsAccepted}
         errorText={
-          isSubmitted &&
-          !areServiceSpecificTermsAccepted &&
-          `${t("forms:prefix.approve")} ${box[0].heading.toLocaleLowerCase()}`
+          isSubmitted && !areServiceSpecificTermsAccepted
+            ? `${t(
+                "forms:prefix.approve"
+              )} ${box[0].heading.toLocaleLowerCase()}`
+            : undefined
         }
       />
       <TermsBox
@@ -278,9 +280,11 @@ const Step1 = ({
         accepted={areTermsSpaceAccepted}
         setAccepted={setAreTermsSpaceAccepted}
         errorText={
-          isSubmitted &&
-          !areTermsSpaceAccepted &&
-          `${t("forms:prefix.approve")} ${box[1].heading.toLocaleLowerCase()}`
+          isSubmitted && !areTermsSpaceAccepted
+            ? `${t(
+                "forms:prefix.approve"
+              )} ${box[1].heading.toLocaleLowerCase()}`
+            : undefined
         }
       />
       {termsOfUseContent && (

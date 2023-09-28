@@ -32,7 +32,7 @@
   "pastSlug": "Tidigare",
   "modifyReservationTime": "Ändra tid",
   "modifyApplication": "Redigera ansökan",
-  "backToReservations": "Gå tillbaka till Mina bokningar",
+  "backToReservations": "Gå till Mina bokningar",
   "showCancellationTerms": "Visa avbokningsvillkoren",
   "hideCancellationTerms": "Dölj avbokningsvillkoren",
   "cancelInfo": "Uppgifter om avbokningen",
@@ -97,7 +97,7 @@
     "refunded": "Återbetald"
   },
   "reservationEditFailed": "Det gick inte att redigera bokningen",
-  "backToReservationUnit": "Gå tillbaka till objektets sida",
+  "backToReservationUnit": "Tillbaka till objektets sida",
   "reservationExpired": "Bokningen har gått ut",
   "reservationExpiredDescription": "Din bokning gick ut innan betalningen behandlades. Vänligen upprepa bokningsprocessen.",
   "orderInvalid": "Ordernummer ogiltigt",

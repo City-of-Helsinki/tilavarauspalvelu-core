@@ -84,7 +84,7 @@ const EditStep1 = ({
   const { t } = useTranslation();
   const router = useRouter();
 
-  const [hasTermsOfUse, setHasTermsOfUse] = useState<boolean>(null);
+  const [hasTermsOfUse, setHasTermsOfUse] = useState<boolean>();
 
   useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE, {
     variables: {
@@ -92,16 +92,16 @@ const EditStep1 = ({
     },
     onCompleted: (data) => {
       const result: TermsOfUseType =
-        data.termsOfUse.edges
-          .map((n) => n.node)
-          .find((n) => n.pk === "generic1") || null;
+        data.termsOfUse?.edges
+          .map((n) => n?.node)
+          .find((n) => n?.pk === "generic1") || undefined;
       setHasTermsOfUse(Boolean(result));
     },
   });
 
   const frozenReservationUnit = useMemo(() => {
-    return reservation.reservationUnits.find(
-      (n) => n.pk === reservationUnit.pk
+    return reservation.reservationUnits?.find(
+      (n) => n?.pk === reservationUnit.pk
     );
   }, [reservation, reservationUnit]);
 
@@ -111,21 +111,23 @@ const EditStep1 = ({
 
   const generalFields = useMemo(() => {
     return getReservationApplicationFields({
-      supportedFields: frozenReservationUnit.metadataSet?.supportedFields,
+      supportedFields: frozenReservationUnit?.metadataSet?.supportedFields,
       reserveeType: "common",
       camelCaseOutput: true,
     }).filter((n) => n !== "reserveeType");
   }, [frozenReservationUnit?.metadataSet?.supportedFields]);
 
   const reservationApplicationFields = useMemo(() => {
-    const type = frozenReservationUnit.metadataSet?.supportedFields?.includes(
+    const type = frozenReservationUnit?.metadataSet?.supportedFields?.includes(
       "reservee_type"
     )
       ? reservation.reserveeType
       : ReservationsReservationReserveeTypeChoices.Individual;
 
     return getReservationApplicationFields({
-      supportedFields: frozenReservationUnit.metadataSet?.supportedFields,
+      supportedFields: frozenReservationUnit?.metadataSet?.supportedFields ?? [
+        "",
+      ],
       reserveeType: type,
       camelCaseOutput: true,
     });
@@ -141,7 +143,10 @@ const EditStep1 = ({
       }
 
       if (key === "ageGroup") {
-        const { minimum, maximum } = reservation[key];
+        const { minimum, maximum } = reservation[key] ?? {
+          minimum: "1",
+          maximum: "",
+        };
         return `${minimum} - ${maximum}`;
       }
 
@@ -150,7 +155,7 @@ const EditStep1 = ({
       }
 
       if (key === "homeCity") {
-        return `${reservation[key].name}`;
+        return `${reservation[key]?.name}`;
       }
 
       const rawValue = get(reservation, key);
@@ -172,7 +177,7 @@ const EditStep1 = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          setErrorMsg(null);
+          setErrorMsg("");
           if (!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted) {
             setErrorMsg(t("reservationCalendar:errors.termsNotAccepted"));
           } else {
@@ -224,10 +229,10 @@ const EditStep1 = ({
                 <PreviewLabel>
                   {t("reservationApplication:reserveeTypePrefix")}
                 </PreviewLabel>
-                <PreviewValue data-testid="edit_reserveeType">
+                <PreviewValue data-testid="reservation-edit_reserveeType">
                   {capitalize(
                     t(
-                      `reservationApplication:reserveeTypes.labels.${reservation.reserveeType.toLowerCase()}`
+                      `reservationApplication:reserveeTypes.labels.${reservation.reserveeType?.toLowerCase()}`
                     )
                   )}
                 </PreviewValue>
@@ -252,7 +257,7 @@ const EditStep1 = ({
                         }.${key}`
                       )}
                     </PreviewLabel>
-                    <PreviewValue data-testid={`edit_${key}`}>
+                    <PreviewValue data-testid={`reservation-edit__${key}`}>
                       {value}
                     </PreviewValue>
                   </ParagraphAlt>
@@ -306,12 +311,14 @@ const EditStep1 = ({
             />
           }
           links={
-            hasTermsOfUse && [
-              {
-                href: "/terms/general",
-                text: t("reservationCalendar:heading.generalTerms"),
-              },
-            ]
+            hasTermsOfUse
+              ? [
+                  {
+                    href: "/terms/general",
+                    text: t("reservationCalendar:heading.generalTerms"),
+                  },
+                ]
+              : undefined
           }
           acceptLabel={t(
             `reservationCalendar:label.${
