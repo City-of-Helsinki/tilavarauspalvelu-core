@@ -224,7 +224,7 @@ const EditStep1 = ({
                 <PreviewLabel>
                   {t("reservationApplication:reserveeTypePrefix")}
                 </PreviewLabel>
-                <PreviewValue data-testid="edit_reserveeType">
+                <PreviewValue data-testid="reservation-edit_reserveeType">
                   {capitalize(
                     t(
                       `reservationApplication:reserveeTypes.labels.${reservation.reserveeType.toLowerCase()}`
@@ -252,7 +252,7 @@ const EditStep1 = ({
                         }.${key}`
                       )}
                     </PreviewLabel>
-                    <PreviewValue data-testid={`edit_${key}`}>
+                    <PreviewValue data-testid={`reservation-edit__${key}`}>
                       {value}
                     </PreviewValue>
                   </ParagraphAlt>

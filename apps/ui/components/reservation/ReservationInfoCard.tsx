@@ -166,12 +166,12 @@ const ReservationInfoCard = ({
           </Subheading>
         )}
         <Subheading>{getTranslation(reservationUnit.unit, "name")}</Subheading>
-        <Value>
+        <Value data-testid="reservation__reservation-info-card__duration">
           <Strong>
             {capitalize(timeString)}, {formatDurationMinutes(duration)}
           </Strong>
         </Value>
-        <Value>
+        <Value data-testid="reservation__reservation-info-card__price">
           {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
