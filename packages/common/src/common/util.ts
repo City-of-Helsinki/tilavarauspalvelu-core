@@ -134,14 +134,26 @@ export const sortAgeGroups = (ageGroups: Parameter[]): Parameter[] => {
   });
 };
 
+/// @param options.fallbackLang - use a fallback language instead of returning an empty string
 export const getTranslation = (
   parent: Record<string, unknown>,
-  key: string
+  key: string,
+  options?: {
+    fallbackLang?: "fi" | "sv" | "en";
+  }
 ): string => {
   const keyString = `${key}${capitalize(i18n?.language)}`;
   if (parent && parent[keyString]) {
     if (typeof parent[keyString] === "string") {
       return String(parent[keyString]);
+    }
+  }
+  if (options?.fallbackLang) {
+    const fallbackKeyString = `${key}${capitalize(options.fallbackLang)}`;
+    if (parent && parent[fallbackKeyString]) {
+      if (typeof parent[fallbackKeyString] === "string") {
+        return String(parent[fallbackKeyString]);
+      }
     }
   }
 
