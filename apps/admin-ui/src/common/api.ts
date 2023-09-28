@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
 import applyCaseMiddleware from "axios-case-converter";
+import { getCookie } from "typescript-cookie";
 import omit from "lodash/omit";
 import {
   Application,
@@ -97,10 +98,12 @@ async function apiGet<T>({
 const validateStatus = (status: number): boolean => status < 300;
 
 async function apiPut<T>({ path, data }: RequestParameters): Promise<T> {
+  const csrfToken = getCookie("csrftoken");
   return request<T>({
     url: `${apiBaseUrl}/${path}`,
     headers: {
       "Content-Type": "application/json",
+      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
     },
     method: "put",
     data,
@@ -109,10 +112,12 @@ async function apiPut<T>({ path, data }: RequestParameters): Promise<T> {
 }
 
 async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
+  const csrfToken = getCookie("csrftoken");
   return request<T>({
     url: `${apiBaseUrl}/${path}`,
     headers: {
       "Content-Type": "application/json",
+      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
     },
     method: "post",
     data,
@@ -121,10 +126,12 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
 }
 
 async function apiDelete<T>({ path }: RequestParameters): Promise<T> {
+  const csrfToken = getCookie("csrftoken");
   return request<T>({
     url: `${apiBaseUrl}/${path}`,
     headers: {
       "Content-Type": "application/json",
+      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
     },
     method: "delete",
     validateStatus,
@@ -132,10 +139,12 @@ async function apiDelete<T>({ path }: RequestParameters): Promise<T> {
 }
 
 async function apiPatch<T>({ path, data }: RequestParameters): Promise<T> {
+  const csrfToken = getCookie("csrftoken");
   return request<T>({
     url: `${apiBaseUrl}/${path}`,
     headers: {
       "Content-Type": "application/json",
+      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
     },
     method: "patch",
     data,
@@ -157,7 +166,7 @@ export function patchApplicationRoundStatus(
 ): Promise<ApplicationRound> {
   return apiPatch<ApplicationRound>({
     data: { status },
-    path: `v1/${applicationRoundsBasePath}/${id}`,
+    path: `v1/${applicationRoundsBasePath}/${id}/`,
   });
 }
 
@@ -217,7 +226,7 @@ export function setApplicationStatus(
 ): Promise<Application> {
   return apiPost<Application>({
     data: { applicationId, status },
-    path: `v1/${applicationStatusBasePath}`,
+    path: `v1/${applicationStatusBasePath}/`,
   });
 }
 

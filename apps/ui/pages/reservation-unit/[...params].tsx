@@ -41,7 +41,7 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { Container } from "common";
 
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import {
   isBrowser,
   reservationUnitPath,
@@ -87,12 +87,12 @@ type Props = {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const getServerSideProps: GetServerSideProps = async ({
-  locale,
-  params,
-}) => {
-  const reservationUnitPk = Number(params.params[0]);
-  const path = params.params[1];
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale, params } = ctx;
+  const reservationUnitPk = Number(params?.params?.[0]);
+  const path = params?.params?.[1];
+  const apolloClient = createApolloClient(ctx);
+
   let reservationPurposes = [];
   let ageGroups = [];
   let cities = [];

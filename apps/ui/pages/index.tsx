@@ -15,7 +15,7 @@ import Header from "../components/index/Header";
 import SearchGuides from "../components/index/SearchGuides";
 import Purposes from "../components/index/Purposes";
 import Units from "../components/index/Units";
-import apolloClient from "../modules/apolloClient";
+import { createApolloClient } from "../modules/apolloClient";
 import {
   RESERVATION_UNIT_PURPOSES,
   SEARCH_FORM_PARAMS_UNIT,
@@ -39,7 +39,9 @@ const Home = ({ purposes, units }: Props): JSX.Element => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
+  const apolloClient = createApolloClient(ctx);
   const { data: purposeData } = await apolloClient.query<
     Query,
     QueryPurposesArgs

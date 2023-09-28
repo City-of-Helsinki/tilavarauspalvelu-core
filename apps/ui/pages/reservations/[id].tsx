@@ -26,7 +26,7 @@ import Link from "next/link";
 import { Container } from "common";
 import { useSession } from "~/hooks/auth";
 
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { CenterSpinner } from "../../components/common/common";
@@ -60,10 +60,9 @@ type Props = {
   id: number;
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  locale,
-  params,
-}) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale, params } = ctx;
+  const apolloClient = createApolloClient(ctx);
   const id = Number(params?.id);
 
   if (isFinite(id)) {

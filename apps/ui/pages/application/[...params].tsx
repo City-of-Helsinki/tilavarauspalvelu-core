@@ -36,10 +36,12 @@ import {
   uiDateToApiDate,
 } from "../../modules/util";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
+  const apolloClient = createApolloClient(ctx);
   const { data: tosData } = await apolloClient.query<
     Query,
     QueryTermsOfUseArgs
@@ -86,6 +88,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     if (applicationId && Number(applicationId)) {
       try {
         const application = await getApplication(Number(applicationId));
+        // TODO this is weird, why are we not using Client side cache?
+        const apolloClient = createApolloClient(undefined);
         const { data } = await apolloClient.query<
           Query,
           QueryApplicationRoundsArgs

@@ -17,7 +17,7 @@ import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
-import apolloClient from "../../modules/apolloClient";
+import { createApolloClient } from "../../modules/apolloClient";
 import { CenterSpinner } from "../common/common";
 
 type OptionTypes = {
@@ -97,6 +97,8 @@ const ReservationUnitList = ({
           applicationEvent.eventReservationUnits,
           "priority"
         ).map((n) => n.reservationUnitId);
+        // TODO why is this using client directly instead of apollo context with useQuery?
+        const apolloClient = createApolloClient(undefined);
         const { data: reservationUnitData } = await apolloClient.query<
           Query,
           QueryReservationUnitsArgs
