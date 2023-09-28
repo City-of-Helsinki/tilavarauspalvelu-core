@@ -41,7 +41,7 @@ const BannerNotificationBackground = styled.div`
   }
 `;
 
-const BannerNotificationText = styled.span`
+const BannerNotificationText = styled.div`
   font-size: var(--fontsize-body-m);
   p {
     display: inline;
@@ -89,7 +89,9 @@ const NotificationsListItem = ({
           <BannerNotificationText
             dangerouslySetInnerHTML={{
               // eslint-disable-next-line @typescript-eslint/naming-convention
-              __html: getTranslation(notification, "message"),
+              __html: getTranslation(notification, "message", {
+                fallbackLang: "fi",
+              }),
             }}
           />
         )}
