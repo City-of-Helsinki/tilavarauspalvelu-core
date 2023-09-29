@@ -80,7 +80,7 @@ const ReservationInfoCard = ({
   reservationUnit,
   type,
   shouldDisplayReservationUnitPrice = false,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
 
   const { begin, end, taxPercentageValue } = reservation || {};
@@ -123,7 +123,7 @@ const ReservationInfoCard = ({
           trailingZeros: true,
         })
       : getReservationPrice(
-          reservation?.price,
+          Number(reservation?.price),
           t("prices:priceFree"),
           i18n.language,
           true
@@ -137,7 +137,7 @@ const ReservationInfoCard = ({
           minutes: 0,
           asInt: true,
         }) !== "0"
-      : reservation?.price > 0;
+      : Number(reservation?.price) > 0;
 
   const formatters = useMemo(
     () => getFormatters(i18n.language),
@@ -156,13 +156,19 @@ const ReservationInfoCard = ({
       )}
       <Content data-testid="reservation__reservation-info-card__content">
         <Heading>
-          <StyledLink href={reservationUnitPath(reservationUnit.pk)}>
+          <StyledLink
+            data-testid="reservation__reservation-info-card__reservationUnit"
+            href={reservationUnitPath(Number(reservationUnit.pk))}
+          >
             {getTranslation(reservationUnit, "name")}
           </StyledLink>
         </Heading>
         {["confirmed", "complete"].includes(type) && (
           <Subheading>
-            {t("reservations:reservationNumber")}: {reservation.pk}
+            {t("reservations:reservationNumber")}:{" "}
+            <span data-testid="reservation__reservation-info-card__reservationNumber">
+              {reservation.pk}
+            </span>
           </Subheading>
         )}
         <Subheading>{getTranslation(reservationUnit.unit, "name")}</Subheading>
