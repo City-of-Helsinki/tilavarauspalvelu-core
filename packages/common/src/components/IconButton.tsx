@@ -24,12 +24,23 @@ const Container = styled.div`
   text-decoration: none !important;
 `;
 
-const StyledLink = styled(Link)`
-  color: var(--color-black);
+const linkStyles = `
+ color: var(--color-black);
   text-decoration: none;
   &:hover {
     text-decoration: none;
   }
+`;
+
+const StyledLink = styled(Link)`
+  ${linkStyles}
+`;
+
+const StyledLinkButton = styled.button`
+  background: none;
+  border: none;
+  -webkit-appearance: none;
+  padding: 0;
 `;
 
 const Anchor = styled.a`
@@ -41,6 +52,7 @@ const HoverWrapper = styled.div`
   gap: var(--spacing-xs);
   padding-bottom: var(--spacing-3-xs);
   border-bottom: 1px solid transparent;
+  align-items: center;
   &:hover {
     border-color: var(--color-black-30);
   }
@@ -83,7 +95,8 @@ const IconButton = ({
   icon,
   label,
   onClick,
-  href = "#",
+  // eslint-disable-next-line no-script-url
+  href = "javascript:void(0)",
   openInNewTab = !!href && href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
@@ -94,24 +107,31 @@ const IconButton = ({
     onClick,
     ...rest,
   };
-  return !!href && href.substring(0, 4) !== "http" ? (
-    <StyledLink {...buttonProps}>
-      <Container>
-        <HoverWrapper>
-          <Label>{label}</Label>
-          {icon && <IconContainer>{icon}</IconContainer>}
-        </HoverWrapper>
-      </Container>
-    </StyledLink>
+  const LinkElement = () => (
+    <Container>
+      <HoverWrapper>
+        <Label>{label}</Label>
+        {icon && <IconContainer>{icon}</IconContainer>}
+      </HoverWrapper>
+    </Container>
+  );
+  const LinkWrapper = () =>
+    href.substring(0, 4) !== "http" ? (
+      <StyledLink {...buttonProps}>
+        <LinkElement />
+      </StyledLink>
+    ) : (
+      <Anchor {...buttonProps}>
+        <LinkElement />
+      </Anchor>
+    );
+
+  return onClick ? (
+    <StyledLinkButton type="button" {...buttonProps}>
+      <LinkElement />
+    </StyledLinkButton>
   ) : (
-    <Anchor {...buttonProps}>
-      <Container>
-        <HoverWrapper>
-          <Label>{label}</Label>
-          {icon && <IconContainer>{icon}</IconContainer>}
-        </HoverWrapper>
-      </Container>
-    </Anchor>
+    <LinkWrapper />
   );
 };
 export default IconButton;
