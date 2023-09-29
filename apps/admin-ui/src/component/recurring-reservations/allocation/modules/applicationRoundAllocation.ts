@@ -6,11 +6,18 @@ import {
   type ApplicationType,
   type ReservationUnitType,
 } from "common/types/gql-types";
-import type {
-  ApplicationEventSchedulePriority,
-  OptionType,
-} from "@/common/types";
-import { parseApplicationEventScheduleTime } from "@/common/util";
+import type { ApplicationEventSchedulePriority } from "common/types/common";
+import i18next from "i18next";
+import type { OptionType } from "@/common/types";
+
+const parseApplicationEventScheduleTime = (
+  applicationEventSchedule: ApplicationEventScheduleType
+): string => {
+  const weekday = i18next.t(`dayShort.${applicationEventSchedule?.day}`);
+  return `${weekday} ${Number(
+    applicationEventSchedule.begin.substring(0, 2)
+  )}-${Number(applicationEventSchedule.end.substring(0, 2))}`;
+};
 
 export const getFilteredApplicationEvents = (
   applications: ApplicationType[],

@@ -1,10 +1,37 @@
 import React from "react";
 import isPast from "date-fns/isPast";
 import { useTranslation } from "react-i18next";
-import { Application, ApplicationRound } from "../../common/types";
-import { getNormalizedApplicationRoundStatus } from "../../common/util";
+import {
+  Application,
+  ApplicationRound,
+  ApplicationRoundStatus,
+} from "common/types/common";
+import { NormalizedApplicationRoundStatus } from "@/common/types";
 import { getApplicationRoundStatusColor } from "../../styles/util";
 import StatusBlock from "../StatusBlock";
+
+const getNormalizedApplicationRoundStatus = (
+  applicationRound: ApplicationRound
+): ApplicationRoundStatus | NormalizedApplicationRoundStatus => {
+  let normalizedStatus: NormalizedApplicationRoundStatus;
+
+  if (
+    ["in_review", "review_done", "allocated", "handled"].includes(
+      applicationRound.status
+    )
+  ) {
+    normalizedStatus = "handling";
+  } else if (
+    ["approved"].includes(applicationRound.status) &&
+    applicationRound.applicationsSent
+  ) {
+    normalizedStatus = "sent";
+  } else {
+    normalizedStatus = applicationRound.status;
+  }
+
+  return normalizedStatus;
+};
 
 interface IProps {
   applicationRound: ApplicationRound;

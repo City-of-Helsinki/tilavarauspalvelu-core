@@ -1,24 +1,9 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
-import trim from "lodash/trim";
-import upperFirst from "lodash/upperFirst";
-import { groupBy, set, get } from "lodash";
-import {
-  ApplicationEventScheduleType,
-  LocationType,
-  Query,
-} from "common/types/gql-types";
-import {
-  ApplicationEventSchedule,
-  ApplicationEventStatus,
-  ApplicationRound,
-  ApplicationRoundStatus,
-  DataFilterOption,
-  LocalizationLanguages,
-  Location,
-  NormalizedApplicationRoundStatus,
-  TranslationObject,
-} from "./types";
+import { groupBy, set, get, trim } from "lodash";
+import { LocationType, Query } from "common/types/gql-types";
+import { Location } from "common/types/common";
+import { DataFilterOption } from "./types";
 import { NUMBER_OF_DECIMALS } from "./const";
 
 export const DATE_FORMAT = "d.M.yyyy";
@@ -70,69 +55,6 @@ export const formatDecimal = ({
   const value = typeof input === "string" ? parseFloat(input) : input;
 
   return parseFloat(value.toFixed(decimals));
-};
-
-export type ApplicationRoundStatusView = "listing";
-
-export const getNormalizedApplicationEventStatus = (
-  status: ApplicationEventStatus,
-  accepted?: boolean
-): ApplicationEventStatus => {
-  let normalizedStatus: ApplicationEventStatus = status;
-
-  if (accepted) {
-    normalizedStatus = "validated";
-  } else if (["created", "allocating", "allocated"].includes(status)) {
-    normalizedStatus = "created";
-  }
-
-  return normalizedStatus;
-};
-
-export const getNormalizedApplicationRoundStatus = (
-  applicationRound: ApplicationRound
-): ApplicationRoundStatus | NormalizedApplicationRoundStatus => {
-  let normalizedStatus: NormalizedApplicationRoundStatus;
-
-  if (
-    ["in_review", "review_done", "allocated", "handled"].includes(
-      applicationRound.status
-    )
-  ) {
-    normalizedStatus = "handling";
-  } else if (
-    ["approved"].includes(applicationRound.status) &&
-    applicationRound.applicationsSent
-  ) {
-    normalizedStatus = "sent";
-  } else {
-    normalizedStatus = applicationRound.status;
-  }
-
-  return normalizedStatus;
-};
-
-export const parseApplicationEventSchedules = (
-  applicationEventSchedules: ApplicationEventSchedule[],
-  index: number,
-  priority: number
-): string => {
-  const schedules = applicationEventSchedules
-    .filter((s) => s.day === index)
-    .filter((s) => s.priority === priority);
-
-  return schedules
-    .map((s) => `${s.begin.substring(0, 2)}-${s.end.substring(0, 2)}`)
-    .join(", ");
-};
-
-export const parseApplicationEventScheduleTime = (
-  applicationEventSchedule: ApplicationEventScheduleType
-): string => {
-  const weekday = i18next.t(`dayShort.${applicationEventSchedule?.day}`);
-  return `${weekday} ${Number(
-    applicationEventSchedule.begin.substring(0, 2)
-  )}-${Number(applicationEventSchedule.end.substring(0, 2))}`;
 };
 
 interface HMS {
@@ -278,40 +200,19 @@ export const describeArc = (
   ].join(" ");
 };
 
-export const localizedValue = (
-  name: TranslationObject | string | undefined,
-  lang: string
-): string => {
-  if (!name) {
-    return "???";
-  }
-  if (typeof name === "string") {
-    return name;
-  }
-
-  return name[lang as LocalizationLanguages] || "???";
-};
-
-export const localizedPropValue = (
-  // eslint-disable-next-line
-  o: any,
-  propName: string,
-  lang: string
-): string => {
-  return get(o, `${propName}${upperFirst(lang)}`, "???");
-};
-
 interface IAgeGroups {
   minimum?: number;
   maximum?: number;
 }
 
+// TODO rename to print or format
 export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
   return `${i18next.t("common.agesSuffix", {
     range: trim(`${ageGroups.minimum || ""}-${ageGroups.maximum || ""}`, "-"),
   })}`;
 };
 
+// TODO type this to LocationType only (check the users)
 export const parseAddress = (location: Location | LocationType): string => {
   return trim(
     `${
@@ -324,40 +225,6 @@ export const parseAddress = (location: Location | LocationType): string => {
       ""
     }`,
     ", "
-  );
-};
-
-export const isTranslationObject = (value: unknown): boolean => {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    ({}.propertyIsEnumerable.call(value, "fi") ||
-      {}.propertyIsEnumerable.call(value, "en") ||
-      {}.propertyIsEnumerable.call(value, "sv"))
-  );
-};
-
-export const parseAddressLine1 = (
-  location: Location | LocationType
-): string => {
-  return trim(
-    `${
-      (location as Location).addressStreet ||
-      (location as LocationType).addressStreetFi ||
-      ""
-    }`
-  );
-};
-
-export const parseAddressLine2 = (
-  location: Location | LocationType
-): string => {
-  return trim(
-    `${location.addressZip || ""} ${
-      (location as Location).addressCity ||
-      (location as LocationType).addressCityFi ||
-      ""
-    }`
   );
 };
 

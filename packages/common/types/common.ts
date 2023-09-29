@@ -170,6 +170,8 @@ export type ApplicantType =
   | "company";
 
 export type ApplicationStatus =
+  // TODO approved is an extra status that should be removed from admin-ui
+  | "approved"
   | "draft"
   | "in_review"
   | "review_done"
@@ -217,6 +219,8 @@ export type ContactPerson = {
 };
 
 export type ApplicationEventStatus =
+  // TODO ignored is extra status added somewhere in admin-ui
+  | "ignored"
   | "created"
   | "allocating"
   | "allocated"

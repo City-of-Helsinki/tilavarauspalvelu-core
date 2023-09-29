@@ -1,7 +1,5 @@
-import {
-  ApplicationEventSchedule,
-  ApplicationEventSchedulePriority,
-} from "../../../common/types";
+import { ApplicationEventScheduleType } from "common/types/gql-types";
+import { ApplicationEventSchedulePriority } from "common/types/common";
 
 export type Cell = {
   hour: number;
@@ -15,7 +13,7 @@ const cellLabel = (row: number): string => {
 };
 
 export const applicationEventSchedulesToCells = (
-  applicationEventSchedules: ApplicationEventSchedule[]
+  applicationEventSchedules: ApplicationEventScheduleType[]
 ): Cell[][] => {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
@@ -36,6 +34,7 @@ export const applicationEventSchedulesToCells = (
 
   applicationEventSchedules.forEach((applicationEventSchedule) => {
     const { day } = applicationEventSchedule;
+    if (day == null) return;
     const hourBegin =
       Number(applicationEventSchedule.begin.substring(0, 2)) - firstSlotStart;
 
@@ -43,9 +42,10 @@ export const applicationEventSchedulesToCells = (
       (Number(applicationEventSchedule.end.substring(0, 2)) || 24) -
       firstSlotStart;
 
+    const { priority } = applicationEventSchedule;
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day][h];
-      cell.state = applicationEventSchedule.priority;
+      cell.state = priority === 300 || priority === 200 ? priority : 100;
     }
   });
 

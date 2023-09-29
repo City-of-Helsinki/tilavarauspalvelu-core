@@ -8,12 +8,9 @@ import {
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";
-import {
-  ApplicationEventStatus,
-  ApplicationStatus,
-  NormalizedApplicationRoundStatus,
-} from "../common/types";
-import { getApplicationStatusColor } from "../component/applications/util";
+import { ApplicationEventStatus, ApplicationStatus } from "common/types/common";
+import { NormalizedApplicationRoundStatus } from "@/common/types";
+import { getApplicationStatusColor } from "@/component/applications/util";
 
 export const getGridFraction = (space: number, columns = 12): number => {
   const fraction = (space / columns) * 100;

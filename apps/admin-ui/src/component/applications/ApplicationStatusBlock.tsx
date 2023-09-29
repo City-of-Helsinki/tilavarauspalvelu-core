@@ -1,7 +1,7 @@
 import { IconCheck, IconEnvelope } from "hds-react";
 import React, { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { ApplicationStatus, ApplicationRoundStatus } from "../../common/types";
+import { ApplicationStatus, ApplicationRoundStatus } from "common/types/common";
 
 import StatusBlock from "../StatusBlock";
 import {

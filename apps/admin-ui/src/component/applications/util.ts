@@ -9,7 +9,7 @@ import {
   Application,
   ApplicationRoundStatus,
   ApplicationStatus,
-} from "../../common/types";
+} from "common/types/common";
 
 export const applicantName = (app: Application | ApplicationType): string => {
   return app.applicantType === "individual" ||

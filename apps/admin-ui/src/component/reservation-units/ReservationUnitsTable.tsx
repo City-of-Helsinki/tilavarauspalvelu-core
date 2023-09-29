@@ -1,12 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { memoize, truncate } from "lodash";
+import { truncate } from "lodash";
 import { ReservationUnitType } from "common/types/gql-types";
 import { TFunction } from "i18next";
 import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
-import { LocalizationLanguages } from "../../common/types";
 import { reservationUnitUrl } from "../../common/urls";
-import { localizedPropValue } from "../../common/util";
 
 export type Sort = {
   field: string;
@@ -19,13 +17,13 @@ type Props = {
   reservationUnits: ReservationUnitType[];
 };
 
-const getColConfig = (t: TFunction, language: LocalizationLanguages) => [
+const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
     transform: ({ nameFi, pk, unit }: ReservationUnitType) => (
-      <TableLink href={reservationUnitUrl(pk as number, unit?.pk as number)}>
-        {truncate(nameFi as string, {
+      <TableLink href={reservationUnitUrl(pk ?? 0, unit?.pk ?? 0)}>
+        {truncate(nameFi ?? "-", {
           length: 22,
           omission: "...",
         })}
@@ -37,15 +35,14 @@ const getColConfig = (t: TFunction, language: LocalizationLanguages) => [
     headerName: t("ReservationUnits.headings.unitName"),
     key: "unitNameFi",
     isSortable: true,
-    transform: (resUnit: ReservationUnitType) =>
-      localizedPropValue(resUnit, "unit.name", language),
+    transform: (resUnit: ReservationUnitType) => resUnit.unit?.nameFi ?? "-",
   },
   {
     headerName: t("ReservationUnits.headings.reservationUnitType"),
     key: "typeFi",
     isSortable: true,
     transform: ({ reservationUnitType }: ReservationUnitType) => (
-      <span>{localizedPropValue(reservationUnitType, "name", language)}</span>
+      <span>{reservationUnitType?.nameFi ?? "-"}</span>
     ),
   },
   {
@@ -89,11 +86,9 @@ const ReservationUnitsTable = ({
   sortChanged: onSortChanged,
   reservationUnits,
 }: Props): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
-  const cols = memoize(() =>
-    getColConfig(t, i18n.language as LocalizationLanguages)
-  )();
+  const cols = getColConfig(t);
 
   return (
     <DataOrMessage

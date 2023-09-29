@@ -6,6 +6,7 @@ import { TFunction } from "i18next";
 import { IconLinkExternal } from "hds-react";
 import { formatters as getFormatters } from "common";
 import { ApplicationType } from "common/types/gql-types";
+import { ApplicationStatus } from "common/types/common";
 import { publicUrl } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
 import { formatNumber } from "@/common/util";
@@ -14,7 +15,6 @@ import {
   applicationStatusFromGqlToRest,
   applicantName as getApplicantName,
 } from "@/component/applications/util";
-import { ApplicationStatus } from "@/common/types";
 import StatusCell from "@/component/StatusCell";
 import { CustomTable, ExternalTableLink } from "../../lists/components";
 

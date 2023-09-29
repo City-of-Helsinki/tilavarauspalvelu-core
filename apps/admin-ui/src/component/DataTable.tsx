@@ -22,17 +22,13 @@ import pullAll from "lodash/pullAll";
 import classNames from "classnames";
 import { breakpoints } from "common/src/common/style";
 import FilterControls from "./FilterControls";
-import { DataFilterConfig, DataFilterOption, DataGroup } from "../common/types";
+import { DataFilterConfig, DataFilterOption } from "../common/types";
 import { SelectionCheckbox, getGridFraction } from "../styles/util";
 import IconOpenAll from "../images/icon_open-all.svg";
 import IconActivateSelection from "../images/icon_select.svg";
 import IconDisableSelection from "../images/icon_unselect.svg";
 import { truncatedText } from "../styles/typography";
-import {
-  isTranslationObject,
-  localizedValue,
-  filterData,
-} from "../common/util";
+import { filterData } from "../common/util";
 import FilterContainer, { FilterBtn } from "./FilterContainer";
 
 export type OrderTypes = "asc" | "desc";
@@ -57,11 +53,11 @@ export interface CellConfig {
   sorting: string;
   order: OrderTypes;
   rowLink?: ({ id }: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
-  groupLink?: ({ id }: DataGroup) => string;
+  groupLink?: ({ id }: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface IProps {
-  groups: DataGroup[];
+  groups: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
   hasGrouping: boolean;
   config: GeneralConfig;
   cellConfig: CellConfig;
@@ -388,16 +384,12 @@ const processData = (
     }
 
     const sortedData = [...data].sort((a, b) => {
-      let aValue = isTranslationObject(get(a, sorting))
-        ? localizedValue(get(a, sorting), language)
-        : get(a, sorting, "");
+      let aValue = get(a, sorting, "");
 
       if (typeof aValue === "string") {
         aValue = aValue.toLowerCase();
       }
-      let bValue = isTranslationObject(get(b, sorting))
-        ? localizedValue(get(b, sorting), language)
-        : get(b, sorting, "");
+      let bValue = get(b, sorting, "");
 
       if (typeof bValue === "string") {
         bValue = bValue.toLowerCase();

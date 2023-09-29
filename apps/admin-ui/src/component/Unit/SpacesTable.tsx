@@ -17,7 +17,6 @@ import PopupMenu from "./PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
-import { DataGroup } from "../../common/types";
 import SpaceTreeDataTableGroup from "./SpaceTreeDataTableGroup";
 import { useNotification } from "../../context/NotificationContext";
 
@@ -67,12 +66,12 @@ const collectSubTree = (space: SpaceType): SpaceType[] => {
   return [space].concat(children.flatMap((c) => collectSubTree(c)));
 };
 
-const spacesAsGroups = (spaces: SpaceType[]): DataGroup[] => {
+const spacesAsGroups = (spaces: SpaceType[]) => {
   const reconciled = buildTrees(spaces);
   const roots = reconciled.filter((e) => e.parent === null);
 
   return roots.map((sp) => ({
-    id: sp.pk as number,
+    id: sp.pk ?? 0,
     data: collectSubTree(sp),
   }));
 };

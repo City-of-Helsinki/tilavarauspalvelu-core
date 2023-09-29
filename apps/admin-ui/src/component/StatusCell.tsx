@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import styled from "styled-components";
 import { IconArrowRight, IconCheck, IconEnvelope } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { ApplicationEventStatus, ApplicationStatus } from "../common/types";
+import { ApplicationEventStatus, ApplicationStatus } from "common/types/common";
 import { ApplicationEventStatusDot, StatusDot } from "../styles/util";
 
 interface IStatusCellProps {

@@ -41,18 +41,19 @@ const ReservationsDocument = ({
     </PDFPage>
     {application.applicationEvents.map(
       (applicationEvent: ApplicationEvent): JSX.Element[] => {
-        const eventReservations = reservations.filter((res) => {
-          return res.applicationEventId === applicationEvent.id;
-        });
+        const eventReservations = reservations.filter(
+          (res) => res.applicationEventId === applicationEvent.id
+        );
 
         const eventReservationUnits = eventReservations
           .flatMap((value) => value.reservationUnit)
-          .reduce((prev, current) => {
-            if (current != null && !prev.find((v) => v.id === current.id)) {
+          .filter((value): value is ReservationUnit => value != null)
+          .reduce((prev: ReservationUnit[], current) => {
+            if (!prev.find((v) => v.id === current.id)) {
               prev.push(current);
             }
             return prev;
-          }, [] as ReservationUnit[]);
+          }, []);
 
         return eventReservationUnits.map((resUnit) => {
           const reservationUnitReservations = eventReservations.filter((er) =>
