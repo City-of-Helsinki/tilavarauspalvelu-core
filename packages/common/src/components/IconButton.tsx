@@ -25,7 +25,7 @@ const Container = styled.div`
 `;
 
 const linkStyles = `
- color: var(--color-black);
+  color: var(--color-black);
   text-decoration: none;
   &:hover {
     text-decoration: none;
@@ -81,6 +81,25 @@ const IconContainer = styled.div`
   align-items: center;
 `;
 
+const LinkElement = ({ label, icon }) => (
+  <Container>
+    <HoverWrapper>
+      <Label>{label}</Label>
+      {icon && <IconContainer>{icon}</IconContainer>}
+    </HoverWrapper>
+  </Container>
+);
+
+const LinkWrapper = ({ label, icon, href, buttonProps }: IconButtonProps) =>
+  String(href).substring(0, 4) !== "http" ? (
+    <StyledLink {...buttonProps}>
+      <LinkElement label={label} icon={icon} />
+    </StyledLink>
+  ) : (
+    <Anchor {...buttonProps}>
+      <LinkElement label={label} icon={icon} />
+    </Anchor>
+  );
 /*
  *  @param {string} label - the button label text (required)
  *  @param {React.ReactNode | null} icon - an HDS-icon element (required, use `null` if no icon is desired)
@@ -107,31 +126,19 @@ const IconButton = ({
     onClick,
     ...rest,
   };
-  const LinkElement = () => (
-    <Container>
-      <HoverWrapper>
-        <Label>{label}</Label>
-        {icon && <IconContainer>{icon}</IconContainer>}
-      </HoverWrapper>
-    </Container>
-  );
-  const LinkWrapper = () =>
-    href.substring(0, 4) !== "http" ? (
-      <StyledLink {...buttonProps}>
-        <LinkElement />
-      </StyledLink>
-    ) : (
-      <Anchor {...buttonProps}>
-        <LinkElement />
-      </Anchor>
-    );
 
-  return onClick ? (
+  // eslint-disable-next-line no-script-url
+  return onClick && href === "javascript:void(0)" ? (
     <StyledLinkButton type="button" {...buttonProps}>
-      <LinkElement />
+      <LinkElement label={label} icon={icon} />
     </StyledLinkButton>
   ) : (
-    <LinkWrapper />
+    <LinkWrapper
+      label={label}
+      icon={icon}
+      href={href}
+      buttonProps={buttonProps}
+    />
   );
 };
 export default IconButton;
