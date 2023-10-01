@@ -539,7 +539,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 ? "ReservationUnitEditor.reservationUnitUpdatedNotification"
                 : "ReservationUnitEditor.reservationUnitCreatedNotification",
               { name: state.reservationUnitEdit.nameFi }
-            )
+            ),
+            { autoClose: true }
           );
         } else {
           notifyError("jokin meni pieleen");
@@ -600,6 +601,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           type="error"
           label={t("ReservationUnitEditor.errorDataHeading")}
           position="top-center"
+          autoClose={false}
           dismissible
           closeButtonLabelText={t("common.close")}
           onClose={() => dispatch({ type: "clearError" })}

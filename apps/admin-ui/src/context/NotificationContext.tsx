@@ -34,6 +34,7 @@ export const NotificationContext =
 
 export type NotificationOptions = {
   dismissible?: boolean;
+  autoClose?: boolean;
 };
 
 export const useNotification = (): NotificationContextProps =>
@@ -55,11 +56,14 @@ export const NotificationContextProvider: React.FC<Props> = ({
   const showDisappearingNotification = (n: NotificationType) => {
     clearTimeout(cancel);
     setNotification(n);
-    const timeout = setTimeout(() => {
-      setNotification(null);
-    }, 1000 * 5);
-
-    setCancel(timeout);
+    if (n.options.autoClose) {
+      const timeout =
+        n.options.autoClose &&
+        setTimeout(() => {
+          setNotification(null);
+        }, 5 * 1000);
+      setCancel(timeout);
+    }
   };
 
   const notifyError = (
