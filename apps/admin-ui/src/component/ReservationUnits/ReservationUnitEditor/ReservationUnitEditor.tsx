@@ -5,7 +5,6 @@ import {
   IconAlertCircleFill,
   IconArrowLeft,
   IconLinkExternal,
-  Notification,
   NumberInput,
   RadioButton,
   SelectionGroup,
@@ -52,7 +51,11 @@ import {
   VerticalFlex,
 } from "../../../styles/layout";
 
-import { ButtonsStripe, WhiteButton } from "../../../styles/util";
+import {
+  ButtonsStripe,
+  StyledNotification,
+  WhiteButton,
+} from "../../../styles/util";
 import Loader from "../../Loader";
 import { useNotification } from "../../../context/NotificationContext";
 import ActivationGroup from "./ActivationGroup";
@@ -574,7 +577,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   if (state.error && !state.reservationUnit) {
     return (
       <Wrapper>
-        <Notification
+        <StyledNotification
           type="error"
           label={t("errors.functionFailed")}
           position="top-center"
@@ -585,7 +588,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           displayAutoCloseProgress={false}
         >
           {t(state.error.message)}
-        </Notification>
+        </StyledNotification>
       </Wrapper>
     );
   }
@@ -593,7 +596,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   if (state.error) {
     return (
       <Wrapper>
-        <Notification
+        <StyledNotification
           type="error"
           label={t("ReservationUnitEditor.errorDataHeading")}
           position="top-center"
@@ -602,7 +605,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           onClose={() => dispatch({ type: "clearError" })}
         >
           {t(state.error?.message)}
-        </Notification>
+        </StyledNotification>
       </Wrapper>
     );
   }
