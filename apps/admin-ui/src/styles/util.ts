@@ -147,7 +147,7 @@ export const InlineRowLink = styled(BasicLink).attrs({
 
 export const StyledHDSNavigation = styled(Navigation)`
   --breakpoint-xl: 9000px;
-  z-index: var(--tilavaraus-admin-stack-main-menu);
+  z-index: var(--tilavaraus-admin-stack-order-toast);
   .btn-logout {
     span {
       margin: 0;
@@ -240,6 +240,7 @@ export const StyledNotification = styled(Notification)`
   z-index: var(--tilavaraus-admin-stack-notification);
   margin: var(--spacing-xs) var(--spacing-layout-2-xs);
   width: auto;
+  opacity: 1 !important;
   @media (min-width: ${breakpoints.xl}) {
     margin: var(--spacing-s) var(--spacing-layout-xl);
   }
