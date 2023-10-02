@@ -216,14 +216,11 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
   }, [register]);
 
   const bylineContent = useMemo(() => {
-    const reservationUnit = reservation?.reservationUnits
-      ? reservation?.reservationUnits[0]
-      : null;
     return (
       reservation && (
         <ReservationInfoCard
           reservation={reservation}
-          reservationUnit={reservationUnit}
+          reservationUnit={reservation?.reservationUnits?.[0]}
           type="confirmed"
         />
       )
