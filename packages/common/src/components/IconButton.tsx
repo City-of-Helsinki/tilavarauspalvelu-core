@@ -24,12 +24,23 @@ const Container = styled.div`
   text-decoration: none !important;
 `;
 
-const StyledLink = styled(Link)`
+const linkStyles = `
   color: var(--color-black);
   text-decoration: none;
   &:hover {
     text-decoration: none;
   }
+`;
+
+const StyledLink = styled(Link)`
+  ${linkStyles}
+`;
+
+const StyledLinkButton = styled.button`
+  background: none;
+  border: none;
+  -webkit-appearance: none;
+  padding: 0;
 `;
 
 const Anchor = styled.a`
@@ -41,6 +52,7 @@ const HoverWrapper = styled.div`
   gap: var(--spacing-xs);
   padding-bottom: var(--spacing-3-xs);
   border-bottom: 1px solid transparent;
+  align-items: center;
   &:hover {
     border-color: var(--color-black-30);
   }
@@ -69,6 +81,25 @@ const IconContainer = styled.div`
   align-items: center;
 `;
 
+const LinkElement = ({ label, icon }) => (
+  <Container>
+    <HoverWrapper>
+      <Label>{label}</Label>
+      {icon && <IconContainer>{icon}</IconContainer>}
+    </HoverWrapper>
+  </Container>
+);
+
+const LinkWrapper = ({ label, icon, href, buttonProps }: IconButtonProps) =>
+  String(href).substring(0, 4) !== "http" ? (
+    <StyledLink {...buttonProps}>
+      <LinkElement label={label} icon={icon} />
+    </StyledLink>
+  ) : (
+    <Anchor {...buttonProps}>
+      <LinkElement label={label} icon={icon} />
+    </Anchor>
+  );
 /*
  *  @param {string} label - the button label text (required)
  *  @param {React.ReactNode | null} icon - an HDS-icon element (required, use `null` if no icon is desired)
@@ -83,7 +114,8 @@ const IconButton = ({
   icon,
   label,
   onClick,
-  href = "#",
+  // eslint-disable-next-line no-script-url
+  href = "javascript:void(0)",
   openInNewTab = !!href && href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
@@ -94,24 +126,19 @@ const IconButton = ({
     onClick,
     ...rest,
   };
-  return !!href && href.substring(0, 4) !== "http" ? (
-    <StyledLink {...buttonProps}>
-      <Container>
-        <HoverWrapper>
-          <Label>{label}</Label>
-          {icon && <IconContainer>{icon}</IconContainer>}
-        </HoverWrapper>
-      </Container>
-    </StyledLink>
+
+  // eslint-disable-next-line no-script-url
+  return onClick && href === "javascript:void(0)" ? (
+    <StyledLinkButton type="button" {...buttonProps}>
+      <LinkElement label={label} icon={icon} />
+    </StyledLinkButton>
   ) : (
-    <Anchor {...buttonProps}>
-      <Container>
-        <HoverWrapper>
-          <Label>{label}</Label>
-          {icon && <IconContainer>{icon}</IconContainer>}
-        </HoverWrapper>
-      </Container>
-    </Anchor>
+    <LinkWrapper
+      label={label}
+      icon={icon}
+      href={href}
+      buttonProps={buttonProps}
+    />
   );
 };
 export default IconButton;
