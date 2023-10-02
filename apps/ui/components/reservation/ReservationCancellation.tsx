@@ -215,24 +215,26 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     register("description");
   }, [register]);
 
+  const reservationUnit = reservation?.reservationUnits
+    ? reservation.reservationUnits[0]
+    : undefined;
+
   const bylineContent = useMemo(() => {
     return (
       reservation && (
         <ReservationInfoCard
           reservation={reservation}
-          reservationUnit={reservation?.reservationUnits?.[0]}
+          reservationUnit={reservationUnit}
           type="confirmed"
         />
       )
     );
-  }, [reservation]);
+  }, [reservation, reservationUnit]);
 
   if (!reservation) {
     return <Spinner />;
   }
 
-  const reservationUnit =
-    reservation.reservationUnits && reservation.reservationUnits[0];
   const instructions = getTranslation(
     reservationUnit,
     "reservationCancelledInstructions"

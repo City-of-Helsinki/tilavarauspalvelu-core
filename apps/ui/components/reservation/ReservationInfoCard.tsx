@@ -18,14 +18,18 @@ import {
   formatDurationMinutes,
   getMainImage,
   getTranslation,
-} from "../../modules/util";
+} from "../../modules/util";
 import { reservationUnitPath } from "../../modules/const";
 
 type Type = "pending" | "confirmed" | "complete";
 
 type Props = {
   reservation: ReservationType;
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType | undefined;
+  reservationUnit:
+    | ReservationUnitType
+    | ReservationUnitByPkType
+    | null
+    | undefined;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
 };
