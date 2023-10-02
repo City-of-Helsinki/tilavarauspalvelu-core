@@ -25,7 +25,7 @@ type Type = "pending" | "confirmed" | "complete";
 
 type Props = {
   reservation: ReservationType;
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType | null;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
 };

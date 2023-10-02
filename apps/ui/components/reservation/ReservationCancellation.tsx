@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useMutation, useQuery } from "@apollo/client";
 import router from "next/router";
 import { Controller, useForm } from "react-hook-form";
-import { IconCross, Select } from "hds-react";
+import { IconArrowRight, IconCross, IconSignout, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
@@ -17,7 +17,7 @@ import {
   ReservationType,
 } from "common/types/gql-types";
 import { Container as CommonContainer } from "common";
-import { ShowAllContainer } from "common/src/components";
+import { IconButton, ShowAllContainer } from "common/src/components";
 import Sanitize from "../common/Sanitize";
 import {
   CANCEL_RESERVATION,
@@ -30,8 +30,7 @@ import { CenterSpinner } from "../common/common";
 import { BlackButton, MediumButton, Toast } from "../../styles/util";
 import ReservationInfoCard from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
-import { reservationUnitPath } from "../../modules/const";
-import ReturnLinkList from "./ReturnLinkList";
+import { signOut } from "@/hooks/auth";
 
 type Props = {
   id: number;
@@ -116,13 +115,46 @@ const Form = styled.form`
   }
 `;
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled(Select<OptionType>)`
   margin-bottom: var(--spacing-l);
 
   @media (min-width: ${breakpoints.l}) {
     width: 50%;
   }
 `;
+
+const ReturnLinkContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const ReturnLinkList = ({
+  style,
+}: {
+  style: React.CSSProperties;
+}): JSX.Element => {
+  const { t } = useTranslation();
+  return (
+    <ReturnLinkContainer style={style}>
+      <IconButton
+        href="/reservations"
+        label={t("reservations:gotoReservations")}
+        icon={<IconArrowRight aria-hidden />}
+      />
+      <IconButton
+        href="/"
+        label={t("common:gotoFrontpage")}
+        icon={<IconArrowRight aria-hidden />}
+      />
+      <IconButton
+        icon={<IconSignout aria-hidden />}
+        onClick={() => signOut()}
+        label={t("common:logout")}
+      />
+    </ReturnLinkContainer>
+  );
+};
 
 const ReservationCancellation = ({ id }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -147,12 +179,14 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     {
       fetchPolicy: "cache-first",
       onCompleted: (data) => {
-        setReasons(
-          data.reservationCancelReasons.edges.map((edge) => ({
-            label: getTranslation(edge.node, "reason"),
-            value: edge.node.pk,
-          }))
-        );
+        const { edges } = data.reservationCancelReasons ?? {};
+        if (edges)
+          setReasons(
+            edges.map((edge) => ({
+              label: getTranslation(edge?.node, "reason"),
+              value: edge?.node?.pk !== null ? edge?.node?.pk : "",
+            }))
+          );
       },
     }
   );
@@ -167,7 +201,7 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
 
   useEffect(() => {
     if (!loading) {
-      if (error || data?.cancelReservation?.errors?.length > 0) {
+      if (error || Number(data?.cancelReservation?.errors?.length) > 0) {
         setErrorMsg(t("reservations:reservationCancellationFailed"));
       } else if (data) {
         setFormState("sent");
@@ -182,7 +216,9 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
   }, [register]);
 
   const bylineContent = useMemo(() => {
-    const reservationUnit = reservation?.reservationUnits[0];
+    const reservationUnit = reservation?.reservationUnits
+      ? reservation?.reservationUnits[0]
+      : null;
     return (
       reservation && (
         <ReservationInfoCard
@@ -198,19 +234,20 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     return <Spinner />;
   }
 
-  const reservationUnit = reservation.reservationUnits[0];
+  const reservationUnit =
+    reservation.reservationUnits && reservation.reservationUnits[0];
   const instructions = getTranslation(
     reservationUnit,
     "reservationCancelledInstructions"
   );
 
-  const onSubmit = (formData: { reason: number; description?: string }) => {
+  const onSubmit = (formData: { reason?: number; description?: string }) => {
     const { reason, description } = formData;
     cancelReservation({
       variables: {
         input: {
-          pk: reservation.pk,
-          cancelReasonPk: reason,
+          pk: Number(reservation.pk),
+          cancelReasonPk: Number(reason),
           cancelDetails: description,
         },
       },
@@ -255,7 +292,7 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
                         body={
                           <Sanitize
                             html={getTranslation(
-                              reservationUnit.cancellationTerms,
+                              reservationUnit?.cancellationTerms,
                               "text"
                             )}
                           />
@@ -311,9 +348,6 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
                       </Paragraph>
                     )}
                     <ReturnLinkList
-                      reservationUnitHome={reservationUnitPath(
-                        reservationUnit.pk
-                      )}
                       style={{
                         marginTop: "var(--spacing-3-xl)",
                       }}

@@ -98,7 +98,7 @@
     "refunded": "Refunded"
   },
   "reservationEditFailed": "Failed to edit the booking",
-  "backToReservationUnit": "Back to the item’s front page",
+  "backToReservationUnit": "Back to destination page",
   "reservationExpired": "Booking has expired",
   "reservationExpiredDescription": "Your booking expired before the payment was processed. Please, repeat the booking process.",
   "orderInvalid": "Order number invalid",

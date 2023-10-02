@@ -1,6 +1,11 @@
 import React, { useMemo } from "react";
 import { ReservationState } from "common/types/common";
-import { IconCalendar, IconLinkExternal } from "hds-react";
+import {
+  IconArrowRight,
+  IconCalendar,
+  IconLinkExternal,
+  IconSignout,
+} from "hds-react";
 import { useRouter } from "next/router";
 import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
@@ -15,12 +20,13 @@ import {
 } from "common/types/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
+import { IconButton } from "common/src/components";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
-import ReturnLinkList from "./ReturnLinkList";
+import { signOut } from "@/hooks/auth";
 
 type Props = {
   reservation: Reservation | ReservationType;
@@ -58,6 +64,41 @@ const InlineStyledLink = styled(Link)`
     ${fontRegular};
   }
 `;
+
+const ReturnLinkContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const ReturnLinkList = ({
+  reservationUnitHome,
+  style,
+}: {
+  reservationUnitHome: string;
+  style: React.CSSProperties;
+}): JSX.Element => {
+  const { t } = useTranslation();
+  return (
+    <ReturnLinkContainer style={style}>
+      <IconButton
+        href={reservationUnitHome}
+        label={t("reservations:backToReservationUnit")}
+        icon={<IconArrowRight aria-hidden />}
+      />
+      <IconButton
+        href="/"
+        label={t("common:gotoFrontpage")}
+        icon={<IconArrowRight aria-hidden />}
+      />
+      <IconButton
+        icon={<IconSignout aria-hidden />}
+        onClick={() => signOut()}
+        label={t("common:logout")}
+      />
+    </ReturnLinkContainer>
+  );
+};
 
 const ReservationConfirmation = ({
   reservation,
@@ -111,7 +152,7 @@ const ReservationConfirmation = ({
           <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
             <BlackButton
               data-testid="reservation__confirmation--button__calendar-url"
-              onClick={() => router.push(reservation.calendarUrl)}
+              onClick={() => router.push(String(reservation.calendarUrl))}
               variant="secondary"
               iconRight={<IconCalendar aria-hidden />}
             >
@@ -134,16 +175,16 @@ const ReservationConfirmation = ({
             )}
           </ActionContainer1>
         )}
-        {getTranslation(reservationUnit, instructionsKey) && (
+        {getTranslation(reservationUnit, String(instructionsKey)) && (
           <>
             <Subheading>{t("reservations:reservationInfo")}</Subheading>
             <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-              {getTranslation(reservationUnit, instructionsKey)}
+              {getTranslation(reservationUnit, String(instructionsKey))}
             </Paragraph>
           </>
         )}
         <ReturnLinkList
-          reservationUnitHome={reservationUnitPath(reservationUnit.pk)}
+          reservationUnitHome={reservationUnitPath(Number(reservationUnit.pk))}
           style={{
             marginTop: "var(--spacing-3-xl)",
           }}
