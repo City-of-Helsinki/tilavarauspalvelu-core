@@ -67,7 +67,9 @@ const Navigation = () => {
   const router = useRouter();
 
   const handleNavigationTitleClick = () =>
-    router.push("/", "/", { locale: router.locale });
+    router.push("/", "/", {
+      locale: router.locale,
+    });
 
   const handleLanguageChange = (
     e: MouseEvent<HTMLAnchorElement>,
@@ -82,7 +84,6 @@ const Navigation = () => {
   return (
     <StyledNavigation
       title={t("common:applicationName")}
-      titleUrl="/"
       titleAriaLabel={t("common:applicationName")}
       onTitleClick={handleNavigationTitleClick}
       menuToggleAriaLabel="Menu"
