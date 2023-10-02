@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize, truncate } from "lodash";
 import { ReservationType } from "common/types/gql-types";
-import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
+import { CustomTable, TableLink } from "../lists/components";
 import { reservationUrl } from "../../common/urls";
 import { getReserveeName, reservationDateTimeString } from "./requested/util";
 import { formatDateTime } from "../../common/util";
@@ -101,22 +101,21 @@ const ReservationsTable = ({
 
   const cols = memoize(() => getColConfig(t))();
 
+  if (reservations.length === 0) {
+    return <div>{t("Reservations.noFilteredReservations")}</div>;
+  }
+
   return (
-    <DataOrMessage
-      filteredData={reservations}
-      noFilteredData={t("Reservations.noFilteredReservations")}
-    >
-      <CustomTable
-        setSort={onSortChanged}
-        indexKey="pk"
-        rows={reservations}
-        cols={cols}
-        initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-        initialSortingOrder={
-          sort === undefined ? undefined : (sort.asc && "asc") || "desc"
-        }
-      />
-    </DataOrMessage>
+    <CustomTable
+      setSort={onSortChanged}
+      indexKey="pk"
+      rows={reservations}
+      cols={cols}
+      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
+      initialSortingOrder={
+        sort === undefined ? undefined : (sort.asc && "asc") || "desc"
+      }
+    />
   );
 };
 

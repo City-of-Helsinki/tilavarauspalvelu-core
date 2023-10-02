@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { truncate } from "lodash";
 import { ReservationUnitType } from "common/types/gql-types";
 import { TFunction } from "i18next";
-import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
+import { CustomTable, TableLink } from "../lists/components";
 import { reservationUnitUrl } from "../../common/urls";
 
 export type Sort = {
@@ -90,22 +90,20 @@ const ReservationUnitsTable = ({
 
   const cols = getColConfig(t);
 
+  if (reservationUnits.length === 0) {
+    <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
+  }
   return (
-    <DataOrMessage
-      filteredData={reservationUnits}
-      noFilteredData={t("ReservationUnits.noFilteredReservationUnits")}
-    >
-      <CustomTable
-        setSort={onSortChanged}
-        indexKey="pk"
-        rows={reservationUnits}
-        cols={cols}
-        initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-        initialSortingOrder={
-          sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-        }
-      />
-    </DataOrMessage>
+    <CustomTable
+      setSort={onSortChanged}
+      indexKey="pk"
+      rows={reservationUnits}
+      cols={cols}
+      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
+      initialSortingOrder={
+        sort === undefined ? undefined : (sort.sort && "asc") || "desc"
+      }
+    />
   );
 };
 

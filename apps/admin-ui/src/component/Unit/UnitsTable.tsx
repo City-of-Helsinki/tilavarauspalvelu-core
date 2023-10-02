@@ -4,7 +4,7 @@ import { memoize } from "lodash";
 import { UnitType } from "common/types/gql-types";
 import { TFunction } from "i18next";
 import { myUnitUrl, unitUrl } from "../../common/urls";
-import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
+import { CustomTable, TableLink } from "../lists/components";
 
 export type Sort = {
   field: string;
@@ -69,22 +69,20 @@ const UnitsTable = ({
 
   const cols = memoize(() => getColConfig(t, isMyUnits))();
 
+  if (units.length === 0) {
+    return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
+  }
   return (
-    <DataOrMessage
-      filteredData={units}
-      noFilteredData={t("ReservationUnits.noFilteredReservationUnits")}
-    >
-      <CustomTable
-        setSort={onSortChanged}
-        indexKey="pk"
-        rows={units}
-        cols={cols}
-        initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-        initialSortingOrder={
-          sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-        }
-      />
-    </DataOrMessage>
+    <CustomTable
+      setSort={onSortChanged}
+      indexKey="pk"
+      rows={units}
+      cols={cols}
+      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
+      initialSortingOrder={
+        sort === undefined ? undefined : (sort.sort && "asc") || "desc"
+      }
+    />
   );
 };
 
