@@ -197,6 +197,11 @@ const SearchForm = ({
 
   const [reservationTypeSearchInput, setReservationTypeSearchInput] =
     useState<string>("");
+  const [reservationEquipmentSearchInput, setReservationEquipmentSearchInput] =
+    useState<string>("");
+  const [reservationEquipmentOptions, setReservationEquipmentOptions] = useState<
+    OptionType[]
+  >([]);
   const [unitSearchInput, setUnitSearchInput] = useState<string>("");
   const [purposeSearchInput, setPurposeSearchInput] = useState<string>("");
   const [areFiltersVisible, setAreFiltersVisible] = useState(false);
@@ -270,6 +275,7 @@ const SearchForm = ({
     register("maxPersons");
     register("unit");
     register("reservationUnitType");
+    register("reservationEquipment");
     register("purposes");
   }, [register]);
 
@@ -316,6 +322,23 @@ const SearchForm = ({
             showSearch
             title={t("searchForm:unitFilter")}
             value={watch("unit")?.split(",") || [""]}
+          />
+          <MultiSelectDropdown
+            id="reservationUnitEquipmentFilter"
+            checkboxName="reservationUnitEquipmentFilter"
+            inputValue={reservationEquipmentSearchInput}
+            name="reservationEquipment"
+            onChange={(selection: string[]): void => {
+              setValue(
+                "reservationEquipment",
+                selection.filter((n) => n !== "").join(",")
+              );
+            }}
+            options={reservationEquipmentOptions}
+            setInputValue={setReservationEquipmentSearchInput}
+            showSearch
+            title={t("searchForm:equipmentLabel")}
+            value={watch("reservationEquipment")?.split(",") || [""]}
           />
           <MultiSelectDropdown
             id="reservationUnitTypeFilter"
