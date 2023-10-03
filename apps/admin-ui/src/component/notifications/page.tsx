@@ -443,6 +443,7 @@ const NotificationForm = ({
       // TODO what is the format of these errors?
       // eslint-disable-next-line no-console
       console.error("error", e);
+      // TODO this is not necessary gql error, for example notifySuccess can throw on null
       handleError(["gql threw an error"]);
     }
   };

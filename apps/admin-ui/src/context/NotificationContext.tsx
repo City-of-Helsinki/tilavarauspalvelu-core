@@ -17,10 +17,9 @@ export type NotificationContextProps = {
 };
 
 export type NotificationType = {
-  title: string | null;
-  message: string | null;
   type: "error" | "success";
-  options?: NotificationOptions;
+  title?: string;
+  message?: string;
 };
 
 export const NotificationContext =
@@ -33,7 +32,6 @@ export const NotificationContext =
   });
 
 export type NotificationOptions = {
-  dismissible?: boolean;
   autoClose?: boolean;
 };
 
@@ -53,15 +51,16 @@ export const NotificationContextProvider: React.FC<Props> = ({
 
   const clearNotification = () => setNotification(null);
 
-  const showDisappearingNotification = (n: NotificationType) => {
+  const showDisappearingNotification = (
+    n: NotificationType,
+    options?: NotificationOptions
+  ) => {
     clearTimeout(cancel);
     setNotification(n);
-    if (n.options.autoClose) {
-      const timeout =
-        n.options.autoClose &&
-        setTimeout(() => {
-          setNotification(null);
-        }, 5 * 1000);
+    if (options?.autoClose) {
+      const timeout = setTimeout(() => {
+        setNotification(null);
+      }, 5 * 1000);
       setCancel(timeout);
     }
   };
@@ -69,27 +68,31 @@ export const NotificationContextProvider: React.FC<Props> = ({
   const notifyError = (
     message?: string,
     options?: NotificationOptions,
-    title = ""
+    title?: string
   ) => {
-    showDisappearingNotification({
-      type: "error",
-      title: title || null,
-      message: message || null,
-      options,
-    });
+    showDisappearingNotification(
+      {
+        type: "error",
+        title,
+        message,
+      },
+      options
+    );
   };
 
   const notifySuccess = (
     message?: string,
     options?: NotificationOptions,
-    title = ""
+    title?: string
   ) => {
-    showDisappearingNotification({
-      type: "success",
-      title: title || null,
-      message: message || null,
-      options,
-    });
+    showDisappearingNotification(
+      {
+        type: "success",
+        title,
+        message,
+      },
+      options
+    );
   };
 
   const [state] = React.useState({
