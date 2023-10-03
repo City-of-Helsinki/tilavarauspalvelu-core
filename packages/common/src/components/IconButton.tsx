@@ -113,7 +113,7 @@ const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) =>
   );
 /*
  *  @param {string} label - the button label text (required)
- *  @param {React.ReactNode | null} icon - an HDS-icon element (required, use `null` if no icon is desired)
+ *  @param {React.ReactNode} icon - an HDS-icon element (required)
  *  @param {string} [href] - the link URI (optional) if none is provided, renders a non-link button
  *  @param {boolean} [openInNewTab] - should the link open in a new tab (optional, default true if href begins "http...")
  *  @param {function} [onClick] - a function to execute upon clicking the button (optional)
