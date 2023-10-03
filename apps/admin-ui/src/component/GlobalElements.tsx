@@ -16,13 +16,6 @@ const GlobalElements = (): JSX.Element => {
     <Modal>{modalContent.content}</Modal>
   );
 
-  const dismissible = Object.prototype.hasOwnProperty.call(
-    notification?.options || {},
-    "dismissible"
-  )
-    ? notification?.options?.dismissible
-    : true;
-
   return (
     <>
       {modalContent.content ? modal : null}
@@ -31,7 +24,6 @@ const GlobalElements = (): JSX.Element => {
           type={notification.type}
           label={notification.title}
           position="top-center"
-          dismissible={dismissible}
           closeButtonLabelText={`${t("common.close")}`}
           onClose={clearNotification}
         >

@@ -100,8 +100,7 @@ const ApplicationEventScheduleCard = ({
       notifySuccess(
         t("Allocation.acceptingSuccess", {
           applicationEvent: applicationEvent.name,
-        }),
-        { dismissible: false }
+        })
       );
     },
     onError: (error) => {
@@ -109,9 +108,7 @@ const ApplicationEventScheduleCard = ({
         error.message === "No permission to mutate"
           ? "Allocation.errors.noPermission"
           : "Allocation.errors.acceptingFailed";
-      notifyError(t(msg, { applicationEvent: applicationEvent.name }), {
-        dismissible: false,
-      });
+      notifyError(t(msg, { applicationEvent: applicationEvent.name }));
       setProcessingResult(false);
     },
   });
@@ -124,8 +121,7 @@ const ApplicationEventScheduleCard = ({
       notifySuccess(
         t("Allocation.acceptingSuccess", {
           applicationEvent: applicationEvent.name,
-        }),
-        { dismissible: false }
+        })
       );
     },
     onError: (error) => {
@@ -133,9 +129,7 @@ const ApplicationEventScheduleCard = ({
         error.message === "No permission to mutate"
           ? "Allocation.errors.noPermission"
           : "Allocation.errors.acceptingFailed";
-      notifyError(t(msg, { applicationEvent: applicationEvent.name }), {
-        dismissible: false,
-      });
+      notifyError(t(msg, { applicationEvent: applicationEvent.name }));
       setProcessingResult(false);
     },
   });
