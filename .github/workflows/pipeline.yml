@@ -44,9 +44,9 @@ jobs:
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Lint admin ui
         run: |
+          pnpm tsc --filter=admin-ui...
           pnpm lint --filter=admin-ui...
           pnpm lint:css --filter=admin-ui...
-          # TODO run tsc also when it's not broken
 
   build-admin-ui:
     name: Build admin ui

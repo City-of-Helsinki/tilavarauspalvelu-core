@@ -16,7 +16,8 @@
     "generate-gql-types": "graphql-codegen",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "update-schema": "npx --yes get-graphql-schema http://localhost:8000/graphql/ > ../../tilavaraus.graphql",
-    "generate-email-templates": "node ./email/convertToHTML.mjs"
+    "generate-email-templates": "node ./email/convertToHTML.mjs",
+    "tsc": "tsc --noEmit --project tsconfig.tscheck.json"
   },
   "dependencies": {
     "@apollo/client": "^3.8.1",
