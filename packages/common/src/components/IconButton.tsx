@@ -7,7 +7,7 @@ interface IconButtonProps {
   // the button label text
   label: string;
   // a HDS-icon element (use `null` if no icon is desired)
-  icon: React.ReactNode | null;
+  icon: React.ReactNode;
   // the link URI (defaults to "javascript:void(0);" to not interfere with onClick if not in use)
   href?: string;
   // should the link open in a new tab (true if href begins "http...", otherwise false by default)
@@ -81,7 +81,13 @@ const IconContainer = styled.div`
   align-items: center;
 `;
 
-const LinkElement = ({ label, icon }) => (
+const LinkElement = ({
+  label,
+  icon,
+}: {
+  label: string;
+  icon: React.ReactNode;
+}) => (
   <Container>
     <HoverWrapper>
       <Label>{label}</Label>
@@ -90,20 +96,25 @@ const LinkElement = ({ label, icon }) => (
   </Container>
 );
 
-const LinkWrapper = ({ label, icon, href, buttonProps }: IconButtonProps) =>
+type LinkWrapperProps = {
+  label: string;
+  icon: React.ReactNode;
+  href: string;
+};
+const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) =>
   String(href).substring(0, 4) !== "http" ? (
-    <StyledLink {...buttonProps}>
+    <StyledLink {...rest} href={href}>
       <LinkElement label={label} icon={icon} />
     </StyledLink>
   ) : (
-    <Anchor {...buttonProps}>
+    <Anchor {...rest} href={href}>
       <LinkElement label={label} icon={icon} />
     </Anchor>
   );
 /*
  *  @param {string} label - the button label text (required)
  *  @param {React.ReactNode | null} icon - an HDS-icon element (required, use `null` if no icon is desired)
- *  @param {string} [href] - the link URI (optional, defaults to "javascript:void(0);")
+ *  @param {string} [href] - the link URI (optional) if none is provided, renders a non-link button
  *  @param {boolean} [openInNewTab] - should the link open in a new tab (optional, default true if href begins "http...")
  *  @param {function} [onClick] - a function to execute upon clicking the button (optional)
  *  @returns {JSX.Element} A `<Link>` for internal or an `<a>` for external `href`s, with the `icon` aligned to the
@@ -113,32 +124,23 @@ const LinkWrapper = ({ label, icon, href, buttonProps }: IconButtonProps) =>
 const IconButton = ({
   icon,
   label,
-  onClick,
-  // eslint-disable-next-line no-script-url
-  href = "javascript:void(0)",
+  href,
   openInNewTab = !!href && href.substring(0, 4) === "http", // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
-  const buttonProps = {
+  const linkOptions = {
     href,
     target: openInNewTab ? "_blank" : undefined,
     rel: openInNewTab ? "noopener noreferrer" : undefined,
-    onClick,
     ...rest,
   };
 
-  // eslint-disable-next-line no-script-url
-  return onClick && href === "javascript:void(0)" ? (
-    <StyledLinkButton type="button" {...buttonProps}>
+  return href == null ? (
+    <StyledLinkButton type="button" {...rest}>
       <LinkElement label={label} icon={icon} />
     </StyledLinkButton>
   ) : (
-    <LinkWrapper
-      label={label}
-      icon={icon}
-      href={href}
-      buttonProps={buttonProps}
-    />
+    <LinkWrapper {...linkOptions} href={href} label={label} icon={icon} />
   );
 };
 export default IconButton;
