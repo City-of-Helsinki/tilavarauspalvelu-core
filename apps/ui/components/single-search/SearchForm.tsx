@@ -16,10 +16,13 @@ import { sortBy } from "lodash";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryUnitsArgs } from "common/types/gql-types";
+import { toApiDate } from "common/src/common/util";
+import { addYears } from "date-fns";
 import {
   mapOptions,
   getSelectedOption,
   getTranslation,
+  fromUIDate,
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { MediumButton, truncatedText } from "../../styles/util";
@@ -31,6 +34,7 @@ import {
 import { RESERVATION_UNIT_TYPES } from "../../modules/queries/reservationUnit";
 import { getUnitName } from "../../modules/reservationUnit";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
+import DateRangePicker from "@/components/form/DateRangePicker";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -41,10 +45,9 @@ type Props = {
 const desktopBreakpoint = "840px";
 
 const TopContainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-flow: column nowrap;
   gap: var(--spacing-m);
-  align-items: flex-end;
 
   @media (min-width: ${desktopBreakpoint}) {
     grid-template-columns: 1fr 154px;
@@ -136,11 +139,28 @@ const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
   ${({ $gap }) => $gap && `gap: ${$gap};`}
 `;
 
-const ButtonContainer = styled.div`
+const DateRangeWrapper = styled.div`
+  > div {
+    display: flex;
+    // Starting date picker
+    > div:first-child {
+      input {
+        border-right: 0;
+      }
+    }
+    // Ending date picker
+    > div:last-child {
+      margin-top: 0;
+    }
+  }
+`;
+
+const BottomContainer = styled.div`
   margin: var(--spacing-m) 0;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  width: 100%;
+  flex-flow: row nowrap;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--spacing-m);
 `;
@@ -186,6 +206,7 @@ const filterOrder = [
   "reservationUnitType",
   "unit",
   "purposes",
+  // TODO: add the new filters here - order is unclear
 ];
 
 const SearchForm = ({
@@ -199,9 +220,14 @@ const SearchForm = ({
     useState<string>("");
   const [reservationEquipmentSearchInput, setReservationEquipmentSearchInput] =
     useState<string>("");
-  const [reservationEquipmentOptions, setReservationEquipmentOptions] = useState<
-    OptionType[]
-  >([]);
+  const [reservationStartDate, setReservationStartDate] = useState<Date | null>(
+    new Date()
+  );
+  const [reservationEndDate, setReservationEndDate] = useState<Date | null>(
+    null
+  );
+  const [reservationEquipmentOptions, setReservationEquipmentOptions] =
+    useState<OptionType[]>([]);
   const [unitSearchInput, setUnitSearchInput] = useState<string>("");
   const [purposeSearchInput, setPurposeSearchInput] = useState<string>("");
   const [areFiltersVisible, setAreFiltersVisible] = useState(false);
@@ -250,6 +276,64 @@ const SearchForm = ({
       })) ?? [];
   const reservationUnitTypeOptions = mapOptions(sortBy(unitTypes, "name"));
 
+  // TODO: populate the equipment options from the API
+
+  const minuteDurations = [
+    {
+      label: t("common:minute_other", { count: 15 }),
+      value: 0.25,
+    },
+    {
+      label: t("common:minute_other", { count: 30 }),
+      value: 0.5,
+    },
+    {
+      label: t("common:minute_other", { count: 45 }),
+      value: 0.75,
+    },
+    {
+      label: t("common:minute_other", { count: 60 }),
+      value: 1,
+    },
+    {
+      label: t("common:minute_other", { count: 90 }),
+      value: 1.5,
+    },
+  ] as OptionType[];
+
+  const populateTimeOptions = (
+    type: "time" | "duration",
+    startHour?: number,
+    endHour?: number
+  ): OptionType[] => {
+    const times: { label: string; value: number }[] = [];
+    let hour = startHour ?? 0;
+    let minute = 0;
+
+    while (hour <= (endHour ?? 23)) {
+      times.push({
+        label:
+          // decide the option label format based on type
+          type === "time"
+            ? `${hour.toString().padStart(2, "0")}:${minute
+                .toString()
+                .padStart(2, "0")}`
+            : t("common:hour_other", { count: hour + minute / 60 }),
+        value: hour + minute / 60,
+      });
+      // Increment/reset the minute counter, and increment the hour counter if necessary
+      minute += 30;
+      if (minute === 60) {
+        minute = 0;
+        hour++;
+      }
+    }
+    // we need to add the minute times to the beginning of the duration options
+    return (
+      type === "duration" ? minuteDurations.concat(times) : times
+    ) as OptionType[];
+  };
+
   const { register, watch, handleSubmit, setValue, getValues } = useForm();
 
   const getFormSubValueLabel = (
@@ -275,7 +359,12 @@ const SearchForm = ({
     register("maxPersons");
     register("unit");
     register("reservationUnitType");
-    register("reservationEquipment");
+    register("equipment");
+    register("dateStart");
+    register("dateEnd");
+    register("timeStart");
+    register("timeEnd");
+    register("duration");
     register("purposes");
   }, [register]);
 
@@ -327,35 +416,97 @@ const SearchForm = ({
             id="reservationUnitEquipmentFilter"
             checkboxName="reservationUnitEquipmentFilter"
             inputValue={reservationEquipmentSearchInput}
-            name="reservationEquipment"
+            name="equipment"
             onChange={(selection: string[]): void => {
               setValue(
-                "reservationEquipment",
+                "equipment",
                 selection.filter((n) => n !== "").join(",")
               );
             }}
             options={reservationEquipmentOptions}
             setInputValue={setReservationEquipmentSearchInput}
             showSearch
-            title={t("searchForm:equipmentLabel")}
-            value={watch("reservationEquipment")?.split(",") || [""]}
+            title={t("searchForm:equipmentFilter")}
+            value={watch("equipment")?.split(",") || [""]}
           />
-          <MultiSelectDropdown
-            id="reservationUnitTypeFilter"
-            checkboxName="reservationUnitTypeFilter"
-            inputValue={reservationTypeSearchInput}
-            name="reservationType"
-            onChange={(selection: string[]): void => {
-              setValue(
-                "reservationUnitType",
-                selection.filter((n) => n !== "").join(",")
-              );
+          <DateRangeWrapper>
+            <DateRangePicker
+              startDate={reservationStartDate}
+              onChangeStartDate={(date: Date | null) => {
+                setValue("dateStart", !!date && toApiDate(date));
+              }}
+              endDate={reservationEndDate}
+              onChangeEndDate={(date: Date | null) =>
+                setValue("dateEnd", date ? toApiDate(date) : null)
+              }
+              labels={{
+                start: t("common:startLabel"),
+                end: t("common:endLabel"),
+              }}
+              required={{
+                start: true,
+                end: false,
+              }}
+              limits={{
+                startMinDate: new Date(),
+                startMaxDate: getValues("dateEnd")
+                  ? fromUIDate(getValues("dateEnd"))
+                  : undefined,
+                endMinDate: getValues("dateStart")
+                  ? fromUIDate(getValues("dateStart"))
+                  : undefined,
+                endMaxDate: addYears(new Date(), 2),
+              }}
+            />
+          </DateRangeWrapper>
+          <Group>
+            <StyledSelect
+              id="timeStartFilter"
+              placeholder={t("common:startLabel")}
+              options={populateTimeOptions("time")}
+              label={t("common:timeLabel")}
+              onChange={(selection: OptionType): void => {
+                // TODO: check that the end time is not before the start time
+                setValue("timeStart", selection.value);
+              }}
+              defaultValue={getSelectedOption(
+                getValues("timeStart"),
+                populateTimeOptions("time")
+              )}
+              key={`timeStart${getValues("timeStart")}`}
+              className="inputSm inputGroupStart"
+            />
+
+            <StyledSelect
+              id="timeEndFilter"
+              placeholder={t("common:endLabel")}
+              options={populateTimeOptions("time")}
+              label="&nbsp;"
+              onChange={(selection: OptionType): void => {
+                // TODO: check that the end time is not before the start time
+                setValue("timeEnd", selection.value);
+              }}
+              defaultValue={getSelectedOption(
+                getValues("timeEnd"),
+                populateTimeOptions("time")
+              )}
+              key={`timeEnd${getValues("timeEnd")}`}
+              className="inputSm inputGroupEnd"
+            />
+          </Group>
+          <StyledSelect
+            id="durationFilter"
+            placeholder={t("common:minimum")}
+            options={populateTimeOptions("duration", 2)}
+            label={t("common:duration", { duration: "" })}
+            onChange={(selection: OptionType): void => {
+              setValue("duration", selection.value);
             }}
-            options={reservationUnitTypeOptions}
-            setInputValue={setReservationTypeSearchInput}
-            showSearch
-            title={t("searchForm:typeLabel")}
-            value={watch("reservationUnitType")?.split(",") || [""]}
+            defaultValue={getSelectedOption(
+              getValues("duration"),
+              populateTimeOptions("duration", 2)
+            )}
+            key={`duration${getValues("duration")}`}
           />
           <Group>
             <StyledSelect
@@ -394,6 +545,23 @@ const SearchForm = ({
               className="inputSm inputGroupEnd"
             />
           </Group>
+          <MultiSelectDropdown
+            id="reservationUnitTypeFilter"
+            checkboxName="reservationUnitTypeFilter"
+            inputValue={reservationTypeSearchInput}
+            name="reservationType"
+            onChange={(selection: string[]): void => {
+              setValue(
+                "reservationUnitType",
+                selection.filter((n) => n !== "").join(",")
+              );
+            }}
+            options={reservationUnitTypeOptions}
+            setInputValue={setReservationTypeSearchInput}
+            showSearch
+            title={t("searchForm:typeLabel")}
+            value={watch("reservationUnitType")?.split(",") || [""]}
+          />
           <TextInput
             id="search"
             label={t("searchForm:textSearchLabel")}
@@ -407,11 +575,20 @@ const SearchForm = ({
             defaultValue={formValues.textSearch}
           />
         </Filters>
-        <JustForDesktop customBreakpoint={desktopBreakpoint}>
+        <JustForDesktop
+          style={{
+            display: "flex",
+            width: "100%",
+            flexFlow: "row nowrap",
+            justifyContent: "space-between",
+          }}
+          customBreakpoint={desktopBreakpoint}
+        >
           <SubmitButton
             id="searchButton-desktop"
             onClick={handleSubmit(search)}
             iconLeft={<IconSearch />}
+            style={{ marginLeft: "auto" }}
           >
             {t("searchForm:searchButton")}
           </SubmitButton>
@@ -430,7 +607,7 @@ const SearchForm = ({
         </FilterToggleWrapper>
         <Hr />
       </JustForMobile>
-      <ButtonContainer>
+      <BottomContainer>
         {areOptionsLoaded && formValueKeys.length > 0 && (
           <TagControls>
             <FilterTags data-test-id="search-form__filter--tags">
@@ -495,7 +672,7 @@ const SearchForm = ({
             {t("searchForm:searchButton")}
           </SubmitButton>
         </JustForMobile>
-      </ButtonContainer>
+      </BottomContainer>
     </>
   );
 };

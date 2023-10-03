@@ -1,4 +1,6 @@
 {
+  "dateLabel": "Datum",
+  "timeLabel": "Tid",
   "dateTime": "{{date, d.M.yyyy 'kl' H.mm}}",
   "dateTimeInForm": "{{date, d.M.yyyy 'kl' H:mm}}",
   "dateWithWeekday": "{{date, cccccc d.M.yyyy}}",
@@ -103,6 +105,8 @@
   "showLess": "Visa mindre",
   "showAll": "Visa allt",
   "duration": "Varaktighet {{duration}}",
+  "startLabel": "Från",
+  "endLabel": "Till",,
   "fyiLabel": "Till kännedom",
   "add": "addera",
   "subtract": "subtrahera",

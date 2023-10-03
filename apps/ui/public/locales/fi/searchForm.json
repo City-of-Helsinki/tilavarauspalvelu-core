@@ -13,6 +13,7 @@
   "showLessFilters": "Näytä vähemmän vaihtoehtoja",
   "unitFilter": "Toimipiste",
   "purposesFilter": "Käyttötarkoitus",
+  "equipmentFilter": "Varustelu",
   "resetForm": "Tyhjennä",
   "filters": {
     "applicationRound": "{{label}}",

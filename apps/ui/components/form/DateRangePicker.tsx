@@ -18,6 +18,15 @@ export interface DateRangePickerProps {
   startDate: Date | null;
   onChangeEndDate: (date: Date | null) => void;
   onChangeStartDate: (date: Date | null) => void;
+  showHelperText?: boolean;
+  labels?: { start?: string; end?: string };
+  required?: { start?: boolean; end?: boolean };
+  limits?: {
+    startMinDate?: Date;
+    startMaxDate?: Date;
+    endMinDate?: Date;
+    endMaxDate?: Date;
+  };
 }
 
 const Wrapper = styled.div`
@@ -31,6 +40,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   startDate,
   onChangeEndDate,
   onChangeStartDate,
+  showHelperText,
+  labels,
+  required,
+  limits,
 }) => {
   const [internalStartDateString, setInternalStartDateString] =
     React.useState<string>(() => initDate(startDate));
@@ -123,17 +136,20 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   return (
-    <Wrapper>
+    <Wrapper className="date-range-input__wrapper">
       <DateInput
         autoComplete="off"
         id="start-date"
         value={internalStartDateString}
         onBlur={handleStartDateValidation}
         disableConfirmation
-        helperText={!errors.startDateIsInvalid ? helperText : undefined}
-        minDate={new Date()}
+        helperText={
+          showHelperText && !errors.startDateIsInvalid ? helperText : undefined
+        }
+        minDate={limits?.startMinDate ?? new Date()}
+        maxDate={limits?.startMaxDate}
         initialMonth={new Date()}
-        label={t("dateSelector:labelStartDate")}
+        label={labels?.start ?? t("dateSelector:labelStartDate")}
         language={i18n.language as Language}
         onChange={(date) => setInternalStartDateString(date)}
         errorText={
@@ -141,6 +157,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             ? t("dateSelector:errorDateFormat")
             : undefined
         }
+        required={required?.start !== undefined ? required.start : true}
       />
       <DateInput
         autoComplete="off"
@@ -149,13 +166,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         onBlur={handleEndDateValidation}
         disableConfirmation
         helperText={
-          !endDateIsBeforeStartDate && !errors.endDateIsInvalid
+          showHelperText &&
+          !endDateIsBeforeStartDate &&
+          !errors.endDateIsInvalid
             ? helperText
             : undefined
         }
-        minDate={new Date()}
+        minDate={limits?.endMinDate ?? new Date()}
+        maxDate={limits?.endMaxDate}
         initialMonth={startDate ?? new Date()}
-        label={t("dateSelector:labelEndDate")}
+        label={labels?.end ?? t("dateSelector:labelEndDate")}
         language={i18n.language as Language}
         onChange={(date) => setInternalEndDateString(date)}
         errorText={
@@ -165,6 +185,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             ? t("dateSelector:errorDateFormat")
             : undefined
         }
+        required={required?.end !== undefined ? required.end : true}
       />
     </Wrapper>
   );

@@ -13,6 +13,7 @@
   "showLessFilters": "Show less options",
   "unitFilter": "Location",
   "purposesFilter": "Purpose of use",
+  "equipmentFilter": "Equipment",
   "resetForm": "Clear",
   "filters": {
     "applicationRound": "{{label}}",

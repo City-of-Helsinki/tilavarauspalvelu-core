@@ -13,6 +13,7 @@
   "showLessFilters": "Visa färre alternativ",
   "unitFilter": "Verksamhetsställe",
   "purposesFilter": "Användningsändamål",
+  "equipmentFilter": "Utrustning",
   "resetForm": "Töm",
   "filters": {
     "applicationRound": "{{label}}",

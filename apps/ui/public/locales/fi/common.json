@@ -1,4 +1,6 @@
 {
+  "dateLabel": "Päivämäärä",
+  "timeLabel": "Kellonaika",
   "dateTime": "{{date, d.M.yyyy 'klo' H.mm}}",
   "dateTimeInForm": "{{date, d.M.yyyy 'klo' H:mm}}",
   "dateWithWeekday": "{{date, cccccc d.M.yyyy}}",
@@ -103,6 +105,8 @@
   "showLess": "Näytä vähemmän",
   "showAll": "Näytä kaikki",
   "duration": "Kesto {{duration}}",
+  "startLabel": "Alkaen",
+  "endLabel": "Asti",
   "fyiLabel": "Tiedoksi",
   "add": "Lisää",
   "subtract": "Vähennä",

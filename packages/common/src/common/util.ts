@@ -64,6 +64,12 @@ export const formatDuration = (
   }${minutes ? i18n?.t(minuteKey, { count: minutes }) : ""}`.trim();
 };
 
+export const addYears = (date: Date, years: number): Date => {
+  const newDate = new Date(date);
+  newDate.setFullYear(newDate.getFullYear() + years);
+  return newDate;
+};
+
 export const formatSecondDuration = (
   duration: number,
   abbreviated = true

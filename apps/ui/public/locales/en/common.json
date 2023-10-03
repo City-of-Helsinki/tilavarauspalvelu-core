@@ -1,4 +1,6 @@
 {
+  "dateLabel": "Date",
+  "timeLabel": "Time",
   "dateTime": "{{date, d.M.yyyy',' H.mm}}",
   "dateTimeInForm": "{{date, d.M.yyyy',' H:mm}}",
   "dateWithWeekday": "{{date, cccccc d.M.yyyy}}",
@@ -103,6 +105,8 @@
   "showLess": "Show less",
   "showAll": "Show all",
   "duration": "Duration {{duration}}",
+  "startLabel": "From",
+  "endLabel": "Until",
   "fyiLabel": "For information",
   "add": "Add",
   "subtract": "Subtract",
