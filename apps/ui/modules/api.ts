@@ -4,7 +4,6 @@ import { getCookie } from "typescript-cookie";
 import {
   Application,
   ApplicationRound,
-  Parameter,
   RecurringReservation,
   ReservationUnit,
 } from "common/types/common";
@@ -13,9 +12,7 @@ import { ApiError } from "./ApiError";
 
 const applicationRoundBasePath = "application_round";
 const recurringReservationBasePath = "recurring_reservation";
-const parameterBasePath = "parameters";
 const applicationBasePath = "application";
-const applicationEventFeedBasePath = "application_event_calendar";
 
 const axiosOptions = {
   timeout: 20000,
@@ -163,19 +160,6 @@ export function getReservationUnit(id: number): Promise<ReservationUnit> {
   });
 }
 
-export function getParameters(
-  name:
-    | "purpose"
-    | "age_group"
-    | "ability_group"
-    | "reservation_unit_type"
-    | "city"
-): Promise<Parameter[]> {
-  return apiGet<Parameter[]>({
-    path: `${parameterBasePath}/${name}`,
-  });
-}
-
 export function getApplication(id: number): Promise<Application> {
   return apiGet<Application>({
     path: `${applicationBasePath}/${id}`,
@@ -205,6 +189,3 @@ export const cancelApplication = async (
 
   await saveApplication(application);
 };
-
-export const applicationEventCalendarFeedUrl = (uuid: string): string =>
-  `${REST_API_URL}${applicationEventFeedBasePath}/${uuid}`;

@@ -1,39 +1,32 @@
 import { IconArrowRight, IconPlusCircle } from "hds-react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
-import { sortBy, uniq } from "lodash";
+import { uniq } from "lodash";
 import { useRouter } from "next/router";
-import {
+import type {
   Action,
   Application,
   ApplicationStatus,
   EditorState,
-  OptionType,
-  StringParameter,
 } from "common/types/common";
-import { sortAgeGroups } from "common/src/common/util";
-import {
+import type {
   Query,
   ApplicationRoundType,
   ReservationUnitType,
 } from "common/types/gql-types";
-import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import {
   apiDateToUIDate,
   deepCopy,
   getTranslation,
   mapOptions,
-} from "../../modules/util";
-import { getParameters } from "../../modules/api";
-import { participantCountOptions } from "../../modules/const";
-import { ButtonContainer, CenterSpinner } from "../common/common";
-import { MediumButton } from "../../styles/util";
-import {
-  RESERVATION_PURPOSES,
-  SEARCH_FORM_PARAMS_UNIT,
-} from "../../modules/queries/params";
+} from "@/modules/util";
+import { MediumButton } from "@/styles/util";
+import { useOptions } from "@/hooks/useOptions";
+import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
+import { ButtonContainer } from "../common/common";
+import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import ApplicationForm from "./ApplicationForm";
 
 type Props = {
@@ -52,65 +45,6 @@ type Props = {
   setError: (error: string) => void;
 };
 
-type OptionTypes = {
-  ageGroupOptions: OptionType[];
-  abilityGroupOptions: OptionType[];
-  reservationUnitTypeOptions: OptionType[];
-  participantCountOptions: OptionType[];
-};
-
-const useOptions = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState<OptionTypes | null>(null);
-
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    async function fetchData() {
-      const [
-        fetchedAbilityGroupOptions,
-        fetchedAgeGroupOptions,
-        fetchedReservationUnitType,
-      ] = await Promise.all([
-        getParameters("ability_group"),
-        getParameters("age_group"),
-        getParameters("reservation_unit_type"),
-      ]);
-
-      setOptions({
-        ageGroupOptions: mapOptions(
-          sortAgeGroups(fetchedAgeGroupOptions),
-          undefined,
-          i18n.language
-        ),
-        abilityGroupOptions: mapOptions(
-          fetchedAbilityGroupOptions,
-          undefined,
-          i18n.language
-        ),
-        reservationUnitTypeOptions: mapOptions(
-          fetchedReservationUnitType,
-          undefined,
-          i18n.language
-        ),
-        participantCountOptions,
-      });
-      setIsLoading(false);
-    }
-
-    if (!isLoading && !options) {
-      setIsLoading(true);
-      fetchData();
-    }
-  }, [isLoading, i18n.language, options]);
-
-  return {
-    isLoading: !options && isLoading,
-    options,
-    refetch: () => setIsLoading(false),
-  };
-};
-
 const Page1 = ({
   save,
   addNewApplicationEvent,
@@ -120,49 +54,28 @@ const Page1 = ({
   selectedReservationUnits,
   setError,
 }: Props): JSX.Element | null => {
-  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
-  const [unitOptions, setUnitOptions] = useState<OptionType[]>([]);
-
   const history = useRouter();
-
   const { t } = useTranslation();
 
   const { application } = editorState;
 
-  useQuery<Query>(SEARCH_FORM_PARAMS_UNIT, {
-    onCompleted: (res) => {
-      const unitsInApplicationRound = uniq(
-        applicationRound.reservationUnits
-          ?.flatMap((resUnit) => resUnit?.unit?.pk)
-          .filter((pk): pk is number => pk != null)
-      );
-      const units = res?.units?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .filter((node) => node.pk && unitsInApplicationRound.includes(node.pk))
-        .map((node) => ({
-          id: String(node.pk),
-          name: getTranslation(node, "name"),
-        }));
-      setUnitOptions(mapOptions(sortBy(units, "name")));
-    },
-  });
+  const unitsInApplicationRound = uniq(
+    applicationRound.reservationUnits?.flatMap((resUnit) => resUnit?.unit?.pk)
+  );
+  const { data: unitData } = useQuery<Query>(SEARCH_FORM_PARAMS_UNIT);
+  const units =
+    unitData?.units?.edges
+      ?.map((e) => e?.node)
+      .filter((node): node is NonNullable<typeof node> => node != null)
+      .filter((u) => unitsInApplicationRound.includes(u.pk))
+      .map((u) => ({
+        id: String(u.pk),
+        name: getTranslation(u, "name"),
+      })) ?? [];
+  const unitOptions = mapOptions(units);
 
-  useQuery<Query>(RESERVATION_PURPOSES, {
-    onCompleted: (res) => {
-      const purposes = res?.reservationPurposes?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          id: String(node.pk),
-          name: getTranslation(node, "name"),
-        }));
-      setPurposeOptions(
-        mapOptions(sortBy(purposes, "name") as StringParameter[])
-      );
-    },
-    skip: unitOptions.length < 1,
-  });
+  const { options } = useOptions();
+  const { purposeOptions } = options;
 
   const form = useForm<ApplicationForm>({
     mode: "onChange",
@@ -185,8 +98,6 @@ const Page1 = ({
   const {
     formState: { errors },
   } = form;
-
-  const { isLoading, options } = useOptions();
 
   const prepareData = (data: Application): Application => {
     const applicationCopy = {
@@ -257,9 +168,6 @@ const Page1 = ({
     }
   };
 
-  if (isLoading || !options) {
-    return <CenterSpinner />;
-  }
   const addNewEventButtonDisabled =
     application.applicationEvents.filter((ae) => !ae.id).length > 0;
 

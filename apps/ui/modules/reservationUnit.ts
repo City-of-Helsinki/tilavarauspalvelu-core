@@ -120,8 +120,8 @@ export const getOldReservationUnitName = (
     return undefined;
   }
   return (
-    localizedValue(reservationUnit.name, language) ||
-    localizedValue(reservationUnit.name, "fi")
+    localizedValue(reservationUnit?.name, language) ||
+    localizedValue(reservationUnit?.name, "fi")
   );
 };
 

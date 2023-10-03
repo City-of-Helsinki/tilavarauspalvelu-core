@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useTranslation, TFunction } from "next-i18next";
+import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import {
@@ -11,17 +11,17 @@ import {
 } from "hds-react";
 import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
-import { ApplicationRoundType, ApplicationType } from "common/types/gql-types";
+import { type ApplicationType } from "common/types/gql-types";
 import {
   isActive,
   applicationUrl,
   getReducedApplicationStatus,
-} from "../../modules/util";
+} from "@/modules/util";
+import { cancelApplication } from "@/modules/api";
+import { BlackButton } from "@/styles/util";
+import { getApplicationRoundName } from "@/modules/applicationRound";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
-import { cancelApplication } from "../../modules/api";
-import { BlackButton } from "../../styles/util";
-import { getApplicationRoundName } from "../../modules/applicationRound";
 
 const Card = styled(HdsCard)`
   border-width: 0;
@@ -134,7 +134,6 @@ const StyledButton = styled(BlackButton).attrs({
 `;
 type Props = {
   application: ApplicationType;
-  applicationRound: ApplicationRoundType;
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
@@ -156,15 +155,15 @@ const getApplicant = (application: ApplicationType, t: TFunction): string => {
 
 const ApplicationCard = ({
   application,
-  applicationRound,
   actionCallback,
 }: Props): JSX.Element | null => {
   const [state, setState] = useState<"ok" | "cancelling">("ok");
   const { t } = useTranslation();
   const router = useRouter();
+  const { applicationRound } = application;
   const editable = isActive(
-    applicationRound?.applicationPeriodBegin,
-    applicationRound?.applicationPeriodEnd
+    applicationRound.applicationPeriodBegin,
+    applicationRound.applicationPeriodEnd
   );
 
   const reducedApplicationStatus = getReducedApplicationStatus(

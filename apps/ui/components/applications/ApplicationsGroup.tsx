@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { H3 } from "common/src/common/typography";
-import { ApplicationRoundType, ApplicationType } from "common/types/gql-types";
+import { type ApplicationType } from "common/types/gql-types";
 import ApplicationCard from "./ApplicationCard";
 
 const GroupName = styled(H3).attrs({ as: "h2" })`
@@ -10,7 +10,6 @@ const GroupName = styled(H3).attrs({ as: "h2" })`
 
 type Props = {
   name: string;
-  rounds: { [key: number]: ApplicationRoundType };
   applications: ApplicationType[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
@@ -22,7 +21,6 @@ const Wrapper = styled.div`
 const ApplicationsGroup = ({
   name,
   applications,
-  rounds,
   actionCallback,
 }: Props): JSX.Element | null => {
   if (applications.length === 0 || !applications[0].applicationRound == null) {
@@ -40,7 +38,6 @@ const ApplicationsGroup = ({
         <ApplicationCard
           key={application.pk}
           application={application}
-          applicationRound={rounds[roundPk]}
           actionCallback={actionCallback}
         />
       ))}

@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Checkbox, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { useQuery } from "@apollo/client";
 import { sortBy, trim } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
-import { Application, Parameter, OptionType } from "common/types/common";
+import { type Application } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { Query, TermsOfUseType } from "common/types/gql-types";
-import { getTranslation, mapOptions } from "../../modules/util";
-import { getParameters } from "../../modules/api";
+import { type TermsOfUseType } from "common/types/gql-types";
+import { useOptions } from "@/hooks/useOptions";
+import { getTranslation } from "@/modules/util";
+import { BlackButton } from "@/styles/util";
+import { getOldReservationUnitName } from "@/modules/reservationUnit";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
@@ -21,23 +22,10 @@ import {
   TwoColumnContainer,
 } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
-import { BlackButton } from "../../styles/util";
-import { CITIES, RESERVATION_PURPOSES } from "../../modules/queries/params";
-import { getOldReservationUnitName } from "../../modules/reservationUnit";
 
 type Props = {
   application: Application;
   tos: TermsOfUseType[];
-};
-
-const mapArrayById = (
-  array: { id: number }[]
-): { [key: number]: { id: number } } => {
-  return array.reduce((prev, current) => {
-    // eslint-disable-next-line no-param-reassign
-    prev[current.id] = current;
-    return prev;
-  }, {} as { [key: number]: { id: number } });
 };
 
 const UnitList = styled.ol`
@@ -99,78 +87,20 @@ const Terms = styled.div`
   }
 `;
 
-// Page specific hook so we don't make extra REST calls
-const useViewHook = (application: Application) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetched, setIsFetched] = useState(false);
-
-  const [ageGroupOptions, setAgeGroupOptions] = useState<{
-    [key: number]: Parameter;
-  }>({});
-
-  useEffect(() => {
-    async function fetchData() {
-      const fetchedAgeGroupOptions = await getParameters("age_group");
-      setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
-      setIsLoading(false);
-      setIsFetched(true);
-    }
-
-    if (!isLoading && !isFetched) {
-      setIsLoading(true);
-      fetchData();
-    }
-  }, [isLoading, isFetched, application, ageGroupOptions]);
-
-  return {
-    isLoading: isLoading || !isFetched,
-    ageGroupOptions,
-  };
-};
-
 const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
-
-  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
-  const [citiesOptions, setCitiesOptions] = useState<OptionType[]>([]);
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
   const router = useRouter();
 
-  useQuery<Query>(RESERVATION_PURPOSES, {
-    onCompleted: (res) => {
-      const purposes = res?.reservationPurposes?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          id: String(node?.pk),
-          name: getTranslation(node, "name"),
-        }));
-      setPurposeOptions(mapOptions(sortBy(purposes, "name")));
-    },
-  });
+  const { params, options } = useOptions();
 
-  useQuery<Query>(CITIES, {
-    onCompleted: (res) => {
-      const cities = res?.cities?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          id: String(node.pk),
-          name: getTranslation(node, "name"),
-        }));
-      setCitiesOptions(mapOptions(sortBy(cities, "id")));
-    },
-  });
+  const { purposeOptions } = options;
+  const citiesOptions = options.cityOptions;
+  const { ageGroups } = params;
 
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
-
-  const { isLoading, ageGroupOptions } = useViewHook(application);
-
-  if (isLoading) {
-    return null;
-  }
 
   return (
     <>
@@ -217,15 +147,18 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.ageGroup")}
-                value={
-                  applicationEvent.ageGroupId
-                    ? `${
-                        ageGroupOptions[applicationEvent.ageGroupId].minimum
-                      } - ${
-                        ageGroupOptions[applicationEvent.ageGroupId].maximum
-                      }`
-                    : ""
-                }
+                value={(() => {
+                  if (!applicationEvent.ageGroupId) {
+                    return "";
+                  }
+                  const fid = ageGroups.find(
+                    (ag) => ag.pk === applicationEvent.ageGroupId
+                  );
+                  if (!fid) {
+                    return "";
+                  }
+                  return `${fid.minimum} - ${fid.maximum}`;
+                })()}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.purpose")}
@@ -233,7 +166,7 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
                   applicationEvent.purposeId
                     ? purposeOptions.find(
                         (n) =>
-                          n.value === applicationEvent?.purposeId?.toString()
+                          n.value === applicationEvent.purposeId?.toString()
                       )?.label
                     : ""
                 }
@@ -248,11 +181,11 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.minDuration")}
-                value={formatDuration(applicationEvent?.minDuration)}
+                value={formatDuration(applicationEvent.minDuration ?? "")}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.maxDuration")}
-                value={formatDuration(applicationEvent?.maxDuration)}
+                value={formatDuration(applicationEvent.maxDuration ?? "")}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.eventsPerWeek")}

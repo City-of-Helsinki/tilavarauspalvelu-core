@@ -3,16 +3,14 @@ import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
-import { useTranslation, TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
 import { ReducedApplicationStatus } from "common/types/common";
 import {
-  ApplicationRoundType,
   ApplicationType,
   ApplicationStatus,
   Query,
-  QueryApplicationRoundsArgs,
   QueryApplicationsArgs,
 } from "common/types/gql-types";
 import { useSession } from "@/hooks/auth";
@@ -22,7 +20,6 @@ import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import { CenterSpinner } from "../components/common/common";
 import { APPLICATIONS } from "../modules/queries/application";
-import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -55,16 +52,13 @@ const statusGroupOrder: ReducedApplicationStatus[] = [
 ];
 
 const ApplicationGroups = ({
-  rounds,
   applications,
   actionCallback,
-  t,
 }: {
-  rounds: { [key: number]: ApplicationRoundType };
   applications: { [key: string]: ApplicationType[] };
   actionCallback: (string: "error" | "cancel") => Promise<void>;
-  t: TFunction;
 }) => {
+  const { t } = useTranslation();
   if (Object.keys(applications).length === 0) {
     return <span>{t("applications:noApplications")}</span>;
   }
@@ -74,7 +68,6 @@ const ApplicationGroups = ({
         <ApplicationsGroup
           key={gr}
           name={t(`applications:group.${gr}`)}
-          rounds={rounds}
           applications={applications[gr] || []}
           actionCallback={actionCallback}
         />
@@ -86,30 +79,13 @@ const ApplicationGroups = ({
 const ApplicationsPage = (): JSX.Element | null => {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useSession();
-
   const [cancelled, setCancelled] = useState(false);
   const [cancelError, setCancelError] = useState(false);
 
   const {
-    data: roundsData,
-    error: roundsError,
-    loading: isRoundsLoading,
-  } = useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS);
-
-  const rounds =
-    roundsData?.applicationRounds?.edges
-      ?.map((n) => n?.node)
-      .filter((n): n is ApplicationRoundType => n != null)
-      .reduce(
-        (prev, current) =>
-          current.pk != null ? { ...prev, [current.pk]: current } : prev,
-        {} as { [key: number]: ApplicationRoundType }
-      ) ?? [];
-
-  const {
     data: appData,
-    error: appError,
-    loading: isAppLoading,
+    error: isError,
+    loading: isLoading,
     refetch,
   } = useQuery<Query, QueryApplicationsArgs>(APPLICATIONS, {
     fetchPolicy: "no-cache",
@@ -135,9 +111,6 @@ const ApplicationsPage = (): JSX.Element | null => {
   const applications: Dictionary<ApplicationType[]> = groupBy(appNodes, (a) =>
     getReducedApplicationStatus(a?.status ?? undefined)
   );
-
-  const isLoading = isRoundsLoading || isAppLoading;
-  const isError = roundsError || appError;
 
   const actionCallback = async (type: "cancel" | "error") => {
     switch (type) {
@@ -173,8 +146,6 @@ const ApplicationsPage = (): JSX.Element | null => {
         )}
         {!isLoading && !isError ? (
           <ApplicationGroups
-            t={t}
-            rounds={rounds}
             applications={applications}
             actionCallback={actionCallback}
           />

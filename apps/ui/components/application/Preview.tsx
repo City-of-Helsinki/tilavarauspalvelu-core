@@ -2,28 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Checkbox, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
-import { useQuery } from "@apollo/client";
 import { get, sortBy, trim } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
-import {
-  Application,
-  ReservationUnit,
-  Parameter,
-  StringParameter,
-  OptionType,
-} from "common/types/common";
+import { Application, ReservationUnit, Parameter } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { Query, TermsOfUseType } from "common/types/gql-types";
-import {
-  deepCopy,
-  getTranslation,
-  localizedValue,
-  mapOptions,
-} from "../../modules/util";
-import { getParameters, getReservationUnit } from "../../modules/api";
+import { TermsOfUseType } from "common/types/gql-types";
+import { deepCopy, getTranslation, localizedValue } from "@/modules/util";
+import { getReservationUnit } from "@/modules/api";
+import { useOptions } from "@/hooks/useOptions";
+import { MediumButton } from "@/styles/util";
+import { getOldReservationUnitName } from "@/modules/reservationUnit";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
@@ -33,9 +24,6 @@ import {
   TwoColumnContainer,
 } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
-import { MediumButton } from "../../styles/util";
-import { CITIES, RESERVATION_PURPOSES } from "../../modules/queries/params";
-import { getOldReservationUnitName } from "../../modules/reservationUnit";
 
 type Props = {
   application: Application;
@@ -117,46 +105,17 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
 
   const [ready, setReady] = useState(false);
 
-  const [ageGroupOptions, setAgeGroupOptions] = useState<{
-    [key: number]: Parameter;
-  }>({});
   const [reservationUnits, setReservationUnits] = useState<{
     [key: number]: ReservationUnit;
   }>({});
 
-  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
-  const [citiesOptions, setCitiesOptions] = useState<OptionType[]>([]);
-
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
   const router = useRouter();
 
-  useQuery<Query>(RESERVATION_PURPOSES, {
-    onCompleted: (res) => {
-      const purposes = res?.reservationPurposes?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          id: String(node.pk),
-          name: getTranslation(node, "name"),
-        }));
-      setPurposeOptions(
-        mapOptions(sortBy(purposes, "name") as StringParameter[])
-      );
-    },
-  });
-
-  useQuery<Query>(CITIES, {
-    onCompleted: (res) => {
-      const cities = res?.cities?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          id: String(node.pk),
-          name: getTranslation(node, "name"),
-        }));
-      setCitiesOptions(mapOptions(sortBy(cities, "id") as StringParameter[]));
-    },
-  });
+  const { options, params } = useOptions();
+  const { purposeOptions } = options;
+  const citiesOptions = options.cityOptions;
+  const { ageGroups } = params;
 
   useEffect(() => {
     let mounted = true;
@@ -180,10 +139,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
           }
         );
       }
-
-      const fetchedAgeGroupOptions = await getParameters("age_group");
       if (mounted) {
-        setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
         setReady(true);
       }
     }
@@ -222,7 +178,11 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
-  return ready ? (
+  if (!ready) {
+    return null;
+  }
+
+  return (
     <>
       <Accordion
         open
@@ -267,19 +227,23 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.ageGroup")}
-                value={
-                  applicationEvent.ageGroupId
-                    ? `${
-                        ageGroupOptions[applicationEvent.ageGroupId].minimum
-                      } - ${
-                        ageGroupOptions[applicationEvent.ageGroupId].maximum
-                      }`
-                    : ""
-                }
+                value={(() => {
+                  if (!applicationEvent.ageGroupId) {
+                    return "";
+                  }
+                  const fid = ageGroups.find(
+                    (ag) => ag.pk === applicationEvent.ageGroupId
+                  );
+                  if (!fid) {
+                    return "";
+                  }
+                  return `${fid.minimum} - ${fid.maximum}`;
+                })()}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.purpose")}
                 value={
+                  // TODO check if this is correct (id)
                   applicationEvent.purposeId
                     ? purposeOptions.find(
                         (n) =>
@@ -290,19 +254,19 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.begin")}
-                value={applicationEvent.begin || ""}
+                value={applicationEvent.begin ?? "-"}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.end")}
-                value={applicationEvent.end || ""}
+                value={applicationEvent.end ?? "-"}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.minDuration")}
-                value={formatDuration(applicationEvent.minDuration as string)}
+                value={formatDuration(applicationEvent.minDuration ?? "-")}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.maxDuration")}
-                value={formatDuration(applicationEvent.maxDuration as string)}
+                value={formatDuration(applicationEvent.maxDuration ?? "-")}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.eventsPerWeek")}
@@ -316,17 +280,15 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
             </FormSubHeading>
             <UnitList>
               {sortBy(applicationEvent.eventReservationUnits, "priority").map(
-                (reservationUnit, index) => {
-                  const resUnit = get(reservationUnits, [
-                    reservationUnit.reservationUnitId,
-                  ]);
+                (ru, index) => {
+                  const resUnit = get(reservationUnits, [ru.reservationUnitId]);
                   return (
-                    <UnitName key={reservationUnit.reservationUnitId}>
+                    <UnitName key={ru.reservationUnitId}>
                       <div>{index + 1}</div>
                       <div>
                         {trim(
                           `${getOldReservationUnitName(
-                            reservationUnit.reservationUnitDetails
+                            ru.reservationUnitDetails
                           )}${
                             resUnit &&
                             `, ${localizedValue(
@@ -393,7 +355,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
         </MediumButton>
       </ButtonContainer>
     </>
-  ) : null;
+  );
 };
 
 export default Preview;
