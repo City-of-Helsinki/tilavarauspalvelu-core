@@ -291,15 +291,15 @@ const NotificationForm = ({
   const activeFrom = valueForDateInput(
     notification?.activeFrom ?? today.toISOString()
   );
-  const activeFromTime = valueForTimeInput(
-    notification?.activeFrom ?? today.toISOString()
-  );
+  const activeFromTime = notification?.activeFrom
+    ? valueForTimeInput(notification?.activeFrom)
+    : "06:00";
   const activeUntil = notification?.activeUntil
     ? valueForDateInput(notification?.activeUntil)
     : "";
   const activeUntilTime = notification?.activeUntil
     ? valueForTimeInput(notification?.activeUntil)
-    : "";
+    : "23:59";
 
   const {
     handleSubmit,

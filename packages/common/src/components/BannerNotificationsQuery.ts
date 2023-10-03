@@ -19,7 +19,6 @@ const BANNER_NOTIFICATION_ADMIN_FRAGMENT = gql`
   fragment BannerNotificationsAdminFragment on BannerNotificationType {
     pk
     ...BannerNotificationCommon
-    target
     name
     activeUntil
     draft
@@ -57,8 +56,10 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
 
 export const BANNER_NOTIFICATIONS_LIST = gql`
   ${BANNER_NOTIFICATION_COMMON}
-  query BannerNotificationsList {
-    bannerNotifications(isVisible: true) {
+  query BannerNotificationsList(
+    $target: CommonBannerNotificationTargetChoices!
+  ) {
+    bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {
           id

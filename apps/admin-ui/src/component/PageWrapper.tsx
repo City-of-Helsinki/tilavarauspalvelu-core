@@ -7,6 +7,7 @@ import ClientOnly from "common/src/ClientOnly";
 import Error5xx from "app/common/Error5xx";
 import usePermission from "app/hooks/usePermission";
 import { BannerNotificationsList } from "common/src/components";
+import { CommonBannerNotificationTargetChoices } from "common/types/gql-types";
 import ScrollToTop from "../common/ScrollToTop";
 import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
@@ -50,7 +51,11 @@ export default function PageWrapper({ children }: Props): JSX.Element {
           {hasAccess && <MainMenu placement="default" />}
           <Suspense fallback={<Loader />}>
             <Content>
-              {hasAccess && <BannerNotificationsList />}
+              {hasAccess && (
+                <BannerNotificationsList
+                  target={CommonBannerNotificationTargetChoices.Staff}
+                />
+              )}
               {user ? children : <MainLander />}
             </Content>
           </Suspense>

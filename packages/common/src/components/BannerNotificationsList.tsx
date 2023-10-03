@@ -7,12 +7,18 @@ import { t } from "i18next";
 import NotificationWrapper from "./NotificationWrapper";
 import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
-import { BannerNotificationType, Query } from "../../types/gql-types";
+import {
+  type BannerNotificationType,
+  type Query,
+  type QueryBannerNotificationsArgs,
+  type CommonBannerNotificationTargetChoices,
+} from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
 type BannerNotificationListProps = {
   displayAmount?: number;
   centered?: boolean;
+  target?: CommonBannerNotificationTargetChoices;
 };
 
 type BannerNotificationItemProps = {
@@ -110,13 +116,19 @@ const NotificationsListItem = ({
 const BannerNotificationsList = ({
   displayAmount = 2,
   centered,
+  target,
 }: BannerNotificationListProps) => {
   // no-cache is required because admin is caching bannerNotifications query and
   // there is no key setup for this so this query returns garbage from the admin cache.
-  const { data: notificationData } = useQuery<Query>(
-    BANNER_NOTIFICATIONS_LIST,
-    { fetchPolicy: "no-cache" }
-  );
+  const { data: notificationData } = useQuery<
+    Query,
+    QueryBannerNotificationsArgs
+  >(BANNER_NOTIFICATIONS_LIST, {
+    variables: {
+      target,
+    },
+    fetchPolicy: "no-cache",
+  });
   const notificationsList =
     notificationData?.bannerNotifications?.edges
       .map((edge) => edge?.node)

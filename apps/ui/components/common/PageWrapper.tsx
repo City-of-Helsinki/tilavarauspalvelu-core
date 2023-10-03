@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { BannerNotificationsList } from "common/src/components";
+import { CommonBannerNotificationTargetChoices } from "common/types/gql-types";
 import Footer from "./Footer";
 import { Navigation } from "./Navigation/Navigation";
 import Title from "./Title";
@@ -22,7 +23,10 @@ const PageWrapper = (props: Props): JSX.Element => {
     <>
       <Title>Tilavarauspalvelu</Title>
       <Navigation />
-      <BannerNotificationsList centered />
+      <BannerNotificationsList
+        centered
+        target={CommonBannerNotificationTargetChoices.User}
+      />
       <UnpaidReservationNotification />
       <Main
         $bgColor={props.overrideBackgroundColor}
