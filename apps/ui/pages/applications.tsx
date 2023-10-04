@@ -42,7 +42,6 @@ const Container = styled.div`
   max-width: var(--container-width-xl);
   margin: 0 auto var(--spacing-2-xl) auto;
   font-size: var(--fontsize-body-xl);
-  height: 100%;
 `;
 
 const statusGroupOrder: ReducedApplicationStatus[] = [

@@ -122,13 +122,15 @@ export function getApplicationRounds(): Promise<ApplicationRound[]> {
   });
 }
 
+/*
 export function getApplicationRound(
-  params: IDParameter
+  params: { id: number }
 ): Promise<ApplicationRound> {
   return apiGet<ApplicationRound>({
     path: `${applicationRoundBasePath}/${params.id}`,
   });
 }
+*/
 
 export interface ReservationUnitsParameters {
   applicationRound?: number;
@@ -141,6 +143,7 @@ export interface ReservationUnitsParameters {
   after?: string;
 }
 
+/*
 export function getRecurringReservations(
   applicationId: number
 ): Promise<RecurringReservation[]> {
@@ -149,10 +152,7 @@ export function getRecurringReservations(
     parameters: { application: applicationId },
   });
 }
-
-interface IDParameter {
-  id: number;
-}
+*/
 
 export function getReservationUnit(id: number): Promise<ReservationUnit> {
   return apiGet<ReservationUnit>({
