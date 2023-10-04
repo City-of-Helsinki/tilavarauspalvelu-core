@@ -73,7 +73,7 @@
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
     "viewport-mercator-project": "^7.0.4",
-    "zod": "^3.22.1"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",
