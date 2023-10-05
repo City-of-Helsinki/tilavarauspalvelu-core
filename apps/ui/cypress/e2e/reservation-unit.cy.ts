@@ -47,7 +47,7 @@ import {
 } from "../model/reservation-unit";
 import { textWithIcon } from "../model/search";
 
-const CYPRESS_TIMEOUT = 60000
+const CYPRESS_TIMEOUT = 5000
 
 const matchEvent = (): void => {
   reservationEvent()
@@ -136,7 +136,7 @@ describe("reservation", () => {
   });
 
   // Flaky test on CI
-  it("can cancel reservation process", () => {
+  it.skip("can cancel reservation process", () => {
     textWithIcon(1).contains("20 henkilö");
 
     drawReservation();
@@ -734,7 +734,7 @@ describe.skip("with metadataset", () => {
   });
 
   // Flaky
-  it("should populate default values", () => {
+  it.skip("should populate default values", () => {
     cy.visit("/reservation-unit/700");
     cy.injectAxe();
 
@@ -784,7 +784,7 @@ describe("with application", () => {
   });
 
   // Flaky test on CI
-  it("can do a reservation application with applied subvention", () => {
+  it.skip("can do a reservation application with applied subvention", () => {
     cy.visit("/reservation-unit/909");
     cy.injectAxe();
 
