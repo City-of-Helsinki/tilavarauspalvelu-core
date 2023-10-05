@@ -20,6 +20,7 @@ const BANNER_NOTIFICATION_ADMIN_FRAGMENT = gql`
     pk
     ...BannerNotificationCommon
     name
+    target
     activeUntil
     draft
     state
