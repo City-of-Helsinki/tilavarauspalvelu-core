@@ -52,6 +52,12 @@ class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBu
 
     qualifiers = django_filters.ModelMultipleChoiceFilter(field_name="qualifiers", queryset=Qualifier.objects.all())
 
+    equipments = django_filters.ModelMultipleChoiceFilter(
+        field_name="equipments",
+        queryset=Equipment.objects.all(),
+        conjoined=True,
+    )
+
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
 
     is_visible = django_filters.BooleanFilter(method="get_is_visible")
