@@ -54,6 +54,21 @@ export const SEARCH_FORM_PARAMS_PURPOSE = gql`
   }
 `;
 
+export const SEARCH_FORM_PARAMS_EQUIPMENT = gql`
+  query Equipment {
+    equipments {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+  }
+`;
+
 export const RESERVATION_PURPOSES = gql`
   query ReservationPurposes {
     reservationPurposes {

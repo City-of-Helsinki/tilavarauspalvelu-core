@@ -28,6 +28,7 @@ import { emptyOption, participantCountOptions } from "../../modules/const";
 import { MediumButton, truncatedText } from "../../styles/util";
 import MultiSelectDropdown from "../form/MultiselectDropdown";
 import {
+  SEARCH_FORM_PARAMS_EQUIPMENT,
   SEARCH_FORM_PARAMS_PURPOSE,
   SEARCH_FORM_PARAMS_UNIT,
 } from "../../modules/queries/params";
@@ -276,7 +277,17 @@ const SearchForm = ({
       })) ?? [];
   const reservationUnitTypeOptions = mapOptions(sortBy(unitTypes, "name"));
 
-  // TODO: populate the equipment options from the API
+  const { data: equipmentQueryData, loading: equipmentsLoading } =
+    useQuery<Query>(SEARCH_FORM_PARAMS_EQUIPMENT);
+  const equipments =
+    equipmentQueryData?.equipments?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n != null)
+      .map((node) => ({
+        id: String(node.pk),
+        name: getTranslation(node, "name"),
+      })) ?? [];
+  const equipmentOptions = mapOptions(sortBy(equipments, "name"));
 
   const minuteDurations = [
     {
@@ -347,12 +358,19 @@ const SearchForm = ({
         return reservationUnitTypeOptions.find((n) => n.value === value)?.label;
       case "purposes":
         return purposeOptions.find((n) => n.value === value)?.label;
+      case "equipment":
+        return equipmentOptions.find((n) => n.value === value)?.label;
       default:
         return "";
     }
   };
 
-  const multiSelectFilters = ["unit", "reservationUnitType", "purposes"];
+  const multiSelectFilters = [
+    "unit",
+    "reservationUnitType",
+    "purposes",
+    "equipment",
+  ];
 
   useEffect(() => {
     register("minPersons");
@@ -423,7 +441,7 @@ const SearchForm = ({
                 selection.filter((n) => n !== "").join(",")
               );
             }}
-            options={reservationEquipmentOptions}
+            options={equipmentOptions}
             setInputValue={setReservationEquipmentSearchInput}
             showSearch
             title={t("searchForm:equipmentFilter")}
