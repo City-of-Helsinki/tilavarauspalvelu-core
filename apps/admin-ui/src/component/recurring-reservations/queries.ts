@@ -25,6 +25,26 @@ export const APPLICATION_ROUNDS_QUERY = gql`
   }
 `;
 
+// TODO combine with APPLICATION_ROUNDS_QUERY
+export const APPLICATION_ROUD_QUERY = gql`
+  query ApplicationRoundCriteria($pk: [ID]!) {
+    applicationRounds(pk: $pk) {
+      edges {
+        node {
+          pk
+          nameFi
+          status
+          applicationPeriodBegin
+          applicationPeriodEnd
+          reservationUnits {
+            pk
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const APPLICATIONS_QUERY = gql`
   query getApplications {
     applications(status: "in_review") {

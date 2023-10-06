@@ -114,29 +114,6 @@ export const applicationStatusFromGqlToRest = (
       return "draft";
   }
 };
-export const applicationStatusFromGqlToRes = (
-  t?: ApplicationStatusGql
-): ApplicationStatus => {
-  switch (t) {
-    case ApplicationStatusGql.Handled:
-      return "handled";
-    case ApplicationStatusGql.ReviewDone:
-      return "review_done";
-    case ApplicationStatusGql.InReview:
-    case ApplicationStatusGql.Expired:
-      return "in_review";
-    case ApplicationStatusGql.Cancelled:
-      return "cancelled";
-    case ApplicationStatusGql.Sent:
-      return "sent";
-    case ApplicationStatusGql.Allocated:
-      return "allocated";
-    case ApplicationStatusGql.Received:
-    case ApplicationStatusGql.Draft:
-    default:
-      return "draft";
-  }
-};
 
 export const getNormalizedApplicationStatus = (
   status: ApplicationStatus,

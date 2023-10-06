@@ -1,10 +1,9 @@
 import { useQuery } from "@apollo/client";
-import { Notification } from "hds-react";
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import styled from "styled-components";
-import { Query, QueryUnitByPkArgs, UnitByPkType } from "common/types/gql-types";
+import { Query, QueryUnitByPkArgs } from "common/types/gql-types";
+import { useNotification } from "@/context/NotificationContext";
 import { UNIT_QUERY } from "../../common/queries";
 import { ContentContainer } from "../../styles/layout";
 import Loader from "../Loader";
@@ -16,29 +15,22 @@ interface IProps {
   unitPk: string;
 }
 
-const Wrapper = styled.div``;
-
 const UnitMap = (): JSX.Element => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [unit, setUnit] = useState<UnitByPkType | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
+  const { notifyError } = useNotification();
   const { t } = useTranslation();
   const unitPk = Number(useParams<IProps>().unitPk);
 
-  useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
-    variables: { pk: unitPk },
-    onCompleted: ({ unitByPk }) => {
-      if (unitByPk) {
-        setUnit(unitByPk);
-      }
-      setIsLoading(false);
-    },
-    onError: () => {
-      setErrorMsg("errors.errorFetchingData");
-      setIsLoading(false);
-    },
-  });
+  const { data, loading: isLoading } = useQuery<Query, QueryUnitByPkArgs>(
+    UNIT_QUERY,
+    {
+      variables: { pk: unitPk },
+      onError: () => {
+        notifyError("errors.errorFetchingData");
+      },
+    }
+  );
+
+  const unit = data?.unitByPk ?? undefined;
 
   if (isLoading || !unit) {
     return <Loader />;
@@ -54,26 +46,12 @@ const UnitMap = (): JSX.Element => {
   }
 
   return (
-    <Wrapper>
+    <div>
       <SubPageHead title={t("Unit.location")} unit={unit} />
       <ContentContainer>
         <Map markers={markers} />
       </ContentContainer>
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
-    </Wrapper>
+    </div>
   );
 };
 

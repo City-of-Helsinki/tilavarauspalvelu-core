@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Card, Table, IconCheck, IconEnvelope } from "hds-react";
 import { isEqual, trim, orderBy } from "lodash";
-import { gql, useQuery as useApolloQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -41,6 +41,7 @@ import ShowWhenTargetInvisible from "../ShowWhenTargetInvisible";
 import StickyHeader from "../StickyHeader";
 import ApplicationUserBirthDate from "./ApplicationUserBirthDate";
 import StatusBlock from "../StatusBlock";
+import { APPLICATION_QUERY } from "./queries";
 
 const parseApplicationEventSchedules = (
   applicationEventSchedules: ApplicationEventScheduleType[],
@@ -254,103 +255,6 @@ const appEventDuration = (
   return trim(duration, ", ");
 };
 
-// TODO move them to common file
-// TODO make into fragments
-// TODO still missing some fields (undefineds and "-"s in the UI)
-const APPLICATION_QUERY = gql`
-  query getapplications($pk: [ID]) {
-    applications(pk: $pk) {
-      edges {
-        node {
-          pk
-          status
-          applicantType
-          applicationRound {
-            pk
-            nameFi
-            serviceSector {
-              pk
-              nameFi
-            }
-            applicationPeriodBegin
-            applicationPeriodEnd
-            reservationPeriodBegin
-            reservationPeriodEnd
-            status
-            applicationsCount
-            reservationUnitCount
-            statusTimestamp
-          }
-          contactPerson {
-            firstName
-            lastName
-            email
-            phoneNumber
-          }
-          additionalInformation
-          organisation {
-            name
-            identifier
-            organisationType
-            coreBusiness
-            address {
-              postCode
-              streetAddress
-              city
-            }
-          }
-          homeCity {
-            nameFi
-          }
-          billingAddress {
-            postCode
-            streetAddress
-            city
-          }
-          aggregatedData {
-            appliedMinDurationTotal
-            appliedReservationsTotal
-          }
-          applicationEvents {
-            pk
-            name
-            begin
-            end
-            eventsPerWeek
-            minDuration
-            numPersons
-            purpose {
-              nameFi
-            }
-            ageGroup {
-              pk
-              minimum
-              maximum
-            }
-            applicationEventSchedules {
-              begin
-              end
-              day
-              priority
-            }
-            eventReservationUnits {
-              pk
-              priority
-              reservationUnit {
-                pk
-                nameFi
-                unit {
-                  nameFi
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 function ApplicationDetails({
   applicationPk,
 }: {
@@ -360,16 +264,13 @@ function ApplicationDetails({
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const { data, loading: isLoading } = useApolloQuery<Query>(
-    APPLICATION_QUERY,
-    {
-      skip: applicationPk === 0,
-      variables: { pk: [applicationPk] },
-      onError: () => {
-        notifyError(t("errors.errorFetchingApplication"));
-      },
-    }
-  );
+  const { data, loading: isLoading } = useQuery<Query>(APPLICATION_QUERY, {
+    skip: applicationPk === 0,
+    variables: { pk: [applicationPk] },
+    onError: () => {
+      notifyError(t("errors.errorFetchingApplication"));
+    },
+  });
   const application = data?.applications?.edges[0]?.node ?? undefined;
   const applicationRound = application?.applicationRound ?? undefined;
 

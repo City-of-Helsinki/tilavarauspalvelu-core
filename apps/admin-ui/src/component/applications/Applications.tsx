@@ -1,5 +1,5 @@
 import React from "react";
-import { gql, useQuery as useApolloQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { uniqBy } from "lodash";
 import {
   type Query,
@@ -24,7 +24,10 @@ import { applicationUrl } from "@/common/urls";
 import { ContentContainer, IngressContainer } from "@/styles/layout";
 import { DataFilterConfig } from "@/common/types";
 import LinkPrev from "../LinkPrev";
-import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../recurring-reservations/queries";
+import {
+  APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
+  APPLICATION_ROUD_QUERY,
+} from "../recurring-reservations/queries";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
 import StatusCell from "../StatusCell";
@@ -187,26 +190,6 @@ const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
   };
 };
 
-// TODO pick the fields we need
-const APPLICATION_ROUD_QUERY = gql`
-  query ApplicationRoundCriteria($pk: [ID]!) {
-    applicationRounds(pk: $pk) {
-      edges {
-        node {
-          pk
-          nameFi
-          status
-          applicationPeriodBegin
-          applicationPeriodEnd
-          reservationUnits {
-            pk
-          }
-        }
-      }
-    }
-  }
-`;
-
 function Applications({
   applicationRoundId,
 }: {
@@ -217,7 +200,7 @@ function Applications({
   const { t } = useTranslation();
 
   const { data: applicationRoundData, loading: isLoadingRound } =
-    useApolloQuery<Query>(APPLICATION_ROUD_QUERY, {
+    useQuery<Query>(APPLICATION_ROUD_QUERY, {
       variables: {
         pk: [applicationRoundId],
       },
@@ -228,7 +211,7 @@ function Applications({
   const applicationRound =
     applicationRoundData?.applicationRounds?.edges?.[0]?.node;
 
-  const { loading: isApplicationsLoading, data } = useApolloQuery<
+  const { loading: isApplicationsLoading, data } = useQuery<
     Query,
     QueryApplicationsArgs
   >(APPLICATIONS_BY_APPLICATION_ROUND_QUERY, {
