@@ -385,7 +385,6 @@ function ApplicationDetails({
                   application?.aggregatedData?.appliedReservationsTotal
                 } ${t("common.volumeUnit")}`}
               />
-              <KV k={t("Application.basket")} v="" />
             </DefinitionList>
           </CardContentContainer>
         </Card>

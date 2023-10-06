@@ -386,7 +386,7 @@ const CreateReservationModal = ({
         })}
       />
       {reservationUnit != null && (
-        <ErrorBoundary fallback={<div>{t("errors.uncaught")}</div>}>
+        <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
           <DialogContent
             onClose={onClose}
             reservationUnit={reservationUnit}

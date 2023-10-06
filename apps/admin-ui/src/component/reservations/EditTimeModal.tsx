@@ -385,7 +385,7 @@ const EditTimeModal = ({ reservation, onAccept, onClose }: Props) => {
         id="modal-header"
         title={t("Reservation.EditTime.title")}
       />
-      <ErrorBoundary fallback={<div>{t("errors.uncaught")}</div>}>
+      <ErrorBoundary fallback={<div>{t("errors.functionFailedTitle")}</div>}>
         <DialogContent
           reservation={reservation}
           onAccept={onAccept}

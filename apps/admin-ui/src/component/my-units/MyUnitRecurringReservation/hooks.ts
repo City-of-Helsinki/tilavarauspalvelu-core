@@ -319,7 +319,7 @@ export const useCreateRecurringReservation = () => {
         return {
           ...common,
           reservationPk: undefined,
-          error: errors.length > 0 ? errors[0] : "unkownError",
+          error: errors.length > 0 ? errors[0] : "unknownError",
         };
       }
       return {

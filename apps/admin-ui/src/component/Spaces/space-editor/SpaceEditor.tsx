@@ -278,7 +278,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
       <Wrapper>
         <Notification
           type="error"
-          label={t("errors.functionFailed")}
+          label={t("errors.functionFailedTitle")}
           position="top-center"
           autoClose={false}
           dismissible
@@ -395,7 +395,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
         <Wrapper>
           <Notification
             type="error"
-            label={t("errors.functionFailed")}
+            label={t("errors.functionFailedTitle")}
             position="top-center"
             autoClose={false}
             dismissible

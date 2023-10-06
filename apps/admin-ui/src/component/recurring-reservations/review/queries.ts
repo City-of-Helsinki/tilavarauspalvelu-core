@@ -54,6 +54,8 @@ export const APPLICATIONS_QUERY = gql`
     }
   }
 `;
+
+// TODO use enum instead of string for status (also rename the query if you hard code the status)
 export const APPLICATIONS_EVENTS_QUERY = gql`
   query getApplicationEvents(
     $offset: Int

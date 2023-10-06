@@ -50,7 +50,6 @@ const translations: ITranslations = {
     WEAK: ["Heikko tunnistautuminen"],
     STRONG: ["Vahva tunnistautuminen"],
   },
-  AuthState: { initializing: ["Alustetaan..."] },
   ReserveeType: {
     INDIVIDUAL: ["yksityishenkilö"],
     BUSINESS: ["yritys"],
@@ -75,7 +74,6 @@ const translations: ITranslations = {
     sv: ["ruotsiksi"],
     en: ["englanniksi"],
   },
-
   paging: {
     numResults: ["{{count}} tulosta {{totalCount}} tuloksesta näytetty"],
     allResults: ["Kaikki {{totalCount}} tulosta näytetty"],
@@ -90,9 +88,7 @@ const translations: ITranslations = {
     hoursLabel: ["Tunnit"],
     minutesLabel: ["Minuutit"],
     applicationName: ["Tilavarauskäsittely"],
-    selectReservationUnit: ["Valitse tila"],
-    favourite: ["Suosikki", "Favourite", "Favorit"],
-    next: ["Seuraava", "Next", "Nästa"],
+    next: ["Seuraava"],
     prev: ["Takaisin"],
     submit: ["Lähetä"],
     false: ["Ei"],
@@ -109,15 +105,22 @@ const translations: ITranslations = {
     select: ["Valitse"],
     filter: ["Suodata"],
     filtered: ["Suodatettu"],
+    // TODO these are only used in DataTable, they are uncommon
     filterHideHandled: ["Piilota jo käsitellyt"],
     filterShowHandled: ["Näytä myös käsitellyt"],
     activateSelection: ["Siirry valintatilaan"],
     disableSelection: ["Poistu valintatilasta"],
     closeAll: ["Sulje kaikki"],
     openAll: ["Avaa kaikki"],
+    selectAllRows: ["Valitse kaikki rivit"],
+    deselectAllRows: ["Poista kaikkien rivien valinta"],
+    selectRowX: ["Valitse rivi {{row}}"],
+    deselectRowX: ["Posta rivin {{row}} valinta"],
+    // --- end of DataTable specific translations
     closeModal: ["Sulje modaali-ikkuna"],
     today: ["Tänään"],
     agesSuffix: ["{{range}} -vuotiaat"],
+    // TODO this is only used in FilterControls
     resetFilters: ["Tyhjennä suodattimet"],
     resetSearch: ["Tyhjennä hakukenttä"],
     apply: ["Käytä"],
@@ -125,44 +128,24 @@ const translations: ITranslations = {
     volumeUnit: [" kpl", " ", " "],
     personUnit_one: ["{{count}} henkilö"],
     personUnit_other: ["{{count}} henkeä"],
-    hoursUnit: ["{{count}} h", "{{count}} h", "{{count}} h"],
-    hoursUnitLong_one: ["{{count}} tunti", "{{count}} hour", "{{count}} timme"],
-    hoursUnitLong_other: [
-      "{{count}} tuntia",
-      "{{count}} hours",
-      "{{count}} timmar",
-    ],
-    minutesUnit: ["{{count}} min", "{{count}} min", "{{count}} min"],
-    minutesUnitLong_one: [
-      "{{count}} minuutti",
-      "{{count}} minute",
-      "{{count}} minut",
-    ],
-    minutesUnitLong_other: [
-      "{{count}} minuuttia",
-      "{{count}} minutes",
-      "{{count}} minuter",
-    ],
+    hoursUnit: ["{{count}} h"],
+    hoursUnitLong_one: ["{{count}} tunti"],
+    hoursUnitLong_other: ["{{count}} tuntia"],
+    minutesUnit: ["{{count}} min"],
+    minutesUnitLong_one: ["{{count}} minuutti"],
+    minutesUnitLong_other: ["{{count}} minuuttia"],
     streetAddress: ["Katuosoite"],
     postalNumber: ["Postinumero"],
     postalDistrict: ["Postitoimipaikka"],
     emailAddress: ["Sähköpostiosoite"],
     billingAddress: ["Laskutusosoite"],
     homeCity: ["Kotipaikka"],
+    // TODO this is silly use count (with zero, one, other)
     membersSuffix: [" jäsentä"],
     minAmount: ["Vähintään"],
     maxAmount: ["Enintään"],
     option: ["Vaihtoehto"],
     same: ["Sama"],
-    loginWithTunnistamo: ["Kirjaudu palveluun Tunnistamon avulla, kiitos."],
-    noAuthorization: ["Tunnuksellasi ei ole oikeuksia kyseiseen sisältöön."],
-    youthServices: ["Nuorisopalvelut"],
-    selectAllRows: ["Valitse kaikki rivit"],
-    deselectAllRows: ["Poista kaikkien rivien valinta"],
-    selectRowX: ["Valitse rivi {{row}}"],
-    deselectRowX: ["Posta rivin {{row}} valinta"],
-    selectGroupX: ["Valitse ryhmän {{group}} rivit"],
-    deselectGroupX: ["Poista ryhmän {{group}} rivien valinta"],
     day: ["Päivä"],
     month: ["Kuukausi"],
     year: ["Vuosi"],
@@ -178,6 +161,7 @@ const translations: ITranslations = {
     weekday: ["Viikonpäivä"],
     date: ["Päivämäärä"],
     time: ["Kellonaika"],
+    // TODO AriaLabel is not needed in the key value
     increaseByOneAriaLabel: ["Lisää yhdellä"],
     decreaseByOneAriaLabel: ["Vähennä yhdellä"],
     openToNewTab: ["Avaa uuteen välilehteen"],
@@ -187,32 +171,19 @@ const translations: ITranslations = {
   },
   errors: {
     router: {
-      invalidPath: ["Virheellinen polku"],
       invalidApplicationNumber: ["Virheellinen hakemusnumero"],
       invalidApplicationRoundNumber: ["Virheellinen hakukierroksen numero"],
     },
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
     errorFetchingData: ["Virhe haettaessa tietoja"],
-    functionFailed: ["Toiminto epäonnistui"],
     errorFetchingApplication: ["Virhe haettaessa hakemusta"],
-    errorFetchingApplicationRound: ["Virhe haettaessa hakukierrosta"],
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
-    errorFetchingRecommendations: ["Virhe haettaessa ehdotuksia"],
-    errorFetchingReservationUnit: ["Virhe haettaessa tilan tietoja"],
-    errorFetchingReservations: ["Virhe haettaessa varauksia"],
-    errorFetchingCities: ["Virhe haettaessa kaupunkeja"],
-    errorFetchingCapacity: ["Virhe haettaessa varaustilannetta"],
-    errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
-    errorSavingRecommendation: ["Virhe tallennettaessa ehdotusta"],
-    errorSavingRecommendations: ["Virhe tallennettaessa ehdotuksia"],
-    loginNeeded: ["Kirjautuminen vaaditaan"],
-    authorizationNeeded: ["Oikeudet vaaditaan"],
-    errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
-    errorSavingData: ["Virhe tallennettaessa tietoja"],
-    uncaught: ["Odottamaton virhe"],
+    // TODO describe what failed if you don't know why it failed
+    functionFailedTitle: ["Toiminto epäonnistui"],
+    unexpectedError: ["Odottamaton virhe"],
     missingReservationType: ["Varaustyyppi puuttuu"],
     errorRecurringReservationsDoneDisplay: [
-      "Virhe varaus tehty, mutta sen näyttäminen epäonnistui.",
+      "Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui.",
     ],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
     descriptive: {
@@ -228,7 +199,7 @@ const translations: ITranslations = {
       "Overlapping reservations are not allowed.": [
         "Ajankohdalle on jo varaus toisen varausyksikön kautta.",
       ],
-      unkown: ["Tuntematon virhe"],
+      unknown: ["Tuntematon virhe"],
       genericError: [""],
       "Only reservations with states DENIED and CONFIRMED can be reverted to requires handling.":
         [
@@ -265,7 +236,6 @@ const translations: ITranslations = {
       "Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot",
     ],
   },
-
   errorPages: {
     accessForbidden: {
       title: ["Sinulla ei ole käyttöoikeuksia tälle sivulle"],
@@ -276,7 +246,7 @@ const translations: ITranslations = {
       giveFeedback: ["Anna palautetta"],
     },
   },
-
+  // TODO used inside the ReservationUnitEditor
   ArchiveReservationUnitDialog: {
     title: ["Oletko varma että haluat arkistoida varausyksikön {{name}}?"],
     description: [
@@ -285,6 +255,7 @@ const translations: ITranslations = {
     archive: ["Arkistoi"],
     success: ["Varausyksikkö arkistoitu."],
   },
+  // TODO used inside the ReservationUnitEditor
   DiscardReservationUnitChangesDialog: {
     title: [
       "Oletko varma että haluat palata takaisin tallentamatta varausyksikön tietoja?",
@@ -321,24 +292,14 @@ const translations: ITranslations = {
     resources: ["Resurssit"],
     units: ["Toimipisteet"],
   },
-  HeadingMenu: {
-    recurringReservations: ["Vakiovuorot"],
-    singleReservations: ["Yksittäisvuorot"],
-  },
   Navigation: {
-    login: ["Kirjaudu sisään", "Login", "Logga in"],
-    logging: ["Odota...", "Please hold", "Please hold"],
-    logout: ["Kirjaudu ulos", "Logout", "Logga ut"],
-    profile: ["Profiili", "Profile", "Profil"],
-    languageSelection: ["Kielen valinta", "Language selection", "Språkval"],
+    login: ["Kirjaudu sisään"],
+    logging: ["Odota..."],
+    logout: ["Kirjaudu ulos"],
     goBack: ["Palaa takaisin"],
-    skipToMainContent: [
-      "Siirry sivun pääsisältöön",
-      "Skip to main content",
-      "Hoppa till huvudnavigeringen",
-    ],
-    expandMenu: ['Laajenna valikko "{{title}}"', 'Expand menu "{{title}}"'],
-    shrinkMenu: ['Pienennä valikko "{{title}}"', 'Shrink menu "{{title}}"'],
+    skipToMainContent: ["Siirry sivun pääsisältöön"],
+    expandMenu: ['Laajenna valikko "{{title}}"'],
+    shrinkMenu: ['Pienennä valikko "{{title}}"'],
     noName: ["Ei nimeä"],
   },
   MyUnits: {
@@ -420,11 +381,6 @@ const translations: ITranslations = {
     application_one: ["Hakemus", "Application"],
     application_other: ["Hakemusta", "Applications"],
     applicantType: ["Asiakastyyppi"],
-    showAllApplications: ["Näytä kaikki hakemukset"],
-    showResolutions: ["Näytä päätöslauselma"],
-    recommendedStage: ["Suositeltu vaihe"],
-    gotoSplitPreparation: ["Siirry valmistelemaan jakoa"],
-    iHaveCheckedApplications: ["Olen tarkistanut hakemukset"],
     timeframeCurrent: ["Sulkeutuu {{date}}"],
     timeframeFuture: ["Haku aukeaa {{date}}"],
     timeframePast: ["Sulkeutunut {{date}}"],
@@ -435,10 +391,7 @@ const translations: ITranslations = {
     coreActivity: ["Ydintoiminta"],
     numHours: ["Vuorojen kokonaiskesto"],
     numTurns: ["Vuorojen määrä"],
-    basket: ["Kori"],
     authenticatedUser: ["Tunnistautunut käyttäjä"],
-    unhandledApplications: ["{{count}} hakemusta"],
-    unhandledApplicationEvents: ["{{count}} haettua vuoroa"],
     headings: {
       id: ["id"],
       customer: ["Hakija"],
@@ -451,12 +404,10 @@ const translations: ITranslations = {
       applicationStatus: ["Hakemuksen status"],
       reviewStatus: ["Esitarkastuksen tulos"],
       resolutionStatus: ["Päätöksen status"],
-      basket: ["Kori"],
       resolution: ["Päätös"],
       applicantName: ["Hakijan nimi"],
       purpose: ["Käyttötarkoitus"],
       ageGroup: ["Ikäluokka"],
-      recommendations: ["Ehdotukset"],
       additionalInformation: ["Lisätiedot (yksityishenkilö)"],
       userBirthDate: ["Syntymäaika"],
     },
@@ -473,20 +424,7 @@ const translations: ITranslations = {
       approved: ["Päatös tehty"],
       sent: ["Päatös lähetetty"],
     },
-    actions: {
-      returnAsPartOfAllocation: ["Palauta hakemus osaksi jakoa"],
-      declineApplication: ["Hylkää hakemus"],
-    },
-    saveNotification: {
-      in_review: {
-        heading: ["Hakemus on merkitty jakoon eteneväksi"],
-        body: ["Hakemus on mukana tulevassa tilanjaossa."],
-      },
-      declined: {
-        heading: ["Hakemus on merkitty hylätyksi"],
-        body: ["Hakemus ei ole mukana tulevassa tilanjaossa."],
-      },
-    },
+    // TODO these are in ApplicationDetaiils
     customerBasicInfo: ["Varaajan perustiedot"],
     contactPersonInformation: ["Yhteyshenkilön tiedot"],
     members: ["Jäsenet"],
@@ -494,7 +432,6 @@ const translations: ITranslations = {
     contactPersonLastName: ["Sukunimi"],
     contactPersonEmail: ["Sähköpostiosoite"],
     contactPersonPhoneNumber: ["Puhelinnumero"],
-    organisationCoreActivity: ["Yhdistyksen tai seuran ydintoiminta"],
     contactInformation: ["Yhteystiedot"],
     applicantTypes: {
       INDIVIDUAL: ["Yksityishenkilö"],
@@ -507,25 +444,6 @@ const translations: ITranslations = {
     applicationsSelected_one: ["{{count}} hakemus valittu"],
     applicationsSelected_other: ["{{count}} hakemusta valittu"],
     allApplications: ["Kaikki hakemukset"],
-    resolution: ["Päätös"],
-    graduatedToAllocation: ["Edennyt jakoon esitarkastuksessa"],
-    declinedFromAllocation: ["Hylätty esitarkastuksessa"],
-    allocatedReservations: ["Myönnetyt vuorot"],
-    noAllocatedReservations: ["Ei myönnettyjä vuoroja"],
-    downloadResolution: ["Lataa päätös"],
-    downloadResolutionHelper: [
-      "Toimita päätös asiakkaalle ja merkitse se toimitetuksi alhaalta.",
-    ],
-    summaryOfAllocatedApplicationEvents: ["Erittely myönnetyistä vuoroista"],
-    showAllocationResultsOfApplicant: ["Näytä asiakkaalle tehdyt ehdotukset"],
-    markAsResolutionSent: ["Merkitse päätös toimitetuksi"],
-    markAsResolutionNotSent: ["Merkitse päätös toimittamattomaksi"],
-    showDetailedResultList: ["Näytä yksityiskohtainen vuorolista"],
-    space: ["Tila"],
-    allocatedForGroupX: ["Myönnetty ryhmälle {{group}}"],
-    declinedReservations: [
-      "Poikkeukset, jolloin vakiovuoro ei ole käytettävissä",
-    ],
     gotoLink: ["Tarkastele hakemusta"],
   },
   TimeSelector: {
@@ -533,8 +451,6 @@ const translations: ITranslations = {
     secondary: ["Muu toive"],
   },
   ApplicationRound: {
-    titleAllRecurringApplicationRounds: ["Kaikki vakiovuorojen hakukierrokset"],
-    browseAllApplicationRounds: ["Selaa kaikkia"],
     noUpcoming: ["Ei tulossa olevia hakukierroksia."],
     statuses: {
       upcoming: ["Tulossa"],
@@ -565,20 +481,10 @@ const translations: ITranslations = {
     applicationCount: ["hakemusta"],
     reservationUnitCount: ["varausyksikköä"],
     applicants: ["Hakukierroksen hakijat"],
-    listApprovalTitle: ["Hyväksynnät"],
     listHandlingTitle: ["Käsittely"],
-    pastRounds: ["Menneet"],
-    roundsInProcessing: ["Käsittelyssä"],
-    roundsOpenForApplication: ["Haku avoinna"],
-    futureRounds: ["Tulevat"],
-    showClientApplication: ["Näytä asiakkaan koko hakemus"],
-    infoGivenByCustomer: ["Asiakkaan ilmoittamat tiedot"],
-    recommendedAid: ["Haetut vuorot"],
     appliedReservations: ["Haetut vuorot"],
     applications: ["Hakemukset"],
-    appliedReservationUnit: ["Tarjottu tila"],
-    totalReservationTime: ["Kokonaiskesto"],
-    recommendedSpaceAid: ["Tilankäyttönä suositeltava avustus"],
+    // TODO this is used in StatusRecommendations.tsx
     recommendations: {
       in_review: [
         "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
@@ -592,80 +498,8 @@ const translations: ITranslations = {
       ],
     },
     roundCriteria: ["Kierroksen kriteerit"],
-    basket: ["Kori"],
-    allocatedBasket: ["Jaettava kori"],
-    allocatedBasketHelper: [
-      "Korit ja niiden järjestys on ennalta määritetty. Korin jakaminen tuottaa ehdotuksen, jonka voit hakemus kerrallaan tarkistaa. Jos olet tehnyt hylkäyksiä, käynnistä kori uudelleen ennen seuraavaan koriin siirtymistä.",
-    ],
-    navigateBackToReview: ["Palaa esitarkistusvaiheeseen"],
-    navigateToApprovalPreparation: [
-      "Siirry esihenkilöhyväksynnän valmisteluun",
-    ],
-    navigateBackToHandling: ["Palaa ehdotusten käsittelyyn"],
-    allocateAction: ["Käynnistä jako"],
-    deliverAction: ["Toimita"],
-    sendForApproval: ["Toimita esihenkilölle"],
-    allocationNotificationHeading: [
-      "Näet käsitelävät ehdotukset täällä, kun olet käynnistänyt jaon Jaa-painikkeesta.",
-    ],
-    allocationNotificationBody: [
-      "Kone tekee ehdotukset ennalta määritellyille ryhmille priorisointijärjestyksessä.\nNäet kierroksen kriteerit näkymän ylälaidasta.",
-    ],
-    allocateLabel: [
-      "Huomaathan, että et voi enää palata esitarkistusvaiheeseen, jos olet käynnistänyt ehdotusten jakamisen.",
-    ],
-    allocationDialogHeading: ["Laaditaan ehdotuksia"],
-    allocationDialogBody: [
-      "Odotathan hetken, tämä voi viedä joitakin kymmeniä sekunteja tai minuutteja.",
-    ],
-    suffixUnhandledSuggestions: ["käsittelemätöntä ehdotusta"],
-    sentForApprovalDialogHeader: [
-      "Toimitetaanko alustava tilanjakoehdotus hyväksyttäväksi?",
-    ],
-    sentForApprovalDialogBody: [
-      "Esihenkilö saa listan hyväksyttäväkseen, jonka jälkeen tarjoukset tai päätökset toimitetaan asiakkaalle.",
-    ],
-    sentForApprovalNotificationHeader: [
-      "Vuorojakopaatös on toimitettu tarkistettavaksi",
-    ],
-    sentForApprovalNotificationBody: [
-      "Voit katsella alta hyväksyntää odottavaa päätöslauselmaa.",
-    ],
-    approvedNotificationHeader: ["Olet hyväskynyt vuorojakopäätöksen"],
-    approvalCancelledNotificationHeader: [
-      "Olet palauttanut listan käsittelyyn",
-    ],
-    approvalCancelledNotificationBody: ["Muutos näkyy käsittelijöille."],
-    unallocatedApplications: [
-      "Hakemuksia, joille ei voitu tehdä lainkaan ehdotuksia",
-    ],
-    schedulesToBeGranted: ["Myönnettäviä vuoroja"],
+    // TODO this is used in Criteria page
     attachedReservationUnits: ["Liitettyä varausyksikköä"],
-    inUniqueReservationUnits: ["Eri varausyksikössä"],
-    orphanApplications: ["Ehdotuksitta jääneet"],
-    handledApplications: ["Käsitellyt ehdotukset"],
-    amountReserved: ["Kapasiteetista varattu"],
-    amountReservedOfSpace: ["Tilan kapasiteetista varattu"],
-    amountReservedOfSpaceSubtext: ["Kierrokselle osoitetusta tilan maksimista"],
-    percentageOfCapacity: ["{{percentage}} % kapasiteetista"],
-    cancelSupervisorApproval: ["Palauta lista hyväksymättä käsittelijälle"],
-    approveAndSendToCustomers: ["Hyväksy ja toimita päätökset asiakkaille"],
-    cancelSupervisorApprovalDialogHeader: [
-      "Oletko varma, että haluat palauttaa listan käsittelyyn?",
-    ],
-    cancelSupervisorApprovalDialogBody: [
-      "Lista poistuu tällöin näkymästäsi, etkä voi nähdä tai hyväksyä listaa ennen kuin käsittelijät ovat pyytäneet hyväksyntää sinulta uudelleen.",
-    ],
-    approveRecommendationsDialogHeader: [
-      "Hyväksytäänkö ehdotus kierroksen vuorojaosta?",
-    ],
-    approveRecommendationsDialogBody: [
-      "Kaikkien toimipisteiden asiakkaat saavat myöntöpäätökset heti, kun hyväksyntä on tehty.",
-    ],
-    returnListToHandling: ["Palauta lista käsittelyyn"],
-    listHandlingIngressEmpty: [
-      "Vastuullasi ei ole tällä hetkellä ole lainkaan tulevia tai käsittelyvaiheessa olevia hakukierroksia.",
-    ],
     listHandlingIngress_one: [
       "Vastuullasi on tällä hetkellä {{count}} tuleva tai käsittelyvaiheessa oleva hakukierros.",
     ],
@@ -681,48 +515,20 @@ const translations: ITranslations = {
     listApprovalIngress_other: [
       "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselmaa",
     ],
-    allRecurringApplicationRounds: ["Vakiovuorojen kaikki hakukierrokset"],
+    // TODO this is used in Criteria page
     searchAndUsageTimeRanges: ["Haku- ja käyttöajanjaksot"],
+    // TODO this is used in Criteria page
     applicationPeriodTitle: [
       "Hakukauden alkamis- ja päätymisajankohta asiakkaille",
     ],
+    // TODO this is used in Criteria page
     reservationPeriodTitle: [
       "Hakuun kuuluvien varausyksiköiden varsinainen käyttöajanjakso",
     ],
-    summaryOfCriteriaAndBaskets: ["Kriteerien ja korien yhteenveto"],
-    preferredAllocationGroups: ["Tilan saajina suositut ryhmät"],
+    // TODO this is used in Criteria page
     usedReservationUnits: ["Kierrokselle liitetyt varausyksiköt"],
-    approvalListTitle: ["Hyväksyntäjonosi"],
-    approvalListSubtitle: [
-      "Näet täällä hyväksyntääsi odottavat ja hyväksytyt ehdotukset hakukierrosten tarjous- tai myöntöpäätöksistä.",
-    ],
-    noApprovalRights: [
-      "Sinulla ei ole riittäviä oikeuksia hakukierrosten hyväksyntään.",
-    ],
-    waitingForApproval: ["Odottaa hyväksyntää"],
-    noPendingApprovals: ["Ei hyväksyntää odottavia hakukierroksia."],
-    approvalDoneListTitle: ["Hyväksytyt"],
-    noPendingDoneApprovals: ["Ei hyväksyttyjä hakukierroksia."],
-    resolutionNumber: ["Päätösnumero #{{no}}"],
+    // TODO used in TimerFrameStatus.tsx instead
     resolutionDate: ["Päätös tehty {{date}}"],
-    notificationResolutionDoneHeading: ["Esihenkilöhyväksyntä ja päätös tehty"],
-    notificationResolutionDoneBody: [
-      "Voit hallita asiakkaille lähetettäviä päätöksiä täältä.",
-    ],
-    noApplications: ["Hakukierroksella ei ole vielä hakemuksia."],
-    noApplicationEvents: ["Hakukierroksella ei ole vielä haettuja vuoroja."],
-    noFilteredApplications: [
-      "Valituilla suodattimilla ei löytynyt yhtään hakemusta. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
-    ],
-    noFilteredApplicationEvents: [
-      "Valituilla suodattimilla ei löytynyt yhtään haettua vuoroa. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
-    ],
-  },
-  Basket: {
-    purpose: ["Tuettava toiminta"],
-    customerType: ["Asiakastyypin täytyy olla"],
-    ageGroup: ["Vuoron käyttäjätyypin täytyy olla"],
-    homeCity: ["Organisaation kotipaikkakunnan täytyy olla"],
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],
@@ -753,62 +559,10 @@ const translations: ITranslations = {
       phase: ["Vaihe"],
     },
   },
-  Organisation: {
-    activeParticipants: ["Aktiiviharrastajat"],
-    extraInformation: ["Lisätiedot toiminnasta"],
-  },
   Recommendation: {
-    linkToOtherRecommendations: ["Näytä asiakkaan muut ehdotukset"],
-    summary: ["Ehdotuksen tiivistelmä"],
-    recommendedSlot: ["Asiakkaalle ehdotettava jakso"],
-    thisPartsTerms: ["Tämän osan käyttöehdot"],
-    actionDecline: ["Hylkää vuoro ja rajoita viikkomäärää"],
-    actionApprove: ["Hyväksy ehdotettu vuoro"],
-    actionIgnoreReservationUnit: ["Hylkää tilaehdotus"],
-    actionMassDecline: ["Hylkää vuorot ja rajoita viikkomäärää"],
-    actionMassApprove: ["Hyväksy ehdotetut vuorot"],
-    actionMassIgnoreReservationUnit: ["Hylkää ehdotetut vuorot tästä tilasta"],
-    actionHelperText: [
-      "Jos hylkäät tämän vuoron, ryhmältä vähennetään yksi viikkovuorotoive. Muille vuorotoiveille, joita ei ole käsitelty, pyritään löytämään vuoro. Jos hylkäät ryhmän tästä tilasta, pyritään ryhmälle löytämään korvaava tila. Uutta tilaa tarjotaan vain, jos hakijan toiveiden mukaisia vapaita aikoja on valituista tiloista jakamatta. Vuoron hylkäyksen ja kiellon tarjota tätä tilaa voi purkaa tarvittaessa myöhemmin. Hyväksyminen ei lähetä myöntöpäätöstä välittömästi asiakkaalle, vaan vasta esihenkilön hyväksyessä kaikki myöntöpäätökset kerralla.",
-    ],
-    actionReturnAsPartOfAllocation: [
-      "Palauta viikkovuorotoive osaksi käsittelyä",
-    ],
-    actionReturnAsPartOfAllocationHelper: [
-      "Palautus ei tarkoita, että ryhmälle on mahdollista enää myöntää juuri tätä vuoroa. Viikkovuorotoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
-    ],
-    actionRevertIgnoreReservationUnit: [
-      "Pura vuoroltatilakielto, joka kohdistuu tähän tilaan",
-    ],
-    actionRevertIgnoreReservationUnitAbrv: ["Pura tilakielto"],
-    actionRevertIgnoreReservationUnitHelper: [
-      "Purkaminen ei tarkoita, että ryhmälle on mahdollista enää myöntää juuri tätä vuoroa tähän tilaan. Vuoron tilatoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
-    ],
-    confirmationRevertIgnoreReservationUnitHeader: [
-      "Puretaanko vuoron tilakielto tämän tilan osalta?",
-    ],
-    confirmationRevertIgnoreReservationUnitBody: [
-      "Et näe tätä ehdotusta enää palauttamisen jälkeen. Purkaminen ei tarkoita, että vuorolle on mahdollista enää myöntää juuri tätä vuoroa tähän tilaan. Vuoron tilatoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
-    ],
-    actionRevertToUnhandled: ["Palauta ehdotus käsittelemättömäksi"],
-    labelAgeGroup: ["Käyttäjien ikäryhmä"],
-    labelAppliedReservations: ["Vuoroja"],
-    labelReservationUnitRank: ["Tarjottu tila toivesijalla {{rank}}"],
+    // TODO this is used in SelectionActionBar.tsx
     actionMassActionSubmit: ["Massakäsittele valitut"],
-    recommendationCount_one: ["{{count}} ehdotus tehty"],
-    recommendationCount_other: ["{{count}} ehdotusta tehty"],
-    showOriginalApplication: ["Näytä alkuperäinen hakemus"],
-    headings: {
-      applicationEventName: ["Ryhmä"],
-      status: ["Ehdotuksen status"],
-      part: ["Osa"],
-      recommendationCount: ["Vuoroja (kpl/h)"],
-      spaceName: ["Tilan nimi"],
-      resolution: ["Päätös"],
-      reservationUnit: ["Toimipiste"],
-      basket: ["Kori"],
-      purpose: ["Toimintatyyppi"],
-    },
+    // TODO these are used in ApplicationEventStatusBlock.tsx
     statuses: {
       approved: ["Päätös tehty"],
       created: ["Käsittelemättä"],
@@ -816,52 +570,20 @@ const translations: ITranslations = {
       declined: ["Ehdotus hylätty"],
       ignored: ["Tilakielto asetettu"],
     },
+    // TODO these are used in ApplicantApplicationStatusBlock.tsx
     applicantStatuses: {
       handling: ["Käsittely kesken"],
       validated: ["Odottaa esihenkilöhyväksyntää"],
       approved: ["Päätös tehty"],
       sent: ["Päätös lähetetty"],
     },
-    approveSuccessHeading: ["Ehdotus hyväksytty onnistuneesti"],
-    approveSuccessBody: [
-      "Hyväksytyt ehdotukset siirtyvät esihenkilölle hyväksyttäväksi.",
-    ],
-    revertToUnhandledSuccessHeading: ["Ehdotus palautettu käsittelemättömäksi"],
-    revertToUnhandledSuccessBody: [
-      "Voit käsitellä ehdotuksen tavalliseen tapaan.",
-    ],
-    declineSuccessHeading: ["Vuoro hylätty"],
-    declineSuccessBody: [
-      "Hakijalta on vähennetty yksi viikkovuorotoive. Voit tarvittaessa purkaa hylkäyksen.",
-    ],
-    confirmationRevertDeclineRecomendationHeader: [
-      "Palautetaanko hylätty vuoro-osuus takaisin osaksi käsittelyä?",
-    ],
-    confirmationRevertDeclineRecomendationBody: [
-      "Et näe tätä ehdotusta enää palauttamisen jälkeen. Palautus ei tarkoita, että osuudelle on mahdollista enää myöntää juuri tätä vuoroa.  Palautettu viikkovuorotoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
-    ],
-    actionRevertRejectionAbrv: ["Palauta osuus"],
-    banSuccessHeading: ["Tilakielto asetettu"],
-    banSuccessBody: [
-      "Valittua vuoroa ja ryhmän tulevia vuoroja ei tarjota enää tähän tilaan. Voit tarvittaessa purkaa tähän tilaan kohdistuvan kiellon.",
-    ],
-    scheduleDuration: ["Vuoron kesto {{duration}}"],
-    noRecommendations: ["Ei ehdotuksia"],
   },
   Reservation: {
-    showSummaryOfReservationsByReservationUnit: [
-      "Näytä kooste tilaan myönnetyistä vuoroista",
-    ],
-    showSummaryOfReservations: ["Näytä tiivistelmä vuoroista"],
-    showReservations: ["Näytä tilan täydellinen vuoroista"],
-    allocatedReservationsForReservationUnit: ["Myönnetyt käyttövuorot tilaan"],
     headings: {
       applicant: ["Hakija"],
       schedule: ["Vuoro"],
     },
     noReservations: ["Ei varauksia"],
-    generatingDocument: ["Dokumenttia luodaan"],
-    errorGeneratingDocument: ["Dokumenttia ei pystytty luomaan"],
     EditTime: {
       buttonName: ["Muuta aikaa"],
       title: ["Muuta varauksen aikaa"],
@@ -892,10 +614,6 @@ const translations: ITranslations = {
     },
   },
   ReservationUnit: {
-    reservationStatus: ["Varaustilanne"],
-    purposeCount_one: ["{{count}} käyttötarkoitus"],
-    purposeCount_other: ["{{count}} käyttötarkoitusta"],
-    downloadSpaceCalendar: ["Lataa tilan kalenterimerkinnät (.ics)"],
     isDraft: {
       true: ["Luonnos"],
       false: ["Julkaistu"],
@@ -1054,9 +772,6 @@ const translations: ITranslations = {
       level: ["Tyyppi"],
     },
   },
-  Applicant: {
-    inAllocation: ["Mukana jaossa"],
-  },
   StageInfo: {
     stagesOfHandling: ["Käsittelyn vaiheet"],
     stage1: {
@@ -1143,12 +858,8 @@ const translations: ITranslations = {
       "Toimipisteellä täytyy olla vähintään yksi tila, jotta voit luoda ensimmäisen varausyksikön.",
     ],
     createSpaces: ["Luo tiloja."],
-    noOpeningHoursTitle: ["Toimipisteelle ei ole määritetty aukioloaikoja"],
     maintainOpeningHours: [
       "Siirry päivittämään toimipisteesi tiedot Toimipisterekisterin kautta.",
-    ],
-    noOpeningHours: [
-      "Toimipisteellä täytyy olla aukioloajat, jotka ohjaavat käytön suunnittelua.",
     ],
     reservationUnitTitle: ["Varausyksiköt"],
     reservationUnitReadMore: ["Lue lisää varausyksiköistä"],
@@ -1161,7 +872,6 @@ const translations: ITranslations = {
     address: ["Osoite"],
     noAddress: ["Osoite puuttuu"],
     location: ["Toimipisteen sijainti"],
-    linkToUnitPage: ["Siirry"],
     spaces: ["Tilat"],
     addSpace: ["Uusi tila"],
     noSpaces: ["Ei vielä tiloja"],
@@ -1185,6 +895,7 @@ const translations: ITranslations = {
     illegalUnit: ["Virheellinen toimipisteen tunniste"],
   },
   SpaceEditor: {
+    // TODO this is weird translation key (it's the default value if there is no name for the parent)
     noParent: ["Päätason tila"],
     noUnit: ["Tilaa ei ole liitetty toimipisteeseen"],
     noAddress: ["Toimipisteellä ei ole osoitetta"],
@@ -1205,7 +916,6 @@ const translations: ITranslations = {
     },
     namePlaceholder: ["Tilan nimi {{language}}"],
     touLabel: ["Tilan ohjeet {{lang}}"],
-    termsOfUseHelperText: ["Tilan käyttöehdot..."],
     noMaxPersons: ["Henkilömäärää ei asetettu"],
     spaceUpdated: ["Tiedot tallennettu"],
     spaceUpdatedNotification: ["Tilan tiedot tallennettu"],
@@ -1353,17 +1063,9 @@ const translations: ITranslations = {
       surfaceAreaLteTag: ["Enintään {{value}} m²."],
     },
   },
-  ReservationStateFilter: {
-    label: ["Käsittelytila"],
-    state: {
-      CANCELLED: "",
-    },
-  },
-
   ReservationUnitsFilter: {
     label: ["Varausyksikkö"],
   },
-
   ReservationUnitCard: {
     spaceOnly: ["Tila"],
     spaceAndResource: ["Tila ja resurssi"],
@@ -1435,7 +1137,6 @@ const translations: ITranslations = {
       },
       priceChange: ["Hintaan on tulossa muutos"],
     },
-
     tooltip: {
       reservationKind: [
         `Valitse miten varausyksikköä annetaan varattavaksi.
@@ -1489,13 +1190,11 @@ const translations: ITranslations = {
         SOITTIMET:
         valitse “soittimet”`,
       ],
-
       purposes: [
         `Valitse käyttötarkoitukset, joihin varausyksikkö aidosti sopii. Voit valita useita. Valinta vaikuttaa hakutuloksiin.
       LAITTEET:
       valitse “Laitteiden käyttö”`,
       ],
-
       equipments: [
         `Valitse varusteet, jotka ovat kaikkien käyttäjien saatavilla. Jos tiettyä varustusta voi käyttää vain erikseen kysymällä, sitä ei tule listata.
         Täydennyksiä varustelistaan voi pyytää ylläpidolta. `,
@@ -1694,7 +1393,6 @@ const translations: ITranslations = {
     confirmedInstructions: ["Hyväksytty varaus"],
     cancelledInstructions: ["Peruttu varaus"],
     nameHelper: ["Vinkki: hyvä nimi erottaa sen muista."],
-    descriptionPlaceholder: ["Kuvaus {{language}}"],
     spacesPlaceholder: ["Liitä tarvittavat tilat"],
     equipmentsLabel: ["Varustelu"],
     equipmentsPlaceholder: ["Valitse varusteet"],
@@ -1713,7 +1411,6 @@ const translations: ITranslations = {
     maxPersonsHelperText: [
       "Tilojen yhteenlaskettua enimmäishenkilömäärää ei voi ylittää",
     ],
-    errorNoResources: ["Toimipisteeseen ei ole liitetty yhtään resurssia"],
     errorNoSpaces: ["Toimipisteeseen ei ole liitetty yhtään tilaa"],
     errorDataHeading: ["Datavirhe"],
     errorParamsNotAvailable: [
@@ -1787,15 +1484,8 @@ const translations: ITranslations = {
     imageType: ["Kuvan tyyppi"],
     label: ["Varausyksikön kuvat"],
     buttonLabel: ["Valitse ja lataa kuva"],
-    errorTitle: ["Tapahtui virhe"],
-    errorLoadingImages: ["Kuvia ei saatu haettua"],
-    addImage: ["Lisää kuva"],
-    deleteImage: ["poista"],
     mainImage: ["Pääkuva"],
     useAsMainImage: ["Käytä pääkuvana"],
-    imageDeletedTitle: ["Kuva poistettiin"],
-    imageDeleted: [""],
-    errorDeletingImage: ["Kuvan poistaminen ei onnistunut"],
   },
   priceUnit: {
     FIXED: ["Per kerta"],
@@ -1819,8 +1509,6 @@ const translations: ITranslations = {
     ],
     selectSpace: ["Valitse tila"],
     namePlaceholder: ["Resurssin nimi  {{language}}"],
-    descriptionLabel: ["Resurssin kuvaus {{lang}}"],
-    descriptionPlaceholder: ["Kuvaile resurssia {{language}}"],
     cancel: ["Palaa tallentamatta tietoja"],
     save: ["Tallenna"],
     saveError: ["Tietojen tallennus epäonnistui."],
@@ -1830,7 +1518,6 @@ const translations: ITranslations = {
       name: ["Nimi"],
       unitName: ["Toimipiste"],
     },
-    noDistrict: ["(Ei aluetta)"],
     menuEditResource: ["Muokkaa resurssia"],
     menuRemoveResource: ["Poista resurssi"],
     removeConfirmationTitle: ["Haluatko varmasti poistaa resurssin {{name}}?"],
@@ -1844,16 +1531,6 @@ const translations: ITranslations = {
   },
   RecurringReservationsView: {
     Heading: ["Ajankohta"],
-  },
-  RequestedReservations: {
-    heading: {
-      unit: ["Toimipiste"],
-      applicant: ["Tilan käyttäjä"],
-      name: ["Varauksen nimi"],
-      price: ["Hinta"],
-      paymentStatus: ["Maksutila"],
-      state: ["Varauksen tila"],
-    },
   },
   Payment: {
     status: {
@@ -1873,6 +1550,7 @@ const translations: ITranslations = {
       rest: ["Varattu"],
     },
   },
+  // TODO this is in RequestedReservations.tsx
   Reservations: {
     reservationListHeading: ["Varaustoiveet"],
     noFilteredReservations: [
@@ -1900,7 +1578,6 @@ const translations: ITranslations = {
     changeTime: ["Muuta aikaa"],
     showInCalendar: ["Näytä kalenterissa"],
   },
-
   ReservationsSearch: {
     textSearch: ["Hae varausta"],
     textSearchPlaceholder: ["Hae nimellä tai idllä"],
@@ -1916,7 +1593,6 @@ const translations: ITranslations = {
       endTag: ["Asti: {{value}}"],
     },
   },
-
   ApprovalButtons: {
     edit: ["Muokkaa"],
     editTime: ["Muuta aikaa"],
@@ -1928,7 +1604,6 @@ const translations: ITranslations = {
     },
   },
   RequestedReservation: {
-    errorFetchingData: ["Tietoja ei saatu haettua"],
     heading: ["Varauksen tarkastelu"],
     calendar: ["Varauskalenteri"],
     summary: ["Varauksen yhteenveto"],
@@ -2061,6 +1736,7 @@ const translations: ITranslations = {
   Allocation: {
     allocationTitle: ["Vuorojen jako"],
     applicants: ["Hakijat"],
+    // TODO this is deeper in the tree (ApplicationEvents)
     selectApplicant: [
       "Valitse hakija nähdäksesi hakijan toivomat ajat kalenterissa.",
     ],

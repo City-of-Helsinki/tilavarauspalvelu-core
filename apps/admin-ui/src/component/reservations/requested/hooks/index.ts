@@ -155,7 +155,7 @@ export const useRecurringReservations = (
         }
       },
       onError: () => {
-        notifyError(t("RequestedReservation.errorFetchingData"));
+        notifyError(t("errors.errorFetchingData"));
       },
     }
   );
@@ -205,7 +205,7 @@ export const useDenyReasonOptions = () => {
         }
       },
       onError: () => {
-        notifyError(t("RequestedReservation.errorFetchingData"));
+        notifyError(t("errors.errorFetchingData"));
       },
     }
   );

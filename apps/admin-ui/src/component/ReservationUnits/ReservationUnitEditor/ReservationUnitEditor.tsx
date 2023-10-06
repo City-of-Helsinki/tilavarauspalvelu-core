@@ -593,7 +593,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       <Wrapper>
         <StyledNotification
           type="error"
-          label={t("errors.functionFailed")}
+          label={t("errors.functionFailedTitle")}
           position="top-center"
           autoClose={false}
           dismissible

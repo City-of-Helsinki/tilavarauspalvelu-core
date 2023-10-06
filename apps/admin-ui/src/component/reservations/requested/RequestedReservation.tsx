@@ -686,7 +686,7 @@ const PermissionWrappedReservation = () => {
         pk: Number(id),
       },
       onError: () => {
-        notifyError(t("RequestedReservation.errorFetchingData"));
+        notifyError(t("errors.errorFetchingData"));
       },
     }
   );
