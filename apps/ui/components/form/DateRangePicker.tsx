@@ -6,7 +6,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { toUIDate } from "common/src/common/util";
-import { Language } from "common/types/common";
+import { Language, type OptionType } from "common/types/common";
 import { isValidDateString } from "../../modules/util";
 
 const initDate = (date: Date | null): string => {
@@ -16,8 +16,8 @@ const initDate = (date: Date | null): string => {
 export interface DateRangePickerProps {
   endDate: Date | null;
   startDate: Date | null;
-  onChangeEndDate: (date: Date | null) => void;
-  onChangeStartDate: (date: Date | null) => void;
+  onChangeEndDate: (time: OptionType | null) => void;
+  onChangeStartDate: (time: OptionType | null) => void;
   showHelperText?: boolean;
   labels?: { start?: string; end?: string };
   required?: { start?: boolean; end?: boolean };
