@@ -236,10 +236,10 @@ export const WhiteButton = styled(Button)<{
   margin: 0;
 `;
 
+/// @deprecated use Notification context instead
 export const StyledNotification = styled(Notification)`
   z-index: var(--tilavaraus-admin-stack-notification);
   margin: var(--spacing-xs) var(--spacing-layout-2-xs);
-  width: auto;
   opacity: 1 !important;
   @media (min-width: ${breakpoints.xl}) {
     margin: var(--spacing-s) var(--spacing-layout-xl);

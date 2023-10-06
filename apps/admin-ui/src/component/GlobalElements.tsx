@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useModal } from "../context/ModalContext";
-import { useNotification } from "../context/NotificationContext";
-import { StyledNotification } from "../styles/util";
+import { Notification } from "hds-react";
+import { useModal } from "@/context/ModalContext";
+import { useNotification } from "@/context/NotificationContext";
 import Modal from "./Modal";
 
 const GlobalElements = (): JSX.Element => {
@@ -20,15 +20,23 @@ const GlobalElements = (): JSX.Element => {
     <>
       {modalContent.content ? modal : null}
       {notification ? (
-        <StyledNotification
+        <Notification
           type={notification.type}
           label={notification.title}
           position="top-center"
           closeButtonLabelText={`${t("common.close")}`}
           onClose={clearNotification}
+          dismissible
+          // NOTE: there is something funny with the HDS notification styling so forcing it
+          // TODO: figure out what is causing this and remove the style override
+          style={{
+            transform: "translate3d(-50%, 0px, 0px)",
+            opacity: 1,
+          }}
+          autoClose={notification.type === "success"}
         >
           {notification.message}
-        </StyledNotification>
+        </Notification>
       ) : null}
     </>
   );

@@ -7,7 +7,6 @@ import {
   IconLocate,
   IconMap,
   IconPlusCircleFill,
-  Notification,
 } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -21,6 +20,7 @@ import {
   ReservationUnitType,
   UnitByPkType,
 } from "common/types/gql-types";
+import { StyledNotification } from "@/styles/util";
 import { UNIT_QUERY } from "../../common/queries";
 import { parseAddress } from "../../common/util";
 import { useModal } from "../../context/ModalContext";
@@ -91,14 +91,6 @@ const Prop = styled.div<{ $disabled: boolean }>`
   margin-bottom: var(--spacing-xs);
 
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
-`;
-
-const StyledNotification = styled(Notification)`
-  margin: var(--spacing-xs) var(--spacing-layout-2-xs);
-  width: auto;
-  @media (min-width: ${breakpoints.xl}) {
-    margin: var(--spacing-s) var(--spacing-layout-xl);
-  }
 `;
 
 const HeadingLarge = styled.div`

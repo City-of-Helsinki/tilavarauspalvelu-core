@@ -181,7 +181,6 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
       if (data?.updateResource?.errors === null) {
         notifySuccess(
           t("ResourceEditor.resourceUpdatedNotification"),
-          undefined,
           t("ResourceEditor.resourceUpdated")
         );
       } else {

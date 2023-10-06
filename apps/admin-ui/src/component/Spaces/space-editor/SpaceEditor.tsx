@@ -17,6 +17,7 @@ import {
   SpaceUpdateMutationPayload,
   UnitType,
 } from "common/types/gql-types";
+import { StyledNotification } from "@/styles/util";
 import { schema } from "./util";
 import { useNotification } from "../../../context/NotificationContext";
 import { SPACE_QUERY, UPDATE_SPACE } from "./queries";
@@ -163,14 +164,6 @@ const reducer = (state: State, action: Action): State => {
 
 const Wrapper = styled.div``;
 
-const StyledNotification = styled(Notification)`
-  margin: var(--spacing-xs) var(--spacing-layout-2-xs);
-  width: auto;
-  @media (min-width: ${breakpoints.xl}) {
-    margin: var(--spacing-s) var(--spacing-layout-xl);
-  }
-`;
-
 const EditorContainer = styled.div`
   margin: 0;
   @media (min-width: ${breakpoints.l}) {
@@ -264,7 +257,6 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
       if (data?.data?.updateSpace.errors === null) {
         notifySuccess(
           t("SpaceEditor.spaceUpdatedNotification"),
-          undefined,
           t("SpaceEditor.spaceUpdated")
         );
         refetch();

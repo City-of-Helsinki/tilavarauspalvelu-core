@@ -225,7 +225,6 @@ const SpacesTable = ({
                       ) {
                         notifyError(
                           t("SpaceTable.removeConflictMessage"),
-                          undefined,
                           t("SpaceTable.removeConflictTitle")
                         );
                         return;

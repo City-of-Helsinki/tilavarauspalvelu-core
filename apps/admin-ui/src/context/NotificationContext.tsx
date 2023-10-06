@@ -3,16 +3,8 @@ import React, { useContext, useMemo } from "react";
 export type NotificationContextProps = {
   notification: NotificationType | null;
   setNotification: (notification: NotificationType) => void;
-  notifyError: (
-    message?: string,
-    options?: NotificationOptions,
-    title?: string
-  ) => void;
-  notifySuccess: (
-    message?: string,
-    options?: NotificationOptions,
-    title?: string
-  ) => void;
+  notifyError: (message?: string, title?: string) => void;
+  notifySuccess: (message?: string, title?: string) => void;
   clearNotification: () => void;
 };
 
@@ -47,56 +39,27 @@ export const NotificationContextProvider: React.FC<Props> = ({
 }: Props) => {
   const [notification, setNotification] =
     React.useState<NotificationType | null>(null);
-  const [cancel, setCancel] = React.useState<NodeJS.Timeout>();
 
   const clearNotification = () => setNotification(null);
 
-  const showDisappearingNotification = (
-    n: NotificationType,
-    options?: NotificationOptions
-  ) => {
-    clearTimeout(cancel);
-    setNotification(n);
-    if (options?.autoClose) {
-      const timeout = setTimeout(() => {
-        setNotification(null);
-      }, 5 * 1000);
-      setCancel(timeout);
-    }
+  const notifyError = (message?: string, title?: string) => {
+    setNotification({
+      type: "error",
+      title,
+      message,
+    });
   };
 
-  const notifyError = (
-    message?: string,
-    options?: NotificationOptions,
-    title?: string
-  ) => {
-    showDisappearingNotification(
-      {
-        type: "error",
-        title,
-        message,
-      },
-      options
-    );
-  };
-
-  const notifySuccess = (
-    message?: string,
-    options?: NotificationOptions,
-    title?: string
-  ) => {
-    showDisappearingNotification(
-      {
-        type: "success",
-        title,
-        message,
-      },
-      options
-    );
+  const notifySuccess = (message?: string, title?: string) => {
+    setNotification({
+      type: "success",
+      title,
+      message,
+    });
   };
 
   const [state] = React.useState({
-    setNotification: showDisappearingNotification,
+    setNotification,
     clearNotification,
     notifyError,
     notifySuccess,

@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
-import { breakpoints } from "common/src/common/style";
 import {
   Query,
   QueryUnitByPkArgs,
@@ -18,12 +17,13 @@ import {
   UnitByPkType,
   UnitType,
 } from "common/types/gql-types";
-import { useModal } from "../../context/ModalContext";
+import { StyledNotification } from "@/styles/util";
+import { useModal } from "@/context/ModalContext";
 import {
   ContentContainer,
   IngressContainer,
   WideContainer,
-} from "../../styles/layout";
+} from "@/styles/layout";
 import Loader from "../Loader";
 import InfoModalContent from "./InfoModalContent";
 import ResourcesTable from "./ResourcesTable";
@@ -132,14 +132,6 @@ const ActionButton = styled(Button)`
     padding: 0;
     color: var(--color-black);
     font-family: var(--tilavaraus-admin-font-bold);
-  }
-`;
-
-const StyledNotification = styled(Notification)`
-  margin: var(--spacing-xs) var(--spacing-layout-2-xs);
-  width: auto;
-  @media (min-width: ${breakpoints.xl}) {
-    margin: var(--spacing-s) var(--spacing-layout-xl);
   }
 `;
 

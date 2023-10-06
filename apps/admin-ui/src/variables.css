@@ -65,3 +65,8 @@
   --tilavaraus-event-booking-internal-border: var(--color-bus-dark);
   --tilavaraus-event-booking-closed-border: var(--color-black);
 }
+
+/* override HDS variables */
+* {
+  --notification-z-index-toast: var(--tilavaraus-admin-stack-notification) !important;
+}

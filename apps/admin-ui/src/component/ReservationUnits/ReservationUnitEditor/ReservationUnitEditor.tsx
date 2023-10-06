@@ -539,8 +539,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 ? "ReservationUnitEditor.reservationUnitUpdatedNotification"
                 : "ReservationUnitEditor.reservationUnitCreatedNotification",
               { name: state.reservationUnitEdit.nameFi }
-            ),
-            { autoClose: true }
+            )
           );
         } else {
           notifyError("jokin meni pieleen");
