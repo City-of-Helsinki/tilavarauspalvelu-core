@@ -41,6 +41,7 @@ const StyledLinkButton = styled.button`
   border: none;
   -webkit-appearance: none;
   padding: 0;
+  ${linkStyles}
 `;
 
 const Anchor = styled.a`
@@ -53,6 +54,7 @@ const HoverWrapper = styled.div`
   padding-bottom: var(--spacing-3-xs);
   border-bottom: 1px solid transparent;
   align-items: center;
+  cursor: pointer;
   &:hover {
     border-color: var(--color-black-30);
   }
