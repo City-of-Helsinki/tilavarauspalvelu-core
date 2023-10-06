@@ -14,6 +14,8 @@
   "unitFilter": "Toimipiste",
   "purposesFilter": "Käyttötarkoitus",
   "equipmentFilter": "Varustelu",
+  "intervalFilter": "Aikaväli",
+  "startTimeIsBeforeEndTime": "Alkamisajan on oltava ennen loppumisaikaa",
   "resetForm": "Tyhjennä",
   "filters": {
     "applicationRound": "{{label}}",

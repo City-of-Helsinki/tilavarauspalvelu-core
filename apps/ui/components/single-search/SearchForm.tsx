@@ -36,6 +36,7 @@ import { RESERVATION_UNIT_TYPES } from "../../modules/queries/reservationUnit";
 import { getUnitName } from "../../modules/reservationUnit";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import DateRangePicker from "@/components/form/DateRangePicker";
+import TimeRangePicker from "@/components/form/TimeRangePicker";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -164,6 +165,13 @@ const BottomContainer = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--spacing-m);
+const TimeRangeWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  .error-message {
+    grid-column: span 2;
+  }
 `;
 
 const TagControls = styled.div`
@@ -312,40 +320,29 @@ const SearchForm = ({
     },
   ] as OptionType[];
 
-  const populateTimeOptions = (
-    type: "time" | "duration",
-    startHour?: number,
-    endHour?: number
-  ): OptionType[] => {
-    const times: { label: string; value: number }[] = [];
-    let hour = startHour ?? 0;
+  const populateDurationOptions = (): OptionType[] => {
+    const times: OptionType[] = [];
+    let hour = 2;
     let minute = 0;
 
-    while (hour <= (endHour ?? 23)) {
+    while (hour < 24) {
       times.push({
-        label:
-          // decide the option label format based on type
-          type === "time"
-            ? `${hour.toString().padStart(2, "0")}:${minute
-                .toString()
-                .padStart(2, "0")}`
-            : t("common:hour_other", { count: hour + minute / 60 }),
+        label: t("common:hour_other", { count: hour + minute / 60 }),
         value: hour + minute / 60,
       });
-      // Increment/reset the minute counter, and increment the hour counter if necessary
       minute += 30;
+      // Reset the minute counter, and increment the hour counter if necessary
       if (minute === 60) {
         minute = 0;
         hour++;
       }
     }
     // we need to add the minute times to the beginning of the duration options
-    return (
-      type === "duration" ? minuteDurations.concat(times) : times
-    ) as OptionType[];
+    return minuteDurations.concat(...times) as OptionType[];
   };
 
-  const { register, watch, handleSubmit, setValue, getValues } = useForm();
+  const { register, watch, handleSubmit, setValue, getValues, control } =
+    useForm();
 
   const getFormSubValueLabel = (
     key: string,
@@ -477,52 +474,29 @@ const SearchForm = ({
               }}
             />
           </DateRangeWrapper>
-          <Group>
-            <StyledSelect
-              id="timeStartFilter"
-              placeholder={t("common:startLabel")}
-              options={populateTimeOptions("time")}
-              label={t("common:timeLabel")}
-              onChange={(selection: OptionType): void => {
-                // TODO: check that the end time is not before the start time
-                setValue("timeStart", selection.value);
+          <TimeRangeWrapper>
+            <TimeRangePicker
+              control={control}
+              name={{ start: "timeStart", end: "timeEnd" }}
+              label={{ start: t("searchForm:intervalFilter"), end: " " }}
+              placeholder={{
+                start: t("common:startLabel"),
+                end: t("common:endLabel"),
               }}
-              defaultValue={getSelectedOption(
-                getValues("timeStart"),
-                populateTimeOptions("time")
-              )}
-              key={`timeStart${getValues("timeStart")}`}
-              className="inputSm inputGroupStart"
+              clearable={{ start: true, end: true }}
             />
-
-            <StyledSelect
-              id="timeEndFilter"
-              placeholder={t("common:endLabel")}
-              options={populateTimeOptions("time")}
-              label="&nbsp;"
-              onChange={(selection: OptionType): void => {
-                // TODO: check that the end time is not before the start time
-                setValue("timeEnd", selection.value);
-              }}
-              defaultValue={getSelectedOption(
-                getValues("timeEnd"),
-                populateTimeOptions("time")
-              )}
-              key={`timeEnd${getValues("timeEnd")}`}
-              className="inputSm inputGroupEnd"
-            />
-          </Group>
+          </TimeRangeWrapper>
           <StyledSelect
             id="durationFilter"
             placeholder={t("common:minimum")}
-            options={populateTimeOptions("duration", 2)}
+            options={populateDurationOptions()}
             label={t("common:duration", { duration: "" })}
             onChange={(selection: OptionType): void => {
-              setValue("duration", selection.value);
+              setValue("duration", selection?.value);
             }}
             defaultValue={getSelectedOption(
               getValues("duration"),
-              populateTimeOptions("duration", 2)
+              populateDurationOptions()
             )}
             key={`duration${getValues("duration")}`}
           />
