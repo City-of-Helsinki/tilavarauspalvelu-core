@@ -18,6 +18,7 @@ import { breakpoints } from "common/src/common/style";
 import { Query, QueryUnitsArgs } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
+import { ShowAllContainer } from "common/src/components";
 import {
   mapOptions,
   getSelectedOption,
@@ -67,35 +68,33 @@ const Hr = styled.hr`
   border-style: solid;
 `;
 
-const Filters = styled.div<{ $areFiltersVisible: boolean }>`
+const Filters = styled.div<{ children: ReactNode[] }>`
   margin-top: 0;
   max-width: 100%;
   display: grid;
   grid-template-columns: 1fr;
+  grid-template-rows: repeat(${({ children }) => children.length}, auto);
   grid-gap: var(--spacing-m);
   font-size: var(--fontsize-body-m);
-
-  ${({ $areFiltersVisible }) =>
-    !$areFiltersVisible &&
-    `
-    @media (max-width: ${desktopBreakpoint}) {
-    & > *:nth-child(n + 3) {
-      display: none;
-    }}
-  `}
 
   label {
     font-family: var(--font-medium);
     font-weight: 500;
   }
+  > div {
+    grid-column: span 1;
+  }
 
   @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-s);
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    > div {
+      grid-column: span 1;
+    }
   }
 
   @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
 `;
 
@@ -141,6 +140,57 @@ const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
   ${({ $gap }) => $gap && `gap: ${$gap};`}
 `;
 
+const OptionalFilters = styled(ShowAllContainer)<{
+  children: ReactNode[];
+  $gap?: string;
+}>`
+  && {
+    grid-column: span 3;
+  }
+  > [class="ShowAllContainer__Content"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, auto);
+    display: grid;
+    gap: ${({ $gap }) => $gap ?? "var(--spacing-m)"};
+  }
+  @media (min-width: ${breakpoints.m}) {
+    grid-template-rows: repeat(${({ children }) => children.length}, auto);
+    grid-column: 1 / span 2;
+    grid-row: span 1;
+    margin-bottom: var(--spacing-m);
+    > [class="ShowAllContainer__Content"] {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, auto);
+    }
+
+    > div {
+      grid-column: span 1;
+    }
+
+    [class*="OptionalFilters"] {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: ${breakpoints.l}) {
+    > [class="ShowAllContainer__Content"] {
+      grid-template-columns: repeat(3, 1fr);
+      grid-column: 1 / span 3;
+    }
+  }
+`;
+
+const BottomContainer = styled.div`
+  margin: var(--spacing-m) 0;
+  display: flex;
+  width: 100%;
+  flex-flow: row nowrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+`;
+
 const DateRangeWrapper = styled.div`
   > div {
     display: flex;
@@ -157,14 +207,6 @@ const DateRangeWrapper = styled.div`
   }
 `;
 
-const BottomContainer = styled.div`
-  margin: var(--spacing-m) 0;
-  display: flex;
-  width: 100%;
-  flex-flow: row nowrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--spacing-m);
 const TimeRangeWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -398,7 +440,7 @@ const SearchForm = ({
   return (
     <>
       <TopContainer>
-        <Filters $areFiltersVisible={areFiltersVisible}>
+        <Filters>
           <MultiSelectDropdown
             id="purposeFilter"
             checkboxName="purposeFilter"
@@ -500,72 +542,78 @@ const SearchForm = ({
             )}
             key={`duration${getValues("duration")}`}
           />
-          <Group>
-            <StyledSelect
-              id="participantMinCountFilter"
-              placeholder={t("common:minimum")}
-              options={[emptyOption(t("common:select"))].concat(
-                participantCountOptions
-              )}
-              label={t("searchForm:participantCountCombined")}
-              onChange={(selection: OptionType): void => {
-                setValue("minPersons", selection.value);
-              }}
-              defaultValue={getSelectedOption(
-                getValues("minPersons"),
-                participantCountOptions
-              )}
-              key={`minPersons${getValues("minPersons")}`}
-              className="inputSm inputGroupStart"
-            />
+          <OptionalFilters
+            showAllLabel={t("searchForm:showMoreFilters")}
+            showLessLabel={t("searchForm:showLessFilters")}
+            maximumNumber={0}
+          >
+            <Group>
+              <StyledSelect
+                id="participantMinCountFilter"
+                placeholder={t("common:minimum")}
+                options={[emptyOption(t("common:select"))].concat(
+                  participantCountOptions
+                )}
+                label={t("searchForm:participantCountCombined")}
+                onChange={(selection: OptionType): void => {
+                  setValue("minPersons", selection.value);
+                }}
+                defaultValue={getSelectedOption(
+                  getValues("minPersons"),
+                  participantCountOptions
+                )}
+                key={`minPersons${getValues("minPersons")}`}
+                className="inputSm inputGroupStart"
+              />
 
-            <StyledSelect
-              id="participantMaxCountFilter"
-              placeholder={t("common:maximum")}
-              options={[emptyOption(t("common:select"))].concat(
-                participantCountOptions
-              )}
-              label="&nbsp;"
-              onChange={(selection: OptionType): void => {
-                setValue("maxPersons", selection.value);
+              <StyledSelect
+                id="participantMaxCountFilter"
+                placeholder={t("common:maximum")}
+                options={[emptyOption(t("common:select"))].concat(
+                  participantCountOptions
+                )}
+                label="&nbsp;"
+                onChange={(selection: OptionType): void => {
+                  setValue("maxPersons", selection.value);
+                }}
+                defaultValue={getSelectedOption(
+                  getValues("maxPersons"),
+                  participantCountOptions
+                )}
+                key={`maxPersons${getValues("maxPersons")}`}
+                className="inputSm inputGroupEnd"
+              />
+            </Group>
+            <MultiSelectDropdown
+              id="reservationUnitTypeFilter"
+              checkboxName="reservationUnitTypeFilter"
+              inputValue={reservationTypeSearchInput}
+              name="reservationType"
+              onChange={(selection: string[]): void => {
+                setValue(
+                  "reservationUnitType",
+                  selection.filter((n) => n !== "").join(",")
+                );
               }}
-              defaultValue={getSelectedOption(
-                getValues("maxPersons"),
-                participantCountOptions
-              )}
-              key={`maxPersons${getValues("maxPersons")}`}
-              className="inputSm inputGroupEnd"
+              options={reservationUnitTypeOptions}
+              setInputValue={setReservationTypeSearchInput}
+              showSearch
+              title={t("searchForm:typeLabel")}
+              value={watch("reservationUnitType")?.split(",") || [""]}
             />
-          </Group>
-          <MultiSelectDropdown
-            id="reservationUnitTypeFilter"
-            checkboxName="reservationUnitTypeFilter"
-            inputValue={reservationTypeSearchInput}
-            name="reservationType"
-            onChange={(selection: string[]): void => {
-              setValue(
-                "reservationUnitType",
-                selection.filter((n) => n !== "").join(",")
-              );
-            }}
-            options={reservationUnitTypeOptions}
-            setInputValue={setReservationTypeSearchInput}
-            showSearch
-            title={t("searchForm:typeLabel")}
-            value={watch("reservationUnitType")?.split(",") || [""]}
-          />
-          <TextInput
-            id="search"
-            label={t("searchForm:textSearchLabel")}
-            {...register("textSearch")}
-            placeholder={t("searchForm:searchTermPlaceholder")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSubmit(search)();
-              }
-            }}
-            defaultValue={formValues.textSearch}
-          />
+            <TextInput
+              id="search"
+              label={t("searchForm:textSearchLabel")}
+              {...register("textSearch")}
+              placeholder={t("searchForm:searchTermPlaceholder")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSubmit(search)();
+                }
+              }}
+              defaultValue={formValues.textSearch}
+            />
+          </OptionalFilters>
         </Filters>
         <JustForDesktop
           style={{
