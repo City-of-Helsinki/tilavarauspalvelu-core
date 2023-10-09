@@ -142,7 +142,7 @@ const getApplicant = (application: ApplicationType, t: TFunction): string => {
   if (application.organisation) {
     return t("applicationCard:organisation", {
       type: t(
-        `applicationCard:applicantType.${application.applicantType.toLocaleLowerCase()}`
+        `applicationCard:applicantType.${application.applicantType?.toLocaleLowerCase()}`
       ),
       name: application.organisation?.name || t("applicationCard:noName"),
     });
@@ -168,7 +168,7 @@ const ApplicationCard = ({
   );
 
   const reducedApplicationStatus = getReducedApplicationStatus(
-    application.status
+    application.status ?? undefined
   );
 
   let C = Tag;
@@ -182,6 +182,9 @@ const ApplicationCard = ({
   const cancel = async () => {
     setState("cancelling");
     try {
+      if (!application.pk) {
+        throw new Error("No application pk");
+      }
       await cancelApplication(application.pk);
       actionCallback("cancel");
     } catch (e) {
@@ -228,7 +231,9 @@ const ApplicationCard = ({
           aria-label={t("applicationCard:edit")}
           disabled={!editable}
           onClick={() => {
-            router.push(`${applicationUrl(application.pk)}/page1`);
+            if (application.pk != null) {
+              router.push(`${applicationUrl(application.pk)}/page1`);
+            }
           }}
           iconRight={<IconPen aria-hidden />}
         >
@@ -237,7 +242,9 @@ const ApplicationCard = ({
         <StyledButton
           aria-label={t("applicationCard:view")}
           onClick={() => {
-            router.push(`${applicationUrl(application.pk)}/view`);
+            if (application.pk != null) {
+              router.push(`${applicationUrl(application.pk)}/view`);
+            }
           }}
           iconRight={<IconArrowRight aria-hidden />}
         >

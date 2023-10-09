@@ -24,16 +24,22 @@ export const getActiveOpeningTimePeriod = (
   date: string
 ): PeriodType | undefined => {
   return openingTimePeriods?.find((openingTimePeriod) => {
-    const startDate = new Date(openingTimePeriod.startDate);
-    const endDate = new Date(openingTimePeriod.endDate);
-    return (
+    const start = openingTimePeriod.startDate ?? null
+    const end = openingTimePeriod.endDate ?? null
+    if (start == null || end == null) {
+      return false;
+    }
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (
       isWithinInterval(new Date(date), {
         start: startDate,
         end: endDate,
-      }) ||
-      ((openingTimePeriod.startDate === null || toApiDate(startDate) <= date) &&
-        (openingTimePeriod.endDate === null || toApiDate(endDate) >= date))
-    );
+      })) {
+      return true;
+    }
+
+    return startDate <= new Date(date) && endDate >= new Date(date)
   });
 };
 
@@ -41,27 +47,29 @@ export const getActiveOpeningTimes = (
   openingTimePeriods?: PeriodType[]
 ): ActiveOpeningTime[] => {
   const result = [] as ActiveOpeningTime[];
-  const activeOpeningTimePeriod = getActiveOpeningTimePeriod(
-    openingTimePeriods,
-    toApiDate(new Date())
-  );
+  const openingTimes = openingTimePeriods ?? [];
+  const apiDate = toApiDate(new Date());
+  const activeOpeningTimePeriod = apiDate != null ? getActiveOpeningTimePeriod(openingTimes, apiDate) : undefined;
 
-  const timeSpans = activeOpeningTimePeriod?.timeSpans?.filter((timeSpan) =>
-    reservableStates.includes(timeSpan.resourceState)
-  );
+  const timeSpans = activeOpeningTimePeriod?.timeSpans?.filter((ts) =>
+    ts?.resourceState != null && reservableStates.includes(ts.resourceState)
+  ).filter((ts): ts is TimeSpanType => ts != null) ?? [];
   const weekdays = uniq(
-    timeSpans?.reduce((acc, timeSpan) => acc.concat(timeSpan.weekdays), [])
+    timeSpans?.reduce<number[]>((acc, timeSpan) => ([
+      ...acc,
+      ...(timeSpan.weekdays != null ? timeSpan.weekdays.filter((d): d is number => d != null) : []),
+    ]), [])
   ).sort();
   weekdays.forEach((weekday) => {
     const activeTimeSpans: TimeSpanType[] = timeSpans?.filter((n) =>
-      n.weekdays.includes(weekday)
+      n.weekdays != null && n.weekdays.includes(weekday)
     );
     activeTimeSpans.forEach((timeSpan) => {
       result.push({
         day: weekday,
-        label: i18n.t(`common:weekDay.${weekday}`),
-        from: timeSpan.startTime,
-        to: timeSpan.endTime,
+        label: i18n?.t(`common:weekDay.${weekday}`) ?? "",
+        from: timeSpan.startTime ?? "",
+        to: timeSpan.endTime ?? "",
       });
     });
   });
@@ -79,11 +87,11 @@ export const getDayOpeningTimes = (
 
   const fromDate = new Date();
   fromDate.setUTCHours(fromHours, fromMinutes);
-  const fromStr = i18n.t("common:time", { date: fromDate });
+  const fromStr = i18n?.t("common:time", { date: fromDate });
 
   const toDate = new Date();
   toDate.setUTCHours(toHours, toMinutes);
-  const toStr = i18n.t("common:time", { date: toDate });
+  const toStr = i18n?.t("common:time", { date: toDate });
 
   return { label, value: `${fromStr} - ${toStr}`, index };
 };

@@ -39,14 +39,12 @@ const BreadcrumbWrapper = ({
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
   const routes =
-    route
-      ?.filter((n) => n)
-      .map((n) => ({
-        title:
-          aliases?.find((alias) => alias.slug === n)?.title ||
-          t(`breadcrumb:${trim(n, "/")}`),
-        ...(n.includes("/") && { slug: n }),
-      })) || [];
+    route.map((n) => ({
+      title:
+        aliases?.find((alias) => alias.slug === n)?.title ||
+        t(`breadcrumb:${trim(n, "/")}`),
+      ...(n.includes("/") && { slug: n }),
+    })) || [];
 
   return (
     <Wrapper>

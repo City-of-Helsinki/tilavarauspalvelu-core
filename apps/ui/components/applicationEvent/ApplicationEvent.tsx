@@ -190,8 +190,14 @@ const ApplicationEventInner = ({
   const modalRef = useRef<ModalRef>();
 
   const selectDefaultPeriod = (): void => {
-    form.setValue(fieldName("begin"), apiDateToUIDate(periodStartDate));
-    form.setValue(fieldName("end"), apiDateToUIDate(periodEndDate));
+    form.setValue(
+      fieldName("begin"),
+      periodStartDate ? apiDateToUIDate(periodStartDate) : ""
+    );
+    form.setValue(
+      fieldName("end"),
+      periodEndDate ? apiDateToUIDate(periodEndDate) : ""
+    );
   };
 
   const selectionIsDefaultPeriod =
@@ -217,9 +223,11 @@ const ApplicationEventInner = ({
             label={t("application:Page1.name")}
             id={fieldName("name")}
             required
+            // @ts-expect-error: TODO refactor
             invalid={!!errors.applicationEvents?.[index]?.name?.type}
             errorText={applicationErrorText(
               t,
+              // @ts-expect-error: TODO refactor
               errors.applicationEvents?.[index]?.name?.type,
               { count: 255 }
             )}
@@ -245,8 +253,10 @@ const ApplicationEventInner = ({
             step={1}
             errorText={applicationErrorText(
               t,
+              // @ts-expect-error: TODO refactor
               errors.applicationEvents?.[index]?.numPersons?.type
             )}
+            // @ts-expect-error: TODO refactor
             invalid={!!errors.applicationEvents?.[index]?.numPersons?.type}
           />
         </div>
@@ -258,6 +268,7 @@ const ApplicationEventInner = ({
           options={ageGroupOptions}
           error={applicationErrorText(
             t,
+            // @ts-expect-error: TODO refactor
             errors.applicationEvents?.[index]?.ageGroupId?.type
           )}
         />
@@ -269,6 +280,7 @@ const ApplicationEventInner = ({
           options={purposeOptions}
           error={applicationErrorText(
             t,
+            // @ts-expect-error: TODO refactor
             errors.applicationEvents?.[index]?.purposeId?.type
           )}
         />
@@ -342,9 +354,11 @@ const ApplicationEventInner = ({
           required
           minDate={new Date(applicationRound.reservationPeriodBegin)}
           maxDate={new Date(applicationRound.reservationPeriodEnd)}
+          // @ts-expect-error: TODO refactor
           invalid={!!errors?.applicationEvents?.[index]?.begin?.type}
           errorText={applicationErrorText(
             t,
+            // @ts-expect-error: TODO refactor
             errors?.applicationEvents?.[index]?.begin?.type
           )}
         />
@@ -387,9 +401,11 @@ const ApplicationEventInner = ({
           required
           minDate={new Date(applicationRound.reservationPeriodBegin)}
           maxDate={new Date(applicationRound.reservationPeriodEnd)}
+          // @ts-expect-error: TODO refactor
           invalid={errors.applicationEvents?.[index]?.end?.type}
           errorText={applicationErrorText(
             t,
+            // @ts-expect-error: TODO refactor
             errors.applicationEvents?.[index]?.end?.type
           )}
         />
@@ -401,6 +417,7 @@ const ApplicationEventInner = ({
           options={getDurationOptions()}
           error={applicationErrorText(
             t,
+            // @ts-expect-error: TODO refactor
             errors.applicationEvents?.[index]?.minDuration?.type
           )}
           validate={{
@@ -424,6 +441,7 @@ const ApplicationEventInner = ({
           options={getDurationOptions()}
           error={applicationErrorText(
             t,
+            // @ts-expect-error: TODO refactor
             errors.applicationEvents?.[index]?.maxDuration?.type
           )}
           validate={{
@@ -455,9 +473,11 @@ const ApplicationEventInner = ({
           minusStepButtonAriaLabel={t("common:subtract")}
           plusStepButtonAriaLabel={t("common:add")}
           step={1}
+          // @ts-expect-error: TODO refactor
           invalid={!!errors.applicationEvents?.[index]?.eventsPerWeek?.type}
           errorText={applicationErrorText(
             t,
+            // @ts-expect-error: TODO refactor
             errors.applicationEvents?.[index]?.eventsPerWeek?.type
           )}
         />

@@ -75,39 +75,40 @@ const IconLinkContainer = styled.div`
   ${fontMedium}
 `;
 
-const Units = ({ units }: Props): JSX.Element => {
+const Units = ({ units }: Props): JSX.Element | null => {
   const { t } = useTranslation(["home", "common"]);
 
+  if (!units == null || units.length === 0) {
+    return null;
+  }
   return (
-    units?.length > 0 && (
-      <Wrapper>
-        <Content>
-          <Heading>{t("unitsHeading")}</Heading>
-          <UnitContainer>
-            {units.slice(0, itemLimit).map((unit) => (
-              <UnitItemLink
-                key={unit.pk}
-                href={`${singleSearchPrefix}?unit=${unit.pk}#content`}
-                data-testid="front-page__units--unit"
-              >
-                {getTranslation(unit, "name") || unit.nameFi}
-                <IconArrowRight size="l" aria-hidden />
-              </UnitItemLink>
-            ))}
-          </UnitContainer>
-        </Content>
-        {units?.length > itemLimit && (
-          <IconLinkContainer>
-            <IconButton
-              href={singleSearchPrefix}
-              label={t("common:showAll")}
-              icon={<IconArrowRight aria-hidden />}
-              data-testid="front-page__units--more-link"
-            />
-          </IconLinkContainer>
-        )}
-      </Wrapper>
-    )
+    <Wrapper>
+      <Content>
+        <Heading>{t("unitsHeading")}</Heading>
+        <UnitContainer>
+          {units.slice(0, itemLimit).map((unit) => (
+            <UnitItemLink
+              key={unit.pk}
+              href={`${singleSearchPrefix}?unit=${unit.pk}#content`}
+              data-testid="front-page__units--unit"
+            >
+              {getTranslation(unit, "name") || unit.nameFi}
+              <IconArrowRight size="l" aria-hidden />
+            </UnitItemLink>
+          ))}
+        </UnitContainer>
+      </Content>
+      {units?.length > itemLimit && (
+        <IconLinkContainer>
+          <IconButton
+            href={singleSearchPrefix}
+            label={t("common:showAll")}
+            icon={<IconArrowRight aria-hidden />}
+            data-testid="front-page__units--more-link"
+          />
+        </IconLinkContainer>
+      )}
+    </Wrapper>
   );
 };
 

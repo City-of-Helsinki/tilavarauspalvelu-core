@@ -23,7 +23,13 @@ export const useDataContext = (): DataContextProps => useContext(DataContext);
 type Props = { children: React.ReactNode };
 
 const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
-  const [reservation, setReservation] = React.useState<ReservationProps>(null);
+  const [reservation, setReservation] = React.useState<ReservationProps>({
+    pk: null,
+    begin: null,
+    end: null,
+    price: null,
+    reservationUnitPk: null,
+  });
   const dataContextValues = useMemo(
     () => ({ reservation, setReservation }),
     [reservation, setReservation]

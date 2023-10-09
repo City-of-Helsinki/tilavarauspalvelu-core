@@ -8,10 +8,10 @@ type Props = {
   style?: React.CSSProperties;
 };
 
-const Wrapper = styled.div<{ $from: string; $to: string }>`
+const Wrapper = styled.div<{ $from?: string; $to?: string }>`
   ${({ $from, $to }) => `
-    background-color: ${$from};
-    fill: ${$to};
+    ${$from != null ? `background-color: ${$from}` : ""};
+    ${$to != null ? `fill': ${$to}` : ""}};
   `}
   margin-bottom: -1px;
 `;

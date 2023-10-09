@@ -132,10 +132,13 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
 
   useQuery<Query>(RESERVATION_PURPOSES, {
     onCompleted: (res) => {
-      const purposes = res?.reservationPurposes?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
+      const purposes = res?.reservationPurposes?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        }));
       setPurposeOptions(
         mapOptions(sortBy(purposes, "name") as StringParameter[])
       );
@@ -144,10 +147,13 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
 
   useQuery<Query>(CITIES, {
     onCompleted: (res) => {
-      const cities = res?.cities?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
+      const cities = res?.cities?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        }));
       setCitiesOptions(mapOptions(sortBy(cities, "id") as StringParameter[]));
     },
   });
@@ -276,7 +282,8 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
                 value={
                   applicationEvent.purposeId
                     ? purposeOptions.find(
-                        (n) => n.value === applicationEvent.purposeId.toString()
+                        (n) =>
+                          n.value === applicationEvent.purposeId?.toString()
                       )?.label
                     : ""
                 }
@@ -350,11 +357,11 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
         );
       })}
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
-      <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>
+      {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>
         {t("application:preview.reservationUnitTerms")}
       </FormSubHeading>
-      <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>
+      {tos2 && <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>}
       <CheckboxContainer>
         <Checkbox
           id="preview.acceptTermsOfUse"

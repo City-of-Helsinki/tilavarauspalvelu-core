@@ -120,23 +120,32 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
         {units.map((unit) => {
           const name = getReservationUnitName(unit);
           const pricing = getActivePricing(unit);
-          const unitPrice = getPrice({ pricing });
-          const reservationUnitTypeName = getTranslation(
-            unit.reservationUnitType,
-            "name"
-          );
+          const unitPrice = pricing != null ? getPrice({ pricing }) : undefined;
+          const reservationUnitTypeName =
+            unit.reservationUnitType != null
+              ? getTranslation(unit.reservationUnitType, "name")
+              : undefined;
+          const img = getMainImage(unit);
           return (
             <Unit key={unit.pk}>
-              <Image
-                src={getMainImage(unit)?.mediumUrl}
-                alt={name}
-                style={{ marginTop: 0 }}
-              />
+              {img?.mediumUrl != null && (
+                <Image
+                  src={img.mediumUrl}
+                  alt={name}
+                  style={{ marginTop: 0 }}
+                />
+              )}
               <Content>
-                <Link href={reservationUnitPath(unit.pk)}>
+                {unit.pk != null ? (
+                  <Link href={reservationUnitPath(unit.pk)}>
+                    <Name>{name}</Name>
+                  </Link>
+                ) : (
                   <Name>{name}</Name>
-                </Link>
-                <Building>{getUnitName(unit.unit)}</Building>
+                )}
+                <Building>
+                  {unit.unit != null ? getUnitName(unit.unit) : ""}
+                </Building>
                 <Props>
                   {reservationUnitTypeName && (
                     <StyledIconWithText
@@ -179,7 +188,11 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
                 </Props>
                 <Buttons>
                   <LinkButton
-                    onClick={() => router.push(reservationUnitPath(unit.pk))}
+                    onClick={() => {
+                      if (unit.pk != null) {
+                        router.push(reservationUnitPath(unit.pk));
+                      }
+                    }}
                   >
                     <IconArrowRight
                       size="l"

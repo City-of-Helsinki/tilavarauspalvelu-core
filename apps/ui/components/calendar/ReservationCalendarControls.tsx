@@ -61,14 +61,14 @@ import { capitalize, formatDurationMinutes } from "../../modules/util";
 
 type Props<T> = {
   reservationUnit: ReservationUnitByPkType;
-  initialReservation: PendingReservation;
-  setInitialReservation: (reservation: PendingReservation) => void;
+  initialReservation: PendingReservation | null;
+  setInitialReservation: (reservation: PendingReservation | null) => void;
   isSlotReservable: (start: Date, end: Date) => boolean;
   isReserving: boolean;
   setCalendarFocusDate: (date: Date) => void;
   activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
   createReservation?: (arg: ReservationProps) => void;
-  setErrorMsg: (msg: string) => void;
+  setErrorMsg: (msg: string | null) => void;
   handleEventChange: (
     event: CalendarEvent<T>,
     skipLengthCheck?: boolean
@@ -261,7 +261,7 @@ const SubmitButton = styled(MediumButton)`
   }
 `;
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled(Select<OptionType>)`
   & > div:nth-of-type(2) {
     line-height: var(--lineheight-l);
   }
@@ -311,8 +311,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
   const durationOptions = useMemo(() => {
     const options = getDurationOptions(
-      minReservationDuration,
-      maxReservationDuration,
+      minReservationDuration ?? 0,
+      maxReservationDuration ?? 0,
       reservationStartInterval
     );
     return [{ value: "0:00", label: "" }, ...options];
@@ -344,7 +344,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
   useEffect(() => {
     if (setShouldCalendarControlsBeVisible) {
-      setAreControlsVisible(shouldCalendarControlsBeVisible);
+      setAreControlsVisible(shouldCalendarControlsBeVisible ?? false);
     }
   }, [setShouldCalendarControlsBeVisible, shouldCalendarControlsBeVisible]);
 
@@ -367,12 +367,12 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
       setDate(newDate);
       setStartTime(newStartTime);
-      setDuration(newDuration);
+      setDuration(newDuration ?? null);
     }
   }, [debouncedStartTime, debouncedEndTime, setDate, durationOptions]);
 
   useEffect(() => {
-    if (isValid(date) && startTime && duration) {
+    if (date != null && isValid(date) && startTime && duration) {
       const {
         bufferTimeBefore,
         bufferTimeAfter,
@@ -406,48 +406,43 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           end: endDate.toISOString(),
         });
       } else {
-        setInitialReservation({
-          begin: null,
-          end: null,
-        });
         setInitialReservation(null);
       }
+      const res =
+        reservations?.filter((r): r is NonNullable<typeof r> => r != null) ??
+        [];
       if (
         doBuffersCollide(
           {
             start: startDate,
             end: endDate,
             isBlocked: false,
-            bufferTimeBefore,
-            bufferTimeAfter,
+            bufferTimeBefore: bufferTimeBefore ?? undefined,
+            bufferTimeAfter: bufferTimeAfter ?? undefined,
           },
-          reservations
+          res
         )
       ) {
         setErrorMsg(t("reservationCalendar:errors.bufferCollision"));
       }
 
-      if (
-        doReservationsCollide(
-          {
-            start: startDate,
-            end: endDate,
-          },
-          reservations
-        )
-      ) {
+      const openingTimes =
+        openingHours?.openingTimes?.filter(
+          (n): n is NonNullable<typeof n> => n !== null
+        ) ?? [];
+      if (doReservationsCollide({ start: startDate, end: endDate }, res)) {
         setErrorMsg(t(`reservationCalendar:errors.collision`));
       } else if (
         !isRangeReservable({
           range: [startDate, addMinutes(endDate, -1)],
-          openingHours: openingHours.openingTimes,
+          openingHours: openingTimes,
           reservationBegins: reservationBegins
             ? new Date(reservationBegins)
             : undefined,
           reservationEnds: reservationEnds
             ? new Date(reservationEnds)
             : undefined,
-          reservationsMinDaysBefore,
+          reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
           activeApplicationRounds,
           reservationStartInterval,
         }) ||
@@ -466,31 +461,41 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     reservationStartInterval,
   ]);
 
+  // TODO why?
   useEffect(() => {
-    setInitialReservation({
-      begin: null,
-      end: null,
-    });
+    setInitialReservation(null);
   }, [setInitialReservation]);
 
   const {
     startTime: dayStartTime,
     endTime: dayEndTime,
   }: { startTime?: string; endTime?: string } = useMemo(() => {
-    const timeframes = reservationUnit.openingHours?.openingTimes?.filter(
-      (n) => n.date === toApiDate(date)
-    );
+    const timeframes =
+      reservationUnit.openingHours?.openingTimes
+        ?.filter((n): n is NonNullable<typeof n> => n !== null)
+        .filter(
+          (n) => n?.date != null && date != null && n.date === toApiDate(date)
+        ) ?? [];
 
-    if (timeframes.length === 0) return {};
+    if (timeframes.length === 0) {
+      return {
+        startTime: undefined,
+        endTime: undefined,
+      };
+    }
 
-    const first = min(
-      timeframes.map((n) => n.startTime && new Date(n.startTime))
-    );
-    const last = max(timeframes.map((n) => n.endTime && new Date(n.endTime)));
+    const possibleStartTimes = timeframes
+      .map((n) => n.startTime != null && new Date(n.startTime))
+      .filter((n): n is Date => n !== null);
+    const first = min(possibleStartTimes);
+    const possibleEndTimes = timeframes
+      .map((n) => n.endTime && new Date(n.endTime))
+      .filter((n): n is Date => n !== null);
+    const last = max(possibleEndTimes);
 
     return {
-      startTime: first ? first.toISOString() : null,
-      endTime: last ? last.toISOString() : null,
+      startTime: first ? first.toISOString() : undefined,
+      endTime: last ? last.toISOString() : undefined,
     };
   }, [reservationUnit.openingHours?.openingTimes, date]);
 
@@ -500,7 +505,14 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       .map((n) => n.value);
     const durationValue = durations[0]?.toString();
 
-    if (!dayStartTime || !dayEndTime || !durationValue) return [];
+    if (
+      date == null ||
+      dayStartTime == null ||
+      dayEndTime == null ||
+      durationValue == null
+    ) {
+      return [];
+    }
 
     const [endHours, endMinutes] = durationValue.split(":").map(Number);
 
@@ -567,45 +579,57 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       }${endTime}`,
       "-"
     );
-    const durationStr = formatDurationMinutes(
-      differenceInMinutes(new Date(end), new Date(begin))
-    );
+    const durationStr =
+      end != null && begin != null
+        ? formatDurationMinutes(
+            differenceInMinutes(new Date(end), new Date(begin))
+          )
+        : "";
 
     return `${dateStr}, ${durationStr}`;
   })();
 
-  const price = getReservationUnitPrice({
-    reservationUnit,
-    pricingDate: date,
-    minutes: convertHMSToSeconds(`0${duration?.value}:00`) / 60,
-    trailingZeros: true,
-  });
+  const minutes =
+    (convertHMSToSeconds(`0${duration?.value ?? 0}:00`) ?? 0) / 60;
+  const price =
+    date != null
+      ? getReservationUnitPrice({
+          reservationUnit,
+          pricingDate: date,
+          minutes,
+          trailingZeros: true,
+        })
+      : undefined;
 
   const lastOpeningDate = maxBy(
     reservationUnit.openingHours?.openingTimes,
-    (n) => n.date
+    (n) => n?.date
   );
 
   const submitButton = createReservation ? (
     <SubmitButtonWrapper>
       <LoginFragment
         isActionDisabled={!isReservable}
-        actionCallback={() =>
-          setStoredReservation({
-            ...initialReservation,
-            pk: null,
-            price: null,
-            reservationUnitPk: reservationUnit.pk,
-          })
-        }
+        actionCallback={() => {
+          if (reservationUnit.pk != null && initialReservation != null) {
+            setStoredReservation({
+              ...initialReservation,
+              pk: null,
+              price: null,
+              reservationUnitPk: reservationUnit.pk ?? 0,
+            });
+          }
+        }}
         componentIfAuthenticated={
           <SubmitButton
             onClick={() => {
-              createReservation({
-                ...initialReservation,
-                price: null,
-                reservationUnitPk: reservationUnit.pk,
-              });
+              if (reservationUnit.pk != null && initialReservation != null) {
+                createReservation({
+                  ...initialReservation,
+                  price: null,
+                  reservationUnitPk: reservationUnit.pk,
+                });
+              }
             }}
             disabled={!isReservable || isReserving}
             data-test="reservation__button--submit"
@@ -640,7 +664,10 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           <ToggleButton
             onClick={() => {
               setAreControlsVisible(!areControlsVisible);
-              if (shouldCalendarControlsBeVisible) {
+              if (
+                shouldCalendarControlsBeVisible &&
+                setShouldCalendarControlsBeVisible != null
+              ) {
                 setShouldCalendarControlsBeVisible(!areControlsVisible);
               }
             }}
@@ -667,18 +694,14 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           <Content className={state} $isAnimated={isAnimated}>
             <DateInput
               onChange={(val, valueAsDate) => {
-                if (
-                  !val ||
-                  !isValid(valueAsDate) ||
-                  toApiDate(valueAsDate) < toApiDate(new Date())
-                ) {
+                if (!val || !isValid(valueAsDate) || valueAsDate < new Date()) {
                   setInitialReservation(null);
                 } else {
                   setDate(valueAsDate);
                   setCalendarFocusDate(valueAsDate);
                 }
               }}
-              value={toUIDate(date)}
+              value={date != null ? toUIDate(date) : ""}
               id="reservation__input--date"
               initialMonth={new Date()}
               label={t("reservationCalendar:startDate")}
@@ -693,7 +716,11 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
             <StyledSelect
               id="reservation__input--start-time"
               label={t("reservationCalendar:startTime")}
-              onChange={(val: OptionType) => setStartTime(val.value as string)}
+              onChange={(val: OptionType) => {
+                if (val.value != null) {
+                  setStartTime(val.value?.toString());
+                }
+              }}
               options={startingTimesOptions}
               value={startingTimesOptions.find((n) => n.value === startTime)}
             />

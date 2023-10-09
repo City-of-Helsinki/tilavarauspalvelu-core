@@ -152,10 +152,12 @@ const ReservationUnitCard = ({
     ? t("reservationUnitModal:unSelectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
   const reservationUnitName = getReservationUnitName(reservationUnit);
-  const reservationUnitTypeName = getTranslation(
-    reservationUnit.reservationUnitType,
-    "name"
-  );
+  const reservationUnitTypeName = reservationUnit.reservationUnitType
+    ? getTranslation(reservationUnit.reservationUnitType, "name")
+    : undefined;
+  const unitName = reservationUnit.unit
+    ? getUnitName(reservationUnit.unit)
+    : undefined;
 
   return (
     <Container>
@@ -165,9 +167,10 @@ const ReservationUnitCard = ({
       />
       <Main>
         <Name>{reservationUnitName}</Name>
-        <Unit>{getUnitName(reservationUnit.unit)}</Unit>
+        <Unit>{unitName}</Unit>
         <Link
-          href={reservationUnitPath(reservationUnit.pk)}
+          // TODO link should be disabled if no pk
+          href={reservationUnitPath(reservationUnit.pk ?? 0)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -323,13 +326,14 @@ const ReservationUnitModal = ({
   const { data, refetch, loading } = useQuery<Query, QueryReservationUnitsArgs>(
     RESERVATION_UNITS,
     {
+      skip: !applicationRound.pk,
       variables: {
         textSearch: searchTerm,
         maxPersonsGte: Number(maxPersons?.value),
         reservationUnitType: reservationUnitType?.value
           ? [reservationUnitType?.value?.toString()]
           : [],
-        applicationRound: [applicationRound.pk.toString()],
+        applicationRound: [applicationRound.pk?.toString() ?? ""],
         unit: unit?.value ? [unit?.value?.toString()] : [],
         orderBy: "nameFi",
         isDraft: false,
@@ -341,11 +345,13 @@ const ReservationUnitModal = ({
   );
 
   useEffect(() => {
-    const reservationUnits = data?.reservationUnits.edges
-      .map((n) => n.node)
-      .filter((n) =>
-        applicationRound.reservationUnits.map((ru) => ru.pk).includes(n.pk)
-      );
+    const reservationUnits =
+      data?.reservationUnits?.edges
+        .map((n) => n?.node)
+        .filter((n): n is ReservationUnitType => n !== null)
+        .filter((n) =>
+          applicationRound.reservationUnits?.map((ru) => ru?.pk).includes(n?.pk)
+        ) ?? [];
     setResults(reservationUnits);
   }, [data, applicationRound.reservationUnits]);
 

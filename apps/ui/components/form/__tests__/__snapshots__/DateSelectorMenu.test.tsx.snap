@@ -2,11 +2,11 @@
 
 exports[`matches snapshot 1`] = `
 <div
-  class="DateSelectorMenu__Wrapper-sc-dee007ce-0 cLxHPf"
+  class="DateSelectorMenu__Wrapper-sc-e655d354-0 clCDEX"
   data-testid="date-selector-menu"
 >
   <div
-    class="DateSelectorMenu__CheckboxWrapper-sc-dee007ce-1 ljnXzQ"
+    class="DateSelectorMenu__CheckboxWrapper-sc-e655d354-1 gZbieU"
   >
     <div
       class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-3840ce6a-0 YVBir"
@@ -86,7 +86,7 @@ exports[`matches snapshot 1`] = `
     </div>
   </div>
   <button
-    class="DateSelectorMenu__Btn-sc-dee007ce-2 bVbXfe selectDates"
+    class="DateSelectorMenu__Btn-sc-e655d354-2 dZBtJC selectDates"
     type="button"
   >
     <svg
@@ -110,7 +110,7 @@ exports[`matches snapshot 1`] = `
       </g>
     </svg>
     <div
-      class="DateSelectorMenu__BtnText-sc-dee007ce-3 hgzzGb"
+      class="DateSelectorMenu__BtnText-sc-e655d354-3 ewYfqr"
     >
       dateSelector:menu.buttonCustom
     </div>
@@ -136,7 +136,7 @@ exports[`matches snapshot 1`] = `
     </svg>
   </button>
   <button
-    class="DateSelectorMenu__Btn-sc-dee007ce-2 fFcVjb back"
+    class="DateSelectorMenu__Btn-sc-e655d354-2 eukpHr back"
     type="button"
   >
     <svg
@@ -160,17 +160,17 @@ exports[`matches snapshot 1`] = `
       </g>
     </svg>
     <div
-      class="DateSelectorMenu__BtnText-sc-dee007ce-3 hgzzGb"
+      class="DateSelectorMenu__BtnText-sc-e655d354-3 ewYfqr"
     >
       dateSelector:menu.buttonBack
     </div>
   </button>
   <button
-    class="DateSelectorMenu__Btn-sc-dee007ce-2 bVbXfe close"
+    class="DateSelectorMenu__Btn-sc-e655d354-2 dZBtJC close"
     type="button"
   >
     <div
-      class="DateSelectorMenu__BtnText-sc-dee007ce-3 hgzzGb"
+      class="DateSelectorMenu__BtnText-sc-e655d354-3 ewYfqr"
     >
       dateSelector:menu.buttonClose
     </div>

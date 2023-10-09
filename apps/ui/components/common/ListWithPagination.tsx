@@ -10,8 +10,8 @@ export type Props = {
   id: string;
   items: JSX.Element[];
   fetchMore: (arg: string) => void;
-  pageInfo: PageInfo;
-  totalCount: number;
+  pageInfo?: PageInfo;
+  totalCount?: number;
   loading: boolean;
   loadingMore: boolean;
   sortingComponent?: React.ReactNode;
@@ -87,7 +87,9 @@ const ListWithPagination = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const shouldShowPaginationButton = pageInfo?.hasNextPage && items?.length > 0;
+  const endCursor = pageInfo?.endCursor ?? undefined;
+  const shouldShowPaginationButton =
+    endCursor != null && pageInfo?.hasNextPage && items?.length > 0;
 
   const content = items ? (
     <>
@@ -111,7 +113,7 @@ const ListWithPagination = ({
             </HitCountSummary>
             {shouldShowPaginationButton && (
               <PaginationButton
-                onClick={() => fetchMore(pageInfo.endCursor)}
+                onClick={() => fetchMore(endCursor)}
                 data-test-id="list-with-pagination__button--paginate"
               >
                 {t("common:showMore")}

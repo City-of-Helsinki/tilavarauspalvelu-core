@@ -51,7 +51,10 @@ const numHours = (
   return hours;
 };
 
-function displayDuration(duration: string, t: TFunction) {
+function displayDuration(duration: string | null, t: TFunction) {
+  if (!duration) {
+    return "";
+  }
   const displayHours = Number((duration || "00:00:00").split(":")[0]);
   const displayMinutes = Number((duration || "00:00:00").split(":")[1]);
 

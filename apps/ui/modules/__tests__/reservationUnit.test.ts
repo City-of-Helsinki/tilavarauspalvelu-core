@@ -1,5 +1,5 @@
 import { cloneDeep, get as mockGet } from "lodash";
-import { addDays, addMinutes } from "date-fns";
+import { addDays } from "date-fns";
 import {
   ApplicationRound,
   ReservationState,
@@ -868,33 +868,42 @@ describe("getFuturePricing", () => {
 
   it("should sort items correctly", () => {
     const data = cloneDeep(reservationUnit);
+    if (data.pricings == null || data.pricings.length < 2) {
+      throw new Error("Invalid test data");
+    }
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
-    data.pricings[1].begins = toUIDate(addDays(new Date(), 3), "yyyy-MM-dd");
+    data.pricings[1]!.begins = toUIDate(addDays(new Date(), 3), "yyyy-MM-dd");
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
-    data.pricings[2].begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
+    data.pricings[2]!.begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
   });
 
-  it("should return null if no future pricing", () => {
+  it("should return undefined if no future pricing", () => {
     const data = cloneDeep(reservationUnit);
+    if (data.pricings == null || data.pricings.length < 2) {
+      throw new Error("Invalid test data");
+    }
 
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
-    data.pricings[0].status =
+    data.pricings[0]!.status =
       ReservationUnitsReservationUnitPricingStatusChoices.Past;
-    data.pricings[1].status =
+    data.pricings[1]!.status =
       ReservationUnitsReservationUnitPricingStatusChoices.Active;
-    data.pricings[2].status =
+    data.pricings[2]!.status =
       ReservationUnitsReservationUnitPricingStatusChoices.Past;
-    expect(getFuturePricing(data)).toEqual(null);
+    expect(getFuturePricing(data)).toBeUndefined();
 
-    expect(getFuturePricing({} as ReservationUnitByPkType)).toEqual(null);
+    expect(getFuturePricing({} as ReservationUnitByPkType)).toBeUndefined();
   });
 
   it("with reservation begin time", () => {
     const data = cloneDeep(reservationUnit);
+    if (data.pricings == null || data.pricings.length < 2) {
+      throw new Error("Invalid test data");
+    }
 
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
@@ -902,16 +911,19 @@ describe("getFuturePricing", () => {
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
     data.reservationBegins = addDays(new Date(), 20).toISOString();
-    expect(getFuturePricing(data)).toEqual(null);
+    expect(getFuturePricing(data)).toBeUndefined();
   });
 
   it("with reservation end time", () => {
     const data = cloneDeep(reservationUnit);
+    if (data.pricings == null || data.pricings.length < 2) {
+      throw new Error("Invalid test data");
+    }
 
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
     data.reservationEnds = addDays(new Date(), 1).toISOString();
-    expect(getFuturePricing(data)).toEqual(null);
+    expect(getFuturePricing(data)).toBeUndefined();
 
     data.reservationEnds = addDays(new Date(), 5).toISOString();
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
@@ -919,6 +931,9 @@ describe("getFuturePricing", () => {
 
   it("with both reservation times", () => {
     const data = cloneDeep(reservationUnit);
+    if (data.pricings == null || data.pricings.length < 2) {
+      throw new Error("Invalid test data");
+    }
 
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
@@ -929,35 +944,11 @@ describe("getFuturePricing", () => {
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
   });
 
-  // it("with opening time periods", () => {
-  //   const data = cloneDeep(reservationUnit);
-
-  //   expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-  //   data.pricings[1].begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
-  //   expect(getFuturePricing(data)).toEqual(data.pricings[1]);
-
-  //   data.openingHours.openingTimePeriods = [];
-  //   expect(getFuturePricing(data)).toEqual(null);
-
-  //   data.openingHours.openingTimePeriods.push({
-  //     startDate: addDays(new Date(), 1),
-  //     endDate: addDays(new Date(), 20),
-  //   });
-  //   expect(getFuturePricing(data)).toEqual(data.pricings[1]);
-
-  //   data.openingHours.openingTimePeriods[0].startDate = null;
-  //   expect(getFuturePricing(data)).toEqual(null);
-
-  //   data.openingHours.openingTimePeriods[0].startDate = new Date();
-  //   expect(getFuturePricing(data)).toEqual(data.pricings[1]);
-
-  //   data.openingHours.openingTimePeriods[0].endDate = null;
-  //   expect(getFuturePricing(data)).toEqual(null);
-  // });
-
   it("handles active application rounds", () => {
     const data = cloneDeep(reservationUnit);
+    if (data.pricings == null || data.pricings.length < 2) {
+      throw new Error("Invalid test data");
+    }
     const applicationRounds = [{} as ApplicationRound];
 
     expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
@@ -977,11 +968,14 @@ describe("getFuturePricing", () => {
       reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
       reservationPeriodEnd: addDays(new Date(), 20).toISOString(),
     } as ApplicationRound;
-    expect(getFuturePricing(data, applicationRounds)).toEqual(null);
+    expect(getFuturePricing(data, applicationRounds)).toBeUndefined();
   });
 
   it("handles date lookups", () => {
     const data = cloneDeep(reservationUnit);
+    if (data.pricings == null || data.pricings.length < 2) {
+      throw new Error("Invalid test data");
+    }
     let date = addDays(new Date(), 15);
 
     expect(getFuturePricing(data, [], date)).toEqual(data.pricings[0]);
@@ -1094,14 +1088,6 @@ describe("getReservationUnitPrice", () => {
         trailingZeros: true,
       })
     ).toEqual("10,00 - 20,00 € / tunti");
-  });
-
-  it("returns null if incomplete data", () => {
-    expect(
-      getReservationUnitPrice({
-        reservationUnit: null as ReservationUnitByPkType,
-      })
-    ).toEqual(null);
   });
 });
 

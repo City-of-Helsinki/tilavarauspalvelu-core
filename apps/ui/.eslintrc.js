@@ -19,6 +19,12 @@ module.exports = {
   rules: {
     "global-require": 0,
     "import/no-unresolved": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+      },
+    ],
     // mixing mjs with ts in nextjs causes issues
     "import/extensions": [
       "error",
@@ -62,7 +68,8 @@ module.exports = {
       {
         selector: "default",
         format: ["camelCase"],
-        // leadingUnderscore: 'allow',
+        // TODO only unused should be allowed to have leading underscore
+        leadingUnderscore: 'allow',
         // trailingUnderscore: 'allow',
       },
       {

@@ -291,22 +291,22 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     );
   }, [reservation, reservationUnit]);
 
-  const paymentTermsContent = getTranslation(
-    reservationUnit?.paymentTerms,
-    "text"
-  );
-  const cancellationTermsContent = getTranslation(
-    reservationUnit?.cancellationTerms,
-    "text"
-  );
-  const pricingTermsContent = getTranslation(
-    reservationUnit?.pricingTerms,
-    "text"
-  );
-  const serviceSpecificTermsContent = getTranslation(
-    reservationUnit?.serviceSpecificTerms,
-    "text"
-  );
+  const paymentTermsContent =
+    reservationUnit?.paymentTerms != null
+      ? getTranslation(reservationUnit?.paymentTerms, "text")
+      : undefined;
+  const cancellationTermsContent =
+    reservationUnit?.cancellationTerms != null
+      ? getTranslation(reservationUnit?.cancellationTerms, "text")
+      : undefined;
+  const pricingTermsContent =
+    reservationUnit?.pricingTerms != null
+      ? getTranslation(reservationUnit?.pricingTerms, "text")
+      : undefined;
+  const serviceSpecificTermsContent =
+    reservationUnit?.serviceSpecificTerms != null
+      ? getTranslation(reservationUnit?.serviceSpecificTerms, "text")
+      : undefined;
 
   const bylineContent = useMemo(() => {
     if (!reservation) {
@@ -661,14 +661,16 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
                     theme="thin"
                     data-testid="reservation__payment-and-cancellation-terms"
                   >
-                    {paymentTermsContent && (
+                    {paymentTermsContent != null && (
                       <AccordionContent>
                         <Sanitize html={paymentTermsContent} />
                       </AccordionContent>
                     )}
-                    <AccordionContent>
-                      <Sanitize html={cancellationTermsContent} />
-                    </AccordionContent>
+                    {cancellationTermsContent != null && (
+                      <AccordionContent>
+                        <Sanitize html={cancellationTermsContent} />
+                      </AccordionContent>
+                    )}
                   </Accordion>
                 )}
                 {shouldDisplayPricingTerms && pricingTermsContent && (

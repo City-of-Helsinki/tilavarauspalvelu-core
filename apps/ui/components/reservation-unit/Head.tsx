@@ -37,7 +37,7 @@ interface PropsType {
   reservationUnit: ReservationUnitByPkType;
   // activeOpeningTimes: ActiveOpeningTime[];
   isReservable?: boolean;
-  subventionSuffix?: (arg: string) => JSX.Element;
+  subventionSuffix?: JSX.Element;
 }
 
 const TopContainer = styled.div`
@@ -130,25 +130,28 @@ const Head = ({
   }, [storedValues]);
 
   const minReservationDuration = formatSecondDuration(
-    reservationUnit.minReservationDuration,
+    reservationUnit.minReservationDuration ?? 0,
     true
   );
 
   const maxReservationDuration = formatSecondDuration(
-    reservationUnit.maxReservationDuration,
+    reservationUnit.maxReservationDuration ?? 0,
     true
   );
 
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = getPrice({ pricing });
+  const unitPrice = pricing ? getPrice({ pricing }) : undefined;
 
   const unitPriceSuffix =
+    pricing &&
     getPrice({ pricing, asInt: true }) !== "0" &&
-    subventionSuffix("reservation-unit-head");
+    subventionSuffix != null
+      ? subventionSuffix
+      : undefined;
 
   const reservationUnitName = getReservationUnitName(reservationUnit);
 
-  const unitName = getUnitName(reservationUnit.unit);
+  const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
   return (
     <>
@@ -156,7 +159,7 @@ const Head = ({
         route={["", searchUrlWithParams, "reservationUnitName"]}
         aliases={[
           { slug: searchUrlWithParams, title: t("breadcrumb:search") },
-          { slug: "reservationUnitName", title: reservationUnitName },
+          { slug: "reservationUnitName", title: reservationUnitName ?? "-" },
         ]}
       />
       <TopContainer>
@@ -193,6 +196,7 @@ const Head = ({
                       value:
                         reservationUnit.minPersons !==
                           reservationUnit.maxPersons &&
+                        reservationUnit.minPersons != null &&
                         reservationUnit.minPersons > 1
                           ? `${reservationUnit.minPersons} - ${reservationUnit.maxPersons}`
                           : reservationUnit.maxPersons,
@@ -257,11 +261,15 @@ const Head = ({
                 <StyledAltNotification
                   data-testid="reservation-unit--notification__reservation-start"
                   text={t("reservationUnit:notifications.futureOpening", {
-                    date: formatDate(
-                      reservationUnit.reservationBegins,
-                      "d.M.yyyy"
-                    ),
-                    time: formatDate(reservationUnit.reservationBegins, "H.mm"),
+                    date: reservationUnit.reservationBegins
+                      ? formatDate(
+                          reservationUnit.reservationBegins,
+                          "d.M.yyyy"
+                        )
+                      : "",
+                    time: reservationUnit.reservationBegins
+                      ? formatDate(reservationUnit.reservationBegins, "H.mm")
+                      : "",
                   })}
                   type="alert"
                 />

@@ -55,7 +55,7 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
       applicationCopy.billingAddress = null;
     }
 
-    applicationCopy.additionalInformation = null;
+    applicationCopy.additionalInformation = undefined;
 
     return applicationCopy;
   };
@@ -245,10 +245,12 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           <EmailInput />
         </FormProvider>
       </TwoColumnContainer>
-      <Buttons
-        onSubmit={handleSubmit(onSubmit)}
-        applicationId={application.id}
-      />
+      {application.id != null && (
+        <Buttons
+          onSubmit={handleSubmit(onSubmit)}
+          applicationId={application.id}
+        />
+      )}
     </form>
   );
 };

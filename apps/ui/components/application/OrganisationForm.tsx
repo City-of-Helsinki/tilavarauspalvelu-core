@@ -92,7 +92,7 @@ const OrganisationForm = ({
     }
 
     applicationCopy.homeCityId = data.homeCityId;
-    applicationCopy.additionalInformation = null;
+    applicationCopy.additionalInformation = undefined;
 
     return applicationCopy;
   };
@@ -298,10 +298,12 @@ const OrganisationForm = ({
           <EmailInput />
         </FormProvider>
       </TwoColumnContainer>
-      <Buttons
-        onSubmit={handleSubmit(onSubmit)}
-        applicationId={application.id}
-      />
+      {application.id != null && (
+        <Buttons
+          onSubmit={handleSubmit(onSubmit)}
+          applicationId={application.id}
+        />
+      )}
     </form>
   );
 };

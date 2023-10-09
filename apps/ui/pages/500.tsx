@@ -8,7 +8,7 @@ import { CenteredContainer } from "common/src/layout/Container";
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };

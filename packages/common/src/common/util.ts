@@ -37,7 +37,7 @@ export const secondsToHms = (
 };
 
 export const formatDuration = (
-  duration: string,
+  duration: string | null,
   abbreviated = true
 ): string => {
   if (!duration || isNumber(duration) || !duration?.includes(":")) {
@@ -103,7 +103,7 @@ export const fromUIDate = (date: string): Date =>
 export const isValidDate = (date: Date): boolean =>
   isValid(date) && isAfter(date, new Date("1000-01-01"));
 
-export const toUIDate = (date: Date, formatStr = "d.M.yyyy"): string => {
+export const toUIDate = (date?: Date, formatStr = "d.M.yyyy"): string => {
   if (!date || !isValidDate(date)) {
     return "";
   }
@@ -134,7 +134,7 @@ export const sortAgeGroups = (ageGroups: Parameter[]): Parameter[] => {
   });
 };
 
-/// @param options.fallbackLang - use a fallback language instead of returning an empty string
+/// @param options.fallbackLang - what language to fallback defaults to fi
 export const getTranslation = (
   parent: Record<string, unknown>,
   key: string,
@@ -148,12 +148,11 @@ export const getTranslation = (
       return String(parent[keyString]);
     }
   }
-  if (options?.fallbackLang) {
-    const fallbackKeyString = `${key}${capitalize(options.fallbackLang)}`;
-    if (parent && parent[fallbackKeyString]) {
-      if (typeof parent[fallbackKeyString] === "string") {
-        return String(parent[fallbackKeyString]);
-      }
+  const fallback = options?.fallbackLang || "fi";
+  const fallbackKeyString = `${key}${capitalize(fallback)}`;
+  if (parent && parent[fallbackKeyString]) {
+    if (typeof parent[fallbackKeyString] === "string") {
+      return String(parent[fallbackKeyString]);
     }
   }
 

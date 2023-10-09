@@ -15,7 +15,6 @@ import { breakpoints } from "common/src/common/style";
 import ClientOnly from "common/src/ClientOnly";
 import {
   ApplicationRoundType,
-  PageInfo,
   Query,
   QueryApplicationRoundsArgs,
   QueryReservationUnitsArgs,
@@ -55,8 +54,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     fetchPolicy: "no-cache",
     query: APPLICATION_ROUNDS,
   });
-  const applicationRounds = data.applicationRounds?.edges?.map((n) => n.node);
-
+  const applicationRounds =
+    data.applicationRounds?.edges
+      ?.map((n) => n?.node)
+      .filter((n): n is NonNullable<typeof n> => n != null) ?? [];
   const activeApplicationRounds = sortBy(
     applicationRounds.filter(
       (applicationRound) =>
@@ -75,7 +76,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       applicationRounds: activeApplicationRounds,
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -209,10 +210,12 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   const parsedParams = queryString.parse(searchParams);
 
   const reservationUnits: ReservationUnitType[] =
-    data?.reservationUnits?.edges?.map((edge) => edge.node);
+    data?.reservationUnits?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n != null) ?? [];
   const totalCount = data?.reservationUnits?.totalCount;
 
-  const pageInfo: PageInfo = data?.reservationUnits?.pageInfo;
+  const pageInfo = data?.reservationUnits?.pageInfo;
 
   useEffect(() => {
     if (parsedParams) {
@@ -238,6 +241,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
 
   useEffect(() => {
     const params = queryString.parse(searchParams);
+    // @ts-expect-error: TODO: fix this (first though figure out why we are saving queryparams to localstorage)
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
 
@@ -253,7 +257,13 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       "sort",
       "order",
     ]);
-    history.replace(searchUrl({ ...criteria, ...sortingCriteria }));
+    history.replace(
+      // @ts-expect-error: TODO: fix this
+      searchUrl({
+        ...criteria,
+        ...sortingCriteria,
+      })
+    );
   };
 
   const onRemove = (key?: string[], subItemKey?: string) => {
@@ -263,7 +273,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
         ...values,
         [subItemKey]: values[subItemKey]
           .split(",")
-          .filter((n) => !key.includes(n))
+          .filter((n) => !key?.includes(n))
           .join(","),
       };
     } else if (key) {
@@ -275,6 +285,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       "order",
     ]);
     history.replace(
+      // @ts-expect-error: TODO: fix this
       searchUrl({
         ...newValues,
         ...sortingCriteria,
@@ -323,7 +334,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
             loading={loading}
             loadingMore={loadingMore}
             pageInfo={pageInfo}
-            totalCount={totalCount}
+            totalCount={totalCount ?? undefined}
             fetchMore={(cursor) => {
               const variables = {
                 ...values,

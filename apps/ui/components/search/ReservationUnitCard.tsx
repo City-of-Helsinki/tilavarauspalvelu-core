@@ -160,12 +160,14 @@ const ReservationUnitCard = ({
 
   const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
 
-  const unitName = getUnitName(reservationUnit.unit);
+  const unitName = reservationUnit.unit
+    ? getUnitName(reservationUnit.unit)
+    : "-";
 
-  const reservationUnitTypeName = getTranslation(
-    reservationUnit.reservationUnitType,
-    "name"
-  );
+  const reservationUnitTypeName =
+    reservationUnit.reservationUnitType != null
+      ? getTranslation(reservationUnit.reservationUnitType, "name")
+      : undefined;
 
   return (
     <Container>

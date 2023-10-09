@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { IconGlyphEuro, IconCross, IconArrowRight } from "hds-react";
-import { i18n, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { differenceInMinutes, parseISO } from "date-fns";
 import router from "next/router";
 import styled from "styled-components";
@@ -159,9 +159,9 @@ const Image = styled.img`
 `;
 
 const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnits[0];
+  const reservationUnit = reservation.reservationUnits?.[0] ?? undefined;
   const link = `/reservations/${reservation.pk}`;
 
   const timeStripContent = useMemo(() => {
@@ -190,7 +190,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
 
   const title = trim(
     `${getReservationUnitName(reservationUnit)}, ${getUnitName(
-      reservationUnit.unit
+      reservationUnit?.unit ?? undefined
     )}`,
     ", "
   );
@@ -207,8 +207,8 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
           trailingZeros: true,
         })
       : getReservationPrice(
-          reservation.price,
-          i18n.t("prices:priceFree"),
+          reservation.price ?? undefined,
+          t("prices:priceFree"),
           i18n.language
         );
 
@@ -221,11 +221,11 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
     statusType = "desktop",
   }: {
     state: ReservationsReservationStateChoices;
-    orderStatus: string;
+    orderStatus: string | null;
     statusType: "desktop" | "mobile";
   }) => (
     <StatusContainer>
-      {orderStatus && (
+      {orderStatus != null && (
         <ReservationOrderStatus
           orderStatus={orderStatus}
           data-testid={`reservation__card--order-status-${statusType}`}
@@ -238,10 +238,11 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
     </StatusContainer>
   );
 
+  const name = reservationUnit ? getTranslation(reservationUnit, "name") : "-";
   return (
     <Container data-testid="reservation__card--container">
       <Image
-        alt={getTranslation(reservationUnit, "name")}
+        alt={name}
         src={
           getMainImage(reservationUnit)?.mediumUrl ||
           "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
@@ -281,18 +282,17 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
           </Props>
           <Actions>
             <ActionButtons>
-              {["upcoming"].includes(type) &&
-                canUserCancelReservation(reservation) && (
-                  <ActionButton
-                    iconRight={<IconCross aria-hidden />}
-                    onClick={() =>
-                      router.push(`${reservationsUrl}${reservation.pk}/cancel`)
-                    }
-                    data-testid="reservation-card__button--cancel-reservation"
-                  >
-                    {t("reservations:cancelReservationAbbreviated")}
-                  </ActionButton>
-                )}
+              {type === "upcoming" && canUserCancelReservation(reservation) && (
+                <ActionButton
+                  iconRight={<IconCross aria-hidden />}
+                  onClick={() =>
+                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
+                  }
+                  data-testid="reservation-card__button--cancel-reservation"
+                >
+                  {t("reservations:cancelReservationAbbreviated")}
+                </ActionButton>
+              )}
               <ActionButton
                 iconRight={<IconArrowRight aria-hidden />}
                 onClick={() => router.push(link)}

@@ -89,7 +89,7 @@ const Columns = styled.div`
   }
 `;
 
-const BylineContent = styled.div`
+const BylineWrapper = styled.div`
   max-width: 390px;
 `;
 
@@ -123,11 +123,47 @@ const PinkBox = styled.div`
   }
 `;
 
+const BylineContent = ({
+  reservation,
+  reservationUnit,
+  step,
+  initialReservation,
+}: {
+  reservation: ReservationType;
+  reservationUnit: ReservationUnitByPkType;
+  step: number;
+  initialReservation: PendingReservation | null;
+}) => {
+  const { t } = useTranslation();
+
+  const reservationData =
+    step === 1
+      ? { ...reservation, ...pick(initialReservation, ["begin", "end"]) }
+      : reservation;
+  const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
+
+  return (
+    <BylineWrapper>
+      <ReservationInfoCard
+        // @ts-expect-error: TODO: fix this
+        reservation={reservationData}
+        reservationUnit={reservationUnit}
+        type="confirmed"
+      />
+      {step === 0 && termsOfUse && (
+        <PinkBox>
+          <Subheading>{t("reservations:reservationInfoBoxHeading")}</Subheading>
+          <Sanitize html={termsOfUse} />
+        </PinkBox>
+      )}
+    </BylineWrapper>
+  );
+};
+
 const ReservationEdit = ({ id }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [reservation, setReservation] = useState<ReservationType | null>(null);
   const [reservationUnit, setReservationUnit] =
     useState<ReservationUnitByPkType | null>(null);
   const [activeApplicationRounds, setActiveApplicationRounds] = useState<
@@ -137,24 +173,22 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
 
   const [initialReservation, setInitialReservation] =
     useState<PendingReservation | null>(null);
-  const [userReservations, setUserReservations] = useState<
-    ReservationType[] | null
-  >(null);
+  const [userReservations, setUserReservations] = useState<ReservationType[]>(
+    []
+  );
   const [showSuccessMsg, setShowSuccessMsg] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const now = useMemo(() => new Date().toISOString(), []);
   const { currentUser } = useCurrentUser();
 
-  useQuery(GET_RESERVATION, {
+  const { data } = useQuery<Query>(GET_RESERVATION, {
     fetchPolicy: "no-cache",
     variables: {
       pk: id,
     },
-    onCompleted: (data) => {
-      setReservation(data.reservationByPk);
-    },
   });
+  const reservation = data?.reservationByPk ?? undefined;
 
   const { data: reservationUnitData } = useQuery<
     Query,
@@ -198,6 +232,9 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
       reservationUnitData?.reservationUnitByPk
         ?.allowReservationsWithoutOpeningHours;
 
+    if (reservationUnitData?.reservationUnitByPk == null) {
+      return;
+    }
     setReservationUnit({
       ...reservationUnitData?.reservationUnitByPk,
       openingHours: {
@@ -208,8 +245,8 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
               ?.openingTimePeriods || [],
         openingTimes: allowReservationsWithoutOpeningHours
           ? mockOpeningTimes
-          : additionalData?.reservationUnitByPk?.openingHours?.openingTimes.filter(
-              (n) => n.isReservable
+          : additionalData?.reservationUnitByPk?.openingHours?.openingTimes?.filter(
+              (n) => n?.isReservable
             ) || [],
       },
       reservations: additionalData?.reservationUnitByPk?.reservations,
@@ -224,7 +261,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
       variables: {
         begin: now,
         user: currentUser?.pk?.toString(),
-        reservationUnit: [reservationUnit?.pk?.toString()],
+        reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
       },
     }
@@ -232,7 +269,8 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
 
   useEffect(() => {
     const reservations = userReservationsData?.reservations?.edges
-      ?.map(({ node }) => node)
+      ?.map((e) => e?.node)
+      .filter((n): n is ReservationType => n !== null)
       .filter((n) => allowedReservationStates.includes(n.state));
     setUserReservations(reservations || []);
   }, [userReservationsData]);
@@ -243,15 +281,16 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
 
   useEffect(() => {
     if (applicationRoundsData && reservationUnit) {
-      setActiveApplicationRounds(
+      const appRounds =
         applicationRoundsData?.applicationRounds?.edges
-          .map(({ node }) => node)
+          ?.map((e) => e?.node)
+          .filter((n): n is NonNullable<typeof n> => n !== null)
           .filter((applicationRound) =>
             applicationRound.reservationUnits
-              .map((n) => n.pk)
+              ?.map((n) => n?.pk)
               .includes(reservationUnit.pk)
-          ) || []
-      );
+          ) || [];
+      setActiveApplicationRounds(appRounds);
     }
   }, [applicationRoundsData, reservationUnit]);
 
@@ -290,35 +329,6 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     ];
   }, [t, step]);
 
-  const bylineContent = useMemo(() => {
-    const reservationData =
-      step === 1
-        ? { ...reservation, ...pick(initialReservation, ["begin", "end"]) }
-        : reservation;
-    const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
-
-    return (
-      reservation &&
-      reservationUnit && (
-        <BylineContent>
-          <ReservationInfoCard
-            reservation={reservationData}
-            reservationUnit={reservationUnit}
-            type="confirmed"
-          />
-          {step === 0 && termsOfUse && (
-            <PinkBox>
-              <Subheading>
-                {t("reservations:reservationInfoBoxHeading")}
-              </Subheading>
-              <Sanitize html={termsOfUse} />
-            </PinkBox>
-          )}
-        </BylineContent>
-      )
-    );
-  }, [reservationUnit, reservation, initialReservation, t, step]);
-
   if (
     !reservation ||
     !reservationUnit ||
@@ -340,7 +350,12 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
         <Columns>
           <div>
             <JustForDesktop customBreakpoint={breakpoints.l}>
-              {bylineContent}
+              <BylineContent
+                reservation={reservation}
+                reservationUnit={reservationUnit}
+                initialReservation={initialReservation}
+                step={step}
+              />
             </JustForDesktop>
           </div>
           <div>
@@ -360,13 +375,20 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
                 const target = e.currentTarget;
                 const s = target
                   .getAttribute("data-testid")
-                  .replace("hds-stepper-step-", "");
-                setStep(parseInt(s, 10));
+                  ?.replace("hds-stepper-step-", "");
+                if (s != null) {
+                  setStep(parseInt(s, 10));
+                }
               }}
               steps={steps}
             />
             <JustForMobile customBreakpoint={breakpoints.l}>
-              {bylineContent}
+              <BylineContent
+                reservation={reservation}
+                reservationUnit={reservationUnit}
+                initialReservation={initialReservation}
+                step={step}
+              />
             </JustForMobile>
             {step === 0 && (
               <EditStep0
@@ -387,15 +409,21 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
                 setErrorMsg={setErrorMsg}
                 setStep={setStep}
                 handleSubmit={() => {
-                  adjustReservationTime({
-                    variables: {
-                      input: {
-                        pk: reservation.pk,
-                        begin: initialReservation.begin,
-                        end: initialReservation.end,
+                  if (
+                    initialReservation?.begin &&
+                    initialReservation?.end &&
+                    reservation.pk
+                  ) {
+                    adjustReservationTime({
+                      variables: {
+                        input: {
+                          pk: reservation.pk,
+                          begin: initialReservation.begin,
+                          end: initialReservation.end,
+                        },
                       },
-                    },
-                  });
+                    });
+                  }
                 }}
                 isSubmitting={adjustReservationTimeLoading}
               />

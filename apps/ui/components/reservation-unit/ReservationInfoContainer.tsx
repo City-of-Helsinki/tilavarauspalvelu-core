@@ -1,7 +1,7 @@
+import React from "react";
 import { formatSecondDuration } from "common/src/common/util";
 import { ReservationUnitByPkType } from "common/types/gql-types";
 import ClientOnly from "common/src/ClientOnly";
-import React, { useMemo } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "../../modules/const";
 import { formatDate } from "../../modules/util";
@@ -12,100 +12,101 @@ type Props = {
   isReservable: boolean;
 };
 
+function getStatus(reservationUnit: ReservationUnitByPkType) {
+  const now = new Date().toISOString();
+  const { reservationBegins, reservationEnds } = reservationUnit;
+
+  if (reservationEnds && reservationEnds < now) {
+    return "hasClosed";
+  }
+
+  if (reservationBegins && reservationBegins > now) {
+    return "willOpen";
+  }
+
+  if (reservationBegins && reservationBegins < now) {
+    if (reservationEnds) {
+      return "isOpen";
+    }
+  }
+
+  return null;
+}
+
 const ReservationInfoContainer = ({
   reservationUnit,
   isReservable,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const reservationStatus = useMemo(() => {
-    const now = new Date().toISOString();
-    const { reservationBegins, reservationEnds } = reservationUnit;
+  const reservationStatus = getStatus(reservationUnit);
 
-    if (reservationEnds && reservationEnds < now) {
-      return "hasClosed";
-    }
-
-    if (reservationBegins && reservationBegins > now) {
-      return "willOpen";
-    }
-
-    if (reservationBegins && reservationBegins < now) {
-      if (reservationEnds) return "isOpen";
-    }
-
-    return null;
-  }, [reservationUnit]);
-
-  const reservationUnitIsReservableAndHasReservationBuffers =
+  const reservationUnitIsReservable =
     isReservable &&
-    (reservationUnit.reservationsMaxDaysBefore ||
-      reservationUnit.reservationsMinDaysBefore);
+    (reservationUnit.reservationsMaxDaysBefore != null ||
+      reservationUnit.reservationsMinDaysBefore != null);
 
+  const maxDaysBefore = reservationUnit.reservationsMaxDaysBefore ?? 0;
+  const minDaysBefore = reservationUnit.reservationsMinDaysBefore ?? 0;
   return (
     <>
       <Subheading $withBorder>
         {t("reservationCalendar:reservationInfo")}
       </Subheading>
       <Content data-testid="reservation-unit__reservation-info">
-        {reservationUnitIsReservableAndHasReservationBuffers && (
+        {reservationUnitIsReservable && (
           <p>
-            {reservationUnit.reservationsMaxDaysBefore > 0 &&
-              reservationUnit.reservationsMinDaysBefore > 0 && (
-                <Trans
-                  i18nKey="reservationUnit:reservationInfo1-1"
-                  defaults="Voit tehdä varauksen <strong>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}}</strong> ja <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
-                  values={{
-                    reservationsMaxDaysBefore: daysByMonths.find(
-                      (n) =>
-                        n.value === reservationUnit.reservationsMaxDaysBefore
-                    )?.label,
-                    unit: t(
-                      `reservationUnit:reservationInfo1-${
-                        reservationUnit.reservationsMaxDaysBefore === 14
-                          ? "weeks"
-                          : "months"
-                      }`
-                    ),
-                    reservationsMinDaysBefore:
-                      reservationUnit.reservationsMinDaysBefore,
-                  }}
-                  components={{ bold: <strong /> }}
-                />
-              )}
-            {reservationUnit.reservationsMaxDaysBefore > 0 &&
-              !reservationUnit.reservationsMinDaysBefore && (
-                <Trans
-                  i18nKey="reservationUnit:reservationInfo1-2"
-                  defaults="Voit tehdä varauksen <bold>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}} etukäteen</bold>."
-                  values={{
-                    reservationsMaxDaysBefore: daysByMonths.find(
-                      (n) =>
-                        n.value === reservationUnit.reservationsMaxDaysBefore
-                    )?.label,
-                    unit: t(
-                      `reservationUnit:reservationInfo1-${
-                        reservationUnit.reservationsMaxDaysBefore === 14
-                          ? "weeks"
-                          : "months"
-                      }`
-                    ),
-                  }}
-                  components={{ bold: <strong /> }}
-                />
-              )}
-            {reservationUnit.reservationsMaxDaysBefore === 0 &&
-              reservationUnit.reservationsMinDaysBefore > 0 && (
-                <Trans
-                  i18nKey="reservationUnit:reservationInfo1-3"
-                  defaults="Voit tehdä varauksen <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
-                  values={{
-                    reservationsMinDaysBefore:
-                      reservationUnit.reservationsMinDaysBefore,
-                  }}
-                  components={{ bold: <strong /> }}
-                />
-              )}
+            {maxDaysBefore > 0 && minDaysBefore > 0 && (
+              <Trans
+                i18nKey="reservationUnit:reservationInfo1-1"
+                defaults="Voit tehdä varauksen <strong>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}}</strong> ja <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
+                values={{
+                  reservationsMaxDaysBefore: daysByMonths.find(
+                    (n) => n.value === reservationUnit.reservationsMaxDaysBefore
+                  )?.label,
+                  unit: t(
+                    `reservationUnit:reservationInfo1-${
+                      reservationUnit.reservationsMaxDaysBefore === 14
+                        ? "weeks"
+                        : "months"
+                    }`
+                  ),
+                  reservationsMinDaysBefore:
+                    reservationUnit.reservationsMinDaysBefore,
+                }}
+                components={{ bold: <strong /> }}
+              />
+            )}
+            {maxDaysBefore > 0 && minDaysBefore === 0 && (
+              <Trans
+                i18nKey="reservationUnit:reservationInfo1-2"
+                defaults="Voit tehdä varauksen <bold>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}} etukäteen</bold>."
+                values={{
+                  reservationsMaxDaysBefore: daysByMonths.find(
+                    (n) => n.value === reservationUnit.reservationsMaxDaysBefore
+                  )?.label,
+                  unit: t(
+                    `reservationUnit:reservationInfo1-${
+                      reservationUnit.reservationsMaxDaysBefore === 14
+                        ? "weeks"
+                        : "months"
+                    }`
+                  ),
+                }}
+                components={{ bold: <strong /> }}
+              />
+            )}
+            {maxDaysBefore === 0 && minDaysBefore > 0 && (
+              <Trans
+                i18nKey="reservationUnit:reservationInfo1-3"
+                defaults="Voit tehdä varauksen <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
+                values={{
+                  reservationsMinDaysBefore:
+                    reservationUnit.reservationsMinDaysBefore,
+                }}
+                components={{ bold: <strong /> }}
+              />
+            )}
           </p>
         )}
         {reservationStatus === "willOpen" && (
@@ -113,8 +114,12 @@ const ReservationInfoContainer = ({
             <Trans
               i18nKey="reservationUnit:reservationInfo2-1"
               values={{
-                date: formatDate(reservationUnit.reservationBegins, "d.M.yyyy"),
-                time: formatDate(reservationUnit.reservationBegins, "H.mm"),
+                date: reservationUnit.reservationBegins
+                  ? formatDate(reservationUnit.reservationBegins, "d.M.yyyy")
+                  : "",
+                time: reservationUnit.reservationBegins
+                  ? formatDate(reservationUnit.reservationBegins, "H.mm")
+                  : "",
               }}
               defaults="<bold>Varauskalenteri avautuu {{date}} klo {{time}}</bold>."
               components={{ bold: <strong /> }}
@@ -126,8 +131,12 @@ const ReservationInfoContainer = ({
             <Trans
               i18nKey="reservationUnit:reservationInfo2-2"
               values={{
-                date: formatDate(reservationUnit.reservationEnds, "d.M.yyyy"),
-                time: formatDate(reservationUnit.reservationEnds, "H.mm"),
+                date: reservationUnit.reservationEnds
+                  ? formatDate(reservationUnit.reservationEnds, "d.M.yyyy")
+                  : "",
+                time: reservationUnit.reservationEnds
+                  ? formatDate(reservationUnit.reservationEnds, "H.mm")
+                  : "",
               }}
               defaults="<bold>Varauskalenteri on auki {{date}} klo {{time}}</bold> asti."
               components={{ bold: <strong /> }}
@@ -139,8 +148,12 @@ const ReservationInfoContainer = ({
             <Trans
               i18nKey="reservationUnit:reservationInfo2-3"
               values={{
-                date: formatDate(reservationUnit.reservationEnds, "d.M.yyyy"),
-                time: formatDate(reservationUnit.reservationEnds, "H.mm"),
+                date: reservationUnit.reservationEnds
+                  ? formatDate(reservationUnit.reservationEnds, "d.M.yyyy")
+                  : "",
+                time: reservationUnit.reservationEnds
+                  ? formatDate(reservationUnit.reservationEnds, "H.mm")
+                  : "",
               }}
               defaults="<bold>Varauskalenteri on sulkeutunut {{date}} klo {{time}}</bold>."
               components={{ bold: <strong /> }}
@@ -187,6 +200,7 @@ const ReservationInfoContainer = ({
 };
 
 // Hack to deal with translations causing hydration errors
+// TODO can we remove this now that we got rid of the useMemo?
 export default (props: Props) => (
   <ClientOnly>
     <ReservationInfoContainer {...props} />

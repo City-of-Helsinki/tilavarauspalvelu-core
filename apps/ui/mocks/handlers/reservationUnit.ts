@@ -454,7 +454,7 @@ const equipmentCategories: EquipmentCategoryType[] = [
 ];
 
 const reservationUnitREST = [
-  rest.get(`*/v1/reservation-unit/:id/*`, (req, res, ctx) => {
+  rest.get(`*/v1/reservation-unit/:id/*`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json(getJSONResponse));
   }),
 ];
@@ -468,7 +468,7 @@ const selectedReservationUnitQuery = graphql.query<
     services: [],
     uuid: "8e5275aa-8625-4458-88b4-d5b1b2df6619",
     isDraft: false,
-    contactInformation: null,
+    contactInformation: "",
     authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
     id: "UmVzZXJ2YXRpb25Vbml0QnlQa1R5cGU6MzY=",
     pk: req.variables.pk,
@@ -790,8 +790,8 @@ const selectedReservationUnitQuery = graphql.query<
   } as ReservationUnitByPkType;
 
   if (req.variables.pk === 2) {
-    const pricings = reservationUnitByPk.pricings.map((pricing) => {
-      return pricing.status ===
+    const pricings = reservationUnitByPk.pricings?.map((pricing) => {
+      return pricing?.status ===
         ReservationUnitsReservationUnitPricingStatusChoices.Active
         ? {
             ...pricing,
@@ -1012,7 +1012,7 @@ const openingHoursQuery = graphql.query<
     data: {
       reservationUnit: {
         openingHours: {
-          openingTimes: Array.from(Array(100)).map((val, index) => ({
+          openingTimes: Array.from(Array(100)).map((_val, index) => ({
             date: toApiDate(addDays(new Date(), index)),
             startTime: "07:00:00+00:00",
             endTime: "20:00:00+00:00",
@@ -1144,7 +1144,9 @@ const openingHoursQuery = graphql.query<
   const openingTimes: OpeningTimesType[] =
     reservationUnitOpeningHours.data.reservationUnit.openingHours.openingTimes.filter(
       (openingTime: OpeningTimesType) => {
-        return openingTime.date >= startDate && openingTime.date <= endDate;
+        if (openingTime.date != null && startDate != null && endDate != null) {
+          return openingTime.date >= startDate && openingTime.date <= endDate;
+        }
       }
     );
 
@@ -1153,10 +1155,10 @@ const openingHoursQuery = graphql.query<
       (reservation) => {
         let pass = false;
 
-        if (toApiDate(new Date(reservation.begin)) >= toApiDate(new Date(from)))
+        if (from != null && new Date(reservation.begin) >= new Date(from))
           pass = true;
 
-        if (toApiDate(new Date(reservation.begin)) <= toApiDate(new Date(to)))
+        if (to != null && new Date(reservation.begin) <= new Date(to))
           pass = true;
 
         if (state) {
@@ -1410,7 +1412,7 @@ const reservationUnitTypeData: Parameter[] = [
 
 const relatedReservationUnits = graphql.query<Query, QueryReservationUnitsArgs>(
   "RelatedReservationUnits",
-  (req, res, ctx) => {
+  (_req, res, ctx) => {
     return res(
       ctx.data({
         reservationUnits: relatedReservationUnitsData,
@@ -1421,7 +1423,7 @@ const relatedReservationUnits = graphql.query<Query, QueryReservationUnitsArgs>(
 
 const reservationUnitTypesRest = rest.get<Parameter[]>(
   "http://localhost:8000/v1/parameters/reservation_unit_type/",
-  (req, res, ctx) => {
+  (_req, res, ctx) => {
     return res(ctx.json(reservationUnitTypeData));
   }
 );
@@ -1429,7 +1431,7 @@ const reservationUnitTypesRest = rest.get<Parameter[]>(
 const reservationUnitTypes = graphql.query<
   Query,
   QueryReservationUnitTypesArgs
->("ReservationUnitTypes", (req, res, ctx) => {
+>("ReservationUnitTypes", (_req, res, ctx) => {
   const data = {
     edges: reservationUnitTypeData.map((item) => ({
       node: {
@@ -1465,7 +1467,7 @@ const termsOfUseData: TermsOfUseTypeConnection = {
         textSv: "",
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms,
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1479,7 +1481,7 @@ const termsOfUseData: TermsOfUseTypeConnection = {
         textSv: "",
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms,
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1494,7 +1496,7 @@ const termsOfUseData: TermsOfUseTypeConnection = {
         textSv: "",
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.ServiceTerms,
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1508,10 +1510,13 @@ const termsOfUseData: TermsOfUseTypeConnection = {
         textSv: "Sopparijuttuja \r\n\r\nToinen rivi",
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
-      cursor: null,
+      cursor: "",
     },
   ],
-  pageInfo: null,
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+  }
 };
 
 export const termsOfUse = graphql.query<Query, QueryTermsOfUseArgs>(
@@ -1521,7 +1526,7 @@ export const termsOfUse = graphql.query<Query, QueryTermsOfUseArgs>(
     const result = termsType
       ? ({
           edges: termsOfUseData.edges.filter(
-            (n) => n.node.termsType === termsType.toUpperCase()
+            (n) => n?.node?.termsType === termsType.toUpperCase()
           ),
         } as TermsOfUseTypeConnection)
       : termsOfUseData;
@@ -1541,7 +1546,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 10,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1553,7 +1558,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 7,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1565,7 +1570,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 3,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1577,7 +1582,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 4,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1589,7 +1594,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 5,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1601,7 +1606,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 6,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1613,7 +1618,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 7,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1625,7 +1630,7 @@ const purposeData: PurposeTypeConnection = {
         rank: 8,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
     {
       node: {
@@ -1637,15 +1642,18 @@ const purposeData: PurposeTypeConnection = {
         rank: 9,
         smallUrl: "https://via.placeholder.com/390x245",
       },
-      cursor: null,
+      cursor: "",
     },
   ],
-  pageInfo: null,
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+  }
 };
 
 export const reservationUnitPurposes = graphql.query<Query, QueryPurposesArgs>(
   "ReservationUnitPurposes",
-  (req, res, ctx) => {
+  (_req, res, ctx) => {
     return res(ctx.data({ purposes: purposeData }));
   }
 );

@@ -163,7 +163,7 @@ const ReservationUnitEventsSummaryForList = ({
 
   const keys = [] as ReservationUnit[];
   const resUnitEvents = eventReservations.reduce((prev, reservation) => {
-    reservation.reservationUnit.forEach((resUnit) => {
+    reservation.reservationUnit?.forEach((resUnit) => {
       let key = keys.find((k) => k.id === resUnit.id);
       if (!key) {
         keys.push(resUnit);
@@ -318,13 +318,15 @@ const ReservationUnitEventsSummaryForList = ({
                       text={`${reservationUnit.building.name}, ${reservationUnit.name.fi}`}
                     />
                     <CalendarFeedLink>
-                      <a
-                        href={applicationEventCalendarFeedUrl(
-                          applicationEvent.uuid
-                        )}
-                      >
-                        {t("eventSummary:downloadCalendarFeed")}
-                      </a>
+                      {applicationEvent.uuid && (
+                        <a
+                          href={applicationEventCalendarFeedUrl(
+                            applicationEvent.uuid
+                          )}
+                        >
+                          {t("eventSummary:downloadCalendarFeed")}
+                        </a>
+                      )}
                     </CalendarFeedLink>
                   </div>
                   <div>

@@ -14,7 +14,6 @@ import { OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import {
-  PageInfo,
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitsReservationUnitReservationKindChoices,
@@ -73,7 +72,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     props: {
       key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -152,12 +151,14 @@ const SearchSingle = (): JSX.Element => {
   });
 
   const reservationUnits: ReservationUnitType[] =
-    data?.reservationUnits?.edges?.map((edge) => edge.node);
+    data?.reservationUnits?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
   const totalCount = data?.reservationUnits?.totalCount;
 
-  const pageInfo: PageInfo = data?.reservationUnits?.pageInfo;
+  const pageInfo = data?.reservationUnits?.pageInfo;
 
-  const content = useRef(null);
+  const content = useRef<HTMLElement>(null);
   const router = useRouter();
 
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
@@ -189,6 +190,7 @@ const SearchSingle = (): JSX.Element => {
 
   useEffect(() => {
     const params = queryString.parse(searchParams);
+    // @ts-expect-error: TODO: fix this (first though figure out why we are saving queryparams to localstorage)
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
 
@@ -215,17 +217,18 @@ const SearchSingle = (): JSX.Element => {
       "sort",
       "order",
     ]);
+    // @ts-expect-error: TODO: fix this
     router.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 
-  const onRemove = (key: string[], subItemKey?: string) => {
+  const onRemove = (key: string[] | undefined, subItemKey?: string) => {
     let newValues = {};
     if (subItemKey) {
       newValues = {
         ...values,
         [subItemKey]: values[subItemKey]
           .split(",")
-          .filter((n) => !key.includes(n))
+          .filter((n) => !key?.includes(n))
           .join(","),
       };
     } else if (key) {
@@ -237,6 +240,7 @@ const SearchSingle = (): JSX.Element => {
       "order",
     ]);
     router.replace(
+      // @ts-expect-error: TODO: fix this
       singleSearchUrl({
         ...newValues,
         ...sortingCriteria,
@@ -278,7 +282,7 @@ const SearchSingle = (): JSX.Element => {
               loading={loading}
               loadingMore={loadingMore}
               pageInfo={pageInfo}
-              totalCount={totalCount}
+              totalCount={totalCount ?? undefined}
               fetchMore={(cursor) => {
                 const variables = {
                   ...values,

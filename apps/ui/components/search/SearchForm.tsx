@@ -100,7 +100,7 @@ const Filters = styled.div<{ $areFiltersVisible: boolean }>`
   }
 `;
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled(Select<OptionType>)`
   button {
     display: grid;
     text-align: left;
@@ -216,7 +216,7 @@ const SearchForm = ({
 
   const applicationPeriodOptions = useMemo(() => {
     return applicationRounds.map((applicationRound) => ({
-      value: applicationRound.pk,
+      value: applicationRound.pk ?? 0,
       label: getApplicationRoundName(applicationRound),
     }));
   }, [applicationRounds]);
@@ -226,20 +226,26 @@ const SearchForm = ({
       publishedReservationUnits: true,
     },
     onCompleted: (res) => {
-      const units = res?.units?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getUnitName(node),
-      }));
+      const units = res?.units?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node.pk),
+          name: getUnitName(node),
+        }));
       setUnitOptions(mapOptions(sortBy(units, "name") as StringParameter[]));
     },
   });
 
   useQuery<Query>(SEARCH_FORM_PARAMS_PURPOSE, {
     onCompleted: (res) => {
-      const purposes = res?.purposes?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
+      const purposes = res?.purposes?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        }));
       setPurposeOptions(
         mapOptions(sortBy(purposes, "name") as StringParameter[])
       );
@@ -248,17 +254,20 @@ const SearchForm = ({
 
   useQuery<Query>(RESERVATION_UNIT_TYPES, {
     onCompleted: (res) => {
-      const types = res?.reservationUnitTypes?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
+      const types = res?.reservationUnitTypes?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        }));
       setReservationUnitTypeOptions(mapOptions(sortBy(types, "name")));
     },
   });
 
   const { register, watch, handleSubmit, setValue, getValues } = useForm();
 
-  const getFormValueLabel = (value: string): string => {
+  const getFormValueLabel = (value: string): string | undefined => {
     switch (value) {
       case "applicationRound":
         return applicationPeriodOptions.find(
@@ -269,7 +278,10 @@ const SearchForm = ({
     }
   };
 
-  const getFormSubValueLabel = (key: string, value: string): string => {
+  const getFormSubValueLabel = (
+    key: string,
+    value: string
+  ): string | undefined => {
     switch (key) {
       case "unit":
         return unitOptions.find((n) => n.value === value)?.label;

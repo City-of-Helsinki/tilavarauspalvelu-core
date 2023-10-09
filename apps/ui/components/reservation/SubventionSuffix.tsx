@@ -1,10 +1,10 @@
-import React from "react";
+import React, { type RefObject } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 
 type Props = {
   placement: "reservation-unit-head" | "quick-reservation";
-  ref: React.MutableRefObject<HTMLAnchorElement>;
+  ref: RefObject<HTMLAnchorElement>;
   setIsDialogOpen: (value: boolean) => void;
 };
 

@@ -76,7 +76,7 @@ const ExtraPaddedCell = styled(PaddedCell)`
   }
 `;
 
-const ImageCell = styled.div<{ $src: string }>`
+const ImageCell = styled.div<{ $src?: string }>`
   background-image: url(${(props) => props.$src});
   width: 100%;
   height: 150px;
@@ -169,6 +169,9 @@ const ReservationUnitCard = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
+  const mainImageSrc = getMainImage(reservationUnit)?.mediumUrl ?? undefined;
+  const { unit } = reservationUnit;
+  const unitName = unit ? getTranslation(unit, "name") : "-";
   return (
     <NameCardContainer>
       <PreCardLabel>
@@ -182,10 +185,10 @@ const ReservationUnitCard = ({
       ) : null}
       <CardButtonContainer>
         <CardContainer>
-          <ImageCell $src={getMainImage(reservationUnit)?.mediumUrl} />
+          <ImageCell $src={mainImageSrc} />
           <ExtraPaddedCell>
             <Name>{getReservationUnitName(reservationUnit)}</Name>
-            <UnitName>{getTranslation(reservationUnit.unit, "name")}</UnitName>
+            <UnitName>{unitName}</UnitName>
             <MaxPersonsContainer>
               {reservationUnit.maxPersons && (
                 <>

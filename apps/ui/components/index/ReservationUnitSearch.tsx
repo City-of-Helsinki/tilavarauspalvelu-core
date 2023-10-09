@@ -1,12 +1,10 @@
-import { breakpoints } from "common/src/common/style";
+import React from "react";
 import { IconSearch, TextInput } from "hds-react";
 import { useRouter } from "next/router";
-import React, { useRef } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { singleSearchPrefix } from "../../modules/const";
-
-const Wrapper = styled.form``;
+import { breakpoints } from "common/src/common/style";
+import { singleSearchPrefix } from "@/modules/const";
 
 const StyledTextInput = styled(TextInput)`
   position: relative;
@@ -37,22 +35,20 @@ const ReservationUnitSearch = (): JSX.Element => {
 
   const [searchTerm, setSearchTerm] = React.useState("");
 
-  const formRef = useRef();
-
   const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
     router.push(`${singleSearchPrefix}?textSearch=${searchTerm}`);
   };
 
   return (
-    <Wrapper ref={formRef} onSubmit={(e) => handleSubmit(e)}>
+    <form onSubmit={(e) => handleSubmit(e)}>
       <StyledTextInput
         placeholder={t("home:head.searchPlaceholder")}
         label={<IconSearch onClick={(e) => handleSubmit(e)} aria-hidden />}
         id="front-page__search--reservation-unit"
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-    </Wrapper>
+    </form>
   );
 };
 

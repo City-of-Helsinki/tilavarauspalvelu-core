@@ -6,12 +6,7 @@ import { sortBy, trim } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
-import {
-  Application,
-  Parameter,
-  StringParameter,
-  OptionType,
-} from "common/types/common";
+import { Application, Parameter, OptionType } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { Query, TermsOfUseType } from "common/types/gql-types";
@@ -42,7 +37,7 @@ const mapArrayById = (
     // eslint-disable-next-line no-param-reassign
     prev[current.id] = current;
     return prev;
-  }, {});
+  }, {} as { [key: number]: { id: number } });
 };
 
 const UnitList = styled.ol`
@@ -144,23 +139,27 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
 
   useQuery<Query>(RESERVATION_PURPOSES, {
     onCompleted: (res) => {
-      const purposes = res?.reservationPurposes?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
-      setPurposeOptions(
-        mapOptions(sortBy(purposes, "name") as StringParameter[])
-      );
+      const purposes = res?.reservationPurposes?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node?.pk),
+          name: getTranslation(node, "name"),
+        }));
+      setPurposeOptions(mapOptions(sortBy(purposes, "name")));
     },
   });
 
   useQuery<Query>(CITIES, {
     onCompleted: (res) => {
-      const cities = res?.cities?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
-      setCitiesOptions(mapOptions(sortBy(cities, "id") as StringParameter[]));
+      const cities = res?.cities?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        }));
+      setCitiesOptions(mapOptions(sortBy(cities, "id")));
     },
   });
 
@@ -233,7 +232,8 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
                 value={
                   applicationEvent.purposeId
                     ? purposeOptions.find(
-                        (n) => n.value === applicationEvent.purposeId.toString()
+                        (n) =>
+                          n.value === applicationEvent?.purposeId?.toString()
                       )?.label
                     : ""
                 }
@@ -248,11 +248,11 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.minDuration")}
-                value={formatDuration(applicationEvent.minDuration)}
+                value={formatDuration(applicationEvent?.minDuration)}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.maxDuration")}
-                value={formatDuration(applicationEvent.maxDuration)}
+                value={formatDuration(applicationEvent?.maxDuration)}
               />
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.eventsPerWeek")}
@@ -296,11 +296,11 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
         );
       })}
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
-      <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>
+      {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>
         {t("application:preview.reservationUnitTerms")}
       </FormSubHeading>
-      <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>
+      {tos2 && <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>}
       <CheckboxContainer>
         <Checkbox
           id="preview.acceptTermsOfUse"

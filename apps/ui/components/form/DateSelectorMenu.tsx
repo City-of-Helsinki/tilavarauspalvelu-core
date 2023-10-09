@@ -130,7 +130,7 @@ const DateSelectorMenu = ({
   onCloseMenu,
   startDate,
   toggleIsCustomDate,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -143,7 +143,9 @@ const DateSelectorMenu = ({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <Wrapper data-testid={testIds.menu}>

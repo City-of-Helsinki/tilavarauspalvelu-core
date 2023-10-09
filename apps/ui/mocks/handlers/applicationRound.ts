@@ -115,8 +115,15 @@ const getApplicationRoundOneJSONResponse = {
   approved_by: "",
 };
 
+const aggregatedData = {
+  allocationResultEventsCount: 0,
+  allocationDurationTotal: 0,
+  totalHourCapacity: 0,
+  totalReservationDuration: 0,
+}
+
 const applicationRoundsREST = [
-  rest.get(`*/v1/application_round/`, (req, res, ctx) => {
+  rest.get(`*/v1/application_round/`, (_req, res, ctx) => {
     const result: ApplicationRound[] = [
       {
         id: 2,
@@ -160,12 +167,7 @@ const applicationRoundsREST = [
         criteria:
           "<p><strong>K&auml;ytt&ouml;vuorojen jakoperusteet ja vuorojen my&ouml;nt&auml;minen<br /><br /></strong>Nuorisotilojen tarjoamisessa asukask&auml;ytt&ouml;&ouml;n noudatetaan tasapuolisuutta ja avoimuutta.<br /><br /><br />K&auml;ytt&ouml;vuoroja jaettaessa noudatetaan seuraavaa ensisijaisuusperiaatetta:<br /><br />1. Toimipaikan oma toiminta<br />2. Helsinkil&auml;iset nuorten toimintaryhm&auml;t ja nuorisoj&auml;rjest&ouml;t ja -yhdistykset<br />3. Yhdistykset, joiden kotipaikka on Helsinki<br />4. Helsingin kaupungin toimialat<br />5. Muut k&auml;ytt&auml;j&auml;t<br /><br />Toimipaikkojen vakiovuorot my&ouml;nt&auml;&auml; toiminnanjohtaja. P&auml;&auml;t&ouml;s my&ouml;nnetyst&auml; vuorosta annetaan kuukauden kuluessa<br />hakukierroksen p&auml;&auml;ttymisest&auml;. Tilap&auml;iset k&auml;ytt&ouml;vuorot my&ouml;nt&auml;&auml; vastaava ohjaaja tai toimipaikan nimetty henkil&ouml;.<br />K&auml;ytt&ouml;vuoron my&ouml;nt&auml;j&auml; voi poiketa hakijan ilmaisemista aika- ja tilatoiveista ja tarjota k&auml;ytt&ouml;vuoroa my&ouml;s muista kuin<br />hakijan toivomista toimipisteist&auml; tai aikana. Tilaan sovelletaan voimassa olevia toimialakohtaisia<br />hinnoitteluperiaatteita.</p>",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "",
         applicationsSent: false,
       },
@@ -211,12 +213,7 @@ const applicationRoundsREST = [
         criteria:
           "<p><strong>K&auml;ytt&ouml;vuorojen jakoperusteet ja vuorojen my&ouml;nt&auml;minen<br /><br /></strong>Nuorisotilojen tarjoamisessa asukask&auml;ytt&ouml;&ouml;n noudatetaan tasapuolisuutta ja avoimuutta.<br /><br /><br />K&auml;ytt&ouml;vuoroja jaettaessa noudatetaan seuraavaa ensisijaisuusperiaatetta:<br /><br />1. Toimipaikan oma toiminta<br />2. Helsinkil&auml;iset nuorten toimintaryhm&auml;t ja nuorisoj&auml;rjest&ouml;t ja -yhdistykset<br />3. Yhdistykset, joiden kotipaikka on Helsinki<br />4. Helsingin kaupungin toimialat<br />5. Muut k&auml;ytt&auml;j&auml;t<br /><br />Toimipaikkojen vakiovuorot my&ouml;nt&auml;&auml; toiminnanjohtaja. P&auml;&auml;t&ouml;s my&ouml;nnetyst&auml; vuorosta annetaan kuukauden kuluessa<br />hakukierroksen p&auml;&auml;ttymisest&auml;. Tilap&auml;iset k&auml;ytt&ouml;vuorot my&ouml;nt&auml;&auml; vastaava ohjaaja tai toimipaikan nimetty henkil&ouml;.<br />K&auml;ytt&ouml;vuoron my&ouml;nt&auml;j&auml; voi poiketa hakijan ilmaisemista aika- ja tilatoiveista ja tarjota k&auml;ytt&ouml;vuoroa my&ouml;s muista kuin<br />hakijan toivomista toimipisteist&auml; tai aikana. Tilaan sovelletaan voimassa olevia toimialakohtaisia<br />hinnoitteluperiaatteita.</p>",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "Mikko Sartanen",
         applicationsSent: false,
       },
@@ -262,12 +259,7 @@ const applicationRoundsREST = [
         criteria:
           "<p><strong>K&auml;ytt&ouml;vuorojen jakoperusteet ja vuorojen my&ouml;nt&auml;minen<br /><br /></strong>Nuorisotilojen tarjoamisessa asukask&auml;ytt&ouml;&ouml;n noudatetaan tasapuolisuutta ja avoimuutta.<br /><br /><br />K&auml;ytt&ouml;vuoroja jaettaessa noudatetaan seuraavaa ensisijaisuusperiaatetta:<br /><br />1. Toimipaikan oma toiminta<br />2. Helsinkil&auml;iset nuorten toimintaryhm&auml;t ja nuorisoj&auml;rjest&ouml;t ja -yhdistykset<br />3. Yhdistykset, joiden kotipaikka on Helsinki<br />4. Helsingin kaupungin toimialat<br />5. Muut k&auml;ytt&auml;j&auml;t<br /><br />Toimipaikkojen vakiovuorot my&ouml;nt&auml;&auml; toiminnanjohtaja. P&auml;&auml;t&ouml;s my&ouml;nnetyst&auml; vuorosta annetaan kuukauden kuluessa<br />hakukierroksen p&auml;&auml;ttymisest&auml;. Tilap&auml;iset k&auml;ytt&ouml;vuorot my&ouml;nt&auml;&auml; vastaava ohjaaja tai toimipaikan nimetty henkil&ouml;.<br />K&auml;ytt&ouml;vuoron my&ouml;nt&auml;j&auml; voi poiketa hakijan ilmaisemista aika- ja tilatoiveista ja tarjota k&auml;ytt&ouml;vuoroa my&ouml;s muista kuin<br />hakijan toivomista toimipisteist&auml; tai aikana. Tilaan sovelletaan voimassa olevia toimialakohtaisia<br />hinnoitteluperiaatteita.</p>",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "Mikko Sartanen",
         applicationsSent: false,
       },
@@ -313,12 +305,7 @@ const applicationRoundsREST = [
         criteria:
           "<p><strong>K&auml;ytt&ouml;vuorojen jakoperusteet ja vuorojen my&ouml;nt&auml;minen<br /><br /></strong>Nuorisotilojen tarjoamisessa asukask&auml;ytt&ouml;&ouml;n noudatetaan tasapuolisuutta ja avoimuutta.<br /><br /><br />K&auml;ytt&ouml;vuoroja jaettaessa noudatetaan seuraavaa ensisijaisuusperiaatetta:<br /><br />1. Toimipaikan oma toiminta<br />2. Helsinkil&auml;iset nuorten toimintaryhm&auml;t ja nuorisoj&auml;rjest&ouml;t ja -yhdistykset<br />3. Yhdistykset, joiden kotipaikka on Helsinki<br />4. Helsingin kaupungin toimialat<br />5. Muut k&auml;ytt&auml;j&auml;t<br /><br />Toimipaikkojen vakiovuorot my&ouml;nt&auml;&auml; toiminnanjohtaja. P&auml;&auml;t&ouml;s my&ouml;nnetyst&auml; vuorosta annetaan kuukauden kuluessa<br />hakukierroksen p&auml;&auml;ttymisest&auml;. Tilap&auml;iset k&auml;ytt&ouml;vuorot my&ouml;nt&auml;&auml; vastaava ohjaaja tai toimipaikan nimetty henkil&ouml;.<br />K&auml;ytt&ouml;vuoron my&ouml;nt&auml;j&auml; voi poiketa hakijan ilmaisemista aika- ja tilatoiveista ja tarjota k&auml;ytt&ouml;vuoroa my&ouml;s muista kuin<br />hakijan toivomista toimipisteist&auml; tai aikana. Tilaan sovelletaan voimassa olevia toimialakohtaisia<br />hinnoitteluperiaatteita.</p>",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "Mikko Sartanen",
         applicationsSent: false,
       },
@@ -364,12 +351,7 @@ const applicationRoundsREST = [
         criteria:
           "<p><strong>K&auml;ytt&ouml;vuorojen jakoperusteet ja vuorojen my&ouml;nt&auml;minen<br /><br /></strong>Nuorisotilojen tarjoamisessa asukask&auml;ytt&ouml;&ouml;n noudatetaan tasapuolisuutta ja avoimuutta.<br /><br /><br />K&auml;ytt&ouml;vuoroja jaettaessa noudatetaan seuraavaa ensisijaisuusperiaatetta:<br /><br />1. Toimipaikan oma toiminta<br />2. Helsinkil&auml;iset nuorten toimintaryhm&auml;t ja nuorisoj&auml;rjest&ouml;t ja -yhdistykset<br />3. Yhdistykset, joiden kotipaikka on Helsinki<br />4. Helsingin kaupungin toimialat<br />5. Muut k&auml;ytt&auml;j&auml;t<br /><br />Toimipaikkojen vakiovuorot my&ouml;nt&auml;&auml; toiminnanjohtaja. P&auml;&auml;t&ouml;s my&ouml;nnetyst&auml; vuorosta annetaan kuukauden kuluessa<br />hakukierroksen p&auml;&auml;ttymisest&auml;. Tilap&auml;iset k&auml;ytt&ouml;vuorot my&ouml;nt&auml;&auml; vastaava ohjaaja tai toimipaikan nimetty henkil&ouml;.<br />K&auml;ytt&ouml;vuoron my&ouml;nt&auml;j&auml; voi poiketa hakijan ilmaisemista aika- ja tilatoiveista ja tarjota k&auml;ytt&ouml;vuoroa my&ouml;s muista kuin<br />hakijan toivomista toimipisteist&auml; tai aikana. Tilaan sovelletaan voimassa olevia toimialakohtaisia<br />hinnoitteluperiaatteita.</p>",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "Mikko Sartanen",
         applicationsSent: false,
       },
@@ -384,7 +366,7 @@ const applicationRoundsREST = [
         publicDisplayBegin: "2021-01-01T00:00:00Z",
         publicDisplayEnd: addDays(new Date(), 7).toISOString(),
         purposeIds: [],
-        serviceSectorId: null,
+        serviceSectorId: 0,
         status: "draft",
         statusTimestamp: "2021-03-11T06:20:53.219000Z",
         applicationRoundBaskets: [
@@ -403,12 +385,7 @@ const applicationRoundsREST = [
         allocating: false,
         criteria: "",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "",
         applicationsSent: true,
       },
@@ -423,19 +400,14 @@ const applicationRoundsREST = [
         publicDisplayBegin: "2020-12-18T00:00:00Z",
         publicDisplayEnd: addDays(new Date(), 7).toISOString(),
         purposeIds: [2, 4],
-        serviceSectorId: null,
+        serviceSectorId: 0,
         status: "draft",
         statusTimestamp: "2021-03-11T06:20:53.223000Z",
         applicationRoundBaskets: [],
         allocating: false,
         criteria: "",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "",
         applicationsSent: true,
       },
@@ -445,8 +417,8 @@ const applicationRoundsREST = [
         reservationUnitIds: [52, 1, 49, 50, 51, 53, 54],
         applicationPeriodBegin: "2021-04-19T06:00:00Z",
         applicationPeriodEnd: "2021-12-30T13:00:00Z",
-        reservationPeriodBegin: toApiDate(addMonths(new Date(), 1)),
-        reservationPeriodEnd: toApiDate(addMonths(new Date(), 5)),
+        reservationPeriodBegin: toApiDate(addMonths(new Date(), 1)) ?? "",
+        reservationPeriodEnd: toApiDate(addMonths(new Date(), 5)) ?? "",
         publicDisplayBegin: "2021-04-16T06:00:00Z",
         publicDisplayEnd: addDays(new Date(), 7).toISOString(),
         purposeIds: [5, 6, 7, 8],
@@ -481,12 +453,7 @@ const applicationRoundsREST = [
         criteria:
           "<p><strong>K&auml;ytt&ouml;vuorojen jakoperusteet ja vuorojen my&ouml;nt&auml;minen<br /><br /></strong>Nuorisotilojen tarjoamisessa asukask&auml;ytt&ouml;&ouml;n noudatetaan tasapuolisuutta ja avoimuutta.<br /><br /><br />K&auml;ytt&ouml;vuoroja jaettaessa noudatetaan seuraavaa ensisijaisuusperiaatetta:<br /><br />1. Toimipaikan oma toiminta<br />2. Helsinkil&auml;iset nuorten toimintaryhm&auml;t ja nuorisoj&auml;rjest&ouml;t ja -yhdistykset<br />3. Yhdistykset, joiden kotipaikka on Helsinki<br />4. Helsingin kaupungin toimialat<br />5. Muut k&auml;ytt&auml;j&auml;t<br /><br />Toimipaikkojen vakiovuorot my&ouml;nt&auml;&auml; toiminnanjohtaja. P&auml;&auml;t&ouml;s my&ouml;nnetyst&auml; vuorosta annetaan kuukauden kuluessa<br />hakukierroksen p&auml;&auml;ttymisest&auml;. Tilap&auml;iset k&auml;ytt&ouml;vuorot my&ouml;nt&auml;&auml; vastaava ohjaaja tai toimipaikan nimetty henkil&ouml;.<br />K&auml;ytt&ouml;vuoron my&ouml;nt&auml;j&auml; voi poiketa hakijan ilmaisemista aika- ja tilatoiveista ja tarjota k&auml;ytt&ouml;vuoroa my&ouml;s muista kuin<br />hakijan toivomista toimipisteist&auml; tai aikana. Tilaan sovelletaan voimassa olevia toimialakohtaisia<br />hinnoitteluperiaatteita.</p>",
         isAdmin: true,
-        aggregatedData: {
-          allocationResultEventsCount: null,
-          allocationDurationTotal: null,
-          totalHourCapacity: null,
-          totalReservationDuration: null,
-        },
+        aggregatedData,
         approvedBy: "",
         applicationsSent: false,
       },
@@ -494,18 +461,18 @@ const applicationRoundsREST = [
     return res(ctx.status(200), ctx.json(result));
   }),
 
-  rest.get(`*/v1/application_round/*`, (req, res, ctx) => {
+  rest.get(`*/v1/application_round/*`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json(getApplicationRoundJSONResponse));
   }),
 
-  rest.get(`*/v1/application_round/1/*`, (req, res, ctx) => {
+  rest.get(`*/v1/application_round/1/*`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json(getApplicationRoundOneJSONResponse));
   }),
 ];
 
 const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
   "ApplicationRounds",
-  async (req, res, ctx) => {
+  async (_req, res, ctx) => {
     const result: ApplicationRoundTypeConnection = {
       edges: [
         {
@@ -522,7 +489,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             applicationPeriodBegin: "2021-04-19T06:00:00+00:00",
             applicationPeriodEnd: addDays(new Date(), 7).toISOString(),
             reservationPeriodBegin: "2021-08-16",
-            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
+            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)) ?? "",
             publicDisplayBegin: "2021-04-16T06:00:00+00:00",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
             status: ApplicationRoundStatus.Draft,
@@ -545,7 +512,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
         {
           node: {
@@ -561,7 +528,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             applicationPeriodBegin: "2021-04-19T06:00:00+00:00",
             applicationPeriodEnd: "2021-04-30T13:00:00+00:00",
             reservationPeriodBegin: "2021-08-16",
-            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
+            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)) ?? "",
             publicDisplayBegin: "2021-04-16T06:00:00+00:00",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
             status: ApplicationRoundStatus.Draft,
@@ -584,7 +551,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
         {
           node: {
@@ -600,7 +567,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             applicationPeriodBegin: "2021-04-19T06:00:00Z",
             applicationPeriodEnd: "2021-04-30T13:00:00Z",
             reservationPeriodBegin: "2021-08-16",
-            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
+            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)) ?? "",
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
             status: ApplicationRoundStatus.InReview,
@@ -617,7 +584,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
         {
           node: {
@@ -633,7 +600,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             applicationPeriodBegin: addDays(new Date(), 7).toISOString(),
             applicationPeriodEnd: addDays(new Date(), 17).toISOString(),
             reservationPeriodBegin: "2021-08-16",
-            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
+            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)) ?? "",
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
             status: ApplicationRoundStatus.Draft,
@@ -662,7 +629,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
         {
           node: {
@@ -678,7 +645,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             applicationPeriodBegin: "2021-04-19T06:00:00Z",
             applicationPeriodEnd: "2021-04-30T13:00:00Z",
             reservationPeriodBegin: "2021-09-01",
-            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
+            reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)) ?? "",
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
             status: ApplicationRoundStatus.Draft,
@@ -707,7 +674,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
         {
           node: {
@@ -749,7 +716,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
         {
           node: {
@@ -791,7 +758,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
         {
           node: {
@@ -806,8 +773,8 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
               "Arabian, Koskelan ja Pasilan nuorisotalojen vakiovuorot syksy 2021 - kevät 2022 SV",
             applicationPeriodBegin: "2021-04-19T06:00:00Z",
             applicationPeriodEnd: "2021-12-30T13:00:00Z",
-            reservationPeriodBegin: toApiDate(addMonths(new Date(), 1)),
-            reservationPeriodEnd: toApiDate(addMonths(new Date(), 5)),
+            reservationPeriodBegin: toApiDate(addMonths(new Date(), 1)) ?? "",
+            reservationPeriodEnd: toApiDate(addMonths(new Date(), 5)) ?? "",
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
             status: ApplicationRoundStatus.Draft,
@@ -836,10 +803,13 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             criteriaEn: "Criteria EN",
             criteriaSv: "Criteria SV",
           },
-          cursor: null,
+          cursor: "",
         },
       ],
-      pageInfo: null,
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
     };
     return res(ctx.data({ applicationRounds: result }));
   }

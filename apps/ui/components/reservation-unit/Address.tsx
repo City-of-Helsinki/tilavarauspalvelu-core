@@ -37,9 +37,9 @@ const Links = styled.div`
   }
 `;
 
-const hslUrl = (locale: string, location: LocationType): string | null => {
+const hslUrl = (locale: string, location: LocationType): string | undefined => {
   if (!location) {
-    return null;
+    return undefined;
   }
 
   const addressStreet =
@@ -54,9 +54,12 @@ const hslUrl = (locale: string, location: LocationType): string | null => {
   return `https://reittiopas.hsl.fi/reitti/-/${destination}/?locale=${locale}`;
 };
 
-const googleUrl = (locale: string, location: LocationType): string | null => {
+const googleUrl = (
+  locale: string,
+  location?: LocationType
+): string | undefined => {
   if (!location) {
-    return null;
+    return undefined;
   }
 
   const addressStreet =
@@ -71,17 +74,20 @@ const googleUrl = (locale: string, location: LocationType): string | null => {
   return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${destination}`;
 };
 
-const mapUrl = (locale: string, unit: UnitType): string | null => {
+const mapUrl = (locale: string, unit: UnitType): string | undefined => {
   if (!unit?.tprekId) {
-    return null;
+    return undefined;
   }
 
   return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}`;
 };
 
-const accessibilityUrl = (locale: string, unit: UnitType): string | null => {
+const accessibilityUrl = (
+  locale: string,
+  unit?: UnitType
+): string | undefined => {
   if (!unit?.tprekId) {
-    return null;
+    return undefined;
   }
 
   return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}?p=1&t=accessibilityDetails`;
@@ -92,9 +98,11 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
 
   const location = reservationUnit.unit?.location;
   const addressStreet =
-    getTranslation(location, "addressStreet") || location.addressStreetFi;
+    (location && getTranslation(location, "addressStreet")) ||
+    location?.addressStreetFi;
   const addressCity =
-    getTranslation(location, "addressCity") || location.addressCityFi;
+    (location && getTranslation(location, "addressCity")) ||
+    location?.addressCityFi;
 
   if (!location || !addressStreet || !addressCity) {
     return <div />;
@@ -109,7 +117,11 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
       )}
       <Links>
         <IconButton
-          href={mapUrl(i18n.language, reservationUnit.unit)}
+          href={
+            reservationUnit?.unit
+              ? mapUrl(i18n.language, reservationUnit?.unit)
+              : undefined
+          }
           label={t("reservationUnit:linkMap")}
           icon={<IconLinkExternal aria-hidden />}
         />
@@ -124,7 +136,10 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
           icon={<IconLinkExternal aria-hidden />}
         />
         <IconButton
-          href={accessibilityUrl(i18n.language, reservationUnit.unit)}
+          href={accessibilityUrl(
+            i18n.language,
+            reservationUnit.unit ?? undefined
+          )}
           label={t("reservationUnit:linkAccessibility")}
           icon={<IconLinkExternal aria-hidden />}
         />

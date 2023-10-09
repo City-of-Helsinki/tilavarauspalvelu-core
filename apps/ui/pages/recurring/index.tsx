@@ -31,10 +31,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     query: APPLICATION_ROUNDS,
     fetchPolicy: "no-cache",
   });
-  const applicationRounds = data?.applicationRounds?.edges.map((n) => n.node);
+  const applicationRounds =
+    data?.applicationRounds?.edges
+      .map((n) => n?.node)
+      .filter((n): n is NonNullable<typeof n> => !!n) ?? [];
 
   const filteredApplicationRounds = sortBy(applicationRounds, ["pk"]).filter(
     (applicationRound) =>
+      applicationRound?.publicDisplayBegin &&
+      applicationRound?.publicDisplayEnd &&
       new Date(applicationRound.publicDisplayBegin) <= now &&
       new Date(applicationRound.publicDisplayEnd) >= now
   );
@@ -42,7 +47,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       applicationRounds: filteredApplicationRounds,
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };

@@ -54,8 +54,8 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
       AxiosResponse<T>
     >(config);
     return response.data;
-  } catch (error) {
-    const errorMessage: string | undefined = error.response?.data?.detail;
+  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const errorMessage: string | undefined = error?.response?.data?.detail;
     if (errorMessage) {
       throw new ApiError(
         `${errorMessage} url:'${requestConfig.url}'`,

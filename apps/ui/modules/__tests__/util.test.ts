@@ -30,7 +30,7 @@ jest.mock("next-i18next", () => ({
 
 const cell = (
   hour: number,
-  state?: ApplicationEventSchedulePriority | false
+  state: ApplicationEventSchedulePriority | false
 ): Cell => ({
   label: "cell",
   key: "key",
@@ -149,9 +149,9 @@ test("getComboboxValues", () => {
     { label: "c", value: "c" },
   ]);
 
-  expect(getComboboxValues("", optionsAbc)).toEqual(undefined);
-  expect(getComboboxValues("b,c", [])).toEqual(undefined);
-  expect(getComboboxValues("", [])).toEqual(undefined);
+  expect(getComboboxValues("", optionsAbc)).toEqual([]);
+  expect(getComboboxValues("b,c", [])).toEqual([]);
+  expect(getComboboxValues("", [])).toEqual([]);
 });
 
 test("getReadableList", () => {
@@ -159,7 +159,6 @@ test("getReadableList", () => {
   expect(getReadableList(["a", "b"])).toEqual("a common:and b");
   expect(getReadableList(["a", "b", "c"])).toEqual("a, b common:and c");
   expect(getReadableList([])).toEqual("");
-  expect(getReadableList(undefined)).toEqual("");
 });
 
 test("printErrorMessages", () => {

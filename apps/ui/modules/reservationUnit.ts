@@ -23,8 +23,11 @@ import {
 import { capitalize, getTranslation, localizedValue } from "./util";
 
 export const isReservationUnitPublished = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+  reservationUnit?: ReservationUnitType | ReservationUnitByPkType
 ): boolean => {
+  if (!reservationUnit) {
+    return false;
+  }
   const { state } = reservationUnit;
 
   switch (state) {
@@ -54,8 +57,8 @@ export const getEquipmentCategories = (
   }
 
   const categories: string[] = [...equipment].map((n) =>
-    equipmentCategoryOrder.includes(n.category.nameFi)
-      ? n.category.nameFi
+    n.category?.nameFi && equipmentCategoryOrder.includes(n.category?.nameFi)
+      ? n.category?.nameFi
       : "Muu"
   );
 
@@ -79,11 +82,11 @@ export const getEquipmentList = (equipment: EquipmentType[]): string[] => {
     categories.map((category) => {
       const eq: EquipmentType[] = [...equipment].filter(
         (n) =>
-          n.category.nameFi === category ||
-          (category === "Muu" &&
-            !equipmentCategoryOrder.includes(n.category.nameFi))
+          n.category?.nameFi === category ||
+          (category === "Muu" && n.category?.nameFi &&
+            !equipmentCategoryOrder.includes(n.category?.nameFi))
       );
-      eq.sort((a, b) => a.nameFi.localeCompare(b.nameFi));
+      eq.sort((a, b) => a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0);
       return eq;
     })
   );
@@ -92,19 +95,30 @@ export const getEquipmentList = (equipment: EquipmentType[]): string[] => {
 };
 
 export const getReservationUnitName = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType,
-  language: string = i18n.language
-): string => {
-  if (!reservationUnit) return null;
-
+  reservationUnit?: ReservationUnitType | ReservationUnitByPkType,
+  language: string = i18n?.language ?? "fi"
+): string | undefined => {
+  if (!reservationUnit) {
+    return undefined;
+  }
   const key = `name${capitalize(language)}`;
-  return reservationUnit[key] || reservationUnit.nameFi;
+  if (key in reservationUnit) {
+    // NOTE some silly magic to avoid implicit any type
+    const val: unknown = (reservationUnit as any)[key];
+    if (typeof val === "string" && val.length > 0) {
+      return val;
+    }
+  }
+  return reservationUnit.nameFi ?? "-";
 };
 
 export const getOldReservationUnitName = (
-  reservationUnit: ReservationUnit,
-  language: string = i18n.language
-): string => {
+  reservationUnit?: ReservationUnit,
+  language: string = i18n?.language ?? "fi"
+): string | undefined => {
+  if (!reservationUnit) {
+    return undefined;
+  }
   return (
     localizedValue(reservationUnit.name, language) ||
     localizedValue(reservationUnit.name, "fi")
@@ -112,12 +126,21 @@ export const getOldReservationUnitName = (
 };
 
 export const getUnitName = (
-  unit: UnitType,
-  language: string = i18n.language
-): string => {
-  if (!unit) return null;
+  unit?: UnitType,
+  language: string = i18n?.language ?? "fi"
+): string | undefined => {
+  if (unit == null) {
+    return undefined;
+  }
   const key = `name${capitalize(language)}`;
-  return unit[key] || unit.nameFi;
+  if (key in unit) {
+    // NOTE some silly magic to avoid implicit any type
+    const val: unknown = (unit as any)[key];
+    if (typeof val === "string" && val.length > 0) {
+      return val;
+    }
+  }
+  return unit.nameFi ?? "-";
 };
 
 export const getReservationUnitInstructionsKey = (
@@ -152,25 +175,25 @@ export const getDurationRange = (
 
 export const getActivePricing = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType
-): ReservationUnitPricingType => {
+): ReservationUnitPricingType | undefined => {
   const { pricings } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
-    return null;
+    return undefined;
   }
 
-  return pricings.find((pricing) => pricing.status === "ACTIVE");
+  return pricings.find((pricing) => pricing?.status === "ACTIVE") ?? undefined;
 };
 
 export const getFuturePricing = (
   reservationUnit: ReservationUnitByPkType,
   applicationRounds: ApplicationRound[] = [],
   reservationDate?: Date
-): ReservationUnitPricingType => {
+): ReservationUnitPricingType | undefined => {
   const { pricings, reservationBegins, reservationEnds } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
-    return null;
+    return undefined;
   }
 
   const now = toUIDate(new Date(), "yyyy-MM-dd");
@@ -178,9 +201,10 @@ export const getFuturePricing = (
   const futurePricings = pricings
     .filter(
       (pricing) =>
-        pricing.status ===
+        pricing?.status ===
         ReservationUnitsReservationUnitPricingStatusChoices.Future
     )
+    .filter((x): x is NonNullable<typeof x> => x != null)
     .filter((futurePricing) => futurePricing.begins > now)
     .filter((futurePricing) => {
       const start = new Date(futurePricing.begins);
@@ -202,6 +226,9 @@ export const getFuturePricing = (
     //   });
     // })
     .filter((futurePricing) => {
+      if (futurePricing.begins == null) {
+        return false;
+      }
       return !applicationRounds.some((applicationRound) => {
         const { reservationPeriodBegin, reservationPeriodEnd } =
           applicationRound;
@@ -215,7 +242,7 @@ export const getFuturePricing = (
     .sort((a, b) => (a.begins > b.begins ? 1 : -1));
 
   if (futurePricings.length === 0) {
-    return null;
+    return undefined;
   }
 
   return reservationDate
@@ -240,12 +267,12 @@ export const getPrice = (props: GetPriceType): string => {
 
   const formatters = getFormatters("fi");
 
-  if (pricing?.pricingType === "PAID" && pricing.highestPrice) {
-    const volume = getReservationVolume(minutes, pricing.priceUnit);
+  if (pricing.pricingType === "PAID" && pricing.highestPrice) {
+    const volume = getReservationVolume(minutes ?? 0, pricing.priceUnit);
     const unitStr =
       pricing.priceUnit === "FIXED" || minutes
         ? ""
-        : i18n.t(`prices:priceUnits.${pricing.priceUnit}`);
+        : i18n?.t(`prices:priceUnits.${pricing.priceUnit}`);
 
     if (pricing.priceUnit === "FIXED") {
       return formatters[currencyFormatter].format(pricing.highestPrice);
@@ -264,11 +291,11 @@ export const getPrice = (props: GetPriceType): string => {
     return trim(`${price} / ${unitStr}`, " / ");
   }
 
-  return asInt ? "0" : i18n.t("prices:priceFree");
+  return asInt ? "0" : i18n?.t("prices:priceFree") ?? "0";
 };
 
 export type GetReservationUnitPriceProps = {
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType;
+  reservationUnit?: ReservationUnitType | ReservationUnitByPkType;
   pricingDate?: Date;
   minutes?: number;
   trailingZeros?: boolean;
@@ -277,7 +304,7 @@ export type GetReservationUnitPriceProps = {
 
 export const getReservationUnitPrice = (
   props: GetReservationUnitPriceProps
-): string => {
+): string | undefined => {
   const {
     reservationUnit,
     pricingDate,
@@ -286,17 +313,17 @@ export const getReservationUnitPrice = (
     asInt = false,
   } = props;
 
-  if (!reservationUnit) return null;
+  if (!reservationUnit) {
+    return undefined;
+  }
 
-  const pricing: ReservationUnitPricingType = pricingDate
-    ? getFuturePricing(
-        reservationUnit as ReservationUnitByPkType,
-        [],
-        pricingDate
-      ) || getActivePricing(reservationUnit as ReservationUnitByPkType)
-    : getActivePricing(reservationUnit as ReservationUnitByPkType);
+  // NOTE cast is mandatory because the Union doesn't overlap even though it has identical fields
+  const ru = reservationUnit as ReservationUnitByPkType
+  const pricing: ReservationUnitPricingType | undefined = pricingDate
+    ? getFuturePricing(ru, [], pricingDate) || getActivePricing(ru)
+    : getActivePricing(ru);
 
-  return getPrice({ pricing, minutes, trailingZeros, asInt });
+  return pricing ? getPrice({ pricing, minutes, trailingZeros, asInt }) : undefined;
 };
 
 export const mockOpeningTimePeriods = [
@@ -382,7 +409,7 @@ export const mockOpeningTimePeriods = [
   },
 ];
 
-export const mockOpeningTimes = Array.from(Array(100)).map((val, index) => {
+export const mockOpeningTimes = Array.from(Array(100)).map((_, index) => {
   const date = toApiDate(addDays(new Date(), index));
   return {
     date,

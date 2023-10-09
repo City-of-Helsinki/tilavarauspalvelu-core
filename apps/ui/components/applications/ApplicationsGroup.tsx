@@ -25,7 +25,11 @@ const ApplicationsGroup = ({
   rounds,
   actionCallback,
 }: Props): JSX.Element | null => {
-  if (!applications.length) {
+  if (applications.length === 0 || !applications[0].applicationRound == null) {
+    return null;
+  }
+  const roundPk = applications[0].applicationRound.pk;
+  if (roundPk == null) {
     return null;
   }
 
@@ -36,7 +40,7 @@ const ApplicationsGroup = ({
         <ApplicationCard
           key={application.pk}
           application={application}
-          applicationRound={rounds[application.applicationRound.pk]}
+          applicationRound={rounds[roundPk]}
           actionCallback={actionCallback}
         />
       ))}

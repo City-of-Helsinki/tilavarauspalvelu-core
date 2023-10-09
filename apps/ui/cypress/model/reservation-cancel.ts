@@ -1,4 +1,4 @@
-export function title(): Cypress.Chainable<JQuery<HTMLElement>> {
+export function title(): Cypress.Chainable<JQuery<HTMLHeadingElement>> {
   return cy.get("h1");
 }
 

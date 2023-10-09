@@ -1,6 +1,6 @@
 import { getDay } from "date-fns";
 import { Button, IconCross } from "hds-react";
-import React, { ReactElement, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { parseTimeframeLength } from "common/src/calendar/util";
@@ -117,7 +117,7 @@ const ReservationDetails = ({
 }: Props) => {
   const { t } = useTranslation();
 
-  if (event.event.state !== "INITIAL") {
+  if (event?.event.state !== "INITIAL") {
     return { children };
   }
 
@@ -133,10 +133,18 @@ const ReservationDetails = ({
         }
       }}
     >
-      {React.Children.map(children, (child: ReactElement) => {
+      {React.Children.map(children, (child) => {
         const day = getDay(new Date(event.start));
         const timeframe = parseTimeframeLength(event.start, event.end);
-        const { top, height } = child?.props?.style || {};
+        const props =
+          child != null && typeof child === "object" && "props" in child
+            ? child?.props
+            : {};
+        const style: { top: number; height: number } = props?.style ?? {
+          top: 0,
+          height: 0,
+        };
+        const { top, height } = style;
 
         return (
           <>

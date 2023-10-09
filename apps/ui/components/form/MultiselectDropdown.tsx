@@ -21,7 +21,7 @@ export interface MultiselectDropdownProps {
   name: string;
   onChange: (values: string[]) => void;
   options: OptionType[];
-  renderOptionText?: (optionValue: string) => React.ReactChild;
+  renderOptionText?: (optionValue: string) => React.ReactNode;
   setInputValue?: (newVal: string) => void;
   showSearch?: boolean;
   title: string;
@@ -121,7 +121,7 @@ const Title = styled.div`
   }
 `;
 
-const TitleText = styled.div<{ $empty }>`
+const TitleText = styled.div<{ $empty: boolean }>`
   line-height: 1.5rem;
   white-space: nowrap;
   overflow: hidden;

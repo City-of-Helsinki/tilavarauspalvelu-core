@@ -6,7 +6,6 @@ import {
   ReservationType,
   ReservationUnitByPkType,
   TermsOfUseTermsOfUseTermsTypeChoices,
-  TermsOfUseType,
 } from "common/types/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { get } from "lodash";
@@ -30,7 +29,7 @@ import { reservationsPrefix } from "../../modules/const";
 type Props = {
   reservation: ReservationType;
   reservationUnit: ReservationUnitByPkType;
-  setErrorMsg: React.Dispatch<React.SetStateAction<string>>;
+  setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   handleSubmit: () => void;
   isSubmitting: boolean;
@@ -91,7 +90,7 @@ const EditStep1 = ({
       termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
     },
     onCompleted: (data) => {
-      const result: TermsOfUseType =
+      const result =
         data.termsOfUse?.edges
           .map((n) => n?.node)
           .find((n) => n?.pk === "generic1") || undefined;
@@ -100,8 +99,9 @@ const EditStep1 = ({
   });
 
   const frozenReservationUnit = useMemo(() => {
-    return reservation.reservationUnits?.find(
-      (n) => n?.pk === reservationUnit.pk
+    return (
+      reservation.reservationUnits?.find((n) => n?.pk === reservationUnit.pk) ??
+      undefined
     );
   }, [reservation, reservationUnit]);
 
@@ -109,49 +109,38 @@ const EditStep1 = ({
   const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
 
-  const generalFields = useMemo(() => {
-    return getReservationApplicationFields({
-      supportedFields: frozenReservationUnit?.metadataSet?.supportedFields,
-      reserveeType: "common",
-      camelCaseOutput: true,
-    }).filter((n) => n !== "reserveeType");
-  }, [frozenReservationUnit?.metadataSet?.supportedFields]);
+  // TODO all this is copy pasta from reservation-unit/[...params].tsx
+  const supportedFields =
+    frozenReservationUnit?.metadataSet?.supportedFields?.filter(
+      (n): n is string => n != null
+    ) ?? [];
+  const generalFields = getReservationApplicationFields({
+    supportedFields,
+    reserveeType: "common",
+    camelCaseOutput: true,
+  }).filter((n) => n !== "reserveeType");
 
-  const reservationApplicationFields = useMemo(() => {
-    const type = frozenReservationUnit?.metadataSet?.supportedFields?.includes(
-      "reservee_type"
-    )
-      ? reservation.reserveeType
-      : ReservationsReservationReserveeTypeChoices.Individual;
-
-    return getReservationApplicationFields({
-      supportedFields: frozenReservationUnit?.metadataSet?.supportedFields ?? [
-        "",
-      ],
-      reserveeType: type,
-      camelCaseOutput: true,
-    });
-  }, [
-    frozenReservationUnit?.metadataSet?.supportedFields,
-    reservation.reserveeType,
-  ]);
+  const type = supportedFields.includes("reservee_type")
+    ? reservation.reserveeType
+    : ReservationsReservationReserveeTypeChoices.Individual;
+  const reservationApplicationFields = getReservationApplicationFields({
+    supportedFields,
+    reserveeType: type ?? "common",
+    camelCaseOutput: true,
+  });
 
   const getValue = useCallback(
     (key: string) => {
-      if (key === "purpose") {
-        return getTranslation(reservation[key], "name");
+      if (key === "purpose" && reservation.purpose != null) {
+        return getTranslation(reservation.purpose, "name");
       }
 
-      if (key === "ageGroup") {
+      if (key === "ageGroup" && reservation.ageGroup != null) {
         const { minimum, maximum } = reservation[key] ?? {
           minimum: "1",
           maximum: "",
         };
         return `${minimum} - ${maximum}`;
-      }
-
-      if (key === "purpose") {
-        return getTranslation(reservation[key], "name");
       }
 
       if (key === "homeCity") {
@@ -278,13 +267,20 @@ const EditStep1 = ({
           )}
           body={
             <>
-              <Sanitize
-                html={getTranslation(reservationUnit.cancellationTerms, "text")}
-              />
+              {reservationUnit.cancellationTerms != null && (
+                <Sanitize
+                  html={getTranslation(
+                    reservationUnit.cancellationTerms,
+                    "text"
+                  )}
+                />
+              )}
               <br />
-              <Sanitize
-                html={getTranslation(reservationUnit.paymentTerms, "text")}
-              />
+              {reservationUnit.paymentTerms != null && (
+                <Sanitize
+                  html={getTranslation(reservationUnit.paymentTerms, "text")}
+                />
+              )}
             </>
           }
           acceptLabel={t(
@@ -303,12 +299,14 @@ const EditStep1 = ({
           id="generic-and-service-specific-terms"
           heading={t("reservationCalendar:heading.termsOfUse")}
           body={
-            <Sanitize
-              html={getTranslation(
-                reservationUnit.serviceSpecificTerms,
-                "text"
-              )}
-            />
+            reservationUnit.serviceSpecificTerms != null ? (
+              <Sanitize
+                html={getTranslation(
+                  reservationUnit.serviceSpecificTerms,
+                  "text"
+                )}
+              />
+            ) : undefined
           }
           links={
             hasTermsOfUse

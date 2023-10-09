@@ -132,24 +132,31 @@ const Page1 = ({
   useQuery<Query>(SEARCH_FORM_PARAMS_UNIT, {
     onCompleted: (res) => {
       const unitsInApplicationRound = uniq(
-        applicationRound.reservationUnits.flatMap((resUnit) => resUnit.unit.pk)
+        applicationRound.reservationUnits
+          ?.flatMap((resUnit) => resUnit?.unit?.pk)
+          .filter((pk): pk is number => pk != null)
       );
       const units = res?.units?.edges
-        ?.filter(({ node }) => unitsInApplicationRound.includes(node.pk))
-        .map(({ node }) => ({
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .filter((node) => node.pk && unitsInApplicationRound.includes(node.pk))
+        .map((node) => ({
           id: String(node.pk),
           name: getTranslation(node, "name"),
         }));
-      setUnitOptions(mapOptions(sortBy(units, "name") as StringParameter[]));
+      setUnitOptions(mapOptions(sortBy(units, "name")));
     },
   });
 
   useQuery<Query>(RESERVATION_PURPOSES, {
     onCompleted: (res) => {
-      const purposes = res?.reservationPurposes?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
+      const purposes = res?.reservationPurposes?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((node) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        }));
       setPurposeOptions(
         mapOptions(sortBy(purposes, "name") as StringParameter[])
       );
@@ -224,8 +231,8 @@ const Page1 = ({
     form.trigger();
 
     const validationErrors = [];
-    if (errors?.applicationEvents) {
-      for (let i = 0; i < errors?.applicationEvents.length; i += 1) {
+    if (errors?.applicationEvents?.length != null) {
+      for (let i = 0; i < errors.applicationEvents.length; i += 1) {
         if (i in errors.applicationEvents) {
           validationErrors.push(i);
         }

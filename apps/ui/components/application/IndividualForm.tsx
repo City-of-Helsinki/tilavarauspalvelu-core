@@ -146,10 +146,12 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           <EmailInput />
         </FormProvider>
       </TwoColumnContainer>
-      <Buttons
-        onSubmit={handleSubmit(onSubmit)}
-        applicationId={application.id}
-      />
+      {application.id && (
+        <Buttons
+          onSubmit={handleSubmit(onSubmit)}
+          applicationId={application.id}
+        />
+      )}
     </form>
   );
 };

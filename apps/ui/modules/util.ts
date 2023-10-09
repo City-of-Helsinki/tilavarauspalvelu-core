@@ -32,6 +32,9 @@ import {
   isBrowser,
 } from "./const";
 
+import { getTranslation } from "common/src/common/util";
+export { getTranslation };
+
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date().getTime();
   return (
@@ -81,7 +84,7 @@ export const apiDateToUIDate = (date: string): string => {
   return toUIDate(fromAPIDate(date));
 };
 
-export const uiDateToApiDate = (date: string): string => {
+export const uiDateToApiDate = (date: string): string | undefined => {
   if (date.indexOf(".") === -1) {
     return date;
   }
@@ -96,9 +99,9 @@ export const isValidDateString = (date: string): boolean => {
   return isValidDate(parse(date, "d.M.yyyy", new Date()));
 };
 
-export const formatApiDate = (date: string): string => {
+export const formatApiDate = (date: string): string | undefined => {
   if (!date) {
-    return "no date";
+    return undefined;
   }
   return toApiDate(parseISO(date));
 };
@@ -119,23 +122,14 @@ export const localizedValue = (
   );
 };
 
-export const getTranslation = (parent: unknown, key: string): string => {
-  const keyString = `${key}${capitalize(i18n.language)}`;
-  if (parent && parent[keyString]) {
-    return parent[keyString];
-  }
-
-  return "";
-};
-
 const getLabel = (
-  parameter: Parameter,
+  parameter: Parameter | StringParameter,
   lang: LocalizationLanguages = "fi"
 ): string => {
   if (parameter.name) {
     return localizedValue(parameter.name, lang);
   }
-  if (parameter.minimum || parameter.maximum) {
+  if ('minimum' in parameter || 'maximum' in parameter) {
     return `${parameter.minimum || ""} - ${parameter.maximum || ""}`;
   }
   return "no label";
@@ -170,10 +164,17 @@ export const getComboboxValues = (
   value: string,
   options: OptionType[]
 ): OptionType[] => {
-  if (!value || options.length < 1) return undefined;
-  return value.includes(",")
-    ? value.split(",").map((unit) => getSelectedOption(unit, options))
-    : [getSelectedOption(value, options)];
+  if (value.length === 0) {
+    return [];
+  }
+  if (value.includes(",")) {
+    return value.split(",").map((unit) => getSelectedOption(unit, options)).filter((x): x is OptionType => x != null)
+  }
+  const val = getSelectedOption(value, options)
+  if (val) {
+    return [val];
+  }
+  return [];
 };
 
 type SearchParams = Record<
@@ -282,7 +283,7 @@ export const applicationEventSchedulesToCells = (
   const firstSlotStart = 7;
   const lastSlotStart = 23;
 
-  const cells = [] as Cell[][];
+  const cells: Cell[][] = [];
 
   for (let j = 0; j < 7; j += 1) {
     const day = [];
@@ -306,9 +307,10 @@ export const applicationEventSchedulesToCells = (
       (Number(applicationEventSchedule.end.substring(0, 2)) || 24) -
       firstSlotStart;
 
+    const priority = applicationEventSchedule.priority;
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day][h];
-      cell.state = applicationEventSchedule.priority;
+      cell.state = priority ?? 100 ;
     }
   });
 
@@ -320,7 +322,7 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
 );
 
 export const getMainImage = (
-  ru: ReservationUnit | ReservationUnitType | ReservationUnitByPkType
+  ru?: ReservationUnit | ReservationUnitType | ReservationUnitByPkType
 ): Image | ReservationUnitImageType | null => {
   if (!ru || !ru.images || ru.images.length === 0) {
     return null;
@@ -354,9 +356,10 @@ export const getAddress = (ru: ReservationUnit): string | null => {
     return null;
   }
 
+  const lang = i18n?.language || "fi";
   return trim(
-    `${localizedValue(ru.location.addressStreet, i18n.language) || ""}, ${
-      localizedValue(ru.location.addressCity, i18n.language) || ""
+    `${localizedValue(ru.location.addressStreet, lang) || ""}, ${
+      localizedValue(ru.location.addressCity, lang) || ""
     }`,
     ", "
   );
@@ -425,10 +428,10 @@ export const formatDurationMinutes = (
 
   const p = [];
 
-  if (hour) {
+  if (hour && i18n?.t != null) {
     p.push(i18n.t(hourKey, { count: hour }).toLocaleLowerCase());
   }
-  if (min) {
+  if (min && i18n?.t != null) {
     p.push(i18n.t(minuteKey, { count: min }).toLocaleLowerCase());
   }
 
@@ -436,9 +439,11 @@ export const formatDurationMinutes = (
 };
 
 export const getReadableList = (list: string[]): string => {
-  if (!list || list.length === 0) return "";
+  if (list.length === 0) {
+    return "";
+  }
 
-  const andStr = i18n.t("common:and");
+  const andStr = i18n?.t("common:and") || "";
 
   if (list.length < 3) {
     return list.join(` ${andStr} `);
@@ -457,11 +462,11 @@ export const printErrorMessages = (error: ApolloError): string => {
   return errors
     .reduce((acc, cur) => {
       const code = cur?.extensions?.error_code
-        ? i18n.t(`errors:${cur?.extensions?.error_code}`)
+        ? i18n?.t(`errors:${cur?.extensions?.error_code}`)
         : "";
       const message =
         code === cur?.extensions?.error_code || !cur?.extensions?.error_code
-          ? i18n.t("errors:general_error")
+          ? i18n?.t("errors:general_error")
           : code || "";
       return message ? `${acc}${message}\n` : acc; /// contains non-breaking space
     }, "")

@@ -131,7 +131,7 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
           {currentImage ? (
             <LargeImage
               alt={t("common:imgAltForSpace")}
-              src={currentImage.largeUrl}
+              src={currentImage.largeUrl ?? undefined}
             />
           ) : null}
           <ModalImages>
@@ -145,7 +145,7 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
               >
                 <ThumbnailImage
                   alt={t("common:imgAltForSpace")}
-                  src={image.smallUrl}
+                  src={image.smallUrl ?? undefined}
                 />
               </ThumbnailButton>
             ))}

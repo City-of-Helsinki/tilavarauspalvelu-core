@@ -36,10 +36,10 @@ import {
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
-import { Inputs, Reservation } from "common/src/reservation-form/types";
+import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { Container } from "common";
+import { Container, PendingReservation } from "common";
 
 import { createApolloClient } from "../../modules/apolloClient";
 import {
@@ -78,7 +78,6 @@ import { PinkBox } from "../../components/reservation-unit/ReservationUnitStyles
 import { Toast } from "../../styles/util";
 
 type Props = {
-  fetchedReservation: Reservation;
   reservationUnit: ReservationUnitType;
   reservationPurposes: ReservationPurposeType[];
   ageGroups: AgeGroupType[];
@@ -92,10 +91,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const reservationUnitPk = Number(params?.params?.[0]);
   const path = params?.params?.[1];
   const apolloClient = createApolloClient(ctx);
-
-  let reservationPurposes = [];
-  let ageGroups = [];
-  let cities = [];
 
   if (isFinite(reservationUnitPk) && path === "reservation") {
     const { data: reservationUnitData } = await apolloClient.query<
@@ -119,57 +114,51 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     });
     const genericTerms =
       genericTermsData.termsOfUse?.edges
-        ?.map((n) => n.node)
-        .find((n) => ["generic1"].includes(n.pk)) || {};
+        ?.map((n) => n?.node)
+        // TODO why does this comparison work? or does it? pk should be a number
+        .find((n) => n?.pk === "generic1") || {};
 
-    if (reservationUnitData?.reservationUnitByPk) {
-      if (reservationUnitData.reservationUnitByPk?.metadataSet) {
-        const { data: reservationPurposesData } = await apolloClient.query<
-          Query,
-          QueryReservationPurposesArgs
-        >({
-          query: RESERVATION_PURPOSES,
-          fetchPolicy: "no-cache",
-        });
-        reservationPurposes =
-          reservationPurposesData.reservationPurposes.edges?.map(
-            (edge) => edge.node
-          );
+    const { data: reservationPurposesData } = await apolloClient.query<
+      Query,
+      QueryReservationPurposesArgs
+    >({
+      query: RESERVATION_PURPOSES,
+      fetchPolicy: "no-cache",
+    });
 
-        const { data: ageGroupsData } = await apolloClient.query<
-          Query,
-          QueryAgeGroupsArgs
-        >({
-          query: AGE_GROUPS,
-          fetchPolicy: "no-cache",
-        });
-        ageGroups = ageGroupsData.ageGroups.edges?.map((edge) => edge.node);
+    const reservationPurposes =
+      reservationPurposesData.reservationPurposes?.edges?.map(
+        (edge) => edge?.node
+      ) || [];
 
-        const { data: citiesData } = await apolloClient.query<
-          Query,
-          QueryCitiesArgs
-        >({
-          query: GET_CITIES,
-          fetchPolicy: "no-cache",
-        });
-        cities = citiesData.cities.edges?.map((edge) => edge.node);
-      }
+    const { data: ageGroupsData } = await apolloClient.query<
+      Query,
+      QueryAgeGroupsArgs
+    >({
+      query: AGE_GROUPS,
+      fetchPolicy: "no-cache",
+    });
+    const ageGroups = ageGroupsData.ageGroups?.edges?.map((edge) => edge?.node);
 
-      return {
-        props: {
-          key: `${reservationUnitPk}${locale}`,
-          reservationUnit: reservationUnitData.reservationUnitByPk,
-          reservationPurposes,
-          ageGroups,
-          cities,
-          termsOfUse: { genericTerms },
-          ...(await serverSideTranslations(locale)),
-        },
-      };
-    }
+    const { data: citiesData } = await apolloClient.query<
+      Query,
+      QueryCitiesArgs
+    >({
+      query: GET_CITIES,
+      fetchPolicy: "no-cache",
+    });
+    const cities = citiesData.cities?.edges?.map((edge) => edge?.node);
 
     return {
-      notFound: true,
+      props: {
+        key: `${reservationUnitPk}${locale}`,
+        reservationUnit: reservationUnitData.reservationUnitByPk,
+        reservationPurposes,
+        ageGroups,
+        cities,
+        termsOfUse: { genericTerms },
+        ...(await serverSideTranslations(locale ?? "fi")),
+      },
     };
   }
 
@@ -232,14 +221,12 @@ const ReservationUnitReservationWithReservationProp = ({
   ageGroups,
   cities,
   termsOfUse,
-}: Props): JSX.Element => {
+}: Props & { fetchedReservation: ReservationType }): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [reservationData, setPendingReservation] = useSessionStorage(
-    "pendingReservation",
-    null
-  );
+  const [reservationData, setPendingReservation] =
+    useSessionStorage<PendingReservation | null>("pendingReservation", null);
 
   const [storedReservation, , removeStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
@@ -248,7 +235,7 @@ const ReservationUnitReservationWithReservationProp = ({
     "pending"
   );
   const [step, setStep] = useState(0);
-  const [reservation, setReservation] = useState<Reservation | null>(
+  const [reservation, setReservation] = useState<ReservationType | null>(
     fetchedReservation
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -266,13 +253,15 @@ const ReservationUnitReservationWithReservationProp = ({
   const steps: ReservationStep[] = useMemo(() => {
     const price = getReservationUnitPrice({
       reservationUnit: reservationUnit as unknown as ReservationUnitByPkType,
-      pricingDate: new Date(reservation?.begin),
+      pricingDate: reservation?.begin
+        ? new Date(reservation?.begin)
+        : undefined,
       asInt: true,
     });
 
     const stepLength = price === "0" || requireHandling ? 2 : 5;
 
-    return Array.from(Array(stepLength)).map((n, i) => {
+    return Array.from(Array(stepLength)).map((_n, i) => {
       const state = i === step ? 0 : i < step ? 1 : 2;
 
       return {
@@ -313,15 +302,20 @@ const ReservationUnitReservationWithReservationProp = ({
       } else {
         const payload = {
           ...omit(data.updateReservation.reservation, "__typename"),
-          purpose: data.updateReservation.reservation.purpose?.pk,
-          ageGroup: data.updateReservation.reservation.ageGroup?.pk,
-          homeCity: data.updateReservation.reservation.homeCity?.pk,
+          purpose: data.updateReservation.reservation?.purpose?.pk,
+          ageGroup: data.updateReservation.reservation?.ageGroup?.pk,
+          homeCity: data.updateReservation.reservation?.homeCity?.pk,
           showBillingAddress: watch("showBillingAddress"),
         };
+        if (reservation == null) {
+          return;
+        }
+        // @ts-expect-error: TODO: the types for reservation are wrong (old rest types)
         setReservation({
           ...reservation,
           ...payload,
-          calendarUrl: data.updateReservation?.reservation?.calendarUrl,
+          calendarUrl:
+            data.updateReservation?.reservation?.calendarUrl ?? undefined,
         });
         setStep(1);
         window.scrollTo(0, 0);
@@ -334,6 +328,9 @@ const ReservationUnitReservationWithReservationProp = ({
   });
 
   const reservationConfirmSuccess = () => {
+    if (reservation == null) {
+      return;
+    }
     setReservation({
       ...reservation,
       state: requireHandling
@@ -358,7 +355,7 @@ const ReservationUnitReservationWithReservationProp = ({
         reservationConfirmSuccess();
       } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
-        const checkoutUrl = getCheckoutUrl(order, i18n.language);
+        const checkoutUrl = getCheckoutUrl(order ?? undefined, i18n.language);
 
         if (checkoutUrl) {
           router.push(checkoutUrl);
@@ -385,7 +382,7 @@ const ReservationUnitReservationWithReservationProp = ({
     () => ({
       purpose: reservationPurposes.map((purpose) => ({
         label: getTranslation(purpose, "name"),
-        value: purpose.pk,
+        value: purpose.pk ?? 0,
       })),
       // the sortedAgeGroups array has "1 - 99" as the first element, so let's move it to the end for correct order
       ageGroup: [
@@ -393,11 +390,11 @@ const ReservationUnitReservationWithReservationProp = ({
         ...sortedAgeGroups.slice(0, 1),
       ].map((ageGroup) => ({
         label: `${ageGroup.minimum} - ${ageGroup.maximum ?? ""}`,
-        value: ageGroup.pk,
+        value: ageGroup.pk ?? 0,
       })),
       homeCity: cities.map((city) => ({
         label: getTranslation(city, "name"),
-        value: city.pk,
+        value: city.pk ?? 0,
       })),
     }),
     [reservationPurposes, cities, sortedAgeGroups]
@@ -413,79 +410,67 @@ const ReservationUnitReservationWithReservationProp = ({
     return t("reservationCalendar:heading.pendingReservation");
   }, [step, formStatus, t]);
 
-  const generalFields = useMemo(() => {
-    return getReservationApplicationFields({
-      supportedFields: reservationUnit.metadataSet?.supportedFields,
-      reserveeType: "common",
-      camelCaseOutput: true,
-    }).filter((n) => n !== "reserveeType");
-  }, [reservationUnit?.metadataSet?.supportedFields]);
+  // TODO all this is copy pasta from EditStep1
+  const supportedFields =
+    reservationUnit.metadataSet?.supportedFields?.filter(
+      (n): n is NonNullable<typeof n> => !!n
+    ) ?? [];
+  const generalFields = getReservationApplicationFields({
+    supportedFields,
+    reserveeType: "common",
+    camelCaseOutput: true,
+  }).filter((n) => n !== "reserveeType");
 
-  const reservationApplicationFields = useMemo(() => {
-    const type = reservationUnit.metadataSet?.supportedFields?.includes(
-      "reservee_type"
-    )
-      ? reserveeType
-      : ReservationsReservationReserveeTypeChoices.Individual;
+  const type = supportedFields.includes("reservee_type")
+    ? reserveeType
+    : ReservationsReservationReserveeTypeChoices.Individual;
+  const reservationApplicationFields = getReservationApplicationFields({
+    supportedFields,
+    reserveeType: type,
+    camelCaseOutput: true,
+  });
 
-    return getReservationApplicationFields({
-      supportedFields: reservationUnit.metadataSet?.supportedFields,
-      reserveeType: type,
-      camelCaseOutput: true,
-    });
-  }, [reservationUnit?.metadataSet?.supportedFields, reserveeType]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
+  const onSubmitStep0 = (payload: any): void => {
+    if (supportedFields.includes("reservee_type") && !reserveeType) {
+      return;
+    }
 
-  const onSubmitStep0 = useCallback(
-    (payload): void => {
-      if (
-        reservationUnit?.metadataSet?.supportedFields.includes(
-          "reservee_type"
-        ) &&
-        !reserveeType
-      ) {
-        return;
-      }
-
-      const normalizedPayload = Object.keys(payload).reduce((acc, key) => {
-        if (["showBillingAddress"].includes(key)) return acc;
-        acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value")
-          ? payload[key].value
-          : payload[key];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
+    const normalizedPayload = Object.keys(payload).reduce<any>((acc, key) => {
+      if (["showBillingAddress"].includes(key)) {
         return acc;
-      }, {});
+      }
+      acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value")
+        ? payload[key].value
+        : payload[key];
+      return acc;
+    }, {});
 
-      const input = getReservationApplicationMutationValues(
-        normalizedPayload,
-        reservationUnit.metadataSet?.supportedFields,
-        reservationUnit?.metadataSet?.supportedFields.includes("reservee_type")
-          ? reserveeType
-          : ReservationsReservationReserveeTypeChoices.Individual
-      );
+    const input = getReservationApplicationMutationValues(
+      normalizedPayload,
+      supportedFields,
+      supportedFields.includes("reservee_type")
+        ? reserveeType
+        : ReservationsReservationReserveeTypeChoices.Individual
+    );
 
-      updateReservation({
-        variables: {
-          input: {
-            pk: reservationPk,
-            ...input,
-            reserveeLanguage: i18n.language,
-          },
+    updateReservation({
+      variables: {
+        input: {
+          pk: reservationPk ?? 0,
+          ...input,
+          reserveeLanguage: i18n.language,
         },
-      });
-    },
-    [
-      i18n.language,
-      reservationPk,
-      reservationUnit.metadataSet?.supportedFields,
-      reserveeType,
-      updateReservation,
-    ]
-  );
+      },
+    });
+  };
 
   const onSubmitStep1 = () => {
     confirmReservation({
       variables: {
         input: {
-          pk: reservationPk,
+          pk: reservationPk ?? 0,
         },
       },
     });
@@ -495,7 +480,7 @@ const ReservationUnitReservationWithReservationProp = ({
     await deleteReservation({
       variables: {
         input: {
-          pk: reservationPk,
+          pk: reservationPk ?? 0,
         },
       },
     });
@@ -504,7 +489,10 @@ const ReservationUnitReservationWithReservationProp = ({
 
   useEffect(() => {
     router.beforePopState(({ as }) => {
-      if (as === reservationUnitPath(reservationUnit.pk)) {
+      if (
+        reservationUnit.pk != null &&
+        as === reservationUnitPath(reservationUnit.pk)
+      ) {
         cancelReservation();
       }
       return true;
@@ -537,38 +525,41 @@ const ReservationUnitReservationWithReservationProp = ({
     return null;
   }
 
+  const pendingReservation = reservation || reservationData;
   return (
     <StyledContainer>
       <Columns>
-        {formStatus === "sent" ? (
+        {formStatus === "sent" && reservation != null ? (
           <div>
             <ReservationInfoCard
-              reservation={reservation as unknown as ReservationType}
+              reservation={reservation}
               reservationUnit={reservationUnit}
               type="confirmed"
             />
           </div>
         ) : (
-          <div>
-            <ReservationInfoCard
-              reservation={reservation || reservationData}
-              reservationUnit={reservationUnit}
-              type="pending"
-              shouldDisplayReservationUnitPrice={
-                shouldDisplayReservationUnitPrice
-              }
-            />
-            {termsOfUseContent && (
-              <JustForDesktop>
-                <PinkBox>
-                  <Subheading>
-                    {t("reservations:reservationInfoBoxHeading")}
-                  </Subheading>
-                  <Sanitize html={termsOfUseContent} />
-                </PinkBox>
-              </JustForDesktop>
-            )}
-          </div>
+          pendingReservation != null && (
+            <div>
+              <ReservationInfoCard
+                reservation={pendingReservation}
+                reservationUnit={reservationUnit}
+                type="pending"
+                shouldDisplayReservationUnitPrice={
+                  shouldDisplayReservationUnitPrice
+                }
+              />
+              {termsOfUseContent && (
+                <JustForDesktop>
+                  <PinkBox>
+                    <Subheading>
+                      {t("reservations:reservationInfoBoxHeading")}
+                    </Subheading>
+                    <Sanitize html={termsOfUseContent} />
+                  </PinkBox>
+                </JustForDesktop>
+              )}
+            </div>
+          )
         )}
         <BodyContainer>
           {formStatus === "pending" && (
@@ -584,8 +575,10 @@ const ReservationUnitReservationWithReservationProp = ({
                       const target = e.currentTarget;
                       const s = target
                         .getAttribute("data-testid")
-                        .replace("hds-stepper-step-", "");
-                      setStep(parseInt(s, 10));
+                        ?.replace("hds-stepper-step-", "");
+                      if (s) {
+                        setStep(parseInt(s, 10));
+                      }
                     }}
                     steps={steps}
                   />
@@ -601,7 +594,7 @@ const ReservationUnitReservationWithReservationProp = ({
                   options={options}
                 />
               )}
-              {step === 1 && (
+              {step === 1 && reservation != null && (
                 <Step1
                   reservation={reservation}
                   reservationUnit={reservationUnit}
@@ -617,7 +610,7 @@ const ReservationUnitReservationWithReservationProp = ({
               )}
             </FormProvider>
           )}
-          {formStatus === "sent" && (
+          {formStatus === "sent" && reservation != null && (
             <ReservationConfirmation
               reservation={reservation}
               reservationUnit={reservationUnit}
@@ -644,8 +637,12 @@ const ReservationUnitReservationWithReservationProp = ({
   );
 };
 
-const ReservationUnitReservation = (props) => {
-  const [reservationData] = useSessionStorage("pendingReservation", null);
+// TODO this is wrong. Use getServerSideProps and export the Page component directly without this wrapper
+const ReservationUnitReservation = (props: Props) => {
+  const [reservationData] = useSessionStorage<PendingReservation | null>(
+    "pendingReservation",
+    null
+  );
 
   const { data, loading } = useQuery<Query, QueryReservationByPkArgs>(
     GET_RESERVATION,
@@ -659,20 +656,11 @@ const ReservationUnitReservation = (props) => {
   if (loading || !data?.reservationByPk?.pk) return null;
 
   const { reservationByPk } = data;
-  const { reservationUnit } = props;
 
-  const fetchedReservation: Reservation = {
-    ...reservationByPk,
-    pk: reservationByPk.pk,
-    purpose: reservationByPk.purpose?.pk,
-    ageGroup: reservationByPk.ageGroup?.pk,
-    homeCity: reservationByPk.homeCity?.pk,
-    reservationUnitPks: [reservationUnit.pk],
-  };
   return (
     <ReservationUnitReservationWithReservationProp
       {...props}
-      fetchedReservation={fetchedReservation}
+      fetchedReservation={reservationByPk}
     />
   );
 };

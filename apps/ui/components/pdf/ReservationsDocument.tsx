@@ -48,7 +48,7 @@ const ReservationsDocument = ({
         const eventReservationUnits = eventReservations
           .flatMap((value) => value.reservationUnit)
           .reduce((prev, current) => {
-            if (!prev.find((v) => v.id === current.id)) {
+            if (current != null && !prev.find((v) => v.id === current.id)) {
               prev.push(current);
             }
             return prev;
@@ -56,7 +56,7 @@ const ReservationsDocument = ({
 
         return eventReservationUnits.map((resUnit) => {
           const reservationUnitReservations = eventReservations.filter((er) =>
-            er.reservationUnit.find((ru) => ru.id === resUnit.id)
+            er.reservationUnit?.find((ru) => ru.id === resUnit.id)
           );
 
           const hasCancelations = Boolean(

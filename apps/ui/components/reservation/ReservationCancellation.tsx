@@ -179,12 +179,14 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     {
       fetchPolicy: "cache-first",
       onCompleted: (data) => {
-        const { edges } = data.reservationCancelReasons ?? {};
-        if (edges)
+        const nodes = data.reservationCancelReasons?.edges
+          .map((edge) => edge?.node)
+          .filter((n): n is NonNullable<typeof n> => n !== null);
+        if (nodes)
           setReasons(
-            edges.map((edge) => ({
-              label: getTranslation(edge?.node, "reason"),
-              value: edge?.node?.pk !== null ? edge?.node?.pk : "",
+            nodes.map((node) => ({
+              label: getTranslation(node, "reason"),
+              value: node?.pk !== null ? node?.pk : "",
             }))
           );
       },
@@ -235,10 +237,9 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     return <Spinner />;
   }
 
-  const instructions = getTranslation(
-    reservationUnit,
-    "reservationCancelledInstructions"
-  );
+  const instructions = reservationUnit
+    ? getTranslation(reservationUnit, "reservationCancelledInstructions")
+    : undefined;
 
   const onSubmit = (formData: { reason?: number; description?: string }) => {
     const { reason, description } = formData;
@@ -286,17 +287,19 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
                       showLessLabel={t("reservations:hideCancellationTerms")}
                       maximumNumber={0}
                     >
-                      <NotificationBox
-                        heading={t("reservationUnit:cancellationTerms")}
-                        body={
-                          <Sanitize
-                            html={getTranslation(
-                              reservationUnit?.cancellationTerms,
-                              "text"
-                            )}
-                          />
-                        }
-                      />
+                      {reservationUnit?.cancellationTerms != null && (
+                        <NotificationBox
+                          heading={t("reservationUnit:cancellationTerms")}
+                          body={
+                            <Sanitize
+                              html={getTranslation(
+                                reservationUnit?.cancellationTerms,
+                                "text"
+                              )}
+                            />
+                          }
+                        />
+                      )}
                     </TermsContainer>
                     <Form onSubmit={handleSubmit(onSubmit)}>
                       <Controller

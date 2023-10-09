@@ -288,6 +288,7 @@ export type Reservation = {
 export type PendingReservation = {
   begin: string;
   end: string;
+  pk?: number;
   price?: string;
   reservationUnitPk?: number | null;
   bufferTimeBefore?: string;
@@ -347,7 +348,7 @@ export type AccordionState = {
 export type Cell = {
   hour: number;
   label: string;
-  state: ApplicationEventSchedulePriority | false;
+  state: ApplicationEventSchedulePriority | boolean;
   key: string;
 };
 
@@ -396,14 +397,6 @@ export type OpeningTimePeriod = {
 export type OpeningHours = {
   openingTimes?: OpeningTime[];
   openingTimePeriods?: OpeningTimePeriod[];
-};
-
-export type Promotion = {
-  id: number;
-  heading: TranslationObject;
-  body?: TranslationObject;
-  image: string;
-  link: string;
 };
 
 export interface HMS {

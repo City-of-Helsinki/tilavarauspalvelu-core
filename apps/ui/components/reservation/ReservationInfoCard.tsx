@@ -1,4 +1,8 @@
-import { getReservationPrice, formatters as getFormatters } from "common";
+import {
+  getReservationPrice,
+  formatters as getFormatters,
+  PendingReservation,
+} from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
 import { differenceInMinutes, parseISO } from "date-fns";
@@ -24,7 +28,7 @@ import { reservationUnitPath } from "../../modules/const";
 type Type = "pending" | "confirmed" | "complete";
 
 type Props = {
-  reservation: ReservationType;
+  reservation: ReservationType | PendingReservation;
   reservationUnit:
     | ReservationUnitType
     | ReservationUnitByPkType
@@ -87,7 +91,12 @@ const ReservationInfoCard = ({
 }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
 
-  const { begin, end, taxPercentageValue } = reservation || {};
+  const { begin, end } = reservation || {};
+  // NOTE can be removed after this has been refactored not to be used for PendingReservation
+  const taxPercentageValue =
+    "taxPercentageValue" in reservation
+      ? reservation.taxPercentageValue
+      : undefined;
 
   const beginDate = t("common:dateWithWeekday", {
     date: begin && parseISO(begin),
@@ -114,10 +123,12 @@ const ReservationInfoCard = ({
     " - "
   );
 
-  const mainImage = getMainImage(reservationUnit);
+  const mainImage =
+    reservationUnit != null ? getMainImage(reservationUnit) : null;
 
-  const price: string =
+  const price: string | undefined =
     begin &&
+    reservationUnit != null &&
     (reservation?.state === "REQUIRES_HANDLING" ||
       shouldDisplayReservationUnitPrice)
       ? getReservationUnitPrice({
@@ -134,7 +145,9 @@ const ReservationInfoCard = ({
         );
 
   const shouldDisplayTaxPercentage: boolean =
-    reservation?.state === "REQUIRES_HANDLING" && begin
+    reservationUnit != null &&
+    reservation?.state === "REQUIRES_HANDLING" &&
+    begin
       ? getReservationUnitPrice({
           reservationUnit,
           pricingDate: new Date(begin),
@@ -175,7 +188,11 @@ const ReservationInfoCard = ({
             </span>
           </Subheading>
         )}
-        <Subheading>{getTranslation(reservationUnit.unit, "name")}</Subheading>
+        <Subheading>
+          {reservationUnit.unit != null
+            ? getTranslation(reservationUnit.unit, "name")
+            : "-"}
+        </Subheading>
         <Value data-testid="reservation__reservation-info-card__duration">
           <Strong>
             {capitalize(timeString)}, {formatDurationMinutes(duration)}
@@ -186,9 +203,8 @@ const ReservationInfoCard = ({
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {
-              taxPercentage: formatters.strippedDecimal.format(
-                reservation.taxPercentageValue
-              ),
+              taxPercentage:
+                formatters.strippedDecimal.format(taxPercentageValue),
             })})`}
         </Value>
       </Content>

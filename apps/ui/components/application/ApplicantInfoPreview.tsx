@@ -48,7 +48,8 @@ const ApplicantInfoPreview = ({
               value={
                 application.homeCityId
                   ? cities.find(
-                      (city) => city.value === application.homeCityId.toString()
+                      (city) =>
+                        city.value === application.homeCityId?.toString()
                     )?.label
                   : ""
               }

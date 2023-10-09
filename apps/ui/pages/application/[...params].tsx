@@ -141,10 +141,10 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const transform = (app: ApplicationType): ApplicationType => {
     const appToSave = deepCopy(app);
     appToSave.applicationEvents.forEach((ae, i) => {
-      appToSave.applicationEvents[i].begin = uiDateToApiDate(
-        ae.begin as string
-      );
-      appToSave.applicationEvents[i].end = uiDateToApiDate(ae.end as string);
+      const begin = ae.begin != null ? uiDateToApiDate(ae.begin) : null;
+      const end = ae.end != null ? uiDateToApiDate(ae.end) : null;
+      appToSave.applicationEvents[i].begin = begin ?? null;
+      appToSave.applicationEvents[i].end = end ?? null;
     });
     return appToSave;
   };
@@ -207,9 +207,11 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     });
   };
 
-  const applicationRoundName =
-    getTranslation(applicationLoadingStatus.value?.applicationRound, "name") ||
-    "";
+  const appRound =
+    applicationLoadingStatus.value?.applicationRound ?? undefined;
+  const applicationRoundName = appRound
+    ? getTranslation(appRound, "name")
+    : "-";
 
   const ready = !applicationLoadingStatus.loading && state.loading === false;
 
@@ -298,10 +300,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         <ApplicationPage
           application={state.application}
           translationKeyPrefix="application:view"
-          headContent={getTranslation(
-            applicationLoadingStatus.value?.applicationRound,
-            "name"
-          )}
+          headContent={applicationRoundName}
           hideStepper
         >
           <View application={state.application} tos={tos} />

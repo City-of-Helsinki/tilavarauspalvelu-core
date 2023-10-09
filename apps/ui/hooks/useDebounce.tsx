@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 export const useDebounce = <T,>(value: T, delay: number): T => {
-  const [debouncedValue, setDebouncedValue] = useState(null);
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
   const firstDebounce = React.useRef(true);
 
   useEffect(() => {
@@ -15,7 +15,6 @@ export const useDebounce = <T,>(value: T, delay: number): T => {
       setDebouncedValue(value);
     }, delay);
 
-    // eslint-disable-next-line consistent-return
     return () => clearTimeout(handler);
   }, [value, delay]);
 

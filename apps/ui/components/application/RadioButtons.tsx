@@ -7,7 +7,7 @@ import { fontRegular } from "common/src/common/typography";
 
 type Props = {
   activeForm: FormType;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   setActiveForm: (id: FormType) => void;
 };
 

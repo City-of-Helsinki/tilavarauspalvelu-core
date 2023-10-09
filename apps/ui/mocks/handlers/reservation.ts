@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { graphql } from "msw";
 import { addHours, addDays } from "date-fns";
 import {
@@ -40,6 +41,10 @@ import {
   RefreshOrderMutationInput,
   ReservationsReservationPriorityChoices,
   ReservationsReservationTypeChoices,
+  ReservationUnitsReservationUnitAuthenticationChoices,
+  ReservationUnitsReservationUnitReservationKindChoices,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  ReservationUnitCancellationRuleType,
 } from "common/types/gql-types";
 import { toUIDate } from "common/src/common/util";
 
@@ -70,7 +75,7 @@ const createReservation = graphql.mutation<
     }
   };
 
-  const resUnitPk = req.variables?.input?.reservationUnitPks[0];
+  const resUnitPk = req.variables?.input?.reservationUnitPks[0] ?? 0;
 
   return res(
     ctx.data({
@@ -222,7 +227,7 @@ const deleteReservation = graphql.mutation<
 const adjustReservationTime = graphql.mutation<
   { adjustReservationTime: ReservationAdjustTimeMutationPayload },
   { input: ReservationAdjustTimeMutationInput }
->("adjustReservationTime", (req, res, ctx) => {
+>("adjustReservationTime", (_req, res, ctx) => {
   return res(
     ctx.data({
       adjustReservationTime: {
@@ -233,9 +238,9 @@ const adjustReservationTime = graphql.mutation<
   );
 });
 
-const reservationCancelReasons = graphql.query<Query, null>(
+const reservationCancelReasons = graphql.query<Query>(
   "getReservationCancelReasons",
-  (req, res, ctx) => {
+  (_req, res, ctx) => {
     return res(
       ctx.data({
         reservationCancelReasons: {
@@ -265,7 +270,7 @@ const reservationCancelReasons = graphql.query<Query, null>(
 
 const reservationPurposes = graphql.query<Query, QueryReservationPurposesArgs>(
   "ReservationPurposes",
-  (req, res, ctx) => {
+  (_req, res, ctx) => {
     return res(
       ctx.data({
         reservationPurposes: {
@@ -309,7 +314,7 @@ const reservationPurposes = graphql.query<Query, QueryReservationPurposesArgs>(
   }
 );
 
-const ageGroups = graphql.query<Query, null>("AgeGroups", (req, res, ctx) => {
+const ageGroups = graphql.query<Query>("AgeGroups", (_req, res, ctx) => {
   return res(
     ctx.data({
       ageGroups: {
@@ -350,7 +355,7 @@ const ageGroups = graphql.query<Query, null>("AgeGroups", (req, res, ctx) => {
 
 const cities = graphql.query<Query, QueryCitiesArgs>(
   "getCities",
-  (req, res, ctx) => {
+  (_req, res, ctx) => {
     return res(
       ctx.data({
         cities: {
@@ -533,6 +538,9 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
     };
 
     if (pk === 4 || pk === 44) {
+      if (data.reservationUnits?.[0] == null) {
+        throw new Error("Reservation unit is null");
+      }
       data.price = 0;
       data.begin = addDays(new Date(), 11).toISOString();
       data.end = addHours(addDays(new Date(), 11), 2).toISOString();
@@ -600,6 +608,9 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
     }
 
     if (pk === 11) {
+      if (data.reservationUnits?.[0] == null) {
+        throw new Error("Reservation unit is null");
+      }
       data.reserveeType = ReservationsReservationReserveeTypeChoices.Business;
       data.reserveeOrganisationName = "Acme Oyj";
       data.orderStatus = "PAID";
@@ -621,6 +632,9 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
     }
 
     if (pk === 20) {
+      if (data.reservationUnits?.[0] == null) {
+        throw new Error("Reservation unit is null");
+      }
       data.begin = addDays(new Date(), 1).toISOString();
       data.end = addHours(addDays(new Date(), 1), 2).toISOString();
       data.reservationUnits[0].cancellationRule = {
@@ -631,6 +645,9 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
     }
 
     if (pk === 21) {
+      if (data.reservationUnits?.[0] == null) {
+        throw new Error("Reservation unit is null");
+      }
       data.begin = addDays(new Date(), 10).toISOString();
       data.end = addHours(addDays(new Date(), 10), 2).toISOString();
       data.reservationUnits[0].cancellationRule = {
@@ -741,22 +758,37 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeAfter: 1800,
           reservationUnits: [
             {
+              id: "1",
+              uuid: "1",
               pk: 1,
+              contactInformation: "",
+              isDraft: false,
+              isArchived: false,
+              allowReservationsWithoutOpeningHours: false,
+              canApplyFreeOfCharge: false,
+              requireIntroduction: false,
+              requireReservationHandling: false,
+              authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
+              reservationKind: ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+              reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins,
               nameFi: "Studiohuone 1 + soittimet",
-              nameEn: null,
-              nameSv: null,
+              nameEn: undefined,
+              nameSv: undefined,
               termsOfUseFi:
                 "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+              // @ts-ignore
               unit: {
+                id: "1",
+                uuid: "1",
                 nameFi: "Helsingin keskustakirjasto Oodi",
-                nameEn: null,
-                nameSv: null,
-              },
+                nameEn: undefined,
+                nameSv: undefined,
+              } as UnitType,
               cancellationRule: {
                 canBeCancelledTimeBefore: 86400,
                 needsHandling: false,
-              },
-              location: null,
+              } as ReservationUnitCancellationRuleType,
+              location: undefined,
               images: [],
             } as ReservationUnitType,
           ],
@@ -774,6 +806,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 9,
               nameFi: "Toimistohuone 1",
@@ -857,6 +890,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -892,6 +926,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeAfter: 1800,
           orderUuid: "7777-7777-7777-7777",
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 4,
               nameFi: "Studiohuone 4 + soittimet",
@@ -926,6 +961,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -960,6 +996,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -994,6 +1031,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1028,6 +1066,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1062,6 +1101,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1096,6 +1136,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 3,
               nameFi: "Mika Waltarin sali, kolmasosa",
@@ -1127,6 +1168,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 11,
               nameFi: "Studiohuone 111 + soittimet",
@@ -1159,6 +1201,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeAfter: 1800,
           orderStatus: "DRAFT",
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 11,
               nameFi: "Studiohuone 11 + soittimet",
@@ -1226,6 +1269,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1260,6 +1304,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1294,6 +1339,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1328,6 +1374,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1362,6 +1409,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1396,6 +1444,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1430,6 +1479,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1464,6 +1514,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeBefore: 3600,
           bufferTimeAfter: 1800,
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 1,
               nameFi: "Studiohuone 1 + soittimet",
@@ -1499,6 +1550,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeAfter: 1800,
           orderStatus: "PAID_MANUALLY",
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 3,
               nameFi: "Studiohuone 3 + soittimet",
@@ -1534,6 +1586,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeAfter: 1800,
           orderStatus: "PAID_MANUALLY",
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 3,
               nameFi: "Studiohuone 42 + soittimet",
@@ -1569,6 +1622,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
           bufferTimeAfter: 1800,
           orderStatus: "PAID_MANUALLY",
           reservationUnits: [
+            // @ts-ignore
             {
               pk: 3,
               nameFi: "Studiohuone 43 + soittimet",
@@ -1595,7 +1649,7 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
 
     const edges = reservationData.filter((reservationEdge) =>
       req.variables?.state
-        ? req.variables.state.includes(reservationEdge.node.state)
+        ? req.variables.state.find((s) => s != null && s === reservationEdge.node?.state?.toString())
         : reservationEdge
     );
 

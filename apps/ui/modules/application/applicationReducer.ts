@@ -87,7 +87,7 @@ const reducer = (state: EditorState, action: Action): EditorState => {
       }
 
       nextState.accordionStates =
-        action.application?.applicationEvents.map((ae, i, arr) => ({
+        action.application?.applicationEvents.map((ae, _i, arr) => ({
           applicationEventId: ae.id as number,
           open: arr.length === 1, // auto open if only 1 event
         })) || ([] as AccordionState[]);
@@ -95,8 +95,11 @@ const reducer = (state: EditorState, action: Action): EditorState => {
       return nextState;
     }
     case "save": {
+      if (!action.application) {
+        return state;
+      }
       const editedApplication = deepCopy(action.application);
-      editedApplication.applicationEvents.sort((ae1, ae2) => ae1.id - ae2.id);
+      editedApplication?.applicationEvents.sort((ae1, ae2) => (ae1.id ?? 0) - (ae2.id ?? 0));
 
       const nextState = {
         ...state,

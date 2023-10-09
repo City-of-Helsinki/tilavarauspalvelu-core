@@ -71,11 +71,14 @@ export const getReservationVolume = (
 };
 
 export const getReservationPrice = (
-  price: number,
+  price: number | undefined,
   defaultText: string,
   language = "fi",
   trailingZeros = false
 ): string => {
+  if (price === undefined || price === 0) {
+    return defaultText;
+  }
   const formatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  return price ? formatters(language)[formatter].format(price) : defaultText;
+  return formatters(language)[formatter].format(price);
 };

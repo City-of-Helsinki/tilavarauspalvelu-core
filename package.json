@@ -17,8 +17,8 @@
     "lint:fix": "turbo lint -- --fix",
     "lint:css": "turbo lint:css",
     "test": "turbo test",
-    "tsc": "turbo tsc",
-    "generate-certificate": "mkdir -p certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
+    "tsc:check": "turbo tsc:check",
+    "tsc:clean": "turbo tsc:clean"
   },
   "devDependencies": {
     "npkill": "^0.10.0",

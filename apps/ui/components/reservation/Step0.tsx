@@ -130,7 +130,11 @@ const Step0 = ({
       <InfoDialog
         id="pricing-terms"
         heading={t("reservationUnit:pricingTerms")}
-        text={getTranslation(reservationUnit.pricingTerms, "text")}
+        text={
+          reservationUnit.pricingTerms
+            ? getTranslation(reservationUnit.pricingTerms, "text")
+            : ""
+        }
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
@@ -166,7 +170,7 @@ const Step0 = ({
                       const element =
                         document.getElementById(key) ||
                         document.getElementById(`${key}-label`);
-                      const top = element.getBoundingClientRect()?.y || 0;
+                      const top = element?.getBoundingClientRect()?.y || 0;
                       window.scroll({
                         top: window.scrollY + top - 28,
                         left: 0,

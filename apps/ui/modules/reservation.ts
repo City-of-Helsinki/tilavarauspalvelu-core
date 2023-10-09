@@ -3,7 +3,6 @@ import camelCase from "lodash/camelCase";
 import { secondsToHms } from "common/src/common/util";
 import {
   ApplicationRound,
-  Language,
   OptionType,
   PendingReservation,
 } from "common/types/common";
@@ -29,8 +28,8 @@ import { getReservationApplicationFields } from "common/src/reservation-form/uti
 import { getTranslation } from "./util";
 
 export const getDurationOptions = (
-  minReservationDuration: number,
-  maxReservationDuration: number,
+  minReservationDuration: number | undefined,
+  maxReservationDuration: number | undefined,
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): OptionType[] => {
   const durationStep = getIntervalMinutes(reservationStartInterval) * 60;
@@ -65,7 +64,9 @@ export const getDurationOptions = (
 export const isReservationInThePast = (
   reservation: ReservationType
 ): boolean => {
-  if (!reservation?.begin) return null;
+  if (!reservation?.begin) {
+    return false;
+  }
 
   const now = new Date().setSeconds(0, 0);
   return !isAfter(new Date(reservation.begin).setSeconds(0, 0), now);
@@ -106,7 +107,7 @@ export const getReservationApplicationMutationValues = (
   supportedFields: string[],
   reserveeType: ReservationsReservationReserveeTypeChoices
 ): Record<string, string | number | boolean> => {
-  const result = { reserveeType };
+  const result: typeof payload = { reserveeType };
   const intValues = ["numPersons"];
   const changes = [
     { field: "homeCity", mutationField: "homeCityPk" },
@@ -125,7 +126,7 @@ export const getReservationApplicationMutationValues = (
 
   [...fields, ...commonFields].forEach((field: string) => {
     const key = changes.find((c) => c.field === field)?.mutationField || field;
-    result[key as string] = intValues.includes(field)
+    result[key] = intValues.includes(field)
       ? Number(payload[field])
       : payload[field];
   });
@@ -171,13 +172,15 @@ export const getReservationCancellationReason = (
 export const getNormalizedReservationOrderStatus = (
   reservation: ReservationType
 ): string | null => {
-  if (!reservation) return null;
+  if (!reservation) {
+    return null;
+  }
 
   const shouldShowOrderStatus = (state: ReservationsReservationStateChoices) =>
     !["CREATED", "WAITING_FOR_PAYMENT", "REQUIRES_HANDLING"].includes(state);
 
   if (shouldShowOrderStatus(reservation.state)) {
-    return reservation.orderStatus || null;
+    return reservation.orderStatus ?? null;
   }
 
   return null;
@@ -190,13 +193,15 @@ export const isReservationReservable = ({
   end,
   skipLengthCheck = false,
 }: {
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit?: ReservationUnitByPkType;
   activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
   start: Date;
   end: Date;
   skipLengthCheck: boolean;
 }): boolean => {
-  if (!reservationUnit) return false;
+  if (!reservationUnit) {
+    return false;
+  }
 
   const normalizedEnd = addMinutes(end, -1);
 
@@ -213,40 +218,53 @@ export const isReservationReservable = ({
     reservationEnds,
   } = reservationUnit;
 
+  if ( !isValid(start) || !isValid(end)) {
+    return false;
+  }
+
+  const reservationsArr = reservations?.filter((r): r is NonNullable<typeof r> => r !== null) ?? []
   if (
-    !isValid(start) ||
-    !isValid(end) ||
     doBuffersCollide(
       {
         start,
         end,
         isBlocked: false,
-        bufferTimeBefore,
-        bufferTimeAfter,
+        bufferTimeBefore: bufferTimeBefore ?? 0,
+        bufferTimeAfter: bufferTimeAfter ?? 0,
       },
-      reservations
-    ) ||
+      reservationsArr,
+    )) {
+    return false;
+  }
+
+  const openingTimes = openingHours?.openingTimes?.filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  if (
     !isStartTimeWithinInterval(
       start,
-      openingHours?.openingTimes,
+      openingTimes,
       reservationStartInterval
-    ) ||
+    )) {
+    return false;
+  }
+  if (
     !isRangeReservable({
       range: [new Date(start), normalizedEnd],
-      openingHours: openingHours.openingTimes,
+      openingHours: openingTimes,
       reservationBegins: reservationBegins
         ? new Date(reservationBegins)
         : undefined,
       reservationEnds: reservationEnds ? new Date(reservationEnds) : undefined,
-      reservationsMinDaysBefore,
+      reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
       activeApplicationRounds,
       reservationStartInterval,
-    }) ||
+    })) {
+    return false;
+  }
+  if (
     (!skipLengthCheck &&
-      !isReservationLongEnough(start, end, minReservationDuration)) ||
-    !isReservationShortEnough(start, end, maxReservationDuration) ||
-    doReservationsCollide({ start, end }, reservations)
-    // || !isSlotWithinTimeframe(start, reservationsMinDaysBefore, start, end)
+      !isReservationLongEnough(start, end, minReservationDuration ?? 0)) ||
+    !isReservationShortEnough(start, end, maxReservationDuration ?? 0) ||
+    doReservationsCollide({ start, end }, reservationsArr)
   ) {
     return false;
   }
@@ -268,13 +286,14 @@ export type CanReservationBeChangedProps = {
   activeApplicationRounds?: ApplicationRoundType[];
 };
 
+// TODO disable undefined from reservation and reservationUnit
 export const canReservationTimeBeChanged = ({
   reservation,
   newReservation,
   reservationUnit,
   activeApplicationRounds = [],
 }: CanReservationBeChangedProps): [boolean, string?] => {
-  if (!reservation) {
+  if (reservation == null) {
     return [false];
   }
   // existing reservation state is not CONFIRMED
@@ -318,8 +337,8 @@ export const canReservationTimeBeChanged = ({
       !isReservationReservable({
         reservationUnit,
         activeApplicationRounds,
-        start: Boolean(newReservation.begin) && new Date(newReservation.begin),
-        end: Boolean(newReservation.end) && new Date(newReservation.end),
+        start: new Date(newReservation.begin),
+        end: new Date(newReservation.end),
         skipLengthCheck: false,
       })
     ) {
@@ -350,15 +369,30 @@ export const getReservationValue = (
       const { minimum, maximum } = reservation.ageGroup || {};
       return minimum && maximum ? `${minimum} - ${maximum}` : null;
     }
-    case "purpose":
-      return getTranslation(reservation.purpose, "name");
-    case "homeCity":
+    case "purpose": {
+      if (reservation.purpose != null) {
+        return getTranslation(reservation.purpose, "name");
+      }
+      return null
+    }
+    case "homeCity": {
+      if (reservation.homeCity == null) {
+        return null;
+      }
       return (
         getTranslation(reservation.homeCity, "name") ||
-        reservation.homeCity?.name || null
+        reservation.homeCity.name
       );
-    default:
-      return reservation[key] ?? null;
+    }
+    default: {
+      if (key in reservation) {
+        const val = reservation[key as keyof ReservationType];
+        if (typeof val === "string" || typeof val === "number") {
+          return val;
+          }
+      }
+      return null;
+    }
   }
 };
 

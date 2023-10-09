@@ -40,11 +40,11 @@ type Props = {
   setInitialReservation: React.Dispatch<
     React.SetStateAction<PendingReservation | null>
   >;
-  quickReservationSlot: QuickReservationSlotProps;
+  quickReservationSlot: QuickReservationSlotProps | null;
   setQuickReservationSlot: React.Dispatch<
-    React.SetStateAction<QuickReservationSlotProps>
+    React.SetStateAction<QuickReservationSlotProps | null>
   >;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitByPkType | null;
   scrollPosition: number;
   isSlotReservable: (arg1: Date, arg2: Date, arg3?: boolean) => boolean;
   setErrorMsg: (arg: string) => void;
@@ -173,7 +173,7 @@ const SlotButton = styled.button`
   user-select: none;
 `;
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled(Select<OptionType>)`
   li[role="option"] {
     white-space: nowrap;
   }
@@ -227,7 +227,7 @@ const QuickReservation = ({
   setInitialReservation,
   quickReservationSlot,
   setQuickReservationSlot,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
 
   const {
@@ -236,15 +236,24 @@ const QuickReservation = ({
     reservationStartInterval,
   } = reservationUnit || {};
 
-  const durationOptions = useMemo(
-    () =>
-      getDurationOptions(
-        minReservationDuration,
-        maxReservationDuration,
-        reservationStartInterval
-      ),
-    [minReservationDuration, maxReservationDuration, reservationStartInterval]
-  );
+  const durationOptions = useMemo(() => {
+    if (
+      minReservationDuration == null ||
+      maxReservationDuration == null ||
+      reservationStartInterval == null
+    ) {
+      return [];
+    }
+    return getDurationOptions(
+      minReservationDuration ?? undefined,
+      maxReservationDuration ?? undefined,
+      reservationStartInterval
+    );
+  }, [
+    minReservationDuration,
+    maxReservationDuration,
+    reservationStartInterval,
+  ]);
 
   const nextHour: Date = useMemo(() => {
     const now = new Date();
@@ -256,7 +265,7 @@ const QuickReservation = ({
   }, []);
 
   const [localReservation, setLocalReservation] =
-    useState<ReservationProps>(null);
+    useState<ReservationProps | null>(null);
   const [date, setDate] = useState(() => {
     const result = new Date();
     result.setHours(0, 0, 0, 0);
@@ -265,7 +274,7 @@ const QuickReservation = ({
   const [time, setTime] = useState<string>(
     formatDate(nextHour.toISOString(), "HH:mm")
   );
-  const [duration, setDuration] = useState<OptionType>(
+  const [duration, setDuration] = useState<OptionType | undefined>(
     durationOptions.find((n) => n.value === "1:00") || durationOptions[0]
   );
   const [slot, setSlot] = useState<string | null>(null);
@@ -274,7 +283,15 @@ const QuickReservation = ({
   const getPrice = useCallback(
     (asInt = false) => {
       const [hours, minutes] =
-        duration?.value.toString().split(":").map(Number) || [];
+        duration?.value?.toString().split(":").map(Number) || [];
+      if (
+        reservationUnit == null ||
+        date == null ||
+        hours == null ||
+        minutes == null
+      ) {
+        return null;
+      }
       const length = hours * 60 + minutes;
       return getReservationUnitPrice({
         reservationUnit,
@@ -288,13 +305,13 @@ const QuickReservation = ({
   );
 
   const [storedReservation, setStoredReservation, removeStoredReservation] =
-    useLocalStorage<ReservationProps>("reservation");
+    useLocalStorage<ReservationProps | null>("reservation");
 
   useEffect(() => {
-    if (storedReservation) {
+    if (storedReservation?.begin && storedReservation?.end) {
       const { begin, end } = storedReservation;
       setLocalReservation(storedReservation);
-      const newDate = new Date(storedReservation.begin);
+      const newDate = new Date(begin);
       newDate.setHours(0, 0, 0, 0);
       setDate(newDate);
       setTime(formatDate(storedReservation.begin, "HH:mm"));
@@ -331,7 +348,7 @@ const QuickReservation = ({
         begin: begin.toISOString(),
         end: end.toISOString(),
         price: null,
-        reservationUnitPk: reservationUnit.pk,
+        reservationUnitPk: reservationUnit?.pk ?? null,
       };
       setLocalReservation(res);
       setQuickReservationSlot({ start: begin, end });
@@ -341,7 +358,7 @@ const QuickReservation = ({
       setQuickReservationSlot(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, duration, slot, reservationUnit.pk, setQuickReservationSlot]);
+  }, [date, duration, slot, reservationUnit?.pk, setQuickReservationSlot]);
 
   useEffect(() => {
     if (shouldUnselect) setSlot(null);
@@ -349,8 +366,11 @@ const QuickReservation = ({
 
   const availableTimes = useCallback(
     (day: Date, fromStartOfDay = false): string[] => {
+      if (reservationUnit == null) {
+        return [];
+      }
       const [durationHours, durationMinutes] =
-        duration?.value.toString().split(":").map(Number) || [];
+        duration?.value?.toString().split(":").map(Number) || [];
       const [timeHours, timeMinutesRaw] = fromStartOfDay
         ? [0, 0]
         : time.split(":").map(Number);
@@ -372,18 +392,24 @@ const QuickReservation = ({
             ? n
             : null;
         })
-        .filter((n) => !!n);
+        .filter((n): n is NonNullable<typeof n> => n != null);
     },
     [time, duration, reservationUnit, isSlotReservable]
   );
 
   const getNextAvailableTime = useCallback(
-    (after: Date): Date => {
-      let nextAvailableTime: Date;
+    (after: Date): Date | null => {
+      if (reservationUnit == null) {
+        return null;
+      }
       const openDays = getOpenDays(reservationUnit);
 
-      if (openDays?.length < 1) return null;
+      if (openDays?.length < 1) {
+        return null;
+      }
 
+      // TODO refactor
+      let nextAvailableTime: Date | null | undefined;
       for (let i = 0; nextAvailableTime === undefined; i++) {
         const day = addDays(after, i);
         day.setHours(0, 0, 0, 0);
@@ -419,15 +445,14 @@ const QuickReservation = ({
     [date, getNextAvailableTime]
   );
 
-  const lastOpeningDate = maxBy(
-    reservationUnit.openingHours?.openingTimes,
-    (n) => n.date
-  );
+  const lastOpeningDate =
+    maxBy(reservationUnit?.openingHours?.openingTimes, (n) => n?.date) ??
+    undefined;
 
   const dayTimes = useMemo(() => availableTimes(date), [availableTimes, date]);
 
   if (
-    !reservationUnit.openingHours ||
+    !reservationUnit?.openingHours ||
     !minReservationDuration ||
     !maxReservationDuration
   ) {
@@ -443,7 +468,7 @@ const QuickReservation = ({
           label={t("reservationCalendar:quickReservation.date")}
           initialMonth={new Date()}
           language={i18n.language as Language}
-          onChange={(val, valueAsDate) => {
+          onChange={(_val, valueAsDate) => {
             if (isValid(valueAsDate) && valueAsDate.getFullYear() > 1970) {
               setSlot(null);
               const times = availableTimes(valueAsDate, true);
@@ -491,7 +516,7 @@ const QuickReservation = ({
         {slot ? (
           <>
             {t("reservationUnit:price")}: <PriceValue>{getPrice()}</PriceValue>
-            {getPrice(true) !== "0" && subventionSuffix("quick-reservation")}
+            {getPrice(true) !== "0" && subventionSuffix?.("quick-reservation")}
           </>
         ) : null}
       </Price>
@@ -506,7 +531,7 @@ const QuickReservation = ({
               hideCenterControls
               wrapAround={false}
               buttonVariant="small"
-              key={`${date}-${time}-${duration.value}`}
+              key={`${date}-${time}-${duration?.value}`}
             >
               {timeChunks.map((chunk: string[], index: number) => (
                 <SlotGroup key={chunk[0]}>
@@ -584,8 +609,10 @@ const QuickReservation = ({
               <MediumButton
                 disabled={!slot || isReserving}
                 onClick={() => {
-                  setIsReserving(true);
-                  createReservation(localReservation);
+                  if (localReservation != null) {
+                    setIsReserving(true);
+                    createReservation(localReservation);
+                  }
                 }}
                 data-test="quick-reservation__button--submit"
               >

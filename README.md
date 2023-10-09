@@ -29,6 +29,19 @@ pnpm {command} --filter {package_name}
 pnpm {command} --filter {package_name}...
 ```
 
+You can disable cache (in most cases, ex. tsc uses it's own cache)
+``` sh
+# disable reads (this is usually what you want)
+pnpm lint --force
+# disable writes (usually if you are adding new commands)
+pnpm dev --no-cache
+```
+
+Install deps
+``` sh
+pnpm i
+```
+
 Start both frontends in dev mode
 ``` sh
 pnpm dev
@@ -48,7 +61,9 @@ pnpm lint:css
 
 Typecheck all packages
 ``` sh
-pnpm tsc
+pnpm tsc:check
+# if you need to remove caches
+pnpm tsc:clean
 ```
 
 Build all packages
@@ -60,6 +75,33 @@ Test all packages
 ```
 pnpm test
 ```
+
+### run commands inside individual projects
+
+Usually you only want to do this if you are testing something or you are writing a new master command.
+
+Example you need to use different options to the typescript compile.
+
+``` sh
+# go to app / package directory (not root) ex.
+cd apps/ui
+pnpm tsc ...
+```
+
+### adding a new command
+
+#### If you need to run the command inside a package
+
+- Add the command you want to all the individual packages `package.json` you want.
+Leave the packages you don't want untouched.
+- Add the master command to turbo.json
+- Add `turbo $cmd` to `/package.json`
+- Run the command `pnpm $cmd`
+
+#### if you need to run it on the root level
+
+- Add the `$cmd` directly to `/package.json`
+- Run the command `pnpm $cmd`
 
 ## Repo structure
 

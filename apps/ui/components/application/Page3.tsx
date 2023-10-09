@@ -2,11 +2,11 @@ import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useTranslation } from "next-i18next";
 import {
   Application,
   Application as ApplicationType,
   FormType,
-  OptionType,
 } from "common/types/common";
 import { Query } from "common/types/gql-types";
 import { CITIES } from "../../modules/queries/params";
@@ -35,34 +35,33 @@ const Wrapper = styled.div`
 `;
 
 const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
+  const { t } = useTranslation();
   const [activeForm, setActiveForm] = useState(
     (application.applicantType
       ? typeForm[application.applicantType]
       : undefined) as FormType
   );
 
-  const [homeCityOptions, setHomeCityOptions] = useState([] as OptionType[]);
-  const [state, setState] = useState<"loading" | "done" | "error">("loading");
-
-  useQuery<Query>(CITIES, {
-    onCompleted: (res) => {
-      const cities = res?.cities?.edges?.map(({ node }) => ({
+  const { data, error, loading } = useQuery<Query>(CITIES);
+  const cities =
+    data?.cities?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n != null)
+      .map((node) => ({
         id: String(node.pk),
         name: getTranslation(node, "name"),
-      }));
-      setHomeCityOptions(mapOptions(sortBy(cities, "id")));
-      setState("done");
-    },
-    onError: () => {
-      setState("error");
-    },
-  });
+      })) ?? [];
+  const homeCityOptions = mapOptions(sortBy(cities, "id"));
 
-  return state !== "loading" ? (
+  if (error) {
+    return <div>{t("common:errors.dataError")}</div>;
+  }
+  if (loading) {
+    return <CenterSpinner />;
+  }
+  return (
     <Wrapper>
-      <RadioButtons activeForm={activeForm} setActiveForm={setActiveForm}>
-        {null}
-      </RadioButtons>
+      <RadioButtons activeForm={activeForm} setActiveForm={setActiveForm} />
       {activeForm === "individual" ? (
         <IndividualForm application={application} onNext={onNext} />
       ) : null}
@@ -77,8 +76,6 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
         <CompanyForm application={application} onNext={onNext} />
       ) : null}
     </Wrapper>
-  ) : (
-    <CenterSpinner />
   );
 };
 

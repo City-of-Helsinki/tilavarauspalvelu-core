@@ -412,8 +412,8 @@ export const getSlotPropGetter =
   }: {
     openingHours: OpeningTimesType[];
     activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
-    reservationBegins: Date;
-    reservationEnds: Date;
+    reservationBegins?: Date;
+    reservationEnds?: Date;
     reservationsMinDaysBefore?: number;
     currentDate: Date;
     customValidation?: (arg: Date) => boolean;
@@ -555,8 +555,11 @@ export const getEventBuffers = (
 };
 
 export const isReservationUnitReservable = (
-  reservationUnit: ReservationUnitByPkType
+  reservationUnit?: ReservationUnitByPkType | null
 ): boolean => {
+  if (!reservationUnit) {
+    return false;
+  }
   const { reservationState, minReservationDuration, maxReservationDuration } =
     reservationUnit;
 

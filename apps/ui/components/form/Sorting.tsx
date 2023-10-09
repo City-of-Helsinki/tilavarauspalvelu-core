@@ -43,7 +43,7 @@ const OrderBtn = styled.button`
   }
 `;
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled(Select<OptionType>)`
   min-width: 230px;
 `;
 

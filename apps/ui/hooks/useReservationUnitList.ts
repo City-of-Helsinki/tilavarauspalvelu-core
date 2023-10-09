@@ -4,34 +4,29 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 
+type ReservationUnitUnion = ReservationUnitType | ReservationUnitByPkType
 export type ReservationUnitList = {
-  reservationUnits: ReservationUnitType[] | ReservationUnitByPkType[];
-  selectReservationUnit: (
-    reservationUnit: ReservationUnitType | ReservationUnitByPkType
-  ) => void;
-  containsReservationUnit: (
-    reservationUnit: ReservationUnitType | ReservationUnitByPkType
-  ) => boolean;
-  removeReservationUnit: (
-    reservationUnit: ReservationUnitType | ReservationUnitByPkType
-  ) => void;
+  reservationUnits: ReservationUnitUnion[];
+  selectReservationUnit: (ru: ReservationUnitUnion) => void;
+  containsReservationUnit: (ru: ReservationUnitUnion) => boolean;
+  removeReservationUnit: (ru: ReservationUnitUnion) => void;
   clearSelections: () => void;
 };
 
 const useReservationUnitsList = (): ReservationUnitList => {
-  const [reservationUnits, setReservationUnits] = useSessionStorage(
+  const [reservationUnits, setReservationUnits] = useSessionStorage<ReservationUnitUnion[]>(
     "reservationUnitList",
-    [] as ReservationUnitType[]
+    []
   );
 
-  const selectReservationUnit = (reservationUnit: ReservationUnitType) => {
+  const selectReservationUnit = (reservationUnit: ReservationUnitUnion) => {
     setReservationUnits([
-      ...(reservationUnits as ReservationUnitType[]),
+      ...(reservationUnits),
       reservationUnit,
     ]);
   };
 
-  const removeReservationUnit = (reservationUnit: ReservationUnitType) => {
+  const removeReservationUnit = (reservationUnit: ReservationUnitUnion) => {
     if (!reservationUnits) {
       return;
     }
@@ -45,7 +40,7 @@ const useReservationUnitsList = (): ReservationUnitList => {
   };
 
   const containsReservationUnit = (
-    reservationUnit: ReservationUnitType
+    reservationUnit: ReservationUnitUnion
   ): boolean =>
     reservationUnits
       ? reservationUnits.some((ru) => ru.pk === reservationUnit.pk)

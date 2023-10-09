@@ -1,6 +1,10 @@
 {
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
+    // NOTE because how we initialise mocks we have to do this.
+    // 96% browser support
+    // this is only necessary for cypress tests we could refactor it out.
+    "target": "es2017",
     "plugins": [{ "name": "next" }],
     "types": ["cypress", "cypress-axe"],
     "paths": {

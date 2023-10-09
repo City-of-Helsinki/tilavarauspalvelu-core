@@ -1,5 +1,5 @@
 import { IconGlyphEuro, IconGroup } from "hds-react";
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -160,17 +160,15 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
 
   const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
 
-  const unitName = getUnitName(reservationUnit.unit);
+  const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
-  const unitPrice = useMemo(() => {
-    const pricing = getActivePricing(reservationUnit);
-    return getPrice({ pricing });
-  }, [reservationUnit]);
+  const pricing = getActivePricing(reservationUnit);
+  const unitPrice = pricing != null ? getPrice({ pricing }) : undefined;
 
-  const reservationUnitTypeName = getTranslation(
-    reservationUnit.reservationUnitType,
-    "name"
-  );
+  const reservationUnitTypeName =
+    reservationUnit.reservationUnitType != null
+      ? getTranslation(reservationUnit.reservationUnitType, "name")
+      : undefined;
 
   return (
     <Container>

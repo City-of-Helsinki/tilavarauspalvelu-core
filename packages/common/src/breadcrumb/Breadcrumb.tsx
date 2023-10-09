@@ -4,7 +4,7 @@ import { IconAngleLeft, IconAngleRight } from "hds-react";
 
 export type RouteItem = {
   title: string;
-  slug: string;
+  slug?: string;
 };
 
 type Props = {

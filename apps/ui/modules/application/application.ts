@@ -26,12 +26,12 @@ export const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
   const selectedHours = getLongestChunks(selectorData);
   return applicationEvents
     .map((applicationEvent, index) => {
-      return selectedHours[index] <
-        convertHMSToSeconds(applicationEvent.minDuration) / 3600
-        ? index
-        : null;
+      const minDuration = applicationEvent.minDuration != null
+        ? convertHMSToSeconds(applicationEvent.minDuration)
+        : 0
+      return selectedHours[index] < (minDuration ?? 0) / 3600 ? index : null;
     })
-    .filter((n) => n !== null);
+    .filter((n): n is NonNullable<typeof n> => n !== null);
 };
 
 export const getListOfApplicationEventTitles = (

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { type FC } from "react";
 import { ApolloProvider } from "@apollo/client";
-import { appWithTranslation, UserConfig } from "next-i18next";
+import { appWithTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
 import { fi } from "date-fns/locale";
 import { format, isValid } from "date-fns";
@@ -42,15 +42,16 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   );
 };
 
+// NOTE functions are not serializable so we have to overload them here (instead of the js config)
+// NOTE infered type problem so casting to FC
 export default appWithTranslation(MyApp, {
-  ...(nextI18NextConfig as UserConfig),
+  ...nextI18NextConfig,
   interpolation: {
-    format: (value, fmt, lng) => {
-      const locales = { fi };
+    format: (value, fmt, _lng) => {
       if (value instanceof Date && isValid(value))
-        return format(value, fmt || "d.M.yyyy", { locale: locales[lng] });
+        return format(value, fmt || "d.M.yyyy", { locale: fi });
       return value;
     },
     escapeValue: false,
   },
-});
+}) as FC;

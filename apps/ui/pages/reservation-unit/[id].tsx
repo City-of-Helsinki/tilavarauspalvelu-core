@@ -55,7 +55,6 @@ import {
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitType,
-  ReservationUnitTypeEdge,
   TermsOfUseTermsOfUseTermsTypeChoices,
   TermsOfUseType,
 } from "common/types/gql-types";
@@ -168,10 +167,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     const previewPass = uuid === reservationUnitData.reservationUnitByPk?.uuid;
 
-    if (
-      !isReservationUnitPublished(reservationUnitData.reservationUnitByPk) &&
-      !previewPass
-    ) {
+    const reservationUnit =
+      reservationUnitData?.reservationUnitByPk ?? undefined;
+    if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return {
         notFound: true,
       };
@@ -196,9 +194,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     });
     const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
 
-    const lastOpeningPeriodEndDate: string =
+    const lastOpeningPeriodEndDate =
       reservationUnitData?.reservationUnitByPk?.openingHours?.openingTimePeriods
-        .map((period) => period.endDate)
+        ?.map((period) => period?.endDate)
         .sort()
         .reverse()[0] || toApiDate(addYears(new Date(), 1));
 
@@ -236,11 +234,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
       relatedReservationUnits =
         relatedReservationUnitsData?.reservationUnits?.edges
-          .map((n: ReservationUnitTypeEdge) => n.node)
+          ?.map((n) => n?.node)
+          .filter((n): n is ReservationUnitType => n != null)
           .filter(
-            (n: ReservationUnitType) =>
-              n.pk !== reservationUnitData.reservationUnitByPk.pk
-          ) || [];
+            (n) => n?.pk !== reservationUnitData.reservationUnitByPk?.pk
+          ) ?? [];
     }
 
     if (!reservationUnitData.reservationUnitByPk?.pk) {
@@ -255,15 +253,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     return {
       props: {
-        ...(await serverSideTranslations(locale)),
+        ...(await serverSideTranslations(locale ?? "fi")),
         key: `${id}-${locale}`,
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
           openingHours: {
             openingTimes: allowReservationsWithoutOpeningHours
               ? mockOpeningTimes
-              : additionalData.reservationUnitByPk?.openingHours?.openingTimes.filter(
-                  (n) => n.isReservable
+              : additionalData.reservationUnitByPk?.openingHours?.openingTimes?.filter(
+                  (n) => n?.isReservable
                 ) || [],
             openingTimePeriods: allowReservationsWithoutOpeningHours
               ? mockOpeningTimePeriods
@@ -284,7 +282,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
       paramsId: id,
     },
   };
@@ -310,8 +308,11 @@ const eventStyleGetter = (
   } as Record<string, string>;
   let className = "";
 
+  const eventPk = event != null && "pk" in event ? event.pk : Number(event?.id);
   const isOwn =
-    ownReservations?.includes((event as ReservationType).pk) &&
+    eventPk != null &&
+    !Number.isNaN(eventPk) &&
+    ownReservations?.includes(eventPk) &&
     (event?.state as ReservationStateWithInitial) !== "BUFFER";
 
   const state = isOwn ? "OWN" : (event?.state as ReservationStateWithInitial);
@@ -354,7 +355,8 @@ const EventWrapperComponent = ({
 }) => {
   let isSmall = false;
   let isMedium = false;
-  if ((event.event.state as string) === "INITIAL") {
+  // TODO don't override state enums with strings
+  if (event.event?.state?.toString() === "INITIAL") {
     const { start, end } = event;
     const diff = differenceInMinutes(end, start);
     if (diff <= 30) isSmall = true;
@@ -394,10 +396,8 @@ const ReservationUnit = ({
 
   const router = useRouter();
 
-  const [, setPendingReservation] = useSessionStorage(
-    "pendingReservation",
-    null
-  );
+  const [, setPendingReservation] =
+    useSessionStorage<PendingReservation | null>("pendingReservation", null);
 
   const now = useMemo(() => new Date().toISOString(), []);
 
@@ -415,23 +415,11 @@ const ReservationUnit = ({
   const [storedReservation, , removeStoredReservation] =
     useLocalStorage<PendingReservation>("reservation");
 
-  const calendarRef = useRef(null);
-  const openPricingTermsRef = useRef(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const openPricingTermsRef = useRef<HTMLAnchorElement>(null);
   const hash = router.asPath.split("#")[1];
 
   const isClientATouchDevice = isTouchDevice();
-
-  const subventionSuffix = useCallback(
-    (placement: "reservation-unit-head" | "quick-reservation") =>
-      reservationUnit.canApplyFreeOfCharge ? (
-        <SubventionSuffix
-          placement={placement}
-          ref={openPricingTermsRef}
-          setIsDialogOpen={setIsDialogOpen}
-        />
-      ) : null,
-    [reservationUnit.canApplyFreeOfCharge]
-  );
 
   useEffect(() => {
     const scrollToCalendar = () =>
@@ -444,7 +432,11 @@ const ReservationUnit = ({
         behavior: "smooth",
       });
 
-    if (storedReservation?.reservationUnitPk === reservationUnit.pk) {
+    if (
+      storedReservation?.reservationUnitPk === reservationUnit?.pk &&
+      storedReservation?.begin &&
+      storedReservation?.end
+    ) {
       setFocusDate(new Date(storedReservation.begin));
       scrollToCalendar();
       setInitialReservation(storedReservation);
@@ -462,11 +454,11 @@ const ReservationUnit = ({
     LIST_RESERVATIONS,
     {
       fetchPolicy: "no-cache",
-      skip: !currentUser,
+      skip: !currentUser || !reservationUnit?.pk,
       variables: {
         begin: now,
         user: currentUser?.pk?.toString(),
-        reservationUnit: [reservationUnit?.pk?.toString()],
+        reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
       },
     }
@@ -474,65 +466,78 @@ const ReservationUnit = ({
 
   useEffect(() => {
     const reservations = userReservationsData?.reservations?.edges
-      ?.map(({ node }) => node)
-      .filter((n) => allowedReservationStates.includes(n.state));
+      ?.map((e) => e?.node)
+      .filter((n): n is ReservationType => n != null)
+      .filter(
+        (n) => allowedReservationStates.find((s) => s === n.state) != null
+      );
     setUserReservations(reservations || []);
   }, [userReservationsData]);
 
-  // const activeOpeningTimes = getActiveOpeningTimes(
-  //   reservationUnit.openingHours?.openingTimePeriods
-  // );
-
-  const slotPropGetter = useMemo(
-    () =>
-      getSlotPropGetter({
-        openingHours: reservationUnit.openingHours?.openingTimes,
-        activeApplicationRounds,
-        reservationBegins: reservationUnit.reservationBegins
-          ? new Date(reservationUnit.reservationBegins)
-          : undefined,
-        reservationEnds: reservationUnit.reservationEnds
-          ? new Date(reservationUnit.reservationEnds)
-          : undefined,
-        reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore,
-        currentDate: focusDate,
-      }),
-    [
-      reservationUnit.openingHours?.openingTimes,
+  const slotPropGetter = useMemo(() => {
+    const openingHours =
+      reservationUnit?.openingHours?.openingTimes?.filter(
+        (x): x is NonNullable<typeof x> => x != null
+      ) ?? [];
+    return getSlotPropGetter({
+      openingHours,
       activeApplicationRounds,
-      reservationUnit.reservationBegins,
-      reservationUnit.reservationEnds,
-      reservationUnit.reservationsMinDaysBefore,
-      focusDate,
-    ]
-  );
+      reservationBegins: reservationUnit?.reservationBegins
+        ? new Date(reservationUnit.reservationBegins)
+        : undefined,
+      reservationEnds: reservationUnit?.reservationEnds
+        ? new Date(reservationUnit.reservationEnds)
+        : undefined,
+      reservationsMinDaysBefore:
+        reservationUnit?.reservationsMinDaysBefore ?? 0,
+      currentDate: focusDate,
+    });
+  }, [
+    reservationUnit?.openingHours?.openingTimes,
+    activeApplicationRounds,
+    reservationUnit?.reservationBegins,
+    reservationUnit?.reservationEnds,
+    reservationUnit?.reservationsMinDaysBefore,
+    focusDate,
+  ]);
 
   const isReservationQuotaReached = useMemo(() => {
     return (
-      reservationUnit.maxReservationsPerUser &&
-      userReservations?.length >= reservationUnit.maxReservationsPerUser
+      reservationUnit?.maxReservationsPerUser != null &&
+      userReservations?.length != null &&
+      userReservations?.length >= reservationUnit?.maxReservationsPerUser
     );
-  }, [reservationUnit.maxReservationsPerUser, userReservations]);
+  }, [reservationUnit?.maxReservationsPerUser, userReservations]);
 
   const isSlotReservable = useCallback(
     (start: Date, end: Date, skipLengthCheck = false): boolean => {
-      return isReservationReservable({
-        reservationUnit,
-        activeApplicationRounds,
-        start,
-        end,
-        skipLengthCheck,
-      });
+      return (
+        reservationUnit != null &&
+        isReservationReservable({
+          reservationUnit,
+          activeApplicationRounds,
+          start,
+          end,
+          skipLengthCheck,
+        })
+      );
     },
     [activeApplicationRounds, reservationUnit]
   );
 
   const shouldDisplayPricingTerms = useMemo(() => {
+    const pricings =
+      reservationUnit?.pricings?.filter(
+        (n): n is NonNullable<typeof n> => n != null
+      ) ?? undefined;
+    if (pricings == null) {
+      return false;
+    }
     return (
-      reservationUnit.canApplyFreeOfCharge &&
-      isReservationUnitPaidInFuture(reservationUnit.pricings)
+      reservationUnit?.canApplyFreeOfCharge &&
+      isReservationUnitPaidInFuture(pricings)
     );
-  }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
+  }, [reservationUnit?.canApplyFreeOfCharge, reservationUnit?.pricings]);
 
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
@@ -542,6 +547,9 @@ const ReservationUnit = ({
       { start, end }: CalendarEvent<Reservation | ReservationType>,
       skipLengthCheck = false
     ): boolean => {
+      if (!reservationUnit) {
+        return false;
+      }
       const newReservation = getNewReservation({ start, end, reservationUnit });
 
       if (
@@ -569,7 +577,8 @@ const ReservationUnit = ({
   );
 
   const handleSlotClick = useCallback(
-    ({ start, end, action }, skipLengthCheck = false): boolean => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
+    ({ start, end, action }: any, skipLengthCheck = false): boolean => {
       const isTouchClick = action === "select" && isClientATouchDevice;
 
       if (action === "select" && !isClientATouchDevice) {
@@ -585,10 +594,13 @@ const ReservationUnit = ({
         (isTouchClick && differenceInMinutes(end, start) <= 30)
           ? addSeconds(
               new Date(start),
-              reservationUnit.minReservationDuration || 0
+              reservationUnit?.minReservationDuration ?? 0
             )
           : new Date(end);
 
+      if (!reservationUnit) {
+        return false;
+      }
       const newReservation = getNewReservation({
         start,
         end: normalizedEnd,
@@ -615,7 +627,12 @@ const ReservationUnit = ({
     ]
   );
 
-  const TouchCellWrapper = ({ children, value, onSelectSlot }): JSX.Element => {
+  const TouchCellWrapper = ({
+    children,
+    value,
+    onSelectSlot,
+  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
+  any): JSX.Element => {
     return React.cloneElement(Children.only(children), {
       onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
       style: {
@@ -651,50 +668,55 @@ const ReservationUnit = ({
   const calendarEvents: CalendarEvent<Reservation | ReservationType>[] =
     useMemo(() => {
       const diff =
-        initialReservation &&
-        differenceInMinutes(
-          new Date(initialReservation.end),
-          new Date(initialReservation.begin)
-        );
+        initialReservation != null
+          ? differenceInMinutes(
+              new Date(initialReservation.end),
+              new Date(initialReservation.begin)
+            )
+          : 0;
       const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
 
-      return userReservations && reservationUnit?.reservations
-        ? [
-            ...reservationUnit.reservations,
-            {
-              ...initialReservation,
-              state: "INITIAL",
-            },
-          ]
-            .filter((n: ReservationType) => n)
-            .map((n: ReservationType | PendingReservation) => {
-              const suffix = n.state === "INITIAL" ? duration : "";
-              const event = {
-                title: `${
-                  n.state === "CANCELLED"
-                    ? `${t("reservationCalendar:prefixForCancelled")}: `
-                    : suffix
-                }`,
-                start: parseDate(n.begin),
-                end: parseDate(n.end),
-                allDay: false,
-                event: n,
-              };
+      if (userReservations && reservationUnit?.reservations) {
+        return [
+          ...reservationUnit.reservations,
+          {
+            ...initialReservation,
+            state: "INITIAL",
+          },
+        ]
+          .filter((n): n is NonNullable<typeof n> => n != null)
+          .map((n) => {
+            const suffix = n.state === "INITIAL" ? duration : "";
+            const event: CalendarEvent<ReservationType> = {
+              title: `${
+                n.state === "CANCELLED"
+                  ? `${t("reservationCalendar:prefixForCancelled")}: `
+                  : suffix
+              }`,
+              start: n.begin != null ? parseDate(n.begin) : new Date(),
+              end: n.end != null ? parseDate(n.end) : new Date(),
+              allDay: false,
+              // TODO refactor and remove modifying the state
+              event: n as ReservationType,
+            };
 
-              return event as CalendarEvent<Reservation>;
-            })
-        : [];
+            return event;
+          });
+      }
+      return [];
     }, [reservationUnit, t, initialReservation, userReservations]);
 
   const eventBuffers = useMemo(() => {
     return getEventBuffers([
-      ...calendarEvents.flatMap((e) => e.event),
+      ...calendarEvents
+        .flatMap((e) => e.event)
+        .filter((n): n is NonNullable<typeof n> => n != null),
       {
         begin: initialReservation?.begin,
         end: initialReservation?.end,
         state: "INITIAL",
-        bufferTimeBefore: reservationUnit.bufferTimeBefore?.toString(),
-        bufferTimeAfter: reservationUnit.bufferTimeAfter?.toString(),
+        bufferTimeBefore: reservationUnit?.bufferTimeBefore?.toString(),
+        bufferTimeAfter: reservationUnit?.bufferTimeAfter?.toString(),
       } as PendingReservation,
     ]);
   }, [calendarEvents, initialReservation, reservationUnit]);
@@ -704,12 +726,21 @@ const ReservationUnit = ({
     { input: ReservationCreateMutationInput }
   >(CREATE_RESERVATION, {
     onCompleted: (data) => {
+      if (
+        initialReservation == null ||
+        data.createReservation == null ||
+        data.createReservation.pk == null
+      ) {
+        return;
+      }
       setPendingReservation({
         ...initialReservation,
         pk: data.createReservation.pk,
-        price: data.createReservation.price,
+        price: data.createReservation.price?.toString() ?? undefined,
       });
-      router.push(`/reservation-unit/${reservationUnit.pk}/reservation`);
+      if (reservationUnit?.pk != null) {
+        router.push(`/reservation-unit/${reservationUnit?.pk}/reservation`);
+      }
     },
     onError: (error) => {
       const msg = printErrorMessages(error);
@@ -722,6 +753,9 @@ const ReservationUnit = ({
       setErrorMsg(null);
       setIsReserving(true);
       const { begin, end } = res;
+      if (reservationUnit?.pk == null || begin == null || end == null) {
+        return;
+      }
       const input: ReservationCreateMutationInput = {
         begin,
         end,
@@ -739,65 +773,37 @@ const ReservationUnit = ({
         },
       });
     },
-    [addReservation, reservationUnit.pk, setInitialReservation]
+    [addReservation, reservationUnit?.pk, setInitialReservation]
   );
 
   const isReservable = isReservationUnitReservable(reservationUnit);
 
-  const termsOfUseContent = useMemo(
-    () => getTranslation(reservationUnit, "termsOfUse"),
-    [reservationUnit]
-  );
-
-  const paymentTermsContent = useMemo(
-    () => getTranslation(reservationUnit.paymentTerms, "text"),
-    [reservationUnit]
-  );
-
-  const cancellationTermsContent = useMemo(
-    () => getTranslation(reservationUnit.cancellationTerms, "text"),
-    [reservationUnit]
-  );
-
-  const pricingTermsContent = useMemo(
-    () => getTranslation(reservationUnit.pricingTerms, "text"),
-    [reservationUnit]
-  );
-
-  const serviceSpecificTermsContent = useMemo(
-    () => getTranslation(reservationUnit.serviceSpecificTerms, "text"),
-    [reservationUnit]
-  );
+  const termsOfUseContent = reservationUnit
+    ? getTranslation(reservationUnit, "termsOfUse")
+    : undefined;
+  const paymentTermsContent = reservationUnit?.paymentTerms
+    ? getTranslation(reservationUnit.paymentTerms, "text")
+    : undefined;
+  const cancellationTermsContent = reservationUnit?.cancellationTerms
+    ? getTranslation(reservationUnit.cancellationTerms, "text")
+    : undefined;
+  const pricingTermsContent = reservationUnit?.pricingTerms
+    ? getTranslation(reservationUnit.pricingTerms, "text")
+    : undefined;
+  const serviceSpecificTermsContent = reservationUnit?.serviceSpecificTerms
+    ? getTranslation(reservationUnit.serviceSpecificTerms, "text")
+    : undefined;
 
   const [quickReservationSlot, setQuickReservationSlot] =
-    useState<QuickReservationSlotProps>(null);
+    useState<QuickReservationSlotProps | null>(null);
 
-  const quickReservationProps = {
-    isSlotReservable,
-    isReservationUnitReservable: !isReservationQuotaReached,
-    createReservation: (res) => createReservation(res),
-    scrollPosition: calendarRef?.current?.offsetTop
-      ? calendarRef.current.offsetTop - 20
-      : undefined,
-    reservationUnit,
-    calendarRef,
-    setErrorMsg,
-    subventionSuffix,
-    shouldUnselect,
-    quickReservationSlot,
-    setQuickReservationSlot,
-    setInitialReservation,
-  };
-
-  const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<
-    number | null
-  >(null);
+  const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<number>(0);
 
   const onScroll = () => {
-    const banner: HTMLElement = window.document.querySelector(
+    const banner: HTMLElement | null = window.document.querySelector(
       ".ch2 .ch2-dialog.ch2-visible"
     );
-    const height: number = banner?.offsetHeight;
+    const height: number = banner?.offsetHeight ?? 0;
     setCookiehubBannerHeight(height);
   };
 
@@ -846,27 +852,61 @@ const ReservationUnit = ({
     };
   }, []);
 
-  const futurePricing = useMemo(
-    () => getFuturePricing(reservationUnit, activeApplicationRounds),
-    [reservationUnit, activeApplicationRounds]
-  );
+  const futurePricing =
+    reservationUnit != null
+      ? getFuturePricing(reservationUnit, activeApplicationRounds)
+      : undefined;
 
-  const formatters = useMemo(
-    () => getFormatters(i18n.language),
-    [i18n.language]
-  );
+  const formatters = getFormatters(i18n.language);
 
   const currentDate = focusDate || new Date();
 
   const dayStartTime = addHours(startOfDay(currentDate), 6);
 
+  const equipment =
+    reservationUnit?.equipment?.filter(
+      (n): n is NonNullable<typeof n> => n != null
+    ) ?? [];
+
+  const quickReservationProps = {
+    isSlotReservable,
+    isReservationUnitReservable: !isReservationQuotaReached,
+    createReservation,
+    scrollPosition: calendarRef?.current?.offsetTop
+      ? calendarRef.current.offsetTop - 20
+      : 0,
+    reservationUnit,
+    calendarRef,
+    setErrorMsg,
+    subventionSuffix: reservationUnit?.canApplyFreeOfCharge
+      ? () => (
+          <SubventionSuffix
+            placement="quick-reservation"
+            ref={openPricingTermsRef}
+            setIsDialogOpen={setIsDialogOpen}
+          />
+        )
+      : undefined,
+    shouldUnselect,
+    quickReservationSlot,
+    setQuickReservationSlot,
+    setInitialReservation,
+  };
+
   return reservationUnit ? (
     <Wrapper>
       <Head
         reservationUnit={reservationUnit}
-        // activeOpeningTimes={activeOpeningTimes}
         isReservable={isReservable}
-        subventionSuffix={subventionSuffix}
+        subventionSuffix={
+          reservationUnit?.canApplyFreeOfCharge ? (
+            <SubventionSuffix
+              placement="reservation-unit-head"
+              ref={openPricingTermsRef}
+              setIsDialogOpen={setIsDialogOpen}
+            />
+          ) : undefined
+        }
       />
       <Container>
         <Columns>
@@ -894,11 +934,11 @@ const ReservationUnit = ({
             <Content data-testid="reservation-unit__description">
               <Sanitize html={getTranslation(reservationUnit, "description")} />
             </Content>
-            {reservationUnit.equipment?.length > 0 && (
+            {equipment?.length > 0 && (
               <>
                 <Subheading>{t("reservationUnit:equipment")}</Subheading>
                 <Content data-testid="reservation-unit__equipment">
-                  <EquipmentList equipment={reservationUnit.equipment} />
+                  <EquipmentList equipment={equipment} />
                 </Content>
               </>
             )}
@@ -910,7 +950,8 @@ const ReservationUnit = ({
                   })}
                 </Subheading>
                 {reservationUnit.maxReservationsPerUser &&
-                  userReservations?.length > 0 && (
+                  userReservations?.length != null &&
+                  userReservations.length > 0 && (
                     <StyledNotification
                       $isSticky={isReservationQuotaReached}
                       type={isReservationQuotaReached ? "alert" : "info"}
@@ -943,14 +984,18 @@ const ReservationUnit = ({
                     eventStyleGetter={(event) =>
                       eventStyleGetter(
                         event,
-                        userReservations?.map((n) => n.pk),
+                        userReservations
+                          ?.map((n) => n?.pk)
+                          .filter((n): n is number => n != null) ?? [],
                         !isReservationQuotaReached
                       )
                     }
                     slotPropGetter={slotPropGetter}
                     viewType={calendarViewType}
-                    onView={(n: WeekOptions) => {
-                      setCalendarViewType(n);
+                    onView={(n) => {
+                      if (n === "month" || n === "week" || n === "day") {
+                        setCalendarViewType(n);
+                      }
                     }}
                     onSelecting={(
                       event: CalendarEvent<Reservation | ReservationType>
@@ -960,6 +1005,7 @@ const ReservationUnit = ({
                     reservable={!isReservationQuotaReached}
                     toolbarComponent={Toolbar}
                     dateCellWrapperComponent={TouchCellWrapper}
+                    // @ts-expect-error: TODO: fix this
                     eventWrapperComponent={EventWrapperComponent}
                     resizable={!isReservationQuotaReached}
                     draggable={
@@ -968,15 +1014,11 @@ const ReservationUnit = ({
                     onEventDrop={handleCalendarEventChange}
                     onEventResize={handleCalendarEventChange}
                     onSelectSlot={handleSlotClick}
-                    draggableAccessor={({
-                      event,
-                    }: CalendarEvent<Reservation | ReservationType>) =>
-                      (event.state as ReservationStateWithInitial) === "INITIAL"
+                    draggableAccessor={({ event }) =>
+                      event?.state?.toString() === "INITIAL"
                     }
-                    resizableAccessor={({
-                      event,
-                    }: CalendarEvent<Reservation | ReservationType>) =>
-                      (event.state as ReservationStateWithInitial) === "INITIAL"
+                    resizableAccessor={({ event }) =>
+                      event?.state?.toString() === "INITIAL"
                     }
                     step={30}
                     timeslots={getTimeslots(
@@ -1095,7 +1137,7 @@ const ReservationUnit = ({
                       style={{ marginBottom: "var(--spacing-m)" }}
                     />
                   )}
-                  <Sanitize html={cancellationTermsContent} />
+                  <Sanitize html={cancellationTermsContent ?? ""} />
                 </PaddedContent>
               </Accordion>
             )}
@@ -1132,7 +1174,7 @@ const ReservationUnit = ({
         <InfoDialog
           id="pricing-terms"
           heading={t("reservationUnit:pricingTerms")}
-          text={getTranslation(reservationUnit.pricingTerms, "text")}
+          text={pricingTermsContent ?? ""}
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
         />

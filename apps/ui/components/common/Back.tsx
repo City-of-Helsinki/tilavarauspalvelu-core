@@ -30,12 +30,19 @@ type Props = {
 };
 
 const Back = ({ link, label = "common:prev", restore }: Props): JSX.Element => {
-  const [storedValues] = useLocalStorage(restore, null);
+  const [storedValues] = useLocalStorage(restore ?? "", null);
 
   const { t } = useTranslation();
   const { back, push } = useRouter();
-  const linkWithArgs =
-    restore && `${link}?${queryString.stringify(storedValues)}`;
+
+  const handleClick = () => {
+    if (link && storedValues) {
+      const linkWithArgs = `${link}?${queryString.stringify(storedValues)}`;
+      push(linkWithArgs);
+    } else {
+      back();
+    }
+  };
 
   return (
     <Button
@@ -43,15 +50,7 @@ const Back = ({ link, label = "common:prev", restore }: Props): JSX.Element => {
       variant="supplementary"
       type="button"
       iconLeft={<IconArrowLeft />}
-      onClick={
-        link
-          ? () => {
-              push(linkWithArgs);
-            }
-          : () => {
-              back();
-            }
-      }
+      onClick={handleClick}
     >
       {t(label)}
     </Button>

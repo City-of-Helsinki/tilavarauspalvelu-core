@@ -36,7 +36,7 @@ const CalendarHead = styled.div`
 `;
 
 const TimeSelectionButton = styled.button<{
-  state: ApplicationEventSchedulePriority | false;
+  state: ApplicationEventSchedulePriority | boolean;
   firstRow: boolean;
 }>`
   --border-color: var(--color-black-50);
@@ -177,7 +177,7 @@ const OptionWrapper = styled.div`
   margin-top: var(--spacing-m);
 `;
 
-const PrioritySelect = styled(Select)`
+const PrioritySelect = styled(Select<OptionType>)`
   max-width: 380px;
 `;
 
@@ -302,7 +302,7 @@ const TimeSelector = ({
   resetCells,
   index,
   summaryData,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const cellTypes = useMemo(
@@ -337,7 +337,9 @@ const TimeSelector = ({
     }));
   }, [t]);
 
-  if (!cells) return null;
+  if (!cells) {
+    return null;
+  }
 
   const setCellValue = (
     selection: Cell,

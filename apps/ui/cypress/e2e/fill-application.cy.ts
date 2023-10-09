@@ -57,25 +57,25 @@ describe("application", () => {
       worker.use(
         rest.get(
           `*/v1/application/138/*`,
-          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+          (_req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
             return res(ctx.status(200), ctx.json(get138Page1JSONResponse));
           }
         ),
         rest.post(
           `*/v1/application/`,
-          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+          (_req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
             return res(ctx.status(200), ctx.json(postJSONResponse));
           }
         ),
         rest.put(
           `*/v1/application/138`,
-          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+          (_req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
             return res(ctx.status(200), ctx.json(putPage1Response));
           }
         ),
         rest.get(
           `*/v1/reservation_unit/2/*`,
-          (req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
+          (_req: RestRequest, res: ResponseFunction, ctx: RestContext) => {
             return res(ctx.status(200), ctx.json(getReservationUnitResponse));
           }
         )
@@ -126,10 +126,12 @@ describe("application", () => {
       const { worker, rest } = (window as any).msw;
 
       worker.use(
-        rest.get(`*/v1/application/138`, (req, res, ctx) => {
+        // @ts-ignore: suppress implicit any errors
+        rest.get(`*/v1/application/138`, (_req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(get138Page2JSONResponse));
         }),
-        rest.put(`*/v1/application/138`, (req, res, ctx) => {
+        // @ts-ignore: suppress implicit any errors
+        rest.put(`*/v1/application/138`, (_req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(get138Page2JSONResponse));
         })
       );
@@ -243,10 +245,12 @@ describe("application", () => {
       const { worker, rest } = (window as any).msw;
 
       worker.use(
-        rest.get(`*/v1/application/138/*`, (req, res, ctx) => {
+        // @ts-ignore: suppress implicit any errors
+        rest.get(`*/v1/application/138/*`, (_req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(putPage3Response));
         }),
-        rest.put(`*/v1/application/138`, (req, res, ctx) => {
+        // @ts-ignore: suppress implicit any errors
+        rest.put(`*/v1/application/138`, (_req, res, ctx) => {
           return res.once(ctx.status(200), ctx.json(putPage3Response));
         })
       );

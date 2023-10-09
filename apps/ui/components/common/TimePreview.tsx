@@ -23,7 +23,7 @@ const Label = styled.div`
   padding-right: 4px;
 `;
 
-const Weekdays = ({ schedules }) => {
+const Weekdays = ({ schedules }: { schedules: ApplicationEventSchedule[] }) => {
   const { t } = useTranslation();
   return (
     <>

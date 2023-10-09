@@ -106,7 +106,7 @@ const ConfirmationModal = forwardRef(
         aria-describedby={`${id}-content`}
         style={{ width: "auto" }}
       >
-        <Dialog.Header id={`${id}-header`} title={heading} />
+        <Dialog.Header id={`${id}-header`} title={heading ?? ""} />
         <Dialog.Content id={`${id}-content`}>{content}</Dialog.Content>
         <Dialog.ActionButtons>
           <MediumButton

@@ -7,6 +7,8 @@ import {
   ReservationType,
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  OpeningTimesType,
+  OpeningHoursType,
 } from "common/types/gql-types";
 import {
   CanReservationBeChangedProps,
@@ -20,7 +22,6 @@ import {
   isReservationInThePast,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
-import { Language } from "common";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -274,7 +275,7 @@ describe("isReservationInThePast", () => {
   });
 
   test("with invalid data", () => {
-    expect(isReservationInThePast({} as ReservationType)).toBe(null);
+    expect(isReservationInThePast({} as ReservationType)).toBe(false);
   });
 });
 
@@ -294,6 +295,7 @@ describe("getReservationCancellationReason", () => {
 
   test("with no reservation unit", () => {
     expect(
+      // @ts-expect-error: TODO
       getReservationCancellationReason({
         ...reservation,
         reservationUnits: [],
@@ -449,11 +451,12 @@ describe("canReservationBeChanged", () => {
     ],
   };
 
+  // @ts-expect-error: TODO
   const reservationUnit = {
     reservationBegins: addDays(new Date(), -1).toISOString(),
     reservationEnds: addDays(new Date(), 100).toISOString(),
     openingHours: {
-      openingTimes: Array.from(Array(100)).map((val, index) => {
+      openingTimes: Array.from(Array(100)).map((_val, index) => {
         const date = format(addDays(new Date(), index), "yyyy-MM-dd");
         return {
           date,
@@ -463,8 +466,8 @@ describe("canReservationBeChanged", () => {
           periods: null,
           isReservable: true,
         };
-      }),
-    },
+      }) as OpeningTimesType[],
+    } as OpeningHoursType,
     reservations: [],
   } as ReservationUnitByPkType;
 
@@ -591,6 +594,7 @@ describe("canReservationBeChanged", () => {
   describe("handles new reservation general validation", () => {
     test("with incomplete data", () => {
       expect(
+        // @ts-expect-error: TODO
         canReservationTimeBeChanged({
           reservation,
           newReservation: {
@@ -603,6 +607,7 @@ describe("canReservationBeChanged", () => {
       ).toStrictEqual([false, "RESERVATION_TIME_INVALID"]);
 
       expect(
+        // @ts-expect-error: TODO
         canReservationTimeBeChanged({
           reservation,
           newReservation: {
@@ -616,6 +621,7 @@ describe("canReservationBeChanged", () => {
       ).toStrictEqual([false, "RESERVATION_TIME_INVALID"]);
 
       expect(
+        // @ts-expect-error: TODO
         canReservationTimeBeChanged({
           reservation,
           newReservation: {
@@ -636,6 +642,7 @@ describe("canReservationBeChanged", () => {
 
     test("with reservation start buffer", () => {
       expect(
+        // @ts-expect-error: TODO
         canReservationTimeBeChanged({
           reservation,
           newReservation: {
@@ -654,6 +661,7 @@ describe("canReservationBeChanged", () => {
 
     test("with reservation time missing reservation units reservation time slot", () => {
       expect(
+        // @ts-expect-error: TODO
         canReservationTimeBeChanged({
           reservation,
           newReservation: {
@@ -670,6 +678,7 @@ describe("canReservationBeChanged", () => {
       ).toStrictEqual([false, "RESERVATION_TIME_INVALID"]);
 
       expect(
+        // @ts-expect-error: TODO
         canReservationTimeBeChanged({
           reservation,
           newReservation: {

@@ -9,7 +9,6 @@ import {
   ApplicationRoundType,
   Query,
   QueryReservationUnitsArgs,
-  ReservationUnitByPkType,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
@@ -28,7 +27,7 @@ type OptionTypes = {
 };
 
 type Props = {
-  selectedReservationUnits: ReservationUnitType[] | ReservationUnitByPkType;
+  selectedReservationUnits: ReservationUnitType[];
   applicationEvent: ApplicationEvent;
   fieldName: string;
   form: ReturnType<typeof useForm>;
@@ -70,7 +69,12 @@ const ReservationUnitList = ({
 
   const isValid = (units: ReservationUnitType[]) => {
     const error = units
-      .map((resUnit) => minSize && resUnit.maxPersons < minSize)
+      .map(
+        (resUnit) =>
+          minSize != null &&
+          resUnit.maxPersons != null &&
+          resUnit.maxPersons < minSize
+      )
       .find((a) => a);
     return !error;
   };
@@ -87,7 +91,7 @@ const ReservationUnitList = ({
 
   useEffect(() => {
     let isMounted = true;
-    let data;
+    let data: ReservationUnitType[] = [];
     const fetchData = async () => {
       setIsLoading(true);
       if (applicationEvent.eventReservationUnits?.length === 0) {
@@ -109,17 +113,21 @@ const ReservationUnitList = ({
             pk: eventUniIds.map(String),
           },
         });
-        data = reservationUnitData?.reservationUnits?.edges
-          .map((n) => n.node)
-          .filter((n) => eventUniIds.includes(n.pk))
-          .sort(
-            (a, b) => eventUniIds.indexOf(a.pk) - eventUniIds.indexOf(b.pk)
-          );
+        data =
+          reservationUnitData?.reservationUnits?.edges
+            .map((n) => n?.node)
+            .filter((n) => n?.pk != null && eventUniIds.includes(n.pk))
+            .filter((n): n is ReservationUnitType => n != null)
+            .sort((a, b) =>
+              a?.pk != null && b?.pk != null
+                ? eventUniIds.indexOf(a.pk) - eventUniIds.indexOf(b.pk)
+                : 0
+            ) ?? [];
       }
       if (isMounted) {
         setReservationUnits(
           data.filter((ru) =>
-            applicationRound.reservationUnits.map((n) => n.pk).includes(ru.pk)
+            applicationRound.reservationUnits?.map((n) => n?.pk).includes(ru.pk)
           )
         );
         setIsLoading(false);
@@ -203,7 +211,11 @@ const ReservationUnitList = ({
         return (
           <ReservationUnitCard
             key={ru.pk}
-            invalid={minSize && minSize > ru.maxPersons}
+            invalid={
+              minSize != null &&
+              ru.maxPersons != null &&
+              minSize > ru.maxPersons
+            }
             onDelete={remove}
             reservationUnit={ru}
             order={index}

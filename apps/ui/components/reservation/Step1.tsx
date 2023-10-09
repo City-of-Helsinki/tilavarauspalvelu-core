@@ -6,10 +6,10 @@ import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
   ReservationsReservationReserveeTypeChoices,
+  ReservationType,
   ReservationUnitType,
   TermsOfUseType,
 } from "common/types/gql-types";
-import { Reservation } from "common/src/reservation-form/types";
 import TermsBox from "common/src/termsbox/TermsBox";
 import {
   Subheading,
@@ -29,7 +29,7 @@ import {
 } from "../reservation-unit/ReservationUnitStyles";
 
 type Props = {
-  reservation: Reservation;
+  reservation: ReservationType;
   reservationUnit: ReservationUnitType;
   handleSubmit: () => void;
   generalFields: string[];
@@ -240,13 +240,17 @@ const Step1 = ({
         heading={box[0].heading}
         body={
           <>
-            <Sanitize
-              html={getTranslation(reservationUnit.cancellationTerms, "text")}
-            />
+            {reservationUnit.cancellationTerms && (
+              <Sanitize
+                html={getTranslation(reservationUnit.cancellationTerms, "text")}
+              />
+            )}
             <br />
-            <Sanitize
-              html={getTranslation(reservationUnit.paymentTerms, "text")}
-            />
+            {reservationUnit.paymentTerms && (
+              <Sanitize
+                html={getTranslation(reservationUnit.paymentTerms, "text")}
+              />
+            )}
           </>
         }
         acceptLabel={box[0].acceptLabel}
@@ -264,9 +268,14 @@ const Step1 = ({
         id={box[1].id}
         heading={box[1].heading}
         body={
-          <Sanitize
-            html={getTranslation(reservationUnit.serviceSpecificTerms, "text")}
-          />
+          reservationUnit.serviceSpecificTerms != null ? (
+            <Sanitize
+              html={getTranslation(
+                reservationUnit.serviceSpecificTerms,
+                "text"
+              )}
+            />
+          ) : undefined
         }
         links={
           termsOfUse.genericTerms && [

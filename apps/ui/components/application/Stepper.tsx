@@ -81,11 +81,15 @@ type Props = {
   application?: Application;
 };
 
-const checkReady = (application: Application, index: number): boolean => {
+const checkReady = (application?: Application, index?: number): boolean => {
+  if (!application) {
+    return false;
+  }
   switch (index) {
     case 0: {
       return (
         application.applicationEvents.length > 0 &&
+        application.applicationEvents[0].id != null &&
         application.applicationEvents[0].id > 0
       );
     }
@@ -139,7 +143,7 @@ const Stepper = ({ application }: Props): JSX.Element => {
                 key={page}
                 onClick={() => {
                   if (!isCurrent) {
-                    push(`/application/${application.id}/${page}`);
+                    push(`/application/${application?.id}/${page}`);
                   }
                 }}
                 $clickable={!isDisabled && !isCurrent}
