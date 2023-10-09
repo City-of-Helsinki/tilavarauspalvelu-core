@@ -4,13 +4,14 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
-import { GetStaticProps } from "next";
+import { type GetServerSideProps } from "next";
 import styled from "styled-components";
 import { Application, OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryApplicationRoundsArgs } from "common/types/gql-types";
-import { useSession } from "~/hooks/auth";
-import { saveApplication } from "../modules/api";
+import { useSession } from "@/hooks/auth";
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
+import { saveApplication } from "@/modules/api";
 import { applicationRoundState, deepCopy } from "../modules/util";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
 import { MediumButton } from "../styles/util";
@@ -18,9 +19,15 @@ import Head from "../components/application/Head";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { CenterSpinner } from "../components/common/common";
 import { getApplicationRoundName } from "../modules/applicationRound";
-import { authEnabled } from "../modules/const";
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
+
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
+
   return {
     props: {
       overrideBackgroundColor: "white",
@@ -57,16 +64,6 @@ const IntroPage = (): JSX.Element => {
 
   const history = useRouter();
   const { t } = useTranslation();
-
-  const isUserUnauthenticated = authEnabled && !isAuthenticated;
-
-  /*
-  useEffect(() => {
-    if (isUserUnauthenticated) {
-      signIn();
-    }
-  }, [isUserUnauthenticated]);
-  */
 
   useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS, {
     fetchPolicy: "no-cache",
@@ -112,6 +109,11 @@ const IntroPage = (): JSX.Element => {
     }
   };
 
+  // NOTE should never happen since we do an SSR redirect
+  if (!isAuthenticated) {
+    return <div>{t("common:error.notAuthenticated")}</div>;
+  }
+
   return (
     <>
       <Head noKoros heading={t("application:Intro.heading")}>
@@ -132,7 +134,7 @@ const IntroPage = (): JSX.Element => {
               />
               <MediumButton
                 id="start-application"
-                disabled={isUserUnauthenticated || !applicationRound || saving}
+                disabled={!applicationRound || saving}
                 onClick={() => {
                   createNewApplication(applicationRound);
                 }}

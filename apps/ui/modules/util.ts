@@ -391,7 +391,7 @@ export const applicationErrorText = (
 ): string => (key ? t(`application:error.${key}`, attrs) : "");
 
 export const getReducedApplicationStatus = (
-  status: ApplicationStatus
+  status?: ApplicationStatus
 ): ReducedApplicationStatus | null => {
   switch (status) {
     case "in_review":

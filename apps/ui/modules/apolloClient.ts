@@ -26,7 +26,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const getServerCrsfToken = (headers: IncomingHttpHeaders) => {
+const getServerCrsfToken = (headers?: IncomingHttpHeaders) => {
   const cookie = headers?.cookie;
   if (cookie == null) {
     // eslint-disable-next-line no-console
@@ -48,7 +48,7 @@ const getServerCrsfToken = (headers: IncomingHttpHeaders) => {
   return token;
 }
 
-export function createApolloClient(ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>) {
+export function createApolloClient(ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>) {
   const isServer = typeof window === "undefined";
   const csrfToken = isServer ? getServerCrsfToken(ctx?.req?.headers) : getCookie("csrftoken")
 

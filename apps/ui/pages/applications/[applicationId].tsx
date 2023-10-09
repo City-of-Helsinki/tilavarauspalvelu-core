@@ -26,6 +26,8 @@ import { TwoColumnContainer } from "../../components/common/common";
 import { isBrowser } from "../../modules/const";
 import { MediumButton } from "../../styles/util";
 
+// TODO why is this page not protected by login?
+// where is it accessed from? and it's still using Rest API instead of GraphQL
 export const getServerSideProps: GetServerSideProps = async ({
   locale,
   query,
@@ -34,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   return {
     props: {
       key: `{locale}${applicationId}`,
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };

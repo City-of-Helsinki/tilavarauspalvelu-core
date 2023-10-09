@@ -16,9 +16,9 @@ import {
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
 type BannerNotificationListProps = {
+  target: CommonBannerNotificationTargetChoices;
   displayAmount?: number;
   centered?: boolean;
-  target?: CommonBannerNotificationTargetChoices;
 };
 
 type BannerNotificationItemProps = {
@@ -114,9 +114,9 @@ const NotificationsListItem = ({
 /// @desc A component which returns a list of styled banner notifications, clipped at the specified amount, targeted to the specified targets and ordered by level
 /// TODO under testing: can't do target checks to the query because backend doesn't allow querying target without can_manage_notifications permission
 const BannerNotificationsList = ({
+  target,
   displayAmount = 2,
   centered,
-  target,
 }: BannerNotificationListProps) => {
   // no-cache is required because admin is caching bannerNotifications query and
   // there is no key setup for this so this query returns garbage from the admin cache.

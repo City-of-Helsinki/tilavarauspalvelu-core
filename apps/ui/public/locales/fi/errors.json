@@ -5,6 +5,7 @@
   "500": {
     "body": "Jotain meni pieleen"
   },
+  "notAuthenticated": "Kirjaudu sisään ensin",
   "general_error": "Tapahtui määrittämätön virhe.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
   "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",

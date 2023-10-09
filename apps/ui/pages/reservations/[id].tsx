@@ -24,15 +24,17 @@ import {
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
-import { useSession } from "~/hooks/auth";
-
-import { createApolloClient } from "../../modules/apolloClient";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import { getTranslation, reservationsUrl } from "../../modules/util";
-import { CenterSpinner } from "../../components/common/common";
-import { BlackButton, Toast } from "../../styles/util";
-import Sanitize from "../../components/common/Sanitize";
-import { AccordionWithState as Accordion } from "../../components/common/Accordion";
+import { useSession } from "@/hooks/auth";
+import { useReservation, useOrder } from "@/hooks/reservation";
+import { reservationUnitPath } from "@/modules/const";
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
+import { createApolloClient } from "@/modules/apolloClient";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
+import { getTranslation, reservationsUrl } from "@/modules/util";
+import { BlackButton, Toast } from "@/styles/util";
+import { CenterSpinner } from "@/components/common/common";
+import Sanitize from "@/components/common/Sanitize";
+import { AccordionWithState as Accordion } from "@/components/common/Accordion";
 import {
   canReservationTimeBeChanged,
   canUserCancelReservation,
@@ -52,8 +54,6 @@ import ReservationStatus from "../../components/reservation/ReservationStatus";
 import Address from "../../components/reservation-unit/Address";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
 import ReservationOrderStatus from "../../components/reservation/ReservationOrderStatus";
-import { reservationUnitPath, authEnabled } from "../../modules/const";
-import { useReservation, useOrder } from "../../hooks/reservation";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -62,6 +62,12 @@ type Props = {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale, params } = ctx;
+
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
+
   const apolloClient = createApolloClient(ctx);
   const id = Number(params?.id);
 
@@ -257,30 +263,16 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useSession();
 
-  const isUserUnauthenticated = authEnabled && !isAuthenticated;
-
-  /*
-  useEffect(() => {
-    if (isUserUnauthenticated) {
-      signIn();
-    }
-  }, [isUserUnauthenticated]);
-  */
-
   const { reservation, loading, error } = useReservation({ reservationPk: id });
-  const { order, loading: orderLoading } = useOrder({
+  const { order, isLoading: orderLoading } = useOrder({
     orderUuid: reservation?.orderUuid ?? "",
   });
 
   const reservationUnit = reservation?.reservationUnits?.[0];
-
-  const instructionsKey = useMemo(
-    () => getReservationUnitInstructionsKey(reservation?.state),
-    [reservation?.state]
-  );
-
-  const isReservationCancelled = reservation?.state === "CANCELLED";
-  const isBeingHandled = reservation?.state === "REQUIRES_HANDLING";
+  const instructionsKey =
+    reservation?.state != null
+      ? getReservationUnitInstructionsKey(reservation?.state)
+      : undefined;
 
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
     if (!reservation || !reservationUnit) {
@@ -299,67 +291,66 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     );
   }, [reservation, reservationUnit]);
 
-  const paymentTermsContent = useMemo(
-    () => getTranslation(reservationUnit?.paymentTerms, "text"),
-    [reservationUnit]
+  const paymentTermsContent = getTranslation(
+    reservationUnit?.paymentTerms,
+    "text"
   );
-
-  const cancellationTermsContent = useMemo(
-    () => getTranslation(reservationUnit?.cancellationTerms, "text"),
-    [reservationUnit]
+  const cancellationTermsContent = getTranslation(
+    reservationUnit?.cancellationTerms,
+    "text"
   );
-
-  const pricingTermsContent = useMemo(
-    () => getTranslation(reservationUnit?.pricingTerms, "text"),
-    [reservationUnit]
+  const pricingTermsContent = getTranslation(
+    reservationUnit?.pricingTerms,
+    "text"
   );
-
-  const serviceSpecificTermsContent = useMemo(
-    () => getTranslation(reservationUnit?.serviceSpecificTerms, "text"),
-    [reservationUnit]
+  const serviceSpecificTermsContent = getTranslation(
+    reservationUnit?.serviceSpecificTerms,
+    "text"
   );
 
   const bylineContent = useMemo(() => {
+    if (!reservation) {
+      return undefined;
+    }
     return (
-      reservation && (
-        <>
-          <ReservationInfoCard
-            reservation={reservation}
-            reservationUnit={reservationUnit}
-            type="complete"
-          />
-          <SecondaryActions>
-            {reservation.state ===
-              ReservationsReservationStateChoices.Confirmed && (
+      <>
+        <ReservationInfoCard
+          reservation={reservation}
+          reservationUnit={reservationUnit}
+          type="complete"
+        />
+        <SecondaryActions>
+          {reservation.state ===
+            ReservationsReservationStateChoices.Confirmed && (
+            <BlackButton
+              variant="secondary"
+              iconRight={<IconCalendar aria-hidden />}
+              disabled={!reservation.calendarUrl}
+              data-testid="reservation__button--calendar-link"
+              onClick={() => router.push(reservation.calendarUrl ?? "")}
+            >
+              {t("reservations:saveToCalendar")}
+            </BlackButton>
+          )}
+          {order?.receiptUrl &&
+            // TODO enum comparison (not string)
+            ["PAID", "REFUNDED"].includes(order?.status ?? "") && (
               <BlackButton
+                data-testid="reservation__confirmation--button__receipt-link"
+                onClick={() =>
+                  window.open(
+                    `${order.receiptUrl}&lang=${i18n.language}`,
+                    "_blank"
+                  )
+                }
                 variant="secondary"
-                iconRight={<IconCalendar aria-hidden />}
-                disabled={!reservation.calendarUrl}
-                data-testid="reservation__button--calendar-link"
-                onClick={() => router.push(reservation.calendarUrl)}
+                iconRight={<IconLinkExternal aria-hidden />}
               >
-                {t("reservations:saveToCalendar")}
+                {t("reservations:downloadReceipt")}
               </BlackButton>
             )}
-            {order?.receiptUrl &&
-              ["PAID", "REFUNDED"].includes(order?.status) && (
-                <BlackButton
-                  data-testid="reservation__confirmation--button__receipt-link"
-                  onClick={() =>
-                    window.open(
-                      `${order.receiptUrl}&lang=${i18n.language}`,
-                      "_blank"
-                    )
-                  }
-                  variant="secondary"
-                  iconRight={<IconLinkExternal aria-hidden />}
-                >
-                  {t("reservations:downloadReceipt")}
-                </BlackButton>
-              )}
-          </SecondaryActions>
-        </>
-      )
+        </SecondaryActions>
+      </>
     );
   }, [
     reservation,
@@ -370,10 +361,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     i18n.language,
   ]);
 
-  const [canTimeBeModified, modifyTimeReason] = useMemo(
-    () => canReservationTimeBeChanged({ reservation }),
-    [reservation]
-  );
+  const [canTimeBeModified, modifyTimeReason] = canReservationTimeBeChanged({
+    reservation,
+  });
 
   const cancellationReason = useMemo(() => {
     const reason = reservation && getReservationCancellationReason(reservation);
@@ -388,8 +378,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     }
   }, [reservation]);
 
-  if (isUserUnauthenticated) {
-    return null;
+  // NOTE should never end up here (SSR redirect to login)
+  if (!isAuthenticated) {
+    return <div>{t("common:error.notAuthenticated")}</div>;
   }
 
   if (error) {
@@ -406,8 +397,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     );
   }
 
-  const normalizedOrderStatus =
-    getNormalizedReservationOrderStatus(reservation);
+  const normalizedOrderStatus = reservation
+    ? getNormalizedReservationOrderStatus(reservation)
+    : null;
 
   if (loading || orderLoading) {
     return <Spinner />;
@@ -445,7 +437,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   );
 
   const supportedFields =
-    reservationUnit.metadataSet?.supportedFields?.map(camelCase) || [];
+    reservationUnit.metadataSet?.supportedFields
+      ?.filter((n): n is string => n != null)
+      .map(camelCase) ?? [];
 
   const reservationInfo = [
     "purpose",
@@ -462,65 +456,69 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
       )
   );
 
-  const reserveeInfo = [
-    ReservationsReservationReserveeTypeChoices.Business.toString(),
-    ReservationsReservationReserveeTypeChoices.Nonprofit.toString(),
-  ].includes(reservation.reserveeType) ? (
-    <>
-      {supportedFields.includes("reserveeOrganisationName") && (
-        <ParagraphAlt>
-          {t("reservations:organisationName")}:{" "}
-          {reservation.reserveeOrganisationName || "-"}
-        </ParagraphAlt>
-      )}
-      {supportedFields.includes("reserveeId") && (
-        <ParagraphAlt>
-          {t("reservations:reserveeId")}: {reservation.reserveeId || "-"}
-        </ParagraphAlt>
-      )}
-      {(supportedFields.includes("reserveeFirstName") ||
-        supportedFields.includes("reserveeLastName")) && (
-        <ParagraphAlt>
-          {t("reservations:contactName")}:{" "}
-          {`${reservation.reserveeFirstName || ""} ${
-            reservation.reserveeLastName || ""
-          }`.trim()}
-        </ParagraphAlt>
-      )}
-      {supportedFields.includes("reserveePhone") && (
-        <ParagraphAlt>
-          {t("reservations:contactPhone")}: {reservation.reserveePhone}
-        </ParagraphAlt>
-      )}
-      {supportedFields.includes("reserveeEmail") && (
-        <ParagraphAlt>
-          {t("reservations:contactEmail")}: {reservation.reserveeEmail}
-        </ParagraphAlt>
-      )}
-    </>
-  ) : (
-    <>
-      {(supportedFields.includes("reserveeFirstName") ||
-        supportedFields.includes("reserveeLastName")) && (
-        <ParagraphAlt>
-          {t("common:name")}:{" "}
-          {`${reservation.reserveeFirstName || ""} ${
-            reservation.reserveeLastName || ""
-          }`.trim()}
-        </ParagraphAlt>
-      )}
-      {supportedFields.includes("reserveePhone") && (
-        <ParagraphAlt>
-          {t("common:phone")}: {reservation.reserveePhone || "-"}
-        </ParagraphAlt>
-      )}
-      {supportedFields.includes("reserveeEmail") && (
-        <ParagraphAlt>
-          {t("common:email")}: {reservation.reserveeEmail || "-"}
-        </ParagraphAlt>
-      )}
-    </>
-  );
+  const reserveeInfo =
+    ReservationsReservationReserveeTypeChoices.Business ===
+      reservation.reserveeType ||
+    ReservationsReservationReserveeTypeChoices.Nonprofit ===
+      reservation.reserveeType ? (
+      <>
+        {supportedFields.includes("reserveeOrganisationName") && (
+          <ParagraphAlt>
+            {t("reservations:organisationName")}:{" "}
+            {reservation.reserveeOrganisationName || "-"}
+          </ParagraphAlt>
+        )}
+        {supportedFields.includes("reserveeId") && (
+          <ParagraphAlt>
+            {t("reservations:reserveeId")}: {reservation.reserveeId || "-"}
+          </ParagraphAlt>
+        )}
+        {(supportedFields.includes("reserveeFirstName") ||
+          supportedFields.includes("reserveeLastName")) && (
+          <ParagraphAlt>
+            {t("reservations:contactName")}:{" "}
+            {`${reservation.reserveeFirstName || ""} ${
+              reservation.reserveeLastName || ""
+            }`.trim()}
+          </ParagraphAlt>
+        )}
+        {supportedFields.includes("reserveePhone") && (
+          <ParagraphAlt>
+            {t("reservations:contactPhone")}: {reservation.reserveePhone}
+          </ParagraphAlt>
+        )}
+        {supportedFields.includes("reserveeEmail") && (
+          <ParagraphAlt>
+            {t("reservations:contactEmail")}: {reservation.reserveeEmail}
+          </ParagraphAlt>
+        )}
+      </>
+    ) : (
+      <>
+        {(supportedFields.includes("reserveeFirstName") ||
+          supportedFields.includes("reserveeLastName")) && (
+          <ParagraphAlt>
+            {t("common:name")}:{" "}
+            {`${reservation.reserveeFirstName || ""} ${
+              reservation.reserveeLastName || ""
+            }`.trim()}
+          </ParagraphAlt>
+        )}
+        {supportedFields.includes("reserveePhone") && (
+          <ParagraphAlt>
+            {t("common:phone")}: {reservation.reserveePhone || "-"}
+          </ParagraphAlt>
+        )}
+        {supportedFields.includes("reserveeEmail") && (
+          <ParagraphAlt>
+            {t("common:email")}: {reservation.reserveeEmail || "-"}
+          </ParagraphAlt>
+        )}
+      </>
+    );
+
+  const isReservationCancelled = reservation?.state === "CANCELLED";
+  const isBeingHandled = reservation?.state === "REQUIRES_HANDLING";
 
   const isReservationCancellable =
     canUserCancelReservation(reservation) &&
@@ -554,7 +552,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
               {t("reservations:reservationName", { id: reservation.pk })}
             </Heading>
             <SubHeading>
-              <Link href={`${reservationUnitPath(reservationUnit.pk)}`}>
+              <Link href={`${reservationUnitPath(reservationUnit.pk ?? 0)}`}>
                 {getReservationUnitName(reservationUnit)}
               </Link>
               <span>{timeString}</span>
@@ -631,16 +629,17 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
               )}
             </Reasons>
             <Content>
-              {getTranslation(reservationUnit, instructionsKey) && (
-                <ContentContainer>
-                  <ParagraphHeading>
-                    {t("reservations:reservationInfo")}
-                  </ParagraphHeading>
-                  <Paragraph>
-                    {getTranslation(reservationUnit, instructionsKey)}
-                  </Paragraph>
-                </ContentContainer>
-              )}
+              {instructionsKey &&
+                getTranslation(reservationUnit, instructionsKey) && (
+                  <ContentContainer>
+                    <ParagraphHeading>
+                      {t("reservations:reservationInfo")}
+                    </ParagraphHeading>
+                    <Paragraph>
+                      {getTranslation(reservationUnit, instructionsKey)}
+                    </Paragraph>
+                  </ContentContainer>
+                )}
               <ParagraphHeading>
                 {t("reservationApplication:applicationInfo")}
               </ParagraphHeading>

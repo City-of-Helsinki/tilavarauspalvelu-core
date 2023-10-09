@@ -262,7 +262,7 @@ export const isReservationFreeOfCharge = (
 ): boolean => parseInt(String(reservation.price), 10) === 0;
 
 export type CanReservationBeChangedProps = {
-  reservation: ReservationType;
+  reservation?: ReservationType;
   newReservation?: ReservationType | PendingReservation;
   reservationUnit?: ReservationUnitByPkType;
   activeApplicationRounds?: ApplicationRoundType[];
@@ -274,7 +274,9 @@ export const canReservationTimeBeChanged = ({
   reservationUnit,
   activeApplicationRounds = [],
 }: CanReservationBeChangedProps): [boolean, string?] => {
-  if (!reservation) return [false];
+  if (!reservation) {
+    return [false];
+  }
   // existing reservation state is not CONFIRMED
   if (!isReservationConfirmed(reservation)) {
     return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];

@@ -16,8 +16,8 @@ import {
   QueryTermsOfUseArgs,
   ReservationUnitType,
   TermsOfUseType,
-  TermsOfUseTypeEdge,
 } from "common/types/gql-types";
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { saveApplication, getApplication } from "../../modules/api";
 import ApplicationPage from "../../components/application/ApplicationPage";
 import Page1 from "../../components/application/Page1";
@@ -41,6 +41,12 @@ import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
+
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
+
   const apolloClient = createApolloClient(ctx);
   const { data: tosData } = await apolloClient.query<
     Query,
@@ -49,15 +55,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     query: TERMS_OF_USE,
   });
 
+  // TODO why does this work? pk should be number but we compare to string?
+  // is this an inconsistency in the backend?
   const tos = tosData?.termsOfUse?.edges
-    .map((n: TermsOfUseTypeEdge) => n.node)
-    .filter((n) => ["KUVAnupa", "generic1"].includes(n.pk));
+    .map((n) => n?.node)
+    .filter((n) => n?.pk === "KUVAnupa" || n?.pk === "generic1");
 
   return {
     props: {
       key: locale,
       tos,
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -98,8 +106,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           fetchPolicy: "no-cache",
         });
         const applicationRound = data.applicationRounds?.edges
-          ?.map((n) => n.node)
-          .find((n) => n.pk === application.applicationRoundId);
+          ?.map((n) => n?.node)
+          .find((n) => n?.pk === application.applicationRoundId);
 
         // convert dates
         application.applicationEvents.forEach((ae, i) => {
@@ -110,12 +118,14 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
             application.applicationEvents[i].begin = apiDateToUIDate(ae.begin);
           }
         });
+        const begin = applicationRound?.reservationPeriodBegin;
+        const end = applicationRound?.reservationPeriodEnd;
         dispatch({
           type: "load",
           application,
           params: {
-            begin: apiDateToUIDate(applicationRound.reservationPeriodBegin),
-            end: apiDateToUIDate(applicationRound.reservationPeriodEnd),
+            begin: begin ? apiDateToUIDate(begin) : "",
+            end: end ? apiDateToUIDate(end) : "",
           },
         });
         return { application, applicationRound };
@@ -182,13 +192,13 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     const args = {} as {
       [key: string]: string;
     };
+    const begin =
+      applicationLoadingStatus.value?.applicationRound?.reservationPeriodBegin;
+    const end =
+      applicationLoadingStatus.value?.applicationRound?.reservationPeriodEnd;
     if (applicationLoadingStatus.value) {
-      args.begin = apiDateToUIDate(
-        applicationLoadingStatus.value.applicationRound.reservationPeriodBegin
-      );
-      args.end = apiDateToUIDate(
-        applicationLoadingStatus.value.applicationRound.reservationPeriodEnd
-      );
+      args.begin = begin ? apiDateToUIDate(begin) : "";
+      args.end = end ? apiDateToUIDate(end) : "";
     }
 
     dispatch({

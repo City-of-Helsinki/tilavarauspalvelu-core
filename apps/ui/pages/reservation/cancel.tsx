@@ -5,15 +5,22 @@ import React, { useEffect } from "react";
 import { breakpoints } from "common/src/common/style";
 import { LoadingSpinner } from "hds-react";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 import { Container } from "common";
-import { useSession } from "~/hooks/auth";
+import { useSession } from "@/hooks/auth";
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
+import { useOrder, useReservation } from "@/hooks/reservation";
+import DeleteCancelled from "@/components/reservation/DeleteCancelled";
+import ReservationFail from "@/components/reservation/ReservationFail";
 
-import { authEnabled } from "../../modules/const";
-import { useOrder, useReservation } from "../../hooks/reservation";
-import DeleteCancelled from "../../components/reservation/DeleteCancelled";
-import ReservationFail from "../../components/reservation/ReservationFail";
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
+
   return {
     props: {
       ...(await serverSideTranslations(locale ?? "fi")),
@@ -36,10 +43,8 @@ const Cancel = () => {
   const router = useRouter();
   const { orderId } = router.query;
 
-  const isLoggedOut = authEnabled && !isAuthenticated;
-
   const uuid = Array.isArray(orderId) ? orderId[0] : orderId;
-  const { order, loading, called } = useOrder({ orderUuid: uuid });
+  const { order, isLoading, called } = useOrder({ orderUuid: uuid });
 
   const { deleteReservation, deleteError, deleteLoading, deleted } =
     useReservation({
@@ -57,7 +62,16 @@ const Cancel = () => {
     }
   }, [deleteReservation, order]);
 
-  if (loading || deleteLoading || !called || isLoggedOut) {
+  const { t } = useTranslation("common");
+
+  // NOTE should not end up here (SSR redirect to login)
+  if (!isAuthenticated) {
+    <StyledContainer>
+      <div>{t("common:error.notAuthenticated")}</div>
+    </StyledContainer>;
+  }
+
+  if (isLoading || deleteLoading || !called) {
     return (
       <StyledContainer>
         <LoadingSpinner />

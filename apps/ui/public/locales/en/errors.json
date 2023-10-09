@@ -5,6 +5,7 @@
   "500": {
     "body": "Something unexpected happened"
   },
+  "notAuthenticated": "Please login first",
   "general_error": "Undefined error.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",
   "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",

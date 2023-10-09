@@ -30,13 +30,13 @@ export const useOrder = ({
   orderUuid,
 }: UseOrderProps): {
   order?: PaymentOrderType;
-  error: boolean;
+  isError: boolean;
   refreshError?: ApolloError;
-  loading: boolean;
+  isLoading: boolean;
   refresh: () => void;
   called: boolean;
 } => {
-  const [data, setData] = useState<PaymentOrderType | null>(null);
+  const [data, setData] = useState<PaymentOrderType | undefined>(undefined);
   const [called, setCalled] = useState(false);
 
   const { error, loading: orderLoading } = useQuery<Query, QueryOrderArgs>(
@@ -47,7 +47,7 @@ export const useOrder = ({
       variables: { orderUuid },
       onCompleted: (res) => {
         setCalled(true);
-        setData(res?.order ?? null);
+        setData(res?.order ?? undefined);
       },
       onError: () => {
         setCalled(true);
@@ -63,7 +63,7 @@ export const useOrder = ({
       fetchPolicy: "no-cache",
       variables: { input: { orderUuid: orderUuid ?? "" } },
       onCompleted: (res) => {
-        const newData = data != null ? { ...data, status: res.refreshOrder.status } : null
+        const newData = data != null ? { ...data, status: res.refreshOrder.status } : undefined;
         setData(newData);
       },
       // catch all thrown errors so we don't crash
@@ -73,9 +73,9 @@ export const useOrder = ({
 
   return {
     order: data ?? undefined,
-    error: error != null,
+    isError: error != null,
     refreshError,
-    loading: orderLoading || refreshLoading,
+    isLoading: orderLoading || refreshLoading,
     refresh,
     called,
   };

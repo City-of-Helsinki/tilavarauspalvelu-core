@@ -1,20 +1,15 @@
+import React from "react";
 import { useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
-import {
-  Query,
-  QueryReservationByPkArgs,
-  ReservationType,
-} from "common/types/gql-types";
+import { Query, QueryReservationByPkArgs } from "common/types/gql-types";
 import { LoadingSpinner } from "hds-react";
-import { get } from "lodash";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Container } from "common";
-
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import ReservationConfirmation from "../../../components/reservation/ReservationConfirmation";
 import ReservationInfoCard from "../../../components/reservation/ReservationInfoCard";
 import { Paragraph } from "../../../components/reservation/styles";
@@ -25,17 +20,20 @@ type Props = {
   reservationPk: number;
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  locale,
-  params,
-}) => {
-  const reservationPk = Number(params.id);
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale, params } = ctx;
+  const reservationPk = Number(params?.id);
+
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
 
   return {
     props: {
       key: `${reservationPk}${locale}`,
-      reservationPk,
-      ...(await serverSideTranslations(locale)),
+      reservationPk: Number.isNaN(reservationPk) ? null : reservationPk,
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -66,30 +64,28 @@ const Columns = styled.div`
 
 const ReservationSuccess = ({ reservationPk }: Props) => {
   const { t } = useTranslation();
-  const [reservation, setReservation] = useState<ReservationType>(null);
-  const [error, setError] = useState<boolean>(false);
 
-  useQuery<Query, QueryReservationByPkArgs>(GET_RESERVATION, {
+  const {
+    data,
+    loading: isReservationLoading,
+    error: isError,
+  } = useQuery<Query, QueryReservationByPkArgs>(GET_RESERVATION, {
+    skip: !reservationPk,
     fetchPolicy: "no-cache",
     variables: { pk: reservationPk },
-    onCompleted: (data) => {
-      if (!data.reservationByPk) {
-        setError(true);
-        return;
-      }
-      setReservation(data.reservationByPk);
-    },
   });
+  const reservation = data?.reservationByPk;
 
   const {
     order,
-    error: orderError,
-    loading: orderLoading,
-  } = useOrder({ orderUuid: reservation?.orderUuid });
+    isError: orderError,
+    isLoading: orderLoading,
+  } = useOrder({ orderUuid: reservation?.orderUuid ?? "" });
 
   const isOrderUuidMissing = reservation && !reservation.orderUuid;
 
-  if (error || orderError || isOrderUuidMissing) {
+  // TODO display error if the orderUuid is missing or the pk is invalid
+  if (isError || orderError || isOrderUuidMissing) {
     return (
       <StyledContainer size="s">
         <Columns>
@@ -102,7 +98,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
     );
   }
 
-  if (!reservation || orderLoading) {
+  if (isReservationLoading || orderLoading || !reservation) {
     return (
       <StyledContainer size="s">
         <Columns style={{ justifyItems: "center" }}>
@@ -112,7 +108,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
     );
   }
 
-  const reservationUnit = get(reservation, "reservationUnits.[0]");
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? undefined;
 
   return (
     <StyledContainer size="s">
@@ -124,11 +120,13 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
             type="confirmed"
           />
         </div>
-        <ReservationConfirmation
-          reservation={reservation}
-          reservationUnit={reservationUnit}
-          order={order}
-        />
+        {reservationUnit ? (
+          <ReservationConfirmation
+            reservation={reservation}
+            reservationUnit={reservationUnit}
+            order={order}
+          />
+        ) : null}
       </Columns>
     </StyledContainer>
   );

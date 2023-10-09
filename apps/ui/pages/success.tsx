@@ -1,19 +1,26 @@
+import React, { useEffect, useState } from "react";
+import { LoadingSpinner } from "hds-react";
+import { type GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { ReservationsReservationStateChoices } from "common/types/gql-types";
-import { LoadingSpinner } from "hds-react";
-import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
 import { Container } from "common";
-import { useSession } from "~/hooks/auth";
+import { useTranslation } from "react-i18next";
+import { useSession } from "@/hooks/auth";
+import { useOrder, useReservation } from "@/hooks/reservation";
+import ReservationFail from "@/components/reservation/ReservationFail";
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
 
-import ReservationFail from "../components/reservation/ReservationFail";
-import { authEnabled } from "../modules/const";
-import { useOrder, useReservation } from "../hooks/reservation";
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
+
   return {
     props: {
       ...(await serverSideTranslations(locale ?? "fi")),
@@ -43,21 +50,11 @@ const ReservationSuccess = () => {
     useState<boolean>(false);
   const [refreshRetries, setRefreshRetries] = useState<number>(0);
 
-  const isLoggedOut = authEnabled && !isAuthenticated;
-
-  /*
-  useEffect(() => {
-    if (isLoggedOut) {
-      signIn();
-    }
-  }, [isLoggedOut]);
-  */
-
   const {
     order,
-    error: orderError,
+    isError: orderError,
     refreshError,
-    loading: orderLoading,
+    isLoading: isOrderLoading,
     refresh,
     called: orderCalled,
   } = useOrder({ orderUuid: orderId });
@@ -73,7 +70,7 @@ const ReservationSuccess = () => {
   });
 
   useEffect(() => {
-    if (order && !orderLoading) {
+    if (order && !isOrderLoading) {
       const { reservationPk, status } = order;
       if (!reservationPk) {
         setIsReservationInvalid(true);
@@ -89,10 +86,10 @@ const ReservationSuccess = () => {
         }
       }
     }
-  }, [order, refresh, refreshRetries, orderLoading]);
+  }, [order, refresh, refreshRetries, isOrderLoading]);
 
   useEffect(() => {
-    if (refreshError && !orderLoading) {
+    if (refreshError && !isOrderLoading) {
       const errors = refreshError.graphQLErrors;
       if (errors[0].extensions.error_code === "EXTERNAL_SERVICE_ERROR") {
         if (refreshRetries < howManyTimeShouldWeRetryOrder) {
@@ -104,13 +101,11 @@ const ReservationSuccess = () => {
         }
       }
     }
-  }, [refreshError, orderLoading, refreshRetries, refresh]);
+  }, [refreshError, isOrderLoading, refreshRetries, refresh]);
 
   const isOrderFetched = orderCalled && order && !orderError;
   const isOrderValid = isOrderFetched && order?.status === "PAID";
   const isReservationValid = !reservationError && !isReservationInvalid;
-
-  const readyToReport = !isLoggedOut && !orderLoading && !reservationLoading;
 
   useEffect(() => {
     if (!reservation?.state || !isOrderValid || reservationError) return;
@@ -129,14 +124,34 @@ const ReservationSuccess = () => {
     }
   }, [orderId, reservation, router, isOrderValid, reservationError]);
 
-  if (readyToReport && !isOrderFetched) {
+  const { t } = useTranslation("common");
+
+  // NOTE Should never end up here (SSR redirect to login)
+  if (!isAuthenticated) {
+    return (
+      <StyledContainer>
+        <div>{t("common:error.notAuthenticated")}</div>
+      </StyledContainer>
+    );
+  }
+
+  if (isOrderLoading || reservationLoading) {
+    return (
+      <StyledContainer>
+        <LoadingSpinner />
+      </StyledContainer>
+    );
+  }
+
+  if (!isOrderFetched) {
     return <ReservationFail type="order" />;
   }
 
-  if (readyToReport && !isReservationValid) {
+  if (!isReservationValid) {
     return <ReservationFail type="reservation" />;
   }
 
+  // NOTE weird fallback because we use useEffect to redirect on success
   return (
     <StyledContainer>
       <LoadingSpinner />

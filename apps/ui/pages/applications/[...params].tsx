@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     key: locale,
     props: {
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -66,12 +66,8 @@ const ReservationUnitName = styled.span`
 const EventReservationUnitDetails = (): JSX.Element | null => {
   const [isLoading, setIsLoading] = useState(true);
   const [application, setApplication] = useState<Application | null>(null);
-  // eslint-disable-next-line prettier/prettier
-  const [
-    applicationRound,
-    setApplicationRound,
-    // eslint-disable-next-line prettier/prettier
-  ] = useState<ApplicationRound | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRound | null>(null);
   const [reservations, setReservations] = useState<
     RecurringReservation[] | null
   >(null);
@@ -83,8 +79,7 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
 
   const { t, i18n } = useTranslation();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [path, applicationId, eventId, reservationUnitId] = params as string[];
+  const [, applicationId, eventId, reservationUnitId] = params as string[];
 
   const fetchData = async (appId: number) => {
     try {
@@ -120,12 +115,11 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
   const unitReservations = reservations
     ?.filter((recurring) => recurring.applicationEventId === Number(eventId))
     .flatMap((recurringreservations) => recurringreservations.reservations)
-    .filter((reservation) =>
-      Boolean(
-        reservation.reservationUnit.find(
+    .filter(
+      (reservation) =>
+        reservation.reservationUnit?.find(
           (unit) => unit.id === Number(reservationUnitId)
-        )
-      )
+        ) != null
     );
 
   const applicationEvent = application?.applicationEvents?.find(
@@ -134,7 +128,7 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
 
   const reservationUnit = unitReservations
     ?.flatMap((reservation) => reservation.reservationUnit)
-    .find((ru) => ru.id === Number(reservationUnitId));
+    .find((ru) => ru?.id === Number(reservationUnitId));
 
   return (
     <Container>
@@ -155,7 +149,7 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
         }
       />
       <ReservationList
-        groupName={applicationEvent?.name}
+        groupName={applicationEvent?.name ?? ""}
         reservations={unitReservations}
       />
     </Container>

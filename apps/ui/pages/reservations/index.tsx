@@ -16,16 +16,22 @@ import {
   ReservationType,
 } from "common/types/gql-types";
 import { Container } from "common";
-import { useSession } from "~/hooks/auth";
+import { useSession } from "@/hooks/auth";
+import { Toast } from "@/styles/util";
+import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
+import ReservationCard from "@/components/reservation/ReservationCard";
+import Head from "@/components/reservations/Head";
+import { CenterSpinner } from "@/components/common/common";
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
 
-import { LIST_RESERVATIONS } from "../../modules/queries/reservation";
-import ReservationCard from "../../components/reservation/ReservationCard";
-import Head from "../../components/reservations/Head";
-import { CenterSpinner } from "../../components/common/common";
-import { Toast } from "../../styles/util";
-import { authEnabled } from "../../modules/const";
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
+
   return {
     props: {
       ...(await serverSideTranslations(locale ?? "fi")),
@@ -80,16 +86,6 @@ const Reservations = (): JSX.Element | null => {
   const { t } = useTranslation();
   const { isAuthenticated, user: currentUser } = useSession();
   const { error: routerError } = router.query;
-
-  const isUserUnauthenticated = !isAuthenticated && authEnabled;
-
-  /*
-  useEffect(() => {
-    if (isUserUnauthenticated) {
-      signIn();
-    }
-  }, [isUserUnauthenticated]);
-  */
 
   const [upcomingReservations, setUpcomingReservations] = useState<
     ReservationType[]
@@ -153,8 +149,9 @@ const Reservations = (): JSX.Element | null => {
     }
   }, [reservationData]);
 
-  if (isUserUnauthenticated) {
-    return null;
+  // NOTE should never happen since we do an SSR redirect
+  if (!isAuthenticated) {
+    return <div>{t("common:error.notAuthenticated")}</div>;
   }
 
   return (

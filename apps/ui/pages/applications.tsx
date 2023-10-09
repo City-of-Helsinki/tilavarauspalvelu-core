@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { GetStaticProps } from "next";
+import React, { useState } from "react";
+import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
@@ -15,22 +15,28 @@ import {
   QueryApplicationRoundsArgs,
   QueryApplicationsArgs,
 } from "common/types/gql-types";
-import { useSession } from "~/hooks/auth";
+import { useSession } from "@/hooks/auth";
+import { getReducedApplicationStatus } from "@/modules/util";
+import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import { CenterSpinner } from "../components/common/common";
 import { APPLICATIONS } from "../modules/queries/application";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
-import { getReducedApplicationStatus } from "../modules/util";
-import { authEnabled } from "../modules/const";
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { locale } = ctx;
+
+  const redirect = redirectProtectedRoute(ctx);
+  if (redirect) {
+    return redirect;
+  }
+
   return {
     props: {
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
     },
-    revalidate: 100, // In seconds
   };
 };
 
@@ -81,40 +87,29 @@ const ApplicationsPage = (): JSX.Element | null => {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useSession();
 
-  const isUserUnauthenticated = !isAuthenticated && authEnabled;
-
-  /*
-  useEffect(() => {
-    if (isUserUnauthenticated) {
-      signIn();
-    }
-  }, [isUserUnauthenticated]);
-  */
-
-  const [state, setState] = useState<"loading" | "error" | "done">("loading");
   const [cancelled, setCancelled] = useState(false);
   const [cancelError, setCancelError] = useState(false);
 
-  const { data: roundsData, error: roundsError } = useQuery<
-    Query,
-    QueryApplicationRoundsArgs
-  >(APPLICATION_ROUNDS);
+  const {
+    data: roundsData,
+    error: roundsError,
+    loading: isRoundsLoading,
+  } = useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS);
 
-  const rounds = useMemo(
-    () =>
-      roundsData?.applicationRounds?.edges
-        ?.map((n) => n?.node)
-        .filter((n): n is ApplicationRoundType => !!n)
-        .reduce(
-          (prev, current) => ({ ...prev, [current.pk]: current }),
-          {} as { [key: number]: ApplicationRoundType }
-        ),
-    [roundsData]
-  );
+  const rounds =
+    roundsData?.applicationRounds?.edges
+      ?.map((n) => n?.node)
+      .filter((n): n is ApplicationRoundType => n != null)
+      .reduce(
+        (prev, current) =>
+          current.pk != null ? { ...prev, [current.pk]: current } : prev,
+        {} as { [key: number]: ApplicationRoundType }
+      ) ?? [];
 
   const {
     data: appData,
     error: appError,
+    loading: isAppLoading,
     refetch,
   } = useQuery<Query, QueryApplicationsArgs>(APPLICATIONS, {
     fetchPolicy: "no-cache",
@@ -133,30 +128,16 @@ const ApplicationsPage = (): JSX.Element | null => {
     },
   });
 
-  const applications: Dictionary<ApplicationType[]> = useMemo(
-    () =>
-      groupBy(
-        appData?.applications?.edges?.map((n) => n?.node),
-        (a) => getReducedApplicationStatus(a?.status)
-      ),
-    [appData]
+  const appNodes =
+    appData?.applications?.edges
+      ?.map((n) => n?.node)
+      .filter((n): n is ApplicationType => n != null) ?? [];
+  const applications: Dictionary<ApplicationType[]> = groupBy(appNodes, (a) =>
+    getReducedApplicationStatus(a?.status ?? undefined)
   );
 
-  useEffect(() => {
-    if (roundsError || appError) {
-      setState("error");
-    }
-  }, [roundsError, appError]);
-
-  useEffect(() => {
-    if (
-      appData?.applications?.edges &&
-      rounds &&
-      Object.keys(rounds).length > 0
-    ) {
-      setState("done");
-    }
-  }, [appData, applications, rounds]);
+  const isLoading = isRoundsLoading || isAppLoading;
+  const isError = roundsError || appError;
 
   const actionCallback = async (type: "cancel" | "error") => {
     switch (type) {
@@ -171,22 +152,17 @@ const ApplicationsPage = (): JSX.Element | null => {
     }
   };
 
-  if (isUserUnauthenticated) {
-    return null;
+  // NOTE should never happen since we do an SSR redirect
+  if (!isAuthenticated) {
+    return <div>{t("common:error.notAuthenticated")}</div>;
   }
 
   return (
     <>
       <Head />
       <Container>
-        {state === "done" ? (
-          <ApplicationGroups
-            t={t}
-            rounds={rounds}
-            applications={applications}
-            actionCallback={actionCallback}
-          />
-        ) : state === "error" ? (
+        {isLoading && <CenterSpinner />}
+        {isError && (
           <Notification
             type="error"
             label={t("common:error.error")}
@@ -194,9 +170,15 @@ const ApplicationsPage = (): JSX.Element | null => {
           >
             {t("common:error.dataError")}
           </Notification>
-        ) : (
-          state === "loading" && <CenterSpinner />
         )}
+        {!isLoading && !isError ? (
+          <ApplicationGroups
+            t={t}
+            rounds={rounds}
+            applications={applications}
+            actionCallback={actionCallback}
+          />
+        ) : null}
       </Container>
       {cancelled && (
         <Notification
