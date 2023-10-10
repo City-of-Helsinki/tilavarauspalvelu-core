@@ -19,6 +19,7 @@ import { Query, QueryUnitsArgs } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { ShowAllContainer } from "common/src/components";
+import TimeRangePicker from "common/src/components/form/TimeRangePicker";
 import {
   mapOptions,
   getSelectedOption,
@@ -37,7 +38,6 @@ import { RESERVATION_UNIT_TYPES } from "../../modules/queries/reservationUnit";
 import { getUnitName } from "../../modules/reservationUnit";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
 import DateRangePicker from "@/components/form/DateRangePicker";
-import TimeRangePicker from "@/components/form/TimeRangePicker";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -211,8 +211,21 @@ const TimeRangeWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
+  gap: 0;
   .error-message {
     grid-column: span 2;
+  }
+  // Starting date picker
+  > div:first-child > div {
+    border-right: 0;
+  }
+  // Hide the label text (but keep its height) for the end time select, since HDS adds a "*" to required field labels
+  // TODO: Make the displaying of the label text component conditional on having an empty text as endTime label, as it could possibly often be empty. Especially if the component to be is re-used.
+  > div:nth-child(2) label {
+    height: 24px;
+    span {
+      display: none;
+    }
   }
 `;
 
@@ -361,6 +374,18 @@ const SearchForm = ({
       value: 1.5,
     },
   ] as OptionType[];
+  const durationMinuteOptions = () => {
+    const durations: OptionType[] = [];
+    let minute = 15;
+    while (minute <= 90) {
+      durations.push({
+        label: t("common:minute_other", { count: minute }),
+        value: 60 / minute,
+      });
+      minute += 15;
+    }
+    return durations;
+  };
 
   const populateDurationOptions = (): OptionType[] => {
     const times: OptionType[] = [];
@@ -380,11 +405,25 @@ const SearchForm = ({
       }
     }
     // we need to add the minute times to the beginning of the duration options
-    return minuteDurations.concat(...times) as OptionType[];
+    return durationMinuteOptions().concat(...times) as OptionType[];
   };
 
   const { register, watch, handleSubmit, setValue, getValues, control } =
-    useForm();
+    useForm({
+      defaultValues: {
+        purposes: "",
+        unit: "",
+        equipment: "",
+        dateBegin: todayDate,
+        dateEnd: null,
+        timeBegin: null,
+        timeEnd: null,
+        duration: null,
+        minPersons: 1,
+        maxPersons: null,
+        reservationUnitType: "",
+      },
+    });
 
   const getFormSubValueLabel = (
     key: string,
@@ -412,17 +451,17 @@ const SearchForm = ({
   ];
 
   useEffect(() => {
-    register("minPersons");
-    register("maxPersons");
+    register("purposes");
     register("unit");
-    register("reservationUnitType");
     register("equipment");
-    register("dateStart");
+    register("dateBegin");
     register("dateEnd");
-    register("timeStart");
+    register("timeBegin");
     register("timeEnd");
     register("duration");
-    register("purposes");
+    register("minPersons");
+    register("maxPersons");
+    register("reservationUnitType");
   }, [register]);
 
   // TODO this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
@@ -519,13 +558,13 @@ const SearchForm = ({
           <TimeRangeWrapper>
             <TimeRangePicker
               control={control}
-              name={{ start: "timeStart", end: "timeEnd" }}
-              label={{ start: t("searchForm:intervalFilter"), end: " " }}
+              name={{ begin: "timeBegin", end: "timeEnd" }}
+              label={{ begin: t("searchForm:intervalFilter"), end: " " }}
               placeholder={{
-                start: t("common:startLabel"),
+                begin: t("common:beginLabel"),
                 end: t("common:endLabel"),
               }}
-              clearable={{ start: true, end: true }}
+              clearable={{ begin: true, end: true }}
             />
           </TimeRangeWrapper>
           <StyledSelect

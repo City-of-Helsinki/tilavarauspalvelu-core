@@ -105,7 +105,7 @@
   "showLess": "Visa mindre",
   "showAll": "Visa allt",
   "duration": "Varaktighet {{duration}}",
-  "startLabel": "Från",
+  "beginLabel": "Från",
   "endLabel": "Till",,
   "fyiLabel": "Till kännedom",
   "add": "addera",

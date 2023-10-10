@@ -105,7 +105,7 @@
   "showLess": "Näytä vähemmän",
   "showAll": "Näytä kaikki",
   "duration": "Kesto {{duration}}",
-  "startLabel": "Alkaen",
+  "beginLabel": "Alkaen",
   "endLabel": "Asti",
   "fyiLabel": "Tiedoksi",
   "add": "Lisää",

@@ -105,7 +105,7 @@
   "showLess": "Show less",
   "showAll": "Show all",
   "duration": "Duration {{duration}}",
-  "startLabel": "From",
+  "beginLabel": "From",
   "endLabel": "Until",
   "fyiLabel": "For information",
   "add": "Add",
