@@ -50,6 +50,7 @@
   "error": {
     "dataError": "Uppgifterna hittades inte",
     "error": "Fel",
+    "notAuthenticated": "Var god och logga in.",
     "closeErrorMsg": "Stäng felmeddelandet"
   },
   "applicationNavigationName": "Ansökan",

@@ -2,7 +2,7 @@ import React from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isFinite } from "lodash";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useSession } from "@/hooks/auth";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import ReservationCancellation from "../../components/reservation/ReservationCancellation";

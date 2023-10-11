@@ -23,7 +23,7 @@ import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
 import React, { Children, useCallback, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import { Toolbar } from "common/src/calendar/Toolbar";

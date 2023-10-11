@@ -50,6 +50,7 @@
   "error": {
     "dataError": "Information could not be retrieved",
     "error": "Error",
+    "notAuthenticated": "Please login first",
     "closeErrorMsg": "Close error message"
   },
   "applicationNavigationName": "Application",

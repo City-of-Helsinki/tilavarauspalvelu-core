@@ -5,7 +5,7 @@ import React, { useEffect } from "react";
 import { breakpoints } from "common/src/common/style";
 import { LoadingSpinner } from "hds-react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { Container } from "common";
 import { useSession } from "@/hooks/auth";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";

@@ -2,7 +2,7 @@ import { formatSecondDuration } from "common/src/common/util";
 import { ReservationUnitByPkType } from "common/types/gql-types";
 import ClientOnly from "common/src/ClientOnly";
 import React, { useMemo } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "../../modules/const";
 import { formatDate } from "../../modules/util";
 import { Content, Subheading } from "./ReservationUnitStyles";

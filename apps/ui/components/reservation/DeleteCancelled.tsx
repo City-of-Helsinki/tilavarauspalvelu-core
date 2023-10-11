@@ -1,7 +1,7 @@
 import { breakpoints } from "common/src/common/style";
 import { H2, fontMedium } from "common/src/common/typography";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import Link from "next/link";
 import { IconArrowRight, IconSignout } from "hds-react";

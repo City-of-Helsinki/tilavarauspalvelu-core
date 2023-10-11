@@ -50,6 +50,7 @@
   "error": {
     "dataError": "Tietoja ei saatu haettua",
     "error": "Virhe",
+    "notAuthenticated": "Kirjaudu sisään ensin",
     "closeErrorMsg": "Sulje virheilmoitus"
   },
   "applicationNavigationName": "Hakemus",

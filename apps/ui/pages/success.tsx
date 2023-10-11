@@ -7,7 +7,7 @@ import { breakpoints } from "common/src/common/style";
 import { ReservationsReservationStateChoices } from "common/types/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Container } from "common";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useSession } from "@/hooks/auth";
 import { useOrder, useReservation } from "@/hooks/reservation";
 import ReservationFail from "@/components/reservation/ReservationFail";
@@ -44,6 +44,7 @@ const StyledContainer = styled(Container)`
 const ReservationSuccess = () => {
   const { isAuthenticated } = useSession();
   const router = useRouter();
+  const { t } = useTranslation(["common"]);
   const { orderId } = router.query as { orderId: string };
 
   const [isReservationInvalid, setIsReservationInvalid] =
@@ -123,8 +124,6 @@ const ReservationSuccess = () => {
         router.replace(`/reservation/confirmation/${reservation.pk}`);
     }
   }, [orderId, reservation, router, isOrderValid, reservationError]);
-
-  const { t } = useTranslation("common");
 
   // NOTE Should never end up here (SSR redirect to login)
   if (!isAuthenticated) {

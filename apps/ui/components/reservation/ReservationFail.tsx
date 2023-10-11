@@ -3,7 +3,7 @@ import { fontMedium, H2 } from "common/src/common/typography";
 import { IconArrowRight, IconSignout } from "hds-react";
 import Link from "next/link";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Container } from "common";
 import { signOut } from "~/hooks/auth";

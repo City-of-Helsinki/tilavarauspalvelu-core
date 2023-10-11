@@ -6,7 +6,7 @@ import { Query, QueryReservationByPkArgs } from "common/types/gql-types";
 import { LoadingSpinner } from "hds-react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Container } from "common";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
