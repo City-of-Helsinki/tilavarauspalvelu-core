@@ -35,6 +35,7 @@ import {
   UnitByPkType,
   ReservationState,
   ReservationUnitState,
+  ReservationUnitsReservationUnitPricingStatusChoices,
 } from "common/types/gql-types";
 
 import { languages, previewUrlPrefix, publicUrl } from "../../../common/const";
@@ -376,7 +377,20 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     skip: !reservationUnitPk,
     onCompleted: ({ reservationUnitByPk }) => {
       if (reservationUnitByPk) {
-        dispatch({ type: "dataLoaded", reservationUnit: reservationUnitByPk });
+        // Filter out PAST pricing since saving it causes mutation errors
+        const { pricings, ...rest } = reservationUnitByPk;
+        const activePricing = pricings?.filter(
+          (p) =>
+            p?.status !==
+            ReservationUnitsReservationUnitPricingStatusChoices.Past
+        );
+        dispatch({
+          type: "dataLoaded",
+          reservationUnit: {
+            ...rest,
+            pricings: activePricing,
+          },
+        });
       } else {
         onDataError(t("ReservationUnitEditor.reservationUnitNotAvailable"));
       }
