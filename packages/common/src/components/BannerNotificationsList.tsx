@@ -12,6 +12,8 @@ import {
   type Query,
   type QueryBannerNotificationsArgs,
   type CommonBannerNotificationTargetChoices,
+  type BannerNotificationTypeConnection,
+  type Maybe,
 } from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
@@ -129,8 +131,12 @@ const BannerNotificationsList = ({
     },
     fetchPolicy: "no-cache",
   });
+  const notificationsTarget = notificationData?.bannerNotifications;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dirty way to deal with gql alias
+  const notificationsAll = (notificationData as any)
+    ?.bannerNotificationsAll as Maybe<BannerNotificationTypeConnection>;
   const notificationsList =
-    notificationData?.bannerNotifications?.edges
+    [...(notificationsAll?.edges ?? []), ...(notificationsTarget?.edges ?? [])]
       .map((edge) => edge?.node)
       .filter((x): x is BannerNotificationType => x != null) ?? [];
 

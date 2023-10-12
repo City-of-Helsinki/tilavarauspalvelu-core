@@ -55,12 +55,24 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
   }
 `;
 
+// Always return the ALL target + either USER or STAFF target
+// has to be done like this because target is a single option (not an array)
+// and we can't filter on the frontend because target is not allowed in the query for unauthorized users
+// query alias breaks typescript typing (refactor later if possible).
 export const BANNER_NOTIFICATIONS_LIST = gql`
   ${BANNER_NOTIFICATION_COMMON}
   query BannerNotificationsList(
     $target: CommonBannerNotificationTargetChoices!
   ) {
     bannerNotifications(isVisible: true, target: $target) {
+      edges {
+        node {
+          id
+          ...BannerNotificationCommon
+        }
+      }
+    }
+    bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
       edges {
         node {
           id
