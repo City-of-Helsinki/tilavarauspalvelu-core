@@ -6,7 +6,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { toUIDate } from "common/src/common/util";
-import { Language, type OptionType } from "common/types/common";
+import { Language } from "common/types/common";
 import { isValidDateString } from "../../modules/util";
 
 const initDate = (date: Date | null): string => {
@@ -16,11 +16,11 @@ const initDate = (date: Date | null): string => {
 export interface DateRangePickerProps {
   endDate: Date | null;
   startDate: Date | null;
-  onChangeEndDate: (time: OptionType | null) => void;
-  onChangeStartDate: (time: OptionType | null) => void;
+  onChangeEndDate: (time: Date | null) => void;
+  onChangeStartDate: (time: Date | null) => void;
   showHelperText?: boolean;
-  labels?: { start?: string; end?: string };
-  required?: { start?: boolean; end?: boolean };
+  labels?: { begin?: string; end?: string };
+  required?: { begin?: boolean; end?: boolean };
   limits?: {
     startMinDate?: Date;
     startMaxDate?: Date;
@@ -149,7 +149,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         minDate={limits?.startMinDate ?? new Date()}
         maxDate={limits?.startMaxDate}
         initialMonth={new Date()}
-        label={labels?.start ?? t("dateSelector:labelStartDate")}
+        label={labels?.begin ?? t("dateSelector:labelStartDate")}
         language={i18n.language as Language}
         onChange={(date) => setInternalStartDateString(date)}
         errorText={
@@ -157,7 +157,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             ? t("dateSelector:errorDateFormat")
             : undefined
         }
-        required={required?.start !== undefined ? required.start : true}
+        required={required?.begin ?? true}
       />
       <DateInput
         autoComplete="off"
@@ -185,7 +185,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             ? t("dateSelector:errorDateFormat")
             : undefined
         }
-        required={required?.end !== undefined ? required.end : true}
+        required={required?.end ?? true}
       />
     </Wrapper>
   );

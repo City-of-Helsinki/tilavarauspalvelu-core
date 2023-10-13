@@ -527,29 +527,37 @@ const SearchForm = ({
           />
           <DateRangeWrapper>
             <DateRangePicker
-              startDate={reservationStartDate}
-              onChangeStartDate={(date: Date | null) => {
-                setValue("dateStart", !!date && toApiDate(date));
-              }}
-              endDate={reservationEndDate}
+              startDate={
+                getValues("dateStart") != null
+                  ? new Date(fromUIDate(getValues("dateStart")))
+                  : null
+              }
+              endDate={
+                getValues("dateEnd") != null
+                  ? new Date(fromUIDate(getValues("dateEnd")))
+                  : null
+              }
+              onChangeStartDate={(date: Date | null) =>
+                setValue("dateStart", date != null ? toUIDate(date) : "")
+              }
               onChangeEndDate={(date: Date | null) =>
-                setValue("dateEnd", date ? toApiDate(date) : null)
+                setValue("dateEnd", date != null ? toUIDate(date) : "")
               }
               labels={{
-                start: t("common:startLabel"),
+                begin: t("common:beginLabel"),
                 end: t("common:endLabel"),
               }}
               required={{
-                start: true,
+                begin: true,
                 end: false,
               }}
               limits={{
                 startMinDate: new Date(),
                 startMaxDate: getValues("dateEnd")
-                  ? fromUIDate(getValues("dateEnd"))
+                  ? fromApiDate(String(getValues("dateEnd")))
                   : undefined,
                 endMinDate: getValues("dateStart")
-                  ? fromUIDate(getValues("dateStart"))
+                  ? fromUIDate(String(getValues("dateStart")))
                   : undefined,
                 endMaxDate: addYears(new Date(), 2),
               }}
