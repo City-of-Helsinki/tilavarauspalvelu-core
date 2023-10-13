@@ -14,7 +14,7 @@ import {
 import { HeroSubheading } from "../../modules/style/typography";
 import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
 import { applicationRoundState } from "../../modules/util";
-import KorosDefault from "../../components/common/KorosDefault";
+import KorosDefault from "@/components/common/KorosDefault";
 import { createApolloClient } from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
@@ -27,6 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const now = new Date();
   const { locale } = ctx;
   const apolloClient = createApolloClient(ctx);
+
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     query: APPLICATION_ROUNDS,
     fetchPolicy: "no-cache",
@@ -52,10 +53,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-const Wrapper = styled.div`
-  background-color: var(--color-white);
-`;
-
 const HeadWrapper = styled.div`
   background-color: var(--tilavaraus-hero-background-color);
   color: var(--color-white);
@@ -71,10 +68,6 @@ const Head = styled.div`
     padding-bottom: var(--spacing-layout-l);
   }
 `;
-
-const Heading = styled(H2).attrs({ as: "h1" })``;
-
-const SubHeading = styled(HeroSubheading)``;
 
 const Content = styled.div`
   padding: 0 var(--spacing-m) var(--spacing-xl);
@@ -124,18 +117,15 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
   );
 
   return (
-    <Wrapper>
+    <div>
       <BreadcrumbWrapper route={["recurring"]} />
       <HeadWrapper>
         <Head>
-          <Heading>{t("recurringLander:heading")}</Heading>
-          <SubHeading>{t("recurringLander:subHeading")}</SubHeading>
+          <H2 as="h1">{t("recurringLander:heading")}</H2>
+          <HeroSubheading>{t("recurringLander:subHeading")}</HeroSubheading>
         </Head>
       </HeadWrapper>
-      <KorosDefault
-        from="var(--tilavaraus-hero-background-color)"
-        to="var(--color-white)"
-      />
+      <KorosDefault />
       <Content>
         {activeApplicationRounds?.length > 0 ? (
           <RoundList data-testid="recurring-lander__application-round-container--active">
@@ -184,7 +174,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
           </RoundList>
         )}
       </Content>
-    </Wrapper>
+    </div>
   );
 };
 

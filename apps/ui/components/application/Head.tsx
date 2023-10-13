@@ -46,12 +46,7 @@ const Head = ({
         <Heading>{heading}</Heading>
         {children || null}
       </Content>
-      {noKoros ? null : (
-        <StyledKoros
-          from="var(--tilavaraus-hero-background-color)"
-          to="var(--color-white)"
-        />
-      )}
+      {!noKoros && <StyledKoros />}
     </Container>
   );
 };

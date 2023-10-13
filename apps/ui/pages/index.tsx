@@ -42,6 +42,7 @@ const Home = ({ purposes, units }: Props): JSX.Element => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
   const apolloClient = createApolloClient(ctx);
+
   const { data: purposeData } = await apolloClient.query<
     Query,
     QueryPurposesArgs
@@ -52,7 +53,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       orderBy: "rank",
     },
   });
-
   const purposes = purposeData?.purposes?.edges.map((edge) => edge?.node) ?? [];
 
   const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
@@ -63,7 +63,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       orderBy: "rank",
     },
   });
-
   const units = unitData?.units?.edges?.map((edge) => edge?.node) ?? [];
 
   return {

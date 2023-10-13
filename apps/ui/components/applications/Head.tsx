@@ -25,8 +25,6 @@ const Content = styled.div`
   }
 `;
 
-const StyledKoros = styled(KorosDefault)``;
-
 const Head = (): JSX.Element => {
   const { t } = useTranslation();
 
@@ -37,10 +35,7 @@ const Head = (): JSX.Element => {
         <Heading>{t("applications:heading")}</Heading>
         <HeroSubheading>{t("applications:subHeading")}</HeroSubheading>
       </Content>
-      <StyledKoros
-        from="var(--tilavaraus-hero-background-color)"
-        to="var(--tilavaraus-gray)"
-      />
+      <KorosDefault to="var(--tilavaraus-gray)" />
     </Container>
   );
 };

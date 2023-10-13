@@ -1,19 +1,26 @@
 import React from "react";
-import Document, { Html, Head, Main, NextScript } from "next/document";
+import Document, {
+  DocumentContext,
+  Html,
+  Head,
+  Main,
+  NextScript,
+} from "next/document";
 import { ServerStyleSheet } from "styled-components";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: this works in ui/pages/_document.js for some reason
 import { getCriticalHdsRules, hdsStyles } from "hds-react";
 
 export default class MyDocument extends Document {
-  static async getInitialProps(ctx) {
+  static async getInitialProps(ctx: DocumentContext) {
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
 
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+          // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO: App should be a valid name in lint
           enhanceApp: (App) => (props) =>
-            // eslint-disable-next-line react/jsx-filename-extension
             sheet.collectStyles(<App {...props} />),
         });
 
@@ -26,12 +33,7 @@ export default class MyDocument extends Document {
       return {
         ...initialProps,
         hdsCriticalRules,
-        styles: (
-          <>
-            {initialProps.styles}
-            {sheet.getStyleElement()}
-          </>
-        ),
+        styles: [initialProps.styles, sheet.getStyleElement()],
       };
     } finally {
       sheet.seal();
@@ -39,6 +41,8 @@ export default class MyDocument extends Document {
   }
 
   render() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: this works in ui/pages/_document.js for some reason
     const { locale, hdsCriticalRules } = this.props;
 
     return (

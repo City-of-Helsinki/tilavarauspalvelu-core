@@ -80,10 +80,7 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
             )}`}
           </H1>
         </HeadContent>
-        <KorosDefault
-          from="var(--tilavaraus-hero-background-color)"
-          to="var(--color-white)"
-        />
+        <KorosDefault />
       </Head>
       <Container>
         <Content>

@@ -3,22 +3,20 @@ import React from "react";
 import styled from "styled-components";
 
 type Props = {
-  from?: string;
   to?: string;
   style?: React.CSSProperties;
+  className?: string;
 };
 
-const Wrapper = styled.div<{ $from?: string; $to?: string }>`
-  ${({ $from, $to }) => `
-    ${$from != null ? `background-color: ${$from}` : ""};
-    ${$to != null ? `fill': ${$to}` : ""}};
-  `}
+const Wrapper = styled.div<{ $fill?: string }>`
+  background-color: var(--tilavaraus-hero-background-color);
+  fill: ${({ $fill }) => $fill || "var(--color-white)"};
   margin-bottom: -1px;
 `;
 
-const KorosDefault = ({ from, to, ...rest }: Props): JSX.Element => {
+const KorosDefault = ({ to, ...rest }: Props): JSX.Element => {
   return (
-    <Wrapper $from={from} $to={to} {...rest}>
+    <Wrapper {...rest} $fill={to}>
       <Koros type="basic" />
     </Wrapper>
   );
