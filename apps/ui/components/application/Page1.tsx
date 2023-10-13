@@ -30,6 +30,7 @@ import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import ApplicationForm from "./ApplicationForm";
 
 type Props = {
+  // TODO break this down to smaller pieces (only the required props)
   applicationRound: ApplicationRoundType;
   editorState: EditorState;
   selectedReservationUnits: ReservationUnitType[];
@@ -40,6 +41,7 @@ type Props = {
     application: Application;
     eventId?: number;
   }) => void;
+  // TODO wrap dispatch to specific callback functions
   dispatch: React.Dispatch<Action>;
   addNewApplicationEvent: () => void;
   setError: (error: string) => void;

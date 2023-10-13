@@ -10,11 +10,8 @@ import { useTranslation } from "next-i18next";
 import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 import {
-  AccordionState,
-  Action,
   Application,
   ApplicationEvent as ApplicationEventType,
-  EditorState,
   LocalizationLanguages,
   OptionType,
 } from "common/types/common";
@@ -26,6 +23,11 @@ import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { omit } from "lodash";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
+import {
+  AccordionState,
+  Action,
+  EditorState,
+} from "@/modules/application/applicationReducer";
 import ReservationUnitList from "../reservation-unit/ReservationUnitList";
 import {
   apiDateToUIDate,

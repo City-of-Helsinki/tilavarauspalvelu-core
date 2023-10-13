@@ -3,13 +3,11 @@ import applyCaseMiddleware from "axios-case-converter";
 import { getCookie } from "typescript-cookie";
 import {
   Application,
-  ApplicationRound,
   ReservationUnit,
 } from "common/types/common";
 import { REST_API_URL } from "./const";
 import { ApiError } from "./ApiError";
 
-const applicationRoundBasePath = "application_round";
 const applicationBasePath = "application";
 
 const axiosOptions = {
@@ -112,17 +110,6 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
     data,
     validateStatus,
   });
-}
-
-export interface ReservationUnitsParameters {
-  applicationRound?: number;
-  application?: number;
-  search?: string;
-  purpose?: number;
-  reservationUnitType?: number;
-  unit?: number;
-  limit?: number;
-  after?: string;
 }
 
 export function getReservationUnit(id: number): Promise<ReservationUnit> {

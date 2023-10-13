@@ -105,6 +105,9 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
 
   const [ready, setReady] = useState(false);
 
+  // TODO replace this with a Array<{ pk: number, name: string, unitName }>
+  // though we also need translations for the names nameFi, nameSv, nameEn
+  // TODO pass it as a prop also don't fetch it here
   const [reservationUnits, setReservationUnits] = useState<{
     [key: number]: ReservationUnit;
   }>({});
@@ -117,6 +120,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const citiesOptions = options.cityOptions;
   const { ageGroups } = params;
 
+  // FIXME replace with GQL query
   useEffect(() => {
     let mounted = true;
     async function fetchData() {

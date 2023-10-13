@@ -315,53 +315,15 @@ export type OptionType = {
   value?: number | string;
 };
 
-export type Action = {
-  type:
-    | "load"
-    | "addNewApplicationEvent"
-    | "save"
-    | "toggleAccordionState"
-    | "removeApplicationEvent";
-  application?: Application;
-  savedEventId?: number;
-  eventId?: number;
-  params?: { [key: string]: string };
-};
-
-export type ApplicationEditor = {
-  application: Application;
-  reservationUnits: ReservationUnit[];
-};
-
 export type FormType = undefined | "individual" | "organisation" | "company";
 
 export type LocalizationLanguages = "fi" | "sv" | "en";
-
-export type EditorState = {
-  loading: boolean;
-  application: Application;
-  savedEventId?: number;
-  accordionStates: AccordionState[];
-};
-
-export type AccordionState = {
-  applicationEventId: number | null; // null is used for non saved event
-  open: boolean;
-};
 
 export type Cell = {
   hour: number;
   label: string;
   state: ApplicationEventSchedulePriority | boolean;
   key: string;
-};
-
-export type UserProfile = {
-  // eslint-disable-next-line camelcase
-  given_name: string;
-  // eslint-disable-next-line camelcase
-  family_name: string;
-  email: string;
 };
 
 export type TimeSpan = {

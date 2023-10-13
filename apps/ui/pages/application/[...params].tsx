@@ -5,10 +5,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  Application as ApplicationType,
-  EditorState,
-} from "common/types/common";
+import { Application as ApplicationType } from "common/types/common";
 import {
   ApplicationRoundType,
   Query,
@@ -25,7 +22,9 @@ import Page2 from "../../components/application/Page2";
 import Page3 from "../../components/application/Page3";
 import Preview from "../../components/application/Preview";
 import View from "../../components/application/View";
-import applicationReducer from "../../modules/application/applicationReducer";
+import applicationReducer, {
+  EditorState,
+} from "@/modules/application/applicationReducer";
 import useReservationUnitList from "../../hooks/useReservationUnitList";
 import Sent from "../../components/application/Sent";
 import { CenterSpinner } from "../../components/common/common";

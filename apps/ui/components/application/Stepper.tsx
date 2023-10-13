@@ -77,6 +77,7 @@ const Name = styled.div<{ $disabled: boolean; $current: boolean }>`
   ${({ $disabled }) => ($disabled ? `color: var(--color-black-40);` : ``)}
 `;
 
+// TODO only pass the props that are needed (not the whole application)
 type Props = {
   application?: Application;
 };

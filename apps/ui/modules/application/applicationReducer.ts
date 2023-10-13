@@ -1,13 +1,34 @@
 import i18next from "i18next";
-import {
-  AccordionState,
-  Action,
-  Application,
-  ApplicationEvent,
-  EditorState,
-} from "common/types/common";
+import { Application, ApplicationEvent } from "common/types/common";
 import { defaultDuration } from "../const";
 import { deepCopy } from "../util";
+
+// TODO this is only used for the ApplicationEditor in UI
+export type Action = {
+  type:
+    | "load"
+    | "addNewApplicationEvent"
+    | "save"
+    | "toggleAccordionState"
+    | "removeApplicationEvent";
+  application?: Application;
+  savedEventId?: number;
+  eventId?: number;
+  params?: { [key: string]: string };
+};
+
+// TODO this is badly named and should be in the UI only (reducer)
+export type EditorState = {
+  loading: boolean;
+  application: Application;
+  savedEventId?: number;
+  accordionStates: AccordionState[];
+};
+
+export type AccordionState = {
+  applicationEventId: number | null; // null is used for non saved event
+  open: boolean;
+};
 
 const applicationEvent = (
   applicationId?: number,
