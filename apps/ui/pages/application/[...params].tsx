@@ -7,7 +7,6 @@ import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Application as ApplicationType } from "common/types/common";
 import {
-  ApplicationRoundType,
   Query,
   QueryApplicationRoundsArgs,
   QueryTermsOfUseArgs,
@@ -187,14 +186,14 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         router.push(target);
       });
 
+  const applicationRound = applicationLoadingStatus.value?.applicationRound;
+
   const addNewApplicationEvent = async () => {
     const args = {} as {
       [key: string]: string;
     };
-    const begin =
-      applicationLoadingStatus.value?.applicationRound?.reservationPeriodBegin;
-    const end =
-      applicationLoadingStatus.value?.applicationRound?.reservationPeriodEnd;
+    const begin = applicationRound?.reservationPeriodBegin;
+    const end = applicationRound?.reservationPeriodEnd;
     if (applicationLoadingStatus.value) {
       args.begin = begin ? apiDateToUIDate(begin) : "";
       args.end = end ? apiDateToUIDate(end) : "";
@@ -208,9 +207,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   const appRound =
     applicationLoadingStatus.value?.applicationRound ?? undefined;
-  const applicationRoundName = appRound
-    ? getTranslation(appRound, "name")
-    : "-";
+  const applicationRoundName =
+    appRound != null ? getTranslation(appRound, "name") : "-";
 
   const ready = !applicationLoadingStatus.loading && state.loading === false;
 
@@ -241,24 +239,25 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
         >
-          <Page1
-            selectedReservationUnits={reservationUnits as ReservationUnitType[]}
-            applicationRound={
-              applicationLoadingStatus.value?.applicationRound ||
-              ({} as ApplicationRoundType)
-            }
-            dispatch={dispatch}
-            editorState={state}
-            save={({
-              application,
-              eventId,
-            }: {
-              application: ApplicationType;
-              eventId?: number;
-            }) => saveWithEffect(application, undefined, eventId)}
-            addNewApplicationEvent={addNewApplicationEvent}
-            setError={setError}
-          />
+          {applicationRound != null && (
+            <Page1
+              selectedReservationUnits={
+                reservationUnits as ReservationUnitType[]
+              }
+              applicationRound={applicationRound}
+              dispatch={dispatch}
+              editorState={state}
+              save={({
+                application,
+                eventId,
+              }: {
+                application: ApplicationType;
+                eventId?: number;
+              }) => saveWithEffect(application, undefined, eventId)}
+              addNewApplicationEvent={addNewApplicationEvent}
+              setError={setError}
+            />
+          )}
         </ApplicationPage>
       )}
       {pageId === "page2" && (

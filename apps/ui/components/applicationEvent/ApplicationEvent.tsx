@@ -23,11 +23,6 @@ import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { omit } from "lodash";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import {
-  AccordionState,
-  Action,
-  EditorState,
-} from "@/modules/application/applicationReducer";
 import ReservationUnitList from "../reservation-unit/ReservationUnitList";
 import {
   apiDateToUIDate,
@@ -61,10 +56,11 @@ type Props = {
   form: ReturnType<typeof useForm>;
   selectedReservationUnits: ReservationUnitType[];
   optionTypes: OptionTypes;
-  editorState: EditorState;
-  dispatch: React.Dispatch<Action>;
+  isVisible: boolean;
+  onToggleAccordian: () => void;
   onSave: () => void;
   onDeleteEvent: () => void;
+  applicationEventSaved: boolean;
 };
 
 const Wrapper = styled.div`
@@ -130,15 +126,6 @@ const Button = styled(MediumButton)`
   }
 `;
 
-const isOpen = (
-  current: number | undefined,
-  states: AccordionState[]
-): boolean => {
-  return Boolean(
-    states.find((state) => state.applicationEventId === current)?.open
-  );
-};
-
 const getApplicationEventData = (
   original: ApplicationEventType,
   form: ApplicationEventType
@@ -162,7 +149,7 @@ const ApplicationEventInner = ({
   optionTypes,
   del,
   onSave,
-}: Omit<Props, "dispatch" | "onDeleteEvent"> & {
+}: Omit<Props, "onToggleAccordian" | "onDeleteEvent"> & {
   del: () => void;
 }): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -553,12 +540,12 @@ const ApplicationEventInner = ({
 
 const ApplicationEvent = (props: Props): JSX.Element => {
   const {
-    applicationEvent,
     index,
     form,
-    editorState,
-    dispatch,
+    isVisible,
+    applicationEventSaved,
     onDeleteEvent,
+    onToggleAccordian,
   } = props;
 
   const { t } = useTranslation();
@@ -581,33 +568,18 @@ const ApplicationEvent = (props: Props): JSX.Element => {
   form.watch(fieldName("eventsPerWeek"));
   form.watch(fieldName("biweekly"));
 
-  const del = () => {
-    if (!applicationEvent.id) {
-      dispatch({ type: "removeApplicationEvent", eventId: undefined });
-    } else {
-      onDeleteEvent();
-    }
-  };
-
-  const isVisible = isOpen(applicationEvent.id, editorState.accordionStates);
   return (
     <Wrapper>
       <Accordion
-        onToggle={() => {
-          dispatch({
-            type: "toggleAccordionState",
-            eventId: applicationEvent.id,
-          });
-        }}
+        onToggle={onToggleAccordian}
         open={isVisible}
         heading={`${eventName}` || t("application:Page1.applicationEventName")}
         theme="thin"
       >
         {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
-        {isVisible && <ApplicationEventInner {...props} del={del} />}
+        {isVisible && <ApplicationEventInner {...props} del={onDeleteEvent} />}
       </Accordion>
-      {editorState.savedEventId &&
-      editorState.savedEventId === applicationEvent.id ? (
+      {applicationEventSaved ? (
         <Notification
           size="small"
           type="success"

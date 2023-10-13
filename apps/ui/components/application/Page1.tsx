@@ -5,17 +5,16 @@ import { useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
 import { useRouter } from "next/router";
-import type {
-  Action,
-  Application,
-  ApplicationStatus,
-  EditorState,
-} from "common/types/common";
+import type { Application } from "common/types/common";
 import type {
   Query,
   ApplicationRoundType,
   ReservationUnitType,
 } from "common/types/gql-types";
+import type {
+  Action,
+  EditorState,
+} from "@/modules/application/applicationReducer";
 import {
   apiDateToUIDate,
   deepCopy,
@@ -158,7 +157,7 @@ const Page1 = ({
     if (otherEventsAreValid) {
       const appToSave = {
         ...prepareData(form.getValues()),
-        status: "draft" as ApplicationStatus,
+        status: "draft" as const
       };
       appToSave.applicationEvents = appToSave.applicationEvents.filter(
         (ae) => ae.id !== eventId
@@ -197,9 +196,31 @@ const Page1 = ({
             onSave={form.handleSubmit((app: Application) =>
               onSubmit(app, event.id)
             )}
-            onDeleteEvent={() => onDeleteEvent(event.id, index)}
-            editorState={editorState}
-            dispatch={dispatch}
+            onDeleteEvent={() => {
+              if (!event.id) {
+                dispatch({
+                  type: "removeApplicationEvent",
+                  eventId: undefined,
+                });
+              } else {
+                onDeleteEvent(event.id, index);
+              }
+            }}
+            onToggleAccordian={() => {
+              dispatch({
+                type: "toggleAccordionState",
+                eventId: event.id,
+              });
+            }}
+            isVisible={
+              editorState.accordionStates.filter(
+                (state) => state.applicationEventId === event.id && state.open
+              ).length > 0
+            }
+            applicationEventSaved={
+              editorState.savedEventId != null &&
+              editorState.savedEventId === event.id
+            }
           />
         );
       })}
