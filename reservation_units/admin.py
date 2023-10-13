@@ -192,8 +192,9 @@ class ReservationUnitAdmin(ExtraButtonsMixin, SortableAdminMixin, admin.ModelAdm
                 level=messages.ERROR,
             )
         else:
-            with open(path, "rb") as file:
-                return FileResponse(file)
+            # Filehandler needs to be left open for Django to be able to stream the file
+            # Should fix the exporter to use an in-memory stream instead of writing to a file.
+            return FileResponse(open(path, "rb"))  # noqa: SIM115
 
 
 @admin.register(ReservationUnitImage)
