@@ -232,9 +232,6 @@ const formatDuration = (
     return "";
   }
   const translationKey = `common.${type}Amount`;
-  if (!duration) {
-    return "";
-  }
   return `${type ? t(translationKey) : ""} ${formatDurationShort(
     secondsToHms(duration)
   )}`;
