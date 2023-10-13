@@ -15,7 +15,6 @@ import {
 } from "date-fns";
 import { TFunction } from "next-i18next";
 import {
-  type ApplicationRoundType,
   type OpeningTimesType,
   type ReservationType,
   type ReservationUnitByPkType,
@@ -29,7 +28,6 @@ import {
   type ApplicationEvent,
   type OptionType,
   type PendingReservation,
-  type ApplicationRound,
 } from "../../types/common";
 import {
   convertHMSToSeconds,
@@ -153,16 +151,20 @@ export const isSlotWithinTimeframe = (
         isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
 };
 
+export type RoundPeriod = {
+  reservationPeriodBegin: string;
+  reservationPeriodEnd: string;
+};
 const doesSlotCollideWithApplicationRounds = (
   slot: Date,
-  applicationRounds: ApplicationRound[] | ApplicationRoundType[] = []
+  rounds: RoundPeriod[]
 ): boolean => {
-  if (applicationRounds?.length < 1) return false;
+  if (rounds.length < 1) return false;
 
-  return applicationRounds.some((applicationRound) =>
+  return rounds.some((round) =>
     isWithinInterval(slot, {
-      start: new Date(applicationRound.reservationPeriodBegin),
-      end: new Date(applicationRound.reservationPeriodEnd).setHours(23, 59, 59),
+      start: new Date(round.reservationPeriodBegin),
+      end: new Date(round.reservationPeriodEnd).setHours(23, 59, 59),
     })
   );
 };
@@ -207,7 +209,7 @@ export const areSlotsReservable = (
   reservationBegins?: Date,
   reservationEnds?: Date,
   reservationsMinDaysBefore = 0,
-  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[] = [],
+  activeApplicationRounds: RoundPeriod[] = [],
   validateEnding = false
 ): boolean => {
   return slots.every((slot) => {
@@ -240,7 +242,7 @@ export const isRangeReservable = ({
   reservationBegins?: Date;
   reservationEnds?: Date;
   reservationsMinDaysBefore: number;
-  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
+  activeApplicationRounds: RoundPeriod[];
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
 }): boolean => {
   const slots = generateSlots(range[0], range[1], reservationStartInterval);
@@ -411,7 +413,7 @@ export const getSlotPropGetter =
     customValidation,
   }: {
     openingHours: OpeningTimesType[];
-    activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
+    activeApplicationRounds: RoundPeriod[];
     reservationBegins?: Date;
     reservationEnds?: Date;
     reservationsMinDaysBefore?: number;

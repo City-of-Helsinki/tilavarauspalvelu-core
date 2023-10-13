@@ -3,12 +3,11 @@ import { flatten, trim, uniq } from "lodash";
 import { addDays } from "date-fns";
 import { i18n } from "next-i18next";
 import {
-  ApplicationRound,
   ReservationState,
   ReservationUnit,
 } from "common/types/common";
 import { toApiDate, toUIDate } from "common/src/common/util";
-import { isSlotWithinReservationTime } from "common/src/calendar/util";
+import { RoundPeriod, isSlotWithinReservationTime } from "common/src/calendar/util";
 import {
   EquipmentType,
   ReservationsReservationStateChoices,
@@ -187,7 +186,7 @@ export const getActivePricing = (
 
 export const getFuturePricing = (
   reservationUnit: ReservationUnitByPkType,
-  applicationRounds: ApplicationRound[] = [],
+  applicationRounds: RoundPeriod[] = [],
   reservationDate?: Date
 ): ReservationUnitPricingType | undefined => {
   const { pricings, reservationBegins, reservationEnds } = reservationUnit;

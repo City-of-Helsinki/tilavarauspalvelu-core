@@ -4,14 +4,12 @@ import { getCookie } from "typescript-cookie";
 import {
   Application,
   ApplicationRound,
-  RecurringReservation,
   ReservationUnit,
 } from "common/types/common";
 import { REST_API_URL } from "./const";
 import { ApiError } from "./ApiError";
 
 const applicationRoundBasePath = "application_round";
-const recurringReservationBasePath = "recurring_reservation";
 const applicationBasePath = "application";
 
 const axiosOptions = {
@@ -116,22 +114,6 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
   });
 }
 
-export function getApplicationRounds(): Promise<ApplicationRound[]> {
-  return apiGet<ApplicationRound[]>({
-    path: `${applicationRoundBasePath}`,
-  });
-}
-
-/*
-export function getApplicationRound(
-  params: { id: number }
-): Promise<ApplicationRound> {
-  return apiGet<ApplicationRound>({
-    path: `${applicationRoundBasePath}/${params.id}`,
-  });
-}
-*/
-
 export interface ReservationUnitsParameters {
   applicationRound?: number;
   application?: number;
@@ -142,17 +124,6 @@ export interface ReservationUnitsParameters {
   limit?: number;
   after?: string;
 }
-
-/*
-export function getRecurringReservations(
-  applicationId: number
-): Promise<RecurringReservation[]> {
-  return apiGet<RecurringReservation[]>({
-    path: `${recurringReservationBasePath}`,
-    parameters: { application: applicationId },
-  });
-}
-*/
 
 export function getReservationUnit(id: number): Promise<ReservationUnit> {
   return apiGet<ReservationUnit>({

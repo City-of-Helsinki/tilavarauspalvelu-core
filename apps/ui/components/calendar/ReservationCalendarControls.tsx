@@ -30,27 +30,20 @@ import {
 import { useLocalStorage } from "react-use";
 import { Transition } from "react-transition-group";
 import {
+  RoundPeriod,
   doBuffersCollide,
   doReservationsCollide,
   getDayIntervals,
   isRangeReservable,
 } from "common/src/calendar/util";
-import {
-  ApplicationRound,
-  Language,
-  OptionType,
-  PendingReservation,
-} from "common/types/common";
+import { Language, OptionType, PendingReservation } from "common/types/common";
 import {
   fontBold,
   fontMedium,
   fontRegular,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import {
-  ApplicationRoundType,
-  ReservationUnitByPkType,
-} from "common/types/gql-types";
+import { ReservationUnitByPkType } from "common/types/gql-types";
 import { MediumButton, truncatedText } from "../../styles/util";
 import { ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
@@ -66,7 +59,7 @@ type Props<T> = {
   isSlotReservable: (start: Date, end: Date) => boolean;
   isReserving: boolean;
   setCalendarFocusDate: (date: Date) => void;
-  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
+  activeApplicationRounds: RoundPeriod[];
   createReservation?: (arg: ReservationProps) => void;
   setErrorMsg: (msg: string | null) => void;
   handleEventChange: (

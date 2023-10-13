@@ -2,12 +2,10 @@ import { addMinutes, isAfter, isValid } from "date-fns";
 import camelCase from "lodash/camelCase";
 import { secondsToHms } from "common/src/common/util";
 import {
-  ApplicationRound,
   OptionType,
   PendingReservation,
 } from "common/types/common";
 import {
-  ApplicationRoundType,
   PaymentOrderType,
   ReservationsReservationReserveeTypeChoices,
   ReservationsReservationStateChoices,
@@ -16,6 +14,7 @@ import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "common/types/gql-types";
 import {
+    RoundPeriod,
   doBuffersCollide,
   doReservationsCollide,
   getIntervalMinutes,
@@ -193,8 +192,8 @@ export const isReservationReservable = ({
   end,
   skipLengthCheck = false,
 }: {
-  reservationUnit?: ReservationUnitByPkType;
-  activeApplicationRounds: ApplicationRound[] | ApplicationRoundType[];
+  reservationUnit: ReservationUnitByPkType;
+  activeApplicationRounds: RoundPeriod[];
   start: Date;
   end: Date;
   skipLengthCheck: boolean;
@@ -283,7 +282,7 @@ export type CanReservationBeChangedProps = {
   reservation?: ReservationType;
   newReservation?: ReservationType | PendingReservation;
   reservationUnit?: ReservationUnitByPkType;
-  activeApplicationRounds?: ApplicationRoundType[];
+  activeApplicationRounds?: RoundPeriod[];
 };
 
 // TODO disable undefined from reservation and reservationUnit
@@ -333,7 +332,7 @@ export const canReservationTimeBeChanged = ({
     }
 
     //  new reservation is valid
-    if (
+    if (reservationUnit != null &&
       !isReservationReservable({
         reservationUnit,
         activeApplicationRounds,

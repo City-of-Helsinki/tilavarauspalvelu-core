@@ -20,6 +20,7 @@ import {
 } from "date-fns";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import {
+  RoundPeriod,
   getEventBuffers,
   getNewReservation,
   getSlotPropGetter,
@@ -34,12 +35,10 @@ import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
 import ClientOnly from "common/src/ClientOnly";
+import { PendingReservation, Reservation } from "common/types/common";
 import {
-  ApplicationRound,
-  PendingReservation,
-  Reservation,
-} from "common/types/common";
-import {
+  ApplicationRoundStatus,
+  ApplicationRoundType,
   Query,
   QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
@@ -80,7 +79,6 @@ import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
 } from "@/modules/queries/reservationUnit";
-import { getApplicationRounds } from "@/modules/api";
 import { ReservationProps } from "@/context/DataContext";
 import {
   CREATE_RESERVATION,
@@ -119,11 +117,12 @@ import QuickReservation, {
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "~/hooks/user";
 import { genericTermsVariant } from "@/modules/const";
+import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
   relatedReservationUnits: ReservationUnitType[];
-  activeApplicationRounds: ApplicationRound[];
+  activeApplicationRounds: RoundPeriod[];
   termsOfUse: Record<string, TermsOfUseType>;
 };
 
@@ -147,10 +146,20 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   let relatedReservationUnits = [] as ReservationUnitType[];
 
-  const applicationRounds = await getApplicationRounds();
-  const activeApplicationRounds = applicationRounds.filter((applicationRound) =>
-    applicationRound.reservationUnitIds.includes(id)
-  );
+  const { data } = await apolloClient.query<Query>({
+    query: APPLICATION_ROUNDS_PERIODS,
+  });
+  const activeApplicationRounds = data?.applicationRounds?.edges
+    ?.map((e) => e?.node)
+    .filter((n): n is ApplicationRoundType => n != null)
+    .filter(
+      (n) =>
+        today &&
+        n?.status !== ApplicationRoundStatus.Archived &&
+        n.publicDisplayBegin <= today &&
+        n.publicDisplayEnd >= today
+    )
+    .filter((n) => n?.reservationUnits?.find((x) => x?.pk === id));
 
   if (id) {
     const { data: reservationUnitData } = await apolloClient.query<

@@ -25,6 +25,21 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
   }
 `;
 
+// This is a simple variant that maps to RoundPeriod[] for time collision checks
+export const APPLICATION_ROUNDS_PERIODS = gql`
+  query ApplicationRounds {
+    applicationRounds {
+      edges {
+        node {
+          pk
+          reservationPeriodBegin
+          reservationPeriodEnd
+        }
+      }
+    }
+  }
+`;
+
 export const APPLICATION_ROUNDS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
   query ApplicationRounds {
