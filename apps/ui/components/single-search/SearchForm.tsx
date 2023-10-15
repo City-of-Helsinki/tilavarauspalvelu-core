@@ -29,6 +29,7 @@ import {
 import { RESERVATION_UNIT_TYPES } from "@/modules/queries/reservationUnit";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import DateRangePicker from "@/components/form/DateRangePicker";
+import Checkbox from "@/components/form/Checkbox";
 
 export interface FormValues {
   purposes: string | null;
@@ -42,6 +43,7 @@ export interface FormValues {
   minPersons: string | null;
   maxPersons: string | null;
   reservationUnitType: string;
+  showOnlyAvailable: boolean;
 }
 
 type Props = {
@@ -440,6 +442,7 @@ const SearchForm = ({
     }
     return t("searchForm:filters.duration", { unit });
   };
+  const showOnlyChecked = watch("showOnlyAvailable");
   return (
     <>
       <TopContainer>
@@ -626,6 +629,15 @@ const SearchForm = ({
                   : undefined
               }
             />
+            <Checkbox
+              id="showOnlyAvailable"
+              name="showOnlyAvailable"
+              label="Näytä vain vapaana olevat tilat"
+              onChange={(e) => {
+                setValue("showOnlyAvailable", e.currentTarget.checked);
+              }}
+              checked={showOnlyChecked}
+            />
           </OptionalFilters>
         </Filters>
         <JustForDesktop
@@ -655,6 +667,7 @@ const SearchForm = ({
               {formValueKeys
                 .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
                 .map((formValueKey) => {
+                  if (formValueKey === "showOnlyAvailable") return null;
                   const label = t(`searchForm:filters.${formValueKey}`, {
                     label: formValueKey,
                     value: formValues[formValueKey],
