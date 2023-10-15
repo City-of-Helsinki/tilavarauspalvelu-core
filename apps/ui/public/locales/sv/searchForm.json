@@ -14,6 +14,10 @@
   "unitFilter": "Verksamhetsställe",
   "purposesFilter": "Användningsändamål",
   "equipmentFilter": "Utrustning",
+  "dateFilter": "Datum",
+  "timeFilter": "Tid",
+  "durationFilter": "Varaktighet",
+  "beginTimeIsBeforeEndTime": "Sluttiden måste vara senare än starttiden",
   "resetForm": "Töm",
   "filters": {
     "applicationRound": "{{label}}",
@@ -21,7 +25,12 @@
     "minPersons_one": "Minst {{value}} person",
     "minPersons_other": "Minst {{value}} personer",
     "maxPersons_one": "Upp till {{value}} person",
-    "maxPersons_other": "Upp till {{value}} personer"
+    "maxPersons_other": "Upp till {{value}} personer",
+    "begin": "Från {{value}}",
+    "end": "Till {{value}}",
+    "after": "Tidigast kl.{{value}}",
+    "before": "Senast kl.{{value}}",
+    "duration": "Varaktighet minst {{unit}}"
   },
   "all": "Alla",
   "clearSelections": "Redigera",

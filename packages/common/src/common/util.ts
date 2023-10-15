@@ -82,7 +82,8 @@ export const formatSecondDuration = (
   return formatDuration(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
 };
 
-// Don't crash on invalid dates
+// Returns a string in specified format (default: "yyyy-MM-dd") from a Date object,
+// pass a format string as a second parameter to change the format
 export const toApiDate = (
   date: Date,
   formatStr = "yyyy-MM-dd"
@@ -97,23 +98,31 @@ export const toApiDate = (
   }
 };
 
+// May crash on invalid dates
 export const toApiDateUnsafe = (date: Date, formatStr = "yyyy-MM-dd") =>
   format(date, formatStr);
 
+// Returns a Date object from a string in format "yyyy-MM-dd"
 export const fromApiDate = (date: string): Date =>
   parse(date, "yyyy-MM-dd", new Date());
 
+// Returns a Date object from a string in format "d.M.yyyy"
 export const fromUIDate = (date: string): Date =>
   parse(date, "d.M.yyyy", new Date());
 
 export const isValidDate = (date: Date): boolean =>
   isValid(date) && isAfter(date, new Date("1000-01-01"));
 
-export const toUIDate = (date?: Date, formatStr = "d.M.yyyy"): string => {
+// Returns a string in "d.M.yyyy" format from a Date object
+export const toUIDate = (date: Date, formatStr = "d.M.yyyy"): string => {
   if (!date || !isValidDate(date)) {
     return "";
   }
-  return format(date, formatStr, { locale: fi });
+  try {
+    return format(date, formatStr, { locale: fi });
+  } catch (e) {
+    return "";
+  }
 };
 
 export const chunkArray = <T>(array: T[], size: number): T[][] => {

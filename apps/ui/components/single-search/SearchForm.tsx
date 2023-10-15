@@ -1,25 +1,17 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { useTranslation } from "next-i18next";
-import {
-  Select,
-  TextInput,
-  IconSearch,
-  Tag,
-  IconAngleUp,
-  IconAngleDown,
-  Button,
-} from "hds-react";
-import { useForm } from "react-hook-form";
-import styled from "styled-components";
-import { useQuery } from "@apollo/client";
+import { IconSearch, Select, Tag, TextInput } from "hds-react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import styled, { css } from "styled-components";
+import { DocumentNode, useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryUnitsArgs } from "common/types/gql-types";
-import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { ShowAllContainer } from "common/src/components";
 import TimeRangePicker from "common/src/components/form/TimeRangePicker";
+import { toUIDate } from "common/src/common/util";
 import {
   fromUIDate,
   getSelectedOption,
@@ -38,10 +30,24 @@ import { RESERVATION_UNIT_TYPES } from "@/modules/queries/reservationUnit";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import DateRangePicker from "@/components/form/DateRangePicker";
 
+export interface FormValues {
+  purposes: string | null;
+  unit: string | null;
+  equipments: string | null;
+  begin: string | null;
+  end: string | null;
+  after: string | null;
+  before: string | null;
+  duration: number | null;
+  minPersons: string | null;
+  maxPersons: string | null;
+  reservationUnitType: string;
+}
+
 type Props = {
   onSearch: (search: Record<string, string>) => void;
-  formValues: { [key: string]: string };
-  removeValue: (key?: string[], subItemKey?: string) => void;
+  formValues: { [key: string]: string | null };
+  removeValue?: (key?: string[], subItemKey?: string) => void;
 };
 
 const desktopBreakpoint = "840px";
@@ -56,32 +62,21 @@ const TopContainer = styled.div`
   }
 `;
 
-const FilterToggleWrapper = styled.div`
-  display: grid;
-  justify-items: center;
-  margin: var(--spacing-xs) 0;
-`;
-
-const Hr = styled.hr`
-  border-color: var(--color-black-60);
-  border-style: solid;
-`;
-
-const Filters = styled.div<{ children: ReactNode[] }>`
+const filterGrid = css`
   margin-top: 0;
   max-width: 100%;
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(${({ children }) => children.length}, auto);
+  grid-template-columns: auto;
+  grid-template-rows: repeat(2, auto);
   grid-gap: var(--spacing-m);
   font-size: var(--fontsize-body-m);
+  > div {
+    grid-column: 1 / span 3;
+  }
 
   label {
     font-family: var(--font-medium);
     font-weight: 500;
-  }
-  > div {
-    grid-column: span 1;
   }
 
   @media (min-width: ${breakpoints.m}) {
@@ -97,7 +92,11 @@ const Filters = styled.div<{ children: ReactNode[] }>`
   }
 `;
 
-const StyledSelect = styled(Select<OptionType>)`
+const Filters = styled.div<{ children: ReactNode[] }>`
+  ${filterGrid}
+`;
+
+const StyledSelect = styled(Select<OptionType>)<{ name?: string }>`
   button {
     display: grid;
     text-align: left;
@@ -108,72 +107,53 @@ const StyledSelect = styled(Select<OptionType>)`
   }
 `;
 
-const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
-  > div:first-of-type {
-    label {
-      width: calc(${({ children }) => children.length} * 100%);
-    }
-  }
-
-  .inputGroupEnd {
-    & > div {
-      border-left-width: 0;
-    }
-    margin-left: 0;
-  }
-
+const TwInput = styled.div`
+  display: grid;
+  grid-template-columns: 50% 50%;
   .inputGroupStart {
     & > div {
       border-right-width: 0;
     }
-
-    & + .inputGroupEnd > div {
-      border-left-width: 2px;
-    }
-
-    margin-right: 0;
   }
-
-  display: grid;
-  grid-template-columns: repeat(${({ children }) => children.length}, 1fr);
-  ${({ $gap }) => $gap && `gap: ${$gap};`}
 `;
 
 const OptionalFilters = styled(ShowAllContainer)<{
   children: ReactNode[];
-  $gap?: string;
 }>`
   && {
     grid-column: span 3;
   }
   > [class="ShowAllContainer__Content"] {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(3, auto);
     display: grid;
-    gap: ${({ $gap }) => $gap ?? "var(--spacing-m)"};
+    &:not:empty {
+      gap: var(--spacing-m);
+    }
   }
   @media (min-width: ${breakpoints.m}) {
-    grid-template-rows: repeat(${({ children }) => children.length}, auto);
     grid-column: 1 / span 2;
-    grid-row: span 1;
+    grid-row: 3 / span 1;
     margin-bottom: var(--spacing-m);
     > [class="ShowAllContainer__Content"] {
       grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(3, auto);
+      gap: var(--spacing-m);
+      &:empty {
+        row-gap: 0;
+        ~ [class*="ShowAllContainer__ToggleButtonContainer"] {
+          margin-top: 0;
+        }
+      }
+    }
+    > [class*="ShowAllContainer__ToggleButtonContainer"] {
+      margin-top: var(--spacing-s);
     }
 
     > div {
       grid-column: span 1;
     }
-
-    [class*="OptionalFilters"] {
-      grid-column: span 2;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-    }
   }
   @media (min-width: ${breakpoints.l}) {
-    > [class="ShowAllContainer__Content"] {
+    > [class*="ShowAllContainer__Content"] {
       grid-template-columns: repeat(3, 1fr);
       grid-column: 1 / span 3;
     }
@@ -193,6 +173,12 @@ const BottomContainer = styled.div`
 const DateRangeWrapper = styled.div`
   > div {
     display: flex;
+    > div {
+      width: 50%;
+    }
+    label {
+      height: 24px;
+    }
     // Starting date picker
     > div:first-child {
       input {
@@ -219,7 +205,7 @@ const TimeRangeWrapper = styled.div`
     border-right: 0;
   }
   // Hide the label text (but keep its height) for the end time select, since HDS adds a "*" to required field labels
-  // TODO: Make the displaying of the label text component conditional on having an empty text as endTime label, as it could possibly often be empty. Especially if the component to be is re-used.
+  // TODO: Make the displaying of the label text component conditional on having an empty text as before label, as it could possibly often be empty. Especially if the component to be is re-used.
   > div:nth-child(2) label {
     height: 24px;
     span {
@@ -264,13 +250,46 @@ const SubmitButton = styled(MediumButton)`
 
 const filterOrder = [
   "textSearch",
+  "begin",
+  "end",
+  "after",
+  "before",
+  "duration",
   "minPersons",
   "maxPersons",
   "reservationUnitType",
   "unit",
   "purposes",
-  // TODO: add the new filters here - order is unclear
+  "equipments",
 ];
+
+// Custom hook for fetching options from the backend and mapping them to the format used by the Select component
+const useMappedOptions = (
+  queryName: DocumentNode,
+  queryNodeName: string,
+  queryOptions?: { publishedReservationUnits: boolean }
+): { options: OptionType[]; isLoading: boolean } => {
+  const { data, loading } = useQuery<Query, QueryUnitsArgs>(queryName, {
+    variables: { ...queryOptions },
+  });
+  if (data != null && queryNodeName in data) {
+    const options =
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      data[queryNodeName]?.edges
+        ?.map((e: { node: unknown }) => e?.node)
+        .filter((n: null): n is NonNullable<typeof n> => n != null)
+        .map((node: { pk: unknown }) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        })) ?? [];
+    return {
+      options: mapOptions(sortBy(options, "name")),
+      isLoading: loading,
+    };
+  }
+  return { options: [], isLoading: loading };
+};
 
 const SearchForm = ({
   onSearch,
@@ -278,108 +297,28 @@ const SearchForm = ({
   removeValue,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-
-  const [reservationTypeSearchInput, setReservationTypeSearchInput] =
-    useState<string>("");
-  const [reservationEquipmentSearchInput, setReservationEquipmentSearchInput] =
-    useState<string>("");
-  const [reservationStartDate, setReservationStartDate] = useState<Date | null>(
-    new Date()
+  const todayDate = new Date();
+  const { options: unitOptions, isLoading: unitsLoading } = useMappedOptions(
+    SEARCH_FORM_PARAMS_UNIT,
+    "units",
+    { publishedReservationUnits: true }
   );
-  const [reservationEndDate, setReservationEndDate] = useState<Date | null>(
-    null
-  );
-  const [reservationEquipmentOptions, setReservationEquipmentOptions] =
-    useState<OptionType[]>([]);
-  const [unitSearchInput, setUnitSearchInput] = useState<string>("");
-  const [purposeSearchInput, setPurposeSearchInput] = useState<string>("");
-  const [areFiltersVisible, setAreFiltersVisible] = useState(false);
-
-  const { data: unitQueryData, loading: unitsLoading } = useQuery<
-    Query,
-    QueryUnitsArgs
-  >(SEARCH_FORM_PARAMS_UNIT, {
-    variables: {
-      publishedReservationUnits: true,
-    },
-  });
-  const units =
-    unitQueryData?.units?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null)
-      .map((node) => ({
-        id: String(node.pk),
-        name: getUnitName(node),
-      })) ?? [];
-  const unitOptions = mapOptions(sortBy(units, "name"));
-
-  const { data: purposesQueryData, loading: purposesLoading } = useQuery<Query>(
-    SEARCH_FORM_PARAMS_PURPOSE
-  );
-  const purposes =
-    purposesQueryData?.purposes?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null)
-      .map((node) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      })) ?? [];
-  const purposeOptions = mapOptions(sortBy(purposes, "name"));
-
-  const { data: unitTypeQueryData, loading: typesLoading } = useQuery<Query>(
-    RESERVATION_UNIT_TYPES
-  );
-  const unitTypes =
-    unitTypeQueryData?.reservationUnitTypes?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null)
-      .map((node) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      })) ?? [];
-  const reservationUnitTypeOptions = mapOptions(sortBy(unitTypes, "name"));
-
-  const { data: equipmentQueryData, loading: equipmentsLoading } =
-    useQuery<Query>(SEARCH_FORM_PARAMS_EQUIPMENT);
-  const equipments =
-    equipmentQueryData?.equipments?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null)
-      .map((node) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      })) ?? [];
-  const equipmentOptions = mapOptions(sortBy(equipments, "name"));
-
-  const minuteDurations = [
-    {
-      label: t("common:minute_other", { count: 15 }),
-      value: 0.25,
-    },
-    {
-      label: t("common:minute_other", { count: 30 }),
-      value: 0.5,
-    },
-    {
-      label: t("common:minute_other", { count: 45 }),
-      value: 0.75,
-    },
-    {
-      label: t("common:minute_other", { count: 60 }),
-      value: 1,
-    },
-    {
-      label: t("common:minute_other", { count: 90 }),
-      value: 1.5,
-    },
-  ] as OptionType[];
+  const { options: purposeOptions, isLoading: purposesLoading } =
+    useMappedOptions(SEARCH_FORM_PARAMS_PURPOSE, "purposes");
+  const { options: unitTypeOptions, isLoading: typesLoading } =
+    useMappedOptions(RESERVATION_UNIT_TYPES, "reservationUnitTypes");
+  const { options: equipmentsOptions, isLoading: equipmentsLoading } =
+    useMappedOptions(SEARCH_FORM_PARAMS_EQUIPMENT, "equipments");
+  console.log("search form values:", formValues);
+  const inHours = (minutes: number): number =>
+    Math.round((minutes / 60) * 100) / 100; // two decimal places
   const durationMinuteOptions = () => {
     const durations: OptionType[] = [];
-    let minute = 15;
+    let minute = 15; // no zero duration option, as all available reservations have a positive/non-zero duration
     while (minute <= 90) {
       durations.push({
         label: t("common:minute_other", { count: minute }),
-        value: 60 / minute,
+        value: minute,
       });
       minute += 15;
     }
@@ -394,7 +333,7 @@ const SearchForm = ({
     while (hour < 24) {
       times.push({
         label: t("common:hour_other", { count: hour + minute / 60 }),
-        value: hour + minute / 60,
+        value: hour * 60 + minute,
       });
       minute += 30;
       // Reset the minute counter, and increment the hour counter if necessary
@@ -406,21 +345,26 @@ const SearchForm = ({
     // we need to add the minute times to the beginning of the duration options
     return durationMinuteOptions().concat(...times) as OptionType[];
   };
+  const durationOptions = populateDurationOptions();
+
+  const initialValues = {
+    unit: "",
+    equipments: "",
+    begin: fromUIDate(todayDate),
+    end: "",
+    after: null,
+    before: null,
+    duration: null,
+    minPersons: "1",
+    maxPersons: "",
+    reservationUnitType: formValues.reservationUnitType ?? "",
+  };
 
   const { register, watch, handleSubmit, setValue, getValues, control } =
-    useForm({
+    useForm<FormValues>({
       defaultValues: {
-        purposes: "",
-        unit: "",
-        equipment: "",
-        dateBegin: todayDate,
-        dateEnd: null,
-        timeBegin: null,
-        timeEnd: null,
-        duration: null,
-        minPersons: 1,
-        maxPersons: null,
-        reservationUnitType: "",
+        ...initialValues,
+        ...formValues,
       },
     });
 
@@ -432,11 +376,18 @@ const SearchForm = ({
       case "unit":
         return unitOptions.find((n) => n.value === value)?.label;
       case "reservationUnitType":
-        return reservationUnitTypeOptions.find((n) => n.value === value)?.label;
+        return unitTypeOptions.find((n) => n.value === value)?.label;
       case "purposes":
         return purposeOptions.find((n) => n.value === value)?.label;
-      case "equipment":
-        return equipmentOptions.find((n) => n.value === value)?.label;
+      case "equipments":
+        return equipmentsOptions.find((n) => n.value === value)?.label;
+      case "duration":
+        return durationOptions.find((n) => n.value === value)?.label;
+      case "begin":
+      case "end":
+      case "before":
+      case "after":
+        return value;
       default:
         return "";
     }
@@ -446,17 +397,17 @@ const SearchForm = ({
     "unit",
     "reservationUnitType",
     "purposes",
-    "equipment",
+    "equipments",
   ];
 
   useEffect(() => {
     register("purposes");
     register("unit");
-    register("equipment");
-    register("dateBegin");
-    register("dateEnd");
-    register("timeBegin");
-    register("timeEnd");
+    register("equipments");
+    register("begin");
+    register("end");
+    register("after");
+    register("before");
     register("duration");
     register("minPersons");
     register("maxPersons");
@@ -465,16 +416,30 @@ const SearchForm = ({
 
   // TODO this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
   useEffect(() => {
-    Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
+    Object.keys(formValues).forEach((p) =>
+      setValue(p as keyof FormValues, formValues[p as keyof FormValues])
+    );
   }, [formValues, setValue]);
 
-  const search = (criteria: Record<string, string>) => {
-    onSearch(criteria);
+  const search: SubmitHandler<FormValues> = (criteria: FormValues) => {
+    // Remove empty (null & "") values from the criteria
+    const searchCriteria = Object.entries(criteria).reduce((c, cv) => {
+      if (cv[1] == null || cv[1] === "") return c;
+      return { ...c, [cv[0]]: cv[1] };
+    }, {});
+    onSearch(searchCriteria);
   };
 
-  const areOptionsLoaded = !unitsLoading && !purposesLoading && !typesLoading;
+  const areOptionsLoaded =
+    !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
   const formValueKeys = Object.keys(formValues);
-
+  const durationTranslation = (duration: number): string => {
+    let unit = t("common:abbreviations.hour", { count: inHours(duration) });
+    if (duration <= 90) {
+      unit = t("common:abbreviations.minute", { count: duration });
+    }
+    return t("searchForm:filters.duration", { unit });
+  };
   return (
     <>
       <TopContainer>
@@ -482,13 +447,11 @@ const SearchForm = ({
           <MultiSelectDropdown
             id="purposeFilter"
             checkboxName="purposeFilter"
-            inputValue={purposeSearchInput}
             name="purposes"
             onChange={(selection: string[]): void => {
               setValue("purposes", selection.filter((n) => n !== "").join(","));
             }}
             options={purposeOptions}
-            setInputValue={setPurposeSearchInput}
             showSearch
             title={t("searchForm:purposesFilter")}
             value={watch("purposes")?.split(",") || [""]}
@@ -496,77 +459,71 @@ const SearchForm = ({
           <MultiSelectDropdown
             id="unitFilter"
             checkboxName="unitFilter"
-            inputValue={unitSearchInput}
             name="unit"
             onChange={(selection: string[]): void => {
               setValue("unit", selection.filter((n) => n !== "").join(","));
             }}
             options={unitOptions}
-            setInputValue={setUnitSearchInput}
             showSearch
             title={t("searchForm:unitFilter")}
             value={watch("unit")?.split(",") || [""]}
           />
           <MultiSelectDropdown
-            id="reservationUnitEquipmentFilter"
-            checkboxName="reservationUnitEquipmentFilter"
-            inputValue={reservationEquipmentSearchInput}
-            name="equipment"
+            id="reservationUnitEquipmentsFilter"
+            checkboxName="reservationUnitEquipmentsFilter"
+            name="equipments"
             onChange={(selection: string[]): void => {
               setValue(
-                "equipment",
+                "equipments",
                 selection.filter((n) => n !== "").join(",")
               );
             }}
-            options={equipmentOptions}
-            setInputValue={setReservationEquipmentSearchInput}
+            options={equipmentsOptions}
             showSearch
-            title={t("searchForm:equipmentFilter")}
-            value={watch("equipment")?.split(",") || [""]}
+            title={t("searchForm:equipmentsFilter")}
+            value={watch("equipments")?.split(",") || [""]}
           />
           <DateRangeWrapper>
             <DateRangePicker
               startDate={
-                getValues("dateStart") != null
-                  ? new Date(fromUIDate(getValues("dateStart")))
-                  : null
+                formValues.begin != null
+                  ? new Date(fromUIDate(String(formValues.begin)))
+                  : new Date()
               }
-              endDate={
-                getValues("dateEnd") != null
-                  ? new Date(fromUIDate(getValues("dateEnd")))
+              end={
+                formValues.end != null
+                  ? new Date(fromUIDate(String(formValues.end)))
                   : null
               }
               onChangeStartDate={(date: Date | null) =>
-                setValue("dateStart", date != null ? toUIDate(date) : "")
+                setValue("begin", date != null ? toUIDate(date) : "")
               }
               onChangeEndDate={(date: Date | null) =>
-                setValue("dateEnd", date != null ? toUIDate(date) : "")
+                setValue("end", date != null ? toUIDate(date) : "")
               }
               labels={{
-                begin: t("common:beginLabel"),
-                end: t("common:endLabel"),
+                begin: t("searchForm:dateFilter"),
+                end: t(" "),
               }}
-              required={{
-                begin: true,
-                end: false,
-              }}
+              required={{ begin: false, end: false }}
               limits={{
                 startMinDate: new Date(),
-                startMaxDate: getValues("dateEnd")
-                  ? fromApiDate(String(getValues("dateEnd")))
+                startMaxDate: getValues("end")
+                  ? fromUIDate(String(getValues("end")))
                   : undefined,
-                endMinDate: getValues("dateStart")
-                  ? fromUIDate(String(getValues("dateStart")))
+                endMinDate: getValues("begin")
+                  ? fromUIDate(String(getValues("begin")))
                   : undefined,
                 endMaxDate: addYears(new Date(), 2),
               }}
             />
           </DateRangeWrapper>
+
           <TimeRangeWrapper>
             <TimeRangePicker
               control={control}
-              name={{ begin: "timeBegin", end: "timeEnd" }}
-              label={{ begin: t("searchForm:intervalFilter"), end: " " }}
+              name={{ begin: "after", end: "before" }}
+              label={{ begin: t("searchForm:timeFilter"), end: " " }}
               placeholder={{
                 begin: t("common:beginLabel"),
                 end: t("common:endLabel"),
@@ -574,26 +531,34 @@ const SearchForm = ({
               clearable={{ begin: true, end: true }}
             />
           </TimeRangeWrapper>
+
           <StyledSelect
             id="durationFilter"
+            name="duration"
             placeholder={t("common:minimum")}
-            options={populateDurationOptions()}
-            label={t("common:duration", { duration: "" })}
+            options={[emptyOption(t("common:select"))].concat(durationOptions)}
+            label={t("searchForm:durationFilter", { duration: "" })}
             onChange={(selection: OptionType): void => {
-              setValue("duration", selection?.value);
+              setValue(
+                "duration",
+                !Number.isNaN(Number(selection.value))
+                  ? Math.round(Number(selection.value) * 10) / 10
+                  : null
+              );
             }}
             defaultValue={getSelectedOption(
               getValues("duration"),
-              populateDurationOptions()
+              durationOptions
             )}
             key={`duration${getValues("duration")}`}
           />
+
           <OptionalFilters
             showAllLabel={t("searchForm:showMoreFilters")}
             showLessLabel={t("searchForm:showLessFilters")}
             maximumNumber={0}
           >
-            <Group>
+            <TwInput>
               <StyledSelect
                 id="participantMinCountFilter"
                 placeholder={t("common:minimum")}
@@ -602,13 +567,12 @@ const SearchForm = ({
                 )}
                 label={t("searchForm:participantCountCombined")}
                 onChange={(selection: OptionType): void => {
-                  setValue("minPersons", selection.value);
+                  setValue("minPersons", String(selection.value));
                 }}
                 defaultValue={getSelectedOption(
                   getValues("minPersons"),
                   participantCountOptions
                 )}
-                key={`minPersons${getValues("minPersons")}`}
                 className="inputSm inputGroupStart"
               />
 
@@ -620,7 +584,7 @@ const SearchForm = ({
                 )}
                 label="&nbsp;"
                 onChange={(selection: OptionType): void => {
-                  setValue("maxPersons", selection.value);
+                  setValue("maxPersons", String(selection.value));
                 }}
                 defaultValue={getSelectedOption(
                   getValues("maxPersons"),
@@ -629,11 +593,10 @@ const SearchForm = ({
                 key={`maxPersons${getValues("maxPersons")}`}
                 className="inputSm inputGroupEnd"
               />
-            </Group>
+            </TwInput>
             <MultiSelectDropdown
               id="reservationUnitTypeFilter"
               checkboxName="reservationUnitTypeFilter"
-              inputValue={reservationTypeSearchInput}
               name="reservationType"
               onChange={(selection: string[]): void => {
                 setValue(
@@ -641,23 +604,27 @@ const SearchForm = ({
                   selection.filter((n) => n !== "").join(",")
                 );
               }}
-              options={reservationUnitTypeOptions}
-              setInputValue={setReservationTypeSearchInput}
+              options={unitTypeOptions}
               showSearch
               title={t("searchForm:typeLabel")}
               value={watch("reservationUnitType")?.split(",") || [""]}
+              key={`minPersons${getValues("minPersons")}`}
             />
             <TextInput
               id="search"
+              name="textSearch"
               label={t("searchForm:textSearchLabel")}
-              {...register("textSearch")}
               placeholder={t("searchForm:searchTermPlaceholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSubmit(search)();
                 }
               }}
-              defaultValue={formValues.textSearch}
+              defaultValue={
+                formValues.textSearch != null
+                  ? formValues.textSearch
+                  : undefined
+              }
             />
           </OptionalFilters>
         </Filters>
@@ -680,65 +647,63 @@ const SearchForm = ({
           </SubmitButton>
         </JustForDesktop>
       </TopContainer>
-      <JustForMobile customBreakpoint={desktopBreakpoint}>
-        <FilterToggleWrapper>
-          <Button
-            data-testid="search-form__button--toggle-filters"
-            variant="supplementary"
-            onClick={() => setAreFiltersVisible(!areFiltersVisible)}
-            iconLeft={areFiltersVisible ? <IconAngleUp /> : <IconAngleDown />}
-          >
-            {t(`searchForm:show${areFiltersVisible ? "Less" : "More"}Filters`)}
-          </Button>
-        </FilterToggleWrapper>
-        <Hr />
-      </JustForMobile>
+
       <BottomContainer>
         {areOptionsLoaded && formValueKeys.length > 0 && (
           <TagControls>
             <FilterTags data-test-id="search-form__filter--tags">
               {formValueKeys
                 .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
-                .map((value) => {
-                  const label = t(`searchForm:filters.${value}`, {
-                    label: value,
-                    value: formValues[value],
-                    count: Number(formValues[value]),
+                .map((formValueKey) => {
+                  const label = t(`searchForm:filters.${formValueKey}`, {
+                    label: formValueKey,
+                    value: formValues[formValueKey],
+                    count: Number(formValues[formValueKey]),
                   });
-                  const result = multiSelectFilters.includes(value) ? (
-                    formValues[value].split(",").map((subValue) => (
-                      <StyledTag
-                        id={`filter-tag__${value}-${subValue}`}
-                        onClick={() => removeValue([subValue], value)}
-                        onDelete={() => removeValue([subValue], value)}
-                        key={`${value}-${subValue}`}
-                        deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                          value: getFormSubValueLabel(value, subValue),
-                        })}
-                      >
-                        {getFormSubValueLabel(value, subValue)}
-                      </StyledTag>
-                    ))
+                  return multiSelectFilters.includes(formValueKey) ? (
+                    (formValues[formValueKey] ?? "")
+                      .split(",")
+                      .map((subValue) => (
+                        <StyledTag
+                          id={`filter-tag__${formValueKey}-${subValue}`}
+                          onClick={() =>
+                            removeValue && removeValue([subValue], formValueKey)
+                          }
+                          onDelete={() =>
+                            removeValue && removeValue([subValue], formValueKey)
+                          }
+                          key={`${formValueKey}-${subValue}`}
+                          deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+                            value: getFormSubValueLabel(formValueKey, subValue),
+                          })}
+                        >
+                          {getFormSubValueLabel(formValueKey, subValue)}
+                        </StyledTag>
+                      ))
                   ) : (
                     <StyledTag
-                      id={`filter-tag__${value}`}
-                      onDelete={() => removeValue([value])}
-                      key={value}
+                      id={`filter-tag__${formValueKey}`}
+                      onDelete={() =>
+                        removeValue && removeValue([formValueKey])
+                      }
+                      key={formValueKey}
                       deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
                         value: label,
                       })}
                     >
-                      {label}
+                      {formValueKey === "duration" &&
+                      !Number.isNaN(Number(formValues.duration))
+                        ? durationTranslation(Number(formValues.duration))
+                        : label}
                     </StyledTag>
                   );
-                  return result;
                 })}
             </FilterTags>
             {formValueKeys.length > 0 && (
               <ResetButton
                 aria-label={t("searchForm:resetForm")}
-                onClick={() => removeValue()}
-                onDelete={() => removeValue()}
+                onClick={() => removeValue && removeValue()}
+                onDelete={() => removeValue && removeValue()}
                 data-test-id="search-form__reset-button"
               >
                 {t("searchForm:resetForm")}

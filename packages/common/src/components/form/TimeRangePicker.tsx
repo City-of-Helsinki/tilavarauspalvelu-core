@@ -79,14 +79,13 @@ const TimeRangePicker = <T extends FieldValues>({
   });
   const { t } = useTranslation();
 
+  // Return the option with the given value as label
   const getSelectedOption = (
     optionValue: number | null,
     optionList: OptionType[]
   ): OptionType | null => {
-    const returnOption = optionList.find((o) => o.value === optionValue);
-    return returnOption ?? null;
+    return optionList.find((o) => o.label === optionValue) ?? null;
   };
-
   const populateTimes = (
     populateTimesProps?: PopulateTimesProps
   ): OptionType[] => {
@@ -121,12 +120,6 @@ const TimeRangePicker = <T extends FieldValues>({
     endField.value &&
     beginField.value.value >= endField.value.value;
 
-  // Format the value to seconds
-  // TODO: check what format the API expects
-  const formatTimeToApi = (time: number) => {
-    return time !== null ? time * 60 * 60 : null;
-  };
-
   return (
     <>
       <StyledSelect
@@ -140,7 +133,7 @@ const TimeRangePicker = <T extends FieldValues>({
         invalid={endTimeIsBeforeStartTime || beginFieldState.invalid}
         value={getSelectedOption(beginField.value, populatedTimeOptions)}
         onChange={(e) => {
-          beginField.onChange(e !== null ? e.currentTarget.value : null);
+          beginField.onChange(e !== null ? e.label : null);
         }}
       />
       <StyledSelect
@@ -152,9 +145,9 @@ const TimeRangePicker = <T extends FieldValues>({
         error={endFieldState.error && endFieldState.error.message}
         clearable={clearable?.end}
         invalid={endTimeIsBeforeStartTime || endFieldState.invalid}
-        value={getSelectedOption(beginField.value, populatedTimeOptions)}
+        value={getSelectedOption(endField.value, populatedTimeOptions)}
         onChange={(e) => {
-          endField.onChange(e !== null ? formatTimeToApi(e.value) : null);
+          endField.onChange(e !== null ? e.label : null);
         }}
       />
       {endTimeIsBeforeStartTime && (

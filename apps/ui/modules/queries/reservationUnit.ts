@@ -163,6 +163,8 @@ export const RESERVATION_UNITS = gql`
     $reservationUnitType: [ID]
     $purposes: [ID]
     $first: Int
+    $equipments: [ID]
+    $before: String
     $after: String
     $orderBy: String
     $isDraft: Boolean
@@ -179,9 +181,11 @@ export const RESERVATION_UNITS = gql`
       minPersonsLte: $maxPersons
       reservationUnitType: $reservationUnitType
       purposes: $purposes
+      equipments: $equipments
       unit: $unit
       first: $first
       after: $after
+      before: $before
       orderBy: $orderBy
       isDraft: $isDraft
       isVisible: $isVisible

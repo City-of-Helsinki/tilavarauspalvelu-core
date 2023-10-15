@@ -64,6 +64,7 @@ export const applicationRoundState = (
 
 export const parseDate = (date: string): Date => parseISO(date);
 
+// Returns a Date from a string in format "yyyy-MM-dd"
 const fromAPIDate = (date: string): Date => {
   const d = parse(date, "yyyy-MM-dd", new Date());
   return d;
@@ -107,16 +108,22 @@ export const formatApiDate = (date: string): string | undefined => {
 };
 
 export const localizedValue = (
-  name: string | TranslationObject | undefined,
+  name: string | TranslationObject | number | undefined,
   lang: string
 ): string => {
   if (!name) {
     return "";
   }
+
+  if (typeof name === "number") {
+    return name.toString();
+  }
+
   // needed until api stabilizes
   if (typeof name === "string") {
     return name;
   }
+
   return (
     name[lang as LocalizationLanguages] || name.fi || name.en || name.sv || ""
   );
@@ -179,7 +186,7 @@ export const getComboboxValues = (
 
 type SearchParams = Record<
   string,
-  string | string[] | number | boolean | undefined
+  string | (string | null)[] | number | boolean | null
 >;
 
 export const searchUrl = (params: SearchParams): string => {
