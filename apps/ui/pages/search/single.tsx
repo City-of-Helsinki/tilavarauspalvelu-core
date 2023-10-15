@@ -3,14 +3,14 @@ import { useTranslation } from "next-i18next";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import styled from "styled-components";
-import queryString from "query-string";
+import queryString, { type ParsedQuery } from "query-string";
 import { useRouter } from "next/router";
 import { Notification } from "hds-react";
 import { useLocalStorage, useMedia } from "react-use";
 import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
-import { OptionType } from "common/types/common";
+import { type OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import {
@@ -81,8 +81,7 @@ const processVariables = (values: Record<string, string>, language: string) => {
   const sortCriteria = ["name", "unitName"].includes(values.sort)
     ? `${values.sort}${capitalize(language)}`
     : values.sort;
-
-  return {
+  const returnValues = {
     ...omit(values, [
       "order",
       "sort",
@@ -91,6 +90,10 @@ const processVariables = (values: Record<string, string>, language: string) => {
       "purposes",
       "unit",
       "reservationUnitType",
+      "equipments",
+      "begin",
+      "end",
+      "duration",
     ]),
     ...(values.minPersons && {
       minPersons: parseInt(values.minPersons, 10),
@@ -107,6 +110,18 @@ const processVariables = (values: Record<string, string>, language: string) => {
     ...(values.reservationUnitType && {
       reservationUnitType: values.reservationUnitType.split(","),
     }),
+    ...(values.equipments && {
+      equipments: values.equipments.split(","),
+    }),
+    ...(values.begin && {
+      begin: `${values.begin.split(".").reverse().join("-")}T00:00:00+00:00`,
+    }),
+    ...(values.end && {
+      end: `${values.end.split(".").reverse().join("-")}T00:00:00+00:00`,
+    }),
+    ...(values.duration && {
+      minReservationDuration: parseInt(values.duration, 10) * 60,
+    }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
     isDraft: false,
@@ -114,6 +129,7 @@ const processVariables = (values: Record<string, string>, language: string) => {
     reservationKind:
       ReservationUnitsReservationUnitReservationKindChoices.Direct,
   };
+  return returnValues;
 };
 
 const SearchSingle = (): JSX.Element => {
@@ -137,16 +153,21 @@ const SearchSingle = (): JSX.Element => {
     [t]
   );
 
-  const [values, setValues] = useState({} as Record<string, string>);
-  const setStoredValues = useLocalStorage("reservationUnit-search", null)[1];
+  const [searchValues, setSearchValues] = useState(
+    {} as Record<string, string>
+  );
+  const setStoredValues = useLocalStorage<ParsedQuery<string>>(
+    "reservationUnit-search",
+    {}
+  )[1];
 
   const { data, fetchMore, loading, error, networkStatus } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    variables: processVariables(values, i18n.language),
+    variables: processVariables(searchValues, i18n.language),
     fetchPolicy: "network-only",
-    skip: Object.keys(values).length === 0,
+    skip: Object.keys(searchValues).length === 0,
     notifyOnNetworkStatusChange: true,
   });
 
@@ -181,13 +202,13 @@ const SearchSingle = (): JSX.Element => {
         }
         return p;
       }, {} as Record<string, string>);
-
-      if (!isEqual(values, newValues)) {
-        setValues(newValues);
+      if (!isEqual(searchValues, newValues)) {
+        setSearchValues(newValues);
       }
     }
-  }, [parsedParams, values, i18n.language]);
+  }, [parsedParams, searchValues, i18n.language]);
 
+  // If search params change, update stored values
   useEffect(() => {
     const params = queryString.parse(searchParams);
     // @ts-expect-error: TODO: fix this (first though figure out why we are saving queryparams to localstorage)
@@ -212,7 +233,7 @@ const SearchSingle = (): JSX.Element => {
 
   const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
-  const onSearch = async (criteria: QueryReservationUnitsArgs) => {
+  const onSearch = async (criteria: Record<string, string>) => {
     const sortingCriteria = pick(queryString.parse(searchParams), [
       "sort",
       "order",
@@ -221,18 +242,18 @@ const SearchSingle = (): JSX.Element => {
     router.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 
-  const onRemove = (key: string[] | undefined, subItemKey?: string) => {
+  const onRemove = (key?: string[], subItemKey?: string) => {
     let newValues = {};
     if (subItemKey) {
       newValues = {
-        ...values,
-        [subItemKey]: values[subItemKey]
+        ...searchValues,
+        [subItemKey]: searchValues[subItemKey]
           .split(",")
           .filter((n) => !key?.includes(n))
           .join(","),
       };
     } else if (key) {
-      newValues = omit(values, key);
+      newValues = omit(searchValues, key);
     }
 
     const sortingCriteria = pick(queryString.parse(searchParams), [
@@ -246,12 +267,14 @@ const SearchSingle = (): JSX.Element => {
         ...sortingCriteria,
         // a hacky way to bypass query cache
         textSearch:
-          !key || key.includes("textSearch") ? "" : values.textSearch || "",
+          !key || key.includes("textSearch")
+            ? ""
+            : searchValues.textSearch || "",
       })
     );
   };
 
-  const isOrderingAsc = values.order !== "desc";
+  const isOrderingAsc = searchValues.order !== "desc";
 
   return (
     <Wrapper>
@@ -266,7 +289,7 @@ const SearchSingle = (): JSX.Element => {
           <Heading>{t("search:single.heading")}</Heading>
           <SearchForm
             onSearch={onSearch}
-            formValues={omit(values, ["order", "sort"])}
+            formValues={omit(searchValues, ["order", "sort"])}
             removeValue={onRemove}
           />
         </StyledContainer>
@@ -276,16 +299,21 @@ const SearchSingle = (): JSX.Element => {
           <BottomWrapper>
             <ListWithPagination
               id="searchResultList"
-              items={reservationUnits?.map((ru) => (
-                <ReservationUnitCard reservationUnit={ru} key={ru.id} />
-              ))}
+              items={reservationUnits?.map((ru) =>
+                ru ? (
+                  <ReservationUnitCard reservationUnit={ru} key={ru.id} />
+                ) : (
+                  // eslint-disable-next-line react/jsx-no-useless-fragment
+                  <></> // items attribute expects an array of JSX elements
+                )
+              )}
               loading={loading}
               loadingMore={loadingMore}
               pageInfo={pageInfo}
               totalCount={totalCount ?? undefined}
               fetchMore={(cursor) => {
                 const variables = {
-                  ...values,
+                  ...searchValues,
                   after: cursor,
                 };
                 fetchMore({
@@ -294,11 +322,11 @@ const SearchSingle = (): JSX.Element => {
               }}
               sortingComponent={
                 <StyledSorting
-                  value={values.sort}
+                  value={searchValues.sort}
                   sortingOptions={sortingOptions}
                   setSorting={(val: OptionType) => {
                     const params = {
-                      ...values,
+                      ...searchValues,
                       sort: String(val.value),
                     };
                     router.replace(singleSearchUrl(params));
@@ -306,7 +334,7 @@ const SearchSingle = (): JSX.Element => {
                   isOrderingAsc={isOrderingAsc}
                   setIsOrderingAsc={(isAsc: boolean) => {
                     const params = {
-                      ...values,
+                      ...searchValues,
                       order: isAsc ? "asc" : "desc",
                     };
                     router.replace(singleSearchUrl(params));
