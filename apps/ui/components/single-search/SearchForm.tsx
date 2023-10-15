@@ -21,22 +21,21 @@ import { addYears } from "date-fns";
 import { ShowAllContainer } from "common/src/components";
 import TimeRangePicker from "common/src/components/form/TimeRangePicker";
 import {
-  mapOptions,
+  fromUIDate,
   getSelectedOption,
   getTranslation,
-  fromUIDate,
-} from "../../modules/util";
-import { emptyOption, participantCountOptions } from "../../modules/const";
-import { MediumButton, truncatedText } from "../../styles/util";
+  mapOptions,
+} from "@/modules/util";
+import { emptyOption, participantCountOptions } from "@/modules/const";
+import { MediumButton, truncatedText } from "@/styles/util";
 import MultiSelectDropdown from "../form/MultiselectDropdown";
 import {
   SEARCH_FORM_PARAMS_EQUIPMENT,
   SEARCH_FORM_PARAMS_PURPOSE,
   SEARCH_FORM_PARAMS_UNIT,
-} from "../../modules/queries/params";
-import { RESERVATION_UNIT_TYPES } from "../../modules/queries/reservationUnit";
-import { getUnitName } from "../../modules/reservationUnit";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
+} from "@/modules/queries/params";
+import { RESERVATION_UNIT_TYPES } from "@/modules/queries/reservationUnit";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import DateRangePicker from "@/components/form/DateRangePicker";
 
 type Props = {
