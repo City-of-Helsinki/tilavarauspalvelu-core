@@ -309,7 +309,7 @@ const SearchForm = ({
     useMappedOptions(RESERVATION_UNIT_TYPES, "reservationUnitTypes");
   const { options: equipmentsOptions, isLoading: equipmentsLoading } =
     useMappedOptions(SEARCH_FORM_PARAMS_EQUIPMENT, "equipments");
-  console.log("search form values:", formValues);
+
   const inHours = (minutes: number): number =>
     Math.round((minutes / 60) * 100) / 100; // two decimal places
   const durationMinuteOptions = () => {
