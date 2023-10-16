@@ -3,9 +3,11 @@ import { useQuery, gql } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { type Query } from "common/types/gql-types";
+import { useNotification } from "@/context/NotificationContext";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
+import { publicUrl } from "@/common/const";
+import Loader from "@/component/Loader";
 import Review from "./review/Review";
-import Loader from "../Loader";
-import { useNotification } from "../../context/NotificationContext";
 
 // TODO pick the fields we need
 const APPLICATION_ROUD_QUERY = gql`
@@ -54,7 +56,21 @@ function ApplicationRound({
     return <div>{t("errors.applicationRoundNotFound")}</div>;
   }
 
-  return <Review applicationRound={applicationRound} />;
+  return (
+    <>
+      <BreadcrumbWrapper
+        route={[
+          "recurring-reservations",
+          `${publicUrl}/recurring-reservations/application-rounds`,
+          "application-round",
+        ]}
+        aliases={[
+          { slug: "application-round", title: applicationRound.nameFi ?? "-" },
+        ]}
+      />
+      <Review applicationRound={applicationRound} />;
+    </>
+  );
 }
 
 type IParams = {

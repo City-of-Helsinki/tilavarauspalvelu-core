@@ -10,7 +10,6 @@ import { type Query, type ApplicationRoundType } from "common/types/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container } from "@/styles/layout";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import StatusRecommendation from "./StatusRecommendation";
 import ApplicationRoundStatusTag from "../ApplicationRoundStatusTag";
 import TimeframeStatus from "../TimeframeStatus";
@@ -110,79 +109,67 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
   const unitPks = uniqBy(ds, (unit) => unit.pk);
 
   return (
-    <>
-      <BreadcrumbWrapper
-        route={[
-          "recurring-reservations",
-          "/recurring-reservations/application-rounds",
-          "application-round",
-        ]}
-        aliases={[
-          { slug: "application-round", title: applicationRound.nameFi ?? "-" },
-        ]}
-      />
-      <Container>
-        <Header>
-          <SpaceBetweenContainer>
-            {applicationRound.status != null && (
-              <ApplicationRoundStatusTag
-                status={applicationRound.status}
-                start={new Date(applicationRound.applicationPeriodBegin)}
-                end={new Date(applicationRound.applicationPeriodEnd)}
-              />
-            )}
-            <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
-          </SpaceBetweenContainer>
-          <H2>{applicationRound.nameFi}</H2>
-          <TimeframeStatus
-            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-          />
-          <AlignEndContainer>
-            {applicationRound.status != null && (
-              <StatusRecommendation
-                status={applicationRound.status}
-                name={applicationRound.nameFi ?? "-"}
-                reservationPeriodEnd={applicationRound.reservationPeriodEnd}
-              />
-            )}
-            <ButtonLikeLink to="allocation" variant="primary" size="large">
-              {t("ApplicationRound.allocate")}
-            </ButtonLikeLink>
-          </AlignEndContainer>
-        </Header>
-        <Tabs>
-          <Tabs.TabList>
-            <Tabs.Tab>{t("ApplicationRound.applications")}</Tabs.Tab>
-            <Tabs.Tab>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
-          </Tabs.TabList>
-          <Tabs.TabPanel>
-            <TabContent>
-              <Filters onSearch={debouncedSearch} units={unitPks} />
-              <ApplicationDataLoader
-                applicationRound={applicationRound}
-                key={JSON.stringify({ ...search, ...sort })}
-                filters={search}
-                sort={sort}
-                sortChanged={onSortChanged}
-              />
-            </TabContent>
-          </Tabs.TabPanel>
-          <Tabs.TabPanel>
-            <TabContent>
-              <Filters onSearch={debouncedSearch} units={unitPks} />
-              <ApplicationEventDataLoader
-                applicationRound={applicationRound}
-                key={JSON.stringify({ ...search, ...sort })}
-                filters={search}
-                sort={sort}
-                sortChanged={onSortChanged}
-              />
-            </TabContent>
-          </Tabs.TabPanel>
-        </Tabs>
-      </Container>
-    </>
+    <Container>
+      <Header>
+        <SpaceBetweenContainer>
+          {applicationRound.status != null && (
+            <ApplicationRoundStatusTag
+              status={applicationRound.status}
+              start={new Date(applicationRound.applicationPeriodBegin)}
+              end={new Date(applicationRound.applicationPeriodEnd)}
+            />
+          )}
+          <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
+        </SpaceBetweenContainer>
+        <H2>{applicationRound.nameFi}</H2>
+        <TimeframeStatus
+          applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+          applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+        />
+        <AlignEndContainer>
+          {applicationRound.status != null && (
+            <StatusRecommendation
+              status={applicationRound.status}
+              name={applicationRound.nameFi ?? "-"}
+              reservationPeriodEnd={applicationRound.reservationPeriodEnd}
+            />
+          )}
+          <ButtonLikeLink to="allocation" variant="primary" size="large">
+            {t("ApplicationRound.allocate")}
+          </ButtonLikeLink>
+        </AlignEndContainer>
+      </Header>
+      <Tabs>
+        <Tabs.TabList>
+          <Tabs.Tab>{t("ApplicationRound.applications")}</Tabs.Tab>
+          <Tabs.Tab>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
+        </Tabs.TabList>
+        <Tabs.TabPanel>
+          <TabContent>
+            <Filters onSearch={debouncedSearch} units={unitPks} />
+            <ApplicationDataLoader
+              applicationRound={applicationRound}
+              key={JSON.stringify({ ...search, ...sort })}
+              filters={search}
+              sort={sort}
+              sortChanged={onSortChanged}
+            />
+          </TabContent>
+        </Tabs.TabPanel>
+        <Tabs.TabPanel>
+          <TabContent>
+            <Filters onSearch={debouncedSearch} units={unitPks} />
+            <ApplicationEventDataLoader
+              applicationRound={applicationRound}
+              key={JSON.stringify({ ...search, ...sort })}
+              filters={search}
+              sort={sort}
+              sortChanged={onSortChanged}
+            />
+          </TabContent>
+        </Tabs.TabPanel>
+      </Tabs>
+    </Container>
   );
 }
 
