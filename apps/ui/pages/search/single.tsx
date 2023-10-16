@@ -211,7 +211,10 @@ const SearchSingle = (): JSX.Element => {
   // If search params change, update stored values
   useEffect(() => {
     const params = queryString.parse(searchParams);
-    // @ts-expect-error: TODO: fix this (first though figure out why we are saving queryparams to localstorage)
+    /*
+     TODO: fix this (first though figure out why we are saving queryparams to localstorage)
+     @ts-expect-error
+    */
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
 

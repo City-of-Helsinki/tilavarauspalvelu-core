@@ -1,4 +1,5 @@
 {
+  "maxPersons": "{{count}} henkilöä",
   "maxPersons_one": "{{count}} henkilö",
   "maxPersons_other": "{{count}} henkilöä",
   "personRange_one": "{{value}} henkilö",

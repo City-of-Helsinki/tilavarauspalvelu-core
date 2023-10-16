@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { IconSearch, Select, Tag, TextInput } from "hds-react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -30,6 +30,7 @@ import { RESERVATION_UNIT_TYPES } from "@/modules/queries/reservationUnit";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import DateRangePicker from "@/components/form/DateRangePicker";
 import Checkbox from "@/components/form/Checkbox";
+import FilterTagList from "./FilterTagList";
 
 export interface FormValues {
   purposes: string | null;
@@ -216,31 +217,6 @@ const TimeRangeWrapper = styled.div`
   }
 `;
 
-const TagControls = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-s);
-`;
-
-const StyledTag = styled(Tag)`
-  font-size: var(--fontsize-body-m);
-`;
-
-const FilterTags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-s);
-  margin-right: var(--spacing-m);
-`;
-
-const ResetButton = styled(StyledTag).attrs({
-  theme: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    "--tag-background": "transparent",
-  },
-})``;
-
 const SubmitButton = styled(MediumButton)`
   width: 100%;
 
@@ -249,21 +225,6 @@ const SubmitButton = styled(MediumButton)`
     white-space: nowrap;
   }
 `;
-
-const filterOrder = [
-  "textSearch",
-  "begin",
-  "end",
-  "after",
-  "before",
-  "duration",
-  "minPersons",
-  "maxPersons",
-  "reservationUnitType",
-  "unit",
-  "purposes",
-  "equipments",
-];
 
 // Custom hook for fetching options from the backend and mapping them to the format used by the Select component
 const useMappedOptions = (
@@ -293,12 +254,15 @@ const useMappedOptions = (
   return { options: [], isLoading: loading };
 };
 
+export const inHours = (minutes: number): number =>
+  Math.round((minutes / 60) * 100) / 100; // two decimal places
+
 const SearchForm = ({
   onSearch,
   formValues,
   removeValue,
 }: Props): JSX.Element | null => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const todayDate = new Date();
   const { options: unitOptions, isLoading: unitsLoading } = useMappedOptions(
     SEARCH_FORM_PARAMS_UNIT,
@@ -311,9 +275,6 @@ const SearchForm = ({
     useMappedOptions(RESERVATION_UNIT_TYPES, "reservationUnitTypes");
   const { options: equipmentsOptions, isLoading: equipmentsLoading } =
     useMappedOptions(SEARCH_FORM_PARAMS_EQUIPMENT, "equipments");
-
-  const inHours = (minutes: number): number =>
-    Math.round((minutes / 60) * 100) / 100; // two decimal places
   const durationMinuteOptions = () => {
     const durations: OptionType[] = [];
     let minute = 15; // no zero duration option, as all available reservations have a positive/non-zero duration
@@ -347,12 +308,14 @@ const SearchForm = ({
     // we need to add the minute times to the beginning of the duration options
     return durationMinuteOptions().concat(...times) as OptionType[];
   };
-  const durationOptions = populateDurationOptions();
+  const [durationOptions, setDurationOptions] = useState<OptionType[]>(
+    populateDurationOptions()
+  );
 
   const initialValues = {
     unit: "",
     equipments: "",
-    begin: fromUIDate(todayDate),
+    begin: toUIDate(todayDate),
     end: "",
     after: null,
     before: null,
@@ -369,6 +332,27 @@ const SearchForm = ({
         ...formValues,
       },
     });
+
+  useEffect(() => {
+    register("purposes");
+    register("unit");
+    register("equipments");
+    register("begin");
+    register("end");
+    register("after");
+    register("before");
+    register("duration");
+    register("minPersons");
+    register("maxPersons");
+    register("reservationUnitType");
+  }, [register]);
+
+  // TODO this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
+  useEffect(() => {
+    Object.keys(formValues).forEach((p) =>
+      setValue(p as keyof FormValues, formValues[p as keyof FormValues])
+    );
+  }, [formValues, setValue]);
 
   const getFormSubValueLabel = (
     key: string,
@@ -395,34 +379,6 @@ const SearchForm = ({
     }
   };
 
-  const multiSelectFilters = [
-    "unit",
-    "reservationUnitType",
-    "purposes",
-    "equipments",
-  ];
-
-  useEffect(() => {
-    register("purposes");
-    register("unit");
-    register("equipments");
-    register("begin");
-    register("end");
-    register("after");
-    register("before");
-    register("duration");
-    register("minPersons");
-    register("maxPersons");
-    register("reservationUnitType");
-  }, [register]);
-
-  // TODO this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
-  useEffect(() => {
-    Object.keys(formValues).forEach((p) =>
-      setValue(p as keyof FormValues, formValues[p as keyof FormValues])
-    );
-  }, [formValues, setValue]);
-
   const search: SubmitHandler<FormValues> = (criteria: FormValues) => {
     // Remove empty (null & "") values from the criteria
     const searchCriteria = Object.entries(criteria).reduce((c, cv) => {
@@ -435,14 +391,13 @@ const SearchForm = ({
   const areOptionsLoaded =
     !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
   const formValueKeys = Object.keys(formValues);
-  const durationTranslation = (duration: number): string => {
-    let unit = t("common:abbreviations.hour", { count: inHours(duration) });
-    if (duration <= 90) {
-      unit = t("common:abbreviations.minute", { count: duration });
-    }
-    return t("searchForm:filters.duration", { unit });
-  };
+
   const showOnlyChecked = watch("showOnlyAvailable");
+
+  useEffect(() => {
+    setDurationOptions(populateDurationOptions());
+  }, [i18n.language]);
+
   return (
     <>
       <TopContainer>
@@ -493,7 +448,7 @@ const SearchForm = ({
                   ? new Date(fromUIDate(String(formValues.begin)))
                   : new Date()
               }
-              end={
+              endDate={
                 formValues.end != null
                   ? new Date(fromUIDate(String(formValues.end)))
                   : null
@@ -662,67 +617,12 @@ const SearchForm = ({
 
       <BottomContainer>
         {areOptionsLoaded && formValueKeys.length > 0 && (
-          <TagControls>
-            <FilterTags data-test-id="search-form__filter--tags">
-              {formValueKeys
-                .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
-                .map((formValueKey) => {
-                  if (formValueKey === "showOnlyAvailable") return null;
-                  const label = t(`searchForm:filters.${formValueKey}`, {
-                    label: formValueKey,
-                    value: formValues[formValueKey],
-                    count: Number(formValues[formValueKey]),
-                  });
-                  return multiSelectFilters.includes(formValueKey) ? (
-                    (formValues[formValueKey] ?? "")
-                      .split(",")
-                      .map((subValue) => (
-                        <StyledTag
-                          id={`filter-tag__${formValueKey}-${subValue}`}
-                          onClick={() =>
-                            removeValue && removeValue([subValue], formValueKey)
-                          }
-                          onDelete={() =>
-                            removeValue && removeValue([subValue], formValueKey)
-                          }
-                          key={`${formValueKey}-${subValue}`}
-                          deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                            value: getFormSubValueLabel(formValueKey, subValue),
-                          })}
-                        >
-                          {getFormSubValueLabel(formValueKey, subValue)}
-                        </StyledTag>
-                      ))
-                  ) : (
-                    <StyledTag
-                      id={`filter-tag__${formValueKey}`}
-                      onDelete={() =>
-                        removeValue && removeValue([formValueKey])
-                      }
-                      key={formValueKey}
-                      deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                        value: label,
-                      })}
-                    >
-                      {formValueKey === "duration" &&
-                      !Number.isNaN(Number(formValues.duration))
-                        ? durationTranslation(Number(formValues.duration))
-                        : label}
-                    </StyledTag>
-                  );
-                })}
-            </FilterTags>
-            {formValueKeys.length > 0 && (
-              <ResetButton
-                aria-label={t("searchForm:resetForm")}
-                onClick={() => removeValue && removeValue()}
-                onDelete={() => removeValue && removeValue()}
-                data-test-id="search-form__reset-button"
-              >
-                {t("searchForm:resetForm")}
-              </ResetButton>
-            )}
-          </TagControls>
+          <FilterTagList
+            formValueKeys={formValueKeys}
+            formValues={formValues}
+            removeValue={removeValue}
+            getFormSubValueLabel={getFormSubValueLabel}
+          />
         )}
         <JustForMobile
           style={{ width: "100%" }}

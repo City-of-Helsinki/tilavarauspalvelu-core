@@ -22,13 +22,14 @@
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
+    "equipments": "{{value}}",
     "minPersons": "Vähintään {{value}} hlö",
     "maxPersons": "Enintään {{value}} hlö",
     "begin": "Alkaen {{value}}",
     "end": "{{value}} asti",
     "after": "Aikaisintaan {{value}}",
     "before": "Viimeistään {{value}}",
-    "duration": "Kesto vähintään {{unit}}"
+    "duration": "Vähintään {{unit}}"
   },
   "all": "Kaikki",
   "clearSelections": "Poista valinnat",

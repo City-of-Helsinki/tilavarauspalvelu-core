@@ -22,6 +22,7 @@
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
+    "equipments": "{{value}}",
     "minPersons_one": "Minst {{value}} person",
     "minPersons_other": "Minst {{value}} personer",
     "maxPersons_one": "Upp till {{value}} person",
@@ -30,7 +31,7 @@
     "end": "Till {{value}}",
     "after": "Tidigast kl.{{value}}",
     "before": "Senast kl.{{value}}",
-    "duration": "Varaktighet minst {{unit}}"
+    "duration": "Minst {{unit}}"
   },
   "all": "Alla",
   "clearSelections": "Redigera",

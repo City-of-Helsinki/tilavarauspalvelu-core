@@ -21,6 +21,7 @@
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
+    "equipments": "{{value}}",
     "minPersons_one": "Min. {{value}} person",
     "minPersons_other": "Min. {{value}} persons",
     "maxPersons_one": "Max. {{value}} person",
@@ -29,7 +30,7 @@
     "end": "Until {{value}}",
     "after": "After {{value}}",
     "before": "Before {{value}}",
-    "duration": "Minimum duration {{unit}}"
+    "duration": "Minimum {{unit}}"
   },
   "all": "All",
   "clearSelections": "Clear selections",
