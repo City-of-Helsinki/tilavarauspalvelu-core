@@ -12,13 +12,13 @@ import {
   MutationUpdateApplicationEventScheduleResultArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
+import { applicantName as getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "../../../common/util";
 import { useAllocationContext } from "../../../context/AllocationContext";
 import { useNotification } from "../../../context/NotificationContext";
 import { SmallRoundButton } from "../../../styles/buttons";
 import {
   ApplicationEventScheduleResultStatuses,
-  getApplicantName,
   getApplicationByApplicationEvent,
   getApplicationEventScheduleTimeString,
   getMatchingApplicationEventSchedules,

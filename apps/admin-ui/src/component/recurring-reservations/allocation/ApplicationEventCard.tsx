@@ -8,14 +8,12 @@ import {
   ApplicationType,
   ReservationUnitType,
 } from "common/types/gql-types";
+import { applicantName as getApplicantName } from "@/component/applications/util";
 import { publicUrl } from "../../../common/const";
 import { AllocationApplicationEventCardType } from "../../../common/types";
 import { formatDuration } from "../../../common/util";
 import { ageGroup } from "../../reservations/requested/util";
-import {
-  getApplicantName,
-  getApplicationByApplicationEvent,
-} from "./modules/applicationRoundAllocation";
+import { getApplicationByApplicationEvent } from "./modules/applicationRoundAllocation";
 
 type Props = {
   applicationEvent: ApplicationEventType;
@@ -123,6 +121,11 @@ const ApplicationEventCard = ({
     applications,
     applicationEvent.pk ?? 0
   );
+
+  if (!application || !applicationEvent) {
+    return null;
+  }
+
   const applicantName = getApplicantName(application);
   const isActive = applicationEvent === selectedApplicationEvent;
   const parsedDuration =
@@ -136,10 +139,6 @@ const ApplicationEventCard = ({
     .filter((ru) => ru?.pk !== reservationUnit.pk)
     .map((ru) => ru?.nameFi)
     .join(", ");
-
-  if (!application || !applicationEvent) {
-    return null;
-  }
 
   return (
     <Card $type={type}>

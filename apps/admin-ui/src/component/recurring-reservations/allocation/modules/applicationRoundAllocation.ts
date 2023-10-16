@@ -298,15 +298,6 @@ export const getTimeSeries = (
   return timeSlots;
 };
 
-export const getApplicantName = (
-  application: ApplicationType | undefined
-): string => {
-  return application?.applicantType ===
-    ApplicationsApplicationApplicantTypeChoices.Individual
-    ? `${application?.contactPerson?.firstName} ${application?.contactPerson?.lastName}`.trim()
-    : application?.applicantName || "";
-};
-
 export const getSlotApplicationEvents = (
   slots: string[] | null,
   applicationEvents: ApplicationEventType[] | null
