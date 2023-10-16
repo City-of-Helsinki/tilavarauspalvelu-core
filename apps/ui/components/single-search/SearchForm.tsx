@@ -113,9 +113,11 @@ const StyledSelect = styled(Select<OptionType>)<{ name?: string }>`
 
 const StyledCheckBox = styled(Checkbox)`
   &&&& {
-    margin-top: -70px;
-    grid-column: 3;
-    grid-row: 4;
+    @media (min-width: ${breakpoints.m}) {
+      margin-top: -70px;
+      grid-column: 3 / span 1;
+      grid-row: 4;
+    }
   }
 `;
 
@@ -138,8 +140,9 @@ const OptionalFilters = styled(ShowAllContainer)<{
   > [class="ShowAllContainer__Content"] {
     display: grid;
     grid-template-columns: 1fr;
-    &:not:empty {
-      gap: var(--spacing-m);
+    gap: var(--spacing-m);
+    &:empty {
+      row-gap: 0;
     }
   }
   @media (min-width: ${breakpoints.m}) {
@@ -175,10 +178,13 @@ const BottomContainer = styled.div`
   margin: var(--spacing-m) 0;
   display: flex;
   width: 100%;
-  flex-flow: row nowrap;
+  flex-flow: column nowrap;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--spacing-m);
+  @media (min-width: ${breakpoints.m}) {
+    flex-flow: row nowrap;
+  }
 `;
 
 const DateRangeWrapper = styled.div`

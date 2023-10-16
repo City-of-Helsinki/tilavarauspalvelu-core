@@ -16,6 +16,7 @@ const TagControls = styled.div`
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-s);
+  flex-grow: 1;
 `;
 
 const StyledTag = styled(Tag)`
