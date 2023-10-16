@@ -2,7 +2,6 @@ import { get, orderBy, padStart, sortBy, uniqBy } from "lodash";
 import {
   type ApplicationEventScheduleType,
   type ApplicationEventType,
-  ApplicationsApplicationApplicantTypeChoices,
   type ApplicationType,
   type ReservationUnitType,
 } from "common/types/gql-types";
@@ -178,16 +177,6 @@ export const doSomeSlotsFitApplicationEventSchedule = (
     const endTime = new Date().setHours(endHour, endMinute);
     return slotDay === beginDay && beginTime <= slotTime && endTime > slotTime;
   });
-};
-
-export const getMatchingApplicationEventSchedules = (
-  selection: string[],
-  applicationEventSchedules?: ApplicationEventScheduleType[] | null
-): ApplicationEventScheduleType[] => {
-  if (!applicationEventSchedules) return [];
-  return applicationEventSchedules.filter((applicationEventSchedule) =>
-    doSomeSlotsFitApplicationEventSchedule(applicationEventSchedule, selection)
-  );
 };
 
 export const getSlotApplicationEventCount = (

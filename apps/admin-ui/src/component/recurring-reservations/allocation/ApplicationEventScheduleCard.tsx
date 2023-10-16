@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Strong } from "common/src/common/typography";
@@ -19,9 +19,9 @@ import { useNotification } from "../../../context/NotificationContext";
 import { SmallRoundButton } from "../../../styles/buttons";
 import {
   ApplicationEventScheduleResultStatuses,
+  doSomeSlotsFitApplicationEventSchedule,
   getApplicationByApplicationEvent,
   getApplicationEventScheduleTimeString,
-  getMatchingApplicationEventSchedules,
   timeSlotKeyToScheduleTime,
 } from "./modules/applicationRoundAllocation";
 import {
@@ -79,6 +79,18 @@ const Actions = styled.div`
   margin-top: var(--spacing-s);
 `;
 
+const getMatchingApplicationEventSchedules = (
+  selection: string[],
+  applicationEventSchedules: ApplicationEventScheduleType[]
+): ApplicationEventScheduleType[] => {
+  if (!applicationEventSchedules) {
+    return [];
+  }
+  return applicationEventSchedules.filter((applicationEventSchedule) =>
+    doSomeSlotsFitApplicationEventSchedule(applicationEventSchedule, selection)
+  );
+};
+
 const ApplicationEventScheduleCard = ({
   applicationEvent,
   applications,
@@ -134,68 +146,80 @@ const ApplicationEventScheduleCard = ({
     },
   });
 
-  const selectionDuration = useMemo(
-    () => selection && formatDuration(selection.length * 30 * 60),
-    [selection]
+  const selectionDuration = formatDuration(selection.length * 30 * 60);
+
+  const parsedDuration =
+    applicationEvent.minDuration === applicationEvent.maxDuration
+      ? formatDuration(applicationEvent.minDuration)
+      : `${formatDuration(applicationEvent.minDuration)} - ${formatDuration(
+          applicationEvent.maxDuration
+        )}`;
+
+  const schedules =
+    applicationEvent?.applicationEventSchedules?.filter(
+      (x): x is ApplicationEventScheduleType => x !== null
+    ) ?? [];
+  const primaryTimes = getApplicationEventScheduleTimeString(schedules, 300);
+  const secondaryTimes = getApplicationEventScheduleTimeString(schedules, 200);
+  const matchingSchedules = getMatchingApplicationEventSchedules(
+    selection,
+    schedules
   );
+  const matchingApplicationEventSchedule =
+    matchingSchedules.length > 0 ? matchingSchedules[0] : undefined;
 
-  const application = useMemo(
-    () =>
-      getApplicationByApplicationEvent(
-        applications,
-        applicationEvent.pk as number
-      ),
-    [applicationEvent, applications]
+  const handleAcceptSlot = async () => {
+    if (
+      selection.length === 0 ||
+      reservationUnit.pk == null ||
+      matchingApplicationEventSchedule?.pk == null
+    ) {
+      notifyError(t("Allocation.errors.acceptingFailed"));
+      return;
+    }
+    setProcessingResult(true);
+    const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
+    const allocatedEnd = timeSlotKeyToScheduleTime(
+      selection[selection.length - 1],
+      true
+    );
+    const input = {
+      accepted: true,
+      allocatedReservationUnit: reservationUnit.pk,
+      applicationEventSchedule: matchingApplicationEventSchedule.pk,
+      allocatedDay: matchingApplicationEventSchedule.day,
+      allocatedBegin,
+      allocatedEnd,
+    };
+    if (
+      matchingApplicationEventSchedule.applicationEventScheduleResult != null
+    ) {
+      await acceptExistingApplicationEventScheduleResult({
+        variables: {
+          input,
+        },
+      });
+    } else {
+      await acceptApplicationEvent({
+        variables: {
+          input,
+        },
+      });
+    }
+    setRefreshApplicationEvents(true);
+  };
+
+  const application = getApplicationByApplicationEvent(
+    applications,
+    applicationEvent.pk ?? 0
   );
-
-  const applicantName = useMemo(
-    () => getApplicantName(application),
-    [application]
+  const applicantName =
+    application != null ? getApplicantName(application) : "-";
+  const isReservable = !selection.some((slot) =>
+    applicationEventScheduleResultStatuses.acceptedSlots.includes(slot)
   );
-
-  const parsedDuration = useMemo(
-    () =>
-      applicationEvent.minDuration === applicationEvent.maxDuration
-        ? formatDuration(applicationEvent.minDuration)
-        : `${formatDuration(applicationEvent.minDuration)} - ${formatDuration(
-            applicationEvent.maxDuration
-          )}`,
-    [applicationEvent.minDuration, applicationEvent.maxDuration]
-  );
-
-  const primaryTimes = useMemo(() => {
-    return applicationEvent?.applicationEventSchedules
-      ? getApplicationEventScheduleTimeString(
-          applicationEvent.applicationEventSchedules as ApplicationEventScheduleType[],
-          300
-        )
-      : "";
-  }, [applicationEvent?.applicationEventSchedules]);
-
-  const secondaryTimes = useMemo(() => {
-    return applicationEvent?.applicationEventSchedules
-      ? getApplicationEventScheduleTimeString(
-          applicationEvent.applicationEventSchedules as ApplicationEventScheduleType[],
-          200
-        )
-      : "";
-  }, [applicationEvent?.applicationEventSchedules]);
-
-  const matchingApplicationEventSchedule: ApplicationEventScheduleType =
-    useMemo(() => {
-      return getMatchingApplicationEventSchedules(
-        selection,
-        applicationEvent?.applicationEventSchedules as ApplicationEventScheduleType[]
-      )[0];
-    }, [selection, applicationEvent?.applicationEventSchedules]);
-
-  const isReservable = useMemo(
-    () =>
-      !selection.some((slot) =>
-        applicationEventScheduleResultStatuses.acceptedSlots.includes(slot)
-      ),
-    [selection, applicationEventScheduleResultStatuses]
-  );
+  const disableAllocateButton =
+    !reservationUnit.pk || !matchingApplicationEventSchedule || !isReservable;
 
   return (
     <Wrapper>
@@ -218,44 +242,8 @@ const ApplicationEventScheduleCard = ({
       <Actions>
         <SmallRoundButton
           variant="primary"
-          disabled={
-            !reservationUnit.pk ||
-            !matchingApplicationEventSchedule ||
-            !isReservable
-          }
-          onClick={async () => {
-            setProcessingResult(true);
-            const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
-            const allocatedEnd = timeSlotKeyToScheduleTime(
-              selection[selection.length - 1],
-              true
-            );
-            const input = {
-              accepted: true,
-              allocatedReservationUnit: reservationUnit.pk as number,
-              applicationEventSchedule:
-                matchingApplicationEventSchedule?.pk as number,
-              allocatedDay: matchingApplicationEventSchedule?.day,
-              allocatedBegin,
-              allocatedEnd,
-            };
-            if (
-              matchingApplicationEventSchedule.applicationEventScheduleResult
-            ) {
-              await acceptExistingApplicationEventScheduleResult({
-                variables: {
-                  input,
-                },
-              });
-            } else {
-              await acceptApplicationEvent({
-                variables: {
-                  input,
-                },
-              });
-            }
-            setRefreshApplicationEvents(true);
-          }}
+          disabled={disableAllocateButton}
+          onClick={handleAcceptSlot}
         >
           {processingResult
             ? t("Allocation.acceptingSlot")

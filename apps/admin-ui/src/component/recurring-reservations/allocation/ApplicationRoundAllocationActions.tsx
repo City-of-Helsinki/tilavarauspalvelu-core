@@ -1,5 +1,5 @@
 import { IconCross, Select } from "hds-react";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { Strong, Strongish } from "common/src/common/typography";
@@ -141,8 +141,8 @@ const ApplicationRoundAllocationActions = ({
     [selection]
   );
 
-  const timeSlotStartOptions = useMemo(() => getOptions("start"), [getOptions]);
-  const timeSlotEndOptions = useMemo(() => getOptions("end"), [getOptions]);
+  const timeSlotStartOptions = getOptions("start");
+  const timeSlotEndOptions = getOptions("end");
 
   // eslint-disable-next-line consistent-return
   const setSelectedTime = (startValue?: string, endValue?: string): void => {
@@ -167,21 +167,27 @@ const ApplicationRoundAllocationActions = ({
     );
   };
 
-  const primaryApplicationEvents = useMemo(
-    () =>
-      getSelectedApplicationEvents(paintedApplicationEvents, selection, 300),
-    [paintedApplicationEvents, selection]
+  const primaryApplicationEvents = getSelectedApplicationEvents(
+    paintedApplicationEvents,
+    selection,
+    300
   );
 
-  const otherApplicationEvents = useMemo(
-    () =>
-      getSelectedApplicationEvents(paintedApplicationEvents, selection, 200),
-    [paintedApplicationEvents, selection]
+  const otherApplicationEvents = getSelectedApplicationEvents(
+    paintedApplicationEvents,
+    selection,
+    200
   );
 
-  if (isSelecting) return null;
+  if (isSelecting) {
+    return null;
+  }
 
-  return selection && selection.length > 0 ? (
+  if (!selection || selection.length < 1) {
+    return null;
+  }
+
+  return (
     <Wrapper>
       <CloseBtn type="button" onClick={() => setSelection([])}>
         <IconCross />
@@ -291,7 +297,7 @@ const ApplicationRoundAllocationActions = ({
           <EmptyState>{t("Allocation.noRequestedTimes")}</EmptyState>
         )}
     </Wrapper>
-  ) : null;
+  );
 };
 
 export default ApplicationRoundAllocationActions;
