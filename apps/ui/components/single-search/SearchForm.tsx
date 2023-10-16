@@ -85,6 +85,7 @@ const filterGrid = css`
   @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-s);
     grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, auto);
     > div {
       grid-column: span 1;
     }
@@ -110,6 +111,14 @@ const StyledSelect = styled(Select<OptionType>)<{ name?: string }>`
   }
 `;
 
+const StyledCheckBox = styled(Checkbox)`
+  &&&& {
+    margin-top: -70px;
+    grid-column: 3;
+    grid-row: 4;
+  }
+`;
+
 const TwInput = styled.div`
   display: grid;
   grid-template-columns: 50% 50%;
@@ -124,11 +133,11 @@ const OptionalFilters = styled(ShowAllContainer)<{
   children: ReactNode[];
 }>`
   && {
-    grid-column: span 3;
+    grid-column: 1 / span 3;
   }
   > [class="ShowAllContainer__Content"] {
-    grid-template-columns: 1fr;
     display: grid;
+    grid-template-columns: 1fr;
     &:not:empty {
       gap: var(--spacing-m);
     }
@@ -136,7 +145,6 @@ const OptionalFilters = styled(ShowAllContainer)<{
   @media (min-width: ${breakpoints.m}) {
     grid-column: 1 / span 2;
     grid-row: 3 / span 1;
-    margin-bottom: var(--spacing-m);
     > [class="ShowAllContainer__Content"] {
       grid-template-columns: repeat(2, 1fr);
       gap: var(--spacing-m);
@@ -392,7 +400,7 @@ const SearchForm = ({
     !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
   const formValueKeys = Object.keys(formValues);
 
-  const showOnlyChecked = watch("showOnlyAvailable");
+  const showOnlyChecked = Boolean(watch("showOnlyAvailable"));
 
   useEffect(() => {
     setDurationOptions(populateDurationOptions());
@@ -494,7 +502,7 @@ const SearchForm = ({
             id="durationFilter"
             name="duration"
             placeholder={t("common:minimum")}
-            options={[emptyOption(t("common:select"))].concat(durationOptions)}
+            options={[emptyOption(t("common:minimum"))].concat(durationOptions)}
             label={t("searchForm:durationFilter", { duration: "" })}
             onChange={(selection: OptionType): void => {
               setValue(
@@ -584,16 +592,16 @@ const SearchForm = ({
                   : undefined
               }
             />
-            <Checkbox
-              id="showOnlyAvailable"
-              name="showOnlyAvailable"
-              label="Näytä vain vapaana olevat tilat"
-              onChange={(e) => {
-                setValue("showOnlyAvailable", e.currentTarget.checked);
-              }}
-              checked={showOnlyChecked}
-            />
           </OptionalFilters>
+          <StyledCheckBox
+            id="showOnlyAvailable"
+            name="showOnlyAvailable"
+            label={t("searchForm:showOnlyAvailableLabel")}
+            onChange={(e) => {
+              setValue("showOnlyAvailable", e.currentTarget.checked);
+            }}
+            checked={showOnlyChecked}
+          />
         </Filters>
         <JustForDesktop
           style={{

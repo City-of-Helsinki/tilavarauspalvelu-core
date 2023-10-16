@@ -36,5 +36,6 @@
   "removeSelection": "Poista valinta",
   "selectedElement": "Valinta",
   "searchForValue": "Hae",
-  "removeFilter": "Poista hakuehto \"{{value}}\""
+  "removeFilter": "Poista hakuehto \"{{value}}\"",
+  "showOnlyAvailableLabel": "Näytä vain vapaana olevat tilat"
 }

@@ -37,5 +37,6 @@
   "removeSelection": "Clear selection",
   "selectedElement": "Selection",
   "searchForValue": "Search",
-  "removeFilter": "Remove filter \"{{value}}\""
+  "removeFilter": "Remove filter \"{{value}}\"",
+  "showOnlyAvailableLabel": "Show only available spaces"
 }

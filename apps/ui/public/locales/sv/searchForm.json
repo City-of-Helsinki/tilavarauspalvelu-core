@@ -39,5 +39,6 @@
   "selectedElement": "Val",
   "openCombobox": "Öppna kryssrutan",
   "searchForValue": "Sök",
-  "removeFilter": "Redigera \"{{value}}\""
+  "removeFilter": "Redigera \"{{value}}\"",
+  "showOnlyAvailableLabel": "Visa endast lediga utrymmen"
 }
