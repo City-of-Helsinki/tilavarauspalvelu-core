@@ -23,6 +23,7 @@ export const APPLICATION_QUERY = gql`
           pk
           status
           applicantType
+          applicantEmail
           applicationRound {
             pk
             nameFi
