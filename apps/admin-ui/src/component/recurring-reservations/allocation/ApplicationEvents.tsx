@@ -15,12 +15,9 @@ import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";
 import ApplicationEventCard from "./ApplicationEventCard";
 
-const Wrapper = styled.div`
+const Content = styled.div`
   font-size: var(--fontsize-body-s);
   line-height: var(--lineheight-xl);
-`;
-
-const Content = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   gap: var(--spacing-l);
@@ -170,71 +167,69 @@ function ApplicationEvents({
   };
 
   return (
-    <Wrapper>
-      <Content>
-        <ApplicationEventList>
-          <div>
-            <StyledH5>{t("Allocation.applicants")}</StyledH5>
-            <p>{t("Allocation.selectApplicant")}</p>
-          </div>
-          <ApplicationEventsContainer>
+    <Content>
+      <ApplicationEventList>
+        <div>
+          <StyledH5>{t("Allocation.applicants")}</StyledH5>
+          <p>{t("Allocation.selectApplicant")}</p>
+        </div>
+        <ApplicationEventsContainer>
+          <EventGroupList
+            applicationEvents={unallocatedApplicationEvents}
+            selectedApplicationEvent={selectedApplicationEvent}
+            setSelectedApplicationEvent={setSelectedApplicationEvent}
+            applications={applications}
+            reservationUnit={reservationUnit}
+            type="unallocated"
+          />
+          <StyledAccordion heading={t("Allocation.otherApplicants")}>
+            <p>{t("Allocation.allocatedApplicants")}</p>
             <EventGroupList
-              applicationEvents={unallocatedApplicationEvents}
+              applicationEvents={allocatedApplicationEvents}
               selectedApplicationEvent={selectedApplicationEvent}
               setSelectedApplicationEvent={setSelectedApplicationEvent}
               applications={applications}
               reservationUnit={reservationUnit}
-              type="unallocated"
+              type="allocated"
             />
-            <StyledAccordion heading={t("Allocation.otherApplicants")}>
-              <p>{t("Allocation.allocatedApplicants")}</p>
-              <EventGroupList
-                applicationEvents={allocatedApplicationEvents}
-                selectedApplicationEvent={selectedApplicationEvent}
-                setSelectedApplicationEvent={setSelectedApplicationEvent}
-                applications={applications}
-                reservationUnit={reservationUnit}
-                type="allocated"
-              />
-              <p>{t("Allocation.declinedApplicants")}</p>
-              <EventGroupList
-                applicationEvents={declinedApplicationEvents}
-                selectedApplicationEvent={selectedApplicationEvent}
-                setSelectedApplicationEvent={setSelectedApplicationEvent}
-                applications={applications}
-                reservationUnit={reservationUnit}
-                type="declined"
-              />
-            </StyledAccordion>
-          </ApplicationEventsContainer>
-        </ApplicationEventList>
-        <AllocationCalendar
-          applicationEvents={applicationEvents}
-          selectedApplicationEvent={selectedApplicationEvent}
-          paintApplicationEvents={paintApplicationEvents}
-          selection={selection}
-          setSelection={setSelection}
-          isSelecting={isSelecting}
-          setIsSelecting={setIsSelecting}
-          applicationEventScheduleResultStatuses={
-            applicationEventScheduleResultStatuses
-          }
-        />
-        <ApplicationRoundAllocationActions
-          applications={applications}
-          applicationEvents={applicationEvents}
-          reservationUnit={reservationUnit}
-          paintedApplicationEvents={paintedApplicationEvents}
-          paintApplicationEvents={paintApplicationEvents}
-          selection={selection}
-          setSelection={setSelection}
-          isSelecting={isSelecting}
-          applicationEventScheduleResultStatuses={
-            applicationEventScheduleResultStatuses
-          }
-        />
-      </Content>
-    </Wrapper>
+            <p>{t("Allocation.declinedApplicants")}</p>
+            <EventGroupList
+              applicationEvents={declinedApplicationEvents}
+              selectedApplicationEvent={selectedApplicationEvent}
+              setSelectedApplicationEvent={setSelectedApplicationEvent}
+              applications={applications}
+              reservationUnit={reservationUnit}
+              type="declined"
+            />
+          </StyledAccordion>
+        </ApplicationEventsContainer>
+      </ApplicationEventList>
+      <AllocationCalendar
+        applicationEvents={applicationEvents}
+        selectedApplicationEvent={selectedApplicationEvent}
+        paintApplicationEvents={paintApplicationEvents}
+        selection={selection}
+        setSelection={setSelection}
+        isSelecting={isSelecting}
+        setIsSelecting={setIsSelecting}
+        applicationEventScheduleResultStatuses={
+          applicationEventScheduleResultStatuses
+        }
+      />
+      <ApplicationRoundAllocationActions
+        applications={applications}
+        applicationEvents={applicationEvents}
+        reservationUnit={reservationUnit}
+        paintedApplicationEvents={paintedApplicationEvents}
+        paintApplicationEvents={paintApplicationEvents}
+        selection={selection}
+        setSelection={setSelection}
+        isSelecting={isSelecting}
+        applicationEventScheduleResultStatuses={
+          applicationEventScheduleResultStatuses
+        }
+      />
+    </Content>
   );
 }
 
