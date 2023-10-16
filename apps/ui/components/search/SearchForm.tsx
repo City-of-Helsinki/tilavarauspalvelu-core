@@ -27,7 +27,7 @@ import {
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { MediumButton, truncatedText } from "../../styles/util";
-import MultiSelectDropdown from "../form/MultiselectDropdown";
+import MultiSelectDropdown from "../form/MultiSelectDropdown";
 import {
   SEARCH_FORM_PARAMS_PURPOSE,
   SEARCH_FORM_PARAMS_UNIT,

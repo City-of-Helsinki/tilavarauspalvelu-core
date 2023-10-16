@@ -12,7 +12,7 @@ import SearchLabel from "./SearchLabel";
 
 const SELECT_ALL = "SELECT_ALL";
 
-export interface MultiselectDropdownProps {
+export interface MultiSelectDropdownProps {
   id: string;
   checkboxName: string;
   icon?: React.ReactElement;
@@ -140,7 +140,7 @@ const ArrowWrapper = styled.div`
   }
 `;
 
-const MultiSelectDropdown: React.FC<MultiselectDropdownProps> = ({
+const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   id,
   checkboxName,
   icon,

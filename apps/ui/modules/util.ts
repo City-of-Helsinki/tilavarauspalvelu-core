@@ -3,7 +3,12 @@ import { i18n, TFunction } from "next-i18next";
 import queryString from "query-string";
 import { trim } from "lodash";
 import { ApolloError } from "@apollo/client";
-import { toApiDate, toUIDate, isValidDate } from "common/src/common/util";
+import {
+  toApiDate,
+  toUIDate,
+  isValidDate,
+  getTranslation,
+} from "common/src/common/util";
 import {
   ApplicationEventSchedule,
   Cell,
@@ -32,7 +37,6 @@ import {
   isBrowser,
 } from "./const";
 
-import { getTranslation } from "common/src/common/util";
 export { getTranslation };
 
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -96,7 +100,8 @@ export const capitalize = (s: string): string => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-export const isValidDateString = (date: string): boolean => {
+export const isValidDateString = (date: string | null): boolean => {
+  if (!date) return false;
   return isValidDate(parse(date, "d.M.yyyy", new Date()));
 };
 
@@ -136,7 +141,7 @@ const getLabel = (
   if (parameter.name) {
     return localizedValue(parameter.name, lang);
   }
-  if ('minimum' in parameter || 'maximum' in parameter) {
+  if ("minimum" in parameter || "maximum" in parameter) {
     return `${parameter.minimum || ""} - ${parameter.maximum || ""}`;
   }
   return "no label";
@@ -175,9 +180,12 @@ export const getComboboxValues = (
     return [];
   }
   if (value.includes(",")) {
-    return value.split(",").map((unit) => getSelectedOption(unit, options)).filter((x): x is OptionType => x != null)
+    return value
+      .split(",")
+      .map((unit) => getSelectedOption(unit, options))
+      .filter((x): x is OptionType => x != null);
   }
-  const val = getSelectedOption(value, options)
+  const val = getSelectedOption(value, options);
   if (val) {
     return [val];
   }
@@ -314,10 +322,10 @@ export const applicationEventSchedulesToCells = (
       (Number(applicationEventSchedule.end.substring(0, 2)) || 24) -
       firstSlotStart;
 
-    const priority = applicationEventSchedule.priority;
+    const { priority } = applicationEventSchedule;
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day][h];
-      cell.state = priority ?? 100 ;
+      cell.state = priority ?? 100;
     }
   });
 

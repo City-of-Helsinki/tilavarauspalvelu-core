@@ -91,8 +91,8 @@ const processVariables = (values: Record<string, string>, language: string) => {
       "unit",
       "reservationUnitType",
       "equipments",
-      "begin",
-      "end",
+      "dateBegin",
+      "dateEnd",
       "duration",
     ]),
     ...(values.minPersons && {
@@ -113,14 +113,20 @@ const processVariables = (values: Record<string, string>, language: string) => {
     ...(values.equipments && {
       equipments: values.equipments.split(","),
     }),
-    ...(values.begin && {
-      begin: `${values.begin.split(".").reverse().join("-")}T00:00:00+00:00`,
+    ...(values.dateBegin && {
+      dateBegin: `${values.dateBegin
+        .split(".")
+        .reverse()
+        .join("-")}T00:00:00+00:00`,
     }),
-    ...(values.end && {
-      end: `${values.end.split(".").reverse().join("-")}T00:00:00+00:00`,
+    ...(values.dateEnd && {
+      dateEnd: `${values.dateEnd
+        .split(".")
+        .reverse()
+        .join("-")}T23:59:59+00:00`,
     }),
     ...(values.duration && {
-      minReservationDuration: parseInt(values.duration, 10) * 60,
+      duration: parseInt(values.duration, 10) * 60,
     }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,

@@ -10,7 +10,8 @@ import { Language } from "common/types/common";
 import { isValidDateString } from "../../modules/util";
 
 const initDate = (date: Date | null): string => {
-  return date ? toUIDate(date) : "";
+  if (date == null) return "";
+  return toUIDate(date);
 };
 
 export interface DateRangePickerProps {
@@ -70,18 +71,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     isBefore(internalEndDate, internalStartDate);
 
   React.useEffect(() => {
-    if (!startDate && !endDate) {
-      setInternalStartDateString("");
-      setInternalEndDateString("");
-    }
-  }, [startDate, endDate]);
-
-  React.useEffect(() => {
     const startDateIsValid = isValidDateString(internalStartDateString);
     const endDateIsValid = isValidDateString(internalEndDateString);
     const startDateObj = parse(internalStartDateString, "d.M.yyyy", new Date());
     const endDateObj = parse(internalEndDateString, "d.M.yyyy", new Date());
-
+    console.log(startDateObj, endDateObj);
     if (
       startDateIsValid &&
       endDateIsValid &&
@@ -97,25 +91,18 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         ...errors,
         startDateIsInvalid: false,
       });
+      onChangeStartDate(startDateObj);
     }
+    if (!startDateIsValid) onChangeStartDate(null);
 
     if (endDateIsValid) {
       setErrors({
         ...errors,
         endDateIsInvalid: false,
       });
+      onChangeEndDate(endDateObj);
     }
-
-    if (startDateIsValid) {
-      onChangeStartDate(parse(internalStartDateString, "d.M.yyyy", new Date()));
-    } else {
-      onChangeStartDate(null);
-    }
-    if (endDateIsValid) {
-      onChangeEndDate(parse(internalEndDateString, "d.M.yyyy", new Date()));
-    } else {
-      onChangeEndDate(null);
-    }
+    if (!endDateIsValid) onChangeEndDate(null);
 
     // ignore change handlers to avoid infinite loops (if func changes on every render)
     // eslint-disable-next-line react-hooks/exhaustive-deps

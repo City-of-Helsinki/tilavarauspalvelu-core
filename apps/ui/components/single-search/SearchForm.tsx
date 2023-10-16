@@ -1,16 +1,16 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { IconSearch, Select, Tag, TextInput } from "hds-react";
+import { IconSearch, Select } from "hds-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styled, { css } from "styled-components";
 import { DocumentNode, useQuery } from "@apollo/client";
-import { sortBy } from "lodash";
+import { omit, sortBy } from "lodash";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryUnitsArgs } from "common/types/gql-types";
 import { addYears } from "date-fns";
 import { ShowAllContainer } from "common/src/components";
-import TimeRangePicker from "common/src/components/form/TimeRangePicker";
+import { TextInput, TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
 import {
   fromUIDate,
@@ -20,7 +20,6 @@ import {
 } from "@/modules/util";
 import { emptyOption, participantCountOptions } from "@/modules/const";
 import { MediumButton, truncatedText } from "@/styles/util";
-import MultiSelectDropdown from "../form/MultiselectDropdown";
 import {
   SEARCH_FORM_PARAMS_EQUIPMENT,
   SEARCH_FORM_PARAMS_PURPOSE,
@@ -28,23 +27,27 @@ import {
 } from "@/modules/queries/params";
 import { RESERVATION_UNIT_TYPES } from "@/modules/queries/reservationUnit";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
-import DateRangePicker from "@/components/form/DateRangePicker";
-import Checkbox from "@/components/form/Checkbox";
+import {
+  Checkbox,
+  DateRangePicker,
+  MultiSelectDropdown,
+} from "@/components/form";
 import FilterTagList from "./FilterTagList";
 
 export interface FormValues {
   purposes: string | null;
   unit: string | null;
   equipments: string | null;
-  begin: string | null;
-  end: string | null;
-  after: string | null;
-  before: string | null;
+  timeBegin: string | null;
+  timeEnd: string | null;
+  dateBegin: string | null;
+  dateEnd: string | null;
   duration: number | null;
   minPersons: string | null;
   maxPersons: string | null;
   reservationUnitType: string;
-  showOnlyAvailable: boolean;
+  showOnlyAvailable?: boolean;
+  textSearch?: string;
 }
 
 type Props = {
@@ -276,8 +279,8 @@ const SearchForm = ({
   formValues,
   removeValue,
 }: Props): JSX.Element | null => {
-  const { t, i18n } = useTranslation();
-  const todayDate = new Date();
+  const formValueKeys = Object.keys(formValues);
+  const { t } = useTranslation();
   const { options: unitOptions, isLoading: unitsLoading } = useMappedOptions(
     SEARCH_FORM_PARAMS_UNIT,
     "units",
@@ -322,21 +325,20 @@ const SearchForm = ({
     // we need to add the minute times to the beginning of the duration options
     return durationMinuteOptions().concat(...times) as OptionType[];
   };
-  const [durationOptions, setDurationOptions] = useState<OptionType[]>(
-    populateDurationOptions()
-  );
+  const durationOptions = populateDurationOptions();
 
   const initialValues = {
     unit: "",
     equipments: "",
-    begin: toUIDate(todayDate),
+    begin: "",
     end: "",
     after: null,
     before: null,
     duration: null,
-    minPersons: "1",
+    minPersons: "",
     maxPersons: "",
-    reservationUnitType: formValues.reservationUnitType ?? "",
+    reservationUnitType: "",
+    showOnlyAvailable: true,
   };
 
   const { register, watch, handleSubmit, setValue, getValues, control } =
@@ -359,13 +361,21 @@ const SearchForm = ({
     register("minPersons");
     register("maxPersons");
     register("reservationUnitType");
+    register("textSearch");
+    register("showOnlyAvailable");
   }, [register]);
 
   // TODO this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
   useEffect(() => {
     Object.keys(formValues).forEach((p) =>
-      setValue(p as keyof FormValues, formValues[p as keyof FormValues])
+      setValue(
+        p as keyof FormValues,
+        p === "showOnlyAvailable"
+          ? formValues[p as keyof FormValues] !== "false"
+          : formValues[p as keyof FormValues]
+      )
     );
+    console.log(getValues());
   }, [formValues, setValue]);
 
   const getFormSubValueLabel = (
@@ -394,24 +404,18 @@ const SearchForm = ({
   };
 
   const search: SubmitHandler<FormValues> = (criteria: FormValues) => {
-    // Remove empty (null & "") values from the criteria
+    // Remove empty (null || "") values from the criteria
     const searchCriteria = Object.entries(criteria).reduce((c, cv) => {
       if (cv[1] == null || cv[1] === "") return c;
       return { ...c, [cv[0]]: cv[1] };
     }, {});
     onSearch(searchCriteria);
   };
-
+  console.log(formValues);
+  const startDate = fromUIDate(String(formValues.dateBegin));
+  console.log(`Sent startDate: ${startDate}`);
   const areOptionsLoaded =
     !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
-  const formValueKeys = Object.keys(formValues);
-
-  const showOnlyChecked = Boolean(watch("showOnlyAvailable"));
-
-  useEffect(() => {
-    setDurationOptions(populateDurationOptions());
-  }, [i18n.language]);
-
   return (
     <>
       <TopContainer>
@@ -457,21 +461,13 @@ const SearchForm = ({
           />
           <DateRangeWrapper>
             <DateRangePicker
-              startDate={
-                formValues.begin != null
-                  ? new Date(fromUIDate(String(formValues.begin)))
-                  : new Date()
-              }
-              endDate={
-                formValues.end != null
-                  ? new Date(fromUIDate(String(formValues.end)))
-                  : null
-              }
+              startDate={fromUIDate(String(formValues.dateBegin))}
+              endDate={fromUIDate(String(formValues.dateEnd))}
               onChangeStartDate={(date: Date | null) =>
-                setValue("begin", date != null ? toUIDate(date) : "")
+                setValue("dateBegin", date != null ? toUIDate(date) : "")
               }
               onChangeEndDate={(date: Date | null) =>
-                setValue("end", date != null ? toUIDate(date) : "")
+                setValue("dateEnd", date != null ? toUIDate(date) : "")
               }
               labels={{
                 begin: t("searchForm:dateFilter"),
@@ -480,11 +476,11 @@ const SearchForm = ({
               required={{ begin: false, end: false }}
               limits={{
                 startMinDate: new Date(),
-                startMaxDate: getValues("end")
-                  ? fromUIDate(String(getValues("end")))
+                startMaxDate: getValues("dateEnd")
+                  ? fromUIDate(String(getValues("dateEnd")))
                   : undefined,
-                endMinDate: getValues("begin")
-                  ? fromUIDate(String(getValues("begin")))
+                endMinDate: getValues("dateBegin")
+                  ? fromUIDate(String(getValues("dateBegin")))
                   : undefined,
                 endMaxDate: addYears(new Date(), 2),
               }}
@@ -494,7 +490,7 @@ const SearchForm = ({
           <TimeRangeWrapper>
             <TimeRangePicker
               control={control}
-              name={{ begin: "after", end: "before" }}
+              name={{ begin: "timeBegin", end: "timeEnd" }}
               label={{ begin: t("searchForm:timeFilter"), end: " " }}
               placeholder={{
                 begin: t("common:beginLabel"),
@@ -529,12 +525,19 @@ const SearchForm = ({
             showAllLabel={t("searchForm:showMoreFilters")}
             showLessLabel={t("searchForm:showLessFilters")}
             maximumNumber={0}
+            initiallyOpen={
+              !!formValues.maxPersons ||
+              !!formValues.minPersons ||
+              !!formValues.reservationUnitType ||
+              !!formValues.textSearch
+            }
           >
             <TwInput>
               <StyledSelect
                 id="participantMinCountFilter"
+                name="minPersons"
                 placeholder={t("common:minimum")}
-                options={[emptyOption(t("common:select"))].concat(
+                options={[emptyOption(t("common:minimum"), "")].concat(
                   participantCountOptions
                 )}
                 label={t("searchForm:participantCountCombined")}
@@ -545,13 +548,15 @@ const SearchForm = ({
                   getValues("minPersons"),
                   participantCountOptions
                 )}
+                key={`minPersons${getValues("minPersons")}`}
                 className="inputSm inputGroupStart"
               />
 
               <StyledSelect
                 id="participantMaxCountFilter"
+                name="maxPersons"
                 placeholder={t("common:maximum")}
-                options={[emptyOption(t("common:select"))].concat(
+                options={[emptyOption(t("common:maximum"))].concat(
                   participantCountOptions
                 )}
                 label="&nbsp;"
@@ -583,15 +588,12 @@ const SearchForm = ({
               key={`minPersons${getValues("minPersons")}`}
             />
             <TextInput
+              control={control}
               id="search"
               name="textSearch"
               label={t("searchForm:textSearchLabel")}
               placeholder={t("searchForm:searchTermPlaceholder")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSubmit(search)();
-                }
-              }}
+              onEnterKeyPress={() => handleSubmit(search)()}
               defaultValue={
                 formValues.textSearch != null
                   ? formValues.textSearch
@@ -603,10 +605,13 @@ const SearchForm = ({
             id="showOnlyAvailable"
             name="showOnlyAvailable"
             label={t("searchForm:showOnlyAvailableLabel")}
-            onChange={(e) => {
-              setValue("showOnlyAvailable", e.currentTarget.checked);
-            }}
-            checked={showOnlyChecked}
+            onChange={() =>
+              setValue(
+                "showOnlyAvailable",
+                Boolean(!getValues("showOnlyAvailable"))
+              )
+            }
+            checked={Boolean(watch("showOnlyAvailable"))}
           />
         </Filters>
         <JustForDesktop

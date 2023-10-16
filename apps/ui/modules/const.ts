@@ -47,9 +47,12 @@ export const mapStyle: MapboxStyle = {
 export const reservationUnitPath = (id: number): string =>
   `${reservationUnitPrefix}/${id}`;
 
-export const emptyOption = (label: string): OptionType => ({
+export const emptyOption = (
+  label: string,
+  value?: string | number | null
+): OptionType => ({
   label,
-  value: undefined,
+  value: value != null ? value : undefined,
 });
 
 export const participantCountOptions = [
@@ -132,8 +135,13 @@ if (!isBrowser && process.env.SKIP_ENV_VALIDATION !== "true") {
   }
   // this could be a transformation on the base value in env.mjs and a warning
   // throwing here because we'd have to fix all baseurls
-  if ((apiBaseUrl.match("localhost") || apiBaseUrl.match("127.0.0.1")) && apiBaseUrl.startsWith("https://")) {
-    throw new Error("API_BASE_URL is not valid, don't use SSL (https) when using localhost");
+  if (
+    (apiBaseUrl.match("localhost") || apiBaseUrl.match("127.0.0.1")) &&
+    apiBaseUrl.startsWith("https://")
+  ) {
+    throw new Error(
+      "API_BASE_URL is not valid, don't use SSL (https) when using localhost"
+    );
   }
 }
 
@@ -141,24 +149,35 @@ const apiUrl = apiBaseUrl ?? "";
 
 // a hack to workaround node-fetch dns problems with localhost
 // this will not work with authentication so when we add authentication to the SSR we need to fix it properly
-const shouldModifyLocalhost = (process.env.ENABLE_FETCH_HACK === "true") && !isBrowser && apiUrl.includes("localhost");
-const hostUrl = shouldModifyLocalhost ? apiUrl.replace("localhost", "127.0.0.1") : apiUrl;
-export const GRAPHQL_URL = `${hostUrl}${hostUrl.endsWith('/') ? '' : '/'}graphql/`;
-export const REST_API_URL = `${hostUrl}${hostUrl.endsWith('/') ? '' : '/'}v1/`;
+const shouldModifyLocalhost =
+  process.env.ENABLE_FETCH_HACK === "true" &&
+  !isBrowser &&
+  apiUrl.includes("localhost");
+const hostUrl = shouldModifyLocalhost
+  ? apiUrl.replace("localhost", "127.0.0.1")
+  : apiUrl;
+export const GRAPHQL_URL = `${hostUrl}${
+  hostUrl.endsWith("/") ? "" : "/"
+}graphql/`;
+export const REST_API_URL = `${hostUrl}${hostUrl.endsWith("/") ? "" : "/"}v1/`;
 
 export const authEnabled: boolean | undefined = isBrowser
   ? publicRuntimeConfig.authEnabled
   : serverRuntimeConfig.authEnabled;
 
-const AUTH_URL = apiBaseUrl != null ? `${apiBaseUrl}/helauth` : '/helauth';
+const AUTH_URL = apiBaseUrl != null ? `${apiBaseUrl}/helauth` : "/helauth";
 const PUBLIC_URL: string = "";
 
 const getCleanPublicUrl = () => {
-  const hasPublicUrl = PUBLIC_URL != null && PUBLIC_URL !== '/' && PUBLIC_URL !== '';
-  const publicUrlNoSlash = PUBLIC_URL && hasPublicUrl ? PUBLIC_URL.replace(/\/$/, '') : '';
-  const cleanPublicUrl  = publicUrlNoSlash.startsWith('/') ? publicUrlNoSlash : `/${publicUrlNoSlash}`;
+  const hasPublicUrl =
+    PUBLIC_URL != null && PUBLIC_URL !== "/" && PUBLIC_URL !== "";
+  const publicUrlNoSlash =
+    PUBLIC_URL && hasPublicUrl ? PUBLIC_URL.replace(/\/$/, "") : "";
+  const cleanPublicUrl = publicUrlNoSlash.startsWith("/")
+    ? publicUrlNoSlash
+    : `/${publicUrlNoSlash}`;
   return cleanPublicUrl;
-}
+};
 // Returns href url for sign in dialog when given redirect url as parameter
 export const getSignInUrl = (callBackUrl: string): string => {
   if (callBackUrl.includes(`/logout`)) {

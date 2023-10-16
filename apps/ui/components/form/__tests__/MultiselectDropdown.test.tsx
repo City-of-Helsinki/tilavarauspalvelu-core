@@ -10,8 +10,8 @@ import {
   userEvent,
 } from "../../../test/testUtils";
 import MultiSelectDropdown, {
-  MultiselectDropdownProps,
-} from "../MultiselectDropdown";
+  type MultiSelectDropdownProps,
+} from "../MultiSelectDropdown";
 
 jest.mock("next-i18next", () => ({
   useTranslation: () => {
