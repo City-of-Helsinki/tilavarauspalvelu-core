@@ -1,7 +1,16 @@
-from typing import Any
+from datetime import datetime, timedelta
+from typing import Any, Literal
+
+from django.conf import settings
+from django.db import models
+from modeltranslation.manager import get_translatable_fields_for_model
 
 __all__ = [
     "get_nested",
+    "timedelta_from_json",
+    "timedelta_to_json",
+    "get_field_to_related_field_mapping",
+    "get_translation_fields",
 ]
 
 
@@ -31,3 +40,39 @@ def get_nested(obj: dict | list | None, /, *args: str | int, default: Any = None
 
     obj = obj or {}
     return get_nested(obj.get(arg), *args, default=default)
+
+
+def timedelta_to_json(delta: timedelta) -> str:
+    return str(delta).zfill(8)
+
+
+def timedelta_from_json(delta: str) -> timedelta:
+    try:
+        time_ = datetime.strptime(delta, "%H:%M:%S")
+    except ValueError:
+        time_ = datetime.strptime(delta, "%H:%M")
+
+    return timedelta(hours=time_.hour, minutes=time_.minute, seconds=time_.second)
+
+
+def get_field_to_related_field_mapping(model: type[models.Model]) -> dict[str, str]:
+    """
+    Mapping of all 'many_to_one' and 'many_to_many' fields
+    on the given model to their related entity's field names.
+    """
+    return {
+        field.name: field.remote_field.name  # many_to_one
+        if isinstance(field.remote_field, models.ForeignKey)
+        else field.remote_field.get_accessor_name()  # many_to_many
+        for field in model._meta.get_fields()
+        if field.is_relation and (field.many_to_many or field.one_to_many)
+    }
+
+
+def get_translation_fields(model: type[models.Model], fields: list[str] | Literal["__all__"]) -> list[str]:
+    translatable_fields = get_translatable_fields_for_model(model) or []
+    if fields == "__all__":
+        fields = translatable_fields
+    return [
+        f"{field}_{language}" for field in translatable_fields for language, _ in settings.LANGUAGES if field in fields
+    ]

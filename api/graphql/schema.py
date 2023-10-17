@@ -1,55 +1,66 @@
 from typing import Any
 
-import django_filters
 import graphene
 from django.conf import settings
-from django.db.models import Q
 from graphene import Field, relay
 from graphene_django.debug import DjangoDebug
-from graphene_permissions.mixins import AuthFilter
-from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
-from api.graphql.application_rounds.application_round_filtersets import ApplicationRoundFilterSet
-from api.graphql.application_rounds.application_round_types import ApplicationRoundType
-from api.graphql.applications.application_filtersets import (
-    ApplicationEventFilterSet,
-    ApplicationFilterSet,
-)
-from api.graphql.applications.application_mutations import (
+from api.graphql.extensions.permission_helpers import check_resolver_permission
+from api.graphql.types.application.mutations import (
+    ApplicationCancelMutation,
     ApplicationCreateMutation,
     ApplicationDeclineMutation,
+    ApplicationSendMutation,
+    ApplicationUpdateMutation,
+)
+from api.graphql.types.application.types import ApplicationNode
+from api.graphql.types.application_event.mutations import (
     ApplicationEventCreateMutation,
     ApplicationEventDeclineMutation,
     ApplicationEventDeleteMutation,
-    ApplicationEventFlagMutation,
-    ApplicationEventScheduleResultCreateMutation,
-    ApplicationEventScheduleResultUpdateMutation,
     ApplicationEventUpdateMutation,
-    ApplicationFlagMutation,
-    ApplicationUpdateMutation,
 )
-from api.graphql.applications.application_types import (
-    ApplicationEventType,
-    ApplicationType,
-    CityType,
+from api.graphql.types.application_event.types import ApplicationEventNode
+from api.graphql.types.application_event_schedule.mutations import (
+    ApplicationEventScheduleApproveMutation,
+    ApplicationEventScheduleDeclineMutation,
 )
-from api.graphql.banner_notification.filter import BannerNotificationConnection
-from api.graphql.banner_notification.mutations import (
+from api.graphql.types.application_round.types import ApplicationRoundNode
+from api.graphql.types.banner_notification.mutations import (
     BannerNotificationCreateMutation,
     BannerNotificationDeleteMutation,
     BannerNotificationUpdateMutation,
 )
-from api.graphql.banner_notification.types import BannerNotificationType
-from api.graphql.merchants.merchant_mutations import RefreshOrderMutation
-from api.graphql.merchants.merchant_types import PaymentOrderType
-from api.graphql.reservation_units.reservation_unit_filtersets import (
+from api.graphql.types.banner_notification.types import BannerNotificationNode
+from api.graphql.types.city.types import CityNode
+from api.graphql.types.merchants.mutations import RefreshOrderMutation
+from api.graphql.types.merchants.permissions import PaymentOrderPermission
+from api.graphql.types.merchants.types import PaymentOrderType
+from api.graphql.types.recurring_reservation.fields import RecurringReservationsFilter
+from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
+from api.graphql.types.recurring_reservation.mutations import (
+    RecurringReservationCreateMutation,
+    RecurringReservationUpdateMutation,
+)
+from api.graphql.types.reservation_units.fields import (
+    EquipmentCategoryFilter,
+    EquipmentFilter,
+    KeywordFilter,
+    PurposeFilter,
+    QualifierFilter,
+    ReservationUnitCancellationRulesFilter,
+    ReservationUnitsFilter,
+    ReservationUnitTypesFilter,
+    TaxPercentageFilter,
+)
+from api.graphql.types.reservation_units.filtersets import (
     EquipmentFilterSet,
     PurposeFilterSet,
     ReservationUnitsFilterSet,
     ReservationUnitTypeFilterSet,
 )
-from api.graphql.reservation_units.reservation_unit_mutations import (
+from api.graphql.types.reservation_units.mutations import (
     EquipmentCategoryCreateMutation,
     EquipmentCategoryDeleteMutation,
     EquipmentCategoryUpdateMutation,
@@ -64,7 +75,12 @@ from api.graphql.reservation_units.reservation_unit_mutations import (
     ReservationUnitImageUpdateMutation,
     ReservationUnitUpdateMutation,
 )
-from api.graphql.reservation_units.reservation_unit_types import (
+from api.graphql.types.reservation_units.permissions import (
+    EquipmentCategoryPermission,
+    EquipmentPermission,
+    ReservationUnitPermission,
+)
+from api.graphql.types.reservation_units.types import (
     EquipmentCategoryType,
     EquipmentType,
     KeywordCategoryType,
@@ -79,13 +95,16 @@ from api.graphql.reservation_units.reservation_unit_types import (
     ReservationUnitTypeType,
     TaxPercentageType,
 )
-from api.graphql.reservations.recurring_reservation_filtersets import RecurringReservationFilterSet
-from api.graphql.reservations.recurring_reservation_mutations import (
-    RecurringReservationCreateMutation,
-    RecurringReservationUpdateMutation,
+from api.graphql.types.reservations.fields import (
+    AgeGroupFilter,
+    ReservationCancelReasonFilter,
+    ReservationDenyReasonFilter,
+    ReservationMetadataSetFilter,
+    ReservationPurposeFilter,
+    ReservationsFilter,
 )
-from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
-from api.graphql.reservations.reservation_mutations import (
+from api.graphql.types.reservations.filtersets import ReservationFilterSet
+from api.graphql.types.reservations.mutations import (
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
     ReservationCancellationMutation,
@@ -101,7 +120,8 @@ from api.graphql.reservations.reservation_mutations import (
     ReservationUpdateMutation,
     ReservationWorkingMemoMutation,
 )
-from api.graphql.reservations.reservation_types import (
+from api.graphql.types.reservations.permissions import ReservationPermission
+from api.graphql.types.reservations.types import (
     AgeGroupType,
     RecurringReservationType,
     ReservationCancelReasonType,
@@ -110,66 +130,30 @@ from api.graphql.reservations.reservation_types import (
     ReservationPurposeType,
     ReservationType,
 )
-from api.graphql.resources.resource_filtersets import ResourceFilterSet
-from api.graphql.resources.resource_mutations import (
-    ResourceCreateMutation,
-    ResourceDeleteMutation,
-    ResourceUpdateMutation,
-)
-from api.graphql.resources.resource_types import ResourceType
-from api.graphql.spaces.space_filtersets import SpaceFilterSet
-from api.graphql.spaces.space_mutations import (
-    SpaceCreateMutation,
-    SpaceDeleteMutation,
-    SpaceUpdateMutation,
-)
-from api.graphql.spaces.space_types import ServiceSectorType, SpaceType
-from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
-from api.graphql.units.unit_filtersets import UnitsFilterSet
-from api.graphql.units.unit_mutations import UnitUpdateMutation
-from api.graphql.units.unit_types import UnitByPkType, UnitType
-from api.graphql.users.user_mutations import UserUpdateMutation
-from api.graphql.users.user_types import UserType
+from api.graphql.types.resources.fields import ResourcesFilter
+from api.graphql.types.resources.filtersets import ResourceFilterSet
+from api.graphql.types.resources.mutations import ResourceCreateMutation, ResourceDeleteMutation, ResourceUpdateMutation
+from api.graphql.types.resources.permissions import ResourcePermission
+from api.graphql.types.resources.types import ResourceType
+from api.graphql.types.spaces.fields import ServiceSectorFilter, SpacesFilter
+from api.graphql.types.spaces.filtersets import SpaceFilterSet
+from api.graphql.types.spaces.mutations import SpaceCreateMutation, SpaceDeleteMutation, SpaceUpdateMutation
+from api.graphql.types.spaces.permissions import SpacePermission
+from api.graphql.types.spaces.types import ServiceSectorType, SpaceType
+from api.graphql.types.terms_of_use.fields import TermsOfUseFilter
+from api.graphql.types.terms_of_use.types import TermsOfUseType
+from api.graphql.types.units.fields import UnitsFilter
+from api.graphql.types.units.filtersets import UnitsFilterSet
+from api.graphql.types.units.mutations import UnitUpdateMutation
+from api.graphql.types.units.permissions import UnitPermission
+from api.graphql.types.units.types import UnitByPkType, UnitType
+from api.graphql.types.users.mutations import UserUpdateMutation
+from api.graphql.types.users.permissions import UserPermission
+from api.graphql.types.users.types import UserType
 from common.models import BannerNotification
-from common.querysets import BannerNotificationQuerySet
 from common.typing import GQLInfo
 from merchants.models import PaymentOrder
-from permissions.api_permissions.graphene_field_decorators import (
-    check_resolver_permission,
-)
-from permissions.api_permissions.graphene_permissions import (
-    AgeGroupPermission,
-    ApplicationEventPermission,
-    ApplicationPermission,
-    ApplicationRoundPermission,
-    CityPermission,
-    EquipmentCategoryPermission,
-    EquipmentPermission,
-    KeywordPermission,
-    PaymentOrderPermission,
-    PurposePermission,
-    QualifierPermission,
-    RecurringReservationPermission,
-    ReservationMetadataSetPermission,
-    ReservationPermission,
-    ReservationPurposePermission,
-    ReservationUnitCancellationRulePermission,
-    ReservationUnitPermission,
-    ResourcePermission,
-    ServiceSectorPermission,
-    SpacePermission,
-    TaxPercentagePermission,
-    TermsOfUsePermission,
-    UnitPermission,
-    UserPermission,
-)
-from permissions.helpers import (
-    can_handle_reservation,
-    can_manage_banner_notifications,
-    get_service_sectors_where_can_view_applications,
-    get_service_sectors_where_can_view_reservations,
-    get_units_where_can_view_reservations,
-)
+from permissions.helpers import can_handle_reservation, can_manage_banner_notifications
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.models import Reservation
 from resources.models import Resource
@@ -177,186 +161,10 @@ from spaces.models import Space, Unit
 from users.models import User
 
 
-class AllowAuthenticatedFilter(AuthFilter):
-    permission_classes = (AllowAuthenticated,)
-
-
-class ApplicationRoundFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (ApplicationRoundPermission,)
-
-
-class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (ApplicationPermission,)
-
-    @classmethod
-    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
-        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
-
-        # Filtering queries formation
-        user = info.context.user
-        unit_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
-            "unit", flat=True
-        )
-        group_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
-            "unit_group", flat=True
-        )
-        units = Unit.objects.filter(Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)).values_list("id", flat=True)
-
-        return queryset.filter(
-            Q(application_round__service_sector__in=get_service_sectors_where_can_view_applications(user))
-            | Q(application_events__event_reservation_units__reservation_unit__unit__in=units)
-            | Q(user=user)
-        ).distinct()
-
-
-class ApplicationEventsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (ApplicationEventPermission,)
-
-    @classmethod
-    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
-        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
-
-        # Filtering queries formation
-        user = info.context.user
-        unit_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
-            "unit", flat=True
-        )
-        group_ids = user.unit_roles.filter(role__permissions__permission="can_validate_applications").values_list(
-            "unit_group", flat=True
-        )
-        units = Unit.objects.filter(Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)).values_list("id", flat=True)
-
-        return queryset.filter(
-            Q(application__application_round__service_sector__in=get_service_sectors_where_can_view_applications(user))
-            | Q(event_reservation_units__reservation_unit__unit__in=units)
-            | Q(application__user=user)
-        ).distinct()
-
-
-class ReservationsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (ReservationPermission,)
-
-    @classmethod
-    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
-        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
-
-        if not args.get("order_by", None):
-            queryset = queryset.order_by("begin")
-        return queryset
-
-
-class RecurringReservationsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (RecurringReservationPermission,)
-
-    @classmethod
-    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
-        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
-        user = info.context.user
-        viewable_units = get_units_where_can_view_reservations(user)
-        viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
-        if user.is_anonymous:
-            return queryset.none()
-        queryset = queryset.filter(
-            Q(reservation_unit__unit__in=viewable_units)
-            | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
-            | Q(user=user)
-        ).distinct()
-
-        if not args.get("order_by", None):
-            queryset = queryset.order_by("begin_date", "begin_time", "reservation_unit")
-        return queryset
-
-
-class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (ReservationUnitPermission,)
-
-    @classmethod
-    def resolve_queryset(cls, connection, iterable, info, args, filtering_args, filterset_class):
-        queryset = super().resolve_queryset(connection, iterable, info, args, filtering_args, filterset_class)
-        # Hide archived reservation units
-        return queryset.filter(is_archived=False)
-
-
-class ReservationUnitTypesFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (ReservationUnitPermission,)
-
-
-class ResourcesFilter(AuthFilter):
-    permission_classes = (ResourcePermission,)
-
-
-class SpacesFilter(AuthFilter):
-    permission_classes = (SpacePermission,)
-
-
-class UnitsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (UnitPermission,)
-
-
-class KeywordFilter(AuthFilter):
-    permission_classes = (KeywordPermission,)
-
-
-class EquipmentFilter(AuthFilter):
-    permission_classes = (EquipmentPermission,)
-
-
-class EquipmentCategoryFilter(AuthFilter):
-    permission_classes = (EquipmentCategoryPermission,)
-
-
-class PurposeFilter(AuthFilter):
-    permission_classes = (PurposePermission,)
-
-
-class QualifierFilter(AuthFilter):
-    permission_classes = (QualifierPermission,)
-
-
-class ReservationPurposeFilter(AuthFilter):
-    permission_classes = (ReservationPurposePermission,)
-
-
-class ReservationCancelReasonFilter(AuthFilter):
-    permission_classes = (AllowAuthenticated,)
-
-
-class ReservationDenyReasonFilter(AuthFilter):
-    permission_classes = (AllowAuthenticated,)
-
-
-class ReservationUnitCancellationRulesFilter(AuthFilter):
-    permission_classes = (ReservationUnitCancellationRulePermission,)
-
-
-class TermsOfUseFilter(AuthFilter):
-    permission_classes = (TermsOfUsePermission,)
-
-
-class TaxPercentageFilter(AuthFilter):
-    permission_classes = (TaxPercentagePermission,)
-
-
-class AgeGroupFilter(AuthFilter):
-    permission_classes = (AgeGroupPermission,)
-
-
-class CityFilter(AuthFilter):
-    permission_classes = (CityPermission,)
-
-
-class ReservationMetadataSetFilter(AuthFilter):
-    permission_classes = (ReservationMetadataSetPermission,)
-
-
-class ServiceSectorFilter(AuthFilter):
-    permission_classes = (ServiceSectorPermission,)
-
-
 class Query(graphene.ObjectType):
-    applications = ApplicationsFilter(ApplicationType, filterset_class=ApplicationFilterSet)
-    application_events = ApplicationEventsFilter(ApplicationEventType, filterset_class=ApplicationEventFilterSet)
-    application_rounds = ApplicationRoundFilter(ApplicationRoundType, filterset_class=ApplicationRoundFilterSet)
+    applications = ApplicationNode.Connection()
+    application_events = ApplicationEventNode.Connection()
+    application_rounds = ApplicationRoundNode.Connection()
 
     reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
@@ -418,13 +226,13 @@ class Query(graphene.ObjectType):
     terms_of_use = TermsOfUseFilter(TermsOfUseType)
     tax_percentages = TaxPercentageFilter(TaxPercentageType)
     age_groups = AgeGroupFilter(AgeGroupType)
-    cities = CityFilter(CityType)
+    cities = CityNode.Connection()
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
 
     order = Field(PaymentOrderType, order_uuid=graphene.String())
 
-    banner_notification = relay.Node.Field(BannerNotificationType)
-    banner_notifications = BannerNotificationConnection(BannerNotificationType)
+    banner_notification = BannerNotificationNode.Node()
+    banner_notifications = BannerNotificationNode.Connection()
 
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
         debug = Field(DjangoDebug, name="_debug")
@@ -495,7 +303,7 @@ class Query(graphene.ObjectType):
             return order
         return None
 
-    def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any) -> BannerNotificationQuerySet:
+    def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any):
         can_see_all = can_manage_banner_notifications(info.context.user)
         if can_see_all:
             return BannerNotification.objects.all()
@@ -508,16 +316,16 @@ class Mutation(graphene.ObjectType):
     create_application = ApplicationCreateMutation.Field()
     update_application = ApplicationUpdateMutation.Field()
     decline_application = ApplicationDeclineMutation.Field()
-    flag_application = ApplicationFlagMutation.Field()
+    send_application = ApplicationSendMutation.Field()
+    cancel_application = ApplicationCancelMutation.Field()
 
     create_application_event = ApplicationEventCreateMutation.Field()
     update_application_event = ApplicationEventUpdateMutation.Field()
     delete_application_event = ApplicationEventDeleteMutation.Field()
     decline_application_event = ApplicationEventDeclineMutation.Field()
-    flag_application_event = ApplicationEventFlagMutation.Field()
 
-    create_application_event_schedule_result = ApplicationEventScheduleResultCreateMutation.Field()
-    update_application_event_schedule_result = ApplicationEventScheduleResultUpdateMutation.Field()
+    approve_application_event_schedule = ApplicationEventScheduleApproveMutation.Field()
+    decline_application_event_schedule = ApplicationEventScheduleDeclineMutation.Field()
 
     create_recurring_reservation = RecurringReservationCreateMutation.Field()
     update_recurring_reservation = RecurringReservationUpdateMutation.Field()

@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
@@ -11,65 +10,41 @@ from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
-from applications.models import (
-    CUSTOMER_TYPES,
-    PRIORITIES,
-    Application,
-    ApplicationEvent,
-    ApplicationRound,
-    City,
-)
+from applications.choices import CustomerTypeChoice, PriorityChoice
+from applications.models import ApplicationRound, City
 from merchants.models import OrderStatus
 from reservation_units.models import ReservationUnit
+from reservations.choices import RESERVEE_LANGUAGE_CHOICES, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 User = get_user_model()
 
-RESERVEE_LANGUAGE_CHOICES = settings.LANGUAGES + (("", ""),)
-
-
-class ReservationType(models.TextChoices):
-    NORMAL = "normal"
-    BLOCKED = "blocked"
-    STAFF = "staff"
-    BEHALF = "behalf"
-
 
 class AgeGroup(models.Model):
-    minimum = models.fields.PositiveIntegerField(verbose_name=_("Minimum"), null=False, blank=False)
-    maximum = models.fields.PositiveIntegerField(verbose_name=_("Maximum"), null=True, blank=True)
+    minimum = models.fields.PositiveIntegerField(null=False, blank=False)
+    maximum = models.fields.PositiveIntegerField(null=True, blank=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.minimum} - {self.maximum}"
 
 
 class AbilityGroup(models.Model):
-    name = models.fields.TextField(verbose_name=_("Name"), null=False, blank=False, unique=True)
+    name = models.fields.TextField(null=False, blank=False, unique=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class ReservationCancelReason(models.Model):
-    reason = models.CharField(
-        max_length=255,
-        null=False,
-        blank=False,
-        verbose_name=_("Reason for cancellation"),
-    )
+    reason = models.CharField(max_length=255, null=False, blank=False)
 
     def __str__(self) -> str:
         return self.reason
 
 
 class ReservationDenyReason(models.Model):
-    reason = models.CharField(
-        max_length=255,
-        null=False,
-        blank=False,
-        verbose_name=_("Reason for deny"),
-    )
+    reason = models.CharField(max_length=255, null=False, blank=False)
 
     def __str__(self) -> str:
         return self.reason
@@ -77,56 +52,45 @@ class ReservationDenyReason(models.Model):
 
 class RecurringReservation(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
-    user = models.ForeignKey(
-        User,
-        verbose_name=_("User"),
-        on_delete=models.SET_NULL,
-        null=True,
-    )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     application = models.ForeignKey(
-        Application,
-        verbose_name=_("Application"),
-        related_name="recurring_reservation",
+        "applications.Application",
         null=True,
         blank=True,
         on_delete=models.PROTECT,
+        related_name="recurring_reservations",
     )
 
     application_event = models.ForeignKey(
-        ApplicationEvent,
-        verbose_name=_("Application event"),
-        related_name="recurring_reservation",
+        "applications.ApplicationEvent",
         null=True,
         blank=True,
         on_delete=models.PROTECT,
+        related_name="recurring_reservations",
     )
 
     age_group = models.ForeignKey(
-        AgeGroup,
-        verbose_name=_("Age group"),
+        "reservations.AgeGroup",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="recurring_reservations",
     )
 
     ability_group = models.ForeignKey(
-        AbilityGroup,
-        verbose_name=_("Ability group"),
+        "reservations.AbilityGroup",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="recurring_reservations",
     )
 
     reservation_unit = models.ForeignKey(
-        ReservationUnit,
-        verbose_name=_("Reservation unit"),
+        "reservation_units.ReservationUnit",
         null=False,
         on_delete=models.PROTECT,
-    )
-
-    created = models.DateTimeField(
-        auto_now_add=True,
+        related_name="recurring_reservations",
     )
 
     name = models.CharField(
@@ -143,13 +107,8 @@ class RecurringReservation(models.Model):
         blank=True,
     )
 
-    recurrence_in_days = models.PositiveIntegerField(
-        null=True,
-        help_text=_(
-            "How this recurring reservation's reservations occurs within days. "
-            "E.g 7 means that it occurs every week. 14 every other week"
-        ),
-    )
+    recurrence_in_days = models.PositiveIntegerField(null=True)
+    """How many days between reoccurring reservations"""
 
     weekdays = models.CharField(
         max_length=16,
@@ -159,13 +118,15 @@ class RecurringReservation(models.Model):
         default="",
     )
 
-    begin_time = models.TimeField(verbose_name=_("Begin time"), null=True)
+    begin_date = models.DateField(null=True)
+    begin_time = models.TimeField(null=True)
+    end_date = models.DateField(null=True)
+    end_time = models.TimeField(null=True)
 
-    end_time = models.TimeField(verbose_name=_("End time"), null=True)
+    created = models.DateTimeField(auto_now_add=True)
 
-    begin_date = models.DateField(verbose_name=_("Begin date"), null=True)
-
-    end_date = models.DateField(verbose_name=_("End date"), null=True)
+    class Meta:
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return f"{self.name}"
@@ -174,9 +135,13 @@ class RecurringReservation(models.Model):
     def denied_reservations(self):
         # Avoid a query to the database if we have fetched list already
         if "reservations" in self._prefetched_objects_cache:
-            return [reservation for reservation in self.reservations.all() if reservation.state == STATE_CHOICES.DENIED]
+            return [
+                reservation
+                for reservation in self.reservations.all()
+                if reservation.state == ReservationStateChoice.DENIED
+            ]
 
-        return self.reservations.filter(state=STATE_CHOICES.DENIED)
+        return self.reservations.filter(state=ReservationStateChoice.DENIED)
 
     @property
     def weekday_list(self):
@@ -185,31 +150,16 @@ class RecurringReservation(models.Model):
         return []
 
 
-class STATE_CHOISE_CONST:
-    __slots__ = ()
-
-    CREATED = "created"
-    CANCELLED = "cancelled"
-    REQUIRES_HANDLING = "requires_handling"
-    WAITING_FOR_PAYMENT = "waiting_for_payment"
-    CONFIRMED = "confirmed"
-    DENIED = "denied"
-    STATE_CHOICES = (
-        (CREATED, _("created")),
-        (CANCELLED, _("cancelled")),
-        (REQUIRES_HANDLING, _("requires_handling")),
-        (WAITING_FOR_PAYMENT, _("waiting_for_payment")),
-        (CONFIRMED, _("confirmed")),
-        (DENIED, _("denied")),
-    )
-
-
-STATE_CHOICES = STATE_CHOISE_CONST()
-
-
 class ReservationQuerySet(models.QuerySet):
-    def total_duration(self):
-        return self.annotate(duration=F("end") - F("begin")).aggregate(total_duration=Sum("duration"))
+    def total_duration(self) -> timedelta:
+        return (
+            self.annotate(duration=F("end") - F("begin"))
+            .aggregate(total_duration=Sum("duration"))
+            .get("total_duration")
+        ) or timedelta()
+
+    def total_seconds(self) -> int:
+        return int(self.total_duration().total_seconds())
 
     def within_application_round_period(self, app_round: ApplicationRound):
         return self.within_period(
@@ -226,10 +176,10 @@ class ReservationQuerySet(models.QuerySet):
     def going_to_occur(self):
         return self.filter(
             state__in=(
-                STATE_CHOICES.CREATED,
-                STATE_CHOICES.CONFIRMED,
-                STATE_CHOICES.WAITING_FOR_PAYMENT,
-                STATE_CHOICES.REQUIRES_HANDLING,
+                ReservationStateChoice.CREATED,
+                ReservationStateChoice.CONFIRMED,
+                ReservationStateChoice.WAITING_FOR_PAYMENT,
+                ReservationStateChoice.REQUIRES_HANDLING,
             )
         )
 
@@ -238,7 +188,7 @@ class ReservationQuerySet(models.QuerySet):
 
     def inactive(self, older_than_minutes: int):
         return self.filter(
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
             created_at__lte=datetime.now(tz=get_current_timezone()) - timedelta(minutes=older_than_minutes),
         )
 
@@ -248,12 +198,12 @@ class ReservationQuerySet(models.QuerySet):
                 reservation_unit__in=reservation_unit.reservation_units_with_same_components,
                 end__lte=end,
                 begin__gte=begin,
-            ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+            ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
         return self.none()
 
     def with_inactive_payments(self, older_than_minutes: int):
         return self.filter(
-            state=STATE_CHOICES.WAITING_FOR_PAYMENT,
+            state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             payment_order__remote_id__isnull=False,
             payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
             payment_order__created_at__lte=datetime.now(tz=get_current_timezone())
@@ -264,7 +214,7 @@ class ReservationQuerySet(models.QuerySet):
 class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
     reservee_type = models.CharField(
         max_length=50,
-        choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
+        choices=CustomerTypeChoice.choices,
         null=True,
         blank=True,
         help_text="Type of reservee",
@@ -375,13 +325,13 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
 
     state = models.CharField(
         max_length=32,
-        choices=STATE_CHOICES.STATE_CHOICES,
+        choices=ReservationStateChoice.choices,
         verbose_name=_("State"),
-        default=STATE_CHOICES.CREATED,
+        default=ReservationStateChoice.CREATED,
         db_index=True,
     )
 
-    priority = models.IntegerField(choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM)
+    priority = models.IntegerField(choices=PriorityChoice.choices, default=PriorityChoice.MEDIUM)
 
     user = models.ForeignKey(
         User,
@@ -504,14 +454,17 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
 
     type = models.CharField(
         max_length=50,
-        choices=ReservationType.choices,
+        choices=ReservationTypeChoice.choices,
         null=True,
         blank=False,
-        default=ReservationType.NORMAL,
+        default=ReservationTypeChoice.NORMAL,
         help_text="Type of reservation",
     )
 
     objects = ReservationQuerySet.as_manager()
+
+    class Meta:
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return f"{self.name} ({self.type})"
@@ -642,7 +595,7 @@ class ReservationStatistic(models.Model):
 
     reservee_type = models.CharField(
         max_length=50,
-        choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
+        choices=CustomerTypeChoice.choices,
         null=True,
         blank=True,
         help_text="Type of reservee",
@@ -664,7 +617,7 @@ class ReservationStatistic(models.Model):
 
     num_persons = models.fields.PositiveIntegerField(verbose_name=_("Number of persons"), null=True, blank=True)
 
-    priority = models.IntegerField(choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM)
+    priority = models.IntegerField(choices=PriorityChoice.choices, default=PriorityChoice.MEDIUM)
 
     priority_name = models.CharField(max_length=255, null=False, default="", blank=True)
 

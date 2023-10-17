@@ -2,16 +2,20 @@
 
 from django.db import migrations
 
-from applications.models import ApplicationAggregateData
-
 NEW_KEY_NAMES = ["applied_min_duration_total", "applied_reservations_total"]
 OLD_KEY_NAMES = ["min_duration_total", "reservations_total"]
 
-def change_key_names_to_new_name(*args, **kwargs):
+
+def change_key_names_to_new_name(apps, schema_editor):
+    ApplicationAggregateData = apps.get_model("applications", "ApplicationAggregateData")
+
     for new, old in zip(NEW_KEY_NAMES, OLD_KEY_NAMES):
         ApplicationAggregateData.objects.filter(name=old).update(name=new)
 
-def change_key_names_to_old_name(*args, **kwargs):
+
+def change_key_names_to_old_name(apps, schema_editor):
+    ApplicationAggregateData = apps.get_model("applications", "ApplicationAggregateData")
+
     for new, old in zip(NEW_KEY_NAMES, OLD_KEY_NAMES):
         ApplicationAggregateData.objects.filter(name=new).update(name=old)
 

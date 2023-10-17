@@ -566,13 +566,14 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
     def check_reservation_overlap(self, start_time, end_time, reservation=None):
-        from reservations.models import STATE_CHOICES, Reservation
+        from reservations.choices import ReservationStateChoice
+        from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_same_components,
             end__gt=start_time,
             begin__lt=end_time,
-        ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
         # If updating an existing reservation, allow "overlapping" it's old time
         if reservation:
@@ -586,18 +587,19 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         reservation=None,
         exclude_blocked: bool = False,
     ):
-        from reservations.models import STATE_CHOICES, Reservation, ReservationType
+        from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+        from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_same_components,
             begin__gte=end_time,
-        ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
         if reservation:
             qs = qs.exclude(id=reservation.id)
 
         if exclude_blocked:
-            qs = qs.exclude(type=ReservationType.BLOCKED)
+            qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
 
         return qs.order_by("begin").first()
 
@@ -607,18 +609,19 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         reservation=None,
         exclude_blocked: bool = False,
     ):
-        from reservations.models import STATE_CHOICES, Reservation, ReservationType
+        from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+        from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_same_components,
             end__lte=start_time,
-        ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
         if reservation:
             qs = qs.exclude(id=reservation.id)
 
         if exclude_blocked:
-            qs = qs.exclude(type=ReservationType.BLOCKED)
+            qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
 
         return qs.order_by("-end").first()
 

@@ -414,7 +414,7 @@ OPEN_CITY_PROFILE_SCOPE = env("OPEN_CITY_PROFILE_SCOPE")
 PREFILL_RESERVATION_WITH_PROFILE_DATA = env("PREFILL_RESERVATION_WITH_PROFILE_DATA")
 
 # GDPR API settings
-GDPR_API_MODEL = "api.ProfileUser"
+GDPR_API_MODEL = "users.ProfileUser"
 GDPR_API_QUERY_SCOPE = env("GDPR_API_QUERY_SCOPE")
 GDPR_API_DELETE_SCOPE = env("GDPR_API_DELETE_SCOPE")
 
@@ -463,59 +463,10 @@ GRAPHQL_JWT = {"JWT_AUTH_HEADER_PREFIX": "Bearer"}
 # ----- Django Rest Framework --------------------------------------------------------------------------
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["permissions.api_permissions.drf_permissions.ReadOnly"],
-    "DEFAULT_AUTHENTICATION_CLASSES": ["helusers.oidc.ApiTokenAuthentication"]
-    + (
-        [
-            "rest_framework.authentication.SessionAuthentication",
-            "rest_framework.authentication.BasicAuthentication",
-        ]
-        if DEBUG
-        else []
-    ),
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-# ----- OpenAPI settings -------------------------------------------------------------------------------
-
-SPECTACULAR_SETTINGS = {
-    # path prefix is used for tagging the discovered operations.
-    # use '/api/v[0-9]' for tagging apis like '/api/v1/albums' with ['albums']
-    "SCHEMA_PATH_PREFIX": r"/v[^/]",
-    "TITLE": "Tilavaraus API",
-    "DESCRIPTION": "",
-    "VERSION": "1.0.0",
-    "TAGS": [
-        {
-            "name": "openapi",
-            "description": "",
-        },
-        {
-            "name": "application",
-            "description": "Applications for recurring reservations for individuals and organisations.",
-        },
-        {
-            "name": "application_event",
-            "description": "Single recurring events related to a certain application.",
-        },
-        {
-            "name": "application_round",
-            "description": "Information of past, current and future application periods "
-            "to where applications are targeted to.",
-        },
-        {
-            "name": "parameters",
-            "description": "",
-        },
-        {
-            "name": "reservation",
-            "description": "Reservation for single or multiple reservation units.",
-        },
-        {
-            "name": "reservation_unit",
-            "description": "A single unit that can be reserved. "
-            "Wrapper for combinations of spaces, resources and services.",
-        },
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "helusers.oidc.ApiTokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
     ],
 }
 

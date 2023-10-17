@@ -2,13 +2,13 @@
 
 from django.db import migrations, models
 
-from reservations.models import ReservationType
-
 
 def change_staff_event_types(apps, schema_editor):
+    from reservations.choices import ReservationTypeChoice
+
     Reservation = apps.get_model("reservations", "Reservation")
 
-    Reservation.objects.filter(staff_event=True).update(type=ReservationType.STAFF)
+    Reservation.objects.filter(staff_event=True).update(type=ReservationTypeChoice.STAFF)
 
 
 

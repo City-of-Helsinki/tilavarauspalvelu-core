@@ -2,13 +2,13 @@
 
 from django.db import migrations
 
-from applications.models import ApplicationEventStatus
-
 OLD_STATUS_VALUES = ["allocated", "validated"]
 NEW_STATUS_VALUES = ["approved", "approved"]
 
 
-def change_status_to_new(*args, **kwargs):
+def change_status_to_new(apps, schema_editor):
+    ApplicationEventStatus = apps.get_model("applications", "ApplicationEventStatus")
+
     for new, old in zip(NEW_STATUS_VALUES, OLD_STATUS_VALUES):
         ApplicationEventStatus.objects.filter(status=old).update(status=new)
 
