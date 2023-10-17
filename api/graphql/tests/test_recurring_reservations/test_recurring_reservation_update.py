@@ -4,9 +4,9 @@ import json
 import freezegun
 from assertpy import assert_that
 
+from api.graphql.extensions.validation_errors import ValidationErrorCodes
 from api.graphql.tests.base import GrapheneTestCaseBase
 from api.graphql.tests.test_reservations.base import DEFAULT_TIMEZONE
-from api.graphql.validation_errors import ValidationErrorCodes
 from reservations.models import RecurringReservation
 from tests.factories import RecurringReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UnitFactory
 

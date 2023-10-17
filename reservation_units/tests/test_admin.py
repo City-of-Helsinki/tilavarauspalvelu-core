@@ -22,9 +22,9 @@ class ReservationUnitAdminApplicationRoundTestCase(TestCase):
 
     def test_reservation_kind_is_direct_are_excluded_from_queryset(self):
         get_request = self.req_factory.get(
-            "/admin/autocomplete/?app_label=applications&model_name=applicationround&field_name=reservation_units",
+            "/admin/autocomplete/?app_label=application&model_name=applicationround&field_name=reservation_units",
             data={
-                "app_label": "applications",
+                "app_label": "application",
                 "model_name": "applicationround",
                 "field_name": "reservation_units",
             },

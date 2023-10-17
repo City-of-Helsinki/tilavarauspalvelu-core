@@ -28,7 +28,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from reservation_units.models import ReservationKind, ReservationUnit
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
     ApplicationRoundFactory,
@@ -121,7 +121,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             applicationRounds {
                               nameFi
                               targetGroup
-                              allocating
                               applicationPeriodBegin
                               applicationPeriodEnd
                               reservationPeriodBegin
@@ -1085,7 +1084,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         matching_reservation = ReservationFactory(
             begin=now,
             end=now + one_hour,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         other_reservation = ReservationFactory(
             begin=datetime.datetime(2021, 1, 1),
@@ -1126,12 +1125,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         matching_reservation = ReservationFactory(
             begin=now,
             end=now + one_hour,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         other_reservation = ReservationFactory(
             begin=now + one_hour,
             end=now + one_hour + one_hour,
-            state=STATE_CHOICES.CANCELLED,
+            state=ReservationStateChoice.CANCELLED,
         )
         self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
@@ -1165,13 +1164,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         one_hour = datetime.timedelta(hours=1)
         two_hours = datetime.timedelta(hours=2)
         matching_reservations = [
-            ReservationFactory(begin=now, end=now + one_hour, state=STATE_CHOICES.CREATED),
-            ReservationFactory(begin=now + one_hour, end=now + two_hours, state=STATE_CHOICES.CONFIRMED),
+            ReservationFactory(begin=now, end=now + one_hour, state=ReservationStateChoice.CREATED),
+            ReservationFactory(begin=now + one_hour, end=now + two_hours, state=ReservationStateChoice.CONFIRMED),
         ]
         other_reservation = ReservationFactory(
             begin=now + two_hours,
             end=now + two_hours + one_hour,
-            state=STATE_CHOICES.CANCELLED,
+            state=ReservationStateChoice.CANCELLED,
         )
         self.reservation_unit.reservation_set.set(matching_reservations + [other_reservation])
         self.reservation_unit.save()
@@ -2592,7 +2591,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         matching_reservation = ReservationFactory(
             begin=now,
             end=now + one_hour,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         other_reservation = ReservationFactory(
             begin=datetime.datetime(2021, 1, 1, tzinfo=TIMEZONE),
@@ -2693,7 +2692,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationFactory(
             begin=now,
             end=now + one_hour,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
             reservation_unit=[self.reservation_unit],
         )
 

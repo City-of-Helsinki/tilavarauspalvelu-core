@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.models import CUSTOMER_TYPES
+from applications.choices import CustomerTypeChoice
 from merchants.verkkokauppa.helpers import _get_order_params, get_validated_phone_number
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
@@ -31,7 +31,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             price_net=Decimal("10.12"),
             price=Decimal("12.5488"),
             tax_percentage_value=Decimal("24"),
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="Firstname",
             reservee_last_name="Lastname",
             reservee_email="test@example.com",
@@ -101,7 +101,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             price_net=Decimal("10.12"),
             price=Decimal("12.5488"),
             tax_percentage_value=Decimal("24"),
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="Firstname",
             reservee_last_name="Lastname",
             reservee_email="test@example.com",

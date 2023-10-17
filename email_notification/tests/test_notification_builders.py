@@ -7,7 +7,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.utils import timezone
 
-from applications.models import CUSTOMER_TYPES
+from applications.choices import CustomerTypeChoice
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailBuilderConfigError,
@@ -31,13 +31,13 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
 
     def test_get_reservee_name_when_reservee_type_business(self):
-        self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS
+        self.reservation.reservee_type = CustomerTypeChoice.BUSINESS
         self.reservation.save()
         reservee_name_str = self.reservation.reservee_organisation_name
         assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
 
     def test_get_reservee_name_when_reservee_type_nonprofit(self):
-        self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT
+        self.reservation.reservee_type = CustomerTypeChoice.NONPROFIT
         self.reservation.save()
         reservee_name_str = self.reservation.reservee_organisation_name
         assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)

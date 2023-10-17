@@ -1,89 +1,132 @@
-from datetime import date, timedelta
+from collections.abc import Iterable
+from datetime import timedelta
+from typing import Any
 
 import factory
 from django.utils.timezone import now
 from factory import fuzzy
 
-from applications.models import ApplicationRound, ApplicationRoundStatus
+from applications.choices import ApplicationRoundStatusChoice, TargetGroupChoice
+from applications.models import ApplicationRound
+from reservation_units.models import Purpose, ReservationUnit
 
 from ._base import GenericDjangoModelFactory
 
 __all__ = [
     "ApplicationRoundFactory",
-    "ApplicationRoundStatusFactory",
 ]
 
 
 class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
     class Meta:
         model = ApplicationRound
+        exclude = ["timestamp"]
 
     name = fuzzy.FuzzyText()
-    target_group = fuzzy.FuzzyChoice(
-        choices=(
-            ApplicationRound.TARGET_GROUP_INTERNAL,
-            ApplicationRound.TARGET_GROUP_PUBLIC,
-            ApplicationRound.TARGET_GROUP_ALL,
-        )
-    )
+    target_group = fuzzy.FuzzyChoice(choices=TargetGroupChoice.values)
+
+    timestamp = factory.LazyFunction(now)  # private helper (see Meta.exclude)
+
+    application_period_begin = factory.LazyAttribute(lambda a: a.timestamp)
+    application_period_end = factory.LazyAttribute(lambda a: a.application_period_begin + timedelta(weeks=4))
+
+    reservation_period_begin = factory.LazyAttribute(lambda a: a.timestamp.date())
+    reservation_period_end = factory.LazyAttribute(lambda a: a.reservation_period_begin + timedelta(weeks=4))
+
+    public_display_begin = factory.LazyAttribute(lambda a: a.timestamp)
+    public_display_end = factory.LazyAttribute(lambda a: a.public_display_begin + timedelta(weeks=4))
+
+    handled_date = None
+    sent_date = None
+
     service_sector = factory.SubFactory("tests.factories.ServiceSectorFactory")
-    application_period_begin = fuzzy.FuzzyDateTime(
-        start_dt=now(),
-        end_dt=now(),
-    )
-    application_period_end = fuzzy.FuzzyDateTime(
-        start_dt=now() + timedelta(weeks=4),
-        end_dt=now() + timedelta(weeks=4),
-    )
-    reservation_period_begin = fuzzy.FuzzyDate(
-        start_date=date.today(),
-        end_date=date.today(),
-    )
-    reservation_period_end = fuzzy.FuzzyDate(
-        start_date=date.today() + timedelta(days=1),
-        end_date=date.today() + timedelta(weeks=4),
-    )
-    public_display_begin = fuzzy.FuzzyDateTime(
-        start_dt=now(),
-        end_dt=now(),
-    )
-    public_display_end = fuzzy.FuzzyDateTime(
-        start_dt=now() + timedelta(weeks=4),
-        end_dt=now() + timedelta(weeks=4),
-    )
+    criteria = ""
+
+    @classmethod
+    def create_in_status(cls, status: ApplicationRoundStatusChoice, **kwargs: Any) -> ApplicationRound:
+        match status:
+            case ApplicationRoundStatusChoice.UPCOMING:
+                return cls.create_in_status_upcoming(**kwargs)
+            case ApplicationRoundStatusChoice.OPEN:
+                return cls.create_in_status_open(**kwargs)
+            case ApplicationRoundStatusChoice.IN_ALLOCATION:
+                return cls.create_in_status_in_allocation(**kwargs)
+            case ApplicationRoundStatusChoice.HANDLED:
+                return cls.create_in_status_handled(**kwargs)
+            case ApplicationRoundStatusChoice.RESULTS_SENT:
+                return cls.create_in_status_result_sent(**kwargs)
+
+    @classmethod
+    def create_in_status_upcoming(cls, **kwargs: Any) -> ApplicationRound:
+        """Create an upcoming application round."""
+        kwargs.setdefault("sent_date", None)
+        kwargs.setdefault("handled_date", None)
+        kwargs.setdefault("application_period_begin", now() + timedelta(days=1))
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_in_status_open(cls, **kwargs: Any) -> ApplicationRound:
+        """Create an open application round."""
+        kwargs.setdefault("sent_date", None)
+        kwargs.setdefault("handled_date", None)
+        kwargs.setdefault("application_period_begin", now() - timedelta(days=1))
+        kwargs.setdefault("application_period_end", now() + timedelta(days=1))
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_in_status_in_allocation(cls, **kwargs: Any) -> ApplicationRound:
+        """Create an application round in allocation."""
+        kwargs.setdefault("sent_date", None)
+        kwargs.setdefault("handled_date", None)
+        kwargs.setdefault("application_period_begin", now() - timedelta(days=2))
+        kwargs.setdefault("application_period_end", now() - timedelta(days=1))
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_in_status_handled(cls, **kwargs: Any) -> ApplicationRound:
+        """Create a handled application round."""
+        kwargs.setdefault("sent_date", None)
+        kwargs.setdefault("handled_date", now())
+        kwargs.setdefault("application_period_begin", now() - timedelta(days=2))
+        kwargs.setdefault("application_period_end", now() - timedelta(days=1))
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_in_status_result_sent(cls, **kwargs: Any) -> ApplicationRound:
+        """Create an application round with results sent."""
+        kwargs.setdefault("sent_date", now())
+        kwargs.setdefault("handled_date", now())
+        kwargs.setdefault("application_period_begin", now() - timedelta(days=2))
+        kwargs.setdefault("application_period_end", now() - timedelta(days=1))
+        return cls.create(**kwargs)
 
     @factory.post_generation
-    def purposes(self, create, purposes, **kwargs):
-        if not create or not purposes:
+    def purposes(self, create: bool, purposes: Iterable[Purpose] | None, **kwargs: Any) -> None:
+        if not create:
             return
 
-        for purpose in purposes:
+        if not purposes and kwargs:
+            from .purpose import PurposeFactory
+
+            self.purposes.add(PurposeFactory.create(**kwargs))
+
+        for purpose in purposes or []:
             self.purposes.add(purpose)
 
     @factory.post_generation
-    def reservation_units(self, create, reservation_units, **kwargs):
-        if not create or not reservation_units:
+    def reservation_units(
+        self,
+        create: bool,
+        reservation_units: Iterable[ReservationUnit] | None,
+        **kwargs: Any,
+    ) -> None:
+        if not create:
             return
 
-        for reservation_unit in reservation_units:
+        if not reservation_units and kwargs:
+            from .reservation_unit import ReservationUnitFactory
+
+            self.reservation_units.add(ReservationUnitFactory.create(**kwargs))
+
+        for reservation_unit in reservation_units or []:
             self.reservation_units.add(reservation_unit)
-
-
-class ApplicationRoundStatusFactory(GenericDjangoModelFactory[ApplicationRoundStatus]):
-    class Meta:
-        model = ApplicationRoundStatus
-
-    status = fuzzy.FuzzyChoice(
-        choices=[
-            ApplicationRoundStatus.DRAFT,
-            ApplicationRoundStatus.IN_REVIEW,
-            ApplicationRoundStatus.REVIEW_DONE,
-            ApplicationRoundStatus.ALLOCATED,
-            ApplicationRoundStatus.RESERVING,
-            ApplicationRoundStatus.HANDLED,
-            ApplicationRoundStatus.SENDING,
-            ApplicationRoundStatus.SENT,
-            ApplicationRoundStatus.ARCHIVED,
-        ]
-    )
-    application_round = factory.SubFactory("tests.factories.ApplicationRoundFactory")

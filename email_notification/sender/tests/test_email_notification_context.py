@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.models import CUSTOMER_TYPES
+from applications.choices import CustomerTypeChoice
 from email_notification.sender.email_notification_context import (
     EmailNotificationContext,
 )
@@ -143,7 +143,7 @@ class EmailNotificationContextTestCase(TestCase):
         assert_that(context.cancel_reason["en"]).is_equal_to(self.cancel_reason.reason_en)
 
     def test_from_reservation_organisation_name(self):
-        self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS
+        self.reservation.reservee_type = CustomerTypeChoice.BUSINESS
         self.reservation.reservee_organisation_name = "Business"
         self.reservation.save()
 

@@ -14,7 +14,7 @@ from rest_framework.test import APIClient
 from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 
 NOW = datetime(2023, 5, 10, 13, 0, 0, tzinfo=UTC).astimezone(get_default_timezone())
@@ -149,7 +149,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             name="Test reservation",
             reservation_unit=[cls.reservation_unit],
             user=cls.regular_joe,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         cls.payment_order = PaymentOrderFactory.create(
             reservation=cls.reservation,
@@ -182,8 +182,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(content.get("errors")).is_not_none()
         self.assertMatchSnapshot(content)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.capture_message")
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.capture_message")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_payment_not_found_returns_error_with_no_changes(self, mock_get_payment, mock_capture):
         mock_get_payment.return_value = None
 
@@ -200,7 +200,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(self.payment_order.status)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_created_cause_no_changes(self, mock_get_payment):
         mock_get_payment.return_value = PaymentFactory.create(status="payment_created")
 
@@ -215,7 +215,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(self.payment_order.status)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_authorized_cause_no_changes(self, mock_get_payment):
         mock_get_payment.return_value = PaymentFactory.create(status="authorized")
 
@@ -230,7 +230,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(self.payment_order.status)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_payment_cancelled_cause_cancellation(self, mock_get_payment):
         mock_get_payment.return_value = PaymentFactory.create(status="payment_cancelled")
 
@@ -245,8 +245,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(OrderStatus.CANCELLED)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.send_confirmation_email")
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.send_confirmation_email")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_paid_online_cause_paid_marking_and_no_notification(self, mock_get_payment, mock_send_email):
         mock_get_payment.return_value = PaymentFactory.create(status="payment_paid_online")
 
@@ -263,14 +263,14 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(OrderStatus.PAID)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.send_confirmation_email")
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.send_confirmation_email")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_paid_online_sends_notification_if_reservation_waiting_for_payment(
         self, mock_get_payment, mock_send_email
     ):
         mock_get_payment.return_value = PaymentFactory.create(status="payment_paid_online")
 
-        self.reservation.state = STATE_CHOICES.WAITING_FOR_PAYMENT
+        self.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
         self.reservation.save()
 
         self.client.force_login(self.regular_joe)
@@ -286,8 +286,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(OrderStatus.PAID)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.capture_exception")
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.capture_exception")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_get_payment_exceptions_are_logged(self, mock_get_payment, mock_capture):
         mock_get_payment.side_effect = GetPaymentError("Mock error")
 
@@ -304,7 +304,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(self.payment_order.status)
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_reservation_managers_can_call(self, mock_get_payment):
         mock_get_payment.return_value = PaymentFactory.create(status="payment_created")
 

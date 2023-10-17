@@ -1,6 +1,7 @@
 from typing import ParamSpec, TypeVar
 
 import pytest
+from rest_framework.test import APIClient
 
 from tests.helpers import GraphQLClient
 
@@ -11,6 +12,11 @@ P = ParamSpec("P")
 @pytest.fixture()
 def graphql() -> GraphQLClient:
     return GraphQLClient()
+
+
+@pytest.fixture()
+def api_client() -> APIClient:
+    return APIClient()
 
 
 @pytest.fixture()

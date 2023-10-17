@@ -18,8 +18,8 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservations.models import STATE_CHOICES as ReservationState
-from reservations.models import AgeGroup, Reservation, ReservationType
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.models import AgeGroup, Reservation
 from tests.factories import RecurringReservationFactory, ReservationFactory
 
 
@@ -54,7 +54,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
 
     def get_valid_minimum_input_data(self):
         return {
-            "type": ReservationType.STAFF,
+            "type": ReservationTypeChoice.STAFF,
             "begin": self.res_begin.strftime("%Y%m%dT%H%M%S%z"),
             "end": self.res_end.strftime("%Y%m%dT%H%M%S%z"),
             "reservationUnitPks": [self.reservation_unit.pk],
@@ -62,7 +62,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
 
     def get_valid_optional_full_input_data(self):
         return {
-            "type": ReservationType.BLOCKED,
+            "type": ReservationTypeChoice.BLOCKED,
             "begin": self.res_begin.strftime("%Y%m%dT%H%M%S%z"),
             "end": self.res_end.strftime("%Y%m%dT%H%M%S%z"),
             "reservationUnitPks": [self.reservation_unit.pk],
@@ -107,7 +107,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
-        assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
+        assert_that(reservation.type).is_equal_to(ReservationTypeChoice.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
@@ -129,7 +129,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
-        assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
+        assert_that(reservation.type).is_equal_to(ReservationTypeChoice.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
@@ -151,7 +151,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
-        assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
+        assert_that(reservation.type).is_equal_to(ReservationTypeChoice.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
@@ -239,12 +239,12 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
-        assert_that(reservation.type).is_equal_to(ReservationType.BLOCKED)
+        assert_that(reservation.type).is_equal_to(ReservationTypeChoice.BLOCKED)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.user).is_equal_to(self.general_admin)
-        assert_that(reservation.state).is_equal_to(ReservationState.CONFIRMED)
+        assert_that(reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(reservation.reservee_first_name).is_equal_to(input_data["reserveeFirstName"])
         assert_that(reservation.reservee_last_name).is_equal_to(input_data["reserveeLastName"])
         assert_that(reservation.reservee_phone).is_equal_to(input_data["reserveePhone"])
@@ -261,7 +261,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.res_begin,
             end=self.res_end,
-            state=ReservationState.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         response = self.query(self.get_create_query(), input_data=self.get_valid_minimum_input_data())
@@ -279,7 +279,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             begin=self.res_begin - datetime.timedelta(hours=2),
             end=self.res_begin - datetime.timedelta(hours=1),
             buffer_time_after=datetime.timedelta(hours=1, minutes=30),
-            state=ReservationState.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         response = self.query(self.get_create_query(), input_data=input_data)
@@ -297,7 +297,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.res_begin - datetime.timedelta(hours=2),
             end=self.res_begin - datetime.timedelta(hours=1),
-            state=ReservationState.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         response = self.query(self.get_create_query(), input_data=input_data)
@@ -315,7 +315,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.res_begin + datetime.timedelta(hours=1),
             end=self.res_begin + datetime.timedelta(hours=2),
-            state=ReservationState.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         response = self.query(self.get_create_query(), input_data=input_data)
@@ -339,8 +339,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.res_begin - datetime.timedelta(hours=1),
             end=self.res_begin,
-            state=ReservationState.CONFIRMED,
-            type=ReservationType.STAFF,
+            state=ReservationStateChoice.CONFIRMED,
+            type=ReservationTypeChoice.STAFF,
             buffer_time_before=datetime.timedelta(0),
             buffer_time_after=datetime.timedelta(0),
         )
@@ -387,7 +387,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
     def test_reservation_type_not_allowed(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_minimum_input_data()
-        input_data["type"] = ReservationType.NORMAL
+        input_data["type"] = ReservationTypeChoice.NORMAL
 
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
@@ -400,7 +400,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
 
         input_data = self.get_valid_minimum_input_data()
-        input_data["type"] = ReservationType.BEHALF
+        input_data["type"] = ReservationTypeChoice.BEHALF
 
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
@@ -410,7 +410,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createStaffReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
 
-        assert_that(reservation.type).is_equal_to(ReservationType.BEHALF)
+        assert_that(reservation.type).is_equal_to(ReservationTypeChoice.BEHALF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)

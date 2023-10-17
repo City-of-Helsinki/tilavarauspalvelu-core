@@ -5,7 +5,7 @@ import pytest
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import load_content, parametrize_helper
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -49,32 +49,25 @@ def test_user_updates_draft_banner_notification(graphql):
     # - User tries to modify the banner notification
     response = graphql(
         MUTATION_QUERY % ("pk name message target level draft",),
-        variables={
-            "input": {
-                "pk": notification.pk,
-                "name": "1",
-                "message": "2",
-                "target": BannerNotificationTarget.ALL.value,
-                "level": BannerNotificationLevel.NORMAL.value,
-            }
+        input_data={
+            "pk": notification.pk,
+            "name": "1",
+            "message": "2",
+            "target": BannerNotificationTarget.ALL.value,
+            "level": BannerNotificationLevel.NORMAL.value,
         },
     )
 
     # then:
     # - The response contains the modified notification
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "updateBannerNotification": {
-                "pk": notification.pk,
-                "name": "1",
-                "message": "2",
-                "target": BannerNotificationTarget.ALL.value,
-                "level": BannerNotificationLevel.NORMAL.value,
-                "draft": True,
-                "errors": None,
-            },
-        },
+    assert response.first_query_object == {
+        "pk": notification.pk,
+        "name": "1",
+        "message": "2",
+        "target": BannerNotificationTarget.ALL.value,
+        "level": BannerNotificationLevel.NORMAL.value,
+        "draft": True,
+        "errors": None,
     }
 
 
@@ -95,29 +88,22 @@ def test_user_publishes_draft_banner_notification(graphql):
     # - User tries to 'publish' the banner notification
     response = graphql(
         MUTATION_QUERY % ("pk draft activeFrom activeUntil",),
-        variables={
-            "input": {
-                "pk": notification.pk,
-                "draft": False,
-                "activeFrom": "2020-01-01T00:00:00+00:00",
-                "activeUntil": "2020-01-02T00:00:00+00:00",
-            }
+        input_data={
+            "pk": notification.pk,
+            "draft": False,
+            "activeFrom": "2020-01-01T00:00:00+00:00",
+            "activeUntil": "2020-01-02T00:00:00+00:00",
         },
     )
 
     # then:
     # - The response contains the 'published' notification
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "updateBannerNotification": {
-                "pk": notification.pk,
-                "draft": False,
-                "activeFrom": "2020-01-01T02:00:00+02:00",
-                "activeUntil": "2020-01-02T02:00:00+02:00",
-                "errors": None,
-            }
-        }
+    assert response.first_query_object == {
+        "pk": notification.pk,
+        "draft": False,
+        "activeFrom": "2020-01-01T02:00:00+02:00",
+        "activeUntil": "2020-01-02T02:00:00+02:00",
+        "errors": None,
     }
 
 
@@ -138,39 +124,16 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
     # - User tries to 'publish' the banner notification
     response = graphql(
         MUTATION_QUERY % ("pk draft",),
-        variables={
-            "input": {
-                "pk": notification.pk,
-                "draft": False,
-            }
+        input_data={
+            "pk": notification.pk,
+            "draft": False,
         },
     )
 
     # then:
     # - The response contains errors about missing active period
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "updateBannerNotification": {
-                "pk": None,
-                "draft": None,
-                "errors": [
-                    {
-                        "field": "activeFrom",
-                        "messages": [
-                            "Non-draft notifications must set 'active_from'",
-                        ],
-                    },
-                    {
-                        "field": "activeUntil",
-                        "messages": [
-                            "Non-draft notifications must set 'active_until'",
-                        ],
-                    },
-                ],
-            }
-        }
-    }
+    assert response.field_error_messages("activeFrom") == ["Non-draft notifications must set 'active_from'"]
+    assert response.field_error_messages("activeUntil") == ["Non-draft notifications must set 'active_until'"]
 
 
 @pytest.mark.parametrize(
@@ -260,30 +223,17 @@ def test_user_tries_to_publish_draft_banner_notification_with_improper_active_pe
     # - User tries to modify the banner notification
     response = graphql(
         MUTATION_QUERY % ("pk draft activeFrom activeUntil",),
-        variables={
-            "input": {
-                "pk": notification.pk,
-                "draft": False,
-                "activeFrom": active_from,
-                "activeUntil": active_until,
-            }
+        input_data={
+            "pk": notification.pk,
+            "draft": False,
+            "activeFrom": active_from,
+            "activeUntil": active_until,
         },
     )
 
     # then:
     # - The response contains errors about the improper active period
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "updateBannerNotification": {
-                "errors": expected,
-                "pk": None,
-                "draft": None,
-                "activeFrom": None,
-                "activeUntil": None,
-            }
-        }
-    }
+    assert response.field_errors == expected, response
 
 
 def test_primary_key_is_required_for_updating(graphql):
@@ -301,29 +251,14 @@ def test_primary_key_is_required_for_updating(graphql):
 
     # when:
     # - User tries to modify the banner notification
-    response = graphql(
-        MUTATION_QUERY % ("pk",),
-        variables={"input": {}},
-    )
+    response = graphql(MUTATION_QUERY % ("pk",), input_data={})
 
     # then:
-    # - The response contains an error about missing primary key in the input
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "updateBannerNotification": {
-                "pk": None,
-                "errors": [
-                    {
-                        "field": "pk",
-                        "messages": [
-                            "This field is required.",
-                        ],
-                    }
-                ],
-            },
-        },
-    }
+    # - The response complains about the improper input
+    assert (
+        response.error_message()
+        == "Variable '$input' of required type 'BannerNotificationUpdateMutationInput!' was not provided."
+    )
 
 
 def test_user_updates_non_existing_banner_notification(graphql):
@@ -338,32 +273,15 @@ def test_user_updates_non_existing_banner_notification(graphql):
     # - User tries to modify a non-existing banner notification
     response = graphql(
         MUTATION_QUERY % ("pk",),
-        variables={
-            "input": {
-                "pk": 1,
-                "name": "1",
-                "message": "2",
-                "target": BannerNotificationTarget.ALL.value,
-                "level": BannerNotificationLevel.NORMAL.value,
-            }
+        input_data={
+            "pk": 1,
+            "name": "1",
+            "message": "2",
+            "target": BannerNotificationTarget.ALL.value,
+            "level": BannerNotificationLevel.NORMAL.value,
         },
     )
 
     # then:
     # - The response contains an error about non-existing banner notification
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "updateBannerNotification": {
-                "errors": [
-                    {
-                        "field": "nonFieldErrors",
-                        "messages": [
-                            "Object does not exist.",
-                        ],
-                    },
-                ],
-                "pk": None,
-            }
-        }
-    }
+    assert response.field_error_messages("nonFieldErrors") == ["Object does not exist."]

@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 
-from applications.models import CUSTOMER_TYPES
+from applications.choices import CustomerTypeChoice
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.helpers import (
     create_verkkokauppa_order,
@@ -90,7 +90,7 @@ class HelpersTestCase(TestCase):
         reservation = ReservationFactory(
             reservation_unit=[runit],
             user=user,
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_phone="+358 50 123 4567",
         )
 
@@ -110,7 +110,7 @@ class HelpersTestCase(TestCase):
         reservation = ReservationFactory(
             reservation_unit=[runit],
             user=user,
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_type=CustomerTypeChoice.BUSINESS,
             reservee_phone="+358 50 123 4567",
         )
 
@@ -130,7 +130,7 @@ class HelpersTestCase(TestCase):
         reservation = ReservationFactory(
             reservation_unit=[runit],
             user=user,
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_phone="1234-333",
         )
 
@@ -155,13 +155,13 @@ class HelpersTestCase(TestCase):
         reservation_en = ReservationFactory(
             reservation_unit=[runit],
             user=user,
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_language="en",
         )
         reservation_sv = ReservationFactory(
             reservation_unit=[runit],
             user=user,
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_language="sv",
         )
 

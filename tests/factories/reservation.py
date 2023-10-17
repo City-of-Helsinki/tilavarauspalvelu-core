@@ -1,12 +1,14 @@
+from collections.abc import Iterable
 from datetime import datetime
+from typing import Any
 
 import factory
 from django.utils import timezone
 from factory import fuzzy
 
-from applications.models import PRIORITIES
+from applications.choices import PriorityChoice
+from reservations.choices import ReservationStateChoice
 from reservations.models import (
-    STATE_CHOICES,
     RecurringReservation,
     Reservation,
     ReservationCancelReason,
@@ -39,13 +41,13 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
     state = fuzzy.FuzzyChoice(
         choices=(
-            STATE_CHOICES.CREATED,
-            STATE_CHOICES.CANCELLED,
-            STATE_CHOICES.CONFIRMED,
-            STATE_CHOICES.DENIED,
+            ReservationStateChoice.CREATED,
+            ReservationStateChoice.CANCELLED,
+            ReservationStateChoice.CONFIRMED,
+            ReservationStateChoice.DENIED,
         )
     )
-    priority = fuzzy.FuzzyInteger(low=PRIORITIES.PRIORITY_LOW, high=PRIORITIES.PRIORITY_HIGH, step=100)
+    priority = fuzzy.FuzzyInteger(low=PriorityChoice.LOW, high=PriorityChoice.HIGH, step=100)
     begin = fuzzy.FuzzyDateTime(
         start_dt=datetime(2021, 1, 1, tzinfo=timezone.utc),
         end_dt=datetime(2022, 5, 31, tzinfo=timezone.utc),
@@ -79,6 +81,22 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
         model = RecurringReservation
 
     reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
+
+    @factory.post_generation
+    def reservations(
+        self,
+        create: bool,
+        reservations: Iterable[Reservation] | None,
+        **kwargs: Any,
+    ):
+        if not create:
+            return
+
+        if not reservations and kwargs:
+            self.reservations.add(ReservationFactory.create(**kwargs))
+
+        for reservation in reservations or []:
+            self.reservations.add(reservation)
 
 
 class ReservationPurposeFactory(GenericDjangoModelFactory[ReservationPurpose]):

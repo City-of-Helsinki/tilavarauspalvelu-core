@@ -12,7 +12,7 @@ from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 
 TIMEZONE = get_default_timezone()
@@ -21,7 +21,7 @@ TIMEZONE = get_default_timezone()
 @freeze_time(datetime(2022, 11, 28, 10, 10, 0, tzinfo=TIMEZONE))
 class UpdateExpiredOrderTestCase(TestCase):
     def setUp(self) -> None:
-        self.reservation = ReservationFactory.create(state=STATE_CHOICES.WAITING_FOR_PAYMENT)
+        self.reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
         return super().setUp()
 
     @mock.patch("merchants.pruning.get_payment")
@@ -62,7 +62,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         assert_that(order.status).is_equal_to(OrderStatus.PAID)
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
 
         assert_that(mock_confirmation_email.called).is_true()
 

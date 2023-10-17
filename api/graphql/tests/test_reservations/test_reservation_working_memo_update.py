@@ -18,7 +18,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from tests.factories import ReservationFactory
 
 
@@ -31,7 +31,7 @@ class ReservationWorkingMemoWriteTestCase(ReservationTestCaseBase):
             reservation_unit=[cls.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             user=cls.regular_joe,
         )
 

@@ -8,7 +8,12 @@ from django.utils.timezone import get_current_timezone, get_default_timezone
 from freezegun import freeze_time
 
 from merchants.models import OrderStatus
-from reservations.models import STATE_CHOICES, RecurringReservation, Reservation, ReservationStatistic
+from reservations.choices import ReservationStateChoice
+from reservations.models import (
+    RecurringReservation,
+    Reservation,
+    ReservationStatistic,
+)
 from reservations.pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
@@ -21,12 +26,14 @@ from tests.factories import PaymentOrderFactory, RecurringReservationFactory, Re
 class PruneInactiveReservationsTestCase(TestCase):
     def test_prune_reservations_deletes_old_reservations_with_state_created(self):
         twenty_minutes_ago = datetime.now(tz=get_current_timezone()) - timedelta(minutes=20)
-        ReservationFactory(created_at=twenty_minutes_ago, state=STATE_CHOICES.CREATED)
+        ReservationFactory(created_at=twenty_minutes_ago, state=ReservationStateChoice.CREATED)
         prune_inactive_reservations(older_than_minutes=20)
         assert_that(Reservation.objects.exists()).is_false()
 
     def test_prune_reservations_does_not_delete_inactive_reservations_with_state(self):
-        ignored_states = tuple([item for item in STATE_CHOICES.STATE_CHOICES if item[0] != STATE_CHOICES.CREATED])
+        ignored_states = tuple(
+            [item for item in ReservationStateChoice.choices if item[0] != ReservationStateChoice.CREATED]
+        )
         for state, _ in ignored_states:
             twenty_minutes_ago = datetime.now(tz=get_current_timezone()) - timedelta(minutes=20)
             ReservationFactory(created_at=twenty_minutes_ago, state=state)
@@ -35,7 +42,7 @@ class PruneInactiveReservationsTestCase(TestCase):
 
     def test_prune_reservations_does_not_delete_recent_reservations(self):
         under_twenty_minutes_ago = datetime.now(tz=get_current_timezone()) - timedelta(minutes=19)
-        ReservationFactory(created_at=under_twenty_minutes_ago, state=STATE_CHOICES.CREATED)
+        ReservationFactory(created_at=under_twenty_minutes_ago, state=ReservationStateChoice.CREATED)
         prune_inactive_reservations(older_than_minutes=20)
         assert_that(Reservation.objects.exists()).is_true()
 
@@ -60,14 +67,18 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
         five_minutes_ago = now - timedelta(minutes=5)
 
         with freeze_time(five_minutes_ago):
-            reservation_with_cancelled = ReservationFactory(name="delete_me", state=STATE_CHOICES.WAITING_FOR_PAYMENT)
+            reservation_with_cancelled = ReservationFactory(
+                name="delete_me", state=ReservationStateChoice.WAITING_FOR_PAYMENT
+            )
             PaymentOrderFactory(
                 reservation=reservation_with_cancelled,
                 remote_id=uuid4(),
                 status=OrderStatus.CANCELLED,
             )
 
-            reservation_with_expired = ReservationFactory(name="delete_me_too", state=STATE_CHOICES.WAITING_FOR_PAYMENT)
+            reservation_with_expired = ReservationFactory(
+                name="delete_me_too", state=ReservationStateChoice.WAITING_FOR_PAYMENT
+            )
             PaymentOrderFactory(
                 reservation=reservation_with_expired,
                 remote_id=uuid4(),
@@ -85,7 +96,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
 
         with freeze_time(less_than_five_minutes_ago):
             reservation_with_fresh_1 = ReservationFactory(
-                name="do not delete me", state=STATE_CHOICES.WAITING_FOR_PAYMENT
+                name="do not delete me", state=ReservationStateChoice.WAITING_FOR_PAYMENT
             )
             PaymentOrderFactory(
                 reservation=reservation_with_fresh_1,
@@ -94,7 +105,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
 
             reservation_with_fresh_2 = ReservationFactory(
-                name="do not delete me either", state=STATE_CHOICES.WAITING_FOR_PAYMENT
+                name="do not delete me either", state=ReservationStateChoice.WAITING_FOR_PAYMENT
             )
             PaymentOrderFactory(
                 reservation=reservation_with_fresh_2,
@@ -103,7 +114,9 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
 
         with freeze_time(five_minutes_ago):
-            reservation_with_old = ReservationFactory(name="delete me!", state=STATE_CHOICES.WAITING_FOR_PAYMENT)
+            reservation_with_old = ReservationFactory(
+                name="delete me!", state=ReservationStateChoice.WAITING_FOR_PAYMENT
+            )
             PaymentOrderFactory(
                 reservation=reservation_with_old,
                 remote_id=uuid4(),
@@ -120,7 +133,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
         five_minutes_ago = now - timedelta(minutes=5)
 
         ignored_states = tuple(
-            [item for item in STATE_CHOICES.STATE_CHOICES if item[0] != STATE_CHOICES.WAITING_FOR_PAYMENT]
+            [item for item in ReservationStateChoice.choices if item[0] != ReservationStateChoice.WAITING_FOR_PAYMENT]
         )
 
         for state, _ in ignored_states:
@@ -142,7 +155,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
         five_minutes_ago = now - timedelta(minutes=5)
 
         with freeze_time(five_minutes_ago):
-            reservation = ReservationFactory(name="do not delete_me", state=STATE_CHOICES.WAITING_FOR_PAYMENT)
+            reservation = ReservationFactory(name="do not delete_me", state=ReservationStateChoice.WAITING_FOR_PAYMENT)
             PaymentOrderFactory(reservation=reservation, status=OrderStatus.CANCELLED)
 
         with freeze_time(now):
@@ -150,7 +163,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             assert_that(Reservation.objects.exists()).is_true()
 
     def test_prune_does_not_delete_reservations_without_order(self):
-        ReservationFactory(name="do not delete_me", state=STATE_CHOICES.WAITING_FOR_PAYMENT)
+        ReservationFactory(name="do not delete_me", state=ReservationStateChoice.WAITING_FOR_PAYMENT)
 
         prune_reservation_with_inactive_payments(older_than_minutes=5)
         assert_that(Reservation.objects.exists()).is_true()
