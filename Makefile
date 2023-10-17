@@ -18,6 +18,15 @@
 .PHONY: services-local-stop
 .PHONY: stop
 
+# Trick to allow passing commands to make
+# Use quotes (" ") if command contains flags (-h / --help)
+args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
+
+# If command doesn't match, do not throw error
+%:
+	@:
+
+
 define helptext
 
  Commands:
@@ -51,7 +60,7 @@ bash:
 	@docker exec -it tvp-core bash
 
 clear-db:
-	@python manage.py dbshell -- -c "DROP SCHEMA public CASCADE;CREATE SCHEMA public;"
+	@python manage.py dbshell -- -c "DROP SCHEMA $(call args, 'public') CASCADE;CREATE SCHEMA $(call args, 'public');"
 
 dev:
 	@python manage.py runserver localhost:8000
