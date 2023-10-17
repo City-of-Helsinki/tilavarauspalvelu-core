@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 
+
 def update_permissions(apps, schema_editor):
     UnitRoleChoice = apps.get_model('permissions', 'UnitRoleChoice')
     UnitRolePermission = apps.get_model('permissions', 'UnitRolePermission')

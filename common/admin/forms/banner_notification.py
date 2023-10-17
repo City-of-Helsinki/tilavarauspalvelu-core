@@ -25,12 +25,8 @@ class BannerNotificationAdminForm(forms.ModelForm):
             "message": gettext_lazy("Notification body."),
             "level": gettext_lazy("Level of the notification."),
             "target": gettext_lazy("Target user interface of the notification."),
-            "active_from": gettext_lazy(
-                "Start date of the notification. If empty, 'active_until' must also be empty.",
-            ),
-            "active_until": gettext_lazy(
-                "End date of the notification. If empty, 'active_from' must also be empty.",
-            ),
+            "active_from": gettext_lazy("Start date of the notification. If empty, 'active_until' must also be empty."),
+            "active_until": gettext_lazy("End date of the notification. If empty, 'active_from' must also be empty."),
             "draft": gettext_lazy(
                 "Is the notification a draft. Drafts won't be shown to users, even if they would be active.",
             ),

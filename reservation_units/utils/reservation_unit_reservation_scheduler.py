@@ -2,6 +2,7 @@ import datetime
 
 from django.utils.timezone import get_default_timezone
 
+from applications.choices import ApplicationRoundStatusChoice
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -34,14 +35,14 @@ class ReservationUnitReservationScheduler:
         )
 
     def get_conflicting_open_application_round(self, start: datetime.date, end: datetime.date):
-        from applications.models import ApplicationRound, ApplicationRoundStatus
+        from applications.models import ApplicationRound
 
         for app_round in ApplicationRound.objects.filter(
             reservation_units=self.reservation_unit,
             reservation_period_end__gte=end,
             reservation_period_begin__lte=start,
         ):
-            if app_round.status not in ApplicationRoundStatus.CLOSED_STATUSES:
+            if app_round.status != ApplicationRoundStatusChoice.RESULTS_SENT:
                 return app_round
 
         return None

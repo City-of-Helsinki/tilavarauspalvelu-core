@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
-from applications.models import CUSTOMER_TYPES
+from applications.choices import CustomerTypeChoice
 from email_notification.email_tester import EmailTestForm
 from reservations.models import Reservation
 
@@ -88,7 +88,7 @@ class EmailNotificationContext:
         """Build context from reservation"""
         context = EmailNotificationContext()
 
-        if not reservation.reservee_type or reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL:
+        if not reservation.reservee_type or reservation.reservee_type == CustomerTypeChoice.INDIVIDUAL.value:
             context.reservee_name = f"{reservation.reservee_first_name} {reservation.reservee_last_name}"
         else:
             context.reservee_name = reservation.reservee_organisation_name
@@ -131,7 +131,7 @@ class EmailNotificationContext:
         if not reservation.applying_for_free_of_charge:
             context.subsidised_price = reservation.price
         else:
-            from api.graphql.reservations.reservation_serializers.mixins import (
+            from api.graphql.types.reservations.serializers.mixins import (
                 ReservationPriceMixin,
             )
 

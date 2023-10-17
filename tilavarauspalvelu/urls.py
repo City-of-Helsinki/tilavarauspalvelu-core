@@ -2,47 +2,33 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
-from helusers import views
+from django.views.decorators.csrf import csrf_exempt
+from graphene_file_upload.django import FileUploadGraphQLView
 
-from api.urls import router as api_router
-from api.urls import urlpatterns as other_patterns  # GraphQL and GDPR api.
-
-
-class TVPLogoutView(views.LogoutView):
-    success_url_allowed_hosts = settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS
-
-
-class TVPLogoutCompleteView(views.LogoutCompleteView):
-    success_url_allowed_hosts = settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS
-
+from api.legacy_rest_api.urls import legacy_outer
+from api.webhooks.urls import webhook_router
+from users.views import TilavarauspalveluGDPRAPIView, TVPLoginView, TVPLogoutCompleteView, TVPLogoutView
 
 helusers_pattern = (
     [
-        path("login/", views.LoginView.as_view(), name="auth_login"),
+        path("login/", TVPLoginView.as_view(), name="auth_login"),
         path("logout/", TVPLogoutView.as_view(), name="auth_logout"),
         path("logout/complete/", TVPLogoutCompleteView.as_view(), name="auth_logout_complete"),
     ],
     "helusers",
 )
 
-
 urlpatterns = [
+    path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))),  # NOSONAR
     path("admin/", admin.site.urls),
-    path("v1/", include(api_router.urls)),
-    path("openapi/", SpectacularAPIView.as_view(), name="schema"),
-    path("swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema")),
-    path("redoc/", SpectacularRedocView.as_view(url_name="schema")),
+    path("v1/", include(legacy_outer.urls)),
+    path("v1/webhook/", include(webhook_router.urls)),
+    path("gdpr/v1/user/<str:uuid>/", TilavarauspalveluGDPRAPIView.as_view(), name="gdpr_v1"),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include(helusers_pattern)),
     path("tinymce/", include("tinymce.urls")),
     path("", include("django_prometheus.urls")),
 ]
-urlpatterns.extend(other_patterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

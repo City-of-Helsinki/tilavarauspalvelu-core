@@ -2,10 +2,9 @@
 
 from django.db import migrations
 
-from applications.models import ApplicationStatus
 
-
-def change_status_to_new(*args, **kwargs):
+def change_status_to_new(apps, schema_editor):
+    ApplicationStatus = apps.get_model("applications", "ApplicationStatus")
     ApplicationStatus.objects.filter(status="declined").update(status="handled")
 
 

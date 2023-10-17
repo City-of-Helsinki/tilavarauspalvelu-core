@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 
+
 def update_permissions(apps, schema_editor):
     ServiceSectorRoleChoice = apps.get_model('permissions', 'ServiceSectorRoleChoice')
     GeneralRoleChoice = apps.get_model('permissions', 'GeneralRoleChoice')

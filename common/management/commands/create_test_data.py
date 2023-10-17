@@ -13,18 +13,19 @@ from django.contrib.gis.geos import Point
 from django.core.management import BaseCommand, call_command
 from django.utils.timezone import now
 
+from applications.choices import (
+    ApplicantTypeChoice,
+    CustomerTypeChoice,
+    OrganizationTypeChoice,
+    PriorityChoice,
+    TargetGroupChoice,
+)
 from applications.models import (
-    APPLICANT_TYPES,
-    CUSTOMER_TYPES,
-    PRIORITIES,
     Address,
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
-    ApplicationEventStatus,
     ApplicationRound,
-    ApplicationRoundStatus,
-    ApplicationStatus,
     City,
     EventReservationUnit,
     Organisation,
@@ -73,8 +74,8 @@ from reservation_units.models import (
     ReservationUnitType,
     TaxPercentage,
 )
+from reservations.choices import ReservationStateChoice
 from reservations.models import (
-    STATE_CHOICES,
     AgeGroup,
     Reservation,
     ReservationCancelReason,
@@ -1536,7 +1537,7 @@ def _create_reservations(  # NOSONAR (python:S3776)
         )
         end = begin + timedelta(hours=random.choice(range(min_hours, max_hours)))
 
-        state = STATE_CHOICES.CONFIRMED
+        state = ReservationStateChoice.CONFIRMED
         applying_for_free_of_charge = random.choice([True, False])
         free_of_charge_reason: str = ""
         confirmed_at: datetime | None = begin
@@ -1544,7 +1545,7 @@ def _create_reservations(  # NOSONAR (python:S3776)
 
         pricing: ReservationUnitPricing = random.choice(list(reservation_unit.pricings.all()))
         if pricing.highest_price != Decimal("0") and applying_for_free_of_charge:
-            state = STATE_CHOICES.REQUIRES_HANDLING
+            state = ReservationStateChoice.REQUIRES_HANDLING
             free_of_charge_reason = faker_fi.sentence()
             confirmed_at = None
             handled_at = begin
@@ -1560,22 +1561,22 @@ def _create_reservations(  # NOSONAR (python:S3776)
                 weights=[3, 1],
             )
             if deny_reason is not None:
-                state = STATE_CHOICES.DENIED
+                state = ReservationStateChoice.DENIED
                 free_of_charge_reason = faker_fi.sentence()
                 confirmed_at = None
                 handled_at = begin
         else:
-            state = STATE_CHOICES.CANCELLED
+            state = ReservationStateChoice.CANCELLED
 
         reservee_organisation_name: str = ""
         reservee_id: str = ""
         reservee_is_unregistered_association: bool = False
 
-        reservee_type: str = random.choice(CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)[0]
-        if reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS:
+        reservee_type: str = random.choice(CustomerTypeChoice.values)
+        if reservee_type == CustomerTypeChoice.BUSINESS:
             reservee_organisation_name = faker_fi.company()
             reservee_id = faker_fi.company_business_id()
-        elif reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT:
+        elif reservee_type == CustomerTypeChoice.NONPROFIT:
             reservee_organisation_name = faker_fi.company()
             reservee_is_unregistered_association = random.choice([True, False])
             if not reservee_is_unregistered_association:
@@ -1678,7 +1679,7 @@ def _create_application_rounds(
             name_fi=f"Application Round {i}",
             name_en=f"Application Round {i}",
             name_sv=f"Application Round {i}",
-            target_group=random.choice(ApplicationRound.TARGET_GROUP_CHOICES)[0],
+            target_group=random.choice(TargetGroupChoice.values),
             application_period_begin=period[0],
             application_period_end=period[1],
             reservation_period_begin=period[0],
@@ -1695,8 +1696,6 @@ def _create_application_rounds(
 
     application_rounds = ApplicationRound.objects.bulk_create(application_rounds)
 
-    _create_application_round_statuses(application_rounds, user)
-
     for application_round in application_rounds:
         application_round.reservation_units.add(
             *random_subset(reservation_units, max_size=10),
@@ -1709,36 +1708,7 @@ def _create_application_rounds(
 
 
 @with_logs(
-    text_entering="Creating application round statuses...",
-    text_exiting="Applications round statuses created!",
-)
-def _create_application_round_statuses(
-    application_rounds: list[ApplicationRound],
-    user: User,
-) -> list[ApplicationRoundStatus]:
-    statuses: list[ApplicationRoundStatus] = []
-    now = datetime.now(tz=UTC)
-
-    for application_round in application_rounds:
-        if application_round.application_period_end < now:
-            application_status = ApplicationRoundStatus.HANDLED
-        elif application_round.application_period_begin > now:
-            application_status = ApplicationRoundStatus.DRAFT
-        else:
-            application_status = ApplicationRoundStatus.DRAFT
-
-        status = ApplicationRoundStatus(
-            application_round=application_round,
-            status=application_status,
-            user=user,
-        )
-        statuses.append(status)
-
-    return ApplicationRoundStatus.objects.bulk_create(statuses)
-
-
-@with_logs(
-    text_entering="Creating applications...",
+    text_entering="Creating application...",
     text_exiting="Applications created!",
 )
 def _create_applications(
@@ -1764,7 +1734,7 @@ def _create_applications(
         weights = [len(users)] + ([1] * (len(users) - 1))
         user: User = weighted_choice(users, weights=weights)
 
-        # No applications for future application rounds
+        # No application for future application rounds
         application_round: ApplicationRound = random.choice(application_rounds)
         while application_round.application_period_begin > now:
             application_round = random.choice(application_rounds)
@@ -1782,7 +1752,6 @@ def _create_applications(
         applications.append(application)
 
     applications = Application.objects.bulk_create(applications)
-    _create_application_statuses(applications)
     _create_application_events(
         applications,
         age_groups,
@@ -1790,44 +1759,6 @@ def _create_applications(
         reservation_units,
     )
     return applications
-
-
-@with_logs(
-    text_entering="Creating application statuses...",
-    text_exiting="Application statuses created!",
-)
-def _create_application_statuses(
-    applications: list[Application],
-) -> list[ApplicationStatus]:
-    statuses: list[ApplicationStatus] = []
-    now = datetime.now(tz=UTC)
-
-    for application in applications:
-        if application.application_round.application_period_end < now:
-            application_status: str = random.choice(
-                [
-                    ApplicationStatus.HANDLED,
-                    ApplicationStatus.CANCELLED,
-                    ApplicationStatus.EXPIRED,
-                ]
-            )
-        else:
-            application_status: str = random.choice(
-                [
-                    ApplicationStatus.DRAFT,
-                    ApplicationStatus.RECEIVED,
-                    ApplicationStatus.CANCELLED,
-                ]
-            )
-
-        status = ApplicationStatus(
-            application=application,
-            status=application_status,
-            user=application.user,
-        )
-        statuses.append(status)
-
-    return ApplicationStatus.objects.bulk_create(statuses)
 
 
 @with_logs(
@@ -1892,41 +1823,41 @@ def _create_organisation(
     applicant_types: list[str] = []
 
     for billing_address in billing_addresses:
-        applicant_type = random.choice(APPLICANT_TYPES.APPLICANT_TYPE_CHOICES)[0]
+        applicant_type = random.choice(ApplicantTypeChoice.values)
 
         organisation: Organisation | None = None
-        if applicant_type == APPLICANT_TYPES.APPLICANT_TYPE_COMMUNITY:
+        if applicant_type == ApplicantTypeChoice.COMMUNITY:
             organisation = Organisation(
                 name=faker_fi.company(),
                 identifier=faker_fi.company_business_id(),
-                organisation_type=Organisation.RELIGIOUS_COMMUNITY,
+                organisation_type=OrganizationTypeChoice.RELIGIOUS_COMMUNITY,
                 year_established=random.randint(1900, 2022),
                 address=billing_address,
                 active_members=random.randint(1, 1000),
                 core_business=faker_fi.sentence(),
                 email=faker_fi.email(),
             )
-        elif applicant_type == APPLICANT_TYPES.APPLICANT_TYPE_COMPANY:
+        elif applicant_type == ApplicantTypeChoice.COMPANY:
             organisation = Organisation(
                 name=faker_fi.company(),
                 identifier=faker_fi.company_business_id(),
-                organisation_type=Organisation.COMPANY,
+                organisation_type=OrganizationTypeChoice.COMPANY,
                 year_established=random.randint(1900, 2022),
                 address=billing_address,
                 active_members=random.randint(1, 1000),
                 core_business=faker_fi.sentence(),
                 email=faker_fi.email(),
             )
-        elif applicant_type == APPLICANT_TYPES.APPLICANT_TYPE_ASSOCIATION:
+        elif applicant_type == ApplicantTypeChoice.ASSOCIATION:
             organisation = Organisation(
                 name=faker_fi.company(),
                 identifier=faker_fi.company_business_id(),
                 organisation_type=random.choice(
                     [
-                        Organisation.REGISTERED_ASSOCIATION,
-                        Organisation.PUBLIC_ASSOCIATION,
-                        Organisation.UNREGISTERED_ASSOCIATION,
-                        Organisation.MUNICIPALITY_CONSORTIUM,
+                        OrganizationTypeChoice.REGISTERED_ASSOCIATION,
+                        OrganizationTypeChoice.PUBLIC_ASSOCIATION,
+                        OrganizationTypeChoice.UNREGISTERED_ASSOCIATION,
+                        OrganizationTypeChoice.MUNICIPALITY_CONSORTIUM,
                     ],
                 ),
                 year_established=random.randint(1900, 2022),
@@ -1948,7 +1879,7 @@ def _create_organisation(
     # Add Nones where organization was not created
     return [
         (applicant_type, None)
-        if applicant_type == APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL
+        if applicant_type == ApplicantTypeChoice.INDIVIDUAL
         else (applicant_type, next(organisations_iter))
         for applicant_type in applicant_types
     ]
@@ -1991,41 +1922,9 @@ def _create_application_events(
             application_events.append(event)
 
     application_events = ApplicationEvent.objects.bulk_create(application_events)
-    _create_application_event_statuses(application_events)
     _create_event_reservation_units(application_events, reservation_units)
     _create_application_event_schedules(application_events)
     return application_events
-
-
-@with_logs(
-    text_entering="Creating application even statuses...",
-    text_exiting="Application event statuses created!",
-)
-def _create_application_event_statuses(
-    application_events: list[ApplicationEvent],
-) -> list[ApplicationEventStatus]:
-    statuses: list[ApplicationEventStatus] = []
-    now = datetime.now(tz=UTC)
-
-    for event in application_events:
-        if event.application.application_round.application_period_end < now:
-            event_status: str = random.choice(
-                [
-                    ApplicationEventStatus.APPROVED,
-                    ApplicationEventStatus.DECLINED,
-                ]
-            )
-        else:
-            event_status = ApplicationEventStatus.CREATED
-
-        status = ApplicationEventStatus(
-            application_event=event,
-            status=event_status,
-            user=event.application.user,
-        )
-        statuses.append(status)
-
-    return ApplicationEventStatus.objects.bulk_create(statuses)
 
 
 @with_logs(
@@ -2061,9 +1960,6 @@ def _create_application_event_schedules(
 ) -> list[ApplicationEventSchedule]:
     schedules: list[ApplicationEventSchedule] = []
     for application_event in application_events:
-        if application_event.status != ApplicationEventStatus.APPROVED:
-            continue
-
         weekdays: list[int] = [choice for choice, _ in WEEKDAYS.CHOICES]
         for _ in range(random.randint(1, 4)):
             weekday = weekdays.pop(random.randint(0, len(weekdays) - 1))
@@ -2074,7 +1970,7 @@ def _create_application_event_schedules(
                 day=weekday,
                 begin=time(hour=begin, tzinfo=UTC),
                 end=time(hour=end, tzinfo=UTC),
-                priority=random.choice(PRIORITIES.PRIORITY_CHOICES)[0],
+                priority=random.choice(PriorityChoice.values),
                 application_event=application_event,
             )
             schedules.append(schedule)

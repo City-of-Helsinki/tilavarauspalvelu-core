@@ -6,8 +6,8 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from sentry_sdk import capture_exception, push_scope
 
-from api.graphql.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from applications.models import CUSTOMER_TYPES
+from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from applications.choices import CustomerTypeChoice
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.order.requests import create_order
@@ -158,7 +158,7 @@ def _get_order_params(reservation: Reservation):
             last_name=reservation.reservee_last_name,
             email=reservation.reservee_email,
             phone=get_validated_phone_number(reservation.reservee_phone)
-            if reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
+            if reservation.reservee_type == CustomerTypeChoice.INDIVIDUAL
             else "",
         ),
         last_valid_purchase_datetime=datetime.now(tz=get_default_timezone())

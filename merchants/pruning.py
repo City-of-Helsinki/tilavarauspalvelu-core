@@ -10,8 +10,9 @@ from merchants.verkkokauppa.order.requests import cancel_order
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
+from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
-from reservations.models import STATE_CHOICES, Reservation
+from reservations.models import Reservation
 
 TIMEZONE = get_default_timezone()
 
@@ -48,8 +49,8 @@ def update_expired_orders(older_than_minutes: int) -> None:
 
             # Confirm the reservation and send confirmation email
             reservation: Reservation = order.reservation
-            if order.status == OrderStatus.PAID and reservation.state == STATE_CHOICES.WAITING_FOR_PAYMENT:
-                reservation.state = STATE_CHOICES.CONFIRMED
+            if order.status == OrderStatus.PAID and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
+                reservation.state = ReservationStateChoice.CONFIRMED
                 reservation.save()
                 send_confirmation_email(reservation)
 

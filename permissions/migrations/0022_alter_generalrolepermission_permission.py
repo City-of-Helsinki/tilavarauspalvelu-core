@@ -10,7 +10,7 @@ def add_new_roles_and_permissions(apps, schema_editor):
     # Add new role and permission
     new_role, _ = GeneralRoleChoice.objects.get_or_create(
         verbose_name="Ilmoitusten ylläpitäjä",
-        defaults=dict(code="communications_ALL"),
+        defaults={"code": "communications_ALL"},
     )
     GeneralRolePermission.objects.create(
         role=new_role,
@@ -20,7 +20,7 @@ def add_new_roles_and_permissions(apps, schema_editor):
     # Add new permission to old general role
     general_role, _ = GeneralRoleChoice.objects.get_or_create(
         verbose_name="Kaiken ylläpitäjä",
-        defaults=dict(code="General_ALL"),
+        defaults={"code": "General_ALL"},
     )
     GeneralRolePermission.objects.create(
         role=general_role,

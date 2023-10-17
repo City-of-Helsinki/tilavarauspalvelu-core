@@ -1,7 +1,8 @@
 from typing import Any
 
-import graphene
 from django.db.models import Prefetch, QuerySet
+
+from common.typing import GQLInfo
 
 
 class QueryPerformanceOptimizerMixin:
@@ -38,7 +39,7 @@ class QueryPerformanceOptimizerMixin:
     """
 
     @classmethod
-    def get_queryset(cls, queryset: QuerySet, info: graphene.ResolveInfo):
+    def get_queryset(cls, queryset: QuerySet, info: GQLInfo):
         query = super().get_queryset(queryset, info)
         query_optimizations = cls.QueryOptimization.query_optimization
         field_name = cls.QueryOptimization.field_name

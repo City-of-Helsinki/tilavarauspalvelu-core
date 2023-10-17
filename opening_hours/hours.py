@@ -190,3 +190,33 @@ def get_periods_for_resource(
             periods_data_out.append(Period(**period_data_out))
 
     return periods_data_out
+
+
+def can_reserve_based_on_opening_hours(
+    opening_hours: list[OpeningHoursDayData],
+    reservations_start: datetime.datetime,
+    reservations_end: datetime.datetime,
+) -> bool:
+    """Clamp the given reservation start and end times based on the given opening hours."""
+    for opening_hour in opening_hours:
+        time_element: TimeElement
+        for time_element in opening_hour["times"]:
+            # Find the first opening time on the reservation period
+            if reservations_start.date() <= opening_hour["date"] <= reservations_end.date():
+                opening_start = datetime.datetime.combine(
+                    opening_hour["date"],
+                    time_element.start_time,
+                    tzinfo=get_default_timezone(),
+                )
+                opening_end = datetime.datetime.combine(
+                    opening_hour["date"],
+                    time_element.end_time,
+                    tzinfo=get_default_timezone(),
+                )
+
+                max_start = max(opening_start, reservations_start)
+                min_end = min(opening_end, reservations_end)
+                return not (max_start > reservations_start or min_end < reservations_end)
+
+    # Don't know if opening hours exists, so assume we can't get what we want
+    return False

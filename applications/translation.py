@@ -1,35 +1,28 @@
-from modeltranslation.translator import TranslationOptions, translator
+from modeltranslation.translator import TranslationOptions, register
 
-from applications.models import Address, ApplicationEvent, ApplicationRound, ApplicationRoundBasket, City, Organisation
+from applications.models import Address, ApplicationEvent, ApplicationRound, City, Organisation
 
 
+@register(Address)
 class AddressTranslationOptions(TranslationOptions):
     fields = ["street_address", "city"]
 
 
+@register(Organisation)
 class OrganisationTranslationOptions(TranslationOptions):
     fields = ["name", "core_business"]
 
 
+@register(ApplicationRound)
 class ApplicationRoundTranslationOptions(TranslationOptions):
     fields = ["name", "criteria"]
 
 
+@register(City)
 class CityTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-class ApplicationRoundBasketTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
+@register(ApplicationEvent)
 class ApplicationEventTranslationOptions(TranslationOptions):
     fields = ["name"]
-
-
-translator.register(Address, AddressTranslationOptions)
-translator.register(Organisation, OrganisationTranslationOptions)
-translator.register(ApplicationRound, ApplicationRoundTranslationOptions)
-translator.register(City, CityTranslationOptions)
-translator.register(ApplicationRoundBasket, ApplicationRoundBasketTranslationOptions)
-translator.register(ApplicationEvent, ApplicationEventTranslationOptions)
