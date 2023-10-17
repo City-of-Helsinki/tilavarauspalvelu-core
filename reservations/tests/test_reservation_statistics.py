@@ -6,8 +6,10 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.models import CUSTOMER_TYPES, PRIORITIES, City
-from reservations.models import STATE_CHOICES, AgeGroup, ReservationStatistic
+from applications.choices import CustomerTypeChoice, PriorityChoice
+from applications.models import City
+from reservations.choices import ReservationStateChoice
+from reservations.models import AgeGroup, ReservationStatistic
 from tests.factories import (
     AbilityGroupFactory,
     ApplicationEventFactory,
@@ -32,10 +34,10 @@ class ReservationStatisticsCreateTestCase(TestCase):
         )
         cls.reservation_unit = ReservationUnitFactory(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
         cls.recurring = RecurringReservationFactory()
-        cls.priority = PRIORITIES.PRIORITY_LOW
-        cls.priority_name = PRIORITIES.get_priority_name_from_constant(cls.priority)
+        cls.priority = PriorityChoice.LOW
+        cls.priority_name = PriorityChoice(cls.priority).name
         cls.reservation_data = {
-            "reservee_type": CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            "reservee_type": CustomerTypeChoice.INDIVIDUAL,
             "reservee_is_unregistered_association": False,
             "home_city": City.objects.create(name="Test", municipality_code="1234"),
             "applying_for_free_of_charge": True,
@@ -45,7 +47,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
             "description": "movies&popcorn",
             "begin": datetime.datetime(2020, 1, 1, 12, 0, tzinfo=get_default_timezone()),
             "end": datetime.datetime(2020, 1, 1, 14, 0, tzinfo=get_default_timezone()),
-            "state": STATE_CHOICES.CREATED,
+            "state": ReservationStateChoice.CREATED.value,
             "user": cls.joe_the_reggie,
             "priority": cls.priority,
             "purpose": ReservationPurposeFactory(name="PurpleChoice"),

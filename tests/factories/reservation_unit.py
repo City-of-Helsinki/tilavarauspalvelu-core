@@ -6,6 +6,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
+from applications.models import ApplicationRound
 from reservation_units.models import (
     Equipment,
     PriceUnit,
@@ -27,6 +28,7 @@ from spaces.models import Space
 from terms_of_use.models import TermsOfUse
 
 from ._base import GenericDjangoModelFactory
+from .application_round import ApplicationRoundFactory
 from .equipment import EquipmentFactory
 from .purpose import PurposeFactory
 from .qualifier import QualifierFactory
@@ -147,6 +149,17 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
 
         for payment_type in payment_types or []:
             self.payment_types.add(payment_type)
+
+    @factory.post_generation
+    def application_rounds(self, create: bool, application_rounds: Iterable[ApplicationRound] | None, **kwargs) -> None:
+        if not create:
+            return
+
+        if not application_rounds and kwargs:
+            self.application_rounds.add(ApplicationRoundFactory.create(**kwargs))
+
+        for payment_type in application_rounds or []:
+            self.application_rounds.add(payment_type)
 
     # TODO: These should be SubFactories but some test might be expecting None for the respective fields
 

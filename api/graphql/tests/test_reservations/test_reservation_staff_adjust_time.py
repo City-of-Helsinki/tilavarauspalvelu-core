@@ -13,7 +13,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservation_units.models import ReservationUnit
-from reservations.models import STATE_CHOICES, ReservationType
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -33,14 +33,14 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
             reservee_email=cls.regular_joe.email,
             begin=cls.reservation_begin,
             end=cls.reservation_end,
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
             user=cls.regular_joe,
             priority=100,
             unit_price=0,
             tax_percentage_value=24,
             price=0,
             price_net=Decimal(0) / (Decimal("1.24")),
-            type=ReservationType.NORMAL,
+            type=ReservationTypeChoice.NORMAL,
         )
 
         EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content="", subject="modified")
@@ -90,7 +90,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(payload.get("errors")).is_none()
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
         assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_equal_to(1)
@@ -109,7 +109,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(payload.get("errors")).is_none()
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.buffer_time_before).is_equal_to(datetime.timedelta(minutes=15))
         assert_that(self.reservation.buffer_time_after).is_equal_to(datetime.timedelta(minutes=30))
 
@@ -129,7 +129,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(payload.get("errors")).is_none()
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
         assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_equal_to(1)
@@ -137,7 +137,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
 
     def test_time_change_to_staff_type_reservation_does_not_send_email(self):
         self.client.force_login(self.general_admin)
-        self.reservation.type = ReservationType.STAFF
+        self.reservation.type = ReservationTypeChoice.STAFF
         self.reservation.save()
 
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
@@ -148,13 +148,13 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(payload.get("errors")).is_none()
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
         assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_zero()
 
     def test_wrong_state_fails(self):
-        self.reservation.state = STATE_CHOICES.CANCELLED
+        self.reservation.state = ReservationStateChoice.CANCELLED
         self.reservation.save()
         self.client.force_login(self.general_admin)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
@@ -164,7 +164,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CANCELLED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CANCELLED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -197,7 +197,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("RESERVATION_BEGIN_IN_PAST")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -220,7 +220,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(payload.get("errors")).is_none()
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin + datetime.timedelta(hours=1))
         assert_that(self.reservation.end).is_equal_to(self.reservation_end + datetime.timedelta(hours=1))
         assert_that(len(mail.outbox)).is_zero()  # End is passed should not send email.
@@ -235,7 +235,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -246,7 +246,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.reservation_begin + datetime.timedelta(hours=1),
             end=self.reservation_end + datetime.timedelta(hours=1),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         self.client.force_login(self.general_admin)
@@ -257,7 +257,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("OVERLAPPING_RESERVATIONS")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -266,7 +266,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.reservation_begin + datetime.timedelta(hours=2),
             end=self.reservation_end + datetime.timedelta(hours=2),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
             buffer_time_after=datetime.timedelta(minutes=62),
         )
 
@@ -282,7 +282,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("RESERVATION_OVERLAP")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -292,7 +292,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.reservation_begin - datetime.timedelta(hours=3),
             end=self.reservation_end - datetime.timedelta(hours=2),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         data = self.get_valid_adjust_data()
@@ -308,7 +308,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("RESERVATION_OVERLAP")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -318,7 +318,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.reservation_begin + datetime.timedelta(hours=2),
             end=self.reservation_end + datetime.timedelta(hours=3),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         data = self.get_valid_adjust_data()
@@ -334,7 +334,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("RESERVATION_OVERLAP")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -353,7 +353,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).is_equal_to("RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
@@ -423,6 +423,6 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(error).contains_ignoring_case("No permission to mutate")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)

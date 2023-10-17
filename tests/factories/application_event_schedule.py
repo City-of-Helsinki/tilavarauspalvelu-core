@@ -1,16 +1,18 @@
 import datetime
+import random
+from typing import Any
 
 import factory
-from django.utils import timezone
+from django.utils.timezone import get_default_timezone
 from factory import fuzzy
 
-from applications.models import PRIORITIES, ApplicationEventSchedule, ApplicationEventScheduleResult
+from applications.choices import PriorityChoice, WeekdayChoice
+from applications.models import ApplicationEventSchedule
 
 from ._base import GenericDjangoModelFactory
 
 __all__ = [
     "ApplicationEventScheduleFactory",
-    "ApplicationEventScheduleResultFactory",
 ]
 
 
@@ -18,20 +20,33 @@ class ApplicationEventScheduleFactory(GenericDjangoModelFactory[ApplicationEvent
     class Meta:
         model = ApplicationEventSchedule
 
-    day = fuzzy.FuzzyInteger(low=0, high=6)
-    begin = datetime.time(12, 0, tzinfo=timezone.get_default_timezone())
-    end = datetime.time(14, 0, tzinfo=timezone.get_default_timezone())
+    day = fuzzy.FuzzyChoice(choices=WeekdayChoice.values)
+    begin = datetime.time(12, 0, tzinfo=get_default_timezone())
+    end = datetime.time(14, 0, tzinfo=get_default_timezone())
+
+    allocated_day = None
+    allocated_begin = None
+    allocated_end = None
+
+    declined = False
+    priority = fuzzy.FuzzyChoice(choices=PriorityChoice.values)
+
     application_event = factory.SubFactory("tests.factories.ApplicationEventFactory")
-    priority = fuzzy.FuzzyChoice(choices=[choice[0] for choice in PRIORITIES.PRIORITY_CHOICES])
+    allocated_reservation_unit = None
 
+    @classmethod
+    def create_allocated(cls, **kwargs: Any) -> ApplicationEventSchedule:
+        from .reservation_unit import ReservationUnitFactory
 
-class ApplicationEventScheduleResultFactory(GenericDjangoModelFactory[ApplicationEventScheduleResult]):
-    class Meta:
-        model = ApplicationEventScheduleResult
+        day = random.choice(WeekdayChoice.values)  # noqa: S311
+        kwargs.setdefault("day", day)
+        kwargs.setdefault("allocated_day", day)
+        kwargs.setdefault("allocated_begin", cls.begin)
+        kwargs.setdefault("allocated_end", cls.end)
 
-    application_event_schedule = factory.SubFactory("tests.factories.ApplicationEventScheduleFactory")
-    allocated_reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
-    allocated_duration = "01:00"
-    allocated_day = fuzzy.FuzzyInteger(low=0, high=6)
-    allocated_begin = datetime.time(12, 0, tzinfo=timezone.get_default_timezone())
-    allocated_end = datetime.time(14, 0, tzinfo=timezone.get_default_timezone())
+        unit_key = "allocated_reservation_unit"
+        unit_kwargs = cls.pop_sub_kwargs(unit_key, kwargs)
+        if unit_key not in kwargs:
+            kwargs[unit_key] = ReservationUnitFactory.create(**unit_kwargs)
+
+        return cls.create(**kwargs)

@@ -5,7 +5,7 @@ import pytest
 from django.test.testcases import TestCase
 from django.utils import timezone
 
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 
 
@@ -45,7 +45,7 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             reservation_unit=[self.res_unit_whole_room],
             begin=self.begin,
             end=self.end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         assert self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end)
 
@@ -54,7 +54,7 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             reservation_unit=[self.res_unit_first_half_room],
             begin=self.begin,
             end=self.end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         assert self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end)
 
@@ -65,7 +65,7 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             reservation_unit=[self.res_unit_first_half_room],
             begin=self.begin,
             end=self.end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         assert not self.res_unit_second_half_room.check_reservation_overlap(self.begin, self.end)
 
@@ -74,7 +74,16 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             reservation_unit=[self.res_unit_first_half_room],
             begin=self.begin + timedelta(minutes=30),
             end=self.end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
+        )
+        assert self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end)
+
+    def test_part_of_the_room_reserved_whole_room_partly_same_time_overlaps(self):
+        ReservationFactory(
+            reservation_unit=[self.res_unit_first_half_room],
+            begin=self.begin + timedelta(minutes=30),
+            end=self.end,
+            state=ReservationStateChoice.CREATED,
         )
         assert self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end)
 
@@ -83,7 +92,7 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             reservation_unit=[self.res_unit_corner_of_second_half],
             begin=self.begin,
             end=self.end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         assert self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end)
 
@@ -92,7 +101,7 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             reservation_unit=[self.res_unit_corner_of_second_half],
             begin=self.begin,
             end=self.end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         assert not self.res_unit_first_half_room.check_reservation_overlap(self.begin, self.end)
         assert self.res_unit_whole_room.check_reservation_overlap(self.begin, self.end)
@@ -102,6 +111,6 @@ class CheckReservationOverlapForSpacesTestCase(TestCase, UnitTestCase):
             reservation_unit=[self.res_unit_second_half_room],
             begin=self.begin,
             end=self.end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
         )
         assert self.res_unit_corner_of_second_half.check_reservation_overlap(self.begin, self.end)

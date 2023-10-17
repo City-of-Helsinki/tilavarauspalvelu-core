@@ -11,7 +11,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from merchants.models import OrderStatus
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationMetadataSetFactory
 
 
@@ -29,7 +29,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=2),
             end=(datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=12)),
-            state=STATE_CHOICES.CANCELLED,
+            state=ReservationStateChoice.CANCELLED,
             user=self.regular_joe,
             reservee_email="email@reservee",
             price_net=Decimal("10.0"),
@@ -93,7 +93,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
     def test_cant_refund_if_invalid_state_and_not_in_the_past(self):
         self.client.force_login(self.general_admin)
 
-        self.reservation.state = STATE_CHOICES.CONFIRMED
+        self.reservation.state = ReservationStateChoice.CONFIRMED
         self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
         self.reservation.save()
 
@@ -113,7 +113,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
 
     @mock.patch("reservations.tasks.refund_order")
     def test_refund_success_when_correct_state_and_not_in_the_past(self, mock_refund_order):
-        self.reservation.state = STATE_CHOICES.CANCELLED
+        self.reservation.state = ReservationStateChoice.CANCELLED
         self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
         self.reservation.save()
 
@@ -138,7 +138,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
 
     @mock.patch("reservations.tasks.refund_order")
     def test_refund_success_when_invalid_state_and_in_the_past(self, mock_refund_order):
-        self.reservation.state = STATE_CHOICES.CONFIRMED
+        self.reservation.state = ReservationStateChoice.CONFIRMED
         self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=2)
         self.reservation.save()
 

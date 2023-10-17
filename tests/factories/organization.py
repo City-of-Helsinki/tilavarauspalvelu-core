@@ -3,6 +3,7 @@ import datetime
 import factory
 from factory import fuzzy
 
+from applications.choices import OrganizationTypeChoice
 from applications.models import Organisation
 
 from ._base import GenericDjangoModelFactory
@@ -21,14 +22,5 @@ class OrganisationFactory(GenericDjangoModelFactory[Organisation]):
     year_established = fuzzy.FuzzyInteger(low=1, high=datetime.date.today().year)
     address = factory.SubFactory("tests.factories.AddressFactory")
     active_members = fuzzy.FuzzyInteger(low=1, high=500)
-    organisation_type = fuzzy.FuzzyChoice(
-        choices=(
-            Organisation.COMPANY,
-            Organisation.REGISTERED_ASSOCIATION,
-            Organisation.PUBLIC_ASSOCIATION,
-            Organisation.UNREGISTERED_ASSOCIATION,
-            Organisation.MUNICIPALITY_CONSORTIUM,
-            Organisation.RELIGIOUS_COMMUNITY,
-        )
-    )
+    organisation_type = fuzzy.FuzzyChoice(choices=OrganizationTypeChoice.values)
     email = fuzzy.FuzzyText(suffix="@testingisbesthing.com")

@@ -9,10 +9,12 @@ from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from applications.models import CUSTOMER_TYPES, City
+from applications.choices import CustomerTypeChoice
+from applications.models import City
 from merchants.models import OrderStatus
 from reservation_units.models import ReservationUnit
-from reservations.models import STATE_CHOICES, AgeGroup, ReservationType
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.models import AgeGroup
 from tests.factories import (
     PaymentOrderFactory,
     RecurringReservationFactory,
@@ -33,7 +35,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ReservationFactory(
             reservee_first_name="Shouldbe",
             reservee_last_name="Hidden",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_organisation_name="Hidden organisation",
             reservee_address_street="Mystery street 2",
             reservee_address_city="Nowhere",
@@ -58,7 +60,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=reservation_begin,
             end=reservation_end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
             user=self.general_admin,
             priority=100,
             purpose=self.purpose,
@@ -131,7 +133,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.reservation = ReservationFactory(
             reservee_first_name="Reser",
             reservee_last_name="Vee",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_organisation_name="Test organisation",
             reservee_address_street="Mannerheimintie 2",
             reservee_address_city="Helsinki",
@@ -156,7 +158,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=reservation_begin,
             end=reservation_end,
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED,
             user=self.regular_joe,
             priority=100,
             purpose=self.purpose,
@@ -244,7 +246,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         metadata = ReservationMetadataSetFactory()
         res_unit = ReservationUnitFactory(metadata_set=metadata)
         ReservationFactory(
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
@@ -274,14 +276,14 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         metadata = ReservationMetadataSetFactory()
         res_unit = ReservationUnitFactory(metadata_set=metadata)
         ReservationFactory(
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
             begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(days=2),
         )
         ReservationFactory(
-            state=STATE_CHOICES.CANCELLED,
+            state=ReservationStateChoice.CANCELLED,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me too",
@@ -312,7 +314,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         metadata = ReservationMetadataSetFactory()
         res_unit = ReservationUnitFactory(metadata_set=metadata)
         res = ReservationFactory(
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
@@ -343,7 +345,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         metadata = ReservationMetadataSetFactory()
         res_unit = ReservationUnitFactory(metadata_set=metadata)
         res = ReservationFactory(
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
@@ -351,7 +353,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         )
         PaymentOrderFactory(reservation=res, status=OrderStatus.PAID)
         res_too = ReservationFactory(
-            state=STATE_CHOICES.CANCELLED,
+            state=ReservationStateChoice.CANCELLED,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me too",
@@ -360,7 +362,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         PaymentOrderFactory(reservation=res_too, status=OrderStatus.REFUNDED)
 
         ReservationFactory(
-            state=STATE_CHOICES.WAITING_FOR_PAYMENT,
+            state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="I shouldn't be visible in snapshots. PANIC!",
@@ -393,7 +395,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         metadata = ReservationMetadataSetFactory()
         res_unit = ReservationUnitFactory(metadata_set=metadata)
         res = ReservationFactory(
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="show me",
@@ -424,13 +426,13 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         metadata = ReservationMetadataSetFactory()
         res_unit = ReservationUnitFactory(metadata_set=metadata)
         ReservationFactory(
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="This is requested",
         )
         ReservationFactory(
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="I'm requesting this to be dealt with. Oh this is already dealt with, nice!",
@@ -484,7 +486,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             begin=self.reservation.begin - datetime.timedelta(hours=2),
             user=reserver,
             working_memo="Read me.",
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
         response = self.query(
             """
@@ -1108,7 +1110,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_filter_by_text_search_business_reservee_name(self):
         ReservationFactory(
             name="Test reservation",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_type=CustomerTypeChoice.BUSINESS,
             reservee_organisation_name="Bizniz name will find me",
             reservation_unit=[self.reservation_unit],
         )
@@ -1135,7 +1137,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_filter_by_text_search_non_profit_reservee_name(self):
         ReservationFactory(
             name="Test reservation",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+            reservee_type=CustomerTypeChoice.NONPROFIT,
             reservee_organisation_name="Non-profit name will find me",
             reservation_unit=[self.reservation_unit],
         )
@@ -1162,7 +1164,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_filter_by_text_search_individual_reservee_name(self):
         ReservationFactory(
             name="Test reservation",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="First",
             reservee_last_name="Name",
             reservation_unit=[self.reservation_unit],
@@ -1226,7 +1228,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ReservationFactory(
             name="this should be 1st",
             reservation_unit=[self.reservation_unit],
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_type=CustomerTypeChoice.BUSINESS,
             reservee_organisation_name="A company",
             reservee_first_name="",
             reservee_last_name="",
@@ -1234,7 +1236,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ReservationFactory(
             name="this should be 2nd",
             reservation_unit=[self.reservation_unit],
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+            reservee_type=CustomerTypeChoice.NONPROFIT,
             reservee_organisation_name="B non-profit",
             reservee_first_name="",
             reservee_last_name="",
@@ -1242,7 +1244,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         ReservationFactory(
             name="this should be 3rd",
             reservation_unit=[self.reservation_unit],
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="Charlie",
             reservee_last_name="Chaplin",
             reservee_organisation_name="",
@@ -1402,7 +1404,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
     def test_filter_by_reservation_unit(self):
         ReservationFactory(
             name="Test reservation",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="First",
             reservee_last_name="Name",
             reservation_unit=[self.reservation_unit],
@@ -1455,7 +1457,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
         ReservationFactory(
             name="test reservation",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="First",
             reservee_last_name="Name",
             reservation_unit=[other_unit],
@@ -1463,7 +1465,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
         ReservationFactory(
             name="hidden reservation",
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="First",
             reservee_last_name="Name",
             reservation_unit=[not_visible_unit],
@@ -1620,7 +1622,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         ReservationFactory(
             begin=self.reservation.begin - datetime.timedelta(hours=3),
-            type=ReservationType.BLOCKED,
+            type=ReservationTypeChoice.BLOCKED,
         )
         response = self.query(
             """
@@ -1732,7 +1734,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
 
     def test_reservee_name_for_individual_reservee(self):
         reservation = ReservationFactory(
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_first_name="First",
             reservee_last_name="Last",
         )
@@ -1753,7 +1755,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
 
     def test_reservee_name_for_business_reservee(self):
         reservation = ReservationFactory(
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_type=CustomerTypeChoice.BUSINESS,
             reservee_organisation_name="Business Oy",
         )
 
@@ -1773,7 +1775,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
 
     def test_reservee_name_for_nonprofit_reservee(self):
         reservation = ReservationFactory(
-            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+            reservee_type=CustomerTypeChoice.NONPROFIT,
             reservee_organisation_name="Nonprofit Ry",
         )
 

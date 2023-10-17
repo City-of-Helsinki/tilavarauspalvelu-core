@@ -10,7 +10,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from merchants.models import OrderStatus
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
-from reservations.models import STATE_CHOICES as ReservationState
+from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import OrderFactory, PaymentOrderFactory, ReservationFactory
 
@@ -24,7 +24,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
             reservation_unit=[cls.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
-            state=ReservationState.CREATED,
+            state=ReservationStateChoice.CREATED,
             user=cls.regular_joe,
             reservee_email="email@reservee",
         )
@@ -69,7 +69,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert_that(Reservation.objects.filter(pk=self.reservation.pk).exists()).is_false()
 
     def test_waiting_for_payment_can_be_deleted(self):
-        self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
+        self.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
         self.reservation.save()
         self.client.force_login(self.regular_joe)
 
@@ -83,11 +83,11 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
 
         assert_that(Reservation.objects.filter(pk=self.reservation.pk).exists()).is_false()
 
-    @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
+    @mock.patch("api.graphql.types.reservations.mutations.cancel_order")
     def test_call_webshop_cancel_and_mark_order_cancelled_on_delete(self, mock_cancel_order):
         mock_cancel_order.return_value = OrderFactory(status="cancelled")
 
-        self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
+        self.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
         self.reservation.save()
 
         payment_order = PaymentOrderFactory.create(
@@ -106,9 +106,9 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         payment_order.refresh_from_db()
         assert_that(payment_order.status).is_equal_to(OrderStatus.CANCELLED)
 
-    @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
+    @mock.patch("api.graphql.types.reservations.mutations.cancel_order")
     def test_dont_call_webshop_cancel_when_order_is_already_cancelled(self, mock_cancel_order):
-        self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
+        self.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
         self.reservation.save()
 
         payment_order = PaymentOrderFactory.create(
@@ -129,11 +129,11 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         payment_order.refresh_from_db()
         assert_that(payment_order.status).is_equal_to(OrderStatus.CANCELLED)
 
-    @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
+    @mock.patch("api.graphql.types.reservations.mutations.cancel_order")
     def test_do_not_mark_order_cancelled_if_webshop_call_fails(self, mock_cancel_order):
         mock_cancel_order.return_value = OrderFactory(status="draft")
 
-        self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
+        self.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
         self.reservation.save()
 
         payment_order = PaymentOrderFactory.create(
@@ -152,14 +152,14 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         payment_order.refresh_from_db()
         assert_that(payment_order.status).is_equal_to(OrderStatus.DRAFT)
 
-    @mock.patch("api.graphql.reservations.reservation_mutations.capture_exception")
-    @mock.patch("api.graphql.reservations.reservation_mutations.cancel_order")
+    @mock.patch("api.graphql.types.reservations.mutations.capture_exception")
+    @mock.patch("api.graphql.types.reservations.mutations.cancel_order")
     def test_log_error_on_cancel_order_failure_but_mark_order_cancelled(
         self, mock_cancel_order, mock_capture_exceptions
     ):
         mock_cancel_order.side_effect = CancelOrderError("mock-error")
 
-        self.reservation.state = ReservationState.WAITING_FOR_PAYMENT
+        self.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
         self.reservation.save()
 
         payment_order = PaymentOrderFactory.create(
@@ -183,7 +183,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
     def test_cannot_delete_when_status_not_created_nor_waiting_for_payment(self):
         self.client.force_login(self.general_admin)
 
-        self.reservation.state = ReservationState.CONFIRMED
+        self.reservation.state = ReservationStateChoice.CONFIRMED
         self.reservation.save()
         response = self.query(self.get_delete_query(), input_data=self.get_delete_input_data())
         assert_that(response.status_code).is_equal_to(200)

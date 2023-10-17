@@ -8,12 +8,10 @@ from assertpy import assert_that
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
-from api.graphql.tests.test_reservations.base import (
-    DEFAULT_TIMEZONE,
-    ReservationTestCaseBase,
-)
-from api.graphql.validation_errors import ValidationErrorCodes
-from applications.models import PRIORITY_CONST, City
+from api.graphql.extensions.validation_errors import ValidationErrorCodes
+from api.graphql.tests.test_reservations.base import DEFAULT_TIMEZONE, ReservationTestCaseBase
+from applications.choices import PriorityChoice
+from applications.models import City
 from opening_hours.tests.test_get_periods import mocked_get_resource_periods_response_data
 from reservation_units.models import (
     PriceUnit,
@@ -22,7 +20,8 @@ from reservation_units.models import (
     ReservationKind,
     ReservationUnit,
 )
-from reservations.models import STATE_CHOICES, AgeGroup, Reservation, ReservationType
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.models import AgeGroup, Reservation
 from tests.factories import (
     ApplicationRoundFactory,
     CityFactory,
@@ -114,8 +113,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
         assert_that(reservation.user).is_equal_to(self.regular_joe)
-        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
-        assert_that(reservation.priority).is_equal_to(PRIORITY_CONST.PRIORITY_MEDIUM)
+        assert_that(reservation.state).is_equal_to(ReservationStateChoice.CREATED)
+        assert_that(reservation.priority).is_equal_to(PriorityChoice.MEDIUM)
         assert_that(reservation.reservee_first_name).is_equal_to(input_data["reserveeFirstName"])
         assert_that(reservation.reservee_last_name).is_equal_to(input_data["reserveeLastName"])
         assert_that(reservation.reservee_phone).is_equal_to(input_data["reserveePhone"])
@@ -150,8 +149,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
         assert_that(reservation.user).is_equal_to(self.regular_joe)
-        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
-        assert_that(reservation.priority).is_equal_to(PRIORITY_CONST.PRIORITY_MEDIUM)
+        assert_that(reservation.state).is_equal_to(ReservationStateChoice.CREATED)
+        assert_that(reservation.priority).is_equal_to(PriorityChoice.MEDIUM)
 
         assert_that(reservation.buffer_time_after).is_equal_to(self.reservation_unit.buffer_time_after)
         assert_that(reservation.buffer_time_before).is_equal_to(self.reservation_unit.buffer_time_before)
@@ -384,7 +383,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
             end=datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         self.client.force_login(self.regular_joe)
@@ -404,7 +403,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             begin=begin,
             end=end,
             buffer_time_after=datetime.timedelta(hours=1, minutes=1),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         self.client.force_login(self.regular_joe)
@@ -428,8 +427,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             begin=begin,
             end=end,
             buffer_time_after=datetime.timedelta(hours=1, minutes=1),
-            state=STATE_CHOICES.CONFIRMED,
-            type=ReservationType.BLOCKED,
+            state=ReservationStateChoice.CONFIRMED,
+            type=ReservationTypeChoice.BLOCKED,
         )
 
         self.client.force_login(self.regular_joe)
@@ -447,7 +446,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             begin=begin,
             end=end,
             buffer_time_before=datetime.timedelta(hours=1, minutes=1),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         self.client.force_login(self.regular_joe)
@@ -469,8 +468,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             begin=begin,
             end=end,
             buffer_time_before=datetime.timedelta(hours=1, minutes=1),
-            state=STATE_CHOICES.CONFIRMED,
-            type=ReservationType.BLOCKED,
+            state=ReservationStateChoice.CONFIRMED,
+            type=ReservationTypeChoice.BLOCKED,
         )
 
         self.client.force_login(self.regular_joe)
@@ -491,7 +490,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=begin,
             end=end,
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         self.client.force_login(self.regular_joe)
@@ -516,7 +515,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=begin,
             end=end,
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
         self.client.force_login(self.regular_joe)
@@ -876,7 +875,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now() + datetime.timedelta(hours=24),
             end=datetime.datetime.now() + datetime.timedelta(hours=25),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
             user=self.regular_joe,
         )
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -899,7 +898,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now() - datetime.timedelta(hours=25),
             end=datetime.datetime.now() - datetime.timedelta(hours=24),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
             user=self.regular_joe,
         )
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -928,7 +927,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_unit=[other_reservation_unit],
             begin=datetime.datetime.now() + datetime.timedelta(hours=24),
             end=datetime.datetime.now() + datetime.timedelta(hours=25),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
             user=self.regular_joe,
         )
 
@@ -936,7 +935,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now() - datetime.timedelta(hours=25),
             end=datetime.datetime.now() - datetime.timedelta(hours=24),
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
             user=self.regular_joe,
         )
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -1097,7 +1096,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_input_data()
-        input_data["type"] = ReservationType.STAFF
+        input_data["type"] = ReservationTypeChoice.STAFF
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -1106,7 +1105,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
-        assert_that(reservation.type).is_equal_to(ReservationType.STAFF)
+        assert_that(reservation.type).is_equal_to(ReservationTypeChoice.STAFF)
 
     def test_creating_reservation_with_type_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()

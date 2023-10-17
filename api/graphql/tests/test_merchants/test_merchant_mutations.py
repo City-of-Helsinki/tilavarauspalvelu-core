@@ -9,8 +9,8 @@ from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
+from api.graphql.extensions.validation_errors import ValidationErrorCodes
 from api.graphql.tests.base import GrapheneTestCaseBase
-from api.graphql.validation_errors import ValidationErrorCodes
 from merchants.models import OrderStatus
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 
@@ -44,7 +44,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
         }
         """
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_refresh_mutation_set_order_to_paid(self, mock_get_payment):
         remote_id = str(self.payment_order.remote_id)
         mock_get_payment.return_value = PaymentFactory(payment_id=remote_id, status="payment_paid_online")
@@ -68,7 +68,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.PAID)
         assert_that(self.payment_order.processed_at).is_equal_to(datetime.now().astimezone(get_default_timezone()))
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_refresh_mutation_set_order_to_cancelled(self, mock_get_payment):
         remote_id = str(self.payment_order.remote_id)
         mock_get_payment.return_value = PaymentFactory(payment_id=remote_id, status="payment_cancelled")
@@ -92,7 +92,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.CANCELLED)
         assert_that(self.payment_order.processed_at).is_equal_to(datetime.now().astimezone(get_default_timezone()))
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_refresh_mutation_skip_update_if_order_is_not_in_updateable_state(self, mock_get_payment):
         self.payment_order.status = OrderStatus.REFUNDED
         self.payment_order.save()
@@ -120,7 +120,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
 
         assert_that(mock_get_payment.called).is_false()
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_refresh_mutation_raise_error_when_order_not_found(self, mock_get_payment):
         not_found_remote_id = str(uuid4())
         mock_get_payment.return_value = None
@@ -143,8 +143,8 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase):
         assert_that(self.payment_order.status).is_equal_to(OrderStatus.DRAFT)
         assert_that(self.payment_order.processed_at).is_none()
 
-    @mock.patch("api.graphql.merchants.merchant_mutations.capture_message")
-    @mock.patch("api.graphql.merchants.merchant_mutations.get_payment")
+    @mock.patch("api.graphql.types.merchants.mutations.capture_message")
+    @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_refresh_mutation_raise_error_when_payment_not_found(self, mock_get_payment, mock_capture_message):
         remote_id = str(self.payment_order.remote_id)
         mock_get_payment.return_value = None

@@ -1,7 +1,10 @@
+from collections.abc import Iterable
+from typing import Any
+
 import factory
 from factory import fuzzy
 
-from spaces.models import ServiceSector
+from spaces.models import ServiceSector, Unit
 
 from ._base import GenericDjangoModelFactory
 
@@ -17,9 +20,14 @@ class ServiceSectorFactory(GenericDjangoModelFactory[ServiceSector]):
     name = fuzzy.FuzzyText()
 
     @factory.post_generation
-    def units(self, create, units, **kwargs):
-        if not create or not units:
+    def units(self, create: bool, units: Iterable[Unit] | None, **kwargs: Any) -> None:
+        if not create:
             return
 
-        for unit in units:
+        if not units and kwargs:
+            from .unit import UnitFactory
+
+            self.units.add(UnitFactory.create(**kwargs))
+
+        for unit in units or []:
             self.units.add(unit)

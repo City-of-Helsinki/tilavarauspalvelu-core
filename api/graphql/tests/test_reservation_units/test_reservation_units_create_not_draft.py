@@ -373,7 +373,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.spaces.all().values_list("id", flat=True))).is_in(data.get("spacePks"))
+        res_units = list(res_unit.spaces.all().order_by("pk").values_list("id", flat=True))
+        assert_that(res_units).is_in(data.get("spacePks"))
 
     def test_create_with_multiple_purposes(self):
         purposes = PurposeFactory.create_batch(5)
@@ -390,7 +391,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.purposes.all().values_list("id", flat=True))).is_in(data.get("purposePks"))
+        res_units = list(res_unit.purposes.all().order_by("pk").values_list("id", flat=True))
+        assert_that(res_units).is_in(data.get("purposePks"))
 
     def test_create_errors_on_wrong_type_of_purpose_pk(self):
         data = self.get_valid_data()
@@ -416,7 +418,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.qualifiers.all().values_list("id", flat=True))).is_in(data.get("qualifierPks"))
+        res_units = list(res_unit.qualifiers.all().order_by("pk").values_list("id", flat=True))
+        assert_that(res_units).is_in(data.get("qualifierPks"))
 
     def test_create_errors_on_wrong_type_of_qualifier_pk(self):
         data = self.get_valid_data()
@@ -442,7 +445,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.services.all().values_list("id", flat=True))).is_in(data.get("servicePks"))
+        res_units = list(res_unit.services.all().order_by("pk").values_list("id", flat=True))
+        assert_that(res_units).is_in(data.get("servicePks"))
 
     def test_create_errors_on_wrong_type_of_service_pk(self):
         data = self.get_valid_data()
@@ -468,7 +472,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.resources.all().values_list("id", flat=True))).is_in(data.get("resourcePks"))
+        res_units = list(res_unit.resources.all().order_by("pk").values_list("id", flat=True))
+        assert_that(res_units).is_in(data.get("resourcePks"))
 
     def test_create_with_multiple_equipments(self):
         equipments = EquipmentFactory.create_batch(5)
@@ -485,7 +490,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(list(res_unit.equipments.all().values_list("id", flat=True))).is_in(data.get("equipmentPks"))
+        res_units = list(res_unit.equipments.all().order_by("pk").values_list("id", flat=True))
+        assert_that(res_units).is_in(data.get("equipmentPks"))
 
     def test_create_errors_on_wrong_type_of_equipment_pk(self):
         data = self.get_valid_data()

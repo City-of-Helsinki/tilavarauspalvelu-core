@@ -12,7 +12,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationMetadataSetFactory
 
 
@@ -27,7 +27,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
-            state=STATE_CHOICES.REQUIRES_HANDLING,
+            state=ReservationStateChoice.REQUIRES_HANDLING,
             user=self.regular_joe,
             reservee_email="email@reservee",
         )
@@ -71,16 +71,16 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
     def test_approve_success_when_admin(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_approve_data()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
+        assert_that(approve_data.get("state")).is_equal_to(ReservationStateChoice.CONFIRMED.upper())
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.handling_details).is_equal_to("You're welcome.")
         assert_that(self.reservation.handled_at).is_not_none()
         assert_that(self.reservation.price).is_equal_to(Decimal("10.59"))  # Float does not cause abnormality.
@@ -101,16 +101,16 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         input_data["price"] = 0.0
         input_data["priceNet"] = 0.0
 
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
+        assert_that(approve_data.get("state")).is_equal_to(ReservationStateChoice.CONFIRMED.upper())
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.handling_details).is_equal_to("You're welcome.")
         assert_that(self.reservation.handled_at).is_not_none()
         assert_that(self.reservation.price).is_equal_to(Decimal("0.0"))  # Float does not cause abnormality.
@@ -122,7 +122,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
     def test_cant_approve_if_regular_user(self):
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_approve_data()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
@@ -130,12 +130,12 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data).is_none()
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
 
     def test_cant_approve_if_status_not_requires_handling(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_approve_data()
-        self.reservation.state = STATE_CHOICES.CREATED
+        self.reservation.state = ReservationStateChoice.CREATED
         self.reservation.save()
         response = self.query(self.get_handle_query(), input_data=input_data)
 
@@ -148,7 +148,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("APPROVING_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
         assert_that(self.reservation.handling_details).is_empty()
 
     def test_approving_fails_when_price_missing(self):
@@ -160,7 +160,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()
 
     def test_approving_fails_when_price_net_missing(self):
@@ -172,7 +172,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()
 
     def test_approving_fails_when_handling_details_missing(self):
@@ -184,7 +184,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()
 
     @override_settings(
@@ -195,13 +195,13 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         """Previously we had a feature which copied to handling details to working memo."""
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_approve_data()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.handling_details).is_not_equal_to(self.reservation.working_memo)
 
     @override_settings(
@@ -213,16 +213,16 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_approve_data()
         input_data["handlingDetails"] = ""
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
+        assert_that(approve_data.get("state")).is_equal_to(ReservationStateChoice.CONFIRMED.upper())
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(self.reservation.handling_details).is_equal_to("")
         assert_that(self.reservation.handled_at).is_not_none()
         assert_that(self.reservation.price).is_equal_to(Decimal("10.59"))  # Float does not cause abnormality.
@@ -261,16 +261,16 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
 
         input_data = self.get_valid_approve_data()
         input_data["handlingDetails"] = ""
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         approve_data = content.get("data").get("approveReservation")
         assert_that(approve_data.get("errors")).is_none()
-        assert_that(approve_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED.upper())
+        assert_that(approve_data.get("state")).is_equal_to(ReservationStateChoice.CONFIRMED.upper())
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
 
     def test_unit_reserver_cant_approve_other_reservation(self):
         reserver_staff_user = get_user_model().objects.create(
@@ -298,7 +298,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
 
         input_data = self.get_valid_approve_data()
         input_data["handlingDetails"] = ""
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)

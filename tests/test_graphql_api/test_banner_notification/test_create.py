@@ -4,7 +4,7 @@ import pytest
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import UserFactory
-from tests.helpers import load_content, parametrize_helper
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -47,28 +47,21 @@ def test_user_creates_draft_banner_notification(graphql):
     # - User tries to create a new draft banner notification
     response = graphql(
         MUTATION_QUERY,
-        variables={
-            "input": {
-                "name": "foo",
-                "message": "bar",
-                "target": BannerNotificationTarget.ALL.value,
-                "level": BannerNotificationLevel.NORMAL.value,
-            }
+        input_data={
+            "name": "foo",
+            "message": "bar",
+            "target": BannerNotificationTarget.ALL.value,
+            "level": BannerNotificationLevel.NORMAL.value,
         },
     )
 
     # then:
     # - The response contains the created notification
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "createBannerNotification": {
-                "name": "foo",
-                "message": "bar",
-                "errors": None,
-            },
-        },
-    }
+    assert response.first_query_object == {
+        "name": "foo",
+        "message": "bar",
+        "errors": None,
+    }, response
 
 
 def test_user_creates_draft_banner_notification_without_required_fields(graphql):
@@ -79,36 +72,14 @@ def test_user_creates_draft_banner_notification_without_required_fields(graphql)
 
     # when:
     # - User tries to create a new banner notification with the given invalid data
-    response = graphql(MUTATION_QUERY, variables={"input": {}})
+    response = graphql(MUTATION_QUERY, input_data={})
 
     # then:
-    # - The response complains about the missing fields
-    content = load_content(response.content)
-    assert content == {
-        "errors": [
-            {
-                "locations": [{"column": 15, "line": 2}],
-                "message": (
-                    "Variable '$input' got invalid value {}; "
-                    "Field 'level' of required type 'level!' was not provided."
-                ),
-            },
-            {
-                "locations": [{"column": 15, "line": 2}],
-                "message": (
-                    "Variable '$input' got invalid value {}; "
-                    "Field 'name' of required type 'String!' was not provided."
-                ),
-            },
-            {
-                "locations": [{"column": 15, "line": 2}],
-                "message": (
-                    "Variable '$input' got invalid value {}; "
-                    "Field 'target' of required type 'target!' was not provided."
-                ),
-            },
-        ]
-    }
+    # - The response complains about the improper input
+    assert (
+        response.error_message()
+        == "Variable '$input' of required type 'BannerNotificationCreateMutationInput!' was not provided."
+    )
 
 
 def test_user_creates_non_draft_banner_notification_without_required_fields(graphql):
@@ -121,47 +92,19 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
     # - User tries to create a new banner notification with the given invalid data
     response = graphql(
         MUTATION_QUERY,
-        variables={
-            "input": {
-                "name": "foo",
-                "target": BannerNotificationTarget.ALL.value,
-                "level": BannerNotificationLevel.NORMAL.value,
-                "draft": False,
-            }
+        input_data={
+            "name": "foo",
+            "target": BannerNotificationTarget.ALL.value,
+            "level": BannerNotificationLevel.NORMAL.value,
+            "draft": False,
         },
     )
 
     # then:
     # - The response complains about the missing fields
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "createBannerNotification": {
-                "errors": [
-                    {
-                        "field": "activeFrom",
-                        "messages": [
-                            "Non-draft notifications must set 'active_from'",
-                        ],
-                    },
-                    {
-                        "field": "activeUntil",
-                        "messages": [
-                            "Non-draft notifications must set 'active_until'",
-                        ],
-                    },
-                    {
-                        "field": "message",
-                        "messages": [
-                            "Non-draft notifications must have a message.",
-                        ],
-                    },
-                ],
-                "message": None,
-                "name": None,
-            }
-        }
-    }
+    assert response.field_error_messages("activeFrom") == ["Non-draft notifications must set 'active_from'"]
+    assert response.field_error_messages("activeUntil") == ["Non-draft notifications must set 'active_until'"]
+    assert response.field_error_messages("message") == ["Non-draft notifications must have a message."]
 
 
 @pytest.mark.parametrize(
@@ -240,27 +183,20 @@ def test_user_creates_banner_notification_where_active_range_is_invalid(graphql,
     # - User tries to create a new banner notification with the given invalid data
     response = graphql(
         MUTATION_QUERY,
-        variables={
-            "input": {
-                "name": "foo",
-                "target": BannerNotificationTarget.ALL.value,
-                "level": BannerNotificationLevel.NORMAL.value,
-                "draft": True,
-                "activeFrom": active_from,
-                "activeUntil": active_until,
-            }
+        input_data={
+            "name": "foo",
+            "target": BannerNotificationTarget.ALL.value,
+            "level": BannerNotificationLevel.NORMAL.value,
+            "draft": True,
+            "activeFrom": active_from,
+            "activeUntil": active_until,
         },
     )
 
     # then:
-    # - The response complains about the 'active'-fields being invalid
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "createBannerNotification": {
-                "errors": expected,
-                "message": None,
-                "name": None,
-            }
-        }
-    }
+    # - The response complains about the 'active'-fields being invali
+    assert response.first_query_object == {
+        "errors": expected,
+        "message": None,
+        "name": None,
+    }, response

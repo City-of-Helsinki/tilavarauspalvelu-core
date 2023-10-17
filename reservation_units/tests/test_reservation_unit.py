@@ -5,7 +5,7 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from reservation_units.models import ReservationUnit
-from reservations.models import STATE_CHOICES, ReservationType
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from spaces.models import Space
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 
@@ -21,14 +21,14 @@ class GetPreviousReservationTestCase(TestCase):
             begin=(self.now - timedelta(hours=2)),
             end=(self.now - timedelta(hours=1)),
             reservation_unit=[self.reservation_unit],
-            type=ReservationType.BLOCKED,
-            state=STATE_CHOICES.CONFIRMED,
+            type=ReservationTypeChoice.BLOCKED,
+            state=ReservationStateChoice.CONFIRMED,
         )
         self.reservation = ReservationFactory(
             begin=(self.now - timedelta(hours=3)),
             end=(self.now - timedelta(hours=2)),
             reservation_unit=[self.reservation_unit],
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
     def test_get_previous_reservation(self):
@@ -60,14 +60,14 @@ class GetNextReservationTestCase(TestCase):
             begin=(self.now + timedelta(hours=1)),
             end=(self.now + timedelta(hours=2)),
             reservation_unit=[self.reservation_unit],
-            type=ReservationType.BLOCKED,
-            state=STATE_CHOICES.CONFIRMED,
+            type=ReservationTypeChoice.BLOCKED,
+            state=ReservationStateChoice.CONFIRMED,
         )
         self.reservation = ReservationFactory(
             begin=(self.now + timedelta(hours=2)),
             end=(self.now + timedelta(hours=3)),
             reservation_unit=[self.reservation_unit],
-            state=STATE_CHOICES.CONFIRMED,
+            state=ReservationStateChoice.CONFIRMED,
         )
 
     def test_get_next_reservation(self):

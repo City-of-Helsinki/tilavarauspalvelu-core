@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import EquipmentFactory, ReservationUnitFactory
-from tests.helpers import load_content
 
 # Applied to all tests
 pytestmark = [
@@ -41,9 +40,9 @@ def test_filter_reservation_units_by_one_equipment(graphql):
 
     # then:
     # - The response contains only the expected reservation unit
-    content = load_content(response.content)
-    notifications = content["data"]["reservationUnits"]["edges"]
-    assert notifications == [{"node": {"nameFi": "fizz"}}], content
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"nameFi": "fizz"}
 
 
 def test_filter_reservation_units_by_multiple_equipments(graphql):
@@ -66,9 +65,9 @@ def test_filter_reservation_units_by_multiple_equipments(graphql):
 
     # then:
     # - The response contains only the reservation unit with all equipments
-    content = load_content(response.content)
-    notifications = content["data"]["reservationUnits"]["edges"]
-    assert notifications == [{"node": {"nameFi": "1"}}], content
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"nameFi": "1"}
 
 
 def test_filter_reservation_units_by_multiple_equipments__none_match(graphql):
@@ -90,6 +89,5 @@ def test_filter_reservation_units_by_multiple_equipments__none_match(graphql):
 
     # then:
     # - The response does not contain any reservation units
-    content = load_content(response.content)
-    notifications = content["data"]["reservationUnits"]["edges"]
-    assert notifications == [], content
+    assert response.has_errors is False, response
+    assert len(response.edges) == 0, response

@@ -3,10 +3,10 @@ from typing import Any, NamedTuple
 import pytest
 from graphql_relay import to_global_id
 
-from api.graphql.banner_notification.types import BannerNotificationType
+from api.graphql.types.banner_notification.types import BannerNotificationNode
 from common.choices import BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import load_content, parametrize_helper
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -16,7 +16,7 @@ pytestmark = [
 
 class FilteringParams(NamedTuple):
     value: Any
-    expected: list[dict]
+    expected: Any
 
 
 def test_filter_banner_notifications_by_name(graphql):
@@ -46,9 +46,8 @@ def test_filter_banner_notifications_by_name(graphql):
 
     # then:
     # - The response contains only the expected banner notification
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == [{"node": {"name": "foo"}}], content
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"name": "foo"}, response
 
 
 @pytest.mark.parametrize(
@@ -56,21 +55,15 @@ def test_filter_banner_notifications_by_name(graphql):
         {
             "All": FilteringParams(
                 value=BannerNotificationTarget.ALL.value,
-                expected=[
-                    {"node": {"name": "baz"}},
-                ],
+                expected={"name": "baz"},
             ),
             "Staff": FilteringParams(
                 value=BannerNotificationTarget.STAFF.value,
-                expected=[
-                    {"node": {"name": "bar"}},
-                ],
+                expected={"name": "bar"},
             ),
             "User": FilteringParams(
                 value=BannerNotificationTarget.USER.value,
-                expected=[
-                    {"node": {"name": "foo"}},
-                ],
+                expected={"name": "foo"},
             ),
         },
     )
@@ -103,9 +96,8 @@ def test_filter_banner_notifications_by_target(graphql, value, expected):
 
     # then:
     # - The response contains only the expected banner notifications
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected, content
+    assert len(response.edges) == 1, response
+    assert response.node(0) == expected, response
 
 
 @pytest.mark.parametrize(
@@ -113,15 +105,11 @@ def test_filter_banner_notifications_by_target(graphql, value, expected):
         {
             "Active": FilteringParams(
                 value=True,
-                expected=[
-                    {"node": {"name": "bar"}},
-                ],
+                expected={"name": "bar"},
             ),
             "Inactive": FilteringParams(
                 value=False,
-                expected=[
-                    {"node": {"name": "foo"}},
-                ],
+                expected={"name": "foo"},
             ),
         },
     )
@@ -154,9 +142,8 @@ def test_filter_banner_notifications_by_is_active(graphql, value, expected):
 
     # then:
     # - The response contains only the expected banner notifications
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected, content
+    assert len(response.edges) == 1, response
+    assert response.node(0) == expected, response
 
 
 @pytest.mark.parametrize(
@@ -213,9 +200,7 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
 
     # then:
     # - The response contains only the expected banner notifications
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected, content
+    assert response.edges == expected, response
 
 
 def test_fetch_single_banner_notification_by_id(graphql):
@@ -227,7 +212,7 @@ def test_fetch_single_banner_notification_by_id(graphql):
     user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
     graphql.force_login(user)
 
-    global_id = to_global_id(BannerNotificationType.__name__, notification_1.pk)
+    global_id = to_global_id(BannerNotificationNode.__name__, notification_1.pk)
 
     # when:
     # - The user requests a banner notification with the given id
@@ -244,6 +229,4 @@ def test_fetch_single_banner_notification_by_id(graphql):
 
     # then:
     # - The response contains the expected banner notification
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotification"]
-    assert notifications == {"name": "foo"}, content
+    assert response.first_query_object == {"name": "foo"}, response

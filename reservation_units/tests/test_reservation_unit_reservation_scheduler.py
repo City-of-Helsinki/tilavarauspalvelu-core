@@ -8,13 +8,12 @@ from django.test.testcases import TestCase
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
-from applications.models import ApplicationRoundStatus
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
-from reservations.models import STATE_CHOICES
+from reservations.choices import ReservationStateChoice
 from tests.factories import ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory, SpaceFactory
 from utils.test_utils import skip_long_running
 
@@ -47,14 +46,13 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
             begin=datetime.datetime(2022, 4, 15, 12, 00, tzinfo=DEFAULT_TIMEZONE),
             end=datetime.datetime(2022, 4, 15, 14, 00, tzinfo=DEFAULT_TIMEZONE),
             reservation_unit=[cls.reservation_unit],
-            state=STATE_CHOICES.CREATED,
+            state=ReservationStateChoice.CREATED.value,
         )
 
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
     def setUp(self, mock) -> None:
         mock.return_value = self.get_mocked_opening_hours()
         self.scheduler = ReservationUnitReservationScheduler(self.reservation_unit, opening_hours_end=self.DATES[2])
-        self.app_round.set_status(ApplicationRoundStatus.SENT)
 
     def get_mocked_opening_hours(self):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"

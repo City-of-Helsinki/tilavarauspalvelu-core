@@ -7,7 +7,7 @@ from freezegun import freeze_time
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import load_content, parametrize_helper
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -87,9 +87,7 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
 
     # then:
     # - The response contains the notifications in the expected order
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected
+    assert response.edges == expected, response
 
 
 @pytest.mark.parametrize(
@@ -148,9 +146,7 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
 
     # then:
     # - The response contains the notifications in the expected order
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected
+    assert response.edges == expected, response
 
 
 @pytest.mark.parametrize(
@@ -218,9 +214,7 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
 
     # then:
     # - The response contains the notifications in the expected order
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected
+    assert response.edges == expected, response
 
 
 @pytest.mark.parametrize(
@@ -288,9 +282,7 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
 
     # then:
     # - The response contains the notifications in the expected order
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected
+    assert response.edges == expected, response
 
 
 @pytest.mark.parametrize(
@@ -353,9 +345,7 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
 
     # then:
     # - The response contains the notifications in the expected order
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected
+    assert response.edges == expected, response
 
 
 @pytest.mark.parametrize(
@@ -418,6 +408,4 @@ def test_sort_banner_notifications_by_level(graphql, order_by, expected):
 
     # then:
     # - The response contains the notifications in the expected order
-    content = load_content(response.content)
-    notifications = content["data"]["bannerNotifications"]["edges"]
-    assert notifications == expected
+    assert response.edges == expected, response

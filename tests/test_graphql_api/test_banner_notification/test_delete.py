@@ -2,7 +2,6 @@ import pytest
 
 from common.models import BannerNotification
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import load_content
 
 # Applied to all tests
 pytestmark = [
@@ -36,25 +35,18 @@ def test_user_deletes_banner_notification(graphql):
     # - User tries to delete the banner notification
     response = graphql(
         MUTATION_QUERY,
-        variables={
-            "input": {
-                "pk": notification.pk,
-            }
+        input_data={
+            "pk": notification.pk,
         },
     )
 
     # then:
     # - The response contains the result of the deletion
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "deleteBannerNotification": {
-                "deleted": True,
-                "rowCount": 1,
-                "errors": None,
-            },
-        },
-    }
+    assert response.first_query_object == {
+        "deleted": True,
+        "rowCount": 1,
+        "errors": None,
+    }, response
 
 
 def test_primary_key_is_required_for_deleting(graphql):
@@ -67,60 +59,33 @@ def test_primary_key_is_required_for_deleting(graphql):
 
     # when:
     # - User tries to delete the banner notification
-    response = graphql(
-        MUTATION_QUERY,
-        variables={"input": {}},
-    )
+    response = graphql(MUTATION_QUERY, input_data={})
 
     # then:
-    # - The response contains an error about missing primary key in the input
-    content = load_content(response.content)
-    assert content == {
-        "errors": [
-            {
-                "locations": [{"column": 15, "line": 2}],
-                "message": "Variable '$input' got invalid value {}; Field 'pk' of "
-                "required type 'ID!' was not provided.",
-            },
-        ],
-    }
+    # - The response complains about the improper input
+    assert (
+        response.error_message()
+        == "Variable '$input' of required type 'BannerNotificationDeleteMutationInput!' was not provided."
+    )
 
 
 def test_user_tries_to_delete_non_existing_banner_notification(graphql):
     # given:
-    # - There is no draft banner notification in the system
+    # - There is no draft banner notifications in the system
     # - Notification manager is using the system
     assert BannerNotification.objects.count() == 0
     user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
     graphql.force_login(user)
 
     # when:
-    # - User tries to delete the banner notification
+    # - User tries to delete a banner notification
     response = graphql(
         MUTATION_QUERY,
-        variables={
-            "input": {
-                "pk": 1,
-            }
+        input_data={
+            "pk": 1,
         },
     )
 
     # then:
-    # - The response contains the result of the deletion
-    content = load_content(response.content)
-    assert content == {
-        "data": {
-            "deleteBannerNotification": {
-                "deleted": False,
-                "errors": [
-                    {
-                        "field": "nonFieldErrors",
-                        "messages": [
-                            "Object does not exist.",
-                        ],
-                    },
-                ],
-                "rowCount": 0,
-            }
-        }
-    }
+    # - The response complains about missing banner notification
+    assert response.field_error_messages("nonFieldErrors") == ["Object does not exist."]

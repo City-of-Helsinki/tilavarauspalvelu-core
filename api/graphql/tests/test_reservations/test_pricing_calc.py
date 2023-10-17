@@ -4,10 +4,10 @@ from decimal import Decimal
 from assertpy import assert_that
 from django.utils.timezone import get_default_timezone, utc
 
-from api.graphql.reservations.reservation_serializers.mixins import (
+from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
+from api.graphql.types.reservations.serializers.mixins import (
     ReservationPriceMixin,
 )
-from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from reservation_units.models import PriceUnit, PricingStatus, PricingType
 from tests.factories import ReservationUnitPricingFactory, TaxPercentageFactory
 

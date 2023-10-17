@@ -1,10 +1,10 @@
 from .ability_group import AbilityGroupFactory
 from .address import AddressFactory
 from .age_group import AgeGroupFactory
-from .application import ApplicationAggregateDataFactory, ApplicationFactory, ApplicationStatusFactory
-from .application_event import ApplicationEventFactory, ApplicationEventStatusFactory, EventReservationUnitFactory
-from .application_event_schedule import ApplicationEventScheduleFactory, ApplicationEventScheduleResultFactory
-from .application_round import ApplicationRoundFactory, ApplicationRoundStatusFactory
+from .application import ApplicationFactory
+from .application_event import ApplicationEventFactory, EventReservationUnitFactory
+from .application_event_schedule import ApplicationEventScheduleFactory
+from .application_round import ApplicationRoundFactory
 from .banner_notification import BannerNotificationFactory
 from .building import BuildingFactory
 from .city import CityFactory
@@ -42,7 +42,17 @@ from .reservation_unit import (
     ReservationUnitTypeFactory,
 )
 from .resource import ResourceFactory
-from .role import GeneralRoleChoiceFactory, GeneralRoleFactory, GeneralRolePermissionFactory
+from .role import (
+    GeneralRoleChoiceFactory,
+    GeneralRoleFactory,
+    GeneralRolePermissionFactory,
+    ServiceSectorRoleChoiceFactory,
+    ServiceSectorRoleFactory,
+    ServiceSectorRolePermissionFactory,
+    UnitRoleChoiceFactory,
+    UnitRoleFactory,
+    UnitRolePermissionFactory,
+)
 from .service import ServiceFactory
 from .service_sector import ServiceSectorFactory
 from .space import SpaceFactory
@@ -54,16 +64,17 @@ from .user import UserFactory
 __all__ = [
     "AbilityGroupFactory",
     "AddressFactory",
+    "ServiceSectorRoleChoiceFactory",
+    "ServiceSectorRoleFactory",
+    "ServiceSectorRolePermissionFactory",
+    "UnitRoleChoiceFactory",
+    "UnitRoleFactory",
+    "UnitRolePermissionFactory",
     "AgeGroupFactory",
-    "ApplicationAggregateDataFactory",
     "ApplicationEventFactory",
     "ApplicationEventScheduleFactory",
-    "ApplicationEventScheduleResultFactory",
-    "ApplicationEventStatusFactory",
     "ApplicationFactory",
     "ApplicationRoundFactory",
-    "ApplicationRoundStatusFactory",
-    "ApplicationStatusFactory",
     "BannerNotificationFactory",
     "BuildingFactory",
     "CityFactory",
