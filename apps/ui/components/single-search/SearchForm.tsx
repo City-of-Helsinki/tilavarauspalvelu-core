@@ -330,10 +330,10 @@ const SearchForm = ({
   const initialValues = {
     unit: "",
     equipments: "",
-    begin: "",
-    end: "",
-    after: null,
-    before: null,
+    dateBegin: "",
+    dateEnd: "",
+    timeBegin: null,
+    timeEnd: null,
     duration: null,
     minPersons: "",
     maxPersons: "",
@@ -353,10 +353,10 @@ const SearchForm = ({
     register("purposes");
     register("unit");
     register("equipments");
-    register("begin");
-    register("end");
-    register("after");
-    register("before");
+    register("dateBegin");
+    register("dateEnd");
+    register("timeBegin");
+    register("timeEnd");
     register("duration");
     register("minPersons");
     register("maxPersons");
@@ -393,10 +393,10 @@ const SearchForm = ({
         return equipmentsOptions.find((n) => n.value === value)?.label;
       case "duration":
         return durationOptions.find((n) => n.value === value)?.label;
-      case "begin":
-      case "end":
-      case "before":
-      case "after":
+      case "dateBegin":
+      case "dateEnd":
+      case "timeBegin":
+      case "timeEnd":
         return value;
       default:
         return "";
@@ -411,7 +411,6 @@ const SearchForm = ({
     }, {});
     onSearch(searchCriteria);
   };
-  console.log(formValues);
   const startDate = fromUIDate(String(formValues.dateBegin));
   console.log(`Sent startDate: ${startDate}`);
   const areOptionsLoaded =
@@ -461,8 +460,8 @@ const SearchForm = ({
           />
           <DateRangeWrapper>
             <DateRangePicker
-              startDate={fromUIDate(String(formValues.dateBegin))}
-              endDate={fromUIDate(String(formValues.dateEnd))}
+              startDate={fromUIDate(String(getValues("dateBegin")))}
+              endDate={fromUIDate(String(getValues("dateEnd")))}
               onChangeStartDate={(date: Date | null) =>
                 setValue("dateBegin", date != null ? toUIDate(date) : "")
               }
@@ -526,10 +525,10 @@ const SearchForm = ({
             showLessLabel={t("searchForm:showLessFilters")}
             maximumNumber={0}
             initiallyOpen={
-              !!formValues.maxPersons ||
-              !!formValues.minPersons ||
-              !!formValues.reservationUnitType ||
-              !!formValues.textSearch
+              formValues.reservationUnitType != null ||
+              formValues.minPersons != null ||
+              formValues.maxPersons != null ||
+              formValues.textSearch != null
             }
           >
             <TwInput>

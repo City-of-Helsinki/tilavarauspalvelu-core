@@ -1,4 +1,4 @@
-import React, { Children, useState } from "react";
+import React, {Children, useEffect, useState} from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { fontMedium } from "../common/typography";
@@ -55,7 +55,7 @@ const ShowAllContainer = ({
   children,
   ...rest
 }: ShowAllContainerProps) => {
-  const [showAll, setShowAll] = useState<boolean>(initiallyOpen != null);
+  const [showAll, setShowAll] = useState<boolean>(false);
   let buttonAlignCSS: string;
   switch (alignButton) {
     case "left":
@@ -67,6 +67,12 @@ const ShowAllContainer = ({
     default:
       buttonAlignCSS = "flex-end";
   }
+
+  // update the showAll state if the initiallyOpen prop changes
+  useEffect(() => {
+    setShowAll(initiallyOpen);
+  }, [initiallyOpen]);
+
   return (
     <div {...rest}>
       {renderAsUl ? (
