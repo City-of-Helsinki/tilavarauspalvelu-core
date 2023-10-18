@@ -1,4 +1,4 @@
-import { IconArrowRight, Notification as HDSNotification } from "hds-react";
+import { IconArrowRight, Notification } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -27,11 +27,24 @@ const SubHeading = styled.p`
   margin-top: var(--spacing-2-xs);
 `;
 
-const Notification = styled(HDSNotification)``;
-
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
 `;
+
+const prepareData = (
+  data: Application,
+  selectorData: Cell[][][]
+): Application => {
+  const applicationCopy = deepCopy(data);
+
+  applicationCopy.applicationEvents.forEach((applicationEvent, i) => {
+    applicationCopy.applicationEvents[i].applicationEventSchedules.length = 0;
+    cellsToApplicationEventSchedules(selectorData[i]).forEach((e) =>
+      applicationEvent.applicationEventSchedules.push(e)
+    );
+  });
+  return applicationCopy;
+};
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -82,20 +95,8 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     setSuccessMsg(t("application:Page2.notification.copyCells"));
   };
 
-  const prepareData = (data: Application): Application => {
-    const applicationCopy = deepCopy(data);
-
-    applicationCopy.applicationEvents.forEach((applicationEvent, i) => {
-      applicationCopy.applicationEvents[i].applicationEventSchedules.length = 0;
-      cellsToApplicationEventSchedules(selectorData[i]).forEach((e) =>
-        applicationEvent.applicationEventSchedules.push(e)
-      );
-    });
-    return applicationCopy;
-  };
-
   const onSubmit = () => {
-    const appToSave = prepareData(application);
+    const appToSave = prepareData(application, selectorData);
     if (
       appToSave.applicationEvents
         .map((ae) => ae.applicationEventSchedules.length > 0)

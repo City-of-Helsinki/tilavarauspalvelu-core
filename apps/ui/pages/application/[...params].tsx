@@ -15,7 +15,7 @@ import {
 } from "common/types/gql-types";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { saveApplication, getApplication } from "../../modules/api";
-import ApplicationPage from "../../components/application/ApplicationPage";
+import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import Page1 from "../../components/application/Page1";
 import Page2 from "../../components/application/Page2";
 import Page3 from "../../components/application/Page3";
@@ -82,11 +82,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   });
 
   const router = useRouter();
-  const {
-    query: { params },
-  } = router;
 
-  const [applicationId, pageId] = params as string[];
+  const [applicationId, pageId] = router.query?.params as string[];
 
   const applicationLoadingStatus = useAsync(async () => {
     // TODO check for NaN also
@@ -136,17 +133,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   const { reservationUnits, clearSelections } = useReservationUnitList();
 
-  const transform = (app: ApplicationType): ApplicationType => {
-    const appToSave = deepCopy(app);
-    appToSave.applicationEvents.forEach((ae, i) => {
-      const begin = ae.begin != null ? uiDateToApiDate(ae.begin) : null;
-      const end = ae.end != null ? uiDateToApiDate(ae.end) : null;
-      appToSave.applicationEvents[i].begin = begin ?? null;
-      appToSave.applicationEvents[i].end = end ?? null;
-    });
-    return appToSave;
-  };
-
   const saveWithEffect = async (
     appToSave: ApplicationType,
     postSave?: (string?: number) => void,
@@ -154,11 +140,22 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   ) => {
     let loadedApplication: ApplicationType;
 
+    const transformForSaving = (app: ApplicationType): ApplicationType => {
+      const tapp = deepCopy(app);
+      tapp.applicationEvents.forEach((ae, i) => {
+        const begin = ae.begin != null ? uiDateToApiDate(ae.begin) : null;
+        const end = ae.end != null ? uiDateToApiDate(ae.end) : null;
+        tapp.applicationEvents[i].begin = begin ?? null;
+        tapp.applicationEvents[i].end = end ?? null;
+      });
+      return tapp;
+    };
+
     try {
       const existingIds = appToSave.applicationEvents
         .filter((ae) => ae.id)
         .map((ae) => ae.id);
-      loadedApplication = await saveApplication(transform(appToSave));
+      loadedApplication = await saveApplication(transformForSaving(appToSave));
       const newEvent = loadedApplication.applicationEvents.filter(
         (ae) => existingIds.indexOf(ae.id) === -1
       );
@@ -177,30 +174,28 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     }
   };
 
-  const saveAndNavigate =
-    (path: string) => async (appToSave: ApplicationType) =>
-      saveWithEffect(appToSave, (id) => {
-        const prefix = `/application/${id}`;
-        const target = `${prefix}/${path}`;
-        clearSelections();
-        router.push(target);
-      });
+  const saveAndNavigate = (path: string) => (appToSave: ApplicationType) =>
+    saveWithEffect(appToSave, (id) => {
+      const prefix = `/application/${id}`;
+      const target = `${prefix}/${path}`;
+      clearSelections();
+      router.push(target);
+    });
 
   const applicationRound = applicationLoadingStatus.value?.applicationRound;
 
-  const addNewApplicationEvent = async () => {
-    const args = {} as {
-      [key: string]: string;
-    };
+  const addNewApplicationEvent = () => {
     const begin = applicationRound?.reservationPeriodBegin;
     const end = applicationRound?.reservationPeriodEnd;
-    if (applicationLoadingStatus.value) {
-      args.begin = begin ? apiDateToUIDate(begin) : "";
-      args.end = end ? apiDateToUIDate(end) : "";
-    }
+    const params = applicationLoadingStatus.value
+      ? {
+          begin: begin ? apiDateToUIDate(begin) : "",
+          end: end ? apiDateToUIDate(end) : "",
+        }
+      : {};
 
     dispatch({
-      params: args,
+      params,
       type: "addNewApplicationEvent",
     });
   };
@@ -233,7 +228,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   return (
     <>
       {pageId === "page1" && (
-        <ApplicationPage
+        <ApplicationPageWrapper
           key={rerender}
           application={state.application}
           overrideText={applicationRoundName}
@@ -264,10 +259,10 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
               setError={setError}
             />
           )}
-        </ApplicationPage>
+        </ApplicationPageWrapper>
       )}
       {pageId === "page2" && (
-        <ApplicationPage
+        <ApplicationPageWrapper
           application={state.application}
           translationKeyPrefix="application:Page2"
         >
@@ -275,10 +270,10 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
             application={state.application}
             onNext={saveAndNavigate("page3")}
           />
-        </ApplicationPage>
+        </ApplicationPageWrapper>
       )}
       {pageId === "page3" && (
-        <ApplicationPage
+        <ApplicationPageWrapper
           application={state.application}
           translationKeyPrefix="application:Page3"
         >
@@ -286,10 +281,10 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
             application={state.application}
             onNext={saveAndNavigate("preview")}
           />
-        </ApplicationPage>
+        </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (
-        <ApplicationPage
+        <ApplicationPageWrapper
           application={state.application}
           translationKeyPrefix="application:preview"
         >
@@ -298,17 +293,17 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
             onNext={saveAndNavigate("sent")}
             tos={tos}
           />
-        </ApplicationPage>
+        </ApplicationPageWrapper>
       )}
       {pageId === "view" && (
-        <ApplicationPage
+        <ApplicationPageWrapper
           application={state.application}
           translationKeyPrefix="application:view"
           headContent={applicationRoundName}
           hideStepper
         >
           <View application={state.application} tos={tos} />
-        </ApplicationPage>
+        </ApplicationPageWrapper>
       )}
       {pageId === "sent" && <Sent />}
 

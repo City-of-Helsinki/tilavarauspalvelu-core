@@ -1,21 +1,15 @@
-import { useQuery } from "@apollo/client";
-import { sortBy } from "lodash";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { useTranslation } from "next-i18next";
 import {
   Application,
   Application as ApplicationType,
   FormType,
 } from "common/types/common";
-import { Query } from "common/types/gql-types";
-import { CITIES } from "../../modules/queries/params";
-import { getTranslation, mapOptions } from "../../modules/util";
-import { CenterSpinner } from "../common/common";
 import CompanyForm from "./CompanyForm";
 import IndividualForm from "./IndividualForm";
 import OrganisationForm from "./OrganisationForm";
 import RadioButtons from "./RadioButtons";
+import { useOptions } from "@/hooks/useOptions";
 
 type Props = {
   application: ApplicationType;
@@ -35,30 +29,15 @@ const Wrapper = styled.div`
 `;
 
 const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
-  const { t } = useTranslation();
   const [activeForm, setActiveForm] = useState(
     (application.applicantType
       ? typeForm[application.applicantType]
       : undefined) as FormType
   );
 
-  const { data, error, loading } = useQuery<Query>(CITIES);
-  const cities =
-    data?.cities?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null)
-      .map((node) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      })) ?? [];
-  const homeCityOptions = mapOptions(sortBy(cities, "id"));
+  const { options } = useOptions();
+  const { cityOptions } = options;
 
-  if (error) {
-    return <div>{t("common:errors.dataError")}</div>;
-  }
-  if (loading) {
-    return <CenterSpinner />;
-  }
   return (
     <Wrapper>
       <RadioButtons activeForm={activeForm} setActiveForm={setActiveForm} />
@@ -67,7 +46,7 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
       ) : null}
       {activeForm === "organisation" ? (
         <OrganisationForm
-          homeCityOptions={homeCityOptions}
+          homeCityOptions={cityOptions}
           application={application}
           onNext={onNext}
         />

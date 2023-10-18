@@ -14,7 +14,10 @@ export type Action = {
   application?: Application;
   savedEventId?: number;
   eventId?: number;
-  params?: { [key: string]: string };
+  params?: {
+    begin?: string;
+    end?: string;
+  }
 };
 
 // TODO this is badly named and should be in the UI only (reducer)
@@ -72,9 +75,12 @@ const reducer = (state: EditorState, action: Action): EditorState => {
       return nextState;
     }
     case "load": {
+      if (!action.application) {
+        return state;
+      }
       const nextState = {
         ...state,
-        application: { ...(action.application as Application) },
+        application: action.application,
         loading: false,
       };
 

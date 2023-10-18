@@ -256,7 +256,7 @@ const Page1 = ({
           id="button__application--next"
           iconRight={<IconArrowRight />}
           disabled={nextButtonDisabled}
-          onClick={() => history.push(`${editorState.application.id}/page2`)}
+          onClick={() => history.push(`${application.id}/page2`)}
         >
           {t("common:next")}
         </MediumButton>

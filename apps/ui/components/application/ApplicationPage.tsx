@@ -42,7 +42,7 @@ const Main = styled.div`
   }
 `;
 
-const ApplicationPage = ({
+const ApplicationPageWrapper = ({
   application,
   translationKeyPrefix,
   headContent,
@@ -59,7 +59,15 @@ const ApplicationPage = ({
       </Head>
       <StyledContainer>
         <InnerContainer $hideStepper={hideStepper}>
-          {hideStepper ? <div /> : <Stepper application={application} />}
+          {hideStepper || application == null ? (
+            <div />
+          ) : (
+            <Stepper
+              applicationPk={application.id ?? 0}
+              applicationEvents={application.applicationEvents}
+              applicantType={application.applicantType}
+            />
+          )}
           <Main>{children}</Main>
         </InnerContainer>
       </StyledContainer>
@@ -67,4 +75,4 @@ const ApplicationPage = ({
   );
 };
 
-export default ApplicationPage;
+export { ApplicationPageWrapper };

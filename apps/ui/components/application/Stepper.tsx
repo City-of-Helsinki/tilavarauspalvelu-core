@@ -79,93 +79,110 @@ const Name = styled.div<{ $disabled: boolean; $current: boolean }>`
 
 // TODO only pass the props that are needed (not the whole application)
 type Props = {
-  application?: Application;
+  applicationPk: number;
+  applicationEvents: Application["applicationEvents"];
+  applicantType: Application["applicantType"];
 };
 
-const checkReady = (application?: Application, index?: number): boolean => {
-  if (!application) {
-    return false;
-  }
-  switch (index) {
+const checkReady = ({
+  applicationEvents,
+  applicantType,
+  step,
+}: {
+  applicationEvents: Application["applicationEvents"];
+  applicantType: Application["applicantType"];
+  step: number;
+}): boolean => {
+  switch (step) {
     case 0: {
       return (
-        application.applicationEvents.length > 0 &&
-        application.applicationEvents[0].id != null &&
-        application.applicationEvents[0].id > 0
+        applicationEvents.length > 0 &&
+        applicationEvents[0].id != null &&
+        applicationEvents[0].id > 0
       );
     }
     case 1: {
-      return (
-        application.applicationEvents?.[0]?.applicationEventSchedules.length > 0
-      );
+      return applicationEvents[0]?.applicationEventSchedules.length > 0;
     }
     case 2: {
-      return application.applicantType !== null;
+      return applicantType !== null;
     }
-
     default:
       return false;
   }
 };
 
-const Stepper = ({ application }: Props): JSX.Element => {
+const getMaxPage = ({
+  applicationEvents,
+  applicantType,
+}: {
+  applicationEvents: Application["applicationEvents"];
+  applicantType: Application["applicantType"];
+}) => {
+  let maxPage = 0;
+  if (applicationEvents.length > 0 && applicationEvents[0].id) {
+    maxPage = 1;
+  }
+  if (applicationEvents[0].applicationEventSchedules.length > 0) {
+    maxPage = 2;
+  }
+  if (applicantType != null) {
+    maxPage = 3;
+  }
+  return maxPage;
+};
+
+const Stepper = ({
+  applicationPk,
+  applicationEvents,
+  applicantType,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
   const { asPath, push } = useRouter();
-  let maxPage = -1;
-  if (application) {
-    maxPage = 0;
-    if (
-      application.applicationEvents.length > 0 &&
-      application.applicationEvents[0].id
-    ) {
-      maxPage = 1;
-    }
-    if (
-      application.applicationEvents?.[0]?.applicationEventSchedules.length > 0
-    ) {
-      maxPage = 2;
-    }
-    if (application.applicantType != null) {
-      maxPage = 3;
-    }
-  }
+  const maxPage = getMaxPage({ applicationEvents, applicantType });
   const pages = ["page1", "page2", "page3", "preview"];
+
+  const handleStepClick = (page: string) => {
+    const isCurrent = asPath.indexOf(page) !== -1;
+    if (!isCurrent) {
+      push(`/application/${applicationPk}/${page}`);
+    }
+  };
 
   return (
     <Container aria-label={t("common:applicationNavigationName")}>
-      <>
-        {pages.map((page, index) => {
-          const isCurrent = asPath.indexOf(page) !== -1;
-          const isDisabled = index > maxPage;
-          const isReady = checkReady(application, index);
-          return (
-            <StepContainer $disabled={index >= maxPage} key={page}>
-              <Step
-                key={page}
-                onClick={() => {
-                  if (!isCurrent) {
-                    push(`/application/${application?.id}/${page}`);
-                  }
-                }}
-                $clickable={!isDisabled && !isCurrent}
-                disabled={isDisabled || isCurrent}
+      {pages.map((page, step) => {
+        const isCurrent = asPath.indexOf(page) !== -1;
+        const isDisabled = step > maxPage;
+        const isReady = checkReady({
+          applicationEvents,
+          applicantType,
+          step,
+        });
+        return (
+          <StepContainer $disabled={step >= maxPage} key={page}>
+            <Step
+              key={page}
+              onClick={() => handleStepClick(page)}
+              $clickable={!isDisabled && !isCurrent}
+              disabled={isDisabled || isCurrent}
+            >
+              <Number
+                $disabled={isDisabled}
+                $current={isCurrent}
+                aria-hidden="true"
               >
-                <Number
-                  $disabled={isDisabled}
-                  $current={isCurrent}
-                  aria-hidden="true"
-                >
-                  {isReady ? <IconCheck aria-hidden="true" /> : index + 1}
-                </Number>
-                <Name $current={isCurrent} $disabled={isDisabled}>
-                  {t(`application:navigation.${page}`)}
-                </Name>
-              </Step>
-            </StepContainer>
-          );
-        })}
-      </>
+                {isReady ? <IconCheck aria-hidden="true" /> : step + 1}
+              </Number>
+              <Name $current={isCurrent} $disabled={isDisabled}>
+                {t(`application:navigation.${page}`)}
+              </Name>
+            </Step>
+          </StepContainer>
+        );
+      })}
     </Container>
   );
 };
+
 export default Stepper;
