@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
@@ -10,14 +10,14 @@ import {
   Tag as HdsTag,
 } from "hds-react";
 import { parseISO } from "date-fns";
+import { gql, useMutation } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
-import { type ApplicationType } from "common/types/gql-types";
+import type { Mutation, ApplicationType, MutationUpdateApplicationArgs } from "common/types/gql-types";
 import {
   isActive,
   applicationUrl,
   getReducedApplicationStatus,
 } from "@/modules/util";
-import { cancelApplication } from "@/modules/api";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
@@ -134,6 +134,7 @@ const StyledButton = styled(BlackButton).attrs({
 `;
 type Props = {
   application: ApplicationType;
+  // TODO refactor the action callback (it's not a good idea in general, but especially error callback)
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
@@ -153,13 +154,43 @@ const getApplicant = (application: ApplicationType, t: TFunction): string => {
   return "";
 };
 
+const CANCEL_APPLICATION_MUTATION = gql`
+  mutation ($input: ApplicationUpdateMutationInput!) {
+    updateApplication(input: $input) {
+      errors {
+        messages
+      }
+    }
+  }
+`;
+
 const ApplicationCard = ({
   application,
   actionCallback,
 }: Props): JSX.Element | null => {
-  const [state, setState] = useState<"ok" | "cancelling">("ok");
   const { t } = useTranslation();
   const router = useRouter();
+  const modal = useRef<ModalRef>();
+
+  const [mutation, { loading: isLoading }] = useMutation<Mutation, MutationUpdateApplicationArgs>(CANCEL_APPLICATION_MUTATION, {
+    variables: {
+      input: {
+        pk: application.pk ?? 0,
+        status: "cancelled",
+      },
+    },
+    onCompleted: () => {
+      actionCallback("cancel");
+    },
+    onError: () => {
+      actionCallback("error");
+    },
+  });
+
+  const cancel = async () => {
+    await mutation();
+  };
+
   const { applicationRound } = application;
   const editable = isActive(
     applicationRound.applicationPeriodBegin,
@@ -178,21 +209,6 @@ const ApplicationCard = ({
     C = GreenTag;
   }
 
-  const cancel = async () => {
-    setState("cancelling");
-    try {
-      if (!application.pk) {
-        throw new Error("No application pk");
-      }
-      await cancelApplication(application.pk);
-      actionCallback("cancel");
-    } catch (e) {
-      actionCallback("error");
-      setState("ok");
-    }
-  };
-
-  const modal = useRef<ModalRef>();
   return (
     <Card border key={application.pk} data-testid="applications__card--wrapper">
       <div>
@@ -212,7 +228,7 @@ const ApplicationCard = ({
         </Modified>
       </div>
       <Buttons>
-        {state === "cancelling" ? (
+        {isLoading ? (
           <CenterSpinner />
         ) : (
           <StyledButton
