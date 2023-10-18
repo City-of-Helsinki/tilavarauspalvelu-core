@@ -21,9 +21,7 @@ import Page2 from "../../components/application/Page2";
 import Page3 from "../../components/application/Page3";
 import Preview from "../../components/application/Preview";
 import View from "../../components/application/View";
-import applicationReducer, {
-  EditorState,
-} from "@/modules/application/applicationReducer";
+import applicationReducer from "@/modules/application/applicationReducer";
 import useReservationUnitList from "../../hooks/useReservationUnitList";
 import Sent from "../../components/application/Sent";
 import { CenterSpinner } from "../../components/common/common";
@@ -79,9 +77,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   const [state, dispatch] = useReducer(applicationReducer, {
     application: { id: 0 } as ApplicationType,
-    accordionStates: [],
+    applicationEvents: [],
     loading: true,
-  } as EditorState);
+  });
 
   const router = useRouter();
   const {
@@ -91,8 +89,10 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const [applicationId, pageId] = params as string[];
 
   const applicationLoadingStatus = useAsync(async () => {
+    // TODO check for NaN also
     if (applicationId && Number(applicationId)) {
       try {
+        // FIXME replace with GQL
         const application = await getApplication(Number(applicationId));
         // TODO this is weird, why are we not using Client side cache?
         const apolloClient = createApolloClient(undefined);
@@ -245,8 +245,14 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
                 reservationUnits as ReservationUnitType[]
               }
               applicationRound={applicationRound}
-              dispatch={dispatch}
-              editorState={state}
+              onDeleteUnsavedEvent={() => {
+                dispatch({
+                  type: "removeApplicationEvent",
+                  eventId: undefined,
+                });
+              }}
+              application={state.application}
+              savedEventId={state.savedEventId}
               save={({
                 application,
                 eventId,

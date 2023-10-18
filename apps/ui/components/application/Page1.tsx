@@ -1,5 +1,5 @@
 import { IconArrowRight, IconPlusCircle } from "hds-react";
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
@@ -11,10 +11,6 @@ import type {
   ApplicationRoundType,
   ReservationUnitType,
 } from "common/types/gql-types";
-import type {
-  Action,
-  EditorState,
-} from "@/modules/application/applicationReducer";
 import {
   apiDateToUIDate,
   deepCopy,
@@ -31,7 +27,8 @@ import ApplicationForm from "./ApplicationForm";
 type Props = {
   // TODO break this down to smaller pieces (only the required props)
   applicationRound: ApplicationRoundType;
-  editorState: EditorState;
+  application: Application;
+  savedEventId: number | undefined;
   selectedReservationUnits: ReservationUnitType[];
   save: ({
     application,
@@ -40,8 +37,7 @@ type Props = {
     application: Application;
     eventId?: number;
   }) => void;
-  // TODO wrap dispatch to specific callback functions
-  dispatch: React.Dispatch<Action>;
+  onDeleteUnsavedEvent: () => void;
   addNewApplicationEvent: () => void;
   setError: (error: string) => void;
 };
@@ -50,15 +46,14 @@ const Page1 = ({
   save,
   addNewApplicationEvent,
   applicationRound,
-  editorState,
-  dispatch,
+  application,
+  savedEventId,
+  onDeleteUnsavedEvent,
   selectedReservationUnits,
   setError,
 }: Props): JSX.Element | null => {
   const history = useRouter();
   const { t } = useTranslation();
-
-  const { application } = editorState;
 
   const unitsInApplicationRound = uniq(
     applicationRound.reservationUnits?.flatMap((resUnit) => resUnit?.unit?.pk)
@@ -95,6 +90,10 @@ const Page1 = ({
       ),
     },
   });
+
+  const [accordionStates, setAccordionStates] = useState<
+    { applicationEventId: number | undefined; isOpen: boolean }[]
+  >([]);
 
   const {
     formState: { errors },
@@ -169,61 +168,76 @@ const Page1 = ({
     }
   };
 
+  const isAccordianOpen = (applicationEventId: number | undefined) => {
+    const state = accordionStates.find(
+      (s) => s.applicationEventId === applicationEventId
+    );
+    return state?.isOpen ?? false;
+  };
+
+  const handleToggleAccordion = (applicationEventId: number | undefined) => {
+    const state = accordionStates.find(
+      (s) => s.applicationEventId === applicationEventId
+    );
+    if (state) {
+      setAccordionStates(
+        accordionStates.map((s) =>
+          s.applicationEventId === applicationEventId
+            ? { ...s, isOpen: !s.isOpen }
+            : s
+        )
+      );
+    } else {
+      setAccordionStates([
+        ...accordionStates,
+        { applicationEventId, isOpen: true },
+      ]);
+    }
+  };
+
+  // TODO why does this need an indx?
+  const handleDeleteEvent = (eventId: number | undefined, index: number) => {
+    if (!eventId) {
+      onDeleteUnsavedEvent();
+    } else {
+      onDeleteEvent(eventId, index);
+    }
+  };
+
   const addNewEventButtonDisabled =
     application.applicationEvents.filter((ae) => !ae.id).length > 0;
 
   const nextButtonDisabled =
     application.applicationEvents.length === 0 ||
     application.applicationEvents.filter((ae) => !ae.id).length > 0 ||
-    (form.formState.isDirty && !editorState.savedEventId);
+    (form.formState.isDirty && !savedEventId);
 
   return (
     <>
-      {application.applicationEvents.map((event, index) => {
-        return (
-          <ApplicationEvent
-            key={event.id || "NEW"}
-            form={form as unknown as ReturnType<typeof useForm>}
-            applicationEvent={event}
-            index={index}
-            applicationRound={applicationRound}
-            optionTypes={{
-              ...options,
-              purposeOptions,
-              unitOptions,
-            }}
-            selectedReservationUnits={selectedReservationUnits}
-            onSave={form.handleSubmit((app: Application) =>
-              onSubmit(app, event.id)
-            )}
-            onDeleteEvent={() => {
-              if (!event.id) {
-                dispatch({
-                  type: "removeApplicationEvent",
-                  eventId: undefined,
-                });
-              } else {
-                onDeleteEvent(event.id, index);
-              }
-            }}
-            onToggleAccordian={() => {
-              dispatch({
-                type: "toggleAccordionState",
-                eventId: event.id,
-              });
-            }}
-            isVisible={
-              editorState.accordionStates.filter(
-                (state) => state.applicationEventId === event.id && state.open
-              ).length > 0
-            }
-            applicationEventSaved={
-              editorState.savedEventId != null &&
-              editorState.savedEventId === event.id
-            }
-          />
-        );
-      })}
+      {application.applicationEvents.map((event, index) => (
+        <ApplicationEvent
+          key={event.id || "NEW"}
+          form={form as unknown as ReturnType<typeof useForm>}
+          applicationEvent={event}
+          index={index}
+          applicationRound={applicationRound}
+          optionTypes={{
+            ...options,
+            purposeOptions,
+            unitOptions,
+          }}
+          selectedReservationUnits={selectedReservationUnits}
+          onSave={form.handleSubmit((app: Application) =>
+            onSubmit(app, event.id)
+          )}
+          onDeleteEvent={() => handleDeleteEvent(event.id, index)}
+          onToggleAccordian={() => handleToggleAccordion(event.id)}
+          isVisible={isAccordianOpen(event.id)}
+          applicationEventSaved={
+            savedEventId != null && savedEventId === event.id
+          }
+        />
+      ))}
       {!addNewEventButtonDisabled && (
         <MediumButton
           id="addApplicationEvent"

@@ -12,7 +12,11 @@ import {
 import { parseISO } from "date-fns";
 import { gql, useMutation } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
-import type { Mutation, ApplicationType, MutationUpdateApplicationArgs } from "common/types/gql-types";
+import type {
+  Mutation,
+  ApplicationType,
+  MutationUpdateApplicationArgs,
+} from "common/types/gql-types";
 import {
   isActive,
   applicationUrl,
@@ -172,7 +176,10 @@ const ApplicationCard = ({
   const router = useRouter();
   const modal = useRef<ModalRef>();
 
-  const [mutation, { loading: isLoading }] = useMutation<Mutation, MutationUpdateApplicationArgs>(CANCEL_APPLICATION_MUTATION, {
+  const [mutation, { loading: isLoading }] = useMutation<
+    Mutation,
+    MutationUpdateApplicationArgs
+  >(CANCEL_APPLICATION_MUTATION, {
     variables: {
       input: {
         pk: application.pk ?? 0,

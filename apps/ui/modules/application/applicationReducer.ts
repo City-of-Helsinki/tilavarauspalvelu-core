@@ -3,13 +3,13 @@ import { Application, ApplicationEvent } from "common/types/common";
 import { defaultDuration } from "../const";
 import { deepCopy } from "../util";
 
-// TODO this is only used for the ApplicationEditor in UI
+// TODO remove load / save states from the reducer (use query / mutation state instead)
+// TODO don't modify the Application directly, add sepearate ApplicationEvents (the full type, not just the id)
 export type Action = {
   type:
     | "load"
     | "addNewApplicationEvent"
     | "save"
-    | "toggleAccordionState"
     | "removeApplicationEvent";
   application?: Application;
   savedEventId?: number;
@@ -18,16 +18,11 @@ export type Action = {
 };
 
 // TODO this is badly named and should be in the UI only (reducer)
-export type EditorState = {
+type EditorState = {
   loading: boolean;
   application: Application;
   savedEventId?: number;
-  accordionStates: AccordionState[];
-};
-
-export type AccordionState = {
-  applicationEventId: number | null; // null is used for non saved event
-  open: boolean;
+  applicationEvents: number[];
 };
 
 const applicationEvent = (
@@ -63,12 +58,7 @@ const reducer = (state: EditorState, action: Action): EditorState => {
           action?.params?.end
         )
       );
-      nextState.accordionStates = nextState.application.applicationEvents.map(
-        (ae) => ({
-          applicationEventId: ae.id as number,
-          open: !ae.id,
-        })
-      );
+      nextState.applicationEvents = nextState.application.applicationEvents.map((ae) => ae.id as number)
       return nextState;
     }
     case "removeApplicationEvent": {
@@ -78,12 +68,7 @@ const reducer = (state: EditorState, action: Action): EditorState => {
         nextState.application.applicationEvents.filter(
           (ae) => ae.id !== eventId
         );
-      nextState.accordionStates = nextState.application.applicationEvents.map(
-        (ae) => ({
-          applicationEventId: ae.id as number,
-          open: !ae.id,
-        })
-      );
+      nextState.applicationEvents = nextState.application.applicationEvents.map((ae) => ae.id as number);
       return nextState;
     }
     case "load": {
@@ -107,11 +92,8 @@ const reducer = (state: EditorState, action: Action): EditorState => {
         }
       }
 
-      nextState.accordionStates =
-        action.application?.applicationEvents.map((ae, _i, arr) => ({
-          applicationEventId: ae.id as number,
-          open: arr.length === 1, // auto open if only 1 event
-        })) || ([] as AccordionState[]);
+      nextState.applicationEvents =
+        action.application?.applicationEvents.map((ae, _i) => ae.id as number) ?? []
 
       return nextState;
     }
@@ -126,36 +108,8 @@ const reducer = (state: EditorState, action: Action): EditorState => {
         ...state,
         application: editedApplication,
         savedEventId: action.savedEventId,
-        accordionStates:
-          action.application?.applicationEvents.map((ae) => ({
-            applicationEventId: ae.id as number,
-            open: false,
-          })) || ([] as AccordionState[]),
+        applicationEvents: action.application?.applicationEvents.map((ae) => ae.id as number)
       };
-      return nextState;
-    }
-
-    case "toggleAccordionState": {
-      const nextState = {
-        ...state,
-        accordionStates: [
-          ...state.accordionStates.filter(
-            (accordionState) =>
-              accordionState.applicationEventId !== action.eventId
-          ),
-        ].concat([
-          ...state.accordionStates
-            .filter(
-              (accordionState) =>
-                accordionState.applicationEventId === action.eventId
-            )
-            .map((accordionState) => ({
-              ...accordionState,
-              open: !accordionState.open,
-            })),
-        ]),
-      };
-
       return nextState;
     }
 
