@@ -67,10 +67,10 @@ const Page1 = ({
         id: String(u.pk),
         name: getTranslation(u, "name"),
       })) ?? [];
+  // TODO does this work? mapOptions wasn't working in useOptions at least (old REST things)
   const unitOptions = mapOptions(units);
 
   const { options } = useOptions();
-  const { purposeOptions } = options;
 
   const form = useForm<Application>({
     mode: "onChange",
@@ -222,7 +222,6 @@ const Page1 = ({
           applicationRound={applicationRound}
           optionTypes={{
             ...options,
-            purposeOptions,
             unitOptions,
           }}
           selectedReservationUnits={selectedReservationUnits}
