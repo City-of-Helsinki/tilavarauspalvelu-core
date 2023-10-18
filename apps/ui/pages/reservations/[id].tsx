@@ -235,6 +235,9 @@ const Paragraph = styled.p`
 
 const ParagraphAlt = styled(Paragraph)`
   margin-bottom: 0;
+  & > span {
+    display: inline;
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -451,7 +454,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
       supportedFields.includes(field) && (
         <ParagraphAlt key={field}>
           {t(`reservationApplication:label.common.${field}`)}:{" "}
-          {getReservationValue(reservation, field) || "-"}
+          <span data-testid={`reservation__${field}`}>
+            {getReservationValue(reservation, field) || "-"}
+          </span>
         </ParagraphAlt>
       )
   );
@@ -465,31 +470,44 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
         {supportedFields.includes("reserveeOrganisationName") && (
           <ParagraphAlt>
             {t("reservations:organisationName")}:{" "}
-            {reservation.reserveeOrganisationName || "-"}
+            <span data-testid="reservation__reservee-organisation-name">
+              {reservation.reserveeOrganisationName || "-"}
+            </span>
           </ParagraphAlt>
         )}
         {supportedFields.includes("reserveeId") && (
           <ParagraphAlt>
-            {t("reservations:reserveeId")}: {reservation.reserveeId || "-"}
+            {t("reservations:reserveeId")}:
+            <span data-testid="reservation__reservee-id">
+              {reservation.reserveeId || "-"}
+            </span>
           </ParagraphAlt>
         )}
         {(supportedFields.includes("reserveeFirstName") ||
           supportedFields.includes("reserveeLastName")) && (
           <ParagraphAlt>
             {t("reservations:contactName")}:{" "}
-            {`${reservation.reserveeFirstName || ""} ${
-              reservation.reserveeLastName || ""
-            }`.trim()}
+            <span data-testid="reservation__reservee-name">
+              {`${reservation.reserveeFirstName || ""} ${
+                reservation.reserveeLastName || ""
+              }`.trim()}
+            </span>
           </ParagraphAlt>
         )}
         {supportedFields.includes("reserveePhone") && (
           <ParagraphAlt>
-            {t("reservations:contactPhone")}: {reservation.reserveePhone}
+            {t("reservations:contactPhone")}:
+            <span data-testid="reservation__reservee-phone">
+              {reservation.reserveePhone}
+            </span>
           </ParagraphAlt>
         )}
         {supportedFields.includes("reserveeEmail") && (
           <ParagraphAlt>
-            {t("reservations:contactEmail")}: {reservation.reserveeEmail}
+            {t("reservations:contactEmail")}:
+            <span data-testid="reservation__reservee-email">
+              {reservation.reserveeEmail}
+            </span>
           </ParagraphAlt>
         )}
       </>
@@ -499,19 +517,27 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
           supportedFields.includes("reserveeLastName")) && (
           <ParagraphAlt>
             {t("common:name")}:{" "}
-            {`${reservation.reserveeFirstName || ""} ${
-              reservation.reserveeLastName || ""
-            }`.trim()}
+            <span data-testid="reservation__reservee-name">
+              {`${reservation.reserveeFirstName || ""} ${
+                reservation.reserveeLastName || ""
+              }`.trim()}
+            </span>
           </ParagraphAlt>
         )}
         {supportedFields.includes("reserveePhone") && (
           <ParagraphAlt>
-            {t("common:phone")}: {reservation.reserveePhone || "-"}
+            {t("common:phone")}:
+            <span data-testid="reservation__reservee-phone">
+              {reservation.reserveePhone || "-"}
+            </span>
           </ParagraphAlt>
         )}
         {supportedFields.includes("reserveeEmail") && (
           <ParagraphAlt>
-            {t("common:email")}: {reservation.reserveeEmail || "-"}
+            {t("common:email")}:
+            <span data-testid="reservation__reservee-email">
+              {reservation.reserveeEmail || "-"}
+            </span>
           </ParagraphAlt>
         )}
       </>
@@ -544,25 +570,29 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
           ]}
         />
         <Columns>
-          <div>
-            <JustForDesktop>{bylineContent}</JustForDesktop>
-          </div>
+          <JustForDesktop>{bylineContent}</JustForDesktop>
           <div data-testid="reservation__content">
-            <Heading>
+            <Heading data-testid="reservation__name">
               {t("reservations:reservationName", { id: reservation.pk })}
             </Heading>
             <SubHeading>
-              <Link href={`${reservationUnitPath(reservationUnit.pk ?? 0)}`}>
+              <Link
+                data-testid="reservation__reservation-unit"
+                href={`${reservationUnitPath(reservationUnit.pk ?? 0)}`}
+              >
                 {getReservationUnitName(reservationUnit)}
               </Link>
-              <span>{timeString}</span>
+              <span data-testid="reservation__time">{timeString}</span>
             </SubHeading>
             <StatusContainer>
-              <ReservationStatus state={reservation.state} />
+              <ReservationStatus
+                data-testid="reservation__status"
+                state={reservation.state}
+              />
               {normalizedOrderStatus && (
                 <ReservationOrderStatus
                   orderStatus={normalizedOrderStatus}
-                  data-testid="reservation__card--order-status-desktop"
+                  data-testid="reservation__status"
                 />
               )}
             </StatusContainer>

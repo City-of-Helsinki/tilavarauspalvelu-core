@@ -73,7 +73,8 @@ const StatusContainer = styled.div`
   align-items: flex-start;
 `;
 
-const Name = styled.span`
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const Name = styled.span.attrs({ "data-testid": "reservation-card__name" })`
   font-size: var(--fontsize-heading-m);
   font-family: var(--font-bold);
   font-weight: 700;
@@ -228,11 +229,11 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
       {orderStatus != null && (
         <ReservationOrderStatus
           orderStatus={orderStatus}
-          data-testid={`reservation__card--order-status-${statusType}`}
+          data-testid={`reservation-card__order-status-${statusType}`}
         />
       )}
       <ReservationStatus
-        data-testid={`reservation__card--status-${statusType}`}
+        data-testid={`reservation-card__status-${statusType}`}
         state={state}
       />
     </StatusContainer>
@@ -240,7 +241,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
 
   const name = reservationUnit ? getTranslation(reservationUnit, "name") : "-";
   return (
-    <Container data-testid="reservation__card--container">
+    <Container data-testid="reservation-card__container">
       <Image
         alt={name}
         src={
@@ -261,7 +262,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
         </Top>
         <Bottom>
           <Props>
-            <TimeStrip data-testid="reservation__card--time">
+            <TimeStrip data-testid="reservation-card__time">
               {timeStripContent}
             </TimeStrip>
             <JustForMobile
@@ -277,7 +278,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
             <Price
               icon={<IconGlyphEuro aria-label={t("reservationUnit:price")} />}
               text={price}
-              data-testid="reservation__card--price"
+              data-testid="reservation-card__price"
             />
           </Props>
           <Actions>

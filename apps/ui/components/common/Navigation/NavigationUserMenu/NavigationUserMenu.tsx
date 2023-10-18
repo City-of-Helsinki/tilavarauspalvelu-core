@@ -126,6 +126,7 @@ const NavigationUserMenu = () => {
           onClick={() =>
             router.push(item.path, item.path, { locale: router.locale })
           }
+          data-testid={`navigation__user-${item.title}`}
         >
           {t(`navigation:Item.${item.title}`)}
         </NavigationUserMenuItem>
@@ -135,6 +136,7 @@ const NavigationUserMenu = () => {
         onClick={signOut}
         icon={<IconSignout aria-hidden />}
         label={t("common:logout")}
+        data-testid="navigation__user-logout"
         $divider
       />
     </StyledUserMenu>
