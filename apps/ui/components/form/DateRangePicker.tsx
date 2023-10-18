@@ -75,7 +75,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     const endDateIsValid = isValidDateString(internalEndDateString);
     const startDateObj = parse(internalStartDateString, "d.M.yyyy", new Date());
     const endDateObj = parse(internalEndDateString, "d.M.yyyy", new Date());
-    console.log(startDateObj, endDateObj);
     if (
       startDateIsValid &&
       endDateIsValid &&

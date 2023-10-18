@@ -375,7 +375,6 @@ const SearchForm = ({
           : formValues[p as keyof FormValues]
       )
     );
-    console.log(getValues());
   }, [formValues, setValue]);
 
   const getFormSubValueLabel = (
@@ -411,8 +410,6 @@ const SearchForm = ({
     }, {});
     onSearch(searchCriteria);
   };
-  const startDate = fromUIDate(String(formValues.dateBegin));
-  console.log(`Sent startDate: ${startDate}`);
   const areOptionsLoaded =
     !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
   return (
