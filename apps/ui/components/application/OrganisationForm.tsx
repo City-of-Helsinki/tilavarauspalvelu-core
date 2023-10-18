@@ -10,9 +10,9 @@ import {
   Address,
   OptionType,
 } from "common/types/common";
-import { deepCopy, applicationErrorText } from "@/modules/util";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
+import { deepCopy, applicationErrorText } from "@/modules/util";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
@@ -38,12 +38,15 @@ type FormValues = {
   homeCityId: number | null;
 };
 
-const prepareData = (application: Application, data: FormValues, isRegistered: boolean, hasBillingAddress: boolean): Application => {
+const prepareData = (
+  application: Application,
+  data: FormValues,
+  isRegistered: boolean,
+  hasBillingAddress: boolean
+): Application => {
   const applicationCopy = deepCopy(application);
 
-  applicationCopy.applicantType = isRegistered
-    ? "association"
-    : "community";
+  applicationCopy.applicantType = isRegistered ? "association" : "community";
 
   applicationCopy.contactPerson = data.contactPerson;
   applicationCopy.organisation = data.organisation;
@@ -73,9 +76,9 @@ const OrganisationForm = ({
 
   const form = useForm<FormValues>({
     defaultValues: {
-      organisation: (application.organisation ?? {}),
-      contactPerson: (application.contactPerson ?? {}),
-      billingAddress: (application.billingAddress ?? {}),
+      organisation: application.organisation ?? {},
+      contactPerson: application.contactPerson ?? {},
+      billingAddress: application.billingAddress ?? {},
       homeCityId: application.homeCityId,
     },
   });
@@ -104,9 +107,13 @@ const OrganisationForm = ({
     }
   }, [hasRegistration, register, unregister]);
 
-
   const onSubmit = (data: FormValues): void => {
-    const appToSave = prepareData(application, data, hasRegistration, hasBillingAddress);
+    const appToSave = prepareData(
+      application,
+      data,
+      hasRegistration,
+      hasBillingAddress
+    );
     onNext(appToSave);
   };
 

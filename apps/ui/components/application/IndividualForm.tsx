@@ -24,7 +24,10 @@ type FormValues = {
   additionalInformation: string;
 };
 
-const prepareData = (application: Application, data: FormValues): Application => {
+const prepareData = (
+  application: Application,
+  data: FormValues
+): Application => {
   const applicationCopy = deepCopy(application);
 
   applicationCopy.applicantType = "individual";
@@ -50,8 +53,8 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
 
   const form = useForm<FormValues>({
     defaultValues: {
-      contactPerson: (application.contactPerson ?? {}),
-      billingAddress: (application.billingAddress ?? {}),
+      contactPerson: application.contactPerson ?? {},
+      billingAddress: application.billingAddress ?? {},
       additionalInformation: application.additionalInformation,
     },
   });

@@ -2,8 +2,6 @@ node_modules
 dist
 build
 public
-next-env.d.ts
-gql-types.ts
 setupTests.ts
 # ignore tests till they work with TS
 *.test.*

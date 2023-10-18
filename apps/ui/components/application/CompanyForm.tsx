@@ -8,8 +8,8 @@ import {
   ContactPerson,
   Organisation,
 } from "common/types/common";
-import { deepCopy, applicationErrorText } from "@/modules/util";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
+import { deepCopy, applicationErrorText } from "@/modules/util";
 import { FormSubHeading, TwoColumnContainer } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
@@ -27,7 +27,11 @@ type FormValues = {
 };
 
 // TODO hasBillingAddress can be removed by using the form field
-const prepareData = (application: Application, data: FormValues, hasBillingAddress: boolean): Application => {
+const prepareData = (
+  application: Application,
+  data: FormValues,
+  hasBillingAddress: boolean
+): Application => {
   const applicationCopy = deepCopy(application);
   applicationCopy.applicantType = "company";
 
@@ -54,9 +58,9 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
 
   const form = useForm<FormValues>({
     defaultValues: {
-      organisation: (application.organisation ?? {}),
-      contactPerson: (application.contactPerson ?? {}),
-      billingAddress: (application.billingAddress ?? {}),
+      organisation: application.organisation ?? {},
+      contactPerson: application.contactPerson ?? {},
+      billingAddress: application.billingAddress ?? {},
     },
   });
 

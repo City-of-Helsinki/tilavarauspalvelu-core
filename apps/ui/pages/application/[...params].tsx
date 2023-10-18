@@ -6,7 +6,10 @@ import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import i18next from "i18next";
-import { ApplicationEvent, Application as ApplicationType } from "common/types/common";
+import {
+  ApplicationEvent,
+  Application as ApplicationType,
+} from "common/types/common";
 import {
   Query,
   QueryApplicationRoundsArgs,
@@ -100,9 +103,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   const router = useRouter();
   const [error, setError] = useState<string | null>();
-  const [localApplication, setLocalApplication] = useState<ApplicationType | null>(
-    null
-  );
+  const [localApplication, setLocalApplication] =
+    useState<ApplicationType | null>(null);
 
   const [applicationId, pageId] = router.query?.params as string[];
 
@@ -120,7 +122,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         );
       */
     }
-  }
+  };
 
   const applicationLoadingStatus = useAsync(async () => {
     // TODO check for NaN also
@@ -174,7 +176,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     };
 
     try {
-      const savedApplication = await saveApplication(transformForSaving(appToSave));
+      const savedApplication = await saveApplication(
+        transformForSaving(appToSave)
+      );
       // TODO do a refetch here instead of cache modification (after moving to fetch hook)
       return savedApplication.id;
     } catch (e) {
@@ -183,18 +187,20 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     }
   };
 
-  const saveAndNavigate = (path: string) => async (appToSave: ApplicationType) => {
-    const id = await handleSave(appToSave);
-    const prefix = `/application/${id}`;
-    const target = `${prefix}/${path}`;
-    clearSelections();
-    router.push(target);
-  };
+  const saveAndNavigate =
+    (path: string) => async (appToSave: ApplicationType) => {
+      const id = await handleSave(appToSave);
+      const prefix = `/application/${id}`;
+      const target = `${prefix}/${path}`;
+      clearSelections();
+      router.push(target);
+    };
 
   const applicationRound = applicationLoadingStatus.value?.applicationRound;
 
   const [localApplicationEvents, setLocalApplicationEvents] = useState<
-    ApplicationEvent[]> ([]);
+    ApplicationEvent[]
+  >([]);
 
   useEffect(() => {
     if (localApplication?.id) {
@@ -202,10 +208,18 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     }
   }, [localApplication]);
 
+  // Modify the laoded application to include localchanges
+  const application = localApplication
+    ? {
+        ...localApplication,
+        applicationEvents: localApplicationEvents,
+      }
+    : undefined;
+
   const handleRemoveUnsavedApplicationEvent = () => {
     // TODO can we be sure that the last element is the new one? for now at least we can
     setLocalApplicationEvents((prev) => prev.slice(0, -1));
-  }
+  };
 
   const handleNewApplicationEvent = () => {
     const begin = applicationRound?.reservationPeriodBegin;
@@ -218,7 +232,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       : {};
     setLocalApplicationEvents((prev) => [
       ...prev,
-      createApplicationEvent(application?.id, params?.begin, params?.end)
+      createApplicationEvent(application?.id, params?.begin, params?.end),
     ]);
     // TODO do we need to keep this also?
     // nextState.applicationEvents = nextState.application.applicationEvents.map((ae) => ae.id as number)
@@ -230,7 +244,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     appRound != null ? getTranslation(appRound, "name") : "-";
 
   // TODO use hook and loading state from it
-  const ready = true // !applicationLoadingStatus.loading && state.loading === false;
+  const ready = true; // !applicationLoadingStatus.loading && state.loading === false;
 
   if (!ready) {
     return error ? (
@@ -250,15 +264,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   const rerender = localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
 
-  // Modify the laoded application to include localchanges
-  const application = localApplication ? {
-    ...localApplication,
-    applicationEvents: localApplicationEvents,
-  } : undefined;
-
   // For now FIXME (we need special handling for the first element)
   // or we need checks down the line to handle 0 length arrays
-  if (!application || application.applicationEvents.length === 0 ) {
+  if (!application || application.applicationEvents.length === 0) {
     return null;
   }
 
@@ -281,7 +289,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
               application={application}
               // TODO what is the purpose of this?
               savedEventId={0} // state.savedEventId}
-              save={({ application }: { application: ApplicationType }) => handleSave(application)}
+              save={(data) => handleSave(data.application)}
               addNewApplicationEvent={handleNewApplicationEvent}
               setError={setError}
             />
@@ -293,10 +301,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           application={application}
           translationKeyPrefix="application:Page2"
         >
-          <Page2
-            application={application}
-            onNext={saveAndNavigate("page3")}
-          />
+          <Page2 application={application} onNext={saveAndNavigate("page3")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "page3" && (
@@ -311,7 +316,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (
-       <ApplicationPageWrapper
+        <ApplicationPageWrapper
           application={application}
           translationKeyPrefix="application:preview"
         >
