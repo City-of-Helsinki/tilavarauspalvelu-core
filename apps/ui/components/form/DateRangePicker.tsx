@@ -2,7 +2,7 @@ import { parse } from "date-fns";
 import isBefore from "date-fns/isBefore";
 import isValidDate from "date-fns/isValid";
 import { DateInput } from "hds-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { toUIDate } from "common/src/common/util";
@@ -108,6 +108,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [internalStartDateString, internalEndDateString, setErrors]);
 
+  useEffect(() => {
+    setInternalStartDateString(initDate(startDate));
+    setInternalEndDateString(initDate(endDate));
+  }, [startDate, endDate]);
   const handleStartDateValidation = (e: React.FocusEvent<HTMLInputElement>) => {
     setErrors({
       ...errors,
