@@ -1,10 +1,7 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
 import applyCaseMiddleware from "axios-case-converter";
 import { getCookie } from "typescript-cookie";
-import {
-  Application,
-  ReservationUnit,
-} from "common/types/common";
+import { type Application } from "common/types/common";
 import { REST_API_URL } from "./const";
 import { ApiError } from "./ApiError";
 
@@ -109,12 +106,6 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
     method: "post",
     data,
     validateStatus,
-  });
-}
-
-export function getReservationUnit(id: number): Promise<ReservationUnit> {
-  return apiGet<ReservationUnit>({
-    path: `reservation_unit/${id}`,
   });
 }
 

@@ -157,7 +157,7 @@ const Page1 = ({
     if (otherEventsAreValid) {
       const appToSave = {
         ...prepareData(form.getValues()),
-        status: "draft" as const
+        status: "draft" as const,
       };
       appToSave.applicationEvents = appToSave.applicationEvents.filter(
         (ae) => ae.id !== eventId
