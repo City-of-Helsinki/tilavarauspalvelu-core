@@ -1,11 +1,12 @@
-import React, { useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAsync } from "react-use";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Application as ApplicationType } from "common/types/common";
+import i18next from "i18next";
+import { ApplicationEvent, Application as ApplicationType } from "common/types/common";
 import {
   Query,
   QueryApplicationRoundsArgs,
@@ -16,12 +17,12 @@ import {
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { saveApplication, getApplication } from "../../modules/api";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
+import { defaultDuration } from "@/modules/const";
 import Page1 from "../../components/application/Page1";
 import Page2 from "../../components/application/Page2";
 import Page3 from "../../components/application/Page3";
 import Preview from "../../components/application/Preview";
 import View from "../../components/application/View";
-import applicationReducer from "@/modules/application/applicationReducer";
 import useReservationUnitList from "../../hooks/useReservationUnitList";
 import Sent from "../../components/application/Sent";
 import { CenterSpinner } from "../../components/common/common";
@@ -66,24 +67,60 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
+const createApplicationEvent = (
+  applicationId?: number,
+  begin?: string,
+  end?: string
+): ApplicationEvent => ({
+  // TODO this is bad, use the hook instead (or empty / undefined and default value in the Page1)
+  // it's bad because the translation might not be loaded yet when this is shown
+  // useTranslation from next-i18next handles translation loading automatically
+  name: i18next.t("Application.Page1.applicationEventName"),
+  minDuration: defaultDuration,
+  maxDuration: defaultDuration,
+  eventsPerWeek: 1,
+  numPersons: null,
+  ageGroupId: null,
+  purposeId: null,
+  abilityGroupId: null,
+  applicationId: applicationId || 0,
+  begin: begin || null,
+  end: end || null,
+  biweekly: false,
+  eventReservationUnits: [],
+  applicationEventSchedules: [],
+  status: "created",
+});
+
 type Props = {
   tos: TermsOfUseType[];
 };
 
 const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-
-  const [error, setError] = useState<string | null>();
-
-  const [state, dispatch] = useReducer(applicationReducer, {
-    application: { id: 0 } as ApplicationType,
-    applicationEvents: [],
-    loading: true,
-  });
-
   const router = useRouter();
+  const [error, setError] = useState<string | null>();
+  const [localApplication, setLocalApplication] = useState<ApplicationType | null>(
+    null
+  );
 
   const [applicationId, pageId] = router.query?.params as string[];
+
+  const handleLoad = (application: ApplicationType) => {
+    if (application != null) {
+      setLocalApplication(application);
+      /*  this is silly, we should have a better way to deal with new applications
+      if (application.applicationEvents?.length < 1) {
+        nextState.application.applicationEvents.push(
+          applicationEvent(
+            action.application?.id,
+            action?.params?.begin,
+            action?.params?.end
+          )
+        );
+      */
+    }
+  }
 
   const applicationLoadingStatus = useAsync(async () => {
     // TODO check for NaN also
@@ -113,16 +150,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
             application.applicationEvents[i].begin = apiDateToUIDate(ae.begin);
           }
         });
-        const begin = applicationRound?.reservationPeriodBegin;
-        const end = applicationRound?.reservationPeriodEnd;
-        dispatch({
-          type: "load",
-          application,
-          params: {
-            begin: begin ? apiDateToUIDate(begin) : "",
-            end: end ? apiDateToUIDate(end) : "",
-          },
-        });
+        handleLoad(application);
         return { application, applicationRound };
       } catch (e) {
         setError(`${t("common:error.dataError")}`);
@@ -133,13 +161,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   const { reservationUnits, clearSelections } = useReservationUnitList();
 
-  const saveWithEffect = async (
-    appToSave: ApplicationType,
-    postSave?: (string?: number) => void,
-    eventId?: number
-  ) => {
-    let loadedApplication: ApplicationType;
-
+  const handleSave = async (appToSave: ApplicationType) => {
     const transformForSaving = (app: ApplicationType): ApplicationType => {
       const tapp = deepCopy(app);
       tapp.applicationEvents.forEach((ae, i) => {
@@ -152,39 +174,40 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     };
 
     try {
-      const existingIds = appToSave.applicationEvents
-        .map((ae) => ae.id)
-        .filter((id): id is number => id != null);
-      loadedApplication = await saveApplication(transformForSaving(appToSave));
-      const newEvent = loadedApplication.applicationEvents.filter(
-        (ae) => ae.id != null && existingIds.indexOf(ae.id) === -1
-      );
-      dispatch({
-        type: "save",
-        application: loadedApplication,
-        savedEventId: eventId || (newEvent.length && newEvent[0].id) || 0,
-      });
-
-      if (postSave) {
-        postSave(loadedApplication.id);
-      }
+      const savedApplication = await saveApplication(transformForSaving(appToSave));
+      // TODO do a refetch here instead of cache modification (after moving to fetch hook)
+      return savedApplication.id;
     } catch (e) {
       setError(`${t("application:error.saveFailed")}`);
       throw e;
     }
   };
 
-  const saveAndNavigate = (path: string) => (appToSave: ApplicationType) =>
-    saveWithEffect(appToSave, (id) => {
-      const prefix = `/application/${id}`;
-      const target = `${prefix}/${path}`;
-      clearSelections();
-      router.push(target);
-    });
+  const saveAndNavigate = (path: string) => async (appToSave: ApplicationType) => {
+    const id = await handleSave(appToSave);
+    const prefix = `/application/${id}`;
+    const target = `${prefix}/${path}`;
+    clearSelections();
+    router.push(target);
+  };
 
   const applicationRound = applicationLoadingStatus.value?.applicationRound;
 
-  const addNewApplicationEvent = () => {
+  const [localApplicationEvents, setLocalApplicationEvents] = useState<
+    ApplicationEvent[]> ([]);
+
+  useEffect(() => {
+    if (localApplication?.id) {
+      setLocalApplicationEvents(localApplication.applicationEvents);
+    }
+  }, [localApplication]);
+
+  const handleRemoveUnsavedApplicationEvent = () => {
+    // TODO can we be sure that the last element is the new one? for now at least we can
+    setLocalApplicationEvents((prev) => prev.slice(0, -1));
+  }
+
+  const handleNewApplicationEvent = () => {
     const begin = applicationRound?.reservationPeriodBegin;
     const end = applicationRound?.reservationPeriodEnd;
     const params = applicationLoadingStatus.value
@@ -193,11 +216,12 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           end: end ? apiDateToUIDate(end) : "",
         }
       : {};
-
-    dispatch({
-      params,
-      type: "addNewApplicationEvent",
-    });
+    setLocalApplicationEvents((prev) => [
+      ...prev,
+      createApplicationEvent(application?.id, params?.begin, params?.end)
+    ]);
+    // TODO do we need to keep this also?
+    // nextState.applicationEvents = nextState.application.applicationEvents.map((ae) => ae.id as number)
   };
 
   const appRound =
@@ -205,7 +229,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const applicationRoundName =
     appRound != null ? getTranslation(appRound, "name") : "-";
 
-  const ready = !applicationLoadingStatus.loading && state.loading === false;
+  // TODO use hook and loading state from it
+  const ready = true // !applicationLoadingStatus.loading && state.loading === false;
 
   if (!ready) {
     return error ? (
@@ -223,9 +248,20 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     );
   }
 
-  const rerender = state.application.applicationEvents.length; // rerender every time event count is changed so that form state stays in sync
+  const rerender = localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
 
-  const application = state.application;
+  // Modify the laoded application to include localchanges
+  const application = localApplication ? {
+    ...localApplication,
+    applicationEvents: localApplicationEvents,
+  } : undefined;
+
+  // For now FIXME (we need special handling for the first element)
+  // or we need checks down the line to handle 0 length arrays
+  if (!application || application.applicationEvents.length === 0 ) {
+    return null;
+  }
+
   return (
     <>
       {pageId === "page1" && (
@@ -241,22 +277,12 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
                 reservationUnits as ReservationUnitType[]
               }
               applicationRound={applicationRound}
-              onDeleteUnsavedEvent={() => {
-                dispatch({
-                  type: "removeApplicationEvent",
-                  eventId: undefined,
-                });
-              }}
+              onDeleteUnsavedEvent={handleRemoveUnsavedApplicationEvent}
               application={application}
-              savedEventId={state.savedEventId}
-              save={({
-                application,
-                eventId,
-              }: {
-                application: ApplicationType;
-                eventId?: number;
-              }) => saveWithEffect(application, undefined, eventId)}
-              addNewApplicationEvent={addNewApplicationEvent}
+              // TODO what is the purpose of this?
+              savedEventId={0} // state.savedEventId}
+              save={({ application }: { application: ApplicationType }) => handleSave(application)}
+              addNewApplicationEvent={handleNewApplicationEvent}
               setError={setError}
             />
           )}
