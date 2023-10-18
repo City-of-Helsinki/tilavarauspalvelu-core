@@ -39,5 +39,5 @@ class ResourceDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
     model = Resource
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         return None

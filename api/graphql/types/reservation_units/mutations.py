@@ -74,7 +74,7 @@ class EquipmentDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
     model = Equipment
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         return None
 
 
@@ -104,7 +104,7 @@ class EquipmentCategoryDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
     model = EquipmentCategory
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         return None
 
 
@@ -256,5 +256,5 @@ class ReservationUnitImageDeleteMutation(OldAuthDeleteMutation, ClientIDMutation
     model = ReservationUnitImage
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         return None

@@ -58,7 +58,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         else:
             return PaymentType.ONLINE
 
-    def validate(self, data):
+    def validate(self, data, prefill_from_profile=False):
         data = super().validate(data)
 
         if self.instance.payment_order.exists():
