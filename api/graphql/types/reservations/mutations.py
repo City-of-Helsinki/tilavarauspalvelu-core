@@ -169,7 +169,7 @@ class ReservationDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
     model = Reservation
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         reservation = get_object_or_404(Reservation, pk=input.get("pk", None))
         if reservation.state not in (
             ReservationStateChoice.CREATED.value,

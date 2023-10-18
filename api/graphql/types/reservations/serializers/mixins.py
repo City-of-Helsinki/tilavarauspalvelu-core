@@ -74,8 +74,8 @@ class ReservationPriceMixin:
 
         return False
 
+    @staticmethod
     def calculate_price(
-        self,
         begin: datetime.datetime,
         end: datetime.datetime,
         reservation_units: Iterable[ReservationUnit],
@@ -235,7 +235,8 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.OVERLAPPING_RESERVATIONS,
             )
 
-    def check_opening_hours(self, scheduler, begin, end):
+    @staticmethod
+    def check_opening_hours(scheduler, begin, end):
         is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
         if not scheduler.reservation_unit.allow_reservations_without_opening_hours and not is_reservation_unit_open:
             raise ValidationErrorWithCode(
@@ -243,7 +244,8 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_UNIT_IS_NOT_OPEN,
             )
 
-    def check_reservation_duration(self, reservation_unit: ReservationUnit, begin, end):
+    @staticmethod
+    def check_reservation_duration(reservation_unit: ReservationUnit, begin, end):
         duration = end - begin
         if (
             reservation_unit.max_reservation_duration
@@ -326,7 +328,8 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_OVERLAP,
             )
 
-    def check_reservation_start_time(self, scheduler, begin):
+    @staticmethod
+    def check_reservation_start_time(scheduler, begin):
         if scheduler.reservation_unit.allow_reservations_without_opening_hours:
             return
 
@@ -346,7 +349,8 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
             )
 
-    def check_reservation_days_before(self, begin, reservation_unit):
+    @staticmethod
+    def check_reservation_days_before(begin, reservation_unit):
         now = datetime.datetime.now().astimezone(get_default_timezone())
         start_of_the_day = datetime.datetime.combine(now, datetime.time.min).astimezone(get_default_timezone())
 
@@ -366,7 +370,8 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
             )
 
-    def check_open_application_round(self, scheduler, begin, end):
+    @staticmethod
+    def check_open_application_round(scheduler, begin, end):
         open_app_round = scheduler.get_conflicting_open_application_round(begin.date(), end.date())
 
         if open_app_round:
@@ -375,7 +380,8 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_UNIT_IN_OPEN_ROUND,
             )
 
-    def check_reservation_intervals_for_staff_reservation(self, reservation_unit, begin):
+    @staticmethod
+    def check_reservation_intervals_for_staff_reservation(reservation_unit, begin):
         interval_to_minutes = {
             ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
             ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,

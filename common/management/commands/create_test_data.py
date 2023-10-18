@@ -1410,7 +1410,7 @@ def _create_pricings(
     reservation_units: list[ReservationUnit],
 ) -> list[ReservationUnitPricing]:
     tax_percentages = _create_tax_percentages()
-    zero_tax = next(tax for tax in tax_percentages if float(tax.value) == 0.0)
+    zero_tax = next(tax for tax in tax_percentages if int(tax.value) == 0)
 
     pricings: list[ReservationUnitPricing] = []
     for reservation_unit in reservation_units:

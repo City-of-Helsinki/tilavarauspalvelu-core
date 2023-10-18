@@ -42,7 +42,7 @@ class SpaceDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
     model = Space
 
     @classmethod
-    def validate(self, root, info, **input):
+    def validate(cls, root, info, **input):
         space = get_object_or_404(Space, pk=input.get("pk", None))
         in_active_round = ApplicationRound.objects.active().filter(reservation_units__spaces=space).exists()
         if in_active_round:
