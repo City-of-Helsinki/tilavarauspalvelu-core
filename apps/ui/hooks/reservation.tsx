@@ -12,7 +12,7 @@ import {
   ReservationDeleteMutationPayload,
   ReservationType,
   ReservationsReservationStateChoices,
-  UserType,
+  UserType, ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import {
   DELETE_RESERVATION,
@@ -140,12 +140,14 @@ type UseReservationsProps = {
   currentUser?: UserType;
   states?: ReservationsReservationStateChoices[];
   orderBy?: string;
+  type?: ReservationsReservationTypeChoices;
 };
 
 export const useReservations = ({
   currentUser,
   states,
   orderBy,
+  type,
 }: UseReservationsProps): {
   reservations: ReservationType[];
   error?: ApolloError;
@@ -158,6 +160,7 @@ export const useReservations = ({
       variables: {
         ...(states != null && states?.length > 0 && { state: states }),
         ...(orderBy && { orderBy }),
+        ...(type && { type }),
         user: currentUser?.pk?.toString(),
       },
       fetchPolicy: "no-cache",

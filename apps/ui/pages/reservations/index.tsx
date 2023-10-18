@@ -12,7 +12,7 @@ import { breakpoints } from "common/src/common/style";
 import {
   Query,
   QueryReservationsArgs,
-  ReservationsReservationStateChoices,
+  ReservationsReservationStateChoices, ReservationsReservationTypeChoices,
   ReservationType,
 } from "common/types/gql-types";
 import { Container } from "common";
@@ -114,6 +114,7 @@ const Reservations = (): JSX.Element | null => {
       ],
       orderBy: "-begin",
       user: currentUser?.pk?.toString(),
+      type: ReservationsReservationTypeChoices.Normal,
     },
     fetchPolicy: "no-cache",
   });
