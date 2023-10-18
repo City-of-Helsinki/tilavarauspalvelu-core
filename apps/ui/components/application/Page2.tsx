@@ -4,19 +4,19 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Application, Cell } from "common/types/common";
-import TimeSelector from "../common/TimeSelector";
+import { MediumButton } from "@/styles/util";
 import {
   deepCopy,
   cellsToApplicationEventSchedules,
   applicationEventSchedulesToCells,
-} from "../../modules/util";
-import { AccordionWithState as Accordion } from "../common/Accordion";
-import { MediumButton } from "../../styles/util";
-import { ButtonContainer } from "../common/common";
+} from "@/modules/util";
 import {
   getApplicationEventsWhichMinDurationsIsNotFulfilled,
   getListOfApplicationEventTitles,
-} from "../../modules/application/application";
+} from "@/modules/application/application";
+import { AccordionWithState as Accordion } from "../common/Accordion";
+import TimeSelector from "../common/TimeSelector";
+import { ButtonContainer } from "../common/common";
 
 type Props = {
   application: Application;

@@ -153,11 +153,11 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
     try {
       const existingIds = appToSave.applicationEvents
-        .filter((ae) => ae.id)
-        .map((ae) => ae.id);
+        .map((ae) => ae.id)
+        .filter((id): id is number => id != null);
       loadedApplication = await saveApplication(transformForSaving(appToSave));
       const newEvent = loadedApplication.applicationEvents.filter(
-        (ae) => existingIds.indexOf(ae.id) === -1
+        (ae) => ae.id != null && existingIds.indexOf(ae.id) === -1
       );
       dispatch({
         type: "save",
@@ -225,12 +225,13 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   const rerender = state.application.applicationEvents.length; // rerender every time event count is changed so that form state stays in sync
 
+  const application = state.application;
   return (
     <>
       {pageId === "page1" && (
         <ApplicationPageWrapper
           key={rerender}
-          application={state.application}
+          application={application}
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
         >
@@ -246,7 +247,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
                   eventId: undefined,
                 });
               }}
-              application={state.application}
+              application={application}
               savedEventId={state.savedEventId}
               save={({
                 application,
@@ -263,33 +264,33 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       )}
       {pageId === "page2" && (
         <ApplicationPageWrapper
-          application={state.application}
+          application={application}
           translationKeyPrefix="application:Page2"
         >
           <Page2
-            application={state.application}
+            application={application}
             onNext={saveAndNavigate("page3")}
           />
         </ApplicationPageWrapper>
       )}
       {pageId === "page3" && (
         <ApplicationPageWrapper
-          application={state.application}
+          application={application}
           translationKeyPrefix="application:Page3"
         >
           <Page3
-            application={state.application}
+            application={application}
             onNext={saveAndNavigate("preview")}
           />
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (
-        <ApplicationPageWrapper
-          application={state.application}
+       <ApplicationPageWrapper
+          application={application}
           translationKeyPrefix="application:preview"
         >
           <Preview
-            application={state.application}
+            application={application}
             onNext={saveAndNavigate("sent")}
             tos={tos}
           />
@@ -297,12 +298,12 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       )}
       {pageId === "view" && (
         <ApplicationPageWrapper
-          application={state.application}
+          application={application}
           translationKeyPrefix="application:view"
           headContent={applicationRoundName}
           hideStepper
         >
-          <View application={state.application} tos={tos} />
+          <View application={application} tos={tos} />
         </ApplicationPageWrapper>
       )}
       {pageId === "sent" && <Sent />}

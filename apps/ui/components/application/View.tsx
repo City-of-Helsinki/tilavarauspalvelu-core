@@ -18,7 +18,7 @@ type Props = {
   tos: TermsOfUseType[];
 };
 
-const ViewApplication = ({ application, tos }: Props): JSX.Element | null => {
+const ViewApplication = ({ application, tos }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);

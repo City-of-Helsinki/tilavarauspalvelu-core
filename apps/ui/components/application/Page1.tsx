@@ -22,7 +22,6 @@ import { useOptions } from "@/hooks/useOptions";
 import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { ButtonContainer } from "../common/common";
 import ApplicationEvent from "../applicationEvent/ApplicationEvent";
-import ApplicationForm from "./ApplicationForm";
 
 type Props = {
   // TODO break this down to smaller pieces (only the required props)
@@ -73,7 +72,7 @@ const Page1 = ({
   const { options } = useOptions();
   const { purposeOptions } = options;
 
-  const form = useForm<ApplicationForm>({
+  const form = useForm<Application>({
     mode: "onChange",
     defaultValues: {
       // hack to make sure form dates are in correct format

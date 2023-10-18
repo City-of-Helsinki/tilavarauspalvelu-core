@@ -3,29 +3,55 @@ import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm } from "react-hook-form";
 import { Address, Application, ContactPerson } from "common/types/common";
+import { deepCopy, applicationErrorText } from "@/modules/util";
 import {
   FormSubHeading,
   SpanTwoColumns,
   TwoColumnContainer,
 } from "../common/common";
-import EmailInput from "./EmailInput";
-import BillingAddress from "./BillingAddress";
+import { EmailInput } from "./EmailInput";
+import { BillingAddress } from "./BillingAddress";
 import Buttons from "./Buttons";
-import { deepCopy, applicationErrorText } from "../../modules/util";
-import ApplicationForm from "./ApplicationForm";
 
 type Props = {
   application: Application;
   onNext: (appToSave: Application) => void;
 };
 
+type FormValues = {
+  contactPerson: ContactPerson;
+  billingAddress: Address;
+  additionalInformation: string;
+};
+
+const prepareData = (application: Application, data: FormValues): Application => {
+  const applicationCopy = deepCopy(application);
+
+  applicationCopy.applicantType = "individual";
+  // TODO why is this done like this? it's not type safe but is there a reason for it?
+  if (!applicationCopy.contactPerson) {
+    applicationCopy.contactPerson = {} as ContactPerson;
+  }
+  applicationCopy.contactPerson = data.contactPerson;
+
+  if (!applicationCopy.billingAddress) {
+    applicationCopy.billingAddress = {} as Address;
+  }
+
+  applicationCopy.organisation = null;
+  applicationCopy.billingAddress = data.billingAddress;
+  applicationCopy.additionalInformation = data.additionalInformation;
+
+  return applicationCopy;
+};
+
 const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const form = useForm<ApplicationForm>({
+  const form = useForm<FormValues>({
     defaultValues: {
-      contactPerson: { ...application.contactPerson } as ContactPerson,
-      billingAddress: { ...application.billingAddress } as Address,
+      contactPerson: (application.contactPerson ?? {}),
+      billingAddress: (application.billingAddress ?? {}),
       additionalInformation: application.additionalInformation,
     },
   });
@@ -36,29 +62,8 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
     formState: { errors },
   } = form;
 
-  const prepareData = (data: Application): Application => {
-    const applicationCopy = deepCopy(application);
-
-    applicationCopy.applicantType = "individual";
-    if (!applicationCopy.contactPerson) {
-      applicationCopy.contactPerson = {} as ContactPerson;
-    }
-    applicationCopy.contactPerson = data.contactPerson;
-
-    if (!applicationCopy.billingAddress) {
-      applicationCopy.billingAddress = {} as Address;
-    }
-
-    applicationCopy.organisation = null;
-    applicationCopy.billingAddress = data.billingAddress;
-    applicationCopy.additionalInformation = data.additionalInformation;
-
-    return applicationCopy;
-  };
-
-  const onSubmit = (data: Application): void => {
-    const appToSave = prepareData(data);
-
+  const onSubmit = (data: FormValues): void => {
+    const appToSave = prepareData(application, data);
     onNext(appToSave);
   };
 

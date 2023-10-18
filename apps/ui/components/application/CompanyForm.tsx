@@ -8,17 +8,41 @@ import {
   ContactPerson,
   Organisation,
 } from "common/types/common";
+import { deepCopy, applicationErrorText } from "@/modules/util";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { FormSubHeading, TwoColumnContainer } from "../common/common";
-import EmailInput from "./EmailInput";
-import BillingAddress from "./BillingAddress";
+import { EmailInput } from "./EmailInput";
+import { BillingAddress } from "./BillingAddress";
 import Buttons from "./Buttons";
-import { deepCopy, applicationErrorText } from "../../modules/util";
-import ApplicationForm from "./ApplicationForm";
 
 type Props = {
   application: Application;
   onNext: (appToSave: Application) => void;
+};
+
+type FormValues = {
+  organisation: Organisation;
+  contactPerson: ContactPerson;
+  billingAddress: Address;
+};
+
+// TODO hasBillingAddress can be removed by using the form field
+const prepareData = (application: Application, data: FormValues, hasBillingAddress: boolean): Application => {
+  const applicationCopy = deepCopy(application);
+  applicationCopy.applicantType = "company";
+
+  applicationCopy.contactPerson = data.contactPerson;
+  applicationCopy.organisation = data.organisation;
+
+  if (hasBillingAddress) {
+    applicationCopy.billingAddress = data.billingAddress;
+  } else {
+    applicationCopy.billingAddress = null;
+  }
+
+  applicationCopy.additionalInformation = undefined;
+
+  return applicationCopy;
 };
 
 const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
@@ -28,11 +52,11 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
     application.billingAddress !== null
   );
 
-  const form = useForm<ApplicationForm>({
+  const form = useForm<FormValues>({
     defaultValues: {
-      organisation: { ...application.organisation } as Organisation,
-      contactPerson: { ...application.contactPerson } as ContactPerson,
-      billingAddress: { ...application.billingAddress } as Address,
+      organisation: (application.organisation ?? {}),
+      contactPerson: (application.contactPerson ?? {}),
+      billingAddress: (application.billingAddress ?? {}),
     },
   });
 
@@ -42,29 +66,11 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
     handleSubmit,
   } = form;
 
-  const prepareData = (data: Application): Application => {
-    const applicationCopy = deepCopy(application);
-    applicationCopy.applicantType = "company";
-
-    applicationCopy.contactPerson = data.contactPerson;
-    applicationCopy.organisation = data.organisation;
-
-    if (hasBillingAddress) {
-      applicationCopy.billingAddress = data.billingAddress;
-    } else {
-      applicationCopy.billingAddress = null;
-    }
-
-    applicationCopy.additionalInformation = undefined;
-
-    return applicationCopy;
-  };
-
-  const onSubmit = (data: Application): void => {
-    const appToSave = prepareData(data);
-
+  const onSubmit = (data: FormValues): void => {
+    const appToSave = prepareData(application, data, hasBillingAddress);
     onNext(appToSave);
   };
+
   return (
     <form>
       <TwoColumnContainer>

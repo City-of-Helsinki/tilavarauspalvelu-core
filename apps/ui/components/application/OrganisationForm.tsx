@@ -10,15 +10,14 @@ import {
   Address,
   OptionType,
 } from "common/types/common";
+import { deepCopy, applicationErrorText } from "@/modules/util";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
-import EmailInput from "./EmailInput";
-import BillingAddress from "./BillingAddress";
+import { EmailInput } from "./EmailInput";
+import { BillingAddress } from "./BillingAddress";
 import Buttons from "./Buttons";
-import { deepCopy, applicationErrorText } from "../../modules/util";
 import ControlledSelect from "../common/ControlledSelect";
-import ApplicationForm from "./ApplicationForm";
 
 export const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {
@@ -32,6 +31,39 @@ type Props = {
   homeCityOptions: OptionType[];
 };
 
+type FormValues = {
+  organisation: Organisation;
+  contactPerson: ContactPerson;
+  billingAddress: Address;
+  homeCityId: number | null;
+};
+
+const prepareData = (application: Application, data: FormValues, isRegistered: boolean, hasBillingAddress: boolean): Application => {
+  const applicationCopy = deepCopy(application);
+
+  applicationCopy.applicantType = isRegistered
+    ? "association"
+    : "community";
+
+  applicationCopy.contactPerson = data.contactPerson;
+  applicationCopy.organisation = data.organisation;
+
+  if (!isRegistered && applicationCopy.organisation != null) {
+    applicationCopy.organisation.identifier = null;
+  }
+
+  if (hasBillingAddress) {
+    applicationCopy.billingAddress = data.billingAddress;
+  } else {
+    applicationCopy.billingAddress = null;
+  }
+
+  applicationCopy.homeCityId = data.homeCityId;
+  applicationCopy.additionalInformation = undefined;
+
+  return applicationCopy;
+};
+
 const OrganisationForm = ({
   application,
   onNext,
@@ -39,11 +71,11 @@ const OrganisationForm = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const form = useForm<ApplicationForm>({
+  const form = useForm<FormValues>({
     defaultValues: {
-      organisation: { ...application.organisation } as Organisation,
-      contactPerson: { ...application.contactPerson } as ContactPerson,
-      billingAddress: { ...application.billingAddress } as Address,
+      organisation: (application.organisation ?? {}),
+      contactPerson: (application.contactPerson ?? {}),
+      billingAddress: (application.billingAddress ?? {}),
       homeCityId: application.homeCityId,
     },
   });
@@ -56,6 +88,7 @@ const OrganisationForm = ({
     formState: { errors },
   } = form;
 
+  // TODO can be removed by using setValue and watch
   const [hasRegistration, setHasRegistration] = useState(
     Boolean(application.organisation?.identifier) // it is registered if identifier is set
   );
@@ -71,34 +104,9 @@ const OrganisationForm = ({
     }
   }, [hasRegistration, register, unregister]);
 
-  const prepareData = (data: Application): Application => {
-    const applicationCopy = deepCopy(application);
 
-    applicationCopy.applicantType = hasRegistration
-      ? "association"
-      : "community";
-
-    applicationCopy.contactPerson = data.contactPerson;
-    applicationCopy.organisation = data.organisation;
-
-    if (!hasRegistration && applicationCopy.organisation != null) {
-      applicationCopy.organisation.identifier = null;
-    }
-
-    if (hasBillingAddress) {
-      applicationCopy.billingAddress = data.billingAddress;
-    } else {
-      applicationCopy.billingAddress = null;
-    }
-
-    applicationCopy.homeCityId = data.homeCityId;
-    applicationCopy.additionalInformation = undefined;
-
-    return applicationCopy;
-  };
-
-  const onSubmit = (data: Application): void => {
-    const appToSave = prepareData(data);
+  const onSubmit = (data: FormValues): void => {
+    const appToSave = prepareData(application, data, hasRegistration, hasBillingAddress);
     onNext(appToSave);
   };
 
