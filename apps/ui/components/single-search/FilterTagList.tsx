@@ -13,7 +13,7 @@ type FilterTagProps = {
 
 const TagControls = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-flow: row nowrap;
   align-items: center;
   gap: var(--spacing-s);
   flex-grow: 1;
@@ -21,6 +21,34 @@ const TagControls = styled.div`
 
 const StyledTag = styled(Tag)`
   font-size: var(--fontsize-body-m);
+  svg {
+    scale: 0.8;
+  }
+  &,
+  svg {
+    transition: all 200ms linear;
+  }
+  &:hover {
+    background: var(--color-black-20);
+    svg {
+      scale: 1;
+    }
+  }
+  &:focus {
+    && {
+      box-shadow: 0 0 0 3px var(--color-black-80);
+    }
+    svg {
+      scale: 1;
+    }
+  }
+  &:active {
+    background: var(--color-black-80);
+    color: var(--color-white);
+    svg {
+      scale: 1;
+    }
+  }
 `;
 
 const FilterTags = styled.div`
@@ -35,7 +63,12 @@ const ResetButton = styled(StyledTag).attrs({
     // eslint-disable-next-line @typescript-eslint/naming-convention
     "--tag-background": "transparent",
   },
-})``;
+})`
+  border: 1px var(--color-black-80) solid;
+  &:hover {
+    background: var(--color-black-10);
+  }
+`;
 
 const FilterTagList = ({
   formValueKeys,
@@ -117,17 +150,17 @@ const FilterTagList = ({
               </StyledTag>
             );
           })}
+        {formValueKeys.length > 0 && (
+          <ResetButton
+            aria-label={t("searchForm:resetForm")}
+            onClick={() => removeValue && removeValue()}
+            onDelete={() => removeValue && removeValue()}
+            data-test-id="search-form__reset-button"
+          >
+            {t("searchForm:resetForm")}
+          </ResetButton>
+        )}
       </FilterTags>
-      {formValueKeys.length > 0 && (
-        <ResetButton
-          aria-label={t("searchForm:resetForm")}
-          onClick={() => removeValue && removeValue()}
-          onDelete={() => removeValue && removeValue()}
-          data-test-id="search-form__reset-button"
-        >
-          {t("searchForm:resetForm")}
-        </ResetButton>
-      )}
     </TagControls>
   );
 };

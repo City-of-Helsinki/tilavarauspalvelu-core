@@ -182,7 +182,7 @@ const BottomContainer = styled.div`
   display: flex;
   width: 100%;
   flex-flow: column nowrap;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--spacing-m);
   @media (min-width: ${breakpoints.m}) {
@@ -236,7 +236,9 @@ const TimeRangeWrapper = styled.div`
 
 const SubmitButton = styled(MediumButton)`
   width: 100%;
-
+  svg {
+    scale: 2;
+  }
   @media (min-width: ${breakpoints.s}) {
     width: auto;
     white-space: nowrap;
@@ -610,24 +612,6 @@ const SearchForm = ({
             checked={Boolean(watch("showOnlyAvailable"))}
           />
         </Filters>
-        <JustForDesktop
-          style={{
-            display: "flex",
-            width: "100%",
-            flexFlow: "row nowrap",
-            justifyContent: "space-between",
-          }}
-          customBreakpoint={desktopBreakpoint}
-        >
-          <SubmitButton
-            id="searchButton-desktop"
-            onClick={handleSubmit(search)}
-            iconLeft={<IconSearch />}
-            style={{ marginLeft: "auto" }}
-          >
-            {t("searchForm:searchButton")}
-          </SubmitButton>
-        </JustForDesktop>
       </TopContainer>
 
       <BottomContainer>
@@ -639,18 +623,13 @@ const SearchForm = ({
             getFormSubValueLabel={getFormSubValueLabel}
           />
         )}
-        <JustForMobile
-          style={{ width: "100%" }}
-          customBreakpoint={desktopBreakpoint}
+        <SubmitButton
+          id="searchButton"
+          onClick={handleSubmit(search)}
+          iconLeft={<IconSearch />}
         >
-          <SubmitButton
-            id="searchButton"
-            onClick={handleSubmit(search)}
-            iconLeft={<IconSearch />}
-          >
-            {t("searchForm:searchButton")}
-          </SubmitButton>
-        </JustForMobile>
+          {t("searchForm:searchButton")}
+        </SubmitButton>
       </BottomContainer>
     </>
   );
