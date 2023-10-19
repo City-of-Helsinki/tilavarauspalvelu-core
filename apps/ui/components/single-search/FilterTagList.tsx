@@ -11,12 +11,14 @@ type FilterTagProps = {
   getFormSubValueLabel: (key: string, value: string) => string | undefined;
 };
 
-const TagControls = styled.div`
+const FilterTags = styled.div`
   display: flex;
-  flex-flow: row nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-s);
+  margin-right: var(--spacing-m);
   flex-grow: 1;
+  width: calc(100% - 120px);
 `;
 
 const StyledTag = styled(Tag)`
@@ -28,34 +30,18 @@ const StyledTag = styled(Tag)`
   svg {
     transition: all 200ms linear;
   }
-  &:hover {
-    background: var(--color-black-20);
-    svg {
-      scale: 1;
-    }
-  }
   &:focus {
     && {
       box-shadow: 0 0 0 3px var(--color-black-80);
-    }
-    svg {
-      scale: 1;
     }
   }
   &:active {
     background: var(--color-black-80);
     color: var(--color-white);
-    svg {
-      scale: 1;
-    }
   }
-`;
-
-const FilterTags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-s);
-  margin-right: var(--spacing-m);
+  svg:hover {
+    scale: 1;
+  }
 `;
 
 const ResetButton = styled(StyledTag).attrs({
@@ -105,63 +91,60 @@ const FilterTagList = ({
     return t("searchForm:filters.duration", { unit });
   };
   return (
-    <TagControls>
-      <FilterTags data-test-id="search-form__filter--tags">
-        {formValueKeys
-          .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
-          .map((formValueKey) => {
-            if (formValueKey === "showOnlyAvailable") return null;
-            const label = t(`searchForm:filters.${formValueKey}`, {
-              label: formValueKey,
-              value: formValues[formValueKey],
-              count: Number(formValues[formValueKey]),
-            });
-            return multiSelectFilters.includes(formValueKey) ? (
-              (formValues[formValueKey] ?? "").split(",").map((subValue) => (
-                <StyledTag
-                  id={`filter-tag__${formValueKey}-${subValue}`}
-                  onClick={() =>
-                    removeValue && removeValue([subValue], formValueKey)
-                  }
-                  onDelete={() =>
-                    removeValue && removeValue([subValue], formValueKey)
-                  }
-                  key={`${formValueKey}-${subValue}`}
-                  deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                    value: getFormSubValueLabel(formValueKey, subValue),
-                  })}
-                >
-                  {getFormSubValueLabel(formValueKey, subValue)}
-                </StyledTag>
-              ))
-            ) : (
+    <FilterTags data-test-id="search-form__filter--tags">
+      {formValueKeys
+        .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
+        .map((formValueKey) => {
+          if (formValueKey === "showOnlyAvailable") return null;
+          const label = t(`searchForm:filters.${formValueKey}`, {
+            label: formValueKey,
+            value: formValues[formValueKey],
+            count: Number(formValues[formValueKey]),
+          });
+          return multiSelectFilters.includes(formValueKey) ? (
+            (formValues[formValueKey] ?? "").split(",").map((subValue) => (
               <StyledTag
-                id={`filter-tag__${formValueKey}`}
-                onDelete={() => removeValue && removeValue([formValueKey])}
-                key={formValueKey}
+                id={`filter-tag__${formValueKey}-${subValue}`}
+                onClick={() =>
+                  removeValue && removeValue([subValue], formValueKey)
+                }
+                onDelete={() =>
+                  removeValue && removeValue([subValue], formValueKey)
+                }
+                key={`${formValueKey}-${subValue}`}
                 deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                  value: label,
+                  value: getFormSubValueLabel(formValueKey, subValue),
                 })}
               >
-                {formValueKey === "duration" &&
-                !Number.isNaN(Number(formValues.duration))
-                  ? durationTranslation(Number(formValues.duration))
-                  : label}
+                {getFormSubValueLabel(formValueKey, subValue)}
               </StyledTag>
-            );
-          })}
-        {formValueKeys.length > 0 && (
-          <ResetButton
-            aria-label={t("searchForm:resetForm")}
-            onClick={() => removeValue && removeValue()}
-            onDelete={() => removeValue && removeValue()}
-            data-test-id="search-form__reset-button"
-          >
-            {t("searchForm:resetForm")}
-          </ResetButton>
-        )}
-      </FilterTags>
-    </TagControls>
+            ))
+          ) : (
+            <StyledTag
+              id={`filter-tag__${formValueKey}`}
+              onDelete={() => removeValue && removeValue([formValueKey])}
+              key={formValueKey}
+              deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+                value: label,
+              })}
+            >
+              {formValueKey === "duration" &&
+              !Number.isNaN(Number(formValues.duration))
+                ? durationTranslation(Number(formValues.duration))
+                : label}
+            </StyledTag>
+          );
+        })}
+      {formValueKeys.length > 0 && (
+        <ResetButton
+          onClick={() => removeValue && removeValue()}
+          onDelete={() => removeValue && removeValue()}
+          data-test-id="search-form__reset-button"
+        >
+          {t("searchForm:resetForm")}
+        </ResetButton>
+      )}
+    </FilterTags>
   );
 };
 

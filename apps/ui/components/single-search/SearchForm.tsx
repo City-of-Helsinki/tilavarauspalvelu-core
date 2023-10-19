@@ -68,7 +68,7 @@ const TopContainer = styled.div`
   }
 `;
 
-const filterGrid = css`
+const Filters = styled.div`
   margin-top: 0;
   max-width: 100%;
   display: grid;
@@ -87,7 +87,6 @@ const filterGrid = css`
 
   @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-s);
-    grid-template-columns: repeat(2, 1fr);
     grid-template-columns: repeat(3, auto);
     > div {
       grid-column: span 1;
@@ -97,10 +96,6 @@ const filterGrid = css`
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: repeat(3, 1fr);
   }
-`;
-
-const Filters = styled.div<{ children: ReactNode[] }>`
-  ${filterGrid}
 `;
 
 const StyledSelect = styled(Select<OptionType>)<{ name?: string }>`
@@ -236,11 +231,8 @@ const TimeRangeWrapper = styled.div`
 
 const SubmitButton = styled(MediumButton)`
   width: 100%;
-  svg {
-    scale: 2;
-  }
   @media (min-width: ${breakpoints.s}) {
-    width: auto;
+    width: 120px;
     white-space: nowrap;
   }
 `;
