@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAsync } from "react-use";
+import { FormProvider, useForm } from "react-hook-form";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
@@ -7,37 +7,43 @@ import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import i18next from "i18next";
 import {
-  ApplicationEvent,
-  Application as ApplicationType,
-} from "common/types/common";
-import {
   Query,
-  QueryApplicationRoundsArgs,
+  QueryApplicationsArgs,
+  ApplicationEventType,
   QueryTermsOfUseArgs,
   ReservationUnitType,
   TermsOfUseType,
+  ApplicationEventStatus,
+  Mutation,
+  MutationCreateApplicationArgs,
+  MutationUpdateApplicationArgs,
+  ApplicationCreateMutationInput,
 } from "common/types/gql-types";
+import { APPLICATION_QUERY } from "common/src/queries/application";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { Application } from "common";
+import { filterNonNullable } from "common/src/helpers";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
-import { saveApplication, getApplication } from "../../modules/api";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { defaultDuration } from "@/modules/const";
-import Page1 from "../../components/application/Page1";
-import Page2 from "../../components/application/Page2";
-import Page3 from "../../components/application/Page3";
-import Preview from "../../components/application/Preview";
-import View from "../../components/application/View";
-import useReservationUnitList from "../../hooks/useReservationUnitList";
-import Sent from "../../components/application/Sent";
-import { CenterSpinner } from "../../components/common/common";
+import { defaultDurationMins } from "@/modules/const";
+import Page1 from "@/components/application/Page1";
+import Page2 from "@/components/application/Page2";
+import Page3 from "@/components/application/Page3";
+import Preview from "@/components/application/Preview";
+import View from "@/components/application/View";
+import useReservationUnitList from "@/hooks/useReservationUnitList";
+import Sent from "@/components/application/Sent";
+import { CenterSpinner } from "@/components/common/common";
+import { apiDateToUIDate, getTranslation } from "@/modules/util";
+import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
+import { createApolloClient } from "@/modules/apolloClient";
 import {
-  apiDateToUIDate,
-  deepCopy,
-  getTranslation,
-  uiDateToApiDate,
-} from "../../modules/util";
-import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
-import { createApolloClient } from "../../modules/apolloClient";
-import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
+  ApplicationFormValues,
+  convertAddress,
+  convertOrganisation,
+  convertPerson,
+  transformApplicationEventToForm,
+} from "@/components/application/Form";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -70,125 +76,162 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
+// TODO replacing this with a NewApplicationType that is specific to the frontend
+// might be preferable (allow undefined for most fields)
+// then just convert to ApplicationType when sending to backend
 const createApplicationEvent = (
   applicationId?: number,
   begin?: string,
   end?: string
-): ApplicationEvent => ({
+): ApplicationEventType => ({
   // TODO this is bad, use the hook instead (or empty / undefined and default value in the Page1)
   // it's bad because the translation might not be loaded yet when this is shown
   // useTranslation from next-i18next handles translation loading automatically
   name: i18next.t("Application.Page1.applicationEventName"),
-  minDuration: defaultDuration,
-  maxDuration: defaultDuration,
+  minDuration: defaultDurationMins,
+  maxDuration: defaultDurationMins,
   eventsPerWeek: 1,
   numPersons: null,
-  ageGroupId: null,
-  purposeId: null,
-  abilityGroupId: null,
-  applicationId: applicationId || 0,
+  ageGroup: null,
+  purpose: null,
+  abilityGroup: null,
+  application: {
+    id: "",
+    pk: applicationId || 0,
+  },
   begin: begin || null,
   end: end || null,
   biweekly: false,
   eventReservationUnits: [],
   applicationEventSchedules: [],
-  status: "created",
+  status: ApplicationEventStatus.Created,
 });
 
 type Props = {
   tos: TermsOfUseType[];
 };
 
+const CREATE_APPLICATION_MUTATION = gql`
+  mutation ($input: ApplicationCreateMutationInput!) {
+    createApplication(input: $input) {
+      errors {
+        messages
+      }
+    }
+  }
+`;
+// TODO do we need createApplicationEventMutation also?
+
+const UPDATE_APPLICATION_MUTATION = gql`
+  mutation ($input: ApplicationUpdateMutationInput!) {
+    updateApplication(input: $input) {
+      errors {
+        messages
+      }
+    }
+  }
+`;
+
 const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   const router = useRouter();
   const [error, setError] = useState<string | null>();
-  const [localApplication, setLocalApplication] =
-    useState<ApplicationType | null>(null);
 
   const [applicationId, pageId] = router.query?.params as string[];
 
-  const handleLoad = (application: ApplicationType) => {
-    if (application != null) {
-      setLocalApplication(application);
-      /*  this is silly, we should have a better way to deal with new applications
-      if (application.applicationEvents?.length < 1) {
-        nextState.application.applicationEvents.push(
-          applicationEvent(
-            action.application?.id,
-            action?.params?.begin,
-            action?.params?.end
-          )
-        );
-      */
-    }
-  };
-
-  const applicationLoadingStatus = useAsync(async () => {
-    // TODO check for NaN also
-    if (applicationId && Number(applicationId)) {
-      try {
-        // FIXME replace with GQL
-        const application = await getApplication(Number(applicationId));
-        // TODO this is weird, why are we not using Client side cache?
-        const apolloClient = createApolloClient(undefined);
-        const { data } = await apolloClient.query<
-          Query,
-          QueryApplicationRoundsArgs
-        >({
-          query: APPLICATION_ROUNDS,
-          fetchPolicy: "no-cache",
-        });
-        const applicationRound = data.applicationRounds?.edges
-          ?.map((n) => n?.node)
-          .find((n) => n?.pk === application.applicationRoundId);
-
-        // convert dates
-        application.applicationEvents.forEach((ae, i) => {
-          if (ae.end) {
-            application.applicationEvents[i].end = apiDateToUIDate(ae.end);
-          }
-          if (ae.begin) {
-            application.applicationEvents[i].begin = apiDateToUIDate(ae.begin);
-          }
-        });
-        handleLoad(application);
-        return { application, applicationRound };
-      } catch (e) {
-        setError(`${t("common:error.dataError")}`);
-      }
-    }
-    return null;
+  const { data: applicationData, loading: isLoading } = useQuery<
+    Query,
+    QueryApplicationsArgs
+  >(APPLICATION_QUERY, {
+    variables: {
+      pk: [applicationId],
+    },
+    skip: !applicationId,
+    onError: (e) => {
+      console.warn("applications query failed: ", e);
+      setError(`${t("common:error.dataError")}`);
+    },
   });
+
+  console.log("applicationData: ", applicationData);
+
+  const localApplication =
+    applicationData?.applications?.edges?.[0]?.node ?? undefined;
+  const applicationRound = localApplication?.applicationRound ?? undefined;
 
   const { reservationUnits, clearSelections } = useReservationUnitList();
 
-  const handleSave = async (appToSave: ApplicationType) => {
-    const transformForSaving = (app: ApplicationType): ApplicationType => {
-      const tapp = deepCopy(app);
-      tapp.applicationEvents.forEach((ae, i) => {
-        const begin = ae.begin != null ? uiDateToApiDate(ae.begin) : null;
-        const end = ae.end != null ? uiDateToApiDate(ae.end) : null;
+  const [create] = useMutation<Mutation, MutationCreateApplicationArgs>(
+    CREATE_APPLICATION_MUTATION,
+    {
+      onError: (e) => {
+        console.warn("create application mutation failed: ", e);
+        setError(`${t("application:error.saveFailed")}`);
+      },
+    }
+  );
+  const [update] = useMutation<Mutation, MutationUpdateApplicationArgs>(
+    UPDATE_APPLICATION_MUTATION,
+    {
+      onError: (e) => {
+        console.warn("update application mutation failed: ", e);
+        setError(`${t("application:error.saveFailed")}`);
+      },
+    }
+  );
+
+  const handleSave = async (appToSave: ApplicationFormValues) => {
+    // TODO replace this with Application -> ApplicationType conversion
+    // ApplicationUpdateMutationInput
+    // update mutation is looser than create mutation so we could do incremental updates
+    const transformForSaving = (
+      app: Application
+    ): ApplicationCreateMutationInput => {
+      console.log("transforming for saving: ", app);
+      const appMod: ApplicationCreateMutationInput = {
+        additionalInformation: app.additionalInformation,
+        applicantType: app.applicantType,
+        applicationEvents: app.applicationEvents,
+        applicationRoundPk: app.applicationRoundId,
+        billingAddress: app.billingAddress,
+        contactPerson: app.contactPerson,
+        homeCityPk: app.homeCityId,
+        organisation: app.organisation,
+        pk: app.id,
+        status: app.status,
+      };
+      /* TODO what is the purpose of this?
+      tapp.applicationEvents?.forEach((ae, i) => {
+        const begin = ae?.begin != null ? uiDateToApiDate(ae.begin) : null;
+        const end = ae?.end != null ? uiDateToApiDate(ae.end) : null;
         tapp.applicationEvents[i].begin = begin ?? null;
         tapp.applicationEvents[i].end = end ?? null;
       });
-      return tapp;
+      */
+      return appMod;
     };
 
-    try {
-      const savedApplication = await saveApplication(
-        transformForSaving(appToSave)
-      );
+    if (appToSave.id === 0) {
+      const { data } = await create({
+        variables: {
+          input: transformForSaving(appToSave),
+        },
+      });
       // TODO do a refetch here instead of cache modification (after moving to fetch hook)
-      return savedApplication.id;
-    } catch (e) {
-      setError(`${t("application:error.saveFailed")}`);
-      throw e;
+      return data?.createApplication?.application?.pk ?? 0;
     }
+    const { data } = await update({
+      variables: {
+        input: transformForSaving(appToSave),
+      },
+    });
+    // TODO do a refetch here instead of cache modification (after moving to fetch hook)
+    return data?.updateApplication?.application?.pk ?? 0;
   };
 
+  // Use the old type for the form and transform it in the mutation
   const saveAndNavigate =
-    (path: string) => async (appToSave: ApplicationType) => {
+    (path: string) => async (appToSave: ApplicationFormValues) => {
       const id = await handleSave(appToSave);
       const prefix = `/application/${id}`;
       const target = `${prefix}/${path}`;
@@ -196,57 +239,111 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       router.push(target);
     };
 
-  const applicationRound = applicationLoadingStatus.value?.applicationRound;
-
+  /*
   const [localApplicationEvents, setLocalApplicationEvents] = useState<
-    ApplicationEvent[]
+    ApplicationEventType[]
   >([]);
+  */
 
+  /*
   useEffect(() => {
-    if (localApplication?.id) {
-      setLocalApplicationEvents(localApplication.applicationEvents);
+    if (localApplication?.pk) {
+      const events = localApplication.applicationEvents?.filter((ae): ae is NonNullable<typeof ae> => ae != null) ?? [];
+      console.log('events: ', events);
+      setLocalApplicationEvents(events);
     }
   }, [localApplication]);
+  */
 
+  console.log("localApplication: ", localApplication);
   // Modify the laoded application to include localchanges
-  const application = localApplication
-    ? {
-        ...localApplication,
-        applicationEvents: localApplicationEvents,
-      }
-    : undefined;
+  const application = localApplication;
+  // ? { ...localApplication, applicationEvents: localApplicationEvents
+  // Don't think converting the dates is a good idea anymore but this would be the place for it
+  // why it's not good? because it breaks the type system (or we have to rewrite the codegen types)
+  /* .map((ae) => ({
+        application.applicationEvents.forEach((ae, i) => {
+          if (ae.end) {
+            application.applicationEvents[i].end = apiDateToUIDate(ae.end);
+          }
+          if (ae.begin) {
+            application.applicationEvents[i].begin = apiDateToUIDate(ae.begin);
+          }
+          }),
+        */
+  // }
+  // : undefined;
+
+  // TODO this needs a proper transformation function from ApplicationType -> Application (form type)
+  // TODO application values???
+  // TODO need a useEffect for when the API call returns
+  const form = useForm<ApplicationFormValues>({
+    mode: "onChange",
+    defaultValues: {
+      applicationEvents: filterNonNullable(application?.applicationEvents).map(
+        (ae) => transformApplicationEventToForm(ae)
+      ),
+      organisation: convertOrganisation(application?.organisation),
+      contactPerson: convertPerson(application?.contactPerson),
+      billingAddress: convertAddress(application?.billingAddress),
+      additionalInformation: application?.additionalInformation ?? "",
+      homeCityId: application?.homeCity?.pk ?? undefined,
+    },
+  });
+
+  const { getValues, reset } = form;
+
+  // TODO this is problematic since we are dynamically adding and removing events and that modifies the application
+  // the logic for adding should be inside the form not a custom effect
+  // TODO combine the defaultValues and reset (single transformation function)
+  useEffect(() => {
+    if (application) {
+      reset({
+        applicationEvents: filterNonNullable(
+          application?.applicationEvents
+        ).map((ae) => transformApplicationEventToForm(ae)),
+        organisation: convertOrganisation(application?.organisation),
+        contactPerson: convertPerson(application?.contactPerson),
+        billingAddress: convertAddress(application?.billingAddress),
+        additionalInformation: application?.additionalInformation ?? "",
+        homeCityId: application?.homeCity?.pk ?? undefined,
+      });
+    }
+  }, [application, reset]);
 
   const handleRemoveUnsavedApplicationEvent = () => {
+    /* TODO use form instead
     // TODO can we be sure that the last element is the new one? for now at least we can
     setLocalApplicationEvents((prev) => prev.slice(0, -1));
+    */
   };
 
   const handleNewApplicationEvent = () => {
+    if (application?.pk == null) {
+      throw new Error("Application id is missing");
+    }
+    // TODO what is the purpose of this time section?
     const begin = applicationRound?.reservationPeriodBegin;
     const end = applicationRound?.reservationPeriodEnd;
-    const params = applicationLoadingStatus.value
-      ? {
-          begin: begin ? apiDateToUIDate(begin) : "",
-          end: end ? apiDateToUIDate(end) : "",
-        }
-      : {};
-    setLocalApplicationEvents((prev) => [
-      ...prev,
-      createApplicationEvent(application?.id, params?.begin, params?.end),
+    const params = {
+      begin: begin ? apiDateToUIDate(begin) : "",
+      end: end ? apiDateToUIDate(end) : "",
+    };
+    /* FIXME use the form here (register new applicationEvent)
+    setLocalApplicationEvents([
+      ...localApplicationEvents,
+      createApplicationEvent(application.pk, params?.begin, params?.end),
     ]);
+    */
     // TODO do we need to keep this also?
     // nextState.applicationEvents = nextState.application.applicationEvents.map((ae) => ae.id as number)
   };
 
-  const appRound =
-    applicationLoadingStatus.value?.applicationRound ?? undefined;
   const applicationRoundName =
-    appRound != null ? getTranslation(appRound, "name") : "-";
+    applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
-  // TODO use hook and loading state from it
-  const ready = true; // !applicationLoadingStatus.loading && state.loading === false;
-
-  if (!ready) {
+  // TODO the error needs to be in a top level component (wrapping this) or use context / toasts
+  if (isLoading) {
     return error ? (
       <Notification
         type="error"
@@ -262,8 +359,14 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     );
   }
 
-  const rerender = localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
+  const handleApplicationFinished = () => {
+    // TODO get the form context here and send the form
+    saveAndNavigate("sent")(getValues());
+  };
 
+  const rerender = false; // localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
+
+  console.log("application", application);
   // For now FIXME (we need special handling for the first element)
   // or we need checks down the line to handle 0 length arrays
   if (!application || application.applicationEvents.length === 0) {
@@ -281,6 +384,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         >
           {applicationRound != null && (
             <Page1
+              form={form}
               selectedReservationUnits={
                 reservationUnits as ReservationUnitType[]
               }
@@ -309,10 +413,13 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           application={application}
           translationKeyPrefix="application:Page3"
         >
-          <Page3
-            application={application}
-            onNext={saveAndNavigate("preview")}
-          />
+          {/* TODO wrap the other pages in this also and remove prop drilling */}
+          <FormProvider {...form}>
+            <Page3
+              application={application}
+              onNext={saveAndNavigate("preview")}
+            />
+          </FormProvider>
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (
@@ -322,7 +429,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         >
           <Preview
             application={application}
-            onNext={saveAndNavigate("sent")}
+            onNext={handleApplicationFinished}
             tos={tos}
           />
         </ApplicationPageWrapper>

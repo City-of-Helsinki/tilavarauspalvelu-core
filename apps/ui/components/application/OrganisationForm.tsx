@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Control, FieldValues, FormProvider, useForm } from "react-hook-form";
+import { Control, FieldValues, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import {
-  Application,
-  ContactPerson,
-  Organisation,
-  Address,
-  OptionType,
-} from "common/types/common";
+import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import { deepCopy, applicationErrorText } from "@/modules/util";
+import { ApplicationType } from "common/types/gql-types";
+import { applicationErrorText } from "@/modules/util";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import Buttons from "./Buttons";
 import ControlledSelect from "../common/ControlledSelect";
+import { ApplicationFormValues } from "./Form";
 
 export const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {
@@ -26,18 +22,12 @@ export const Placeholder = styled.span`
 `;
 
 type Props = {
-  application: Application;
-  onNext: (appToSave: Application) => void;
+  application: ApplicationType;
+  onNext: (appToSave: ApplicationFormValues) => void;
   homeCityOptions: OptionType[];
 };
 
-type FormValues = {
-  organisation: Organisation;
-  contactPerson: ContactPerson;
-  billingAddress: Address;
-  homeCityId: number | null;
-};
-
+/*
 const prepareData = (
   application: Application,
   data: FormValues,
@@ -66,6 +56,7 @@ const prepareData = (
 
   return applicationCopy;
 };
+*/
 
 const OrganisationForm = ({
   application,
@@ -74,27 +65,24 @@ const OrganisationForm = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const form = useForm<FormValues>({
-    defaultValues: {
-      organisation: application.organisation ?? {},
-      contactPerson: application.contactPerson ?? {},
-      billingAddress: application.billingAddress ?? {},
-      homeCityId: application.homeCityId,
-    },
-  });
-
   const {
     register,
-    unregister,
     handleSubmit,
+    unregister,
     control,
     formState: { errors },
-  } = form;
+    watch,
+    setValue,
+  } = useFormContext<ApplicationFormValues>();
 
   // TODO can be removed by using setValue and watch
+  /*
   const [hasRegistration, setHasRegistration] = useState(
     Boolean(application.organisation?.identifier) // it is registered if identifier is set
   );
+  */
+  const id = watch("organisation.identifier");
+  const hasRegistration = id != null;
   const [hasBillingAddress, setHasBillingAddress] = useState(
     application.billingAddress !== null
   );
@@ -107,14 +95,16 @@ const OrganisationForm = ({
     }
   }, [hasRegistration, register, unregister]);
 
-  const onSubmit = (data: FormValues): void => {
+  const onSubmit = (data: ApplicationFormValues): void => {
+    /*
     const appToSave = prepareData(
       application,
       data,
       hasRegistration,
       hasBillingAddress
     );
-    onNext(appToSave);
+    */
+    onNext(data);
   };
 
   return (
@@ -165,7 +155,13 @@ const OrganisationForm = ({
             id="organisation.notRegistered"
             name="organisation.notRegistered"
             checked={!hasRegistration}
-            onClick={() => setHasRegistration(!hasRegistration)}
+            onClick={() => {
+              if (!hasRegistration) {
+                setValue("organisation.identifier", "");
+              } else {
+                setValue("organisation.identifier", null);
+              }
+            }}
           />
         </CheckboxWrapper>
         <Placeholder />
@@ -250,11 +246,7 @@ const OrganisationForm = ({
             onClick={() => setHasBillingAddress(!hasBillingAddress)}
           />
         </CheckboxWrapper>
-        {hasBillingAddress ? (
-          <FormProvider {...form}>
-            <BillingAddress />
-          </FormProvider>
-        ) : null}
+        {hasBillingAddress ? <BillingAddress /> : null}
         <FormSubHeading>
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
@@ -309,18 +301,16 @@ const OrganisationForm = ({
             }
           )}
         />
-        <FormProvider {...form}>
-          <EmailInput />
-        </FormProvider>
+        <EmailInput />
       </TwoColumnContainer>
-      {application.id != null && (
+      {application.pk != null && (
         <Buttons
           onSubmit={handleSubmit(onSubmit)}
-          applicationId={application.id}
+          applicationId={application.pk}
         />
       )}
     </form>
   );
 };
 
-export default OrganisationForm;
+export { OrganisationForm };

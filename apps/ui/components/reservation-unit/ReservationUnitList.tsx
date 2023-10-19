@@ -1,23 +1,20 @@
 import { IconPlusCircle, Notification as HDSNotification } from "hds-react";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { isEqual, sortBy } from "lodash";
 import styled from "styled-components";
-import { ApplicationEvent, OptionType } from "common/types/common";
+import { OptionType } from "common/types/common";
 import {
+  ApplicationEventType,
   ApplicationRoundType,
-  Query,
-  QueryReservationUnitsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
+import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";
-import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
-import { createApolloClient } from "../../modules/apolloClient";
-import { CenterSpinner } from "../common/common";
+import { ApplicationFormValues } from "../application/Form";
 
 type OptionTypes = {
   purposeOptions: OptionType[];
@@ -28,9 +25,9 @@ type OptionTypes = {
 
 type Props = {
   selectedReservationUnits: ReservationUnitType[];
-  applicationEvent: ApplicationEvent;
-  fieldName: string;
-  form: ReturnType<typeof useForm>;
+  applicationEvent: ApplicationEventType;
+  form: UseFormReturn<ApplicationFormValues>;
+  index: number;
   applicationRound: ApplicationRoundType;
   options: OptionTypes;
   minSize?: number;
@@ -52,16 +49,19 @@ const ReservationUnitList = ({
   selectedReservationUnits,
   applicationEvent,
   form,
-  fieldName,
+  index,
   applicationRound,
   options,
   minSize,
 }: Props): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
-  const [reservationUnits, setReservationUnits] = useState<
-    ReservationUnitType[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // TODO selected vs. available units
+  const evtResUnits = filterNonNullable(applicationEvent.eventReservationUnits);
+  const resUnits = evtResUnits
+    .map((n) => n.reservationUnit)
+    .filter((n): n is ReservationUnitType => n != null);
+  const [reservationUnits, setReservationUnits] =
+    useState<ReservationUnitType[]>(resUnits);
 
   const handleAdd = (ru: ReservationUnitType) => {
     setReservationUnits([...reservationUnits, ru]);
@@ -79,16 +79,19 @@ const ReservationUnitList = ({
     return !error;
   };
 
+  const fieldName = `applicationEvents.${index}.reservationUnits` as const;
   useEffect(() => {
     const valid = isValid(reservationUnits);
     if (valid) {
-      form.clearErrors([fieldName]);
+      form.clearErrors([`applicationEvents.${index}.reservationUnits`]);
     } else {
       form.setError(fieldName, { type: "reservationUnitTooSmall" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnits, minSize]);
 
+  // FIXME this can be removed if we get the units directly from the applicationRound
+  /*
   useEffect(() => {
     let isMounted = true;
     let data: ReservationUnitType[] = [];
@@ -100,7 +103,7 @@ const ReservationUnitList = ({
         const eventUniIds = sortBy(
           applicationEvent.eventReservationUnits,
           "priority"
-        ).map((n) => n.reservationUnitId);
+        ).map((n) => n?.reservationUnit?.pk).filter((n): n is number => n != null);
         // TODO why is this using client directly instead of apollo context with useQuery?
         const apolloClient = createApolloClient(undefined);
         const { data: reservationUnitData } = await apolloClient.query<
@@ -143,7 +146,9 @@ const ReservationUnitList = ({
     applicationEvent.eventReservationUnits,
     applicationRound,
   ]);
+  */
 
+  /*
   useEffect(() => {
     if (isLoading) {
       return;
@@ -160,8 +165,10 @@ const ReservationUnitList = ({
       return;
     }
 
-    form.setValue(fieldName, newReservationUnits);
+    // FIXME
+    // form.setValue(fieldName, newReservationUnits);
   }, [isLoading, reservationUnits, fieldName, form]);
+  */
 
   const move = (
     units: ReservationUnitType[],
@@ -195,9 +202,7 @@ const ReservationUnitList = ({
 
   const { t } = useTranslation();
 
-  if (isLoading) {
-    return <CenterSpinner />;
-  }
+  console.log("reservationUnits", reservationUnits);
 
   return (
     <MainContainer>
@@ -252,4 +257,4 @@ const ReservationUnitList = ({
   );
 };
 
-export default ReservationUnitList;
+export { ReservationUnitList };

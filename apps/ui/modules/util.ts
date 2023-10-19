@@ -27,6 +27,7 @@ import {
   ReservationUnitType,
   ApplicationStatus,
   ReservationUnitByPkType,
+  ApplicationEventScheduleType,
 } from "common/types/gql-types";
 import {
   searchPrefix,
@@ -230,106 +231,6 @@ export const apiDurationToMinutes = (duration: string): number => {
   }
   const parts = duration.split(":");
   return Number(parts[0]) * 60 + Number(parts[1]);
-};
-
-const formatNumber = (n: number): string => `0${n > 23 ? 0 : n}`.slice(-2);
-
-type Timespan = {
-  begin: number;
-  end: number;
-  priority: ApplicationEventSchedulePriority;
-};
-
-export const cellsToApplicationEventSchedules = (
-  cells: Cell[][]
-): ApplicationEventSchedule[] => {
-  const daySchedules = [] as ApplicationEventSchedule[];
-  for (let day = 0; day < cells.length; day += 1) {
-    const dayCells = cells[day];
-    dayCells
-      .filter((cell) => cell.state)
-      .map(
-        (cell) =>
-          ({
-            begin: cell.hour,
-            end: cell.hour + 1,
-            priority: cell.state,
-          } as Timespan)
-      )
-      .reduce((prev, current) => {
-        if (!prev.length) {
-          return [current];
-        }
-        if (
-          prev[prev.length - 1].end === current.begin &&
-          prev[prev.length - 1].priority === current.priority
-        ) {
-          return [
-            ...prev.slice(0, prev.length - 1),
-            {
-              begin: prev[prev.length - 1].begin,
-              end: prev[prev.length - 1].end + 1,
-              priority: prev[prev.length - 1].priority,
-            },
-          ];
-        }
-        return prev.concat([current]);
-      }, [] as Timespan[])
-      .map((cell) => {
-        return {
-          day,
-          begin: `${formatNumber(cell.begin)}:00`,
-          end: `${formatNumber(cell.end)}:00`,
-          priority: cell.priority,
-        } as ApplicationEventSchedule;
-      })
-      .forEach((e) => daySchedules.push(e));
-  }
-  return daySchedules;
-};
-
-const cellLabel = (row: number): string => {
-  return `${row} - ${row + 1}`;
-};
-
-export const applicationEventSchedulesToCells = (
-  applicationEventSchedules: ApplicationEventSchedule[]
-): Cell[][] => {
-  const firstSlotStart = 7;
-  const lastSlotStart = 23;
-
-  const cells: Cell[][] = [];
-
-  for (let j = 0; j < 7; j += 1) {
-    const day = [];
-    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
-      day.push({
-        key: `${i}-${j}`,
-        hour: i,
-        label: cellLabel(i),
-        state: false,
-      });
-    }
-    cells.push(day);
-  }
-
-  applicationEventSchedules.forEach((applicationEventSchedule) => {
-    const { day } = applicationEventSchedule;
-    const hourBegin =
-      Number(applicationEventSchedule.begin.substring(0, 2)) - firstSlotStart;
-
-    const hourEnd =
-      (Number(applicationEventSchedule.end.substring(0, 2)) || 24) -
-      firstSlotStart;
-
-    const { priority } = applicationEventSchedule;
-    for (let h = hourBegin; h < hourEnd; h += 1) {
-      const cell = cells[day][h];
-      cell.state = priority ?? 100;
-    }
-  });
-
-  return cells;
 };
 
 const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>

@@ -1,34 +1,25 @@
 import React, { useState } from "react";
 import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { FormProvider, useForm } from "react-hook-form";
-import {
-  Address,
-  Application,
-  ContactPerson,
-  Organisation,
-} from "common/types/common";
+import { useFormContext } from "react-hook-form";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import { deepCopy, applicationErrorText } from "@/modules/util";
+import { ApplicationType } from "common/types/gql-types";
+import { applicationErrorText } from "@/modules/util";
 import { FormSubHeading, TwoColumnContainer } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import Buttons from "./Buttons";
+import { ApplicationFormValues } from "./Form";
 
 type Props = {
-  application: Application;
-  onNext: (appToSave: Application) => void;
-};
-
-type FormValues = {
-  organisation: Organisation;
-  contactPerson: ContactPerson;
-  billingAddress: Address;
+  application: ApplicationType;
+  onNext: (appToSave: ApplicationFormValues) => void;
 };
 
 // TODO hasBillingAddress can be removed by using the form field
+/*
 const prepareData = (
-  application: Application,
+  application: ApplicationType,
   data: FormValues,
   hasBillingAddress: boolean
 ): Application => {
@@ -48,6 +39,7 @@ const prepareData = (
 
   return applicationCopy;
 };
+*/
 
 const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
   const { t } = useTranslation();
@@ -56,6 +48,13 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
     application.billingAddress !== null
   );
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useFormContext<ApplicationFormValues>();
+
+  /*
   const form = useForm<FormValues>({
     defaultValues: {
       organisation: application.organisation ?? {},
@@ -63,20 +62,15 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
       billingAddress: application.billingAddress ?? {},
     },
   });
+  */
 
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = form;
-
-  const onSubmit = (data: FormValues): void => {
-    const appToSave = prepareData(application, data, hasBillingAddress);
-    onNext(appToSave);
+  const onSubmit = (data: ApplicationFormValues): void => {
+    // const appToSave = prepareData(application, data, hasBillingAddress);
+    onNext(data);
   };
 
   return (
-    <form>
+    <>
       <TwoColumnContainer>
         <FormSubHeading>
           {t("application:Page3.subHeading.basicInfo")}
@@ -191,11 +185,7 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
             onClick={() => setHasBillingAddress(!hasBillingAddress)}
           />
         </CheckboxWrapper>
-        {hasBillingAddress ? (
-          <FormProvider {...form}>
-            <BillingAddress />
-          </FormProvider>
-        ) : null}
+        {hasBillingAddress ? <BillingAddress /> : null}
         <FormSubHeading>
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
@@ -251,18 +241,16 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
             }
           )}
         />
-        <FormProvider {...form}>
-          <EmailInput />
-        </FormProvider>
+        <EmailInput />
       </TwoColumnContainer>
-      {application.id != null && (
+      {application.pk != null && (
         <Buttons
           onSubmit={handleSubmit(onSubmit)}
-          applicationId={application.id}
+          applicationId={application.pk ?? 0}
         />
       )}
-    </form>
+    </>
   );
 };
 
-export default CompanyForm;
+export { CompanyForm };

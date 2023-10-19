@@ -1,25 +1,42 @@
 import React from "react";
 import { formatDuration } from "common/src/common/util";
+import type { ApplicationEventSchedule } from "common/types/common";
 import type {
-  ApplicationEvent,
-  ApplicationEventSchedule,
-} from "common/types/common";
+  ApplicationEventScheduleType,
+  ApplicationEventType,
+} from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
+import { filterNonNullable } from "common/src/helpers";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { useOptions } from "@/hooks/useOptions";
-import TimePreview from "../common/TimePreview";
+import { TimePreview } from "./TimePreview";
 import { StyledLabelValue, TimePreviewContainer } from "./styled";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import UnitList from "./UnitList";
 
-const ApplicationEventList = ({ events }: { events: ApplicationEvent[] }) => {
+const convertToApplicationEventScheduleRest = (
+  schedule: ApplicationEventScheduleType
+): ApplicationEventSchedule => ({
+  id: schedule.pk ?? undefined,
+  day: (schedule.day ?? 0) as ApplicationEventSchedule["day"],
+  begin: schedule.begin,
+  end: schedule.end,
+  priority: schedule.priority as ApplicationEventSchedule["priority"],
+});
+
+const ApplicationEventList = ({
+  events,
+}: {
+  events: ApplicationEventType[];
+}) => {
   const { t } = useTranslation();
   const { params, options } = useOptions();
   const { purposeOptions } = options;
   const { ageGroups } = params;
 
-  const filterPrimary = (n: ApplicationEventSchedule) => n.priority === 300;
-  const filterSecondary = (n: ApplicationEventSchedule) => n.priority === 200;
+  const filterPrimary = (n: ApplicationEventScheduleType) => n.priority === 300;
+  const filterSecondary = (n: ApplicationEventScheduleType) =>
+    n.priority === 200;
 
   const getAgeGroupString = (ageGroupId: number | null | undefined) => {
     if (!ageGroupId) {
@@ -62,11 +79,11 @@ const ApplicationEventList = ({ events }: { events: ApplicationEvent[] }) => {
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.ageGroup")}
-              value={getAgeGroupString(applicationEvent.ageGroupId)}
+              value={getAgeGroupString(applicationEvent.ageGroup?.pk)}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.purpose")}
-              value={getPurposeString(applicationEvent.purposeId)}
+              value={getPurposeString(applicationEvent.purpose?.pk)}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.begin")}
@@ -78,6 +95,7 @@ const ApplicationEventList = ({ events }: { events: ApplicationEvent[] }) => {
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.minDuration")}
+              // TODO rewrite formatDuration to use numbers
               value={formatDuration(applicationEvent.minDuration ?? "")}
             />
             <StyledLabelValue
@@ -93,19 +111,21 @@ const ApplicationEventList = ({ events }: { events: ApplicationEvent[] }) => {
           <FormSubHeading>
             {t("application:Page1.spacesSubHeading")}
           </FormSubHeading>
-          <UnitList units={applicationEvent.eventReservationUnits} />
+          <UnitList
+            units={filterNonNullable(applicationEvent.eventReservationUnits)}
+          />
           <FormSubHeading>
             {t("application:preview.applicationEventSchedules")}
           </FormSubHeading>
           <TimePreviewContainer data-testid={`time-selector__preview-${i}`}>
             <TimePreview
               applicationEventSchedules={[
-                applicationEvent.applicationEventSchedules.filter(
-                  filterPrimary
-                ),
-                applicationEvent.applicationEventSchedules.filter(
-                  filterSecondary
-                ),
+                filterNonNullable(
+                  applicationEvent.applicationEventSchedules
+                ).filter(filterPrimary),
+                filterNonNullable(
+                  applicationEvent.applicationEventSchedules
+                ).filter(filterSecondary),
               ]}
             />
           </TimePreviewContainer>

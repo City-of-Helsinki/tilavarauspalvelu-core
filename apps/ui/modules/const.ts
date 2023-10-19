@@ -66,6 +66,28 @@ export const DATE_TYPES = {
   THIS_WEEK: "this_week",
 };
 
+// TODO use of i18n.t is bad (loading of translations)
+export const getDurationNumberOptions = (): Array<{ label: string; value: number }> => {
+  const result: Array<{ label: string; value: number }> = [];
+  let h = 1;
+  let m = 0;
+  // why are we doing till 45?
+  for (let i = 0; i < 45; i += 1) {
+    const label = `${i18n?.t("common:abbreviations.hour", { count: h })} ${
+          m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
+        }`
+    const value = h * 60 + m;
+    result.push({ label, value });
+    m += 15;
+    if (m === 60) {
+      m = 0;
+      h += 1;
+    }
+  }
+
+  return result;
+};
+
 const option = (label: string, value: string): OptionType => {
   return { label, value };
 };
@@ -106,6 +128,7 @@ export const daysByMonths: OptionType[] = [
 ];
 
 export const defaultDuration = "01:30:00";
+export const defaultDurationMins = 90;
 
 export const isBrowser = typeof window !== "undefined";
 

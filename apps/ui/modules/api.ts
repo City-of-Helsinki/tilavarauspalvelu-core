@@ -27,14 +27,6 @@ interface RequestParameters {
   data?: Application;
 }
 
-enum ApiResponseFormat {
-  json = "json",
-}
-
-interface ApiParameters extends QueryParameters {
-  format: ApiResponseFormat;
-}
-
 async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   const config: AxiosRequestConfig = requestConfig;
 
@@ -58,25 +50,6 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
       );
     }
   }
-}
-
-async function apiGet<T>({
-  path,
-  parameters = {} as QueryParameters,
-}: RequestParameters): Promise<T> {
-  const apiParameters: ApiParameters = {
-    ...parameters,
-    format: ApiResponseFormat.json,
-  };
-
-  return request<T>({
-    url: `${REST_API_URL}${path}/`,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "get",
-    params: apiParameters,
-  });
 }
 
 const validateStatus = (status: number): boolean => status < 300;
@@ -106,12 +79,6 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
     method: "post",
     data,
     validateStatus,
-  });
-}
-
-export function getApplication(id: number): Promise<Application> {
-  return apiGet<Application>({
-    path: `${applicationBasePath}/${id}`,
   });
 }
 

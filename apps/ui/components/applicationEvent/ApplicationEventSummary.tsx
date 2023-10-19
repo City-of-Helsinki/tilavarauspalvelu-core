@@ -3,13 +3,13 @@ import { IconArrowRedo, IconCalendar, IconClock, IconGroup } from "hds-react";
 import React from "react";
 import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
-import { ApplicationEvent } from "common/types/common";
 import { H5 } from "common/src/common/typography";
-import { apiDurationToMinutes, fromUIDate } from "../../modules/util";
+import { fromUIDate } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
+import { ApplicationEventFormValue } from "../application/Form";
 
 type Props = {
-  applicationEvent: ApplicationEvent;
+  applicationEvent: ApplicationEventFormValue;
   name: string;
 };
 
@@ -37,12 +37,15 @@ const Box = styled.div`
 `;
 
 const numHours = (
-  startDate: string,
-  endDate: string,
+  startDate: string | null,
+  endDate: string | null,
   biweekly: boolean,
   eventsPerWeek: number,
   minDurationMinutes: number
 ) => {
+  if (!startDate || !endDate) {
+    return 0;
+  }
   const numWeeks =
     differenceInWeeks(fromUIDate(endDate), fromUIDate(startDate)) /
     (biweekly ? 2 : 1);
@@ -51,12 +54,13 @@ const numHours = (
   return hours;
 };
 
-function displayDuration(duration: string | null, t: TFunction) {
+function displayDuration(duration: number, t: TFunction) {
   if (!duration) {
     return "";
   }
-  const displayHours = Number((duration || "00:00:00").split(":")[0]);
-  const displayMinutes = Number((duration || "00:00:00").split(":")[1]);
+  const durMinutes = duration / 60;
+  const displayHours = Math.floor(durMinutes / 60);
+  const displayMinutes = durMinutes % 60;
 
   return `${t("common:hour", { count: displayHours })} ${
     displayMinutes ? t("common:minute", { count: displayMinutes }) : ""
@@ -73,18 +77,14 @@ const ApplicationEventSummary = ({
     return null;
   }
 
-  const begin = applicationEvent.begin as string;
-  const end = applicationEvent.end as string;
-  const biweekly = Boolean(applicationEvent.biweekly);
-  const eventsPerWeek = Number(applicationEvent.eventsPerWeek);
-  const minDuration = apiDurationToMinutes(
-    applicationEvent.minDuration || "00:00:00"
-  );
-  const maxDuration = apiDurationToMinutes(
-    applicationEvent.maxDuration || "00:00:00"
-  );
-  const numPersons = Number(applicationEvent.numPersons);
-  const hours = numHours(begin, end, biweekly, eventsPerWeek, minDuration);
+  const { begin } = applicationEvent;
+  const { end } = applicationEvent;
+  const { biweekly } = applicationEvent;
+  const { eventsPerWeek } = applicationEvent;
+  const { minDuration } = applicationEvent;
+  const { maxDuration } = applicationEvent;
+  const { numPersons } = applicationEvent;
+  const hours = numHours(begin, end, biweekly, eventsPerWeek, minDuration / 60);
 
   if (!begin || !end || !minDuration) {
     return null;
@@ -107,7 +107,9 @@ const ApplicationEventSummary = ({
         </Message>
         <CustomIconWithText
           icon={<IconGroup aria-hidden />}
-          text={t("applicationEventSummary:numPersons", { count: numPersons })}
+          text={t("applicationEventSummary:numPersons", {
+            count: numPersons ?? 0,
+          })}
         />
         <CustomIconWithText
           icon={<IconClock aria-hidden />}

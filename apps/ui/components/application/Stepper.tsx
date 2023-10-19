@@ -3,8 +3,11 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconCheck } from "hds-react";
 import { useRouter } from "next/router";
-import { Application } from "common/types/common";
 import { fontBold } from "common/src/common/typography";
+import type {
+  ApplicationEventType,
+  ApplicationsApplicationApplicantTypeChoices,
+} from "common/types/gql-types";
 
 const StepContainer = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) =>
@@ -80,8 +83,8 @@ const Name = styled.div<{ $disabled: boolean; $current: boolean }>`
 // TODO only pass the props that are needed (not the whole application)
 type Props = {
   applicationPk: number;
-  applicationEvents: Application["applicationEvents"];
-  applicantType: Application["applicantType"];
+  applicationEvents: ApplicationEventType[];
+  applicantType: ApplicationsApplicationApplicantTypeChoices;
 };
 
 const checkReady = ({
@@ -89,20 +92,23 @@ const checkReady = ({
   applicantType,
   step,
 }: {
-  applicationEvents: Application["applicationEvents"];
-  applicantType: Application["applicantType"];
+  applicationEvents: ApplicationEventType[];
+  applicantType: ApplicationsApplicationApplicantTypeChoices;
   step: number;
 }): boolean => {
   switch (step) {
     case 0: {
       return (
         applicationEvents.length > 0 &&
-        applicationEvents[0].id != null &&
-        applicationEvents[0].id > 0
+        applicationEvents[0].pk != null &&
+        applicationEvents[0].pk > 0
       );
     }
     case 1: {
-      return applicationEvents[0]?.applicationEventSchedules.length > 0;
+      return (
+        applicationEvents[0]?.applicationEventSchedules != null &&
+        applicationEvents[0]?.applicationEventSchedules.length > 0
+      );
     }
     case 2: {
       return applicantType !== null;
@@ -116,14 +122,17 @@ const getMaxPage = ({
   applicationEvents,
   applicantType,
 }: {
-  applicationEvents: Application["applicationEvents"];
-  applicantType: Application["applicantType"];
+  applicationEvents: ApplicationEventType[];
+  applicantType: ApplicationsApplicationApplicantTypeChoices;
 }) => {
   let maxPage = 0;
   if (applicationEvents.length > 0 && applicationEvents[0].id) {
     maxPage = 1;
   }
-  if (applicationEvents[0].applicationEventSchedules.length > 0) {
+  if (
+    applicationEvents[0].applicationEventSchedules != null &&
+    applicationEvents[0].applicationEventSchedules.length > 0
+  ) {
     maxPage = 2;
   }
   if (applicantType != null) {

@@ -2,9 +2,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { Notification, TextInput } from "hds-react";
-import type { Application } from "common/types/common";
+import { applicationErrorText } from "@/modules/util";
 import { SpanTwoColumns } from "../common/common";
-import { applicationErrorText } from "../../modules/util";
+import type { ApplicationFormValues } from "./Form";
 
 const EmailInput = () => {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ const EmailInput = () => {
   const {
     register,
     formState: { errors },
-  } = useFormContext<Application>();
+  } = useFormContext<ApplicationFormValues>();
 
   return (
     <>

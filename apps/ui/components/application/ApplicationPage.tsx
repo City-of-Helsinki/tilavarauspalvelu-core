@@ -1,14 +1,18 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Application } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Container } from "common";
+import {
+  ApplicationType,
+  ApplicationsApplicationApplicantTypeChoices,
+} from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import Head from "./Head";
 import Stepper from "./Stepper";
 
 type ApplicationPageProps = {
-  application?: Application;
+  application?: ApplicationType;
   translationKeyPrefix: string;
   overrideText?: string;
   children?: React.ReactNode;
@@ -52,6 +56,7 @@ const ApplicationPageWrapper = ({
 }: ApplicationPageProps): JSX.Element => {
   const { t } = useTranslation();
 
+  console.log("application", application);
   return (
     <>
       <Head heading={t(`${translationKeyPrefix}.heading`)}>
@@ -63,9 +68,14 @@ const ApplicationPageWrapper = ({
             <div />
           ) : (
             <Stepper
-              applicationPk={application.id ?? 0}
-              applicationEvents={application.applicationEvents}
-              applicantType={application.applicantType}
+              applicationPk={application.pk ?? 0}
+              applicationEvents={filterNonNullable(
+                application.applicationEvents
+              )}
+              applicantType={
+                application.applicantType ??
+                ApplicationsApplicationApplicantTypeChoices.Individual
+              }
             />
           )}
           <Main>{children}</Main>

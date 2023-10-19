@@ -1,15 +1,15 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ApplicationEventSchedule } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
+import { ApplicationEventScheduleType } from "common/types/gql-types";
 import { weekdays } from "../../modules/const";
 
 type Props = {
   applicationEventSchedules: [
-    ApplicationEventSchedule[],
-    ApplicationEventSchedule[]
+    ApplicationEventScheduleType[],
+    ApplicationEventScheduleType[]
   ];
 };
 
@@ -23,7 +23,11 @@ const Label = styled.div`
   padding-right: 4px;
 `;
 
-const Weekdays = ({ schedules }: { schedules: ApplicationEventSchedule[] }) => {
+const Weekdays = ({
+  schedules,
+}: {
+  schedules: ApplicationEventScheduleType[];
+}) => {
   const { t } = useTranslation();
   return (
     <>
@@ -90,4 +94,4 @@ const TimePreview = ({ applicationEventSchedules }: Props): JSX.Element => {
   );
 };
 
-export default TimePreview;
+export { TimePreview };

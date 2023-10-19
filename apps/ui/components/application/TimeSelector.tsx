@@ -3,14 +3,13 @@ import styled, { CSSProperties } from "styled-components";
 import { useTranslation } from "next-i18next";
 import { IconCross, Select } from "hds-react";
 import {
-  ApplicationEventSchedule,
-  Cell,
   ApplicationEventSchedulePriority,
   OptionType,
 } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import TimePreview from "./TimePreview";
+import { ApplicationEventScheduleType } from "common/types/gql-types";
+import { TimePreview } from "./TimePreview";
 import { weekdays } from "../../modules/const";
 import {
   arrowDown,
@@ -19,13 +18,20 @@ import {
   SupplementaryButton,
 } from "../../styles/util";
 
+type Cell = {
+  hour: number;
+  label: string;
+  state: ApplicationEventSchedulePriority;
+  key: string;
+};
+
 type Props = {
   index: number;
   cells: Cell[][];
   updateCells: (i: number, cells: Cell[][]) => void;
   copyCells: ((i: number) => void) | null;
   resetCells: () => void;
-  summaryData: [ApplicationEventSchedule[], ApplicationEventSchedule[]];
+  summaryData: [ApplicationEventScheduleType[], ApplicationEventScheduleType[]];
 };
 
 const CalendarHead = styled.div`
@@ -349,7 +355,9 @@ const TimeSelector = ({
       index,
       cells.map((day) => [
         ...day.map((h) =>
-          h.key === selection.key ? { ...h, state: value } : h
+          h.key === selection.key
+            ? { ...h, state: value === false ? 100 : value }
+            : h
         ),
       ])
     );
@@ -427,4 +435,4 @@ const TimeSelector = ({
   );
 };
 
-export default TimeSelector;
+export { TimeSelector };

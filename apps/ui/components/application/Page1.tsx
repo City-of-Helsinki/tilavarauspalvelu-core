@@ -1,39 +1,37 @@
 import { IconArrowRight, IconPlusCircle } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
-import { useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
 import { useRouter } from "next/router";
-import type { Application } from "common/types/common";
-import type {
-  Query,
-  ApplicationRoundType,
-  ReservationUnitType,
-} from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import {
-  apiDateToUIDate,
-  deepCopy,
-  getTranslation,
-  mapOptions,
-} from "@/modules/util";
+  type Query,
+  type ApplicationRoundType,
+  type ReservationUnitType,
+  type ApplicationType,
+} from "common/types/gql-types";
+import { type UseFormReturn } from "react-hook-form";
+import { getTranslation, mapOptions } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { useOptions } from "@/hooks/useOptions";
 import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { ButtonContainer } from "../common/common";
 import ApplicationEvent from "../applicationEvent/ApplicationEvent";
+import { type ApplicationFormValues } from "./Form";
 
 type Props = {
   // TODO break this down to smaller pieces (only the required props)
   applicationRound: ApplicationRoundType;
-  application: Application;
+  form: UseFormReturn<ApplicationFormValues>;
+  application: ApplicationType;
   savedEventId: number | undefined;
   selectedReservationUnits: ReservationUnitType[];
   save: ({
     application,
     eventId,
   }: {
-    application: Application;
+    application: ApplicationFormValues;
     eventId?: number;
   }) => void;
   onDeleteUnsavedEvent: () => void;
@@ -43,6 +41,7 @@ type Props = {
 
 const Page1 = ({
   save,
+  form,
   addNewApplicationEvent,
   applicationRound,
   application,
@@ -72,24 +71,6 @@ const Page1 = ({
 
   const { options } = useOptions();
 
-  const form = useForm<Application>({
-    mode: "onChange",
-    defaultValues: {
-      // hack to make sure form dates are in correct format
-      applicationEvents: application.applicationEvents.map(
-        (applicationEvent) => ({
-          ...applicationEvent,
-          begin: applicationEvent.begin?.includes("-")
-            ? apiDateToUIDate(applicationEvent.begin)
-            : applicationEvent.begin,
-          end: applicationEvent.end?.includes("-")
-            ? apiDateToUIDate(applicationEvent.end)
-            : applicationEvent.end,
-        })
-      ),
-    },
-  });
-
   const [accordionStates, setAccordionStates] = useState<
     { applicationEventId: number | undefined; isOpen: boolean }[]
   >([]);
@@ -98,10 +79,11 @@ const Page1 = ({
     formState: { errors },
   } = form;
 
-  const prepareData = (data: Application): Application => {
+  /*
+  const prepareData = (data: ApplicationFormValues): Application => {
     const applicationCopy = {
       ...deepCopy(application),
-      applicationEvents: application.applicationEvents.map(
+      applicationEvents: application.applicationEvents?.map(
         (appEvent, index) => ({
           ...appEvent,
           ...data.applicationEvents[index],
@@ -110,10 +92,12 @@ const Page1 = ({
     };
     return applicationCopy;
   };
+  */
 
-  const onSubmit = (data: Application, eventId?: number) => {
+  const onSubmit = (data: ApplicationFormValues, eventId?: number) => {
     const appToSave = {
-      ...prepareData(data),
+      ...data,
+      // ...prepareData(data),
       // override status in order to validate correctly when modifying existing application
       status: "draft" as const,
     };
@@ -124,16 +108,17 @@ const Page1 = ({
 
     if (
       appToSave.applicationEvents.filter(
-        (ae) => ae.eventReservationUnits.length === 0
+        (ae) => ae.reservationUnits.length === 0
       ).length > 0
     ) {
       setError(t("application:error.noReservationUnits"));
       return;
     }
 
+    // FIXME
     // TODO this breaks the form submission state i.e. form.isSubmitting returns false
     // even though the form is being saved. Too scared to change though.
-    form.reset({ applicationEvents: appToSave.applicationEvents });
+    // form.reset({ applicationEvents: appToSave.applicationEvents });
     save({ application: appToSave, eventId });
   };
 
@@ -154,8 +139,8 @@ const Page1 = ({
 
     if (otherEventsAreValid) {
       const appToSave = {
-        ...prepareData(form.getValues()),
-        status: "draft" as const,
+        ...form.getValues(),
+        // status: "draft" as const,
       };
       appToSave.applicationEvents = appToSave.applicationEvents.filter(
         (ae) => ae.id !== eventId
@@ -203,20 +188,21 @@ const Page1 = ({
     }
   };
 
+  const applicationEvents = filterNonNullable(application.applicationEvents);
   const addNewEventButtonDisabled =
-    application.applicationEvents.filter((ae) => !ae.id).length > 0;
+    applicationEvents.filter((ae) => !ae.id).length > 0;
 
   const nextButtonDisabled =
-    application.applicationEvents.length === 0 ||
-    application.applicationEvents.filter((ae) => !ae.id).length > 0 ||
+    applicationEvents.length === 0 ||
+    applicationEvents.filter((ae) => !ae.id).length > 0 ||
     (form.formState.isDirty && !savedEventId);
 
   return (
     <>
-      {application.applicationEvents.map((event, index) => (
+      {applicationEvents.map((event, index) => (
         <ApplicationEvent
-          key={event.id || "NEW"}
-          form={form as unknown as ReturnType<typeof useForm>}
+          key={event.pk || "NEW"}
+          form={form}
           applicationEvent={event}
           index={index}
           applicationRound={applicationRound}
@@ -225,14 +211,14 @@ const Page1 = ({
             unitOptions,
           }}
           selectedReservationUnits={selectedReservationUnits}
-          onSave={form.handleSubmit((app: Application) =>
-            onSubmit(app, event.id)
+          onSave={form.handleSubmit((app) =>
+            onSubmit(app, event.pk ?? undefined)
           )}
-          onDeleteEvent={() => handleDeleteEvent(event.id, index)}
-          onToggleAccordian={() => handleToggleAccordion(event.id)}
-          isVisible={isAccordianOpen(event.id)}
+          onDeleteEvent={() => handleDeleteEvent(event.pk ?? undefined, index)}
+          onToggleAccordian={() => handleToggleAccordion(event.pk ?? undefined)}
+          isVisible={isAccordianOpen(event.pk ?? undefined)}
           applicationEventSaved={
-            savedEventId != null && savedEventId === event.id
+            savedEventId != null && savedEventId === event.pk
           }
         />
       ))}
@@ -254,7 +240,7 @@ const Page1 = ({
           id="button__application--next"
           iconRight={<IconArrowRight />}
           disabled={nextButtonDisabled}
-          onClick={() => history.push(`${application.id}/page2`)}
+          onClick={() => history.push(`${application.pk}/page2`)}
         >
           {t("common:next")}
         </MediumButton>

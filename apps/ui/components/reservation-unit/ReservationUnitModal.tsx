@@ -8,7 +8,7 @@ import {
   LoadingSpinner,
   IconLinkExternal,
 } from "hds-react";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
@@ -22,20 +22,13 @@ import {
   QueryReservationUnitsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
-import { reservationUnitPath } from "../../modules/const";
-import {
-  getAddressAlt,
-  getMainImage,
-  getTranslation,
-} from "../../modules/util";
+import { reservationUnitPath } from "@/modules/const";
+import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
+import { MediumButton, pixel } from "@/styles/util";
+import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import IconWithText from "../common/IconWithText";
-import { MediumButton, pixel } from "../../styles/util";
-import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
-import { getApplicationRoundName } from "../../modules/applicationRound";
-import {
-  getReservationUnitName,
-  getUnitName,
-} from "../../modules/reservationUnit";
 
 const Container = styled.div`
   width: 100%;
@@ -306,7 +299,6 @@ const ReservationUnitModal = ({
     OptionType | undefined
   >(undefined);
   const [unit, setUnit] = useState<OptionType | undefined>(undefined);
-  const [results, setResults] = useState<ReservationUnitType[]>([]);
   const [maxPersons, setMaxPersons] = useState<OptionType | undefined>(
     undefined
   );
@@ -328,12 +320,12 @@ const ReservationUnitModal = ({
     {
       skip: !applicationRound.pk,
       variables: {
+        applicationRound: [applicationRound.pk?.toString() ?? ""],
         textSearch: searchTerm,
         maxPersonsGte: Number(maxPersons?.value),
         reservationUnitType: reservationUnitType?.value
           ? [reservationUnitType?.value?.toString()]
           : [],
-        applicationRound: [applicationRound.pk?.toString() ?? ""],
         unit: unit?.value ? [unit?.value?.toString()] : [],
         orderBy: "nameFi",
         isDraft: false,
@@ -344,20 +336,10 @@ const ReservationUnitModal = ({
     }
   );
 
-  useEffect(() => {
-    const reservationUnits =
-      data?.reservationUnits?.edges
-        .map((n) => n?.node)
-        .filter((n): n is ReservationUnitType => n !== null)
-        .filter((n) =>
-          applicationRound.reservationUnits?.map((ru) => ru?.pk).includes(n?.pk)
-        ) ?? [];
-    setResults(reservationUnits);
-  }, [data, applicationRound.reservationUnits]);
-
-  const emptyResult = results?.length === 0 && (
-    <div>{t("common:noResults")}</div>
-  );
+  const reservationUnits =
+    data?.reservationUnits?.edges
+      .map((n) => n?.node)
+      .filter((n): n is ReservationUnitType => n !== null) ?? [];
 
   return (
     <MainContainer>
@@ -415,26 +397,18 @@ const ReservationUnitModal = ({
       </ButtonContainer>
       <Ruler />
       <Results>
-        {results?.length
-          ? results.map((ru) => {
-              return (
-                <ReservationUnitCard
-                  handleAdd={() => {
-                    handleAdd(ru);
-                  }}
-                  handleRemove={() => {
-                    handleRemove(ru);
-                  }}
-                  isSelected={
-                    currentReservationUnits.find((i) => i.pk === ru.pk) !==
-                    undefined
-                  }
-                  reservationUnit={ru}
-                  key={ru.pk}
-                />
-              );
-            })
-          : emptyResult}
+        {reservationUnits.length === 0 && <div>{t("common:noResults")}</div>}
+        {reservationUnits.map((ru) => (
+          <ReservationUnitCard
+            handleAdd={() => handleAdd(ru)}
+            handleRemove={() => handleRemove(ru)}
+            isSelected={
+              currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
+            }
+            reservationUnit={ru}
+            key={ru.pk}
+          />
+        ))}
       </Results>
     </MainContainer>
   );

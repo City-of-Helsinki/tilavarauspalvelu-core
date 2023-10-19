@@ -315,8 +315,6 @@ export type OptionType = {
   value?: number | string;
 };
 
-export type FormType = undefined | "individual" | "organisation" | "company";
-
 export type LocalizationLanguages = "fi" | "sv" | "en";
 
 export type Cell = {

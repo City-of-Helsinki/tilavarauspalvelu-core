@@ -1,7 +1,11 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Application, OptionType } from "common/types/common";
+import { OptionType } from "common/types/common";
+import {
+  ApplicationType,
+  ApplicationsApplicationApplicantTypeChoices,
+} from "common/types/gql-types";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import LabelValue from "../common/LabelValue";
 import Address from "./AddressPreview";
@@ -12,14 +16,15 @@ const ApplicantInfoPreview = ({
   application,
   cities,
 }: {
-  application: Application;
+  application: ApplicationType;
   cities: OptionType[];
 }): JSX.Element | null => {
   const { t } = useTranslation();
 
   return (
     <TwoColumnContainer>
-      {application.applicantType !== "individual" ? (
+      {application.applicantType !==
+      ApplicationsApplicationApplicantTypeChoices.Individual ? (
         <>
           <StyledLabelValue
             label={t("application:preview.organisation.name")}
@@ -46,21 +51,21 @@ const ApplicantInfoPreview = ({
             <StyledLabelValue
               label={t("application:preview.homeCity")}
               value={
-                application.homeCityId
+                application.homeCity?.pk
                   ? cities.find(
                       (city) =>
-                        city.value === application.homeCityId?.toString()
+                        city.value === application.homeCity?.pk?.toString()
                     )?.label
                   : ""
               }
             />
           </SpanTwoColumns>
           <Address
-            address={application.organisation?.address}
+            address={application.organisation?.address ?? undefined}
             i18nMessagePrefix="common:address"
           />
           <Address
-            address={application.billingAddress}
+            address={application.billingAddress ?? undefined}
             i18nMessagePrefix="common:billingAddress"
           />
         </>
@@ -81,10 +86,11 @@ const ApplicantInfoPreview = ({
         label={t("application:preview.phoneNumber")}
         value={application.contactPerson?.phoneNumber}
       />
-      {application.applicantType === "individual" ? (
+      {application.applicantType ===
+      ApplicationsApplicationApplicantTypeChoices.Individual ? (
         <>
           <Address
-            address={application.billingAddress}
+            address={application.billingAddress ?? undefined}
             i18nMessagePrefix="common:address"
           />
           <StyledLabelValue

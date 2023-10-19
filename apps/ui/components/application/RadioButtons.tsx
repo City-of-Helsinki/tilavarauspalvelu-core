@@ -2,13 +2,13 @@ import { RadioButton } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { FormType } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
+import { ApplicationsApplicationApplicantTypeChoices } from "common/types/gql-types";
 
 type Props = {
-  activeForm: FormType;
+  activeForm: ApplicationsApplicationApplicantTypeChoices;
   children?: React.ReactNode;
-  setActiveForm: (id: FormType) => void;
+  setActiveForm: (id: ApplicationsApplicationApplicantTypeChoices) => void;
 };
 
 const Container = styled.div`
@@ -26,19 +26,30 @@ const RadioButtons = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
+  // Community and association are the same except for corporate id
+  const choices = Object.values(
+    ApplicationsApplicationApplicantTypeChoices
+  ).filter(
+    (id) => id !== ApplicationsApplicationApplicantTypeChoices.Community
+  );
+  // TODO is it better to do this here or in the parent?
+  const selection = choices.find(
+    (id) =>
+      id === activeForm ||
+      (id === ApplicationsApplicationApplicantTypeChoices.Association &&
+        activeForm === ApplicationsApplicationApplicantTypeChoices.Community)
+  );
   return (
     <>
       <Prefix>{t("application:Page3.as.prefix")}</Prefix>
-      {["organisation", "individual", "company"].map((id: string) => (
+      {choices.map((id) => (
         <Container key={id}>
           <RadioButton
             name={id}
             id={id}
             label={t(`application:Page3.as.type.${id}`)}
-            onClick={() => {
-              setActiveForm(id as FormType);
-            }}
-            checked={activeForm === id}
+            onClick={() => setActiveForm(id)}
+            checked={selection === id}
           />
           {activeForm === id ? children : null}
         </Container>

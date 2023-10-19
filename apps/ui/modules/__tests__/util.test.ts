@@ -1,13 +1,10 @@
 import { ApolloError } from "@apollo/client";
 import {
-  ApplicationEventSchedule,
   ApplicationEventSchedulePriority,
   Cell,
-  DAY,
 } from "common";
 import {
   cellsToApplicationEventSchedules,
-  applicationEventSchedulesToCells,
   applicationRoundState,
   getComboboxValues,
   getReadableList,
@@ -83,31 +80,6 @@ test("test that time selector ui model converts to api model", () => {
   ]);
 
   expect(noSelections.length).toBe(0);
-});
-
-const appEventSchedule = (
-  begin: string,
-  end: string,
-  day: DAY,
-  priority: ApplicationEventSchedulePriority
-): ApplicationEventSchedule => ({ begin, end, day, priority });
-
-const cellWithHour = (cells: Cell[], hour: number) =>
-  cells.find((c) => c.hour === hour);
-
-test("test that api model converts to time selector ui model", () => {
-  const result = applicationEventSchedulesToCells([
-    appEventSchedule("08:00", "11:00", 0, 300),
-    appEventSchedule("07:00", "08:00", 1, 200),
-  ]);
-
-  expect(result.length).toBe(7);
-  expect(cellWithHour(result[0], 7)?.state).toBe(false);
-  expect(cellWithHour(result[0], 8)?.state).toBe(300);
-  expect(cellWithHour(result[0], 9)?.state).toBe(300);
-  expect(cellWithHour(result[0], 10)?.state).toBe(300);
-  expect(cellWithHour(result[0], 11)?.state).toBe(false);
-  expect(cellWithHour(result[1], 7)?.state).toBe(200);
 });
 
 test("applicationRoundState", () => {

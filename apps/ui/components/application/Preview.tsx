@@ -3,9 +3,9 @@ import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Application } from "common/types/common";
-import { TermsOfUseType } from "common/types/gql-types";
-import { deepCopy, getTranslation } from "@/modules/util";
+import { ApplicationType, TermsOfUseType } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
+import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import { MediumButton } from "@/styles/util";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
@@ -15,15 +15,10 @@ import { AccordionWithState as Accordion } from "../common/Accordion";
 import ApplicationEventList from "./ApplicationEventList";
 
 type Props = {
-  application: Application;
-  onNext: (application: Application) => void;
+  application: ApplicationType;
+  // This only checks that the user accepts the terms of use, no form data modifications is done here
+  onNext: () => void;
   tos: TermsOfUseType[];
-};
-
-const prepareData = (data: Application): Application => {
-  const applicationCopy = deepCopy(data);
-  applicationCopy.status = "in_review";
-  return applicationCopy;
 };
 
 const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
@@ -35,19 +30,16 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
 
   const { t } = useTranslation();
 
-  const onSubmit = (data: Application): void => {
-    const appToSave = prepareData(data);
-    onNext(appToSave);
+  const onSubmit = (): void => {
+    onNext();
   };
 
   // application not saved yet
-  if (!application.id) {
+  if (!application.pk) {
     return (
       <>
         <h1>{t("application:preview.noData.heading")}</h1>
-        <Link href="page1">
-          <a>{t("application:preview.noData.text")}</a>
-        </Link>
+        <Link href="page1">{t("application:preview.noData.text")}</Link>
       </>
     );
   }
@@ -55,6 +47,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
+  const applicationEvents = filterNonNullable(application.applicationEvents);
   return (
     <>
       <Accordion
@@ -68,7 +61,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
           application={application}
         />
       </Accordion>
-      <ApplicationEventList events={application.applicationEvents} />
+      <ApplicationEventList events={applicationEvents} />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>
@@ -91,15 +84,13 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
       <ButtonContainer>
         <MediumButton
           variant="secondary"
-          onClick={() => router.push(`${application.id}/page3`)}
+          onClick={() => router.push(`${application.pk}/page3`)}
         >
           {t("common:prev")}
         </MediumButton>
         <MediumButton
           id="submit"
-          onClick={() => {
-            onSubmit(application);
-          }}
+          onClick={onSubmit}
           disabled={!acceptTermsOfUse}
         >
           {t("common:submit")}

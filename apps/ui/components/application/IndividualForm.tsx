@@ -1,9 +1,9 @@
 import React from "react";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { FormProvider, useForm } from "react-hook-form";
-import { Address, Application, ContactPerson } from "common/types/common";
-import { deepCopy, applicationErrorText } from "@/modules/util";
+import { useFormContext } from "react-hook-form";
+import type { ApplicationType } from "common/types/gql-types";
+import { applicationErrorText } from "@/modules/util";
 import {
   FormSubHeading,
   SpanTwoColumns,
@@ -12,22 +12,18 @@ import {
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import Buttons from "./Buttons";
+import type { ApplicationFormValues } from "./Form";
 
 type Props = {
-  application: Application;
-  onNext: (appToSave: Application) => void;
+  application: ApplicationType;
+  onNext: (appToSave: ApplicationFormValues) => void;
 };
 
-type FormValues = {
-  contactPerson: ContactPerson;
-  billingAddress: Address;
-  additionalInformation: string;
-};
-
+/*
 const prepareData = (
-  application: Application,
+  application: ApplicationType,
   data: FormValues
-): Application => {
+): ApplicationType => {
   const applicationCopy = deepCopy(application);
 
   applicationCopy.applicantType = "individual";
@@ -47,31 +43,23 @@ const prepareData = (
 
   return applicationCopy;
 };
+*/
 
 const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-
-  const form = useForm<FormValues>({
-    defaultValues: {
-      contactPerson: application.contactPerson ?? {},
-      billingAddress: application.billingAddress ?? {},
-      additionalInformation: application.additionalInformation,
-    },
-  });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = form;
+  } = useFormContext<ApplicationFormValues>();
 
-  const onSubmit = (data: FormValues): void => {
-    const appToSave = prepareData(application, data);
-    onNext(appToSave);
+  const onSubmit = (data: ApplicationFormValues): void => {
+    onNext(data);
   };
 
   return (
-    <form>
+    <>
       <TwoColumnContainer>
         <FormSubHeading as="h2">
           {t("application:Page3.subHeading.basicInfo")}
@@ -110,9 +98,7 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
             }
           )}
         />
-        <FormProvider {...form}>
-          <BillingAddress />
-        </FormProvider>
+        <BillingAddress />
         <FormSubHeading as="h2">
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
@@ -150,18 +136,16 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
             )}
           />
         </SpanTwoColumns>
-        <FormProvider {...form}>
-          <EmailInput />
-        </FormProvider>
+        <EmailInput />
       </TwoColumnContainer>
-      {application.id && (
+      {application.pk && (
         <Buttons
           onSubmit={handleSubmit(onSubmit)}
-          applicationId={application.id}
+          applicationId={application.pk}
         />
       )}
-    </form>
+    </>
   );
 };
 
-export default IndividualForm;
+export { IndividualForm };

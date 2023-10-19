@@ -59,41 +59,42 @@ const IntroPage = (): JSX.Element => {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
-  const [applicationRounds, setApplicationRounds] = useState<OptionType[]>([]);
   const [applicationRound, setApplicationRound] = useState(0);
 
   const history = useRouter();
   const { t } = useTranslation();
 
-  useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS, {
-    fetchPolicy: "no-cache",
-    onCompleted: (data) => {
-      const now = new Date();
-      const ars =
-        data?.applicationRounds?.edges
-          ?.map((n) => n?.node)
-          .filter((n): n is NonNullable<typeof n> => !!n)
-          .filter(
-            (ar) =>
-              new Date(ar.publicDisplayBegin) <= now &&
-              new Date(ar.publicDisplayEnd) >= now &&
-              applicationRoundState(
-                ar.applicationPeriodBegin,
-                ar.applicationPeriodEnd
-              ) === "active"
-          )
-          .map((ar) => ({
-            value: ar.pk ?? 0,
-            label: getApplicationRoundName(ar),
-          })) ?? [];
-      setApplicationRounds(ars);
-    },
-  });
+  const { data } = useQuery<Query, QueryApplicationRoundsArgs>(
+    APPLICATION_ROUNDS,
+    {
+      fetchPolicy: "no-cache",
+    }
+  );
+
+  const now = new Date();
+  const applicationRounds =
+    data?.applicationRounds?.edges
+      ?.map((n) => n?.node)
+      .filter((n): n is NonNullable<typeof n> => !!n)
+      .filter(
+        (ar) =>
+          new Date(ar.publicDisplayBegin) <= now &&
+          new Date(ar.publicDisplayEnd) >= now &&
+          applicationRoundState(
+            ar.applicationPeriodBegin,
+            ar.applicationPeriodEnd
+          ) === "active"
+      )
+      .map((ar) => ({
+        value: ar.pk ?? 0,
+        label: getApplicationRoundName(ar),
+      })) ?? [];
 
   const createNewApplication = async (applicationRoundId: number) => {
     setSaving(true);
 
     try {
+      // FIXME replace with GQL (createApplication)
       const templateApplication = {
         ...deepCopy(minimalApplicationForInitialSave(applicationRoundId)),
       } as Application;
@@ -118,17 +119,17 @@ const IntroPage = (): JSX.Element => {
     <>
       <Head noKoros heading={t("application:Intro.heading")}>
         <Container>
-          {applicationRounds?.length > 0 ? (
+          {applicationRounds.length > 0 ? (
             <>
               <Select
                 id="applicationRoundSelect"
                 placeholder={t("common:select")}
-                options={applicationRounds as OptionType[]}
+                options={applicationRounds}
                 label={t("common:select")}
                 onChange={(selection: OptionType): void => {
                   setApplicationRound(selection.value as number);
                 }}
-                value={applicationRounds?.find(
+                value={applicationRounds.find(
                   (n) => n.value === applicationRound
                 )}
               />
