@@ -1,4 +1,4 @@
-import React, {Children, useEffect, useState} from "react";
+import React, { Children, useEffect, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { fontMedium } from "../common/typography";
@@ -49,7 +49,7 @@ const ShowAllContainer = ({
   showAllLabel,
   showLessLabel = showAllLabel,
   maximumNumber = 0,
-  initiallyOpen,
+  initiallyOpen = false,
   alignButton = "left",
   renderAsUl,
   children,

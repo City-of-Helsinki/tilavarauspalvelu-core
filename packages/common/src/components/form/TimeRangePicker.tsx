@@ -132,7 +132,7 @@ const TimeRangePicker = <T extends FieldValues>({
         clearable={clearable?.begin}
         invalid={endTimeIsBeforeStartTime || beginFieldState.invalid}
         value={getSelectedOption(beginField.value, populatedTimeOptions)}
-        onChange={(e) => {
+        onChange={(e: OptionType) => {
           beginField.onChange(e !== null ? e.label : null);
         }}
       />
@@ -146,7 +146,7 @@ const TimeRangePicker = <T extends FieldValues>({
         clearable={clearable?.end}
         invalid={endTimeIsBeforeStartTime || endFieldState.invalid}
         value={getSelectedOption(endField.value, populatedTimeOptions)}
-        onChange={(e) => {
+        onChange={(e: OptionType) => {
           endField.onChange(e !== null ? e.label : null);
         }}
       />

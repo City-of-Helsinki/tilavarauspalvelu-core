@@ -23,6 +23,7 @@
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
     "equipments": "{{value}}",
+    "unit": "{{value}}",
     "minPersons": "Vähintään {{value}} hlö",
     "maxPersons": "Enintään {{value}} hlö",
     "dateBegin": "Alkaen {{value}}",

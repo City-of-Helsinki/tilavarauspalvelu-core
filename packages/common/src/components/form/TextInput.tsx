@@ -1,10 +1,11 @@
 import React from "react";
 import { TextInput as HDSTextInput } from "hds-react";
 import {
-  FieldValues,
-  Path,
+  type FieldValues,
+  type Path,
+  type SubmitHandler,
   useController,
-  UseControllerProps,
+  type UseControllerProps,
 } from "react-hook-form";
 import { removeRefParam } from "../../reservation-form/util";
 
@@ -17,13 +18,13 @@ interface TextInputProps<T extends FieldValues> extends UseControllerProps<T> {
   label?: string;
   placeholder?: string;
   clearable?: boolean;
-  onEnterKeyPress: () => Promise<void>;
+  onEnterKeyPress: () => SubmitHandler<FieldValues>;
 }
 
-const TextInput = (props: TextInputProps<T>) => {
+const TextInput = (props: TextInputProps<FieldValues>) => {
   const {
     name,
-    id,
+    id = name,
     control,
     required,
     disabled,
@@ -52,7 +53,7 @@ const TextInput = (props: TextInputProps<T>) => {
       {...inputProps}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          onEnterKeyPress.call();
+          onEnterKeyPress();
         }
       }}
       onChange={field.onChange}

@@ -81,7 +81,7 @@ const processVariables = (values: Record<string, string>, language: string) => {
   const sortCriteria = ["name", "unitName"].includes(values.sort)
     ? `${values.sort}${capitalize(language)}`
     : values.sort;
-  const returnValues = {
+  return {
     ...omit(values, [
       "order",
       "sort",
@@ -135,7 +135,6 @@ const processVariables = (values: Record<string, string>, language: string) => {
     reservationKind:
       ReservationUnitsReservationUnitReservationKindChoices.Direct,
   };
-  return returnValues;
 };
 
 const SearchSingle = (): JSX.Element => {
