@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Tag } from "hds-react";
-import { inHours } from "./SearchForm";
 
 type FilterTagProps = {
   formValueKeys: string[];
@@ -83,6 +82,8 @@ const FilterTagList = ({
     "equipments",
   ];
   const { t } = useTranslation();
+  const inHours = (minutes: number): number =>
+    Math.round((minutes / 60) * 100) / 100; // two decimal places
   const durationTranslation = (duration: number): string => {
     let unit = t("common:abbreviations.hour", { count: inHours(duration) });
     if (duration <= 90) {

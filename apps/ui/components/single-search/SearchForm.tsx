@@ -266,9 +266,6 @@ const useMappedOptions = (
   return { options: [], isLoading: loading };
 };
 
-export const inHours = (minutes: number): number =>
-  Math.round((minutes / 60) * 100) / 100; // two decimal places
-
 const SearchForm = ({
   onSearch,
   formValues,
