@@ -3,11 +3,11 @@ import { TextInput as HDSTextInput } from "hds-react";
 import {
   type FieldValues,
   type Path,
-  type SubmitHandler,
   useController,
   type UseControllerProps,
 } from "react-hook-form";
 import { removeRefParam } from "../../reservation-form/util";
+import { FormValues } from "../single-search/types";
 
 interface TextInputProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
@@ -18,10 +18,10 @@ interface TextInputProps<T extends FieldValues> extends UseControllerProps<T> {
   label?: string;
   placeholder?: string;
   clearable?: boolean;
-  onEnterKeyPress: () => SubmitHandler<FieldValues>;
+  onEnterKeyPress: () => Promise<void>;
 }
 
-const TextInput = (props: TextInputProps<FieldValues>) => {
+const TextInput = (props: TextInputProps<FormValues>) => {
   const {
     name,
     id = name,
@@ -53,12 +53,12 @@ const TextInput = (props: TextInputProps<FieldValues>) => {
       {...inputProps}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          onEnterKeyPress();
+          onEnterKeyPress().then();
         }
       }}
       onChange={field.onChange}
       onBlur={field.onBlur}
-      value={field.value}
+      value={String(field.value)}
       errorText={fieldState.error && fieldState.error.message}
       aria-placeholder={inputProps.placeholder}
       aria-roledescription={inputProps.label}

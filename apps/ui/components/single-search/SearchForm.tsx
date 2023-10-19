@@ -1,10 +1,10 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { IconSearch, Select } from "hds-react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import styled, { css } from "styled-components";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import styled from "styled-components";
 import { DocumentNode, useQuery } from "@apollo/client";
-import { omit, sortBy } from "lodash";
+import { sortBy } from "lodash";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryUnitsArgs } from "common/types/gql-types";
@@ -12,6 +12,7 @@ import { addYears } from "date-fns";
 import { ShowAllContainer } from "common/src/components";
 import { TextInput, TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
+import { type FormValues } from "common/src/components/single-search/types";
 import {
   fromUIDate,
   getSelectedOption,
@@ -26,29 +27,12 @@ import {
   SEARCH_FORM_PARAMS_UNIT,
 } from "@/modules/queries/params";
 import { RESERVATION_UNIT_TYPES } from "@/modules/queries/reservationUnit";
-import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import {
   Checkbox,
   DateRangePicker,
   MultiSelectDropdown,
 } from "@/components/form";
 import FilterTagList from "./FilterTagList";
-
-export interface FormValues {
-  purposes: string | null;
-  unit: string | null;
-  equipments: string | null;
-  timeBegin: string | null;
-  timeEnd: string | null;
-  dateBegin: string | null;
-  dateEnd: string | null;
-  duration: number | null;
-  minPersons: string | null;
-  maxPersons: string | null;
-  reservationUnitType: string;
-  showOnlyAvailable?: boolean;
-  textSearch?: string;
-}
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -141,24 +125,24 @@ const OptionalFilters = styled(ShowAllContainer)`
       row-gap: 0;
     }
   }
+  /* If OptionalFilters is closed (== has no children), remove the row-gap and margin-top from the
+  toggle button container. Otherwise the toggle button container will have an unwanted gap above it
+  resulting from the empty grid row in breakpoints larger than mobile/s. */
   @media (min-width: ${breakpoints.m}) {
     grid-column: 1 / span 2;
     grid-row: 3 / span 1;
+    > [class*="ShowAllContainer__ToggleButtonContainer"] {
+      margin-top: var(--spacing-s);
+    }
     > [class="ShowAllContainer__Content"] {
       grid-template-columns: repeat(2, 1fr);
       gap: var(--spacing-m);
-      // If ShowAllContainer is closed (== has no children), remove the row-gap and margin-top from the
-      // toggle button container. Otherwise the toggle button container will have an unwanted gap above it
-      // resulting from the empty grid row.
       &:empty {
         row-gap: 0;
         ~ [class*="ShowAllContainer__ToggleButtonContainer"] {
           margin-top: 0;
         }
       }
-    }
-    > [class*="ShowAllContainer__ToggleButtonContainer"] {
-      margin-top: var(--spacing-s);
     }
 
     > div {
@@ -195,13 +179,13 @@ const DateRangeWrapper = styled.div`
     label {
       height: 24px;
     }
-    // Starting date picker
+    /* Starting date picker */
     > div:first-child {
       input {
         border-right: 0;
       }
     }
-    // Ending date picker
+    /* Ending date picker */
     > div:last-child {
       margin-top: 0;
     }
@@ -216,12 +200,13 @@ const TimeRangeWrapper = styled.div`
   .error-message {
     grid-column: span 2;
   }
-  // Starting date picker
+  /* Starting date picker */
   > div:first-child > div {
     border-right: 0;
   }
-  // Hide the label text (but keep its height) for the end time select, since HDS adds a "*" to required field labels
-  // TODO: Make the displaying of the label text component conditional on having an empty text as before label, as it could possibly often be empty. Especially if the component to be is re-used.
+  /* Hide the label text (but keep its height) for the end time select, since HDS adds a "*" to required field labels
+  TODO: Make the displaying of the label text component conditional on having an empty text as before label, as it could possibly often be empty. Especially if the component to be is re-used. */
+  /* Ending date picker */
   > div:nth-child(2) label {
     height: 24px;
     span {
@@ -615,7 +600,7 @@ const SearchForm = ({
         )}
         <SubmitButton
           id="searchButton"
-          onClick={handleSubmit(search)}
+          onClick={handleSubmit(search) as SubmitHandler<FieldValues>}
           iconLeft={<IconSearch />}
         >
           {t("searchForm:searchButton")}

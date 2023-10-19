@@ -258,7 +258,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       "order",
     ]);
     history.replace(
-      // @ts-expect-error: TODO: fix this
+      // TODO: fix this
       searchUrl({
         ...criteria,
         ...sortingCriteria,
@@ -285,7 +285,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       "order",
     ]);
     history.replace(
-      // @ts-expect-error: TODO: fix this
+      // TODO: fix this
       searchUrl({
         ...newValues,
         ...sortingCriteria,

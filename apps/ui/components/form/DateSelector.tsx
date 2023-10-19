@@ -188,8 +188,8 @@ const DateSelector = ({
 
   const selectedText = React.useMemo(() => {
     if (startDate != null || endDate != null) {
-      return `${toUIDate(startDate ?? undefined)} -
-            ${toUIDate(endDate ?? undefined)}`;
+      return `${startDate ? toUIDate(startDate) : ""} -
+            ${endDate ? toUIDate(endDate) : ""}`;
     }
 
     const sortDateTypes = (a: string, b: string): number =>

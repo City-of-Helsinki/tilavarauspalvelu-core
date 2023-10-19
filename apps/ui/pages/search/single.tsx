@@ -246,7 +246,7 @@ const SearchSingle = (): JSX.Element => {
       "sort",
       "order",
     ]);
-    // @ts-expect-error: TODO: fix this
+    // TODO: fix this
     router.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 
@@ -269,7 +269,7 @@ const SearchSingle = (): JSX.Element => {
       "order",
     ]);
     router.replace(
-      // @ts-expect-error: TODO: fix this
+      // TODO: fix this
       singleSearchUrl({
         ...newValues,
         ...sortingCriteria,
