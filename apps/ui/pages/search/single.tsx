@@ -308,14 +308,14 @@ const SearchSingle = (): JSX.Element => {
           <BottomWrapper>
             <ListWithPagination
               id="searchResultList"
-              items={reservationUnits?.map((ru) =>
-                ru ? (
-                  <ReservationUnitCard reservationUnit={ru} key={ru.id} />
-                ) : (
-                  // eslint-disable-next-line react/jsx-no-useless-fragment
-                  <></> // items attribute expects an array of JSX elements
+              items={reservationUnits
+                ?.filter(
+                  (n: null | ReservationUnitType): n is NonNullable<typeof n> =>
+                    n != null
                 )
-              )}
+                .map((ru) => (
+                  <ReservationUnitCard reservationUnit={ru} key={ru.id} />
+                ))}
               loading={loading}
               loadingMore={loadingMore}
               pageInfo={pageInfo}

@@ -111,7 +111,7 @@ const TimeRangePicker = <T extends FieldValues>({
       }
     }
     // we need to add the minute times to the beginning of the duration options
-    return times as OptionType[];
+    return times;
   };
 
   const populatedTimeOptions = populateTimes();

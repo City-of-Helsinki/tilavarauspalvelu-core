@@ -110,7 +110,7 @@ const StyledSelect = styled(Select<OptionType>)<{ name?: string }>`
 `;
 
 const StyledCheckBox = styled(Checkbox)`
-  &&&& {
+  &&& {
     @media (min-width: ${breakpoints.m}) {
       margin-top: -70px;
       grid-column: 3 / span 1;
@@ -129,9 +129,7 @@ const TwInput = styled.div`
   }
 `;
 
-const OptionalFilters = styled(ShowAllContainer)<{
-  children: ReactNode[];
-}>`
+const OptionalFilters = styled(ShowAllContainer)`
   && {
     grid-column: 1 / span 3;
   }
@@ -149,6 +147,9 @@ const OptionalFilters = styled(ShowAllContainer)<{
     > [class="ShowAllContainer__Content"] {
       grid-template-columns: repeat(2, 1fr);
       gap: var(--spacing-m);
+      // If ShowAllContainer is closed (== has no children), remove the row-gap and margin-top from the
+      // toggle button container. Otherwise the toggle button container will have an unwanted gap above it
+      // resulting from the empty grid row.
       &:empty {
         row-gap: 0;
         ~ [class*="ShowAllContainer__ToggleButtonContainer"] {
@@ -317,7 +318,7 @@ const SearchForm = ({
       }
     }
     // we need to add the minute times to the beginning of the duration options
-    return durationMinuteOptions().concat(...times) as OptionType[];
+    return durationMinuteOptions().concat(times);
   };
   const durationOptions = populateDurationOptions();
 
@@ -461,7 +462,7 @@ const SearchForm = ({
               }
               labels={{
                 begin: t("searchForm:dateFilter"),
-                end: t(" "),
+                end: " ",
               }}
               required={{ begin: false, end: false }}
               limits={{
