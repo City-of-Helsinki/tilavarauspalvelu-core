@@ -81,10 +81,10 @@ const TimeRangePicker = <T extends FieldValues>({
 
   // Return the option with the given value as label
   const getSelectedOption = (
-    optionValue: number | null,
+    optionValue: string | null,
     optionList: OptionType[]
-  ): OptionType | null => {
-    return optionList.find((o) => o.label === optionValue) ?? null;
+  ): OptionType | undefined => {
+    return optionList.find((o) => o.label === optionValue);
   };
   const populateTimes = (
     populateTimesProps?: PopulateTimesProps
@@ -115,10 +115,18 @@ const TimeRangePicker = <T extends FieldValues>({
   };
 
   const populatedTimeOptions = populateTimes();
+  const beginValue = getSelectedOption(
+    beginField.value,
+    populatedTimeOptions
+  )?.value;
+  const endValue = getSelectedOption(
+    endField.value,
+    populatedTimeOptions
+  )?.value;
   const endTimeIsBeforeStartTime =
-    beginField.value &&
-    endField.value &&
-    beginField.value.value >= endField.value.value;
+    !Number.isNaN(Number(beginValue)) &&
+    !Number.isNaN(Number(endValue)) &&
+    Number(beginValue) >= Number(endValue);
 
   return (
     <>
@@ -150,7 +158,7 @@ const TimeRangePicker = <T extends FieldValues>({
           endField.onChange(e !== null ? e.label : null);
         }}
       />
-      {endTimeIsBeforeStartTime && (
+      {!!endTimeIsBeforeStartTime && (
         <StartBeforeEndError>
           {t("searchForm:beginTimeIsBeforeEndTime")}
         </StartBeforeEndError>
