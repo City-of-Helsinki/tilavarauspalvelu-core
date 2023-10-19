@@ -20,7 +20,12 @@ export interface DateRangePickerProps {
   onChangeEndDate: (time: Date | null) => void;
   onChangeStartDate: (time: Date | null) => void;
   showHelperText?: boolean;
-  labels?: { begin?: string; end?: string };
+  labels?: {
+    begin?: string;
+    end?: string;
+    ariaBegin?: string;
+    ariaEnd?: string;
+  };
   required?: { begin?: boolean; end?: boolean };
   limits?: {
     startMinDate?: Date;
@@ -140,6 +145,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         maxDate={limits?.startMaxDate}
         initialMonth={new Date()}
         label={labels?.begin ?? t("dateSelector:labelStartDate")}
+        aria-label={labels?.ariaBegin ?? t("dateSelector:labelStartDate")}
         language={i18n.language as Language}
         onChange={(date) => setInternalStartDateString(date)}
         errorText={
@@ -166,6 +172,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         maxDate={limits?.endMaxDate}
         initialMonth={startDate ?? new Date()}
         label={labels?.end ?? t("dateSelector:labelEndDate")}
+        aria-label={labels?.ariaEnd ?? t("dateSelector:labelEndDate")}
         language={i18n.language as Language}
         onChange={(date) => setInternalEndDateString(date)}
         errorText={
