@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Callable
 from functools import partial
 from itertools import chain
@@ -10,10 +11,11 @@ from graphene import Connection, Field, relay
 from graphene.types.resolver import attr_resolver
 from graphene.types.unmountedtype import UnmountedType
 from graphene_django import DjangoConnectionField, DjangoListField, DjangoObjectType
-from graphene_django.converter import convert_django_field
+from graphene_django.converter import convert_django_field, get_django_field_description
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.types import DjangoObjectTypeOptions, ErrorType
 from graphene_permissions.permissions import BasePermission
+from graphql import GraphQLError
 
 from api.graphql.extensions.permission_helpers import Check, private_field
 from common.typing import AnyUser, GQLInfo
@@ -175,6 +177,7 @@ _CONVERSION_TABLE: dict[type, type[models.Field]] = {
     set: models.JSONField,
     tuple: models.JSONField,
     bytes: models.BinaryField,
+    datetime.time: models.TimeField,
 }
 
 
@@ -184,7 +187,27 @@ def convert_typed_dict_to_graphene_type(typed_dict: type[TypedDict]) -> type[gra
         model_field = _CONVERSION_TABLE.get(type_)
         if model_field is None:
             raise ValueError(f"Cannot convert field {field_name} of type {type_} to model field.")
-        graphene_type = convert_django_field(model_field, field_name, None)
+        graphene_type = convert_django_field(model_field())
         graphene_types[field_name] = graphene_type
 
     return type(f"{typed_dict.__name__}Type", (graphene.ObjectType,), graphene_types)  # type: ignore
+
+
+class TimeString(graphene.Time):
+    """Time scalar that can parse time-strings from database."""
+
+    @staticmethod
+    def serialize(time: datetime.time | str):
+        if isinstance(time, str):
+            time = TimeString.parse_value(time)
+        if not isinstance(time, datetime.time):
+            raise GraphQLError(f"Time cannot represent value: {time!r}")
+        return time.isoformat()
+
+
+@convert_django_field.register(models.TimeField)
+def convert_time_to_string(field, registry=None):
+    return TimeString(
+        description=get_django_field_description(field),
+        required=not field.null,
+    )
