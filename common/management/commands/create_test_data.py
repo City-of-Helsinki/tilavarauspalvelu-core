@@ -19,6 +19,7 @@ from applications.choices import (
     OrganizationTypeChoice,
     PriorityChoice,
     TargetGroupChoice,
+    WeekdayChoice,
 )
 from applications.models import (
     Address,
@@ -26,11 +27,13 @@ from applications.models import (
     ApplicationEvent,
     ApplicationEventSchedule,
     ApplicationRound,
+    ApplicationRoundTimeSlot,
     City,
     EventReservationUnit,
     Organisation,
     Person,
 )
+from applications.typing import TimeSlotDB
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.management.commands._utils import (
     batched,
@@ -1302,6 +1305,8 @@ def _create_reservation_units(
         reservation_unit.spaces.add(*random_subset(spaces))
         reservation_unit.payment_types.add(*random_subset(payment_types))
 
+    _create_application_round_time_slots(reservation_units)
+
     return reservation_units
 
 
@@ -1320,6 +1325,46 @@ def _create_reservation_payment_types() -> list[ReservationUnitPaymentType]:
         payment_types.append(payment_type)
 
     return payment_types
+
+
+@with_logs(
+    text_entering="Creating application round time slots...",
+    text_exiting="Application round time slots created!",
+)
+def _create_application_round_time_slots(reservation_units: list[ReservationUnit]) -> list[ApplicationRoundTimeSlot]:
+    time_slots: list[ApplicationRoundTimeSlot] = []
+    for reservation_unit in reservation_units:
+        weekdays: list[int] = random_subset(WeekdayChoice.values)
+        for weekday in weekdays:
+            reservable_times: list[TimeSlotDB] = []
+            closed: bool = weighted_choice([True, False], weights=[1, 4])
+            if not closed:
+                reservable_times.append(
+                    TimeSlotDB(
+                        begin=time(hour=random.randint(7, 12)).isoformat(timespec="seconds"),
+                        end=time(hour=random.randint(12, 19)).isoformat(timespec="seconds"),
+                    )
+                )
+                # 1/3 chance of having a second reservable time
+                if weighted_choice([True, False], weights=[1, 2]):
+                    reservable_times.append(
+                        TimeSlotDB(
+                            begin=time(hour=random.randint(19, 20)).isoformat(timespec="seconds"),
+                            # 1/2 chance of ending at 22:00, 1/2 chance of ending at 00:00
+                            end=time(hour=random.choice([22, 0])).isoformat(timespec="seconds"),
+                        )
+                    )
+
+            time_slots.append(
+                ApplicationRoundTimeSlot(
+                    reservation_unit=reservation_unit,
+                    weekday=weekday,
+                    closed=closed,
+                    reservable_times=reservable_times,
+                )
+            )
+
+    return ApplicationRoundTimeSlot.objects.bulk_create(time_slots)
 
 
 @with_logs(
