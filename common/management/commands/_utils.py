@@ -8,8 +8,6 @@ from faker import Faker
 T = TypeVar("T")
 P = ParamSpec("P")
 
-TList = TypeVar("TList", bound=list)
-
 faker_fi = Faker(locale="fi_FI")
 faker_sv = Faker(locale="sv_SE")
 faker_en = Faker(locale="en_US")
@@ -37,7 +35,7 @@ def get_paragraphs() -> Paragraphs:
     )
 
 
-def batched(iterable: TList, *, batch_size: int) -> Generator[TList, Any, None]:
+def batched(iterable: list[T], *, batch_size: int) -> Generator[list[T], Any, None]:
     if batch_size <= 0:
         raise ValueError("Batch size must be positive.")
 
@@ -47,15 +45,15 @@ def batched(iterable: TList, *, batch_size: int) -> Generator[TList, Any, None]:
 
 
 def random_subset(
-    iterable: TList,
+    sequence: Sequence[T],
     *,
     max_size: int = 0,
     counts: list[int] | None = None,
-) -> TList:
+) -> list[T]:
     if max_size < 1:
-        max_size = len(iterable)
+        max_size = len(sequence)
     size = random.randint(0, max_size)
-    return random.sample(iterable, counts=counts, k=size)
+    return random.sample(sequence, counts=counts, k=size)
 
 
 def weighted_choice(choices: Sequence[T], weights: list[int]) -> T:
@@ -69,9 +67,9 @@ def with_logs(
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-            print(text_entering)  # noqa: T201
+            print(text_entering)  # noqa: T201, RUF100
             return_value = func(*args, **kwargs)
-            print(text_exiting)  # noqa: T201
+            print(text_exiting)  # noqa: T201, RUF100
             return return_value
 
         return wrapper
