@@ -2,7 +2,7 @@ from assertpy import assert_that
 from django.contrib.admin import AdminSite
 from django.test import RequestFactory, TestCase
 
-from reservation_units.admin import ReservationUnitAdmin
+from reservation_units.admin.reservation_unit import ReservationUnitAdmin
 from reservation_units.models import ReservationKind, ReservationUnit
 from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationUnitFactory, TermsOfUseFactory
