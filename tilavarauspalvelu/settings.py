@@ -190,6 +190,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "social_django",
     "tinymce",
+    "subforms",
     # -- Our apps ------------
     "common",
     "users",
