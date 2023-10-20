@@ -4,7 +4,7 @@ import graphene
 from django.db.models import Q, QuerySet, Sum
 from django.utils.timezone import get_default_timezone
 from easy_thumbnails.files import get_thumbnailer
-from graphene_django import DjangoObjectType
+from graphene_django import DjangoListField, DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 from graphql import GraphQLError
 
@@ -12,6 +12,7 @@ from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.duration_field import Duration
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from api.graphql.extensions.permission_helpers import check_resolver_permission
+from api.graphql.types.application_round_time_slot.types import ApplicationRoundTimeSlotNode
 from api.graphql.types.merchants.types import PaymentMerchantType, PaymentProductType
 from api.graphql.types.opening_hours.types import OpeningHoursMixin
 from api.graphql.types.reservation_units.permissions import (
@@ -415,6 +416,8 @@ class ReservationUnitType(
     permission_classes = (ReservationUnitPermission,)
     pricings = graphene.List(ReservationUnitPricingType)
 
+    application_round_time_slots = DjangoListField(ApplicationRoundTimeSlotNode)
+
     class Meta:
         model = ReservationUnit
         fields = [
@@ -467,6 +470,7 @@ class ReservationUnitType(
             "reservation_state",
             "payment_merchant",
             "payment_product",
+            "application_round_time_slots",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],

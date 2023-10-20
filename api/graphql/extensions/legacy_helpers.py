@@ -25,32 +25,40 @@ class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
     def to_internal_value(self, data):
         try:
             int_val = super().to_internal_value(data)
-        except serializers.ValidationError as e:
-            raise self.validation_error_to_graphql_error(e)
+        except serializers.ValidationError as error:
+            raise self.validation_error_to_graphql_error(error)
 
         return int_val
 
-    def validation_error_to_graphql_error(self, e: serializers.ValidationError):
-        fields = ["nonFieldError"]
-        messages = []
-        if isinstance(e.detail, dict) and len(e.detail.items()) > 0:
-            fields = []
-            for f, detail in e.detail.items():
-                fields.append(to_camel_case(f))
-                messages.append(" ".join(detail))
+    def validation_error_to_graphql_error(self, error: serializers.ValidationError):
+        fields, message = self.compile_fields_and_errors(error.detail)
+        return GraphQLError(message, extensions={"field": fields}, original_error=error)
 
-        elif isinstance(e.detail, list) and len(e.detail) > 0:
-            for m in e.detail:
-                messages.append(m)
+    def compile_fields_and_errors(self, detail: list | dict | ErrorDetail) -> tuple[str, str]:
+        fields: dict[str, None] = {"nonFieldError": None}  # dict used to maintain uniqueness and order
+        message = self.compile_error_messages(detail, fields)
+        return ", ".join(fields), message
 
-        elif isinstance(e.detail, ErrorDetail):
-            messages.append(e.detail)
+    def compile_error_messages(self, detail: list | dict | ErrorDetail, fields: dict[str, None]) -> str:
+        messages: list[str] = []
 
-        return GraphQLError(
-            " ".join(messages),
-            extensions={"field": ", ".join(fields)},
-            original_error=e,
-        )
+        if isinstance(detail, dict) and len(detail) > 0:
+            fields.pop("nonFieldError", None)
+
+            for field_name, field_details in detail.items():
+                fields[to_camel_case(field_name)] = None
+                for item in field_details:
+                    message = self.compile_error_messages(item, fields)
+                    messages.append(message)
+
+        elif isinstance(detail, list) and len(detail) > 0:
+            for item in detail:
+                messages.append(item)
+
+        elif isinstance(detail, ErrorDetail | str):
+            messages.append(detail)
+
+        return " ".join(messages)
 
 
 class OldPrimaryKeySerializer(OldPrimaryKeySerializerBase):

@@ -4,6 +4,7 @@ from django.core import validators
 from graphene.utils.str_converters import to_camel_case
 from graphql import GraphQLError
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions.decimal_field import DecimalField
 from api.graphql.extensions.duration_field import DurationField
@@ -14,7 +15,10 @@ from api.graphql.extensions.legacy_helpers import (
     get_all_translatable_fields,
 )
 from api.graphql.extensions.validating_list_field import ValidatingListField
+from api.graphql.types.application_round_time_slot.serializers import ApplicationRoundTimeSlotSerializer
 from api.legacy_rest_api.serializers import ReservationUnitSerializer
+from applications.choices import WeekdayChoice
+from applications.models import ApplicationRoundTimeSlot
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.models import (
     Equipment,
@@ -304,6 +308,8 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
 
     pricings = ReservationUnitPricingCreateSerializer(many=True, read_only=False, required=False)
 
+    application_round_time_slots = ApplicationRoundTimeSlotSerializer(many=True, required=False)
+
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
     class Meta(ReservationUnitSerializer.Meta):
@@ -360,6 +366,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
             "pricing_terms",
             "payment_types",
             "pricings",
+            "application_round_time_slots",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
@@ -447,14 +454,47 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
         return data
 
     @staticmethod
+    def validate_application_round_time_slots(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        errors: list[str] = []
+        weekdays_seen: set[int] = set()
+
+        for timeslot in timeslots:
+            weekday = timeslot["weekday"]
+            closed = timeslot.get("closed", False)
+            reservable_times = timeslot.get("reservable_times", [])
+
+            if closed and len(reservable_times) > 0:
+                errors.append("Closed timeslots cannot have reservable times.")
+            elif not closed and len(reservable_times) == 0:
+                errors.append("Open timeslots must have reservable times.")
+
+            if weekday in weekdays_seen:
+                day = WeekdayChoice(weekday).name.capitalize()
+                errors.append(f"Got multiple timeslots for {day}.")
+
+            weekdays_seen.add(weekday)
+
+        if errors:
+            raise ValidationError(errors)
+
+        return timeslots
+
+    @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit):
         for pricing in pricings:
             ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
+    @staticmethod
+    def handle_timeslots(time_slots: list[dict[str, Any]], reservation_unit: ReservationUnit) -> None:
+        for time_slot in time_slots:
+            ApplicationRoundTimeSlot.objects.create(**time_slot, reservation_unit=reservation_unit)
+
     def create(self, validated_data):
         pricings = validated_data.pop("pricings", [])
+        application_round_time_slots = validated_data.pop("application_round_time_slots", [])
         reservation_unit = super().create(validated_data)
         self.handle_pricings(pricings, reservation_unit)
+        self.handle_timeslots(application_round_time_slots, reservation_unit)
         return reservation_unit
 
 
@@ -517,10 +557,27 @@ class ReservationUnitUpdateSerializer(OldPrimaryKeyUpdateSerializer, Reservation
                 ReservationUnitPricing.objects.filter(reservation_unit=reservation_unit, status=status).delete()
                 ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
+    @staticmethod
+    def handle_timeslots(time_slots: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
+        ids: list[int] = []
+        for time_slot_data in time_slots:
+            weekday = time_slot_data.pop("weekday")
+            time_slot, _ = ApplicationRoundTimeSlot.objects.update_or_create(
+                weekday=weekday,
+                reservation_unit=reservation_unit,
+                defaults=time_slot_data,
+            )
+            ids.append(time_slot.pk)
+
+        # Delete un-updated timeslots for this reservation unit
+        ApplicationRoundTimeSlot.objects.filter(reservation_unit=reservation_unit).exclude(pk__in=ids).delete()
+
     def update(self, instance, validated_data):
         pricings = validated_data.pop("pricings", [])
+        application_round_time_slots = validated_data.pop("application_round_time_slots", [])
         reservation_unit = super().update(instance, validated_data)
         self.handle_pricings(pricings, instance)
+        self.handle_timeslots(application_round_time_slots, reservation_unit)
         return reservation_unit
 
 
