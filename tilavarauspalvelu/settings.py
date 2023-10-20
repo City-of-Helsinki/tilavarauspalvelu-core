@@ -71,6 +71,7 @@ env = environ.Env(
     IMAGE_CACHE_PURGE_KEY=(str, ""),
     IMAGE_CACHE_VARNISH_HOST=(str, ""),
     IPWARE_META_PRECEDENCE_ORDER=(str, "HTTP_X_FORWARDED_FOR"),
+    LOGIN_ERROR_URL=(str, "/admin/"),
     MAIL_MAILGUN_API=(str, ""),
     MAIL_MAILGUN_DOMAIN=(str, ""),
     MAIL_MAILGUN_KEY=(str, ""),
@@ -222,6 +223,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
     # Make sure PrometheusAfterMiddleware is the last one
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
@@ -390,6 +392,9 @@ OIDC_API_TOKEN_AUTH = {
 }
 
 TUNNISTAMO_BASE_URL = env("TUNNISTAMO_BASE_URL")
+
+# Url where user is redirected after login error or cancellation
+SOCIAL_AUTH_LOGIN_ERROR_URL = env("LOGIN_ERROR_URL")
 
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
