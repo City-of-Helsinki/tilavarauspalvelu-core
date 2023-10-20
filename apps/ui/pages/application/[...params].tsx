@@ -18,10 +18,11 @@ import {
   MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
   ApplicationCreateMutationInput,
+  Priority,
 } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Application } from "common";
+import { Application, ApplicationEventSchedulePriority } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
@@ -75,37 +76,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
   };
 };
-
-// TODO replacing this with a NewApplicationType that is specific to the frontend
-// might be preferable (allow undefined for most fields)
-// then just convert to ApplicationType when sending to backend
-const createApplicationEvent = (
-  applicationId?: number,
-  begin?: string,
-  end?: string
-): ApplicationEventType => ({
-  // TODO this is bad, use the hook instead (or empty / undefined and default value in the Page1)
-  // it's bad because the translation might not be loaded yet when this is shown
-  // useTranslation from next-i18next handles translation loading automatically
-  name: i18next.t("Application.Page1.applicationEventName"),
-  minDuration: defaultDurationMins,
-  maxDuration: defaultDurationMins,
-  eventsPerWeek: 1,
-  numPersons: null,
-  ageGroup: null,
-  purpose: null,
-  abilityGroup: null,
-  application: {
-    id: "",
-    pk: applicationId || 0,
-  },
-  begin: begin || null,
-  end: end || null,
-  biweekly: false,
-  eventReservationUnits: [],
-  applicationEventSchedules: [],
-  status: ApplicationEventStatus.Created,
-});
 
 type Props = {
   tos: TermsOfUseType[];
@@ -184,6 +154,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     // TODO replace this with Application -> ApplicationType conversion
     // ApplicationUpdateMutationInput
     // update mutation is looser than create mutation so we could do incremental updates
+    /*
     const transformForSaving = (
       app: Application
     ): ApplicationCreateMutationInput => {
@@ -197,36 +168,71 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         contactPerson: app.contactPerson,
         homeCityPk: app.homeCityId,
         organisation: app.organisation,
-        pk: app.id,
+        pk: app.pk,
         status: app.status,
       };
-      /* TODO what is the purpose of this?
       tapp.applicationEvents?.forEach((ae, i) => {
         const begin = ae?.begin != null ? uiDateToApiDate(ae.begin) : null;
         const end = ae?.end != null ? uiDateToApiDate(ae.end) : null;
         tapp.applicationEvents[i].begin = begin ?? null;
         tapp.applicationEvents[i].end = end ?? null;
       });
-      */
       return appMod;
     };
+    */
+    const convertPriority = (prio: ApplicationEventSchedulePriority): Priority => {
+      switch (prio) {
+        case 300:
+          return Priority.A_300;
+        case 200:
+          return Priority.A_200;
+        case 100:
+        default:
+          return Priority.A_100;
+        }
+    };
 
-    if (appToSave.id === 0) {
-      const { data } = await create({
+    const input: ApplicationCreateMutationInput = {
+      additionalInformation: appToSave.additionalInformation,
+      applicantType: appToSave.applicantType,
+      // ...(appToSave.applicantType ? { applicantType: appToSave.applicantType } : {}),
+
+      applicationEvents: appToSave.applicationEvents.map((ae) => ({
+        ...(ae.begin ? { begin: apiDateToUIDate(ae.begin) } : {}),
+        ...(ae.end ? { end: apiDateToUIDate(ae.end) } : {}),
+        numPersons: ae.numPersons ?? 0,
+        abilityGroup: ae.abilityGroup ?? 0,
+        ageGroup: ae.ageGroup ?? 0,
+        purpose: ae.purpose ?? 0,
+        status: ae.status,
+        applicationEventSchedules: ae.applicationEventSchedules.filter((aes): aes is Omit<typeof aes, "priority"> & { priority: ApplicationEventSchedulePriority } => aes.priority != null).map((aes) => ({
+          day: aes.day,
+          begin: aes.begin,
+          end: aes.end,
+          priority: convertPriority(aes.priority),
+        })),
+        eventReservationUnits: ae.reservationUnits.map((eru) => ({
+          priority: eru.priority,
+          reservationUnit: eru.reservationUnitId,
+        })),
+      })),
+      applicationRoundPk: appToSave.applicationRoundId,
+      billingAddress: appToSave.billingAddress,
+      contactPerson: appToSave.contactPerson,
+      homeCityPk: appToSave.homeCityId,
+      organisation: appToSave.organisation,
+      ...(appToSave.pk != null ? { pk: appToSave.pk } : {}),
+      status: appToSave.status,
+    };
+
+    const mutation = appToSave.pk == null || appToSave.pk === 0 ? create : update;
+      const { data } = await mutation({
         variables: {
-          input: transformForSaving(appToSave),
+          input,
         },
       });
-      // TODO do a refetch here instead of cache modification (after moving to fetch hook)
-      return data?.createApplication?.application?.pk ?? 0;
-    }
-    const { data } = await update({
-      variables: {
-        input: transformForSaving(appToSave),
-      },
-    });
     // TODO do a refetch here instead of cache modification (after moving to fetch hook)
-    return data?.updateApplication?.application?.pk ?? 0;
+    return data?.createApplication?.application?.pk ?? 0;
   };
 
   // Use the old type for the form and transform it in the mutation
@@ -364,27 +370,26 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     saveAndNavigate("sent")(getValues());
   };
 
-  const rerender = false; // localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
+  // const rerender = false; // localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
 
   console.log("application", application);
   // For now FIXME (we need special handling for the first element)
   // or we need checks down the line to handle 0 length arrays
-  if (!application || application.applicationEvents.length === 0) {
+  if (!application || application.applicationEvents == null ||  application.applicationEvents?.length === 0) {
     return null;
   }
 
   return (
-    <>
+    <FormProvider {...form}>
       {pageId === "page1" && (
         <ApplicationPageWrapper
-          key={rerender}
+          // key={rerender}
           application={application}
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
         >
           {applicationRound != null && (
             <Page1
-              form={form}
               selectedReservationUnits={
                 reservationUnits as ReservationUnitType[]
               }
@@ -413,13 +418,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           application={application}
           translationKeyPrefix="application:Page3"
         >
-          {/* TODO wrap the other pages in this also and remove prop drilling */}
-          <FormProvider {...form}>
-            <Page3
-              application={application}
-              onNext={saveAndNavigate("preview")}
-            />
-          </FormProvider>
+          <Page3 application={application} onNext={saveAndNavigate("preview")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (
@@ -458,7 +457,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           {error}
         </Notification>
       ) : null}
-    </>
+    </FormProvider>
   );
 };
 

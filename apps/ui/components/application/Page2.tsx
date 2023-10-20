@@ -1,5 +1,5 @@
 import { IconArrowRight, Notification } from "hds-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -11,14 +11,16 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { MediumButton } from "@/styles/util";
-import { deepCopy, getReadableList } from "@/modules/util";
+import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "../common/common";
+import { ApplicationEventScheduleFormType, ApplicationFormValues } from "./Form";
+import { useFormContext } from "react-hook-form";
 
 type Props = {
   application: ApplicationType;
-  onNext: (appToSave: ApplicationType) => void;
+  onNext: (appToSave: ApplicationFormValues) => void;
 };
 
 const SubHeading = styled.p`
@@ -72,7 +74,6 @@ const applicationEventSchedulesToCells = (
       firstSlotStart;
 
     const { priority } = applicationEventSchedule;
-    console.log("priority", priority);
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day][h];
       cell.state = (priority ?? 100) as ApplicationEventSchedulePriority;
@@ -178,6 +179,7 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
     .filter((n): n is NonNullable<typeof n> => n !== null);
 };
 
+/*
 const prepareData = (
   data: NonNullable<ApplicationType>,
   selectorData: Cell[][][]
@@ -192,6 +194,7 @@ const prepareData = (
   });
   return applicationCopy;
 };
+*/
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -201,7 +204,10 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const history = useRouter();
 
+  // TODO replace with form context
   const applicationEvents = filterNonNullable(application.applicationEvents);
+
+  // TOOD should save directly to form context, not to state
   const [selectorData, setSelectorData] = useState<Cell[][][]>(
     applicationEvents.map((ae) =>
       applicationEventSchedulesToCells(
@@ -209,6 +215,59 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       )
     )
   );
+
+  const {
+    getValues,
+    setValue,
+    watch,
+  } = useFormContext<ApplicationFormValues>();
+
+  const convertCellToApplicationEventSchedule = (
+    cells: Cell[][][]
+  ): ApplicationEventScheduleType[] => {
+    const result = cells.map((cell) => cellsToApplicationEventSchedules(cell)).flat();
+    return result;
+  };
+
+  useEffect(() => {
+    console.log('selectorData', selectorData);
+    const faes = selectorData.map((day) => day.map((cell) => cell.filter((elem) => elem.state === 300 || elem.state === 200)));
+    console.log('faes', faes);
+    // So this returns them as:
+    // applicationEvents (N)
+    // - ApplicationEventSchedule[][]: Array(7) (i is the day)
+    // - ApplicationEventSchedule[]: Array(M) (j is the continuous block)
+    // priority: 200 | 300 (200 is secondary, 300 is primary)
+    // priority: 100 (? assuming it's not selected)
+    const applicationEvents = selectorData
+      .map((cell) => cellsToApplicationEventSchedules(cell))
+      .map((aes) => aes.filter((ae) => ae.priority === 300 || ae.priority === 200));
+    console.log('application event schedules', applicationEvents);
+    // this seems to work except
+    // TODO: day is incorrect (empty days at the start are missing, and 200 / 300 priority on the same day gets split into two days)
+    // TODO refactor the Cell -> ApplicationEventSchedule conversion to use FormTypes
+    applicationEvents.forEach((aes, i) => {
+      const val = aes.map((ae, day) => {
+        // debug check
+        if (day > 6) {
+          throw new Error("Day is out of range");
+        }
+        return {
+          begin: ae.begin,
+          end: ae.end,
+          // The default will never happen (it's already filtered)
+          // TODO type this better
+          priority: ae.priority === 300 ? (300 as const) : (200 as const),
+          day: day as Day
+        }
+      });
+      // because of debug print?
+      setValue(`applicationEvents.${i}.applicationEventSchedules`, val);
+    });
+  }, [selectorData]);
+
+  // debug print
+  console.log('DEBUG watch application events', watch('applicationEvents'));
 
   const updateCells = (index: number, newCells: Cell[][]) => {
     const updated = [...selectorData];
@@ -245,18 +304,27 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   };
 
   const onSubmit = () => {
-    const appToSave = prepareData(application, selectorData);
-    const aes = filterNonNullable(appToSave.applicationEvents) ?? [];
+    // TODO all of this should be in the form state not in the submit
+    // const appToSave = prepareData(application, selectorData);
+    // const aes = filterNonNullable(appToSave.applicationEvents) ?? [];
+    // FIXME use form values for the cells
+    // TODO add the error reporting back
+    /*
+    const aes = application.applicationEvents?.map((applicationEvent, i) => {
+    // applicationCopy.applicationEvents[i].applicationEventSchedules.length = 0;
+      return cellsToApplicationEventSchedules(selectorData[i])
+    }).flat() ?? [];
     if (
       aes
-        .map((ae) => filterNonNullable(ae.applicationEventSchedules).length > 0)
+        .map((ae) => filterNonNullable(ae.).length > 0)
         .filter((l) => l === false).length > 0
     ) {
       setSuccessMsg("");
       setErrorMsg("application:error.missingSchedule");
       return;
     }
-    onNext(appToSave);
+    */
+    onNext(getValues());
   };
 
   const applicationEventsForWhichMinDurationIsNotFulfilled: number[] =
@@ -298,21 +366,17 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         </Notification>
       )}
       {applicationEvents.map((event, index) => {
-        console.log("event", event);
         const data = selectorData[index];
-        // const cells =
         const summaryDataPrimary = data
           ? cellsToApplicationEventSchedules(
               data.map((n) => n.filter((nn) => nn.state === 300))
             )
           : [];
-        console.log("summaryDataPrimary", summaryDataPrimary);
         const summaryDataSecondary = data
           ? cellsToApplicationEventSchedules(
               data.map((n) => n.filter((nn) => nn.state === 200))
             )
           : [];
-        console.log("summaryDataSecondary", summaryDataSecondary);
         return (
           <Accordion
             open={index === 0}

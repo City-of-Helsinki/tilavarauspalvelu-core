@@ -10,8 +10,6 @@ import {
   getTranslation,
 } from "common/src/common/util";
 import {
-  ApplicationEventSchedule,
-  Cell,
   LocalizationLanguages,
   OptionType,
   Parameter,
@@ -20,14 +18,12 @@ import {
   Image,
   ReducedApplicationStatus,
   StringParameter,
-  ApplicationEventSchedulePriority,
 } from "common/types/common";
 import {
   ReservationUnitImageType,
   ReservationUnitType,
   ApplicationStatus,
   ReservationUnitByPkType,
-  ApplicationEventScheduleType,
 } from "common/types/gql-types";
 import {
   searchPrefix,

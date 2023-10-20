@@ -1,20 +1,33 @@
 import { filterNonNullable } from "common/src/helpers";
 import type {
-  Application,
-  ApplicationEventSchedule,
   EventReservationUnit,
+  Address,
+  ApplicationEventSchedulePriority,
 } from "common/types/common";
 import {
   type ApplicationEventType,
   ApplicationEventStatus,
-  OrganisationType,
-  AddressType,
-  PersonType,
+  type OrganisationType,
+  type AddressType,
+  type PersonType,
+  type ApplicationStatus,
+  type ApplicationsApplicationApplicantTypeChoices,
+  ApplicationEventScheduleType,
+  Priority,
 } from "common/types/gql-types";
 // TODO replace these with form types
-import type { Address, ContactPerson, Organisation } from "common/types/common";
-import { Maybe } from "graphql/jsutils/Maybe";
+import { type Maybe } from "graphql/jsutils/Maybe";
 import { apiDateToUIDate } from "@/modules/util";
+
+
+// export type ApplicationEventScheduleFormType = Omit<ApplicationEventScheduleType, 'id'>[];
+export type ApplicationEventScheduleFormType = {
+  day: Day;
+  begin: string;
+  end: string;
+  priority: ApplicationEventSchedulePriority;
+};
+
 
 // TODO move to application level and reuse the form type
 export type ApplicationEventFormValue = {
@@ -35,10 +48,10 @@ export type ApplicationEventFormValue = {
   end: string | null;
   // TODO this should not be needed anymore
   applicationId: number;
+  applicationEventSchedules: ApplicationEventScheduleFormType[];
+  status: ApplicationEventStatus;
   // TODO replace with form type (don't reuse the REST type)
   reservationUnits: EventReservationUnit[];
-  applicationEventSchedules: ApplicationEventSchedule[];
-  status: ApplicationEventStatus;
 };
 
 // TODO write the conversion other way around also
@@ -69,8 +82,8 @@ export const transformApplicationEventToForm = (
   applicationEventSchedules: filterNonNullable(
     applicationEvent.applicationEventSchedules
   ).map((aes) => ({
-    id: aes.pk ?? undefined,
-    day: (aes.day ?? 0) as Day,
+    pk : aes.pk ?? undefined,
+    day: aes.day,
     begin: aes.begin ?? "",
     end: aes.end ?? "",
   })),
@@ -86,11 +99,26 @@ export const transformApplicationEventToForm = (
       : applicationEvent?.end ?? null,
 });
 
-type OrganisationFormValues = Omit<Organisation, "description">;
+// type OrganisationFormValues = Omit<Organisation, "description">;
 type AddressFormValue = Address;
+type OrganisationFormValues = {
+  pk: number | null;
+  name: string;
+  identifier: string | null;
+  yearEstablished: number | null;
+  coreBusiness: string;
+  address: AddressFormValue;
+}
+type PersonFormValues = {
+  pk: number | null;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+}
 
-export const convertPerson = (p: Maybe<PersonType>): ContactPerson => ({
-  id: p?.pk ?? 0,
+export const convertPerson = (p: Maybe<PersonType>): PersonFormValues => ({
+  pk: p?.pk ?? null,
   firstName: p?.firstName ?? "",
   lastName: p?.lastName ?? "",
   email: p?.email ?? "",
@@ -107,7 +135,7 @@ export const convertAddress = (a: Maybe<AddressType>): AddressFormValue => ({
 export const convertOrganisation = (
   o: Maybe<OrganisationType>
 ): OrganisationFormValues => ({
-  id: o?.pk ?? 0,
+  pk: o?.pk ?? null,
   name: o?.name ?? "",
   identifier: o?.identifier ?? null,
   yearEstablished: o?.yearEstablished ?? 0,
@@ -115,12 +143,24 @@ export const convertOrganisation = (
   address: convertAddress(o?.address),
 });
 
-export type ApplicationFormValues = Omit<Application, "applicationEvents"> & {
+export type ApplicationFormValues = {
+  pk?: number;
+  applicantType: ApplicationsApplicationApplicantTypeChoices;
+  // TODO these (status and round) needs to be hidden fields
+  // status is changed on the final page
+  status: ApplicationStatus;
+  // TODO remove id (also does this need to be sent?)
+  applicationRoundId: number;
   applicationEvents: ApplicationEventFormValue[];
-  organisation: Organisation;
-  contactPerson: ContactPerson;
-  billingAddress: Address;
+  organisation: OrganisationFormValues;
+  contactPerson: PersonFormValues;
+  billingAddress: AddressFormValue;
+  // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
+  hasBillingAddress: boolean;
   additionalInformation: string;
-  // TODO
+  // TODO remove id
   homeCityId: number;
+  // TODO are these needed?
+  createdDate?: string;
+  lastModifiedDate?: string;
 };

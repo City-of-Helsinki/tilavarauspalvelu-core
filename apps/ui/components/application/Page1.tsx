@@ -10,8 +10,9 @@ import {
   type ApplicationRoundType,
   type ReservationUnitType,
   type ApplicationType,
+  ApplicationStatus,
 } from "common/types/gql-types";
-import { type UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { getTranslation, mapOptions } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { useOptions } from "@/hooks/useOptions";
@@ -23,7 +24,6 @@ import { type ApplicationFormValues } from "./Form";
 type Props = {
   // TODO break this down to smaller pieces (only the required props)
   applicationRound: ApplicationRoundType;
-  form: UseFormReturn<ApplicationFormValues>;
   application: ApplicationType;
   savedEventId: number | undefined;
   selectedReservationUnits: ReservationUnitType[];
@@ -41,7 +41,6 @@ type Props = {
 
 const Page1 = ({
   save,
-  form,
   addNewApplicationEvent,
   applicationRound,
   application,
@@ -75,6 +74,7 @@ const Page1 = ({
     { applicationEventId: number | undefined; isOpen: boolean }[]
   >([]);
 
+  const form = useFormContext<ApplicationFormValues>();
   const {
     formState: { errors },
   } = form;
@@ -99,7 +99,8 @@ const Page1 = ({
       ...data,
       // ...prepareData(data),
       // override status in order to validate correctly when modifying existing application
-      status: "draft" as const,
+      // TODO this should be set in the form itself
+      status: ApplicationStatus.Draft,
     };
     if (appToSave.applicationEvents.length === 0) {
       setError(t("application:error.noEvents"));

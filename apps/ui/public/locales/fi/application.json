@@ -104,9 +104,9 @@
     "as": {
       "prefix": "Varaan",
       "type": {
-        "organisation": "järjestön, ryhmän tai yhteisön puolesta",
-        "company": "yrityksen puolesta",
-        "individual": "yksityishenkilönä"
+        "ASSOCIATION": "järjestön, ryhmän tai yhteisön puolesta",
+        "COMPANY": "yrityksen puolesta",
+        "INDIVIDUAL": "yksityishenkilönä"
       }
     },
     "contactPerson": {
@@ -138,10 +138,10 @@
   },
   "preview": {
     "applicantType": {
-      "community": "Rekisteröimätön yhdistys",
-      "company": "Yritys",
-      "individual": "Yksityishenkilö",
-      "association": "Rekisteröity yhdistys"
+      "COMMUNITY": "Rekisteröimätön yhdistys",
+      "COMPANY": "Yritys",
+      "INDIVIDUAL": "Yksityishenkilö",
+      "ASSOCIATION": "Rekisteröity yhdistys"
     },
     "homeCity": "Kotipaikka",
     "heading": "4. Tarkista ja lähetä hakemus",

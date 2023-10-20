@@ -81,11 +81,9 @@ const OrganisationForm = ({
     Boolean(application.organisation?.identifier) // it is registered if identifier is set
   );
   */
-  const id = watch("organisation.identifier");
-  const hasRegistration = id != null;
-  const [hasBillingAddress, setHasBillingAddress] = useState(
-    application.billingAddress !== null
-  );
+  const identifier = watch("organisation.identifier");
+  const hasRegistration = identifier != null;
+  const hasBillingAddress = watch("hasBillingAddress");
 
   useEffect(() => {
     if (hasRegistration) {
@@ -243,7 +241,13 @@ const OrganisationForm = ({
             id="organisation.hasInvoicingAddress"
             name="organisation.hasInvoicingAddress"
             checked={hasBillingAddress}
-            onClick={() => setHasBillingAddress(!hasBillingAddress)}
+            onClick={() => {
+              if (!hasBillingAddress) {
+                setValue("hasBillingAddress", true);
+              } else {
+                setValue("hasBillingAddress", false);
+              }
+            }}
           />
         </CheckboxWrapper>
         {hasBillingAddress ? <BillingAddress /> : null}
