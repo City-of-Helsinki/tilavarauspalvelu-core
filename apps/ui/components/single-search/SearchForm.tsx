@@ -82,7 +82,7 @@ const Filters = styled.div`
   }
 `;
 
-const StyledSelect = styled(Select<OptionType>)<{ name?: string }>`
+const StyledSelect = styled(Select<OptionType>)`
   button {
     display: grid;
     text-align: left;
@@ -475,7 +475,6 @@ const SearchForm = ({
 
           <StyledSelect
             id="durationFilter"
-            name="duration"
             placeholder={t("common:minimum")}
             options={[emptyOption(t("common:minimum"))].concat(durationOptions)}
             label={t("searchForm:durationFilter", { duration: "" })}
@@ -508,7 +507,6 @@ const SearchForm = ({
             <TwInput>
               <StyledSelect
                 id="participantMinCountFilter"
-                name="minPersons"
                 placeholder={t("common:minimum")}
                 options={[emptyOption(t("common:minimum"), "")].concat(
                   participantCountOptions
@@ -527,7 +525,6 @@ const SearchForm = ({
 
               <StyledSelect
                 id="participantMaxCountFilter"
-                name="maxPersons"
                 placeholder={t("common:maximum")}
                 options={[emptyOption(t("common:maximum"))].concat(
                   participantCountOptions
