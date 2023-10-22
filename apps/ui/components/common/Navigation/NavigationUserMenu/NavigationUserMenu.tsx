@@ -10,6 +10,12 @@ import { MenuItem } from "../types";
 const StyledUserMenu = styled(HDSNavigation.User)<{
   $active?: boolean;
 }>`
+  @media (min-width: ${(props) => props.theme.spacing.m}) {
+    #userDropdown-menu {
+      left: auto;
+      right: 0;
+    }
+  }
   ${({ $active }) =>
     $active &&
     css`
