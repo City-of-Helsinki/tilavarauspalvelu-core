@@ -6,23 +6,11 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H5, Strongish } from "common/src/common/typography";
 import { ReservationUnitType } from "common/types/gql-types";
-import {
-  getAddressAlt,
-  getMainImage,
-  getTranslation,
-} from "../../modules/util";
+import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
-import {
-  BlackButton,
-  MediumButton,
-  pixel,
-  truncatedText,
-} from "../../styles/util";
-import { reservationUnitPrefix } from "../../modules/const";
-import {
-  getReservationUnitName,
-  getUnitName,
-} from "../../modules/reservationUnit";
+import { BlackButton, MediumButton, pixel, truncatedText } from "@/styles/util";
+import { reservationUnitPrefix } from "@/modules/const";
+import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -152,13 +140,13 @@ const ReservationUnitCard = ({
   containsReservationUnit,
   removeReservationUnit,
 }: Props): JSX.Element => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const name = getReservationUnitName(reservationUnit);
 
   const addressString = getAddressAlt(reservationUnit);
-
-  const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
+  const localeString = i18n.language === "fi" ? "" : `/${i18n.language}`;
+  const link = `${localeString}${reservationUnitPrefix}/${reservationUnit.pk}`;
 
   const unitName = reservationUnit.unit
     ? getUnitName(reservationUnit.unit)
