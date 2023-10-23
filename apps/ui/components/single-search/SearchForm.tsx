@@ -316,6 +316,7 @@ const SearchForm = ({
     maxPersons: "",
     reservationUnitType: "",
     showOnlyAvailable: true,
+    textSearch: "",
   };
 
   const { register, watch, handleSubmit, setValue, getValues, control } =
