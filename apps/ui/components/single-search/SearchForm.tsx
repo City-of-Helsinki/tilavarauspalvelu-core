@@ -95,6 +95,8 @@ const StyledSelect = styled(Select<OptionType>)`
 
 const StyledCheckBox = styled(Checkbox)`
   &&& {
+    /* TODO: Remove the following style declaration once backend supports showing only available results */
+    display: none !important;
     @media (min-width: ${breakpoints.m}) {
       margin-top: -70px;
       grid-column: 3 / span 1;
@@ -433,66 +435,71 @@ const SearchForm = ({
             title={t("searchForm:equipmentsFilter")}
             value={watch("equipments")?.split(",") || [""]}
           />
-          <DateRangeWrapper>
-            <DateRangePicker
-              startDate={fromUIDate(String(getValues("dateBegin")))}
-              endDate={fromUIDate(String(getValues("dateEnd")))}
-              onChangeStartDate={(date: Date | null) =>
-                setValue("dateBegin", date != null ? toUIDate(date) : "")
-              }
-              onChangeEndDate={(date: Date | null) =>
-                setValue("dateEnd", date != null ? toUIDate(date) : "")
-              }
-              labels={{
-                begin: t("searchForm:dateFilter"),
-                end: " ",
-              }}
-              required={{ begin: false, end: false }}
-              limits={{
-                startMinDate: new Date(),
-                startMaxDate: getValues("dateEnd")
-                  ? fromUIDate(String(getValues("dateEnd")))
-                  : undefined,
-                endMinDate: getValues("dateBegin")
-                  ? fromUIDate(String(getValues("dateBegin")))
-                  : undefined,
-                endMaxDate: addYears(new Date(), 2),
-              }}
-            />
-          </DateRangeWrapper>
+          {/* TODO: Remove the following div once backend supports time-related filters */}
+          <div style={{ display: "none" }}>
+            <DateRangeWrapper>
+              <DateRangePicker
+                startDate={fromUIDate(String(getValues("dateBegin")))}
+                endDate={fromUIDate(String(getValues("dateEnd")))}
+                onChangeStartDate={(date: Date | null) =>
+                  setValue("dateBegin", date != null ? toUIDate(date) : "")
+                }
+                onChangeEndDate={(date: Date | null) =>
+                  setValue("dateEnd", date != null ? toUIDate(date) : "")
+                }
+                labels={{
+                  begin: t("searchForm:dateFilter"),
+                  end: " ",
+                }}
+                required={{ begin: false, end: false }}
+                limits={{
+                  startMinDate: new Date(),
+                  startMaxDate: getValues("dateEnd")
+                    ? fromUIDate(String(getValues("dateEnd")))
+                    : undefined,
+                  endMinDate: getValues("dateBegin")
+                    ? fromUIDate(String(getValues("dateBegin")))
+                    : undefined,
+                  endMaxDate: addYears(new Date(), 2),
+                }}
+              />
+            </DateRangeWrapper>
 
-          <TimeRangeWrapper>
-            <TimeRangePicker
-              control={control}
-              name={{ begin: "timeBegin", end: "timeEnd" }}
-              label={{ begin: t("searchForm:timeFilter"), end: " " }}
-              placeholder={{
-                begin: t("common:beginLabel"),
-                end: t("common:endLabel"),
-              }}
-              clearable={{ begin: true, end: true }}
-            />
-          </TimeRangeWrapper>
+            <TimeRangeWrapper>
+              <TimeRangePicker
+                control={control}
+                name={{ begin: "timeBegin", end: "timeEnd" }}
+                label={{ begin: t("searchForm:timeFilter"), end: " " }}
+                placeholder={{
+                  begin: t("common:beginLabel"),
+                  end: t("common:endLabel"),
+                }}
+                clearable={{ begin: true, end: true }}
+              />
+            </TimeRangeWrapper>
 
-          <StyledSelect
-            id="durationFilter"
-            placeholder={t("common:minimum")}
-            options={[emptyOption(t("common:minimum"))].concat(durationOptions)}
-            label={t("searchForm:durationFilter", { duration: "" })}
-            onChange={(selection: OptionType): void => {
-              setValue(
-                "duration",
-                !Number.isNaN(Number(selection.value))
-                  ? Math.round(Number(selection.value) * 10) / 10
-                  : null
-              );
-            }}
-            defaultValue={getSelectedOption(
-              getValues("duration"),
-              durationOptions
-            )}
-            key={`duration${getValues("duration")}`}
-          />
+            <StyledSelect
+              id="durationFilter"
+              placeholder={t("common:minimum")}
+              options={[emptyOption(t("common:minimum"))].concat(
+                durationOptions
+              )}
+              label={t("searchForm:durationFilter", { duration: "" })}
+              onChange={(selection: OptionType): void => {
+                setValue(
+                  "duration",
+                  !Number.isNaN(Number(selection.value))
+                    ? Math.round(Number(selection.value) * 10) / 10
+                    : null
+                );
+              }}
+              defaultValue={getSelectedOption(
+                getValues("duration"),
+                durationOptions
+              )}
+              key={`duration${getValues("duration")}`}
+            />
+          </div>
 
           <OptionalFilters
             showAllLabel={t("searchForm:showMoreFilters")}
