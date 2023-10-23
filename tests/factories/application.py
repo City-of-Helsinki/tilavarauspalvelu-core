@@ -31,6 +31,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     cancelled_date = None
     sent_date = None
     additional_information = fuzzy.FuzzyText()
+    working_memo = fuzzy.FuzzyText()
 
     @classmethod
     def create_in_status(cls, status: ApplicationStatusChoice, **kwargs: Any) -> Application:
