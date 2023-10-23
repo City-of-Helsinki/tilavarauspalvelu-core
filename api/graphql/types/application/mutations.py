@@ -2,9 +2,10 @@ from api.graphql.extensions.base_mutations import CreateAuthMutation, UpdateAuth
 from api.graphql.types.application.permissions import ApplicationDeclinePermission, ApplicationPermission
 from api.graphql.types.application.serializers import (
     ApplicationCancelSerializer,
+    ApplicationCreateSerializer,
     ApplicationDeclineSerializer,
     ApplicationSendSerializer,
-    ApplicationSerializer,
+    ApplicationUpdateSerializer,
 )
 from api.graphql.types.application.types import ApplicationNode
 
@@ -12,14 +13,14 @@ from api.graphql.types.application.types import ApplicationNode
 class ApplicationCreateMutation(CreateAuthMutation):
     class Meta:
         node = ApplicationNode
-        serializer_class = ApplicationSerializer
+        serializer_class = ApplicationCreateSerializer
         permission_classes = (ApplicationPermission,)
 
 
 class ApplicationUpdateMutation(UpdateAuthMutation):
     class Meta:
         node = ApplicationNode
-        serializer_class = ApplicationSerializer
+        serializer_class = ApplicationUpdateSerializer
         permission_classes = (ApplicationPermission,)
 
 

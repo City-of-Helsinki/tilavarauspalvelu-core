@@ -11,6 +11,7 @@ from api.graphql.types.organization.serializers import OrganisationSerializer
 from api.graphql.types.person.serializers import PersonSerializer
 from applications.models import Application, ApplicationEvent
 from common.serializers import TranslatedModelSerializer
+from permissions.helpers import can_validate_unit_applications
 
 
 class ApplicationEventInApplicationSerializer(ApplicationEventSerializer):
@@ -19,7 +20,9 @@ class ApplicationEventInApplicationSerializer(ApplicationEventSerializer):
         fields = [field for field in ApplicationEventSerializer.Meta.fields if field != "application"]
 
 
-class ApplicationSerializer(TranslatedModelSerializer):
+class ApplicationCreateSerializer(TranslatedModelSerializer):
+    instance: Application
+
     organisation = OrganisationSerializer(required=False, allow_null=True)
     contact_person = PersonSerializer(required=False, allow_null=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -49,6 +52,18 @@ class ApplicationSerializer(TranslatedModelSerializer):
                 "allow_null": True,
             },
         }
+
+
+class ApplicationUpdateSerializer(ApplicationCreateSerializer):
+    class Meta(ApplicationCreateSerializer.Meta):
+        fields = ApplicationCreateSerializer.Meta.fields + [
+            "working_memo",
+        ]
+
+    def validate_working_memo(self, value: str) -> str:
+        if not can_validate_unit_applications(self.request_user, self.instance.units):
+            raise serializers.ValidationError("No permission to access working memo.")
+        return value
 
 
 class ApplicationDeclineSerializer(TranslatedModelSerializer):
