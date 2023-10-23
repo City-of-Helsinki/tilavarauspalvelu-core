@@ -20,6 +20,7 @@ class ApplicationAdminForm(forms.ModelForm):
             "billing_address",
             "home_city",
             "additional_information",
+            "working_memo",
             "sent_date",
             "cancelled_date",
         ]
@@ -35,6 +36,7 @@ class ApplicationAdminForm(forms.ModelForm):
             "billing_address": _("Billing address for the application."),
             "home_city": _("Home city for the application."),
             "additional_information": _("Additional information for the application."),
+            "working_memo": _("Working memo for staff users."),
             "sent_date": _("Date when the application was sent."),
             "cancelled_date": _("Date when the application was cancelled."),
         }
