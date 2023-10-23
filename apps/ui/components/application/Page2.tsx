@@ -65,7 +65,9 @@ const applicationEventSchedulesToCells = (
 
   applicationEventSchedules.forEach((applicationEventSchedule) => {
     const { day } = applicationEventSchedule;
-    if (!day) return;
+    if (day == null) {
+      return;
+    }
     const hourBegin =
       Number(applicationEventSchedule.begin.substring(0, 2)) - firstSlotStart;
 
@@ -101,7 +103,6 @@ type Cell = {
 const cellsToApplicationEventSchedules = (
   cells: Cell[][]
 ): ApplicationEventScheduleType[] => {
-  // TODO this seems to fail, needs a rewrite
   const daySchedules: ApplicationEventScheduleType[] = [];
   for (let day = 0; day < cells.length; day += 1) {
     const dayCells = cells[day];
@@ -179,23 +180,6 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
     .filter((n): n is NonNullable<typeof n> => n !== null);
 };
 
-/*
-const prepareData = (
-  data: NonNullable<ApplicationType>,
-  selectorData: Cell[][][]
-): NonNullable<ApplicationType> => {
-  const applicationCopy = deepCopy(data);
-
-  applicationCopy.applicationEvents?.forEach((applicationEvent, i) => {
-    // applicationCopy.applicationEvents[i].applicationEventSchedules.length = 0;
-    cellsToApplicationEventSchedules(selectorData[i]).forEach((e) =>
-      applicationEvent?.applicationEventSchedules?.push(e)
-    );
-  });
-  return applicationCopy;
-};
-*/
-
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -234,9 +218,10 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     // TODO: day is incorrect (empty days at the start are missing, and 200 / 300 priority on the same day gets split into two days)
     // TODO refactor the Cell -> ApplicationEventSchedule conversion to use FormTypes
     selectedAppEvents.forEach((aes, i) => {
-      const val = aes.map((ae, day) => {
+      const val = aes.map((ae) => {
+        const { day } = ae;
         // debug check
-        if (day > 6) {
+        if (day == null || day < 0 || day > 6) {
           throw new Error("Day is out of range");
         }
         return {
@@ -248,7 +233,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           day: day as Day,
         };
       });
-      // because of debug print?
       setValue(`applicationEvents.${i}.applicationEventSchedules`, val);
     });
   }, [selectorData, setValue]);
@@ -288,26 +272,18 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   };
 
   const onSubmit = () => {
-    // TODO all of this should be in the form state not in the submit
-    // const appToSave = prepareData(application, selectorData);
-    // const aes = filterNonNullable(appToSave.applicationEvents) ?? [];
-    // FIXME use form values for the cells
-    // TODO add the error reporting back
-    /*
-    const aes = application.applicationEvents?.map((applicationEvent, i) => {
-    // applicationCopy.applicationEvents[i].applicationEventSchedules.length = 0;
-      return cellsToApplicationEventSchedules(selectorData[i])
-    }).flat() ?? [];
-    if (
-      aes
-        .map((ae) => filterNonNullable(ae.).length > 0)
-        .filter((l) => l === false).length > 0
-    ) {
+    // TODO test the checking of that there is at least one primary or secondary
+    const selectedAppEvents = selectorData
+      .map((cell) => cellsToApplicationEventSchedules(cell))
+      .map((aes) =>
+        aes.filter((ae) => ae.priority === 300 || ae.priority === 200)
+      )
+      .flat();
+    if (selectedAppEvents.length === 0) {
       setSuccessMsg("");
       setErrorMsg("application:error.missingSchedule");
       return;
     }
-    */
     onNext(getValues());
   };
 

@@ -16,6 +16,8 @@ import {
   MutationUpdateApplicationArgs,
   ApplicationCreateMutationInput,
   Priority,
+  ApplicationStatus,
+  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -36,6 +38,7 @@ import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   ApplicationFormValues,
+  OrganisationFormValues,
   convertAddress,
   convertOrganisation,
   convertPerson,
@@ -98,6 +101,35 @@ const UPDATE_APPLICATION_MUTATION = gql`
   }
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const convertPriority = (prio: ApplicationEventSchedulePriority): Priority => {
+  switch (prio) {
+    case 300:
+      return Priority.A_300;
+    case 200:
+      return Priority.A_200;
+    case 100:
+    default:
+      return Priority.A_100;
+  }
+};
+
+// remove the identifier if it's empty (otherwise the mutation fails)
+const transformOrganisation = ({
+  identifier,
+  ...rest
+}: OrganisationFormValues) => ({
+  ...rest,
+  ...(identifier != null && identifier !== "" ? { identifier } : {}),
+});
+
+// TODO refactor the input data to no include nulls
+// TODO use a custom transformation instead of the utility functions
+const transformDateString = (date?: string | null): string | undefined =>
+  date != null && apiDateToUIDate(date) !== ""
+    ? apiDateToUIDate(date)
+    : undefined;
+
 const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -119,11 +151,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     },
   });
 
-  console.log("applicationData: ", applicationData);
-
-  const localApplication =
+  const application =
     applicationData?.applications?.edges?.[0]?.node ?? undefined;
-  const applicationRound = localApplication?.applicationRound ?? undefined;
+  const applicationRound = application?.applicationRound ?? undefined;
 
   const { reservationUnits, clearSelections } = useReservationUnitList();
 
@@ -147,60 +177,40 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   );
 
   const handleSave = async (appToSave: ApplicationFormValues) => {
-    // TODO replace this with Application -> ApplicationType conversion
-    // ApplicationUpdateMutationInput
-    // update mutation is looser than create mutation so we could do incremental updates
-    /*
-    const transformForSaving = (
-      app: Application
-    ): ApplicationCreateMutationInput => {
-      console.log("transforming for saving: ", app);
-      const appMod: ApplicationCreateMutationInput = {
-        additionalInformation: app.additionalInformation,
-        applicantType: app.applicantType,
-        applicationEvents: app.applicationEvents,
-        applicationRoundPk: app.applicationRoundId,
-        billingAddress: app.billingAddress,
-        contactPerson: app.contactPerson,
-        homeCityPk: app.homeCityId,
-        organisation: app.organisation,
-        pk: app.pk,
-        status: app.status,
-      };
-      tapp.applicationEvents?.forEach((ae, i) => {
-        const begin = ae?.begin != null ? uiDateToApiDate(ae.begin) : null;
-        const end = ae?.end != null ? uiDateToApiDate(ae.end) : null;
-        tapp.applicationEvents[i].begin = begin ?? null;
-        tapp.applicationEvents[i].end = end ?? null;
-      });
-      return appMod;
-    };
-    */
-    const convertPriority = (
-      prio: ApplicationEventSchedulePriority
-    ): Priority => {
-      switch (prio) {
-        case 300:
-          return Priority.A_300;
-        case 200:
-          return Priority.A_200;
-        case 100:
-        default:
-          return Priority.A_100;
-      }
-    };
-
+    // TODO test all variations (update / create) (individual / organisation / company)
+    // @ts-expect-error -- For update mutation removing the organisation.identifier is necessary if the organisation doesn't have it
     const input: ApplicationCreateMutationInput = {
       additionalInformation: appToSave.additionalInformation,
       applicantType: appToSave.applicantType,
       applicationEvents: appToSave.applicationEvents.map((ae) => ({
-        ...(ae.begin ? { begin: apiDateToUIDate(ae.begin) } : {}),
-        ...(ae.end ? { end: apiDateToUIDate(ae.end) } : {}),
+        ...(transformDateString(ae.begin) != null
+          ? { begin: transformDateString(ae.begin) }
+          : {}),
+        ...(transformDateString(ae.end) != null
+          ? { end: transformDateString(ae.end) }
+          : {}),
+        pk: ae.pk,
         numPersons: ae.numPersons ?? 0,
-        abilityGroup: ae.abilityGroup ?? 0,
-        ageGroup: ae.ageGroup ?? 0,
-        purpose: ae.purpose ?? 0,
+        // these (pks) can never be zero or null in the current version
+        // even if there are no abilityGroups in the database...
+        // so for now default them to 1 and have another look after the backend change is merged
+        abilityGroup: ae.abilityGroup ?? 1,
+        ageGroup: ae.ageGroup ?? 1,
+        purpose: ae.purpose ?? 1,
         status: ae.status,
+        // min / max duration is a weird string format in the API
+        minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
+        maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
+        // API Date format (YYYY-MM-DD)
+        // not mandatory in the input but what is the default value?
+        ...(transformDateString(ae.begin) != null
+          ? { begin: transformDateString(ae.begin) }
+          : {}),
+        ...(transformDateString(ae.end) != null
+          ? { end: transformDateString(ae.end) }
+          : {}),
+        biweekly: ae.biweekly,
+        eventsPerWeek: ae.eventsPerWeek,
         applicationEventSchedules: ae.applicationEventSchedules
           .filter(
             (
@@ -209,22 +219,31 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
               priority: ApplicationEventSchedulePriority;
             } => aes.priority != null
           )
-          .map((aes) => ({
-            day: aes.day,
-            begin: aes.begin,
-            end: aes.end,
-            priority: convertPriority(aes.priority),
-          })),
+          .map((aes) => {
+            return {
+              day: aes.day,
+              // Time format (HH:MM)
+              begin: aes.begin,
+              end: aes.end,
+              // FIXME priority is not a valid value
+              // This seems to be a backend problem (some extra validation that is not in sync with GQL schema)
+              // "\"priority.A_300\" ei ole kelvollinen valinta."
+              // priority: convertPriority(aes.priority),
+            };
+          }),
+        // FIXME these are not saved (or sent)
         eventReservationUnits: ae.reservationUnits.map((eru) => ({
           priority: eru.priority,
           reservationUnit: eru.reservationUnitId,
         })),
       })),
       applicationRoundPk: appToSave.applicationRoundId,
-      billingAddress: appToSave.billingAddress,
+      ...(appToSave.hasBillingAddress
+        ? { billingAddress: appToSave.billingAddress }
+        : {}),
       contactPerson: appToSave.contactPerson,
       homeCityPk: appToSave.homeCityId,
-      organisation: appToSave.organisation,
+      organisation: transformOrganisation(appToSave.organisation),
       ...(appToSave.pk != null ? { pk: appToSave.pk } : {}),
       status: appToSave.status,
     };
@@ -236,39 +255,33 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         input,
       },
     });
+    const errors =
+      appToSave.pk == null || appToSave.pk === 0
+        ? data?.createApplication?.errors
+        : data?.updateApplication?.errors;
+    if (errors != null && errors.length > 0) {
+      console.error("Error saving application: ", errors);
+      // TOOD display to the user
+      setError("Error saving application");
+      return 0;
+    }
     // TODO do a refetch here instead of cache modification (after moving to fetch hook)
-    return data?.createApplication?.application?.pk ?? 0;
+    return appToSave.pk ?? data?.createApplication?.application?.pk ?? 0;
   };
 
   // Use the old type for the form and transform it in the mutation
   const saveAndNavigate =
     (path: string) => async (appToSave: ApplicationFormValues) => {
-      const id = await handleSave(appToSave);
-      const prefix = `/application/${id}`;
+      const pk = await handleSave(appToSave);
+      if (pk === 0) {
+        return;
+      }
+      const prefix = `/application/${pk}`;
       const target = `${prefix}/${path}`;
       clearSelections();
       router.push(target);
     };
 
-  /*
-  const [localApplicationEvents, setLocalApplicationEvents] = useState<
-    ApplicationEventType[]
-  >([]);
-  */
-
-  /*
-  useEffect(() => {
-    if (localApplication?.pk) {
-      const events = localApplication.applicationEvents?.filter((ae): ae is NonNullable<typeof ae> => ae != null) ?? [];
-      console.log('events: ', events);
-      setLocalApplicationEvents(events);
-    }
-  }, [localApplication]);
-  */
-
-  console.log("localApplication: ", localApplication);
-  // Modify the laoded application to include localchanges
-  const application = localApplication;
   // ? { ...localApplication, applicationEvents: localApplicationEvents
   // Don't think converting the dates is a good idea anymore but this would be the place for it
   // why it's not good? because it breaks the type system (or we have to rewrite the codegen types)
@@ -291,11 +304,20 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   const form = useForm<ApplicationFormValues>({
     mode: "onChange",
     defaultValues: {
+      pk: application?.pk ?? undefined,
+      status: application?.status ?? ApplicationStatus.Draft,
+      applicantType:
+        application?.applicantType ??
+        ApplicationsApplicationApplicantTypeChoices.Individual,
+      // TODO do we need to get the applicationRoundId from somewhere else?
+      applicationRoundId: application?.applicationRound?.pk ?? undefined,
+
       applicationEvents: filterNonNullable(application?.applicationEvents).map(
         (ae) => transformApplicationEventToForm(ae)
       ),
       organisation: convertOrganisation(application?.organisation),
       contactPerson: convertPerson(application?.contactPerson),
+      // TODO do we check if the billing address is toggled
       billingAddress: convertAddress(application?.billingAddress),
       additionalInformation: application?.additionalInformation ?? "",
       homeCityId: application?.homeCity?.pk ?? undefined,
@@ -310,6 +332,13 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   useEffect(() => {
     if (application) {
       reset({
+        pk: application?.pk ?? undefined,
+        status: application?.status ?? ApplicationStatus.Draft,
+        applicantType:
+          application?.applicantType ??
+          ApplicationsApplicationApplicantTypeChoices.Individual,
+        // TODO do we need to get the applicationRoundId from somewhere else?
+        applicationRoundId: application?.applicationRound?.pk ?? undefined,
         applicationEvents: filterNonNullable(
           application?.applicationEvents
         ).map((ae) => transformApplicationEventToForm(ae)),

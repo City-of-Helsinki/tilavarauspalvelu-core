@@ -1,7 +1,6 @@
 import { filterNonNullable } from "common/src/helpers";
 import type {
   EventReservationUnit,
-  Address,
   ApplicationEventSchedulePriority,
 } from "common/types/common";
 import {
@@ -28,7 +27,7 @@ export type ApplicationEventScheduleFormType = {
 // TODO move to application level and reuse the form type
 export type ApplicationEventFormValue = {
   // TODO change to pk: 0 for new events, 0 > for existing events
-  id?: number;
+  pk?: number;
   name: string | null;
   numPersons: number | null;
   // TODO remove ids from parameters
@@ -54,7 +53,7 @@ export type ApplicationEventFormValue = {
 export const transformApplicationEventToForm = (
   applicationEvent: ApplicationEventType
 ): ApplicationEventFormValue => ({
-  id: applicationEvent.pk ?? undefined,
+  pk: applicationEvent.pk ?? undefined,
   name: applicationEvent.name,
   numPersons: applicationEvent.numPersons ?? null,
   ageGroup: applicationEvent.ageGroup?.pk ?? null,
@@ -79,9 +78,10 @@ export const transformApplicationEventToForm = (
     applicationEvent.applicationEventSchedules
   ).map((aes) => ({
     pk: aes.pk ?? undefined,
-    day: aes.day,
+    day: (aes.day ?? 0) as Day,
     begin: aes.begin ?? "",
     end: aes.end ?? "",
+    priority: aes.priority === 200 || aes.priority === 300 ? aes.priority : 100,
   })),
   status: applicationEvent.status ?? ApplicationEventStatus.Created,
   // TODO remove the format hacks
@@ -95,9 +95,13 @@ export const transformApplicationEventToForm = (
       : applicationEvent?.end ?? null,
 });
 
-// type OrganisationFormValues = Omit<Organisation, "description">;
-type AddressFormValue = Address;
-type OrganisationFormValues = {
+type AddressFormValue = {
+  pk: number | undefined;
+  streetAddress: string;
+  city: string;
+  postCode: string;
+};
+export type OrganisationFormValues = {
   pk: number | null;
   name: string;
   identifier: string | null;
@@ -122,7 +126,7 @@ export const convertPerson = (p: Maybe<PersonType>): PersonFormValues => ({
 });
 
 export const convertAddress = (a: Maybe<AddressType>): AddressFormValue => ({
-  id: a?.pk ?? 0,
+  pk: a?.pk ?? undefined,
   streetAddress: a?.streetAddress ?? "",
   city: a?.city ?? "",
   postCode: a?.postCode ?? "",

@@ -66,6 +66,7 @@ export const DATE_TYPES = {
   THIS_WEEK: "this_week",
 };
 
+/// @return options array with value in seconds
 // TODO use of i18n.t is bad (loading of translations)
 export const getDurationNumberOptions = (): Array<{ label: string; value: number }> => {
   const result: Array<{ label: string; value: number }> = [];
@@ -76,8 +77,7 @@ export const getDurationNumberOptions = (): Array<{ label: string; value: number
     const label = `${i18n?.t("common:abbreviations.hour", { count: h })} ${
           m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
         }`
-    const value = h * 60 + m;
-    result.push({ label, value });
+    result.push({ label, value: (h * 60 + m) * 60 });
     m += 15;
     if (m === 60) {
       m = 0;

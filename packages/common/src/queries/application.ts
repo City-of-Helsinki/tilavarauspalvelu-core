@@ -27,6 +27,7 @@ export const APPLICATION_QUERY = gql`
             statusTimestamp
           }
           contactPerson {
+            pk
             firstName
             lastName
             email
@@ -34,6 +35,7 @@ export const APPLICATION_QUERY = gql`
           }
           additionalInformation
           organisation {
+            pk
             name
             identifier
             organisationType
@@ -45,9 +47,11 @@ export const APPLICATION_QUERY = gql`
             }
           }
           homeCity {
+            pk
             nameFi
           }
           billingAddress {
+            pk
             postCode
             streetAddress
             city
@@ -64,6 +68,7 @@ export const APPLICATION_QUERY = gql`
             status
             eventsPerWeek
             minDuration
+            maxDuration
             numPersons
             purpose {
               pk
