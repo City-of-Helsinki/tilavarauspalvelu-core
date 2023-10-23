@@ -22,6 +22,7 @@ class Application(models.Model):
     cancelled_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     additional_information: str | None = models.TextField(null=True, blank=True)
+    working_memo: str = models.TextField(blank=True, default="")
 
     application_round = models.ForeignKey(
         "applications.ApplicationRound",
