@@ -51,6 +51,7 @@ def test_can_query_application__all_fields(graphql):
         createdDate
         lastModifiedDate
         additionalInformation
+        workingMemo
     """
 
     # when:
@@ -91,6 +92,7 @@ def test_can_query_application__all_fields(graphql):
         "createdDate": application.created_date.isoformat(),
         "lastModifiedDate": application.last_modified_date.isoformat(),
         "additionalInformation": application.additional_information,
+        "workingMemo": application.working_memo,
     }
 
 

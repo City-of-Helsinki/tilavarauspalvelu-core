@@ -161,20 +161,36 @@ class GQLResponse:
         except (KeyError, TypeError):
             pytest.fail(f"Errors not found in response content: {self.json}")
 
-    def error_message(self, index: int = 0) -> str:
+    def error_message(self, selector: int | str = 0) -> str:
         """
-        Return the error message found in the given index in the errors list.
+        Return the error message from the errors list...
 
-        >>> self.json = {"errors": [{"locations": [...], "message": ["bar"], "path": [...]}]}
-        >>> self.error_message(0)
+        1) in the given index
+
+        >>> self.json = {"errors": [{"message": ["bar"], "path": [...]}]}
+        >>> self.error_message(0)  # default
+        "bar"
+
+        2) in the given path:
+
+        >>> self.json = {"errors": [{"message": ["bar"], "path": ["fizz", "buzz", "foo"]}]}
+        >>> self.error_message("foo")
         "bar"
         """
-        try:
-            return self.errors[index]["message"]
-        except IndexError:
-            pytest.fail(f"Errors list doesn't have an index {index}: {self.json}")
-        except (KeyError, TypeError):
-            pytest.fail(f"Field 'message' not found in error content: {self.json}")
+        if isinstance(selector, int):
+            try:
+                return self.errors[selector]["message"]
+            except IndexError:
+                pytest.fail(f"Errors list doesn't have an index {selector}: {self.json}")
+            except (KeyError, TypeError):
+                pytest.fail(f"Field 'message' not found in error content: {self.json}")
+        else:
+            try:
+                return next(error["message"] for error in self.errors if error["path"][-1] == selector)
+            except StopIteration:
+                pytest.fail(f"Errors list doesn't have an error for field '{selector}': {self.json}")
+            except (KeyError, TypeError):
+                pytest.fail(f"Field 'message' not found in error content: {self.json}")
 
     @property
     def field_errors(self) -> list[FieldError]:

@@ -228,3 +228,62 @@ def test_general_admin_can_view_applications(graphql, perms):
     assert response.has_errors is False, response
     assert len(response.edges) == 1
     assert response.node(0) == {"pk": application.pk}
+
+
+def test_application_user_cannot_see_own_application_working_memo(graphql):
+    # given:
+    # - There is an application in the system
+    # - The application user is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to search for applications working memo
+    response = graphql(applications_query(fields="workingMemo"))
+
+    # then:
+    # - The response complains about permissions to working memo.
+    assert response.error_message("workingMemo") == "You do not have permission to access this field."
+
+
+def test_service_sector_admin_can_see_working_memo(graphql):
+    # given:
+    # - There is an application in the system
+    # - A service sector admin is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    admin = UserFactory.create_with_service_sector_permissions(
+        service_sector=application.application_round.service_sector,
+        perms=["can_handle_applications"],
+    )
+    graphql.force_login(admin)
+
+    # when:
+    # - User tries to search for applications working memo
+    response = graphql(applications_query(fields="workingMemo"))
+
+    # then:
+    # - The response has no errors
+    assert response.has_errors is False, response
+
+
+def test_unit_admin_can_see_working_memo(graphql):
+    # given:
+    # - There is an application event in an application with an event reservation unit
+    # - A unit admin for that unit is using the system
+    event = ApplicationEventFactory.create_in_status_unallocated(
+        event_reservation_units__reservation_unit__unit__name="foo",
+    )
+    event_reservation_unit: EventReservationUnit = event.event_reservation_units.first()
+    admin = UserFactory.create_with_unit_permissions(
+        unit=event_reservation_unit.reservation_unit.unit,
+        perms=["can_validate_applications"],
+    )
+    graphql.force_login(admin)
+
+    # when:
+    # - User tries to search for applications working memo
+    response = graphql(applications_query(fields="workingMemo"))
+
+    # then:
+    # - The response has no errors
+    assert response.has_errors is False, response

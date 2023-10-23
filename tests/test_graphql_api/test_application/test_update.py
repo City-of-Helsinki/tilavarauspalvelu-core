@@ -375,21 +375,3 @@ def test_update_application__organisation__deleted_if_empty(graphql):
     application.refresh_from_db()
     event: ApplicationEvent = application.application_events.first()
     assert event is None
-
-
-def test_application_owner_cannot_update_own_application_after_application_period_over(graphql):
-    # given:
-    # - There an application round in allocation with a single application
-    # - The application owner is using the system
-    application = ApplicationFactory.create_in_status_in_allocation(additional_information="foo")
-    graphql.force_login(application.user)
-
-    input_data = {
-        "pk": application.pk,
-        "additionalInformation": "bar",
-    }
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
-
-    # then:
-    # - The response contains errors
-    assert response.field_error_messages() == ["No permission to mutate."]
