@@ -15,6 +15,7 @@ from applications.choices import ApplicationStatusChoice
 from applications.models import Application
 from common.typing import AnyUser
 from permissions.helpers import (
+    can_access_application_private_fields,
     get_service_sectors_where_can_view_applications,
     get_units_where_can_view_applications,
 )
@@ -49,7 +50,11 @@ class ApplicationNode(DjangoAuthNode):
             "created_date",
             "last_modified_date",
             "additional_information",
+            "working_memo",
         ]
+        restricted_fields = {
+            "working_memo": can_access_application_private_fields,
+        }
         filterset_class = ApplicationFilterSet
         permission_classes = (ApplicationPermission,)
 
