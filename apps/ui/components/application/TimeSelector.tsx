@@ -31,7 +31,10 @@ type Props = {
   updateCells: (i: number, cells: Cell[][]) => void;
   copyCells: ((i: number) => void) | null;
   resetCells: () => void;
-  summaryData: [ApplicationEventScheduleFormType[], ApplicationEventScheduleFormType[]];
+  summaryData: [
+    ApplicationEventScheduleFormType[],
+    ApplicationEventScheduleFormType[]
+  ];
 };
 
 const CalendarHead = styled.div`

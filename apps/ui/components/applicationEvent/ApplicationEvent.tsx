@@ -10,13 +10,10 @@ import {
   TextInput,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Controller, UseFormReturn } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import { LocalizationLanguages, OptionType } from "common/types/common";
-import type {
-  ApplicationEventType,
-  ApplicationRoundType,
-} from "common/types/gql-types";
+import type { ApplicationRoundType } from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { omit } from "lodash";
@@ -48,10 +45,8 @@ type OptionTypes = {
 };
 
 type Props = {
-  applicationEvent: ApplicationEventType;
   index: number;
   applicationRound: ApplicationRoundType;
-  form: UseFormReturn<ApplicationFormValues>;
   optionTypes: OptionTypes;
   isVisible: boolean;
   onToggleAccordian: () => void;
@@ -124,9 +119,9 @@ const Button = styled(MediumButton)`
 `;
 
 const clearDurationErrors = (
-  form: UseFormReturn<ApplicationFormValues>,
   index: number
 ) => {
+  const form = useFormContext<ApplicationFormValues>();
   form.clearErrors([
     `applicationEvents.${index}.minDuration`,
     `applicationEvents.${index}.maxDuration`,
@@ -134,10 +129,8 @@ const clearDurationErrors = (
 };
 
 const ApplicationEventInner = ({
-  applicationEvent,
   index,
   applicationRound,
-  form,
   optionTypes,
   del,
   onSave,
@@ -148,6 +141,7 @@ const ApplicationEventInner = ({
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
 
+  const form = useFormContext<ApplicationFormValues>();
   const {
     formState: { errors },
   } = form;
@@ -566,7 +560,6 @@ const ApplicationEventInner = ({
 const ApplicationEvent = (props: Props): JSX.Element => {
   const {
     index,
-    form,
     isVisible,
     applicationEventSaved,
     onDeleteEvent,
@@ -575,6 +568,7 @@ const ApplicationEvent = (props: Props): JSX.Element => {
 
   const { t } = useTranslation();
 
+  const form = useFormContext<ApplicationFormValues>();
   const { register, watch, getValues } = form;
 
   register(`applicationEvents.${index}.reservationUnits`);

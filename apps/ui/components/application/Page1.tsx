@@ -193,8 +193,6 @@ const Page1 = ({
       {applicationEvents.map((event, index) => (
         <ApplicationEvent
           key={event.pk || "NEW"}
-          form={form}
-          applicationEvent={event}
           index={index}
           applicationRound={applicationRound}
           optionTypes={{

@@ -9,10 +9,15 @@ import { StyledLabelValue, TimePreviewContainer } from "./styled";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { UnitList } from "./UnitList";
-import { ApplicationEventScheduleFormType, ApplicationFormValues } from "./Form";
+import {
+  ApplicationEventScheduleFormType,
+  ApplicationFormValues,
+} from "./Form";
 
-const filterPrimary = (n: ApplicationEventScheduleFormType) => n.priority === 300;
-const filterSecondary = (n: ApplicationEventScheduleFormType) => n.priority === 200;
+const filterPrimary = (n: ApplicationEventScheduleFormType) =>
+  n.priority === 300;
+const filterSecondary = (n: ApplicationEventScheduleFormType) =>
+  n.priority === 200;
 
 // TODO replace events with form context
 const ApplicationEventList = ({
@@ -47,7 +52,7 @@ const ApplicationEventList = ({
       : "";
   };
 
-  const evts = watch(`applicationEvents`)
+  const evts = watch(`applicationEvents`);
 
   return (
     <>
@@ -113,8 +118,12 @@ const ApplicationEventList = ({
           </FormSubHeading>
           <TimePreviewContainer data-testid={`time-selector__preview-${i}`}>
             <TimePreview
-              primary={applicationEvent.applicationEventSchedules.filter(filterPrimary)}
-              secondary={applicationEvent.applicationEventSchedules.filter(filterSecondary)}
+              primary={applicationEvent.applicationEventSchedules.filter(
+                filterPrimary
+              )}
+              secondary={applicationEvent.applicationEventSchedules.filter(
+                filterSecondary
+              )}
             />
           </TimePreviewContainer>
         </Accordion>

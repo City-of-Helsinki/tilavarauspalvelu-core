@@ -326,9 +326,15 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         </Notification>
       )}
       {applicationEvents.map((event, index) => {
-        const schedules = getValues(`applicationEvents.${index}.applicationEventSchedules`);
-        const summaryDataPrimary = schedules.filter((n) => n.priority === 300)
-        const summaryDataSecondary = schedules.filter((n) => n.priority === 200)
+        // TODO there is something funny with this one on the first render
+        // (it's undefined and not Array as expected).
+        const schedules = getValues(
+          `applicationEvents.${index}.applicationEventSchedules`
+        ) ?? [];
+        const summaryDataPrimary = schedules.filter((n) => n.priority === 300);
+        const summaryDataSecondary = schedules.filter(
+          (n) => n.priority === 200
+        );
         return (
           <Accordion
             open={index === 0}

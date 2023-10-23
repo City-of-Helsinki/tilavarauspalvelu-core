@@ -3,13 +3,12 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
-import { ApplicationEventScheduleType } from "common/types/gql-types";
 import { weekdays } from "../../modules/const";
 import { ApplicationEventScheduleFormType } from "./Form";
 
 type Props = {
-  primary: ApplicationEventScheduleFormType[],
-  secondary: ApplicationEventScheduleFormType[],
+  primary: ApplicationEventScheduleFormType[];
+  secondary: ApplicationEventScheduleFormType[];
 };
 
 const WeekWrapper = styled.div`
