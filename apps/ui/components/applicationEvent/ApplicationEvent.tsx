@@ -1,3 +1,5 @@
+// TODO this file should be moved to application/ since the only user is Page1
+// also remove default export
 import React, { useRef } from "react";
 import {
   Checkbox,
@@ -11,10 +13,9 @@ import { useTranslation } from "next-i18next";
 import { Controller, UseFormReturn } from "react-hook-form";
 import styled from "styled-components";
 import { LocalizationLanguages, OptionType } from "common/types/common";
-import {
+import type {
   ApplicationEventType,
   ApplicationRoundType,
-  ReservationUnitType,
 } from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -51,7 +52,6 @@ type Props = {
   index: number;
   applicationRound: ApplicationRoundType;
   form: UseFormReturn<ApplicationFormValues>;
-  selectedReservationUnits: ReservationUnitType[];
   optionTypes: OptionTypes;
   isVisible: boolean;
   onToggleAccordian: () => void;
@@ -138,7 +138,6 @@ const ApplicationEventInner = ({
   index,
   applicationRound,
   form,
-  selectedReservationUnits,
   optionTypes,
   del,
   onSave,
@@ -262,10 +261,7 @@ const ApplicationEventInner = ({
       </TwoColumnContainer>
       <SubHeadLine>{t("application:Page1.spacesSubHeading")}</SubHeadLine>
       <ReservationUnitList
-        selectedReservationUnits={selectedReservationUnits}
-        applicationEvent={applicationEvent}
         applicationRound={applicationRound}
-        form={form}
         index={index}
         minSize={numPersons ?? undefined}
         options={{
@@ -579,7 +575,7 @@ const ApplicationEvent = (props: Props): JSX.Element => {
 
   const { t } = useTranslation();
 
-  const { register, watch } = form;
+  const { register, watch, getValues } = form;
 
   register(`applicationEvents.${index}.reservationUnits`);
   register(`applicationEvents.${index}.begin`);
@@ -594,6 +590,16 @@ const ApplicationEvent = (props: Props): JSX.Element => {
   watch(`applicationEvents.${index}.eventsPerWeek`);
   watch(`applicationEvents.${index}.biweekly`);
 
+  // TODO for some reason there is an applicationEvent with all fields undefined on the first render
+  // this might be because we register the fields and their values are reset in the parent
+  // it might also be because form values are async
+  // (the values are not available on the first render because the query is still in progress)
+  // but why is there a single element in the array then (should be empty)?
+  const shouldRenderInner =
+    isVisible && getValues(`applicationEvents.${index}`)?.name != null;
+  // TODO another thing to check is what happens if we add a new event (what's it's default values)
+  // can it be rendered?
+
   return (
     <Wrapper>
       <Accordion
@@ -603,7 +609,9 @@ const ApplicationEvent = (props: Props): JSX.Element => {
         theme="thin"
       >
         {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
-        {isVisible && <ApplicationEventInner {...props} del={onDeleteEvent} />}
+        {shouldRenderInner && (
+          <ApplicationEventInner {...props} del={onDeleteEvent} />
+        )}
       </Accordion>
       {applicationEventSaved ? (
         <Notification

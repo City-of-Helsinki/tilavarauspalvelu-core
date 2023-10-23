@@ -8,7 +8,6 @@ import { filterNonNullable } from "common/src/helpers";
 import {
   type Query,
   type ApplicationRoundType,
-  type ReservationUnitType,
   type ApplicationType,
   ApplicationStatus,
 } from "common/types/gql-types";
@@ -26,7 +25,6 @@ type Props = {
   applicationRound: ApplicationRoundType;
   application: ApplicationType;
   savedEventId: number | undefined;
-  selectedReservationUnits: ReservationUnitType[];
   save: ({
     application,
     eventId,
@@ -46,7 +44,6 @@ const Page1 = ({
   application,
   savedEventId,
   onDeleteUnsavedEvent,
-  selectedReservationUnits,
   setError,
 }: Props): JSX.Element | null => {
   const history = useRouter();
@@ -70,34 +67,28 @@ const Page1 = ({
 
   const { options } = useOptions();
 
+  // TODO do we want to open the first / last event by default? or only if there is only one event?
+  // or only if there is an unsaved event?
+  const firstApplicationEvent = application.applicationEvents?.find(
+    (ae) => ae?.pk != null
+  )?.pk;
+  // TODO these could be saved in the form state should they stay consistent when navigating
   const [accordionStates, setAccordionStates] = useState<
     { applicationEventId: number | undefined; isOpen: boolean }[]
-  >([]);
+  >(
+    firstApplicationEvent != null
+      ? [{ applicationEventId: firstApplicationEvent, isOpen: true }]
+      : []
+  );
 
   const form = useFormContext<ApplicationFormValues>();
   const {
     formState: { errors },
   } = form;
 
-  /*
-  const prepareData = (data: ApplicationFormValues): Application => {
-    const applicationCopy = {
-      ...deepCopy(application),
-      applicationEvents: application.applicationEvents?.map(
-        (appEvent, index) => ({
-          ...appEvent,
-          ...data.applicationEvents[index],
-        })
-      ),
-    };
-    return applicationCopy;
-  };
-  */
-
   const onSubmit = (data: ApplicationFormValues, eventId?: number) => {
     const appToSave = {
       ...data,
-      // ...prepareData(data),
       // override status in order to validate correctly when modifying existing application
       // TODO this should be set in the form itself
       status: ApplicationStatus.Draft,
@@ -139,12 +130,10 @@ const Page1 = ({
       validationErrors.filter((i) => i !== index).length === 0;
 
     if (otherEventsAreValid) {
-      const appToSave = {
-        ...form.getValues(),
-        // status: "draft" as const,
-      };
+      const appToSave = form.getValues();
+      // TODO what is this magic and why?
       appToSave.applicationEvents = appToSave.applicationEvents.filter(
-        (ae) => ae.id !== eventId
+        (ae) => ae.pk !== eventId
       );
       save({ application: appToSave, eventId: -1 });
     } else {
@@ -193,6 +182,7 @@ const Page1 = ({
   const addNewEventButtonDisabled =
     applicationEvents.filter((ae) => !ae.id).length > 0;
 
+  // FIXME this isn't working
   const nextButtonDisabled =
     applicationEvents.length === 0 ||
     applicationEvents.filter((ae) => !ae.id).length > 0 ||
@@ -211,7 +201,6 @@ const Page1 = ({
             ...options,
             unitOptions,
           }}
-          selectedReservationUnits={selectedReservationUnits}
           onSave={form.handleSubmit((app) =>
             onSubmit(app, event.pk ?? undefined)
           )}

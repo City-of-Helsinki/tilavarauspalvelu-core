@@ -1,8 +1,5 @@
 import { filterNonNullable } from "common/src/helpers";
-import type {
-  EventReservationUnit,
-  ApplicationEventSchedulePriority,
-} from "common/types/common";
+import type { ApplicationEventSchedulePriority } from "common/types/common";
 import {
   type ApplicationEventType,
   ApplicationEventStatus,
@@ -45,8 +42,8 @@ export type ApplicationEventFormValue = {
   applicationId: number;
   applicationEventSchedules: ApplicationEventScheduleFormType[];
   status: ApplicationEventStatus;
-  // TODO replace with form type (don't reuse the REST type)
-  reservationUnits: EventReservationUnit[];
+  // pk only for now (priority is based on the index)
+  reservationUnits: number[];
 };
 
 // TODO write the conversion other way around also
@@ -64,16 +61,10 @@ export const transformApplicationEventToForm = (
   eventsPerWeek: applicationEvent.eventsPerWeek ?? 0,
   biweekly: applicationEvent.biweekly ?? false,
   applicationId: applicationEvent.application?.pk ?? 0,
-  reservationUnits: filterNonNullable(
-    applicationEvent.eventReservationUnits
-  ).map((eru) => ({
-    // TODO remove ids
-    id: eru.pk ?? undefined,
-    priority: eru.priority ?? 0,
-    reservationUnitId: eru.reservationUnit?.pk ?? 0,
-    // TODO what is needed here? where is this used, and what of it? narrow the type
-    reservationUnit: eru.reservationUnit ?? null,
-  })),
+  reservationUnits: filterNonNullable(applicationEvent.eventReservationUnits)
+    .sort((a, b) => (a.priority && b.priority ? a.priority - b.priority : 0))
+    .map((eru) => eru.reservationUnit?.pk ?? 0)
+    .filter((pk) => pk > 0),
   applicationEventSchedules: filterNonNullable(
     applicationEvent.applicationEventSchedules
   ).map((aes) => ({

@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
 
 // TODO make into fragments and combine them with other queries
+// a lot of things like name translations are only needed in the client side (not admin)
+// also a lot of the deep hierarchy is only needed in the client side
 export const APPLICATION_QUERY = gql`
   query getApplications($pk: [ID]) {
     applications(pk: $pk) {
@@ -16,6 +18,24 @@ export const APPLICATION_QUERY = gql`
             serviceSector {
               pk
               nameFi
+            }
+             reservationUnits {
+              pk
+              nameFi
+              nameSv
+              nameEn
+              minPersons
+              maxPersons
+              images {
+                imageType
+                mediumUrl
+              }
+              unit {
+                pk
+                nameFi
+                nameSv
+                nameEn
+              }
             }
             applicationPeriodBegin
             applicationPeriodEnd

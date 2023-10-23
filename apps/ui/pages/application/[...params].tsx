@@ -9,7 +9,6 @@ import {
   Query,
   QueryApplicationsArgs,
   QueryTermsOfUseArgs,
-  ReservationUnitType,
   TermsOfUseType,
   Mutation,
   MutationCreateApplicationArgs,
@@ -30,7 +29,6 @@ import Page2 from "@/components/application/Page2";
 import Page3 from "@/components/application/Page3";
 import Preview from "@/components/application/Preview";
 import View from "@/components/application/View";
-import useReservationUnitList from "@/hooks/useReservationUnitList";
 import Sent from "@/components/application/Sent";
 import { CenterSpinner } from "@/components/common/common";
 import { apiDateToUIDate, getTranslation } from "@/modules/util";
@@ -155,8 +153,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     applicationData?.applications?.edges?.[0]?.node ?? undefined;
   const applicationRound = application?.applicationRound ?? undefined;
 
-  const { reservationUnits, clearSelections } = useReservationUnitList();
-
   const [create] = useMutation<Mutation, MutationCreateApplicationArgs>(
     CREATE_APPLICATION_MUTATION,
     {
@@ -231,10 +227,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
               // priority: convertPriority(aes.priority),
             };
           }),
-        // FIXME these are not saved (or sent)
-        eventReservationUnits: ae.reservationUnits.map((eru) => ({
-          priority: eru.priority,
-          reservationUnit: eru.reservationUnitId,
+        eventReservationUnits: ae.reservationUnits.map((eruPk, eruIndex) => ({
+          priority: eruIndex,
+          reservationUnit: eruPk,
         })),
       })),
       applicationRoundPk: appToSave.applicationRoundId,
@@ -248,6 +243,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       status: appToSave.status,
     };
 
+    // TODO can this mutation ever be create?
+    // since the applications are created on a separate page
+    // i.e. can we be on this page with application.pk == null?
     const mutation =
       appToSave.pk == null || appToSave.pk === 0 ? create : update;
     const { data } = await mutation({
@@ -278,7 +276,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       }
       const prefix = `/application/${pk}`;
       const target = `${prefix}/${path}`;
-      clearSelections();
       router.push(target);
     };
 
@@ -428,9 +425,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         >
           {applicationRound != null && (
             <Page1
-              selectedReservationUnits={
-                reservationUnits as ReservationUnitType[]
-              }
               applicationRound={applicationRound}
               onDeleteUnsavedEvent={handleRemoveUnsavedApplicationEvent}
               application={application}
