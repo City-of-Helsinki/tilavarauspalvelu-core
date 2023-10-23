@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Tag } from "hds-react";
+import { omit } from "lodash";
 
 type FilterTagProps = {
   formValueKeys: string[];
@@ -136,7 +137,7 @@ const FilterTagList = ({
             </StyledTag>
           );
         })}
-      {formValueKeys.length > 0 && (
+      {omit(formValueKeys, "showOnlyAvailable").length > 0 && (
         <ResetButton
           onClick={() => removeValue && removeValue()}
           onDelete={() => removeValue && removeValue()}
