@@ -5,12 +5,11 @@ import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
 import { ApplicationEventScheduleType } from "common/types/gql-types";
 import { weekdays } from "../../modules/const";
+import { ApplicationEventScheduleFormType } from "./Form";
 
 type Props = {
-  applicationEventSchedules: [
-    ApplicationEventScheduleType[],
-    ApplicationEventScheduleType[]
-  ];
+  primary: ApplicationEventScheduleFormType[],
+  secondary: ApplicationEventScheduleFormType[],
 };
 
 const WeekWrapper = styled.div`
@@ -26,7 +25,7 @@ const Label = styled.div`
 const Weekdays = ({
   schedules,
 }: {
-  schedules: ApplicationEventScheduleType[];
+  schedules: ApplicationEventScheduleFormType[];
 }) => {
   const { t } = useTranslation();
   return (
@@ -76,19 +75,18 @@ const Heading = styled(H4).attrs({
   margin-top: 0;
 `;
 
-const TimePreview = ({ applicationEventSchedules }: Props): JSX.Element => {
+const TimePreview = ({ primary, secondary }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [primarySchedules, secondarySchedules] = applicationEventSchedules;
 
   return (
     <Wrapper>
       <div>
         <Heading>{t("application:Page2.primarySchedules")}</Heading>
-        <Weekdays schedules={primarySchedules} />
+        <Weekdays schedules={primary} />
       </div>
       <div>
         <Heading>{t("application:Page2.secondarySchedules")}</Heading>
-        <Weekdays schedules={secondarySchedules} />
+        <Weekdays schedules={secondary} />
       </div>
     </Wrapper>
   );

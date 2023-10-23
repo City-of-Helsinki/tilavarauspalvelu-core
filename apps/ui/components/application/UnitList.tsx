@@ -40,4 +40,4 @@ const UnitList = ({ units }: { units: EventReservationUnitType[] }) => {
   );
 };
 
-export default UnitList;
+export { UnitList };

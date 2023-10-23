@@ -2,21 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import styled, { CSSProperties } from "styled-components";
 import { useTranslation } from "next-i18next";
 import { IconCross, Select } from "hds-react";
-import {
+import type {
   ApplicationEventSchedulePriority,
   OptionType,
 } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ApplicationEventScheduleType } from "common/types/gql-types";
-import { TimePreview } from "./TimePreview";
-import { weekdays } from "../../modules/const";
+import { weekdays } from "@/modules/const";
 import {
   arrowDown,
   arrowUp,
   MediumButton,
   SupplementaryButton,
-} from "../../styles/util";
+} from "@/styles/util";
+import { TimePreview } from "./TimePreview";
+import { type ApplicationEventScheduleFormType } from "./Form";
 
 type Cell = {
   hour: number;
@@ -31,7 +31,7 @@ type Props = {
   updateCells: (i: number, cells: Cell[][]) => void;
   copyCells: ((i: number) => void) | null;
   resetCells: () => void;
-  summaryData: [ApplicationEventScheduleType[], ApplicationEventScheduleType[]];
+  summaryData: [ApplicationEventScheduleFormType[], ApplicationEventScheduleFormType[]];
 };
 
 const CalendarHead = styled.div`
@@ -418,7 +418,7 @@ const TimeSelector = ({
         </ResetButton>
       </LegendContainer>
       <TimePreviewContainer data-testid={`time-selector__preview-${index}`}>
-        <TimePreview applicationEventSchedules={summaryData} />
+        <TimePreview primary={summaryData[0]} secondary={summaryData[1]} />
       </TimePreviewContainer>
       {copyCells && (
         <ButtonContainer>

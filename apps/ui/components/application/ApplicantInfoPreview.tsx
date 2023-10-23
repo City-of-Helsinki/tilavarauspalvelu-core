@@ -18,7 +18,7 @@ const ApplicantInfoPreview = ({
 }: {
   application: ApplicationType;
   cities: OptionType[];
-}): JSX.Element | null => {
+}): JSX.Element => {
   const { t } = useTranslation();
 
   return (

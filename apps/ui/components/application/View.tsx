@@ -11,7 +11,7 @@ import ApplicantInfoPreview from "./ApplicantInfoPreview";
 import { CheckboxContainer, StyledNotification, Terms } from "./styled";
 import { ButtonContainer, FormSubHeading } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
-import ApplicationEventList from "./ApplicationEventList";
+import { ApplicationEventList } from "./ApplicationEventList";
 
 type Props = {
   application: ApplicationType;

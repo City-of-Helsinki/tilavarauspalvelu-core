@@ -326,17 +326,9 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         </Notification>
       )}
       {applicationEvents.map((event, index) => {
-        const data = selectorData[index];
-        const summaryDataPrimary = data
-          ? cellsToApplicationEventSchedules(
-              data.map((n) => n.filter((nn) => nn.state === 300))
-            )
-          : [];
-        const summaryDataSecondary = data
-          ? cellsToApplicationEventSchedules(
-              data.map((n) => n.filter((nn) => nn.state === 200))
-            )
-          : [];
+        const schedules = getValues(`applicationEvents.${index}.applicationEventSchedules`);
+        const summaryDataPrimary = schedules.filter((n) => n.priority === 300)
+        const summaryDataSecondary = schedules.filter((n) => n.priority === 200)
         return (
           <Accordion
             open={index === 0}

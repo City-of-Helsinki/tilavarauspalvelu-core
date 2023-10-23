@@ -1,29 +1,20 @@
 import React from "react";
 import { formatDuration } from "common/src/common/util";
-import type { ApplicationEventSchedule } from "common/types/common";
-import type {
-  ApplicationEventScheduleType,
-  ApplicationEventType,
-} from "common/types/gql-types";
+import type { ApplicationEventType } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
-import { filterNonNullable } from "common/src/helpers";
-import { AccordionWithState as Accordion } from "../common/Accordion";
+import { useFormContext } from "react-hook-form";
 import { useOptions } from "@/hooks/useOptions";
 import { TimePreview } from "./TimePreview";
 import { StyledLabelValue, TimePreviewContainer } from "./styled";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
-import UnitList from "./UnitList";
+import { AccordionWithState as Accordion } from "../common/Accordion";
+import { UnitList } from "./UnitList";
+import { ApplicationEventScheduleFormType, ApplicationFormValues } from "./Form";
 
-const convertToApplicationEventScheduleRest = (
-  schedule: ApplicationEventScheduleType
-): ApplicationEventSchedule => ({
-  id: schedule.pk ?? undefined,
-  day: (schedule.day ?? 0) as ApplicationEventSchedule["day"],
-  begin: schedule.begin,
-  end: schedule.end,
-  priority: schedule.priority as ApplicationEventSchedule["priority"],
-});
+const filterPrimary = (n: ApplicationEventScheduleFormType) => n.priority === 300;
+const filterSecondary = (n: ApplicationEventScheduleFormType) => n.priority === 200;
 
+// TODO replace events with form context
 const ApplicationEventList = ({
   events,
 }: {
@@ -34,9 +25,10 @@ const ApplicationEventList = ({
   const { purposeOptions } = options;
   const { ageGroups } = params;
 
-  const filterPrimary = (n: ApplicationEventScheduleType) => n.priority === 300;
-  const filterSecondary = (n: ApplicationEventScheduleType) =>
-    n.priority === 200;
+  // TODO check that this is only used with form context
+  // (if not we need to pass the applicationEvents here and use the form context in the parent).
+  const form = useFormContext<ApplicationFormValues>();
+  const { watch } = form;
 
   const getAgeGroupString = (ageGroupId: number | null | undefined) => {
     if (!ageGroupId) {
@@ -55,13 +47,15 @@ const ApplicationEventList = ({
       : "";
   };
 
+  const evts = watch(`applicationEvents`)
+
   return (
     <>
-      {events.map((applicationEvent, i) => (
+      {evts.map((applicationEvent, i) => (
         <Accordion
           open
           id={`applicationEvent-${i}`}
-          key={applicationEvent.id}
+          key={applicationEvent.pk}
           heading={applicationEvent.name || ""}
           theme="thin"
         >
@@ -79,11 +73,11 @@ const ApplicationEventList = ({
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.ageGroup")}
-              value={getAgeGroupString(applicationEvent.ageGroup?.pk)}
+              value={getAgeGroupString(applicationEvent.ageGroup)}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.purpose")}
-              value={getPurposeString(applicationEvent.purpose?.pk)}
+              value={getPurposeString(applicationEvent.purpose)}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.begin")}
@@ -96,11 +90,11 @@ const ApplicationEventList = ({
             <StyledLabelValue
               label={t("application:preview.applicationEvent.minDuration")}
               // TODO rewrite formatDuration to use numbers
-              value={formatDuration(applicationEvent.minDuration ?? "")}
+              value={formatDuration(applicationEvent.minDuration.toString())}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.maxDuration")}
-              value={formatDuration(applicationEvent.maxDuration ?? "")}
+              value={formatDuration(applicationEvent.maxDuration.toString())}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.eventsPerWeek")}
@@ -111,22 +105,16 @@ const ApplicationEventList = ({
           <FormSubHeading>
             {t("application:Page1.spacesSubHeading")}
           </FormSubHeading>
-          <UnitList
-            units={filterNonNullable(applicationEvent.eventReservationUnits)}
-          />
+          {/* FIXME need to convert from number[] to ReservationUnit[] or at least retrieve the name and some other info
+          <UnitList units={reservationUnits} />
+          */}
           <FormSubHeading>
             {t("application:preview.applicationEventSchedules")}
           </FormSubHeading>
           <TimePreviewContainer data-testid={`time-selector__preview-${i}`}>
             <TimePreview
-              applicationEventSchedules={[
-                filterNonNullable(
-                  applicationEvent.applicationEventSchedules
-                ).filter(filterPrimary),
-                filterNonNullable(
-                  applicationEvent.applicationEventSchedules
-                ).filter(filterSecondary),
-              ]}
+              primary={applicationEvent.applicationEventSchedules.filter(filterPrimary)}
+              secondary={applicationEvent.applicationEventSchedules.filter(filterSecondary)}
             />
           </TimePreviewContainer>
         </Accordion>
@@ -135,4 +123,4 @@ const ApplicationEventList = ({
   );
 };
 
-export default ApplicationEventList;
+export { ApplicationEventList };
