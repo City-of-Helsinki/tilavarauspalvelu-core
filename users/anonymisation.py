@@ -12,8 +12,12 @@ from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from users.models import ReservationNotification, User
 
+ANONYMIZED = "Anonymized"
+SENSITIVE_RESERVATION = "Sensitive data of this reservation has been anonymized by a script"
+SENSITIVE_APPLICATION = "Sensitive data of this application has been anonymized by a script"
 
-def anonymize_string(s: str | None, replacement: str = "Anonymized") -> str:
+
+def anonymize_string(s: str | None, replacement: str = ANONYMIZED) -> str:
     return replacement if s and s.strip() else s
 
 
@@ -36,7 +40,6 @@ def anonymize_user(user: User) -> None:
 
 
 def anonymize_user_reservations(user: User) -> None:
-    long_text_replacement = "Sensitive data of this reservation has been anonymized by a script"
     reservations = Reservation.objects.filter(user=user).exclude(
         type__in=[ReservationTypeChoice.BLOCKED, ReservationTypeChoice.STAFF]
     )
@@ -59,9 +62,9 @@ def anonymize_user_reservations(user: User) -> None:
             billing_address_city=anonymize_string(reservation.billing_address_city),
             billing_address_street=anonymize_string(reservation.billing_address_street),
             working_memo="",
-            free_of_charge_reason=anonymize_string(reservation.free_of_charge_reason, long_text_replacement),
-            cancel_details=anonymize_string(reservation.cancel_details, long_text_replacement),
-            handling_details=anonymize_string(reservation.handling_details, long_text_replacement),
+            free_of_charge_reason=anonymize_string(reservation.free_of_charge_reason, SENSITIVE_RESERVATION),
+            cancel_details=anonymize_string(reservation.cancel_details, SENSITIVE_RESERVATION),
+            handling_details=anonymize_string(reservation.handling_details, SENSITIVE_RESERVATION),
         )
     audit_log_ids = LogEntry.objects.get_for_objects(reservations).values_list("id", flat=True)
     LogEntry.objects.filter(id__in=audit_log_ids).delete()
@@ -69,10 +72,10 @@ def anonymize_user_reservations(user: User) -> None:
 
 def anonymize_user_applications(user: User) -> None:
     ApplicationEvent.objects.filter(application__user=user).update(
-        name="Sensitive data of this application has been anonymized by a script",
-        name_fi="Sensitive data of this application has been anonymized by a script",
-        name_en="Sensitive data of this application has been anonymized by a script",
-        name_sv="Sensitive data of this application has been anonymized by a script",
+        name=SENSITIVE_APPLICATION,
+        name_fi=SENSITIVE_APPLICATION,
+        name_en=SENSITIVE_APPLICATION,
+        name_sv=SENSITIVE_APPLICATION,
     )
     Person.objects.filter(applications__user=user).update(
         first_name=user.first_name,
@@ -82,17 +85,18 @@ def anonymize_user_applications(user: User) -> None:
     )
     Address.objects.filter(applications__user=user).update(
         post_code="99999",
-        city="Anonymized",
-        city_fi="Anonymized",
-        city_en="Anonymized",
-        city_sv="Anonymized",
-        street_address="Anonymized",
-        street_address_fi="Anonymized",
-        street_address_en="Anonymized",
-        street_address_sv="Anonymized",
+        city=ANONYMIZED,
+        city_fi=ANONYMIZED,
+        city_en=ANONYMIZED,
+        city_sv=ANONYMIZED,
+        street_address=ANONYMIZED,
+        street_address_fi=ANONYMIZED,
+        street_address_en=ANONYMIZED,
+        street_address_sv=ANONYMIZED,
     )
     Application.objects.filter(user=user).update(
-        additional_information="Sensitive data of this application has been anonymized by a script"
+        additional_information=SENSITIVE_APPLICATION,
+        working_memo=SENSITIVE_APPLICATION,
     )
 
 
