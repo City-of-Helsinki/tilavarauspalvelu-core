@@ -11,10 +11,12 @@ const StyledUserMenu = styled(HDSNavigation.User)<{
   $active?: boolean;
 }>`
   @media (min-width: ${(props) => props.theme.spacing.m}) {
+    /* stylelint-disable -- Using HDS naming convention to overwrite styles */
     #userDropdown-menu {
       left: auto;
       right: 0;
     }
+    /* stylelint-enable */
   }
   ${({ $active }) =>
     $active &&
