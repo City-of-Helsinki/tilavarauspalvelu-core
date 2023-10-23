@@ -505,6 +505,7 @@ const SearchForm = ({
             showAllLabel={t("searchForm:showMoreFilters")}
             showLessLabel={t("searchForm:showLessFilters")}
             maximumNumber={0}
+            data-testid="search-form__filters--optional"
             initiallyOpen={
               formValues.reservationUnitType != null ||
               formValues.minPersons != null ||
