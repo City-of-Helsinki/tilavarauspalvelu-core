@@ -13,7 +13,7 @@ from permissions.helpers import (
     get_units_where_can_view_reservations,
 )
 from reservation_units.models import ReservationUnit, ReservationUnitType
-from reservations.choices import ReservationStateChoice
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation, User
 from spaces.models import Unit
 
@@ -49,6 +49,11 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     reservation_unit = django_filters.ModelMultipleChoiceFilter(
         method="get_reservation_unit", queryset=ReservationUnit.objects.all()
+    )
+
+    reservation_type = django_filters.MultipleChoiceFilter(
+        field_name="type",
+        choices=ReservationTypeChoice.choices,
     )
 
     reservation_unit_name_fi = django_filters.CharFilter(method="get_reservation_unit_name")
