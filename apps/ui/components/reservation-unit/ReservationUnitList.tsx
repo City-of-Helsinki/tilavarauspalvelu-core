@@ -212,7 +212,7 @@ const ReservationUnitList = ({
       >
         {t("reservationUnitList:infoReservationUnits")}
       </Notification>
-      {reservationUnits.map((ru, index, all) => {
+      {reservationUnits.map((ru, i, all) => {
         return (
           <ReservationUnitCard
             key={ru.pk}
@@ -223,9 +223,9 @@ const ReservationUnitList = ({
             }
             onDelete={remove}
             reservationUnit={ru}
-            order={index}
-            first={index === 0}
-            last={index === all.length - 1}
+            order={i}
+            first={i === 0}
+            last={i === all.length - 1}
             onMoveDown={moveDown}
             onMoveUp={moveUp}
           />

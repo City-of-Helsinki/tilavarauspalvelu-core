@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Control, FieldValues, useFormContext } from "react-hook-form";
@@ -27,37 +27,6 @@ type Props = {
   homeCityOptions: OptionType[];
 };
 
-/*
-const prepareData = (
-  application: Application,
-  data: FormValues,
-  isRegistered: boolean,
-  hasBillingAddress: boolean
-): Application => {
-  const applicationCopy = deepCopy(application);
-
-  applicationCopy.applicantType = isRegistered ? "association" : "community";
-
-  applicationCopy.contactPerson = data.contactPerson;
-  applicationCopy.organisation = data.organisation;
-
-  if (!isRegistered && applicationCopy.organisation != null) {
-    applicationCopy.organisation.identifier = null;
-  }
-
-  if (hasBillingAddress) {
-    applicationCopy.billingAddress = data.billingAddress;
-  } else {
-    applicationCopy.billingAddress = null;
-  }
-
-  applicationCopy.homeCityId = data.homeCityId;
-  applicationCopy.additionalInformation = undefined;
-
-  return applicationCopy;
-};
-*/
-
 const OrganisationForm = ({
   application,
   onNext,
@@ -75,12 +44,6 @@ const OrganisationForm = ({
     setValue,
   } = useFormContext<ApplicationFormValues>();
 
-  // TODO can be removed by using setValue and watch
-  /*
-  const [hasRegistration, setHasRegistration] = useState(
-    Boolean(application.organisation?.identifier) // it is registered if identifier is set
-  );
-  */
   const identifier = watch("organisation.identifier");
   const hasRegistration = identifier != null;
   const hasBillingAddress = watch("hasBillingAddress");
@@ -94,14 +57,6 @@ const OrganisationForm = ({
   }, [hasRegistration, register, unregister]);
 
   const onSubmit = (data: ApplicationFormValues): void => {
-    /*
-    const appToSave = prepareData(
-      application,
-      data,
-      hasRegistration,
-      hasBillingAddress
-    );
-    */
     onNext(data);
   };
 

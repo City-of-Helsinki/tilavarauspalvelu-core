@@ -10,13 +10,13 @@ import {
   ApplicationType,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import { useFormContext } from "react-hook-form";
 import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "../common/common";
-import { ApplicationEventScheduleFormType, ApplicationFormValues } from "./Form";
-import { useFormContext } from "react-hook-form";
+import { ApplicationFormValues } from "./Form";
 
 type Props = {
   application: ApplicationType;
@@ -216,37 +216,24 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     )
   );
 
-  const {
-    getValues,
-    setValue,
-    watch,
-  } = useFormContext<ApplicationFormValues>();
-
-  const convertCellToApplicationEventSchedule = (
-    cells: Cell[][][]
-  ): ApplicationEventScheduleType[] => {
-    const result = cells.map((cell) => cellsToApplicationEventSchedules(cell)).flat();
-    return result;
-  };
+  const { getValues, setValue } = useFormContext<ApplicationFormValues>();
 
   useEffect(() => {
-    console.log('selectorData', selectorData);
-    const faes = selectorData.map((day) => day.map((cell) => cell.filter((elem) => elem.state === 300 || elem.state === 200)));
-    console.log('faes', faes);
     // So this returns them as:
     // applicationEvents (N)
     // - ApplicationEventSchedule[][]: Array(7) (i is the day)
     // - ApplicationEventSchedule[]: Array(M) (j is the continuous block)
     // priority: 200 | 300 (200 is secondary, 300 is primary)
     // priority: 100 (? assuming it's not selected)
-    const applicationEvents = selectorData
+    const selectedAppEvents = selectorData
       .map((cell) => cellsToApplicationEventSchedules(cell))
-      .map((aes) => aes.filter((ae) => ae.priority === 300 || ae.priority === 200));
-    console.log('application event schedules', applicationEvents);
+      .map((aes) =>
+        aes.filter((ae) => ae.priority === 300 || ae.priority === 200)
+      );
     // this seems to work except
     // TODO: day is incorrect (empty days at the start are missing, and 200 / 300 priority on the same day gets split into two days)
     // TODO refactor the Cell -> ApplicationEventSchedule conversion to use FormTypes
-    applicationEvents.forEach((aes, i) => {
+    selectedAppEvents.forEach((aes, i) => {
       const val = aes.map((ae, day) => {
         // debug check
         if (day > 6) {
@@ -258,16 +245,13 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           // The default will never happen (it's already filtered)
           // TODO type this better
           priority: ae.priority === 300 ? (300 as const) : (200 as const),
-          day: day as Day
-        }
+          day: day as Day,
+        };
       });
       // because of debug print?
       setValue(`applicationEvents.${i}.applicationEventSchedules`, val);
     });
-  }, [selectorData]);
-
-  // debug print
-  console.log('DEBUG watch application events', watch('applicationEvents'));
+  }, [selectorData, setValue]);
 
   const updateCells = (index: number, newCells: Cell[][]) => {
     const updated = [...selectorData];

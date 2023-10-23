@@ -79,6 +79,7 @@ export const APPLICATION_QUERY = gql`
               name
             }
             applicationEventSchedules {
+              pk
               begin
               end
               day

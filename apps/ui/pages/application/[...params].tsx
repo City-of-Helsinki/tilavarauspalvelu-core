@@ -5,15 +5,12 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import i18next from "i18next";
 import {
   Query,
   QueryApplicationsArgs,
-  ApplicationEventType,
   QueryTermsOfUseArgs,
   ReservationUnitType,
   TermsOfUseType,
-  ApplicationEventStatus,
   Mutation,
   MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
@@ -22,11 +19,10 @@ import {
 } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Application, ApplicationEventSchedulePriority } from "common";
+import { ApplicationEventSchedulePriority } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { defaultDurationMins } from "@/modules/const";
 import Page1 from "@/components/application/Page1";
 import Page2 from "@/components/application/Page2";
 import Page3 from "@/components/application/Page3";
@@ -180,7 +176,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       return appMod;
     };
     */
-    const convertPriority = (prio: ApplicationEventSchedulePriority): Priority => {
+    const convertPriority = (
+      prio: ApplicationEventSchedulePriority
+    ): Priority => {
       switch (prio) {
         case 300:
           return Priority.A_300;
@@ -189,14 +187,12 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         case 100:
         default:
           return Priority.A_100;
-        }
+      }
     };
 
     const input: ApplicationCreateMutationInput = {
       additionalInformation: appToSave.additionalInformation,
       applicantType: appToSave.applicantType,
-      // ...(appToSave.applicantType ? { applicantType: appToSave.applicantType } : {}),
-
       applicationEvents: appToSave.applicationEvents.map((ae) => ({
         ...(ae.begin ? { begin: apiDateToUIDate(ae.begin) } : {}),
         ...(ae.end ? { end: apiDateToUIDate(ae.end) } : {}),
@@ -205,12 +201,20 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         ageGroup: ae.ageGroup ?? 0,
         purpose: ae.purpose ?? 0,
         status: ae.status,
-        applicationEventSchedules: ae.applicationEventSchedules.filter((aes): aes is Omit<typeof aes, "priority"> & { priority: ApplicationEventSchedulePriority } => aes.priority != null).map((aes) => ({
-          day: aes.day,
-          begin: aes.begin,
-          end: aes.end,
-          priority: convertPriority(aes.priority),
-        })),
+        applicationEventSchedules: ae.applicationEventSchedules
+          .filter(
+            (
+              aes
+            ): aes is Omit<typeof aes, "priority"> & {
+              priority: ApplicationEventSchedulePriority;
+            } => aes.priority != null
+          )
+          .map((aes) => ({
+            day: aes.day,
+            begin: aes.begin,
+            end: aes.end,
+            priority: convertPriority(aes.priority),
+          })),
         eventReservationUnits: ae.reservationUnits.map((eru) => ({
           priority: eru.priority,
           reservationUnit: eru.reservationUnitId,
@@ -225,12 +229,13 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       status: appToSave.status,
     };
 
-    const mutation = appToSave.pk == null || appToSave.pk === 0 ? create : update;
-      const { data } = await mutation({
-        variables: {
-          input,
-        },
-      });
+    const mutation =
+      appToSave.pk == null || appToSave.pk === 0 ? create : update;
+    const { data } = await mutation({
+      variables: {
+        input,
+      },
+    });
     // TODO do a refetch here instead of cache modification (after moving to fetch hook)
     return data?.createApplication?.application?.pk ?? 0;
   };
@@ -375,7 +380,11 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   console.log("application", application);
   // For now FIXME (we need special handling for the first element)
   // or we need checks down the line to handle 0 length arrays
-  if (!application || application.applicationEvents == null ||  application.applicationEvents?.length === 0) {
+  if (
+    !application ||
+    application.applicationEvents == null ||
+    application.applicationEvents?.length === 0
+  ) {
     return null;
   }
 
@@ -418,7 +427,10 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           application={application}
           translationKeyPrefix="application:Page3"
         >
-          <Page3 application={application} onNext={saveAndNavigate("preview")} />
+          <Page3
+            application={application}
+            onNext={saveAndNavigate("preview")}
+          />
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (

@@ -12,13 +12,10 @@ import {
   type PersonType,
   type ApplicationStatus,
   type ApplicationsApplicationApplicantTypeChoices,
-  ApplicationEventScheduleType,
-  Priority,
 } from "common/types/gql-types";
 // TODO replace these with form types
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { apiDateToUIDate } from "@/modules/util";
-
 
 // export type ApplicationEventScheduleFormType = Omit<ApplicationEventScheduleType, 'id'>[];
 export type ApplicationEventScheduleFormType = {
@@ -27,7 +24,6 @@ export type ApplicationEventScheduleFormType = {
   end: string;
   priority: ApplicationEventSchedulePriority;
 };
-
 
 // TODO move to application level and reuse the form type
 export type ApplicationEventFormValue = {
@@ -82,7 +78,7 @@ export const transformApplicationEventToForm = (
   applicationEventSchedules: filterNonNullable(
     applicationEvent.applicationEventSchedules
   ).map((aes) => ({
-    pk : aes.pk ?? undefined,
+    pk: aes.pk ?? undefined,
     day: aes.day,
     begin: aes.begin ?? "",
     end: aes.end ?? "",
@@ -108,14 +104,14 @@ type OrganisationFormValues = {
   yearEstablished: number | null;
   coreBusiness: string;
   address: AddressFormValue;
-}
+};
 type PersonFormValues = {
   pk: number | null;
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
-}
+};
 
 export const convertPerson = (p: Maybe<PersonType>): PersonFormValues => ({
   pk: p?.pk ?? null,

@@ -23,7 +23,6 @@ import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { ReservationUnitList } from "../reservation-unit/ReservationUnitList";
 import {
   apiDateToUIDate,
-  apiDurationToMinutes,
   applicationErrorText,
   formatApiDate,
   formatDate,
@@ -240,7 +239,7 @@ const ApplicationEventInner = ({
           name={`applicationEvents.${index}.ageGroup`}
           required
           label={t("application:Page1.ageGroup")}
-          // @ts-expect-error
+          // @ts-expect-error -- Remove the ControlledSelect to fix the types
           control={form.control}
           options={ageGroupOptions}
           error={applicationErrorText(
@@ -252,7 +251,7 @@ const ApplicationEventInner = ({
           name={`applicationEvents.${index}.purpose`}
           required
           label={t("application:Page1.purpose")}
-          // @ts-expect-error
+          // @ts-expect-error -- Remove the ControlledSelect to fix the types
           control={form.control}
           options={purposeOptions}
           error={applicationErrorText(
@@ -582,7 +581,7 @@ const ApplicationEvent = (props: Props): JSX.Element => {
 
   const { register, watch } = form;
 
-  register(`applicationEvents.${index}.eventReservationUnits`);
+  register(`applicationEvents.${index}.reservationUnits`);
   register(`applicationEvents.${index}.begin`);
   register(`applicationEvents.${index}.end`);
   register(`applicationEvents.${index}.minDuration`);
