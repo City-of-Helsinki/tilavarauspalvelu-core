@@ -26,7 +26,7 @@ import Link from "next/link";
 import { Container } from "common";
 import { useSession } from "@/hooks/auth";
 import { useReservation, useOrder } from "@/hooks/reservation";
-import { reservationUnitPath } from "@/modules/const";
+import { genericTermsVariant, reservationUnitPath } from "@/modules/const";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { createApolloClient } from "@/modules/apolloClient";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
@@ -42,13 +42,13 @@ import {
   getNormalizedReservationOrderStatus,
   getReservationCancellationReason,
   getReservationValue,
-} from "../../modules/reservation";
-import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
+} from "@/modules/reservation";
+import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import {
   getReservationUnitInstructionsKey,
   getReservationUnitName,
   getReservationUnitPrice,
-} from "../../modules/reservationUnit";
+} from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 import ReservationStatus from "../../components/reservation/ReservationStatus";
 import Address from "../../components/reservation-unit/Address";
@@ -81,7 +81,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
-    const genericTerms = genericTermsData?.termsOfUse?.edges[0]?.node || {};
+    const bookingTerms =
+      genericTermsData?.termsOfUse?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n !== null)
+        .filter((edge) => edge.pk === genericTermsVariant.BOOKING) || {};
 
     return {
       props: {
@@ -89,7 +93,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         ...(await serverSideTranslations(locale ?? "fi")),
         overrideBackgroundColor: "var(--tilavaraus-white)",
         termsOfUse: {
-          genericTerms,
+          genericTerms: bookingTerms,
         },
         id,
       },

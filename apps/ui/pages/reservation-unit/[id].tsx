@@ -64,7 +64,7 @@ import Address from "../../components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";
 import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
-import { createApolloClient } from "../../modules/apolloClient";
+import { createApolloClient } from "@/modules/apolloClient";
 import Map from "../../components/Map";
 import Legend from "../../components/calendar/Legend";
 import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
@@ -74,19 +74,19 @@ import {
   isTouchDevice,
   parseDate,
   printErrorMessages,
-} from "../../modules/util";
+} from "@/modules/util";
 import {
   OPENING_HOURS,
   RELATED_RESERVATION_UNITS,
   RESERVATION_UNIT,
   TERMS_OF_USE,
-} from "../../modules/queries/reservationUnit";
-import { getApplicationRounds } from "../../modules/api";
-import { ReservationProps } from "../../context/DataContext";
+} from "@/modules/queries/reservationUnit";
+import { getApplicationRounds } from "@/modules/api";
+import { ReservationProps } from "@/context/DataContext";
 import {
   CREATE_RESERVATION,
   LIST_RESERVATIONS,
-} from "../../modules/queries/reservation";
+} from "@/modules/queries/reservation";
 import {
   getFuturePricing,
   getPrice,
@@ -94,10 +94,10 @@ import {
   isReservationUnitPublished,
   mockOpeningTimePeriods,
   mockOpeningTimes,
-} from "../../modules/reservationUnit";
+} from "@/modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import { isReservationReservable } from "../../modules/reservation";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
+import { isReservationReservable } from "@/modules/reservation";
 import SubventionSuffix from "../../components/reservation/SubventionSuffix";
 import InfoDialog from "../../components/common/InfoDialog";
 import {
@@ -113,13 +113,14 @@ import {
   Subheading,
   TwoColumnLayout,
   Wrapper,
-} from "../../components/reservation-unit/ReservationUnitStyles";
-import { Toast } from "../../components/common/Toast";
+} from "@/components/reservation-unit/ReservationUnitStyles";
+import { Toast } from "@/components/common/Toast";
 import QuickReservation, {
   QuickReservationSlotProps,
 } from "../../components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "~/hooks/user";
+import { genericTermsVariant } from "@/modules/const";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -192,7 +193,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
-    const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
+    const bookingTerms: TermsOfUseType | undefined =
+      genericTermsData.termsOfUse?.edges
+        ?.map((e) => e?.node)
+        .filter((n): n is NonNullable<typeof n> => n !== null)
+        .find((edge) => edge.pk === genericTermsVariant.BOOKING);
 
     const lastOpeningPeriodEndDate =
       reservationUnitData?.reservationUnitByPk?.openingHours?.openingTimePeriods
@@ -275,7 +280,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         },
         relatedReservationUnits,
         activeApplicationRounds,
-        termsOfUse: { genericTerms },
+        termsOfUse: { genericTerms: bookingTerms },
       },
     };
   }
