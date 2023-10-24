@@ -3,13 +3,11 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
-import { useRouter } from "next/router";
-import { filterNonNullable } from "common/src/helpers";
 import {
   type Query,
   type ApplicationRoundType,
   type ApplicationType,
-  ApplicationStatus,
+  ApplicationEventStatus,
 } from "common/types/gql-types";
 import { useFormContext } from "react-hook-form";
 import { getTranslation, mapOptions } from "@/modules/util";
@@ -24,29 +22,14 @@ type Props = {
   // TODO break this down to smaller pieces (only the required props)
   applicationRound: ApplicationRoundType;
   application: ApplicationType;
-  savedEventId: number | undefined;
-  save: ({
-    application,
-    eventId,
-  }: {
-    application: ApplicationFormValues;
-    eventId?: number;
-  }) => void;
-  onDeleteUnsavedEvent: () => void;
-  addNewApplicationEvent: () => void;
-  setError: (error: string) => void;
+  onNext: (formValues: ApplicationFormValues) => void;
 };
 
 const Page1 = ({
-  save,
-  addNewApplicationEvent,
   applicationRound,
   application,
-  savedEventId,
-  onDeleteUnsavedEvent,
-  setError,
+  onNext,
 }: Props): JSX.Element | null => {
-  const history = useRouter();
   const { t } = useTranslation();
 
   const unitsInApplicationRound = uniq(
@@ -83,39 +66,16 @@ const Page1 = ({
 
   const form = useFormContext<ApplicationFormValues>();
   const {
-    formState: { errors },
+    getValues,
+    setValue,
+    register,
+    unregister,
+    watch,
   } = form;
 
-  const onSubmit = (data: ApplicationFormValues, eventId?: number) => {
-    const appToSave = {
-      ...data,
-      // override status in order to validate correctly when modifying existing application
-      // TODO this should be set in the form itself
-      status: ApplicationStatus.Draft,
-    };
-    if (appToSave.applicationEvents.length === 0) {
-      setError(t("application:error.noEvents"));
-      return;
-    }
-
-    if (
-      appToSave.applicationEvents.filter(
-        (ae) => ae.reservationUnits.length === 0
-      ).length > 0
-    ) {
-      setError(t("application:error.noReservationUnits"));
-      return;
-    }
-
-    // FIXME
-    // TODO this breaks the form submission state i.e. form.isSubmitting returns false
-    // even though the form is being saved. Too scared to change though.
-    // form.reset({ applicationEvents: appToSave.applicationEvents });
-    save({ application: appToSave, eventId });
-  };
-
+  /*
   const onDeleteEvent = async (eventId: number | undefined, index: number) => {
-    form.trigger();
+    trigger();
 
     const validationErrors = [];
     if (errors?.applicationEvents?.length != null) {
@@ -130,7 +90,7 @@ const Page1 = ({
       validationErrors.filter((i) => i !== index).length === 0;
 
     if (otherEventsAreValid) {
-      const appToSave = form.getValues();
+      const appToSave = getValues();
       // TODO what is this magic and why?
       appToSave.applicationEvents = appToSave.applicationEvents.filter(
         (ae) => ae.pk !== eventId
@@ -141,6 +101,7 @@ const Page1 = ({
       setError(t("application:error.otherEventsHaveErrors"));
     }
   };
+  */
 
   const isAccordianOpen = (applicationEventId: number | undefined) => {
     const state = accordionStates.find(
@@ -169,24 +130,83 @@ const Page1 = ({
     }
   };
 
-  // TODO why does this need an indx?
-  const handleDeleteEvent = (eventId: number | undefined, index: number) => {
-    if (!eventId) {
-      onDeleteUnsavedEvent();
+  const handleDeleteEvent = (index: number) => {
+    const pk = getValues(`applicationEvents.${index}.pk`);
+    if (pk) {
+      unregister(`applicationEvents.${index}`);
     } else {
-      onDeleteEvent(eventId, index);
+      unregister(`applicationEvents.${index}`);
     }
   };
 
-  const applicationEvents = filterNonNullable(application.applicationEvents);
-  const addNewEventButtonDisabled =
-    applicationEvents.filter((ae) => !ae.id).length > 0;
+  const applicationEvents = watch("applicationEvents");
 
-  // FIXME this isn't working
-  const nextButtonDisabled =
-    applicationEvents.length === 0 ||
-    applicationEvents.filter((ae) => !ae.id).length > 0 ||
-    (form.formState.isDirty && !savedEventId);
+  const handleAddNewApplicationEvent = () => {
+    const nextIndex = applicationEvents.length;
+    // TODO check if we have to register all the sub fields in application event
+    // seems so, we could also just register the pk here and register the rest in the form where they are used
+    register(`applicationEvents.${nextIndex}.pk`);
+    register(`applicationEvents.${nextIndex}.name`);
+    register(`applicationEvents.${nextIndex}.numPersons`);
+    register(`applicationEvents.${nextIndex}.ageGroup`);
+    register(`applicationEvents.${nextIndex}.abilityGroup`);
+    register(`applicationEvents.${nextIndex}.purpose`);
+    register(`applicationEvents.${nextIndex}.minDuration`);
+    register(`applicationEvents.${nextIndex}.maxDuration`);
+    register(`applicationEvents.${nextIndex}.eventsPerWeek`);
+    register(`applicationEvents.${nextIndex}.biweekly`);
+    register(`applicationEvents.${nextIndex}.begin`);
+    register(`applicationEvents.${nextIndex}.end`);
+    register(`applicationEvents.${nextIndex}.applicationEventSchedules`);
+    register(`applicationEvents.${nextIndex}.status`);
+    register(`applicationEvents.${nextIndex}.reservationUnits`);
+    setValue(`applicationEvents.${nextIndex}.reservationUnits`, [])
+    setValue(`applicationEvents.${nextIndex}.status`, ApplicationEventStatus.Created)
+    setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, [])
+    setValue(`applicationEvents.${nextIndex}.pk`, undefined)
+    setValue(`applicationEvents.${nextIndex}.name`, "")
+    setValue(`applicationEvents.${nextIndex}.eventsPerWeek`, 1)
+    setValue(`applicationEvents.${nextIndex}.biweekly`, false)
+  };
+
+  const addNewEventButtonDisabled =
+    applicationEvents.filter((ae) => !ae.pk).length > 0;
+
+  // TODO check if the form is valid? before allowing next or check when clicking next?
+  const nextButtonDisabled = false
+
+  const onSubmit = (): void => {
+    onNext(getValues());
+  };
+  /*
+  const onSubmit = (data: ApplicationFormValues, eventId?: number) => {
+    const appToSave = {
+      ...data,
+      // override status in order to validate correctly when modifying existing application
+      // TODO this should be set in the form itself
+      status: ApplicationStatus.Draft,
+    };
+    if (appToSave.applicationEvents.length === 0) {
+      setError(t("application:error.noEvents"));
+      return;
+    }
+
+    if (
+      appToSave.applicationEvents.filter(
+        (ae) => ae.reservationUnits.length === 0
+      ).length > 0
+    ) {
+      setError(t("application:error.noReservationUnits"));
+      return;
+    }
+
+    // FIXME
+    // TODO this breaks the form submission state i.e. form.isSubmitting returns false
+    // even though the form is being saved. Too scared to change though.
+    // form.reset({ applicationEvents: appToSave.applicationEvents });
+    save({ application: appToSave, eventId });
+  };
+  */
 
   return (
     <>
@@ -199,15 +219,9 @@ const Page1 = ({
             ...options,
             unitOptions,
           }}
-          onSave={form.handleSubmit((app) =>
-            onSubmit(app, event.pk ?? undefined)
-          )}
-          onDeleteEvent={() => handleDeleteEvent(event.pk ?? undefined, index)}
+          onDeleteEvent={() => handleDeleteEvent(index)}
           onToggleAccordian={() => handleToggleAccordion(event.pk ?? undefined)}
           isVisible={isAccordianOpen(event.pk ?? undefined)}
-          applicationEventSaved={
-            savedEventId != null && savedEventId === event.pk
-          }
         />
       ))}
       {!addNewEventButtonDisabled && (
@@ -215,7 +229,7 @@ const Page1 = ({
           id="addApplicationEvent"
           variant="supplementary"
           iconLeft={<IconPlusCircle />}
-          onClick={() => form.handleSubmit(addNewApplicationEvent)()}
+          onClick={handleAddNewApplicationEvent}
           size="small"
           style={{ gap: "var(--spacing-s)" }}
         >
@@ -228,7 +242,7 @@ const Page1 = ({
           id="button__application--next"
           iconRight={<IconArrowRight />}
           disabled={nextButtonDisabled}
-          onClick={() => history.push(`${application.pk}/page2`)}
+          onClick={onSubmit}
         >
           {t("common:next")}
         </MediumButton>

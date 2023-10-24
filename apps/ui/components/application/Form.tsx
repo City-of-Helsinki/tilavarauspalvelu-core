@@ -39,7 +39,6 @@ export type ApplicationEventFormValue = {
   begin: string | null;
   end: string | null;
   // TODO this should not be needed anymore
-  applicationId: number;
   applicationEventSchedules: ApplicationEventScheduleFormType[];
   status: ApplicationEventStatus;
   // pk only for now (priority is based on the index)
@@ -60,7 +59,6 @@ export const transformApplicationEventToForm = (
   maxDuration: applicationEvent.maxDuration ?? 0,
   eventsPerWeek: applicationEvent.eventsPerWeek ?? 0,
   biweekly: applicationEvent.biweekly ?? false,
-  applicationId: applicationEvent.application?.pk ?? 0,
   reservationUnits: filterNonNullable(applicationEvent.eventReservationUnits)
     .sort((a, b) => (a.priority && b.priority ? a.priority - b.priority : 0))
     .map((eru) => eru.reservationUnit?.pk ?? 0)

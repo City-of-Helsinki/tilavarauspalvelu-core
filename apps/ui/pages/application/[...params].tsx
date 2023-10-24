@@ -31,7 +31,7 @@ import { Preview } from "@/components/application/Preview";
 import View from "@/components/application/View";
 import Sent from "@/components/application/Sent";
 import { CenterSpinner } from "@/components/common/common";
-import { apiDateToUIDate, getTranslation } from "@/modules/util";
+import { fromUIDate, getTranslation } from "@/modules/util";
 import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
@@ -42,6 +42,7 @@ import {
   convertPerson,
   transformApplicationEventToForm,
 } from "@/components/application/Form";
+import { toApiDate } from "common/src/common/util";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -124,8 +125,8 @@ const transformOrganisation = ({
 // TODO refactor the input data to no include nulls
 // TODO use a custom transformation instead of the utility functions
 const transformDateString = (date?: string | null): string | undefined =>
-  date != null && apiDateToUIDate(date) !== ""
-    ? apiDateToUIDate(date)
+  date != null && toApiDate(fromUIDate(date)) != null
+    ? toApiDate(fromUIDate(date))
     : undefined;
 
 const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
@@ -178,6 +179,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     const input: ApplicationCreateMutationInput = {
       additionalInformation: appToSave.additionalInformation,
       applicantType: appToSave.applicantType,
+      // FIXME this includes nulls which are not allowed in the mutation
+      // if we unregister the applicationEvent
       applicationEvents: appToSave.applicationEvents.map((ae) => ({
         ...(transformDateString(ae.begin) != null
           ? { begin: transformDateString(ae.begin) }
@@ -248,52 +251,56 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     // i.e. can we be on this page with application.pk == null?
     const mutation =
       appToSave.pk == null || appToSave.pk === 0 ? create : update;
-    const { data } = await mutation({
-      variables: {
-        input,
-      },
-    });
-    const errors =
-      appToSave.pk == null || appToSave.pk === 0
-        ? data?.createApplication?.errors
-        : data?.updateApplication?.errors;
-    if (errors != null && errors.length > 0) {
-      console.error("Error saving application: ", errors);
-      // TOOD display to the user
-      setError("Error saving application");
+    try {
+      const response = await mutation({
+        variables: {
+          input,
+        },
+      });
+      // TODO cleanup the error handling
+      // TODO translate errors
+      const { data, errors } = response;
+      const mutErrors =
+        appToSave.pk == null || appToSave.pk === 0
+          ? data?.createApplication?.errors
+          : data?.updateApplication?.errors;
+      if (errors != null) {
+        console.error("Error saving application: ", errors);
+        // TOOD display to the user
+        setError("Error saving application");
+        return 0;
+      }
+      if (mutErrors != null) {
+        console.error("Mutation error saving application: ", errors);
+        // TOOD display to the user
+        setError("Mutation error saving application");
+        return 0;
+      }
+      // TODO do a refetch here instead of cache modification (after moving to fetch hook)
+      return appToSave.pk ?? data?.createApplication?.application?.pk ?? 0;
+    } catch (e) {
+      console.error("Error thrown while saving application: ", e);
+      setError("Error thrown while saving application");
       return 0;
     }
-    // TODO do a refetch here instead of cache modification (after moving to fetch hook)
-    return appToSave.pk ?? data?.createApplication?.application?.pk ?? 0;
   };
 
   // Use the old type for the form and transform it in the mutation
+  // TODO don't create functions?
   const saveAndNavigate =
     (path: string) => async (appToSave: ApplicationFormValues) => {
+      // FIXME this somehow manages to change the page even though the mutation fails
+      // Page1 (invalid applicationEvents array)
       const pk = await handleSave(appToSave);
       if (pk === 0) {
+        console.error("Error saving application");
         return;
       }
+      console.log("saveAndNavigate", pk, path);
       const prefix = `/application/${pk}`;
       const target = `${prefix}/${path}`;
       router.push(target);
     };
-
-  // ? { ...localApplication, applicationEvents: localApplicationEvents
-  // Don't think converting the dates is a good idea anymore but this would be the place for it
-  // why it's not good? because it breaks the type system (or we have to rewrite the codegen types)
-  /* .map((ae) => ({
-        application.applicationEvents.forEach((ae, i) => {
-          if (ae.end) {
-            application.applicationEvents[i].end = apiDateToUIDate(ae.end);
-          }
-          if (ae.begin) {
-            application.applicationEvents[i].begin = apiDateToUIDate(ae.begin);
-          }
-          }),
-        */
-  // }
-  // : undefined;
 
   // TODO this needs a proper transformation function from ApplicationType -> Application (form type)
   // TODO application values???
@@ -348,34 +355,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     }
   }, [application, reset]);
 
-  const handleRemoveUnsavedApplicationEvent = () => {
-    /* TODO use form instead
-    // TODO can we be sure that the last element is the new one? for now at least we can
-    setLocalApplicationEvents((prev) => prev.slice(0, -1));
-    */
-  };
-
-  const handleNewApplicationEvent = () => {
-    if (application?.pk == null) {
-      throw new Error("Application id is missing");
-    }
-    // TODO what is the purpose of this time section?
-    const begin = applicationRound?.reservationPeriodBegin;
-    const end = applicationRound?.reservationPeriodEnd;
-    const params = {
-      begin: begin ? apiDateToUIDate(begin) : "",
-      end: end ? apiDateToUIDate(end) : "",
-    };
-    /* FIXME use the form here (register new applicationEvent)
-    setLocalApplicationEvents([
-      ...localApplicationEvents,
-      createApplicationEvent(application.pk, params?.begin, params?.end),
-    ]);
-    */
-    // TODO do we need to keep this also?
-    // nextState.applicationEvents = nextState.application.applicationEvents.map((ae) => ae.id as number)
-  };
-
   const applicationRoundName =
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
@@ -403,14 +382,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   // const rerender = false; // localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
 
-  console.log("application", application);
-  // For now FIXME (we need special handling for the first element)
-  // or we need checks down the line to handle 0 length arrays
-  if (
-    !application ||
-    application.applicationEvents == null ||
-    application.applicationEvents?.length === 0
-  ) {
+  if (!application || application.applicationEvents == null) {
     return null;
   }
 
@@ -418,7 +390,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     <FormProvider {...form}>
       {pageId === "page1" && (
         <ApplicationPageWrapper
-          // key={rerender}
           application={application}
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
@@ -426,13 +397,8 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           {applicationRound != null && (
             <Page1
               applicationRound={applicationRound}
-              onDeleteUnsavedEvent={handleRemoveUnsavedApplicationEvent}
               application={application}
-              // TODO what is the purpose of this?
-              savedEventId={0} // state.savedEventId}
-              save={(data) => handleSave(data.application)}
-              addNewApplicationEvent={handleNewApplicationEvent}
-              setError={setError}
+              onNext={saveAndNavigate("page2")}
             />
           )}
         </ApplicationPageWrapper>

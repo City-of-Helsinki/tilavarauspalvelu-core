@@ -4,7 +4,6 @@ import React, { useRef } from "react";
 import {
   Checkbox,
   DateInput,
-  Notification,
   NumberInput,
   Select,
   TextInput,
@@ -16,7 +15,6 @@ import { LocalizationLanguages, OptionType } from "common/types/common";
 import type { ApplicationRoundType } from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { omit } from "lodash";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { ReservationUnitList } from "../reservation-unit/ReservationUnitList";
 import {
@@ -50,9 +48,7 @@ type Props = {
   optionTypes: OptionTypes;
   isVisible: boolean;
   onToggleAccordian: () => void;
-  onSave: () => void;
   onDeleteEvent: () => void;
-  applicationEventSaved: boolean;
 };
 
 const Wrapper = styled.div`
@@ -133,17 +129,16 @@ const ApplicationEventInner = ({
   applicationRound,
   optionTypes,
   del,
-  onSave,
 }: Omit<Props, "onToggleAccordian" | "onDeleteEvent"> & {
   del: () => void;
 }): JSX.Element => {
   const { t, i18n } = useTranslation();
-  const fieldName = (nameField: string) =>
-    `applicationEvents[${index}].${nameField}`;
-
   const form = useFormContext<ApplicationFormValues>();
   const {
+    register,
     formState: { errors },
+    setValue,
+    watch,
   } = form;
 
   const periodStartDate = formatApiDate(
@@ -167,8 +162,8 @@ const ApplicationEventInner = ({
   const selectDefaultPeriod = (): void => {
     const begin = periodStartDate ? apiDateToUIDate(periodStartDate) : "";
     const end = periodEndDate ? apiDateToUIDate(periodEndDate) : "";
-    form.setValue(`applicationEvents.${index}.begin`, begin);
-    form.setValue(`applicationEvents.${index}.end`, end);
+    setValue(`applicationEvents.${index}.begin`, begin);
+    setValue(`applicationEvents.${index}.end`, end);
   };
 
   const selectionIsDefaultPeriod =
@@ -176,8 +171,6 @@ const ApplicationEventInner = ({
     applicationPeriodBegin != null &&
     uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
     uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
-
-  const eventName = form.watch(`applicationEvents.${index}.name`);
 
   return (
     <>
@@ -187,12 +180,12 @@ const ApplicationEventInner = ({
       <TwoColumnContainer>
         <div>
           <TextInput
-            {...form.register(`applicationEvents.${index}.name`, {
+            {...register(`applicationEvents.${index}.name`, {
               required: true,
               maxLength: 255,
             })}
             label={t("application:Page1.name")}
-            id={fieldName("name")}
+            id={`applicationEvents.${index}.name`}
             required
             invalid={!!errors.applicationEvents?.[index]?.name?.type}
             errorText={applicationErrorText(
@@ -204,19 +197,19 @@ const ApplicationEventInner = ({
         </div>
         <div>
           <NumberInput
-            id={fieldName("numPersons")}
+            id={`applicationEvents.${index}.numPersons`}
             required
-            {...omit(
-              form.register(`applicationEvents.${index}.numPersons`, {
+            {...register(`applicationEvents.${index}.numPersons`, {
                 validate: {
                   required: (val) => Boolean(val),
                   numPersonsMin: (val) => Number(val) > 0,
                 },
-              }),
-              ["max"]
-            )}
+                valueAsNumber: true,
+              })
+            }
             label={t("application:Page1.groupSize")}
             min={0}
+            max={undefined}
             minusStepButtonAriaLabel={t("common:subtract")}
             plusStepButtonAriaLabel={t("common:add")}
             step={1}
@@ -270,7 +263,7 @@ const ApplicationEventInner = ({
       </SubHeadLine>
       <CheckboxWrapper>
         <Checkbox
-          id={fieldName("defaultPeriod")}
+          id={`applicationEvents.${index}.defaultPeriod`}
           checked={selectionIsDefaultPeriod}
           label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDate(
             applicationRound.reservationPeriodBegin
@@ -289,7 +282,7 @@ const ApplicationEventInner = ({
         <DateInput
           disableConfirmation
           language={i18n.language as LocalizationLanguages}
-          {...form.register(`applicationEvents.${index}.begin`, {
+          {...register(`applicationEvents.${index}.begin`, {
             validate: {
               required: (val) => Boolean(val),
               beginAfterEnd: (val) => {
@@ -326,7 +319,7 @@ const ApplicationEventInner = ({
             ]);
           }}
           label={t("application:Page1.periodStartDate")}
-          id={fieldName("begin")}
+          id={`applicationEvents.${index}.begin`}
           value={
             form.getValues(`applicationEvents.${index}.begin`) ?? undefined
           }
@@ -340,7 +333,7 @@ const ApplicationEventInner = ({
           )}
         />
         <DateInput
-          {...form.register(`applicationEvents.${index}.end`, {
+          {...register(`applicationEvents.${index}.end`, {
             validate: {
               required: (val) => {
                 return Boolean(val);
@@ -384,7 +377,7 @@ const ApplicationEventInner = ({
           }}
           value={form.getValues(`applicationEvents.${index}.end`) ?? undefined}
           label={t("application:Page1.periodEndDate")}
-          id={fieldName("end")}
+          id={`applicationEvents.${index}.end`}
           required
           minDate={new Date(applicationRound.reservationPeriodBegin)}
           maxDate={new Date(applicationRound.reservationPeriodEnd)}
@@ -486,16 +479,16 @@ const ApplicationEventInner = ({
         <NumberInput
           id={`applicationEvents.${index}.eventsPerWeek`}
           required
-          {...omit(
-            form.register(`applicationEvents.${index}.eventsPerWeek`, {
+          {...register(`applicationEvents.${index}.eventsPerWeek`, {
               validate: {
                 eventsPerWeekMin: (val) => Number(val) > 0,
               },
-            }),
-            ["max"]
-          )}
+              valueAsNumber: true,
+            })
+          }
           label={t("application:Page1.eventsPerWeek")}
           min={1}
+          max={undefined}
           minusStepButtonAriaLabel={t("common:subtract")}
           plusStepButtonAriaLabel={t("common:add")}
           step={1}
@@ -508,12 +501,12 @@ const ApplicationEventInner = ({
         <Controller
           control={form.control}
           name={`applicationEvents.${index}.biweekly`}
-          render={() => {
+          render={({ field }) => {
             return (
               <input
                 type="hidden"
-                id={fieldName("biweekly")}
-                name={fieldName("biweekly")}
+                id={field.name}
+                name={field.name}
                 value=""
               />
             );
@@ -522,7 +515,7 @@ const ApplicationEventInner = ({
       </PeriodContainer>
       <ApplicationEventSummary
         applicationEvent={form.getValues(`applicationEvents.${index}`)}
-        name={eventName ?? ""}
+        name={watch(`applicationEvents.${index}.name`) ?? ""}
       />
       <ActionContainer>
         <Button
@@ -535,13 +528,16 @@ const ApplicationEventInner = ({
         >
           {t("application:Page1.deleteEvent")}
         </Button>
+        {/*
         <Button
           type="submit"
           id={`applicationEvents[${index}].save`}
+          disabled={!saveEnabled}
           onClick={onSave}
         >
           {t("application:Page1.saveEvent")}
         </Button>
+        */}
         <ConfirmationModal
           id="application-event-confirmation"
           okLabel="application:Page1.deleteEvent"
@@ -561,7 +557,6 @@ const ApplicationEvent = (props: Props): JSX.Element => {
   const {
     index,
     isVisible,
-    applicationEventSaved,
     onDeleteEvent,
     onToggleAccordian,
   } = props;
@@ -569,16 +564,7 @@ const ApplicationEvent = (props: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const form = useFormContext<ApplicationFormValues>();
-  const { register, watch, getValues } = form;
-
-  register(`applicationEvents.${index}.reservationUnits`);
-  register(`applicationEvents.${index}.begin`);
-  register(`applicationEvents.${index}.end`);
-  register(`applicationEvents.${index}.minDuration`);
-  register(`applicationEvents.${index}.maxDuration`);
-  register(`applicationEvents.${index}.numPersons`);
-  register(`applicationEvents.${index}.eventsPerWeek`);
-  register(`applicationEvents.${index}.biweekly`);
+  const { watch, getValues } = form;
 
   const eventName = watch(`applicationEvents.${index}.name`);
   watch(`applicationEvents.${index}.eventsPerWeek`);
@@ -589,10 +575,9 @@ const ApplicationEvent = (props: Props): JSX.Element => {
   // it might also be because form values are async
   // (the values are not available on the first render because the query is still in progress)
   // but why is there a single element in the array then (should be empty)?
+  // TODO can this be removed? i.e. first render logic changed so we don't need it?
   const shouldRenderInner =
     isVisible && getValues(`applicationEvents.${index}`)?.name != null;
-  // TODO another thing to check is what happens if we add a new event (what's it's default values)
-  // can it be rendered?
 
   return (
     <Wrapper>
@@ -607,7 +592,8 @@ const ApplicationEvent = (props: Props): JSX.Element => {
           <ApplicationEventInner {...props} del={onDeleteEvent} />
         )}
       </Accordion>
-      {applicationEventSaved ? (
+      {/* FIXME this is wrong place for this
+        applicationEventSaved ? (
         <Notification
           size="small"
           type="success"
@@ -616,7 +602,7 @@ const ApplicationEvent = (props: Props): JSX.Element => {
         >
           {t("application:applicationEventSaved")}
         </Notification>
-      ) : null}
+      ) : null */}
     </Wrapper>
   );
 };

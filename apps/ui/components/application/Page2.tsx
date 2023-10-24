@@ -3,20 +3,18 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { ApplicationEventSchedulePriority } from "common/types/common";
-import {
+import type { ApplicationEventSchedulePriority } from "common/types/common";
+import type {
   ApplicationEventScheduleType,
-  ApplicationEventType,
   ApplicationType,
 } from "common/types/gql-types";
-import { filterNonNullable } from "common/src/helpers";
 import { useFormContext } from "react-hook-form";
 import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "../common/common";
-import { ApplicationFormValues } from "./Form";
+import type { ApplicationEventFormValue, ApplicationEventScheduleFormType, ApplicationFormValues } from "./Form";
 
 type Props = {
   application: ApplicationType;
@@ -36,14 +34,14 @@ const cellLabel = (row: number): string => {
 };
 
 const getListOfApplicationEventTitles = (
-  applicationEvents: ApplicationEventType[],
+  applicationEvents: ApplicationEventFormValue[],
   ids: number[]
 ): string => {
   return getReadableList(ids.map((id) => `"${applicationEvents[id].name}"`));
 };
 
 const applicationEventSchedulesToCells = (
-  applicationEventSchedules: ApplicationEventScheduleType[]
+  applicationEventSchedules: ApplicationEventScheduleFormType[]
 ): Cell[][] => {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
@@ -164,7 +162,7 @@ const getLongestChunks = (selectorData: Cell[][][]): number[] =>
   });
 
 const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
-  applicationEvents: ApplicationEventType[],
+  applicationEvents: ApplicationEventFormValue[],
   selectorData: Cell[][][]
 ): number[] => {
   const selectedHours = getLongestChunks(selectorData);
@@ -188,19 +186,19 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const history = useRouter();
 
-  // TODO replace with form context
-  const applicationEvents = filterNonNullable(application.applicationEvents);
+  const {
+    getValues,
+    setValue,
+    watch,
+  } = useFormContext<ApplicationFormValues>();
+
+  const applicationEvents = watch(`applicationEvents`)
 
   // TOOD should save directly to form context, not to state
   const [selectorData, setSelectorData] = useState<Cell[][][]>(
-    applicationEvents.map((ae) =>
-      applicationEventSchedulesToCells(
-        filterNonNullable(ae.applicationEventSchedules)
-      )
+    applicationEvents.map((ae) => applicationEventSchedulesToCells(ae.applicationEventSchedules)
     )
   );
-
-  const { getValues, setValue } = useFormContext<ApplicationFormValues>();
 
   useEffect(() => {
     // So this returns them as:
@@ -293,6 +291,8 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       selectorData
     );
 
+  const shouldShowMinDurationMessage = minDurationMsg && applicationEventsForWhichMinDurationIsNotFulfilled.some((d) => d != null)
+
   return (
     <>
       {successMsg && (
@@ -362,34 +362,31 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           </Accordion>
         );
       })}
-      {minDurationMsg &&
-        applicationEventsForWhichMinDurationIsNotFulfilled.some(
-          (d) => d !== null
-        ) && (
-          <Notification
-            type="alert"
-            label={t("application:Page2.notification.minDuration.title")}
-            dismissible
-            onClose={() => setMinDurationMsg(false)}
-            closeButtonLabelText={t("common:close")}
-            dataTestId="application__page2--notification-min-duration"
-          >
-            {applicationEvents?.length === 1
-              ? t("application:Page2.notification.minDuration.bodySingle")
-              : t("application:Page2.notification.minDuration.body", {
-                  title: getListOfApplicationEventTitles(
-                    applicationEvents,
-                    applicationEventsForWhichMinDurationIsNotFulfilled
-                  ),
-                  count:
-                    applicationEventsForWhichMinDurationIsNotFulfilled.length,
-                })}
-          </Notification>
-        )}
+      {shouldShowMinDurationMessage && (
+        <Notification
+          type="alert"
+          label={t("application:Page2.notification.minDuration.title")}
+          dismissible
+          onClose={() => setMinDurationMsg(false)}
+          closeButtonLabelText={t("common:close")}
+          dataTestId="application__page2--notification-min-duration"
+        >
+          {applicationEvents?.length === 1
+            ? t("application:Page2.notification.minDuration.bodySingle")
+            : t("application:Page2.notification.minDuration.body", {
+                title: getListOfApplicationEventTitles(
+                  applicationEvents,
+                  applicationEventsForWhichMinDurationIsNotFulfilled
+                ),
+                count:
+                  applicationEventsForWhichMinDurationIsNotFulfilled.length,
+              })}
+        </Notification>
+      )}
       <ButtonContainer>
         <MediumButton
           variant="secondary"
-          onClick={() => history.push(`${application.id}/page1`)}
+          onClick={() => history.push(`${application.pk}/page1`)}
         >
           {t("common:prev")}
         </MediumButton>
