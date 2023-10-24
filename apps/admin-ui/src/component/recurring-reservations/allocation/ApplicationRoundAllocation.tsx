@@ -33,7 +33,7 @@ const Ingress = styled.p`
   margin-bottom: var(--spacing-xl);
 `;
 
-const ReservationUnits = styled(Tabs.TabList)`
+const TabList = styled(Tabs.TabList)`
   ${Strongish};
 `;
 
@@ -208,7 +208,7 @@ function ApplicationRoundAllocation({
         />
       </AutoGrid>
       <Tabs>
-        <ReservationUnits>
+        <TabList>
           {reservationUnits?.map((reservationUnit) => (
             <Tab
               onClick={() => {
@@ -219,7 +219,9 @@ function ApplicationRoundAllocation({
               {reservationUnit?.nameFi}
             </Tab>
           ))}
-        </ReservationUnits>
+        </TabList>
+        {/* NOTE: we want the tabs as buttons, without this the HDS tabs break */}
+        <Tabs.TabPanel />
       </Tabs>
       {applicationEvents && applicationEvents.length && unitFilter ? (
         <ApplicationEvents
