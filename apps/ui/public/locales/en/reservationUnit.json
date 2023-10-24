@@ -27,6 +27,8 @@
   "loadReservationCalendar": "Download a reminder to your calendar <calendarLink>here</calendarLink>.",
   "openingTimes": "Opening hours",
   "additionalInfo": "Booking details",
+  "recurringHeading": "Seasonal reservation",
+  "recurringBody": "Seasonal reservation hours",
   "reservationFailed": "Booking creation failed",
   "reservationCancellingFailed": "Booking cancellation failed",
   "reservationUpdateFailed": "Booking update failed",

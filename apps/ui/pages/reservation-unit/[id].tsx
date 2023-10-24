@@ -383,6 +383,99 @@ const ClientOnlyCalendar = ({
   </ClientOnly>
 );
 
+const TimeSlot = styled.div`
+  span:first-child {
+    display: inline-block;
+    font-weight: bold;
+    width: 9ch;
+    margin-right: var(--spacing-s);
+  }
+`;
+
+// TODO: Use real data
+const applicationRoundTimeSlotDays = [
+  {
+    weekday: 1,
+    closed: false,
+    reservableTimes: [
+      {
+        begin: "10:00",
+        end: "12:30",
+      },
+    ],
+  },
+  {
+    weekday: 2,
+    closed: false,
+    reservableTimes: [
+      {
+        begin: "10:00",
+        end: "12:30",
+      },
+    ],
+  },
+  {
+    weekday: 3,
+    closed: false,
+    reservableTimes: [
+      {
+        begin: "10:00",
+        end: "12:30",
+      },
+      {
+        begin: "13:30",
+        end: "20:00",
+      },
+    ],
+  },
+  {
+    weekday: 6,
+    closed: true,
+  },
+  {
+    weekday: 0,
+    closed: true,
+  },
+];
+
+const ApplicationRoundTimeSlotDay = ({
+  day,
+}: {
+  day: {
+    reservableTimes?: (
+      | { end: string; begin: string }
+      | { end: string; begin: string }
+    )[];
+    weekday: number;
+    closed: boolean;
+  };
+}) => {
+  const { t } = useTranslation();
+  const weekDay = t(`common:weekDayLong.${day.weekday}`);
+  return (
+    <TimeSlot>
+      <span>{weekDay}</span>{" "}
+      {day.closed ? (
+        <span>-</span>
+      ) : (
+        day.reservableTimes && (
+          <>
+            <span>
+              {day.reservableTimes[0].begin}-{day.reservableTimes[0].end}
+            </span>
+            {day.reservableTimes[1] && (
+              <span>
+                {` ${t("common:and")} `}
+                {day.reservableTimes[1].begin}-{day.reservableTimes[1].end}
+              </span>
+            )}
+          </>
+        )
+      )}
+    </TimeSlot>
+  );
+};
+
 const ReservationUnit = ({
   reservationUnit,
   relatedReservationUnits,
@@ -1097,6 +1190,15 @@ const ReservationUnit = ({
                 </PaddedContent>
               </Accordion>
             )}
+            {/* TODO: Show conditionally */}
+            <Accordion heading={t("reservationUnit:recurringHeading")}>
+              <PaddedContent>
+                <p>{t("reservationUnit:recurringBody")}</p>
+                {applicationRoundTimeSlotDays.map((day) => (
+                  <ApplicationRoundTimeSlotDay key={day.weekday} day={day} />
+                ))}
+              </PaddedContent>
+            </Accordion>
             {reservationUnit.unit?.location && (
               <Accordion heading={t("common:location")} theme="thin" open>
                 <JustForMobile customBreakpoint={breakpoints.l}>

@@ -27,6 +27,8 @@
   "loadReservationCalendar": "<calendarLink>Lataa tästä</calendarLink> kalenteriisi muistutus.",
   "openingTimes": "Aukioloajat",
   "additionalInfo": "Varauksen tiedot",
+  "recurringHeading": "Kausivaraus",
+  "recurringBody": "Kausivarattavat ajat",
   "reservationFailed": "Varauksen luominen epäonnistui",
   "reservationCancellingFailed": "Varauksen peruminen epäonnistui",
   "reservationUpdateFailed": "Varauksen päivitys epäonnistui",

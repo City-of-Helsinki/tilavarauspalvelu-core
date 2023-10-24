@@ -27,6 +27,8 @@
   "loadReservationCalendar": "Ladda en påminnelse till din kalender <calendarLink>här<calendarLink>.",
   "openingTimes": "Öppethållningstider",
   "additionalInfo": "Bokningsinformation",
+  "recurringHeading": "Säsongbokning",
+  "recurringBody": "Säsongbokningstider",
   "reservationFailed": "Bokningen kunde inte skapas",
   "reservationCancellingFailed": "Avbokning misslyckades",
   "reservationUpdateFailed": "Uppdateringen misslyckades",
