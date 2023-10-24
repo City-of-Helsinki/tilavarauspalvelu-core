@@ -5,7 +5,7 @@ import pytest
 from django.conf import settings
 from freezegun import freeze_time
 
-from opening_hours.hauki_link_generator import generate_hauki_link
+from opening_hours.utils.hauki_link_generator import generate_hauki_link
 
 VALID_SIGNATURE = "1e52776ccc95118a29835938593c277bbddca384317820eb5e59835f36307ba6"
 ORGANIZATION = "parent-organisation"

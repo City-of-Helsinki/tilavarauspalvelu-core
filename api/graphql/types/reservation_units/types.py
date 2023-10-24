@@ -36,7 +36,7 @@ from api.graphql.types.units.permissions import UnitPermission
 from api.graphql.types.units.types import UnitType
 from applications.models import ApplicationRound
 from common.typing import GQLInfo
-from opening_hours.hauki_link_generator import generate_hauki_link
+from opening_hours.utils.hauki_link_generator import generate_hauki_link
 from permissions.helpers import can_manage_units, can_modify_reservation_unit
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import (
