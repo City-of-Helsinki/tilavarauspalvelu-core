@@ -80,8 +80,8 @@ export const APPLICATIONS_QUERY = gql`
 `;
 
 export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
-  query getApplicationsByPk($applicationRound: ID) {
-    applications(applicationRound: $applicationRound) {
+  query getApplicationsByPk($applicationRound: ID, $status: [String]) {
+    applications(applicationRound: $applicationRound, status: $status) {
       edges {
         node {
           pk
