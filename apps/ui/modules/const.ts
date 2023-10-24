@@ -192,3 +192,10 @@ export const getSignInUrl = (callBackUrl: string): string => {
 export const getSignOutUrl = (): string => {
   return `${AUTH_URL}/logout`;
 };
+
+export const genericTermsVariant = {
+  BOOKING: "booking",
+  SERVICE: "service",
+  PRIVACY: "privacy",
+  ACCESSIBILITY: "accessibility",
+};

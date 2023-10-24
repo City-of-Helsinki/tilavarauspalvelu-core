@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -12,18 +11,19 @@ import {
 import { H2 } from "common/src/common/typography";
 import { Container } from "common";
 
-import { createApolloClient } from "../../../modules/apolloClient";
-import Sanitize from "../../../components/common/Sanitize";
-import { getTranslation } from "../../../modules/util";
-import { TERMS_OF_USE } from "../../../modules/queries/reservationUnit";
+import { createApolloClient } from "@/modules/apolloClient";
+import Sanitize from "../../components/common/Sanitize";
+import { getTranslation } from "../../modules/util";
+import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 
 type Props = {
   genericTerms: TermsOfUseType;
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { locale } = ctx;
+  const { locale, params } = ctx;
   const apolloClient = createApolloClient(ctx);
+  const genericTermsId = params?.id;
   const { data: genericTermsData } = await apolloClient.query<
     Query,
     QueryTermsOfUseArgs
@@ -36,8 +36,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const genericTerms =
     genericTermsData.termsOfUse?.edges
       ?.map((n) => n?.node)
-      .find((n) => n?.pk && ["generic1"].includes(n.pk)) || {};
-
+      .find((n) => n?.pk && [genericTermsId].includes(n.pk)) || null;
+  if (genericTerms == null)
+    return {
+      notFound: true,
+    };
   return {
     props: {
       genericTerms,
@@ -53,11 +56,9 @@ const Wrapper = styled(Container).attrs({ size: "s" })`
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
-  const { t } = useTranslation();
-
   return (
     <Wrapper>
-      <Heading>{t("reservationCalendar:heading.generalTerms")}</Heading>
+      <Heading>{getTranslation(genericTerms, "name")}</Heading>
       <Sanitize
         html={getTranslation(genericTerms, "text")}
         style={{ whiteSpace: "pre-wrap" }}
