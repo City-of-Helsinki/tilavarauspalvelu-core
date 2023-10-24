@@ -81,11 +81,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
-    const bookingTerms =
-      genericTermsData?.termsOfUse?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n !== null)
-        .filter((edge) => edge.pk === genericTermsVariant.BOOKING) || {};
+    const bookingTerms = genericTermsData?.termsOfUse?.edges
+      ?.map((e) => e?.node)
+      .filter((n): n is NonNullable<typeof n> => n !== null)
+      .find((edge) => edge.pk === genericTermsVariant.BOOKING);
 
     return {
       props: {

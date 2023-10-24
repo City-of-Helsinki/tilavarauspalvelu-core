@@ -33,11 +33,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
     },
   });
-  const genericTerms =
-    genericTermsData.termsOfUse?.edges
-      ?.map((n) => n?.node)
-      .find((n) => n?.pk && [genericTermsId].includes(n.pk)) || null;
-  if (genericTerms == null)
+  const genericTerms = genericTermsData.termsOfUse?.edges
+    ?.map((n) => n?.node)
+    .find((n) => n?.pk === genericTermsId);
+  if (!genericTerms)
     return {
       notFound: true,
     };
