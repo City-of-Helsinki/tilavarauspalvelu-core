@@ -50,10 +50,9 @@ const ReservationUnitEditor = dynamic(
     )
 );
 
+const HomePage = dynamic(() => import("./spa/HomePage"));
+
 const RECURRING_PATH = "./component/recurring-reservations";
-const ApplicationRounds = dynamic(
-  () => import(`${RECURRING_PATH}/ApplicationRounds`)
-);
 const AllApplicationRounds = dynamic(
   () => import(`${RECURRING_PATH}/AllApplicationRounds`)
 );
@@ -143,7 +142,7 @@ const App = () => {
       <PageWrapper>
         <Routes>
           <Route path="*" element={<Error404 />} />
-          <Route path="/" element={withAuthorization(<ApplicationRounds />)} />
+          <Route path="/" element={withAuthorization(<HomePage />)} />
 
           <Route
             path={`${prefixes.applications}/*`}
