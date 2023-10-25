@@ -1,6 +1,5 @@
 import graphene
 from django.db import models
-from graphene_django import DjangoListField
 from graphene_permissions.permissions import AllowAuthenticated
 
 from api.graphql.extensions.base_types import DjangoAuthNode
@@ -8,7 +7,6 @@ from api.graphql.extensions.duration_field import Duration
 from api.graphql.types.application_event.filtersets import ApplicationEventFilterSet
 from api.graphql.types.application_event.permissions import ApplicationEventPermission
 from api.graphql.types.application_event_schedule.types import ApplicationEventScheduleNode
-from api.graphql.types.reservation_units.types import ReservationUnitType
 from applications.choices import ApplicationEventStatusChoice
 from applications.models import ApplicationEvent, EventReservationUnit
 from common.typing import AnyUser
@@ -32,7 +30,6 @@ class ApplicationEventNode(DjangoAuthNode):
     min_duration = Duration()
     max_duration = Duration()
 
-    declined_reservation_units = DjangoListField(ReservationUnitType)
     application_event_schedules = ApplicationEventScheduleNode.ListField()
     event_reservation_units = EventReservationUnitNode.ListField()
 
@@ -56,7 +53,6 @@ class ApplicationEventNode(DjangoAuthNode):
             "ability_group",
             "purpose",
             "event_reservation_units",
-            "declined_reservation_units",
             "flagged",
         ]
         filterset_class = ApplicationEventFilterSet

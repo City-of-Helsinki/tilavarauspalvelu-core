@@ -61,11 +61,6 @@ class ApplicationEvent(models.Model):
         on_delete=models.PROTECT,
         related_name="application_events",
     )
-    declined_reservation_units = models.ManyToManyField(
-        "reservation_units.ReservationUnit",
-        blank=True,
-        related_name="application_events",
-    )
 
     objects = ApplicationEventQuerySet.as_manager()
     actions = ApplicationEventActionsConnector()
