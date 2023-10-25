@@ -56,11 +56,13 @@ const ApplicationPageWrapper = ({
 }: ApplicationPageProps): JSX.Element => {
   const { t } = useTranslation();
 
-  const aes = filterNonNullable(application?.applicationEvents)
-  const type = application?.applicantType ?? ApplicationsApplicationApplicantTypeChoices.Individual
+  const aes = filterNonNullable(application?.applicationEvents);
+  const type =
+    application?.applicantType ??
+    ApplicationsApplicationApplicantTypeChoices.Individual;
   // have to hide stepper if there are no application events
   // should refactor the stepper to be more flexible
-  const hidden = hideStepper || application == null || aes.length === 0
+  const hidden = hideStepper || application == null || aes.length === 0;
   return (
     <>
       <Head heading={t(`${translationKeyPrefix}.heading`)}>

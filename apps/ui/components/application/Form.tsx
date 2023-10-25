@@ -1,60 +1,87 @@
 import { filterNonNullable } from "common/src/helpers";
-import type { ApplicationEventSchedulePriority } from "common/types/common";
 import {
   type ApplicationEventType,
   ApplicationEventStatus,
   type OrganisationType,
   type AddressType,
   type PersonType,
-  type ApplicationStatus,
-  type ApplicationsApplicationApplicantTypeChoices,
+  ApplicationStatus,
+  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
-// TODO replace these with form types
 import { type Maybe } from "graphql/jsutils/Maybe";
+import { z } from "zod";
 import { apiDateToUIDate } from "@/modules/util";
 
-// export type ApplicationEventScheduleFormType = Omit<ApplicationEventScheduleType, 'id'>[];
-export type ApplicationEventScheduleFormType = {
-  day: Day;
-  begin: string;
-  end: string;
-  priority: ApplicationEventSchedulePriority;
-};
+// NOTE the zod schemas have a lot of undefineds because the form is split into four pages
+// so you can't trust some of the zod validation (e.g. mandatory fields)
+// real solution is to split the forms per page so we have four schemas
+// the new mutation interface allows only updating the fields that are present
+// also then all manual validations and setErrors should be removed
 
-// TODO move to application level and reuse the form type
-export type ApplicationEventFormValue = {
-  // TODO change to pk: 0 for new events, 0 > for existing events
-  pk?: number;
-  name: string | null;
-  numPersons: number | null;
-  // TODO remove ids from parameters
-  ageGroup: number | null;
-  abilityGroup: number | null;
-  purpose: number | null;
-  minDuration: number;
-  maxDuration: number;
-  eventsPerWeek: number;
-  biweekly: boolean;
-  // TODO date?
-  begin: string | null;
-  end: string | null;
-  // TODO this should not be needed anymore
-  applicationEventSchedules: ApplicationEventScheduleFormType[];
-  status: ApplicationEventStatus;
-  // pk only for now (priority is based on the index)
-  reservationUnits: number[];
-};
+export const ApplicationEventScheduleFormTypeSchema = z.object({
+  day: z.number().min(0).max(6),
+  begin: z.string(),
+  end: z.string(),
+  priority: z.union([z.literal(100), z.literal(200), z.literal(300)]),
+});
 
-// TODO write the conversion other way around also
+export type ApplicationEventScheduleFormType = z.infer<
+  typeof ApplicationEventScheduleFormTypeSchema
+>;
+
+const ApplicationEventFormValueSchema = z.object({
+  pk: z.number().optional(),
+  name: z.string().min(1),
+  numPersons: z
+    .number()
+    .min(1)
+    .optional()
+    .refine((s) => s, { path: [""], message: "Required" }),
+  ageGroup: z
+    .number()
+    .optional()
+    .refine((s) => s, { path: [""], message: "Required" }),
+  abilityGroup: z.number().optional(),
+  purpose: z
+    .number()
+    .optional()
+    .refine((s) => s, { path: [""], message: "Required" }),
+  minDuration: z.number().min(1),
+  maxDuration: z.number().min(1),
+  eventsPerWeek: z.number().min(1),
+  biweekly: z.boolean(),
+  begin: z
+    .string()
+    .optional()
+    .refine((s) => s, { path: [""], message: "Required" }),
+  end: z
+    .string()
+    .optional()
+    .refine((s) => s, { path: [""], message: "Required" }),
+  applicationEventSchedules: z.array(ApplicationEventScheduleFormTypeSchema),
+  status: z.enum([
+    ApplicationEventStatus.Created,
+    ApplicationEventStatus.Failed,
+    ApplicationEventStatus.Approved,
+    ApplicationEventStatus.Declined,
+    ApplicationEventStatus.Reserved,
+  ]),
+  reservationUnits: z.array(z.number()).min(1),
+});
+
+export type ApplicationEventFormValue = z.infer<
+  typeof ApplicationEventFormValueSchema
+>;
+
 export const transformApplicationEventToForm = (
   applicationEvent: ApplicationEventType
 ): ApplicationEventFormValue => ({
   pk: applicationEvent.pk ?? undefined,
   name: applicationEvent.name,
-  numPersons: applicationEvent.numPersons ?? null,
-  ageGroup: applicationEvent.ageGroup?.pk ?? null,
-  abilityGroup: applicationEvent.abilityGroup?.pk ?? null,
-  purpose: applicationEvent.purpose?.pk ?? null,
+  numPersons: applicationEvent.numPersons ?? undefined,
+  ageGroup: applicationEvent.ageGroup?.pk ?? undefined,
+  abilityGroup: applicationEvent.abilityGroup?.pk ?? undefined,
+  purpose: applicationEvent.purpose?.pk ?? undefined,
   minDuration: applicationEvent.minDuration ?? 0,
   maxDuration: applicationEvent.maxDuration ?? 0,
   eventsPerWeek: applicationEvent.eventsPerWeek ?? 0,
@@ -77,37 +104,45 @@ export const transformApplicationEventToForm = (
   begin:
     applicationEvent?.begin != null && applicationEvent?.begin?.includes("-")
       ? apiDateToUIDate(applicationEvent.begin)
-      : applicationEvent?.begin ?? null,
+      : applicationEvent?.begin ?? undefined,
   end:
     applicationEvent?.end != null && applicationEvent?.end?.includes("-")
       ? apiDateToUIDate(applicationEvent.end)
-      : applicationEvent?.end ?? null,
+      : applicationEvent?.end ?? undefined,
 });
 
-type AddressFormValue = {
-  pk: number | undefined;
-  streetAddress: string;
-  city: string;
-  postCode: string;
-};
-export type OrganisationFormValues = {
-  pk: number | null;
-  name: string;
-  identifier: string | null;
-  yearEstablished: number | null;
-  coreBusiness: string;
-  address: AddressFormValue;
-};
-type PersonFormValues = {
-  pk: number | null;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-};
+export const AddressFormValueSchema = z.object({
+  pk: z.number().optional(),
+  streetAddress: z.string(),
+  city: z.string(),
+  postCode: z.string(),
+});
+type AddressFormValue = z.infer<typeof AddressFormValueSchema>;
+
+// TODO identifier is only optional for Associations (not for Companies / Communities)
+export const OrganisationFormValuesSchema = z.object({
+  pk: z.number().optional(),
+  name: z.string(),
+  identifier: z.string().optional(),
+  yearEstablished: z.number().optional(),
+  coreBusiness: z.string(),
+  address: AddressFormValueSchema,
+});
+export type OrganisationFormValues = z.infer<
+  typeof OrganisationFormValuesSchema
+>;
+
+export const PersonFormValuesSchema = z.object({
+  pk: z.number().optional(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string(),
+  phoneNumber: z.string(),
+});
+export type PersonFormValues = z.infer<typeof PersonFormValuesSchema>;
 
 export const convertPerson = (p: Maybe<PersonType>): PersonFormValues => ({
-  pk: p?.pk ?? null,
+  pk: p?.pk ?? undefined,
   firstName: p?.firstName ?? "",
   lastName: p?.lastName ?? "",
   email: p?.email ?? "",
@@ -124,32 +159,54 @@ export const convertAddress = (a: Maybe<AddressType>): AddressFormValue => ({
 export const convertOrganisation = (
   o: Maybe<OrganisationType>
 ): OrganisationFormValues => ({
-  pk: o?.pk ?? null,
+  pk: o?.pk ?? undefined,
   name: o?.name ?? "",
-  identifier: o?.identifier ?? null,
+  identifier: o?.identifier ?? "",
   yearEstablished: o?.yearEstablished ?? 0,
   coreBusiness: o?.coreBusiness ?? "",
   address: convertAddress(o?.address),
 });
 
-export type ApplicationFormValues = {
-  pk?: number;
-  applicantType: ApplicationsApplicationApplicantTypeChoices;
+export const ApplicationFormSchema = z.object({
+  pk: z.number().optional(),
+  applicantType: z
+    .enum([
+      ApplicationsApplicationApplicantTypeChoices.Individual,
+      ApplicationsApplicationApplicantTypeChoices.Company,
+      ApplicationsApplicationApplicantTypeChoices.Association,
+      ApplicationsApplicationApplicantTypeChoices.Community,
+    ])
+    .optional(),
   // TODO these (status and round) needs to be hidden fields
   // status is changed on the final page
-  status: ApplicationStatus;
+  status: z.enum([
+    ApplicationStatus.Expired,
+    ApplicationStatus.Handled,
+    ApplicationStatus.Draft,
+    ApplicationStatus.Sent,
+    ApplicationStatus.Cancelled,
+    ApplicationStatus.InReview,
+    ApplicationStatus.Received,
+    ApplicationStatus.ReviewDone,
+    ApplicationStatus.Allocated,
+  ]),
   // TODO remove id (also does this need to be sent?)
-  applicationRoundId: number;
-  applicationEvents: ApplicationEventFormValue[];
-  organisation: OrganisationFormValues;
-  contactPerson: PersonFormValues;
-  billingAddress: AddressFormValue;
+  applicationRoundId: z.number(),
+  applicationEvents: z
+    .array(ApplicationEventFormValueSchema.optional())
+    .optional(),
+  organisation: OrganisationFormValuesSchema.optional(),
+  contactPerson: PersonFormValuesSchema.optional(),
+  billingAddress: AddressFormValueSchema.optional(),
   // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
-  hasBillingAddress: boolean;
-  additionalInformation: string;
+  hasBillingAddress: z.boolean().optional(),
+  additionalInformation: z.string().optional(),
   // TODO remove id
-  homeCityId: number;
+  homeCityId: z.number().optional(),
   // TODO are these needed?
-  createdDate?: string;
-  lastModifiedDate?: string;
-};
+  createdDate: z.string().optional(),
+  lastModifiedDate: z.string().optional(),
+});
+export const ApplicationFormSchemaRefined = ApplicationFormSchema;
+
+export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;

@@ -6,11 +6,10 @@ import { ButtonContainer } from "../common/common";
 import { MediumButton } from "../../styles/util";
 
 type Props = {
-  onSubmit: () => void;
   applicationId: number;
 };
 
-const Buttons = ({ onSubmit, applicationId }: Props): JSX.Element | null => {
+const Buttons = ({ applicationId }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const router = useRouter();
@@ -25,7 +24,7 @@ const Buttons = ({ onSubmit, applicationId }: Props): JSX.Element | null => {
       <MediumButton
         id="button__application--next"
         iconRight={<IconArrowRight />}
-        onClick={onSubmit}
+        type="submit"
       >
         {t("common:next")}
       </MediumButton>

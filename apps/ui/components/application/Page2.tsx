@@ -14,7 +14,11 @@ import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "../common/common";
-import type { ApplicationEventFormValue, ApplicationEventScheduleFormType, ApplicationFormValues } from "./Form";
+import type {
+  ApplicationEventFormValue,
+  ApplicationEventScheduleFormType,
+  ApplicationFormValues,
+} from "./Form";
 
 type Props = {
   application: ApplicationType;
@@ -186,17 +190,19 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const history = useRouter();
 
-  const {
-    getValues,
-    setValue,
-    watch,
-  } = useFormContext<ApplicationFormValues>();
+  const { getValues, setValue, watch, handleSubmit } =
+    useFormContext<ApplicationFormValues>();
 
-  const applicationEvents = watch(`applicationEvents`)
+  const applicationEventsUnfiltered = watch(`applicationEvents`);
+  const applicationEvents =
+    applicationEventsUnfiltered?.filter(
+      (ae): ae is ApplicationEventFormValue => ae != null
+    ) ?? [];
 
   // TOOD should save directly to form context, not to state
   const [selectorData, setSelectorData] = useState<Cell[][][]>(
-    applicationEvents.map((ae) => applicationEventSchedulesToCells(ae.applicationEventSchedules)
+    applicationEvents.map((ae) =>
+      applicationEventSchedulesToCells(ae.applicationEventSchedules)
     )
   );
 
@@ -269,8 +275,10 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     setSuccessMsg(t("application:Page2.notification.copyCells"));
   };
 
-  const onSubmit = () => {
+  const onSubmit = (data: ApplicationFormValues) => {
     // TODO test the checking of that there is at least one primary or secondary
+    // TODO this should be a form refinement, but we need separate refinements
+    // for pages or a Page specific checker
     const selectedAppEvents = selectorData
       .map((cell) => cellsToApplicationEventSchedules(cell))
       .map((aes) =>
@@ -282,7 +290,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       setErrorMsg("application:error.missingSchedule");
       return;
     }
-    onNext(getValues());
+    onNext(data);
   };
 
   const applicationEventsForWhichMinDurationIsNotFulfilled: number[] =
@@ -291,10 +299,12 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       selectorData
     );
 
-  const shouldShowMinDurationMessage = minDurationMsg && applicationEventsForWhichMinDurationIsNotFulfilled.some((d) => d != null)
+  const shouldShowMinDurationMessage =
+    minDurationMsg &&
+    applicationEventsForWhichMinDurationIsNotFulfilled.some((d) => d != null);
 
   return (
-    <>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       {successMsg && (
         <Notification
           type="success"
@@ -328,9 +338,9 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       {applicationEvents.map((event, index) => {
         // TODO there is something funny with this one on the first render
         // (it's undefined and not Array as expected).
-        const schedules = getValues(
-          `applicationEvents.${index}.applicationEventSchedules`
-        ) ?? [];
+        const schedules =
+          getValues(`applicationEvents.${index}.applicationEventSchedules`) ??
+          [];
         const summaryDataPrimary = schedules.filter((n) => n.priority === 300);
         const summaryDataSecondary = schedules.filter(
           (n) => n.priority === 200
@@ -393,12 +403,12 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         <MediumButton
           id="button__application--next"
           iconRight={<IconArrowRight />}
-          onClick={() => onSubmit()}
+          type="submit"
         >
           {t("common:next")}
         </MediumButton>
       </ButtonContainer>
-    </>
+    </form>
   );
 };
 

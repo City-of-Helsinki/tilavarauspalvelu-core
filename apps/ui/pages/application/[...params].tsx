@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Query,
   QueryApplicationsArgs,
@@ -13,15 +14,16 @@ import {
   Mutation,
   MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
-  ApplicationCreateMutationInput,
   Priority,
   ApplicationStatus,
   ApplicationsApplicationApplicantTypeChoices,
+  ApplicationUpdateMutationInput,
 } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { ApplicationEventSchedulePriority } from "common";
 import { filterNonNullable } from "common/src/helpers";
+import { toApiDate } from "common/src/common/util";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import Page1 from "@/components/application/Page1";
@@ -35,6 +37,7 @@ import { fromUIDate, getTranslation } from "@/modules/util";
 import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
+  ApplicationFormSchema,
   ApplicationFormValues,
   OrganisationFormValues,
   convertAddress,
@@ -42,7 +45,6 @@ import {
   convertPerson,
   transformApplicationEventToForm,
 } from "@/components/application/Form";
-import { toApiDate } from "common/src/common/util";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -175,73 +177,79 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
 
   const handleSave = async (appToSave: ApplicationFormValues) => {
     // TODO test all variations (update / create) (individual / organisation / company)
-    // @ts-expect-error -- For update mutation removing the organisation.identifier is necessary if the organisation doesn't have it
-    const input: ApplicationCreateMutationInput = {
+    const input: ApplicationUpdateMutationInput = {
       additionalInformation: appToSave.additionalInformation,
-      applicantType: appToSave.applicantType,
+      applicantType:
+        appToSave.applicantType ??
+        ApplicationsApplicationApplicantTypeChoices.Individual,
       // FIXME this includes nulls which are not allowed in the mutation
       // if we unregister the applicationEvent
-      applicationEvents: appToSave.applicationEvents.map((ae) => ({
-        ...(transformDateString(ae.begin) != null
-          ? { begin: transformDateString(ae.begin) }
-          : {}),
-        ...(transformDateString(ae.end) != null
-          ? { end: transformDateString(ae.end) }
-          : {}),
-        pk: ae.pk,
-        numPersons: ae.numPersons ?? 0,
-        // these (pks) can never be zero or null in the current version
-        // even if there are no abilityGroups in the database...
-        // so for now default them to 1 and have another look after the backend change is merged
-        abilityGroup: ae.abilityGroup ?? 1,
-        ageGroup: ae.ageGroup ?? 1,
-        purpose: ae.purpose ?? 1,
-        status: ae.status,
-        // min / max duration is a weird string format in the API
-        minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
-        maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
-        // API Date format (YYYY-MM-DD)
-        // not mandatory in the input but what is the default value?
-        ...(transformDateString(ae.begin) != null
-          ? { begin: transformDateString(ae.begin) }
-          : {}),
-        ...(transformDateString(ae.end) != null
-          ? { end: transformDateString(ae.end) }
-          : {}),
-        biweekly: ae.biweekly,
-        eventsPerWeek: ae.eventsPerWeek,
-        applicationEventSchedules: ae.applicationEventSchedules
-          .filter(
-            (
-              aes
-            ): aes is Omit<typeof aes, "priority"> & {
-              priority: ApplicationEventSchedulePriority;
-            } => aes.priority != null
-          )
-          .map((aes) => {
-            return {
-              day: aes.day,
-              // Time format (HH:MM)
-              begin: aes.begin,
-              end: aes.end,
-              // FIXME priority is not a valid value
-              // This seems to be a backend problem (some extra validation that is not in sync with GQL schema)
-              // "\"priority.A_300\" ei ole kelvollinen valinta."
-              // priority: convertPriority(aes.priority),
-            };
-          }),
-        eventReservationUnits: ae.reservationUnits.map((eruPk, eruIndex) => ({
-          priority: eruIndex,
-          reservationUnit: eruPk,
-        })),
-      })),
+      applicationEvents: filterNonNullable(appToSave.applicationEvents).map(
+        (ae) => ({
+          ...(transformDateString(ae.begin) != null
+            ? { begin: transformDateString(ae.begin) }
+            : {}),
+          ...(transformDateString(ae.end) != null
+            ? { end: transformDateString(ae.end) }
+            : {}),
+          pk: ae.pk,
+          numPersons: ae.numPersons ?? 0,
+          // these (pks) can never be zero or null in the current version
+          // even if there are no abilityGroups in the database...
+          // so for now default them to 1 and have another look after the backend change is merged
+          abilityGroup: ae.abilityGroup ?? 1,
+          ageGroup: ae.ageGroup ?? 1,
+          purpose: ae.purpose ?? 1,
+          status: ae.status,
+          // min / max duration is a weird string format in the API
+          minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
+          maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
+          // API Date format (YYYY-MM-DD)
+          // not mandatory in the input but what is the default value?
+          ...(transformDateString(ae.begin) != null
+            ? { begin: transformDateString(ae.begin) }
+            : {}),
+          ...(transformDateString(ae.end) != null
+            ? { end: transformDateString(ae.end) }
+            : {}),
+          biweekly: ae.biweekly,
+          eventsPerWeek: ae.eventsPerWeek,
+          applicationEventSchedules: ae.applicationEventSchedules
+            .filter(
+              (
+                aes
+              ): aes is Omit<typeof aes, "priority"> & {
+                priority: ApplicationEventSchedulePriority;
+              } => aes.priority != null
+            )
+            .map((aes) => {
+              return {
+                day: aes.day,
+                // Time format (HH:MM)
+                begin: aes.begin,
+                end: aes.end,
+                // FIXME priority is not a valid value
+                // This seems to be a backend problem (some extra validation that is not in sync with GQL schema)
+                // "\"priority.A_300\" ei ole kelvollinen valinta."
+                // priority: convertPriority(aes.priority),
+              };
+            }),
+          eventReservationUnits: ae.reservationUnits.map((eruPk, eruIndex) => ({
+            priority: eruIndex,
+            reservationUnit: eruPk,
+          })),
+        })
+      ),
       applicationRoundPk: appToSave.applicationRoundId,
       ...(appToSave.hasBillingAddress
         ? { billingAddress: appToSave.billingAddress }
         : {}),
-      contactPerson: appToSave.contactPerson,
+      contactPerson: appToSave.contactPerson ?? { firstName: "", lastName: "" },
       homeCityPk: appToSave.homeCityId,
-      organisation: transformOrganisation(appToSave.organisation),
+      organisation:
+        appToSave.organisation != null
+          ? transformOrganisation(appToSave.organisation)
+          : undefined,
       ...(appToSave.pk != null ? { pk: appToSave.pk } : {}),
       status: appToSave.status,
     };
@@ -254,6 +262,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     try {
       const response = await mutation({
         variables: {
+          // @ts-expect-error -- TODO see if we ever use create mutation
           input,
         },
       });
@@ -326,6 +335,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       additionalInformation: application?.additionalInformation ?? "",
       homeCityId: application?.homeCity?.pk ?? undefined,
     },
+    resolver: zodResolver(ApplicationFormSchema),
   });
 
   const { getValues, reset } = form;

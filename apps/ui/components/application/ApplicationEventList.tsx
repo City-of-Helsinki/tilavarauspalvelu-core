@@ -1,8 +1,8 @@
 import React from "react";
 import { formatDuration } from "common/src/common/util";
-import type { ApplicationEventType } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
+import { filterNonNullable } from "common/src/helpers";
 import { useOptions } from "@/hooks/useOptions";
 import { TimePreview } from "./TimePreview";
 import { StyledLabelValue, TimePreviewContainer } from "./styled";
@@ -20,11 +20,7 @@ const filterSecondary = (n: ApplicationEventScheduleFormType) =>
   n.priority === 200;
 
 // TODO replace events with form context
-const ApplicationEventList = ({
-  events,
-}: {
-  events: ApplicationEventType[];
-}) => {
+const ApplicationEventList = () => {
   const { t } = useTranslation();
   const { params, options } = useOptions();
   const { purposeOptions } = options;
@@ -53,10 +49,11 @@ const ApplicationEventList = ({
   };
 
   const evts = watch(`applicationEvents`);
+  const aes = filterNonNullable(evts);
 
   return (
     <>
-      {evts.map((applicationEvent, i) => (
+      {aes.map((applicationEvent, i) => (
         <Accordion
           open
           id={`applicationEvent-${i}`}

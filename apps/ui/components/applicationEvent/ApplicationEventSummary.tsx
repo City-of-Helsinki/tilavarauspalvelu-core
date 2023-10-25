@@ -9,7 +9,7 @@ import IconWithText from "../common/IconWithText";
 import { ApplicationEventFormValue } from "../application/Form";
 
 type Props = {
-  applicationEvent: ApplicationEventFormValue;
+  applicationEvent?: ApplicationEventFormValue;
   name: string;
 };
 
@@ -37,8 +37,8 @@ const Box = styled.div`
 `;
 
 const numHours = (
-  startDate: string | null,
-  endDate: string | null,
+  startDate: string | undefined,
+  endDate: string | undefined,
   biweekly: boolean,
   eventsPerWeek: number,
   minDurationMinutes: number

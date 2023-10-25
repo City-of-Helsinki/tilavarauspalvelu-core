@@ -23,20 +23,17 @@ export const Placeholder = styled.span`
 
 type Props = {
   application: ApplicationType;
-  onNext: (appToSave: ApplicationFormValues) => void;
   homeCityOptions: OptionType[];
 };
 
 const OrganisationForm = ({
   application,
-  onNext,
   homeCityOptions,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const {
     register,
-    handleSubmit,
     unregister,
     control,
     formState: { errors },
@@ -56,12 +53,8 @@ const OrganisationForm = ({
     }
   }, [hasRegistration, register, unregister]);
 
-  const onSubmit = (data: ApplicationFormValues): void => {
-    onNext(data);
-  };
-
   return (
-    <form>
+    <>
       <TwoColumnContainer>
         <FormSubHeading>
           {t("application:Page3.subHeading.basicInfo")}
@@ -112,7 +105,7 @@ const OrganisationForm = ({
               if (!hasRegistration) {
                 setValue("organisation.identifier", "");
               } else {
-                setValue("organisation.identifier", null);
+                setValue("organisation.identifier", undefined);
               }
             }}
           />
@@ -262,13 +255,8 @@ const OrganisationForm = ({
         />
         <EmailInput />
       </TwoColumnContainer>
-      {application.pk != null && (
-        <Buttons
-          onSubmit={handleSubmit(onSubmit)}
-          applicationId={application.pk}
-        />
-      )}
-    </form>
+      {application.pk != null && <Buttons applicationId={application.pk} />}
+    </>
   );
 };
 

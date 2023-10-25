@@ -1,13 +1,7 @@
 // TODO this file should be moved to application/ since the only user is Page1
 // also remove default export
 import React, { useRef } from "react";
-import {
-  Checkbox,
-  DateInput,
-  NumberInput,
-  Select,
-  TextInput,
-} from "hds-react";
+import { Checkbox, DateInput, NumberInput, Select, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
@@ -114,16 +108,6 @@ const Button = styled(MediumButton)`
   }
 `;
 
-const clearDurationErrors = (
-  index: number
-) => {
-  const form = useFormContext<ApplicationFormValues>();
-  form.clearErrors([
-    `applicationEvents.${index}.minDuration`,
-    `applicationEvents.${index}.maxDuration`,
-  ]);
-};
-
 const ApplicationEventInner = ({
   index,
   applicationRound,
@@ -200,13 +184,12 @@ const ApplicationEventInner = ({
             id={`applicationEvents.${index}.numPersons`}
             required
             {...register(`applicationEvents.${index}.numPersons`, {
-                validate: {
-                  required: (val) => Boolean(val),
-                  numPersonsMin: (val) => Number(val) > 0,
-                },
-                valueAsNumber: true,
-              })
-            }
+              validate: {
+                required: (val) => Boolean(val),
+                numPersonsMin: (val) => Number(val) > 0,
+              },
+              valueAsNumber: true,
+            })}
             label={t("application:Page1.groupSize")}
             min={0}
             max={undefined}
@@ -396,7 +379,10 @@ const ApplicationEventInner = ({
             validate: {
               /* FIXME
             required: (val: string) => {
-              clearDurationErrors(form, index);
+              form.clearErrors([
+                `applicationEvents.${index}.minDuration`,
+                `applicationEvents.${index}.maxDuration`,
+              ]);
               return val !== "00:00:00";
             },
             minDurationBiggerThanMaxDuration: (val: string) =>
@@ -438,7 +424,10 @@ const ApplicationEventInner = ({
             validate: {
               /* FIXME
             required: (val: string) => {
-              clearDurationErrors(form, index);
+              form.clearErrors([
+                `applicationEvents.${index}.minDuration`,
+                `applicationEvents.${index}.maxDuration`,
+              ]);
               return val !== "00:00:00";
             },
             maxDurationSmallerThanMinDuration: (val: string) =>
@@ -480,12 +469,11 @@ const ApplicationEventInner = ({
           id={`applicationEvents.${index}.eventsPerWeek`}
           required
           {...register(`applicationEvents.${index}.eventsPerWeek`, {
-              validate: {
-                eventsPerWeekMin: (val) => Number(val) > 0,
-              },
-              valueAsNumber: true,
-            })
-          }
+            validate: {
+              eventsPerWeekMin: (val) => Number(val) > 0,
+            },
+            valueAsNumber: true,
+          })}
           label={t("application:Page1.eventsPerWeek")}
           min={1}
           max={undefined}
@@ -503,12 +491,7 @@ const ApplicationEventInner = ({
           name={`applicationEvents.${index}.biweekly`}
           render={({ field }) => {
             return (
-              <input
-                type="hidden"
-                id={field.name}
-                name={field.name}
-                value=""
-              />
+              <input type="hidden" id={field.name} name={field.name} value="" />
             );
           }}
         />
@@ -554,12 +537,7 @@ const ApplicationEventInner = ({
 };
 
 const ApplicationEvent = (props: Props): JSX.Element => {
-  const {
-    index,
-    isVisible,
-    onDeleteEvent,
-    onToggleAccordian,
-  } = props;
+  const { index, isVisible, onDeleteEvent, onToggleAccordian } = props;
 
   const { t } = useTranslation();
 

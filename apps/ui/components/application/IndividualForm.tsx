@@ -16,7 +16,6 @@ import type { ApplicationFormValues } from "./Form";
 
 type Props = {
   application: ApplicationType;
-  onNext: (appToSave: ApplicationFormValues) => void;
 };
 
 /*
@@ -45,18 +44,13 @@ const prepareData = (
 };
 */
 
-const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
+const IndividualForm = ({ application }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const {
     register,
-    handleSubmit,
     formState: { errors },
   } = useFormContext<ApplicationFormValues>();
-
-  const onSubmit = (data: ApplicationFormValues): void => {
-    onNext(data);
-  };
 
   return (
     <>
@@ -138,12 +132,7 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
         </SpanTwoColumns>
         <EmailInput />
       </TwoColumnContainer>
-      {application.pk && (
-        <Buttons
-          onSubmit={handleSubmit(onSubmit)}
-          applicationId={application.pk}
-        />
-      )}
+      {application.pk && <Buttons applicationId={application.pk} />}
     </>
   );
 };

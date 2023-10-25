@@ -13,7 +13,6 @@ import { ApplicationFormValues } from "./Form";
 
 type Props = {
   application: ApplicationType;
-  onNext: (appToSave: ApplicationFormValues) => void;
 };
 
 // TODO hasBillingAddress can be removed by using the form field
@@ -41,7 +40,7 @@ const prepareData = (
 };
 */
 
-const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
+const CompanyForm = ({ application }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const [hasBillingAddress, setHasBillingAddress] = useState(
@@ -50,7 +49,6 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
 
   const {
     register,
-    handleSubmit,
     formState: { errors },
   } = useFormContext<ApplicationFormValues>();
 
@@ -63,11 +61,6 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
     },
   });
   */
-
-  const onSubmit = (data: ApplicationFormValues): void => {
-    // const appToSave = prepareData(application, data, hasBillingAddress);
-    onNext(data);
-  };
 
   return (
     <>
@@ -244,10 +237,7 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
         <EmailInput />
       </TwoColumnContainer>
       {application.pk != null && (
-        <Buttons
-          onSubmit={handleSubmit(onSubmit)}
-          applicationId={application.pk ?? 0}
-        />
+        <Buttons applicationId={application.pk ?? 0} />
       )}
     </>
   );

@@ -65,13 +65,8 @@ const Page1 = ({
   );
 
   const form = useFormContext<ApplicationFormValues>();
-  const {
-    getValues,
-    setValue,
-    register,
-    unregister,
-    watch,
-  } = form;
+  const { getValues, setValue, register, unregister, watch, handleSubmit } =
+    form;
 
   /*
   const onDeleteEvent = async (eventId: number | undefined, index: number) => {
@@ -142,7 +137,7 @@ const Page1 = ({
   const applicationEvents = watch("applicationEvents");
 
   const handleAddNewApplicationEvent = () => {
-    const nextIndex = applicationEvents.length;
+    const nextIndex = applicationEvents?.length ?? 0;
     // TODO check if we have to register all the sub fields in application event
     // seems so, we could also just register the pk here and register the rest in the form where they are used
     register(`applicationEvents.${nextIndex}.pk`);
@@ -160,24 +155,28 @@ const Page1 = ({
     register(`applicationEvents.${nextIndex}.applicationEventSchedules`);
     register(`applicationEvents.${nextIndex}.status`);
     register(`applicationEvents.${nextIndex}.reservationUnits`);
-    setValue(`applicationEvents.${nextIndex}.reservationUnits`, [])
-    setValue(`applicationEvents.${nextIndex}.status`, ApplicationEventStatus.Created)
-    setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, [])
-    setValue(`applicationEvents.${nextIndex}.pk`, undefined)
-    setValue(`applicationEvents.${nextIndex}.name`, "")
-    setValue(`applicationEvents.${nextIndex}.eventsPerWeek`, 1)
-    setValue(`applicationEvents.${nextIndex}.biweekly`, false)
+    setValue(`applicationEvents.${nextIndex}.reservationUnits`, []);
+    setValue(
+      `applicationEvents.${nextIndex}.status`,
+      ApplicationEventStatus.Created
+    );
+    setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, []);
+    setValue(`applicationEvents.${nextIndex}.pk`, undefined);
+    setValue(`applicationEvents.${nextIndex}.name`, "");
+    setValue(`applicationEvents.${nextIndex}.eventsPerWeek`, 1);
+    setValue(`applicationEvents.${nextIndex}.biweekly`, false);
   };
 
   const addNewEventButtonDisabled =
-    applicationEvents.filter((ae) => !ae.pk).length > 0;
+    applicationEvents?.some((ae) => ae?.pk == null) ?? false;
 
   // TODO check if the form is valid? before allowing next or check when clicking next?
-  const nextButtonDisabled = false
+  const nextButtonDisabled = false;
 
-  const onSubmit = (): void => {
-    onNext(getValues());
+  const onSubmit = (data: ApplicationFormValues) => {
+    onNext(data);
   };
+
   /*
   const onSubmit = (data: ApplicationFormValues, eventId?: number) => {
     const appToSave = {
@@ -209,21 +208,26 @@ const Page1 = ({
   */
 
   return (
-    <>
-      {applicationEvents.map((event, index) => (
-        <ApplicationEvent
-          key={event.pk || "NEW"}
-          index={index}
-          applicationRound={applicationRound}
-          optionTypes={{
-            ...options,
-            unitOptions,
-          }}
-          onDeleteEvent={() => handleDeleteEvent(index)}
-          onToggleAccordian={() => handleToggleAccordion(event.pk ?? undefined)}
-          isVisible={isAccordianOpen(event.pk ?? undefined)}
-        />
-      ))}
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
+      {/* NOTE can't filter this because we have undefined values in the array so the index would break */}
+      {applicationEvents?.map((event, index) =>
+        event != null ? (
+          <ApplicationEvent
+            key={event.pk || "NEW"}
+            index={index}
+            applicationRound={applicationRound}
+            optionTypes={{
+              ...options,
+              unitOptions,
+            }}
+            onDeleteEvent={() => handleDeleteEvent(index)}
+            onToggleAccordian={() =>
+              handleToggleAccordion(event.pk ?? undefined)
+            }
+            isVisible={isAccordianOpen(event.pk ?? undefined)}
+          />
+        ) : null
+      )}
       {!addNewEventButtonDisabled && (
         <MediumButton
           id="addApplicationEvent"
@@ -242,12 +246,12 @@ const Page1 = ({
           id="button__application--next"
           iconRight={<IconArrowRight />}
           disabled={nextButtonDisabled}
-          onClick={onSubmit}
+          type="submit"
         >
           {t("common:next")}
         </MediumButton>
       </ButtonContainer>
-    </>
+    </form>
   );
 };
 
