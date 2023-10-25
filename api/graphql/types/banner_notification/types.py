@@ -16,6 +16,7 @@ class BannerNotificationNode(DjangoAuthNode):
     class Meta:
         model = BannerNotification
         fields = [
+            "pk",
             "name",
             "message",
             "message_fi",
