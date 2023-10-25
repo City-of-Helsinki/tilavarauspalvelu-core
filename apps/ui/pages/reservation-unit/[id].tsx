@@ -19,7 +19,7 @@ import {
   differenceInMinutes,
   startOfDay,
 } from "date-fns";
-import { toApiDate, toUIDate } from "common/src/common/util";
+import { fromApiDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
   RoundPeriod,
   getEventBuffers,
@@ -393,65 +393,73 @@ const TimeSlot = styled.div`
 `;
 
 // TODO: Use real data
-const applicationRoundTimeSlotDays = [
-  {
-    weekday: 1,
-    closed: false,
-    reservableTimes: [
-      {
-        begin: "10:00",
-        end: "12:30",
-      },
-    ],
-  },
-  {
-    weekday: 2,
-    closed: false,
-    reservableTimes: [
-      {
-        begin: "10:00",
-        end: "12:30",
-      },
-    ],
-  },
-  {
-    weekday: 3,
-    closed: false,
-    reservableTimes: [
-      {
-        begin: "10:00",
-        end: "12:30",
-      },
-      {
-        begin: "13:30",
-        end: "20:00",
-      },
-    ],
-  },
-  {
-    weekday: 6,
-    closed: true,
-  },
-  {
-    weekday: 0,
-    closed: true,
-  },
-];
+const applicationRoundTimeSlotData = {
+  applicationRounds: [
+    {
+      publicDisplayBegin: "2023-09-12T00:00:00+00:00",
+      reservationPeriodBegin: "2023-09-12",
+      reservationPeriodEnd: "2027-01-01",
+    },
+  ],
+  applicationRoundTimeSlots: [
+    {
+      weekday: 1,
+      closed: false,
+      reservableTimes: [
+        {
+          begin: "10:00:00",
+          end: "12:30:00",
+        },
+      ],
+    },
+    {
+      weekday: 2,
+      closed: false,
+      reservableTimes: [
+        {
+          begin: "10:00:00",
+          end: "12:30:00",
+        },
+      ],
+    },
+    {
+      weekday: 3,
+      closed: false,
+      reservableTimes: [
+        {
+          begin: "10:00:00",
+          end: "12:30:00",
+        },
+        {
+          begin: "13:30:00",
+          end: "20:00:00",
+        },
+      ],
+    },
+    {
+      weekday: 6,
+      closed: true,
+    },
+    {
+      weekday: 0,
+      closed: true,
+    },
+  ],
+};
 
+// Returns an element for a weekday in the application round time slots, with up to two time slots
 const ApplicationRoundTimeSlotDay = ({
   day,
 }: {
   day: {
-    reservableTimes?: (
-      | { end: string; begin: string }
-      | { end: string; begin: string }
-    )[];
+    reservableTimes?: { end: string; begin: string }[];
     weekday: number;
     closed: boolean;
   };
 }) => {
   const { t } = useTranslation();
   const weekDay = t(`common:weekDayLong.${day.weekday}`);
+  const noSeconds = (time: string) => time.split(":").slice(0, 2).join(":");
   return (
     <TimeSlot>
       <span>{weekDay}</span>{" "}
@@ -461,12 +469,15 @@ const ApplicationRoundTimeSlotDay = ({
         day.reservableTimes && (
           <>
             <span>
-              {day.reservableTimes[0].begin}-{day.reservableTimes[0].end}
+              {`${noSeconds(day.reservableTimes[0].begin)}-${noSeconds(
+                day.reservableTimes[0].end
+              )}`}
             </span>
             {day.reservableTimes[1] && (
               <span>
-                {` ${t("common:and")} `}
-                {day.reservableTimes[1].begin}-{day.reservableTimes[1].end}
+                {` ${t("common:and")} ${noSeconds(
+                  day.reservableTimes[1].begin
+                )}-${noSeconds(day.reservableTimes[1].end)}`}
               </span>
             )}
           </>
@@ -614,6 +625,27 @@ const ReservationUnit = ({
     },
     [activeApplicationRounds, reservationUnit]
   );
+
+  // TODO: Use real query data
+  // Don't display the application round time slots..
+  let shouldDisplayApplicationRoundTimeSlots = false;
+  applicationRoundTimeSlotData.applicationRounds.forEach((applicationRound) => {
+    if (!applicationRound) return;
+    const applicationRoundStart = fromApiDate(
+      applicationRound.publicDisplayBegin.split("T")[0]
+    );
+    const applicationRoundEnd = fromApiDate(
+      applicationRound.reservationPeriodEnd
+    );
+    console.log(applicationRoundStart, applicationRoundEnd);
+    // ...unless there is an active application round
+    if (
+      applicationRoundStart <= new Date() &&
+      new Date() <= applicationRoundEnd
+    ) {
+      shouldDisplayApplicationRoundTimeSlots = true;
+    }
+  });
 
   const shouldDisplayPricingTerms = useMemo(() => {
     const pricings = filterNonNullable(reservationUnit?.pricings);
@@ -1190,15 +1222,21 @@ const ReservationUnit = ({
                 </PaddedContent>
               </Accordion>
             )}
-            {/* TODO: Show conditionally */}
-            <Accordion heading={t("reservationUnit:recurringHeading")}>
-              <PaddedContent>
-                <p>{t("reservationUnit:recurringBody")}</p>
-                {applicationRoundTimeSlotDays.map((day) => (
-                  <ApplicationRoundTimeSlotDay key={day.weekday} day={day} />
-                ))}
-              </PaddedContent>
-            </Accordion>
+            {shouldDisplayApplicationRoundTimeSlots && (
+              <Accordion heading={t("reservationUnit:recurringHeading")}>
+                <PaddedContent>
+                  <p>{t("reservationUnit:recurringBody")}</p>
+                  {applicationRoundTimeSlotData.applicationRoundTimeSlots.map(
+                    (day) => (
+                      <ApplicationRoundTimeSlotDay
+                        key={day.weekday}
+                        day={day}
+                      />
+                    )
+                  )}
+                </PaddedContent>
+              </Accordion>
+            )}
             {reservationUnit.unit?.location && (
               <Accordion heading={t("common:location")} theme="thin" open>
                 <JustForMobile customBreakpoint={breakpoints.l}>
