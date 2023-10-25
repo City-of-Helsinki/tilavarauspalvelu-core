@@ -83,7 +83,9 @@ class ApplicationRound(models.Model):
     @property
     def status_timestamp(self) -> datetime:
         match self.status:
-            case ApplicationRoundStatusChoice.UPCOMING | ApplicationRoundStatusChoice.OPEN:
+            case ApplicationRoundStatusChoice.UPCOMING:
+                return self.public_display_begin
+            case ApplicationRoundStatusChoice.OPEN:
                 return self.application_period_begin
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
                 return self.application_period_end
