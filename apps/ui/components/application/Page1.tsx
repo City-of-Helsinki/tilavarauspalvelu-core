@@ -15,7 +15,7 @@ import { MediumButton } from "@/styles/util";
 import { useOptions } from "@/hooks/useOptions";
 import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { ButtonContainer } from "../common/common";
-import ApplicationEvent from "../applicationEvent/ApplicationEvent";
+import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationFormValues } from "./Form";
 
 type Props = {

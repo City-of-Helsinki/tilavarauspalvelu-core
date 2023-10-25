@@ -3,7 +3,6 @@ import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import type { ApplicationType, TermsOfUseType } from "common/types/gql-types";
-import { filterNonNullable } from "common/src/helpers";
 import { useOptions } from "@/hooks/useOptions";
 import { getTranslation } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
@@ -30,7 +29,6 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element => {
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
-  const applicationEvents = filterNonNullable(application.applicationEvents);
   return (
     <>
       <Accordion
@@ -44,7 +42,7 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element => {
           application={application}
         />
       </Accordion>
-      <ApplicationEventList events={applicationEvents} />
+      <ApplicationEventList />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>

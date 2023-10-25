@@ -10,22 +10,22 @@ import type { ApplicationRoundType } from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import { ReservationUnitList } from "../reservation-unit/ReservationUnitList";
+import { ReservationUnitList } from "./ReservationUnitList";
 import {
   apiDateToUIDate,
   applicationErrorText,
   formatApiDate,
   formatDate,
   uiDateToApiDate,
-} from "../../modules/util";
-import ApplicationEventSummary from "./ApplicationEventSummary";
+} from "@/modules/util";
+import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import ControlledSelect from "../common/ControlledSelect";
 import Accordion from "../common/Accordion";
-import { getDurationNumberOptions } from "../../modules/const";
-import { after, before } from "../../modules/validation";
+import { getDurationNumberOptions } from "@/modules/const";
+import { after, before } from "@/modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
-import { MediumButton } from "../../styles/util";
-import { ApplicationFormValues } from "../application/Form";
+import { MediumButton } from "@/styles/util";
+import { ApplicationFormValues } from "./Form";
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -585,4 +585,4 @@ const ApplicationEvent = (props: Props): JSX.Element => {
   );
 };
 
-export default ApplicationEvent;
+export { ApplicationEvent };

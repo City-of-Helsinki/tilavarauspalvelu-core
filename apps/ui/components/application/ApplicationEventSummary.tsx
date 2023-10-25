@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
 import { fromUIDate } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
-import { ApplicationEventFormValue } from "../application/Form";
+import { ApplicationEventFormValue } from "./Form";
 
 type Props = {
   applicationEvent?: ApplicationEventFormValue;
@@ -139,4 +139,4 @@ const ApplicationEventSummary = ({
     </>
   );
 };
-export default ApplicationEventSummary;
+export { ApplicationEventSummary };

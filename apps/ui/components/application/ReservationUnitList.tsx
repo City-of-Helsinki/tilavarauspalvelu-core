@@ -5,16 +5,15 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
 import {
-  ApplicationEventType,
   ApplicationRoundType,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
-import ReservationUnitModal from "./ReservationUnitModal";
-import ReservationUnitCard from "./ReservationUnitCard";
-import { ApplicationFormValues } from "../application/Form";
+import ReservationUnitModal from "../reservation-unit/ReservationUnitModal";
+import ReservationUnitCard from "../reservation-unit/ReservationUnitCard";
+import { ApplicationFormValues } from "./Form";
 
 type OptionTypes = {
   purposeOptions: OptionType[];

@@ -4,7 +4,6 @@ import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ApplicationType, TermsOfUseType } from "common/types/gql-types";
-import { filterNonNullable } from "common/src/helpers";
 import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import { MediumButton } from "@/styles/util";
@@ -47,7 +46,6 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
-  const applicationEvents = filterNonNullable(application.applicationEvents);
   return (
     <>
       <Accordion
@@ -61,7 +59,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
           application={application}
         />
       </Accordion>
-      <ApplicationEventList events={applicationEvents} />
+      <ApplicationEventList />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>
