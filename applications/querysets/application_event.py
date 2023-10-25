@@ -3,9 +3,16 @@ from datetime import timedelta
 from typing import Self, TypedDict
 
 from django.db import models
-from django.db.models.functions import Concat, Now
 
 from applications.choices import ApplicationEventStatusChoice, ApplicationStatusChoice
+from applications.querysets.helpers import (
+    accepted_event_count,
+    applicant_alias_case,
+    application_status_case,
+    non_declined_event_count,
+    unallocated_schedule_count,
+    unallocated_schedule_filter,
+)
 from reservations.choices import ReservationStateChoice
 
 
@@ -16,32 +23,7 @@ class AggregateEventData(TypedDict):
 
 class ApplicationEventQuerySet(models.QuerySet):
     def with_applicant_alias(self) -> Self:
-        return self.alias(
-            applicant=models.Case(
-                models.When(
-                    application__organisation__isnull=False,
-                    then=models.F("application__organisation__name"),
-                ),
-                models.When(
-                    application__contact_person__isnull=False,
-                    then=Concat(
-                        "application__contact_person__first_name",
-                        models.Value(" "),
-                        "application__contact_person__last_name",
-                    ),
-                ),
-                models.When(
-                    application__user__isnull=False,
-                    then=Concat(
-                        "application__user__first_name",
-                        models.Value(" "),
-                        "application__user__last_name",
-                    ),
-                ),
-                default=models.Value(""),
-                output_field=models.CharField(),
-            )
-        )
+        return self.alias(applicant=applicant_alias_case("application"))
 
     def get_event_duration_info(self) -> Sequence[AggregateEventData]:
         return (
@@ -59,36 +41,13 @@ class ApplicationEventQuerySet(models.QuerySet):
         )
 
     def unallocated(self) -> Self:
-        return self.filter(
-            models.Q(application_event_schedules__isnull=True)
-            | (
-                models.Q(application_event_schedules__declined=False)
-                & (
-                    models.Q(application_event_schedules__allocated_day__isnull=True)
-                    | models.Q(application_event_schedules__allocated_begin__isnull=True)
-                    | models.Q(application_event_schedules__allocated_end__isnull=True)
-                    | models.Q(application_event_schedules__allocated_reservation_unit__isnull=True)
-                )
-            )
-        )
+        return self.filter(unallocated_schedule_filter())
 
     def with_event_status(self) -> Self:
         return self.alias(
             schedule_count=models.Count("application_event_schedules"),
-            non_declined_count=models.Count(
-                "application_event_schedules",
-                filter=models.Q(application_event_schedules__declined=False),
-            ),
-            accepted_count=models.Count(
-                "application_event_schedules",
-                filter=(
-                    models.Q(application_event_schedules__declined=False)
-                    & models.Q(application_event_schedules__allocated_day__isnull=False)
-                    & models.Q(application_event_schedules__allocated_begin__isnull=False)
-                    & models.Q(application_event_schedules__allocated_end__isnull=False)
-                    & models.Q(application_event_schedules__allocated_reservation_unit__isnull=False)
-                ),
-            ),
+            non_declined_count=non_declined_event_count(),
+            accepted_count=accepted_event_count(),
             recurring_count=models.Count("recurring_reservations"),
             recurring_denied_count=models.Count(
                 "recurring_reservations",
@@ -97,6 +56,8 @@ class ApplicationEventQuerySet(models.QuerySet):
         ).annotate(
             event_status=models.Case(
                 models.When(
+                    # If there are schedules
+                    # AND all of them are declined
                     ~models.Q(schedule_count=0) & models.Q(non_declined_count=0),
                     then=models.Value(
                         ApplicationEventStatusChoice.DECLINED.value,
@@ -104,6 +65,8 @@ class ApplicationEventQuerySet(models.QuerySet):
                     ),
                 ),
                 models.When(
+                    # If there are no schedules
+                    # OR none of them are accepted
                     models.Q(schedule_count=0) | models.Q(accepted_count=0),
                     then=models.Value(
                         ApplicationEventStatusChoice.UNALLOCATED.value,
@@ -111,6 +74,7 @@ class ApplicationEventQuerySet(models.QuerySet):
                     ),
                 ),
                 models.When(
+                    # If there are no recurring reservations
                     models.Q(recurring_count=0),
                     then=models.Value(
                         ApplicationEventStatusChoice.APPROVED.value,
@@ -118,6 +82,7 @@ class ApplicationEventQuerySet(models.QuerySet):
                     ),
                 ),
                 models.When(
+                    # If there is at least one denied recurring reservation
                     ~models.Q(recurring_denied_count=0),
                     then=models.Value(
                         ApplicationEventStatusChoice.FAILED.value,
@@ -125,6 +90,7 @@ class ApplicationEventQuerySet(models.QuerySet):
                     ),
                 ),
                 default=models.Value(
+                    # Otherwise all reservation are successful
                     ApplicationEventStatusChoice.RESERVED.value,
                     output_field=models.CharField(),
                 ),
@@ -136,80 +102,10 @@ class ApplicationEventQuerySet(models.QuerySet):
         return self.with_event_status().filter(event_status=status.value)
 
     def with_application_status(self) -> Self:
-        # Duplicate code in `applications.querysets.application.ApplicationQuerySet.with_status`
         return self.alias(
-            unallocated_count=models.Count(
-                "application_event_schedules",
-                filter=(
-                    models.Q(application_event_schedules__isnull=True)
-                    | models.Q(application_event_schedules__allocated_begin__isnull=True)
-                    | models.Q(application_event_schedules__allocated_end__isnull=True)
-                    | models.Q(application_event_schedules__allocated_day__isnull=True)
-                    | models.Q(application_event_schedules__allocated_reservation_unit__isnull=True)
-                ),
-            )
+            unallocated_schedule_count=unallocated_schedule_count(),
         ).annotate(
-            application_status=models.Case(
-                models.When(
-                    models.Q(application__cancelled_date__isnull=False),
-                    then=models.Value(
-                        ApplicationStatusChoice.CANCELLED.value,
-                        output_field=models.CharField(),
-                    ),
-                ),
-                models.When(
-                    (
-                        models.Q(application__sent_date__isnull=True)
-                        & models.Q(application__application_round__sent_date__isnull=True)
-                        & models.Q(application__application_round__handled_date__isnull=True)
-                        & models.Q(application__application_round__application_period_end__gt=Now())
-                    ),
-                    then=models.Value(
-                        ApplicationStatusChoice.DRAFT.value,
-                        output_field=models.CharField(),
-                    ),
-                ),
-                models.When(
-                    models.Q(application__sent_date__isnull=True),
-                    then=models.Value(
-                        ApplicationStatusChoice.EXPIRED.value,
-                        output_field=models.CharField(),
-                    ),
-                ),
-                models.When(
-                    models.Q(application__application_round__sent_date__isnull=False),
-                    then=models.Value(
-                        ApplicationStatusChoice.RESULTS_SENT.value,
-                        output_field=models.CharField(),
-                    ),
-                ),
-                models.When(
-                    models.Q(application__application_round__handled_date__isnull=False),
-                    then=models.Value(
-                        ApplicationStatusChoice.HANDLED.value,
-                        output_field=models.CharField(),
-                    ),
-                ),
-                models.When(
-                    models.Q(application__application_round__application_period_end__gt=Now()),
-                    then=models.Value(
-                        ApplicationStatusChoice.RECEIVED.value,
-                        output_field=models.CharField(),
-                    ),
-                ),
-                models.When(
-                    ~models.Q(unallocated_count=0),
-                    then=models.Value(
-                        ApplicationStatusChoice.IN_ALLOCATION.value,
-                        output_field=models.CharField(),
-                    ),
-                ),
-                default=models.Value(
-                    ApplicationStatusChoice.HANDLED.value,
-                    output_field=models.CharField(),
-                ),
-                output_field=models.CharField(),
-            ),
+            application_status=application_status_case("application"),
         )
 
     def has_application_status(self, status: ApplicationStatusChoice) -> Self:
