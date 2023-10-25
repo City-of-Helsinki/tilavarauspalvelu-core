@@ -53,7 +53,6 @@ def test_create_application_event(graphql):
     assert event.biweekly == data["biweekly"]
     assert event.flagged is False
 
-    assert event.declined_reservation_units.count() == 0
     assert event.application_event_schedules.count() == 1
     assert event.event_reservation_units.count() == 1
 

@@ -26,7 +26,6 @@ class ApplicationEventAdminForm(forms.ModelForm):
             "age_group",
             "ability_group",
             "purpose",
-            "declined_reservation_units",
         ]
         help_texts = {
             "name": _("Name that describes this event."),
@@ -42,7 +41,6 @@ class ApplicationEventAdminForm(forms.ModelForm):
             "age_group": _("Age group for this event."),
             "ability_group": _("Ability group for this event."),
             "purpose": _("Purpose for this event."),
-            "declined_reservation_units": _("Reservation units that are declined for this event."),
         }
 
 

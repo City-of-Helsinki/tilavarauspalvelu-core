@@ -46,9 +46,6 @@ def test_can_query_application_event__all_fields(graphql):
         purpose {
             nameFi
         }
-        declinedReservationUnits {
-            nameFi
-        }
         eventReservationUnits {
             pk
         }
@@ -93,7 +90,6 @@ def test_can_query_application_event__all_fields(graphql):
         "purpose": {
             "nameFi": event_1.purpose.name_fi,
         },
-        "declinedReservationUnits": [],
         "eventReservationUnits": [],
         "applicationEventSchedules": [
             {

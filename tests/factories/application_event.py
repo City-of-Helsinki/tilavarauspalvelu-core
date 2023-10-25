@@ -9,7 +9,6 @@ from factory import fuzzy
 
 from applications.choices import ApplicationEventStatusChoice, WeekdayChoice
 from applications.models import ApplicationEvent, ApplicationEventSchedule, EventReservationUnit
-from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from reservations.models import RecurringReservation
 
@@ -139,24 +138,6 @@ class ApplicationEventFactory(GenericDjangoModelFactory[ApplicationEvent]):
             kwargs["application"] = ApplicationFactory.create_in_status_draft(**sub_kwargs)
 
         return cls.create(**kwargs)
-
-    @factory.post_generation
-    def declined_reservation_units(
-        self,
-        create: bool,
-        declined_reservation_units: Iterable[ReservationUnit] | None,
-        **kwargs: Any,
-    ) -> None:
-        if not create:
-            return
-
-        if not declined_reservation_units and kwargs:
-            from .reservation_unit import ReservationUnitFactory
-
-            self.declined_reservation_units.add(ReservationUnitFactory.create(**kwargs))
-
-        for reservation_unit in declined_reservation_units or []:
-            self.declined_reservation_units.add(reservation_unit)
 
     @factory.post_generation
     def application_event_schedules(
