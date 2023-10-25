@@ -35,7 +35,6 @@ import AltNotification from "../common/AltNotification";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
-  // activeOpeningTimes: ActiveOpeningTime[];
   isReservable?: boolean;
   subventionSuffix?: JSX.Element;
 }
@@ -203,16 +202,6 @@ const Head = ({
                     })}
                   />
                 )}
-                {/* {openingTimesTextArr?.length > 0 && (
-                    <StyledIconWithText
-                      icon={
-                        <IconCalendar
-                          aria-label={t("reservationUnit:openingTimes")}
-                        />
-                      }
-                      texts={openingTimesTextArr}
-                    />
-                  )} */}
                 {(reservationUnit.minReservationDuration ||
                   reservationUnit.maxReservationDuration) && (
                   <StyledIconWithText

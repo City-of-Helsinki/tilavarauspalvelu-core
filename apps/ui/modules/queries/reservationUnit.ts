@@ -103,20 +103,6 @@ export const RESERVATION_UNIT = gql`
         nameEn
         nameSv
       }
-      openingHours(openingTimes: false, periods: true) {
-        openingTimePeriods {
-          periodId
-          startDate
-          endDate
-          resourceState
-          timeSpans {
-            startTime
-            endTime
-            resourceState
-            weekdays
-          }
-        }
-      }
       requireReservationHandling
       metadataSet {
         id

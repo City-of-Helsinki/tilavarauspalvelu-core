@@ -380,7 +380,7 @@ export type OpeningHourTime = {
   endTimeOnNextDay?: boolean;
 };
 
-export type OpeningTime = {
+type OpeningTime = {
   date: string;
   startTime: string;
   endTime: string;
@@ -388,7 +388,7 @@ export type OpeningTime = {
   periods: number[] | null;
 };
 
-export type OpeningTimePeriod = {
+type OpeningTimePeriod = {
   periodId: number;
   startDate: string;
   endDate: string;
@@ -398,7 +398,7 @@ export type OpeningTimePeriod = {
   description: TranslationObject;
 };
 
-export type OpeningHours = {
+type OpeningHours = {
   openingTimes?: OpeningTime[];
   openingTimePeriods?: OpeningTimePeriod[];
 };

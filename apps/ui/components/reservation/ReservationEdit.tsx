@@ -40,10 +40,7 @@ import {
   RESERVATION_UNIT,
   OPENING_HOURS,
 } from "../../modules/queries/reservationUnit";
-import {
-  mockOpeningTimePeriods,
-  mockOpeningTimes,
-} from "../../modules/reservationUnit";
+import { mockOpeningTimes } from "../../modules/reservationUnit";
 import EditStep0 from "./EditStep0";
 import EditStep1 from "./EditStep1";
 import { reservationsPrefix } from "../../modules/const";
@@ -239,10 +236,6 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
       ...reservationUnitData?.reservationUnitByPk,
       openingHours: {
         ...reservationUnitData?.reservationUnitByPk?.openingHours,
-        openingTimePeriods: allowReservationsWithoutOpeningHours
-          ? mockOpeningTimePeriods
-          : reservationUnitData?.reservationUnitByPk?.openingHours
-              ?.openingTimePeriods || [],
         openingTimes: allowReservationsWithoutOpeningHours
           ? mockOpeningTimes
           : additionalData?.reservationUnitByPk?.openingHours?.openingTimes?.filter(

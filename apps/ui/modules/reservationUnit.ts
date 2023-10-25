@@ -214,17 +214,6 @@ export const getFuturePricing = (
         reservationEnds ? new Date(reservationEnds) : undefined
       );
     })
-    // TODO: find out should opening hours be checked here
-    // .filter((futurePricing) => {
-    //   const begins = new Date(futurePricing.begins);
-    //   return openingHours.openingTimePeriods.some((period) => {
-    //     const { startDate, endDate } = period;
-    //     if (!startDate || !endDate) return false;
-    //     const periodStart = new Date(startDate);
-    //     const periodEnd = new Date(endDate);
-    //     return begins >= periodStart && begins <= periodEnd;
-    //   });
-    // })
     .filter((futurePricing) => {
       if (futurePricing.begins == null) {
         return false;
@@ -326,88 +315,6 @@ export const getReservationUnitPrice = (
   return pricing ? getPrice({ pricing, minutes, trailingZeros, asInt }) : undefined;
 };
 
-export const mockOpeningTimePeriods = [
-  {
-    periodId: 38600,
-    startDate: toApiDate(new Date()),
-    endDate: toApiDate(addDays(new Date(), 30)),
-    resourceState: null,
-    timeSpans: [
-      {
-        startTime: "09:00:00+00:00",
-        endTime: "12:00:00+00:00",
-        weekdays: [6, 1, 7],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-      {
-        startTime: "12:00:00+00:00",
-        endTime: "21:00:00+00:00",
-        weekdays: [7, 2],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-    ],
-    nameFi: "Period name Fi",
-    nameEn: "Period name En",
-    nameSv: "Period name Sv",
-    descriptionFi: "Period desc Fi",
-    descriptionEn: "Period desc En",
-    descriptionSv: "Period desc Sv",
-  },
-  {
-    periodId: 38601,
-    startDate: toApiDate(addDays(new Date(), 30)),
-    endDate: toApiDate(addDays(new Date(), 300)),
-    resourceState: null,
-    timeSpans: [
-      {
-        startTime: "09:00:00+00:00",
-        endTime: "21:00:00+00:00",
-        weekdays: [4, 5, 6],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-      {
-        startTime: "09:00:00+00:00",
-        endTime: "21:00:00+00:00",
-        weekdays: [7],
-        resourceState: "open",
-        endTimeOnNextDay: null,
-        nameFi: "Span name Fi",
-        nameEn: "Span name En",
-        nameSv: "Span name Sv",
-        descriptionFi: "Span desc Fi",
-        descriptionEn: "Span desc En",
-        descriptionSv: "Span desc Sv",
-      },
-    ],
-    nameFi: "Period name Fi",
-    nameEn: "Period name En",
-    nameSv: "Period name Sv",
-    descriptionFi: "Period desc Fi",
-    descriptionEn: "Period desc En",
-    descriptionSv: "Period desc Sv",
-  },
-];
 
 export const mockOpeningTimes = Array.from(Array(100)).map((_, index) => {
   const date = toApiDate(addDays(new Date(), index));

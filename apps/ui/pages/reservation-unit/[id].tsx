@@ -15,7 +15,6 @@ import styled from "styled-components";
 import {
   addHours,
   addSeconds,
-  addYears,
   differenceInMinutes,
   startOfDay,
 } from "date-fns";
@@ -92,7 +91,6 @@ import {
   getPrice,
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
-  mockOpeningTimePeriods,
   mockOpeningTimes,
 } from "@/modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
@@ -199,12 +197,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         .filter((n): n is NonNullable<typeof n> => n !== null)
         .find((edge) => edge.pk === genericTermsVariant.BOOKING);
 
-    const lastOpeningPeriodEndDate =
-      reservationUnitData?.reservationUnitByPk?.openingHours?.openingTimePeriods
-        ?.map((period) => period?.endDate)
-        .sort()
-        .reverse()[0] || toApiDate(addYears(new Date(), 1));
-
     const { data: additionalData } = await apolloClient.query<
       Query,
       QueryReservationUnitByPkArgs &
@@ -216,9 +208,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       variables: {
         pk: id,
         startDate: today,
-        endDate: lastOpeningPeriodEndDate,
+        // endDate: lastOpeningPeriodEndDate,
         from: today,
-        to: lastOpeningPeriodEndDate,
+        // to: lastOpeningPeriodEndDate,
         state: allowedReservationStates,
         includeWithSameComponents: true,
       },
@@ -268,10 +260,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
               : additionalData.reservationUnitByPk?.openingHours?.openingTimes?.filter(
                   (n) => n?.isReservable
                 ) || [],
-            openingTimePeriods: allowReservationsWithoutOpeningHours
-              ? mockOpeningTimePeriods
-              : reservationUnitData?.reservationUnitByPk?.openingHours
-                  ?.openingTimePeriods || [],
           },
           reservations:
             additionalData?.reservationUnitByPk?.reservations?.filter(

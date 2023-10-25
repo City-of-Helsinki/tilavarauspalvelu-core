@@ -805,15 +805,6 @@ describe("getReservationUnitInstructionsKey", () => {
 describe("getFuturePricing", () => {
   const reservationUnit: ReservationUnitByPkType = {
     id: "testing",
-    openingHours: {
-      openingTimePeriods: [
-        {
-          startDate: new Date(),
-          endDate: addDays(new Date(), 300),
-          id: "testing",
-        },
-      ],
-    },
     pricings: [
       {
         id: "1",
@@ -991,14 +982,6 @@ describe("getFuturePricing", () => {
 describe("getReservationUnitPrice", () => {
   const reservationUnit: ReservationUnitByPkType = {
     id: "testing",
-    openingHours: {
-      openingTimePeriods: [
-        {
-          startDate: new Date().toISOString(),
-          endDate: addDays(new Date(), 300).toISOString(),
-        },
-      ],
-    },
     pricings: [
       {
         pk: 1,
