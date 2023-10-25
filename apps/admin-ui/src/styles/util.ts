@@ -8,15 +8,10 @@ import {
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";
-import { ApplicationEventStatus, ApplicationStatus } from "common/types/common";
+import { ApplicationEventStatus } from "common/types/common";
 import { NormalizedApplicationRoundStatus } from "@/common/types";
-import { getApplicationStatusColor } from "@/component/applications/util";
 
-export const getGridFraction = (space: number, columns = 12): number => {
-  const fraction = (space / columns) * 100;
-  return fraction > 0 ? fraction : 0;
-};
-
+/// @deprecated -- this should be replaced with the GQL status types
 export const getApplicationEventStatusColor = (
   status: ApplicationEventStatus,
   size: "s" | "l"
@@ -88,29 +83,6 @@ export const Seranwrap = styled.div`
   cursor: pointer;
   background-color: black;
   opacity: 0.2;
-`;
-
-export const StatusDot = styled.div<{
-  status: ApplicationStatus;
-  size: number;
-}>`
-  display: inline-block;
-  width: ${({ size }) => size && `${size}px`};
-  height: ${({ size }) => size && `${size}px`};
-  border-radius: 50%;
-  background-color: ${({ status }) => getApplicationStatusColor(status, "s")};
-`;
-
-export const ApplicationEventStatusDot = styled.div<{
-  status: ApplicationEventStatus;
-  size: number;
-}>`
-  display: inline-block;
-  width: ${({ size }) => size && `${size}px`};
-  height: ${({ size }) => size && `${size}px`};
-  border-radius: 50%;
-  background-color: ${({ status }) =>
-    getApplicationEventStatusColor(status, "s")};
 `;
 
 export const InlineErrorSummary = styled(ErrorSummary)`

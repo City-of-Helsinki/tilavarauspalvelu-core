@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@apollo/client";
 import { Query, QueryReservationByPkArgs } from "common/types/gql-types";
 import { GET_BIRTHDATE_BY_RESERVATION_PK } from "./queries";
@@ -16,13 +16,10 @@ const ReservationUserBirthDate = ({
   showLabel,
   hideLabel,
 }: Props): JSX.Element => {
-  const [loaded, setLoaded] = useState(false);
-
   const { loading, data } = useQuery<Query, QueryReservationByPkArgs>(
     GET_BIRTHDATE_BY_RESERVATION_PK,
     {
-      skip: !loaded,
-      fetchPolicy: "no-cache",
+      skip: !reservationPk,
       variables: {
         pk: reservationPk,
       },
@@ -33,12 +30,13 @@ const ReservationUserBirthDate = ({
     return <Loader />;
   }
 
+  const user = data?.reservationByPk?.user;
+  const dateOfBirth = user?.dateOfBirth ?? undefined;
   return (
     <BirthDate
-      user={data?.reservationByPk?.user || null}
+      dateOfBirth={dateOfBirth}
       showLabel={showLabel}
       hideLabel={hideLabel}
-      onShow={() => setLoaded(true)}
     />
   );
 };

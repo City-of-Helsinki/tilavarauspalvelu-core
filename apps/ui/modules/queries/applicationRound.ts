@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const APPLICATION_ROUND_FRAGMENT = gql`
-  fragment ApplicationRoundFields on ApplicationRoundType {
+  fragment ApplicationRoundFields on ApplicationRoundNode {
     pk
     nameFi
     nameEn
@@ -26,6 +26,7 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
 `;
 
 // This is a simple variant that maps to RoundPeriod[] for time collision checks
+// TODO this should have filter params added on the backend for the status
 export const APPLICATION_ROUNDS_PERIODS = gql`
   query ApplicationRounds {
     applicationRounds {
@@ -34,6 +35,7 @@ export const APPLICATION_ROUNDS_PERIODS = gql`
           pk
           reservationPeriodBegin
           reservationPeriodEnd
+          status
         }
       }
     }

@@ -8,8 +8,8 @@ import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
 import { ReducedApplicationStatus } from "common/types/common";
 import {
-  ApplicationType,
-  ApplicationStatus,
+  ApplicationNode,
+  ApplicationStatusChoice,
   Query,
   QueryApplicationsArgs,
 } from "common/types/gql-types";
@@ -54,7 +54,7 @@ const ApplicationGroups = ({
   applications,
   actionCallback,
 }: {
-  applications: { [key: string]: ApplicationType[] };
+  applications: { [key: string]: ApplicationNode[] };
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 }) => {
   const { t } = useTranslation();
@@ -90,15 +90,13 @@ const ApplicationsPage = (): JSX.Element | null => {
     fetchPolicy: "no-cache",
     skip: !user?.pk,
     variables: {
-      user: user?.pk?.toString(),
+      applicant: user?.pk,
       status: [
-        ApplicationStatus.Draft,
-        ApplicationStatus.Sent,
-        ApplicationStatus.InReview,
-        ApplicationStatus.ReviewDone,
-        ApplicationStatus.Allocated,
-        ApplicationStatus.Handled,
-        ApplicationStatus.Received,
+        ApplicationStatusChoice.Draft,
+        ApplicationStatusChoice.ResultsSent,
+        ApplicationStatusChoice.InAllocation,
+        ApplicationStatusChoice.Handled,
+        ApplicationStatusChoice.Received,
       ],
     },
   });
@@ -106,8 +104,8 @@ const ApplicationsPage = (): JSX.Element | null => {
   const appNodes =
     appData?.applications?.edges
       ?.map((n) => n?.node)
-      .filter((n): n is ApplicationType => n != null) ?? [];
-  const applications: Dictionary<ApplicationType[]> = groupBy(appNodes, (a) =>
+      .filter((n): n is ApplicationNode => n != null) ?? [];
+  const applications: Dictionary<ApplicationNode[]> = groupBy(appNodes, (a) =>
     getReducedApplicationStatus(a?.status ?? undefined)
   );
 

@@ -1,28 +1,26 @@
 import { gql } from "@apollo/client";
+import { ApplicationStatusChoice } from "common/types/gql-types";
 
+// TODO is the status correct? and it's just a singular (the backend doesn't allow an array)
 export const APPLICATIONS_QUERY = gql`
   query getApplications(
     $offset: Int
     $first: Int
-    $applicationRound: ID
-    $unit: [ID]
+    $applicationRound: Int
+    $unit: [Int]
   ) {
     applications(
       first: $first
       offset: $offset
       unit: $unit
       applicationRound: $applicationRound
-      status: "in_review"
+      status: ${ApplicationStatusChoice.Received}
     ) {
       edges {
         node {
           pk
           status
           applicantType
-          aggregatedData {
-            appliedMinDurationTotal
-            appliedReservationsTotal
-          }
           contactPerson {
             firstName
             lastName
@@ -55,20 +53,20 @@ export const APPLICATIONS_QUERY = gql`
   }
 `;
 
-// TODO use enum instead of string for status (also rename the query if you hard code the status)
+// TODO is the status correct here? (also rename the query if you hard code the status)
 export const APPLICATIONS_EVENTS_QUERY = gql`
   query getApplicationEvents(
     $offset: Int
     $first: Int
-    $applicationRound: ID
-    $unit: [ID]
+    $applicationRound: Int
+    $unit: [Int]
   ) {
     applicationEvents(
       first: $first
       offset: $offset
       unit: $unit
       applicationRound: $applicationRound
-      applicationStatus: "in_review"
+      applicationStatus: ${ApplicationStatusChoice.Received}
     ) {
       edges {
         node {

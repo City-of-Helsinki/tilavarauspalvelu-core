@@ -6,12 +6,12 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { H2 } from "common/src/common/typography";
-import { type Query, type ApplicationRoundType } from "common/types/gql-types";
+import { type Query, type ApplicationRoundNode } from "common/types/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container } from "@/styles/layout";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import StatusRecommendation from "./StatusRecommendation";
-import ApplicationRoundStatusTag from "../ApplicationRoundStatusTag";
+import { ApplicationRoundStatusTag } from "../ApplicationRoundStatusTag";
 import TimeframeStatus from "../TimeframeStatus";
 import ApplicationDataLoader from "./ApplicationDataLoader";
 import { type Sort } from "./ApplicationsTable";
@@ -64,7 +64,7 @@ const APPLICATION_RESERVATION_UNITS_QUERY = gql`
 `;
 
 interface ReviewProps {
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
 }
 
 function Review({ applicationRound }: ReviewProps): JSX.Element | null {
@@ -113,11 +113,7 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
       <Header>
         <SpaceBetweenContainer>
           {applicationRound.status != null && (
-            <ApplicationRoundStatusTag
-              status={applicationRound.status}
-              start={new Date(applicationRound.applicationPeriodBegin)}
-              end={new Date(applicationRound.applicationPeriodEnd)}
-            />
+            <ApplicationRoundStatusTag status={applicationRound.status} />
           )}
           <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
         </SpaceBetweenContainer>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import {
-  ApplicationType,
+  ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { useFormContext } from "react-hook-form";
@@ -13,7 +13,7 @@ import { useOptions } from "@/hooks/useOptions";
 import { ApplicationFormValues } from "./Form";
 
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
   onNext: (appToSave: ApplicationFormValues) => void;
 };
 
@@ -26,7 +26,7 @@ const Page3 = ({
   application,
   type,
 }: {
-  application: ApplicationType;
+  application: ApplicationNode;
   type: ApplicationsApplicationApplicantTypeChoices;
 }): JSX.Element | null => {
   const { options } = useOptions();

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const BANNER_NOTIFICATION_COMMON = gql`
-  fragment BannerNotificationCommon on BannerNotificationType {
+  fragment BannerNotificationCommon on BannerNotificationNode {
     level
     activeFrom
     message
@@ -16,7 +16,7 @@ export const BANNER_NOTIFICATION_COMMON = gql`
 // so no draft or message*
 const BANNER_NOTIFICATION_ADMIN_FRAGMENT = gql`
   ${BANNER_NOTIFICATION_COMMON}
-  fragment BannerNotificationsAdminFragment on BannerNotificationType {
+  fragment BannerNotificationsAdminFragment on BannerNotificationNode {
     pk
     ...BannerNotificationCommon
     name

@@ -2,7 +2,7 @@ import React from "react";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import type { ApplicationType } from "common/types/gql-types";
+import type { ApplicationNode } from "common/types/gql-types";
 import { applicationErrorText } from "@/modules/util";
 import {
   FormSubHeading,
@@ -15,14 +15,14 @@ import Buttons from "./Buttons";
 import type { ApplicationFormValues } from "./Form";
 
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
 };
 
 /*
 const prepareData = (
-  application: ApplicationType,
+  application: ApplicationNode,
   data: FormValues
-): ApplicationType => {
+): ApplicationNode => {
   const applicationCopy = deepCopy(application);
 
   applicationCopy.applicantType = "individual";

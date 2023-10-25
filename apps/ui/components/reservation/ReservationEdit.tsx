@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   Query,
   QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
@@ -164,7 +164,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   const [reservationUnit, setReservationUnit] =
     useState<ReservationUnitByPkType | null>(null);
   const [activeApplicationRounds, setActiveApplicationRounds] = useState<
-    ApplicationRoundType[]
+    ApplicationRoundNode[]
   >([]);
   const [step, setStep] = useState(0);
 

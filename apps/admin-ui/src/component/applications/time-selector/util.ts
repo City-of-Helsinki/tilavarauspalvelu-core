@@ -1,5 +1,5 @@
-import { ApplicationEventScheduleType } from "common/types/gql-types";
-import { ApplicationEventSchedulePriority } from "common/types/common";
+import type { ApplicationEventScheduleNode } from "common/types/gql-types";
+import type { ApplicationEventSchedulePriority } from "common/types/common";
 
 export type Cell = {
   hour: number;
@@ -13,7 +13,7 @@ const cellLabel = (row: number): string => {
 };
 
 export const applicationEventSchedulesToCells = (
-  applicationEventSchedules: ApplicationEventScheduleType[]
+  applicationEventSchedules: ApplicationEventScheduleNode[]
 ): Cell[][] => {
   const firstSlotStart = 7;
   const lastSlotStart = 23;

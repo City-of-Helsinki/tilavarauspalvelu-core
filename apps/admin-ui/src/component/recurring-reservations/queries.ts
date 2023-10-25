@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { ApplicationStatusChoice } from "common/types/gql-types";
 
 export const APPLICATION_ROUNDS_QUERY = gql`
   query applicationRounds {
@@ -27,7 +28,7 @@ export const APPLICATION_ROUNDS_QUERY = gql`
 
 // TODO combine with APPLICATION_ROUNDS_QUERY
 export const APPLICATION_ROUD_QUERY = gql`
-  query ApplicationRoundCriteria($pk: [ID]!) {
+  query ApplicationRoundCriteria($pk: [Int]!) {
     applicationRounds(pk: $pk) {
       edges {
         node {
@@ -47,7 +48,7 @@ export const APPLICATION_ROUD_QUERY = gql`
 
 export const APPLICATIONS_QUERY = gql`
   query getApplications {
-    applications(status: "in_review") {
+    applications(status: ${ApplicationStatusChoice.Received}) {
       edges {
         node {
           pk
@@ -80,13 +81,15 @@ export const APPLICATIONS_QUERY = gql`
 `;
 
 export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
-  query getApplicationsByPk($applicationRound: ID, $status: [String]) {
+  query getApplicationsByPk($applicationRound: Int, $status: [String]) {
     applications(applicationRound: $applicationRound, status: $status) {
       edges {
         node {
           pk
           status
-          applicantName
+          applicant {
+            name
+          }
           applicantType
           contactPerson {
             firstName
@@ -125,24 +128,6 @@ export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
                 }
               }
             }
-            applicationEventSchedules {
-              pk
-              priority
-              day
-              begin
-              end
-              applicationEventScheduleResult {
-                pk
-                accepted
-                declined
-                allocatedReservationUnit {
-                  pk
-                }
-                allocatedDay
-                allocatedBegin
-                allocatedEnd
-              }
-            }
           }
         }
       }
@@ -150,6 +135,7 @@ export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
   }
 `;
 
+/* FIXME these were removed how to refactor???
 export const CREATE_APPLICATION_EVENT_SCHEDULE_RESULT = gql`
   mutation createApplicationEventScheduleResult(
     $input: ApplicationEventScheduleResultCreateMutationInput!
@@ -187,3 +173,4 @@ export const UPDATE_APPLICATION_EVENT_SCHEDULE_RESULT = gql`
     }
   }
 `;
+*/

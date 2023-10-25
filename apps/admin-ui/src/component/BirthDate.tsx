@@ -1,27 +1,25 @@
 import React, { useState } from "react";
-import { UserType } from "common/types/gql-types";
 import { formatDate } from "../common/util";
 import { HorisontalFlex } from "../styles/layout";
 
 type Props = {
-  user: UserType | null;
-  onShow: () => void;
+  dateOfBirth: string | undefined;
   showLabel: string;
   hideLabel: string;
 };
 
 export const BirthDate = ({
-  user,
-  onShow,
+  dateOfBirth,
   hideLabel,
   showLabel,
 }: Props): JSX.Element => {
-  const [visible, setVisible] = useState(!!user);
+  // default to hidden
+  const [visible, setVisible] = useState(false);
 
   return (
     <HorisontalFlex style={{ gap: "var(--spacing-2-xs)" }}>
       {visible ? (
-        <span>{user?.dateOfBirth ? formatDate(user.dateOfBirth) : "-"}</span>
+        <span>{dateOfBirth ? formatDate(dateOfBirth) : "-"}</span>
       ) : (
         <span>XX.XX.XXXX</span>
       )}
@@ -35,12 +33,7 @@ export const BirthDate = ({
           textDecoration: "underline",
         }}
         type="button"
-        onClick={() => {
-          setVisible(!visible);
-          if (!visible) {
-            onShow();
-          }
-        }}
+        onClick={() => setVisible(!visible)}
       >
         {visible ? hideLabel : showLabel}
       </button>

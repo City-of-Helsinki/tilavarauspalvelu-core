@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { Container } from "common";
 import {
-  ApplicationType,
+  ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
@@ -12,7 +12,7 @@ import Head from "./Head";
 import Stepper from "./Stepper";
 
 type ApplicationPageProps = {
-  application?: ApplicationType;
+  application?: ApplicationNode;
   translationKeyPrefix: string;
   overrideText?: string;
   children?: React.ReactNode;

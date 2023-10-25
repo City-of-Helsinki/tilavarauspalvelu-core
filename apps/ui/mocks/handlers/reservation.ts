@@ -21,7 +21,7 @@ import {
   ReservationPurposeTypeConnection,
   AgeGroupTypeConnection,
   QueryCitiesArgs,
-  CityTypeConnection,
+  CityNodeConnection,
   QueryReservationsArgs,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationUnitsReservationUnitImageImageTypeChoices,
@@ -391,7 +391,7 @@ const cities = graphql.query<Query, QueryCitiesArgs>(
               },
             },
           ],
-        } as CityTypeConnection,
+        } as CityNodeConnection,
       })
     );
   }
@@ -707,6 +707,7 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       data.reserveeAddressCity = "Helsinki";
       data.reserveeAddressZip = "00100";
       data.homeCity = {
+        municipalityCode: "",
         id: "123",
         name: "Lande",
         nameFi: "Lande FI",

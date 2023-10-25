@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import type { ApplicationType, TermsOfUseType } from "common/types/gql-types";
+import type { ApplicationNode, TermsOfUseType } from "common/types/gql-types";
 import { useOptions } from "@/hooks/useOptions";
 import { getTranslation } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
@@ -13,7 +13,7 @@ import { AccordionWithState as Accordion } from "../common/Accordion";
 import { ApplicationEventList } from "./ApplicationEventList";
 
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
   tos: TermsOfUseType[];
 };
 

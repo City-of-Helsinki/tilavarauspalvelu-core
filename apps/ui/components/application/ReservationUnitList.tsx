@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
@@ -24,7 +24,7 @@ type OptionTypes = {
 
 type Props = {
   index: number;
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
   options: OptionTypes;
   minSize?: number;
 };

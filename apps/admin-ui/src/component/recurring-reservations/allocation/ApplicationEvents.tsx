@@ -1,16 +1,14 @@
-import { sortBy } from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
 import {
-  ApplicationEventType,
-  ApplicationType,
-  ReservationUnitType,
+  ApplicationEventNode,
+  ApplicationNode,
+  ReservationUnitByPkType,
 } from "common/types/gql-types";
-import Accordion from "../../Accordion";
-import { getApplicationEventScheduleResultStatuses } from "./modules/applicationRoundAllocation";
-import { AllocationApplicationEventCardType } from "../../../common/types";
+import Accordion from "@/component/Accordion";
+import { AllocationApplicationEventCardType } from "@/common/types";
 import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";
 import ApplicationEventCard from "./ApplicationEventCard";
@@ -57,13 +55,13 @@ const EventGroupList = ({
   reservationUnit,
   type,
 }: {
-  applicationEvents: ApplicationEventType[];
-  selectedApplicationEvent?: ApplicationEventType;
+  applicationEvents: ApplicationEventNode[];
+  selectedApplicationEvent?: ApplicationEventNode;
   setSelectedApplicationEvent: (
-    applicationEvent?: ApplicationEventType
+    applicationEvent?: ApplicationEventNode
   ) => void;
-  applications: ApplicationType[];
-  reservationUnit: ReservationUnitType;
+  applications: ApplicationNode[];
+  reservationUnit: ReservationUnitByPkType;
   type: AllocationApplicationEventCardType;
 }): JSX.Element => {
   if (applicationEvents.length < 1) {
@@ -89,11 +87,12 @@ const EventGroupList = ({
 };
 
 type ApplicationEventsProps = {
-  applications: ApplicationType[];
-  applicationEvents: ApplicationEventType[] | null;
-  reservationUnit: ReservationUnitType;
+  applications: ApplicationNode[];
+  applicationEvents: ApplicationEventNode[] | null;
+  reservationUnit: ReservationUnitByPkType;
 };
 
+/// TODO what is this doing? when is it shown and what does it look like?
 function ApplicationEvents({
   applications,
   applicationEvents,
@@ -104,10 +103,10 @@ function ApplicationEvents({
   const [isSelecting, setIsSelecting] = useState(false);
   const [selection, setSelection] = useState<string[]>([]);
   const [selectedApplicationEvent, setSelectedApplicationEvent] = useState<
-    ApplicationEventType | undefined
+    ApplicationEventNode | undefined
   >(undefined);
   const [paintedApplicationEvents, setPaintedApplicationEvents] = useState<
-    ApplicationEventType[]
+    ApplicationEventNode[]
   >([]);
 
   useEffect(
@@ -119,7 +118,8 @@ function ApplicationEvents({
 
   useEffect(() => setSelection([]), [reservationUnit]);
 
-  const allocatedApplicationEvents = sortBy(
+  const allocatedApplicationEvents: ApplicationEventNode[] =
+    []; /* FIXME sortBy(
     applicationEvents?.filter((applicationEvent) =>
       applicationEvent?.applicationEventSchedules?.some(
         (applicationEventSchedule) =>
@@ -128,9 +128,11 @@ function ApplicationEvents({
       )
     ),
     "name"
-  );
+  ); */
 
   // explicitly declined application events and those that are blocked from current reservation unit
+  const declinedApplicationEvents: ApplicationEventNode[] = [];
+  /* FIXME
   const declinedApplicationEvents = sortBy(
     applicationEvents?.filter((applicationEvent) =>
       applicationEvent?.applicationEventSchedules?.some(
@@ -141,8 +143,11 @@ function ApplicationEvents({
     ),
     "name"
   );
+  */
 
   // take certain states and omit colliding application events
+  const unallocatedApplicationEvents: ApplicationEventNode[] = [];
+  /*
   const unallocatedApplicationEvents = sortBy(
     applicationEvents?.filter((applicationEvent) =>
       applicationEvent?.applicationEventSchedules?.some(
@@ -156,13 +161,16 @@ function ApplicationEvents({
     ),
     "name"
   );
+  */
 
-  const applicationEventScheduleResultStatuses = useMemo(
-    () => getApplicationEventScheduleResultStatuses(applicationEvents),
-    [applicationEvents]
-  );
+  // FIXME
+  const applicationEventScheduleResultStatuses = {
+    acceptedSlots: [],
+    declinedSlots: [],
+  };
+  // const applicationEventScheduleResultStatuses = getApplicationEventScheduleResultStatuses(applicationEvents)
 
-  const paintApplicationEvents = (appEvents: ApplicationEventType[]) => {
+  const paintApplicationEvents = (appEvents: ApplicationEventNode[]) => {
     setPaintedApplicationEvents(appEvents);
   };
 
@@ -233,4 +241,4 @@ function ApplicationEvents({
   );
 }
 
-export default ApplicationEvents;
+export { ApplicationEvents };

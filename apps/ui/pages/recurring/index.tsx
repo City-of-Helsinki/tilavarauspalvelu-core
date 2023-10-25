@@ -7,7 +7,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   Query,
   QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
@@ -20,7 +20,7 @@ import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 
 type Props = {
-  applicationRounds: ApplicationRoundType[];
+  applicationRounds: ApplicationRoundNode[];
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

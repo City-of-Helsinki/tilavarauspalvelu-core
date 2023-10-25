@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { sortBy } from "lodash";
 import { fontRegular } from "common/src/common/typography";
-import { EventReservationUnitType } from "common/types/gql-types";
+import { EventReservationUnitNode } from "common/types/gql-types";
 import { getTranslation } from "common/src/common/util";
 
 const UnitListWrapper = styled.ol`
@@ -20,7 +20,7 @@ const UnitName = styled.li`
   gap: var(--spacing-xl);
 `;
 
-const UnitList = ({ units }: { units: EventReservationUnitType[] }) => {
+const UnitList = ({ units }: { units: EventReservationUnitNode[] }) => {
   const elems = sortBy(units, "priority");
   return (
     <UnitListWrapper>

@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import type {
-  ApplicationEventScheduleType,
-  ApplicationType,
+  ApplicationEventScheduleNode,
+  ApplicationNode,
 } from "common/types/gql-types";
 import { useFormContext } from "react-hook-form";
 import { MediumButton } from "@/styles/util";
@@ -21,7 +21,7 @@ import type {
 } from "./Form";
 
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
   onNext: (appToSave: ApplicationFormValues) => void;
 };
 
@@ -102,10 +102,12 @@ type Cell = {
   key: string;
 };
 
+// TODO the return type is not good (it's gql type, but it doesn't really match the data)
+// better to use a custom type here and convert it when sending / receiving from backend
 const cellsToApplicationEventSchedules = (
   cells: Cell[][]
-): ApplicationEventScheduleType[] => {
-  const daySchedules: ApplicationEventScheduleType[] = [];
+): ApplicationEventScheduleNode[] => {
+  const daySchedules: ApplicationEventScheduleNode[] = [];
   for (let day = 0; day < cells.length; day += 1) {
     const dayCells = cells[day];
     dayCells
@@ -140,7 +142,8 @@ const cellsToApplicationEventSchedules = (
           begin: `${formatNumber(cell.begin)}:00`,
           end: `${formatNumber(cell.end)}:00`,
           id: "",
-          priority: cell.priority,
+          priority: cell.priority as number,
+          declined: false,
         };
       })
       .forEach((e) => daySchedules.push(e));

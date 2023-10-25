@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import { ApplicationType } from "common/types/gql-types";
+import { ApplicationNode } from "common/types/gql-types";
 import { applicationErrorText } from "@/modules/util";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
@@ -22,7 +22,7 @@ export const Placeholder = styled.span`
 `;
 
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
   homeCityOptions: OptionType[];
 };
 

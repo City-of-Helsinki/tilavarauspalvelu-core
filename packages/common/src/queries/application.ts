@@ -4,14 +4,17 @@ import { gql } from "@apollo/client";
 // a lot of things like name translations are only needed in the client side (not admin)
 // also a lot of the deep hierarchy is only needed in the client side
 export const APPLICATION_QUERY = gql`
-  query getApplications($pk: [ID]) {
+  query getApplications($pk: [Int]) {
     applications(pk: $pk) {
       edges {
         node {
           pk
           status
           applicantType
-          applicantEmail
+          applicant {
+            name
+            email
+          }
           applicationRound {
             pk
             nameFi
@@ -19,7 +22,7 @@ export const APPLICATION_QUERY = gql`
               pk
               nameFi
             }
-             reservationUnits {
+            reservationUnits {
               pk
               nameFi
               nameSv
@@ -75,10 +78,6 @@ export const APPLICATION_QUERY = gql`
             postCode
             streetAddress
             city
-          }
-          aggregatedData {
-            appliedMinDurationTotal
-            appliedReservationsTotal
           }
           applicationEvents {
             pk

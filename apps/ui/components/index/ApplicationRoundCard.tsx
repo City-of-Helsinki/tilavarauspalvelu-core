@@ -7,7 +7,7 @@ import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
-import { ApplicationRoundType } from "common/types/gql-types";
+import { ApplicationRoundNode } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
 import Card from "../common/Card";
 import { applicationRoundState, searchUrl } from "../../modules/util";
@@ -15,7 +15,7 @@ import { MediumButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 
 interface Props {
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Strong } from "common/src/common/typography";
 import {
-  ApplicationEventType,
-  ApplicationType,
-  ReservationUnitType,
+  ApplicationEventNode,
+  ApplicationNode,
+  ReservationUnitByPkType,
 } from "common/types/gql-types";
 import { applicantName as getApplicantName } from "@/component/applications/util";
 import { publicUrl } from "../../../common/const";
@@ -16,11 +16,11 @@ import { ageGroup } from "../../reservations/requested/util";
 import { getApplicationByApplicationEvent } from "./modules/applicationRoundAllocation";
 
 type Props = {
-  applicationEvent: ApplicationEventType;
-  selectedApplicationEvent?: ApplicationEventType;
-  setSelectedApplicationEvent: (val?: ApplicationEventType) => void;
-  applications: ApplicationType[];
-  reservationUnit: ReservationUnitType;
+  applicationEvent: ApplicationEventNode;
+  selectedApplicationEvent?: ApplicationEventNode;
+  setSelectedApplicationEvent: (val?: ApplicationEventNode) => void;
+  applications: ApplicationNode[];
+  reservationUnit: ReservationUnitByPkType;
   type: AllocationApplicationEventCardType;
 };
 

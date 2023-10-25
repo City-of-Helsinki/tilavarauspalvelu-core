@@ -4,7 +4,7 @@ import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   Query,
   QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
@@ -19,7 +19,7 @@ import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 
 type Props = {
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

@@ -10,20 +10,20 @@ import {
   getTranslation,
 } from "common/src/common/util";
 import {
-  LocalizationLanguages,
-  OptionType,
-  Parameter,
-  TranslationObject,
-  ReservationUnit,
+  type LocalizationLanguages,
+  type OptionType,
+  type Parameter,
+  type TranslationObject,
+  type ReservationUnit,
   Image,
   ReducedApplicationStatus,
-  StringParameter,
+  type StringParameter,
 } from "common/types/common";
 import {
-  ReservationUnitImageType,
-  ReservationUnitType,
-  ApplicationStatus,
-  ReservationUnitByPkType,
+  type ReservationUnitImageType,
+  type ReservationUnitType,
+  ApplicationStatusChoice,
+  type ReservationUnitByPkType,
 } from "common/types/gql-types";
 import {
   searchPrefix,
@@ -305,17 +305,20 @@ export const applicationErrorText = (
   attrs: { [key: string]: string | number } = {}
 ): string => (key ? t(`application:error.${key}`, attrs) : "");
 
+/// @deprecated TODO: remove this (it makes no sense anymore with the changes to the statuses)
 export const getReducedApplicationStatus = (
-  status?: ApplicationStatus
+  status?: ApplicationStatusChoice
 ): ReducedApplicationStatus | null => {
   switch (status) {
-    case "in_review":
-    case "review_done":
-    case "allocated":
+    case ApplicationStatusChoice.InAllocation:
+    case ApplicationStatusChoice.ResultsSent:
+    case ApplicationStatusChoice.Handled:
       return "processing";
-    case "draft":
+    case ApplicationStatusChoice.Cancelled:
+    case ApplicationStatusChoice.Expired:
+    case ApplicationStatusChoice.Draft:
       return "draft";
-    case "sent":
+    case ApplicationStatusChoice.Received:
       return "sent";
     default:
       return null;

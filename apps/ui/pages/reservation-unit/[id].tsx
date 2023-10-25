@@ -37,8 +37,7 @@ import classNames from "classnames";
 import ClientOnly from "common/src/ClientOnly";
 import { PendingReservation, Reservation } from "common/types/common";
 import {
-  ApplicationRoundStatus,
-  ApplicationRoundType,
+  ApplicationRoundStatusChoice,
   Query,
   QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
@@ -57,6 +56,7 @@ import {
   TermsOfUseType,
 } from "common/types/gql-types";
 
+import { filterNonNullable } from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
 import Address from "../../components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";
@@ -141,24 +141,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { params, query, locale } = ctx;
   const id = Number(params?.id);
   const uuid = query.ru;
-  const today = toApiDate(new Date());
+  const today = new Date();
   const apolloClient = createApolloClient(ctx);
 
   let relatedReservationUnits = [] as ReservationUnitType[];
 
+  // TODO does this return only possible rounds or do we need to do frontend filtering on them?
   const { data } = await apolloClient.query<Query>({
     query: APPLICATION_ROUNDS_PERIODS,
   });
-  const activeApplicationRounds = data?.applicationRounds?.edges
-    ?.map((e) => e?.node)
-    .filter((n): n is ApplicationRoundType => n != null)
-    .filter(
-      (n) =>
-        today &&
-        n?.status !== ApplicationRoundStatus.Archived &&
-        n.publicDisplayBegin <= today &&
-        n.publicDisplayEnd >= today
-    )
+  const activeApplicationRounds = filterNonNullable(
+    data?.applicationRounds?.edges?.map((e) => e?.node)
+  )
+    .filter((n) => n.status === ApplicationRoundStatusChoice.Open)
     .filter((n) => n?.reservationUnits?.find((x) => x?.pk === id));
 
   if (id) {
@@ -216,9 +211,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       fetchPolicy: "no-cache",
       variables: {
         pk: id,
-        startDate: today,
+        startDate: toApiDate(today),
         // endDate: lastOpeningPeriodEndDate,
-        from: today,
+        from: toApiDate(today),
         // to: lastOpeningPeriodEndDate,
         state: allowedReservationStates,
         includeWithSameComponents: true,

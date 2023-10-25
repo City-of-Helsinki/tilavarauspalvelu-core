@@ -1,7 +1,7 @@
 import { Tag } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ApplicationRoundStatus } from "common/types/gql-types";
+import { ApplicationRoundStatusChoice } from "common/types/gql-types";
 
 type RoundStatus = {
   color: string;
@@ -10,49 +10,34 @@ type RoundStatus = {
 };
 
 export const getApplicationRoundStatus = (
-  status: ApplicationRoundStatus | undefined,
-  start: Date,
-  end: Date
+  status: ApplicationRoundStatusChoice | undefined
 ): RoundStatus => {
-  const cutOffDate = new Date();
-
   switch (status) {
-    case ApplicationRoundStatus.InReview:
+    case ApplicationRoundStatusChoice.Open:
       return {
         group: "g1",
         color: "var(--color-gold-medium-light)",
         label: "review",
       };
-    case ApplicationRoundStatus.ReviewDone:
-    case ApplicationRoundStatus.Allocated:
+    case ApplicationRoundStatusChoice.InAllocation:
       return {
         group: "g1",
         color: "var(--color-info-light)",
         label: "handling",
       };
-    case ApplicationRoundStatus.Handled:
-      return { group: "g2", color: "var(--color-bus-light)", label: "handled" };
-    case ApplicationRoundStatus.Draft: {
-      if (cutOffDate < start) {
-        return {
-          group: "g4",
-          color: "var(--color-engel-light)",
-          label: "upcoming",
-        };
-      }
-
-      if (cutOffDate > end) {
-        return {
-          group: "g1",
-          color: "var(--color-info-light)",
-          label: "handling",
-        };
-      }
-
-      return { group: "g3", color: "var(--color-brick-light)", label: "open" };
-    }
-    case ApplicationRoundStatus.Sent:
-      return { group: "g5", color: "var(--color-black-05)", label: "sent" };
+    case ApplicationRoundStatusChoice.Handled:
+    case ApplicationRoundStatusChoice.ResultsSent:
+      return {
+        group: "g2",
+        color: "var(--color-bus-light)",
+        label: "handled",
+      };
+    case ApplicationRoundStatusChoice.Upcoming:
+      return {
+        group: "g4",
+        color: "var(--color-engel-light)",
+        label: "upcoming",
+      };
     default:
       return {
         group: "g5",
@@ -62,21 +47,17 @@ export const getApplicationRoundStatus = (
   }
 };
 
-function ApplicationRoundStatusTag({
+export function ApplicationRoundStatusTag({
   status,
-  start,
-  end,
 }: {
-  status: ApplicationRoundStatus;
-  start: Date;
-  end: Date;
+  status: ApplicationRoundStatusChoice;
 }): JSX.Element {
   const { t } = useTranslation();
   if (!status) {
     return <Tag>{t("ApplicationRound.statuses.unknown")}</Tag>;
   }
 
-  const convertedStatus = getApplicationRoundStatus(status, start, end);
+  const convertedStatus = getApplicationRoundStatus(status);
   return (
     <Tag
       theme={{
@@ -87,5 +68,3 @@ function ApplicationRoundStatusTag({
     </Tag>
   );
 }
-
-export default ApplicationRoundStatusTag;

@@ -5,9 +5,8 @@ import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
 import {
   type Query,
-  type ApplicationRoundType,
-  type ApplicationType,
-  ApplicationEventStatus,
+  type ApplicationRoundNode,
+  type ApplicationNode,
 } from "common/types/gql-types";
 import { useFormContext } from "react-hook-form";
 import { getTranslation, mapOptions } from "@/modules/util";
@@ -20,8 +19,8 @@ import { type ApplicationFormValues } from "./Form";
 
 type Props = {
   // TODO break this down to smaller pieces (only the required props)
-  applicationRound: ApplicationRoundType;
-  application: ApplicationType;
+  applicationRound: ApplicationRoundNode;
+  application: ApplicationNode;
   onNext: (formValues: ApplicationFormValues) => void;
 };
 
@@ -153,13 +152,8 @@ const Page1 = ({
     register(`applicationEvents.${nextIndex}.begin`);
     register(`applicationEvents.${nextIndex}.end`);
     register(`applicationEvents.${nextIndex}.applicationEventSchedules`);
-    register(`applicationEvents.${nextIndex}.status`);
     register(`applicationEvents.${nextIndex}.reservationUnits`);
     setValue(`applicationEvents.${nextIndex}.reservationUnits`, []);
-    setValue(
-      `applicationEvents.${nextIndex}.status`,
-      ApplicationEventStatus.Created
-    );
     setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, []);
     setValue(`applicationEvents.${nextIndex}.pk`, undefined);
     setValue(`applicationEvents.${nextIndex}.name`, "");

@@ -1,12 +1,10 @@
 import { filterNonNullable } from "common/src/helpers";
 import {
-  type ApplicationEventType,
-  ApplicationEventStatus,
-  type OrganisationType,
-  type AddressType,
-  type PersonType,
-  ApplicationStatus,
-  ApplicationsApplicationApplicantTypeChoices,
+  Applicant_Type,
+  type ApplicationEventNode,
+  type AddressNode,
+  type PersonNode,
+  type OrganisationNode,
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -59,13 +57,6 @@ const ApplicationEventFormValueSchema = z.object({
     .optional()
     .refine((s) => s, { path: [""], message: "Required" }),
   applicationEventSchedules: z.array(ApplicationEventScheduleFormTypeSchema),
-  status: z.enum([
-    ApplicationEventStatus.Created,
-    ApplicationEventStatus.Failed,
-    ApplicationEventStatus.Approved,
-    ApplicationEventStatus.Declined,
-    ApplicationEventStatus.Reserved,
-  ]),
   reservationUnits: z.array(z.number()).min(1),
 });
 
@@ -74,7 +65,7 @@ export type ApplicationEventFormValue = z.infer<
 >;
 
 export const transformApplicationEventToForm = (
-  applicationEvent: ApplicationEventType
+  applicationEvent: ApplicationEventNode
 ): ApplicationEventFormValue => ({
   pk: applicationEvent.pk ?? undefined,
   name: applicationEvent.name,
@@ -99,7 +90,6 @@ export const transformApplicationEventToForm = (
     end: aes.end ?? "",
     priority: aes.priority === 200 || aes.priority === 300 ? aes.priority : 100,
   })),
-  status: applicationEvent.status ?? ApplicationEventStatus.Created,
   // TODO remove the format hacks
   begin:
     applicationEvent?.begin != null && applicationEvent?.begin?.includes("-")
@@ -141,7 +131,7 @@ export const PersonFormValuesSchema = z.object({
 });
 export type PersonFormValues = z.infer<typeof PersonFormValuesSchema>;
 
-export const convertPerson = (p: Maybe<PersonType>): PersonFormValues => ({
+export const convertPerson = (p: Maybe<PersonNode>): PersonFormValues => ({
   pk: p?.pk ?? undefined,
   firstName: p?.firstName ?? "",
   lastName: p?.lastName ?? "",
@@ -149,7 +139,8 @@ export const convertPerson = (p: Maybe<PersonType>): PersonFormValues => ({
   phoneNumber: p?.phoneNumber ?? "",
 });
 
-export const convertAddress = (a: Maybe<AddressType>): AddressFormValue => ({
+// TODO are these converters the wrong way around? (not input, but output)
+export const convertAddress = (a: Maybe<AddressNode>): AddressFormValue => ({
   pk: a?.pk ?? undefined,
   streetAddress: a?.streetAddress ?? "",
   city: a?.city ?? "",
@@ -157,7 +148,7 @@ export const convertAddress = (a: Maybe<AddressType>): AddressFormValue => ({
 });
 
 export const convertOrganisation = (
-  o: Maybe<OrganisationType>
+  o: Maybe<OrganisationNode>
 ): OrganisationFormValues => ({
   pk: o?.pk ?? undefined,
   name: o?.name ?? "",
@@ -171,25 +162,12 @@ export const ApplicationFormSchema = z.object({
   pk: z.number().optional(),
   applicantType: z
     .enum([
-      ApplicationsApplicationApplicantTypeChoices.Individual,
-      ApplicationsApplicationApplicantTypeChoices.Company,
-      ApplicationsApplicationApplicantTypeChoices.Association,
-      ApplicationsApplicationApplicantTypeChoices.Community,
+      Applicant_Type.Individual,
+      Applicant_Type.Company,
+      Applicant_Type.Association,
+      Applicant_Type.Community,
     ])
     .optional(),
-  // TODO these (status and round) needs to be hidden fields
-  // status is changed on the final page
-  status: z.enum([
-    ApplicationStatus.Expired,
-    ApplicationStatus.Handled,
-    ApplicationStatus.Draft,
-    ApplicationStatus.Sent,
-    ApplicationStatus.Cancelled,
-    ApplicationStatus.InReview,
-    ApplicationStatus.Received,
-    ApplicationStatus.ReviewDone,
-    ApplicationStatus.Allocated,
-  ]),
   // TODO remove id (also does this need to be sent?)
   applicationRoundId: z.number(),
   applicationEvents: z

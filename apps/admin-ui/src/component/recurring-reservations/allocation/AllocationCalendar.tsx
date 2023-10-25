@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import { Strongish } from "common/src/common/typography";
 import {
-  ApplicationEventScheduleType,
-  ApplicationEventType,
+  ApplicationEventScheduleNode,
+  ApplicationEventNode,
 } from "common/types/gql-types";
 import { ALLOCATION_CALENDAR_TIMES, weekdays } from "../../../common/const";
 import {
@@ -22,9 +22,9 @@ import {
 } from "./modules/applicationRoundAllocation";
 
 type Props = {
-  applicationEvents: ApplicationEventType[] | null;
-  selectedApplicationEvent?: ApplicationEventType;
-  paintApplicationEvents: (val: ApplicationEventType[]) => void;
+  applicationEvents: ApplicationEventNode[] | null;
+  selectedApplicationEvent?: ApplicationEventNode;
+  paintApplicationEvents: (val: ApplicationEventNode[]) => void;
   selection: string[];
   setSelection: (val: string[]) => void;
   isSelecting: boolean;
@@ -169,7 +169,7 @@ const AllocationCalendar = ({
   const activeSlots = useMemo(
     () =>
       getTimeSlots(
-        selectedApplicationEvent?.applicationEventSchedules as ApplicationEventScheduleType[]
+        selectedApplicationEvent?.applicationEventSchedules as ApplicationEventScheduleNode[]
       ),
     [selectedApplicationEvent?.applicationEventSchedules]
   );

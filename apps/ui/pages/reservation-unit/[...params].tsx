@@ -13,7 +13,7 @@ import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
   AgeGroupType,
-  CityType,
+  CityNode,
   Query,
   QueryAgeGroupsArgs,
   QueryCitiesArgs,
@@ -81,7 +81,7 @@ type Props = {
   reservationUnit: ReservationUnitType;
   reservationPurposes: ReservationPurposeType[];
   ageGroups: AgeGroupType[];
-  cities: CityType[];
+  cities: CityNode[];
   termsOfUse: Record<string, TermsOfUseType>;
 };
 

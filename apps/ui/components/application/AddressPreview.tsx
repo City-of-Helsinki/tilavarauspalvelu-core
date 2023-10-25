@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { AddressType } from "common/types/gql-types";
+import { AddressNode } from "common/types/gql-types";
 import { SpanTwoColumns } from "../common/common";
 import LabelValue from "../common/LabelValue";
 
@@ -11,7 +11,7 @@ const Address = ({
   address,
   i18nMessagePrefix,
 }: {
-  address: AddressType | undefined;
+  address: AddressNode | undefined;
   i18nMessagePrefix: string;
 }): JSX.Element | null => {
   const { t } = useTranslation();

@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
 import {
-  ApplicationType,
+  ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
@@ -16,7 +16,7 @@ const ApplicantInfoPreview = ({
   application,
   cities,
 }: {
-  application: ApplicationType;
+  application: ApplicationNode;
   cities: OptionType[];
 }): JSX.Element => {
   const { t } = useTranslation();

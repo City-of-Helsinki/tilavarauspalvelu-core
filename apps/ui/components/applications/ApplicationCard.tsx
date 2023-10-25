@@ -14,8 +14,8 @@ import { gql, useMutation } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import type {
   Mutation,
-  ApplicationType,
-  MutationUpdateApplicationArgs,
+  ApplicationNode,
+  MutationCancelApplicationArgs,
 } from "common/types/gql-types";
 import {
   isActive,
@@ -43,24 +43,17 @@ const Card = styled(HdsCard)`
   }
 `;
 
-const Tag = styled(HdsTag)`
+const Tag = styled(HdsTag)<{ $style: "normal" | "yellow" | "green" }>`
   && {
-    color: var(--color-white);
-    background-color: var(--tilavaraus-blue);
+    color: ${({ $style }) =>
+      $style === "yellow" ? "var(--color-black)" : "var(--color-white)"};
+    background-color: ${({ $style }) =>
+      $style === "green"
+        ? "var(--tilavaraus-green)"
+        : $style === "yellow"
+        ? "var(--tilavaraus-yellow)"
+        : "var(--tilavaraus-blue)"};
     font-family: var(--font-regular);
-  }
-`;
-
-const GreenTag = styled(Tag)`
-  && {
-    background-color: var(--tilavaraus-green);
-  }
-`;
-
-const YellowTag = styled(Tag)`
-  && {
-    background-color: var(--tilavaraus-yellow);
-    color: var(--color-black);
   }
 `;
 
@@ -137,12 +130,12 @@ const StyledButton = styled(BlackButton).attrs({
   }
 `;
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
   // TODO refactor the action callback (it's not a good idea in general, but especially error callback)
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-const getApplicant = (application: ApplicationType, t: TFunction): string => {
+const getApplicant = (application: ApplicationNode, t: TFunction): string => {
   if (application.organisation) {
     return t("applicationCard:organisation", {
       type: t(
@@ -159,8 +152,8 @@ const getApplicant = (application: ApplicationType, t: TFunction): string => {
 };
 
 const CANCEL_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationUpdateMutationInput!) {
-    updateApplication(input: $input) {
+  mutation ($input: ApplicationCancelMutationInput!) {
+    cancelApplication(input: $input) {
       errors {
         messages
       }
@@ -178,12 +171,11 @@ const ApplicationCard = ({
 
   const [mutation, { loading: isLoading }] = useMutation<
     Mutation,
-    MutationUpdateApplicationArgs
+    MutationCancelApplicationArgs
   >(CANCEL_APPLICATION_MUTATION, {
     variables: {
       input: {
         pk: application.pk ?? 0,
-        status: "cancelled",
       },
     },
     onCompleted: () => {
@@ -208,18 +200,19 @@ const ApplicationCard = ({
     application.status ?? undefined
   );
 
-  let C = Tag;
-  if (reducedApplicationStatus === "draft") {
-    C = YellowTag;
-  }
-  if (reducedApplicationStatus === "sent") {
-    C = GreenTag;
-  }
+  const style =
+    reducedApplicationStatus === "draft"
+      ? "yellow"
+      : reducedApplicationStatus === "sent"
+      ? "green"
+      : "normal";
 
   return (
     <Card border key={application.pk} data-testid="applications__card--wrapper">
       <div>
-        <C>{t(`applicationCard:status.${reducedApplicationStatus}`)}</C>
+        <Tag $style={style}>
+          {t(`applicationCard:status.${reducedApplicationStatus}`)}
+        </Tag>
         <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
         <Applicant>
           {application.applicantType !== null

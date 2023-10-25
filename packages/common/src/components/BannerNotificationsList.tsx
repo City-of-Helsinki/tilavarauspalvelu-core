@@ -8,11 +8,11 @@ import NotificationWrapper from "./NotificationWrapper";
 import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
 import {
-  type BannerNotificationType,
+  type BannerNotificationNode,
   type Query,
   type QueryBannerNotificationsArgs,
   type CommonBannerNotificationTargetChoices,
-  type BannerNotificationTypeConnection,
+  type BannerNotificationNodeConnection,
   type Maybe,
 } from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
@@ -24,7 +24,7 @@ type BannerNotificationListProps = {
 };
 
 type BannerNotificationItemProps = {
-  notification: BannerNotificationType;
+  notification: BannerNotificationNode;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   closedArray: string[];
   centered?: boolean;
@@ -134,11 +134,11 @@ const BannerNotificationsList = ({
   const notificationsTarget = notificationData?.bannerNotifications;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dirty way to deal with gql alias
   const notificationsAll = (notificationData as any)
-    ?.bannerNotificationsAll as Maybe<BannerNotificationTypeConnection>;
+    ?.bannerNotificationsAll as Maybe<BannerNotificationNodeConnection>;
   const notificationsList =
     [...(notificationsAll?.edges ?? []), ...(notificationsTarget?.edges ?? [])]
       .map((edge) => edge?.node)
-      .filter((x): x is BannerNotificationType => x != null) ?? [];
+      .filter((x): x is BannerNotificationNode => x != null) ?? [];
 
   const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
     string[]

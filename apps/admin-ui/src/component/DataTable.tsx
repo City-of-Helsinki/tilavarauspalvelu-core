@@ -23,13 +23,18 @@ import classNames from "classnames";
 import { breakpoints } from "common/src/common/style";
 import FilterControls from "./FilterControls";
 import { DataFilterConfig, DataFilterOption } from "../common/types";
-import { SelectionCheckbox, getGridFraction } from "../styles/util";
+import { SelectionCheckbox } from "../styles/util";
 import IconOpenAll from "../images/icon_open-all.svg";
 import IconActivateSelection from "../images/icon_select.svg";
 import IconDisableSelection from "../images/icon_unselect.svg";
 import { truncatedText } from "../styles/typography";
 import { filterData } from "../common/util";
 import FilterContainer, { FilterBtn } from "./FilterContainer";
+
+const getGridFraction = (space: number, columns = 12): number => {
+  const fraction = (space / columns) * 100;
+  return fraction > 0 ? fraction : 0;
+};
 
 export type OrderTypes = "asc" | "desc";
 

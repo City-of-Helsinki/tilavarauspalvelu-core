@@ -3,15 +3,17 @@ import { APPLICATION_ROUND_FRAGMENT } from "./applicationRound";
 
 export const APPLICATIONS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
-  query Applications($user: ID, $status: [String]) {
-    applications(user: $user, status: $status) {
+  query Applications($applicant: Int, $status: [ApplicationStatusChoice]) {
+    applications(applicant: $applicant, status: $status) {
       edges {
         node {
           pk
           applicationRound {
             ...ApplicationRoundFields
           }
-          applicantName
+          applicant {
+            name
+          }
           status
           applicantType
           contactPerson {
@@ -33,6 +35,7 @@ export const APPLICATIONS = gql`
 export const CREATE_APPLICATION_MUTATION = gql`
   mutation ($input: ApplicationCreateMutationInput!) {
     createApplication(input: $input) {
+      pk
       errors {
         messages
       }

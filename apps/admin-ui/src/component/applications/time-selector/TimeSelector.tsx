@@ -3,8 +3,8 @@ import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationEventType,
-  ApplicationEventScheduleType,
+  ApplicationEventNode,
+  ApplicationEventScheduleNode,
 } from "common/types/gql-types";
 import { weekdays } from "../../../common/const";
 
@@ -19,7 +19,7 @@ const cellLabel = (row: number): string => {
 };
 
 export const applicationEventSchedulesToCells = (
-  applicationEventSchedules: ApplicationEventScheduleType[]
+  applicationEventSchedules: ApplicationEventScheduleNode[]
 ): Cell[][] => {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
@@ -243,7 +243,7 @@ const LegendLabel = styled.div`
 `;
 
 type TimeSelectorProps = {
-  applicationEvent: ApplicationEventType;
+  applicationEvent: ApplicationEventNode;
 };
 const TimeSelector = ({ applicationEvent }: TimeSelectorProps): JSX.Element => {
   const schedules =

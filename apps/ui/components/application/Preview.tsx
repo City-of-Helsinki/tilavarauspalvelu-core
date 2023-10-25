@@ -3,7 +3,7 @@ import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ApplicationType, TermsOfUseType } from "common/types/gql-types";
+import { ApplicationNode, TermsOfUseType } from "common/types/gql-types";
 import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import { MediumButton } from "@/styles/util";
@@ -14,7 +14,7 @@ import { AccordionWithState as Accordion } from "../common/Accordion";
 import { ApplicationEventList } from "./ApplicationEventList";
 
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
   // This only checks that the user accepts the terms of use, no form data modifications is done here
   onNext: () => void;
   tos: TermsOfUseType[];

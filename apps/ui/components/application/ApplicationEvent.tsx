@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import { LocalizationLanguages, OptionType } from "common/types/common";
-import type { ApplicationRoundType } from "common/types/gql-types";
+import type { ApplicationRoundNode } from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
@@ -38,7 +38,7 @@ type OptionTypes = {
 
 type Props = {
   index: number;
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
   optionTypes: OptionTypes;
   isVisible: boolean;
   onToggleAccordian: () => void;

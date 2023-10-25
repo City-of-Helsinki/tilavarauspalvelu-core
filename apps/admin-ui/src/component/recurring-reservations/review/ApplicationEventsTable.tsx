@@ -3,22 +3,19 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { TFunction } from "i18next";
 import { memoize, orderBy, trim, uniqBy } from "lodash";
-import { publicUrl } from "app/common/const";
 import { IconLinkExternal } from "hds-react";
+import { differenceInWeeks } from "date-fns";
 import { fromApiDate } from "common/src/common/util";
 import {
-  type ApplicationEventType,
-  ApplicationEventStatus,
+  type ApplicationEventNode,
+  ApplicationEventStatusChoice,
 } from "common/types/gql-types";
 import { formatters as getFormatters } from "common";
+import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import StatusCell from "@/component/StatusCell";
-import {
-  appEventHours,
-  applicantName as getApplicantName,
-  numTurns,
-} from "@/component/applications/util";
+import { applicantName as getApplicantName } from "@/component/applications/util";
 import { formatNumber } from "@/common/util";
 import { CustomTable, ExternalTableLink } from "../../lists/components";
 
@@ -26,6 +23,27 @@ const formatters = getFormatters("fi");
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
+
+const numTurns = (
+  startDate: string,
+  endDate: string,
+  biWeekly: boolean,
+  eventsPerWeek: number
+): number =>
+  (differenceInWeeks(new Date(endDate), new Date(startDate)) /
+    (biWeekly ? 2 : 1)) *
+  eventsPerWeek;
+
+const appEventHours = (
+  startDate: string,
+  endDate: string,
+  biWeekly: boolean,
+  eventsPerWeek: number,
+  minDuration: number
+): number => {
+  const turns = numTurns(startDate, endDate, biWeekly, eventsPerWeek);
+  return (turns * minDuration) / 3600;
+};
 
 export type Sort = {
   field: string;
@@ -35,7 +53,7 @@ export type Sort = {
 type Props = {
   sort?: Sort;
   sortChanged: (field: string) => void;
-  applicationEvents: ApplicationEventType[];
+  applicationEvents: ApplicationEventNode[];
 };
 
 type UnitType = {
@@ -59,8 +77,27 @@ const StyledStatusCell = styled(StatusCell)`
   }
 `;
 
+const convertApplicationEventStatus = (
+  s?: ApplicationEventStatusChoice
+): "approved" | "declined" | "draft" | undefined => {
+  if (!s) {
+    return undefined;
+  }
+  switch (s) {
+    case ApplicationEventStatusChoice.Approved:
+    case ApplicationEventStatusChoice.Reserved:
+      return "approved";
+    case ApplicationEventStatusChoice.Failed:
+    case ApplicationEventStatusChoice.Declined:
+      return "declined";
+    case ApplicationEventStatusChoice.Unallocated:
+    default:
+      return "draft";
+  }
+};
+
 const appEventMapper = (
-  appEvent: ApplicationEventType
+  appEvent: ApplicationEventNode
 ): ApplicationEventView => {
   const resUnits = appEvent.eventReservationUnits?.flatMap((eru) => ({
     ...eru?.reservationUnit?.unit,
@@ -73,24 +110,6 @@ const appEventMapper = (
     }))
     .filter((unit): unit is UnitType => !!unit.pk && !!unit.name);
 
-  const convertApplicationEventStatus = (
-    s?: ApplicationEventStatus
-  ): "approved" | "declined" | "draft" | undefined => {
-    if (!s) {
-      return undefined;
-    }
-    switch (s) {
-      case ApplicationEventStatus.Approved:
-      case ApplicationEventStatus.Reserved:
-        return "approved";
-      case ApplicationEventStatus.Failed:
-      case ApplicationEventStatus.Declined:
-        return "declined";
-      case ApplicationEventStatus.Created:
-      default:
-        return "draft";
-    }
-  };
   const status = convertApplicationEventStatus(appEvent.status ?? undefined);
   const name = appEvent.name || "-";
 

@@ -3,15 +3,15 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Card, IconArrowRight, IconCalendar } from "hds-react";
-import { ApplicationRoundType } from "common/types/gql-types";
+import { ApplicationRoundNode } from "common/types/gql-types";
 import { breakpoints } from "common/src/common/style";
 import { formatDate } from "../../common/util";
 import { applicationRoundUrl } from "../../common/urls";
-import ApplicationRoundStatusTag from "./ApplicationRoundStatusTag";
+import { ApplicationRoundStatusTag } from "./ApplicationRoundStatusTag";
 import TimeframeStatus from "./TimeframeStatus";
 
 interface IProps {
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
 }
 
 const Layout = styled.div`
@@ -142,11 +142,7 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
         </Times>
         <StatusTagContainer>
           {applicationRound.status != null && (
-            <ApplicationRoundStatusTag
-              status={applicationRound.status}
-              start={new Date(applicationRound.applicationPeriodBegin)}
-              end={new Date(applicationRound.applicationPeriodEnd)}
-            />
+            <ApplicationRoundStatusTag status={applicationRound.status} />
           )}
         </StatusTagContainer>
         <BottomContainer>

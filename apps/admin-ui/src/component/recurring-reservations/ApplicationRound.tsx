@@ -11,7 +11,7 @@ import Review from "./review/Review";
 
 // TODO pick the fields we need
 const APPLICATION_ROUD_QUERY = gql`
-  query ApplicationRoundCriteria($pk: [ID]!) {
+  query ApplicationRoundCriteria($pk: [Int]!) {
     applicationRounds(pk: $pk) {
       edges {
         node {

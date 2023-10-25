@@ -9,7 +9,7 @@ import { breakpoints } from "common/src/common/style";
 import { parseDate } from "common/src/common/util";
 import { PendingReservation, Reservation } from "common/types/common";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   ReservationType,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
@@ -46,7 +46,7 @@ type Props = {
   setInitialReservation: React.Dispatch<
     React.SetStateAction<PendingReservation | null>
   >;
-  activeApplicationRounds: ApplicationRoundType[];
+  activeApplicationRounds: ApplicationRoundNode[];
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };

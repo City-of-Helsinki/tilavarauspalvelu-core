@@ -1,13 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { ApplicationRoundStatus } from "common/types/gql-types";
+import { ApplicationRoundStatusChoice } from "common/types/gql-types";
 import { useModal } from "@/context/ModalContext";
 import InfoBubble from "./InfoBubble";
 import StageInfo from "./StageInfo";
 
 interface IProps {
-  status: ApplicationRoundStatus;
+  status: ApplicationRoundStatusChoice;
   name: string;
   reservationPeriodEnd: string;
   className?: string;
@@ -32,36 +32,40 @@ function StatusRecommendation({
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  let activeState: number;
-  let modal = true;
+  // FIXME this changes some status styling with 1 - 7 values
+  // it should be an enum / literal and the states are completely changed from old REST API
+  // we can push the GQL status enum directly to the component
+  const activeState = 1;
+  const modal = true;
+  /*
   switch (status) {
-    case ApplicationRoundStatus.Draft:
+    case ApplicationRoundStatusChoice.Draft:
       activeState = 1;
       break;
-    case ApplicationRoundStatus.InReview:
+    case ApplicationRoundStatusChoice.InReview:
       activeState = 2;
       break;
-    case ApplicationRoundStatus.ReviewDone:
-    case "review_done":
+    case ApplicationRoundStatusChoice.ReviewDone:
       activeState = 3;
       break;
-    case ApplicationRoundStatus.Allocated:
+    case ApplicationRoundStatusChoice.Allocated:
       activeState = 4;
       break;
-    case ApplicationRoundStatus.Reserving:
+    case ApplicationRoundStatusChoice.Reserving:
       activeState = 5;
       break;
-    case ApplicationRoundStatus.Handled:
-    case ApplicationRoundStatus.Sending:
+    case ApplicationRoundStatusChoice.Handled:
+    case ApplicationRoundStatusChoice.Sending:
       activeState = 6;
       break;
-    case ApplicationRoundStatus.Sent:
-    case ApplicationRoundStatus.Archived:
+    case ApplicationRoundStatusChoice.Sent:
+    case ApplicationRoundStatusChoice.Archived:
       activeState = 7;
       modal = false;
       break;
     default:
   }
+  */
 
   return (
     <Wrapper className={className}>

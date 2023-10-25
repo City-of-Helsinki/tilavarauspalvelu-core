@@ -10,7 +10,7 @@ import {
 } from "common/types/gql-types";
 
 export const reservationUnitSearchHandlers = [
-  graphql.query("SearchReservationUnits", (req, res, ctx) => {
+  graphql.query("SearchReservationUnits", (_req, res, ctx) => {
     const reservationUnitData = {
       reservationUnits: {
         edges: [
@@ -477,7 +477,7 @@ export const reservationUnitSearchHandlers = [
       ctx.data({ reservationUnits: reservationUnitData.reservationUnits })
     );
   }),
-  graphql.query("SearchFormParamsUnit", (req, res, ctx) => {
+  graphql.query("SearchFormParamsUnit", (_req, res, ctx) => {
     const response = [
       { pk: 1, nameFi: "Tila #1", nameEn: "Tila #1", nameSv: "Tila #1" },
       { pk: 2, nameFi: "Tila #2", nameEn: "Tila #2", nameSv: "Tila #2" },
@@ -499,7 +499,7 @@ export const reservationUnitSearchHandlers = [
       })
     );
   }),
-  graphql.query<Query>("SearchFormParamsPurpose", (req, res, ctx) => {
+  graphql.query<Query>("SearchFormParamsPurpose", (_req, res, ctx) => {
     const response: PurposeType[] = [
       {
         id: "UHVycG9zZVR5cGU6NQ==",

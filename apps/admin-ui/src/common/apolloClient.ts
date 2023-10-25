@@ -12,7 +12,7 @@ import { uniqBy } from "lodash";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import type {
   ReservationTypeConnection,
-  BannerNotificationTypeConnection,
+  BannerNotificationNodeConnection,
 } from "common/types/gql-types";
 
 import { GRAPQL_API_URL, isBrowser } from "./const";
@@ -73,12 +73,12 @@ const client = new ApolloClient({
         fields: {
           bannerNotifications: {
             keyArgs: ["orderBy"],
-            read(existing: BannerNotificationTypeConnection) {
+            read(existing: BannerNotificationNodeConnection) {
               return existing;
             },
             merge(
-              existing: BannerNotificationTypeConnection,
-              incoming: BannerNotificationTypeConnection
+              existing: BannerNotificationNodeConnection,
+              incoming: BannerNotificationNodeConnection
             ) {
               // TODO this should be optimized; using both spread and uniqBy creates a lot of copies
               const merged = {

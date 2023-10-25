@@ -5,7 +5,7 @@ import { IconCheck } from "hds-react";
 import { useRouter } from "next/router";
 import { fontBold } from "common/src/common/typography";
 import type {
-  ApplicationEventType,
+  ApplicationEventNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 
@@ -83,7 +83,7 @@ const Name = styled.div<{ $disabled: boolean; $current: boolean }>`
 // TODO only pass the props that are needed (not the whole application)
 type Props = {
   applicationPk: number;
-  applicationEvents: ApplicationEventType[];
+  applicationEvents: ApplicationEventNode[];
   applicantType: ApplicationsApplicationApplicantTypeChoices;
 };
 
@@ -92,7 +92,7 @@ const checkReady = ({
   applicantType,
   step,
 }: {
-  applicationEvents: ApplicationEventType[];
+  applicationEvents: ApplicationEventNode[];
   applicantType: ApplicationsApplicationApplicantTypeChoices;
   step: number;
 }): boolean => {
@@ -122,7 +122,7 @@ const getMaxPage = ({
   applicationEvents,
   applicantType,
 }: {
-  applicationEvents: ApplicationEventType[];
+  applicationEvents: ApplicationEventNode[];
   applicantType: ApplicationsApplicationApplicantTypeChoices;
 }) => {
   let maxPage = 0;

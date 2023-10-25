@@ -8,12 +8,13 @@ import { useQuery } from "@apollo/client";
 import { TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type {
-  Query,
-  ApplicationStatus,
-  ApplicationRoundStatus,
-  ApplicationEventScheduleType,
+import {
+  type Query,
+  ApplicationStatusChoice,
+  ApplicationRoundStatusChoice,
+  type ApplicationEventScheduleNode,
 } from "common/types/gql-types";
+import { ApplicationRoundStatus } from "common";
 import { IngressContainer } from "@/styles/layout";
 import {
   formatNumber,
@@ -31,7 +32,6 @@ import Loader from "@/component/Loader";
 import ValueBox from "./ValueBox";
 import {
   applicantName,
-  applicationRoundStatusFromGqlToRest,
   applicationStatusFromGqlToRest,
   getApplicationStatusColor,
   getNormalizedApplicationStatus,
@@ -39,12 +39,30 @@ import {
 import { TimeSelector } from "./time-selector/TimeSelector";
 import ShowWhenTargetInvisible from "../ShowWhenTargetInvisible";
 import StickyHeader from "../StickyHeader";
-import ApplicationUserBirthDate from "./ApplicationUserBirthDate";
+import { ApplicationUserBirthDate } from "./ApplicationUserBirthDate";
 import StatusBlock from "../StatusBlock";
 import { APPLICATION_QUERY } from "./queries";
 
+const applicationRoundStatusFromGqlToRest = (
+  t?: ApplicationRoundStatusChoice
+): ApplicationRoundStatus => {
+  switch (t) {
+    case ApplicationRoundStatusChoice.Open:
+      return "in_review";
+    case ApplicationRoundStatusChoice.InAllocation:
+      return "review_done";
+    case ApplicationRoundStatusChoice.Handled:
+      return "handled";
+    case ApplicationRoundStatusChoice.ResultsSent:
+      return "approved";
+    case ApplicationRoundStatusChoice.Upcoming:
+    default:
+      return "draft";
+  }
+};
+
 const parseApplicationEventSchedules = (
-  applicationEventSchedules: ApplicationEventScheduleType[],
+  applicationEventSchedules: ApplicationEventScheduleNode[],
   index: number,
   priority: 100 | 200 | 300
 ): string => {
@@ -67,8 +85,8 @@ function ApplicationStatusBlock({
   view,
   className,
 }: {
-  status: ApplicationStatus;
-  view?: ApplicationRoundStatus;
+  status: ApplicationStatusChoice;
+  view?: ApplicationRoundStatusChoice;
   className?: string;
 }): JSX.Element {
   const { t } = useTranslation();
@@ -371,16 +389,12 @@ function ApplicationDetails({
               <KV
                 k={t("Application.numHours")}
                 v={`${t("common.hoursUnitLong", {
-                  count:
-                    (application?.aggregatedData?.appliedMinDurationTotal ??
-                      0) / 3600,
+                  count: 0,
                 })}`}
               />
               <KV
                 k={t("Application.numTurns")}
-                v={`${
-                  application?.aggregatedData?.appliedReservationsTotal
-                } ${t("common.volumeUnit")}`}
+                v={`0 ${t("common.volumeUnit")}`}
               />
             </DefinitionList>
           </CardContentContainer>
@@ -526,7 +540,7 @@ function ApplicationDetails({
         <EventProps>
           <ValueBox
             label={t("Application.authenticatedUser")}
-            value={application.applicantEmail}
+            value={application.applicant?.email}
           />
           <ValueBox
             label={t("Application.applicantType")}

@@ -4,7 +4,7 @@ import { groupBy, orderBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
-import type { ApplicationRoundType, Query } from "common/types/gql-types";
+import type { ApplicationRoundNode, Query } from "common/types/gql-types";
 import { applicationRoundUrl } from "../../common/urls";
 import { formatDate } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
@@ -42,7 +42,7 @@ const RoundsAccordion = ({
   initiallyOpen,
   emptyContent,
 }: {
-  rounds?: ApplicationRoundType[];
+  rounds?: ApplicationRoundNode[];
   hideIfEmpty?: boolean;
   name: string;
   initiallyOpen?: boolean;
@@ -80,15 +80,10 @@ function AllApplicationRounds(): JSX.Element | null {
 
   const allApplicationRounds = data?.applicationRounds?.edges
     ?.map((ar) => ar?.node)
-    ?.filter((ar): ar is ApplicationRoundType => ar !== null);
+    ?.filter((ar): ar is ApplicationRoundNode => ar !== null);
   const applicationRounds = groupBy(
     allApplicationRounds,
-    (round) =>
-      getApplicationRoundStatus(
-        round.status ?? undefined,
-        new Date(round.applicationPeriodBegin),
-        new Date(round.applicationPeriodEnd)
-      ).group
+    (round) => getApplicationRoundStatus(round.status ?? undefined).group
   );
 
   if (loading) {
@@ -164,7 +159,7 @@ function AllApplicationRounds(): JSX.Element | null {
               {
                 isSortable: true,
                 headerName: t("ApplicationRound.headings.name"),
-                transform: (applicationRound: ApplicationRoundType) => (
+                transform: (applicationRound: ApplicationRoundNode) => (
                   <TableLink
                     to={applicationRoundUrl(Number(applicationRound.pk))}
                   >
@@ -177,28 +172,28 @@ function AllApplicationRounds(): JSX.Element | null {
               },
               {
                 headerName: t("ApplicationRound.headings.service"),
-                transform: (applicationRound: ApplicationRoundType) =>
+                transform: (applicationRound: ApplicationRoundNode) =>
                   applicationRound.serviceSector?.nameFi ?? "",
                 key: "serviceSectorName",
               },
               {
                 isSortable: true,
                 headerName: t("ApplicationRound.headings.reservationUnitCount"),
-                transform: (applicationRound: ApplicationRoundType) =>
+                transform: (applicationRound: ApplicationRoundNode) =>
                   String(applicationRound.applicationsCount),
                 key: "applicationsCount",
               },
               {
                 isSortable: true,
                 headerName: t("ApplicationRound.headings.applicationCount"),
-                transform: (applicationRound: ApplicationRoundType) =>
+                transform: (applicationRound: ApplicationRoundNode) =>
                   String(applicationRound.reservationUnitCount),
                 key: "reservationUnitCount",
               },
               {
                 isSortable: true,
                 headerName: t("ApplicationRound.headings.sent"),
-                transform: (applicationRound: ApplicationRoundType) =>
+                transform: (applicationRound: ApplicationRoundNode) =>
                   formatDate(applicationRound.statusTimestamp || null) || "-",
                 key: "statusTimestampSort",
               },

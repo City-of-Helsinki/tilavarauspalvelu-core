@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { H3 } from "common/src/common/typography";
-import { type ApplicationType } from "common/types/gql-types";
+import { type ApplicationNode } from "common/types/gql-types";
 import ApplicationCard from "./ApplicationCard";
 
 const GroupName = styled(H3).attrs({ as: "h2" })`
@@ -10,7 +10,7 @@ const GroupName = styled(H3).attrs({ as: "h2" })`
 
 type Props = {
   name: string;
-  applications: ApplicationType[];
+  applications: ApplicationNode[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 

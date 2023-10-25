@@ -103,7 +103,7 @@ const ReservationUnit = styled.div`
 `;
 
 const APPLICATION_ROUND_QUERY = gql`
-  query ApplicationRoundCriteria($pk: [ID]!) {
+  query ApplicationRoundCriteria($pk: [Int]!) {
     applicationRounds(pk: $pk) {
       edges {
         node {

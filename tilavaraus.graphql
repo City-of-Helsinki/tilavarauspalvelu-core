@@ -9,28 +9,36 @@ type AbilityGroupType {
   pk: Int
 }
 
-input AddressCreateSerializerInput {
-  pk: Int
+type AddressNode implements Node {
   streetAddress: String!
+  streetAddressFi: String
+  streetAddressEn: String
+  streetAddressSv: String
   postCode: String!
   city: String!
-}
-
-input AddressSerializerInput {
-  id: Int
-  streetAddress: String!
-  postCode: String!
-  city: String!
-}
-
-type AddressType implements Node {
-  streetAddress: String!
-  postCode: String!
-  city: String!
+  cityFi: String
+  cityEn: String
+  citySv: String
 
   """The ID of the object"""
   id: ID!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   pk: Int
+}
+
+input AddressSerializerInput {
+  city: String!
+  cityEn: String
+  cityFi: String
+  citySv: String
+  pk: Int
+  postCode: String!
+  streetAddress: String!
+  streetAddressEn: String
+  streetAddressFi: String
+  streetAddressSv: String
 }
 
 type AgeGroupType implements Node {
@@ -59,168 +67,154 @@ type AgeGroupTypeEdge {
   cursor: String!
 }
 
-type ApplicationAggregatedDataType {
-  appliedMinDurationTotal: Float
-  appliedReservationsTotal: Float
-  createdReservationsTotal: Float
-  reservationsDurationTotal: Float
+"""An enumeration."""
+enum applicant_type {
+  """Individual"""
+  INDIVIDUAL
+
+  """Association"""
+  ASSOCIATION
+
+  """Community"""
+  COMMUNITY
+
+  """Company"""
+  COMPANY
+}
+
+type ApplicantNode implements Node {
+  email: String!
+  dateOfBirth: Date
+
+  """The ID of the object"""
+  id: ID!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  name: String
+  pk: Int
+}
+
+"""An enumeration."""
+enum ApplicantTypeChoice {
+  INDIVIDUAL
+  ASSOCIATION
+  COMMUNITY
+  COMPANY
+}
+
+input ApplicationCancelMutationInput {
+  pk: Int!
+  clientMutationId: String
+}
+
+type ApplicationCancelMutationPayload {
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
 }
 
 input ApplicationCreateMutationInput {
-  applicantType: String!
-
-  """Organisation information for the application"""
-  organisation: OrganisationCreateSerializerInput
-
-  """Id of the application period for which this application is targeted to"""
-  applicationRoundPk: Int!
-
-  """Contact person information for the application"""
-  contactPerson: PersonCreateSerializerInput!
-
-  """List of applications events"""
-  applicationEvents: [ApplicationEventInApplicationSerializerInput]!
-
-  """Status of this application"""
-  status: String!
-
-  """Billing address for the application"""
-  billingAddress: AddressCreateSerializerInput!
-  homeCityPk: Int
-
-  """Additional information about the application"""
   additionalInformation: String
+  applicantType: applicant_type
+  applicationEvents: [ApplicationEventInApplicationSerializerInput]
+  applicationRound: Int!
+  billingAddress: AddressSerializerInput!
+  contactPerson: PersonSerializerInput
+  homeCity: Int
+  organisation: OrganisationSerializerInput
+  pk: Int
   clientMutationId: String
 }
 
 type ApplicationCreateMutationPayload {
-  pk: Int
-  applicantType: String
-  applicantName: String
-  applicantEmail: String
-
-  """Organisation information for the application"""
-  organisation: OrganisationType
-
-  """Id of the application period for which this application is targeted to"""
-  applicationRoundPk: Int
-
-  """Contact person information for the application"""
-  contactPerson: PersonType
-
-  """List of applications events"""
-  applicationEvents: [ApplicationEventType]
-
-  """Status of this application"""
-  status: String
-
-  """Billing address for the application"""
-  billingAddress: AddressType
-  homeCityPk: Int
-  createdDate: DateTime
-  lastModifiedDate: DateTime
-
-  """Additional information about the application"""
   additionalInformation: String
+  applicantType: applicant_type
+  applicationEvents: [ApplicationEventNode]
+  applicationRound: Int
+  billingAddress: AddressNode
+  contactPerson: PersonNode
+  createdDate: DateTime
+  homeCity: Int
+  lastModifiedDate: DateTime
+  organisation: OrganisationNode
+  pk: Int
+  status: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
-  application: ApplicationType
   clientMutationId: String
 }
 
 input ApplicationDeclineMutationInput {
-  pk: Int
+  pk: Int!
   clientMutationId: String
 }
 
 type ApplicationDeclineMutationPayload {
   pk: Int
-  status: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
   clientMutationId: String
 }
 
-type ApplicationEventAggregatedDataType {
-  durationTotal: Float
-  reservationsTotal: Float
-  allocationResultsDurationTotal: Float
-  allocationResultsReservationsTotal: Float
-}
-
 input ApplicationEventCreateMutationInput {
-  name: String
-  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]!
-  numPersons: Int
-
-  """Age group pk for this event"""
-  ageGroup: Int!
-
-  """AbilityGroup pk for this event"""
-  abilityGroup: Int!
-  minDuration: String
-  maxDuration: String
-
-  """Application pk for this event"""
+  abilityGroup: Int
+  ageGroup: Int
   application: Int!
-  eventsPerWeek: Int
-  biweekly: Boolean
+  applicationEventSchedules: [ApplicationEventScheduleInEventSerializerInput]!
   begin: Date
+  biweekly: Boolean
   end: Date
-
-  """ReservationPurpose pk for this event"""
-  purpose: Int!
-  eventReservationUnits: [EventReservationUnitCreateSerializerInput]!
-
-  """Status of this application event"""
-  status: String!
+  eventReservationUnits: [EventReservationUnitSerializerInput]!
+  eventsPerWeek: Int
+  maxDuration: String
+  minDuration: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
   clientMutationId: String
 }
 
 type ApplicationEventCreateMutationPayload {
-  pk: Int
-  name: String
-  applicationEventSchedules: [ApplicationEventScheduleType]
-  numPersons: Int
-
-  """Age group pk for this event"""
-  ageGroup: Int
-
-  """AbilityGroup pk for this event"""
   abilityGroup: Int
-  minDuration: String
-  maxDuration: String
-
-  """Application pk for this event"""
+  ageGroup: Int
   application: Int
-  eventsPerWeek: Int
-  biweekly: Boolean
+  applicationEventSchedules: [ApplicationEventScheduleNode]
   begin: Date
+  biweekly: Boolean
   end: Date
-
-  """ReservationPurpose pk for this event"""
+  eventReservationUnits: [EventReservationUnitNode]
+  eventsPerWeek: Int
+  maxDuration: String
+  minDuration: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  numPersons: Int
+  pk: Int
   purpose: Int
-  eventReservationUnits: [EventReservationUnitType]
-
-  """Status of this application event"""
-  status: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
-  applicationEvent: ApplicationEventType
   clientMutationId: String
 }
 
 input ApplicationEventDeclineMutationInput {
-  pk: Int
+  pk: Int!
   clientMutationId: String
 }
 
 type ApplicationEventDeclineMutationPayload {
   pk: Int
-  status: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -228,376 +222,307 @@ type ApplicationEventDeclineMutationPayload {
 }
 
 input ApplicationEventDeleteMutationInput {
-  pk: Int!
+  pk: ID!
   clientMutationId: String
 }
 
 type ApplicationEventDeleteMutationPayload {
-  deleted: Boolean
-  errors: String
-  clientMutationId: String
-}
-
-input ApplicationEventFlagMutationInput {
-  pk: Int
-  flagged: Boolean
-  clientMutationId: String
-}
-
-type ApplicationEventFlagMutationPayload {
-  pk: Int
-  flagged: Boolean
-
   """May contain more than one error for same field."""
   errors: [ErrorType]
+
+  """Whether the object was deleted successfully."""
+  deleted: Boolean
+
+  """Number of rows deleted."""
+  rowCount: Int
   clientMutationId: String
 }
 
 input ApplicationEventInApplicationSerializerInput {
-  pk: Int
-  name: String
-  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]!
-  numPersons: Int
-
-  """Age group pk for this event"""
-  ageGroup: Int!
-
-  """AbilityGroup pk for this event"""
-  abilityGroup: Int!
-  minDuration: String
-  maxDuration: String
-
-  """Application pk for this event"""
-  application: Int
-  eventsPerWeek: Int
+  abilityGroup: Int
+  ageGroup: Int
+  applicationEventSchedules: [ApplicationEventScheduleInEventSerializerInput]!
+  begin: Date
   biweekly: Boolean
+  end: Date
+  eventReservationUnits: [EventReservationUnitSerializerInput]!
+  eventsPerWeek: Int
+  maxDuration: String
+  minDuration: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+}
+
+type ApplicationEventNode implements Node {
+  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  uuid: UUID!
+  numPersons: Int
+  minDuration: Duration
+  maxDuration: Duration
   begin: Date
   end: Date
-
-  """ReservationPurpose pk for this event"""
-  purpose: Int!
-  eventReservationUnits: [EventReservationUnitCreateSerializerInput]!
-
-  """Status of this application event"""
-  status: String!
-}
-
-input ApplicationEventScheduleCreateSerializerInput {
-  pk: Int
-  day: Int!
-
-  """Begin time of requested reservation allocation slot."""
-  begin: Time!
-
-  """End time of requested reservation allocation slot."""
-  end: Time!
-
-  """Priority of requested reservation allocation slot as an integer."""
-  priority: priority
-}
-
-input ApplicationEventScheduleResultCreateMutationInput {
-  accepted: Boolean
-  declined: Boolean
-
-  """Application schedule pk for this result"""
-  applicationEventSchedule: Int!
-  allocatedReservationUnit: Int!
-  allocatedDay: Int
-  allocatedBegin: Time
-  allocatedEnd: Time
-  basket: String
-  clientMutationId: String
-}
-
-type ApplicationEventScheduleResultCreateMutationPayload {
-  accepted: Boolean
-  declined: Boolean
-
-  """Application schedule pk for this result"""
-  applicationEventSchedule: Int
-  allocatedReservationUnit: Int
-  allocatedDay: Int
-  allocatedBegin: Time
-  allocatedEnd: Time
-  basket: String
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  applicationEventScheduleResult: ApplicationEventScheduleResultType
-  clientMutationId: String
-}
-
-type ApplicationEventScheduleResultType implements Node {
-  accepted: Boolean!
-  declined: Boolean!
-  allocatedReservationUnit: ReservationUnitType
-  allocatedDay: Int
-  allocatedBegin: Time!
-  allocatedEnd: Time!
-  basket: ApplicationRoundBasketType
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
-input ApplicationEventScheduleResultUpdateMutationInput {
-  accepted: Boolean
-  declined: Boolean
-
-  """Application schedule pk for this result"""
-  applicationEventSchedule: Int!
-  allocatedReservationUnit: Int!
-  allocatedDay: Int
-  allocatedBegin: Time
-  allocatedEnd: Time
-  basket: String
-  clientMutationId: String
-}
-
-type ApplicationEventScheduleResultUpdateMutationPayload {
-  accepted: Boolean
-  declined: Boolean
-
-  """Application schedule pk for this result"""
-  applicationEventSchedule: Int
-  allocatedReservationUnit: Int
-  allocatedDay: Int
-  allocatedBegin: Time
-  allocatedEnd: Time
-  basket: String
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  applicationEventScheduleResult: ApplicationEventScheduleResultType
-  clientMutationId: String
-}
-
-type ApplicationEventScheduleType implements Node {
-  """The ID of the object"""
-  id: ID!
-  day: Int
-  begin: Time!
-  end: Time!
-  priority: Int
-  applicationEventScheduleResult: ApplicationEventScheduleResultType
-  pk: Int
-}
-
-"""An enumeration."""
-enum applicationEventStatus {
-  created
-  approved
-  reserved
-  failed
-  declined
-}
-
-type ApplicationEventType implements Node {
-  """The ID of the object"""
-  id: ID!
-  name: String!
-  numPersons: Int
-  ageGroup: AgeGroupType
-  abilityGroup: AbilityGroupType
-  minDuration: Float
-  maxDuration: Float
   eventsPerWeek: Int
   biweekly: Boolean!
-  begin: Date
-  end: Date
-  application: ApplicationType!
+  flagged: Boolean!
+  application: ApplicationNode!
+  ageGroup: AgeGroupType
+  abilityGroup: AbilityGroupType
   purpose: ReservationPurposeType
   declinedReservationUnits: [ReservationUnitType!]
-  uuid: UUID!
-  flagged: Boolean!
-  aggregatedData: ApplicationEventAggregatedDataType
-  eventReservationUnits: [EventReservationUnitType]
-  applicationEventSchedules: [ApplicationEventScheduleType]
+  eventReservationUnits: [EventReservationUnitNode!]
+  applicationEventSchedules: [ApplicationEventScheduleNode!]
+
+  """The ID of the object"""
+  id: ID!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  status: ApplicationEventStatusChoice
   pk: Int
-  status: applicationEventStatus
-  weeklyAmountReductionsCount: Int
 }
 
-type ApplicationEventTypeConnection {
+type ApplicationEventNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [ApplicationEventTypeEdge]!
+  edges: [ApplicationEventNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `ApplicationEventType` and its cursor."""
-type ApplicationEventTypeEdge {
+"""A Relay edge containing a `ApplicationEventNode` and its cursor."""
+type ApplicationEventNodeEdge {
   """The item at the end of the edge"""
-  node: ApplicationEventType
+  node: ApplicationEventNode
 
   """A cursor for use in pagination"""
   cursor: String!
 }
 
-input ApplicationEventUpdateMutationInput {
+input ApplicationEventScheduleApproveMutationInput {
+  allocatedBegin: Time!
+  allocatedDay: Int!
+  allocatedEnd: Time!
+  allocatedReservationUnit: Int!
+  pk: Int!
+  clientMutationId: String
+}
+
+type ApplicationEventScheduleApproveMutationPayload {
+  allocatedBegin: Time
+  allocatedDay: Int
+  allocatedEnd: Time
+  allocatedReservationUnit: Int
   pk: Int
-  name: String
-  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]
-  numPersons: Int
 
-  """Age group pk for this event"""
-  ageGroup: Int
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
 
-  """AbilityGroup pk for this event"""
+input ApplicationEventScheduleDeclineMutationInput {
+  pk: Int!
+  clientMutationId: String
+}
+
+type ApplicationEventScheduleDeclineMutationPayload {
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
+input ApplicationEventScheduleInEventSerializerInput {
+  begin: Time!
+  day: Int!
+  end: Time!
+  pk: Int
+  priority: Int
+}
+
+type ApplicationEventScheduleNode implements Node {
+  day: Int!
+  begin: Time!
+  end: Time!
+  allocatedDay: Int
+  allocatedBegin: Time
+  allocatedEnd: Time
+  declined: Boolean!
+  priority: Int!
+  allocatedReservationUnit: ReservationUnitType
+
+  """The ID of the object"""
+  id: ID!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  pk: Int
+}
+
+"""An enumeration."""
+enum ApplicationEventStatusChoice {
+  UNALLOCATED
+  APPROVED
+  DECLINED
+  RESERVED
+  FAILED
+}
+
+input ApplicationEventUpdateMutationInput {
   abilityGroup: Int
-  minDuration: String
-  maxDuration: String
-
-  """Application pk for this event"""
+  ageGroup: Int
   application: Int
-  eventsPerWeek: Int
-  biweekly: Boolean
+  applicationEventSchedules: [UpdateApplicationEventScheduleInEventSerializerInput]
   begin: Date
+  biweekly: Boolean
   end: Date
-
-  """ReservationPurpose pk for this event"""
+  eventReservationUnits: [UpdateEventReservationUnitSerializerInput]
+  eventsPerWeek: Int
+  maxDuration: String
+  minDuration: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  numPersons: Int
+  pk: Int!
   purpose: Int
-  eventReservationUnits: [EventReservationUnitCreateSerializerInput]
-
-  """Status of this application event"""
-  status: String
   clientMutationId: String
 }
 
 type ApplicationEventUpdateMutationPayload {
-  pk: Int
-  name: String
-  applicationEventSchedules: [ApplicationEventScheduleType]
-  numPersons: Int
-
-  """Age group pk for this event"""
-  ageGroup: Int
-
-  """AbilityGroup pk for this event"""
   abilityGroup: Int
-  minDuration: String
-  maxDuration: String
-
-  """Application pk for this event"""
+  ageGroup: Int
   application: Int
-  eventsPerWeek: Int
-  biweekly: Boolean
+  applicationEventSchedules: [ApplicationEventScheduleNode]
   begin: Date
+  biweekly: Boolean
   end: Date
-
-  """ReservationPurpose pk for this event"""
+  eventReservationUnits: [EventReservationUnitNode]
+  eventsPerWeek: Int
+  maxDuration: String
+  minDuration: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  numPersons: Int
+  pk: Int
   purpose: Int
-  eventReservationUnits: [EventReservationUnitType]
-
-  """Status of this application event"""
-  status: String
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  applicationEvent: ApplicationEventType
-  clientMutationId: String
-}
-
-input ApplicationFlagMutationInput {
-  pk: Int
-  flagged: Boolean!
-  clientMutationId: String
-}
-
-type ApplicationFlagMutationPayload {
-  pk: Int
-  flagged: Boolean
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
   clientMutationId: String
 }
 
-type ApplicationRoundAggregatedDataType {
-  allocationResultEventsCount: Int
-  allocationDurationTotal: Int
-  totalReservationDuration: Int
-  totalHourCapacity: Int
-}
+type ApplicationNode implements Node {
+  applicantType: ApplicationsApplicationApplicantTypeChoices
+  createdDate: DateTime!
+  lastModifiedDate: DateTime!
+  additionalInformation: String
+  applicationRound: ApplicationRoundNode!
+  organisation: OrganisationNode
+  contactPerson: PersonNode
+  billingAddress: AddressNode
+  homeCity: CityNode
+  applicationEvents: [ApplicationEventNode!]
 
-type ApplicationRoundBasketType implements Node {
   """The ID of the object"""
   id: ID!
-  name: String!
-  mustBeMainPurposeOfApplicant: Boolean!
-  customerType: [String]!
-  allocationPercentage: Int!
-  orderNumber: Int!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  status: ApplicationStatusChoice
+  applicant: ApplicantNode
   pk: Int
-  purposeIds: [Int]
-  ageGroupIds: [Int]
-  homeCityId: Int
 }
 
-"""An enumeration."""
-enum applicationRoundStatus {
-  draft
-  in_review
-  review_done
-  allocated
-  reserving
-  handled
-  sending
-  sent
-  archived
+type ApplicationNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ApplicationNodeEdge]!
+  totalCount: Int
 }
 
-type ApplicationRoundType implements Node {
+"""A Relay edge containing a `ApplicationNode` and its cursor."""
+type ApplicationNodeEdge {
+  """The item at the end of the edge"""
+  node: ApplicationNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type ApplicationRoundNode implements Node {
+  name: String!
   nameFi: String
   nameEn: String
   nameSv: String
   targetGroup: ApplicationsApplicationRoundTargetGroupChoices!
-  allocating: Boolean!
-  reservationUnits: [ReservationUnitType]
+  criteria: String!
+  criteriaFi: String
+  criteriaEn: String
+  criteriaSv: String
   applicationPeriodBegin: DateTime!
   applicationPeriodEnd: DateTime!
   reservationPeriodBegin: Date!
   reservationPeriodEnd: Date!
   publicDisplayBegin: DateTime!
   publicDisplayEnd: DateTime!
-  purposes: [ReservationPurposeType]
+  handledDate: DateTime
+  sentDate: DateTime
+  reservationUnits: [ReservationUnitType!]
+  purposes: [ReservationPurposeType!]
   serviceSector: ServiceSectorType
-  criteriaFi: String
-  criteriaEn: String
-  criteriaSv: String
-  aggregatedData: ApplicationRoundAggregatedDataType
-  applicationRoundBaskets: [ApplicationRoundBasketType]
 
   """The ID of the object"""
   id: ID!
-  pk: Int
-  status: applicationRoundStatus
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  status: ApplicationRoundStatusChoice
   statusTimestamp: DateTime
-  applicationsSent: Boolean
   applicationsCount: Int
   reservationUnitCount: Int
+  pk: Int
 }
 
-type ApplicationRoundTypeConnection {
+type ApplicationRoundNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [ApplicationRoundTypeEdge]!
+  edges: [ApplicationRoundNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `ApplicationRoundType` and its cursor."""
-type ApplicationRoundTypeEdge {
+"""A Relay edge containing a `ApplicationRoundNode` and its cursor."""
+type ApplicationRoundNodeEdge {
   """The item at the end of the edge"""
-  node: ApplicationRoundType
+  node: ApplicationRoundNode
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+"""An enumeration."""
+enum ApplicationRoundStatusChoice {
+  UPCOMING
+  OPEN
+  IN_ALLOCATION
+  HANDLED
+  RESULTS_SENT
 }
 
 """An enumeration."""
@@ -627,6 +552,19 @@ enum ApplicationsApplicationRoundTargetGroupChoices {
   ALL
 }
 
+input ApplicationSendMutationInput {
+  pk: Int!
+  clientMutationId: String
+}
+
+type ApplicationSendMutationPayload {
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
 """An enumeration."""
 enum ApplicationsOrganisationOrganisationTypeChoices {
   """Company"""
@@ -649,121 +587,45 @@ enum ApplicationsOrganisationOrganisationTypeChoices {
 }
 
 """An enumeration."""
-enum applicationStatus {
-  draft
-  received
-  in_review
-  review_done
-  allocated
-  handled
-  sent
-  expired
-  cancelled
-}
-
-type ApplicationType implements Node {
-  """The ID of the object"""
-  id: ID!
-  applicantType: ApplicationsApplicationApplicantTypeChoices
-  organisation: OrganisationType
-  contactPerson: PersonType
-  applicationRound: ApplicationRoundType!
-  billingAddress: AddressType
-  homeCity: CityType
-
-  """Additional information about the application"""
-  additionalInformation: String
-  createdDate: DateTime!
-  lastModifiedDate: DateTime!
-  aggregatedData: ApplicationAggregatedDataType
-  applicationEvents: [ApplicationEventType]
-  pk: Int
-  status: applicationStatus
-  applicantPk: Int
-  applicantName: String
-  applicantEmail: String
-  applicantUser: UserType
-}
-
-type ApplicationTypeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ApplicationTypeEdge]!
-  totalCount: Int
-}
-
-"""A Relay edge containing a `ApplicationType` and its cursor."""
-type ApplicationTypeEdge {
-  """The item at the end of the edge"""
-  node: ApplicationType
-
-  """A cursor for use in pagination"""
-  cursor: String!
+enum ApplicationStatusChoice {
+  DRAFT
+  RECEIVED
+  IN_ALLOCATION
+  HANDLED
+  RESULTS_SENT
+  EXPIRED
+  CANCELLED
 }
 
 input ApplicationUpdateMutationInput {
-  pk: Int
-  applicantType: String
-
-  """Organisation information for the application"""
-  organisation: OrganisationCreateSerializerInput
-
-  """Id of the application period for which this application is targeted to"""
-  applicationRoundPk: Int
-
-  """Contact person information for the application"""
-  contactPerson: PersonCreateSerializerInput
-
-  """Application events in application"""
-  applicationEvents: [ApplicationEventInApplicationSerializerInput]
-
-  """Status of this application"""
-  status: String
-
-  """Billing address for the application"""
-  billingAddress: AddressCreateSerializerInput
-  homeCityPk: Int
-
-  """Additional information about the application"""
   additionalInformation: String
+  applicantType: applicant_type
+  applicationEvents: [UpdateApplicationEventInApplicationSerializerInput]
+  applicationRound: Int
+  billingAddress: UpdateAddressSerializerInput
+  contactPerson: UpdatePersonSerializerInput
+  homeCity: Int
+  organisation: UpdateOrganisationSerializerInput
+  pk: Int!
   clientMutationId: String
 }
 
 type ApplicationUpdateMutationPayload {
-  pk: Int
-  applicantType: String
-  applicantName: String
-  applicantEmail: String
-
-  """Organisation information for the application"""
-  organisation: OrganisationType
-
-  """Id of the application period for which this application is targeted to"""
-  applicationRoundPk: Int
-
-  """Contact person information for the application"""
-  contactPerson: PersonType
-
-  """Application events in application"""
-  applicationEvents: [ApplicationEventType]
-
-  """Status of this application"""
-  status: String
-
-  """Billing address for the application"""
-  billingAddress: AddressType
-  homeCityPk: Int
-  createdDate: DateTime
-  lastModifiedDate: DateTime
-
-  """Additional information about the application"""
   additionalInformation: String
+  applicantType: applicant_type
+  applicationEvents: [ApplicationEventNode]
+  applicationRound: Int
+  billingAddress: AddressNode
+  contactPerson: PersonNode
+  createdDate: DateTime
+  homeCity: Int
+  lastModifiedDate: DateTime
+  organisation: OrganisationNode
+  pk: Int
+  status: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
-  application: ApplicationType
   clientMutationId: String
 }
 
@@ -777,6 +639,7 @@ input BannerNotificationCreateMutationInput {
   messageFi: String
   messageSv: String
   name: String!
+  pk: Int
   target: target!
   clientMutationId: String
 }
@@ -816,14 +679,7 @@ type BannerNotificationDeleteMutationPayload {
   clientMutationId: String
 }
 
-"""An enumeration."""
-enum BannerNotificationState {
-  DRAFT
-  SCHEDULED
-  ACTIVE
-}
-
-type BannerNotificationType implements Node {
+type BannerNotificationNode implements Node {
   name: String!
   message: String!
   messageFi: String
@@ -837,26 +693,36 @@ type BannerNotificationType implements Node {
 
   """The ID of the object"""
   id: ID!
-  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   state: BannerNotificationState
+  pk: Int
 }
 
-type BannerNotificationTypeConnection {
+type BannerNotificationNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [BannerNotificationTypeEdge]!
+  edges: [BannerNotificationNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `BannerNotificationType` and its cursor."""
-type BannerNotificationTypeEdge {
+"""A Relay edge containing a `BannerNotificationNode` and its cursor."""
+type BannerNotificationNodeEdge {
   """The item at the end of the edge"""
-  node: BannerNotificationType
+  node: BannerNotificationNode
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+"""An enumeration."""
+enum BannerNotificationState {
+  DRAFT
+  SCHEDULED
+  ACTIVE
 }
 
 input BannerNotificationUpdateMutationInput {
@@ -869,7 +735,7 @@ input BannerNotificationUpdateMutationInput {
   messageFi: String
   messageSv: String
   name: String
-  pk: Int
+  pk: Int!
   target: target
   clientMutationId: String
 }
@@ -904,30 +770,34 @@ type BuildingType implements Node {
   pk: Int
 }
 
-type CityType implements Node {
+type CityNode implements Node {
   name: String!
   nameFi: String
   nameEn: String
   nameSv: String
+  municipalityCode: String!
 
   """The ID of the object"""
   id: ID!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   pk: Int
 }
 
-type CityTypeConnection {
+type CityNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [CityTypeEdge]!
+  edges: [CityNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `CityType` and its cursor."""
-type CityTypeEdge {
+"""A Relay edge containing a `CityNode` and its cursor."""
+type CityNodeEdge {
   """The item at the end of the edge"""
-  node: CityType
+  node: CityNode
 
   """A cursor for use in pagination"""
   cursor: String!
@@ -1146,24 +1016,22 @@ type ErrorType {
   messages: [String!]!
 }
 
-input EventReservationUnitCreateSerializerInput {
-  pk: Int
-
-  """
-  Priority of this reservation unit for the event. Lower the number, higher the priority.
-  """
+type EventReservationUnitNode implements Node {
   priority: Int
+  reservationUnit: ReservationUnitByPkType!
 
-  """pk of the reservation unit requested for the event."""
-  reservationUnit: Int!
-}
-
-type EventReservationUnitType implements Node {
   """The ID of the object"""
   id: ID!
-  priority: Int
-  reservationUnit: ReservationUnitType
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   pk: Int
+}
+
+input EventReservationUnitSerializerInput {
+  pk: Int
+  priority: Int
+  reservationUnit: Int!
 }
 
 type GeneralRolePermissionType {
@@ -1297,14 +1165,14 @@ type Mutation {
   createApplication(input: ApplicationCreateMutationInput!): ApplicationCreateMutationPayload
   updateApplication(input: ApplicationUpdateMutationInput!): ApplicationUpdateMutationPayload
   declineApplication(input: ApplicationDeclineMutationInput!): ApplicationDeclineMutationPayload
-  flagApplication(input: ApplicationFlagMutationInput!): ApplicationFlagMutationPayload
+  sendApplication(input: ApplicationSendMutationInput!): ApplicationSendMutationPayload
+  cancelApplication(input: ApplicationCancelMutationInput!): ApplicationCancelMutationPayload
   createApplicationEvent(input: ApplicationEventCreateMutationInput!): ApplicationEventCreateMutationPayload
   updateApplicationEvent(input: ApplicationEventUpdateMutationInput!): ApplicationEventUpdateMutationPayload
   deleteApplicationEvent(input: ApplicationEventDeleteMutationInput!): ApplicationEventDeleteMutationPayload
   declineApplicationEvent(input: ApplicationEventDeclineMutationInput!): ApplicationEventDeclineMutationPayload
-  flagApplicationEvent(input: ApplicationEventFlagMutationInput!): ApplicationEventFlagMutationPayload
-  createApplicationEventScheduleResult(input: ApplicationEventScheduleResultCreateMutationInput!): ApplicationEventScheduleResultCreateMutationPayload
-  updateApplicationEventScheduleResult(input: ApplicationEventScheduleResultUpdateMutationInput!): ApplicationEventScheduleResultUpdateMutationPayload
+  approveApplicationEventSchedule(input: ApplicationEventScheduleApproveMutationInput!): ApplicationEventScheduleApproveMutationPayload
+  declineApplicationEventSchedule(input: ApplicationEventScheduleDeclineMutationInput!): ApplicationEventScheduleDeclineMutationPayload
   createRecurringReservation(input: RecurringReservationCreateMutationInput!): RecurringReservationCreateMutationPayload
   updateRecurringReservation(input: RecurringReservationUpdateMutationInput!): RecurringReservationUpdateMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
@@ -1389,32 +1257,46 @@ enum organisation_type {
   RELIGIOUS_COMMUNITY
 }
 
-input OrganisationCreateSerializerInput {
-  pk: Int
+type OrganisationNode implements Node {
   name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  email: String!
   identifier: String
   yearEstablished: Int
-  activeMembers: Int
-  organisationType: organisation_type
-  coreBusiness: String
-  email: String
-
-  """Address object of this organisation"""
-  address: AddressSerializerInput!
-}
-
-type OrganisationType implements Node {
-  """The ID of the object"""
-  id: ID!
-  name: String!
-  identifier: String
-  yearEstablished: Int
-  address: AddressType
   activeMembers: Int
   coreBusiness: String!
+  coreBusinessFi: String
+  coreBusinessEn: String
+  coreBusinessSv: String
   organisationType: ApplicationsOrganisationOrganisationTypeChoices!
-  email: String!
+  address: AddressNode
+
+  """The ID of the object"""
+  id: ID!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   pk: Int
+}
+
+input OrganisationSerializerInput {
+  activeMembers: Int
+  address: AddressSerializerInput!
+  coreBusiness: String
+  coreBusinessEn: String
+  coreBusinessFi: String
+  coreBusinessSv: String
+  email: String
+  identifier: String
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  organisationType: organisation_type
+  pk: Int
+  yearEstablished: Int
 }
 
 """
@@ -1478,34 +1360,26 @@ type PeriodType {
   descriptionSv: String
 }
 
-input PersonCreateSerializerInput {
-  pk: Int
+type PersonNode implements Node {
   firstName: String!
   lastName: String!
   email: String
   phoneNumber: String
-}
 
-type PersonType implements Node {
   """The ID of the object"""
   id: ID!
-  email: String
-  phoneNumber: String
-  firstName: String!
-  lastName: String!
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   pk: Int
 }
 
-"""An enumeration."""
-enum priority {
-  """Low"""
-  A_100
-
-  """Medium"""
-  A_200
-
-  """High"""
-  A_300
+input PersonSerializerInput {
+  email: String
+  firstName: String!
+  lastName: String!
+  phoneNumber: String
+  pk: Int
 }
 
 input PurposeCreateMutationInput {
@@ -1614,41 +1488,48 @@ type Query {
     after: String
     first: Int
     last: Int
-    applicationRound: ID
-    status: [String]
-    unit: [ID]
-    user: ID
-    pk: [ID]
-    appliedCountGte: Decimal
-    appliedCountLte: Decimal
-    applicantType: [String]
+    pk: [Int]
+    applicationRound: Int
+    applicantType: [ApplicantTypeChoice]
+    status: [ApplicationStatusChoice]
+    unit: [Int]
+    applicant: Int
 
     """Järjestys"""
     orderBy: String
-  ): ApplicationTypeConnection
+  ): ApplicationNodeConnection
   applicationEvents(
     offset: Int
     before: String
     after: String
     first: Int
     last: Int
-    pk: [ID]
-    status: String
+    name_Istartswith: String
     application: ID
-    appliedCountGte: Decimal
-    appliedCountLte: Decimal
-    applicationRound: ID
-    applicationStatus: String
-    applicantType: [String]
-    name: String
-    reservationUnit: [ID]
-    unit: [ID]
-    user: ID
+    pk: [Int]
+    user: Int
+    applicationRound: Int
+    reservationUnit: [Int]
+    unit: [Int]
+    applicantType: [ApplicantTypeChoice]
+    status: ApplicationEventStatusChoice
+    applicationStatus: ApplicationStatusChoice
 
     """Järjestys"""
     orderBy: String
-  ): ApplicationEventTypeConnection
-  applicationRounds(offset: Int, before: String, after: String, first: Int, last: Int, pk: [ID]): ApplicationRoundTypeConnection
+  ): ApplicationEventNodeConnection
+  applicationRounds(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    name_Istartswith: String
+    pk: [Int]
+
+    """Järjestys"""
+    orderBy: String
+  ): ApplicationRoundNodeConnection
   reservations(
     offset: Int
     before: String
@@ -1791,7 +1672,17 @@ type Query {
     id: ID!
   ): EquipmentCategoryType
   equipmentCategoryByPk(pk: Int): EquipmentCategoryType
-  spaces(offset: Int, before: String, after: String, first: Int, last: Int, onlyWithPermission: Boolean): SpaceTypeConnection
+  spaces(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    onlyWithPermission: Boolean
+
+    """Järjestys"""
+    orderBy: String
+  ): SpaceTypeConnection
   space(
     """The ID of the object"""
     id: ID!
@@ -1841,13 +1732,13 @@ type Query {
   termsOfUse(offset: Int, before: String, after: String, first: Int, last: Int, termsType: TermsOfUseTermsOfUseTermsTypeChoices): TermsOfUseTypeConnection
   taxPercentages(offset: Int, before: String, after: String, first: Int, last: Int, value: Decimal): TaxPercentageTypeConnection
   ageGroups(offset: Int, before: String, after: String, first: Int, last: Int): AgeGroupTypeConnection
-  cities(offset: Int, before: String, after: String, first: Int, last: Int): CityTypeConnection
+  cities(offset: Int, before: String, after: String, first: Int, last: Int): CityNodeConnection
   metadataSets(offset: Int, before: String, after: String, first: Int, last: Int): ReservationMetadataSetTypeConnection
   order(orderUuid: String): PaymentOrderType
   bannerNotification(
     """The ID of the object"""
     id: ID!
-  ): BannerNotificationType
+  ): BannerNotificationNode
   bannerNotifications(
     offset: Int
     before: String
@@ -1861,7 +1752,7 @@ type Query {
 
     """Järjestys"""
     orderBy: String
-  ): BannerNotificationTypeConnection
+  ): BannerNotificationNodeConnection
 }
 
 type RealEstateType implements Node {
@@ -1937,20 +1828,15 @@ type RecurringReservationType implements Node {
   ageGroup: AgeGroupType
   abilityGroup: AbilityGroupType
   reservationUnit: ReservationUnitByPkType!
-  created: DateTime!
   name: String!
   description: String!
-
-  """
-  How this recurring reservation's reservations occurs within days. E.g 7 means
-  that it occurs every week. 14 every other week
-  """
   recurrenceInDays: Int
   weekdays: [Int]
-  beginTime: Time
-  endTime: Time
   beginDate: Date
+  beginTime: Time
   endDate: Date
+  endTime: Time
+  created: DateTime!
 
   """The ID of the object"""
   id: ID!
@@ -2166,10 +2052,6 @@ type ReservationConfirmMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -2221,10 +2103,6 @@ type ReservationConfirmMutationPayload {
 
   """The non subsidised price of this reservation excluding VAT"""
   nonSubsidisedPriceNet: Decimal
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
 
   """May contain more than one error for same field."""
@@ -2242,10 +2120,6 @@ input ReservationCreateMutationInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -2273,10 +2147,6 @@ input ReservationCreateMutationInput {
   bufferTimeAfter: Int
   reservationUnitPks: [Int]!
   purposePk: Int
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
   clientMutationId: String
 }
@@ -2291,10 +2161,6 @@ type ReservationCreateMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -2315,8 +2181,6 @@ type ReservationCreateMutationPayload {
   numPersons: Int
   name: String
   description: String
-
-  """Read only string value for ReservationType's ReservationState enum."""
   state: String
   priority: Int
   begin: DateTime
@@ -2343,10 +2207,6 @@ type ReservationCreateMutationPayload {
 
   """The non subsidised price of this reservation excluding VAT"""
   nonSubsidisedPriceNet: Decimal
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
 
   """May contain more than one error for same field."""
@@ -2530,22 +2390,22 @@ enum ReservationsReservationReserveeTypeChoices {
 
 """An enumeration."""
 enum ReservationsReservationStateChoices {
-  """created"""
+  """Luotu"""
   CREATED
 
-  """cancelled"""
+  """Cancelled"""
   CANCELLED
 
-  """requires_handling"""
+  """Requires handling"""
   REQUIRES_HANDLING
 
-  """waiting_for_payment"""
+  """Waiting for payment"""
   WAITING_FOR_PAYMENT
 
-  """confirmed"""
+  """Confirmed"""
   CONFIRMED
 
-  """denied"""
+  """Denied"""
   DENIED
 }
 
@@ -2616,10 +2476,6 @@ input ReservationStaffCreateMutationInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -2659,10 +2515,6 @@ input ReservationStaffCreateMutationInput {
 
   """The unit price of this particular reservation"""
   unitPrice: Decimal
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String!
 
   """Working memo for staff users."""
@@ -2681,10 +2533,6 @@ type ReservationStaffCreateMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -2729,10 +2577,6 @@ type ReservationStaffCreateMutationPayload {
 
   """The unit price of this particular reservation"""
   unitPrice: Decimal
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
 
   """Working memo for staff users."""
@@ -2755,10 +2599,6 @@ input ReservationStaffModifyMutationInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -2786,22 +2626,10 @@ input ReservationStaffModifyMutationInput {
   """
   state: String
   priority: Int
-
-  """
-  Number of seconds. Null/undefined value means buffer from reservation unit is used.
-  """
   bufferTimeBefore: Int
-
-  """
-  Number of seconds. Null/undefined value means buffer from reservation unit is used.
-  """
   bufferTimeAfter: Int
   reservationUnitPks: [Int]
   purposePk: Int
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
   clientMutationId: String
 }
@@ -2816,10 +2644,6 @@ type ReservationStaffModifyMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -2849,15 +2673,7 @@ type ReservationStaffModifyMutationPayload {
   priority: Int
   begin: DateTime
   end: DateTime
-
-  """
-  Number of seconds. Null/undefined value means buffer from reservation unit is used.
-  """
   bufferTimeBefore: Int
-
-  """
-  Number of seconds. Null/undefined value means buffer from reservation unit is used.
-  """
   bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
@@ -2879,10 +2695,6 @@ type ReservationStaffModifyMutationPayload {
 
   """The non subsidised price of this reservation excluding VAT"""
   nonSubsidisedPriceNet: Decimal
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
 
   """May contain more than one error for same field."""
@@ -2921,7 +2733,7 @@ type ReservationType implements Node {
   billingAddressZip: String
 
   """Home city of the group or association"""
-  homeCity: CityType
+  homeCity: CityNode
   ageGroup: AgeGroupType
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
@@ -3084,8 +2896,8 @@ type ReservationUnitByPkType implements Node {
 
   """Is reservation unit archived."""
   isArchived: Boolean!
+  applicationRounds(active: Boolean): [ApplicationRoundNode]
   images: [ReservationUnitImageType!]!
-  applicationRounds(active: Boolean): [ApplicationRoundType]
 
   """The ID of the object"""
   id: ID!
@@ -3232,21 +3044,21 @@ input ReservationUnitCreateMutationInput {
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -3356,21 +3168,21 @@ type ReservationUnitCreateMutationPayload {
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3746,9 +3558,9 @@ type ReservationUnitType implements Node {
   isArchived: Boolean!
   paymentMerchant: PaymentMerchantType
   paymentProduct: PaymentProductType
+  applicationRounds(active: Boolean): [ApplicationRoundNode]
   pricings: [ReservationUnitPricingType]
   images: [ReservationUnitImageType!]!
-  applicationRounds(active: Boolean): [ApplicationRoundType]
 
   """The ID of the object"""
   id: ID!
@@ -3903,21 +3715,21 @@ input ReservationUnitUpdateMutationInput {
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -4026,21 +3838,21 @@ type ReservationUnitUpdateMutationPayload {
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4058,10 +3870,6 @@ input ReservationUpdateMutationInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -4095,10 +3903,6 @@ input ReservationUpdateMutationInput {
   bufferTimeAfter: Int
   reservationUnitPks: [Int]
   purposePk: Int
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
   clientMutationId: String
 }
@@ -4113,10 +3917,6 @@ type ReservationUpdateMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-
-  """
-  Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL.
-  """
   reserveeType: String
 
   """Reservee's business or association identity code"""
@@ -4168,10 +3968,6 @@ type ReservationUpdateMutationPayload {
 
   """The non subsidised price of this reservation excluding VAT"""
   nonSubsidisedPriceNet: Decimal
-
-  """
-  Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED, STAFF, BEHALF.
-  """
   type: String
 
   """May contain more than one error for same field."""
@@ -4546,22 +4342,22 @@ type SpaceUpdateMutationPayload {
 
 """An enumeration."""
 enum state {
-  """created"""
+  """Luotu"""
   CREATED
 
-  """cancelled"""
+  """Cancelled"""
   CANCELLED
 
-  """requires_handling"""
+  """Requires handling"""
   REQUIRES_HANDLING
 
-  """waiting_for_payment"""
+  """Waiting for payment"""
   WAITING_FOR_PAYMENT
 
-  """confirmed"""
+  """Confirmed"""
   CONFIRMED
 
-  """denied"""
+  """Denied"""
   DENIED
 }
 
@@ -4809,6 +4605,79 @@ type UnitUpdateMutationPayload {
   errors: [ErrorType]
   unit: UnitType
   clientMutationId: String
+}
+
+input UpdateAddressSerializerInput {
+  city: String
+  cityEn: String
+  cityFi: String
+  citySv: String
+  pk: Int
+  postCode: String
+  streetAddress: String
+  streetAddressEn: String
+  streetAddressFi: String
+  streetAddressSv: String
+}
+
+input UpdateApplicationEventInApplicationSerializerInput {
+  abilityGroup: Int
+  ageGroup: Int
+  applicationEventSchedules: [UpdateApplicationEventScheduleInEventSerializerInput]
+  begin: Date
+  biweekly: Boolean
+  end: Date
+  eventReservationUnits: [UpdateEventReservationUnitSerializerInput]
+  eventsPerWeek: Int
+  maxDuration: String
+  minDuration: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+}
+
+input UpdateApplicationEventScheduleInEventSerializerInput {
+  begin: Time
+  day: Int
+  end: Time
+  pk: Int
+  priority: Int
+}
+
+input UpdateEventReservationUnitSerializerInput {
+  pk: Int
+  priority: Int
+  reservationUnit: Int
+}
+
+input UpdateOrganisationSerializerInput {
+  activeMembers: Int
+  address: UpdateAddressSerializerInput
+  coreBusiness: String
+  coreBusinessEn: String
+  coreBusinessFi: String
+  coreBusinessSv: String
+  email: String
+  identifier: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  organisationType: organisation_type
+  pk: Int
+  yearEstablished: Int
+}
+
+input UpdatePersonSerializerInput {
+  email: String
+  firstName: String
+  lastName: String
+  phoneNumber: String
+  pk: Int
 }
 
 """

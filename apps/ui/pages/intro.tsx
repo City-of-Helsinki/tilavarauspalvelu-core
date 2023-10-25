@@ -9,7 +9,13 @@ import styled from "styled-components";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { filterNonNullable } from "common/src/helpers";
-import { ApplicationsApplicationApplicantTypeChoices, type ApplicationCreateMutationInput, type Mutation, type MutationCreateApplicationArgs, type Query, type QueryApplicationRoundsArgs, ApplicationStatus } from "common/types/gql-types";
+import {
+  type ApplicationCreateMutationInput,
+  type Mutation,
+  type MutationCreateApplicationArgs,
+  type Query,
+  type QueryApplicationRoundsArgs,
+} from "common/types/gql-types";
 import { useSession } from "@/hooks/auth";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { applicationRoundState } from "@/modules/util";
@@ -71,7 +77,8 @@ const IntroPage = (): JSX.Element => {
   );
 
   const now = new Date();
-  const applicationRounds = filterNonNullable(data?.applicationRounds?.edges?.map((n) => n?.node))
+  const applicationRounds =
+    filterNonNullable(data?.applicationRounds?.edges?.map((n) => n?.node))
       .filter(
         (ar) =>
           new Date(ar.publicDisplayBegin) <= now &&
@@ -86,42 +93,40 @@ const IntroPage = (): JSX.Element => {
         label: getApplicationRoundName(ar),
       })) ?? [];
 
-  const [create, { loading: isSaving }] = useMutation<Mutation, MutationCreateApplicationArgs>(
-    CREATE_APPLICATION_MUTATION,
-    {
-      onError: (e) => {
-        console.warn("create application mutation failed: ", e);
-        setError(t("application:Intro.createFailedContent"))
-      },
-    }
-  );
+  const [create, { loading: isSaving }] = useMutation<
+    Mutation,
+    MutationCreateApplicationArgs
+  >(CREATE_APPLICATION_MUTATION, {
+    onError: (e) => {
+      // eslint-disable-next-line no-console
+      console.warn("create application mutation failed: ", e);
+      setError(t("application:Intro.createFailedContent"));
+    },
+  });
 
   const createNewApplication = async (applicationRoundId: number) => {
     const input: ApplicationCreateMutationInput = {
-      applicationRoundPk: applicationRoundId,
-      applicantType: ApplicationsApplicationApplicantTypeChoices.Individual,
-      applicationEvents: [],
-      status: ApplicationStatus.Draft,
+      applicationRound: applicationRoundId,
+      // TODO why is billingAddress required?
+      // also it returns silly errors if they are empty so dummy values for now
       billingAddress: {
-        streetAddress: "",
-        postCode: "",
-        city: "",
-      },
-      contactPerson: {
-        firstName: "",
-        lastName: "",
+        streetAddress: "dummy",
+        postCode: "dummy",
+        city: "dummy",
       },
     };
-    const { data, errors } = await create({
-      variables: { input }
+    const { data: mutResponse, errors } = await create({
+      variables: { input },
     });
 
     if (errors) {
+      // eslint-disable-next-line no-console
       console.error("create application mutation failed: ", errors);
-    } else if (data?.createApplication?.application?.pk) {
-      const { pk } = data.createApplication.application;
+    } else if (mutResponse?.createApplication?.pk) {
+      const { pk } = mutResponse.createApplication;
       history.replace(`/application/${pk}/page1`);
     } else {
+      // eslint-disable-next-line no-console
       console.error("create application mutation failed: ", data);
     }
   };

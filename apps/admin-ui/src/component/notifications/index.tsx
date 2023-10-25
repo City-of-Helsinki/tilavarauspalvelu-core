@@ -5,7 +5,7 @@ import { type TFunction } from "i18next";
 import styled from "styled-components";
 import { Button } from "hds-react";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
-import type { Query, BannerNotificationType } from "common/types/gql-types";
+import type { Query, BannerNotificationNode } from "common/types/gql-types";
 import { H1 } from "common/src/common/typography";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
@@ -23,14 +23,14 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.state"),
     key: "state",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationType>) =>
+    transform: (notification: NonNullable<BannerNotificationNode>) =>
       t(`Notifications.state.${notification.state ?? "noState"}`),
   },
   {
     headerName: t("Notifications.headings.name"),
     key: "name",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationType>) =>
+    transform: (notification: NonNullable<BannerNotificationNode>) =>
       notification.pk ? (
         <TableLink href={notificationUrl(notification.pk)}>
           {notification.name ?? t("Notifications.noName")}
@@ -43,7 +43,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.activeFrom"),
     key: "activeFrom",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationType>) =>
+    transform: (notification: NonNullable<BannerNotificationNode>) =>
       notification.activeFrom
         ? `${valueForDateInput(notification.activeFrom)} ${valueForTimeInput(
             notification.activeFrom
@@ -54,7 +54,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.activeUntil"),
     key: "activeUntil",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationType>) =>
+    transform: (notification: NonNullable<BannerNotificationNode>) =>
       notification.activeUntil
         ? `${valueForDateInput(notification.activeUntil)} ${valueForTimeInput(
             notification.activeUntil
@@ -65,14 +65,14 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.targetGroup"),
     key: "targetGroup",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationType>) =>
+    transform: (notification: NonNullable<BannerNotificationNode>) =>
       t(`Notifications.target.${notification.target ?? "noTarget"}`),
   },
   {
     headerName: t("Notifications.headings.level"),
     key: "level",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationType>) =>
+    transform: (notification: NonNullable<BannerNotificationNode>) =>
       t(`Notifications.level.${notification.level ?? "noLevel"}`),
   },
 ];
@@ -115,7 +115,7 @@ const NotificationsTable = ({
   onSortChanged,
   sortKey,
 }: {
-  notifications: BannerNotificationType[];
+  notifications: BannerNotificationNode[];
   onSortChanged: (key: string) => void;
   sortKey: Sort;
 }) => {
@@ -167,7 +167,7 @@ const Page = () => {
   const notifications =
     data?.bannerNotifications?.edges
       .map((edge) => edge?.node)
-      .filter((n): n is BannerNotificationType => n != null) ?? [];
+      .filter((n): n is BannerNotificationNode => n != null) ?? [];
   const totalCount = data?.bannerNotifications?.totalCount ?? 0;
 
   const { t } = useTranslation();

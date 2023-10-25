@@ -7,12 +7,12 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, Strongish } from "common/src/common/typography";
 import {
-  ApplicationType,
-  QueryApplicationsArgs,
-  Query,
-  ApplicationEventType,
-  ReservationUnitType,
-  ApplicationStatus,
+  type ApplicationNode,
+  type QueryApplicationsArgs,
+  type Query,
+  type ApplicationEventNode,
+  ApplicationStatusChoice,
+  type ReservationUnitByPkType,
 } from "common/types/gql-types";
 import { AutoGrid, Container } from "@/styles/layout";
 import { OptionType } from "@/common/types";
@@ -22,7 +22,7 @@ import Loader from "@/component/Loader";
 import LinkPrev from "@/component/LinkPrev";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
 import { getFilteredApplicationEvents } from "./modules/applicationRoundAllocation";
-import ApplicationEvents from "./ApplicationEvents";
+import { ApplicationEvents } from "./ApplicationEvents";
 
 type IParams = {
   applicationRoundId: string;
@@ -52,7 +52,7 @@ function ApplicationRoundAllocation({
     useAllocationContext();
   const { notifyError } = useNotification();
   const [selectedReservationUnit, setSelectedReservationUnit] =
-    useState<ReservationUnitType | null>(null);
+    useState<ReservationUnitByPkType | null>(null);
 
   const [unitFilter, setUnitFilter] = useState<OptionType | null>(null);
   const [timeFilter, setTimeFilter] = useState<OptionType[]>([]);
@@ -70,15 +70,12 @@ function ApplicationRoundAllocation({
     {
       skip: !applicationRoundId,
       variables: {
-        applicationRound: String(applicationRoundId),
+        applicationRound: applicationRoundId,
         status: [
-          ApplicationStatus.Allocated,
-          ApplicationStatus.Expired,
-          ApplicationStatus.Handled,
-          ApplicationStatus.InReview,
-          ApplicationStatus.Received,
-          ApplicationStatus.ReviewDone,
-          ApplicationStatus.Sent,
+          ApplicationStatusChoice.Received,
+          ApplicationStatusChoice.Handled,
+          ApplicationStatusChoice.ResultsSent,
+          ApplicationStatusChoice.InAllocation,
         ],
       },
       onError: () => {
@@ -90,7 +87,7 @@ function ApplicationRoundAllocation({
   const applications =
     applicationsData?.applications?.edges
       .map((e) => e?.node)
-      ?.filter((x): x is ApplicationType => x != null) ?? [];
+      ?.filter((x): x is ApplicationNode => x != null) ?? [];
 
   const unitData = applications.flatMap((application) =>
     application?.applicationEvents?.flatMap((ae) =>
@@ -130,18 +127,18 @@ function ApplicationRoundAllocation({
     },
   ];
 
-  const reservationUnits: ReservationUnitType[] = uniqBy(
-    applications.flatMap((application) =>
-      application?.applicationEvents?.flatMap((applicationEvent) =>
-        applicationEvent?.eventReservationUnits
-          ?.flatMap((evtRu) => evtRu?.reservationUnit)
-          .filter((ru): ru is ReservationUnitType => ru != null)
+  const allResUnits =
+    applications
+      .flatMap((a) =>
+        a.applicationEvents?.flatMap((ae) =>
+          ae.eventReservationUnits?.flatMap((evtRu) => evtRu?.reservationUnit)
+        )
       )
-    ),
-    "pk"
-  )
+      .filter((ru): ru is ReservationUnitByPkType => ru != null) ?? [];
+
+  const reservationUnits: ReservationUnitByPkType[] = uniqBy(allResUnits, "pk")
     .filter((ru) => unitFilter?.value === ru?.unit?.pk)
-    .filter((ru): ru is ReservationUnitType => ru != null);
+    .filter((ru): ru is ReservationUnitByPkType => ru != null);
 
   // NOTE rather sketchy: this is the context event listener
   useEffect(() => {
@@ -151,7 +148,7 @@ function ApplicationRoundAllocation({
     }
   }, [refetch, refreshApplicationEvents, setRefreshApplicationEvents]);
 
-  const applicationEvents: ApplicationEventType[] =
+  const applicationEvents: ApplicationEventNode[] =
     getFilteredApplicationEvents(
       applications,
       unitFilter,

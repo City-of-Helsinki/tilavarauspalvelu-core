@@ -1,6 +1,7 @@
-import { rest, graphql } from "msw";
-import { Query, CityTypeConnection } from "common/types/gql-types";
+import { graphql } from "msw";
+import { Query, CityNodeConnection } from "common/types/gql-types";
 
+// TODO leaving these for now we might need to change them to GQL responses
 const getAbilityGroupJSONResponse = [{ id: 1, name: "Keskitaso" }];
 
 const getAgeGroupJSONResponse = [
@@ -17,13 +18,14 @@ const getTypeJSONResponse = [
   { id: 2, name: "Kokoustila" },
 ];
 
-const citiesHandler = graphql.query<Query>("Cities", async (req, res, ctx) => {
-  const cities: CityTypeConnection = {
+const citiesHandler = graphql.query<Query>("Cities", async (_req, res, ctx) => {
+  const cities: CityNodeConnection = {
     edges: [
       {
         node: {
           id: "fgh",
           pk: 1,
+          municipalityCode: "",
           name: "Helsinki",
           nameFi: "Helsinki",
           nameEn: "Helsinki",
@@ -35,6 +37,7 @@ const citiesHandler = graphql.query<Query>("Cities", async (req, res, ctx) => {
         node: {
           id: "grt",
           pk: 2,
+          municipalityCode: "",
           name: "Muu",
           nameFi: "Muu",
           nameEn: "Other",
@@ -51,22 +54,4 @@ const citiesHandler = graphql.query<Query>("Cities", async (req, res, ctx) => {
   return res(ctx.data({ cities }));
 });
 
-const parametersREST = [
-  rest.get(`*/v1/parameters/ability_group/*`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(getAbilityGroupJSONResponse));
-  }),
-
-  rest.get(`*/v1/parameters/age_group/*`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(getAgeGroupJSONResponse));
-  }),
-
-  rest.get(`*/v1/parameters/city/*`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(getCityJSONResponse));
-  }),
-
-  rest.get(`*/v1/parameters/reservation_unit_type/*`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(getTypeJSONResponse));
-  }),
-];
-
-export const parameterHandlers = [...parametersREST, citiesHandler];
+export const parameterHandlers = [citiesHandler];

@@ -1,8 +1,8 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import {
-  type ApplicationRoundType,
-  type ApplicationType,
+  type ApplicationRoundNode,
+  type ApplicationNode,
   type Query,
   type QueryApplicationsArgs,
 } from "common/types/gql-types";
@@ -22,7 +22,7 @@ export type Sort = {
 
 const mapFilterParams = (params: FilterArguments) => ({
   ...params,
-  unit: params.unit?.map((u) => u.value as string),
+  unit: params.unit?.map((u) => u.value as string).map(Number),
 });
 
 const updateQuery = (
@@ -37,7 +37,7 @@ const updateQuery = (
 };
 
 type Props = {
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
   filters: FilterArguments;
   sort?: Sort;
   sortChanged: (field: string) => void;
@@ -61,7 +61,7 @@ const ApplicationDataLoader = ({
     {
       variables: {
         ...mapFilterParams(filters),
-        applicationRound: String(applicationRound.pk),
+        applicationRound: applicationRound.pk ?? 0,
         offset: 0,
         first: LIST_PAGE_SIZE,
         orderBy: sortString,
@@ -79,7 +79,7 @@ const ApplicationDataLoader = ({
 
   const applications = (data?.applications?.edges || [])
     .map((edge) => edge?.node)
-    .filter((node): node is ApplicationType => node != null);
+    .filter((node): node is ApplicationNode => node != null);
 
   return (
     <>

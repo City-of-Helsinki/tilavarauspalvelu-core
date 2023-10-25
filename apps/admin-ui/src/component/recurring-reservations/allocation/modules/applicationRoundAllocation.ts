@@ -1,16 +1,18 @@
 import { get, orderBy, padStart, sortBy, uniqBy } from "lodash";
 import {
-  type ApplicationEventScheduleType,
-  type ApplicationEventType,
-  type ApplicationType,
+  type ApplicationEventScheduleNode,
+  type ApplicationEventNode,
+  ApplicationsApplicationApplicantTypeChoices,
+  type ApplicationNode,
   type ReservationUnitType,
+  type ReservationUnitByPkType,
 } from "common/types/gql-types";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import i18next from "i18next";
 import type { OptionType } from "@/common/types";
 
 const parseApplicationEventScheduleTime = (
-  applicationEventSchedule: ApplicationEventScheduleType
+  applicationEventSchedule: ApplicationEventScheduleNode
 ): string => {
   const weekday = i18next.t(`dayShort.${applicationEventSchedule?.day}`);
   return `${weekday} ${Number(
@@ -19,12 +21,12 @@ const parseApplicationEventScheduleTime = (
 };
 
 export const getFilteredApplicationEvents = (
-  applications: ApplicationType[],
+  applications: ApplicationNode[],
   unitFilter: OptionType | null,
   timeFilter: OptionType[],
   orderFilter: OptionType[],
-  reservationUnitFilter: ReservationUnitType | null
-): ApplicationEventType[] => {
+  reservationUnitFilter: ReservationUnitType | ReservationUnitByPkType | null
+): ApplicationEventNode[] => {
   if (applications?.length < 1 || !reservationUnitFilter) {
     return [];
   }
@@ -76,9 +78,9 @@ export const getFilteredApplicationEvents = (
 };
 
 export const getApplicationByApplicationEvent = (
-  applications: ApplicationType[],
+  applications: ApplicationNode[],
   applicationEventId: number
-): ApplicationType | undefined => {
+): ApplicationNode | undefined => {
   return applications.find((application) =>
     application?.applicationEvents?.find(
       (applicationEvent) => applicationEvent?.pk === applicationEventId
@@ -143,7 +145,7 @@ export const isSlotLast = (selection: string[], slot: string): boolean => {
 };
 
 export const getApplicationEventScheduleTimes = (
-  applicationEventSchedule: ApplicationEventScheduleType
+  applicationEventSchedule: ApplicationEventScheduleNode
 ): { begin: string; end: string } => {
   return {
     begin: `${applicationEventSchedule?.day}-${Number(
@@ -161,7 +163,7 @@ export const timeSlotKeyToTime = (slot: string): number => {
 };
 
 export const doSomeSlotsFitApplicationEventSchedule = (
-  applicationEventSchedule: ApplicationEventScheduleType,
+  applicationEventSchedule: ApplicationEventScheduleNode,
   slots: string[]
 ): boolean => {
   const { begin, end } = getApplicationEventScheduleTimes(
@@ -181,7 +183,7 @@ export const doSomeSlotsFitApplicationEventSchedule = (
 
 export const getSlotApplicationEventCount = (
   slots: string[],
-  applicationEvents: ApplicationEventType[] | null
+  applicationEvents: ApplicationEventNode[] | null
 ): number => {
   const applicationEventSchedules = applicationEvents?.flatMap(
     (applicationEvent) => applicationEvent.applicationEventSchedules
@@ -240,10 +242,10 @@ export const getTimeSlotOptions = (
 };
 
 export const getTimeSlots = (
-  applicationEventSchedules: ApplicationEventScheduleType[]
+  applicationEventSchedules: ApplicationEventScheduleNode[]
 ): string[] => {
   return applicationEventSchedules?.reduce(
-    (acc: string[], cur: ApplicationEventScheduleType) => {
+    (acc: string[], cur: ApplicationEventScheduleNode) => {
       const { day } = cur;
       const [startHours, startMinutes] = cur.begin.split(":").map(Number);
       const [endHours, endMinutes] = cur.end.split(":").map(Number);
@@ -287,10 +289,19 @@ export const getTimeSeries = (
   return timeSlots;
 };
 
+export const getApplicantName = (
+  application: ApplicationNode | undefined
+): string => {
+  return application?.applicantType ===
+    ApplicationsApplicationApplicantTypeChoices.Individual
+    ? `${application?.contactPerson?.firstName} ${application?.contactPerson?.lastName}`.trim()
+    : application?.applicant?.name || "";
+};
+
 export const getSlotApplicationEvents = (
   slots: string[] | null,
-  applicationEvents: ApplicationEventType[] | null
-): ApplicationEventType[] => {
+  applicationEvents: ApplicationEventNode[] | null
+): ApplicationEventNode[] => {
   if (!slots) return [];
   return (
     applicationEvents?.filter((applicationEvent) =>
@@ -307,7 +318,7 @@ export const getSlotApplicationEvents = (
 };
 
 export const getTimeSlotMatchingPercentage = (
-  applicationEventSchedules: ApplicationEventScheduleType[],
+  applicationEventSchedules: ApplicationEventScheduleNode[],
   selection: string[] | null
 ): number => {
   if (!selection || applicationEventSchedules?.length < 1) {
@@ -321,17 +332,17 @@ export const getTimeSlotMatchingPercentage = (
 };
 
 export const getEarliestScheduleStart = (
-  applicationEventSchedules: ApplicationEventScheduleType[]
+  applicationEventSchedules: ApplicationEventScheduleNode[]
 ): string | null => {
   const starts = applicationEventSchedules.map((n) => n.begin).sort();
   return starts?.length > 0 ? starts[0] : null;
 };
 
 export const getSelectedApplicationEvents = (
-  applicationEvents: ApplicationEventType[],
+  applicationEvents: ApplicationEventNode[],
   selection: string[] | null,
   priority: ApplicationEventSchedulePriority
-): ApplicationEventType[] => {
+): ApplicationEventNode[] => {
   if (!selection || !applicationEvents) return [];
 
   return orderBy(
@@ -347,12 +358,12 @@ export const getSelectedApplicationEvents = (
     [
       (o) =>
         getTimeSlotMatchingPercentage(
-          o.applicationEventSchedules as ApplicationEventScheduleType[],
+          o.applicationEventSchedules as ApplicationEventScheduleNode[],
           selection
         ),
       (o) =>
         getEarliestScheduleStart(
-          o.applicationEventSchedules as ApplicationEventScheduleType[]
+          o.applicationEventSchedules as ApplicationEventScheduleNode[]
         ),
       (o) => o.name,
     ],
@@ -361,7 +372,7 @@ export const getSelectedApplicationEvents = (
 };
 
 export const getApplicationEventScheduleTimeString = (
-  applicationEventSchedules: ApplicationEventScheduleType[],
+  applicationEventSchedules: ApplicationEventScheduleNode[],
   priority: ApplicationEventSchedulePriority
 ): string => {
   const schedules = sortBy(
@@ -399,8 +410,9 @@ export type ApplicationEventScheduleResultStatuses = {
   declinedSlots: string[];
 };
 
+/* FIXME
 export const getApplicationEventScheduleResultStatuses = (
-  applicationEvents: ApplicationEventType[] | null
+  applicationEvents: ApplicationEventNode[] | null
 ): ApplicationEventScheduleResultStatuses => {
   const getResultTimeSlots = (
     day: number,
@@ -412,17 +424,17 @@ export const getApplicationEventScheduleResultStatuses = (
       begin,
       end,
     };
-    return getTimeSlots([allocationResult as ApplicationEventScheduleType]);
+    return getTimeSlots([allocationResult as ApplicationEventScheduleNode]);
   };
 
   const schedules = applicationEvents?.flatMap(
     (applicationEvent) => applicationEvent.applicationEventSchedules
-  ) as ApplicationEventScheduleType[];
+  ) as ApplicationEventScheduleNode[];
 
   const { acceptedSlots, declinedSlots } = schedules.reduce(
     (
       acc: ApplicationEventScheduleResultStatuses,
-      cur: ApplicationEventScheduleType
+      cur: ApplicationEventScheduleNode
     ): ApplicationEventScheduleResultStatuses => {
       if (cur?.applicationEventScheduleResult?.accepted) {
         const { allocatedDay, allocatedBegin, allocatedEnd } =
@@ -459,3 +471,4 @@ export const getApplicationEventScheduleResultStatuses = (
     declinedSlots,
   };
 };
+*/

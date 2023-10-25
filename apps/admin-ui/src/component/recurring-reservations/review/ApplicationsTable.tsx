@@ -1,15 +1,16 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { memoize, orderBy, trim, uniqBy } from "lodash";
+import { memoize, orderBy, uniqBy } from "lodash";
 import styled from "styled-components";
 import { TFunction } from "i18next";
 import { IconLinkExternal } from "hds-react";
-import { formatters as getFormatters } from "common";
-import { ApplicationType } from "common/types/gql-types";
+import type {
+  ApplicationNode,
+  ApplicationStatusChoice,
+} from "common/types/gql-types";
 import { ApplicationStatus } from "common/types/common";
 import { publicUrl } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
-import { formatNumber } from "@/common/util";
 import { truncate } from "@/helpers";
 import {
   applicationStatusFromGqlToRest,
@@ -41,7 +42,7 @@ type ApplicationView = {
   applicationCount: string;
   status: ApplicationStatus;
   statusView: JSX.Element;
-  statusType: ApplicationStatus;
+  statusType?: ApplicationStatusChoice;
 };
 
 const getColConfig = (t: TFunction) => [
@@ -111,9 +112,7 @@ const StyledStatusCell = styled(StatusCell)`
   }
 `;
 
-const formatters = getFormatters("fi");
-
-const appMapper = (app: ApplicationType, t: TFunction): ApplicationView => {
+const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
   /*
   let applicationStatusView: ApplicationRoundStatus;
   switch (round.status) {
@@ -165,23 +164,15 @@ const appMapper = (app: ApplicationType, t: TFunction): ApplicationView => {
         withArrow={false}
       />
     ),
-    statusType: app.status as ApplicationStatus,
-    applicationCount: trim(
-      `${formatNumber(
-        app.aggregatedData?.appliedReservationsTotal,
-        ""
-      )} / ${formatters.oneDecimal.format(
-        Number(app.aggregatedData?.appliedMinDurationTotal) / 3600
-      )} t`,
-      " / "
-    ),
+    statusType: app.status ?? undefined,
+    applicationCount: "NA",
   };
 };
 
 type ApplicationsTableProps = {
   sort?: Sort;
   sortChanged: (field: string) => void;
-  applications: ApplicationType[];
+  applications: ApplicationNode[];
 };
 
 const ApplicationsTable = ({

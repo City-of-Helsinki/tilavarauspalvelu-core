@@ -1,8 +1,8 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import {
-  ApplicationEventType,
-  ApplicationRoundType,
+import type {
+  ApplicationEventNode,
+  ApplicationRoundNode,
   Query,
   QueryApplicationEventsArgs,
 } from "common/types/gql-types";
@@ -21,7 +21,7 @@ export type Sort = {
 };
 
 type Props = {
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
   filters: FilterArguments;
   sort?: Sort;
   sortChanged: (field: string) => void;
@@ -29,7 +29,7 @@ type Props = {
 
 const mapFilterParams = (params: FilterArguments) => ({
   ...params,
-  unit: params.unit?.map((u) => u.value as string),
+  unit: params.unit?.map((u) => u.value as string).map(Number),
 });
 
 const updateQuery = (
@@ -63,7 +63,7 @@ const ApplicationEventDataLoader = ({
     skip: !applicationRound.pk,
     variables: {
       ...mapFilterParams(filters),
-      applicationRound: String(applicationRound.pk),
+      applicationRound: applicationRound.pk ?? 0,
       offset: 0,
       first: LIST_PAGE_SIZE,
       orderBy: sortString,
@@ -81,7 +81,7 @@ const ApplicationEventDataLoader = ({
   const applicationEvents =
     data?.applicationEvents?.edges
       .map((edge) => edge?.node)
-      .filter((n): n is ApplicationEventType => n != null) ?? [];
+      .filter((n): n is ApplicationEventNode => n != null) ?? [];
 
   return (
     <>

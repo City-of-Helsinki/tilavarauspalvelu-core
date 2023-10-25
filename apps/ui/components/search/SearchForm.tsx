@@ -16,7 +16,7 @@ import { sortBy } from "lodash";
 import { OptionType, StringParameter } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   Query,
   QueryUnitsArgs,
 } from "common/types/gql-types";
@@ -41,7 +41,7 @@ type Props = {
   onSearch: (search: Record<string, string>) => void;
   formValues: { [key: string]: string };
   removeValue: (key?: string[], subItemKey?: string) => void;
-  applicationRounds: ApplicationRoundType[];
+  applicationRounds: ApplicationRoundNode[];
 };
 
 const desktopBreakpoint = "840px";

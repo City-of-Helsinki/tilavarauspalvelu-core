@@ -3,7 +3,7 @@ import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import { ApplicationType } from "common/types/gql-types";
+import { ApplicationNode } from "common/types/gql-types";
 import { applicationErrorText } from "@/modules/util";
 import { FormSubHeading, TwoColumnContainer } from "../common/common";
 import { EmailInput } from "./EmailInput";
@@ -12,13 +12,13 @@ import Buttons from "./Buttons";
 import { ApplicationFormValues } from "./Form";
 
 type Props = {
-  application: ApplicationType;
+  application: ApplicationNode;
 };
 
 // TODO hasBillingAddress can be removed by using the form field
 /*
 const prepareData = (
-  application: ApplicationType,
+  application: ApplicationNode,
   data: FormValues,
   hasBillingAddress: boolean
 ): Application => {

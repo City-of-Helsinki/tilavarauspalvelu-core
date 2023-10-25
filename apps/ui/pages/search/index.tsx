@@ -14,7 +14,7 @@ import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import ClientOnly from "common/src/ClientOnly";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   Query,
   QueryApplicationRoundsArgs,
   QueryReservationUnitsArgs,
@@ -42,7 +42,7 @@ import ListWithPagination from "../../components/common/ListWithPagination";
 import StartApplicationBar from "../../components/common/StartApplicationBar";
 
 type Props = {
-  applicationRounds: ApplicationRoundType[];
+  applicationRounds: ApplicationRoundNode[];
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

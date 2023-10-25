@@ -4,22 +4,20 @@ import { uniqBy } from "lodash";
 import {
   type Query,
   type QueryApplicationsArgs,
-  ApplicationStatus,
-  type ApplicationType,
+  ApplicationStatusChoice,
+  type ApplicationNode,
   type UnitType,
   ApplicationsApplicationApplicantTypeChoices,
-  ApplicationRoundType,
-  ApplicationRoundStatus,
+  type ApplicationRoundNode,
+  ApplicationRoundStatusChoice,
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
-import trim from "lodash/trim";
 import { H1, H3 } from "common/src/common/typography";
 import { useNotification } from "@/context/NotificationContext";
-import { formatNumber, formatDuration } from "@/common/util";
 import { applicationUrl } from "@/common/urls";
 import { ContentContainer, IngressContainer } from "@/styles/layout";
 import { DataFilterConfig } from "@/common/types";
@@ -59,7 +57,7 @@ type ApplicationView = {
   unitsSort: string;
   applicationCount: string;
   applicationCountSort: number;
-  status?: ApplicationStatus;
+  status?: ApplicationStatusChoice;
 };
 
 const getFilterConfig = (
@@ -103,7 +101,7 @@ const getFilterConfig = (
   ];
 };
 
-const appMapper = (app: ApplicationType, t: TFunction): ApplicationView => {
+const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
   const units = uniqBy(
     app?.applicationEvents
       ?.flatMap((ae) => ae?.eventReservationUnits)
@@ -115,7 +113,7 @@ const appMapper = (app: ApplicationType, t: TFunction): ApplicationView => {
 
   const applicantName =
     app.applicantType === ApplicationsApplicationApplicantTypeChoices.Individual
-      ? app.applicantName || ""
+      ? app.applicant?.name || ""
       : app.organisation?.name || "";
 
   return {
@@ -127,21 +125,15 @@ const appMapper = (app: ApplicationType, t: TFunction): ApplicationView => {
     unitsSort: units.find(() => true)?.nameFi || "",
     units,
     status,
-    applicationCount: trim(
-      `${formatNumber(
-        app.aggregatedData?.appliedReservationsTotal,
-        t("common.volumeUnit")
-      )} / ${formatDuration(app.aggregatedData?.appliedMinDurationTotal)}`,
-      " / "
-    ),
-    applicationCountSort: app.aggregatedData?.appliedReservationsTotal || 0,
+    applicationCount: "NA",
+    applicationCountSort: 0,
   };
 };
 
-const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
+const getCellConfig = (applicationRound: ApplicationRoundNode): CellConfig => {
   let statusTitle: string;
   switch (applicationRound.status) {
-    case ApplicationRoundStatus.Handled:
+    case ApplicationRoundStatusChoice.Handled:
       statusTitle = "Application.headings.resolutionStatus";
       break;
     default:
@@ -217,13 +209,12 @@ function Applications({
   >(APPLICATIONS_BY_APPLICATION_ROUND_QUERY, {
     skip: !applicationRound?.pk,
     variables: {
-      applicationRound: String(applicationRound?.pk ?? 0),
+      applicationRound: applicationRound?.pk ?? 0,
       status: [
-        ApplicationStatus.Allocated,
-        ApplicationStatus.Handled,
-        ApplicationStatus.InReview,
-        ApplicationStatus.ReviewDone,
-        ApplicationStatus.Sent,
+        ApplicationStatusChoice.InAllocation,
+        ApplicationStatusChoice.Handled,
+        ApplicationStatusChoice.ResultsSent,
+        ApplicationStatusChoice.Received,
       ],
     },
     onError: () => {
@@ -234,7 +225,7 @@ function Applications({
   const applications =
     data?.applications?.edges
       ?.map((edge) => edge?.node)
-      .filter((app): app is ApplicationType => app != null)
+      .filter((app): app is ApplicationNode => app != null)
       .map((app) => appMapper(app, t)) ?? [];
   const filterConfig = getFilterConfig(applications);
 

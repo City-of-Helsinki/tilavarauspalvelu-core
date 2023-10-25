@@ -62,15 +62,13 @@ module.exports = {
     "react/prop-types": 0,
     "react/require-default-props": 0,
     "react/static-property-placement": 0,
-    "@typescript-eslint/camelcase": ["off"], // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
+    // Prefer naming-conventation
+    "camelcase": 0,
     "@typescript-eslint/naming-convention": [
       "error",
       {
         selector: "default",
         format: ["camelCase"],
-        // TODO only unused should be allowed to have leading underscore
-        leadingUnderscore: 'allow',
-        // trailingUnderscore: 'allow',
       },
       {
         selector: "function",
@@ -78,7 +76,19 @@ module.exports = {
       },
       {
         selector: "variable",
+        format: ["camelCase"],
+      },
+      {
+        selector: "variable",
+        // have to allow PascalCase because of defining React components with arrow functions
         format: ["camelCase", "PascalCase", "UPPER_CASE"],
+        modifiers: ["const"],
+      },
+      {
+        selector: "parameter",
+        format: ["camelCase", "snake_case"],
+        modifiers: ["unused"],
+        leadingUnderscore: "require",
       },
       {
         selector: "property",
@@ -86,7 +96,7 @@ module.exports = {
       },
       {
         selector: "typeLike",
-        format: ["PascalCase"],
+        format: ["StrictPascalCase"],
       },
       {
         selector: "enumMember",

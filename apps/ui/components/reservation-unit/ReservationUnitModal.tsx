@@ -17,7 +17,7 @@ import { OptionType } from "common/types/common";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationRoundType,
+  ApplicationRoundNode,
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitType,
@@ -288,7 +288,7 @@ const ReservationUnitModal = ({
   currentReservationUnits,
   options,
 }: {
-  applicationRound: ApplicationRoundType;
+  applicationRound: ApplicationRoundNode;
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
   currentReservationUnits: ReservationUnitType[];

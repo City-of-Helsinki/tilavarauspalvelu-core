@@ -14,16 +14,17 @@ import {
   Mutation,
   MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
-  Priority,
-  ApplicationStatus,
+  ReservationsReservationPriorityChoices,
   ApplicationsApplicationApplicantTypeChoices,
   ApplicationUpdateMutationInput,
+  Applicant_Type,
 } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { ApplicationEventSchedulePriority } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
+import { Maybe } from "graphql/jsutils/Maybe";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import Page1 from "@/components/application/Page1";
@@ -45,7 +46,10 @@ import {
   convertPerson,
   transformApplicationEventToForm,
 } from "@/components/application/Form";
-import { CREATE_APPLICATION_MUTATION, UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
+import {
+  CREATE_APPLICATION_MUTATION,
+  UPDATE_APPLICATION_MUTATION,
+} from "@/modules/queries/application";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -82,16 +86,35 @@ type Props = {
   tos: TermsOfUseType[];
 };
 
+const convertApplicantType = (
+  type: Maybe<ApplicationsApplicationApplicantTypeChoices> | undefined
+) => {
+  switch (type) {
+    case ApplicationsApplicationApplicantTypeChoices.Individual:
+      return Applicant_Type.Individual;
+    case ApplicationsApplicationApplicantTypeChoices.Company:
+      return Applicant_Type.Company;
+    case ApplicationsApplicationApplicantTypeChoices.Association:
+      return Applicant_Type.Association;
+    case ApplicationsApplicationApplicantTypeChoices.Community:
+      return Applicant_Type.Community;
+    default:
+      return undefined;
+  }
+};
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const convertPriority = (prio: ApplicationEventSchedulePriority): Priority => {
+const convertPriority = (
+  prio: ApplicationEventSchedulePriority
+): ReservationsReservationPriorityChoices => {
   switch (prio) {
     case 300:
-      return Priority.A_300;
+      return ReservationsReservationPriorityChoices.A_300;
     case 200:
-      return Priority.A_200;
+      return ReservationsReservationPriorityChoices.A_200;
     case 100:
     default:
-      return Priority.A_100;
+      return ReservationsReservationPriorityChoices.A_100;
   }
 };
 
@@ -123,9 +146,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     QueryApplicationsArgs
   >(APPLICATION_QUERY, {
     variables: {
-      pk: [applicationId],
+      pk: [Number(applicationId)],
     },
-    skip: !applicationId,
+    skip: !applicationId || Number.isNaN(Number(applicationId)),
     onError: (e) => {
       console.warn("applications query failed: ", e);
       setError(`${t("common:error.dataError")}`);
@@ -156,12 +179,16 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   );
 
   const handleSave = async (appToSave: ApplicationFormValues) => {
+    // TODO check if we ever need create?
+    // if we do then refactor the input if we don't remove it
+    if (appToSave.pk == null) {
+      return 0;
+    }
     // TODO test all variations (update / create) (individual / organisation / company)
     const input: ApplicationUpdateMutationInput = {
+      pk: appToSave.pk,
       additionalInformation: appToSave.additionalInformation,
-      applicantType:
-        appToSave.applicantType ??
-        ApplicationsApplicationApplicantTypeChoices.Individual,
+      applicantType: appToSave.applicantType ?? undefined,
       // FIXME this includes nulls which are not allowed in the mutation
       // if we unregister the applicationEvent
       applicationEvents: filterNonNullable(appToSave.applicationEvents).map(
@@ -180,7 +207,6 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           abilityGroup: ae.abilityGroup ?? 1,
           ageGroup: ae.ageGroup ?? 1,
           purpose: ae.purpose ?? 1,
-          status: ae.status,
           // min / max duration is a weird string format in the API
           minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
           maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
@@ -195,7 +221,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           biweekly: ae.biweekly,
           eventsPerWeek: ae.eventsPerWeek,
           applicationEventSchedules: ae.applicationEventSchedules
-            .filter(
+            ?.filter(
               (
                 aes
               ): aes is Omit<typeof aes, "priority"> & {
@@ -214,24 +240,25 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
                 // priority: convertPriority(aes.priority),
               };
             }),
-          eventReservationUnits: ae.reservationUnits.map((eruPk, eruIndex) => ({
-            priority: eruIndex,
-            reservationUnit: eruPk,
-          })),
+          eventReservationUnits: ae.reservationUnits?.map(
+            (eruPk, eruIndex) => ({
+              priority: eruIndex,
+              reservationUnit: eruPk,
+            })
+          ),
         })
       ),
-      applicationRoundPk: appToSave.applicationRoundId,
+      applicationRound: appToSave.applicationRoundId,
       ...(appToSave.hasBillingAddress
         ? { billingAddress: appToSave.billingAddress }
         : {}),
       contactPerson: appToSave.contactPerson ?? { firstName: "", lastName: "" },
-      homeCityPk: appToSave.homeCityId,
+      homeCity: appToSave.homeCityId,
       organisation:
         appToSave.organisation != null
           ? transformOrganisation(appToSave.organisation)
           : undefined,
       ...(appToSave.pk != null ? { pk: appToSave.pk } : {}),
-      status: appToSave.status,
     };
 
     // TODO can this mutation ever be create?
@@ -266,7 +293,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         return 0;
       }
       // TODO do a refetch here instead of cache modification (after moving to fetch hook)
-      return appToSave.pk ?? data?.createApplication?.application?.pk ?? 0;
+      return appToSave.pk ?? data?.createApplication?.pk ?? 0;
     } catch (e) {
       console.error("Error thrown while saving application: ", e);
       setError("Error thrown while saving application");
@@ -298,13 +325,9 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     mode: "onChange",
     defaultValues: {
       pk: application?.pk ?? undefined,
-      status: application?.status ?? ApplicationStatus.Draft,
-      applicantType:
-        application?.applicantType ??
-        ApplicationsApplicationApplicantTypeChoices.Individual,
+      applicantType: convertApplicantType(application?.applicantType),
       // TODO do we need to get the applicationRoundId from somewhere else?
       applicationRoundId: application?.applicationRound?.pk ?? undefined,
-
       applicationEvents: filterNonNullable(application?.applicationEvents).map(
         (ae) => transformApplicationEventToForm(ae)
       ),
@@ -327,10 +350,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
     if (application) {
       reset({
         pk: application?.pk ?? undefined,
-        status: application?.status ?? ApplicationStatus.Draft,
-        applicantType:
-          application?.applicantType ??
-          ApplicationsApplicationApplicantTypeChoices.Individual,
+        applicantType: convertApplicantType(application?.applicantType),
         // TODO do we need to get the applicationRoundId from somewhere else?
         applicationRoundId: application?.applicationRound?.pk ?? undefined,
         applicationEvents: filterNonNullable(

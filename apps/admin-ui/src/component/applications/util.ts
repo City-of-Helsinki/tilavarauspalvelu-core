@@ -1,9 +1,6 @@
-import { differenceInWeeks } from "date-fns";
-import { sum } from "lodash";
 import {
-  ApplicationRoundStatus as ApplicationRoundStatusGql,
-  ApplicationStatus as ApplicationStatusGql,
-  ApplicationType,
+  ApplicationStatusChoice as ApplicationStatusGql,
+  type ApplicationNode,
 } from "common/types/gql-types";
 import {
   Application,
@@ -11,7 +8,7 @@ import {
   ApplicationStatus,
 } from "common/types/common";
 
-export const applicantName = (app: Application | ApplicationType): string => {
+export const applicantName = (app: Application | ApplicationNode): string => {
   return app.applicantType === "individual" ||
     app.applicantType === "INDIVIDUAL"
     ? `${app.contactPerson?.firstName || "-"} ${
@@ -54,60 +51,20 @@ export const getApplicationStatusColor = (
   return color;
 };
 
-export const applicationRoundStatusFromGqlToRest = (
-  t?: ApplicationRoundStatusGql
-): ApplicationRoundStatus => {
-  switch (t) {
-    case ApplicationRoundStatusGql.InReview:
-      return "in_review";
-    case ApplicationRoundStatusGql.Allocated:
-    case ApplicationRoundStatusGql.ReviewDone:
-      return "review_done";
-    case ApplicationRoundStatusGql.Handled:
-    case ApplicationRoundStatusGql.Reserving:
-    case ApplicationRoundStatusGql.Sent:
-    case ApplicationRoundStatusGql.Sending:
-    case ApplicationRoundStatusGql.Archived:
-      return "handled";
-    case ApplicationRoundStatusGql.Draft:
-    default:
-      return "draft";
-  }
-};
-
-export const applicationRoundStatusFromRestToGql = (
-  t?: ApplicationRoundStatus
-): ApplicationRoundStatusGql => {
-  switch (t) {
-    case "handled":
-      return ApplicationRoundStatusGql.Handled;
-    case "review_done":
-      return ApplicationRoundStatusGql.ReviewDone;
-    case "in_review":
-      return ApplicationRoundStatusGql.InReview;
-    case "draft":
-    default:
-      return ApplicationRoundStatusGql.Draft;
-  }
-};
-
+/// @deprecated
 export const applicationStatusFromGqlToRest = (
   t?: ApplicationStatusGql
 ): ApplicationStatus => {
   switch (t) {
     case ApplicationStatusGql.Handled:
       return "handled";
-    case ApplicationStatusGql.ReviewDone:
+    case ApplicationStatusGql.ResultsSent:
       return "review_done";
-    case ApplicationStatusGql.InReview:
+    case ApplicationStatusGql.InAllocation:
     case ApplicationStatusGql.Expired:
       return "in_review";
     case ApplicationStatusGql.Cancelled:
       return "cancelled";
-    case ApplicationStatusGql.Sent:
-      return "sent";
-    case ApplicationStatusGql.Allocated:
-      return "allocated";
     case ApplicationStatusGql.Received:
     case ApplicationStatusGql.Draft:
     default:
@@ -115,6 +72,7 @@ export const applicationStatusFromGqlToRest = (
   }
 };
 
+/// @deprecated
 export const getNormalizedApplicationStatus = (
   status: ApplicationStatus,
   view: ApplicationRoundStatus
@@ -132,59 +90,3 @@ export const getNormalizedApplicationStatus = (
 
   return normalizedStatus;
 };
-
-export const numTurns = (
-  startDate: string,
-  endDate: string,
-  biWeekly: boolean,
-  eventsPerWeek: number
-): number =>
-  (differenceInWeeks(new Date(endDate), new Date(startDate)) /
-    (biWeekly ? 2 : 1)) *
-  eventsPerWeek;
-
-export const apiDurationToMinutes = (duration: string): number => {
-  if (!duration) {
-    return 0;
-  }
-  const parts = duration.split(":");
-  return Number(parts[0]) * 60 + Number(parts[1]);
-};
-
-export const appEventHours = (
-  startDate: string,
-  endDate: string,
-  biWeekly: boolean,
-  eventsPerWeek: number,
-  minDuration: number
-): number => {
-  const turns = numTurns(startDate, endDate, biWeekly, eventsPerWeek);
-  return (turns * minDuration) / 3600;
-};
-
-export const applicationHours = (
-  application: Application | ApplicationType
-): number =>
-  sum(
-    (application.applicationEvents || []).map((ae) =>
-      appEventHours(
-        ae?.begin as string,
-        ae?.end as string,
-        ae?.biweekly as boolean,
-        ae?.eventsPerWeek as number,
-        ae?.minDuration as number
-      )
-    )
-  );
-
-export const applicationTurns = (application: Application): number =>
-  sum(
-    (application.applicationEvents || []).map((ae) =>
-      numTurns(
-        ae?.begin as string,
-        ae?.end as string,
-        ae?.biweekly as boolean,
-        ae?.eventsPerWeek as number
-      )
-    )
-  );

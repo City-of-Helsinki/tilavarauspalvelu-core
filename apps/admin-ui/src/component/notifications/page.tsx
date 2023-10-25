@@ -17,7 +17,7 @@ import {
 } from "hds-react";
 import {
   BannerNotificationState,
-  BannerNotificationType,
+  type BannerNotificationNode,
   Level,
   Target,
   type Mutation,
@@ -27,7 +27,7 @@ import {
   type MutationCreateBannerNotificationArgs,
   type MutationDeleteBannerNotificationArgs,
   type ErrorType,
-  type BannerNotificationTypeConnection,
+  type BannerNotificationNodeConnection,
 } from "common/types/gql-types";
 import { BANNER_NOTIFICATIONS_ADMIN } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
@@ -283,7 +283,7 @@ const deleteQueryFromCache = (cache: any, matcher: string | RegExp): void => {
 const NotificationForm = ({
   notification,
 }: {
-  notification?: BannerNotificationType;
+  notification?: BannerNotificationNode;
 }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
@@ -404,7 +404,9 @@ const NotificationForm = ({
       messageSv: data.messageSv,
       target: convertTarget(data.targetGroup),
       level: convertLevel(data.level),
-      ...(data.pk !== 0 && { pk: data.pk }),
+      // TODO check that this works both with create and update mutation (type wise it's ok)
+      pk: data.pk,
+      // ...(data.pk !== 0 && { pk: data.pk }),
     };
     const mutationFn = data.pk === 0 ? createMutation : updateMutation;
     try {
@@ -678,7 +680,7 @@ const getName = (
 const useRemoveNotification = ({
   notification,
 }: {
-  notification?: BannerNotificationType;
+  notification?: BannerNotificationNode;
 }) => {
   const { t } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
@@ -697,7 +699,7 @@ const useRemoveNotification = ({
       cache.modify({
         fields: {
           // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
-          bannerNotifications(existing: BannerNotificationTypeConnection) {
+          bannerNotifications(existing: BannerNotificationNodeConnection) {
             const res = newData?.deleteBannerNotification;
             if (res?.errors) {
               return existing;
@@ -750,7 +752,7 @@ function LoadedContent({
   children,
 }: {
   isNew: boolean;
-  notification?: BannerNotificationType;
+  notification?: BannerNotificationNode;
   children?: ReactNode;
 }) {
   const { t } = useTranslation();

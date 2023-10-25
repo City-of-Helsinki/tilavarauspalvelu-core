@@ -1,5 +1,5 @@
 import { addDays, addMinutes, endOfWeek, set } from "date-fns";
-import { graphql, rest } from "msw";
+import { graphql } from "msw";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import { Parameter } from "common/types/common";
 import {
@@ -451,12 +451,6 @@ const equipmentCategories: EquipmentCategoryType[] = [
     nameEn: "Muu En",
     nameSv: "Muu Sv",
   },
-];
-
-const reservationUnitREST = [
-  rest.get(`*/v1/reservation-unit/:id/*`, (_req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(getJSONResponse));
-  }),
 ];
 
 const selectedReservationUnitQuery = graphql.query<
@@ -1337,13 +1331,6 @@ const relatedReservationUnits = graphql.query<Query, QueryReservationUnitsArgs>(
   }
 );
 
-const reservationUnitTypesRest = rest.get<Parameter[]>(
-  "http://localhost:8000/v1/parameters/reservation_unit_type/",
-  (_req, res, ctx) => {
-    return res(ctx.json(reservationUnitTypeData));
-  }
-);
-
 const reservationUnitTypes = graphql.query<
   Query,
   QueryReservationUnitTypesArgs
@@ -1575,11 +1562,9 @@ export const reservationUnitPurposes = graphql.query<Query, QueryPurposesArgs>(
 );
 
 export const reservationUnitHandlers = [
-  ...reservationUnitREST,
   selectedReservationUnitQuery,
   openingHoursQuery,
   relatedReservationUnits,
-  reservationUnitTypesRest,
   reservationUnitTypes,
   termsOfUse,
   reservationUnitPurposes,

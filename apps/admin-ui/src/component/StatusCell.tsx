@@ -3,7 +3,31 @@ import styled from "styled-components";
 import { IconArrowRight, IconCheck, IconEnvelope } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { ApplicationEventStatus, ApplicationStatus } from "common/types/common";
-import { ApplicationEventStatusDot, StatusDot } from "../styles/util";
+import { getApplicationEventStatusColor } from "app/styles/util";
+import { getApplicationStatusColor } from "./applications/util";
+
+const StatusDot = styled.div<{
+  status: ApplicationStatus;
+  size: number;
+}>`
+  display: inline-block;
+  width: ${({ size }) => size && `${size}px`};
+  height: ${({ size }) => size && `${size}px`};
+  border-radius: 50%;
+  background-color: ${({ status }) => getApplicationStatusColor(status, "s")};
+`;
+
+const ApplicationEventStatusDot = styled.div<{
+  status: ApplicationEventStatus;
+  size: number;
+}>`
+  display: inline-block;
+  width: ${({ size }) => size && `${size}px`};
+  height: ${({ size }) => size && `${size}px`};
+  border-radius: 50%;
+  background-color: ${({ status }) =>
+    getApplicationEventStatusColor(status, "s")};
+`;
 
 interface IStatusCellProps {
   text: string;
