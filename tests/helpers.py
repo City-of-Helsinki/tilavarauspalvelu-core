@@ -8,7 +8,6 @@ from typing import Any, NamedTuple, Self, TypedDict, TypeVar
 import pytest
 import sqlparse
 from django import db
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.test import Client
@@ -340,11 +339,7 @@ def build_mutation(name: str, input_name: str, selections: str = "pk errors { me
 @contextmanager
 def capture_database_queries() -> Generator[QueryData, None, None]:
     """Capture results of what database queries were executed."""
-    orig_debug = settings.DEBUG
-    settings.DEBUG = True
-
     results = QueryData(queries=[])
-    old_queries = db.connection.queries_log.copy()
     db.connection.queries_log.clear()
 
     try:
@@ -357,6 +352,3 @@ def capture_database_queries() -> Generator[QueryData, None, None]:
             and not query["sql"].startswith("SAVEPOINT")
             and not query["sql"].startswith("RELEASE SAVEPOINT")
         ]
-
-        db.connection.queries_log.extendleft(reversed(old_queries))
-        settings.DEBUG = orig_debug
