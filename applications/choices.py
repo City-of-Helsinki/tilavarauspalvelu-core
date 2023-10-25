@@ -62,7 +62,7 @@ class ApplicationRoundStatusChoice(models.TextChoices):
     """All application results have been sent to users"""
 
     @DynamicClassAttribute
-    def is_draft(self) -> bool:
+    def is_allocation_upcoming(self) -> bool:
         return self in [
             ApplicationRoundStatusChoice.UPCOMING,
             ApplicationRoundStatusChoice.OPEN,

@@ -80,7 +80,7 @@ class Application(models.Model):
             return ApplicationStatusChoice.CANCELLED
 
         if self.sent_date is None:
-            if self.application_round.status.is_draft:
+            if self.application_round.status.is_allocation_upcoming:
                 return ApplicationStatusChoice.DRAFT
             else:
                 return ApplicationStatusChoice.EXPIRED
