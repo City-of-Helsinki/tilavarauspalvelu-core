@@ -110,7 +110,10 @@ class ApplicationSendSerializer(TranslatedModelSerializer):
             msg = "Contact person is required for application before the it can be sent."
             errors["contact_person"].append(msg)
 
-        # TODO: status is correct
+        status = self.instance.status
+        if not status.can_send:
+            msg = f"Application in status '{status.value}' cannot be sent."
+            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -135,7 +138,10 @@ class ApplicationCancelSerializer(TranslatedModelSerializer):
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         errors: dict[str, list[str]] = defaultdict(list)
 
-        # TODO: status is correct
+        status = self.instance.status
+        if not status.can_cancel:
+            msg = f"Application in status '{status.value}' cannot be cancelled."
+            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
 
         if errors:
             raise serializers.ValidationError(errors)

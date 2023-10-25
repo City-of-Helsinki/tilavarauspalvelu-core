@@ -98,6 +98,5 @@ class ApplicationEvent(models.Model):
             "end",
             "min_duration",
             "events_per_week",
-            "biweekly",
             "age_group",
         ]
