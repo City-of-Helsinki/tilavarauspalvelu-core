@@ -94,13 +94,26 @@ class ApplicationStatusChoice(models.TextChoices):
     @DynamicClassAttribute
     def can_decline(self) -> bool:
         return self in [
-            ApplicationStatusChoice.RECEIVED,
             ApplicationStatusChoice.IN_ALLOCATION,
         ]
 
     @DynamicClassAttribute
     def can_approve(self) -> bool:
         return self == ApplicationStatusChoice.IN_ALLOCATION
+
+    @DynamicClassAttribute
+    def can_send(self):
+        return self in [
+            ApplicationStatusChoice.DRAFT,
+            ApplicationStatusChoice.RECEIVED,
+        ]
+
+    @DynamicClassAttribute
+    def can_cancel(self):
+        return self in [
+            ApplicationStatusChoice.DRAFT,
+            ApplicationStatusChoice.RECEIVED,
+        ]
 
     @DynamicClassAttribute
     def can_flag(self) -> bool:

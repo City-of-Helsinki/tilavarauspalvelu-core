@@ -32,6 +32,16 @@ DECLINE_MUTATION = build_mutation(
     "ApplicationDeclineMutationInput",
 )
 
+SEND_MUTATION = build_mutation(
+    "sendApplication",
+    "ApplicationSendMutationInput",
+)
+
+CANCEL_MUTATION = build_mutation(
+    "cancelApplication",
+    "ApplicationCancelMutationInput",
+)
+
 
 def get_application_create_data(application_round: ApplicationRound, create_events: bool = False) -> dict[str, Any]:
     events: list[dict[str, Any]] = []
