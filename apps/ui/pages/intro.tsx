@@ -3,22 +3,22 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { type GetServerSideProps } from "next";
 import styled from "styled-components";
-import { Application, OptionType } from "common/types/common";
+import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
-import { Query, QueryApplicationRoundsArgs } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
+import { ApplicationsApplicationApplicantTypeChoices, type ApplicationCreateMutationInput, type Mutation, type MutationCreateApplicationArgs, type Query, type QueryApplicationRoundsArgs, ApplicationStatus } from "common/types/gql-types";
 import { useSession } from "@/hooks/auth";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
-import { saveApplication } from "@/modules/api";
-import { applicationRoundState, deepCopy } from "../modules/util";
-import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
-import { MediumButton } from "../styles/util";
-import Head from "../components/application/Head";
-import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
-import { CenterSpinner } from "../components/common/common";
-import { getApplicationRoundName } from "../modules/applicationRound";
+import { applicationRoundState } from "@/modules/util";
+import { MediumButton } from "@/styles/util";
+import Head from "@/components/application/Head";
+import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
+import { CenterSpinner } from "@/components/common/common";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { CREATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -57,8 +57,7 @@ const Container = styled.div`
 const IntroPage = (): JSX.Element => {
   const { isAuthenticated } = useSession();
 
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
   const [applicationRound, setApplicationRound] = useState(0);
 
   const history = useRouter();
@@ -72,10 +71,7 @@ const IntroPage = (): JSX.Element => {
   );
 
   const now = new Date();
-  const applicationRounds =
-    data?.applicationRounds?.edges
-      ?.map((n) => n?.node)
-      .filter((n): n is NonNullable<typeof n> => !!n)
+  const applicationRounds = filterNonNullable(data?.applicationRounds?.edges?.map((n) => n?.node))
       .filter(
         (ar) =>
           new Date(ar.publicDisplayBegin) <= now &&
@@ -90,23 +86,43 @@ const IntroPage = (): JSX.Element => {
         label: getApplicationRoundName(ar),
       })) ?? [];
 
+  const [create, { loading: isSaving }] = useMutation<Mutation, MutationCreateApplicationArgs>(
+    CREATE_APPLICATION_MUTATION,
+    {
+      onError: (e) => {
+        console.warn("create application mutation failed: ", e);
+        setError(t("application:Intro.createFailedContent"))
+      },
+    }
+  );
+
   const createNewApplication = async (applicationRoundId: number) => {
-    setSaving(true);
+    const input: ApplicationCreateMutationInput = {
+      applicationRoundPk: applicationRoundId,
+      applicantType: ApplicationsApplicationApplicantTypeChoices.Individual,
+      applicationEvents: [],
+      status: ApplicationStatus.Draft,
+      billingAddress: {
+        streetAddress: "",
+        postCode: "",
+        city: "",
+      },
+      contactPerson: {
+        firstName: "",
+        lastName: "",
+      },
+    };
+    const { data, errors } = await create({
+      variables: { input }
+    });
 
-    try {
-      // FIXME replace with GQL (createApplication)
-      const templateApplication = {
-        ...deepCopy(minimalApplicationForInitialSave(applicationRoundId)),
-      } as Application;
-
-      const savedApplication = await saveApplication(templateApplication);
-      if (savedApplication.id) {
-        history.replace(`/application/${savedApplication.id}/page1`);
-      }
-    } catch (e) {
-      setError(true);
-    } finally {
-      setSaving(false);
+    if (errors) {
+      console.error("create application mutation failed: ", errors);
+    } else if (data?.createApplication?.application?.pk) {
+      const { pk } = data.createApplication.application;
+      history.replace(`/application/${pk}/page1`);
+    } else {
+      console.error("create application mutation failed: ", data);
     }
   };
 
@@ -135,7 +151,7 @@ const IntroPage = (): JSX.Element => {
               />
               <MediumButton
                 id="start-application"
-                disabled={!applicationRound || saving}
+                disabled={!applicationRound || isSaving}
                 onClick={() => {
                   createNewApplication(applicationRound);
                 }}
@@ -148,16 +164,15 @@ const IntroPage = (): JSX.Element => {
           )}
         </Container>
       </Head>
-      {error ? (
+      {error != null ? (
         <Notification
           type="error"
           label={t("application:Intro.createFailedHeading")}
           position="top-center"
           autoClose
           displayAutoCloseProgress={false}
-          onClose={() => setError(false)}
+          onClose={() => setError(undefined)}
         >
-          {t("application:Intro.createFailedContent")}
           {error}
         </Notification>
       ) : null}

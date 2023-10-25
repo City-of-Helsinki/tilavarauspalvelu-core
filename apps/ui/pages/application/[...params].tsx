@@ -45,6 +45,7 @@ import {
   convertPerson,
   transformApplicationEventToForm,
 } from "@/components/application/Form";
+import { CREATE_APPLICATION_MUTATION, UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -80,27 +81,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 type Props = {
   tos: TermsOfUseType[];
 };
-
-const CREATE_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationCreateMutationInput!) {
-    createApplication(input: $input) {
-      errors {
-        messages
-      }
-    }
-  }
-`;
-// TODO do we need createApplicationEventMutation also?
-
-const UPDATE_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationUpdateMutationInput!) {
-    updateApplication(input: $input) {
-      errors {
-        messages
-      }
-    }
-  }
-`;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const convertPriority = (prio: ApplicationEventSchedulePriority): Priority => {

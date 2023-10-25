@@ -29,3 +29,23 @@ export const APPLICATIONS = gql`
     }
   }
 `;
+
+export const CREATE_APPLICATION_MUTATION = gql`
+  mutation ($input: ApplicationCreateMutationInput!) {
+    createApplication(input: $input) {
+      errors {
+        messages
+      }
+    }
+  }
+`;
+
+export const UPDATE_APPLICATION_MUTATION = gql`
+  mutation ($input: ApplicationUpdateMutationInput!) {
+    updateApplication(input: $input) {
+      errors {
+        messages
+      }
+    }
+  }
+`;
