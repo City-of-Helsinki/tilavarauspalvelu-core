@@ -51,6 +51,86 @@ class BaseModelSerializer(serializers.ModelSerializer):
     """
     Base serializer for all models.
     Expects that models primary keys are integers.
+    Automatically converts IntChoiceField to the appropriate serializer field.
+
+    Contains logic for updating and creating related models when they are included as nested serializer fields:
+
+    ```
+    class SubSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Sub
+            fields = ["pk", "field"]
+
+    class MainSerializer(serializers.ModelSerializer):
+        sub_entry = SubSerializer()
+
+        class Meta:
+            model = Main
+            fields = ["pk", "sub_entry"]
+    ```
+
+    When using the above serializers with the following data:
+
+    ```
+    {
+        "pk": 1,
+        "sub_entities": {
+            "field": "value",
+        },
+    }
+    ```
+
+    This will create the Main entity and the Sub entity,
+    and set the Sub entity's 'main' field to the Main entity.
+
+    If instead this is used:
+
+    ```
+    {
+        "pk": 1,
+        "sub_entities": {
+            "pk": 2,
+        },
+    }
+    ```
+
+    This will create the Main entity and link an existing Sub entity with pk=2 to it.
+    If the Sub entity does not exist, a 404 error will be raised.
+
+    If the 'pk' field is included with some other fields, the Sub entity will also be updated:
+
+    ```
+    {
+        "pk": 1,
+        "sub_entities": {
+            "pk": 2,
+            "field": "value",
+        },
+    }
+    ```
+
+    For "to_many" relations, the serializer field must be a ListSerializer:
+
+    ```
+    class MainSerializer(serializers.ModelSerializer):
+        sub_entry = SubSerializer(many=True)
+    ```
+
+    Same logic applies for "to_many" relations, but if the relation is a 'one_to_many' relation,
+    and the relation is updated, any existing related entities that were not included in the request
+    will be deleted.
+
+    ```
+    {
+        "pk": 1,
+        "sub_entities": [
+            # If pk=1 was previously linked to the main entity, it will be deleted if not included
+            # {"pk": 1},
+            {"pk": 2},
+            {"field": "value"},  # can also add new entities in the same request
+        ],
+    }
+    ```
     """
 
     instance: TModel  # use this to hint the instance model type in subclasses

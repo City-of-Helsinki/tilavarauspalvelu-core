@@ -16,14 +16,26 @@ __all__ = [
 
 
 class IntChoiceFilter(django_filters.TypedChoiceFilter):
+    """
+    Allow plain integers as choices in GraphQL filters.
+    See `common.fields.forms.IntChoiceField` for motivation.
+    """
+
     field_class = IntChoiceField
 
 
 class IntMultipleChoiceFilter(django_filters.TypedMultipleChoiceFilter):
+    """Same as `common.filtersets.IntChoiceFilter` above but supports multiple choices."""
+
     field_class = IntMultipleChoiceField
 
 
 class EnumChoiceFilter(django_filters.TypedChoiceFilter):
+    """
+    Custom field for handling enums better in GraphQL filters.
+    See `common.fields.forms.EnumChoiceField` for motivation.
+    """
+
     field_class = EnumChoiceField
 
     def __init__(self, enum: type[models.Choices], *args: Any, **kwargs: Any) -> None:
@@ -33,6 +45,8 @@ class EnumChoiceFilter(django_filters.TypedChoiceFilter):
 
 
 class EnumMultipleChoiceFilter(django_filters.TypedMultipleChoiceFilter):
+    """Same as `common.filtersets.EnumChoiceFilter` above but supports multiple choices."""
+
     field_class = EnumMultipleChoiceField
 
     def __init__(self, enum: type[models.Choices], *args: Any, **kwargs: Any) -> None:

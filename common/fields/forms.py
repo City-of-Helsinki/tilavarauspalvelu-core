@@ -29,14 +29,32 @@ class IntChoiceMixin:
 
 
 class IntChoiceField(IntChoiceMixin, forms.TypedChoiceField):
-    """Allow plain integers as choices."""
+    """
+    Allow plain integers as choices in GraphQL filters
+    (see `common.fields.model.IntChoiceField` for motivation).
+    Supports a single choice.
+
+    This needs to be registered to graphene form field converters
+    so that when `common.filtersets.IntChoiceFilter` is used,
+    graphene-django knows how to convert the filter to a graphene field.
+    """
 
 
 class IntMultipleChoiceField(IntChoiceMixin, forms.TypedMultipleChoiceField):
-    pass
+    """Same as `common.fields.forms.IntChoiceField` above but supports multiple choices."""
 
 
 class EnumChoiceField(forms.ChoiceField):
+    """
+    Custom field for handling enums better in GraphQL filters.
+    Supports a single choice.
+
+    Using the regular `django_filters.ChoiceFilter` (which uses `forms.ChoiceField` under the hood)
+    causes the enum choices to be converted to strings in GraphQL filters.
+    Using `common.filtersets.EnumChoiceFilter` (which uses this field under the hood)
+    uses GraphQL enums instead, which gives better autocomplete results.
+    """
+
     def __init__(self, enum: type[models.Choices], **kwargs: Any) -> None:
         self.enum = enum
         kwargs["choices"] = enum.choices
@@ -44,10 +62,16 @@ class EnumChoiceField(forms.ChoiceField):
 
 
 class EnumMultipleChoiceField(forms.MultipleChoiceField):
+    """Same as `common.fields.forms.EnumChoiceField` above but supports multiple choices."""
+
     def __init__(self, enum: type[models.Choices], **kwargs: Any) -> None:
         self.enum = enum
         kwargs["choices"] = enum.choices
         super().__init__(**kwargs)
+
+
+# Register the custom form fields to graphene form field converters.
+# This way we get the appropriate schema types when these fields are used in filters.
 
 
 @convert_form_field.register(IntChoiceField)

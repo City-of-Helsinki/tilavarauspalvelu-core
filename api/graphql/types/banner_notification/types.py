@@ -28,7 +28,7 @@ class BannerNotificationNode(DjangoAuthNode):
             "active_from",
             "active_until",
         ]
-        private_fields = {
+        restricted_fields = {
             "name": can_manage_banner_notifications,
             "draft": can_manage_banner_notifications,
             "target": can_manage_banner_notifications,
