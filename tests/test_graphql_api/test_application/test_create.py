@@ -82,3 +82,39 @@ def test_create_application_with_application_events(graphql):
     assert ApplicationEvent.objects.count() == 1
     assert ApplicationEventSchedule.objects.count() == 1
     assert EventReservationUnit.objects.count() == 1
+
+
+def test_create_application__sub_serializer_error(graphql):
+    # given:
+    # - There is an open application round
+    # - A superuser is using the system
+    application_round = ApplicationRoundFactory.create_in_status_open()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    input_data = {
+        "applicationRound": application_round.pk,
+        "billingAddress": {"city": "", "postCode": "", "streetAddress": ""},
+    }
+
+    # when:
+    # - User tries to create a new application with improper address data
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    field_empty = "Tämä kenttä ei voi olla tyhjä."
+
+    # then:
+    # - The response contains errors from sub serializers
+    assert response.field_errors == [
+        {
+            "field": "billingAddress.city",
+            "messages": [field_empty],
+        },
+        {
+            "field": "billingAddress.postCode",
+            "messages": [field_empty],
+        },
+        {
+            "field": "billingAddress.streetAddress",
+            "messages": [field_empty],
+        },
+    ]
