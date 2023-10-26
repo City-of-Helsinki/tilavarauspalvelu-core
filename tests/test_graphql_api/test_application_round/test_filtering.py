@@ -2,7 +2,7 @@ import pytest
 
 from tests.factories import ApplicationRoundFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_rounds.helpers import rounds_query
+from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
 # Applied to all tests
 pytestmark = [

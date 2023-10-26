@@ -2,7 +2,7 @@ import pytest
 
 from applications.models import ApplicationEventSchedule
 from tests.factories import ApplicationEventFactory, ApplicationFactory
-from tests.test_graphql_api.test_application_events.helpers import events_query
+from tests.test_graphql_api.test_application_event.helpers import events_query
 
 # Applied to all tests
 pytestmark = [

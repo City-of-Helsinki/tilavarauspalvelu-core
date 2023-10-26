@@ -3,7 +3,7 @@ import pytest
 from applications.choices import ApplicationEventStatusChoice, ApplicationStatusChoice
 from tests.factories import ApplicationEventFactory, ApplicationFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_events.helpers import DECLINE_MUTATION, get_application_event_decline_data
+from tests.test_graphql_api.test_application_event.helpers import DECLINE_MUTATION, get_application_event_decline_data
 
 # Applied to all tests
 pytestmark = [

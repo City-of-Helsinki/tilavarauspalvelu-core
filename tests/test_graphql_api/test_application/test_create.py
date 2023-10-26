@@ -11,7 +11,7 @@ from applications.models import (
 )
 from tests.factories import ApplicationRoundFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_applications.helpers import get_application_create_data
+from tests.test_graphql_api.test_application.helpers import get_application_create_data
 
 from .helpers import CREATE_MUTATION
 
